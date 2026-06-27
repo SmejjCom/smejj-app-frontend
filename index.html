@@ -2882,7 +2882,7 @@ async function initPush(onToken) {
 
 // public/assets/app.js
 var $ = (selector) => document.querySelector(selector);
-var $ = (selector) => Array.from(document.querySelectorAll(selector));
+var qsa = (selector) => Array.from(document.querySelectorAll(selector));
 var state = {
   uploads: [],
   profile: loadJson(STORAGE_KEYS.profile, { name: "", email: "" }),
@@ -3038,14 +3038,14 @@ function bindNavigation() {
     setMenuOpen(false);
     setBrowserPanelOpen(false);
   });
-  for (const button of $(".nav-button")) {
+  for (const button of qsa(".nav-button")) {
     button.addEventListener("click", () => {
       goToView(button.dataset.view);
       setMenuOpen(false);
       setBrowserPanelOpen(false);
     });
   }
-  for (const button of $("[data-jump]")) {
+  for (const button of qsa("[data-jump]")) {
     button.addEventListener("click", () => {
       showTaskIndicator("done");
       goToView(button.dataset.jump);
@@ -3151,7 +3151,7 @@ function applyPanelCompact(side, width) {
   panel?.classList.toggle("is-compact", width <= PANEL_WIDTHS.compact);
 }
 function hydrateComponents() {
-  for (const button of $(".nav-button")) {
+  for (const button of qsa(".nav-button")) {
     if (!button.dataset.icon) continue;
     setButtonIcon(button, Icons[button.dataset.icon] || "\u2022");
   }
@@ -3163,8 +3163,8 @@ function goToView(viewId, { replace = false } = {}) {
     goToView("error", { replace: true });
     return;
   }
-  $(".nav-button").forEach((item) => item.classList.toggle("is-active", item.dataset.view === resolvedViewId));
-  $(".view").forEach((view) => view.classList.toggle("is-active", view.id === resolvedViewId));
+  qsa(".nav-button").forEach((item) => item.classList.toggle("is-active", item.dataset.view === resolvedViewId));
+  qsa(".view").forEach((view) => view.classList.toggle("is-active", view.id === resolvedViewId));
   const nextPath = ALIAS_PATHS[viewId] || VIEW_PATHS[resolvedViewId] || "/error";
   const nextUrl = `${nextPath}${location.search}`;
   if (location.pathname !== nextPath || location.hash) {
@@ -3204,7 +3204,7 @@ function bindStartComposer() {
     await submitTask(task, { target: "#startLog" });
   };
   send.addEventListener("click", submit);
-  for (const button of $("[data-start-tool]")) {
+  for (const button of qsa("[data-start-tool]")) {
     button.addEventListener("click", () => {
       showTaskIndicator("done");
       showToast("Kommt als naechstes.");
