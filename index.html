@@ -1866,20 +1866,36 @@ button:hover {
               </select>
             </label>
             <label>
+              BYOK Provider
+              <select id="byokProvider">
+                <option value="custom">Custom (frei eingeben)</option>
+                <option value="openrouter">OpenRouter</option>
+                <option value="gemini">Google Gemini</option>
+                <option value="groq">Groq</option>
+                <option value="together">Together</option>
+                <option value="mistral">Mistral</option>
+                <option value="deepinfra">DeepInfra</option>
+              </select>
+            </label>
+            <label>
               BYOK Endpoint
-              <input id="byokBaseUrl" placeholder="https://api.example.com/v1" autocomplete="off">
+              <input id="byokBaseUrl" placeholder="https://api.example.com/v1" autocomplete="off" spellcheck="false">
             </label>
             <label>
               BYOK Modell
-              <input id="byokModel" placeholder="provider/model" autocomplete="off">
+              <input id="byokModel" placeholder="provider/model" autocomplete="off" spellcheck="false">
             </label>
             <label>
               BYOK API-Key
-              <input id="byokKey" type="password" placeholder="Nur Session, nicht dauerhaft speichern" autocomplete="off">
+              <span class="byok-key-field" style="display:flex;gap:.5rem;align-items:center;">
+                <input id="byokKey" type="password" placeholder="Nur Session, nicht dauerhaft speichern" autocomplete="off" spellcheck="false" style="flex:1;min-width:0;">
+                <button id="byokKeyToggle" type="button" class="ghost-button" aria-pressed="false" title="Key anzeigen/verbergen" style="white-space:nowrap;">Anzeigen</button>
+              </span>
             </label>
           </div>
           <div class="toolbar">
             <button id="evaluateAiMode" type="button">KI-Modus pruefen</button>
+            <button id="byokTest" type="button">Verbindung testen</button>
             <button id="clearByok" type="button">BYOK-Felder leeren</button>
           </div>
           <div class="output" id="aiOutput">KI ist deaktiviert. Kimi K2.7 ist Vault/BYOK/Partner/Self-host spaeter, nicht kostenloser Standardmotor.</div>
@@ -2088,6 +2104,30 @@ var STORAGE_KEYS = {
   lastExport: "smejj.project.lastExport.v1",
   currentProject: "smejj.workspace.currentProject.v1"
 };
+// BYOK: nur der Key bleibt fluechtig (sessionStorage). Provider/Endpoint/Modell
+// sind keine Geheimnisse und duerfen lokal gemerkt werden.
+var BYOK_KEY_SESSION = "smejj.byok.key.session";
+var BYOK_PREFS_KEY = "smejj.byok.prefs.v1";
+// OpenAI-kompatible Anbieter: Endpoint-Voreinstellung + Modell-Placeholder.
+var BYOK_PROVIDERS = Object.freeze({
+  custom: { label: "Custom", endpoint: "", model: "provider/model" },
+  openrouter: { label: "OpenRouter", endpoint: "https://openrouter.ai/api/v1", model: "z. B. openai/gpt-4o-mini oder meta-llama/llama-3.3-70b-instruct:free" },
+  gemini: { label: "Google Gemini", endpoint: "https://generativelanguage.googleapis.com/v1beta/openai/", model: "z. B. gemini-2.5-flash oder gemini-2.5-pro" },
+  groq: { label: "Groq", endpoint: "https://api.groq.com/openai/v1", model: "z. B. llama-3.3-70b-versatile oder qwen-2.5-coder-32b" },
+  together: { label: "Together", endpoint: "https://api.together.xyz/v1", model: "z. B. meta-llama/Llama-3.3-70B-Instruct-Turbo" },
+  mistral: { label: "Mistral", endpoint: "https://api.mistral.ai/v1", model: "z. B. mistral-large-latest oder codestral-latest" },
+  deepinfra: { label: "DeepInfra", endpoint: "https://api.deepinfra.com/v1/openai", model: "z. B. meta-llama/Meta-Llama-3.1-70B-Instruct" }
+});
+function byokErrorMessage(status, statusText, body) {
+  var detail = (body || "").toString().slice(0, 300).trim();
+  var base;
+  if (status === 401 || status === 403) base = "Ungueltiger oder abgelehnter API-Key (" + status + "). Bitte Key und Anbieter pruefen.";
+  else if (status === 404) base = "Endpoint/Modell nicht gefunden (404). Endpoint-URL und Modellnamen pruefen.";
+  else if (status === 429) base = "Rate-Limit erreicht (429). Bitte kurz warten und erneut versuchen.";
+  else if (status >= 500) base = "Anbieter-Serverfehler (" + status + "). Spaeter erneut versuchen.";
+  else base = "Fehler vom Anbieter (" + (status || statusText || "unbekannt") + ").";
+  return detail ? base + " Details: " + detail : base;
+}
 
 // public/assets/storage/indexedDbStore.js
 function createMemoryStore() {
@@ -3255,12 +3295,12 @@ ${ctx}` });
       body: JSON.stringify({ model: cfg.model, messages, stream: true })
     });
   } catch (error) {
-    output.textContent = `BYOK-Netzwerkfehler: ${error.message}`;
+    output.textContent = `BYOK-Netzwerkfehler: ${error.message || error}. Pruefe Internetverbindung, Endpoint-URL und ob der Anbieter Browser-Aufrufe (CORS) erlaubt.`;
     return;
   }
   if (!response.ok || !response.body) {
     const errText = await response.text().catch(() => "");
-    output.textContent = `BYOK-Fehler ${response.status}: ${errText.slice(0, 400) || response.statusText}`;
+    output.textContent = byokErrorMessage(response.status, response.statusText, errText);
     return;
   }
   const reader = response.body.getReader();
@@ -3300,7 +3340,8 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   try {
     const model = state.settings.model || "smejj 1.0";
     const byokCfg = readByokConfig();
-    if (model === "BYOK" || $("#aiModeSelect")?.value === AI_MODES.byok && byokCfg) {
+    const wantsByok = model === "BYOK" || $("#aiModeSelect")?.value === AI_MODES.byok;
+    if (wantsByok) {
       if (!byokCfg) {
         output.textContent = "BYOK ist nicht vollstaendig konfiguriert. Oeffne links 'KI / BYOK' und trage Endpoint, Modell und API-Key ein.";
         showTaskIndicator("done");
@@ -3629,7 +3670,120 @@ ${snippet(text, query)}`);
     }, null, 2));
   });
 }
+function saveByokPrefs() {
+  try {
+    const prefs = {
+      provider: $("#byokProvider")?.value || "custom",
+      baseUrl: $("#byokBaseUrl")?.value || "",
+      model: $("#byokModel")?.value || ""
+    };
+    localStorage.setItem(BYOK_PREFS_KEY, JSON.stringify(prefs));
+  } catch {
+  }
+}
+function applyByokProvider(providerId, { overwriteEndpoint = true } = {}) {
+  const preset = BYOK_PROVIDERS[providerId] || BYOK_PROVIDERS.custom;
+  const baseInput = $("#byokBaseUrl");
+  const modelInput = $("#byokModel");
+  if (modelInput) modelInput.placeholder = preset.model || "provider/model";
+  if (baseInput && preset.endpoint && (overwriteEndpoint || !baseInput.value.trim())) {
+    baseInput.value = preset.endpoint;
+  }
+  if (baseInput && providerId === "custom" && overwriteEndpoint) {
+    baseInput.placeholder = "https://api.example.com/v1";
+  }
+}
+function restoreByokState() {
+  let prefs = {};
+  try {
+    prefs = JSON.parse(localStorage.getItem(BYOK_PREFS_KEY) || "{}") || {};
+  } catch {
+    prefs = {};
+  }
+  const providerSelect = $("#byokProvider");
+  if (providerSelect && prefs.provider && BYOK_PROVIDERS[prefs.provider]) {
+    providerSelect.value = prefs.provider;
+  }
+  const baseInput = $("#byokBaseUrl");
+  const modelInput = $("#byokModel");
+  if (baseInput && prefs.baseUrl) baseInput.value = prefs.baseUrl;
+  if (modelInput && prefs.model) modelInput.value = prefs.model;
+  applyByokProvider(providerSelect?.value || "custom", { overwriteEndpoint: false });
+  // Key NUR aus sessionStorage (nie localStorage, nie im Code).
+  try {
+    const sessionKey = sessionStorage.getItem(BYOK_KEY_SESSION);
+    const keyInput = $("#byokKey");
+    if (keyInput && sessionKey) keyInput.value = sessionKey;
+  } catch {
+  }
+}
+async function byokTestConnection() {
+  const out = $("#aiOutput");
+  const cfg = readByokConfig();
+  if (!cfg) {
+    writeOutput("#aiOutput", "Bitte Endpoint (https://...), Modell und API-Key ausfuellen, dann erneut testen.");
+    return;
+  }
+  if (out) out.textContent = "Teste Verbindung ...";
+  const base = cfg.baseUrl.replace(/\/+$/, "");
+  const url = `${base}/chat/completions`;
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${cfg.apiKey}` },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages: [{ role: "user", content: "ping" }],
+        max_tokens: 8,
+        stream: false
+      })
+    });
+  } catch (error) {
+    writeOutput("#aiOutput", `Netzwerkfehler: ${error.message || error}. Pruefe Internetverbindung, Endpoint-URL und ob der Anbieter Browser-Aufrufe (CORS) erlaubt.`);
+    return;
+  }
+  if (!response.ok) {
+    const errText = await response.text().catch(() => "");
+    writeOutput("#aiOutput", byokErrorMessage(response.status, response.statusText, errText));
+    return;
+  }
+  let modelName = cfg.model;
+  try {
+    const data = await response.json();
+    if (data && data.model) modelName = data.model;
+  } catch {
+  }
+  writeOutput("#aiOutput", `Verbindung OK (Status ${response.status}). Modell: ${modelName}. Chat und Coding nutzen jetzt diesen Endpoint.`);
+}
 function bindAi() {
+  restoreByokState();
+  $("#byokProvider")?.addEventListener("change", (event) => {
+    applyByokProvider(event.target.value, { overwriteEndpoint: true });
+    saveByokPrefs();
+  });
+  $("#byokBaseUrl")?.addEventListener("input", saveByokPrefs);
+  $("#byokModel")?.addEventListener("input", saveByokPrefs);
+  $("#byokKey")?.addEventListener("input", (event) => {
+    try {
+      const value = event.target.value;
+      if (value) sessionStorage.setItem(BYOK_KEY_SESSION, value);
+      else sessionStorage.removeItem(BYOK_KEY_SESSION);
+    } catch {
+    }
+  });
+  $("#byokKeyToggle")?.addEventListener("click", () => {
+    const keyInput = $("#byokKey");
+    const toggle = $("#byokKeyToggle");
+    if (!keyInput) return;
+    const show = keyInput.type === "password";
+    keyInput.type = show ? "text" : "password";
+    toggle.textContent = show ? "Verbergen" : "Anzeigen";
+    toggle.setAttribute("aria-pressed", String(show));
+  });
+  $("#byokTest")?.addEventListener("click", () => {
+    byokTestConnection().catch((error) => writeOutput("#aiOutput", `Test fehlgeschlagen: ${error.message || error}`));
+  });
   $("#evaluateAiMode").addEventListener("click", () => {
     const mode = $("#aiModeSelect").value;
     const result = aiRouter.prepareRequest({
@@ -3660,8 +3814,23 @@ function bindAi() {
     $("#byokKey").value = "";
     $("#byokBaseUrl").value = "";
     $("#byokModel").value = "";
+    const providerSelect = $("#byokProvider");
+    if (providerSelect) providerSelect.value = "custom";
+    applyByokProvider("custom", { overwriteEndpoint: true });
+    const toggle = $("#byokKeyToggle");
+    const keyInput = $("#byokKey");
+    if (keyInput) keyInput.type = "password";
+    if (toggle) {
+      toggle.textContent = "Anzeigen";
+      toggle.setAttribute("aria-pressed", "false");
+    }
+    try {
+      sessionStorage.removeItem(BYOK_KEY_SESSION);
+      localStorage.removeItem(BYOK_PREFS_KEY);
+    } catch {
+    }
     updateAiStatus({ ok: false, mode: AI_MODES.disabled, costStatus: "0 EUR Risiko / blockiert", reason: "byok_cleared" });
-    writeOutput("#aiOutput", "BYOK-Felder geleert. Es wurde nichts dauerhaft gespeichert.");
+    writeOutput("#aiOutput", "BYOK-Felder geleert. Key aus dem Session-Speicher entfernt, nichts dauerhaft gespeichert.");
   });
 }
 function updateAiStatus(result) {
