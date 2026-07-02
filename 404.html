@@ -4,6 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
+  <script>
+    // SPA-Fallback fuer GitHub Pages: App-Routen (ohne Dateiendung) zur Shell umleiten.
+    (function () {
+      var path = location.pathname;
+      if (/^\/[a-z0-9-]+(\/[a-z0-9-]+)*\/?$/i.test(path) && path.indexOf(".") === -1) {
+        sessionStorage.setItem("smejj-restore-route", path + location.search + location.hash);
+        location.replace("/");
+      }
+    })();
+  </script>
   <title>404 — Seite nicht gefunden | smejj.com</title>
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; background: #0b0d10; color: #e8eaed; display: grid; place-items: center; min-height: 100vh; margin: 0; }
