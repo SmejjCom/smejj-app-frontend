@@ -1,4 +1,4 @@
-const CACHE_NAME = "smejj-shell-v61";
+const CACHE_NAME = "smejj-shell-v62";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -34,7 +34,7 @@ const SHELL = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL)));
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL.map((url) => new Request(url, { cache: "reload" })))));
   self.skipWaiting();
 });
 
