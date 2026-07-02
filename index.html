@@ -31,6 +31,7 @@
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="apple-touch-icon" href="/icons/icon.svg">
     <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="/assets/composer-tools.css">
   </head>
   <body>
     <button id="appMenuButton" class="glass-icon app-menu-button" type="button" aria-label="Menue oeffnen" aria-expanded="false">
@@ -83,9 +84,31 @@
             <section class="prompt-glass" aria-label="Start Eingabe">
               <textarea id="startMessage" rows="1" aria-label="Startprompt" placeholder="Nachricht schreiben"></textarea>
               <div class="prompt-actions">
-                <button class="ghost-button icon-button" type="button" data-jump="files" aria-label="Datei hinzufuegen" title="Datei hinzufuegen">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-                </button>
+                <div class="plus-picker">
+                  <button id="composerPlusButton" class="ghost-button icon-button" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Aktionen" title="Aktionen">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                  </button>
+                  <div id="composerPlusMenu" class="plus-menu" role="menu" hidden>
+                    <button type="button" role="menuitem" data-composer-action="attach-file">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.5 12.6 21a5.4 5.4 0 0 1-7.6-7.6l8.8-8.8a3.6 3.6 0 0 1 5.1 5.1l-8.8 8.8a1.8 1.8 0 0 1-2.5-2.5l8.1-8.1"/></svg>
+                      Datei anhaengen
+                    </button>
+                    <button type="button" role="menuitem" data-composer-action="attach-photo">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></svg>
+                      Foto oder Bild
+                    </button>
+                    <button type="button" role="menuitem" data-jump="files">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+                      Projekt-Dateien
+                    </button>
+                    <button type="button" role="menuitem" data-jump="search">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                      Suche oeffnen
+                    </button>
+                    <input id="composerFileInput" class="visually-hidden-input" type="file" multiple aria-hidden="true" tabindex="-1">
+                    <input id="composerPhotoInput" class="visually-hidden-input" type="file" accept="image/*" multiple aria-hidden="true" tabindex="-1">
+                  </div>
+                </div>
                 <span class="prompt-spacer"></span>
                 <div class="model-picker">
                   <button id="modelPickerButton" class="ghost-button text-chip" type="button" aria-haspopup="menu" aria-expanded="false" title="Modell wechseln">smejj 1.0</button>
@@ -526,6 +549,15 @@
         <header><h3 id="modalTitle"></h3><button type="button" data-close-modal>Schliessen</button></header>
         <div id="modalBody" class="modal-body"></div>
       </section>
+    </div>
+    <div id="voiceModeOverlay" class="voice-mode-overlay" data-mode="listening" role="dialog" aria-modal="true" aria-label="Sprachmodus" hidden>
+      <button id="voiceModeClose" class="voice-mode-close" type="button" aria-label="Sprachmodus beenden" title="Beenden">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <div class="voice-mode-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <p id="voiceModeStatus" class="voice-mode-status">Ich hoere zu ...</p>
+      <p id="voiceModeTranscript" class="voice-mode-transcript" aria-live="polite"></p>
+      <p class="voice-mode-hint">Sprich einfach — zum Beenden X druecken oder Escape.</p>
     </div>
     <script src="/assets/app.js" type="module"></script>
   </body>
