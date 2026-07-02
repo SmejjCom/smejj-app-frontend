@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://smejj.com/sitemap.xml

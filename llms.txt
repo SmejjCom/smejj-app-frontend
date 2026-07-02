@@ -1,0 +1,14 @@
+# smejj.com
+
+smejj.com is a free-safe AI and code assistant platform shell.
+
+Core rules:
+- GitHub.com is Free-plan-only source code and documentation.
+- GitHub Pages serves the public PWA shell and static assets; Spaceship.com provides domain and DNS.
+- IDrive e2 / S3-compatible storage is the primary store for files, media, models, backups, deployment artifacts, and central data.
+- Paid or trial-based platform services are not core architecture; Cloudflare is not used.
+- If AI inference is unavailable or paid-risk, the app must fail closed.
+
+Useful endpoints:
+- https://smejj.com/api/health
+- https://smejj.com/api/storage/status

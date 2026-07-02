@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://smejj.com/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url><loc>https://smejj.com/home</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://smejj.com/search</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://smejj.com/projects</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://smejj.com/files</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://smejj.com/storage</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://smejj.com/ai</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://smejj.com/settings</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://smejj.com/profile</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://smejj.com/impressum.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://smejj.com/datenschutz.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+</urlset>
