@@ -2,6 +2,7 @@ import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js";
 import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { Icons, closeModal, openModal, renderEmptyState, setButtonIcon, showToast } from "./components.js";
+import { initComposerTools } from "./composer-tools.js";
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -359,12 +360,7 @@ function bindStartComposer() {
     await submitTask(task, { target: "#startLog" });
   };
   send.addEventListener("click", submit);
-  for (const button of $$("[data-start-tool]")) {
-    button.addEventListener("click", () => {
-      showTaskIndicator("done");
-      showToast("Kommt als naechstes.");
-    });
-  }
+  initComposerTools();
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" || event.shiftKey) return;
