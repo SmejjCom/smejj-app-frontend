@@ -411,7 +411,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
     showTaskIndicator("done");
   } catch (error) {
     const message = error?.message === "Failed to fetch"
-      ? "Chat-Stream aktuell nicht erreichbar. Free-safe gestoppt: keine kostenpflichtigen Fallbacks gestartet."
+      ? UI_COPY.chatOffline
       : error.message || "Aufgabe konnte nicht abgeschlossen werden.";
     output.textContent = output.textContent ? `${output.textContent.trim()}\n\n${message}` : message;
     hideTaskIndicator();
@@ -1326,7 +1326,7 @@ async function readableError(response) {
     const payload = JSON.parse(text);
     return payload.error || text;
   } catch {
-    return text;
+    return !text || text.trimStart().startsWith("<") ? UI_COPY.chatOffline : text;
   }
 }
 

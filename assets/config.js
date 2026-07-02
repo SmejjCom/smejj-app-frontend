@@ -22,6 +22,7 @@ export const CLIENT_ROUTES = {
 
 export const UI_COPY = {
   startup: "Hallo. Frag mich etwas, starte ein Projekt oder lass uns Code bauen.",
+  chatOffline: "Chat-Stream aktuell nicht erreichbar. Free-safe gestoppt: keine kostenpflichtigen Fallbacks gestartet.",
   testCommand: "pnpm run check",
   localOnly: "Diese Funktion ist in der Online-Version bewusst geschuetzt oder lokal gespeichert, damit keine versteckten Kosten und keine unsicheren Schreibzugriffe entstehen."
 };
