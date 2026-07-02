@@ -1,6 +1,7 @@
 import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js";
 import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
+import { runClientChat } from "/assets/ai/chatClient.js";
 import { Icons, closeModal, openModal, renderEmptyState, setButtonIcon, showToast } from "./components.js";
 import { initComposerTools } from "./composer-tools.js";
 
@@ -390,6 +391,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   addEntry(task, "user", target);
   const output = addEntry("", "assistant", target);
   try {
+    if (await runClientChat({ task, model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
     const codingJob = await createFreeCodingJob(task);
     if (codingJob?.ok) {
       output.textContent = `${formatFreeCodingJob(codingJob)}\n\n`;
@@ -1074,16 +1076,14 @@ function refreshSessionStatus() {
 }
 
 async function initGoogleLogin() {
-  const config = await getJson(CLIENT_ROUTES.api.authConfig);
-  if (!config.configured) {
-    $("#googleSignIn").textContent = "Google Login: Client-ID fehlt.";
-    return;
+  const config = await getJson(CLIENT_ROUTES.api.authConfig).catch(() => null);
+  if (!config) {
+    $("#googleSignIn").textContent = "Google Login: Control Server ist noch nicht online.";
+    return writeOutput("#profileOutput", "Google Login wartet auf den Control Server.");
   }
-  const session = await getJson(CLIENT_ROUTES.api.authMe);
-  if (session.authenticated && session.user) {
-    showSignedIn(session.user);
-    return;
-  }
+  if (!config.configured) return void ($("#googleSignIn").textContent = "Google Login: Client-ID fehlt.");
+  const session = await getJson(CLIENT_ROUTES.api.authMe).catch(() => ({ authenticated: false, user: null }));
+  if (session.authenticated && session.user) return showSignedIn(session.user);
   const container = $("#googleSignIn");
   container.innerHTML = "";
   const button = document.createElement("button");
