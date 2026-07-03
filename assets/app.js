@@ -1238,7 +1238,7 @@ async function getJson(url) {
     try {
       return JSON.parse(text);
     } catch {
-      return { ok: response.ok, status: response.status, text };
+      return { ok: response.ok, status: response.status, text: text && !text.trimStart().startsWith("<") ? text : UI_COPY.localOnly };
     }
   } catch (error) {
     return { ok: false, error: error.message || "Network request failed" };
@@ -1256,7 +1256,7 @@ async function postJson(url, body) {
     try {
       return JSON.parse(text);
     } catch {
-      return { ok: response.ok, status: response.status, text };
+      return { ok: response.ok, status: response.status, text: text && !text.trimStart().startsWith("<") ? text : UI_COPY.localOnly };
     }
   } catch {
     return { ok: false, error: "Network request failed" };
