@@ -130,6 +130,7 @@ function boot() {
   refreshLocalWorkspaceStatus();
   refreshKimiVaultStatus({ quiet: true }).catch(() => {});
   refreshGlmVaultStatus({ quiet: true }).catch(() => {});
+  applyPendingRestoreRoute();
   restoreViewFromUrl();
 }
 
@@ -325,7 +326,7 @@ function goToView(viewId, { replace = false } = {}) {
     const method = replace ? "replaceState" : "pushState";
     history[method]({ viewId: resolvedViewId }, "", nextUrl);
   }
-  updateCanonical(nextPath);
+  updateCanonical();
   target.scrollIntoView({ block: "start" });
 }
 
@@ -335,15 +336,30 @@ function restoreViewFromUrl({ replace = true } = {}) {
   goToView($(`#${resolvedViewId}`) ? resolvedViewId : "error", { replace });
 }
 
+// 404.html (GitHub-Pages-SPA-Fallback) legt die angefragte App-Route in
+// sessionStorage ab; vor dem View-Restore wird sie in die URL zurueckgeschrieben.
+function applyPendingRestoreRoute() {
+  let pending = "";
+  try {
+    pending = sessionStorage.getItem("smejj-restore-route") || "";
+    if (pending) sessionStorage.removeItem("smejj-restore-route");
+  } catch {
+    pending = "";
+  }
+  if (pending.startsWith("/") && !pending.startsWith("//")) history.replaceState(null, "", pending);
+}
+
 function getViewFromUrl() {
   if (location.hash) return location.hash.replace(/^#\/?/, "") || "home";
   if (location.pathname === "/") return "start";
   return PATH_VIEWS[location.pathname.replace(/\/$/, "")] || location.pathname.replace(/^\/+/, "");
 }
 
-function updateCanonical(path) {
+function updateCanonical() {
+  // App-Routen liefern auf GitHub Pages HTTP 404 (SPA-Fallback); nur "/"
+  // antwortet mit 200 — der Canonical bleibt deshalb immer auf der Root-URL.
   const canonical = document.querySelector('link[rel="canonical"]');
-  if (canonical) canonical.href = `https://smejj.com${path}`;
+  if (canonical) canonical.href = "https://smejj.com/";
 }
 
 function bindStartComposer() {
