@@ -87,6 +87,51 @@ function closePlusMenu() {
   if (button) button.setAttribute("aria-expanded", "false");
 }
 
+function insertIntoComposer(text) {
+  const input = composerInput();
+  if (!input) return;
+  input.value = input.value ? `${input.value}\n${text}` : text;
+  notifyInputChanged(input);
+  input.focus();
+}
+
+function closeWorkspacePicker() {
+  document.querySelector(".workspace-picker")?.remove();
+}
+
+// Kleiner Datei-Picker aus dem Projekt-Manifest (via Workspace-Bruecke),
+// fuegt "[Workspace: pfad]" als Kontext-Referenz in die Nachricht ein.
+function openWorkspacePicker() {
+  closeWorkspacePicker();
+  document.dispatchEvent(new CustomEvent("smejj:workspace-list", {
+    detail: {
+      onDone: (result) => {
+        const files = result?.ok ? result.files || [] : [];
+        if (files.length === 0) {
+          showToast("Noch keine Dateien im Workspace — speichere erst Code aus dem Chat oder im Code-Editor.");
+          return;
+        }
+        const picker = document.createElement("div");
+        picker.className = "plus-menu workspace-picker";
+        picker.setAttribute("role", "menu");
+        for (const path of files.slice(0, 12)) {
+          const item = document.createElement("button");
+          item.type = "button";
+          item.setAttribute("role", "menuitem");
+          item.textContent = path;
+          item.addEventListener("click", (event) => {
+            event.stopPropagation();
+            insertIntoComposer(`[Workspace: ${path}]`);
+            closeWorkspacePicker();
+          });
+          picker.append(item);
+        }
+        document.querySelector(".plus-picker")?.append(picker);
+      }
+    }
+  }));
+}
+
 function bindPlusMenu() {
   const button = $("#composerPlusButton");
   const menu = $("#composerPlusMenu");
@@ -98,11 +143,14 @@ function bindPlusMenu() {
     button.setAttribute("aria-expanded", String(open));
   });
   document.addEventListener("click", (event) => {
+    if (!event.target.closest(".plus-picker")) closeWorkspacePicker();
     if (menu.hidden || event.target.closest(".plus-picker")) return;
     closePlusMenu();
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !menu.hidden) closePlusMenu();
+    if (event.key !== "Escape") return;
+    closeWorkspacePicker();
+    if (!menu.hidden) closePlusMenu();
   });
   menu.addEventListener("click", (event) => {
     const item = event.target.closest("[data-composer-action], [data-jump]");
@@ -110,6 +158,7 @@ function bindPlusMenu() {
     const action = item.dataset.composerAction;
     if (action === "attach-file") $("#composerFileInput")?.click();
     if (action === "attach-photo") $("#composerPhotoInput")?.click();
+    if (action === "attach-workspace") openWorkspacePicker();
     closePlusMenu();
   });
   bindAttachInput("#composerFileInput", "Anhang");
