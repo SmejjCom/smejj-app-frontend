@@ -180,6 +180,59 @@ async function runLocalBrowserChat({ task, output }) {
   return true;
 }
 
+// --- Code-Uebernahme in den Workspace -----------------------------------------
+
+const CODE_EXTENSIONS = Object.freeze({
+  javascript: "js", js: "js", typescript: "ts", ts: "ts", jsx: "jsx", tsx: "tsx",
+  html: "html", css: "css", python: "py", py: "py", json: "json",
+  markdown: "md", md: "md", bash: "sh", sh: "sh", shell: "sh", sql: "sql", yaml: "yml", yml: "yml"
+});
+
+// Haengt unter eine Antwort mit ```-Codebloecken je Block einen Speichern-Button.
+// Die eigentliche Speicherung uebernimmt app.js (Event "smejj:workspace-save"),
+// damit dieses Modul keinen eigenen Workspace-Zugriff braucht (Single Responsibility).
+export function attachCodeActions(output, documentRef = globalThis.document) {
+  const blocks = [];
+  const fence = /```([\w-]*)[^\S\n]*\n([\s\S]*?)```/g;
+  let match;
+  while ((match = fence.exec(output?.textContent || "")) !== null) {
+    const code = match[2].replace(/\s+$/, "");
+    if (code) blocks.push({ lang: (match[1] || "").toLowerCase(), code });
+  }
+  if (blocks.length === 0) return 0;
+  const bar = documentRef.createElement("div");
+  bar.className = "chat-code-actions";
+  const stamp = new Date().toISOString().slice(2, 16).replace(/[-:T]/g, "");
+  blocks.forEach((block, index) => {
+    const extension = CODE_EXTENSIONS[block.lang] || "txt";
+    const path = `chat/${stamp}-snippet-${index + 1}.${extension}`;
+    const button = documentRef.createElement("button");
+    button.type = "button";
+    button.className = "chat-code-save";
+    button.textContent = blocks.length > 1 ? `Code ${index + 1} in Workspace speichern` : "Code in Workspace speichern";
+    button.addEventListener("click", () => {
+      button.disabled = true;
+      documentRef.dispatchEvent(new CustomEvent("smejj:workspace-save", {
+        detail: {
+          path,
+          content: `${block.code}\n`,
+          onDone: (saved) => {
+            if (saved?.ok) {
+              button.textContent = `Gespeichert: ${saved.path}`;
+            } else {
+              button.disabled = false;
+              button.textContent = "Speichern fehlgeschlagen — erneut versuchen";
+            }
+          }
+        }
+      }));
+    });
+    bar.append(button);
+  });
+  output.after(bar);
+  return blocks.length;
+}
+
 /**
  * Beantwortet die Aufgabe client-seitig, wenn der Modell-Modus das erlaubt.
  * Rueckgabe true = erledigt (inkl. Hinweistexten), false = Server-Pfad nutzen.
@@ -187,7 +240,9 @@ async function runLocalBrowserChat({ task, output }) {
  */
 export async function runClientChat({ task, model, output, offlineNotice = "" } = {}) {
   if (!task || !output) return false;
-  if (model === "BYOK") return runByokChat({ task, output, offlineNotice });
-  if (model === "local browser") return runLocalBrowserChat({ task, output });
-  return false;
+  let handled = false;
+  if (model === "BYOK") handled = await runByokChat({ task, output, offlineNotice });
+  if (model === "local browser") handled = await runLocalBrowserChat({ task, output });
+  if (handled) attachCodeActions(output);
+  return handled;
 }
