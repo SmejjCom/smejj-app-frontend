@@ -362,6 +362,10 @@ function bindStartComposer() {
   };
   send.addEventListener("click", submit);
   initComposerTools();
+  document.addEventListener("smejj:workspace-save", async (event) => {
+    const detail = event.detail || {}, saved = await workspace.saveFile(await ensureProject(), String(detail.path || "chat/snippet.txt"), String(detail.content ?? "")).catch(() => null);
+    detail.onDone?.(saved ? { ok: true, path: saved.object.path } : { ok: false }); showToast(saved ? `Im Workspace gespeichert: ${saved.object.path}` : "Workspace-Speichern fehlgeschlagen.");
+  });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" || event.shiftKey) return;

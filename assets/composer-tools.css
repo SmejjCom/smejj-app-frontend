@@ -194,3 +194,35 @@
   font-size: 12px;
   color: rgba(246, 243, 238, 0.45);
 }
+
+/* Code-Uebernahme aus Chat-Antworten in den Workspace. */
+
+.chat-code-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 2px;
+}
+
+.chat-code-save {
+  min-height: 30px;
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(246, 243, 238, 0.85);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.chat-code-save:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+}
+
+.chat-code-save:disabled {
+  border-color: rgba(127, 212, 168, 0.4);
+  color: #7fd4a8;
+  cursor: default;
+}
