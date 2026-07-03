@@ -49,13 +49,41 @@ function collectHistory(offlineNotice) {
   return messages.slice(-MAX_HISTORY_MESSAGES);
 }
 
-function buildMessages(task, offlineNotice) {
+function buildMessages(task, offlineNotice, contextFiles = []) {
   const history = collectHistory(offlineNotice);
   // Die aktuelle Nutzer-Nachricht steht bereits im Log — Duplikat am Ende vermeiden.
   if (history.length === 0 || history[history.length - 1].content !== task.slice(0, MAX_MESSAGE_CHARS)) {
     history.push({ role: "user", content: task.slice(0, MAX_MESSAGE_CHARS) });
   }
-  return [{ role: "system", content: SYSTEM_PROMPT }, ...history.filter((m) => m.content)];
+  const messages = [{ role: "system", content: SYSTEM_PROMPT }, ...history.filter((m) => m.content)];
+  if (contextFiles.length > 0) {
+    const block = contextFiles
+      .map((file) => `--- ${file.path} ---\n${file.content}`)
+      .join("\n\n");
+    messages.splice(1, 0, { role: "user", content: `Kontext aus dem smejj.com Workspace (Referenzdateien):\n\n${block}` });
+  }
+  return messages;
+}
+
+// Loest "[Workspace: pfad]"-Referenzen in der Aufgabe ueber die Workspace-Bruecke
+// auf (Event smejj:workspace-read). Max. 4 Dateien, je max. 20k Zeichen.
+export async function resolveWorkspaceReferences(task, documentRef = globalThis.document) {
+  const paths = Array.from(String(task || "").matchAll(/\[Workspace:\s*([^\]]+)\]/g))
+    .map((match) => match[1].trim())
+    .filter(Boolean)
+    .slice(0, 4);
+  const files = [];
+  for (const path of paths) {
+    const result = await new Promise((resolve) => {
+      const dispatched = documentRef.dispatchEvent(new CustomEvent("smejj:workspace-read", {
+        detail: { path, onDone: resolve }
+      }));
+      if (!dispatched) resolve(null);
+      setTimeout(() => resolve(null), 3000);
+    });
+    if (result?.ok && result.content) files.push({ path, content: String(result.content).slice(0, 20_000) });
+  }
+  return files;
 }
 
 async function streamOpenAiCompatible({ baseUrl, apiKey, model, messages, output }) {
@@ -122,11 +150,12 @@ async function runByokChat({ task, output, offlineNotice }) {
     return true;
   }
   try {
+    const contextFiles = await resolveWorkspaceReferences(task);
     await streamOpenAiCompatible({
       baseUrl: config.baseUrl,
       apiKey: fields.apiKey.trim(),
       model: config.model,
-      messages: buildMessages(task, offlineNotice),
+      messages: buildMessages(task, offlineNotice, contextFiles),
       output
     });
   } catch (error) {
@@ -227,7 +256,20 @@ export function attachCodeActions(output, documentRef = globalThis.document) {
         }
       }));
     });
-    bar.append(button);
+    const editorButton = documentRef.createElement("button");
+    editorButton.type = "button";
+    editorButton.className = "chat-code-save";
+    editorButton.textContent = blocks.length > 1 ? `Code ${index + 1} im Editor oeffnen` : "Im Editor oeffnen";
+    editorButton.addEventListener("click", () => {
+      // Editor befuellen und ueber die oeffentliche SPA-Route /code navigieren.
+      const filePath = documentRef.querySelector("#filePath");
+      const editor = documentRef.querySelector("#editor");
+      if (filePath) filePath.value = path;
+      if (editor) editor.value = `${block.code}\n`;
+      globalThis.history?.pushState({}, "", "/code");
+      globalThis.dispatchEvent?.(new PopStateEvent("popstate"));
+    });
+    bar.append(button, editorButton);
   });
   output.after(bar);
   return blocks.length;
