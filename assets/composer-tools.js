@@ -176,7 +176,6 @@ function bindAttachInput(selector, label) {
     input.value = input.value ? `${input.value}\n${references.join("\n")}` : references.join("\n");
     notifyInputChanged(input);
     input.focus();
-    showToast(files.length === 1 ? `${label} hinzugefuegt: ${files[0].name}` : `${files.length} Dateien hinzugefuegt`);
     fileInput.value = "";
   });
 }
@@ -240,7 +239,6 @@ function startDictation() {
   };
   try {
     recognition.start();
-    showToast("Diktat aktiv — zum Beenden Mikrofon erneut klicken.");
   } catch {
     stopDictation();
   }
@@ -250,7 +248,6 @@ function toggleDictation() {
   if (state.voiceModeActive) closeVoiceMode();
   if (state.dictationActive) {
     stopDictation();
-    showToast("Diktat beendet.");
     return;
   }
   startDictation();

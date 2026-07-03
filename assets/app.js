@@ -243,7 +243,7 @@ function applySelectedModel(model, { persist = true, quiet = false } = {}) {
     mode,
     costStatus: mode === AI_MODES.disabled ? "0 EUR Risiko / blockiert" : "0 EUR Risiko / lokal"
   });
-  if (!quiet) showToast(`Modell: ${selectedModel}`);
+  void quiet; // Auswahl-Meldungen bewusst entfernt (Nutzer-Anweisung 2026-07-03).
 }
 
 function bindPanelResize(selector, side) {
