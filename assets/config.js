@@ -1,6 +1,24 @@
-export const CLIENT_ROUTES = {
-  api: {
-    agent: "/api/agent",
+// smejj.com — API-Origin: Standard ist Same-Origin (GitHub Pages). Fuer das
+// Salad-Container-Gateway (Backend auf *.salad.cloud) wird die Origin hier als
+// Konstante gesetzt oder per localStorage "smejj.apiOrigin.v1" uebersteuert
+// (nur https, fail-safe: ungueltige Werte werden ignoriert).
+const DEFAULT_API_ORIGIN = "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud";
+
+function resolveApiOrigin() {
+  let stored = "";
+  try {
+    stored = globalThis.localStorage?.getItem("smejj.apiOrigin.v1") || "";
+  } catch {
+    stored = "";
+  }
+  const candidate = String(stored || DEFAULT_API_ORIGIN).trim().replace(/\/+$/, "");
+  return /^https:\/\/[a-z0-9.-]+$/i.test(candidate) ? candidate : "";
+}
+
+export const API_ORIGIN = resolveApiOrigin();
+
+const API_PATHS = {
+  agent: "/api/agent",
     authConfig: "/api/auth/config",
     authGoogle: "/api/auth/google",
     authMe: "/api/auth/me",
@@ -17,7 +35,12 @@ export const CLIENT_ROUTES = {
     modelsStatus: "/api/models/status",
     storageStatus: "/api/storage/status",
     terminalRun: "/api/terminal/run"
-  }
+};
+
+export const CLIENT_ROUTES = {
+  api: Object.fromEntries(
+    Object.entries(API_PATHS).map(([name, path]) => [name, `${API_ORIGIN}${path}`])
+  )
 };
 
 export const UI_COPY = {
