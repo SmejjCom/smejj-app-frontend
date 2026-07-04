@@ -76,6 +76,7 @@
 
       <section class="workspace">
         <section id="start" class="view is-active" aria-label="Startseite">
+          <h1 class="visually-hidden">smejj.com — KI- und Code-Assistent</h1>
           <div class="home-feed">
             <header class="home-hero">
               <h2>Was sollen wir in smejj entwickeln?</h2>
@@ -284,7 +285,7 @@
             </label>
             <label>
               Import-Datei
-              <input id="projectImportFile" type="file" accept="application/json,.json">
+              <input id="projectImportFile" type="file" accept="application/json,.json" aria-label="Import-Datei auswaehlen">
             </label>
           </div>
           <div id="projectList" class="output"></div>
@@ -299,11 +300,11 @@
           <div class="panel-grid">
             <label>
               Upload-Staging
-              <input id="upload" type="file" accept=".css,.html,.js,.json,.md,.svg,.txt,text/*,application/json,image/svg+xml" multiple>
+              <input id="upload" type="file" accept=".css,.html,.js,.json,.md,.svg,.txt,text/*,application/json,image/svg+xml" multiple aria-label="Dateien fuer Upload auswaehlen">
             </label>
             <label>
               Gestagte Uploads
-              <textarea id="uploadList" readonly></textarea>
+              <textarea id="uploadList" readonly aria-label="Gestagte Uploads"></textarea>
             </label>
           </div>
           <div class="toolbar">
@@ -370,7 +371,7 @@
           <div class="panel-grid">
             <label>
               KI-Modus
-              <select id="aiModeSelect">
+              <select id="aiModeSelect" aria-label="KI-Modus">
                 <option value="disabled">Disabled</option>
                 <option value="local-browser">Local Browser</option>
                 <option value="byok-openai-compatible">BYOK OpenAI-kompatibel</option>
@@ -453,14 +454,14 @@
           <div class="panel-grid">
             <label>
               Sprache
-              <select id="settingsLanguage">
+              <select id="settingsLanguage" aria-label="Sprache">
                 <option value="de">Deutsch</option>
                 <option value="en">English</option>
               </select>
             </label>
             <label>
               Sicherheitsmodus
-              <select id="settingsMode">
+              <select id="settingsMode" aria-label="Sicherheitsmodus">
                 <option value="safe">Free-safe</option>
                 <option value="byok">BYOK vorbereitet</option>
                 <option value="local">Lokal</option>
@@ -497,14 +498,14 @@
             </label>
             <label>
               Sprache
-              <select id="language">
+              <select id="language" aria-label="Sprache">
                 <option value="de">Deutsch</option>
                 <option value="en">English</option>
               </select>
             </label>
             <label>
               Antwortmodus
-              <select id="mode">
+              <select id="mode" aria-label="Antwortmodus">
                 <option value="safe">Free-safe</option>
                 <option value="byok">BYOK vorbereitet</option>
                 <option value="local">Lokal</option>
