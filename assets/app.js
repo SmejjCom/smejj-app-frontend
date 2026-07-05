@@ -410,20 +410,24 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   const output = addEntry("", "assistant", target);
   try {
     if (await runClientChat({ task, model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
-    const codingJob = await createFreeCodingJob(task);
-    if (codingJob?.ok) {
-      output.textContent = `${formatFreeCodingJob(codingJob)}\n\n`;
+    try {
+      await stream(CLIENT_ROUTES.api.agent, {
+        task,
+        model: state.settings.model || "smejj 1.0",
+        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+      }, output);
+      return showTaskIndicator("done");
+    } catch (streamError) {
+      output.textContent = "";
+      const codingJob = await createFreeCodingJob(task);
+      if (codingJob?.ok) output.textContent = `${formatFreeCodingJob(codingJob)}\n\n`;
+      const executorResult = await runFreeExecutorIfAppTask(task);
+      if (executorResult?.ok) {
+        saveFreeExecutorArtifact(executorResult);
+        output.textContent += `${formatFreeExecutorResult(executorResult)}\n\n`;
+      }
+      if (!output.textContent.trim()) throw streamError;
     }
-    const executorResult = await runFreeExecutorIfAppTask(task);
-    if (executorResult?.ok) {
-      saveFreeExecutorArtifact(executorResult);
-      output.textContent += `${formatFreeExecutorResult(executorResult)}\n\n`;
-    }
-    await stream(CLIENT_ROUTES.api.agent, {
-      task,
-      model: state.settings.model || "smejj 1.0",
-      files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
-    }, output);
     showTaskIndicator("done");
   } catch (error) {
     const message = error?.message === "Failed to fetch"
@@ -436,24 +440,15 @@ async function submitTask(task, { target = "#startLog" } = {}) {
 
 function saveFreeExecutorArtifact(executor) {
   try {
-    localStorage.setItem("smejj.freeExecutor.lastArtifact.v1", JSON.stringify({
-      savedAt: new Date().toISOString(),
-      project: executor.project,
-      taskCapsule: executor.taskCapsule,
-      files: executor.files,
-      objects: executor.objects,
-      verification: executor.verification,
-      rollback: executor.rollback,
-      memory: executor.memory,
-      worker: executor.worker
-    }));
+    const { project, taskCapsule, files, objects, verification, rollback, memory, worker } = executor;
+    localStorage.setItem("smejj.freeExecutor.lastArtifact.v1", JSON.stringify({ savedAt: new Date().toISOString(), project, taskCapsule, files, objects, verification, rollback, memory, worker }));
   } catch {
-    // Browser storage may be unavailable; the server response remains the source.
   }
 }
 
 async function runFreeExecutorIfAppTask(task) {
-  if (!/\b(app|projekt|project|todo|coding|code|programm|erstell|baue|build)\b/i.test(task)) return null;
+  const text = String(task || "").toLowerCase();
+  if (!/\b(app|projekt|project|todo|website|seite|programm|erstell|baue|build)\b/i.test(text) || /\b(function|funktion|klasse|class|snippet|nur code|add\(a,b\)|add\(a, b\))\b/i.test(text)) return null;
   const payload = {
     task,
     projectId: state.currentProjectId || "project_smejj",
