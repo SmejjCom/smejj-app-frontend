@@ -58,32 +58,26 @@
     <main class="shell">
       <aside class="sidebar">
         <nav class="nav" aria-label="Arbeitsbereiche">
-          <button class="nav-button is-active" type="button" data-view="start" data-icon="home" title="Neu">Neu</button>
+          <button class="nav-button is-active" type="button" data-view="start" data-icon="plus" title="Neu">Neu</button>
           <button class="nav-button icon-only-nav" type="button" data-view="search" data-icon="search" title="Suche" aria-label="Suche">Suche</button>
-          <button class="nav-button" type="button" data-view="websites" data-icon="websites" title="Websites">Websites</button>
-          <button class="nav-button" type="button" data-view="smejjClaw" data-icon="claw" title="smejj claw">smejj claw</button>
-          <button class="nav-button" type="button" data-view="automation" data-icon="automation" title="Automatisierung">Automatisierung</button>
-          <button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Chat History">Chat History</button>
+          <button class="nav-button" type="button" data-view="smejjClaw" data-icon="code" title="Coding">Coding</button>
           <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="Projekte">Projekte</button>
           <button class="nav-button" type="button" data-view="files" data-icon="files" title="Dateien">Dateien</button>
+          <button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Verlauf">Verlauf</button>
         </nav>
-        <nav class="nav bottom-nav" aria-label="Konto und Einstellungen">
-          <button class="nav-button" type="button" data-view="cost" data-icon="cost" title="Kosten">Kosten</button>
+        <nav class="nav bottom-nav" aria-label="Nutzer und Einstellungen">
           <button class="nav-button" type="button" data-view="settings" data-icon="settings" title="Einstellungen">Einstellungen</button>
         </nav>
-        <button class="profile-dock nav-button" type="button" data-view="profile" title="Login / Konto">
-          <span id="profileDockAvatar" class="profile-avatar is-empty" aria-hidden="true"></span>
-          <span id="profileDockLabel">Konto</span>
-        </button>
         <div id="leftPanelResize" class="panel-resizer left-panel-resizer" role="separator" aria-orientation="vertical" aria-label="Linke Breite ändern"></div>
       </aside>
 
       <aside id="browserPanel" class="browser-panel" aria-label="Browser Menue">
         <nav class="browser-panel-nav" aria-label="Browser Aktionen">
-          <button type="button" data-jump="browser"><span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg></span>Browser</button>
-          <button type="button" data-jump="code"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4v10"/><path d="M17 4v6a4 4 0 0 1-4 4H7"/><path d="M7 20v-6"/><circle cx="7" cy="4" r="2"/><circle cx="7" cy="20" r="2"/><circle cx="17" cy="4" r="2"/></svg></span>Main</button>
-          <button type="button" data-jump="settings"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3"/><path d="M15 22v-3.9a3.4 3.4 0 0 0-1-2.6c3.2-.4 6.5-1.6 6.5-7A5.4 5.4 0 0 0 19 4.8 5 5 0 0 0 18.9 1S17.7.6 15 2.5a13.4 13.4 0 0 0-7 0C5.3.6 4.1 1 4.1 1A5 5 0 0 0 4 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.4 3.3 6.6 6.5 7a3.4 3.4 0 0 0-1 2.6V22"/></svg></span>GitHub</button>
+          <button type="button" data-jump="websites"><span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg></span>Browser</button>
           <button type="button" data-jump="files"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg></span>Quellen</button>
+          <button type="button" data-jump="settings"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3"/><path d="M15 22v-3.9a3.4 3.4 0 0 0-1-2.6c3.2-.4 6.5-1.6 6.5-7A5.4 5.4 0 0 0 19 4.8 5 5 0 0 0 18.9 1S17.7.6 15 2.5a13.4 13.4 0 0 0-7 0C5.3.6 4.1 1 4.1 1A5 5 0 0 0 4 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.4 3.3 6.6 6.5 7a3.4 3.4 0 0 0-1 2.6V22"/></svg></span>GitHub</button>
+          <button type="button" data-jump="browser"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4Z"/><path d="M8 15l3-3 2 2 3-4 4 5"/></svg></span>Vorschau</button>
+          <button type="button" data-jump="tools"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18h16"/><path d="M4 12h16"/><path d="M4 6h16"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="6" r="2"/></svg></span>Status</button>
         </nav>
         <div id="rightPanelResize" class="panel-resizer right-panel-resizer" role="separator" aria-orientation="vertical" aria-label="Rechte Breite ändern"></div>
       </aside>
@@ -182,13 +176,13 @@
           </header>
           <form id="searchForm" class="search-shell" role="search">
             <label class="search-box" for="searchQuery">
-              <span>Codex Suche</span>
-              <input id="searchQuery" type="search" placeholder="Was soll Codex suchen oder untersuchen?" autocomplete="off">
+              <span>Globale Suche</span>
+              <input id="searchQuery" type="search" placeholder="Chats, Projekte, Dateien, Code, Quellen suchen" autocomplete="off">
             </label>
             <button id="searchSubmit" type="submit">Suchen</button>
           </form>
           <div id="searchLog" class="search-log" aria-live="polite">
-            <div class="search-empty">Stell eine Suchfrage. Die Antwort kommt wie im Chat.</div>
+            <div class="search-empty">Suche ueber alles in smejj.com. Enter oeffnet den besten Treffer.</div>
           </div>
         </section>
 
@@ -200,12 +194,16 @@
           <div class="output">Website-Bereich bereit.</div>
         </section>
 
-        <section id="smejjClaw" class="view" aria-label="smejj claw">
+        <section id="smejjClaw" class="view" aria-label="Coding">
           <header class="view-header">
-            <p class="eyebrow">smejj claw</p>
-            <h2>smejj claw</h2>
+            <p class="eyebrow">Coding</p>
+            <h2>Coding</h2>
           </header>
-          <div class="output">smejj claw bereit.</div>
+          <div class="toolbar">
+            <button type="button" data-jump="automation">Automatisierung</button>
+            <button type="button" data-jump="projects">Projekte</button>
+          </div>
+          <div class="output">Coding bereit.</div>
         </section>
 
         <section id="automation" class="view" aria-label="Automatisierung">
@@ -216,12 +214,12 @@
           <div class="output">Automatisierung bereit.</div>
         </section>
 
-        <section id="chatHistory" class="view" aria-label="Chat History">
+        <section id="chatHistory" class="view" aria-label="Verlauf">
           <header class="view-header">
-            <p class="eyebrow">Chat History</p>
-            <h2>Chat History</h2>
+            <p class="eyebrow">Verlauf</p>
+            <h2>Verlauf</h2>
           </header>
-          <div class="output">Chat History bereit.</div>
+          <div class="output">Verlauf bereit.</div>
         </section>
 
         <section id="browser" class="view" aria-label="Browser">
@@ -484,6 +482,8 @@
           </div>
           <div class="toolbar">
             <button id="saveSettings" type="button">Einstellungen speichern</button>
+            <button type="button" data-jump="cost">Kosten & Limits</button>
+            <button type="button" data-jump="profile">Nutzer</button>
             <button id="showOfflinePage" type="button">Offline-Seite anzeigen</button>
             <button id="showErrorPage" type="button">Fehlerseite anzeigen</button>
           </div>
@@ -495,10 +495,10 @@
           </p>
         </section>
 
-        <section id="profile" class="view" aria-label="Login und Konto">
+        <section id="profile" class="view" aria-label="Nutzer und Login">
           <header class="view-header">
-            <p class="eyebrow">Konto</p>
-            <h2>Login / Konto</h2>
+            <p class="eyebrow">Nutzer</p>
+            <h2>Nutzer</h2>
             <p class="subhead">Login ist vorbereitet. Serverseitige Nutzer-Daten duerfen erst nach sicherer Auth- und Storage-Policy aktiv werden.</p>
           </header>
           <div class="panel-grid">
