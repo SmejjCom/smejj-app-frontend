@@ -1,595 +1,586 @@
 <!doctype html>
 <html lang="de">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7f7f4">
-<meta name="description" content="smejj.com ist ein schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben.">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="smejj">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="smejj.com">
-<meta property="og:title" content="smejj.com — KI- und Code-Assistent | Autonomous AI Coding OS">
-<meta property="og:description" content="smejj.com ist ein schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben. Ein autonomes AI-Coding-OS im Browser — weltweit in 15 Sprachen.">
-<meta property="og:url" content="https://smejj.com/">
-<meta property="og:locale" content="de">
-<meta property="og:image" content="https://smejj.com/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="smejj.com — Autonomous AI Coding OS">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="smejj.com — KI- und Code-Assistent | Autonomous AI Coding OS">
-<meta name="twitter:description" content="Schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben — in 15 Sprachen.">
-<meta name="twitter:image" content="https://smejj.com/og-image.png">
-<link rel="canonical" href="https://smejj.com/">
-<link rel="alternate" hreflang="de" href="https://smejj.com/">
-<link rel="alternate" hreflang="en" href="https://smejj.com/en/">
-<link rel="alternate" hreflang="zh" href="https://smejj.com/zh/">
-<link rel="alternate" hreflang="es" href="https://smejj.com/es/">
-<link rel="alternate" hreflang="ar" href="https://smejj.com/ar/">
-<link rel="alternate" hreflang="fr" href="https://smejj.com/fr/">
-<link rel="alternate" hreflang="pt" href="https://smejj.com/pt/">
-<link rel="alternate" hreflang="ru" href="https://smejj.com/ru/">
-<link rel="alternate" hreflang="tr" href="https://smejj.com/tr/">
-<link rel="alternate" hreflang="ja" href="https://smejj.com/ja/">
-<link rel="alternate" hreflang="ko" href="https://smejj.com/ko/">
-<link rel="alternate" hreflang="it" href="https://smejj.com/it/">
-<link rel="alternate" hreflang="hi" href="https://smejj.com/hi/">
-<link rel="alternate" hreflang="id" href="https://smejj.com/id/">
-<link rel="alternate" hreflang="bn" href="https://smejj.com/bn/">
-<link rel="alternate" hreflang="x-default" href="https://smejj.com/en/">
-<title>smejj.com</title>
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="apple-touch-icon" href="/icons/icon.svg">
-<link rel="stylesheet" href="/assets/styles.css">
-<link rel="stylesheet" href="/assets/composer-tools.css">
-<link rel="stylesheet" href="/assets/ui-modern.css">
-</head>
-<body>
-<button id="appMenuButton" class="glass-icon app-menu-button" type="button" aria-label="Menue oeffnen" aria-expanded="false">
-<span class="split-icon" aria-hidden="true"><span></span><span></span></span>
-</button>
-<button id="browserButton" class="glass-icon browser-button" type="button" aria-label="Browser oeffnen" aria-expanded="false" title="Browser">
-<span class="split-icon" aria-hidden="true"><span></span><span></span></span>
-</button>
-<div id="sidebarBackdrop" class="sidebar-backdrop" hidden></div>
-<main class="shell">
-<aside class="sidebar">
-<nav class="nav" aria-label="Arbeitsbereiche">
-<button class="nav-button is-active" type="button" data-view="start" data-icon="plus" title="Neu">Neu</button>
-<button class="nav-button icon-only-nav" type="button" data-view="search" data-icon="search" title="Suche" aria-label="Suche">Suche</button>
-<button class="nav-button" type="button" data-view="smejjClaw" data-icon="code" title="Coding">Coding</button>
-<button class="nav-button" type="button" data-view="projects" data-icon="projects" title="Projekte">Projekte</button>
-<button class="nav-button" type="button" data-view="files" data-icon="files" title="Dateien">Dateien</button>
-<button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Verlauf">Verlauf</button>
-</nav>
-<nav class="nav bottom-nav" aria-label="Nutzer und Einstellungen">
-<button class="nav-button" type="button" data-view="settings" data-icon="settings" title="Einstellungen">Einstellungen</button>
-</nav>
-<div id="leftPanelResize" class="panel-resizer left-panel-resizer" role="separator" aria-orientation="vertical" aria-label="Linke Breite ändern"></div>
-</aside>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f7f4">
+    <meta name="description" content="smejj.com ist ein schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="smejj">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="smejj.com">
+    <meta property="og:title" content="smejj.com — KI- und Code-Assistent | Autonomous AI Coding OS">
+    <meta property="og:description" content="smejj.com ist ein schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben. Ein autonomes AI-Coding-OS im Browser — weltweit in 15 Sprachen.">
+    <meta property="og:url" content="https://smejj.com/">
+    <meta property="og:locale" content="de">
+    <meta property="og:image" content="https://smejj.com/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="smejj.com — Autonomous AI Coding OS">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="smejj.com — KI- und Code-Assistent | Autonomous AI Coding OS">
+    <meta name="twitter:description" content="Schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben — in 15 Sprachen.">
+    <meta name="twitter:image" content="https://smejj.com/og-image.png">
+    <link rel="canonical" href="https://smejj.com/">
+    <link rel="alternate" hreflang="de" href="https://smejj.com/">
+    <link rel="alternate" hreflang="en" href="https://smejj.com/en/">
+    <link rel="alternate" hreflang="zh" href="https://smejj.com/zh/">
+    <link rel="alternate" hreflang="es" href="https://smejj.com/es/">
+    <link rel="alternate" hreflang="ar" href="https://smejj.com/ar/">
+    <link rel="alternate" hreflang="fr" href="https://smejj.com/fr/">
+    <link rel="alternate" hreflang="pt" href="https://smejj.com/pt/">
+    <link rel="alternate" hreflang="ru" href="https://smejj.com/ru/">
+    <link rel="alternate" hreflang="tr" href="https://smejj.com/tr/">
+    <link rel="alternate" hreflang="ja" href="https://smejj.com/ja/">
+    <link rel="alternate" hreflang="ko" href="https://smejj.com/ko/">
+    <link rel="alternate" hreflang="it" href="https://smejj.com/it/">
+    <link rel="alternate" hreflang="hi" href="https://smejj.com/hi/">
+    <link rel="alternate" hreflang="id" href="https://smejj.com/id/">
+    <link rel="alternate" hreflang="bn" href="https://smejj.com/bn/">
+    <link rel="alternate" hreflang="x-default" href="https://smejj.com/en/">
+    <title>smejj.com</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/icons/icon.svg">
+    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="/assets/composer-tools.css">
+    <link rel="stylesheet" href="/assets/browser-pane.css">
+  </head>
+  <body>
+    <button id="appMenuButton" class="glass-icon app-menu-button" type="button" aria-label="Menue oeffnen" aria-expanded="false">
+      <span class="split-icon" aria-hidden="true"><span></span><span></span></span>
+    </button>
+    <button id="browserButton" class="glass-icon browser-button" type="button" aria-label="Browser oeffnen" aria-expanded="false" title="Browser">
+      <span class="split-icon" aria-hidden="true"><span></span><span></span></span>
+    </button>
+    <div id="sidebarBackdrop" class="sidebar-backdrop" hidden></div>
+    <main class="shell">
+      <aside class="sidebar">
+        <nav class="nav" aria-label="Arbeitsbereiche">
+          <button class="nav-button is-active" type="button" data-view="start" data-icon="plus" title="Neu">Neu</button>
+          <button class="nav-button icon-only-nav" type="button" data-view="search" data-icon="search" title="Suche" aria-label="Suche">Suche</button>
+          <button class="nav-button" type="button" data-view="smejjClaw" data-icon="code" title="Coding">Coding</button>
+          <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="Projekte">Projekte</button>
+          <button class="nav-button" type="button" data-view="files" data-icon="files" title="Dateien">Dateien</button>
+          <button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Verlauf">Verlauf</button>
+        </nav>
+        <nav class="nav bottom-nav" aria-label="Nutzer und Einstellungen">
+          <button class="nav-button" type="button" data-view="settings" data-icon="settings" title="Einstellungen">Einstellungen</button>
+        </nav>
+        <div id="leftPanelResize" class="panel-resizer left-panel-resizer" role="separator" aria-orientation="vertical" aria-label="Linke Breite ändern"></div>
+      </aside>
 
-<aside id="browserPanel" class="browser-panel" aria-label="Browser Menue">
-<nav class="browser-panel-nav" aria-label="Browser Aktionen">
-<button type="button" data-jump="websites"><span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg></span>Browser</button>
-<button type="button" data-jump="files"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg></span>Quellen</button>
-<button type="button" data-jump="settings"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3"/><path d="M15 22v-3.9a3.4 3.4 0 0 0-1-2.6c3.2-.4 6.5-1.6 6.5-7A5.4 5.4 0 0 0 19 4.8 5 5 0 0 0 18.9 1S17.7.6 15 2.5a13.4 13.4 0 0 0-7 0C5.3.6 4.1 1 4.1 1A5 5 0 0 0 4 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.4 3.3 6.6 6.5 7a3.4 3.4 0 0 0-1 2.6V22"/></svg></span>GitHub</button>
-<button type="button" data-jump="browser"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4Z"/><path d="M8 15l3-3 2 2 3-4 4 5"/></svg></span>Vorschau</button>
-<button type="button" data-jump="tools"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18h16"/><path d="M4 12h16"/><path d="M4 6h16"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="6" r="2"/></svg></span>Status</button>
-</nav>
-<div id="rightPanelResize" class="panel-resizer right-panel-resizer" role="separator" aria-orientation="vertical" aria-label="Rechte Breite ändern"></div>
-</aside>
+      <aside id="browserPanel" class="browser-panel" aria-label="Browser Menue">
+        <nav class="browser-panel-nav" aria-label="Browser Aktionen">
+          <button type="button" data-jump="websites"><span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg></span>Browser</button>
+          <button type="button" data-jump="files"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg></span>Quellen</button>
+          <button type="button" data-jump="settings"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3"/><path d="M15 22v-3.9a3.4 3.4 0 0 0-1-2.6c3.2-.4 6.5-1.6 6.5-7A5.4 5.4 0 0 0 19 4.8 5 5 0 0 0 18.9 1S17.7.6 15 2.5a13.4 13.4 0 0 0-7 0C5.3.6 4.1 1 4.1 1A5 5 0 0 0 4 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.4 3.3 6.6 6.5 7a3.4 3.4 0 0 0-1 2.6V22"/></svg></span>GitHub</button>
+          <button type="button" data-jump="browser"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4Z"/><path d="M8 15l3-3 2 2 3-4 4 5"/></svg></span>Vorschau</button>
+          <button type="button" data-jump="tools"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18h16"/><path d="M4 12h16"/><path d="M4 6h16"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="6" r="2"/></svg></span>Status</button>
+        </nav>
+        <div id="browserPaneRoot" class="browser-pane" aria-label="Integrierter Browser" hidden></div>
+        <div id="rightPanelResize" class="panel-resizer right-panel-resizer" role="separator" aria-orientation="vertical" aria-label="Rechte Breite ändern"></div>
+      </aside>
 
-<section class="workspace">
-<section id="start" class="view is-active" aria-label="Startseite">
-<h1 class="visually-hidden">smejj.com — KI- und Code-Assistent</h1>
-<div class="home-feed">
-<header class="home-hero">
-<h2>Was sollen wir in smejj entwickeln?</h2>
-</header>
-<div id="startLog" class="start-log" aria-label="Start Chat" hidden></div>
-<section class="prompt-glass" aria-label="Start Eingabe">
-<textarea id="startMessage" rows="1" aria-label="Startprompt" placeholder="Nachricht schreiben"></textarea>
-<div class="prompt-actions">
-<div class="plus-picker">
-<button id="composerPlusButton" class="ghost-button icon-button" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Aktionen" title="Aktionen">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-</button>
-<div id="composerPlusMenu" class="plus-menu" role="menu" hidden>
-<button type="button" role="menuitem" data-composer-action="attach-file">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.5 12.6 21a5.4 5.4 0 0 1-7.6-7.6l8.8-8.8a3.6 3.6 0 0 1 5.1 5.1l-8.8 8.8a1.8 1.8 0 0 1-2.5-2.5l8.1-8.1"/></svg>
-Datei anhaengen
-</button>
-<button type="button" role="menuitem" data-composer-action="attach-photo">
-<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></svg>
-Foto oder Bild
-</button>
-<button type="button" role="menuitem" data-composer-action="attach-workspace">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6a2 2 0 0 1 2-2h8l6 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z"/><path d="M14 4v6h6"/></svg>
-Workspace-Datei anhaengen
-</button>
-<button type="button" role="menuitem" data-jump="files">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
-Projekt-Dateien
-</button>
-<button type="button" role="menuitem" data-jump="search">
-<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-Suche oeffnen
-</button>
-<input id="composerFileInput" class="visually-hidden-input" type="file" multiple aria-hidden="true" tabindex="-1">
-<input id="composerPhotoInput" class="visually-hidden-input" type="file" accept="image/*" multiple aria-hidden="true" tabindex="-1">
-</div>
-</div>
-<span class="prompt-spacer"></span>
-<div class="model-picker">
-<button id="modelPickerButton" class="ghost-button text-chip" type="button" aria-haspopup="menu" aria-expanded="false" title="Modell wechseln">smejj 1.0</button>
-<div id="modelPickerMenu" class="model-menu" role="menu" hidden>
-<button type="button" role="menuitem" data-model="smejj 1.0">smejj 1.0</button>
-<button type="button" role="menuitem" data-model="smejj Code">smejj Code</button>
-<button type="button" role="menuitem" data-model="GLM-5.2">GLM-5.2</button>
-<button type="button" role="menuitem" data-model="local browser">local browser</button>
-<button type="button" role="menuitem" data-model="BYOK">BYOK</button>
-</div>
-</div>
-<button class="ghost-button icon-button" type="button" data-start-tool="voice" aria-label="Mikrofon" title="Mikrofon">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0V7a4 4 0 0 0-4-4Z"/><path d="M5 11v1a7 7 0 0 0 14 0v-1"/><path d="M12 19v3"/></svg>
-</button>
-<button class="ghost-button icon-button" type="button" data-start-tool="audio" aria-label="Audio" title="Audio">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4"/><path d="M8 7v10"/><path d="M12 4v16"/><path d="M16 7v10"/><path d="M20 10v4"/></svg>
-</button>
-<button class="ghost-button icon-button" type="button" data-start-tool="speaker" aria-label="Stimme" title="Stimme">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10H4Z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a8 8 0 0 1 0 11"/></svg>
-</button>
-<button id="startSend" class="send-button icon-button" type="button" aria-label="Senden" title="Senden">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V4"/><path d="M5 11l7-7 7 7"/></svg>
-</button>
-</div>
-</section>
-<section class="feed-list" aria-label="Feed" hidden>
-<article class="feed-item">
-<strong>Willkommen zurueck</strong>
-<span id="homeWorkspaceSummary">lokal bereit</span>
-</article>
-<article class="feed-item">
-<strong>KI-Modus</strong>
-<span id="homeAiSummary">disabled</span>
-</article>
-<article class="feed-item">
-<strong>Kosten</strong>
-<span id="homeCostSummary">0 EUR Risiko / blockiert</span>
-</article>
-<article class="feed-item">
-<strong>Speicher</strong>
-<span id="homeStorageSummary">Hauptspeicher vorbereitet</span>
-</article>
-</section>
-<div id="homeOutput" class="output" hidden>Bereit. Lokale Arbeit startet sofort; Online-Sync und KI bleiben fail-closed, bis sie sicher konfiguriert sind.</div>
-</div>
-</section>
+      <section class="workspace">
+        <section id="start" class="view is-active" aria-label="Startseite">
+          <h1 class="visually-hidden">smejj.com — KI- und Code-Assistent</h1>
+          <div class="home-feed">
+            <header class="home-hero">
+              <h2>Was sollen wir in smejj entwickeln?</h2>
+            </header>
+            <div id="startLog" class="start-log" aria-label="Start Chat" hidden></div>
+            <section class="prompt-glass" aria-label="Start Eingabe">
+              <textarea id="startMessage" rows="1" aria-label="Startprompt" placeholder="Nachricht schreiben"></textarea>
+              <div class="prompt-actions">
+                <div class="plus-picker">
+                  <button id="composerPlusButton" class="ghost-button icon-button" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Aktionen" title="Aktionen">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                  </button>
+                  <div id="composerPlusMenu" class="plus-menu" role="menu" hidden>
+                    <button type="button" role="menuitem" data-composer-action="attach-file">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.5 12.6 21a5.4 5.4 0 0 1-7.6-7.6l8.8-8.8a3.6 3.6 0 0 1 5.1 5.1l-8.8 8.8a1.8 1.8 0 0 1-2.5-2.5l8.1-8.1"/></svg>
+                      Datei anhaengen
+                    </button>
+                    <button type="button" role="menuitem" data-composer-action="attach-photo">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></svg>
+                      Foto oder Bild
+                    </button>
+                    <button type="button" role="menuitem" data-composer-action="attach-workspace">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6a2 2 0 0 1 2-2h8l6 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z"/><path d="M14 4v6h6"/></svg>
+                      Workspace-Datei anhaengen
+                    </button>
+                    <button type="button" role="menuitem" data-jump="files">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+                      Projekt-Dateien
+                    </button>
+                    <button type="button" role="menuitem" data-jump="search">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                      Suche oeffnen
+                    </button>
+                    <input id="composerFileInput" class="visually-hidden-input" type="file" multiple aria-hidden="true" tabindex="-1">
+                    <input id="composerPhotoInput" class="visually-hidden-input" type="file" accept="image/*" multiple aria-hidden="true" tabindex="-1">
+                  </div>
+                </div>
+                <span class="prompt-spacer"></span>
+                <div class="model-picker">
+                  <button id="modelPickerButton" class="ghost-button text-chip" type="button" aria-haspopup="menu" aria-expanded="false" title="Modell wechseln">smejj 1.0</button>
+                  <div id="modelPickerMenu" class="model-menu" role="menu" hidden>
+                    <button type="button" role="menuitem" data-model="smejj 1.0">smejj 1.0</button>
+                    <button type="button" role="menuitem" data-model="smejj Code">smejj Code</button>
+                    <button type="button" role="menuitem" data-model="GLM-5.2">GLM-5.2</button>
+                    <button type="button" role="menuitem" data-model="local browser">local browser</button>
+                    <button type="button" role="menuitem" data-model="BYOK">BYOK</button>
+                  </div>
+                </div>
+                <button class="ghost-button icon-button" type="button" data-start-tool="voice" aria-label="Mikrofon" title="Mikrofon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0V7a4 4 0 0 0-4-4Z"/><path d="M5 11v1a7 7 0 0 0 14 0v-1"/><path d="M12 19v3"/></svg>
+                </button>
+                <button class="ghost-button icon-button" type="button" data-start-tool="audio" aria-label="Audio" title="Audio">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4"/><path d="M8 7v10"/><path d="M12 4v16"/><path d="M16 7v10"/><path d="M20 10v4"/></svg>
+                </button>
+                <button class="ghost-button icon-button" type="button" data-start-tool="speaker" aria-label="Stimme" title="Stimme">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10H4Z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a8 8 0 0 1 0 11"/></svg>
+                </button>
+                <button id="startSend" class="send-button icon-button" type="button" aria-label="Senden" title="Senden">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V4"/><path d="M5 11l7-7 7 7"/></svg>
+                </button>
+              </div>
+            </section>
+            <section class="feed-list" aria-label="Feed" hidden>
+              <article class="feed-item">
+                <strong>Willkommen zurueck</strong>
+                <span id="homeWorkspaceSummary">lokal bereit</span>
+              </article>
+              <article class="feed-item">
+                <strong>KI-Modus</strong>
+                <span id="homeAiSummary">disabled</span>
+              </article>
+              <article class="feed-item">
+                <strong>Kosten</strong>
+                <span id="homeCostSummary">0 EUR Risiko / blockiert</span>
+              </article>
+              <article class="feed-item">
+                <strong>Speicher</strong>
+                <span id="homeStorageSummary">Hauptspeicher vorbereitet</span>
+              </article>
+            </section>
+            <div id="homeOutput" class="output" hidden>Bereit. Lokale Arbeit startet sofort; Online-Sync und KI bleiben fail-closed, bis sie sicher konfiguriert sind.</div>
+          </div>
+        </section>
 
-<section id="search" class="view" aria-label="Suche">
-<header class="view-header">
-<p class="eyebrow">Suche</p>
-<h2>Suche</h2>
-</header>
-<form id="searchForm" class="search-shell" role="search">
-<label class="search-box" for="searchQuery">
-<span>Globale Suche</span>
-<input id="searchQuery" type="search" placeholder="Chats, Projekte, Dateien, Code, Quellen suchen" autocomplete="off">
-</label>
-<button id="searchSubmit" type="submit">Suchen</button>
-</form>
-<div id="searchLog" class="search-log" aria-live="polite">
-<div class="search-empty">Durchsuche alles in smejj.com — Chats, Projekte, Dateien und Code. Enter öffnet den besten Treffer.</div>
-</div>
-</section>
+        <section id="search" class="view" aria-label="Suche">
+          <header class="view-header">
+            <p class="eyebrow">Suche</p>
+            <h2>Suche</h2>
+          </header>
+          <form id="searchForm" class="search-shell" role="search">
+            <label class="search-box" for="searchQuery">
+              <span>Globale Suche</span>
+              <input id="searchQuery" type="search" placeholder="Chats, Projekte, Dateien, Code, Quellen suchen" autocomplete="off">
+            </label>
+            <button id="searchSubmit" type="submit">Suchen</button>
+          </form>
+          <div id="searchLog" class="search-log" aria-live="polite">
+            <div class="search-empty">Suche ueber alles in smejj.com. Enter oeffnet den besten Treffer.</div>
+          </div>
+        </section>
 
-<section id="websites" class="view" aria-label="Websites">
-<header class="view-header">
-<p class="eyebrow">Websites</p>
-<h2>Websites</h2>
-</header>
-<div class="empty-state"><strong>Noch keine Websites</strong><span>Starte ein Projekt auf der Startseite — veröffentlichte Websites erscheinen hier.</span></div>
-</section>
+        <section id="websites" class="view" aria-label="Websites">
+          <header class="view-header">
+            <p class="eyebrow">Websites</p>
+            <h2>Websites</h2>
+          </header>
+          <div class="output">Website-Bereich bereit.</div>
+        </section>
 
-<section id="smejjClaw" class="view" aria-label="Coding">
-<header class="view-header">
-<p class="eyebrow">Coding</p>
-<h2>Coding</h2>
-</header>
-<div class="toolbar">
-<button type="button" data-jump="automation">Automatisierung</button>
-<button type="button" data-jump="projects">Projekte</button>
-</div>
-<div class="empty-state"><strong>Bereit zum Entwickeln</strong><span>Wähle ein Projekt oder beschreibe auf der Startseite, was gebaut werden soll.</span></div>
-</section>
+        <section id="smejjClaw" class="view" aria-label="Coding">
+          <header class="view-header">
+            <p class="eyebrow">Coding</p>
+            <h2>Coding</h2>
+          </header>
+          <div class="toolbar">
+            <button type="button" data-jump="automation">Automatisierung</button>
+            <button type="button" data-jump="projects">Projekte</button>
+          </div>
+          <div class="output">Coding bereit.</div>
+        </section>
 
-<section id="automation" class="view" aria-label="Automatisierung">
-<header class="view-header">
-<p class="eyebrow">Automatisierung</p>
-<h2>Automatisierung</h2>
-</header>
-<div class="empty-state"><strong>Noch keine Automatisierungen</strong><span>Eingerichtete Agent-Workflows erscheinen hier.</span></div>
-</section>
+        <section id="automation" class="view" aria-label="Automatisierung">
+          <header class="view-header">
+            <p class="eyebrow">Automatisierung</p>
+            <h2>Automatisierung</h2>
+          </header>
+          <div class="output">Automatisierung bereit.</div>
+        </section>
 
-<section id="chatHistory" class="view" aria-label="Verlauf">
-<header class="view-header">
-<p class="eyebrow">Verlauf</p>
-<h2>Verlauf</h2>
-</header>
-<div class="empty-state"><strong>Noch kein Verlauf</strong><span>Deine Chats und Aufgaben erscheinen hier automatisch.</span></div>
-</section>
+        <section id="chatHistory" class="view" aria-label="Verlauf">
+          <header class="view-header">
+            <p class="eyebrow">Verlauf</p>
+            <h2>Verlauf</h2>
+          </header>
+          <div class="output">Verlauf bereit.</div>
+        </section>
 
-<section id="browser" class="view" aria-label="Browser">
-<header class="view-header">
-<p class="eyebrow">Browser</p>
-<h2>Lokaler Browser</h2>
-<p class="subhead">Schneller Einstieg für lokale Dateien, Uploads und Browser-Speicher.</p>
-</header>
-<div class="status-grid">
-<div><strong>Browser-Speicher</strong><span>IndexedDB / OPFS</span></div>
-<div><strong>Secrets</strong><span>nicht im Browser</span></div>
-<div><strong>Sync</strong><span>lokal zuerst</span></div>
-</div>
-<div class="toolbar">
-<button type="button" data-jump="files">Dateien öffnen</button>
-<button type="button" data-jump="storageView">Speicher prüfen</button>
-<button type="button" data-jump="ai">Local Browser KI</button>
-</div>
-<div class="output"></div>
-</section>
+        <section id="browser" class="view" aria-label="Browser">
+          <header class="view-header">
+            <p class="eyebrow">Browser</p>
+            <h2>Lokaler Browser</h2>
+            <p class="subhead">Schneller Einstieg fuer lokale Dateien, Uploads und Browser-Speicher.</p>
+          </header>
+          <div class="status-grid">
+            <div><strong>Browser-Speicher</strong><span>IndexedDB / OPFS</span></div>
+            <div><strong>Secrets</strong><span>nicht im Browser</span></div>
+            <div><strong>Sync</strong><span>lokal zuerst</span></div>
+          </div>
+          <div class="toolbar">
+            <button type="button" data-jump="files">Dateien oeffnen</button>
+            <button type="button" data-jump="storageView">Speicher pruefen</button>
+            <button type="button" data-jump="ai">Local Browser KI</button>
+          </div>
+          <div class="output">Browser-Bereich bereit.</div>
+        </section>
 
-<section id="code" class="view" aria-label="Code-Assistent">
-<header class="view-header">
-<p class="eyebrow">Code</p>
-<h2>Programmieren</h2>
-</header>
-<div class="panel-grid">
-<label>
-Dateien
-<textarea id="fileRefs" spellcheck="false" placeholder="src/server.js"></textarea>
-</label>
-<label>
-Code-Editor
-<textarea id="editor" spellcheck="false" placeholder="Datei laden oder Code hier bearbeiten"></textarea>
-</label>
-</div>
-<div class="toolbar">
-<input id="filePath" placeholder="public/app.js" aria-label="Dateipfad">
-<button id="readFile" type="button">Lesen</button>
-<button id="previewWrite" type="button">Speichern-Vorschau</button>
-<button id="applyWrite" type="button">Lokal speichern</button>
-<button id="downloadEditor" type="button">Download</button>
-</div>
-<div class="toolbar">
-<button id="createLocalProject" type="button">Lokales Projekt erstellen</button>
-<button id="saveWorkspaceFile" type="button">In Workspace speichern</button>
-<button id="snapshotWorkspace" type="button">Snapshot erzeugen</button>
-<button id="restoreWorkspace" type="button">Aus Manifest wiederherstellen</button>
-<button id="workspaceStatus" type="button">Workspace Status</button>
-</div>
-<div id="codeOutput" class="output"></div>
-</section>
+        <section id="code" class="view" aria-label="Code-Assistent">
+          <header class="view-header">
+            <p class="eyebrow">Code</p>
+            <h2>Programmieren</h2>
+          </header>
+          <div class="panel-grid">
+            <label>
+              Dateien
+              <textarea id="fileRefs" spellcheck="false" placeholder="src/server.js"></textarea>
+            </label>
+            <label>
+              Code-Editor
+              <textarea id="editor" spellcheck="false" placeholder="Datei laden oder Code hier bearbeiten"></textarea>
+            </label>
+          </div>
+          <div class="toolbar">
+            <input id="filePath" placeholder="public/app.js" aria-label="Dateipfad">
+            <button id="readFile" type="button">Lesen</button>
+            <button id="previewWrite" type="button">Speichern-Vorschau</button>
+            <button id="applyWrite" type="button">Lokal speichern</button>
+            <button id="downloadEditor" type="button">Download</button>
+          </div>
+          <div class="toolbar">
+            <button id="createLocalProject" type="button">Lokales Projekt erstellen</button>
+            <button id="saveWorkspaceFile" type="button">In Workspace speichern</button>
+            <button id="snapshotWorkspace" type="button">Snapshot erzeugen</button>
+            <button id="restoreWorkspace" type="button">Aus Manifest wiederherstellen</button>
+            <button id="workspaceStatus" type="button">Workspace Status</button>
+          </div>
+          <div id="codeOutput" class="output"></div>
+        </section>
 
-<section id="projects" class="view" aria-label="Projekte">
-<header class="view-header">
-<p class="eyebrow">Projekte</p>
-<h2>Lokale Projekte</h2>
-<p class="subhead">Projekte und Snapshots werden lokal gespeichert. Cloud-Sync über IDrive e2 folgt später.</p>
-</header>
-<div class="toolbar">
-<button id="projectCreate" type="button">Projekt erstellen</button>
-<button id="projectRefresh" type="button">Liste aktualisieren</button>
-<button id="projectOpen" type="button">Projekt öffnen</button>
-<button id="projectSave" type="button">Projekt speichern</button>
-<button id="projectSnapshot" type="button">Snapshot</button>
-<button id="projectManifest" type="button">Manifest anzeigen</button>
-<button id="projectExport" type="button">Exportieren</button>
-<button id="projectImport" type="button">Importieren</button>
-<details class="more-menu">
-<summary aria-label="Weitere Aktionen">Mehr</summary>
-<div class="menu-panel">
-<button id="projectDelete" type="button" class="danger">Projekt löschen</button>
-</div>
-</details>
-</div>
-<div class="panel-grid">
-<label>
-Projektliste
-<select id="projectSelect" aria-label="Projekt auswählen"></select>
-</label>
-<label>
-Import-Datei
-<input id="projectImportFile" type="file" accept="application/json,.json" aria-label="Import-Datei auswählen">
-</label>
-</div>
-<div id="projectList" class="output"></div>
-<div id="projectOutput" class="output"></div>
-</section>
+        <section id="projects" class="view" aria-label="Projekte">
+          <header class="view-header">
+            <p class="eyebrow">Projekte</p>
+            <h2>Lokale Projekte</h2>
+            <p class="subhead">Projektmanifeste und Snapshots entstehen lokal. IDrive-e2-Sync kommt spaeter ueber signierte URLs.</p>
+          </header>
+          <div class="toolbar">
+            <button id="projectCreate" type="button">Projekt erstellen</button>
+            <button id="projectRefresh" type="button">Liste aktualisieren</button>
+            <button id="projectOpen" type="button">Projekt oeffnen</button>
+            <button id="projectSave" type="button">Projekt speichern</button>
+            <button id="projectSnapshot" type="button">Snapshot</button>
+            <button id="projectManifest" type="button">Manifest anzeigen</button>
+            <button id="projectExport" type="button">Exportieren</button>
+            <button id="projectImport" type="button">Importieren</button>
+            <button id="projectDelete" type="button">Projekt loeschen</button>
+          </div>
+          <div class="panel-grid">
+            <label>
+              Projektliste
+              <select id="projectSelect" aria-label="Projekt auswaehlen"></select>
+            </label>
+            <label>
+              Import-Datei
+              <input id="projectImportFile" type="file" accept="application/json,.json" aria-label="Import-Datei auswaehlen">
+            </label>
+          </div>
+          <div id="projectList" class="output"></div>
+          <div id="projectOutput" class="output"></div>
+        </section>
 
-<section id="files" class="view" aria-label="Dateien und Uploads">
-<header class="view-header">
-<p class="eyebrow">Dateien</p>
-<h2>Uploads und Downloads</h2>
-</header>
-<div class="panel-grid">
-<label>
-Upload-Staging
-<input id="upload" type="file" accept=".css,.html,.js,.json,.md,.svg,.txt,text/*,application/json,image/svg+xml" multiple aria-label="Dateien für Upload auswählen">
-</label>
-<label>
-Gestagte Uploads
-<textarea id="uploadList" readonly aria-label="Gestagte Uploads"></textarea>
-</label>
-</div>
-<div class="toolbar">
-<button id="storageAgain" type="button">IDrive e2 prüfen</button>
-<button id="downloadUploadManifest" type="button">Upload-Liste downloaden</button>
-</div>
-<div id="fileOutput" class="output"></div>
-</section>
+        <section id="files" class="view" aria-label="Dateien und Uploads">
+          <header class="view-header">
+            <p class="eyebrow">Dateien</p>
+            <h2>Uploads und Downloads</h2>
+          </header>
+          <div class="panel-grid">
+            <label>
+              Upload-Staging
+              <input id="upload" type="file" accept=".css,.html,.js,.json,.md,.svg,.txt,text/*,application/json,image/svg+xml" multiple aria-label="Dateien fuer Upload auswaehlen">
+            </label>
+            <label>
+              Gestagte Uploads
+              <textarea id="uploadList" readonly aria-label="Gestagte Uploads"></textarea>
+            </label>
+          </div>
+          <div class="toolbar">
+            <button id="storageAgain" type="button">IDrive e2 pruefen</button>
+            <button id="downloadUploadManifest" type="button">Upload-Liste downloaden</button>
+          </div>
+          <div id="fileOutput" class="output"></div>
+        </section>
 
-<section id="storageView" class="view" aria-label="Speicher und IDrive e2 Status">
-<header class="view-header">
-<p class="eyebrow">Speicher</p>
-<h2>IDrive e2 Status</h2>
-<p class="subhead">IDrive e2 ist der Hauptspeicher. Zugangsdaten bleiben sicher außerhalb des Browsers.</p>
-</header>
-<div class="status-grid" aria-label="Speicherstatus">
-<div><strong>Primärspeicher</strong><span>IDrive e2</span></div>
-<div><strong>Browser</strong><span>IndexedDB / OPFS</span></div>
-<div><strong>Sync</strong><span>folgt später</span></div>
-<div><strong>K2.7 Vault</strong><span id="kimiVaultStorageText">geprüfte Metadaten bereit</span></div>
-<div><strong>GLM-5.2 FP8</strong><span id="glmVaultStorageText">Metadaten archiviert</span></div>
-</div>
-<div class="toolbar">
-<button id="storagePanelCheck" type="button">IDrive e2 prüfen</button>
-<button id="kimiStatusCheck" type="button">K2.7 Vault prüfen</button>
-<button id="glmStatusCheck" type="button">GLM Vault prüfen</button>
-<button id="storagePanelLocal" type="button">Lokalen Speicher anzeigen</button>
-</div>
-<div id="storagePanelOutput" class="output"></div>
-<div id="kimiStatusOutput" class="output"></div>
-<div id="glmStatusOutput" class="output"></div>
-</section>
+        <section id="storageView" class="view" aria-label="Speicher und IDrive e2 Status">
+          <header class="view-header">
+            <p class="eyebrow">Speicher</p>
+            <h2>IDrive e2 Status</h2>
+            <p class="subhead">IDrive e2 ist Hauptspeicher/Vault. Der Browser bekommt keine IDrive-Secrets.</p>
+          </header>
+          <div class="status-grid" aria-label="Speicherstatus">
+            <div><strong>Primaerspeicher</strong><span>IDrive e2</span></div>
+            <div><strong>Browser</strong><span>IndexedDB / OPFS</span></div>
+            <div><strong>Sync</strong><span>presigned URLs spaeter</span></div>
+            <div><strong>K2.7 Vault</strong><span id="kimiVaultStorageText">gepruefte Metadaten bereit</span></div>
+            <div><strong>GLM-5.2 FP8</strong><span id="glmVaultStorageText">Metadaten archiviert</span></div>
+          </div>
+          <div class="toolbar">
+            <button id="storagePanelCheck" type="button">IDrive e2 pruefen</button>
+            <button id="kimiStatusCheck" type="button">K2.7 Vault pruefen</button>
+            <button id="glmStatusCheck" type="button">GLM Vault pruefen</button>
+            <button id="storagePanelLocal" type="button">Lokalen Speicher anzeigen</button>
+          </div>
+          <div id="storagePanelOutput" class="output"></div>
+          <div id="kimiStatusOutput" class="output"></div>
+          <div id="glmStatusOutput" class="output"></div>
+        </section>
 
-<section id="memory" class="view" aria-label="Memory und RAG">
-<header class="view-header">
-<p class="eyebrow">Memory</p>
-<h2>Merken und Suchen</h2>
-</header>
-<div class="panel-grid">
-<label>
-Memory
-<textarea id="memoryText" placeholder="Lokale, browserseitige Notizen"></textarea>
-</label>
-<label>
-RAG-Notizen
-<textarea id="ragText" placeholder="Lokale Quellen, Begriffe, Snippets"></textarea>
-</label>
-</div>
-<div class="toolbar">
-<button id="saveMemory" type="button">Memory speichern</button>
-<button id="searchMemory" type="button">Memory/RAG suchen</button>
-<button id="downloadMemory" type="button">Memory downloaden</button>
-<input id="memoryQuery" placeholder="Suchbegriff" aria-label="Suchbegriff">
-</div>
-<div id="memoryOutput" class="output"></div>
-</section>
+        <section id="memory" class="view" aria-label="Memory und RAG">
+          <header class="view-header">
+            <p class="eyebrow">Memory</p>
+            <h2>Merken und Suchen</h2>
+          </header>
+          <div class="panel-grid">
+            <label>
+              Memory
+              <textarea id="memoryText" placeholder="Lokale, browserseitige Notizen"></textarea>
+            </label>
+            <label>
+              RAG-Notizen
+              <textarea id="ragText" placeholder="Lokale Quellen, Begriffe, Snippets"></textarea>
+            </label>
+          </div>
+          <div class="toolbar">
+            <button id="saveMemory" type="button">Memory speichern</button>
+            <button id="searchMemory" type="button">Memory/RAG suchen</button>
+            <button id="downloadMemory" type="button">Memory downloaden</button>
+            <input id="memoryQuery" placeholder="Suchbegriff" aria-label="Suchbegriff">
+          </div>
+          <div id="memoryOutput" class="output"></div>
+        </section>
 
-<section id="ai" class="view" aria-label="KI-Modus">
-<header class="view-header">
-<p class="eyebrow">KI</p>
-<h2>Modus und Kosten</h2>
-<p class="subhead">Standardmäßig sicher deaktiviert. Premium-KI wird nie automatisch oder versteckt kostenpflichtig genutzt.</p>
-</header>
-<div class="panel-grid">
-<label>
-KI-Modus
-<select id="aiModeSelect" aria-label="KI-Modus">
-<option value="disabled">Disabled</option>
-<option value="local-browser">Local Browser</option>
-<option value="byok-openai-compatible">BYOK OpenAI-kompatibel</option>
-<option value="free-demo-hardlimit">Free Demo Hard-Limit</option>
-<option value="glm-5-2-fp8-vault">GLM-5.2 FP8 Vault</option>
-<option value="kimi-k2-7-vault">Kimi K2.7 Vault</option>
-<option value="later-partner-compute">Partner Compute später</option>
-</select>
-</label>
-<label>
-BYOK Endpoint
-<input id="byokBaseUrl" placeholder="https://api.example.com/v1" autocomplete="off">
-</label>
-<label>
-BYOK Modell
-<input id="byokModel" placeholder="provider/model" autocomplete="off">
-</label>
-<label>
-BYOK API-Key
-<input id="byokKey" type="password" placeholder="Nur Session, nicht dauerhaft speichern" autocomplete="off">
-</label>
-</div>
-<div class="toolbar">
-<button id="evaluateAiMode" type="button">KI-Modus prüfen</button>
-<button id="clearByok" type="button">BYOK-Felder leeren</button>
-</div>
-<div class="output" id="aiOutput">KI ist deaktiviert. Premium-Modelle laufen nur über Vault, BYOK oder Partner — nie automatisch.</div>
-</section>
+        <section id="ai" class="view" aria-label="KI-Modus">
+          <header class="view-header">
+            <p class="eyebrow">KI</p>
+            <h2>Modus und Kosten</h2>
+            <p class="subhead">Standard ist sicher deaktiviert. Premium-KI wird nie automatisch oder versteckt kostenpflichtig genutzt.</p>
+          </header>
+          <div class="panel-grid">
+            <label>
+              KI-Modus
+              <select id="aiModeSelect" aria-label="KI-Modus">
+                <option value="disabled">Disabled</option>
+                <option value="local-browser">Local Browser</option>
+                <option value="byok-openai-compatible">BYOK OpenAI-kompatibel</option>
+                <option value="free-demo-hardlimit">Free Demo Hard-Limit</option>
+                <option value="glm-5-2-fp8-vault">GLM-5.2 FP8 Vault</option>
+                <option value="kimi-k2-7-vault">Kimi K2.7 Vault</option>
+                <option value="later-partner-compute">Partner Compute spaeter</option>
+              </select>
+            </label>
+            <label>
+              BYOK Endpoint
+              <input id="byokBaseUrl" placeholder="https://api.example.com/v1" autocomplete="off">
+            </label>
+            <label>
+              BYOK Modell
+              <input id="byokModel" placeholder="provider/model" autocomplete="off">
+            </label>
+            <label>
+              BYOK API-Key
+              <input id="byokKey" type="password" placeholder="Nur Session, nicht dauerhaft speichern" autocomplete="off">
+            </label>
+          </div>
+          <div class="toolbar">
+            <button id="evaluateAiMode" type="button">KI-Modus pruefen</button>
+            <button id="clearByok" type="button">BYOK-Felder leeren</button>
+          </div>
+          <div class="output" id="aiOutput">KI ist deaktiviert. Kimi K2.7 ist Vault/BYOK/Partner/Self-host spaeter, nicht kostenloser Standardmotor.</div>
+        </section>
 
-<section id="cost" class="view" aria-label="Kostenstatus und Free-Schutz">
-<header class="view-header">
-<p class="eyebrow">Kosten</p>
-<h2>Free-Schutz</h2>
-<p class="subhead">GitHub und GitHub Pages bleiben dauerhaft kostenlos. Bezahl-Fallbacks, Trials und Auto-Billing sind blockiert.</p>
-</header>
-<div class="status-grid">
-<div><strong>GitHub</strong><span>Free only</span></div>
-<div><strong>GitHub Pages</strong><span>Free only</span></div>
-<div><strong>AI</strong><span id="costAiMode">disabled</span></div>
-<div><strong>BYOK</strong><span>Nutzer-Key separat</span></div>
-<div><strong>Paid-Fallback</strong><span>blockiert</span></div>
-<div><strong>Trials</strong><span>verboten</span></div>
-</div>
-<div class="toolbar">
-<button id="costGuardDetails" type="button">Free-Guard anzeigen</button>
-<button id="costCheck" type="button">Lokale Checks</button>
-</div>
-<div id="costOutput" class="output"></div>
-</section>
+        <section id="cost" class="view" aria-label="Kostenstatus und Free-Schutz">
+          <header class="view-header">
+            <p class="eyebrow">Kosten</p>
+            <h2>Free-Schutz</h2>
+            <p class="subhead">GitHub und GitHub Pages bleiben dauerhaft Free. Paid-Fallbacks, Trials und Auto-Billing sind blockiert.</p>
+          </header>
+          <div class="status-grid">
+            <div><strong>GitHub</strong><span>Free only</span></div>
+            <div><strong>GitHub Pages</strong><span>Free only</span></div>
+            <div><strong>AI</strong><span id="costAiMode">disabled</span></div>
+            <div><strong>BYOK</strong><span>Nutzer-Key separat</span></div>
+            <div><strong>Paid-Fallback</strong><span>blockiert</span></div>
+            <div><strong>Trials</strong><span>verboten</span></div>
+          </div>
+          <div class="toolbar">
+            <button id="costGuardDetails" type="button">Free-Guard anzeigen</button>
+            <button id="costCheck" type="button">Lokale Checks</button>
+          </div>
+          <div id="costOutput" class="output"></div>
+        </section>
 
-<section id="tools" class="view" aria-label="Status">
-<header class="view-header">
-<p class="eyebrow">Status</p>
-<h2>System</h2>
-</header>
-<div class="toolbar">
-<button id="capabilities" type="button">Capabilities</button>
-<button id="health" type="button">Health</button>
-<button id="freeGuard" type="button">Free-Guard Hinweis</button>
-<button id="localWorkspaceStatus" type="button">Local Workspace</button>
-</div>
-<div class="status-grid" aria-label="Aktueller Betriebsstatus">
-<div><strong>Storage</strong><span id="storageStatusText">local-browser</span></div>
-<div><strong>Local Workspace</strong><span id="workspaceStatusText">lokal</span></div>
-<div><strong>IDrive e2</strong><span id="idriveStatusText">Sync folgt später</span></div>
-<div><strong>AI Mode</strong><span id="aiModeText">disabled</span></div>
-<div><strong>K2.7 Vault</strong><span id="kimiVaultStatusText">geprüft / Inferenz aus</span></div>
-<div><strong>Kosten</strong><span id="costStatusText">0 EUR Risiko / blockiert</span></div>
-<div><strong>Sync</strong><span id="syncStatusText">lokal</span></div>
-</div>
-<div id="toolOutput" class="output"></div>
-</section>
+        <section id="tools" class="view" aria-label="Status">
+          <header class="view-header">
+            <p class="eyebrow">Status</p>
+            <h2>System</h2>
+          </header>
+          <div class="toolbar">
+            <button id="capabilities" type="button">Capabilities</button>
+            <button id="health" type="button">Health</button>
+            <button id="freeGuard" type="button">Free-Guard Hinweis</button>
+            <button id="localWorkspaceStatus" type="button">Local Workspace</button>
+          </div>
+          <div class="status-grid" aria-label="Aktueller Betriebsstatus">
+            <div><strong>Storage</strong><span id="storageStatusText">local-browser</span></div>
+            <div><strong>Local Workspace</strong><span id="workspaceStatusText">lokal</span></div>
+            <div><strong>IDrive e2</strong><span id="idriveStatusText">presigned sync spaeter</span></div>
+            <div><strong>AI Mode</strong><span id="aiModeText">disabled</span></div>
+            <div><strong>K2.7 Vault</strong><span id="kimiVaultStatusText">geprueft / Inferenz disabled</span></div>
+            <div><strong>Kosten</strong><span id="costStatusText">0 EUR Risiko / blockiert</span></div>
+            <div><strong>Sync</strong><span id="syncStatusText">lokal</span></div>
+          </div>
+          <div id="toolOutput" class="output"></div>
+        </section>
 
-<section id="settings" class="view" aria-label="Einstellungen">
-<header class="view-header">
-<p class="eyebrow">Einstellungen</p>
-<h2>App-Modus</h2>
-<p class="subhead">Einstellungen bleiben lokal gespeichert, bis Login und Cloud-Sync sicher aktiv sind.</p>
-</header>
-<div class="panel-grid">
-<label>
-Sprache
-<select id="settingsLanguage" aria-label="Sprache">
-<option value="de">Deutsch</option>
-<option value="en">English</option>
-</select>
-</label>
-<label>
-Sicherheitsmodus
-<select id="settingsMode" aria-label="Sicherheitsmodus">
-<option value="safe">Free-safe</option>
-<option value="byok">BYOK vorbereitet</option>
-<option value="local">Lokal</option>
-</select>
-</label>
-</div>
-<div class="toolbar">
-<button id="saveSettings" type="button">Einstellungen speichern</button>
-<button type="button" data-jump="cost">Kosten &amp; Limits</button>
-<button type="button" data-jump="profile">Nutzer</button>
-<button id="showOfflinePage" type="button">Offline-Seite anzeigen</button>
-<button id="showErrorPage" type="button">Fehlerseite anzeigen</button>
-</div>
-<div id="settingsOutput" class="output"></div>
-<p class="legal-links">
-Rechtliches:
-<a href="/impressum.html">Impressum</a>
-<a href="/datenschutz.html">Datenschutzerklärung</a>
-</p>
-</section>
+        <section id="settings" class="view" aria-label="Einstellungen">
+          <header class="view-header">
+            <p class="eyebrow">Einstellungen</p>
+            <h2>App-Modus</h2>
+            <p class="subhead">Einstellungen bleiben lokal, bis Auth, Limits und IDrive-e2-Sync sicher sind.</p>
+          </header>
+          <div class="panel-grid">
+            <label>
+              Sprache
+              <select id="settingsLanguage" aria-label="Sprache">
+                <option value="de">Deutsch</option>
+                <option value="en">English</option>
+              </select>
+            </label>
+            <label>
+              Sicherheitsmodus
+              <select id="settingsMode" aria-label="Sicherheitsmodus">
+                <option value="safe">Free-safe</option>
+                <option value="byok">BYOK vorbereitet</option>
+                <option value="local">Lokal</option>
+              </select>
+            </label>
+          </div>
+          <div class="toolbar">
+            <button id="saveSettings" type="button">Einstellungen speichern</button>
+            <button type="button" data-jump="cost">Kosten & Limits</button>
+            <button type="button" data-jump="profile">Nutzer</button>
+            <button id="showOfflinePage" type="button">Offline-Seite anzeigen</button>
+            <button id="showErrorPage" type="button">Fehlerseite anzeigen</button>
+          </div>
+          <div id="settingsOutput" class="output"></div>
+          <p class="legal-links">
+            Rechtliches:
+            <a href="/impressum.html">Impressum</a>
+            <a href="/datenschutz.html">Datenschutzerklaerung</a>
+          </p>
+        </section>
 
-<section id="profile" class="view" aria-label="Nutzer und Login">
-<header class="view-header">
-<p class="eyebrow">Nutzer</p>
-<h2>Nutzer</h2>
-<p class="subhead">Melde dich an, um Profil und Projekte zu verwalten. Serverseitige Daten bleiben geschützt, bis Login sicher aktiv ist.</p>
-</header>
-<div class="panel-grid">
-<label>
-Name
-<input id="profileName" placeholder="Dein Name">
-</label>
-<label>
-E-Mail
-<input id="profileEmail" placeholder="name@example.com" inputmode="email">
-</label>
-<label>
-Sprache
-<select id="language" aria-label="Sprache">
-<option value="de">Deutsch</option>
-<option value="en">English</option>
-</select>
-</label>
-<label>
-Antwortmodus
-<select id="mode" aria-label="Antwortmodus">
-<option value="safe">Free-safe</option>
-<option value="byok">BYOK vorbereitet</option>
-<option value="local">Lokal</option>
-</select>
-</label>
-</div>
-<div class="toolbar">
-<div id="googleSignIn"></div>
-<button id="registerLocal" type="button">Registrierung lokal vorbereiten</button>
-<button id="loginLocal" type="button">Login lokal testen</button>
-<button id="logoutLocal" type="button">Ausloggen</button>
-<button id="saveProfile" type="button">Profil speichern</button>
-<details class="more-menu">
-<summary aria-label="Weitere Aktionen">Mehr</summary>
-<div class="menu-panel">
-<button id="clearLocal" type="button" class="danger">Lokale Daten leeren</button>
-</div>
-</details>
-</div>
-<div class="status-grid" aria-label="Sessionstatus">
-<div><strong>Session</strong><span id="sessionStatus">nicht angemeldet</span></div>
-<div><strong>Rolle</strong><span id="userRoleStatus">local-only</span></div>
-<div><strong>Projektrechte</strong><span id="projectRightsStatus">owner/editor/viewer vorbereitet</span></div>
-</div>
-<div id="profileOutput" class="output"></div>
-</section>
+        <section id="profile" class="view" aria-label="Nutzer und Login">
+          <header class="view-header">
+            <p class="eyebrow">Nutzer</p>
+            <h2>Nutzer</h2>
+            <p class="subhead">Login ist vorbereitet. Serverseitige Nutzer-Daten duerfen erst nach sicherer Auth- und Storage-Policy aktiv werden.</p>
+          </header>
+          <div class="panel-grid">
+            <label>
+              Name
+              <input id="profileName" placeholder="Dein Name">
+            </label>
+            <label>
+              E-Mail
+              <input id="profileEmail" placeholder="name@example.com" inputmode="email">
+            </label>
+            <label>
+              Sprache
+              <select id="language" aria-label="Sprache">
+                <option value="de">Deutsch</option>
+                <option value="en">English</option>
+              </select>
+            </label>
+            <label>
+              Antwortmodus
+              <select id="mode" aria-label="Antwortmodus">
+                <option value="safe">Free-safe</option>
+                <option value="byok">BYOK vorbereitet</option>
+                <option value="local">Lokal</option>
+              </select>
+            </label>
+          </div>
+          <div class="toolbar">
+            <div id="googleSignIn"></div>
+            <button id="registerLocal" type="button">Registrierung lokal vorbereiten</button>
+            <button id="loginLocal" type="button">Login lokal testen</button>
+            <button id="logoutLocal" type="button">Ausloggen</button>
+            <button id="saveProfile" type="button">Profil speichern</button>
+            <button id="clearLocal" type="button">Lokale Daten leeren</button>
+          </div>
+          <div class="status-grid" aria-label="Sessionstatus">
+            <div><strong>Session</strong><span id="sessionStatus">nicht angemeldet</span></div>
+            <div><strong>Rolle</strong><span id="userRoleStatus">local-only</span></div>
+            <div><strong>Projektrechte</strong><span id="projectRightsStatus">owner/editor/viewer vorbereitet</span></div>
+          </div>
+          <div id="profileOutput" class="output"></div>
+        </section>
 
-<section id="offline" class="view" aria-label="Offline-Seite">
-<header class="view-header">
-<p class="eyebrow">Offline</p>
-<h2>Offline weiterarbeiten</h2>
-<p class="subhead">Lokale Projekte, Notizen und Snapshots bleiben nutzbar. Online-Sync wartet auf eine sichere Verbindung.</p>
-</header>
-<div class="empty-state"><strong>Offline-Modus</strong><span>Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.</span></div>
-</section>
+        <section id="offline" class="view" aria-label="Offline-Seite">
+          <header class="view-header">
+            <p class="eyebrow">Offline</p>
+            <h2>Offline weiterarbeiten</h2>
+            <p class="subhead">Lokale Projekte, Notizen und Snapshots bleiben nutzbar. Online-Sync wartet auf eine sichere Verbindung.</p>
+          </header>
+          <div class="empty-state"><strong>Offline-Modus</strong><span>Keine Server-Aktion wird vorgetaeuscht. Lokale Arbeit bleibt moeglich.</span></div>
+        </section>
 
-<section id="error" class="view" aria-label="Fehlerseite">
-<header class="view-header">
-<p class="eyebrow">Fehler</p>
-<h2>Aktion blockiert</h2>
-<p class="subhead">Wenn Konfiguration, Kostenstatus oder Provider unklar ist, stoppt smejj.com sicher.</p>
-</header>
-<div class="empty-state"><strong>Fail-closed</strong><span>Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.</span></div>
-</section>
-</section>
-</main>
-<div id="toastRoot" class="toast-root" aria-live="polite"></div>
-<div id="modalRoot" class="modal-root" hidden>
-<div class="modal-backdrop" data-close-modal></div>
-<section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-<header><h3 id="modalTitle"></h3><button type="button" data-close-modal>Schließen</button></header>
-<div id="modalBody" class="modal-body"></div>
-</section>
-</div>
-<div id="voiceModeOverlay" class="voice-mode-overlay" data-mode="listening" role="dialog" aria-modal="true" aria-label="Sprachmodus" hidden>
-<button id="voiceModeClose" class="voice-mode-close" type="button" aria-label="Sprachmodus beenden" title="Beenden">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-</button>
-<div class="voice-mode-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-<p id="voiceModeStatus" class="voice-mode-status">Ich hoere zu ...</p>
-<p id="voiceModeTranscript" class="voice-mode-transcript" aria-live="polite"></p>
-<p class="voice-mode-hint">Sprich einfach — zum Beenden X druecken oder Escape.</p>
-</div>
-<script src="/assets/ui-modern.js" defer></script>
-<script src="/assets/app.js" type="module"></script>
-</body>
+        <section id="error" class="view" aria-label="Fehlerseite">
+          <header class="view-header">
+            <p class="eyebrow">Fehler</p>
+            <h2>Aktion blockiert</h2>
+            <p class="subhead">Wenn Konfiguration, Kostenstatus oder Provider unklar ist, stoppt smejj.com sicher.</p>
+          </header>
+          <div class="empty-state"><strong>Fail-closed</strong><span>Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.</span></div>
+        </section>
+      </section>
+    </main>
+    <div id="toastRoot" class="toast-root" aria-live="polite"></div>
+    <div id="modalRoot" class="modal-root" hidden>
+      <div class="modal-backdrop" data-close-modal></div>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <header><h3 id="modalTitle"></h3><button type="button" data-close-modal>Schliessen</button></header>
+        <div id="modalBody" class="modal-body"></div>
+      </section>
+    </div>
+    <div id="voiceModeOverlay" class="voice-mode-overlay" data-mode="listening" role="dialog" aria-modal="true" aria-label="Sprachmodus" hidden>
+      <button id="voiceModeClose" class="voice-mode-close" type="button" aria-label="Sprachmodus beenden" title="Beenden">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <div class="voice-mode-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <p id="voiceModeStatus" class="voice-mode-status">Ich hoere zu ...</p>
+      <p id="voiceModeTranscript" class="voice-mode-transcript" aria-live="polite"></p>
+      <p class="voice-mode-hint">Sprich einfach — zum Beenden X druecken oder Escape.</p>
+    </div>
+    <script src="/assets/app.js" type="module"></script>
+    <script src="/assets/browser-pane.js" type="module"></script>
+  </body>
 </html>
