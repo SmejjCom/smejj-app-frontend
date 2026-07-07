@@ -21,6 +21,7 @@ const API_PATHS = {
   agent: "/api/agent",
     authConfig: "/api/auth/config",
     browserFetch: "/api/browser/fetch",
+    browserRemote: "/api/browser/remote",
     authGoogle: "/api/auth/google",
     authMe: "/api/auth/me",
     authLogout: "/api/auth/logout",
