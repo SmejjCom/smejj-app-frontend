@@ -46,7 +46,7 @@
     <link rel="apple-touch-icon" href="/icons/icon.svg">
     <link rel="stylesheet" href="/assets/styles.css">
     <link rel="stylesheet" href="/assets/composer-tools.css">
-    <link rel="stylesheet" href="/assets/browser-pane.css">
+    <link rel="stylesheet" href="/assets/browser-pane.css?v=browser-pane-20260707-2">
   </head>
   <body>
     <button id="appMenuButton" class="glass-icon app-menu-button" type="button" aria-label="Menue oeffnen" aria-expanded="false">
@@ -530,6 +530,8 @@
           </div>
           <div class="toolbar">
             <div id="googleSignIn"></div>
+            <button id="passkeyLogin" type="button">Mit Passkey anmelden</button>
+            <button id="passkeyRegister" type="button">Passkey einrichten</button>
             <button id="registerLocal" type="button">Registrierung lokal vorbereiten</button>
             <button id="loginLocal" type="button">Login lokal testen</button>
             <button id="logoutLocal" type="button">Ausloggen</button>
@@ -581,6 +583,7 @@
       <p class="voice-mode-hint">Sprich einfach — zum Beenden X druecken oder Escape.</p>
     </div>
     <script src="/assets/app.js" type="module"></script>
-    <script src="/assets/browser-pane.js" type="module"></script>
+    <script src="/assets/browser-pane.js?v=browser-pane-20260707-2" type="module"></script>
+    <script src="/assets/auth/passkey-ui.js" type="module"></script>
   </body>
 </html>
