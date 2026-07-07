@@ -4,6 +4,7 @@ import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { runClientChat } from "/assets/ai/chatClient.js";
 import { Icons, closeModal, openModal, renderEmptyState, setButtonIcon, showToast } from "./components.js";
 import { initComposerTools } from "./composer-tools.js";
+import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 
 const $ = (selector) => document.querySelector(selector);
@@ -23,13 +24,13 @@ const workspace = createLocalWorkspace();
 const aiRouter = createAiRouter();
 let taskIndicatorTimer;
 const PANEL_WIDTH_KEYS = Object.freeze({
-  left: "smejj.ui.leftPanelWidth.v8",
-  right: "smejj.ui.rightPanelWidth.v8"
+  left: "smejj.ui.leftPanelWidth.v9",
+  right: "smejj.ui.rightPanelWidth.v9"
 });
 const PANEL_WIDTHS = Object.freeze({
-  default: 20,
-  compact: 132,
-  min: 20,
+  default: 228,
+  compact: 96,
+  min: 188,
   close: 10,
   max: 520,
   centerMin: 120
@@ -390,17 +391,7 @@ function bindStartComposer() {
 }
 
 function bindSearch() {
-  const form = $("#searchForm");
-  const input = $("#searchQuery");
-  if (!form || !input) return;
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const query = input.value.trim();
-    if (!query) return;
-    $("#searchLog")?.querySelector(".search-empty")?.remove();
-    input.value = "";
-    submitTask(query, { target: "#searchLog" });
-  });
+  initGlobalSearch({ $, goToView, showTaskIndicator, showToast, state, workspace });
 }
 
 async function submitTask(task, { target = "#startLog" } = {}) {
@@ -1223,7 +1214,7 @@ function refreshProfileDock() {
   const initial = displayName.trim().charAt(0).toLowerCase();
   avatar.classList.toggle("is-empty", !authenticated);
   avatar.textContent = authenticated && initial ? initial : "";
-  label.textContent = authenticated ? (state.profile.name || state.session.email || "Profil") : "Konto";
+  label.textContent = "Nutzer";
 }
 
 async function writeFile(apply) {
