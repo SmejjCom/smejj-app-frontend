@@ -5,7 +5,7 @@
 // blockierende Seiten (Google, GitHub, ...) kommen als sichere, serverseitig
 // umgeschriebene Ansicht ueber /api/browser/fetch. Fail-closed: ohne Server
 // wird direkt eingebettet und "In neuem Tab oeffnen" angeboten.
-import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260707-4";
+import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260707-5";
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
@@ -229,7 +229,7 @@ export function normalizeAddress(input) {
   const text = String(input || "").trim();
   if (!text) return "";
   if (/^https?:\/\//i.test(text)) return text;
-  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\:\d+)?(\/|\?|#|$)/i.test(text)) return `https://${text}`;
+  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(\/|\?|#|$)/i.test(text)) return `https://${text}`;
   return `https://duckduckgo.com/html/?q=${encodeURIComponent(text)}`;
 }
 
@@ -255,6 +255,7 @@ async function navigate(tab, url, { push = true } = {}) {
   if (tab.url !== url) return; // Nutzer hat inzwischen weiternavigiert.
 
   if (data?.ok === false) {
+    if (await tryRemoteBrowser(tab, url, { reason: "fetch-error" })) return;
     tab.status = "error";
     showHint(`Seite konnte nicht geladen werden: ${String(data.error || "unbekannt")}`);
     render();
@@ -266,6 +267,7 @@ async function navigate(tab, url, { push = true } = {}) {
   tab.title = data?.title || shortHost(finalUrl);
 
   if (data?.ok && data.html && shouldOpenInRealBrowser(data.html, finalUrl)) {
+    if (await tryRemoteBrowser(tab, finalUrl, { reason: "external-required" })) return;
     setFallbackFrame(tab, {
       url: finalUrl,
       title: "Echter Browser erforderlich",
@@ -288,6 +290,40 @@ async function navigate(tab, url, { push = true } = {}) {
   tab.status = "ready";
   persistTabs();
   render();
+}
+
+async function tryRemoteBrowser(tab, url, { reason = "" } = {}) {
+  const endpoint = CLIENT_ROUTES.api.browserRemote;
+  if (!endpoint || !endpoint.startsWith("https://")) return false;
+  let data = null;
+  try {
+    const response = await fetch(`${endpoint}?url=${encodeURIComponent(url)}`);
+    data = response.ok ? await response.json() : null;
+  } catch {
+    data = null;
+  }
+  if (!data?.ok || !data.screenshot) return false;
+  tab.url = data.finalUrl || url;
+  tab.title = data.title || shortHost(tab.url);
+  setFrame(tab, {
+    mode: "remote-browser",
+    srcdoc: buildRemoteBrowserHtml({
+      url: tab.url,
+      title: tab.title,
+      screenshot: data.screenshot,
+      reason
+    })
+  });
+  tab.status = "ready";
+  if (!tab.history.includes(tab.url)) {
+    tab.history = tab.history.slice(0, tab.historyIndex + 1);
+    tab.history.push(tab.url);
+    tab.historyIndex = tab.history.length - 1;
+  }
+  showHint("Remote-Browser-Worker hat die Seite gerendert.");
+  persistTabs();
+  render();
+  return true;
 }
 
 function stepHistory(delta) {
@@ -360,6 +396,35 @@ export function buildExternalFallbackHtml({ url, title, message }) {
     <strong>${safeTitle}</strong>
     <span>${safeMessage}</span>
     <a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a>
+  </main>
+</body>
+</html>`;
+}
+
+export function buildRemoteBrowserHtml({ url, title, screenshot, reason = "" }) {
+  const safeUrl = escapeHtml(url || "");
+  const safeTitle = escapeHtml(title || "Remote-Browser");
+  const safeScreenshot = String(screenshot || "").startsWith("data:image/png;base64,") ? screenshot : "";
+  const safeReason = escapeHtml(reason || "remote-browser");
+  return `<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html,body{height:100%;margin:0;background:#101113;color:#f6f3ee;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{min-height:100%;display:grid;grid-template-rows:auto 1fr;box-sizing:border-box}
+    header{display:flex;align-items:center;gap:10px;min-height:38px;padding:0 10px;border-bottom:1px solid rgba(246,243,238,.12);background:#18191c}
+    strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+    span{color:rgba(246,243,238,.54);font-size:11px}
+    a{margin-left:auto;color:#9fe7d4;font-size:12px;font-weight:700;text-decoration:none}
+    img{width:100%;height:100%;object-fit:contain;background:#0c0d0f}
+  </style>
+</head>
+<body>
+  <main class="bp-remote-browser" data-reason="${safeReason}">
+    <header><strong>${safeTitle}</strong><span>Remote-Browser</span><a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a></header>
+    <img src="${safeScreenshot}" alt="Remote-Browser-Ansicht von ${safeTitle}">
   </main>
 </body>
 </html>`;
