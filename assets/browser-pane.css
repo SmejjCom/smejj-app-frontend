@@ -236,6 +236,7 @@
 /* Inhalt */
 
 .bp-content {
+  grid-row: 5;
   position: relative;
   min-height: 0;
   overflow: hidden;
