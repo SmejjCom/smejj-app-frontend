@@ -2,7 +2,7 @@
 
 .browser-panel.is-browser-mode {
   grid-template-rows: 1fr;
-  padding: 32px 0 0;
+  padding: 0;
   gap: 0;
 }
 
@@ -12,9 +12,14 @@
 
 .browser-pane {
   display: grid;
-  grid-template-rows: auto auto auto auto minmax(260px, 1fr);
+  grid-template-rows: 34px auto auto minmax(260px, 1fr);
   min-height: 0;
   height: 100%;
+}
+
+.browser-pane,
+.browser-pane * {
+  box-sizing: border-box;
 }
 
 .browser-panel:not(.is-browser-mode) .browser-pane {
@@ -24,10 +29,16 @@
 /* Tab-Leiste */
 
 .bp-tabstrip {
+  grid-row: 1;
+  grid-column: 1;
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px 0;
+  min-width: 0;
+  height: 34px;
+  padding: 0 min(52%, 430px) 0 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
   overflow: hidden;
 }
 
@@ -45,14 +56,15 @@
   gap: 7px;
   flex: 1 1 40px;
   min-width: 0;
-  max-width: 190px;
-  height: 32px;
-  padding: 0 8px 0 10px;
+  max-width: 150px;
+  height: 26px;
+  min-height: 0;
+  padding: 0 7px;
   border: 1px solid transparent;
-  border-radius: 9px 9px 0 0;
+  border-radius: 7px;
   background: transparent;
   color: rgba(246, 243, 238, 0.62);
-  font-size: 12px;
+  font-size: 11.5px;
   cursor: pointer;
 }
 
@@ -112,8 +124,10 @@
   flex: none;
   width: 26px;
   height: 26px;
+  min-height: 0;
+  padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: 7px;
   background: transparent;
   color: rgba(246, 243, 238, 0.62);
   font-size: 16px;
@@ -134,11 +148,16 @@
 /* Toolbar */
 
 .bp-toolbar {
+  grid-row: 1;
+  grid-column: 1;
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 6px 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: min(52%, 430px);
+  height: 34px;
+  padding: 2px 6px;
+  border-top: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
 }
@@ -147,10 +166,12 @@
   flex: none;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
+  min-height: 0;
+  padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: 7px;
   background: transparent;
   color: rgba(246, 243, 238, 0.72);
   cursor: pointer;
@@ -167,8 +188,8 @@
 }
 
 .bp-toolbar svg {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
@@ -184,13 +205,13 @@
 
 .bp-address {
   width: 100%;
-  height: 30px;
-  padding: 0 12px;
+  height: 26px;
+  padding: 0 10px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.28);
   color: #f6f3ee;
-  font-size: 12.5px;
+  font-size: 12px;
 }
 
 .bp-address:focus {
@@ -236,7 +257,7 @@
 /* Inhalt */
 
 .bp-content {
-  grid-row: 5;
+  grid-row: 4;
   position: relative;
   min-height: 0;
   overflow: hidden;
