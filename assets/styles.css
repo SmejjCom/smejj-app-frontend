@@ -93,7 +93,9 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  gap: 8px;
   min-height: 40px;
+  padding: 7px 8px;
   border-color: transparent;
   background: transparent;
   color: #34342f;
@@ -508,21 +510,12 @@ textarea {
   }
 }
 
-.button-icon {
-  display: inline-grid;
-  place-items: center;
-  width: 28px;
-  min-width: 28px;
-  color: #2f6f5e;
-  font-weight: 800;
-}
+.button-icon { display: inline-grid; place-items: center; width: 26px; min-width: 26px; color: #00ffef; font-weight: 800; }
+.nav-label { min-width: 0; overflow: hidden; font-size: 14px; line-height: 1.16; text-overflow: ellipsis; white-space: nowrap; }
 
 .button-icon svg,
 .browser-panel-nav button svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
+  width: 18px; height: 18px; fill: none; stroke: currentColor;
   stroke-width: 1.9;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -653,9 +646,10 @@ textarea {
 /* Codex-like start shell with glass controls. */
 :root {
   color-scheme: dark;
-  --menu-icon-color: rgba(246, 243, 238, 0.82);
-  --left-panel-width: 20px;
-  --right-panel-width: 20px;
+  --menu-icon-color: rgba(246, 243, 238, 0.78);
+  --menu-icon-active-color: #00ffef;
+  --left-panel-width: 228px;
+  --right-panel-width: 228px;
   background: #101113;
   color: #f6f3ee;
 }
@@ -823,6 +817,7 @@ body.task-indicator-done .split-icon span:last-child {
 .sidebar.is-compact .nav-button,
 .sidebar.is-compact .profile-dock {
   justify-content: center;
+  gap: 0;
   width: 100%;
   min-width: 0;
   overflow: hidden;
@@ -838,8 +833,8 @@ body.task-indicator-done .split-icon span:last-child {
 
 .sidebar.is-compact .button-icon svg,
 .browser-panel.is-compact .browser-panel-nav button svg {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
 }
 
 .sidebar.is-compact .nav {
@@ -854,8 +849,8 @@ body.task-indicator-done .split-icon span:last-child {
 .sidebar.is-compact .nav-button,
 .sidebar.is-compact .profile-dock,
 .browser-panel.is-compact .browser-panel-nav button {
-  min-height: 20px;
-  height: 20px;
+  min-height: 28px;
+  height: 28px;
 }
 
 .sidebar.is-compact .profile-dock {
@@ -876,7 +871,8 @@ body.task-indicator-done .split-icon span:last-child {
   gap: 0;
   align-self: end;
   overflow: visible;
-  padding-top: 0;
+  padding-top: 8px; margin-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sidebar.is-open {
@@ -948,9 +944,7 @@ body.is-resizing-panel .panel-resizer::before {
 
 .browser-panel.is-compact {
   padding-top: 30px;
-  padding-right: 0;
-  padding-bottom: 0;
-  padding-left: 0;
+  padding-right: 0; padding-bottom: 0; padding-left: 0;
 }
 
 .browser-panel.is-compact .browser-panel-nav button {
@@ -1005,9 +999,9 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel-nav button {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   justify-content: flex-start;
-  min-height: 40px;
+  min-height: 36px;
   border-color: transparent;
   border-radius: 10px;
   background: transparent;
@@ -1018,8 +1012,8 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel-nav button span {
   display: inline-grid;
   place-items: center;
-  width: 28px;
-  min-width: 28px;
+  width: 24px;
+  min-width: 24px;
   color: var(--menu-icon-color);
   font-weight: 800;
 }
@@ -1064,6 +1058,9 @@ body.is-resizing-panel .panel-resizer::before {
   border-radius: 10px;
   color: rgba(246, 243, 238, 0.76);
   font-weight: 500;
+  min-height: 36px;
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 
 .sidebar .nav-button,
@@ -1081,6 +1078,9 @@ body.is-resizing-panel .panel-resizer::before {
 .button-icon {
   color: var(--menu-icon-color);
 }
+
+.sidebar .nav-button.is-active .button-icon,
+.browser-panel-nav button.is-active span { color: var(--menu-icon-active-color); }
 
 .sidebar .nav-button:hover,
 .browser-panel-nav button:hover {
