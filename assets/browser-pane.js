@@ -11,6 +11,16 @@ const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
 const PANE_WIDTH = "50vw";
 const NEW_TAB_TITLE = "Neuer Tab";
+const BLOCKED_PAGE_PATTERNS = [
+  /max challenge attempts exceeded/i,
+  /robot check/i,
+  /captcha/i,
+  /verify (that )?you are human/i,
+  /unusual traffic/i,
+  /automated access/i,
+  /enable cookies/i,
+  /api-services-support@amazon\.com/i
+];
 
 const state = {
   tabs: [],
@@ -219,7 +229,7 @@ export function normalizeAddress(input) {
   const text = String(input || "").trim();
   if (!text) return "";
   if (/^https?:\/\//i.test(text)) return text;
-  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(\/|\?|#|$)/i.test(text)) return `https://${text}`;
+  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\:\d+)?(\/|\?|#|$)/i.test(text)) return `https://${text}`;
   return `https://duckduckgo.com/html/?q=${encodeURIComponent(text)}`;
 }
 
@@ -255,7 +265,14 @@ async function navigate(tab, url, { push = true } = {}) {
   tab.url = finalUrl;
   tab.title = data?.title || shortHost(finalUrl);
 
-  if (data?.ok && data.html && !data.embeddable) {
+  if (data?.ok && data.html && shouldOpenInRealBrowser(data.html, finalUrl)) {
+    setFallbackFrame(tab, {
+      url: finalUrl,
+      title: "Echter Browser erforderlich",
+      message: "Diese Webseite blockiert eingebettete oder automatisierte Browser-Ansichten. Oeffne sie extern, damit Login, Cookies und Schutzpruefungen wie in Chrome funktionieren."
+    });
+    showHint("Diese Webseite braucht einen echten Browser-Kontext. Bitte extern oeffnen.");
+  } else if (data?.ok && data.html && !data.embeddable) {
     setFrame(tab, { srcdoc: data.html, mode: "proxy" });
   } else {
     // Direkt einbetten: erlaubt volles JS; ohne Server-Antwort als Fallback.
@@ -290,7 +307,7 @@ function setFrame(tab, { src = "", srcdoc = "", mode }) {
   frame.setAttribute("referrerpolicy", "no-referrer");
   if (srcdoc) {
     // Ohne allow-same-origin: umgeschriebene Seite laeuft in eigener Origin.
-    frame.setAttribute("sandbox", "allow-scripts allow-forms allow-popups");
+    frame.setAttribute("sandbox", "allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox");
     frame.srcdoc = srcdoc;
   } else {
     frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox");
@@ -299,6 +316,61 @@ function setFrame(tab, { src = "", srcdoc = "", mode }) {
   tab.mode = mode;
   tab.frame = frame;
   refs.content.appendChild(frame);
+}
+
+function setFallbackFrame(tab, { url, title, message }) {
+  tab.title = title;
+  setFrame(tab, {
+    mode: "external-required",
+    srcdoc: buildExternalFallbackHtml({ url, title, message })
+  });
+}
+
+export function shouldOpenInRealBrowser(html, url = "") {
+  const text = String(html || "").slice(0, 120000);
+  if (!text) return false;
+  if (BLOCKED_PAGE_PATTERNS.some((pattern) => pattern.test(text))) return true;
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return host === "amazon.com" && /challenge|captcha|robot|automated/i.test(text);
+  } catch {
+    return false;
+  }
+}
+
+export function buildExternalFallbackHtml({ url, title, message }) {
+  const safeUrl = escapeHtml(url || "");
+  const safeTitle = escapeHtml(title || "Echter Browser erforderlich");
+  const safeMessage = escapeHtml(message || "Diese Webseite muss extern geoeffnet werden.");
+  return `<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html,body{height:100%;margin:0;background:#101113;color:#f6f3ee;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{min-height:100%;display:grid;place-content:center;gap:12px;padding:24px;text-align:center;box-sizing:border-box}
+    strong{font-size:18px}
+    span{max-width:420px;color:rgba(246,243,238,.62);font-size:13px;line-height:1.45}
+    a{justify-self:center;display:inline-grid;place-items:center;min-height:34px;padding:0 14px;border:1px solid rgba(159,231,212,.42);border-radius:8px;background:rgba(159,231,212,.12);color:#f6f3ee;font-size:13px;font-weight:700;text-decoration:none}
+  </style>
+</head>
+<body>
+  <main class="bp-fallback">
+    <strong>${safeTitle}</strong>
+    <span>${safeMessage}</span>
+    <a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a>
+  </main>
+</body>
+</html>`;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
 function onFrameMessage(event) {
