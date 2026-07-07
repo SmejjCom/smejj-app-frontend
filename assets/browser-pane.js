@@ -9,7 +9,7 @@ import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260707-3";
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
-const PANE_WIDTH = "min(62vw, 920px)";
+const PANE_WIDTH = "50vw";
 const NEW_TAB_TITLE = "Neuer Tab";
 
 const state = {
@@ -33,6 +33,7 @@ function init() {
     if (!trigger) return;
     event.preventDefault();
     event.stopPropagation();
+    event.stopImmediatePropagation();
     openPane();
   }, true);
   window.addEventListener("message", onFrameMessage);
