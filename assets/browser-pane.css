@@ -12,7 +12,7 @@
 
 .browser-pane {
   display: grid;
-  grid-template-rows: auto auto auto auto 1fr;
+  grid-template-rows: auto auto auto auto minmax(260px, 1fr);
   min-height: 0;
   height: 100%;
 }
@@ -238,6 +238,7 @@
 .bp-content {
   position: relative;
   min-height: 0;
+  overflow: hidden;
   background: #fff;
 }
 

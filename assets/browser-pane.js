@@ -145,6 +145,13 @@ function mountOnce() {
     const target = normalizeAddress(refs.address.value);
     if (tab && target) navigate(tab, target);
   });
+  refs.address.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const tab = activeTab() || addTab();
+    const target = normalizeAddress(refs.address.value);
+    if (tab && target) navigate(tab, target);
+  });
   refs.external.addEventListener("click", () => {
     const url = activeTab()?.url;
     if (url) window.open(url, "_blank", "noopener");
