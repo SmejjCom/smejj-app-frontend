@@ -13,6 +13,7 @@
 .browser-pane {
   display: grid;
   grid-template-rows: 34px auto auto minmax(260px, 1fr);
+  --bp-toolbar-width: clamp(360px, 48%, 430px);
   min-height: 0;
   height: 100%;
 }
@@ -36,7 +37,7 @@
   gap: 4px;
   min-width: 0;
   height: 34px;
-  padding: 0 min(52%, 430px) 0 6px;
+  padding: 0 var(--bp-toolbar-width) 0 6px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
   overflow: hidden;
@@ -154,7 +155,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  width: min(52%, 430px);
+  width: var(--bp-toolbar-width);
   height: 34px;
   padding: 2px 6px;
   border-top: none;
@@ -198,8 +199,8 @@
 }
 
 .bp-address-form {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 170px;
+  min-width: 160px;
   margin: 0 4px;
 }
 
@@ -307,7 +308,58 @@
   font-size: 12.5px;
 }
 
+.bp-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  padding: 24px;
+  background: #101113;
+  color: rgba(246, 243, 238, 0.88);
+  text-align: center;
+}
+
+.bp-fallback strong {
+  font-size: 18px;
+}
+
+.bp-fallback span {
+  max-width: 420px;
+  color: rgba(246, 243, 238, 0.6);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.bp-fallback a {
+  justify-self: center;
+  display: inline-grid;
+  place-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(159, 231, 212, 0.42);
+  border-radius: 8px;
+  background: rgba(159, 231, 212, 0.12);
+  color: #f6f3ee;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 @media (max-width: 680px) {
+  .browser-pane {
+    --bp-toolbar-width: min(76vw, 390px);
+  }
+
+  .bp-address-form {
+    min-width: 120px;
+  }
+
+  .bp-tab {
+    min-width: 26px;
+    padding: 0 5px;
+  }
+
   body.browser-pane-open .browser-panel {
     width: calc(100vw - 12px);
   }
