@@ -276,6 +276,14 @@ async function navigate(tab, url, { push = true } = {}) {
     showHint("Diese Webseite braucht einen echten Browser-Kontext. Bitte extern oeffnen.");
   } else if (data?.ok && data.html && !data.embeddable) {
     setFrame(tab, { srcdoc: data.html, mode: "proxy" });
+  } else if (!data && shouldPreferRealBrowserUrl(finalUrl)) {
+    if (await tryRemoteBrowser(tab, finalUrl, { reason: "known-embed-blocker" })) return;
+    setFallbackFrame(tab, {
+      url: finalUrl,
+      title: "Echter Browser erforderlich",
+      message: "Diese Webseite blockiert eingebettete Browser haeufig. Oeffne sie extern, damit Login, Cookies und Schutzpruefungen wie in Chrome funktionieren."
+    });
+    showHint("Diese Webseite braucht einen echten Browser-Kontext. Bitte extern oeffnen.");
   } else {
     // Direkt einbetten: erlaubt volles JS; ohne Server-Antwort als Fallback.
     setFrame(tab, { src: finalUrl, mode: data ? "direct" : "direct-fallback" });
@@ -368,10 +376,23 @@ export function shouldOpenInRealBrowser(html, url = "") {
   if (BLOCKED_PAGE_PATTERNS.some((pattern) => pattern.test(text))) return true;
   try {
     const host = new URL(url).hostname.replace(/^www\./, "");
-    return host === "amazon.com" && /challenge|captcha|robot|automated/i.test(text);
+    return isAmazonHost(host) && /challenge|captcha|robot|automated/i.test(text);
   } catch {
     return false;
   }
+}
+
+export function shouldPreferRealBrowserUrl(url = "") {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return isAmazonHost(host);
+  } catch {
+    return false;
+  }
+}
+
+function isAmazonHost(host) {
+  return /^amazon\./i.test(String(host || ""));
 }
 
 export function buildExternalFallbackHtml({ url, title, message }) {
