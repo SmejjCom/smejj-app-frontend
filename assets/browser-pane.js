@@ -5,7 +5,7 @@
 // blockierende Seiten (Google, GitHub, ...) kommen als sichere, serverseitig
 // umgeschriebene Ansicht ueber /api/browser/fetch. Fail-closed: ohne Server
 // wird direkt eingebettet und "In neuem Tab oeffnen" angeboten.
-import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260708-6";
+import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260708-7";
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
@@ -88,32 +88,45 @@ function mountOnce() {
   root.hidden = false;
   root.innerHTML = `
     <div class="bp-tabstrip" role="tablist" aria-label="Browser Tabs">
+      <div class="bp-tab-left">
+        <button class="bp-tab-prev" type="button" title="Vorheriger Tab" aria-label="Vorheriger Tab">‹</button>
+        <button class="bp-tab-next" type="button" title="Naechster Tab" aria-label="Naechster Tab">›</button>
+        <button class="bp-tab-add" type="button" title="Neuer Tab" aria-label="Neuer Tab">+</button>
+      </div>
       <div class="bp-tabs"></div>
-      <button class="bp-tab-add" type="button" title="Neuer Tab" aria-label="Neuer Tab">+</button>
+      <div class="bp-tab-right">
+        <button class="bp-tab-count" type="button" title="Tab-Uebersicht" aria-label="Tab-Uebersicht">0</button>
+        <span class="bp-tab-spacer" aria-hidden="true"></span>
+        <span class="bp-tab-spacer" aria-hidden="true"></span>
+      </div>
     </div>
     <div class="bp-toolbar">
-      <button class="bp-nav-back" type="button" title="Zurueck" aria-label="Zurueck" disabled>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-      </button>
-      <button class="bp-nav-forward" type="button" title="Vor" aria-label="Vor" disabled>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-      </button>
-      <button class="bp-nav-reload" type="button" title="Neu laden" aria-label="Neu laden">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>
-      </button>
+      <div class="bp-toolbar-left">
+        <button class="bp-nav-back" type="button" title="Zurueck" aria-label="Zurueck" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <button class="bp-nav-forward" type="button" title="Vor" aria-label="Vor" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <button class="bp-nav-reload" type="button" title="Neu laden" aria-label="Neu laden">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>
+        </button>
+      </div>
       <form class="bp-address-form">
         <input class="bp-address" type="text" inputmode="url" autocomplete="off" spellcheck="false"
           placeholder="Suchen oder URL eingeben" aria-label="Adresse oder Suche">
       </form>
-      <button class="bp-open-external" type="button" title="In neuem Tab oeffnen" aria-label="In neuem Tab oeffnen">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 13v6H5V6h6"/></svg>
-      </button>
-      <button class="bp-menu" type="button" title="Panel-Menue" aria-label="Panel-Menue">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
-      <button class="bp-close" type="button" title="Browser schliessen" aria-label="Browser schliessen">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-      </button>
+      <div class="bp-toolbar-right">
+        <button class="bp-open-external" type="button" title="In neuem Tab oeffnen" aria-label="In neuem Tab oeffnen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 13v6H5V6h6"/></svg>
+        </button>
+        <button class="bp-menu" type="button" title="Panel-Menue" aria-label="Panel-Menue">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <button class="bp-close" type="button" title="Browser schliessen" aria-label="Browser schliessen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
     </div>
     <div class="bp-progress" hidden><span></span></div>
     <div class="bp-hint" hidden></div>
@@ -129,7 +142,10 @@ function mountOnce() {
 
   refs.root = root;
   refs.tabs = root.querySelector(".bp-tabs");
+  refs.prevTab = root.querySelector(".bp-tab-prev");
+  refs.nextTab = root.querySelector(".bp-tab-next");
   refs.addTab = root.querySelector(".bp-tab-add");
+  refs.tabCount = root.querySelector(".bp-tab-count");
   refs.back = root.querySelector(".bp-nav-back");
   refs.forward = root.querySelector(".bp-nav-forward");
   refs.reload = root.querySelector(".bp-nav-reload");
@@ -143,7 +159,10 @@ function mountOnce() {
   refs.content = root.querySelector(".bp-content");
   refs.empty = root.querySelector(".bp-empty");
 
+  refs.prevTab.addEventListener("click", () => switchTab(-1));
+  refs.nextTab.addEventListener("click", () => switchTab(1));
   refs.addTab.addEventListener("click", () => addTab({ focusAddress: true }));
+  refs.tabCount.addEventListener("click", () => switchTab(1));
   refs.back.addEventListener("click", () => stepHistory(-1));
   refs.forward.addEventListener("click", () => stepHistory(1));
   refs.reload.addEventListener("click", () => {
@@ -221,6 +240,13 @@ function selectTab(tabId) {
   render();
   const tab = activeTab();
   if (tab && tab.url && !tab.frame) navigate(tab, tab.url, { push: false });
+}
+
+function switchTab(delta) {
+  if (state.tabs.length <= 1) return;
+  const activeIndex = Math.max(0, state.tabs.findIndex((tab) => tab.id === state.activeId));
+  const nextIndex = (activeIndex + delta + state.tabs.length) % state.tabs.length;
+  selectTab(state.tabs[nextIndex].id);
 }
 
 // --- Navigation --------------------------------------------------------------
@@ -475,7 +501,8 @@ function render() {
   const active = activeTab();
 
   refs.tabs.innerHTML = "";
-  for (const tab of state.tabs) {
+  const visibleTabs = active ? [active] : [];
+  for (const tab of visibleTabs) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `bp-tab${tab.id === state.activeId ? " is-active" : ""}${tab.status === "loading" ? " is-loading" : ""}`;
@@ -501,8 +528,13 @@ function render() {
     button.addEventListener("click", () => selectTab(tab.id));
     refs.tabs.appendChild(button);
   }
+  refs.prevTab.disabled = state.tabs.length <= 1;
+  refs.nextTab.disabled = state.tabs.length <= 1;
   refs.addTab.disabled = state.tabs.length >= MAX_TABS;
   refs.addTab.title = refs.addTab.disabled ? `Tab-Limit erreicht (${MAX_TABS})` : "Neuer Tab";
+  refs.tabCount.textContent = String(state.tabs.length || 1);
+  refs.tabCount.title = `${state.tabs.length || 1} von ${MAX_TABS} Tabs`;
+  refs.tabCount.setAttribute("aria-label", `${state.tabs.length || 1} von ${MAX_TABS} Tabs`);
 
   if (document.activeElement !== refs.address) refs.address.value = active?.url || "";
   refs.back.disabled = !active || active.historyIndex <= 0;
