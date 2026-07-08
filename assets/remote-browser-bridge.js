@@ -74,6 +74,18 @@ function parseTarget(rawUrl) {
   return blocked ? { ok: false, error: "Ziel-Host ist blockiert." } : { ok: true, url: target };
 }
 
+function viewportFromParams(url) {
+  return {
+    width: clampViewport(url.searchParams.get("viewportWidth"), 360, 1920, 1365),
+    height: clampViewport(url.searchParams.get("viewportHeight"), 360, 1200, 900)
+  };
+}
+
+function clampViewport(value, min, max, fallback) {
+  const parsed = Math.round(Number(value));
+  return Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : fallback;
+}
+
 async function handleRemote(req, res, url, origin) {
   if (origin && !ORIGINS.has(origin)) return send(res, 403, { ok: false, error: "Origin nicht erlaubt.", remote: false }, origin);
   if (!takeRate(clientKey(req))) return send(res, 429, { ok: false, error: "Zu viele Remote-Browser-Anfragen. Bitte kurz warten.", remote: false }, origin);
@@ -81,6 +93,7 @@ async function handleRemote(req, res, url, origin) {
 
   const parsed = parseTarget(url.searchParams.get("url"));
   if (!parsed.ok) return send(res, 400, { ok: false, error: parsed.error, remote: false }, origin);
+  const viewport = viewportFromParams(url);
 
   let workerResponse;
   try {
@@ -92,7 +105,7 @@ async function handleRemote(req, res, url, origin) {
         "content-type": "application/json",
         accept: "application/json"
       },
-      body: JSON.stringify({ url: parsed.url.toString(), viewport: { width: 1365, height: 900 } })
+      body: JSON.stringify({ url: parsed.url.toString(), viewport })
     });
   } catch (error) {
     return send(res, 502, { ok: false, error: `Remote-Browser nicht erreichbar: ${String(error?.message || error).slice(0, 200)}`, remote: false }, origin);
@@ -108,6 +121,7 @@ async function handleRemote(req, res, url, origin) {
     finalUrl: payload.finalUrl || parsed.url.toString(),
     title: payload.title || parsed.url.hostname,
     screenshot: payload.screenshot || "",
+    viewport,
     status: payload.status || "rendered"
   }, origin);
 }
