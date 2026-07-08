@@ -21,7 +21,7 @@ const API_PATHS = {
   agent: "/api/agent",
     authConfig: "/api/auth/config",
     browserFetch: "/api/browser/fetch",
-    browserRemote: "/api/browser/remote",
+    browserRemote: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/api/browser/remote",
     authGoogle: "/api/auth/google",
     authMe: "/api/auth/me",
     authLogout: "/api/auth/logout",
@@ -45,7 +45,10 @@ const API_PATHS = {
 
 export const CLIENT_ROUTES = {
   api: Object.fromEntries(
-    Object.entries(API_PATHS).map(([name, path]) => [name, `${API_ORIGIN}${path}`])
+    Object.entries(API_PATHS).map(([name, path]) => [
+      name,
+      path.startsWith("https://") ? path : `${API_ORIGIN}${path}`
+    ])
   )
 };
 
