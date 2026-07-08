@@ -3,11 +3,16 @@
 // isoliert: Browser auf, Seite rendern, Screenshot zurueck, Browser zu.
 import http from "node:http";
 
-const PORT = Number(process.env.PORT || 8080);
-const HOST = process.env.SMEJJ_HOST || "0.0.0.0";
+const PORT = Number(envValue("PORT", 8080));
+const HOST = envValue("SMEJJ_HOST", "0.0.0.0");
 const MAX_BODY_BYTES = 64_000;
-const NAV_TIMEOUT_MS = Number(process.env.SMEJJ_REMOTE_BROWSER_NAV_TIMEOUT_MS || 25_000);
-const TOKEN = String(process.env.SMEJJ_REMOTE_BROWSER_TOKEN || "").trim();
+const NAV_TIMEOUT_MS = Number(envValue("SMEJJ_REMOTE_BROWSER_NAV_TIMEOUT_MS", 25_000));
+const TOKEN = String(envValue("SMEJJ_REMOTE_BROWSER_TOKEN", "")).trim();
+
+function envValue(name, fallback) {
+  const mangled = `_${name.toLowerCase().split("").join("_")}`;
+  return process.env[name] ?? process.env[name.toLowerCase()] ?? process.env[mangled] ?? fallback;
+}
 
 export function isAllowedTarget(rawUrl) {
   let target;
