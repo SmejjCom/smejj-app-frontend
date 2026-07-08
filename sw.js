@@ -1,4 +1,4 @@
-const CACHE_NAME = "smejj-shell-v86";
+const CACHE_NAME = "smejj-shell-v87";
 const SHELL = [
   "/",
   "/assets/styles.css",
