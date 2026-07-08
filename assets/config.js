@@ -18,7 +18,8 @@ function resolveApiOrigin() {
 export const API_ORIGIN = resolveApiOrigin();
 
 const API_PATHS = {
-  agent: "/api/agent",
+  agent: "https://redonion-navybean-sytf0ign8hwzvvwt.salad.cloud/api/agent",
+  chat: "https://redonion-navybean-sytf0ign8hwzvvwt.salad.cloud/api/chat",
     authConfig: "/api/auth/config",
     browserFetch: "/api/browser/fetch",
     browserRemote: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/api/browser/remote",
