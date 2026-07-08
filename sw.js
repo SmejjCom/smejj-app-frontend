@@ -1,4 +1,4 @@
-const CACHE_NAME = "smejj-shell-v90";
+const CACHE_NAME = "smejj-shell-v91";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -60,6 +60,10 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
+  if (url.pathname.replace(/\/$/, "") === "/home") {
+    event.respondWith(Response.redirect(new URL("/", url.origin).href, 302));
+    return;
+  }
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(fetch(request));
     return;
