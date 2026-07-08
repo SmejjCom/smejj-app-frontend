@@ -5,7 +5,7 @@
 // blockierende Seiten (Google, GitHub, ...) kommen als sichere, serverseitig
 // umgeschriebene Ansicht ueber /api/browser/fetch. Fail-closed: ohne Server
 // wird direkt eingebettet und "In neuem Tab oeffnen" angeboten.
-import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260707-5";
+import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260708-6";
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
