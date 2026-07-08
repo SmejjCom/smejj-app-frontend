@@ -1,0 +1,317 @@
+/* Premium app surfaces. Loaded only for non-start views via premium-surfaces.js. */
+.premium-view {
+  --premium-line: rgba(255, 255, 255, 0.13);
+  --premium-line-strong: rgba(0, 255, 239, 0.26);
+  --premium-surface: rgba(255, 255, 255, 0.075);
+  --premium-text: #f8f6f2;
+  --premium-muted: rgba(248, 246, 242, 0.64);
+  --premium-soft: rgba(248, 246, 242, 0.42);
+  position: relative;
+  align-content: start;
+  gap: clamp(14px, 2.2vw, 22px);
+  overflow: auto;
+}
+
+.premium-view::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(0, 255, 239, 0.09), transparent 28%),
+    linear-gradient(225deg, rgba(80, 126, 255, 0.1), transparent 30%);
+}
+
+.premium-view .view-header {
+  display: grid;
+  gap: 10px;
+  max-width: min(920px, 100%);
+}
+
+.premium-view .eyebrow {
+  margin: 0;
+  color: rgba(0, 255, 239, 0.78);
+  font-size: 12px;
+}
+
+.premium-view .view-header h2 {
+  max-width: 880px;
+  margin: 0;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1;
+}
+
+.premium-view .subhead {
+  max-width: 760px;
+  margin: 0;
+  color: var(--premium-muted);
+  font-size: clamp(15px, 1.8vw, 20px);
+  line-height: 1.45;
+}
+
+.premium-view .toolbar,
+.premium-view .panel-grid,
+.premium-view .status-grid,
+.premium-view .search-shell,
+.premium-view .search-log,
+.premium-view .output,
+.premium-view .empty-state,
+.premium-view .surface,
+.premium-view .feed-item {
+  border-color: var(--premium-line);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.045)),
+    rgba(10, 12, 15, 0.42);
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(28px) saturate(1.25);
+  -webkit-backdrop-filter: blur(28px) saturate(1.25);
+}
+
+.premium-view .toolbar,
+.premium-view .panel-grid,
+.premium-view .status-grid {
+  border: 1px solid var(--premium-line);
+  border-radius: 22px;
+  padding: clamp(12px, 2vw, 18px);
+}
+
+.premium-view .toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.premium-view label {
+  color: var(--premium-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.premium-view input,
+.premium-view select,
+.premium-view textarea {
+  min-height: 50px;
+  border-color: var(--premium-line);
+  border-radius: 16px;
+  background: rgba(6, 8, 11, 0.42);
+  color: var(--premium-text);
+}
+
+.premium-view textarea {
+  min-height: 180px;
+}
+
+.premium-view input:focus,
+.premium-view select:focus,
+.premium-view textarea:focus {
+  border-color: var(--premium-line-strong);
+  box-shadow: 0 0 0 4px rgba(0, 255, 239, 0.1);
+}
+
+.premium-view button,
+.premium-view .more-actions summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-color: var(--premium-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--premium-text);
+  padding: 0 18px;
+  font-size: 15px;
+  font-weight: 750;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.premium-view button:hover,
+.premium-view .more-actions summary:hover {
+  border-color: var(--premium-line-strong);
+  background: rgba(0, 255, 239, 0.12);
+  color: #ffffff;
+}
+
+#projects #projectCreate,
+#projects #projectSave,
+#search #searchSubmit,
+#settings #saveSettings,
+#profile #saveProfile,
+#files #storageAgain {
+  border-color: rgba(0, 255, 239, 0.46);
+  background: linear-gradient(135deg, rgba(0, 255, 239, 0.22), rgba(98, 146, 255, 0.16));
+  color: #faffff;
+}
+
+.premium-view .output,
+.premium-view .search-empty,
+.premium-view .entry {
+  border-radius: 20px;
+  color: rgba(248, 246, 242, 0.78);
+  line-height: 1.5;
+}
+
+.premium-view .output:empty::before {
+  content: "Bereit.";
+  color: var(--premium-soft);
+}
+
+.project-card-list {
+  display: grid;
+  gap: 10px;
+}
+
+.project-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+  border: 1px solid var(--premium-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 14px 16px;
+}
+
+.project-card strong,
+.project-card span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.project-card strong {
+  color: var(--premium-text);
+}
+
+.project-card span {
+  color: var(--premium-muted);
+  font-size: 13px;
+}
+
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.project-meta span {
+  border: 1px solid var(--premium-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 6px 9px;
+}
+
+.more-actions {
+  position: relative;
+}
+
+.more-actions summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.more-actions summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 12;
+  display: grid;
+  gap: 6px;
+  min-width: 220px;
+  border: 1px solid var(--premium-line);
+  border-radius: 18px;
+  background: rgba(18, 20, 24, 0.92);
+  padding: 8px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(28px) saturate(1.2);
+  -webkit-backdrop-filter: blur(28px) saturate(1.2);
+}
+
+.more-actions:not([open]) .more-menu {
+  display: none;
+}
+
+.more-menu button {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.more-menu .danger-action {
+  color: #ffb4aa;
+}
+
+.more-menu .danger-action:hover {
+  border-color: rgba(255, 114, 99, 0.45);
+  background: rgba(255, 75, 56, 0.12);
+}
+
+#search .search-shell {
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: min(960px, 100%);
+  border-radius: 24px;
+  padding: 14px;
+}
+
+#search .search-box input {
+  min-height: 62px;
+  border-radius: 18px;
+  font-size: clamp(20px, 2.8vw, 34px);
+  font-weight: 800;
+}
+
+#search .search-log {
+  width: min(960px, 100%);
+}
+
+.modal {
+  border-color: rgba(255, 255, 255, 0.16);
+  border-radius: 22px;
+  background: rgba(19, 21, 25, 0.9);
+}
+
+@media (max-width: 760px) {
+  .premium-view {
+    padding: 56px 12px 22px;
+  }
+
+  .premium-view .toolbar,
+  .premium-view .panel-grid,
+  .premium-view .status-grid,
+  #search .search-shell {
+    border-radius: 18px;
+    padding: 12px;
+  }
+
+  .premium-view .toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .premium-view button,
+  .premium-view .more-actions summary {
+    width: 100%;
+  }
+
+  #search .search-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .project-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .project-meta {
+    justify-content: flex-start;
+  }
+
+  .more-menu {
+    position: static;
+    margin-top: 8px;
+  }
+}
