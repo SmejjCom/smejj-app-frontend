@@ -5,7 +5,7 @@
 // blockierende Seiten (Google, GitHub, ...) kommen als sichere, serverseitig
 // umgeschriebene Ansicht ueber /api/browser/fetch. Fail-closed: ohne Server
 // wird direkt eingebettet und "In neuem Tab oeffnen" angeboten.
-import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260708-7";
+import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260708-8";
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
@@ -329,9 +329,14 @@ async function navigate(tab, url, { push = true } = {}) {
 async function tryRemoteBrowser(tab, url, { reason = "" } = {}) {
   const endpoint = CLIENT_ROUTES.api.browserRemote;
   if (!endpoint || !endpoint.startsWith("https://")) return false;
+  const viewport = remoteBrowserViewport();
+  const requestUrl = new URL(endpoint);
+  requestUrl.searchParams.set("url", url);
+  requestUrl.searchParams.set("viewportWidth", String(viewport.width));
+  requestUrl.searchParams.set("viewportHeight", String(viewport.height));
   let data = null;
   try {
-    const response = await fetch(`${endpoint}?url=${encodeURIComponent(url)}`);
+    const response = await fetch(requestUrl.toString());
     data = response.ok ? await response.json() : null;
   } catch {
     data = null;
@@ -358,6 +363,18 @@ async function tryRemoteBrowser(tab, url, { reason = "" } = {}) {
   persistTabs();
   render();
   return true;
+}
+
+function remoteBrowserViewport() {
+  const rect = refs.content?.getBoundingClientRect?.();
+  const width = clampViewport(rect?.width, 360, 1920, 1365);
+  const height = clampViewport((rect?.height || 0) - 38, 360, 1200, 900);
+  return { width, height };
+}
+
+function clampViewport(value, min, max, fallback) {
+  const parsed = Math.round(Number(value));
+  return Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : fallback;
 }
 
 function stepHistory(delta) {
@@ -460,12 +477,12 @@ export function buildRemoteBrowserHtml({ url, title, screenshot, reason = "" }) 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     html,body{height:100%;margin:0;background:#101113;color:#f6f3ee;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    main{min-height:100%;display:grid;grid-template-rows:auto 1fr;box-sizing:border-box}
+    main{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);box-sizing:border-box}
     header{display:flex;align-items:center;gap:10px;min-height:38px;padding:0 10px;border-bottom:1px solid rgba(246,243,238,.12);background:#18191c}
     strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
     span{color:rgba(246,243,238,.54);font-size:11px}
     a{margin-left:auto;color:#9fe7d4;font-size:12px;font-weight:700;text-decoration:none}
-    img{width:100%;height:100%;object-fit:contain;background:#0c0d0f}
+    img{display:block;width:100%;height:100%;min-width:0;min-height:0;object-fit:contain;background:#0c0d0f}
   </style>
 </head>
 <body>
