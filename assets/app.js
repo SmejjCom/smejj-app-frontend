@@ -6,6 +6,7 @@ import { Icons, closeModal, openModal, renderEmptyState, setButtonIcon, showToas
 import { initComposerTools } from "./composer-tools.js";
 import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
+import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js";
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -114,6 +115,7 @@ function boot() {
   bindMemory();
   bindAi();
   bindProjects();
+  enhancePremiumSurfaces();
   bindStoragePanel();
   bindCost();
   bindSettings();
@@ -410,12 +412,14 @@ async function submitTask(task, { target = "#startLog" } = {}) {
       return showTaskIndicator("done");
     } catch (streamError) {
       output.textContent = "";
-      const codingJob = await createFreeCodingJob(task);
-      if (codingJob?.ok) output.textContent = `${formatFreeCodingJob(codingJob)}\n\n`;
-      const executorResult = await runFreeExecutorIfAppTask(task);
-      if (executorResult?.ok) {
-        saveFreeExecutorArtifact(executorResult);
-        output.textContent += `${formatFreeExecutorResult(executorResult)}\n\n`;
+      if (isFreeCodingFallbackTask(task)) {
+        const codingJob = await createFreeCodingJob(task);
+        if (codingJob?.ok) output.textContent = `${formatFreeCodingJob(codingJob)}\n\n`;
+        const executorResult = await runFreeExecutorIfAppTask(task);
+        if (executorResult?.ok) {
+          saveFreeExecutorArtifact(executorResult);
+          output.textContent += `${formatFreeExecutorResult(executorResult)}\n\n`;
+        }
       }
       if (!output.textContent.trim()) throw streamError;
     }
@@ -427,6 +431,16 @@ async function submitTask(task, { target = "#startLog" } = {}) {
     output.textContent = output.textContent ? `${output.textContent.trim()}\n\n${message}` : message;
     hideTaskIndicator();
   }
+}
+
+function isFreeCodingFallbackTask(task) {
+  const text = String(task || "").toLowerCase();
+  if (/\b(wetter|heute|aktuell|nachricht|news|preis|kurs|boerse|börse|internet|web|quelle|oeffnungszeit|öffnungszeit)\b/i.test(text)) return false;
+  if (/https?:\/\//i.test(text) && !/\b(fetch|proxy|iframe|browser|render|crawler|scraper)\b/i.test(text)) return false;
+  if (/```/.test(text)) return true;
+  if (/\b(refactor|debug|stack ?trace|compile|dockerfile|commit|deploy|npm |pnpm |yarn |git )\b/i.test(text)) return true;
+  return /\b(schreib|erstelle|implementier|programmier|code|coden|baue|fix|behebe)\b/i.test(text)
+    && /\b(funktion|function|klasse|class|script|komponente|component|endpoint|modul|module|css|html|javascript|typescript|python|react|node|bug|fehler|datei|file|repo|app|projekt|website|seite)\b/i.test(text);
 }
 
 function saveFreeExecutorArtifact(executor) {
@@ -728,7 +742,7 @@ async function refreshProjectList() {
     renderEmptyState("#projectList", "Keine Projekte", "Erstelle ein lokales Projekt oder importiere ein smejj-Projekt.");
     return;
   }
-  writeOutput("#projectList", projects.map((project) => `${project.id} | ${project.name} | ${project.syncStatus} | owner=${project.ownerUserId}`).join("\n"));
+  renderProjectCards(projects);
 }
 
 function selectedProjectId() {
