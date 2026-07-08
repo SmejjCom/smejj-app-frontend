@@ -8,6 +8,10 @@
     // SPA-Fallback fuer GitHub Pages: App-Routen (ohne Dateiendung) zur Shell umleiten.
     (function () {
       var path = location.pathname;
+      if (path.replace(/\/$/, "") === "/home") {
+        location.replace("/");
+        return;
+      }
       if (/^\/[a-z0-9-]+(\/[a-z0-9-]+)*\/?$/i.test(path) && path.indexOf(".") === -1) {
         sessionStorage.setItem("smejj-restore-route", path + location.search + location.hash);
         location.replace("/");
