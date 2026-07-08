@@ -64,14 +64,14 @@ const VIEW_ALIASES = Object.freeze({
   storage: "storageView"
 });
 const ALIAS_PATHS = Object.freeze({
-  chat: "/home",
-  home: "/home",
+  chat: "/",
+  home: "/",
   providers: "/ai",
   provider: "/ai",
   storage: "/storage"
 });
 const VIEW_PATHS = Object.freeze({
-  start: "/home",
+  start: "/",
   search: "/search",
   websites: "/websites",
   smejjClaw: "/smejj-claw",
@@ -353,7 +353,7 @@ function applyPendingRestoreRoute() {
 }
 
 function getViewFromUrl() {
-  if (location.hash) return location.hash.replace(/^#\/?/, "") || "home";
+  if (location.hash) return location.hash.replace(/^#\/?/, "") || "start";
   if (location.pathname === "/") return "start";
   return PATH_VIEWS[location.pathname.replace(/\/$/, "")] || location.pathname.replace(/^\/+/, "");
 }
