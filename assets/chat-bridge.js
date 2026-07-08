@@ -11,6 +11,8 @@ const LLM_MODEL = process.env.SMEJJ_LLM_SALAD_MODEL || process.env.SMEJJ_LLM_MOD
 const LLM_HEADER = process.env.SMEJJ_LLM_HEADER || (process.env.SMEJJ_LLM_SALAD_API_KEY ? "Salad-Api-Key" : "Authorization");
 const REQUEST_TIMEOUT_MS = Number(process.env.SMEJJ_CHAT_BRIDGE_TIMEOUT_MS || 60000);
 const MAX_BODY_BYTES = 256 * 1024;
+const STARTED_AT = new Date();
+const BRIDGE_VERSION = "20260708-v88";
 
 export function createChatBridgeServer() {
   return http.createServer(async (req, res) => {
@@ -35,8 +37,12 @@ function healthPayload() {
   return {
     ok: true,
     app: APP,
+    version: BRIDGE_VERSION,
     modelConfigured: Boolean(LLM_BASE_URL && LLM_API_KEY && LLM_MODEL),
-    controlConfigured: Boolean(CONTROL_ORIGIN)
+    controlConfigured: Boolean(CONTROL_ORIGIN),
+    role: "stateless-chat-stream-bridge",
+    costProfile: "cpu-only-no-gpu-no-storage",
+    startedAt: STARTED_AT.toISOString()
   };
 }
 
@@ -64,7 +70,7 @@ function buildAgentMessages({ task, coding, webContext }) {
       ? "Liefere einen kompakten Plan und konkrete Code-/Diff-Vorschlaege. Behaupte nicht, dass Dateien geaendert wurden."
       : "Beantworte in der Sprache des Nutzers korrekt, knapp und hilfreich.",
     webContext
-      ? "Nutze die Live-Internet-Ergebnisse. Nenne am Ende die Quellen-URLs mit Stand."
+      ? "Nutze nur die Live-Internet-Ergebnisse. Antworte in maximal 5 kurzen Saetzen. Schreibe am Ende genau eine Zeile: Quellen: URL1, URL2 (Stand: ISO-Zeit)."
       : "Wenn tagesaktuelle Fakten fehlen, sage das ehrlich statt zu raten."
   ].join("\n");
   const user = ["Frage/Aufgabe:", task, webContext].filter(Boolean).join("\n\n");
@@ -248,8 +254,10 @@ function isCodingTask(task) {
     && /\b(funktion|function|klasse|class|script|komponente|component|endpoint|modul|module|css|html|javascript|typescript|python|react|node|bug|fehler|datei|file|repo)\b/i.test(text);
 }
 
-function shouldSearchWeb(task) {
-  return /\b(heute|aktuell|jetzt|news|nachricht|wetter|preis|kurs|stand|quelle|internet|web|online|2026)\b/i.test(String(task || ""));
+export function shouldSearchWeb(task) {
+  const text = String(task || "").toLowerCase();
+  if (/\b(bist du online|online\?|online$|funktionierst du|bist du da)\b/i.test(text)) return false;
+  return /\b(heute|aktuell|jetzt|news|nachricht|wetter|preis|kurs|stand|quelle|internet|web|2026)\b/i.test(text);
 }
 
 async function readJson(req) {
