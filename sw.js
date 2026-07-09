@@ -1,4 +1,4 @@
-const CACHE_NAME = "smejj-shell-v92";
+const CACHE_NAME = "smejj-shell-v93";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -6,6 +6,7 @@ const SHELL = [
   "/assets/composer-tools.css",
   "/assets/browser-pane.css",
   "/assets/browser-pane.js",
+  "/assets/browser-pane-render.js",
   "/assets/auth/passkey.js",
   "/assets/auth/passkey-ui.js",
   "/assets/config.js",
