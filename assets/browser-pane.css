@@ -16,7 +16,9 @@
   --bp-control-size: 22px;
   --bp-control-gap: 3px;
   --bp-side-width: calc((var(--bp-control-size) * 3) + (var(--bp-control-gap) * 2));
-  grid-template-rows: var(--bp-row-height) var(--bp-row-height) auto auto minmax(260px, 1fr);
+  /* Inhalt darf nie hoeher als das Panel werden: minmax(0, 1fr) statt fester
+     Mindesthoehe — sonst werden Seiten auf kleinen Fenstern abgeschnitten. */
+  grid-template-rows: var(--bp-row-height) var(--bp-row-height) auto auto minmax(0, 1fr);
   min-height: 0;
   height: 100%;
 }
@@ -300,15 +302,21 @@
 .bp-frame {
   position: absolute;
   inset: 0;
-  display: none;
   width: 100%;
   height: 100%;
   border: none;
   background: #fff;
+  transform-origin: 0 0; /* Zoom 50–200 % skaliert von oben links. */
+  /* visibility statt display: display:none setzt in Chromium die Scroll-
+     position eingebetteter Seiten zurueck; visibility erhaelt sie und
+     verhindert Flackern beim Tab-Wechsel. */
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .bp-frame.is-active {
-  display: block;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .bp-empty {

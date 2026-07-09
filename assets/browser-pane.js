@@ -5,7 +5,12 @@
 // blockierende Seiten (Google, GitHub, ...) kommen als sichere, serverseitig
 // umgeschriebene Ansicht ueber /api/browser/fetch. Fail-closed: ohne Server
 // wird direkt eingebettet und "In neuem Tab oeffnen" angeboten.
-import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260708-8";
+import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260709-1";
+import {
+  buildExternalFallbackHtml,
+  buildRemoteBrowserHtml
+} from "./browser-pane-render.js?v=browser-pane-20260709-1";
+export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260709-1";
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
@@ -22,11 +27,22 @@ const BLOCKED_PAGE_PATTERNS = [
   /api-services-support@amazon\.com/i
 ];
 
+const MAX_PERSISTED_HISTORY = 50;
+const ZOOM_MIN = 0.5;
+const ZOOM_MAX = 2;
+const ZOOM_STEP = 0.1;
+const REMOTE_REFIT_DEBOUNCE_MS = 600;
+const REMOTE_REFIT_MIN_DELTA_PX = 64;
+const REMOTE_REFIT_MIN_INTERVAL_MS = 1500;
+
 const state = {
   tabs: [],
   activeId: "",
   nextId: 1,
-  mounted: false
+  mounted: false,
+  persistTimer: 0,
+  remoteRefitTimer: 0,
+  lastRemoteRefitAt: 0
 };
 
 const refs = {};
@@ -171,16 +187,12 @@ function mountOnce() {
   });
   refs.addressForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    const tab = activeTab() || addTab();
-    const target = normalizeAddress(refs.address.value);
-    if (tab && target) navigate(tab, target);
+    submitAddress();
   });
   refs.address.addEventListener("keydown", (event) => {
     if (event.key !== "Enter") return;
     event.preventDefault();
-    const tab = activeTab() || addTab();
-    const target = normalizeAddress(refs.address.value);
-    if (tab && target) navigate(tab, target);
+    submitAddress();
   });
   refs.external.addEventListener("click", () => {
     const url = activeTab()?.url;
@@ -189,7 +201,91 @@ function mountOnce() {
   refs.menu.addEventListener("click", backToMenu);
   refs.close.addEventListener("click", closePane);
 
+  // Zoom wie in Chrome: Strg/Cmd mit +, - oder 0 (50–200 %).
+  document.addEventListener("keydown", onZoomShortcut);
+
+  // Resize: Der Remote-Viewport folgt der sichtbaren Flaeche — debounced und
+  // gedrosselt, damit der Remote-Worker nicht mit Anfragen geflutet wird.
+  if (typeof ResizeObserver === "function") {
+    const observer = new ResizeObserver(() => scheduleRemoteRefit());
+    observer.observe(refs.content);
+  } else {
+    window.addEventListener("resize", () => scheduleRemoteRefit());
+  }
+
   restoreTabs();
+}
+
+// Enter in der Adressleiste: navigieren und den Fokus wie Chrome an die Seite
+// abgeben, damit Space/Pfeile/PageUp sofort im Inhalt scrollen.
+function submitAddress() {
+  const tab = activeTab() || addTab();
+  const target = normalizeAddress(refs.address.value);
+  if (!tab || !target) return;
+  refs.address.blur();
+  navigate(tab, target);
+}
+
+function onZoomShortcut(event) {
+  if (!document.body.classList.contains("browser-pane-open")) return;
+  if (!event.ctrlKey && !event.metaKey) return;
+  const tab = activeTab();
+  if (!tab?.frame) return;
+  let zoom = tab.zoom || 1;
+  if (event.key === "+" || event.key === "=") zoom += ZOOM_STEP;
+  else if (event.key === "-") zoom -= ZOOM_STEP;
+  else if (event.key === "0") zoom = 1;
+  else return;
+  event.preventDefault();
+  tab.zoom = clampZoom(zoom);
+  applyZoom(tab);
+  showHint(tab.zoom === 1 ? "" : `Zoom: ${Math.round(tab.zoom * 100)} %`);
+  schedulePersist();
+}
+
+export function clampZoom(value) {
+  const zoom = Math.round(Number(value) * 10) / 10;
+  if (!Number.isFinite(zoom)) return 1;
+  return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+}
+
+function applyZoom(tab) {
+  const frame = tab?.frame;
+  if (!frame) return;
+  const zoom = clampZoom(tab.zoom || 1);
+  if (zoom === 1) {
+    frame.style.transform = "";
+    frame.style.transformOrigin = "";
+    frame.style.width = "";
+    frame.style.height = "";
+    return;
+  }
+  frame.style.transform = `scale(${zoom})`;
+  frame.style.transformOrigin = "0 0";
+  frame.style.width = `${Math.round(10000 / zoom) / 100}%`;
+  frame.style.height = `${Math.round(10000 / zoom) / 100}%`;
+}
+
+// Remote-Ansicht an neue Panelgroesse anpassen (debounced + Mindestintervall).
+function scheduleRemoteRefit() {
+  if (!state.mounted) return;
+  clearTimeout(state.remoteRefitTimer);
+  state.remoteRefitTimer = setTimeout(() => {
+    const tab = activeTab();
+    if (!tab || tab.mode !== "remote-browser" || !tab.url || tab.status === "loading") return;
+    const current = remoteBrowserViewport();
+    const last = tab.remoteViewport;
+    if (last &&
+      Math.abs(current.width - last.width) < REMOTE_REFIT_MIN_DELTA_PX &&
+      Math.abs(current.height - last.height) < REMOTE_REFIT_MIN_DELTA_PX) return;
+    const now = Date.now();
+    if (now - state.lastRemoteRefitAt < REMOTE_REFIT_MIN_INTERVAL_MS) {
+      scheduleRemoteRefit();
+      return;
+    }
+    state.lastRemoteRefitAt = now;
+    navigate(tab, tab.url, { push: false });
+  }, REMOTE_REFIT_DEBOUNCE_MS);
 }
 
 // --- Tabs --------------------------------------------------------------------
@@ -211,7 +307,10 @@ function addTab({ url = "", focusAddress = false } = {}) {
     mode: "",
     history: [],
     historyIndex: -1,
-    frame: null
+    frame: null,
+    scrollRatio: 0,
+    zoom: 1,
+    remoteViewport: null
   };
   state.tabs.push(tab);
   state.activeId = tab.id;
@@ -259,9 +358,17 @@ export function normalizeAddress(input) {
   return `https://duckduckgo.com/html/?q=${encodeURIComponent(text)}`;
 }
 
+function commitHistory(tab, url, push) {
+  if (!push) return;
+  tab.history = tab.history.slice(0, tab.historyIndex + 1);
+  tab.history.push(url);
+  tab.historyIndex = tab.history.length - 1;
+}
+
 async function navigate(tab, url, { push = true } = {}) {
   tab.status = "loading";
   tab.url = url;
+  if (push) tab.scrollRatio = 0; // Neue Seite startet oben — wie in Chrome.
   showHint("");
   render();
 
@@ -281,7 +388,7 @@ async function navigate(tab, url, { push = true } = {}) {
   if (tab.url !== url) return; // Nutzer hat inzwischen weiternavigiert.
 
   if (data?.ok === false) {
-    if (await tryRemoteBrowser(tab, url, { reason: "fetch-error" })) return;
+    if (await tryRemoteBrowser(tab, url, { reason: "fetch-error", push })) return;
     tab.status = "error";
     showHint(`Seite konnte nicht geladen werden: ${String(data.error || "unbekannt")}`);
     render();
@@ -293,7 +400,7 @@ async function navigate(tab, url, { push = true } = {}) {
   tab.title = data?.title || shortHost(finalUrl);
 
   if (data?.ok && data.html && shouldOpenInRealBrowser(data.html, finalUrl)) {
-    if (await tryRemoteBrowser(tab, finalUrl, { reason: "external-required" })) return;
+    if (await tryRemoteBrowser(tab, finalUrl, { reason: "external-required", push })) return;
     setFallbackFrame(tab, {
       url: finalUrl,
       title: "Echter Browser erforderlich",
@@ -303,7 +410,7 @@ async function navigate(tab, url, { push = true } = {}) {
   } else if (data?.ok && data.html && !data.embeddable) {
     setFrame(tab, { srcdoc: data.html, mode: "proxy" });
   } else if (!data && shouldPreferRealBrowserUrl(finalUrl)) {
-    if (await tryRemoteBrowser(tab, finalUrl, { reason: "known-embed-blocker" })) return;
+    if (await tryRemoteBrowser(tab, finalUrl, { reason: "known-embed-blocker", push })) return;
     setFallbackFrame(tab, {
       url: finalUrl,
       title: "Echter Browser erforderlich",
@@ -316,17 +423,13 @@ async function navigate(tab, url, { push = true } = {}) {
     if (!data) showHint('Server-Proxy nicht erreichbar. Falls die Seite leer bleibt: "In neuem Tab oeffnen".');
   }
 
-  if (push) {
-    tab.history = tab.history.slice(0, tab.historyIndex + 1);
-    tab.history.push(finalUrl);
-    tab.historyIndex = tab.history.length - 1;
-  }
+  commitHistory(tab, finalUrl, push);
   tab.status = "ready";
   persistTabs();
   render();
 }
 
-async function tryRemoteBrowser(tab, url, { reason = "" } = {}) {
+async function tryRemoteBrowser(tab, url, { reason = "", push = true } = {}) {
   const endpoint = CLIENT_ROUTES.api.browserRemote;
   if (!endpoint || !endpoint.startsWith("https://")) return false;
   const viewport = remoteBrowserViewport();
@@ -344,21 +447,20 @@ async function tryRemoteBrowser(tab, url, { reason = "" } = {}) {
   if (!data?.ok || !data.screenshot) return false;
   tab.url = data.finalUrl || url;
   tab.title = data.title || shortHost(tab.url);
+  tab.remoteViewport = viewport;
   setFrame(tab, {
     mode: "remote-browser",
     srcdoc: buildRemoteBrowserHtml({
       url: tab.url,
       title: tab.title,
       screenshot: data.screenshot,
+      capture: data.capture,
+      links: data.links,
       reason
     })
   });
   tab.status = "ready";
-  if (!tab.history.includes(tab.url)) {
-    tab.history = tab.history.slice(0, tab.historyIndex + 1);
-    tab.history.push(tab.url);
-    tab.historyIndex = tab.history.length - 1;
-  }
+  commitHistory(tab, tab.url, push);
   showHint("Remote-Browser-Worker hat die Seite gerendert.");
   persistTabs();
   render();
@@ -392,7 +494,8 @@ function setFrame(tab, { src = "", srcdoc = "", mode }) {
   frame.className = "bp-frame";
   frame.setAttribute("title", tab.title || "Browser Tab");
   frame.setAttribute("referrerpolicy", "no-referrer");
-  if (srcdoc) {
+  const usesSrcdoc = Boolean(srcdoc);
+  if (usesSrcdoc) {
     // Ohne allow-same-origin: umgeschriebene Seite laeuft in eigener Origin.
     frame.setAttribute("sandbox", "allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox");
     frame.srcdoc = srcdoc;
@@ -400,8 +503,22 @@ function setFrame(tab, { src = "", srcdoc = "", mode }) {
     frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox");
     frame.src = src;
   }
+  frame.addEventListener("load", () => {
+    if (tab.frame !== frame) return;
+    // Scrollposition pro Tab wiederherstellen (nur eigene srcdoc-Ansichten).
+    if (usesSrcdoc && tab.scrollRatio > 0) {
+      try {
+        frame.contentWindow?.postMessage({ type: "smejj.browser.restoreScroll", ratio: tab.scrollRatio }, "*");
+      } catch {
+        // Optional — ohne Wiederherstellung bleibt die Seite oben.
+      }
+    }
+    // Fokus wie Chrome an den Inhalt geben, ausser der Nutzer tippt gerade.
+    if (tab.id === state.activeId && document.activeElement !== refs.address) frame.focus();
+  });
   tab.mode = mode;
   tab.frame = frame;
+  applyZoom(tab);
   refs.content.appendChild(frame);
 }
 
@@ -438,77 +555,29 @@ function isAmazonHost(host) {
   return /^amazon\./i.test(String(host || ""));
 }
 
-export function buildExternalFallbackHtml({ url, title, message }) {
-  const safeUrl = escapeHtml(url || "");
-  const safeTitle = escapeHtml(title || "Echter Browser erforderlich");
-  const safeMessage = escapeHtml(message || "Diese Webseite muss extern geoeffnet werden.");
-  return `<!doctype html>
-<html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    html,body{height:100%;margin:0;background:#101113;color:#f6f3ee;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    main{min-height:100%;display:grid;place-content:center;gap:12px;padding:24px;text-align:center;box-sizing:border-box}
-    strong{font-size:18px}
-    span{max-width:420px;color:rgba(246,243,238,.62);font-size:13px;line-height:1.45}
-    a{justify-self:center;display:inline-grid;place-items:center;min-height:34px;padding:0 14px;border:1px solid rgba(159,231,212,.42);border-radius:8px;background:rgba(159,231,212,.12);color:#f6f3ee;font-size:13px;font-weight:700;text-decoration:none}
-  </style>
-</head>
-<body>
-  <main class="bp-fallback">
-    <strong>${safeTitle}</strong>
-    <span>${safeMessage}</span>
-    <a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a>
-  </main>
-</body>
-</html>`;
-}
-
-export function buildRemoteBrowserHtml({ url, title, screenshot, reason = "" }) {
-  const safeUrl = escapeHtml(url || "");
-  const safeTitle = escapeHtml(title || "Remote-Browser");
-  const safeScreenshot = String(screenshot || "").startsWith("data:image/png;base64,") ? screenshot : "";
-  const safeReason = escapeHtml(reason || "remote-browser");
-  return `<!doctype html>
-<html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    html,body{height:100%;margin:0;background:#101113;color:#f6f3ee;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    main{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);box-sizing:border-box}
-    header{display:flex;align-items:center;gap:10px;min-height:38px;padding:0 10px;border-bottom:1px solid rgba(246,243,238,.12);background:#18191c}
-    strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
-    span{color:rgba(246,243,238,.54);font-size:11px}
-    a{margin-left:auto;color:#9fe7d4;font-size:12px;font-weight:700;text-decoration:none}
-    img{display:block;width:100%;height:100%;min-width:0;min-height:0;object-fit:contain;background:#0c0d0f}
-  </style>
-</head>
-<body>
-  <main class="bp-remote-browser" data-reason="${safeReason}">
-    <header><strong>${safeTitle}</strong><span>Remote-Browser</span><a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a></header>
-    <img src="${safeScreenshot}" alt="Remote-Browser-Ansicht von ${safeTitle}">
-  </main>
-</body>
-</html>`;
-}
-
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
-
 function onFrameMessage(event) {
   const message = event.data;
-  if (!message || message.type !== "smejj.browser.navigate" || typeof message.url !== "string") return;
+  if (!message || typeof message.type !== "string") return;
   const tab = state.tabs.find((entry) => entry.frame?.contentWindow === event.source);
   if (!tab) return;
-  const target = normalizeAddress(message.url);
-  if (target) navigate(tab, target);
+  if (message.type === "smejj.browser.navigate" && typeof message.url === "string") {
+    const target = normalizeAddress(message.url);
+    if (target) navigate(tab, target);
+    return;
+  }
+  if (message.type === "smejj.browser.scrollState") {
+    const top = Number(message.top);
+    const max = Number(message.max);
+    if (!Number.isFinite(top) || !Number.isFinite(max) || max <= 0) return;
+    tab.scrollRatio = Math.min(1, Math.max(0, top / max));
+    schedulePersist();
+  }
+}
+
+// Persistenz fuer hochfrequente Updates (Scroll) buendeln.
+function schedulePersist() {
+  clearTimeout(state.persistTimer);
+  state.persistTimer = setTimeout(persistTabs, 800);
 }
 
 // --- Rendering ---------------------------------------------------------------
@@ -577,7 +646,19 @@ function persistTabs() {
   try {
     localStorage.setItem(TABS_STORAGE_KEY, JSON.stringify({
       activeId: state.activeId,
-      tabs: state.tabs.map((tab) => ({ id: tab.id, url: tab.url, title: tab.title }))
+      tabs: state.tabs.map((tab) => {
+        const history = tab.history.slice(-MAX_PERSISTED_HISTORY);
+        const dropped = tab.history.length - history.length;
+        return {
+          id: tab.id,
+          url: tab.url,
+          title: tab.title,
+          scrollRatio: Math.round((tab.scrollRatio || 0) * 1000) / 1000,
+          zoom: tab.zoom || 1,
+          history,
+          historyIndex: Math.max(-1, Math.min(tab.historyIndex - dropped, history.length - 1))
+        };
+      })
     }));
   } catch {
     // Speichern ist optional — kein Fehler nach aussen.
@@ -593,15 +674,26 @@ function restoreTabs() {
   }
   if (!saved?.tabs?.length) return;
   for (const entry of saved.tabs.slice(0, MAX_TABS)) {
+    const url = String(entry.url || "");
+    const history = Array.isArray(entry.history)
+      ? entry.history.filter((item) => typeof item === "string" && item).slice(-MAX_PERSISTED_HISTORY)
+      : (url ? [url] : []);
+    const savedIndex = Number(entry.historyIndex);
+    const historyIndex = Number.isInteger(savedIndex)
+      ? Math.max(history.length ? 0 : -1, Math.min(savedIndex, history.length - 1))
+      : history.length - 1;
     const tab = {
       id: `tab-${state.nextId++}`,
-      url: String(entry.url || ""),
+      url,
       title: String(entry.title || NEW_TAB_TITLE),
       status: "idle",
       mode: "",
-      history: entry.url ? [String(entry.url)] : [],
-      historyIndex: entry.url ? 0 : -1,
-      frame: null
+      history,
+      historyIndex,
+      frame: null,
+      scrollRatio: Math.min(1, Math.max(0, Number(entry.scrollRatio) || 0)),
+      zoom: clampZoom(entry.zoom || 1),
+      remoteViewport: null
     };
     state.tabs.push(tab);
     if (entry.id === saved.activeId) state.activeId = tab.id;
