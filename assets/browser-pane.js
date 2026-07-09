@@ -5,12 +5,12 @@
 // blockierende Seiten (Google, GitHub, ...) kommen als sichere, serverseitig
 // umgeschriebene Ansicht ueber /api/browser/fetch. Fail-closed: ohne Server
 // wird direkt eingebettet und "In neuem Tab oeffnen" angeboten.
-import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260709-1";
+import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260709-2";
 import {
   buildExternalFallbackHtml,
   buildRemoteBrowserHtml
-} from "./browser-pane-render.js?v=browser-pane-20260709-1";
-export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260709-1";
+} from "./browser-pane-render.js?v=browser-pane-20260709-2";
+export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
@@ -194,6 +194,9 @@ function mountOnce() {
     event.preventDefault();
     submitAddress();
   });
+  // Wie Chrome: Fokus in der Adressleiste selektiert die komplette URL,
+  // damit neuer Text sie ersetzt statt angehaengt zu werden.
+  refs.address.addEventListener("focus", () => refs.address.select());
   refs.external.addEventListener("click", () => {
     const url = activeTab()?.url;
     if (url) window.open(url, "_blank", "noopener");
