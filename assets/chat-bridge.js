@@ -24,8 +24,8 @@ export function createChatBridgeServer() {
       if (url.pathname === "/health") return json(res, 200, healthPayload());
       if (req.method !== "POST") return json(res, 404, { ok: false, error: "Not found" });
       if (!cors["Access-Control-Allow-Origin"]) return json(res, 403, { ok: false, error: "Origin not allowed" });
-      if (url.pathname === "/api/chat") return handleChat(req, res);
-      if (url.pathname === "/api/agent") return handleAgent(req, res);
+      if (url.pathname === "/api/chat") return await handleChat(req, res);
+      if (url.pathname === "/api/agent") return await handleAgent(req, res);
       return json(res, 404, { ok: false, error: "Not found" });
     } catch (error) {
       return json(res, 500, { ok: false, error: error?.message || "Internal error" });
@@ -187,7 +187,7 @@ export function filterSsePayload(payload, state = { pending: "", insideThink: fa
   const raw = typeof delta.content === "string" ? delta.content : "";
   if (!raw) return "";
   const visible = stripInternalReferences(stripThinking(raw, state));
-  return visible.trim() ? visible : "";
+  return visible;
 }
 
 function handleSseEvent(event, state, res) {
