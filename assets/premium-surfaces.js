@@ -1,7 +1,30 @@
+import { CLIENT_ROUTES } from "./config.js";
+import { applyServerAiStatus } from "/assets/storage/index.js";
+
 export function enhancePremiumSurfaces() {
   loadPremiumStyles();
   document.querySelectorAll(".view:not(#start)").forEach((view) => view.classList.add("premium-view"));
   enhanceProjectActions();
+  syncServerAiStatus();
+}
+
+// Holt den echten Server-AI-Zustand vom Control-Server (/api/health) und
+// aktualisiert die Statusanzeigen (Statusseite, Home-Zusammenfassung, Kosten).
+// Fail-closed: bei Netz-/Serverfehlern bleibt die Anzeige auf "disabled".
+// Es werden keine Secrets angezeigt — nur "enabled (provider:modell)".
+async function syncServerAiStatus() {
+  try {
+    const response = await fetch(CLIENT_ROUTES.api.health, { cache: "no-store" });
+    if (!response.ok) return;
+    const health = await response.json();
+    const status = applyServerAiStatus(health);
+    for (const selector of ["#aiModeText", "#homeAiSummary", "#costAiMode"]) {
+      const node = document.querySelector(selector);
+      if (node) node.textContent = status.aiMode;
+    }
+  } catch {
+    // fail-closed: Anzeige bleibt "disabled", keine Fehlermeldung noetig.
+  }
 }
 
 export function renderProjectCards(projects) {
