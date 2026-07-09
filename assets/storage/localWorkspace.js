@@ -27,6 +27,33 @@ const ROLE_PERMISSIONS = Object.freeze({
   [PROJECT_ROLES.localOnly]: ["open", "save", "export", "delete"]
 });
 
+// Server-AI-Anzeige: wird ausschliesslich aus /api/health des Control-Servers
+// gespeist (applyServerAiStatus). Fail-closed Standard "disabled" — die Anzeige
+// behauptet nie AI, solange der Server Gate, Budget und Provider-Kette nicht
+// bestaetigt hat. Es werden nur ungefaehrliche Werte uebernommen (Provider:Modell),
+// niemals Keys, URLs oder andere Secrets.
+const AI_BACKEND_PATTERN = /^[a-z0-9][a-z0-9:._\/-]{0,79}$/i;
+const serverAiStatus = { aiMode: "disabled", aiBackend: "" };
+
+/**
+ * Uebernimmt den Server-Health-Zustand fuer die Statusanzeige.
+ * Input: health-Objekt von /api/health ({ ai: boolean, aiBackend?: string }).
+ * Output: Kopie des neuen Anzeige-Zustands { aiMode, aiBackend }.
+ */
+export function applyServerAiStatus(health = {}) {
+  const backend = typeof health.aiBackend === "string" && AI_BACKEND_PATTERN.test(health.aiBackend.trim())
+    ? health.aiBackend.trim()
+    : "";
+  if (health.ai === true) {
+    serverAiStatus.aiMode = backend ? `enabled (${backend})` : "enabled";
+    serverAiStatus.aiBackend = backend;
+  } else {
+    serverAiStatus.aiMode = "disabled";
+    serverAiStatus.aiBackend = "";
+  }
+  return { ...serverAiStatus };
+}
+
 export function createLocalWorkspace({ metadataStore = createIndexedDbStore(), fileStore = createOpfsStore(), onlineRef = globalThis.navigator } = {}) {
   async function saveUserManifest({ id = `user_${Date.now()}`, name = "Lokaler Nutzer", email = "", role = PROJECT_ROLES.localOnly } = {}) {
     const manifest = {
@@ -291,7 +318,8 @@ export function createLocalWorkspace({ metadataStore = createIndexedDbStore(), f
       offline: !online,
       syncStatus: online ? SYNC_STATUS.local : "offline-lokal",
       idriveStatus: "presigned-sync-not-configured",
-      aiMode: "disabled",
+      aiMode: serverAiStatus.aiMode,
+      aiBackend: serverAiStatus.aiBackend,
       costStatus: "0 EUR Risiko / blockiert"
     };
   }

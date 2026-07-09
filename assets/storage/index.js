@@ -1,4 +1,4 @@
-export { createLocalWorkspace, PROJECT_ROLES, SYNC_STATUS, requireProjectAccess } from "./localWorkspace.js";
+export { applyServerAiStatus, createLocalWorkspace, PROJECT_ROLES, SYNC_STATUS, requireProjectAccess } from "./localWorkspace.js";
 export { createIndexedDbStore, createMemoryStore } from "./indexedDbStore.js";
 export { createOpfsStore, createMemoryOpfsStore } from "./opfsStore.js";
 export { createContentObject, objectKeyForHash, normalizeRepoPath } from "./contentAddressed.js";
