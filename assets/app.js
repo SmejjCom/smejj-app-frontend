@@ -39,7 +39,7 @@ const PANEL_WIDTHS = Object.freeze({
 const MODEL_MODES = Object.freeze({
   "smejj 1.0": AI_MODES.disabled,
   "smejj Code": AI_MODES.disabled,
-  "GLM-5.2": AI_MODES.glm52Vault,
+  "GLM-5.2": AI_MODES.glm52Vault, "Kimi K2.7": AI_MODES.kimiK27Vault,
   "BYOK": AI_MODES.byok,
   "local browser": AI_MODES.localBrowser
 });
@@ -190,7 +190,7 @@ function bindModelPicker() {
   const button = $("#modelPickerButton");
   const menu = $("#modelPickerMenu");
   if (!button || !menu) return;
-  applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) || state.settings.model || "smejj 1.0", { persist: false, quiet: true });
+  applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) || state.settings.model || "smejj 1.0", { persist: false, quiet: true }); window.addEventListener("smejj:model-selected", (event) => applySelectedModel(event.detail?.model));
   button.addEventListener("click", (event) => {
     event.stopPropagation();
     const open = menu.hidden;

@@ -1,10 +1,12 @@
 // smejj.com — API-Origin: Standard ist Same-Origin (GitHub Pages). Fuer das
 // Salad-Container-Gateway (Backend auf *.salad.cloud) wird die Origin hier als
 // Konstante gesetzt oder per localStorage "smejj.apiOrigin.v1" uebersteuert
-// (nur https, fail-safe: ungueltige Werte werden ignoriert).
+// (nur https; lokales HTTP nur fuer localhost/Loopback-Testserver).
 const DEFAULT_API_ORIGIN = "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud";
 
 function resolveApiOrigin() {
+  const pageOrigin = String(globalThis.location?.origin || "").trim().replace(/\/+$/, "");
+  if (/^http:\/\/(?:127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/i.test(pageOrigin)) return pageOrigin;
   let stored = "";
   try {
     stored = globalThis.localStorage?.getItem("smejj.apiOrigin.v1") || "";
