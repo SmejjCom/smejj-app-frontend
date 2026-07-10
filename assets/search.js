@@ -1,3 +1,5 @@
+import { CLIENT_ROUTES } from "./config.js";
+
 const STATIC_RESULTS = Object.freeze([
   ["Arbeitsbereiche", "Neu", "Neuer Chat oder neue Aufgabe starten", "start", "neu chat aufgabe start"],
   ["Arbeitsbereiche", "Coding", "Code schreiben, pruefen und umbauen", "smejjClaw", "coding code programmieren terminal"],
@@ -39,7 +41,7 @@ export function initGlobalSearch({ $, goToView, showTaskIndicator, showToast, st
   log.addEventListener("click", (event) => {
     const button = event.target.closest("[data-search-view]");
     if (!button) return;
-    openResult({ view: button.dataset.searchView, label: button.dataset.searchLabel }, goToView, showTaskIndicator, showToast);
+    openResult({ view: button.dataset.searchView, label: button.dataset.searchLabel, jobId: button.dataset.searchJobId }, goToView, showTaskIndicator, showToast);
   });
   document.addEventListener("keydown", (event) => {
     if (event.key.toLowerCase() !== "k" || (!event.metaKey && !event.ctrlKey)) return;
@@ -53,15 +55,37 @@ export function initGlobalSearch({ $, goToView, showTaskIndicator, showToast, st
 async function findResults(query, state, workspace) {
   const needle = query.trim().toLowerCase();
   if (!needle) return [];
-  const projectRows = await workspace.listProjects().catch(() => []);
+  const [projectRows, jobRows] = await Promise.all([
+    workspace.listProjects().catch(() => []),
+    loadJobRows()
+  ]);
+  const chatRows = Array.from(document.querySelectorAll("#startLog .entry"))
+    .slice(-50)
+    .map((entry, index) => ["Chats", entry.textContent?.slice(0, 120) || `Chat ${index + 1}`, "Chat-Verlauf", "chatHistory", entry.textContent || ""]);
   const dynamic = [
     ...projectRows.map((project) => ["Projekte", project.name || project.id, `Projekt ${project.id}`, "projects", `${project.id} ${project.name} ${project.syncStatus}`]),
+    ...jobRows.map((job) => ["Aufgaben", job.task || job.id, `${job.status} - ${job.id}`, "automation", `${job.id} ${job.task} ${job.status}`, job.id]),
+    ...chatRows,
     ["Memory", "Memory/RAG", "Lokale Memory- und RAG-Notizen", "memory", `${state.memory || ""} ${state.rag || ""}`],
     ...state.uploads.map((file) => ["Dateien", file.name, "Lokaler Upload", "files", `${file.name} ${file.type} ${file.preview || ""}`])
   ];
   return [...STATIC_RESULTS, ...dynamic]
     .filter(([, label, detail,, text]) => `${label} ${detail} ${text}`.toLowerCase().includes(needle))
-    .map(([group, label, detail, view]) => ({ group, label, detail, view }));
+    .map(([group, label, detail, view, _text, jobId]) => ({ group, label, detail, view, jobId }));
+}
+
+async function loadJobRows() {
+  try {
+    const headers = new Headers({ Accept: "application/json" });
+    const token = sessionStorage.getItem("smejj.apiToken.v1") || "";
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+    const response = await fetch(`${CLIENT_ROUTES.api.jobs}?limit=30`, { headers });
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data.jobs) ? data.jobs : [];
+  } catch {
+    return [];
+  }
 }
 
 function renderResults(log, results, query) {
@@ -81,6 +105,7 @@ function renderResults(log, results, query) {
       button.className = "nav-button";
       button.dataset.searchView = item.view;
       button.dataset.searchLabel = item.label;
+      if (item.jobId) button.dataset.searchJobId = item.jobId;
       button.textContent = `${item.label} - ${item.detail}`;
       section.append(button);
     }
@@ -98,5 +123,6 @@ function empty(text) {
 function openResult(result, goToView, showTaskIndicator, showToast) {
   showTaskIndicator("done");
   goToView(result.view);
+  if (result.jobId) window.dispatchEvent(new CustomEvent("smejj:job-selected", { detail: { jobId: result.jobId } }));
   showToast?.(`${result.label || "Treffer"} geoeffnet`);
 }

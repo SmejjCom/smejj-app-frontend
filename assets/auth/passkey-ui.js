@@ -8,6 +8,7 @@ const SESSION_KEY = "smejj.session.v1";
 const API_TOKEN_KEY = "smejj.apiToken.v1";
 
 installAuthenticatedFetch();
+completeSessionHandoff().catch((error) => writeOutput(`Anmeldung konnte nicht uebergeben werden: ${error?.message || error}`));
 
 function ready(fn) {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn, { once: true });
@@ -111,4 +112,23 @@ function installAuthenticatedFetch() {
     if (target.origin === API_ORIGIN && target.pathname === "/api/auth/logout" && response.ok) sessionStorage.removeItem(API_TOKEN_KEY);
     return response;
   };
+}
+
+async function completeSessionHandoff() {
+  const params = new URLSearchParams(location.search);
+  if (params.get("session-handoff") !== "1") return;
+  const returnOrigin = String(params.get("returnOrigin") || "");
+  const allowed = new Set(["https://smejj.com", "https://www.smejj.com"]);
+  if (/^http:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?$/.test(returnOrigin)) allowed.add(returnOrigin);
+  if (!allowed.has(returnOrigin) || !window.opener) throw new Error("Ungueltiges Rueckgabeziel.");
+  const response = await fetch(`${API_ORIGIN}/api/auth/session-token`, { headers: { Accept: "application/json" } });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.accessToken) throw new Error(data.error || "Anmeldung erforderlich.");
+  window.opener.postMessage({
+    type: "smejj:session-handoff",
+    accessToken: data.accessToken,
+    user: data.user || null
+  }, returnOrigin);
+  writeOutput("Anmeldung verbunden. Dieses Fenster kann geschlossen werden.");
+  setTimeout(() => window.close(), 250);
 }
