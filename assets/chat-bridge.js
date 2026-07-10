@@ -12,8 +12,13 @@ const LLM_MODEL = process.env.SMEJJ_LLM_SALAD_MODEL || process.env.SMEJJ_LLM_MOD
 const LLM_HEADER = process.env.SMEJJ_LLM_HEADER || (process.env.SMEJJ_LLM_SALAD_API_KEY ? "Salad-Api-Key" : "Authorization");
 const REQUEST_TIMEOUT_MS = Number(process.env.SMEJJ_CHAT_BRIDGE_TIMEOUT_MS || 60000);
 const MAX_BODY_BYTES = 256 * 1024;
+const RATE_WINDOW_MS = 60_000;
+const RATE_PER_CLIENT = boundedInteger(process.env.SMEJJ_PUBLIC_AI_RATE_PER_MINUTE, 1, 600, 12);
+const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_MINUTE, RATE_PER_CLIENT, 5_000, 120);
+const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
+const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260710-v95";
+const BRIDGE_VERSION = "20260710-v96";
 
 export function createChatBridgeServer() {
   return http.createServer(async (req, res) => {
@@ -25,6 +30,7 @@ export function createChatBridgeServer() {
       if (url.pathname === "/health") return json(res, 200, healthPayload());
       if (req.method !== "POST") return json(res, 404, { ok: false, error: "Not found" });
       if (!cors["Access-Control-Allow-Origin"]) return json(res, 403, { ok: false, error: "Origin not allowed" });
+      if ((url.pathname === "/api/chat" || url.pathname === "/api/agent") && !allowModelRequest(req, res)) return;
       if (url.pathname === "/api/chat") return await handleChat(req, res);
       if (url.pathname === "/api/agent") return await handleAgent(req, res);
       return json(res, 404, { ok: false, error: "Not found" });
@@ -44,8 +50,48 @@ function healthPayload() {
     multiModelRouterEnabled: CONTROL_ROUTER_ENABLED,
     role: "stateless-chat-stream-bridge",
     costProfile: "cpu-only-no-gpu-no-storage",
+    publicRateLimit: { perClientPerMinute: RATE_PER_CLIENT, globalPerMinute: RATE_GLOBAL },
     startedAt: STARTED_AT.toISOString()
   };
+}
+
+function allowModelRequest(req, res) {
+  const client = clientLimiter.take(clientKey(req));
+  const global = client.allowed ? globalLimiter.take("global") : { allowed: true, retryAfterMs: 0 };
+  if (client.allowed && global.allowed) return true;
+  const retryAfterMs = Math.max(client.retryAfterMs || 0, global.retryAfterMs || 0);
+  res.setHeader("Retry-After", String(Math.max(1, Math.ceil(retryAfterMs / 1_000))));
+  json(res, 429, { ok: false, error: "public_ai_rate_limit_reached" });
+  return false;
+}
+
+function clientKey(req) {
+  const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return forwarded || String(req.headers["x-real-ip"] || "").trim() || String(req.socket?.remoteAddress || "unknown");
+}
+
+export function createWindowLimiter({ max, windowMs, maxKeys = 10_000, now = () => Date.now() }) {
+  const windows = new Map();
+  return {
+    take(key) {
+      const current = now();
+      const id = String(key || "unknown");
+      const recent = (windows.get(id) || []).filter((timestamp) => timestamp > current - windowMs);
+      if (recent.length >= max) {
+        windows.set(id, recent);
+        return { allowed: false, retryAfterMs: Math.max(0, windowMs - (current - recent[0])) };
+      }
+      recent.push(current);
+      if (!windows.has(id) && windows.size >= maxKeys) windows.delete(windows.keys().next().value);
+      windows.set(id, recent);
+      return { allowed: true, retryAfterMs: 0 };
+    }
+  };
+}
+
+function boundedInteger(value, min, max, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.min(max, Math.max(min, Math.floor(number))) : fallback;
 }
 
 async function handleChat(req, res) {
@@ -342,7 +388,7 @@ function corsHeaders(origin) {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Access-Control-Expose-Headers": "x-smejj-model-backend, x-smejj-model-id, x-smejj-model-fallback",
+    "Access-Control-Expose-Headers": "x-smejj-model-backend, x-smejj-model-id, x-smejj-model-fallback, Retry-After",
     Vary: "Origin"
   };
 }
