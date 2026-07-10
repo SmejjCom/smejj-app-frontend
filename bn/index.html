@@ -14,6 +14,7 @@
     <meta property="og:url" content="https://smejj.com/bn/">
     <meta property="og:locale" content="bn">
     <meta property="og:image" content="https://smejj.com/og-image.png">
+    <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="smejj.com — Autonomous AI Coding OS">
@@ -21,6 +22,7 @@
     <meta name="twitter:title" content="smejj.com — AI ও কোড অ্যাসিস্ট্যান্ট | স্বায়ত্তশাসিত AI কোডিং OS">
     <meta name="twitter:description" content="smejj.com হলো চ্যাট, প্রোগ্রামিং ও এজেন্ট কাজের জন্য একটি দ্রুত AI ও কোড অ্যাসিস্ট্যান্ট। ব্রাউজারে চলা স্বায়ত্তশাসিত AI কোডিং OS — বিশ্বজুড়ে ১৫টি ভাষায় উপলব্ধ।">
     <meta name="twitter:image" content="https://smejj.com/og-image.png">
+    <meta name="twitter:image:alt" content="smejj.com">
     <link rel="canonical" href="https://smejj.com/bn/">
     <link rel="alternate" hreflang="de" href="https://smejj.com/">
     <link rel="alternate" hreflang="en" href="https://smejj.com/en/">
@@ -39,8 +41,12 @@
     <link rel="alternate" hreflang="bn" href="https://smejj.com/bn/">
     <link rel="alternate" hreflang="x-default" href="https://smejj.com/en/">
     <title>smejj.com — AI ও কোড অ্যাসিস্ট্যান্ট | স্বায়ত্তশাসিত AI কোডিং OS</title>
-    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icons/icon.svg">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/icons/smejj_icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -114,9 +120,9 @@
       * { box-sizing: border-box; }
       body { margin: 0; background: #f7f7f4; color: #1c1c1a; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; line-height: 1.6; }
       .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 56px; }
-      header.top { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
-      header.top img { width: 28px; height: 28px; }
-      header.top strong { font-size: 18px; letter-spacing: 0.2px; }
+      header.top { display: flex; align-items: center; margin-bottom: 40px; }
+      header.top a { display: inline-flex; max-width: 100%; }
+      header.top img { width: clamp(126px, 28vw, 168px); height: auto; aspect-ratio: 2920.43 / 659.983; object-fit: contain; }
       h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.2; margin: 0 0 12px; }
       p.tagline { font-size: 18px; color: #44443f; margin: 0 0 24px; }
       a.cta { display: inline-block; background: #1c1c1a; color: #f7f7f4; text-decoration: none; padding: 12px 26px; border-radius: 999px; font-weight: 600; }
@@ -139,8 +145,9 @@
   <body>
     <div class="wrap">
       <header class="top">
-        <img src="/icons/icon.svg" alt="" aria-hidden="true">
-        <strong>smejj.com</strong>
+        <a href="/" aria-label="smejj.com">
+          <img src="/icons/smejj_full_logo.svg" alt="smejj" width="2920" height="660">
+        </a>
       </header>
       <main>
         <h1>smejj.com — আপনার AI ও কোড অ্যাসিস্ট্যান্ট</h1>

@@ -1,0 +1,42 @@
+.app-brand-logo {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 2px);
+  left: calc(env(safe-area-inset-left) + 38px);
+  z-index: 44;
+  display: flex;
+  align-items: center;
+  width: clamp(116px, 13vw, 158px);
+  padding: 3px 6px;
+  border-radius: 7px;
+  background: rgba(247, 247, 244, 0.96);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
+  transition: opacity 160ms ease, visibility 160ms ease;
+}
+
+.app-brand-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2920.43 / 659.983;
+  object-fit: contain;
+}
+
+body.left-panel-open .app-brand-logo {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 560px) {
+  .app-brand-logo {
+    left: calc(env(safe-area-inset-left) + 36px);
+    width: 112px;
+    padding: 3px 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-brand-logo {
+    transition: none;
+  }
+}
