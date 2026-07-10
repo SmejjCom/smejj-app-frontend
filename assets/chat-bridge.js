@@ -5,6 +5,7 @@ const PORT = Number(process.env.PORT || 8080);
 const HOST = process.env.SMEJJ_HOST || "::";
 const ALLOWED_ORIGINS = new Set(["https://smejj.com", "https://www.smejj.com"]);
 const CONTROL_ORIGIN = trimUrl(process.env.SMEJJ_CONTROL_ORIGIN || "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud");
+const CONTROL_ROUTER_ENABLED = /^(1|true|yes)$/i.test(process.env.SMEJJ_MULTI_MODEL_ROUTER_ENABLED || "NO");
 const LLM_BASE_URL = trimUrl(process.env.SMEJJ_LLM_SALAD_BASE_URL || process.env.SMEJJ_LLM_BASE_URL || "");
 const LLM_API_KEY = process.env.SMEJJ_LLM_SALAD_API_KEY || process.env.SMEJJ_LLM_API_KEY || "";
 const LLM_MODEL = process.env.SMEJJ_LLM_SALAD_MODEL || process.env.SMEJJ_LLM_MODEL || "tgi";
@@ -12,7 +13,7 @@ const LLM_HEADER = process.env.SMEJJ_LLM_HEADER || (process.env.SMEJJ_LLM_SALAD_
 const REQUEST_TIMEOUT_MS = Number(process.env.SMEJJ_CHAT_BRIDGE_TIMEOUT_MS || 60000);
 const MAX_BODY_BYTES = 256 * 1024;
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260708-v88";
+const BRIDGE_VERSION = "20260710-v95";
 
 export function createChatBridgeServer() {
   return http.createServer(async (req, res) => {
@@ -40,6 +41,7 @@ function healthPayload() {
     version: BRIDGE_VERSION,
     modelConfigured: Boolean(LLM_BASE_URL && LLM_API_KEY && LLM_MODEL),
     controlConfigured: Boolean(CONTROL_ORIGIN),
+    multiModelRouterEnabled: CONTROL_ROUTER_ENABLED,
     role: "stateless-chat-stream-bridge",
     costProfile: "cpu-only-no-gpu-no-storage",
     startedAt: STARTED_AT.toISOString()
@@ -48,18 +50,20 @@ function healthPayload() {
 
 async function handleChat(req, res) {
   const body = await readJson(req);
+  if (await streamViaControl(res, "/api/chat", body)) return;
   const messages = Array.isArray(body.messages) ? body.messages : [{ role: "user", content: String(body.message || "") }];
-  return streamModel(res, hardenMessages(messages), "chat");
+  return streamModel(res, hardenMessages(messages), "chat", body.model);
 }
 
 async function handleAgent(req, res) {
   const body = await readJson(req);
   const task = String(body.task || body.message || "").trim();
   if (!task) return json(res, 400, { ok: false, error: "Missing task" });
+  if (await streamViaControl(res, "/api/agent", body)) return;
   const coding = isCodingTask(task);
   const webContext = !coding && shouldSearchWeb(task) ? await buildWebContext(task) : "";
   const messages = buildAgentMessages({ task, coding, webContext });
-  return streamModel(res, messages, coding ? "coding" : webContext ? "web" : "fast");
+  return streamModel(res, messages, coding ? "coding" : webContext ? "web" : "fast", body.model);
 }
 
 function buildAgentMessages({ task, coding, webContext }) {
@@ -106,7 +110,42 @@ async function buildWebContext(task) {
   }
 }
 
-async function streamModel(res, messages, profile) {
+async function streamViaControl(res, route, body) {
+  if (!CONTROL_ROUTER_ENABLED || !CONTROL_ORIGIN) return false;
+  let upstream;
+  try {
+    upstream = await fetch(`${CONTROL_ORIGIN}${route}`, {
+      method: "POST",
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      headers: { "Content-Type": "application/json", Accept: "text/event-stream", Origin: "https://smejj.com" },
+      body: JSON.stringify(body || {})
+    });
+  } catch {
+    return false;
+  }
+  if (!upstream.ok || !upstream.body) {
+    if (upstream.status >= 500) return false;
+    const detail = await upstream.text().catch(() => "");
+    json(res, upstream.status || 502, { ok: false, error: "Model router rejected request.", detail: detail.slice(0, 200) });
+    return true;
+  }
+  res.writeHead(200, {
+    ...securityHeaders(),
+    ...corsHeaders("https://smejj.com"),
+    "Content-Type": "text/event-stream; charset=utf-8",
+    "Cache-Control": "no-cache, no-transform",
+    Connection: "keep-alive",
+    "x-smejj-bridge": "multi-model-router",
+    "x-smejj-model-backend": upstream.headers.get("x-smejj-model-backend") || "control-router",
+    "x-smejj-model-id": upstream.headers.get("x-smejj-model-id") || "",
+    "x-smejj-model-fallback": upstream.headers.get("x-smejj-model-fallback") || "false"
+  });
+  await pipeVisibleStream(upstream.body, res);
+  res.end();
+  return true;
+}
+
+async function streamModel(res, messages, profile, requestedModel = "") {
   if (!LLM_BASE_URL || !LLM_API_KEY || !LLM_MODEL) {
     return json(res, 503, { ok: false, error: "Model backend is not configured." });
   }
@@ -142,7 +181,11 @@ async function streamModel(res, messages, profile) {
     "Cache-Control": "no-cache, no-transform",
     Connection: "keep-alive",
     "x-smejj-bridge": "chat",
-    "x-smejj-profile": profile
+    "x-smejj-profile": profile,
+    "x-smejj-model-backend": bridgeModelBackend(),
+    "x-smejj-model-id": "glm-5-2",
+    "x-smejj-requested-model": String(requestedModel || ""),
+    "x-smejj-model-fallback": String(/kimi/i.test(String(requestedModel || "")))
   });
   await pipeVisibleStream(upstream.body, res);
   res.end();
@@ -250,7 +293,7 @@ function isCodingTask(task) {
   const text = String(task || "");
   if (/```/.test(text)) return true;
   if (/\b(refactor|debug|stack ?trace|compile|dockerfile|commit|deploy|npm |pnpm |yarn |git )\b/i.test(text)) return true;
-  return /\b(schreib|erstelle|implementier|programmier|code|coden|baue|fix|behebe)\b/i.test(text)
+  return /\b(schreib\w*|erstell\w*|implementier\w*|programmier\w*|cod\w*|bau\w*|fix\w*|beheb\w*)\b/i.test(text)
     && /\b(funktion|function|klasse|class|script|komponente|component|endpoint|modul|module|css|html|javascript|typescript|python|react|node|bug|fehler|datei|file|repo)\b/i.test(text);
 }
 
@@ -299,6 +342,7 @@ function corsHeaders(origin) {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Expose-Headers": "x-smejj-model-backend, x-smejj-model-id, x-smejj-model-fallback",
     Vary: "Origin"
   };
 }
@@ -313,6 +357,12 @@ function securityHeaders() {
 
 function trimUrl(value) {
   return String(value || "").trim().replace(/\/+$/, "");
+}
+
+function bridgeModelBackend() {
+  if (/api\.z\.ai|bigmodel/i.test(LLM_BASE_URL) || /^glm-/i.test(LLM_MODEL)) return `zhipu:${LLM_MODEL}`;
+  if (/salad\.cloud/i.test(LLM_BASE_URL)) return `salad:${LLM_MODEL}`;
+  return `custom:${LLM_MODEL}`;
 }
 
 if (process.env.SMEJJ_CHAT_BRIDGE_NO_START !== "1") {
