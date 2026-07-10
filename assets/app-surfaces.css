@@ -102,6 +102,73 @@
   min-height: 180px;
 }
 
+.system-model-field {
+  grid-column: 1 / -1;
+}
+
+#systemModelSelect {
+  width: min(420px, 100%);
+}
+
+.model-registry-panel {
+  display: grid;
+  border-block: 1px solid var(--premium-line);
+}
+
+.model-registry-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.4fr) minmax(90px, 0.7fr) minmax(120px, 1fr) minmax(78px, auto);
+  align-items: center;
+  gap: 14px;
+  min-height: 58px;
+  padding: 8px 2px;
+  color: var(--premium-muted);
+  font-size: 13px;
+}
+
+.model-registry-row + .model-registry-row {
+  border-top: 1px solid var(--premium-line);
+}
+
+.model-registry-row strong,
+.model-registry-row div > span {
+  display: block;
+}
+
+.model-registry-row strong {
+  color: var(--premium-text);
+  font-size: 15px;
+}
+
+.model-registry-row div > span {
+  margin-top: 2px;
+  color: var(--premium-soft);
+}
+
+.model-state {
+  justify-self: end;
+  color: var(--premium-muted);
+  font-weight: 700;
+}
+
+.model-state::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: #8a9099;
+}
+
+.model-state-ready::before {
+  background: #4bd48a;
+}
+
+.model-state-fallback-only::before {
+  background: #f1bd59;
+}
+
 .premium-view input:focus,
 .premium-view select:focus,
 .premium-view textarea:focus {
@@ -279,6 +346,12 @@
     padding: 56px 12px 22px;
   }
 
+  .premium-view .view-header h2 {
+    font-size: 32px;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+
   .premium-view .toolbar,
   .premium-view .panel-grid,
   .premium-view .status-grid,
@@ -304,6 +377,20 @@
   .project-card {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .model-registry-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 12px;
+  }
+
+  .model-registry-row > span:not(.model-state) {
+    grid-column: 1;
+  }
+
+  .model-state {
+    grid-column: 2;
+    grid-row: 1;
   }
 
   .project-meta {
