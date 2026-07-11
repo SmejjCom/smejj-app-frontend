@@ -1,6 +1,6 @@
 {
   "name": "smejj.com Code",
-  "short_name": "smejj",
+  "short_name": "smejj.com",
   "id": "/",
   "start_url": "/",
   "scope": "/",
@@ -9,12 +9,6 @@
   "theme_color": "#1f2937",
   "description": "Free-safe PWA shell for smejj.com Code.",
   "icons": [
-    {
-      "src": "/icons/smejj_icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
     {
       "src": "/icons/pwa-192x192.png",
       "sizes": "192x192",

@@ -1,4 +1,4 @@
-const CACHE_NAME = "smejj-shell-v98";
+const CACHE_NAME = "smejj-shell-v99";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -45,7 +45,9 @@ const SHELL = [
   "/apple-touch-icon.png",
   "/og-image.png",
   "/icons/smejj_icon.svg",
+  "/icons/smejj_favicon.svg",
   "/icons/smejj_full_logo.svg",
+  "/icons/smejj_full_logo_on_dark.svg",
   "/icons/favicon-16x16.png",
   "/icons/favicon-32x32.png",
   "/icons/favicon-48x48.png",

@@ -3,8 +3,8 @@
 }
 
 .app-brand-logo {
-  --app-brand-expanded-width: clamp(132px, 13vw, 158px);
-  --app-brand-expanded-height: 39px;
+  --app-brand-expanded-width: 104px;
+  --app-brand-expanded-height: 28px;
   position: fixed;
   top: calc(env(safe-area-inset-top) + 2px);
   left: calc(env(safe-area-inset-left) + 38px);
@@ -15,8 +15,8 @@
   width: 28px;
   height: 28px;
   padding: 0;
-  overflow: hidden;
-  border-radius: 7px;
+  overflow: visible;
+  border-radius: 0;
   background: transparent;
   box-shadow: none;
   line-height: 0;
@@ -32,8 +32,8 @@
 }
 
 .app-brand-icon {
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   background: transparent;
   visibility: visible;
   opacity: 1;
@@ -41,7 +41,8 @@
 
 .app-brand-wordmark {
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: 24px;
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
@@ -50,9 +51,9 @@
 body[data-left-menu-state="expanded"] .app-brand-logo {
   width: min(var(--app-brand-expanded-width), calc(var(--left-panel-width) - 44px));
   height: var(--app-brand-expanded-height);
-  padding: 3px 6px;
-  background: rgba(247, 247, 244, 0.96);
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 body[data-left-menu-state="expanded"] .app-brand-icon {
@@ -67,8 +68,7 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
 
 @media (max-width: 560px) {
   .app-brand-logo {
-    --app-brand-expanded-width: 132px;
-    --app-brand-expanded-height: 36px;
+    --app-brand-expanded-width: 96px;
     left: calc(env(safe-area-inset-left) + 36px);
   }
 }
