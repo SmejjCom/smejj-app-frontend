@@ -7,6 +7,7 @@ import { initComposerTools } from "./composer-tools.js";
 import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js";
+import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -147,14 +148,15 @@ function bindNavigation() {
     sidebar?.classList.toggle("is-open", open);
     document.body.classList.toggle("left-panel-open", open);
     menuButton?.setAttribute("aria-expanded", String(open));
-    if (open) applyPanelCompact("left", getPanelWidth("left"));
+    if (open) applyPanelCompact("left", getPanelWidth("left"), PANEL_WIDTHS.min - 1);
+    syncLeftMenuState({ waitForOpenTransition: open });
     if (backdrop) backdrop.hidden = true;
   };
   const setBrowserPanelOpen = (open) => {
     browserPanel?.classList.toggle("is-open", open);
     document.body.classList.toggle("right-panel-open", open);
     browserButton?.setAttribute("aria-expanded", String(open));
-    if (open) applyPanelCompact("right", getPanelWidth("right"));
+    if (open) applyPanelCompact("right", getPanelWidth("right"), PANEL_WIDTHS.compact);
     if (backdrop) backdrop.hidden = true;
   };
   menuButton?.addEventListener("click", () => setMenuOpen(!sidebar?.classList.contains("is-open")));
@@ -282,10 +284,12 @@ function setPanelWidth(side, rawWidth, { persist = true } = {}) {
     return;
   }
   const maxWidth = Math.max(PANEL_WIDTHS.min, Math.min(PANEL_WIDTHS.max, window.innerWidth - PANEL_WIDTHS.centerMin));
-  const width = Math.round(Math.min(Math.max(rawWidth, PANEL_WIDTHS.min), maxWidth));
+  const width = side === "left"
+    ? Math.round(Math.min(Math.max(rawWidth, PANEL_WIDTHS.compact), maxWidth))
+    : Math.round(Math.min(Math.max(rawWidth, PANEL_WIDTHS.min), maxWidth));
   const prop = side === "left" ? "--left-panel-width" : "--right-panel-width";
   document.documentElement.style.setProperty(prop, `${width}px`);
-  applyPanelCompact(side, width);
+  applyPanelCompact(side, width, side === "left" ? PANEL_WIDTHS.min - 1 : PANEL_WIDTHS.compact);
   if (persist) localStorage.setItem(PANEL_WIDTH_KEYS[side], String(width));
 }
 
@@ -300,11 +304,7 @@ function setPanelOpen(side, open) {
   panel?.classList.toggle("is-open", open);
   document.body.classList.toggle(`${side}-panel-open`, open);
   button?.setAttribute("aria-expanded", String(open));
-}
-
-function applyPanelCompact(side, width) {
-  const panel = side === "left" ? $(".sidebar") : $("#browserPanel");
-  panel?.classList.toggle("is-compact", width <= PANEL_WIDTHS.compact);
+  if (side === "left") syncLeftMenuState();
 }
 
 function hydrateComponents() {

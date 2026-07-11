@@ -679,7 +679,7 @@ body {
 }
 
 body.left-panel-open .workspace {
-  margin-left: min(var(--left-panel-width), calc(100vw - 120px));
+  margin-left: 0;
 }
 
 body.right-panel-open .workspace {
@@ -783,7 +783,7 @@ body.task-indicator-done .split-icon span:last-child {
   top: 0;
   bottom: 0;
   left: 0;
-  z-index: 40;
+  z-index: 70;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto auto;
   gap: 6px;

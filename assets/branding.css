@@ -1,42 +1,74 @@
+.app-menu-button {
+  z-index: 75;
+}
+
 .app-brand-logo {
+  --app-brand-expanded-width: clamp(132px, 13vw, 158px);
+  --app-brand-expanded-height: 39px;
   position: fixed;
   top: calc(env(safe-area-inset-top) + 2px);
   left: calc(env(safe-area-inset-left) + 38px);
-  z-index: 44;
-  display: flex;
-  align-items: center;
-  width: clamp(116px, 13vw, 158px);
-  padding: 3px 6px;
+  z-index: 74;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  overflow: hidden;
   border-radius: 7px;
-  background: rgba(247, 247, 244, 0.96);
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
-  transition: opacity 160ms ease, visibility 160ms ease;
+  background: transparent;
+  box-shadow: none;
+  line-height: 0;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .app-brand-logo img {
+  grid-area: 1 / 1;
   display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 2920.43 / 659.983;
   object-fit: contain;
 }
 
-body.left-panel-open .app-brand-logo {
+.app-brand-icon {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  visibility: visible;
+  opacity: 1;
+}
+
+.app-brand-wordmark {
+  width: 100%;
+  height: 100%;
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
 }
 
-@media (max-width: 560px) {
-  .app-brand-logo {
-    left: calc(env(safe-area-inset-left) + 36px);
-    width: 112px;
-    padding: 3px 5px;
-  }
+body[data-left-menu-state="expanded"] .app-brand-logo {
+  width: min(var(--app-brand-expanded-width), calc(var(--left-panel-width) - 44px));
+  height: var(--app-brand-expanded-height);
+  padding: 3px 6px;
+  background: rgba(247, 247, 244, 0.96);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
 }
 
-@media (prefers-reduced-motion: reduce) {
+body[data-left-menu-state="expanded"] .app-brand-icon {
+  visibility: hidden;
+  opacity: 0;
+}
+
+body[data-left-menu-state="expanded"] .app-brand-wordmark {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (max-width: 560px) {
   .app-brand-logo {
-    transition: none;
+    --app-brand-expanded-width: 132px;
+    --app-brand-expanded-height: 36px;
+    left: calc(env(safe-area-inset-left) + 36px);
   }
 }
