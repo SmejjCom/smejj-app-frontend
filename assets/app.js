@@ -1,12 +1,12 @@
 import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js";
 import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
-import { runClientChat } from "/assets/ai/chatClient.js";
+import { runClientChat } from "/assets/ai/chatClient.js?v=3";
 import { Icons, closeModal, openModal, renderEmptyState, setButtonIcon, showToast } from "./components.js";
 import { initComposerTools } from "./composer-tools.js";
 import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
-import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js";
+import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=3";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
 const $ = (selector) => document.querySelector(selector);
