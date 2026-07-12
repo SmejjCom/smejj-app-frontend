@@ -8,6 +8,7 @@ let selectedJob = null;
 let streamController = null;
 let pollTimer = null;
 let handoffGeneration = 0;
+const notifiedJobs = new Set();
 
 export function initAutonomousCodingSurface() {
   const view = document.querySelector("#automation");
@@ -22,7 +23,23 @@ export function initAutonomousCodingSurface() {
   bindSurface(surface);
   window.addEventListener("message", handleSessionHandoff);
   window.addEventListener("smejj:job-selected", (event) => selectJob(event.detail?.jobId));
+  window.addEventListener("smejj:autonomous-request", handleAutonomousRequest);
   refreshSession().catch(showError);
+}
+
+async function handleAutonomousRequest(event) {
+  const request = event.detail || {};
+  const task = String(request.task || "").trim();
+  if (!task) return;
+  text("#acTask", task);
+  document.querySelector("#acTask").value = task;
+  document.querySelector("#acUiChange").value = request.uiChange === true ? "true" : "false";
+  document.querySelector("#acPreviewUrl").value = String(request.previewUrl || "");
+  if (!sessionStorage.getItem(API_TOKEN_KEY)) {
+    setNotice("Aufgabe vorbereitet. Bitte sicher anmelden; danach kann der Lauf gestartet werden.");
+    return;
+  }
+  await createAndRun(request).catch(showError);
 }
 
 function surfaceMarkup() {
@@ -189,8 +206,10 @@ async function createAndRun(options = {}) {
     persistToIdrive: true,
     repository,
     parentJobId: options.parentJobId || "",
+    executionMode: options.executionMode === "analyze" ? "analyze" : "edit",
     uiChange,
-    preview: { required: uiChange, ...(previewUrl ? { url: previewUrl } : {}) }
+    preview: { required: uiChange, ...(previewUrl ? { url: previewUrl } : {}) },
+    preferences: window.smejjSettingsRuntime?.task?.() || {}
   };
   setBusy(true);
   setNotice("Task Capsule wird gespeichert.");
@@ -272,6 +291,19 @@ function renderJob(job) {
   setDisabled("#acReplay", !TERMINAL_STATUSES.has(job.status));
   setDisabled("#acFollowUp", job.status !== "passed" || !result.diffSha256);
   setDisabled("#acDownloadDiff", !result.diff);
+  notifyJobOnce(job, result);
+}
+
+function notifyJobOnce(job, result) {
+  if (!job.id || notifiedJobs.has(`${job.id}:${job.status}`)) return;
+  let state = "";
+  if (job.status === "passed" && result.diffSha256 && job.approval?.status !== "human_approved") state = "approval";
+  else if (job.status === "passed" || job.status === "done") state = "complete";
+  else if (job.status === "failed" || job.status === "blocked") state = "error";
+  else if (job.status === "cancelled") state = "cancelled";
+  if (!state) return;
+  notifiedJobs.add(`${job.id}:${job.status}`);
+  window.smejjSettingsRuntime?.notify?.(state, `${statusLabel(job.status)}: ${job.task || job.id}`);
 }
 
 function verificationText(job) {
