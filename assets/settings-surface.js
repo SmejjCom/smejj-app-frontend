@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from "./config.js";
-import { initSettingsRuntime } from "./settings-runtime.js";
+import { initSettingsRuntime } from "./settings-runtime.js?v=2";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
