@@ -2,12 +2,16 @@
   z-index: 75;
 }
 
+.sidebar {
+  border-right: 0;
+}
+
 .app-brand-logo {
-  --app-brand-expanded-width: 104px;
+  --app-brand-expanded-width: 80px;
   --app-brand-expanded-height: 28px;
   position: fixed;
-  top: calc(env(safe-area-inset-top) + 2px);
-  left: calc(env(safe-area-inset-left) + 38px);
+  top: calc(env(safe-area-inset-top) + 0px);
+  left: calc(env(safe-area-inset-left) + 36px);
   z-index: 74;
   display: grid;
   place-items: center;
@@ -32,8 +36,8 @@
 }
 
 .app-brand-icon {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background: transparent;
   visibility: visible;
   opacity: 1;
@@ -42,14 +46,14 @@
 .app-brand-wordmark {
   width: 100%;
   height: auto;
-  max-height: 24px;
+  max-height: 19px;
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
 }
 
 body[data-left-menu-state="expanded"] .app-brand-logo {
-  width: min(var(--app-brand-expanded-width), calc(var(--left-panel-width) - 44px));
+  width: min(var(--app-brand-expanded-width), calc(var(--left-panel-width) - 52px));
   height: var(--app-brand-expanded-height);
   padding: 0;
   background: transparent;
@@ -68,7 +72,6 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
 
 @media (max-width: 560px) {
   .app-brand-logo {
-    --app-brand-expanded-width: 96px;
-    left: calc(env(safe-area-inset-left) + 36px);
+    --app-brand-expanded-width: 76px;
   }
 }
