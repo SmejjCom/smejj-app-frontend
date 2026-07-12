@@ -55,7 +55,9 @@ function buildMessages(task, offlineNotice, contextFiles = []) {
   if (history.length === 0 || history[history.length - 1].content !== task.slice(0, MAX_MESSAGE_CHARS)) {
     history.push({ role: "user", content: task.slice(0, MAX_MESSAGE_CHARS) });
   }
-  const messages = [{ role: "system", content: SYSTEM_PROMPT }, ...history.filter((m) => m.content)];
+  const preferences = window.smejjSettingsRuntime?.promptBlock?.() || "";
+  const systemPrompt = preferences ? `${SYSTEM_PROMPT}\n\nNutzerpraeferenzen:\n${preferences}` : SYSTEM_PROMPT;
+  const messages = [{ role: "system", content: systemPrompt }, ...history.filter((m) => m.content)];
   if (contextFiles.length > 0) {
     const block = contextFiles
       .map((file) => `--- ${file.path} ---\n${file.content}`)
