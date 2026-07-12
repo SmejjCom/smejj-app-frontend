@@ -32,6 +32,17 @@
 #settings .settings-action { flex:none; min-height:38px; padding:0 14px; font-size:13px; }
 #settings .settings-links { display:flex; flex-wrap:wrap; gap:12px; }
 #settings .settings-links a { color:#8ffaf3; font-size:14px; }
+.premium-view[data-settings-density="compact"] { gap:10px; }
+.premium-view[data-settings-density="compact"] .settings-row { min-height:58px; padding-block:9px; }
+.premium-view[data-settings-font-size="small"] { font-size:14px; }
+.premium-view[data-settings-font-size="large"] { font-size:18px; }
+.premium-view[data-settings-theme="light"] { --premium-text:#17191d; --premium-muted:rgba(23,25,29,.68); --premium-soft:rgba(23,25,29,.46); --premium-line:rgba(23,25,29,.16); color:#17191d; }
+.premium-view[data-settings-theme="light"]::before { background:linear-gradient(135deg,rgba(0,178,168,.09),transparent 28%),linear-gradient(225deg,rgba(80,126,255,.1),transparent 30%),#f5f6f8; }
+.premium-view[data-settings-theme="light"] .settings-list { background:rgba(255,255,255,.84); }
+.premium-view[data-settings-theme="light"] input,
+.premium-view[data-settings-theme="light"] select,
+.premium-view[data-settings-theme="light"] textarea { background:rgba(255,255,255,.9); color:#17191d; }
+.premium-view[data-settings-diagnostics="true"] .settings-status::after { content:" · Diagnose aktiv"; }
 @media (max-width:760px) {
   #settings .settings-header { align-items:flex-start; flex-direction:column; }
   #settings .settings-shell { grid-template-columns:1fr; }
