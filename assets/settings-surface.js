@@ -42,7 +42,7 @@ export function initSettingsSurface() {
   view.addEventListener("click", (event) => handleClick(view, event));
   view.addEventListener("change", () => save(view));
   view.querySelector("#settingsPersonalization")?.addEventListener("input", debounce(() => save(view), 350));
-import { initSettingsRuntime } from "./settings-runtime.js?v=2";
+}
 
 function markup() {
   const nav = GROUPS.map(([id, label]) => `<button type="button" class="settings-nav-button" data-settings-tab="${id}" aria-controls="settings-${id}">${label}</button>`).join("");
