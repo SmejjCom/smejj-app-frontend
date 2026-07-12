@@ -8,7 +8,7 @@ import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
-
+import { routeAutonomousRequest } from "./autonomous-intent.js";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
@@ -395,19 +395,19 @@ function bindStartComposer() {
 function bindSearch() {
   initGlobalSearch({ $, goToView, showTaskIndicator, showToast, state, workspace });
 }
-
 async function submitTask(task, { target = "#startLog" } = {}) {
   if (!task) return;
   showTaskIndicator("active");
   addEntry(task, "user", target);
   const output = addEntry("", "assistant", target);
   try {
+    if (routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
     if (await runClientChat({ task, model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
     try {
       await stream(CLIENT_ROUTES.api.agent, {
         task,
         model: state.settings.model || "smejj 1.0",
-        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: window.smejjSettingsRuntime?.task?.() || {}
       }, output);
       return showTaskIndicator("done");
     } catch (streamError) {
