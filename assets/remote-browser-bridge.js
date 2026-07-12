@@ -122,37 +122,8 @@ async function handleRemote(req, res, url, origin) {
     title: payload.title || parsed.url.hostname,
     screenshot: payload.screenshot || "",
     viewport,
-    capture: sanitizeCapture(payload.capture, viewport),
-    pageHeight: clampViewport(payload.pageHeight, 0, 100000, 0),
-    links: sanitizeLinks(payload.links),
     status: payload.status || "rendered"
   }, origin);
-}
-
-// Worker-Antwort defensiv uebernehmen: nur http(s)-Links, endliche Zahlen,
-// harte Obergrenzen — der Browser-Pane rendert daraus klickbare Bereiche.
-function sanitizeCapture(capture, viewport) {
-  return {
-    width: clampViewport(capture?.width, 1, 4000, viewport.width),
-    height: clampViewport(capture?.height, 1, 40000, viewport.height)
-  };
-}
-
-function sanitizeLinks(links, maxLinks = 200) {
-  if (!Array.isArray(links)) return [];
-  const out = [];
-  for (const link of links) {
-    if (out.length >= maxLinks) break;
-    const href = String(link?.href || "");
-    if (!/^https?:\/\//i.test(href)) continue;
-    const x = Math.round(Number(link?.x));
-    const y = Math.round(Number(link?.y));
-    const w = Math.round(Number(link?.w));
-    const h = Math.round(Number(link?.h));
-    if ([x, y, w, h].some((value) => !Number.isFinite(value) || value < 0) || w < 1 || h < 1) continue;
-    out.push({ href: href.slice(0, 2000), x, y, w, h });
-  }
-  return out;
 }
 
 http.createServer(async (req, res) => {

@@ -1,0 +1,429 @@
+/* =============================================================
+   smejj.com — ui-modern.css (Modernisierungs-Ebene v1)
+   Wird NACH styles.css geladen.
+   WICHTIG: Diese Datei darf die Startseite (#start) nicht
+   veraendern. Alle Regeln sind auf .view:not(#start) bzw.
+   globale Overlays (Modal, Toast) beschraenkt.
+   DESIGN LOCK der Startseite (styles.css) bleibt unberuehrt.
+   ============================================================= */
+
+:root {
+  --sm-accent: #00ffef;
+  --sm-accent-soft: rgba(0, 255, 239, 0.12);
+  --sm-accent-border: rgba(0, 255, 239, 0.42);
+  --sm-accent-text: #9ffff8;
+  --sm-card: rgba(255, 255, 255, 0.055);
+  --sm-card-strong: rgba(255, 255, 255, 0.09);
+  --sm-border: rgba(255, 255, 255, 0.11);
+  --sm-border-strong: rgba(255, 255, 255, 0.2);
+  --sm-ink: #f6f3ee;
+  --sm-ink-dim: rgba(246, 243, 238, 0.62);
+  --sm-field: rgba(5, 6, 8, 0.45);
+  --sm-danger: #ff9a9c;
+  --sm-danger-bg: rgba(255, 77, 79, 0.12);
+  --sm-danger-border: rgba(255, 77, 79, 0.38);
+  --sm-radius: 14px;
+  --sm-radius-sm: 10px;
+  --sm-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Layout & Rhythmus (alle Views ausser Start) ---------- */
+
+.view:not(#start) {
+  padding: 76px clamp(16px, 4vw, 44px) 44px;
+}
+
+.view:not(#start).is-active {
+  gap: 18px;
+  align-content: start;
+}
+
+.view:not(#start) > * {
+  width: 100%;
+  max-width: 1020px;
+  margin-inline: auto;
+}
+
+/* ---------- Kopfbereich ---------- */
+
+.view:not(#start) .eyebrow {
+  color: var(--sm-accent);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+}
+
+.view:not(#start) .view-header h2 {
+  max-width: none;
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 600;
+  line-height: 1.08;
+}
+
+.view:not(#start) .subhead {
+  margin-top: 10px;
+  font-size: 14.5px;
+  color: var(--sm-ink-dim);
+}
+
+/* ---------- Buttons: ruhig, kompakt, klare Hierarchie ---------- */
+
+.view:not(#start) .toolbar button,
+.view:not(#start) .search-shell button,
+.modal button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--sm-border);
+  border-radius: var(--sm-radius-sm);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(246, 243, 238, 0.88);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.view:not(#start) .toolbar button:hover,
+.view:not(#start) .search-shell button:hover,
+.modal button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--sm-border-strong);
+  color: #ffffff;
+}
+
+/* Hauptaktion pro Bereich: Akzent Tuerkis */
+#projectCreate,
+#searchSubmit,
+#applyWrite,
+#saveWorkspaceFile,
+#saveMemory,
+#evaluateAiMode,
+#saveSettings,
+#saveProfile,
+#storageAgain,
+#storagePanelCheck,
+#capabilities,
+#costGuardDetails {
+  background: var(--sm-accent-soft) !important;
+  border-color: var(--sm-accent-border) !important;
+  color: var(--sm-accent-text) !important;
+  font-weight: 600;
+}
+
+#projectCreate:hover,
+#searchSubmit:hover,
+#applyWrite:hover,
+#saveWorkspaceFile:hover,
+#saveMemory:hover,
+#evaluateAiMode:hover,
+#saveSettings:hover,
+#saveProfile:hover,
+#storageAgain:hover,
+#storagePanelCheck:hover,
+#capabilities:hover,
+#costGuardDetails:hover {
+  background: rgba(0, 255, 239, 0.2) !important;
+  border-color: rgba(0, 255, 239, 0.65) !important;
+  color: #d9fffb !important;
+}
+
+/* Toolbar: flexibel, kompakt */
+.view:not(#start) .toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.view:not(#start) .toolbar input,
+.view:not(#start) .toolbar select {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+/* Fokus sichtbar */
+.view:not(#start) :is(button, a, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--sm-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Eingabefelder ---------- */
+
+.view:not(#start) :is(input, select, textarea),
+.modal :is(input, select, textarea) {
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+  background: var(--sm-field);
+  color: var(--sm-ink);
+  padding: 11px 13px;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.view:not(#start) :is(input, select, textarea):focus,
+.modal :is(input, select, textarea):focus {
+  border-color: var(--sm-accent-border);
+  box-shadow: 0 0 0 3px rgba(0, 255, 239, 0.14);
+}
+
+.view:not(#start) label {
+  gap: 6px;
+  color: var(--sm-ink-dim);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.view:not(#start) .panel-grid {
+  gap: 12px;
+}
+
+/* ---------- Glas-Karten ---------- */
+
+.view:not(#start) .status-grid {
+  gap: 10px;
+}
+
+.view:not(#start) .status-grid div,
+.view:not(#start) .surface,
+.view:not(#start) .empty-state,
+.view:not(#start) .feed-item {
+  border: 1px solid var(--sm-border);
+  border-radius: var(--sm-radius);
+  background: var(--sm-card);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 15px;
+}
+
+.view:not(#start) .status-grid strong,
+.view:not(#start) .empty-state strong,
+.view:not(#start) .surface strong {
+  color: var(--sm-ink);
+  font-size: 13px;
+}
+
+.view:not(#start) .status-grid span,
+.view:not(#start) .empty-state span,
+.view:not(#start) .surface span {
+  color: var(--sm-ink-dim);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.view:not(#start) .empty-state {
+  padding: 22px 18px;
+  text-align: left;
+}
+
+/* ---------- Ausgabe-/Log-Panels ---------- */
+
+.view:not(#start) .output {
+  border: 1px solid var(--sm-border);
+  border-radius: 12px;
+  background: rgba(5, 6, 8, 0.5);
+  color: rgba(246, 243, 238, 0.8);
+  padding: 14px 16px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+/* Leere Ausgabefelder nicht als graue Kaesten anzeigen */
+.view:not(#start) .output:empty {
+  display: none;
+}
+
+#codeOutput,
+#toolOutput {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+}
+
+/* ---------- Suche ---------- */
+
+.search-shell {
+  border-radius: var(--sm-radius);
+  padding: 12px;
+}
+
+.search-box input {
+  border-radius: 12px;
+}
+
+/* ---------- "Mehr"-Menue fuer gefaehrliche Aktionen ---------- */
+
+.more-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.more-menu summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: var(--sm-radius-sm);
+  background: transparent;
+  color: var(--sm-ink-dim);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 38px;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.more-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-menu summary::after {
+  content: "…";
+  font-weight: 700;
+}
+
+.more-menu summary:hover,
+.more-menu[open] summary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.more-menu .menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  min-width: 210px;
+  padding: 6px;
+  border: 1px solid var(--sm-border);
+  border-radius: 12px;
+  background: rgba(22, 23, 26, 0.92);
+  box-shadow: var(--sm-shadow);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+}
+
+.more-menu .menu-panel button {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.more-menu .menu-panel button.danger,
+button.danger {
+  background: var(--sm-danger-bg) !important;
+  border-color: var(--sm-danger-border) !important;
+  color: var(--sm-danger) !important;
+}
+
+.more-menu .menu-panel button.danger:hover,
+button.danger:hover {
+  background: rgba(255, 77, 79, 0.2) !important;
+  border-color: rgba(255, 77, 79, 0.55) !important;
+  color: #ffc2c3 !important;
+}
+
+/* ---------- Modal ---------- */
+
+.modal {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  background: rgba(22, 23, 26, 0.9);
+  box-shadow: var(--sm-shadow);
+  backdrop-filter: blur(26px) saturate(1.25);
+  -webkit-backdrop-filter: blur(26px) saturate(1.25);
+  padding: 18px;
+}
+
+.modal-backdrop {
+  background: rgba(5, 6, 8, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modal h3 {
+  color: var(--sm-ink);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.modal header button {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.modal-body {
+  color: rgba(246, 243, 238, 0.82);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ---------- Toast ---------- */
+
+.toast {
+  border: 1px solid var(--sm-accent-border);
+  border-radius: 12px;
+  background: rgba(10, 28, 26, 0.92);
+  color: #d9fffb;
+  font-weight: 600;
+  box-shadow: var(--sm-shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* ---------- Rechtliches ---------- */
+
+.legal-links {
+  color: var(--sm-ink-dim);
+}
+
+.legal-links a {
+  color: #7dfff6;
+  text-decoration: none;
+}
+
+.legal-links a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 560px) {
+  .view:not(#start) {
+    padding: 68px 12px 30px;
+  }
+
+  .view:not(#start) .view-header h2 {
+    font-size: 26px;
+  }
+
+  .view:not(#start) .toolbar {
+    gap: 7px;
+  }
+
+  .view:not(#start) .toolbar button {
+    flex: 1 1 calc(50% - 7px);
+    min-height: 42px;
+  }
+
+  .more-menu {
+    flex: 0 0 auto !important;
+  }
+
+  .more-menu .menu-panel {
+    right: auto;
+    left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view:not(#start) *,
+  .modal,
+  .toast {
+    transition: none !important;
+    animation: none !important;
+  }
+}
