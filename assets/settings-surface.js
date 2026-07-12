@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from "./config.js";
+import { initSettingsRuntime } from "./settings-runtime.js";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
@@ -34,6 +35,7 @@ export function initSettingsSurface() {
   if (!view || view.dataset.settingsReady) return;
   view.dataset.settingsReady = "true";
   loadStyles();
+  initSettingsRuntime();
   view.innerHTML = markup();
   applyValues(view, readSettings());
   activate(view, "general");
