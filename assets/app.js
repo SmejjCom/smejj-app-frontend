@@ -6,7 +6,7 @@ import { Icons, closeModal, openModal, renderEmptyState, setButtonIcon, showToas
 import { initComposerTools } from "./composer-tools.js";
 import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
-import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v1";
+import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v2";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
 const $ = (selector) => document.querySelector(selector);
