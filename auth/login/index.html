@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Anmelden · smejj.com</title>
+    <link rel="stylesheet" href="/assets/auth/auth.css">
+  </head>
+  <body data-auth-mode="login">
+    <main class="auth-shell">
+      <a class="auth-brand" id="homeLink" href="/" aria-label="smejj.com Startseite"><span class="auth-brand-mark" aria-hidden="true"></span><span>smejj.com</span></a>
+      <section class="auth-card" aria-labelledby="authTitle">
+        <p class="auth-eyebrow">Konto</p>
+        <h1 id="authTitle">Bei smejj.com anmelden</h1>
+        <p class="auth-subhead">Sicherer Zugang zu Projekten, Dateien und deinen Einstellungen.</p>
+        <label class="auth-field" for="profileEmail">E-Mail (für Passkey und E-Mail-Login)<input id="profileEmail" type="email" autocomplete="email" placeholder="name@example.com"></label>
+        <input id="profileName" type="hidden" value="">
+        <div id="emailFormGroup" hidden>
+          <label class="auth-field" for="emailPassword">Passwort<input id="emailPassword" type="password" autocomplete="current-password" placeholder="Mindestens 10 Zeichen"></label>
+          <p class="auth-note"><a href="#" id="passwordResetLink">Passwort vergessen?</a></p>
+        </div>
+        <div class="auth-stack">
+          <button class="auth-button primary" id="googleLogin" type="button">Mit Google anmelden</button>
+          <button class="auth-button" id="passkeyLogin" type="button">Mit Passkey anmelden</button>
+          <button class="auth-button secondary" id="emailLogin" type="button">Mit E-Mail anmelden</button>
+          <button class="auth-button secondary" id="appleLogin" type="button">Mit Apple anmelden</button>
+        </div>
+        <div class="auth-divider"><span>Hinweis</span></div>
+        <p class="auth-note">Passkeys verwenden Face ID, Touch ID oder den Geräteschutz. E-Mail-Login nutzt serverseitiges scrypt-Hashing; es werden niemals Klartextpasswörter gespeichert. Apple-Login wird erst nach sicherer Backend-Konfiguration aktiviert.</p>
+        <p class="auth-status" id="profileOutput" role="status" aria-live="polite"></p><span id="sessionStatus" hidden></span>
+        <p class="auth-footer">Noch kein Konto? <a href="/auth/register/">Registrieren</a></p>
+      </section>
+      <p class="auth-legal"><a href="/datenschutz.html">Datenschutz</a> · <a href="/impressum.html">Impressum</a></p>
+    </main>
+    <script type="module" src="/assets/auth/auth-page.js"></script>
+    <script type="module" src="/assets/auth/passkey-ui.js"></script>
+  </body>
+</html>
