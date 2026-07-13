@@ -59,6 +59,9 @@ function surfaceMarkup() {
         <label>Basis-Branch
           <input id="acBaseRef" value="main" spellcheck="false">
         </label>
+        <label>Auftragstyp
+          <select id="acExecutionMode"><option value="edit">Änderung mit Diff</option><option value="analyze">Analyse (read-only)</option></select>
+        </label>
         <label>Ausgabe
           <select id="acPublishMode"><option value="diff-only">Diff</option><option value="draft-pr">Draft-PR</option></select>
         </label>
@@ -99,6 +102,7 @@ function surfaceMarkup() {
 
 function bindSurface(surface) {
   surface.querySelector("#acStart").addEventListener("click", () => createAndRun().catch(showError));
+  surface.querySelector("#acExecutionMode").addEventListener("change", syncExecutionModeControls);
   surface.querySelector("#acConnect").addEventListener("click", () => openSessionHandoff().catch(showError));
   surface.querySelector("#acRefresh").addEventListener("click", () => refreshJobs(true).catch(showError));
   surface.querySelector("#acCancel").addEventListener("click", () => cancelSelected().catch(showError));
@@ -107,6 +111,7 @@ function bindSurface(surface) {
   surface.querySelector("#acReplay").addEventListener("click", () => replaySelected().catch(showError));
   surface.querySelector("#acFollowUp").addEventListener("click", () => followUpSelected().catch(showError));
   surface.querySelector("#acDownloadDiff").addEventListener("click", downloadSelectedDiff);
+  syncExecutionModeControls();
   surface.querySelector("#acJobRows").addEventListener("click", (event) => {
     const row = event.target.closest("button[data-job-id]");
     if (row) selectJob(row.dataset.jobId).catch(showError);
@@ -191,10 +196,12 @@ async function createAndRun(options = {}) {
   requireAuth();
   const task = String(options.task ?? value("#acTask")).trim();
   if (!task) throw new Error("Aufgabe fehlt.");
+  const executionMode = options.executionMode === "analyze"
+    || (!options.executionMode && value("#acExecutionMode") === "analyze") ? "analyze" : "edit";
   const repository = options.repository || {
     url: value("#acRepository").trim(),
     baseRef: value("#acBaseRef").trim() || "main",
-    publishMode: value("#acPublishMode")
+    publishMode: executionMode === "analyze" ? "diff-only" : value("#acPublishMode")
   };
   const uiChange = options.uiChange ?? value("#acUiChange") === "true";
   const previewUrl = options.previewUrl ?? value("#acPreviewUrl").trim();
@@ -206,7 +213,7 @@ async function createAndRun(options = {}) {
     persistToIdrive: true,
     repository,
     parentJobId: options.parentJobId || "",
-    executionMode: options.executionMode === "analyze" ? "analyze" : "edit",
+    executionMode,
     uiChange,
     preview: { required: uiChange, ...(previewUrl ? { url: previewUrl } : {}) },
     preferences: window.smejjSettingsRuntime?.task?.() || {}
@@ -282,7 +289,7 @@ function renderJob(job) {
   text("#acModel", job.model?.name || "GLM-5.2");
   text("#acDiffHash", result.diffSha256 || "-");
   document.querySelector("#acProgressBar").style.width = `${Math.round(Math.max(0, Math.min(1, Number(job.progress || 0))) * 100)}%`;
-  text("#acDiff", result.diff || "Noch kein Diff.");
+  text("#acDiff", result.diff || (job.executionMode === "analyze" ? "Read-only-Analyse: Keine Änderungen." : "Noch kein Diff."));
   text("#acVerification", verificationText(job));
   setDisabled("#acCancel", !ACTIVE_STATUSES.has(job.status));
   setDisabled("#acApprove", job.status !== "passed" || !result.diffSha256 || job.approval?.status === "human_approved");
@@ -349,6 +356,7 @@ async function replaySelected() {
   await createAndRun({
     task: selectedJob.task,
     repository: selectedJob.repository,
+    executionMode: selectedJob.executionMode,
     uiChange: selectedJob.preview?.required === true,
     previewUrl: selectedJob.preview?.url || ""
   });
@@ -488,6 +496,14 @@ function requireSelected() {
 function setBusy(busy) {
   setDisabled("#acStart", busy);
   setDisabled("#acRefresh", busy);
+}
+
+function syncExecutionModeControls() {
+  const analysis = value("#acExecutionMode") === "analyze";
+  const publish = document.querySelector("#acPublishMode");
+  if (!publish) return;
+  if (analysis) publish.value = "diff-only";
+  publish.disabled = analysis;
 }
 
 function showError(error) {
