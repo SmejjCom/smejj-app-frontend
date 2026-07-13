@@ -62,6 +62,7 @@ function init() {
     event.stopImmediatePropagation();
     openPane();
   }, true);
+  window.addEventListener("smejj:browser-request", onBrowserRequest);
   window.addEventListener("message", onFrameMessage);
 }
 
@@ -80,6 +81,22 @@ function openPane() {
   const tab = activeTab();
   if (tab?.url && !tab.frame) navigate(tab, tab.url, { push: false });
   refs.address?.focus();
+}
+
+function onBrowserRequest(event) {
+  openBrowserRequest(event.detail?.url);
+}
+
+// Sichtbarer, sicherer Einstieg fuer explizite Browserauftraege aus dem Chat.
+export function openBrowserRequest(value) {
+  const target = normalizeAgentBrowserUrl(value);
+  if (!target) return false;
+  openPane();
+  const current = activeTab();
+  const tab = !current?.url || current.url === target ? current : addTab();
+  if (!tab) return false;
+  if (tab.url !== target || !tab.frame) navigate(tab, target);
+  return true;
 }
 
 function backToMenu() {
@@ -359,6 +376,16 @@ export function normalizeAddress(input) {
   if (/^https?:\/\//i.test(text)) return text;
   if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(\/|\?|#|$)/i.test(text)) return `https://${text}`;
   return `https://duckduckgo.com/html/?q=${encodeURIComponent(text)}`;
+}
+
+export function normalizeAgentBrowserUrl(input) {
+  const target = normalizeAddress(input);
+  try {
+    const url = new URL(target);
+    return url.protocol === "https:" && !url.username && !url.password ? url.toString() : "";
+  } catch {
+    return "";
+  }
 }
 
 function commitHistory(tab, url, push) {

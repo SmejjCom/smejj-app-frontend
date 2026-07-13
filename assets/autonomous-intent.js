@@ -1,5 +1,5 @@
-const EXECUTION_VERBS = /\b(?:arbeite|bearbeite|baue|behebe|deploye|erstelle|fixe?|implementiere|programmiere|pruefe|prüfe|teste|untersuche|veraendere|verändere)\b/i;
-const EXECUTION_TARGETS = /\b(?:app|browser|code|datei|dateien|fehler|projekt|repo|repository|seite|tests?|website|webseite)\b/i;
+const EXECUTION_VERBS = /\b(?:arbeite|bearbeite|benutze|baue|behebe|deploye|erstelle|fixe?|implementiere|klicke|lies|navigiere|nutze|oeffne|öffne|programmiere|pruefe|prüfe|rufe|suche|teste|untersuche|veraendere|verändere)\b/i;
+const EXECUTION_TARGETS = /\b(?:app|browser|code|datei|dateien|fehler|link|portal|projekt|repo|repository|seite|tab|tests?|url|website|webseite)\b/i;
 const AUTONOMY_MARKERS = /\b(?:autonom|eigenstaendig|eigenständig|komplett|von anfang bis ende|bis alles funktioniert)\b/i;
 const CHANGE_VERBS = /\b(?:baue|behebe|deploye|erstelle|fixe?|implementiere|programmiere|veraendere|verändere)\b/i;
 const BROWSER_MARKERS = /\b(?:browser|responsive|webseite|website|ui|frontend|konsole|console)\b/i;
@@ -20,8 +20,15 @@ export function classifyAutonomousRequest(task) {
 export function routeAutonomousRequest({ task, output, goToView, eventTarget }) {
   const request = classifyAutonomousRequest(task);
   if (!request) return false;
-  output.textContent = "Autonomer Auftrag wird als pruefbare Task Capsule geoeffnet.";
+  output.textContent = request.previewUrl
+    ? "Autonomer Browserauftrag wird sichtbar geoeffnet und als pruefbare Task Capsule ausgefuehrt."
+    : "Autonomer Auftrag wird als pruefbare Task Capsule geoeffnet.";
   goToView("automation");
+  if (request.previewUrl) {
+    eventTarget.dispatchEvent(new CustomEvent("smejj:browser-request", {
+      detail: { url: request.previewUrl, task: request.task }
+    }));
+  }
   eventTarget.dispatchEvent(new CustomEvent("smejj:autonomous-request", { detail: request }));
   return true;
 }

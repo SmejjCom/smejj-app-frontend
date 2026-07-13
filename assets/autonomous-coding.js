@@ -33,8 +33,10 @@ async function handleAutonomousRequest(event) {
   if (!task) return;
   text("#acTask", task);
   document.querySelector("#acTask").value = task;
+  document.querySelector("#acExecutionMode").value = request.executionMode === "analyze" ? "analyze" : "edit";
   document.querySelector("#acUiChange").value = request.uiChange === true ? "true" : "false";
   document.querySelector("#acPreviewUrl").value = String(request.previewUrl || "");
+  syncExecutionModeControls();
   if (!sessionStorage.getItem(API_TOKEN_KEY)) {
     setNotice("Aufgabe vorbereitet. Bitte sicher anmelden; danach kann der Lauf gestartet werden.");
     return;
