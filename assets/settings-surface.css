@@ -130,7 +130,7 @@
 .premium-view[data-settings-theme="light"] .settings-list {
   background:var(--premium-surface);
 }
-.premium-view[data-settings-theme="light"] .settings-nav-button.is-active {
+#settings.premium-view[data-settings-theme="light"] .settings-nav-button.is-active {
   color:var(--premium-text);
   background:rgba(23,25,29,.06);
 }
