@@ -1,0 +1,180 @@
+import { API_ORIGIN, CLIENT_ROUTES } from "../config.js";
+
+const EMAIL_API = {
+  register: `${API_ORIGIN}/api/auth/email/register`,
+  login: `${API_ORIGIN}/api/auth/email/login`,
+  verify: `${API_ORIGIN}/api/auth/email/verify`,
+  resetRequest: `${API_ORIGIN}/api/auth/email/reset/request`,
+  resetConfirm: `${API_ORIGIN}/api/auth/email/reset/confirm`
+};
+
+const ERROR_TEXT = {
+  email_invalid: "Bitte eine gültige E-Mail-Adresse eingeben.",
+  email_not_allowed: "Diese E-Mail-Adresse ist für smejj.com nicht freigegeben.",
+  password_too_short: "Das Passwort muss mindestens 10 Zeichen lang sein.",
+  password_too_long: "Das Passwort ist zu lang.",
+  password_whitespace_edges: "Das Passwort darf nicht mit Leerzeichen beginnen oder enden.",
+  email_or_password_invalid: "E-Mail oder Passwort ist falsch.",
+  account_temporarily_locked: "Zu viele Fehlversuche. Bitte in 15 Minuten erneut versuchen.",
+  email_not_verified: "Bitte bestätige zuerst deine E-Mail-Adresse (Link in der E-Mail).",
+  verification_invalid_or_expired: "Der Bestätigungslink ist ungültig oder abgelaufen.",
+  reset_invalid_or_expired: "Der Reset-Link ist ungültig, abgelaufen oder wurde schon verwendet.",
+  rate_limit_reached: "Zu viele Anfragen. Bitte kurz warten.",
+  authentication_required: "Bitte zuerst anmelden."
+};
+
+const output = document.querySelector("#authStatus, #profileOutput");
+const mode = document.body.dataset.authMode || "login";
+
+function status(message, tone = "") {
+  if (!output) return;
+  output.textContent = message;
+  output.dataset.tone = tone;
+}
+
+function errorText(payload, fallback) {
+  return ERROR_TEXT[payload?.error] || payload?.error || fallback;
+}
+
+async function postJson(url, body) {
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  let payload = {};
+  try { payload = await response.json(); } catch { payload = {}; }
+  return { ok: response.ok, status: response.status, payload };
+}
+
+async function refreshSession() {
+  try {
+    const response = await fetch(CLIENT_ROUTES.api.authMe, { credentials: "include" });
+    const data = await response.json();
+    if (data.authenticated && data.user) {
+      status(`Bereits angemeldet: ${data.user.email || data.user.name || "smejj.com Nutzer"}.`, "success");
+    }
+  } catch {
+    status("Anmeldung ist momentan nicht erreichbar. Bitte später erneut versuchen.", "error");
+  }
+}
+
+async function startGoogleLogin() {
+  const button = document.querySelector("#googleLogin");
+  if (button) button.disabled = true;
+  status("Google Login wird geprüft …");
+  try {
+    const response = await fetch(CLIENT_ROUTES.api.authConfig, { credentials: "include" });
+    const config = await response.json();
+    if (!response.ok || config.configured !== true) {
+      status("Google Login ist serverseitig noch nicht konfiguriert. Nutze bis dahin Passkey.", "error");
+      return;
+    }
+    window.location.assign(`${API_ORIGIN}/api/auth/google?mode=redirect`);
+  } catch {
+    status("Google Login konnte nicht gestartet werden.", "error");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+function emailFormValues() {
+  return {
+    email: String(document.querySelector("#profileEmail")?.value || "").trim(),
+    password: String(document.querySelector("#emailPassword")?.value || ""),
+    name: String(document.querySelector("#profileName")?.value || "").trim()
+  };
+}
+
+function revealEmailForm() {
+  const group = document.querySelector("#emailFormGroup");
+  if (group?.hidden) {
+    group.hidden = false;
+    document.querySelector("#profileEmail")?.focus();
+    return false;
+  }
+  return true;
+}
+
+async function submitEmailLogin() {
+  if (!revealEmailForm()) return;
+  const { email, password } = emailFormValues();
+  if (!email || !password) return status("Bitte E-Mail und Passwort eingeben.", "error");
+  status("Anmeldung läuft …");
+  try {
+    const { ok, payload } = await postJson(EMAIL_API.login, { email, password });
+    if (!ok) return status(errorText(payload, "Anmeldung fehlgeschlagen."), "error");
+    status("Angemeldet. Weiterleitung …", "success");
+    window.location.assign("/profile?login=ok");
+  } catch {
+    status("Anmeldung ist momentan nicht erreichbar.", "error");
+  }
+}
+
+async function submitEmailRegister() {
+  if (!revealEmailForm()) return;
+  const { email, password, name } = emailFormValues();
+  if (!email || !password) return status("Bitte E-Mail und Passwort eingeben.", "error");
+  const repeat = String(document.querySelector("#emailPasswordRepeat")?.value || "");
+  if (repeat && repeat !== password) return status("Die Passwörter stimmen nicht überein.", "error");
+  status("Konto wird erstellt …");
+  try {
+    const { ok, payload } = await postJson(EMAIL_API.register, { email, password, name });
+    if (!ok) return status(errorText(payload, "Registrierung fehlgeschlagen."), "error");
+    if (payload.mail?.sent) {
+      status("Konto angelegt. Bitte bestätige deine E-Mail-Adresse über den zugesandten Link.", "success");
+    } else {
+      status("Konto angelegt. E-Mail-Versand ist serverseitig noch nicht konfiguriert – du kannst dich direkt anmelden.", "success");
+    }
+  } catch {
+    status("Registrierung ist momentan nicht erreichbar.", "error");
+  }
+}
+
+async function requestPasswordReset() {
+  const { email } = emailFormValues();
+  if (!email) {
+    revealEmailForm();
+    return status("Bitte zuerst deine E-Mail-Adresse eingeben.", "error");
+  }
+  try {
+    const { ok, payload } = await postJson(EMAIL_API.resetRequest, { email });
+    if (!ok) return status(errorText(payload, "Anfrage fehlgeschlagen."), "error");
+    status("Wenn ein Konto existiert, wurde eine E-Mail zum Zurücksetzen gesendet (30 Minuten gültig).", "success");
+  } catch {
+    status("Anfrage ist momentan nicht erreichbar.", "error");
+  }
+}
+
+async function handleUrlTokens() {
+  const params = new URLSearchParams(window.location.search);
+  const email = params.get("email") || "";
+  if (params.get("verify")) {
+    const { ok, payload } = await postJson(EMAIL_API.verify, { email, token: params.get("verify") });
+    status(ok ? "E-Mail-Adresse bestätigt. Du kannst dich jetzt anmelden." : errorText(payload, "Bestätigung fehlgeschlagen."), ok ? "success" : "error");
+  }
+  if (params.get("reset")) {
+    const emailField = document.querySelector("#profileEmail");
+    if (emailField && email) emailField.value = email;
+    revealEmailForm();
+    const newPassword = window.prompt("Neues Passwort für smejj.com (mindestens 10 Zeichen):") || "";
+    if (!newPassword) return status("Passwort-Reset abgebrochen.", "error");
+    const { ok, payload } = await postJson(EMAIL_API.resetConfirm, { email, token: params.get("reset"), newPassword });
+    status(ok ? "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden." : errorText(payload, "Reset fehlgeschlagen."), ok ? "success" : "error");
+  }
+}
+
+document.querySelector("#googleLogin")?.addEventListener("click", startGoogleLogin);
+document.querySelector("#emailLogin")?.addEventListener("click", () => (mode === "register" ? submitEmailRegister() : submitEmailLogin()));
+document.querySelector("#emailFormSubmit")?.addEventListener("click", () => (mode === "register" ? submitEmailRegister() : submitEmailLogin()));
+document.querySelector("#passwordResetLink")?.addEventListener("click", (event) => { event.preventDefault(); requestPasswordReset(); });
+document.querySelector("#emailPassword")?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") (mode === "register" ? submitEmailRegister() : submitEmailLogin());
+});
+// Apple Login bleibt extern blockiert: Aktivierung erst mit vorhandener, kostenloser
+// Apple-OAuth-Konfiguration und Domain-Prüfung (keine Developer-Mitgliedschaft kaufen).
+document.querySelector("#appleLogin")?.addEventListener("click", () => status("Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.", "error"));
+document.querySelector("#homeLink")?.addEventListener("click", () => { window.location.href = "/"; });
+refreshSession();
+handleUrlTokens();
