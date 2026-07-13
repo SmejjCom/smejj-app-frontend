@@ -95,6 +95,11 @@ export function openBrowserRequest(value) {
   const current = activeTab();
   const tab = !current?.url || current.url === target ? current : addTab();
   if (!tab) return false;
+  // Agentennavigation ersetzt die sichtbare Adresse auch dann, wenn openPane()
+  // die Adressleiste gerade fokussiert hat. Sonst bleibt dort die vorherige
+  // Tab-URL stehen, obwohl Inhalt, Titel und Verlauf bereits gewechselt haben.
+  refs.address.value = target;
+  refs.address.blur();
   if (tab.url !== target || !tab.frame) navigate(tab, target);
   return true;
 }
