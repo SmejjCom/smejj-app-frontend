@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Registrieren · smejj.com</title>
+    <link rel="stylesheet" href="/assets/auth/auth.css">
+  </head>
+  <body data-auth-mode="register">
+    <main class="auth-shell">
+      <a class="auth-brand" id="homeLink" href="/" aria-label="smejj.com Startseite"><span class="auth-brand-mark" aria-hidden="true"></span><span>smejj.com</span></a>
+      <section class="auth-card" aria-labelledby="authTitle">
+        <p class="auth-eyebrow">Neues Konto</p>
+        <h1 id="authTitle">Bei smejj.com registrieren</h1>
+        <p class="auth-subhead">Erstelle deinen sicheren Zugang ohne Passwortspeicherung im Browser.</p>
+        <label class="auth-field" for="profileEmail">E-Mail (für Passkey und E-Mail-Registrierung)<input id="profileEmail" type="email" autocomplete="email" placeholder="name@example.com"></label>
+        <input id="profileName" type="hidden" value="">
+        <div id="emailFormGroup" hidden>
+          <label class="auth-field" for="emailPassword">Passwort<input id="emailPassword" type="password" autocomplete="new-password" placeholder="Mindestens 10 Zeichen"></label>
+          <label class="auth-field" for="emailPasswordRepeat">Passwort wiederholen<input id="emailPasswordRepeat" type="password" autocomplete="new-password" placeholder="Passwort erneut eingeben"></label>
+        </div>
+        <div class="auth-stack">
+          <button class="auth-button primary" id="googleLogin" type="button">Mit Google registrieren</button>
+          <button class="auth-button" id="passkeyRegister" type="button">Mit Passkey registrieren</button>
+          <button class="auth-button secondary" id="emailLogin" type="button">Mit E-Mail registrieren</button>
+          <button class="auth-button secondary" id="appleLogin" type="button">Mit Apple registrieren</button>
+        </div>
+        <div class="auth-divider"><span>Hinweis</span></div>
+        <p class="auth-note">Passkey-Registrierung ist die sicherste Option. E-Mail-Registrierung nutzt serverseitiges scrypt-Hashing mit E-Mail-Verifikation; es werden niemals Klartextpasswörter gespeichert. Apple-Registrierung wird erst mit geprüfter Server-Konfiguration freigeschaltet.</p>
+        <p class="auth-status" id="profileOutput" role="status" aria-live="polite"></p><span id="sessionStatus" hidden></span>
+        <p class="auth-footer">Schon registriert? <a href="/auth/login/">Anmelden</a></p>
+      </section>
+      <p class="auth-legal"><a href="/datenschutz.html">Datenschutz</a> · <a href="/impressum.html">Impressum</a></p>
+    </main>
+    <script type="module" src="/assets/auth/auth-page.js"></script>
+    <script type="module" src="/assets/auth/passkey-ui.js"></script>
+  </body>
+</html>
