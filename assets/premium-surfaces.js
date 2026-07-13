@@ -1,6 +1,6 @@
 import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js";
 import { applyServerAiStatus } from "/assets/storage/index.js";
-import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=3";
+import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=4";
 import { initSettingsSurface } from "./settings-surface.js?v=3";
 import { initAccountPrivacySurface } from "./account-privacy.js?v=1";
 
