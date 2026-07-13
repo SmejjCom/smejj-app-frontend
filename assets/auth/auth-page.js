@@ -1,5 +1,12 @@
 import { API_ORIGIN, CLIENT_ROUTES } from "../config.js";
 
+// Cross-Origin-Auth: smejj.com und der Control-Server sind verschiedene Sites.
+// Session-Cookies (SameSite=Lax) werden cross-site nicht gesendet und CORS
+// erlaubt keine Credentials. Deshalb nutzt das Frontend den vom Login/Passkey
+// zurueckgegebenen accessToken als Authorization: Bearer (der Server akzeptiert
+// beides). Token liegt lokal, niemals in der URL.
+const TOKEN_KEY = "smejj.auth.accessToken.v1";
+
 const EMAIL_API = {
   register: `${API_ORIGIN}/api/auth/email/register`,
   login: `${API_ORIGIN}/api/auth/email/login`,
@@ -36,11 +43,22 @@ function errorText(payload, fallback) {
   return ERROR_TEXT[payload?.error] || payload?.error || fallback;
 }
 
+function getToken() {
+  try { return localStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; }
+}
+function setToken(token) {
+  try { if (token) localStorage.setItem(TOKEN_KEY, token); } catch { /* Storage gesperrt: nur diese Sitzung */ }
+}
+
+function authHeaders(extra = {}) {
+  const token = getToken();
+  return token ? { ...extra, Authorization: `Bearer ${token}` } : { ...extra };
+}
+
 async function postJson(url, body) {
   const response = await fetch(url, {
     method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
+    headers: authHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(body)
   });
   let payload = {};
@@ -49,14 +67,16 @@ async function postJson(url, body) {
 }
 
 async function refreshSession() {
+  const token = getToken();
+  if (!token) return;
   try {
-    const response = await fetch(CLIENT_ROUTES.api.authMe, { credentials: "include" });
+    const response = await fetch(CLIENT_ROUTES.api.authMe, { headers: authHeaders() });
     const data = await response.json();
     if (data.authenticated && data.user) {
       status(`Bereits angemeldet: ${data.user.email || data.user.name || "smejj.com Nutzer"}.`, "success");
     }
   } catch {
-    status("Anmeldung ist momentan nicht erreichbar. Bitte später erneut versuchen.", "error");
+    /* nicht kritisch: Startzustand */
   }
 }
 
@@ -65,7 +85,7 @@ async function startGoogleLogin() {
   if (button) button.disabled = true;
   status("Google Login wird geprüft …");
   try {
-    const response = await fetch(CLIENT_ROUTES.api.authConfig, { credentials: "include" });
+    const response = await fetch(CLIENT_ROUTES.api.authConfig);
     const config = await response.json();
     if (!response.ok || config.configured !== true) {
       status("Google Login ist serverseitig noch nicht konfiguriert. Nutze bis dahin Passkey.", "error");
@@ -105,6 +125,7 @@ async function submitEmailLogin() {
   try {
     const { ok, payload } = await postJson(EMAIL_API.login, { email, password });
     if (!ok) return status(errorText(payload, "Anmeldung fehlgeschlagen."), "error");
+    if (payload.accessToken) setToken(payload.accessToken);
     status("Angemeldet. Weiterleitung …", "success");
     window.location.assign("/profile?login=ok");
   } catch {
@@ -125,7 +146,7 @@ async function submitEmailRegister() {
     if (payload.mail?.sent) {
       status("Konto angelegt. Bitte bestätige deine E-Mail-Adresse über den zugesandten Link.", "success");
     } else {
-      status("Konto angelegt. E-Mail-Versand ist serverseitig noch nicht konfiguriert – du kannst dich direkt anmelden.", "success");
+      status("Konto angelegt. Du kannst dich jetzt mit E-Mail und Passwort anmelden.", "success");
     }
   } catch {
     status("Registrierung ist momentan nicht erreichbar.", "error");
