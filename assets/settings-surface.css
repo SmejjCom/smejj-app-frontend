@@ -130,6 +130,10 @@
 .premium-view[data-settings-theme="light"] .settings-list {
   background:var(--premium-surface);
 }
+.premium-view[data-settings-theme="light"] .settings-nav-button.is-active {
+  color:var(--premium-text);
+  background:rgba(23,25,29,.06);
+}
 @media (max-width:760px) {
   #settings.premium-view {
     padding:56px 12px 22px;
