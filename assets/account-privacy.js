@@ -1,6 +1,8 @@
-import { STORAGE_KEYS } from "./config.js";
+import { API_ORIGIN, STORAGE_KEYS } from "./config.js";
+import { initServerSessionControls } from "./account-sessions.js?v=2";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
+const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const SAFE_EXPORT_KEYS = [STORAGE_KEYS.profile, STORAGE_KEYS.settings, STORAGE_KEYS.session, STORAGE_KEYS.model];
 
 export function initAccountPrivacySurface() {
@@ -11,6 +13,29 @@ export function initAccountPrivacySurface() {
   view.innerHTML = markup();
   hydrate(view);
   bind(view);
+  initServerSessionControls(view, (text) => output(view, text));
+  hydrateAuthSession(view); // angemeldeten Nutzer (Google/E-Mail/Passkey) anzeigen
+}
+
+// Zeigt den serverseitig angemeldeten Nutzer an: Name/E-Mail vorbelegen und
+// Session-Status setzen. Bearer-Token liegt lokal; niemals in der URL.
+async function hydrateAuthSession(view) {
+  let token = "";
+  try { token = localStorage.getItem(TOKEN_KEY) || ""; } catch { token = ""; }
+  if (!token) return;
+  try {
+    const response = await fetch(`${API_ORIGIN}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await response.json();
+    if (!data.authenticated || !data.user) return;
+    const nameField = view.querySelector("#profileName");
+    const emailField = view.querySelector("#profileEmail");
+    if (nameField && !nameField.value) nameField.value = data.user.name || "";
+    if (emailField && !emailField.value) emailField.value = data.user.email || "";
+    const sessionStatus = view.querySelector("#sessionStatus");
+    if (sessionStatus) sessionStatus.textContent = `angemeldet als ${data.user.email || data.user.name} (${data.user.method || "google"})`;
+    const roleStatus = view.querySelector("#userRoleStatus");
+    if (roleStatus) roleStatus.textContent = "angemeldeter Nutzer";
+  } catch { /* nicht kritisch: Anzeige bleibt lokal */ }
 }
 
 function markup() {
@@ -19,7 +44,7 @@ function markup() {
     ${nav("identity", "Profil")}${nav("security", "Anmeldung & Sicherheit")}${nav("privacy", "Datenschutz")}${nav("permissions", "Berechtigungen")}${nav("data", "Daten")}
   </nav><div class="account-content">
     ${panel("identity", "Profil", `<div class="account-grid"><label>Name<input id="profileName" placeholder="Dein Name"></label><label>E-Mail<input id="profileEmail" placeholder="name@example.com" inputmode="email"></label><label>Sprache<select id="language" aria-label="Sprache"><option value="de">Deutsch</option><option value="en">English</option></select></label><label>Antwortmodus<select id="mode" aria-label="Antwortmodus"><option value="safe">Free-safe</option><option value="byok">BYOK vorbereitet</option><option value="local">Lokal</option></select></label></div><div class="account-actions"><button id="saveProfile" type="button">Profil speichern</button><button id="registerLocal" type="button">Lokales Profil erstellen</button></div>`)}
-    ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">nicht angemeldet</span></div><div><strong>Rolle</strong><span id="userRoleStatus">local-only</span></div><div><strong>Projektrechte</strong><span id="projectRightsStatus">owner/editor/viewer vorbereitet</span></div><div><strong>Gerät</strong><span id="currentDevice">Dieser Browser</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">Mit Passkey anmelden</button><button id="passkeyRegister" type="button">Passkey einrichten</button><button id="loginLocal" type="button">Lokal anmelden</button><button id="logoutLocal" type="button">Ausloggen</button></div><p class="account-note">Andere Geräte können erst nach serverseitiger Session-Liste einzeln widerrufen werden. smejj.com behauptet hier keine nicht vorhandene Fernlöschung.</p>`)}
+    ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">nicht angemeldet</span></div><div><strong>Rolle</strong><span id="userRoleStatus">local-only</span></div><div><strong>Projektrechte</strong><span id="projectRightsStatus">owner/editor/viewer vorbereitet</span></div><div><strong>Gerät</strong><span id="currentDevice">Dieser Browser</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">Mit Passkey anmelden</button><button id="passkeyRegister" type="button">Passkey einrichten</button><button id="loginLocal" type="button">Lokal anmelden</button><button id="logoutLocal" type="button">Ausloggen</button></div><p class="account-note">E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.</p>`)}
     ${panel("privacy", "Datenschutz", `<div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Eine lokale Auswahl ersetzt keine serverseitige, signierte Einwilligung.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.</p>`)}
     ${panel("permissions", "Berechtigungen", `<div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div>`)}
     ${panel("data", "Daten verwalten", `<div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">Datenschutzerklärung öffnen</button></div>`)}
@@ -33,6 +58,7 @@ function bind(view) {
     if (tab) return activate(view, tab.dataset.accountTab);
     if (event.target.closest("#accountExport")) exportLocalData(view);
     if (event.target.closest("#accountPrivacyOpen")) location.href = "/datenschutz.html";
+    if (event.target.closest("#logoutLocal")) logoutSession(view);
   });
   view.querySelector("#clearLocal")?.addEventListener("click", (event) => {
     if (!window.confirm("Lokale smejj.com Daten auf diesem Gerät wirklich löschen? Projekte und nicht synchronisierte Daten können verloren gehen.")) {
@@ -86,6 +112,24 @@ function exportLocalData(view) {
 function activate(view, id) {
   view.querySelectorAll("[data-account-tab]").forEach((node) => node.classList.toggle("is-active", node.dataset.accountTab === id));
   view.querySelectorAll("[data-account-panel]").forEach((node) => { node.hidden = node.dataset.accountPanel !== id; });
+}
+
+// Abmelden: Server-Session widerrufen (Bearer) und lokalen Token entfernen.
+async function logoutSession(view) {
+  let token = "";
+  try { token = localStorage.getItem(TOKEN_KEY) || ""; } catch { token = ""; }
+  try {
+    await fetch(`${API_ORIGIN}/api/auth/logout`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+  } catch { /* auch bei Netzfehler lokal abmelden */ }
+  try { localStorage.removeItem(TOKEN_KEY); } catch { /* Storage gesperrt */ }
+  const sessionStatus = view.querySelector("#sessionStatus");
+  if (sessionStatus) sessionStatus.textContent = "nicht angemeldet";
+  const roleStatus = view.querySelector("#userRoleStatus");
+  if (roleStatus) roleStatus.textContent = "local-only";
+  output(view, "Abgemeldet. Die Sitzung wurde beendet.");
 }
 
 function read(key) { try { return JSON.parse(localStorage.getItem(key) || "{}"); } catch { return {}; } }
