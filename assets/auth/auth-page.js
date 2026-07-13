@@ -83,7 +83,7 @@ async function refreshSession() {
 async function startGoogleLogin() {
   const button = document.querySelector("#googleLogin");
   if (button) button.disabled = true;
-  status("Google Login wird geprüft …");
+  status("Google Login wird gestartet …");
   try {
     const response = await fetch(CLIENT_ROUTES.api.authConfig);
     const config = await response.json();
@@ -91,12 +91,47 @@ async function startGoogleLogin() {
       status("Google Login ist serverseitig noch nicht konfiguriert. Nutze bis dahin Passkey.", "error");
       return;
     }
-    window.location.assign(`${API_ORIGIN}/api/auth/google?mode=redirect`);
+    // One-Time-Handoff starten, damit der Token nach der Google-Anmeldung auf
+    // smejj.com landet (gleiches Bearer-Prinzip wie beim E-Mail-Login).
+    const origin = window.location.origin;
+    let query = "";
+    try {
+      const start = await fetch(`${API_ORIGIN}/api/auth/session-handoff/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ returnOrigin: origin })
+      });
+      const handoff = await start.json();
+      if (handoff?.id) query = `&handoff=${encodeURIComponent(handoff.id)}&returnOrigin=${encodeURIComponent(origin)}`;
+    } catch { /* ohne Handoff faellt der Server auf die Control-Domain-Anmeldung zurueck */ }
+    window.location.assign(`${API_ORIGIN}/api/auth/google?mode=redirect${query}`);
   } catch {
     status("Google Login konnte nicht gestartet werden.", "error");
   } finally {
     if (button) button.disabled = false;
   }
+}
+
+// Rueckkehr von Google: Token per One-Time-Handoff abholen und in der App anmelden.
+async function completeGoogleHandoff() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("handoff");
+  if (!id) return false;
+  status("Google-Anmeldung wird abgeschlossen …");
+  try {
+    const response = await fetch(`${API_ORIGIN}/api/auth/session-handoff/${encodeURIComponent(id)}`);
+    const data = await response.json();
+    if (data.state === "completed" && data.accessToken) {
+      setToken(data.accessToken);
+      status("Angemeldet. Weiterleitung …", "success");
+      window.location.assign("/profile?login=ok");
+      return true;
+    }
+    status("Google-Anmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen.", "error");
+  } catch {
+    status("Google-Anmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen.", "error");
+  }
+  return false;
 }
 
 function emailFormValues() {
@@ -197,5 +232,9 @@ document.querySelector("#emailPassword")?.addEventListener("keydown", (event) =>
 // Apple-OAuth-Konfiguration und Domain-Prüfung (keine Developer-Mitgliedschaft kaufen).
 document.querySelector("#appleLogin")?.addEventListener("click", () => status("Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.", "error"));
 document.querySelector("#homeLink")?.addEventListener("click", () => { window.location.href = "/"; });
-refreshSession();
-handleUrlTokens();
+// Google-Rueckkehr zuerst: Wenn ein Handoff-Token vorliegt, wird direkt angemeldet.
+completeGoogleHandoff().then((handled) => {
+  if (handled) return;
+  refreshSession();
+  handleUrlTokens();
+});
