@@ -14,6 +14,24 @@ function authHeaders(extra = {}) {
   return token ? { ...extra, Authorization: `Bearer ${token}` } : { ...extra };
 }
 
+// Angemeldeten Nutzer laden (oder null). Token- und Authorization-Handling
+// bleiben in diesem Modul; Oberflaechen wie account-privacy.js sehen nur das Ergebnis.
+export async function fetchAuthenticatedUser() {
+  if (!getToken()) return null;
+  try {
+    const response = await fetch(API.me, { headers: authHeaders() });
+    const data = await response.json();
+    return data.authenticated && data.user ? data.user : null;
+  } catch { return null; }
+}
+
+// Aktuelle Sitzung beenden: Server-Logout (Bearer) und lokalen Token entfernen.
+// Faellt bei Netzfehlern sicher auf das lokale Abmelden zurueck.
+export async function logoutCurrentSession() {
+  try { await fetch(API.logout, { method: "POST", headers: authHeaders() }); } catch { /* auch offline lokal abmelden */ }
+  clearToken();
+}
+
 const API = {
   me: `${API_ORIGIN}/api/auth/me`,
   logout: `${API_ORIGIN}/api/auth/logout`,

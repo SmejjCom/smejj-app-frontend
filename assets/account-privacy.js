@@ -1,8 +1,7 @@
-import { API_ORIGIN, STORAGE_KEYS } from "./config.js";
-import { initServerSessionControls } from "./account-sessions.js?v=2";
+import { STORAGE_KEYS } from "./config.js";
+import { initServerSessionControls, fetchAuthenticatedUser, logoutCurrentSession } from "./account-sessions.js?v=3";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
-const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const SAFE_EXPORT_KEYS = [STORAGE_KEYS.profile, STORAGE_KEYS.settings, STORAGE_KEYS.session, STORAGE_KEYS.model];
 
 export function initAccountPrivacySurface() {
@@ -18,24 +17,19 @@ export function initAccountPrivacySurface() {
 }
 
 // Zeigt den serverseitig angemeldeten Nutzer an: Name/E-Mail vorbelegen und
-// Session-Status setzen. Bearer-Token liegt lokal; niemals in der URL.
+// Session-Status setzen. Token-Handling liegt vollstaendig in account-sessions.js;
+// diese Oberflaeche sieht keine Secrets.
 async function hydrateAuthSession(view) {
-  let token = "";
-  try { token = localStorage.getItem(TOKEN_KEY) || ""; } catch { token = ""; }
-  if (!token) return;
-  try {
-    const response = await fetch(`${API_ORIGIN}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
-    const data = await response.json();
-    if (!data.authenticated || !data.user) return;
-    const nameField = view.querySelector("#profileName");
-    const emailField = view.querySelector("#profileEmail");
-    if (nameField && !nameField.value) nameField.value = data.user.name || "";
-    if (emailField && !emailField.value) emailField.value = data.user.email || "";
-    const sessionStatus = view.querySelector("#sessionStatus");
-    if (sessionStatus) sessionStatus.textContent = `angemeldet als ${data.user.email || data.user.name} (${data.user.method || "google"})`;
-    const roleStatus = view.querySelector("#userRoleStatus");
-    if (roleStatus) roleStatus.textContent = "angemeldeter Nutzer";
-  } catch { /* nicht kritisch: Anzeige bleibt lokal */ }
+  const user = await fetchAuthenticatedUser();
+  if (!user) return;
+  const nameField = view.querySelector("#profileName");
+  const emailField = view.querySelector("#profileEmail");
+  if (nameField && !nameField.value) nameField.value = user.name || "";
+  if (emailField && !emailField.value) emailField.value = user.email || "";
+  const sessionStatus = view.querySelector("#sessionStatus");
+  if (sessionStatus) sessionStatus.textContent = `angemeldet als ${user.email || user.name} (${user.method || "google"})`;
+  const roleStatus = view.querySelector("#userRoleStatus");
+  if (roleStatus) roleStatus.textContent = "angemeldeter Nutzer";
 }
 
 function markup() {
@@ -114,17 +108,10 @@ function activate(view, id) {
   view.querySelectorAll("[data-account-panel]").forEach((node) => { node.hidden = node.dataset.accountPanel !== id; });
 }
 
-// Abmelden: Server-Session widerrufen (Bearer) und lokalen Token entfernen.
+// Abmelden: Server-Session widerrufen und lokalen Token entfernen —
+// beides gekapselt in account-sessions.js (keine Secrets in dieser Datei).
 async function logoutSession(view) {
-  let token = "";
-  try { token = localStorage.getItem(TOKEN_KEY) || ""; } catch { token = ""; }
-  try {
-    await fetch(`${API_ORIGIN}/api/auth/logout`, {
-      method: "POST",
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
-    });
-  } catch { /* auch bei Netzfehler lokal abmelden */ }
-  try { localStorage.removeItem(TOKEN_KEY); } catch { /* Storage gesperrt */ }
+  await logoutCurrentSession();
   const sessionStatus = view.querySelector("#sessionStatus");
   if (sessionStatus) sessionStatus.textContent = "nicht angemeldet";
   const roleStatus = view.querySelector("#userRoleStatus");
