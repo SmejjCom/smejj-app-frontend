@@ -1,0 +1,85 @@
+/* smejj.com — Cline-Untermenue im Modell-Picker (Codex-Stil).
+   Design-Sprache identisch zum bestehenden .model-menu (dunkel, Glas, dezente Linien). */
+
+.model-menu button[data-submenu-trigger] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.model-submenu-arrow {
+  color: rgba(246, 243, 238, 0.5);
+  font-size: 12px;
+}
+
+.model-submenu {
+  position: absolute;
+  right: calc(100% + 6px);
+  bottom: 0;
+  z-index: 61;
+  display: grid;
+  gap: 2px;
+  min-width: 232px;
+  max-width: 312px;
+  max-height: 340px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(25, 26, 29, 0.96);
+  padding: 6px;
+  box-shadow: 0 16px 52px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+}
+
+.model-submenu-group {
+  padding: 6px 8px 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(246, 243, 238, 0.45);
+}
+
+.model-submenu button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.model-submenu .model-submenu-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.model-submenu .model-submenu-check {
+  visibility: hidden;
+  color: rgba(246, 243, 238, 0.92);
+}
+
+.model-submenu button.is-active .model-submenu-check {
+  visibility: visible;
+}
+
+.model-submenu-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 4px 0;
+}
+
+.model-submenu-note,
+.model-submenu-hint {
+  padding: 8px;
+  font-size: 12px;
+  color: rgba(246, 243, 238, 0.62);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .model-submenu {
+    right: 0;
+    bottom: calc(100% + 6px);
+    max-width: min(312px, calc(100vw - 32px));
+  }
+}

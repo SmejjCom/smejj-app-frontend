@@ -207,14 +207,14 @@ function bindModelPicker() {
   };
   const selectFromEvent = (event) => {
     const item = event.target.closest("[data-model]");
-    if (!item) return;
+    if (!item || item.hasAttribute("data-submenu-trigger")) return; // Untermenue (cline-model-menu.js) uebernimmt Trigger.
     event.stopPropagation();
     event.preventDefault();
     selectItem(item);
   };
   menu.addEventListener("pointerdown", selectFromEvent, true);
   menu.addEventListener("click", selectFromEvent, true);
-  for (const item of menu.querySelectorAll("[data-model]")) {
+  for (const item of menu.querySelectorAll("[data-model]:not([data-submenu-trigger])")) {
     const handleItemSelect = (event) => {
       event.stopPropagation();
       event.preventDefault();
@@ -225,7 +225,7 @@ function bindModelPicker() {
   }
   menu.addEventListener("click", (event) => {
     const item = event.target.closest("[data-model]");
-    if (!item) return;
+    if (!item || item.hasAttribute("data-submenu-trigger")) return;
     selectItem(item);
   });
   document.addEventListener("click", (event) => {
