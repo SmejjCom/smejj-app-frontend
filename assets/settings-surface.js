@@ -2,7 +2,7 @@ import { STORAGE_KEYS } from "./config.js";
 import { initSettingsRuntime } from "./settings-runtime.js?v=3";
 import { initClineProviderSurface } from "./provider-settings.js?v=1";
 import { LANGUAGE_OPTIONS } from "./language-options.js?v=1";
-import { t, loadUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=1";
+import { t, loadUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
@@ -43,7 +43,9 @@ export function initSettingsSurface() {
   initSettingsRuntime();
   view.addEventListener("click", (event) => handleClick(view, event));
   view.addEventListener("change", (event) => handleChange(view, event));
-  loadUiLanguage(readSettings().language).then(() => render(view));
+  // Synchron rendern: der i18n-Sprachcache macht t() sofort einsatzbereit,
+  // damit app.js-Boot-Bindings die gerenderten Elemente vorfinden.
+  render(view);
 }
 
 // Rendert die komplette Oberflaeche in der aktiven UI-Sprache.

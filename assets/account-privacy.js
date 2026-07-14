@@ -1,6 +1,7 @@
 import { STORAGE_KEYS } from "./config.js";
 import { initServerSessionControls, fetchAuthenticatedUser, logoutCurrentSession } from "./account-sessions.js?v=3";
 import { languageOptionsMarkup } from "./language-options.js?v=1";
+import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const SAFE_EXPORT_KEYS = [STORAGE_KEYS.profile, STORAGE_KEYS.settings, STORAGE_KEYS.session, STORAGE_KEYS.model];
@@ -10,7 +11,13 @@ export function initAccountPrivacySurface() {
   if (!view || view.dataset.accountPrivacyReady) return;
   view.dataset.accountPrivacyReady = "true";
   loadStyles();
+  // Synchron rendern (i18n-Sprachcache): app.js-Boot-Bindings (#saveProfile,
+  // #registerLocal, #loginLocal) finden die gerenderten Elemente vor.
+  // Bewusst KEIN Re-Render bei Sprachwechsel — das wuerde diese Bindings
+  // zerstoeren; die neue Sprache gilt nach dem Speichern beim naechsten Laden.
   view.innerHTML = markup();
+  view.setAttribute("lang", uiLanguage());
+  view.setAttribute("dir", uiDirection());
   hydrate(view);
   bind(view);
   initServerSessionControls(view, (text) => output(view, text));
@@ -28,21 +35,21 @@ async function hydrateAuthSession(view) {
   if (nameField && !nameField.value) nameField.value = user.name || "";
   if (emailField && !emailField.value) emailField.value = user.email || "";
   const sessionStatus = view.querySelector("#sessionStatus");
-  if (sessionStatus) sessionStatus.textContent = `angemeldet als ${user.email || user.name} (${user.method || "google"})`;
+  if (sessionStatus) sessionStatus.textContent = `${t("angemeldet als")} ${user.email || user.name} (${user.method || "google"})`;
   const roleStatus = view.querySelector("#userRoleStatus");
-  if (roleStatus) roleStatus.textContent = "angemeldeter Nutzer";
+  if (roleStatus) roleStatus.textContent = t("angemeldeter Nutzer");
 }
 
 function markup() {
-  return `<header class="account-header"><div><p class="eyebrow">Konto & Datenschutz</p><h2>Konto</h2><p class="subhead">Identität, Sitzungen und Daten sicher verwalten. Secrets werden weder angezeigt noch exportiert.</p></div><span class="account-security">Lokal-first · fail-closed</span></header>
-  <div class="account-layout"><nav class="account-nav" aria-label="Kontobereiche">
+  return `<header class="account-header"><div><p class="eyebrow">${t("Konto & Datenschutz")}</p><h2>${t("Konto")}</h2><p class="subhead">${t("Identität, Sitzungen und Daten sicher verwalten. Secrets werden weder angezeigt noch exportiert.")}</p></div><span class="account-security">Lokal-first · fail-closed</span></header>
+  <div class="account-layout"><nav class="account-nav" aria-label="${t("Kontobereiche")}">
     ${nav("identity", "Profil")}${nav("security", "Anmeldung & Sicherheit")}${nav("privacy", "Datenschutz")}${nav("permissions", "Berechtigungen")}${nav("data", "Daten")}
   </nav><div class="account-content">
-    ${panel("identity", "Profil", `<div class="account-grid"><label>Name<input id="profileName" placeholder="Dein Name"></label><label>E-Mail<input id="profileEmail" placeholder="name@example.com" inputmode="email"></label><label>Sprache<select id="language" aria-label="Sprache">${languageOptionsMarkup()}</select></label><label>Antwortmodus<select id="mode" aria-label="Antwortmodus"><option value="safe">Free-safe</option><option value="byok">BYOK vorbereitet</option><option value="local">Lokal</option></select></label></div><div class="account-actions"><button id="saveProfile" type="button">Profil speichern</button><button id="registerLocal" type="button">Lokales Profil erstellen</button></div>`)}
-    ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">nicht angemeldet</span></div><div><strong>Rolle</strong><span id="userRoleStatus">local-only</span></div><div><strong>Projektrechte</strong><span id="projectRightsStatus">owner/editor/viewer vorbereitet</span></div><div><strong>Gerät</strong><span id="currentDevice">Dieser Browser</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">Mit Passkey anmelden</button><button id="passkeyRegister" type="button">Passkey einrichten</button><button id="loginLocal" type="button">Lokal anmelden</button><button id="logoutLocal" type="button">Ausloggen</button></div><p class="account-note">E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.</p>`)}
-    ${panel("privacy", "Datenschutz", `<div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Eine lokale Auswahl ersetzt keine serverseitige, signierte Einwilligung.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.</p>`)}
+    ${panel("identity", "Profil", `<div class="account-grid"><label>${t("Name")}<input id="profileName" placeholder="${t("Dein Name")}"></label><label>${t("E-Mail")}<input id="profileEmail" placeholder="name@example.com" inputmode="email"></label><label>${t("Sprache")}<select id="language" aria-label="${t("Sprache")}">${languageOptionsMarkup()}</select></label><label>${t("Antwortmodus")}<select id="mode" aria-label="${t("Antwortmodus")}"><option value="safe">Free-safe</option><option value="byok">${t("BYOK vorbereitet")}</option><option value="local">${t("Lokal")}</option></select></label></div><div class="account-actions"><button id="saveProfile" type="button">${t("Profil speichern")}</button><button id="registerLocal" type="button">${t("Lokales Profil erstellen")}</button></div>`)}
+    ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
+    ${panel("privacy", "Datenschutz", `<div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Eine lokale Auswahl ersetzt keine serverseitige, signierte Einwilligung.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.")}</p>`)}
     ${panel("permissions", "Berechtigungen", `<div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div>`)}
-    ${panel("data", "Daten verwalten", `<div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">Datenschutzerklärung öffnen</button></div>`)}
+    ${panel("data", "Daten verwalten", `<div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">${t("Datenschutzerklärung öffnen")}</button></div>`)}
   </div></div><div id="profileOutput" class="output" role="status" aria-live="polite"></div>`;
 }
 
@@ -56,10 +63,13 @@ function bind(view) {
     if (event.target.closest("#logoutLocal")) logoutSession(view);
   });
   view.querySelector("#clearLocal")?.addEventListener("click", (event) => {
-    if (!window.confirm("Lokale smejj.com Daten auf diesem Gerät wirklich löschen? Projekte und nicht synchronisierte Daten können verloren gehen.")) {
-      event.preventDefault(); event.stopImmediatePropagation(); output(view, "Löschen abgebrochen. Keine Daten wurden verändert."); return;
+    if (!window.confirm(t("Lokale smejj.com Daten auf diesem Gerät wirklich löschen? Projekte und nicht synchronisierte Daten können verloren gehen."))) {
+      event.preventDefault(); event.stopImmediatePropagation(); output(view, t("Löschen abgebrochen. Keine Daten wurden verändert.")); return;
     }
   }, true);
+  view.querySelector("#language")?.addEventListener("change", () => {
+    output(view, t("Neue Sprache gilt nach dem Speichern des Profils."));
+  });
   for (const id of ["privacyMemory", "privacyTraining", "privacyDiagnostics"]) {
     view.querySelector(`#${id}`)?.addEventListener("change", () => saveConsent(view));
   }
@@ -76,7 +86,7 @@ function hydrate(view) {
   view.querySelector("#privacyMemory").checked = consent.memory === true;
   view.querySelector("#privacyTraining").checked = consent.training === true;
   view.querySelector("#privacyDiagnostics").checked = consent.diagnostics === true;
-  view.querySelector("#currentDevice").textContent = `${navigator.platform || "Browser"} · aktuelle Sitzung`;
+  view.querySelector("#currentDevice").textContent = `${navigator.platform || "Browser"} · ${t("aktuelle Sitzung")}`;
 }
 
 function saveConsent(view) {
@@ -90,7 +100,7 @@ function saveConsent(view) {
     updatedAt: new Date().toISOString()
   };
   localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
-  output(view, consent.training ? "Lokale Präferenz gespeichert. Training bleibt serverseitig gesperrt." : "Datenschutzpräferenz lokal gespeichert.");
+  output(view, consent.training ? t("Lokale Präferenz gespeichert. Training bleibt serverseitig gesperrt.") : t("Datenschutzpräferenz lokal gespeichert."));
 }
 
 function exportLocalData(view) {
@@ -101,7 +111,7 @@ function exportLocalData(view) {
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob); link.download = "smejj.com-local-data-export.json"; link.click();
   setTimeout(() => URL.revokeObjectURL(link.href), 0);
-  output(view, "Sicherer lokaler Export erstellt. Tokens, Passkeys und API-Schlüssel sind ausgeschlossen.");
+  output(view, t("Sicherer lokaler Export erstellt. Tokens, Passkeys und API-Schlüssel sind ausgeschlossen."));
 }
 
 function activate(view, id) {
@@ -114,17 +124,17 @@ function activate(view, id) {
 async function logoutSession(view) {
   await logoutCurrentSession();
   const sessionStatus = view.querySelector("#sessionStatus");
-  if (sessionStatus) sessionStatus.textContent = "nicht angemeldet";
+  if (sessionStatus) sessionStatus.textContent = t("nicht angemeldet");
   const roleStatus = view.querySelector("#userRoleStatus");
   if (roleStatus) roleStatus.textContent = "local-only";
-  output(view, "Abgemeldet. Die Sitzung wurde beendet.");
+  output(view, t("Abgemeldet. Die Sitzung wurde beendet."));
 }
 
 function read(key) { try { return JSON.parse(localStorage.getItem(key) || "{}"); } catch { return {}; } }
 function output(view, text) { view.querySelector("#profileOutput").textContent = text; }
-function nav(id, label) { return `<button type="button" data-account-tab="${id}">${label}</button>`; }
-function panel(id, title, body) { return `<section class="account-panel" data-account-panel="${id}"><h3>${title}</h3>${body}</section>`; }
-function toggle(label, id, hint) { return `<label class="account-row"><span><strong>${label}</strong><small>${hint}</small></span><input id="${id}" type="checkbox"></label>`; }
-function permission(label, status) { return `<div class="account-row"><span><strong>${label}</strong><small>${status}</small></span><span class="permission-state">Geschützt</span></div>`; }
-function dataAction(label, hint, id, text, danger = false) { return `<div class="account-row"><span><strong>${label}</strong><small>${hint}</small></span><button id="${id}" class="${danger ? "danger-action" : ""}" type="button">${text}</button></div>`; }
+function nav(id, label) { return `<button type="button" data-account-tab="${id}">${t(label)}</button>`; }
+function panel(id, title, body) { return `<section class="account-panel" data-account-panel="${id}"><h3>${t(title)}</h3>${body}</section>`; }
+function toggle(label, id, hint) { return `<label class="account-row"><span><strong>${t(label)}</strong><small>${t(hint)}</small></span><input id="${id}" type="checkbox"></label>`; }
+function permission(label, status) { return `<div class="account-row"><span><strong>${t(label)}</strong><small>${t(status)}</small></span><span class="permission-state">${t("Geschützt")}</span></div>`; }
+function dataAction(label, hint, id, text, danger = false) { return `<div class="account-row"><span><strong>${t(label)}</strong><small>${t(hint)}</small></span><button id="${id}" class="${danger ? "danger-action" : ""}" type="button">${t(text)}</button></div>`; }
 function loadStyles() { if (document.querySelector('link[href="/assets/account-privacy.css"]')) return; const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/assets/account-privacy.css"; document.head.append(link); }
