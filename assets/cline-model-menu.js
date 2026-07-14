@@ -78,7 +78,11 @@ function loadCatalog() {
         api("/models"),
         api("/status").catch(() => ({ configured: false, selectedModel: "" }))
       ]);
-      return { models: catalog.models || [], status: providerStatus };
+      const result = { models: catalog.models || [], status: providerStatus };
+      // Nur verbundene Kataloge cachen: nach Login/Key-Verbindung laedt das
+      // Untermenue beim naechsten Oeffnen frisch, ohne Seiten-Reload.
+      if (!providerStatus?.configured) catalogPromise = null;
+      return result;
     })().catch((error) => {
       catalogPromise = null;
       throw error;
