@@ -38,11 +38,11 @@ const PANEL_WIDTHS = Object.freeze({
   centerMin: 120
 });
 const MODEL_MODES = Object.freeze({
+  // Nur echte Modelle im Picker; Verbindungsarten (local browser, BYOK)
+  // werden unter Einstellungen -> KI-Provider (/ai) verwaltet.
   "smejj 1.0": AI_MODES.disabled,
-  "smejj Code": AI_MODES.disabled,
   "GLM-5.2": AI_MODES.glm52Vault, "Kimi K2.7": AI_MODES.kimiK27Vault,
-  "BYOK": AI_MODES.byok,
-  "local browser": AI_MODES.localBrowser
+  "Cline": AI_MODES.byok
 });
 const UPLOAD_LIMITS = Object.freeze({
   maxBytes: 1_000_000,
