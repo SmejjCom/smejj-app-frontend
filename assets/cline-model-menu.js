@@ -35,8 +35,9 @@ function init() {
   const openFromEvent = (event) => {
     event.preventDefault();
     event.stopPropagation();
-    if (submenu.hidden) openSubmenu(trigger, submenu);
-    else closeSubmenu(trigger, submenu);
+    // Klick oeffnet immer (kein Toggle): nach Hover-Oeffnung darf der
+    // Klick das Untermenue nicht wieder schliessen (Codex-Verhalten).
+    openSubmenu(trigger, submenu);
   };
   trigger.addEventListener("click", openFromEvent);
   trigger.addEventListener("mouseenter", () => openSubmenu(trigger, submenu));
