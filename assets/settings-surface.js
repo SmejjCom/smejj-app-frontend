@@ -1,5 +1,7 @@
 import { STORAGE_KEYS } from "./config.js";
 import { initSettingsRuntime } from "./settings-runtime.js?v=3";
+import { initClineProviderSurface } from "./provider-settings.js?v=1";
+import { LANGUAGE_OPTIONS } from "./language-options.js?v=1";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
@@ -37,6 +39,7 @@ export function initSettingsSurface() {
   loadStyles();
   initSettingsRuntime();
   view.innerHTML = markup();
+  initClineProviderSurface(view);
   applyValues(view, readSettings());
   activate(view, "general");
   view.addEventListener("click", (event) => handleClick(view, event));
@@ -49,7 +52,7 @@ function markup() {
   return `<header class="settings-header"><div><p class="eyebrow">Einstellungen</p><h2>Einstellungen</h2><p class="subhead">Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">Lokal gespeichert</div></header>
     <div class="settings-shell"><nav class="settings-nav" aria-label="Einstellungsbereiche">${nav}</nav><div class="settings-content">
       ${panel("general", "Allgemein", "Grundlegendes Verhalten der App.", [
-        select("Sprache", "settingsLanguage", [["de", "Deutsch"], ["en", "English"]]),
+        select("Sprache", "settingsLanguage", LANGUAGE_OPTIONS),
         select("Beim Öffnen anzeigen", "settingsStartView", [["last", "Letzte Ansicht"], ["start", "Startseite"], ["projects", "Projekte"]]),
         select("Sicherheitsmodus", "settingsMode", [["safe", "Free-safe"], ["byok", "BYOK vorbereitet"], ["local", "Lokal"]])])}
       ${panel("appearance", "Darstellung", "Gilt nur außerhalb der geschützten Startseite.", [
