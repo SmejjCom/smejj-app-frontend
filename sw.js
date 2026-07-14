@@ -1,4 +1,4 @@
-const CACHE_NAME = "smejj-shell-v119";
+const CACHE_NAME = "smejj-shell-v120";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -20,6 +20,8 @@ const SHELL = [
   "/assets/settings-surface.js",
   "/assets/settings-runtime.js",
   "/assets/provider-settings.js",
+  "/assets/cline-model-menu.js",
+  "/assets/cline-model-menu.css",
   "/assets/provider-settings.css",
   "/assets/account-privacy.js",
   "/assets/autonomous-coding.js",

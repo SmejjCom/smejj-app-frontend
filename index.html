@@ -51,6 +51,7 @@
     <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
     <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="/assets/cline-model-menu.css">
     <link rel="stylesheet" href="/assets/branding.css">
     <link rel="stylesheet" href="/assets/composer-tools.css">
     <link rel="stylesheet" href="/assets/browser-pane.css?v=browser-pane-20260709-2">
@@ -142,7 +143,7 @@
                     <button type="button" role="menuitem" data-model="smejj 1.0">smejj 1.0</button>
                     <button type="button" role="menuitem" data-model="GLM-5.2">GLM-5.2</button>
                     <button type="button" role="menuitem" data-model="Kimi K2.7">Kimi K2.7</button>
-                    <button type="button" role="menuitem" data-model="Cline">Cline</button>
+                    <button type="button" role="menuitem" data-model="Cline" data-submenu-trigger="cline" aria-haspopup="menu" aria-expanded="false">Cline <span class="model-submenu-arrow" aria-hidden="true">▸</span></button>
                   </div>
                 </div>
                 <button class="ghost-button icon-button" type="button" data-start-tool="voice" aria-label="Mikrofon" title="Mikrofon">
@@ -592,7 +593,8 @@
       <p id="voiceModeTranscript" class="voice-mode-transcript" aria-live="polite"></p>
       <p class="voice-mode-hint">Sprich einfach — zum Beenden X druecken oder Escape.</p>
     </div>
-    <script src="/assets/app.js?v=model-picker-20260714" type="module"></script>
+    <script src="/assets/app.js?v=cline-submenu-20260714" type="module"></script>
+    <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260709-2" type="module"></script>
     <script src="/assets/auth/passkey-ui.js" type="module"></script>
   </body>
