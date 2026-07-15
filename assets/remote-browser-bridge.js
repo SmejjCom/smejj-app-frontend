@@ -7,6 +7,8 @@ const HOST = process.env.SMEJJ_HOST || "0.0.0.0";
 const WORKER_URL = String(process.env.SMEJJ_REMOTE_BROWSER_WORKER_URL || "").replace(/\/$/, "");
 const TOKEN = String(process.env.SMEJJ_REMOTE_BROWSER_TOKEN || "").trim();
 const ORIGINS = new Set(["https://smejj.com", "https://www.smejj.com"]);
+// Version im /health sichtbar: zeigt eindeutig, welcher Bridge-Code live laeuft.
+const BRIDGE_VERSION = "live-browser-2026-07-15-1";
 const RATE = new Map();
 const RATE_CAPACITY = Number(process.env.SMEJJ_REMOTE_BROWSER_RATE_CAPACITY || 12);
 const RATE_REFILL_PER_SEC = Number(process.env.SMEJJ_REMOTE_BROWSER_RATE_REFILL_PER_SEC || 0.2);
@@ -251,7 +253,12 @@ http.createServer(async (req, res) => {
     return res.end();
   }
   if (req.method === "GET" && url.pathname === "/health") {
-    return send(res, 200, { ok: true, app: "smejj.com remote-browser-bridge" }, origin);
+    return send(res, 200, {
+      ok: true,
+      app: "smejj.com remote-browser-bridge",
+      version: BRIDGE_VERSION,
+      liveBrowser: true
+    }, origin);
   }
   if (req.method === "GET" && url.pathname === "/api/browser/remote") {
     return await handleRemote(req, res, url, origin);
