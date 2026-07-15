@@ -161,6 +161,7 @@ function activateClineSelection(model = localStorage.getItem(CLINE_MODEL_KEY) ||
 
 async function api(path, { method = "GET", body } = {}) {
   let token = sessionStorage.getItem(TOKEN_KEY) || "";
+  if (!token) token = recoverLocalToken();
   if (!token) token = await recoverSessionToken();
   const response = await fetch(`${PROVIDER_PREFIX}${path}`, {
     method,
@@ -180,6 +181,14 @@ async function api(path, { method = "GET", body } = {}) {
     throw error;
   }
   return payload;
+}
+
+function recoverLocalToken() {
+  // Fallback: Haupt-App-Login (Bearer-Token in localStorage) auch in frischen Tabs nutzen.
+  const token = String(localStorage.getItem("smejj.auth.accessToken.v1") || "");
+  if (!/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) return "";
+  sessionStorage.setItem(TOKEN_KEY, token);
+  return token;
 }
 
 async function recoverSessionToken() {
