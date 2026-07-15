@@ -1,4 +1,7 @@
 // smejj.com — Integrierter Browser (Codex-Stil) im rechten Panel.
+// Live-Browser: blockierende Seiten (Amazon & Co.) laufen als interaktive
+// Remote-Session (klicken/tippen/scrollen wie in Chrome); Details in
+// browser-pane-session.js. Fallback bleibt die Standbild-Ansicht.
 // Split-View: links bleibt der Arbeitsbereich, rechts oeffnet sich der Browser.
 // Bis zu 7 Tabs, Zurueck/Vor/Neu laden, URL- und Suchleiste.
 // Rendering: direkt einbettbare Seiten laufen im Original-Iframe (volles JS),
@@ -8,9 +11,11 @@
 import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260709-2";
 import {
   buildExternalFallbackHtml,
+  buildLiveBrowserHtml,
   buildRemoteBrowserHtml
 } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260709-2";
+import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260709-2";
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
@@ -46,6 +51,16 @@ const state = {
 };
 
 const refs = {};
+
+// Live-Browser (interaktive Remote-Session) — Details in browser-pane-session.js.
+const sessionClient = createBrowserSessionClient({ routes: CLIENT_ROUTES });
+const sessionHooks = {
+  onNavigated: (tab) => { commitHistory(tab, tab.url, true); persistTabs(); render(); },
+  onLost: (tab) => {
+    showHint("Live-Browser-Session beendet — verbinde neu ...");
+    if (tab.url) navigate(tab, tab.url, { push: false });
+  }
+};
 
 // In Node-Tests gibt es kein document — dort werden nur die puren Helfer importiert.
 if (typeof document !== "undefined") init();
@@ -335,7 +350,8 @@ function addTab({ url = "", focusAddress = false } = {}) {
     frame: null,
     scrollRatio: 0,
     zoom: 1,
-    remoteViewport: null
+    remoteViewport: null,
+    sessionId: ""
   };
   state.tabs.push(tab);
   state.activeId = tab.id;
@@ -349,6 +365,7 @@ function addTab({ url = "", focusAddress = false } = {}) {
 function closeTab(tabId) {
   const index = state.tabs.findIndex((tab) => tab.id === tabId);
   if (index === -1) return;
+  if (state.tabs[index].sessionId) sessionClient.close(state.tabs[index].sessionId);
   state.tabs[index].frame?.remove();
   state.tabs.splice(index, 1);
   if (state.activeId === tabId) {
@@ -401,6 +418,8 @@ function commitHistory(tab, url, push) {
 }
 
 async function navigate(tab, url, { push = true } = {}) {
+  // Neue Navigation beendet eine bestehende Live-Session dieses Tabs.
+  if (tab.sessionId) { sessionClient.close(tab.sessionId); tab.sessionId = ""; }
   tab.status = "loading";
   tab.url = url;
   if (push) tab.scrollRatio = 0; // Neue Seite startet oben — wie in Chrome.
@@ -464,7 +483,30 @@ async function navigate(tab, url, { push = true } = {}) {
   render();
 }
 
+// Live-Browser zuerst: interaktive Remote-Session (klicken/tippen wie Chrome).
+async function tryLiveBrowser(tab, url, { push = true } = {}) {
+  if (!sessionClient.ready()) return false;
+  const viewport = remoteBrowserViewport();
+  const data = await sessionClient.open(url, viewport);
+  if (!data?.ok) return false;
+  tab.sessionId = data.sessionId;
+  tab.url = data.finalUrl || url;
+  tab.title = data.title || shortHost(tab.url);
+  tab.remoteViewport = data.viewport || viewport;
+  setFrame(tab, {
+    mode: "live-browser",
+    srcdoc: buildLiveBrowserHtml({ url: tab.url, title: tab.title, screenshot: data.screenshot, viewport: tab.remoteViewport })
+  });
+  tab.status = "ready";
+  commitHistory(tab, tab.url, push);
+  showHint("Live-Browser verbunden — klicken, tippen und scrollen wie in Chrome.");
+  persistTabs();
+  render();
+  return true;
+}
+
 async function tryRemoteBrowser(tab, url, { reason = "", push = true } = {}) {
+  if (await tryLiveBrowser(tab, url, { push })) return true;
   const endpoint = CLIENT_ROUTES.api.browserRemote;
   if (!endpoint || !endpoint.startsWith("https://")) return false;
   const viewport = remoteBrowserViewport();
@@ -595,6 +637,10 @@ function onFrameMessage(event) {
   if (!message || typeof message.type !== "string") return;
   const tab = state.tabs.find((entry) => entry.frame?.contentWindow === event.source);
   if (!tab) return;
+  if (message.type === "smejj.browser.sessionAct" && message.action) {
+    sessionClient.handleAct(tab, message.action, sessionHooks);
+    return;
+  }
   if (message.type === "smejj.browser.navigate" && typeof message.url === "string") {
     const target = normalizeAddress(message.url);
     if (target) navigate(tab, target);
@@ -728,7 +774,8 @@ function restoreTabs() {
       frame: null,
       scrollRatio: Math.min(1, Math.max(0, Number(entry.scrollRatio) || 0)),
       zoom: clampZoom(entry.zoom || 1),
-      remoteViewport: null
+      remoteViewport: null,
+      sessionId: ""
     };
     state.tabs.push(tab);
     if (entry.id === saved.activeId) state.activeId = tab.id;

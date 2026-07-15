@@ -127,6 +127,147 @@ export function buildRemoteBrowserHtml({ url, title, screenshot, reason = "", ca
 </html>`;
 }
 
+// Interaktive Live-Browser-Ansicht: Viewport-Screenshot als Buehne, alle
+// Eingaben (Klick, Rechtsklick, Tastatur, Scrollen) gehen als Aktions-
+// Nachrichten an den Parent (browser-pane.js -> Session-API) und der Parent
+// schickt frische Frames zurueck. Sandboxed ohne allow-same-origin.
+export function buildLiveBrowserHtml({ url, title, screenshot, viewport = {} } = {}) {
+  const safeUrl = escapeHtml(url || "");
+  const safeTitle = escapeHtml(title || "Live-Browser");
+  const safeScreenshot = isRemoteScreenshot(screenshot) ? screenshot : "";
+  return `<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html,body{height:100%;margin:0;background:#101113;color:#f6f3ee;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);box-sizing:border-box}
+    header{display:flex;align-items:center;gap:10px;min-height:38px;padding:0 10px;border-bottom:1px solid rgba(246,243,238,.12);background:#18191c}
+    strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+    header .bp-live-state{color:#9fe7d4;font-size:11px;white-space:nowrap}
+    header a{margin-left:auto;color:#9fe7d4;font-size:12px;font-weight:700;text-decoration:none}
+    .bp-live-stage{position:relative;overflow:hidden;background:#fff;outline:none;cursor:default}
+    .bp-live-stage img{display:block;width:100%;height:100%;object-fit:contain;background:#fff;user-select:none;-webkit-user-drag:none}
+    .bp-live-stage.is-busy img{opacity:.72;transition:opacity .15s ease}
+  </style>
+</head>
+<body>
+  <main class="bp-live-browser">
+    <header><strong id="bpTitle">${safeTitle}</strong><span class="bp-live-state" id="bpState">Live</span><a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a></header>
+    <div class="bp-live-stage" id="bpStage" tabindex="0">
+      <img id="bpFrame" src="${safeScreenshot}" alt="Live-Browser-Ansicht von ${safeTitle}">
+    </div>
+  </main>
+  <script>(function () {
+    var stage = document.getElementById("bpStage");
+    var frame = document.getElementById("bpFrame");
+    var titleEl = document.getElementById("bpTitle");
+    var stateEl = document.getElementById("bpState");
+    if (!stage || !frame) return;
+    var pendingText = "";
+    var textTimer = 0;
+    var wheelDelta = 0;
+    var wheelTimer = 0;
+
+    function sendAction(action) {
+      parent.postMessage({ type: "smejj.browser.sessionAct", action: action }, "*");
+    }
+    function flushText() {
+      clearTimeout(textTimer);
+      textTimer = 0;
+      if (!pendingText) return;
+      var text = pendingText;
+      pendingText = "";
+      sendAction({ type: "type", text: text });
+    }
+    function flushWheel() {
+      clearTimeout(wheelTimer);
+      wheelTimer = 0;
+      if (!wheelDelta) return;
+      var delta = Math.round(wheelDelta);
+      wheelDelta = 0;
+      sendAction({ type: "scroll", deltaY: delta });
+    }
+    // Klickposition relativ zum tatsaechlich gezeichneten Bild (object-fit:
+    // contain kann Raender erzeugen) in Prozent des Remote-Viewports umrechnen.
+    function toPct(event) {
+      var rect = frame.getBoundingClientRect();
+      var natural = frame.naturalWidth && frame.naturalHeight
+        ? frame.naturalWidth / frame.naturalHeight
+        : rect.width / Math.max(1, rect.height);
+      var shown = rect.width / Math.max(1, rect.height);
+      var drawW = rect.width;
+      var drawH = rect.height;
+      var offX = 0;
+      var offY = 0;
+      if (shown > natural) {
+        drawW = rect.height * natural;
+        offX = (rect.width - drawW) / 2;
+      } else if (shown < natural) {
+        drawH = rect.width / natural;
+        offY = (rect.height - drawH) / 2;
+      }
+      var x = ((event.clientX - rect.left - offX) / Math.max(1, drawW)) * 100;
+      var y = ((event.clientY - rect.top - offY) / Math.max(1, drawH)) * 100;
+      if (x < 0 || x > 100 || y < 0 || y > 100) return null;
+      return { x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 };
+    }
+    stage.addEventListener("click", function (event) {
+      event.preventDefault();
+      flushText();
+      var pct = toPct(event);
+      if (pct) sendAction({ type: "click", xPct: pct.x, yPct: pct.y, button: "left" });
+      try { stage.focus({ preventScroll: true }); } catch (error) {}
+    });
+    stage.addEventListener("contextmenu", function (event) {
+      event.preventDefault();
+      flushText();
+      var pct = toPct(event);
+      if (pct) sendAction({ type: "click", xPct: pct.x, yPct: pct.y, button: "right" });
+    });
+    stage.addEventListener("wheel", function (event) {
+      event.preventDefault();
+      wheelDelta += event.deltaY;
+      if (!wheelTimer) wheelTimer = setTimeout(flushWheel, 200);
+    }, { passive: false });
+    var specialKeys = ["Enter", "Tab", "Escape", "Backspace", "Delete",
+      "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End"];
+    window.addEventListener("keydown", function (event) {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (specialKeys.indexOf(event.key) !== -1) {
+        event.preventDefault();
+        flushText();
+        sendAction({ type: "key", key: event.key });
+        return;
+      }
+      if (event.key && event.key.length === 1) {
+        event.preventDefault();
+        pendingText += event.key;
+        clearTimeout(textTimer);
+        textTimer = setTimeout(flushText, 350);
+      }
+    });
+    window.addEventListener("message", function (event) {
+      var data = event.data || {};
+      if (data.type === "smejj.browser.sessionFrame") {
+        if (typeof data.screenshot === "string" && data.screenshot.indexOf("data:image/") === 0) frame.src = data.screenshot;
+        if (titleEl && typeof data.title === "string" && data.title) titleEl.textContent = data.title;
+        return;
+      }
+      if (data.type === "smejj.browser.sessionState" && stateEl) {
+        stage.classList.toggle("is-busy", data.busy === true);
+        stateEl.textContent = data.busy === true ? "…" : (typeof data.label === "string" && data.label ? data.label : "Live");
+      }
+    });
+    function grabFocus() { try { stage.focus({ preventScroll: true }); } catch (error) {} }
+    window.addEventListener("load", grabFocus);
+    grabFocus();
+  })();</script>
+</body>
+</html>`;
+}
+
 function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")

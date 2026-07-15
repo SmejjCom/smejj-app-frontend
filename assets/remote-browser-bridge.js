@@ -14,7 +14,7 @@ const RATE_REFILL_PER_SEC = Number(process.env.SMEJJ_REMOTE_BROWSER_RATE_REFILL_
 function corsHeaders(origin) {
   return ORIGINS.has(origin) ? {
     "access-control-allow-origin": origin,
-    "access-control-allow-methods": "GET,OPTIONS",
+    "access-control-allow-methods": "GET,POST,OPTIONS",
     "access-control-allow-headers": "content-type",
     "vary": "origin"
   } : {};
@@ -122,7 +122,124 @@ async function handleRemote(req, res, url, origin) {
     title: payload.title || parsed.url.hostname,
     screenshot: payload.screenshot || "",
     viewport,
+    capture: sanitizeCapture(payload.capture, viewport),
+    pageHeight: clampViewport(payload.pageHeight, 0, 100000, 0),
+    links: sanitizeLinks(payload.links),
     status: payload.status || "rendered"
+  }, origin);
+}
+
+// Worker-Antwort defensiv uebernehmen: nur http(s)-Links, endliche Zahlen,
+// harte Obergrenzen — der Browser-Pane rendert daraus klickbare Bereiche.
+function sanitizeCapture(capture, viewport) {
+  return {
+    width: clampViewport(capture?.width, 1, 4000, viewport.width),
+    height: clampViewport(capture?.height, 1, 40000, viewport.height)
+  };
+}
+
+function sanitizeLinks(links, maxLinks = 200) {
+  if (!Array.isArray(links)) return [];
+  const out = [];
+  for (const link of links) {
+    if (out.length >= maxLinks) break;
+    const href = String(link?.href || "");
+    if (!/^https?:\/\//i.test(href)) continue;
+    const x = Math.round(Number(link?.x));
+    const y = Math.round(Number(link?.y));
+    const w = Math.round(Number(link?.w));
+    const h = Math.round(Number(link?.h));
+    if ([x, y, w, h].some((value) => !Number.isFinite(value) || value < 0) || w < 1 || h < 1) continue;
+    out.push({ href: href.slice(0, 2000), x, y, w, h });
+  }
+  return out;
+}
+
+// Body eines POST-Requests begrenzt einlesen (Session-Aktionen sind klein).
+async function readJsonBody(req, maxBytes = 200_000) {
+  let raw = "";
+  for await (const chunk of req) {
+    raw += chunk;
+    if (raw.length > maxBytes) throw new Error("Request zu gross.");
+  }
+  return raw ? JSON.parse(raw) : {};
+}
+
+const SESSION_HEX = /^[a-f0-9]{16,64}$/i;
+
+// Live-Browser-Session: Origin/Rate/Token wie beim Rendern, dann 1:1 an den
+// Worker (/session, /session/act, /session/close) weiterleiten. Fail-closed.
+async function handleSession(kind, req, res, origin) {
+  if (origin && !ORIGINS.has(origin)) return send(res, 403, { ok: false, error: "Origin nicht erlaubt.", remote: false }, origin);
+  if (!takeRate(clientKey(req))) return send(res, 429, { ok: false, error: "Zu viele Live-Browser-Anfragen. Bitte kurz warten.", remote: false }, origin);
+  if (!WORKER_URL || !TOKEN) return send(res, 503, { ok: false, error: "Live-Browser ist nicht konfiguriert.", remote: false }, origin);
+
+  let body;
+  try {
+    body = await readJsonBody(req);
+  } catch {
+    return send(res, 400, { ok: false, error: "Ungueltiger Request-Body.", remote: false }, origin);
+  }
+
+  let forward;
+  if (kind === "open") {
+    const parsed = parseTarget(body.url);
+    if (!parsed.ok) return send(res, 400, { ok: false, error: parsed.error, remote: false }, origin);
+    const viewport = {
+      width: clampViewport(body?.viewport?.width, 360, 1920, 1365),
+      height: clampViewport(body?.viewport?.height, 360, 1200, 900)
+    };
+    forward = { url: parsed.url.toString(), viewport };
+  } else {
+    const sessionId = String(body.sessionId || "");
+    if (!SESSION_HEX.test(sessionId)) return send(res, 400, { ok: false, error: "session_id_invalid", remote: false }, origin);
+    if (kind === "act") {
+      const action = body.action;
+      if (!action || typeof action !== "object" || typeof action.type !== "string") {
+        return send(res, 400, { ok: false, error: "action_missing", remote: false }, origin);
+      }
+      if (action.type === "navigate") {
+        const parsed = parseTarget(action.url);
+        if (!parsed.ok) return send(res, 400, { ok: false, error: parsed.error, remote: false }, origin);
+      }
+      forward = { sessionId, action };
+    } else {
+      forward = { sessionId };
+    }
+  }
+
+  const path = kind === "open" ? "/session" : kind === "act" ? "/session/act" : "/session/close";
+  let workerResponse;
+  try {
+    workerResponse = await fetch(`${WORKER_URL}${path}`, {
+      method: "POST",
+      signal: AbortSignal.timeout(45_000),
+      headers: { authorization: `Bearer ${TOKEN}`, "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify(forward)
+    });
+  } catch (error) {
+    return send(res, 502, { ok: false, error: `Live-Browser nicht erreichbar: ${String(error?.message || error).slice(0, 200)}`, remote: false }, origin);
+  }
+
+  const payload = await workerResponse.json().catch(() => null);
+  if (kind === "close") return send(res, 200, { ok: true, closed: Boolean(payload?.closed) }, origin);
+  if (!workerResponse.ok || !payload?.ok) {
+    const status = [400, 404, 409, 410, 429].includes(workerResponse.status) ? workerResponse.status : 502;
+    return send(res, status, { ok: false, error: String(payload?.error || "Live-Browser-Aktion fehlgeschlagen.").slice(0, 200), remote: false }, origin);
+  }
+  return send(res, 200, {
+    ok: true,
+    remote: true,
+    interactive: true,
+    sessionId: String(payload.sessionId || ""),
+    screenshot: payload.screenshot || "",
+    finalUrl: payload.finalUrl || (kind === "open" ? forward.url : ""),
+    title: payload.title || "",
+    viewport: {
+      width: clampViewport(payload?.viewport?.width, 360, 1920, 1365),
+      height: clampViewport(payload?.viewport?.height, 360, 1200, 900)
+    },
+    expiresInMs: clampViewport(payload.expiresInMs, 0, 3_600_000, 0)
   }, origin);
 }
 
@@ -138,6 +255,15 @@ http.createServer(async (req, res) => {
   }
   if (req.method === "GET" && url.pathname === "/api/browser/remote") {
     return await handleRemote(req, res, url, origin);
+  }
+  if (req.method === "POST" && url.pathname === "/api/browser/session") {
+    return await handleSession("open", req, res, origin);
+  }
+  if (req.method === "POST" && url.pathname === "/api/browser/session/act") {
+    return await handleSession("act", req, res, origin);
+  }
+  if (req.method === "POST" && url.pathname === "/api/browser/session/close") {
+    return await handleSession("close", req, res, origin);
   }
   return send(res, 404, { ok: false, error: "Not found" }, origin);
 }).listen(PORT, HOST, () => {
