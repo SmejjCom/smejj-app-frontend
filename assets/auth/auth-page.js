@@ -1,4 +1,5 @@
 import { API_ORIGIN, CLIENT_ROUTES } from "../config.js";
+import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "../i18n/ui.js?v=2";
 
 // Cross-Origin-Auth: smejj.com und der Control-Server sind verschiedene Sites.
 // Session-Cookies (SameSite=Lax) werden cross-site nicht gesendet und CORS
@@ -40,8 +41,34 @@ function status(message, tone = "") {
 }
 
 function errorText(payload, fallback) {
-  return ERROR_TEXT[payload?.error] || payload?.error || fallback;
+  return t(ERROR_TEXT[payload?.error] || payload?.error || fallback);
 }
+
+// Uebersetzt die statische Auth-Seite (Text-Knoten, Placeholder, Titel) in die
+// gespeicherte UI-Sprache. Eigenstaendige Seite ausserhalb des Start-Locks:
+// lang/dir duerfen hier global gesetzt werden (RTL fuer Arabisch).
+// Fail-safe: ohne Uebersetzung bleibt der deutsche Quelltext unveraendert.
+function translateStaticPage() {
+  if (uiLanguage() === "de") return;
+  document.documentElement.lang = uiLanguage();
+  document.documentElement.dir = uiDirection();
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  for (const node of nodes) {
+    const source = node.nodeValue;
+    const trimmed = source.trim();
+    if (!trimmed) continue;
+    const translated = t(trimmed);
+    if (translated !== trimmed) node.nodeValue = source.replace(trimmed, translated);
+  }
+  for (const field of document.querySelectorAll("[placeholder]")) {
+    field.setAttribute("placeholder", t(field.getAttribute("placeholder")));
+  }
+  document.title = t(document.title);
+}
+translateStaticPage();
+loadUiLanguage(savedUiLanguage()).then(() => translateStaticPage());
 
 function getToken() {
   try { return localStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; }
@@ -73,7 +100,7 @@ async function refreshSession() {
     const response = await fetch(CLIENT_ROUTES.api.authMe, { headers: authHeaders() });
     const data = await response.json();
     if (data.authenticated && data.user) {
-      status(`Bereits angemeldet: ${data.user.email || data.user.name || "smejj.com Nutzer"}.`, "success");
+      status(`${t("Bereits angemeldet:")} ${data.user.email || data.user.name || "smejj.com Nutzer"}.`, "success");
     }
   } catch {
     /* nicht kritisch: Startzustand */
@@ -83,12 +110,12 @@ async function refreshSession() {
 async function startGoogleLogin() {
   const button = document.querySelector("#googleLogin");
   if (button) button.disabled = true;
-  status("Google Login wird gestartet …");
+  status(t("Google Login wird gestartet …"));
   try {
     const response = await fetch(CLIENT_ROUTES.api.authConfig);
     const config = await response.json();
     if (!response.ok || config.configured !== true) {
-      status("Google Login ist serverseitig noch nicht konfiguriert. Nutze bis dahin Passkey.", "error");
+      status(t("Google Login ist serverseitig noch nicht konfiguriert. Nutze bis dahin Passkey."), "error");
       return;
     }
     // One-Time-Handoff starten, damit der Token nach der Google-Anmeldung auf
@@ -106,7 +133,7 @@ async function startGoogleLogin() {
     } catch { /* ohne Handoff faellt der Server auf die Control-Domain-Anmeldung zurueck */ }
     window.location.assign(`${API_ORIGIN}/api/auth/google?mode=redirect${query}`);
   } catch {
-    status("Google Login konnte nicht gestartet werden.", "error");
+    status(t("Google Login konnte nicht gestartet werden."), "error");
   } finally {
     if (button) button.disabled = false;
   }
@@ -117,19 +144,19 @@ async function completeGoogleHandoff() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("handoff");
   if (!id) return false;
-  status("Google-Anmeldung wird abgeschlossen …");
+  status(t("Google-Anmeldung wird abgeschlossen …"));
   try {
     const response = await fetch(`${API_ORIGIN}/api/auth/session-handoff/${encodeURIComponent(id)}`);
     const data = await response.json();
     if (data.state === "completed" && data.accessToken) {
       setToken(data.accessToken);
-      status("Angemeldet. Weiterleitung …", "success");
+      status(t("Angemeldet. Weiterleitung …"), "success");
       window.location.assign("/profile?login=ok");
       return true;
     }
-    status("Google-Anmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen.", "error");
+    status(t("Google-Anmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen."), "error");
   } catch {
-    status("Google-Anmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen.", "error");
+    status(t("Google-Anmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen."), "error");
   }
   return false;
 }
@@ -155,36 +182,36 @@ function revealEmailForm() {
 async function submitEmailLogin() {
   if (!revealEmailForm()) return;
   const { email, password } = emailFormValues();
-  if (!email || !password) return status("Bitte E-Mail und Passwort eingeben.", "error");
-  status("Anmeldung läuft …");
+  if (!email || !password) return status(t("Bitte E-Mail und Passwort eingeben."), "error");
+  status(t("Anmeldung läuft …"));
   try {
     const { ok, payload } = await postJson(EMAIL_API.login, { email, password });
     if (!ok) return status(errorText(payload, "Anmeldung fehlgeschlagen."), "error");
     if (payload.accessToken) setToken(payload.accessToken);
-    status("Angemeldet. Weiterleitung …", "success");
+    status(t("Angemeldet. Weiterleitung …"), "success");
     window.location.assign("/profile?login=ok");
   } catch {
-    status("Anmeldung ist momentan nicht erreichbar.", "error");
+    status(t("Anmeldung ist momentan nicht erreichbar."), "error");
   }
 }
 
 async function submitEmailRegister() {
   if (!revealEmailForm()) return;
   const { email, password, name } = emailFormValues();
-  if (!email || !password) return status("Bitte E-Mail und Passwort eingeben.", "error");
+  if (!email || !password) return status(t("Bitte E-Mail und Passwort eingeben."), "error");
   const repeat = String(document.querySelector("#emailPasswordRepeat")?.value || "");
-  if (repeat && repeat !== password) return status("Die Passwörter stimmen nicht überein.", "error");
-  status("Konto wird erstellt …");
+  if (repeat && repeat !== password) return status(t("Die Passwörter stimmen nicht überein."), "error");
+  status(t("Konto wird erstellt …"));
   try {
     const { ok, payload } = await postJson(EMAIL_API.register, { email, password, name });
     if (!ok) return status(errorText(payload, "Registrierung fehlgeschlagen."), "error");
     if (payload.mail?.sent) {
-      status("Konto angelegt. Bitte bestätige deine E-Mail-Adresse über den zugesandten Link.", "success");
+      status(t("Konto angelegt. Bitte bestätige deine E-Mail-Adresse über den zugesandten Link."), "success");
     } else {
-      status("Konto angelegt. Du kannst dich jetzt mit E-Mail und Passwort anmelden.", "success");
+      status(t("Konto angelegt. Du kannst dich jetzt mit E-Mail und Passwort anmelden."), "success");
     }
   } catch {
-    status("Registrierung ist momentan nicht erreichbar.", "error");
+    status(t("Registrierung ist momentan nicht erreichbar."), "error");
   }
 }
 
@@ -192,14 +219,14 @@ async function requestPasswordReset() {
   const { email } = emailFormValues();
   if (!email) {
     revealEmailForm();
-    return status("Bitte zuerst deine E-Mail-Adresse eingeben.", "error");
+    return status(t("Bitte zuerst deine E-Mail-Adresse eingeben."), "error");
   }
   try {
     const { ok, payload } = await postJson(EMAIL_API.resetRequest, { email });
     if (!ok) return status(errorText(payload, "Anfrage fehlgeschlagen."), "error");
-    status("Wenn ein Konto existiert, wurde eine E-Mail zum Zurücksetzen gesendet (30 Minuten gültig).", "success");
+    status(t("Wenn ein Konto existiert, wurde eine E-Mail zum Zurücksetzen gesendet (30 Minuten gültig)."), "success");
   } catch {
-    status("Anfrage ist momentan nicht erreichbar.", "error");
+    status(t("Anfrage ist momentan nicht erreichbar."), "error");
   }
 }
 
@@ -208,16 +235,16 @@ async function handleUrlTokens() {
   const email = params.get("email") || "";
   if (params.get("verify")) {
     const { ok, payload } = await postJson(EMAIL_API.verify, { email, token: params.get("verify") });
-    status(ok ? "E-Mail-Adresse bestätigt. Du kannst dich jetzt anmelden." : errorText(payload, "Bestätigung fehlgeschlagen."), ok ? "success" : "error");
+    status(ok ? t("E-Mail-Adresse bestätigt. Du kannst dich jetzt anmelden.") : errorText(payload, "Bestätigung fehlgeschlagen."), ok ? "success" : "error");
   }
   if (params.get("reset")) {
     const emailField = document.querySelector("#profileEmail");
     if (emailField && email) emailField.value = email;
     revealEmailForm();
-    const newPassword = window.prompt("Neues Passwort für smejj.com (mindestens 10 Zeichen):") || "";
-    if (!newPassword) return status("Passwort-Reset abgebrochen.", "error");
+    const newPassword = window.prompt(t("Neues Passwort für smejj.com (mindestens 10 Zeichen):")) || "";
+    if (!newPassword) return status(t("Passwort-Reset abgebrochen."), "error");
     const { ok, payload } = await postJson(EMAIL_API.resetConfirm, { email, token: params.get("reset"), newPassword });
-    status(ok ? "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden." : errorText(payload, "Reset fehlgeschlagen."), ok ? "success" : "error");
+    status(ok ? t("Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.") : errorText(payload, "Reset fehlgeschlagen."), ok ? "success" : "error");
   }
 }
 
@@ -230,7 +257,7 @@ document.querySelector("#emailPassword")?.addEventListener("keydown", (event) =>
 });
 // Apple Login bleibt extern blockiert: Aktivierung erst mit vorhandener, kostenloser
 // Apple-OAuth-Konfiguration und Domain-Prüfung (keine Developer-Mitgliedschaft kaufen).
-document.querySelector("#appleLogin")?.addEventListener("click", () => status("Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.", "error"));
+document.querySelector("#appleLogin")?.addEventListener("click", () => status(t("Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen."), "error"));
 document.querySelector("#homeLink")?.addEventListener("click", () => { window.location.href = "/"; });
 // Google-Rueckkehr zuerst: Wenn ein Handoff-Token vorliegt, wird direkt angemeldet.
 completeGoogleHandoff().then((handled) => {
