@@ -324,6 +324,11 @@ function verificationText(job) {
   ];
   for (const check of verification?.checks || []) lines.push(`${check.stage}: ${check.ok ? "OK" : check.skipped ? "SKIP" : "FEHLER"}`);
   if (browser) lines.push(`Browser: ${browser.required ? (browser.ok ? "OK" : "FEHLER") : "nicht erforderlich"}`);
+  const errors = job.result?.errors || [];
+  if (errors.length) {
+    lines.push("", "Fehlerursachen:");
+    for (const error of errors.slice(0, 10)) lines.push(`- [${error.source || "unbekannt"}] ${error.detail || ""}`);
+  }
   if (job.result?.finalReport) lines.push("", job.result.finalReport);
   return lines.join("\n");
 }
