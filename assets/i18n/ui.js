@@ -23,11 +23,28 @@ const CACHE_KEY = "smejj.i18n.cache.v1";
 let currentLanguage = SOURCE_LANGUAGE;
 let messages = null; // null = Quellsprache Deutsch (keine Uebersetzung noetig)
 
-// Gespeicherte UI-Sprache aus den lokalen Einstellungen (fail-safe de).
+// Browser-Sprache fuer Erstnutzer ohne gespeicherte Wahl: erste unterstuetzte
+// Sprache aus navigator.languages/language, sonst Englisch (globaler Fallback).
+const BROWSER_FALLBACK = "en";
+function detectBrowserLanguage() {
+  try {
+    const candidates = [...(navigator.languages || []), navigator.language].filter(Boolean);
+    for (const tag of candidates) {
+      const code = String(tag).slice(0, 2).toLowerCase();
+      if (SUPPORTED.has(code)) return code;
+    }
+  } catch { /* fail-safe */ }
+  return BROWSER_FALLBACK;
+}
+
+// Aktive UI-Sprache: die gespeicherte Wahl gewinnt IMMER; ohne gespeicherte
+// Wahl entscheidet die Browser-Sprache (Fallback en). Fail-safe: de.
 export function savedUiLanguage() {
   try {
     const settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "{}");
-    return SUPPORTED.has(settings.language) ? settings.language : SOURCE_LANGUAGE;
+    if (SUPPORTED.has(settings.language)) return settings.language;
+    if (settings.language) return SOURCE_LANGUAGE; // unbekannter gespeicherter Wert: fail-safe
+    return detectBrowserLanguage();
   } catch {
     return SOURCE_LANGUAGE;
   }
