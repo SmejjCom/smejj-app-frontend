@@ -1,7 +1,7 @@
 import { STORAGE_KEYS } from "./config.js";
 import { initServerSessionControls, fetchAuthenticatedUser, logoutCurrentSession } from "./account-sessions.js?v=3";
 import { languageOptionsMarkup } from "./language-options.js?v=1";
-import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2";
+import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const SAFE_EXPORT_KEYS = [STORAGE_KEYS.profile, STORAGE_KEYS.settings, STORAGE_KEYS.session, STORAGE_KEYS.model];
@@ -80,7 +80,7 @@ function hydrate(view) {
   const settings = read(STORAGE_KEYS.settings);
   view.querySelector("#profileName").value = profile.name || "";
   view.querySelector("#profileEmail").value = profile.email || "";
-  view.querySelector("#language").value = settings.language || "de";
+  view.querySelector("#language").value = settings.language || uiLanguage();
   view.querySelector("#mode").value = settings.mode || "safe";
   const consent = read(CONSENT_KEY);
   view.querySelector("#privacyMemory").checked = consent.memory === true;

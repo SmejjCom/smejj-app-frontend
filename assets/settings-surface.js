@@ -2,7 +2,7 @@ import { STORAGE_KEYS } from "./config.js";
 import { initSettingsRuntime } from "./settings-runtime.js?v=3";
 import { initClineProviderSurface } from "./provider-settings.js?v=1";
 import { LANGUAGE_OPTIONS } from "./language-options.js?v=1";
-import { t, loadUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2";
+import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
@@ -46,6 +46,11 @@ export function initSettingsSurface() {
   // Synchron rendern: der i18n-Sprachcache macht t() sofort einsatzbereit,
   // damit app.js-Boot-Bindings die gerenderten Elemente vorfinden.
   render(view);
+  // Erstbesuch ohne Cache (z. B. Browser-Sprache erkannt): nach dem frischen
+  // Laden der Sprachdatei einmalig neu rendern, falls sich die Sprache aendert.
+  loadUiLanguage(savedUiLanguage()).then((language) => {
+    if (view.getAttribute("lang") !== language) render(view);
+  });
 }
 
 // Rendert die komplette Oberflaeche in der aktiven UI-Sprache.
@@ -166,7 +171,7 @@ function save(view, message) {
 }
 
 function readSettings() {
-  try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "{}") }; }
+  try { return { ...DEFAULTS, language: savedUiLanguage(), ...JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "{}") }; }
   catch { return { ...DEFAULTS }; }
 }
 
