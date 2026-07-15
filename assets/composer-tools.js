@@ -381,12 +381,17 @@ function waitForAssistantReply(knownEntries) {
     return;
   }
   clearVoiceTimers();
+  // Text der neuen Antwort — leer, solange der Server noch arbeitet (z. B. Websuche).
+  const replyText = () => {
+    const entries = document.querySelectorAll("#startLog .entry.assistant");
+    if (entries.length <= knownEntries) return "";
+    const latest = entries[entries.length - 1];
+    return latest ? latest.textContent.trim() : "";
+  };
   const finish = () => {
     if (!state.voiceModeActive) return;
     clearVoiceTimers();
-    const entries = document.querySelectorAll("#startLog .entry.assistant");
-    const latest = entries[entries.length - 1];
-    const reply = latest && entries.length > knownEntries ? latest.textContent.trim() : "";
+    const reply = replyText();
     if (!reply) {
       setVoiceModeStatus("listening", "Keine Antwort erhalten — ich hoere weiter zu.");
       voiceModeListen();
@@ -401,12 +406,17 @@ function waitForAssistantReply(knownEntries) {
   };
   const scheduleSettle = () => {
     clearTimeout(state.voiceSettleTimer);
-    state.voiceSettleTimer = setTimeout(finish, 1400);
+    state.voiceSettleTimer = setTimeout(() => {
+      // Das Antwort-Element entsteht sofort, bleibt aber leer bis der Server liefert.
+      // Erst abschliessen, wenn wirklich Text da ist — sonst weiter warten.
+      if (!replyText()) return;
+      finish();
+    }, 1400);
   };
   state.voiceObserver = new MutationObserver(scheduleSettle);
   state.voiceObserver.observe(log, { childList: true, subtree: true, characterData: true });
   scheduleSettle();
-  state.voiceTimeoutTimer = setTimeout(finish, 25000);
+  state.voiceTimeoutTimer = setTimeout(finish, 45000);
 }
 
 function openVoiceMode() {
