@@ -12,6 +12,11 @@ const CURSOR_ICON = "/icons/maus-cursor.png";
 const BASE_STEP_MS = 1400;
 const TYPE_CHAR_MS = 45;
 const TYPE_MAX_MS = 2500;
+// Stufe B (freigegeben 2026-07-15): Live-Modus pollt den vom Worker pro Schritt
+// geschriebenen Status aus der Capsule. Kein Streaming, kein neuer Dienst —
+// nur Lesen ueber den bestehenden auth-gated Presign-Leseweg.
+const LIVE_POLL_MS = 1500;
+const LIVE_MAX_IDLE_MS = 180000;
 
 // --- pure Helfer (auch ohne DOM nutzbar/testbar) -----------------------------
 
@@ -240,6 +245,108 @@ async function loadRun({ capsuleRef, planId, runId }) {
   return { capsuleRef: ref, planId: plan, protocol, shots };
 }
 
+// --- Live-Modus (Stufe B) ------------------------------------------------------
+
+// Liest live/status.json der Capsule. Rueckgabe null = (noch) kein Live-Status
+// (z. B. Lauf laeuft nicht oder Worker hat noch nichts geschrieben).
+export async function fetchLiveStatus(prefix, { presign = presignDownload, fetchImpl = fetch } = {}) {
+  try {
+    const url = await presign(`${prefix}/live/status.json`);
+    const response = await fetchImpl(url, { cache: "no-store" });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+// Aus dem Live-Status einen Schritt-Eintrag bauen, den der Player wie einen
+// Aktionsprotokoll-Eintrag anzeigen kann.
+export function liveStatusToEntry(status) {
+  if (!status?.step) return null;
+  return {
+    index: status.step.index,
+    id: status.step.id,
+    action: status.step.action,
+    params: status.step.params,
+    ok: status.step.ok,
+    error: status.step.error ?? undefined,
+    durationMs: status.step.durationMs ?? undefined
+  };
+}
+
+async function loadLiveShot(prefix, name) {
+  try {
+    const bytes = await gunzipBytes(await fetchObject(`${prefix}/live/shots/${name}.png.gz`));
+    return URL.createObjectURL(new Blob([bytes], { type: "image/png" }));
+  } catch {
+    return "";
+  }
+}
+
+function renderLiveStep(status) {
+  const entry = liveStatusToEntry(status);
+  const total = status.stepTotal || "?";
+  const index = Number.isFinite(status.stepIndex) ? status.stepIndex + 1 : "?";
+  refs.counter.textContent = `Schritt ${index}/${total}`;
+  refs.label.textContent = entry ? stepLabel(entry) : "Lauf startet ...";
+  refs.label.classList.toggle("is-error", entry?.ok === false);
+  refs.typed.textContent = entry?.action === "type" ? String(entry.params?.text || "") : "";
+  if (entry) moveCursor(cursorTarget(entry, state.cursorPos));
+  if (entry && isClickLike(entry.action)) pulseOnce();
+}
+
+async function livePoll(prefix, capsuleRef, planId) {
+  const token = ++state.playToken;
+  state.live = true;
+  refs.stageWrap.classList.add("is-active");
+  refs.cursor.classList.remove("is-hidden");
+  setMessage("Live: warte auf den Lauf ...", "ok");
+  let lastSeen = -1;
+  let lastChangeAt = Date.now();
+  let shownShot = "";
+
+  while (state.live && token === state.playToken) {
+    const status = await fetchLiveStatus(prefix);
+    if (status) {
+      if (status.stepIndex !== lastSeen) {
+        lastSeen = status.stepIndex;
+        lastChangeAt = Date.now();
+        renderLiveStep(status);
+        setMessage(`Live: ${capsuleRef} / ${planId} — Lauf läuft, du schaust zu.`, "ok");
+      }
+      const shotName = status.step?.action === "screenshot" ? status.step?.params?.name : "";
+      if (shotName && shotName !== shownShot) {
+        const url = await loadLiveShot(prefix, shotName);
+        if (url) {
+          refs.shot.src = url;
+          refs.shot.dataset.name = shotName;
+          refs.shot.style.display = "block";
+          refs.stageEmpty.style.display = "none";
+          shownShot = shotName;
+        }
+      }
+      if (status.finished) {
+        setMessage("Lauf beendet — lade die vollständige Wiedergabe ...", "ok");
+        state.live = false;
+        await onLoadRun(null, { silent: true });
+        return;
+      }
+    }
+    if (Date.now() - lastChangeAt > LIVE_MAX_IDLE_MS) {
+      state.live = false;
+      setMessage("Live-Ansicht beendet (kein Fortschritt). Lade vorhandene Wiedergabe ...", "error");
+      await onLoadRun(null, { silent: true });
+      return;
+    }
+    await sleep(LIVE_POLL_MS);
+  }
+}
+
+function stopLive() {
+  state.live = false;
+}
+
 // --- Player / DOM --------------------------------------------------------------
 
 const state = {
@@ -249,7 +356,9 @@ const state = {
   playing: false,
   speed: 1,
   playToken: 0,
-  cursorPos: { x: 50, y: 45 }
+  cursorPos: { x: 50, y: 45 },
+  // Stufe B: true, solange die Live-Ansicht pollt.
+  live: false
 };
 
 const refs = {};
@@ -380,14 +489,15 @@ function goTo(index) {
   renderStep(token);
 }
 
-async function onLoadRun(event) {
+async function onLoadRun(event, { silent = false } = {}) {
   event?.preventDefault?.();
   pause();
+  stopLive();
   const capsuleRef = refs.capsuleInput.value.trim();
   const planId = refs.planInput.value.trim();
   const runId = refs.runInput.value.trim();
   refs.loadButton.disabled = true;
-  setMessage("Lade Aktionsprotokoll + Screenshots von IDrive e2 ...");
+  if (!silent) setMessage("Lade Aktionsprotokoll + Screenshots von IDrive e2 ...");
   try {
     if (state.run) state.run.shots.forEach((shot) => URL.revokeObjectURL(shot.url));
     const run = await loadRun({ capsuleRef, planId, runId });
@@ -411,12 +521,34 @@ async function onLoadRun(event) {
   }
 }
 
+// Live mitschauen: pollt den Lauf-Fortschritt und schaltet am Ende automatisch
+// auf die vollstaendige Wiedergabe um.
+async function onWatchLive(event) {
+  event?.preventDefault?.();
+  pause();
+  const capsuleRef = refs.capsuleInput.value.trim();
+  const planId = refs.planInput.value.trim();
+  if (!capsuleRef || !planId) {
+    setMessage("Für Live bitte capsuleRef + planId angeben.", "error");
+    return;
+  }
+  if (state.run) state.run.shots.forEach((shot) => URL.revokeObjectURL(shot.url));
+  state.run = null;
+  state.steps = [];
+  refs.stepList.textContent = "";
+  refs.shot.style.display = "none";
+  refs.shot.dataset.name = "";
+  refs.stageEmpty.style.display = "grid";
+  await livePoll(resultPrefix(capsuleRef, planId), capsuleRef, planId);
+}
+
 function init() {
   refs.form = $("replayForm");
   refs.capsuleInput = $("replayCapsuleRef");
   refs.planInput = $("replayPlanId");
   refs.runInput = $("replayRunId");
   refs.loadButton = $("replayLoadButton");
+  refs.liveButton = $("replayLiveButton");
   refs.message = $("replayMessage");
   refs.stageWrap = $("replayStageWrap");
   refs.stage = $("replayStage");
@@ -433,7 +565,9 @@ function init() {
 
   refs.cursor.src = CURSOR_ICON;
   refs.form.addEventListener("submit", onLoadRun);
+  refs.liveButton?.addEventListener("click", onWatchLive);
   refs.playButton.addEventListener("click", () => {
+    stopLive();
     if (state.playing) { pause(); return; }
     if (!state.steps.length) return;
     if (state.index >= state.steps.length - 1) state.index = 0;
@@ -449,7 +583,9 @@ function init() {
   if (params.get("capsuleRef")) refs.capsuleInput.value = params.get("capsuleRef");
   if (params.get("planId")) refs.planInput.value = params.get("planId");
   if (params.get("runId")) refs.runInput.value = params.get("runId");
-  if ((refs.capsuleInput.value && refs.planInput.value) || refs.runInput.value) onLoadRun();
+  // ?live=1 startet direkt die Live-Ansicht (Stufe B).
+  if (params.get("live") === "1" && refs.capsuleInput.value && refs.planInput.value) onWatchLive();
+  else if ((refs.capsuleInput.value && refs.planInput.value) || refs.runInput.value) onLoadRun();
 }
 
 // In Node-Tests gibt es kein document — dort werden nur die puren Helfer importiert.
