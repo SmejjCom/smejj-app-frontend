@@ -8,7 +8,7 @@
     <!-- Additive Route (Stufe A, 2026-07-15): sichtbare Wiedergabe eines
          Maus-Engine-Laufs. Bewusst OHNE eigene Favicon-Links (Favicon-Lock);
          der Browser nutzt automatisch /favicon.ico. Startseite unberuehrt. -->
-    <link rel="stylesheet" href="/assets/maus-replay.css?v=maus-replay-20260715-2">
+    <link rel="stylesheet" href="/assets/maus-replay.css?v=maus-replay-20260715-3">
   </head>
   <body class="maus-replay-body">
     <main class="replay-shell">
@@ -29,6 +29,7 @@
           <input id="replayRunId" name="runId" placeholder="alternativ: runId eines Async-Laufs">
         </label>
         <button id="replayLoadButton" class="primary" type="submit">Lauf laden</button>
+        <button id="replayLiveButton" type="button" title="Laufenden Lauf live mitverfolgen">● Live mitschauen</button>
       </form>
 
       <p id="replayMessage" class="replay-message" aria-live="polite"></p>
@@ -64,6 +65,6 @@
         <div id="replayStepList" class="replay-steps" aria-label="Schrittliste"></div>
       </section>
     </main>
-    <script type="module" src="/assets/maus-replay.js?v=maus-replay-20260715-2"></script>
+    <script type="module" src="/assets/maus-replay.js?v=maus-replay-20260715-3"></script>
   </body>
 </html>
