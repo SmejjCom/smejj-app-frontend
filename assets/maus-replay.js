@@ -125,11 +125,54 @@ export function stageShotIndex(steps, stepIndex, shotNames) {
 
 // --- Laden + Entpacken --------------------------------------------------------
 
+// Auth identisch zum Rest der App (chatClient/provider-settings): Bearer-Token
+// aus sessionStorage, mit Fallback auf den Haupt-App-Login-Token in localStorage
+// und zuletzt dem /api/auth/session-token-Endpunkt. Cross-Origin braucht den
+// Bearer-Header; reines Cookie reicht nicht. Fail-closed: ohne Token kein Header.
+const API_TOKEN_KEY = "smejj.apiToken.v1";
+const TOKEN_PATTERN = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+
+function recoverLocalToken() {
+  let token = "";
+  try {
+    token = String(globalThis.localStorage?.getItem("smejj.auth.accessToken.v1") || "");
+  } catch {
+    token = "";
+  }
+  if (!TOKEN_PATTERN.test(token)) return "";
+  try { globalThis.sessionStorage?.setItem(API_TOKEN_KEY, token); } catch { /* ignore */ }
+  return token;
+}
+
+async function recoverSessionToken() {
+  const response = await fetch(`${API_ORIGIN}/api/auth/session-token`, { credentials: "include" }).catch(() => null);
+  if (!response || !response.ok) return "";
+  const payload = await response.json().catch(() => ({}));
+  const token = String(payload.accessToken || "");
+  if (TOKEN_PATTERN.test(token)) {
+    try { globalThis.sessionStorage?.setItem(API_TOKEN_KEY, token); } catch { /* ignore */ }
+    return token;
+  }
+  return "";
+}
+
+async function resolveApiToken() {
+  let token = "";
+  try { token = globalThis.sessionStorage?.getItem(API_TOKEN_KEY) || ""; } catch { token = ""; }
+  if (!token) token = recoverLocalToken();
+  if (!token) token = await recoverSessionToken();
+  return token;
+}
+
 async function presignDownload(key) {
+  const token = await resolveApiToken();
   const response = await fetch(`${API_ORIGIN}${PRESIGN_PATH}`, {
     method: "POST",
     credentials: "include",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
     body: JSON.stringify({ operation: "download", key })
   });
   if (response.status === 401 || response.status === 403) {
@@ -158,7 +201,11 @@ async function gunzipBytes(response) {
 }
 
 async function resolveRunViaRunId(runId) {
-  const response = await fetch(`${API_ORIGIN}${MAUS_RUN_PATH}?runId=${encodeURIComponent(runId)}`, { credentials: "include" });
+  const token = await resolveApiToken();
+  const response = await fetch(`${API_ORIGIN}${MAUS_RUN_PATH}?runId=${encodeURIComponent(runId)}`, {
+    credentials: "include",
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  });
   if (response.status === 401) throw new Error("Bitte zuerst auf smejj.com anmelden.");
   const data = await response.json().catch(() => ({}));
   const result = data.result || data.run || data;
