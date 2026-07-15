@@ -1,5 +1,5 @@
 import { API_ORIGIN, CLIENT_ROUTES } from "../config.js";
-import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "../i18n/ui.js?v=2";
+import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "../i18n/ui.js?v=3";
 
 // Cross-Origin-Auth: smejj.com und der Control-Server sind verschiedene Sites.
 // Session-Cookies (SameSite=Lax) werden cross-site nicht gesendet und CORS
