@@ -4,7 +4,15 @@
 import { showToast } from "./components.js";
 
 const $ = (selector) => document.querySelector(selector);
-const SPEECH_LANG = "de-DE";
+// Sprache dynamisch aus dem lang-Attribut der Seite (Fallback de-DE).
+const LANG_MAP = {
+    de: "de-DE", en: "en-US", fr: "fr-FR", es: "es-ES", it: "it-IT",
+    pt: "pt-PT", ru: "ru-RU", tr: "tr-TR", ja: "ja-JP", ko: "ko-KR",
+    zh: "zh-CN", hi: "hi-IN", ar: "ar-SA", id: "id-ID", bn: "bn-BD"
+};
+const PAGE_LANG = typeof document !== "undefined" ? (document.documentElement.lang || "de") : "de";
+const SPEECH_LANG = PAGE_LANG.includes("-") ? PAGE_LANG : (LANG_MAP[PAGE_LANG.toLowerCase()] || "de-DE");
+const SPEECH_BASE = SPEECH_LANG.split("-")[0];
 const RecognitionCtor = typeof window !== "undefined"
   ? (window.SpeechRecognition || window.webkitSpeechRecognition || null)
     : null;
@@ -37,7 +45,7 @@ function synthesisSupported() {
 function pickGermanVoice() {
     const voices = window.speechSynthesis.getVoices() || [];
     return voices.find((voice) => voice.lang === SPEECH_LANG)
-      || voices.find((voice) => (voice.lang || "").startsWith("de"))
+      || voices.find((voice) => (voice.lang || "").startsWith(SPEECH_BASE))
       || null;
 }
 
@@ -347,7 +355,11 @@ function waitForAssistantReply(knownEntries) {
                                         setVoiceModeStatus("muted", "Mikrofon aus");
                                         return;
                             }
-                            voiceModeListen();
+                            // Kurze Sperrfrist gegen Echo: das Ende der eigenen Sprachausgabe darf
+                    // nicht als Nutzereingabe aufgenommen werden.
+                    setTimeout(() => {
+                                if (state.voiceModeActive && !state.voiceMuted) voiceModeListen();
+                    }, 450);
                   }
           });
     };
@@ -358,7 +370,8 @@ function waitForAssistantReply(knownEntries) {
     state.voiceObserver = new MutationObserver(scheduleSettle);
     state.voiceObserver.observe(log, { childList: true, subtree: true, characterData: true });
     scheduleSettle();
-    state.voiceTimeoutTimer = setTimeout(finish, 25000);
+    // 60s statt 25s: lange, gestreamte Antworten nicht vorzeitig abbrechen.
+  state.voiceTimeoutTimer = setTimeout(finish, 60000);
 }
 
 function toggleVoiceMute() {
