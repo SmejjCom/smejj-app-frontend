@@ -5,8 +5,8 @@ import { showToast } from "./components.js";
 
 const $ = (selector) => document.querySelector(selector);
 const SPEECH_LANG = "de-DE";
-// Sprachmodus-Qualitaetsgate: unsichere Erkennungen werden nicht an das Modell gesendet.
-const VOICE_MIN_CONFIDENCE = 0.6;
+// Sprachmodus-Qualitaetsgate: Ein-Wort-Fragmente werden nicht an das Modell gesendet.
+// Kein Konfidenz-Gate: Chrome liefert fuer Deutsch real 0.4-0.6 und blockierte echte Eingaben.
 const VOICE_MIN_WORDS = 2;
 const RecognitionCtor = typeof window !== "undefined"
   ? (window.SpeechRecognition || window.webkitSpeechRecognition || null)
@@ -292,10 +292,9 @@ function closeVoiceMode() {
   if (overlay) overlay.hidden = true;
 }
 
-function voiceTranscriptIsReliable(text, confidence) {
+function voiceTranscriptIsReliable(text) {
   const words = String(text || "").split(/\s+/).filter(Boolean);
   if (words.length < VOICE_MIN_WORDS) return false;
-  if (confidence > 0 && confidence < VOICE_MIN_CONFIDENCE) return false;
   return true;
 }
 
@@ -309,20 +308,11 @@ function voiceModeListen() {
   recognition.interimResults = true;
   state.voiceRecognition = recognition;
   let finalTranscript = "";
-  let confidenceSum = 0;
-  let confidenceCount = 0;
   recognition.onresult = (event) => {
     let interim = "";
     for (let index = event.resultIndex; index < event.results.length; index += 1) {
       const result = event.results[index];
-      if (result.isFinal) {
-        finalTranscript += result[0]?.transcript || "";
-        const confidence = Number(result[0]?.confidence);
-        if (Number.isFinite(confidence) && confidence > 0) {
-          confidenceSum += confidence;
-          confidenceCount += 1;
-        }
-      }
+      if (result.isFinal) finalTranscript += result[0]?.transcript || "";
       else interim += result[0]?.transcript || "";
     }
     setVoiceModeTranscript((finalTranscript + interim).trim());
@@ -341,8 +331,7 @@ function voiceModeListen() {
       voiceModeListen();
       return;
     }
-    const confidence = confidenceCount ? confidenceSum / confidenceCount : 0;
-    if (!voiceTranscriptIsReliable(task, confidence)) {
+    if (!voiceTranscriptIsReliable(task)) {
       // Unsichere Erkennung nicht an das Modell senden — lieber nachfragen.
       setVoiceModeTranscript(task);
       setVoiceModeStatus("listening", "Ich habe dich nicht sicher verstanden — bitte wiederhole das.");
