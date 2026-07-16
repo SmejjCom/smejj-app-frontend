@@ -1,7 +1,10 @@
 /* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
-   und Schliessen-X (ganz oben rechts). Ohne Hintergrund, schmal, leicht fett;
-   besetzt keinen Platz. Nur auf Views ausser #start; die Startseite bleibt
-   unveraendert (Design-Lock). */
+   und Schliessen-X (ganz oben rechts). Ohne Hintergrund, transparent, schmal,
+   leicht fett; besetzt keinen Platz. Nur auf Views ausser #start; die
+   Startseite bleibt unveraendert (Design-Lock).
+   Hinweis: !important ist hier bewusst gesetzt, weil generische Button-Regeln
+   der Premium-Flaechen (app-surfaces/settings-surface) sonst Hintergrund,
+   Rahmen, Hoehe und SVG-Groesse ueberschreiben. */
 
 .view.has-view-chrome {
   position: relative;
@@ -20,35 +23,46 @@
   pointer-events: none;
 }
 
-.view-chrome button {
+.view .view-chrome button,
+.premium-view .view-chrome button {
   pointer-events: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 0;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
   border-radius: 8px;
-  background: transparent;
+  background: transparent !important;
+  box-shadow: none !important;
   color: #4a4a43;
   cursor: pointer;
   opacity: 0.85;
   transition: opacity 0.15s ease;
 }
 
-.view-chrome button:hover {
+.view .view-chrome button:hover,
+.premium-view .view-chrome button:hover {
   opacity: 1;
+  background: transparent !important;
 }
 
-.view-chrome button:focus-visible {
+.view .view-chrome button:focus-visible,
+.premium-view .view-chrome button:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 
-.view-chrome svg {
-  width: 20px;
-  height: 20px;
+.view .view-chrome button svg,
+.premium-view .view-chrome button svg {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  flex: none !important;
 }
 
 /* Dunkle Premium-Views: helle Icons ueber die vorhandenen Premium-Variablen. */
