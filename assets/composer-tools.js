@@ -23,6 +23,10 @@ const state = {
       dictationBaseText: "",
       voiceModeActive: false,
       voiceMuted: false,
+      voiceFallback: false,
+      voiceFailStreak: 0,
+      voiceListenStartedAt: 0,
+      synthesisUnlocked: false,
       voiceRecognition: null,
       voiceObserver: null,
       voiceSettleTimer: null,
@@ -63,11 +67,32 @@ function speak(text, { onend, onstart } = {}) {
       utterance.onend = () => onend?.();
       utterance.onerror = () => onend?.();
       window.speechSynthesis.speak(utterance);
+      try {
+              // iOS/Safari pausiert die Synthese manchmal direkt nach speak() — resume ist dort Pflicht.
+              window.speechSynthesis.resume();
+      } catch {
+              // resume ist nur fuer den Safari-Suspend-Fall noetig.
+      }
       return utterance;
 }
 
 function stopSpeaking() {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+}
+
+// iOS/Safari: Die Sprachausgabe muss einmal innerhalb einer echten Nutzergeste
+// gestartet werden, sonst bleiben spaetere automatische Antworten stumm.
+// Eine leere Utterance mit Lautstaerke 0 ist unhoerbar und schaltet sie frei.
+function unlockSpeechSynthesis() {
+      if (state.synthesisUnlocked || !("speechSynthesis" in window)) return;
+      state.synthesisUnlocked = true;
+      try {
+              const utterance = new SpeechSynthesisUtterance(" ");
+              utterance.volume = 0;
+              window.speechSynthesis.speak(utterance);
+      } catch {
+              // Der Unlock ist optional — Chrome/Edge funktionieren auch ohne.
+      }
 }
 
 function composerInput() {
@@ -251,6 +276,8 @@ function syncVoiceMicVisual() {
 function closeVoiceMode() {
       state.voiceModeActive = false;
       state.voiceMuted = false;
+      state.voiceFallback = false;
+      state.voiceFailStreak = 0;
       clearVoiceTimers();
       try {
               state.voiceRecognition?.abort?.();
@@ -265,8 +292,32 @@ function closeVoiceMode() {
       if (overlay) overlay.hidden = true;
 }
 
+// Diktat-Fallback (z. B. iOS/Safari): Die Spracherkennung ist hier nicht nutzbar —
+// das Overlay bleibt offen, Fragen kommen ueber das Eingabefeld unten,
+// die Antworten werden weiterhin vorgelesen.
+function enterVoiceFallback(message) {
+      state.voiceFallback = true;
+      try {
+              state.voiceRecognition?.abort?.();
+      } catch {
+              // Recognition war bereits gestoppt.
+      }
+      state.voiceRecognition = null;
+      setVoiceModeStatus("muted", message || "Spracherkennung nicht verfuegbar — Frage unten eintippen.");
+      const overlay = $("#voiceModeOverlay");
+      if (overlay) overlay.dataset.muted = "true";
+      const mic = $("#voiceModeMic");
+      if (mic) {
+              mic.classList.add("is-muted");
+              mic.title = "Spracherkennung nicht verfuegbar";
+      }
+      const hint = document.querySelector("#voiceModeOverlay .voice-mode-hint");
+      if (hint) hint.textContent = "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.";
+      $("#voiceModeInput")?.focus();
+}
+
 function voiceModeListen() {
-      if (!state.voiceModeActive || state.voiceMuted) return;
+      if (!state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
       setVoiceModeStatus("listening", "Ich hoere zu ...");
       setVoiceModeTranscript("");
       const recognition = new RecognitionCtor();
@@ -286,26 +337,39 @@ function voiceModeListen() {
       };
       recognition.onerror = (event) => {
               if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-                        closeVoiceMode();
                         showToast("Mikrofon-Zugriff verweigert. Bitte in den Browser-Einstellungen erlauben.", "warn");
+                        enterVoiceFallback("Mikrofon nicht erlaubt — Frage unten eintippen.");
               }
       };
       recognition.onend = () => {
-              if (!state.voiceModeActive) return;
+              if (!state.voiceModeActive || state.voiceFallback) return;
               const task = finalTranscript.trim();
               if (task) {
+                        state.voiceFailStreak = 0;
                         // Auch bei Stummschaltung: bereits Gesagtes wird noch gesendet (wie ChatGPT).
                 voiceModeSend(task);
                         return;
               }
               if (state.voiceMuted) return;
+              // Endet die Erkennung mehrfach sofort ohne Ergebnis (typisch iOS/Safari),
+              // nicht endlos neu starten, sondern in den Diktat-Fallback wechseln.
+              if (Date.now() - state.voiceListenStartedAt < 1500) {
+                        state.voiceFailStreak += 1;
+                        if (state.voiceFailStreak >= 3) {
+                                    enterVoiceFallback("Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.");
+                                    return;
+                        }
+              } else {
+                        state.voiceFailStreak = 0;
+              }
               // Nichts verstanden — weiter zuhoeren.
               voiceModeListen();
       };
+      state.voiceListenStartedAt = Date.now();
       try {
               recognition.start();
       } catch {
-              closeVoiceMode();
+              enterVoiceFallback("Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.");
       }
 }
 
@@ -348,6 +412,10 @@ function waitForAssistantReply(knownEntries) {
               const latest = entries[entries.length - 1];
               const reply = latest && entries.length > knownEntries ? latest.textContent.trim() : "";
               if (!reply) {
+                        if (state.voiceFallback) {
+                                    setVoiceModeStatus("muted", "Keine Antwort erhalten — Frage unten eintippen.");
+                                    return;
+                        }
                         if (state.voiceMuted) {
                                     setVoiceModeStatus("muted", "Mikrofon aus");
                                     return;
@@ -360,6 +428,10 @@ function waitForAssistantReply(knownEntries) {
               speak(reply, {
                         onend: () => {
                                     if (!state.voiceModeActive) return;
+                                    if (state.voiceFallback) {
+                                                  setVoiceModeStatus("muted", "Frage unten eintippen — die Antwort wird vorgelesen.");
+                                                  return;
+                                    }
                                     if (state.voiceMuted) {
                                                   setVoiceModeStatus("muted", "Mikrofon aus");
                                                   return;
@@ -386,6 +458,10 @@ function waitForAssistantReply(knownEntries) {
 
 function toggleVoiceMute() {
       if (!state.voiceModeActive) return;
+      if (state.voiceFallback) {
+              showToast("Spracherkennung ist auf diesem Geraet nicht verfuegbar — bitte das Eingabefeld nutzen.");
+              return;
+      }
       state.voiceMuted = !state.voiceMuted;
       syncVoiceMicVisual();
       if (state.voiceMuted) {
@@ -411,16 +487,30 @@ function toggleVoiceMute() {
 }
 
 function openVoiceMode() {
-      if (!speechSupported() || !synthesisSupported()) return;
+      if (!synthesisSupported()) return;
       if (state.dictationActive) stopDictation();
       const overlay = $("#voiceModeOverlay");
       if (!overlay) return;
       state.voiceModeActive = true;
       state.voiceMuted = false;
+      state.voiceFallback = false;
+      state.voiceFailStreak = 0;
       syncVoiceMicVisual();
+      // Innerhalb der Klick-Geste: Sprachausgabe fuer iOS/Safari freischalten.
+      unlockSpeechSynthesis();
+      const hint = overlay.querySelector(".voice-mode-hint");
+      if (hint) hint.textContent = "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.";
+      const mic = $("#voiceModeMic");
+      if (mic) mic.title = "Stummschalten";
       const typedInput = $("#voiceModeInput");
       if (typedInput) typedInput.value = "";
       overlay.hidden = false;
+      if (!RecognitionCtor) {
+              // iOS/Safari ohne Web-Speech-Erkennung: Overlay im Diktat-Fallback oeffnen
+              // statt den Sprachmodus komplett zu verweigern.
+              enterVoiceFallback("Spracherkennung ist auf diesem Geraet nicht verfuegbar — Frage unten eintippen.");
+              return;
+      }
       voiceModeListen();
 }
 
