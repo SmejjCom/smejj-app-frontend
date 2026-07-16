@@ -31,6 +31,8 @@ const state = {
       voiceObserver: null,
       voiceSettleTimer: null,
       voiceTimeoutTimer: null,
+      bargeRecognition: null,
+      bargeConfirmed: false,
       speakerUtterance: null
 };
 
@@ -279,6 +281,7 @@ function closeVoiceMode() {
       state.voiceFallback = false;
       state.voiceFailStreak = 0;
       clearVoiceTimers();
+      stopBargeListener();
       try {
               state.voiceRecognition?.abort?.();
               state.voiceRecognition?.stop?.();
@@ -297,6 +300,7 @@ function closeVoiceMode() {
 // die Antworten werden weiterhin vorgelesen.
 function enterVoiceFallback(message) {
       state.voiceFallback = true;
+      stopBargeListener();
       try {
               state.voiceRecognition?.abort?.();
       } catch {
@@ -316,8 +320,130 @@ function enterVoiceFallback(message) {
       $("#voiceModeInput")?.focus();
 }
 
+// --- Barge-in (Reinsprechen, waehrend die Antwort vorgelesen wird) ------------
+// Waehrend "Ich spreche ..." laeuft eine zweite Erkennung weiter. Ein Text-Echo-
+// Filter (Vergleich mit der vorgelesenen Antwort) ersetzt die fehlende Audio-AEC:
+// Was der Lautsprecher selbst sagt, zaehlt nicht als Nutzereingabe. Erst ab
+// BARGE_MIN_WORDS erkannten Nicht-Echo-Woertern wird die Ausgabe abgebrochen
+// und das Gehoerte als neue Frage genommen. Ohne Erkennung (iOS-Fallback),
+// bei Stummschaltung oder Start-Fehler bleibt das bisherige Verhalten bestehen.
+
+const BARGE_MIN_WORDS = 3;
+
+function normalizeSpeechText(text) {
+      return (text || "")
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s]/gu, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+// Echo-Heuristik: Der gehoerte Text gilt als eigenes Lautsprecher-Echo, wenn er
+// (nahezu) vollstaendig in der gerade vorgelesenen Antwort vorkommt.
+function isLikelyEcho(heardText, spokenText) {
+      const heard = normalizeSpeechText(heardText);
+      if (!heard) return true;
+      const spoken = normalizeSpeechText(spokenText);
+      if (spoken.includes(heard)) return true;
+      const spokenWords = new Set(spoken.split(" "));
+      const heardWords = heard.split(" ");
+      const matches = heardWords.filter((word) => spokenWords.has(word)).length;
+      return matches / heardWords.length >= 0.6;
+}
+
+function stopBargeListener() {
+      const recognition = state.bargeRecognition;
+      state.bargeRecognition = null;
+      state.bargeConfirmed = false;
+      try {
+              recognition?.abort?.();
+      } catch {
+              // Recognition war bereits gestoppt.
+      }
+}
+
+function startBargeListener(spokenText) {
+      if (!RecognitionCtor || !state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
+      stopBargeListener();
+      const recognition = new RecognitionCtor();
+      recognition.lang = SPEECH_LANG;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      state.bargeRecognition = recognition;
+      let finalTranscript = "";
+      recognition.onresult = (event) => {
+              if (state.bargeRecognition !== recognition) return;
+              let interim = "";
+              let sawFinal = false;
+              for (let index = event.resultIndex; index < event.results.length; index += 1) {
+                        const result = event.results[index];
+                        if (result.isFinal) {
+                                    finalTranscript += result[0]?.transcript || "";
+                                    sawFinal = true;
+                        } else {
+                                    interim += result[0]?.transcript || "";
+                        }
+              }
+              const heard = `${finalTranscript} ${interim}`.trim();
+              if (!state.bargeConfirmed) {
+                        const words = normalizeSpeechText(heard).split(" ").filter(Boolean);
+                        if (words.length < BARGE_MIN_WORDS) return;
+                        if (isLikelyEcho(heard, spokenText)) return;
+                        // Echte Unterbrechung: Vorlesen sofort stoppen, weiter zuhoeren
+                        // bis zur Sprechpause, dann als neue Frage senden.
+                        state.bargeConfirmed = true;
+                        stopSpeaking();
+                        setVoiceModeStatus("listening", "Ich hoere zu ...");
+              }
+              setVoiceModeTranscript(heard);
+              // Nach der Unterbrechung beendet die erste finale Phrase die Aufnahme.
+              if (sawFinal) {
+                        try {
+                                  recognition.stop();
+                        } catch {
+                                  // Recognition war bereits gestoppt.
+                        }
+              }
+      };
+      recognition.onerror = () => {
+              // Barge-in ist optional — Fehler duerfen den Sprachmodus nicht stoeren.
+      };
+      recognition.onend = () => {
+              if (state.bargeRecognition !== recognition) return;
+              state.bargeRecognition = null;
+              if (!state.voiceModeActive || state.voiceMuted || state.voiceFallback) {
+                        state.bargeConfirmed = false;
+                        return;
+              }
+              if (state.bargeConfirmed) {
+                        state.bargeConfirmed = false;
+                        const task = finalTranscript.trim();
+                        if (task) {
+                                  voiceModeSend(task);
+                                  return;
+                        }
+                        // Unterbrochen, aber nichts Verwertbares verstanden — normal weiterhoeren.
+                        voiceModeListen();
+                        return;
+              }
+              // Chrome beendet die Erkennung nach Stille — solange noch vorgelesen wird, neu starten.
+              if ("speechSynthesis" in window && window.speechSynthesis.speaking) {
+                        startBargeListener(spokenText);
+              }
+      };
+      try {
+              recognition.start();
+      } catch {
+              // Kein paralleles Hoeren moeglich (z. B. iOS) — heutiges Verhalten bleibt.
+              state.bargeRecognition = null;
+      }
+}
+
 function voiceModeListen() {
       if (!state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
+      // Nur eine Erkennung gleichzeitig — ein noch laufender Barge-Listener wuerde
+      // recognition.start() scheitern lassen und faelschlich den Fallback ausloesen.
+      stopBargeListener();
       setVoiceModeStatus("listening", "Ich hoere zu ...");
       setVoiceModeTranscript("");
       const recognition = new RecognitionCtor();
@@ -380,6 +506,7 @@ function voiceModeSend(task) {
               closeVoiceMode();
               return;
       }
+      stopBargeListener();
       setVoiceModeStatus("thinking", "Einen Moment ...");
       setVoiceModeTranscript(task);
       const knownEntries = document.querySelectorAll("#startLog .entry.assistant").length;
@@ -426,8 +553,14 @@ function waitForAssistantReply(knownEntries) {
               }
               setVoiceModeStatus("speaking", "Ich spreche ...");
               speak(reply, {
+                        // Barge-in: Waehrend des Vorlesens weiterhoeren, damit Reinsprechen
+                        // die Ausgabe sofort abbricht (Echo-Filter siehe startBargeListener).
+                        onstart: () => startBargeListener(reply),
                         onend: () => {
                                     if (!state.voiceModeActive) return;
+                                    // Reinsprechen erkannt: Der Barge-Listener uebernimmt (hoert zu Ende und sendet).
+                                    if (state.bargeConfirmed) return;
+                                    stopBargeListener();
                                     if (state.voiceFallback) {
                                                   setVoiceModeStatus("muted", "Frage unten eintippen — die Antwort wird vorgelesen.");
                                                   return;
@@ -439,7 +572,7 @@ function waitForAssistantReply(knownEntries) {
                                     // Kurze Sperrfrist gegen Echo: das Ende der eigenen Sprachausgabe darf
                           // nicht als Nutzereingabe aufgenommen werden.
                           setTimeout(() => {
-                                        if (state.voiceModeActive && !state.voiceMuted) voiceModeListen();
+                                        if (state.voiceModeActive && !state.voiceMuted && !state.bargeConfirmed) voiceModeListen();
                           }, 450);
                         }
               });
@@ -465,6 +598,7 @@ function toggleVoiceMute() {
       state.voiceMuted = !state.voiceMuted;
       syncVoiceMicVisual();
       if (state.voiceMuted) {
+              stopBargeListener();
               try {
                         // stop() statt abort(): bereits Gesagtes wird noch abgeliefert und gesendet.
                 state.voiceRecognition?.stop?.();
