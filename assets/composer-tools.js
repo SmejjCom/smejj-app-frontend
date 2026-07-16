@@ -362,7 +362,7 @@ function stopBargeListener() {
       }
 }
 
-function startBargeListener(spokenText) {
+function startBargeListener(spokenText, failStreak = 0) {
       if (!RecognitionCtor || !state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
       stopBargeListener();
       const recognition = new RecognitionCtor();
@@ -370,6 +370,7 @@ function startBargeListener(spokenText) {
       recognition.continuous = true;
       recognition.interimResults = true;
       state.bargeRecognition = recognition;
+      const startedAt = Date.now();
       let finalTranscript = "";
       recognition.onresult = (event) => {
               if (state.bargeRecognition !== recognition) return;
@@ -427,9 +428,14 @@ function startBargeListener(spokenText) {
                         return;
               }
               // Chrome beendet die Erkennung nach Stille — solange noch vorgelesen wird, neu starten.
-              if ("speechSynthesis" in window && window.speechSynthesis.speaking) {
-                        startBargeListener(spokenText);
-              }
+              // Bremse wie beim Sprachmodus-Fail-Streak: endet die Erkennung 3x in Folge
+              // sofort (<1500 ms, z. B. Mikro entzogen), Barge-in fuer diese Antwort aufgeben —
+              // das Vorlesen und das normale Weiterhoeren danach bleiben unberuehrt.
+              if (!("speechSynthesis" in window) || !window.speechSynthesis.speaking) return;
+              const endedFast = Date.now() - startedAt < 1500;
+              const nextStreak = endedFast ? failStreak + 1 : 0;
+              if (nextStreak >= 3) return;
+              startBargeListener(spokenText, nextStreak);
       };
       try {
               recognition.start();
