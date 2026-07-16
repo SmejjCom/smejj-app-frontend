@@ -3,7 +3,7 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { runClientChat } from "/assets/ai/chatClient.js?v=3";
 import { Icons, closeModal, openModal, renderEmptyState, setButtonIcon, showToast } from "./components.js";
-import { initComposerTools } from "./composer-tools.js";
+import { initComposerTools } from "./composer-tools.js?v=voice-20260716";
 import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v3";
