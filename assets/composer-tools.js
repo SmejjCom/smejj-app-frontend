@@ -474,6 +474,11 @@ function voiceModeListen() {
               }
       };
       recognition.onend = () => {
+              // Nach abort() (z. B. getippte Frage) feuert onend trotzdem — nur die noch
+              // aktive Erkennung darf den Loop fortsetzen, sonst hoert sie parallel zum
+              // Denken/Vorlesen weiter und nimmt das eigene Echo als Frage auf.
+              if (state.voiceRecognition !== recognition) return;
+              state.voiceRecognition = null;
               if (!state.voiceModeActive || state.voiceFallback) return;
               const task = finalTranscript.trim();
               if (task) {
@@ -513,6 +518,14 @@ function voiceModeSend(task) {
               return;
       }
       stopBargeListener();
+      // Laufende Erkennung abloesen (abort -> onend wird durch den Identitaets-Guard ignoriert).
+      const activeRecognition = state.voiceRecognition;
+      state.voiceRecognition = null;
+      try {
+              activeRecognition?.abort?.();
+      } catch {
+              // Recognition war bereits gestoppt.
+      }
       setVoiceModeStatus("thinking", "Einen Moment ...");
       setVoiceModeTranscript(task);
       const knownEntries = document.querySelectorAll("#startLog .entry.assistant").length;
@@ -702,12 +715,8 @@ function bindVoiceMode() {
               const task = typedInput.value.trim();
               if (!task) return;
               typedInput.value = "";
-              try {
-                        state.voiceRecognition?.abort?.();
-              } catch {
-                        // Recognition war bereits gestoppt.
-              }
               stopSpeaking();
+              // voiceModeSend loest die laufende Erkennung selbst ab (Identitaets-Guard).
               voiceModeSend(task);
       });
       document.addEventListener("keydown", (event) => {
