@@ -374,6 +374,40 @@ function voiceModeSend(task) {
   waitForAssistantReply(knownEntries);
 }
 
+// --- Streaming-Sprachausgabe -------------------------------------------------
+
+// Ende des letzten vollstaendigen Satzes (0 = noch kein ganzer Satz vorhanden).
+function sentenceEnd(text) {
+  const pattern = /[.!?\u2026]["\u0027)\]]?(?=\s|$)/g;
+  let last = 0;
+  let match = null;
+  while ((match = pattern.exec(text)) !== null) last = match.index + match[0].length;
+  return last;
+}
+
+// Reiht Text in die Sprach-Warteschlange ein, ohne Laufendes abzubrechen.
+function queueSpeech(text) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = SPEECH_LANG;
+  const voice = pickGermanVoice();
+  if (voice) utterance.voice = voice;
+  window.speechSynthesis.speak(utterance);
+  return utterance;
+}
+
+// Ruft callback auf, sobald die Warteschlange leer gesprochen ist.
+function whenSpeechDone(callback) {
+  const timer = setInterval(() => {
+    if (!state.voiceModeActive) {
+      clearInterval(timer);
+      return;
+    }
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) return;
+    clearInterval(timer);
+    callback();
+  }, 200);
+}
+
 function waitForAssistantReply(knownEntries) {
   const log = $("#startLog");
   if (!log) {
@@ -381,6 +415,9 @@ function waitForAssistantReply(knownEntries) {
     return;
   }
   clearVoiceTimers();
+  window.speechSynthesis.cancel();
+  let spokenChars = 0;
+  let speakingAnnounced = false;
   // Text der neuen Antwort — leer, solange der Server noch arbeitet (z. B. Websuche).
   const replyText = () => {
     const entries = document.querySelectorAll("#startLog .entry.assistant");
@@ -388,20 +425,32 @@ function waitForAssistantReply(knownEntries) {
     const latest = entries[entries.length - 1];
     return latest ? latest.textContent.trim() : "";
   };
+  // Fertige Saetze sofort sprechen, waehrend der Rest noch streamt.
+  const flushSpeech = (speakRest) => {
+    const pending = replyText().slice(spokenChars);
+    if (!pending) return;
+    const cut = speakRest ? pending.length : sentenceEnd(pending);
+    if (cut <= 0) return;
+    const chunk = pending.slice(0, cut).trim();
+    spokenChars += cut;
+    if (!chunk) return;
+    if (!speakingAnnounced) {
+      speakingAnnounced = true;
+      setVoiceModeStatus("speaking", "Ich spreche ...");
+    }
+    queueSpeech(chunk);
+  };
   const finish = () => {
     if (!state.voiceModeActive) return;
     clearVoiceTimers();
-    const reply = replyText();
-    if (!reply) {
+    flushSpeech(true);
+    if (!replyText()) {
       setVoiceModeStatus("listening", "Keine Antwort erhalten — ich hoere weiter zu.");
       voiceModeListen();
       return;
     }
-    setVoiceModeStatus("speaking", "Ich spreche ...");
-    speak(reply, {
-      onend: () => {
-        if (state.voiceModeActive) voiceModeListen();
-      }
+    whenSpeechDone(() => {
+      if (state.voiceModeActive) voiceModeListen();
     });
   };
   const scheduleSettle = () => {
@@ -413,12 +462,14 @@ function waitForAssistantReply(knownEntries) {
       finish();
     }, 1400);
   };
-  state.voiceObserver = new MutationObserver(scheduleSettle);
+  state.voiceObserver = new MutationObserver(() => {
+    flushSpeech(false);
+    scheduleSettle();
+  });
   state.voiceObserver.observe(log, { childList: true, subtree: true, characterData: true });
   scheduleSettle();
   state.voiceTimeoutTimer = setTimeout(finish, 45000);
 }
-
 function openVoiceMode() {
   if (!speechSupported() || !synthesisSupported()) return;
   if (state.dictationActive) stopDictation();
