@@ -3,121 +3,121 @@
    Design-Sprache identisch zum bestehenden .model-menu (dunkel, Glas, dezente Linien). */
 
 .plus-picker {
-  position: relative;
-  z-index: 50;
+     position: relative;
+     z-index: 50;
 }
 
 .plus-menu {
-  position: absolute;
-  left: 0;
-  bottom: calc(100% + 8px);
-  z-index: 60;
-  display: grid;
-  gap: 4px;
-  min-width: 196px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  background: rgba(25, 26, 29, 0.92);
-  padding: 6px;
-  box-shadow: 0 16px 52px rgba(0, 0, 0, 0.32);
-  backdrop-filter: blur(24px) saturate(1.2);
-  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+     position: absolute;
+     left: 0;
+     bottom: calc(100% + 8px);
+     z-index: 60;
+     display: grid;
+     gap: 4px;
+     min-width: 196px;
+     border: 1px solid rgba(255, 255, 255, 0.13);
+     background: rgba(25, 26, 29, 0.92);
+     padding: 6px;
+     box-shadow: 0 16px 52px rgba(0, 0, 0, 0.32);
+     backdrop-filter: blur(24px) saturate(1.2);
+     -webkit-backdrop-filter: blur(24px) saturate(1.2);
 }
 
 .plus-menu button {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: flex-start;
-  width: 100%;
-  min-height: 34px;
-  padding: 0 8px;
-  border: none;
-  border-color: transparent;
-  background: transparent;
-  color: rgba(246, 243, 238, 0.78);
-  font-size: 13px;
-  font-weight: 500;
-  text-align: left;
-  cursor: pointer;
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     justify-content: flex-start;
+     width: 100%;
+     min-height: 34px;
+     padding: 0 8px;
+     border: none;
+     border-color: transparent;
+     background: transparent;
+     color: rgba(246, 243, 238, 0.78);
+     font-size: 13px;
+     font-weight: 500;
+     text-align: left;
+     cursor: pointer;
 }
 
 .plus-menu button:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
+     background: rgba(255, 255, 255, 0.06);
+     color: #ffffff;
 }
 
 .plus-menu button svg {
-  width: 17px;
-  height: 17px;
-  flex: 0 0 auto;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  pointer-events: none;
+     width: 17px;
+     height: 17px;
+     flex: 0 0 auto;
+     fill: none;
+     stroke: currentColor;
+     stroke-width: 2;
+     stroke-linecap: round;
+     stroke-linejoin: round;
+     pointer-events: none;
 }
 
 .plus-menu .visually-hidden-input {
-  display: none;
+     display: none;
 }
 
 /* Diktat aktiv: Mikrofon pulsiert rot. */
 
 [data-start-tool="voice"].is-recording {
-  color: #ff5c5c;
-  animation: composer-pulse 1.4s ease-in-out infinite;
+     color: #ff5c5c;
+     animation: composer-pulse 1.4s ease-in-out infinite;
 }
 
 /* Vorlesen aktiv: Lautsprecher hervorgehoben. */
 
 [data-start-tool="speaker"].is-speaking {
-  color: #7fd4a8;
-  animation: composer-pulse 1.8s ease-in-out infinite;
+     color: #7fd4a8;
+     animation: composer-pulse 1.8s ease-in-out infinite;
 }
 
 @keyframes composer-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
+     0%, 100% { opacity: 1; }
+     50% { opacity: 0.45; }
 }
 
 /* Sprachmodus-Overlay (Gespraech). */
 
 .voice-mode-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 28px;
-  background: rgba(5, 6, 8, 0.94);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  color: rgba(246, 243, 238, 0.92);
-  text-align: center;
-  padding: 24px;
+     position: fixed;
+     inset: 0;
+     z-index: 200;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     gap: 28px;
+     background: rgba(5, 6, 8, 0.94);
+     backdrop-filter: blur(18px);
+     -webkit-backdrop-filter: blur(18px);
+     color: rgba(246, 243, 238, 0.92);
+     text-align: center;
+     padding: 24px;
 }
 
 .voice-mode-overlay[hidden] {
-  display: none;
+     display: none;
 }
 
 .voice-mode-wave {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  height: 84px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     gap: 7px;
+     height: 84px;
 }
 
 .voice-mode-wave span {
-  width: 9px;
-  height: 18px;
-  border-radius: 6px;
-  background: rgba(246, 243, 238, 0.9);
-  animation: voice-wave 1.15s ease-in-out infinite;
+     width: 9px;
+     height: 18px;
+     border-radius: 6px;
+     background: rgba(246, 243, 238, 0.9);
+     animation: voice-wave 1.15s ease-in-out infinite;
 }
 
 .voice-mode-wave span:nth-child(2) { animation-delay: 0.12s; }
@@ -126,103 +126,297 @@
 .voice-mode-wave span:nth-child(5) { animation-delay: 0.48s; }
 
 @keyframes voice-wave {
-  0%, 100% { transform: scaleY(0.45); }
-  50% { transform: scaleY(1); }
+     0%, 100% { transform: scaleY(0.45); }
+     50% { transform: scaleY(1); }
 }
 
 /* Zustaende: Zuhoeren (weiss), Denken (gedimmt, langsam), Sprechen (gruenlich). */
 
 .voice-mode-overlay[data-mode="thinking"] .voice-mode-wave span {
-  animation-duration: 2.2s;
-  background: rgba(246, 243, 238, 0.45);
+     animation-duration: 2.2s;
+     background: rgba(246, 243, 238, 0.45);
 }
 
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-wave span {
-  background: #7fd4a8;
+     background: #7fd4a8;
 }
 
 .voice-mode-status {
-  font-size: 17px;
-  font-weight: 500;
-  margin: 0;
+     font-size: 17px;
+     font-weight: 500;
+     margin: 0;
 }
 
 .voice-mode-transcript {
-  max-width: 640px;
-  min-height: 24px;
-  margin: 0;
-  font-size: 14px;
-  color: rgba(246, 243, 238, 0.6);
-  line-height: 1.5;
+     max-width: 640px;
+     min-height: 24px;
+     margin: 0;
+     font-size: 14px;
+     color: rgba(246, 243, 238, 0.6);
+     line-height: 1.5;
 }
 
 .voice-mode-close {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 50%;
-  background: transparent;
-  color: rgba(246, 243, 238, 0.9);
-  cursor: pointer;
+     display: grid;
+     place-items: center;
+     flex: 0 0 auto;
+     width: 48px;
+     height: 48px;
+     border: 1px solid rgba(246, 243, 238, 0.92);
+     border-radius: 50%;
+     background: rgba(246, 243, 238, 0.92);
+     color: #101114;
+     cursor: pointer;
 }
 
 .voice-mode-close:hover {
-  background: rgba(255, 255, 255, 0.08);
+     background: #ffffff;
 }
 
 .voice-mode-close svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  pointer-events: none;
+     width: 18px;
+     height: 18px;
+     fill: none;
+     stroke: currentColor;
+     stroke-width: 2.2;
+     stroke-linecap: round;
+     pointer-events: none;
 }
 
 .voice-mode-hint {
-  position: absolute;
-  bottom: 28px;
-  left: 0;
-  right: 0;
-  margin: 0;
-  font-size: 12px;
-  color: rgba(246, 243, 238, 0.45);
+     position: absolute;
+     bottom: 28px;
+     left: 0;
+     right: 0;
+     margin: 0;
+     font-size: 12px;
+     color: rgba(246, 243, 238, 0.45);
+}
+
+/* Sprachmodus neu: animiertes smejj.com Zeichen — linke und rechte Klammer
+   sprechen im Wechsel, je ein Punkt gehoert zu einer Seite. */
+
+.voice-mode-logo {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+}
+
+.voice-mode-logo svg {
+     width: 150px;
+     height: 109px;
+}
+
+.voice-mode-logo path {
+     fill: none;
+     stroke: #14e0dc;
+     stroke-width: 22;
+     stroke-linecap: round;
+     stroke-linejoin: round;
+}
+
+.voice-mode-logo circle {
+     fill: #14e0dc;
+}
+
+.voice-logo-left { animation: voice-talk-left 2.4s ease-in-out infinite; }
+.voice-logo-right { animation: voice-talk-right 2.4s ease-in-out infinite; }
+.voice-logo-dot-a { animation: voice-dot-a 2.4s ease-in-out infinite; }
+.voice-logo-dot-b { animation: voice-dot-b 2.4s ease-in-out infinite; }
+
+@keyframes voice-talk-left {
+     0%, 40%, 100% { transform: translateX(0) scale(1); }
+     15% { transform: translateX(-7px) scale(1.06); }
+     28% { transform: translateX(0) scale(1); }
+}
+
+@keyframes voice-talk-right {
+     0%, 50%, 100% { transform: translateX(0) scale(1); }
+     65% { transform: translateX(7px) scale(1.06); }
+     78% { transform: translateX(0) scale(1); }
+}
+
+@keyframes voice-dot-a {
+     0%, 40%, 100% { opacity: 0.25; }
+     15% { opacity: 1; }
+}
+
+@keyframes voice-dot-b {
+     0%, 50%, 100% { opacity: 0.25; }
+     65% { opacity: 1; }
+}
+
+/* Zustaende des Zeichens: Denken (langsam), Sprechen (gruen), Stumm (grau, eingefroren). */
+
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-left,
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-right,
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a,
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b {
+     animation-duration: 3.6s;
+}
+
+.voice-mode-overlay[data-mode="speaking"] .voice-mode-logo path {
+     stroke: #7fd4a8;
+}
+
+.voice-mode-overlay[data-mode="speaking"] .voice-mode-logo circle {
+     fill: #7fd4a8;
+}
+
+.voice-mode-overlay[data-muted="true"] .voice-mode-logo {
+     opacity: 0.35;
+     filter: grayscale(1);
+}
+
+.voice-mode-overlay[data-muted="true"] .voice-mode-logo g,
+.voice-mode-overlay[data-muted="true"] .voice-mode-logo circle {
+     animation: none;
+}
+
+/* Untere Leiste im Sprachmodus: Eingabefeld mit Plus, Mikrofon (stumm), Beenden. */
+
+.voice-mode-bar {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     width: min(560px, 100%);
+}
+
+.voice-mode-input-wrap {
+     flex: 1 1 auto;
+     display: flex;
+     align-items: center;
+     gap: 6px;
+     min-height: 48px;
+     padding: 0 10px 0 6px;
+     border: 1px solid rgba(255, 255, 255, 0.16);
+     border-radius: 24px;
+     background: rgba(255, 255, 255, 0.05);
+}
+
+.voice-mode-input-wrap button {
+     display: grid;
+     place-items: center;
+     width: 36px;
+     height: 36px;
+     border: none;
+     border-radius: 50%;
+     background: transparent;
+     color: rgba(246, 243, 238, 0.8);
+     cursor: pointer;
+     flex: 0 0 auto;
+}
+
+.voice-mode-input-wrap button:hover {
+     background: rgba(255, 255, 255, 0.08);
+     color: #ffffff;
+}
+
+.voice-mode-input-wrap svg {
+     width: 18px;
+     height: 18px;
+     fill: none;
+     stroke: currentColor;
+     stroke-width: 2;
+     stroke-linecap: round;
+     pointer-events: none;
+}
+
+#voiceModeInput {
+     flex: 1 1 auto;
+     min-width: 0;
+     border: none;
+     background: transparent;
+     color: rgba(246, 243, 238, 0.92);
+     font-size: 14px;
+     outline: none;
+}
+
+#voiceModeInput::placeholder {
+     color: rgba(246, 243, 238, 0.4);
+}
+
+.voice-mode-mic {
+     display: grid;
+     place-items: center;
+     flex: 0 0 auto;
+     width: 48px;
+     height: 48px;
+     border: 1px solid rgba(255, 255, 255, 0.16);
+     border-radius: 50%;
+     background: rgba(255, 255, 255, 0.05);
+     color: rgba(246, 243, 238, 0.9);
+     cursor: pointer;
+}
+
+.voice-mode-mic:hover {
+     background: rgba(255, 255, 255, 0.1);
+}
+
+.voice-mode-mic svg {
+     width: 20px;
+     height: 20px;
+     fill: none;
+     stroke: currentColor;
+     stroke-width: 2;
+     stroke-linecap: round;
+     stroke-linejoin: round;
+     pointer-events: none;
+}
+
+.voice-mode-mic .voice-mic-slash {
+     display: none;
+}
+
+.voice-mode-mic.is-muted {
+     border-color: #e24b4a;
+     background: #e24b4a;
+     color: #ffffff;
+}
+
+.voice-mode-mic.is-muted:hover {
+     background: #d33f3e;
+}
+
+.voice-mode-mic.is-muted .voice-mic-slash {
+     display: block;
+}
+
+/* Nach dem Upgrade steht der Hinweis im Fluss (kein Overlap mit der Leiste). */
+
+.voice-mode-overlay[data-upgraded="true"] .voice-mode-hint {
+     position: static;
+     margin: 0;
 }
 
 /* Code-Uebernahme aus Chat-Antworten in den Workspace. */
 
 .chat-code-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 6px 0 2px;
+     display: flex;
+     flex-wrap: wrap;
+     gap: 8px;
+     margin: 6px 0 2px;
 }
 
 .chat-code-save {
-  min-height: 30px;
-  padding: 4px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(246, 243, 238, 0.85);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
+     min-height: 30px;
+     padding: 4px 12px;
+     border: 1px solid rgba(255, 255, 255, 0.16);
+     border-radius: 8px;
+     background: rgba(255, 255, 255, 0.04);
+     color: rgba(246, 243, 238, 0.85);
+     font-size: 12px;
+     font-weight: 500;
+     cursor: pointer;
 }
 
 .chat-code-save:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.09);
-  color: #ffffff;
+     background: rgba(255, 255, 255, 0.09);
+     color: #ffffff;
 }
 
 .chat-code-save:disabled {
-  border-color: rgba(127, 212, 168, 0.4);
-  color: #7fd4a8;
-  cursor: default;
+     border-color: rgba(127, 212, 168, 0.4);
+     color: #7fd4a8;
+     cursor: default;
 }
