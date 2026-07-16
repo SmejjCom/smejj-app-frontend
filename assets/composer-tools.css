@@ -246,7 +246,9 @@
      65% { opacity: 1; }
 }
 
-/* Zustaende des Zeichens: Denken (langsam), Sprechen (gruen), Stumm (grau, eingefroren). */
+/* Zustaende des Zeichens: Denken (langsam), Sprechen (gruen).
+   Stumm: Das Zeichen bleibt bewusst farbig und animiert — der Sprachmodus
+   laeuft weiter, nur das Mikrofon ist aus (Signal traegt der rote Mic-Button). */
 
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-left,
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-right,
@@ -261,16 +263,6 @@
 
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-logo circle {
      fill: #7fd4a8;
-}
-
-.voice-mode-overlay[data-muted="true"] .voice-mode-logo {
-     opacity: 0.35;
-     filter: grayscale(1);
-}
-
-.voice-mode-overlay[data-muted="true"] .voice-mode-logo g,
-.voice-mode-overlay[data-muted="true"] .voice-mode-logo circle {
-     animation: none;
 }
 
 /* Untere Leiste im Sprachmodus: Eingabefeld mit Plus, Mikrofon (stumm), Beenden. */
@@ -347,6 +339,7 @@
      background: rgba(255, 255, 255, 0.05);
      color: rgba(246, 243, 238, 0.9);
      cursor: pointer;
+     transition: color 0.15s ease;
 }
 
 .voice-mode-mic:hover {
@@ -368,14 +361,15 @@
      display: none;
 }
 
+/* Stumm: Button-Optik bleibt identisch zu den anderen Buttons —
+   nur das Mikrofon-Icon wird rot (ruhiges "laeuft weiter"-Signal). */
+
 .voice-mode-mic.is-muted {
-     border-color: #e24b4a;
-     background: #e24b4a;
-     color: #ffffff;
+     color: #e24b4a;
 }
 
 .voice-mode-mic.is-muted:hover {
-     background: #d33f3e;
+     background: rgba(255, 255, 255, 0.1);
 }
 
 .voice-mode-mic.is-muted .voice-mic-slash {
