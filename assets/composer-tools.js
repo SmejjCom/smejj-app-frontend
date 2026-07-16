@@ -385,17 +385,6 @@ function sentenceEnd(text) {
   return last;
 }
 
-// Quellen-Block, URLs und Markdown nicht vorlesen — die stehen im Chat zum Nachlesen.
-function speakableText(text) {
-  return String(text || "")
-    .split(/(?:\*\*)?\s*Quellen?\s*:?(?:\*\*)?/i)[0]
-    .replace(/https?:\/\/\S+/g, "")
-    .replace(/\*\*/g, "")
-    .replace(/^\s*[-*]\s+/gm, "")
-    .replace(/[ \t]{2,}/g, " ")
-    .trim();
-}
-
 // Reiht Text in die Sprach-Warteschlange ein, ohne Laufendes abzubrechen.
 function queueSpeech(text) {
   const utterance = new SpeechSynthesisUtterance(text);
@@ -442,15 +431,14 @@ function waitForAssistantReply(knownEntries) {
     if (!pending) return;
     const cut = speakRest ? pending.length : sentenceEnd(pending);
     if (cut <= 0) return;
-    const chunk = pending.slice(0, cut);
+    const chunk = pending.slice(0, cut).trim();
     spokenChars += cut;
-    const say = speakableText(chunk);
-    if (!say) return;
+    if (!chunk) return;
     if (!speakingAnnounced) {
       speakingAnnounced = true;
       setVoiceModeStatus("speaking", "Ich spreche ...");
     }
-    queueSpeech(say);
+    queueSpeech(chunk);
   };
   const finish = () => {
     if (!state.voiceModeActive) return;
