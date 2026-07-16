@@ -376,13 +376,39 @@ function voiceModeSend(task) {
 
 // --- Streaming-Sprachausgabe -------------------------------------------------
 
+// Abkuerzungen, nach denen kein Satz endet.
+const ABBREVIATIONS = new Set([
+  "z", "b", "ca", "bzw", "usw", "etc", "dr", "prof", "nr", "str", "mio", "mrd",
+  "evtl", "inkl", "exkl", "ggf", "vgl", "abb", "bd", "hr", "fr", "st", "sog",
+  "bspw", "max", "min", "tel", "u", "d", "s", "o", "a", "engl", "dt"
+]);
+
 // Ende des letzten vollstaendigen Satzes (0 = noch kein ganzer Satz vorhanden).
+// Ordnungszahlen ("17. Juli"), Tausenderpunkte ("55.930"), Domains ("finanzen.net")
+// und Abkuerzungen ("z. B.") sind ausgenommen — sonst zerreisst die Sprachausgabe.
 function sentenceEnd(text) {
-  const pattern = /[.!?\u2026]["\u0027)\]]?(?=\s|$)/g;
+  const pattern = /[.!?\u2026]["\u0027)\]]?(?=\s+["\u201e(]?[A-ZÄÖÜ]|\s*$)/g;
   let last = 0;
   let match = null;
-  while ((match = pattern.exec(text)) !== null) last = match.index + match[0].length;
+  while ((match = pattern.exec(text)) !== null) {
+    const before = text.slice(0, match.index);
+    if (/\d\s*$/.test(before)) continue;
+    const word = (before.match(/([A-Za-zÄÖÜäöüß]+)$/) || [])[1];
+    if (word && ABBREVIATIONS.has(word.toLowerCase())) continue;
+    last = match.index + match[0].length;
+  }
   return last;
+}
+
+// Quellen-Block, URLs und Markdown nicht vorlesen — die stehen im Chat zum Nachlesen.
+function speakableText(text) {
+  return String(text || "")
+    .split(/(?:\*\*)?\s*Quellen?\s*:?(?:\*\*)?/i)[0]
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/\*\*/g, "")
+    .replace(/^\s*[-*]\s+/gm, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
 }
 
 // Reiht Text in die Sprach-Warteschlange ein, ohne Laufendes abzubrechen.
@@ -431,14 +457,15 @@ function waitForAssistantReply(knownEntries) {
     if (!pending) return;
     const cut = speakRest ? pending.length : sentenceEnd(pending);
     if (cut <= 0) return;
-    const chunk = pending.slice(0, cut).trim();
+    const chunk = pending.slice(0, cut);
     spokenChars += cut;
-    if (!chunk) return;
+    const say = speakableText(chunk);
+    if (!say) return;
     if (!speakingAnnounced) {
       speakingAnnounced = true;
       setVoiceModeStatus("speaking", "Ich spreche ...");
     }
-    queueSpeech(chunk);
+    queueSpeech(say);
   };
   const finish = () => {
     if (!state.voiceModeActive) return;
