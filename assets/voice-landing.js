@@ -343,6 +343,11 @@ function listen() {
     }
   };
   recognition.onend = () => {
+    // Nach abort() (z. B. getippte Frage) feuert onend trotzdem — nur die noch
+    // aktive Erkennung darf den Loop fortsetzen, sonst hoert sie parallel zum
+    // Vorlesen weiter und nimmt das eigene Echo als Frage auf.
+    if (state.recognition !== recognition) return;
+    state.recognition = null;
     if (!state.active || state.fallback) return;
     const task = finalTranscript.trim();
     if (task) {
@@ -372,6 +377,14 @@ function listen() {
 async function sendTask(task) {
   if (!state.active) return;
   stopBargeListener();
+  // Laufende Erkennung abloesen (abort -> onend wird durch den Guard ignoriert).
+  const active = state.recognition;
+  state.recognition = null;
+  try {
+    active?.abort?.();
+  } catch {
+    // Recognition war bereits gestoppt.
+  }
   const requestId = state.requestId + 1;
   state.requestId = requestId;
   setStatus("thinking", T.thinking);
@@ -491,13 +504,8 @@ function buildUi() {
     const task = event.currentTarget.value.trim();
     if (!task) return;
     event.currentTarget.value = "";
-    try {
-      state.recognition?.abort?.();
-    } catch {
-      // Recognition war bereits gestoppt.
-    }
     stopSpeaking();
-    sendTask(task);
+    sendTask(task); // loest laufende Erkennung selbst ab (Guard gegen onend-Race)
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && state.active) closeOverlay();
