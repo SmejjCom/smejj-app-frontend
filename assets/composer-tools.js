@@ -483,11 +483,13 @@ function waitForAssistantReply(knownEntries) {
   const scheduleSettle = () => {
     clearTimeout(state.voiceSettleTimer);
     state.voiceSettleTimer = setTimeout(() => {
-      // Das Antwort-Element entsteht sofort, bleibt aber leer bis der Server liefert.
+      // Der Server streamt in Schueben mit Pausen. 4 Sekunden Ruhe gelten als
+      // fertig — kuerzer schnitt die Antwort mitten im Satz ab. Kostet keine
+      // spuerbare Zeit, weil fertige Saetze laengst gesprochen werden.
       // Erst abschliessen, wenn wirklich Text da ist — sonst weiter warten.
       if (!replyText()) return;
       finish();
-    }, 1400);
+    }, 4000);
   };
   state.voiceObserver = new MutationObserver(() => {
     flushSpeech(false);
