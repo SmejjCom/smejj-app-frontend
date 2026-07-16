@@ -283,14 +283,16 @@ function voiceModeListen() {
           }
     };
     recognition.onend = () => {
-          if (!state.voiceModeActive || state.voiceMuted) return;
+          if (!state.voiceModeActive) return;
           const task = finalTranscript.trim();
-          if (!task) {
-                  // Nichts verstanden — weiter zuhoeren.
-            voiceModeListen();
+          if (task) {
+                  // Auch bei Stummschaltung: bereits Gesagtes wird noch gesendet (wie ChatGPT).
+            voiceModeSend(task);
                   return;
           }
-          voiceModeSend(task);
+          if (state.voiceMuted) return;
+          // Nichts verstanden — weiter zuhoeren.
+          voiceModeListen();
     };
     try {
           recognition.start();
@@ -365,12 +367,17 @@ function toggleVoiceMute() {
     syncVoiceMicVisual();
     if (state.voiceMuted) {
           try {
-                  state.voiceRecognition?.abort?.();
+                  // stop() statt abort(): bereits Gesagtes wird noch abgeliefert und gesendet.
+            state.voiceRecognition?.stop?.();
           } catch {
                   // Recognition war bereits gestoppt.
           }
-          state.voiceRecognition = null;
           setVoiceModeStatus("muted", "Mikrofon aus");
+          return;
+    }
+    const overlay = $("#voiceModeOverlay");
+    if (overlay?.dataset.mode === "thinking") {
+          setVoiceModeStatus("thinking", "Einen Moment ...");
           return;
     }
     if ("speechSynthesis" in window && window.speechSynthesis.speaking) {
