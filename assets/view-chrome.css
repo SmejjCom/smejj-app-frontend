@@ -1,17 +1,18 @@
-/* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (oben links) und
-   Schliessen-X (oben rechts). Wird nur auf Views ausser #start angewendet;
-   die Startseite bleibt unveraendert (Design-Lock). */
+/* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
+   und Schliessen-X (ganz oben rechts). Ohne Hintergrund, schmal, leicht fett;
+   besetzt keinen Platz. Nur auf Views ausser #start; die Startseite bleibt
+   unveraendert (Design-Lock). */
 
 .view.has-view-chrome {
   position: relative;
-  padding-top: 86px;
+  padding-top: 52px;
 }
 
 .view-chrome {
   position: absolute;
-  top: 22px;
-  left: 30px;
-  right: 30px;
+  top: 8px;
+  left: 14px;
+  right: 14px;
   z-index: 5;
   display: flex;
   align-items: center;
@@ -24,51 +25,45 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  border: 1px solid #d4d4cc;
-  border-radius: 999px;
-  background: #ffffff;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
   color: #4a4a43;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
 }
 
 .view-chrome button:hover {
-  background: #e8e8e1;
+  opacity: 1;
 }
 
 .view-chrome button:focus-visible {
-  outline: 2px solid #4a4a43;
+  outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 
 .view-chrome svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
 }
 
-/* Dunkle Premium-Views nutzen die vorhandenen Premium-Variablen. */
+/* Dunkle Premium-Views: helle Icons ueber die vorhandenen Premium-Variablen. */
 .premium-view .view-chrome button {
-  border-color: var(--premium-line, rgba(255, 255, 255, 0.13));
-  background: var(--premium-surface, rgba(255, 255, 255, 0.075));
   color: var(--premium-text, #f8f6f2);
-}
-
-.premium-view .view-chrome button:hover {
-  border-color: var(--premium-line-strong, rgba(0, 255, 239, 0.26));
-  background: rgba(255, 255, 255, 0.14);
 }
 
 @media (max-width: 640px) {
   .view.has-view-chrome {
-    padding-top: 70px;
+    padding-top: 46px;
   }
 
   .view-chrome {
-    top: 14px;
-    left: 18px;
-    right: 18px;
+    top: 6px;
+    left: 10px;
+    right: 10px;
   }
 }
