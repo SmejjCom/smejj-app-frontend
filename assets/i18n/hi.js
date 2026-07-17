@@ -238,5 +238,6 @@ export default {
   "Bild konnte nicht gelesen werden.": "चित्र पढ़ा नहीं जा सका।",
   "Bildformat wurde nicht akzeptiert.": "चित्र प्रारूप स्वीकार नहीं किया गया।",
   "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "संपीड़न के बाद भी चित्र बहुत बड़ा है। कृपया दूसरा चित्र चुनें।",
-  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "स्थानीय संग्रहण भरा है। प्रोफ़ाइल चित्र सहेजा नहीं गया।"
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "स्थानीय संग्रहण भरा है। प्रोफ़ाइल चित्र सहेजा नहीं गया।",
+  "Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät.": "आपके खाते से प्रोफ़ाइल चित्र लिया गया। अब यह इसी डिवाइस पर सहेजा गया है।"
 };

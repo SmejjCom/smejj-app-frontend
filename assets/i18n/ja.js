@@ -238,5 +238,6 @@ export default {
   "Bild konnte nicht gelesen werden.": "画像を読み込めませんでした。",
   "Bildformat wurde nicht akzeptiert.": "画像形式が受け付けられませんでした。",
   "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "圧縮しても画像が大きすぎます。別の画像を選択してください。",
-  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "ローカルストレージの空き容量がありません。プロフィール画像は保存されませんでした。"
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "ローカルストレージの空き容量がありません。プロフィール画像は保存されませんでした。",
+  "Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät.": "アカウントからプロフィール画像を取得しました。現在はこの端末内に保存されています。"
 };

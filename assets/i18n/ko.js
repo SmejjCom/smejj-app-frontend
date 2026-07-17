@@ -238,5 +238,6 @@ export default {
   "Bild konnte nicht gelesen werden.": "이미지를 읽을 수 없습니다.",
   "Bildformat wurde nicht akzeptiert.": "이미지 형식이 허용되지 않았습니다.",
   "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "압축해도 이미지가 너무 큽니다. 다른 이미지를 선택하세요.",
-  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "로컬 저장 공간이 가득 찼습니다. 프로필 사진이 저장되지 않았습니다."
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "로컬 저장 공간이 가득 찼습니다. 프로필 사진이 저장되지 않았습니다.",
+  "Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät.": "계정에서 프로필 사진을 가져왔습니다. 이제 이 기기에 저장됩니다."
 };

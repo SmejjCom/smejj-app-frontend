@@ -238,5 +238,6 @@ export default {
   "Bild konnte nicht gelesen werden.": "Görsel okunamadı.",
   "Bildformat wurde nicht akzeptiert.": "Görsel biçimi kabul edilmedi.",
   "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "Görsel sıkıştırılsa da çok büyük kalıyor. Lütfen başka bir görsel seçin.",
-  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Yerel depolama dolu. Profil fotoğrafı kaydedilmedi."
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Yerel depolama dolu. Profil fotoğrafı kaydedilmedi.",
+  "Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät.": "Profil fotoğrafı hesabınızdan alındı. Artık bu cihazda yerel olarak saklanıyor."
 };

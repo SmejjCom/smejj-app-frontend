@@ -238,5 +238,6 @@ export default {
   "Bild konnte nicht gelesen werden.": "Gambar tidak dapat dibaca.",
   "Bildformat wurde nicht akzeptiert.": "Format gambar tidak diterima.",
   "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "Gambar tetap terlalu besar meski dikompresi. Pilih gambar lain.",
-  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Penyimpanan lokal penuh. Foto profil tidak disimpan."
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Penyimpanan lokal penuh. Foto profil tidak disimpan.",
+  "Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät.": "Foto profil diambil dari akun Anda. Kini tersimpan secara lokal di perangkat ini."
 };

@@ -238,5 +238,6 @@ export default {
   "Bild konnte nicht gelesen werden.": "No se ha podido leer la imagen.",
   "Bildformat wurde nicht akzeptiert.": "No se ha aceptado el formato de la imagen.",
   "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "La imagen sigue siendo demasiado grande incluso comprimida. Elige otra.",
-  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "El almacenamiento local está lleno. No se ha guardado la foto de perfil."
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "El almacenamiento local está lleno. No se ha guardado la foto de perfil.",
+  "Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät.": "Foto de perfil tomada de tu cuenta. Ahora se guarda en este dispositivo."
 };

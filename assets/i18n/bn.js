@@ -238,5 +238,6 @@ export default {
   "Bild konnte nicht gelesen werden.": "ছবিটি পড়া যায়নি।",
   "Bildformat wurde nicht akzeptiert.": "ছবির ফরম্যাট গ্রহণ করা হয়নি।",
   "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "সংকুচিত করেও ছবিটি খুব বড়। অন্য ছবি বাছাই করুন।",
-  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "স্থানীয় স্টোরেজ পূর্ণ। প্রোফাইল ছবি সংরক্ষিত হয়নি।"
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "স্থানীয় স্টোরেজ পূর্ণ। প্রোফাইল ছবি সংরক্ষিত হয়নি।",
+  "Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät.": "আপনার অ্যাকাউন্ট থেকে প্রোফাইল ছবি নেওয়া হয়েছে। এটি এখন এই ডিভাইসে সংরক্ষিত।"
 };

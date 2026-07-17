@@ -238,5 +238,6 @@ export default {
   "Bild konnte nicht gelesen werden.": "Не удалось прочитать изображение.",
   "Bildformat wurde nicht akzeptiert.": "Формат изображения не принят.",
   "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "Даже после сжатия изображение слишком большое. Выберите другое.",
-  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Локальное хранилище заполнено. Фото профиля не сохранено."
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Локальное хранилище заполнено. Фото профиля не сохранено.",
+  "Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät.": "Фото профиля взято из вашей учётной записи. Теперь оно хранится локально на этом устройстве."
 };

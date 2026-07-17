@@ -238,5 +238,6 @@ export default {
   "Bild konnte nicht gelesen werden.": "无法读取该图片。",
   "Bildformat wurde nicht akzeptiert.": "图片格式未被接受。",
   "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "压缩后图片仍然过大，请选择其他图片。",
-  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "本地存储空间已满，头像未保存。"
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "本地存储空间已满，头像未保存。",
+  "Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät.": "已从你的账户获取头像，现在仅保存在此设备上。"
 };

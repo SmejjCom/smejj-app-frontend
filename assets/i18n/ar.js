@@ -238,5 +238,6 @@ export default {
   "Bild konnte nicht gelesen werden.": "تعذّرت قراءة الصورة.",
   "Bildformat wurde nicht akzeptiert.": "لم يتم قبول صيغة الصورة.",
   "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "تظل الصورة كبيرة جدًا حتى بعد الضغط. يرجى اختيار صورة أخرى.",
-  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "مساحة التخزين المحلية ممتلئة. لم يتم حفظ صورة الملف الشخصي."
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "مساحة التخزين المحلية ممتلئة. لم يتم حفظ صورة الملف الشخصي.",
+  "Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät.": "تم أخذ صورة الملف الشخصي من حسابك. أصبحت الآن محفوظة محليًا على هذا الجهاز."
 };
