@@ -19,6 +19,11 @@ export function initProfileDockMenu() {
   if (!button || !menu || menu.dataset.menuReady) return;
   menu.dataset.menuReady = "true";
   applyLabels(menu);
+  // Das Menue MUSS aus der Sidebar heraus: .sidebar hat overflow:hidden und
+  // wuerde es abschneiden (live gemessen: 208px Menue in 199px Sidebar). Ein
+  // position:fixed INNERHALB der Sidebar hilft nicht — sie nutzt transform fuer
+  // die Einblend-Animation und wird damit selbst zum Bezugsrahmen.
+  document.body.append(menu);
 
   button.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -61,6 +66,17 @@ export function renderProfileDockMenu(displayName, email) {
 function setOpen(button, menu, open) {
   menu.hidden = !open;
   button.setAttribute("aria-expanded", String(open));
+  if (open) placeAboveButton(button, menu);
+}
+
+// Setzt das Menue ueber den Avatar und haelt es im sichtbaren Bereich.
+// Input: button, menu. Output: void.
+function placeAboveButton(button, menu) {
+  const anchor = button.getBoundingClientRect();
+  const width = menu.offsetWidth;
+  const maxLeft = Math.max(8, window.innerWidth - width - 8);
+  menu.style.left = `${Math.round(Math.min(Math.max(8, anchor.left), maxLeft))}px`;
+  menu.style.bottom = `${Math.round(Math.max(8, window.innerHeight - anchor.top + 8))}px`;
 }
 
 // Fuehrt eine Menue-Aktion aus. Input: action-Name. Output: void.
