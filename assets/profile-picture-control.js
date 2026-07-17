@@ -43,7 +43,9 @@ export function initProfilePictureControl(view, report) {
     if (!file) return;
     const result = await saveProfilePicture(file);
     input.value = "";
-    if (!result.ok) return report(result.error);
+    // Der Store liefert deutsche Quelltexte (fail-closed, ohne i18n-Abhaengigkeit);
+    // uebersetzt wird erst hier an der Oberflaeche.
+    if (!result.ok) return report(t(result.error));
     report(`${t("Profilbild lokal gespeichert")} (${MAX_EDGE}×${MAX_EDGE}, ${Math.round(result.bytes / 1024)} KB).`);
   });
   remove.addEventListener("click", () => {
