@@ -7,6 +7,8 @@
 // Barge-in mit Echo-Textfilter und Restart-Bremse. Startseite/App unberuehrt —
 // das Modul initialisiert sich nur auf Seiten OHNE App-Composer (#startSend).
 import { CLIENT_ROUTES } from "./config.js";
+// Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
+import { createSpeechQueue } from "./voice-speech-queue.js";
 
 const LANG_MAP = {
   de: "de-DE", en: "en-US", fr: "fr-FR", es: "es-ES", it: "it-IT",
@@ -80,11 +82,14 @@ export function enoughForBarge(text, lang) {
 }
 
 export function buildAgentPayload(task, lang) {
-  return { task, model: "smejj 1.0", files: [], preferences: { uiLanguage: lang } };
+  // Stufe 1c: voiceMode signalisiert dem Control-Server das Sprachprofil
+  // (kurze, gespraechige Antworten ohne Markdown, 1-3 Saetze).
+  return { task, model: "smejj 1.0", files: [], preferences: { uiLanguage: lang, voiceMode: true } };
 }
 
 // SSE-Antwort der Bridge einsammeln (nur sichtbarer content, kein reasoning).
-export async function readAgentReply(response) {
+// onText (optional) erhaelt nach jedem Chunk den bisherigen Gesamttext (Stufe 1c).
+export async function readAgentReply(response, onText) {
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -107,6 +112,7 @@ export async function readAgentReply(response) {
         reply += text;
       }
     }
+    onText?.(reply);
   }
   return reply.trim();
 }
@@ -150,7 +156,8 @@ const state = {
   recognition: null,
   bargeRecognition: null,
   bargeConfirmed: false,
-  requestId: 0
+  requestId: 0,
+  speechQueue: null
 };
 
 const lang = pageLang();
@@ -201,6 +208,9 @@ function speak(text, { onstart, onend } = {}) {
 }
 
 function stopSpeaking() {
+  // Auch die satzweise Vorlese-Queue abbrechen (Barge-in, Schliessen, neue Frage).
+  state.speechQueue?.cancel();
+  state.speechQueue = null;
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 }
 
@@ -269,7 +279,8 @@ function startBargeListener(spokenText, failStreak = 0) {
     const heard = `${finalTranscript} ${interim}`.trim();
     if (!state.bargeConfirmed) {
       if (!enoughForBarge(heard, lang)) return;
-      if (isLikelyEcho(heard, spokenText)) return;
+      // spokenText darf ein Getter sein (Stufe 1c: waechst satzweise mit).
+      if (isLikelyEcho(heard, typeof spokenText === "function" ? spokenText() : spokenText)) return;
       state.bargeConfirmed = true;
       stopSpeaking();
       setStatus("listening", T.listening);
@@ -303,7 +314,10 @@ function startBargeListener(spokenText, failStreak = 0) {
       listen();
       return;
     }
-    if (!("speechSynthesis" in window) || !window.speechSynthesis.speaking) return;
+    // Stufe 1c: In den kurzen Pausen zwischen zwei Saetzen ist speechSynthesis
+    // kurz still — die aktive Queue haelt den Barge-Listener trotzdem am Leben.
+    const queueActive = state.speechQueue?.isActive?.() === true;
+    if ((!("speechSynthesis" in window) || !window.speechSynthesis.speaking) && !queueActive) return;
     const nextStreak = Date.now() - startedAt < 1500 ? failStreak + 1 : 0;
     if (nextStreak >= 3) return;
     startBargeListener(spokenText, nextStreak);
@@ -389,32 +403,20 @@ async function sendTask(task) {
   state.requestId = requestId;
   setStatus("thinking", T.thinking);
   setTranscript(task);
-  let reply = "";
-  try {
-    const response = await fetch(CLIENT_ROUTES.api.agent, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(buildAgentPayload(task, lang))
-    });
-    if (response.ok && response.body) reply = await readAgentReply(response);
-  } catch {
-    reply = "";
-  }
-  if (!state.active || state.requestId !== requestId) return;
-  if (!reply) {
-    if (state.fallback) {
-      setStatus("muted", T.error);
-      return;
-    }
-    setStatus("listening", T.noAnswer);
-    listen();
-    return;
-  }
-  setStatus("speaking", T.speaking);
-  speak(reply, {
-    onstart: () => startBargeListener(reply),
-    onend: () => {
-      if (!state.active) return;
+  // Stufe 1c: satzweises Vorlesen — die Ausgabe beginnt mit dem ersten fertigen
+  // Satz, waehrend der Rest der Antwort noch streamt (voice-speech-queue.js).
+  stopSpeaking();
+  const queue = createSpeechQueue({
+    speakFn: speak,
+    stopFn: () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); },
+    onQueueStart: () => {
+      if (!state.active || state.requestId !== requestId) return;
+      setStatus("speaking", T.speaking);
+      // Echo-Filter vergleicht live gegen alles bereits Gesprochene (Getter).
+      startBargeListener(() => queue.spokenText());
+    },
+    onQueueEnd: () => {
+      if (!state.active || state.requestId !== requestId) return;
       if (state.bargeConfirmed) return; // Barge-Listener uebernimmt.
       stopBargeListener();
       if (state.fallback) {
@@ -427,6 +429,41 @@ async function sendTask(task) {
       }, 450);
     }
   });
+  state.speechQueue = queue;
+  let reply = "";
+  let streamed = "";
+  try {
+    const response = await fetch(CLIENT_ROUTES.api.agent, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(buildAgentPayload(task, lang))
+    });
+    if (response.ok && response.body) {
+      reply = await readAgentReply(response, (partial) => {
+        streamed = partial;
+        if (state.active && state.requestId === requestId) queue.push(partial);
+      });
+    }
+  } catch {
+    reply = "";
+  }
+  if (!state.active || state.requestId !== requestId) {
+    queue.cancel();
+    return;
+  }
+  if (!reply) {
+    queue.cancel();
+    if (state.fallback) {
+      setStatus("muted", T.error);
+      return;
+    }
+    setStatus("listening", T.noAnswer);
+    listen();
+    return;
+  }
+  // Stream fertig: Rest in die Queue (gleiche, ungetrimmte Textbasis wie push),
+  // onQueueEnd schliesst den Loop ab.
+  queue.flush(streamed || reply);
 }
 
 // --- Overlay / Einstieg ---------------------------------------------------------

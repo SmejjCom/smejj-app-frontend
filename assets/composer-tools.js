@@ -2,6 +2,8 @@
 // Alles laeuft lokal im Browser (Web Speech API + speechSynthesis) — free-only, keine externen Dienste.
 // Zweck: initComposerTools() verdrahtet die Icon-Zeile des Start-Composers.
 import { showToast } from "./components.js";
+// Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
+import { createSpeechQueue } from "./voice-speech-queue.js";
 
 const $ = (selector) => document.querySelector(selector);
 // Sprache dynamisch aus dem lang-Attribut der Seite (Fallback de-DE).
@@ -33,7 +35,8 @@ const state = {
       voiceTimeoutTimer: null,
       bargeRecognition: null,
       bargeConfirmed: false,
-      speakerUtterance: null
+      speakerUtterance: null,
+      speechQueue: null
 };
 
 function speechSupported() {
@@ -79,6 +82,9 @@ function speak(text, { onend, onstart } = {}) {
 }
 
 function stopSpeaking() {
+      // Auch die satzweise Vorlese-Queue abbrechen (Barge-in, X, getippte Frage).
+      state.speechQueue?.cancel();
+      state.speechQueue = null;
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 }
 
@@ -280,6 +286,8 @@ function closeVoiceMode() {
       state.voiceMuted = false;
       state.voiceFallback = false;
       state.voiceFailStreak = 0;
+      // Sprachprofil-Flag zuruecknehmen — normale Chats antworten wieder ausfuehrlich.
+      window.smejjVoiceModePreferences = null;
       clearVoiceTimers();
       stopBargeListener();
       try {
@@ -389,7 +397,8 @@ function startBargeListener(spokenText, failStreak = 0) {
               if (!state.bargeConfirmed) {
                         const words = normalizeSpeechText(heard).split(" ").filter(Boolean);
                         if (words.length < BARGE_MIN_WORDS) return;
-                        if (isLikelyEcho(heard, spokenText)) return;
+                        // spokenText darf ein Getter sein (Stufe 1c: waechst satzweise mit).
+                        if (isLikelyEcho(heard, typeof spokenText === "function" ? spokenText() : spokenText)) return;
                         // Echte Unterbrechung: Vorlesen sofort stoppen, weiter zuhoeren
                         // bis zur Sprechpause, dann als neue Frage senden.
                         state.bargeConfirmed = true;
@@ -431,7 +440,10 @@ function startBargeListener(spokenText, failStreak = 0) {
               // Bremse wie beim Sprachmodus-Fail-Streak: endet die Erkennung 3x in Folge
               // sofort (<1500 ms, z. B. Mikro entzogen), Barge-in fuer diese Antwort aufgeben —
               // das Vorlesen und das normale Weiterhoeren danach bleiben unberuehrt.
-              if (!("speechSynthesis" in window) || !window.speechSynthesis.speaking) return;
+              // Stufe 1c: In den kurzen Pausen zwischen zwei Saetzen ist speechSynthesis
+              // kurz still — die aktive Queue haelt den Barge-Listener trotzdem am Leben.
+              const queueActive = state.speechQueue?.isActive?.() === true;
+              if ((!("speechSynthesis" in window) || !window.speechSynthesis.speaking) && !queueActive) return;
               const endedFast = Date.now() - startedAt < 1500;
               const nextStreak = endedFast ? failStreak + 1 : 0;
               if (nextStreak >= 3) return;
@@ -546,6 +558,45 @@ function waitForAssistantReply(knownEntries) {
       // app.js setzt task-indicator-active auf body, solange die App arbeitet —
   // zuverlaessiges Antwort-Ende-Signal ohne Aenderung an der start-gelockten app.js.
   const taskRunning = () => document.body.classList.contains("task-indicator-active");
+      const currentReply = () => {
+              const entries = document.querySelectorAll("#startLog .entry.assistant");
+              const latest = entries[entries.length - 1];
+              return latest && entries.length > knownEntries ? latest.textContent.trim() : "";
+      };
+      // Stufe 1c: satzweises Vorlesen — die Ausgabe beginnt mit dem ersten fertigen
+      // Satz, waehrend der Rest der Antwort noch streamt (voice-speech-queue.js).
+      stopSpeaking();
+      const queue = createSpeechQueue({
+              speakFn: speak,
+              stopFn: () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); },
+              onQueueStart: () => {
+                        if (!state.voiceModeActive) return;
+                        setVoiceModeStatus("speaking", "Ich spreche ...");
+                        // Barge-in: Waehrend des Vorlesens weiterhoeren; der Echo-Filter
+                        // vergleicht live gegen alles bereits Gesprochene (Getter).
+                        startBargeListener(() => queue.spokenText());
+              },
+              onQueueEnd: () => {
+                        if (!state.voiceModeActive) return;
+                        // Reinsprechen erkannt: Der Barge-Listener uebernimmt (hoert zu Ende und sendet).
+                        if (state.bargeConfirmed) return;
+                        stopBargeListener();
+                        if (state.voiceFallback) {
+                                    setVoiceModeStatus("muted", "Frage unten eintippen — die Antwort wird vorgelesen.");
+                                    return;
+                        }
+                        if (state.voiceMuted) {
+                                    setVoiceModeStatus("muted", "Mikrofon aus");
+                                    return;
+                        }
+                        // Kurze Sperrfrist gegen Echo: das Ende der eigenen Sprachausgabe darf
+                        // nicht als Nutzereingabe aufgenommen werden.
+                        setTimeout(() => {
+                                    if (state.voiceModeActive && !state.voiceMuted && !state.bargeConfirmed) voiceModeListen();
+                        }, 450);
+              }
+      });
+      state.speechQueue = queue;
       const finish = () => {
               if (!state.voiceModeActive) return;
               if (taskRunning() && Date.now() - startedAt < 120000) {
@@ -554,9 +605,7 @@ function waitForAssistantReply(knownEntries) {
                         return;
               }
               clearVoiceTimers();
-              const entries = document.querySelectorAll("#startLog .entry.assistant");
-              const latest = entries[entries.length - 1];
-              const reply = latest && entries.length > knownEntries ? latest.textContent.trim() : "";
+              const reply = currentReply();
               if (!reply) {
                         if (state.voiceFallback) {
                                     setVoiceModeStatus("muted", "Keine Antwort erhalten — Frage unten eintippen.");
@@ -570,37 +619,19 @@ function waitForAssistantReply(knownEntries) {
                         voiceModeListen();
                         return;
               }
-              setVoiceModeStatus("speaking", "Ich spreche ...");
-              speak(reply, {
-                        // Barge-in: Waehrend des Vorlesens weiterhoeren, damit Reinsprechen
-                        // die Ausgabe sofort abbricht (Echo-Filter siehe startBargeListener).
-                        onstart: () => startBargeListener(reply),
-                        onend: () => {
-                                    if (!state.voiceModeActive) return;
-                                    // Reinsprechen erkannt: Der Barge-Listener uebernimmt (hoert zu Ende und sendet).
-                                    if (state.bargeConfirmed) return;
-                                    stopBargeListener();
-                                    if (state.voiceFallback) {
-                                                  setVoiceModeStatus("muted", "Frage unten eintippen — die Antwort wird vorgelesen.");
-                                                  return;
-                                    }
-                                    if (state.voiceMuted) {
-                                                  setVoiceModeStatus("muted", "Mikrofon aus");
-                                                  return;
-                                    }
-                                    // Kurze Sperrfrist gegen Echo: das Ende der eigenen Sprachausgabe darf
-                          // nicht als Nutzereingabe aufgenommen werden.
-                          setTimeout(() => {
-                                        if (state.voiceModeActive && !state.voiceMuted && !state.bargeConfirmed) voiceModeListen();
-                          }, 450);
-                        }
-              });
+              // Stream fertig: Rest in die Queue, onQueueEnd schliesst den Loop ab.
+              queue.flush(reply);
       };
       const scheduleSettle = () => {
               clearTimeout(state.voiceSettleTimer);
-              state.voiceSettleTimer = setTimeout(finish, 1400);
+              // Stufe 1c: Settle 1400 -> 800 ms — das Antwort-Ende wird frueher erkannt.
+              state.voiceSettleTimer = setTimeout(finish, 800);
       };
-      state.voiceObserver = new MutationObserver(scheduleSettle);
+      state.voiceObserver = new MutationObserver(() => {
+              // Fertige Saetze sofort sprechen, waehrend die Antwort weiter streamt.
+              if (state.voiceModeActive) queue.push(currentReply());
+              scheduleSettle();
+      });
       state.voiceObserver.observe(log, { childList: true, subtree: true, characterData: true });
       state.voiceObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
       scheduleSettle();
@@ -648,6 +679,9 @@ function openVoiceMode() {
       state.voiceMuted = false;
       state.voiceFallback = false;
       state.voiceFailStreak = 0;
+      // Stufe 1c: app.js merged diese Praeferenz beim Senden — der Server antwortet
+      // im Sprachprofil (kurz, gespraechig, ohne Markdown), solange der Modus offen ist.
+      window.smejjVoiceModePreferences = { voiceMode: true };
       syncVoiceMicVisual();
       // Innerhalb der Klick-Geste: Sprachausgabe fuer iOS/Safari freischalten.
       unlockSpeechSynthesis();
