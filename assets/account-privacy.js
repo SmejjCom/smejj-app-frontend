@@ -2,6 +2,8 @@ import { STORAGE_KEYS } from "./config.js";
 import { initServerSessionControls, fetchAuthenticatedUser, logoutCurrentSession } from "./account-sessions.js?v=3";
 import { languageOptionsMarkup } from "./language-options.js?v=1";
 import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
+import { initProfilePictureControl, profilePictureMarkup } from "./profile-picture-control.js?v=1";
+import { clearProfilePicture } from "./profile-picture-store.js?v=1";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const SAFE_EXPORT_KEYS = [STORAGE_KEYS.profile, STORAGE_KEYS.settings, STORAGE_KEYS.session, STORAGE_KEYS.model];
@@ -20,6 +22,7 @@ export function initAccountPrivacySurface() {
   view.setAttribute("dir", uiDirection());
   hydrate(view);
   bind(view);
+  initProfilePictureControl(view, (text) => output(view, text));
   initServerSessionControls(view, (text) => output(view, text));
   hydrateAuthSession(view); // angemeldeten Nutzer (Google/E-Mail/Passkey) anzeigen
 }
@@ -45,7 +48,7 @@ function markup() {
   <div class="account-layout"><nav class="account-nav" aria-label="${t("Kontobereiche")}">
     ${nav("identity", "Profil")}${nav("security", "Anmeldung & Sicherheit")}${nav("privacy", "Datenschutz")}${nav("permissions", "Berechtigungen")}${nav("data", "Daten")}
   </nav><div class="account-content">
-    ${panel("identity", "Profil", `<div class="account-grid"><label>${t("Name")}<input id="profileName" placeholder="${t("Dein Name")}"></label><label>${t("E-Mail")}<input id="profileEmail" placeholder="name@example.com" inputmode="email"></label><label>${t("Sprache")}<select id="language" aria-label="${t("Sprache")}">${languageOptionsMarkup()}</select></label><label>${t("Antwortmodus")}<select id="mode" aria-label="${t("Antwortmodus")}"><option value="safe">Free-safe</option><option value="byok">${t("BYOK vorbereitet")}</option><option value="local">${t("Lokal")}</option></select></label></div><div class="account-actions"><button id="saveProfile" type="button">${t("Profil speichern")}</button><button id="registerLocal" type="button">${t("Lokales Profil erstellen")}</button></div>`)}
+    ${panel("identity", "Profil", `${profilePictureMarkup()}<div class="account-grid"><label>${t("Name")}<input id="profileName" placeholder="${t("Dein Name")}"></label><label>${t("E-Mail")}<input id="profileEmail" placeholder="name@example.com" inputmode="email"></label><label>${t("Sprache")}<select id="language" aria-label="${t("Sprache")}">${languageOptionsMarkup()}</select></label><label>${t("Antwortmodus")}<select id="mode" aria-label="${t("Antwortmodus")}"><option value="safe">Free-safe</option><option value="byok">${t("BYOK vorbereitet")}</option><option value="local">${t("Lokal")}</option></select></label></div><div class="account-actions"><button id="saveProfile" type="button">${t("Profil speichern")}</button><button id="registerLocal" type="button">${t("Lokales Profil erstellen")}</button></div>`)}
     ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
     ${panel("privacy", "Datenschutz", `<div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Eine lokale Auswahl ersetzt keine serverseitige, signierte Einwilligung.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.")}</p>`)}
     ${panel("permissions", "Berechtigungen", `<div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div>`)}
@@ -66,6 +69,9 @@ function bind(view) {
     if (!window.confirm(t("Lokale smejj.com Daten auf diesem Gerät wirklich löschen? Projekte und nicht synchronisierte Daten können verloren gehen."))) {
       event.preventDefault(); event.stopImmediatePropagation(); output(view, t("Löschen abgebrochen. Keine Daten wurden verändert.")); return;
     }
+    // Bestaetigt: Profilbild gehoert zu den lokalen Daten und wird mitgeloescht
+    // (app.js raeumt nur STORAGE_KEYS auf, der Bild-Schluessel liegt daneben).
+    clearProfilePicture();
   }, true);
   view.querySelector("#language")?.addEventListener("change", () => {
     output(view, t("Neue Sprache gilt nach dem Speichern des Profils."));

@@ -195,3 +195,69 @@
     flex-direction: column;
   }
 }
+
+/* Profilbild-Steuerung im Panel "Profil" (public/profile-picture-control.js).
+   Der native File-Input bleibt im DOM und fokussierbar (Tastatur/Screenreader),
+   sichtbar ist das gestylte Label. */
+#profile .account-picture {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+#profile .account-picture .profile-avatar {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  font-size: 26px;
+}
+
+#profile .account-picture-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+#profile .account-picture-body small {
+  opacity: 0.68;
+}
+
+#profile .account-picture-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+#profile #profilePictureInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+#profile .account-picture-choose {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#profile .account-picture-choose:hover {
+  background: rgba(255, 255, 255, 0.11);
+}
+
+#profile #profilePictureInput:focus-visible + .account-picture-choose {
+  outline: 2px solid #00ffef;
+  outline-offset: 2px;
+}
