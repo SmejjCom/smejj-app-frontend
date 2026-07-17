@@ -1,0 +1,61 @@
+/* panel-backdrop.css — Abdunkeln hinter den Seitenpanels
+ *
+ * Freigabe Wof Kadavanich, 2026-07-18: "Design-Lock fuer Sidebar-Fix, eng begrenzt".
+ *
+ * Problem: Das linke Menue deckte den Inhalt zu. Kein Abdunkeln, kein
+ * Wegklicken, kein Escape.
+ *
+ * Das Backdrop-Markup (#sidebarBackdrop) und der Klick-Handler in app.js
+ * existierten laengst - das Element wurde nur nie sichtbar. Zwei Sperren lagen
+ * uebereinander:
+ *   1. styles.css: `.sidebar-backdrop { display: none }` - unbedingt, ohne
+ *      Zustandsbezug.
+ *   2. app.js: `backdrop.hidden = true` in JEDEM Zweig, auch beim Oeffnen.
+ * Dazu `[hidden] { display: none !important }` in styles.css Zeile 12. Gegen
+ * !important gewinnt keine normale Regel - ein reiner CSS-Fix ist hier
+ * nachweislich wirkungslos. Deshalb haengt die Sichtbarkeit am
+ * hidden-Attribut, das panel-backdrop.js zustandsrichtig pflegt.
+ *
+ * `:not([hidden])` greift nur, wenn das Attribut fehlt. Dann ist die
+ * !important-Regel gar nicht aktiv und es entsteht kein Konflikt.
+ *
+ * Eigene Datei statt styles.css: styles.css steht bei 1565 Zeilen an seiner
+ * Ratchet-Baseline (AI_Guidelines 2, Ziel 800). Der Ratchet soll die Altlast
+ * schrumpfen - ihn fuer diesen Fix anzuheben ginge in die falsche Richtung.
+ * Diese Datei wird von panel-backdrop.js nach styles.css eingehaengt, deshalb
+ * gewinnt sie bei gleicher Spezifitaet ueber die Quellreihenfolge. Damit
+ * bleiben styles.css und index.html byte-identisch zum Start-Lock.
+ *
+ * NICHT geaendert: `body.left-panel-open .workspace { margin-left: 0 }`.
+ * Das sieht asymmetrisch zum rechten Panel aus, ist aber korrekt: die Sidebar
+ * ist position:fixed und liegt ueber dem Inhalt (Overlay), das rechte Panel
+ * schiebt ihn. Einen 921px-Zweig zum Schieben gibt es in styles.css nicht.
+ * Ein Overlay darf den Inhalt nicht umbrechen - deshalb bleibt margin-left 0.
+ */
+
+.sidebar-backdrop:not([hidden]) {
+  position: fixed;
+  z-index: 65; /* ueber Inhalt und .model-picker (50), unter .sidebar (70) */
+  display: block;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.44);
+  animation: sidebar-backdrop-in 180ms ease;
+}
+
+/* 40 -> 75: das rechte Panel muss ueber dem Backdrop liegen, sonst dunkelt das
+ * Backdrop es selbst ab, wenn beide Panels offen sind.
+ * Reihenfolge jetzt: Inhalt < Backdrop 65 < Sidebar 70 < Browser-Panel 75. */
+.browser-panel {
+  z-index: 75;
+}
+
+@keyframes sidebar-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-backdrop:not([hidden]) {
+    animation: none;
+  }
+}

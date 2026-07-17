@@ -8,6 +8,7 @@ import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v3";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
+import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260718";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
 import { collectConversationHistory } from "./chat-history-context.js";
 const $ = (selector) => document.querySelector(selector);
@@ -151,23 +152,21 @@ function bindNavigation() {
     menuButton?.setAttribute("aria-expanded", String(open));
     if (open) applyPanelCompact("left", getPanelWidth("left"), PANEL_WIDTHS.min - 1);
     syncLeftMenuState({ waitForOpenTransition: open });
-    if (backdrop) backdrop.hidden = true;
+    syncBackdrop();
   };
   const setBrowserPanelOpen = (open) => {
     browserPanel?.classList.toggle("is-open", open);
     document.body.classList.toggle("right-panel-open", open);
     browserButton?.setAttribute("aria-expanded", String(open));
     if (open) applyPanelCompact("right", getPanelWidth("right"), PANEL_WIDTHS.compact);
-    if (backdrop) backdrop.hidden = true;
+    syncBackdrop();
   };
+  // Abdunkeln, Wegklicken und Escape leben in panel-backdrop.js (SRP).
+  const syncBackdrop = initPanelBackdrop({ backdrop, sidebar, browserPanel, menuButton, browserButton, setMenuOpen, setBrowserPanelOpen });
   menuButton?.addEventListener("click", () => setMenuOpen(!sidebar?.classList.contains("is-open")));
   browserButton?.addEventListener("click", () => setBrowserPanelOpen(!browserPanel?.classList.contains("is-open")));
   bindPanelResize("#leftPanelResize", "left");
   bindPanelResize("#rightPanelResize", "right");
-  backdrop?.addEventListener("click", () => {
-    setMenuOpen(false);
-    setBrowserPanelOpen(false);
-  });
   for (const button of $$(".nav-button")) {
     button.addEventListener("click", () => {
       goToView(button.dataset.view);
