@@ -2,8 +2,9 @@ import { STORAGE_KEYS } from "./config.js";
 import { initServerSessionControls, fetchAuthenticatedUser, logoutCurrentSession } from "./account-sessions.js?v=3";
 import { languageOptionsMarkup } from "./language-options.js?v=1";
 import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
-import { initProfilePictureControl, profilePictureMarkup } from "./profile-picture-control.js?v=1";
+import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=1";
 import { clearProfilePicture } from "./profile-picture-store.js?v=1";
+import { applyAuthState } from "./account-auth-state.js?v=1";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const SAFE_EXPORT_KEYS = [STORAGE_KEYS.profile, STORAGE_KEYS.settings, STORAGE_KEYS.session, STORAGE_KEYS.model];
@@ -32,7 +33,10 @@ export function initAccountPrivacySurface() {
 // diese Oberflaeche sieht keine Secrets.
 async function hydrateAuthSession(view) {
   const user = await fetchAuthenticatedUser();
+  // Zustandsrichtige Oberflaeche: auch der abgemeldete Fall muss angewendet werden.
+  applyAuthState(view, user);
   if (!user) return;
+  maybeImportAccountPicture(user, (text) => output(view, text));
   const nameField = view.querySelector("#profileName");
   const emailField = view.querySelector("#profileEmail");
   if (nameField && !nameField.value) nameField.value = user.name || "";

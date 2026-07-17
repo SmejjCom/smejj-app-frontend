@@ -9,9 +9,14 @@ import {
   MAX_EDGE,
   PROFILE_PICTURE_EVENT,
   clearProfilePicture,
+  importProfilePictureFromUrl,
   readProfilePicture,
   saveProfilePicture
 } from "./profile-picture-store.js?v=1";
+
+// Merker: Das Kontobild wird HOECHSTENS EINMAL uebernommen. Sonst holt es sich
+// ein bewusst entferntes Bild beim naechsten Laden wieder zurueck.
+const AUTO_IMPORT_KEY = "smejj.profile.picture.autoimport.v1";
 
 // Markup fuer das Profil-Panel. Output: HTML-String.
 export function profilePictureMarkup() {
@@ -53,6 +58,31 @@ export function initProfilePictureControl(view, report) {
     clearProfilePicture();
     report(t("Profilbild entfernt. Es wird wieder die Initiale angezeigt."));
   });
+}
+
+// Uebernimmt einmalig das Bild des angemeldeten Kontos (z. B. Google), wenn der
+// Nutzer noch kein eigenes Bild hat. Danach liegt es lokal und wird nie wieder
+// beim Anbieter geladen. Ein selbst gesetztes Bild hat immer Vorrang.
+// Input: user (Auth-Objekt), report (Statusausgabe). Output: void.
+export async function maybeImportAccountPicture(user, report) {
+  if (!user?.picture) return;
+  let alreadyTried = true;
+  try {
+    alreadyTried = Boolean(localStorage.getItem(AUTO_IMPORT_KEY));
+    // Merker VOR dem Versuch setzen: ein Fehlschlag darf sich nicht endlos wiederholen.
+    if (!alreadyTried) localStorage.setItem(AUTO_IMPORT_KEY, user.sub || user.email || "1");
+  } catch {
+    return; // ohne Speicher kein Merker -> lieber nichts uebernehmen
+  }
+  if (alreadyTried || readProfilePicture()) return;
+  const result = await importProfilePictureFromUrl(upgradeSize(user.picture));
+  if (result.ok) report(t("Profilbild aus deinem Konto übernommen. Es liegt jetzt lokal auf diesem Gerät."));
+}
+
+// Google liefert das Bild standardmaessig klein (z. B. =s96-c). Die Groessenangabe
+// steckt in der URL des Nutzers selbst — hier wird nur die Zahl angehoben.
+function upgradeSize(url) {
+  return url.replace(/=s\d+(-c)?$/, `=s${MAX_EDGE}$1`);
 }
 
 // Zeichnet die Vorschau (Bild oder Initiale). Input: view. Output: void.

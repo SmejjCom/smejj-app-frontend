@@ -66,6 +66,27 @@ export async function saveProfilePicture(file) {
   return { ok: true, dataUrl, bytes: dataUrl.length };
 }
 
+// Uebernimmt ein Bild von einer URL (z. B. das Google-Kontobild aus der eigenen
+// Session) EINMALIG und speichert es lokal normalisiert. Danach wird nie wieder
+// beim Anbieter geladen — die Oberflaeche rendert nur noch die lokale Kopie.
+// Der Aufrufer liefert die URL aus der Sitzung des Nutzers; dieses Modul kennt
+// keinen fremden Host fest verdrahtet.
+// Input: url (String). Output: { ok: true, dataUrl, bytes } | { ok: false, error }.
+export async function importProfilePictureFromUrl(url) {
+  if (!url || !/^https:\/\//i.test(url)) return { ok: false, error: "Bild konnte nicht gelesen werden." };
+  let blob;
+  try {
+    const response = await fetch(url, { mode: "cors", credentials: "omit", referrerPolicy: "no-referrer" });
+    if (!response.ok) return { ok: false, error: "Bild konnte nicht gelesen werden." };
+    blob = await response.blob();
+  } catch {
+    return { ok: false, error: "Bild konnte nicht gelesen werden." };
+  }
+  if (!ALLOWED_TYPES.has(blob.type)) return { ok: false, error: "Nur PNG, JPEG oder WebP sind erlaubt." };
+  if (blob.size > MAX_SOURCE_BYTES) return { ok: false, error: "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen." };
+  return saveProfilePicture(new File([blob], "kontobild", { type: blob.type }));
+}
+
 // Skaliert quadratisch (Mittenausschnitt) auf max. MAX_EDGE und komprimiert,
 // bis die Data-URL unter MAX_BYTES liegt. Input: File. Output: Data-URL.
 async function normalize(file) {

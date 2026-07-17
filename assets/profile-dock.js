@@ -12,6 +12,7 @@
 import { STORAGE_KEYS } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
 import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=1";
+import { initProfileDockMenu, renderProfileDockMenu } from "./profile-dock-menu.js?v=1";
 
 // Buttons, nach deren Klick sich Name/Session aendern koennen (app.js schreibt
 // localStorage synchron im Handler; das Neuzeichnen laeuft danach im Makrotask).
@@ -22,6 +23,7 @@ export function initProfileDock() {
   const dock = document.querySelector("#profileDock");
   if (!dock || dock.dataset.profileDockReady) return;
   dock.dataset.profileDockReady = "true";
+  initProfileDockMenu();
   render();
   window.addEventListener(PROFILE_PICTURE_EVENT, render);
   window.addEventListener("storage", (event) => {
@@ -44,6 +46,7 @@ function render() {
   name.textContent = displayName;
   button.setAttribute("aria-label", `${t("Profil")}: ${displayName}`);
   button.setAttribute("title", displayName);
+  renderProfileDockMenu(displayName, read(STORAGE_KEYS.session).email || read(STORAGE_KEYS.profile).email || "");
   face.replaceChildren();
   face.classList.toggle("has-picture", Boolean(picture));
   face.classList.toggle("is-empty", !picture && !initial);

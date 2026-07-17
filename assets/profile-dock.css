@@ -123,3 +123,86 @@
     transition: none;
   }
 }
+
+/* Avatar-Menue: Ausloggen einen Klick vom Avatar entfernt (Freigabe 2026-07-17).
+   Oeffnet nach OBEN, weil das Dock am unteren Rand der Sidebar sitzt. */
+.profile-dock {
+  position: relative;
+}
+
+.profile-dock-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: max(100%, 208px);
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: #1b1c1f;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+}
+
+.profile-dock-menu[hidden] {
+  display: none;
+}
+
+.profile-dock-menu-head {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 4px;
+}
+
+.profile-dock-menu-head strong {
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-dock-menu-head span {
+  overflow: hidden;
+  color: rgba(246, 243, 238, 0.6);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-dock-menu [role="menuitem"] {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.86);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+}
+
+.profile-dock-menu [role="menuitem"]:hover,
+.profile-dock-menu [role="menuitem"]:focus-visible {
+  background: rgba(255, 255, 255, 0.09);
+  color: #f6f3ee;
+  outline: none;
+}
+
+/* Ausloggen bleibt bewusst unauffaellig rot: erkennbar, aber kein Alarm. */
+.profile-dock-menu-logout {
+  margin-top: 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0 0 8px 8px !important;
+  color: #ff9d9d !important;
+}
+
+/* Kompakte Sidebar: Menue neben dem Avatar statt darueber. */
+.sidebar.is-compact .profile-dock-menu {
+  bottom: 0;
+  left: calc(100% + 8px);
+}
