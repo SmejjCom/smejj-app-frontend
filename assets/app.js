@@ -407,7 +407,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
       await stream(CLIENT_ROUTES.api.agent, {
         task,
         model: state.settings.model || "smejj 1.0",
-        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: window.smejjSettingsRuntime?.task?.() || {}
+        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}) }
       }, output);
       return showTaskIndicator("done");
     } catch (streamError) {
