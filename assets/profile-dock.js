@@ -45,7 +45,10 @@ function render() {
   if (!face || !name || !button) return;
   const displayName = resolveDisplayName();
   const picture = isSignedIn() ? readProfilePicture() : "";
-  const initial = displayName.trim().charAt(0);
+  // Abgemeldet KEINE Initiale: sonst stuende dort ein "n" von "Nutzer". Ohne Bild
+  // und ohne Initiale greift .profile-avatar.is-empty — das neutrale Personen-
+  // Symbol aus styles.css.
+  const initial = isSignedIn() ? displayName.trim().charAt(0) : "";
   name.textContent = displayName;
   button.setAttribute("aria-label", `${t("Profil")}: ${displayName}`);
   button.setAttribute("title", displayName);
