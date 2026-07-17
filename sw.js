@@ -1,4 +1,9 @@
-const CACHE_NAME = "smejj-shell-v128";
+// v128 -> v129 (2026-07-18): panel-backdrop.js/.css neu im Shell-Cache.
+// PFLICHT, keine Kosmetik: app.js importiert panel-backdrop.js. Ohne Precache
+// findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
+// (index.html), und der Browser bricht app.js komplett ab - die App waere
+// offline tot. Non-Regression laut Change-Lock.
+const CACHE_NAME = "smejj-shell-v129";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -6,6 +11,7 @@ const SHELL = [
   "/assets/app-surfaces.css",
   "/assets/settings-surface.css",
   "/assets/account-privacy.css",
+  "/assets/panel-backdrop.css",
   "/assets/composer-tools.css",
   "/assets/browser-pane.css",
   "/assets/browser-pane.js",
@@ -19,6 +25,7 @@ const SHELL = [
   "/assets/chat-markdown.css",
   "/assets/app.js",
   "/assets/left-menu-state.js",
+  "/assets/panel-backdrop.js",
   "/assets/premium-surfaces.js",
   "/assets/settings-surface.js",
   "/assets/settings-runtime.js",
