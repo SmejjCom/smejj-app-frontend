@@ -117,6 +117,8 @@ export async function readAgentReply(response, onText) {
   return reply.trim();
 }
 
+// Leiste (Schreibfeld + Mikrofon + Schliessen) fix am unteren Bildschirmrand —
+// wie im freigegebenen Design; Logo/Status bleiben mittig (safe-area beachtet).
 const CSS = `
 #voiceLandingButton { position: fixed; inset-inline-end: 20px; inset-block-end: 20px; z-index: 60;
   width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer;
@@ -125,7 +127,8 @@ const CSS = `
 #voiceLandingButton:hover { background: #1c1c22; }
 #voiceLandingButton svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 #voiceLandingOverlay { position: fixed; inset: 0; z-index: 70; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 18px; padding: 24px;
+  align-items: center; justify-content: center; gap: 18px;
+  padding: 24px 24px calc(150px + env(safe-area-inset-bottom, 0px));
   background: rgba(10, 10, 14, 0.94); backdrop-filter: blur(10px); color: #f2f2ef;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; }
 #voiceLandingOverlay[hidden] { display: none; }
@@ -137,11 +140,20 @@ const CSS = `
 @keyframes voice-landing-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.06); opacity: 0.82; } }
 #voiceLandingStatus { font-size: 19px; font-weight: 600; margin: 0; }
 #voiceLandingTranscript { min-height: 26px; max-width: 640px; text-align: center; color: #b9b9b2; margin: 0; }
-.voice-landing-hint { font-size: 13.5px; color: #8b8b84; text-align: center; max-width: 560px; }
-.voice-landing-bar { display: flex; gap: 10px; align-items: center; width: min(640px, 92vw); margin-top: 8px; }
+.voice-landing-hint { position: fixed; inset-inline: 0; margin-inline: auto;
+  bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  font-size: 13.5px; color: #8b8b84; text-align: center; max-width: 560px; }
+.voice-landing-bar { position: fixed; inset-inline: 0; margin-inline: auto;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  display: flex; gap: 10px; align-items: center; width: min(640px, 92vw); }
 #voiceLandingInput { flex: 1; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.06); color: #f2f2ef; padding: 12px 18px; font-size: 15px; outline: none; }
 #voiceLandingInput::placeholder { color: #8b8b84; }
+#voiceLandingMic { width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.16); cursor: pointer;
+  background: rgba(255, 255, 255, 0.06); color: #f2f2ef; display: flex; align-items: center; justify-content: center; flex: none; }
+#voiceLandingMic:hover { background: rgba(255, 255, 255, 0.12); }
+#voiceLandingOverlay[data-mode="listening"] #voiceLandingMic { color: #6fe3da; border-color: rgba(111, 227, 218, 0.6); }
+#voiceLandingMic svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 #voiceLandingClose { width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
   background: #ecece7; color: #101013; display: flex; align-items: center; justify-content: center; flex: none; }
 #voiceLandingClose svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
@@ -502,6 +514,21 @@ function openOverlay() {
   listen();
 }
 
+// Mikrofon-Button in der unteren Leiste: Tipp-Fallback verlassen und wieder
+// zuhoeren (gleiche Klick-Geste schaltet TTS frei, wie beim Oeffnen).
+function restartListening() {
+  if (!state.active) return;
+  unlockSpeechSynthesis();
+  stopSpeaking();
+  if (!RecognitionCtor) {
+    enterFallback(T.micDenied);
+    return;
+  }
+  state.fallback = false;
+  state.failStreak = 0;
+  listen();
+}
+
 function buildUi() {
   const style = document.createElement("style");
   style.textContent = CSS;
@@ -529,6 +556,9 @@ function buildUi() {
     + `<p class="voice-landing-hint">${T.typeHint}</p>`
     + '<div class="voice-landing-bar">'
     + `<input id="voiceLandingInput" type="text" autocomplete="off" placeholder="${T.placeholder}">`
+    + `<button id="voiceLandingMic" type="button" aria-label="${T.open}" title="${T.open}">`
+    + '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>'
+    + "</button>"
     + `<button id="voiceLandingClose" type="button" aria-label="${T.close}" title="${T.close}">`
     + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'
     + "</button></div>";
@@ -536,6 +566,7 @@ function buildUi() {
 
   button.addEventListener("click", openOverlay);
   $id("voiceLandingClose").addEventListener("click", closeOverlay);
+  $id("voiceLandingMic").addEventListener("click", restartListening);
   $id("voiceLandingInput").addEventListener("keydown", (event) => {
     if (event.key !== "Enter") return;
     const task = event.currentTarget.value.trim();
