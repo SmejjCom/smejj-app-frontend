@@ -56,6 +56,7 @@
     <link rel="stylesheet" href="/assets/composer-tools.css">
     <link rel="stylesheet" href="/assets/browser-pane.css?v=browser-pane-20260709-2">
     <link rel="stylesheet" href="/assets/view-chrome.css?v=view-chrome-20260716-2">
+    <link rel="stylesheet" href="/assets/profile-dock.css?v=profile-dock-20260717">
   </head>
   <body data-left-menu-state="closed">
     <button id="appMenuButton" class="glass-icon app-menu-button" type="button" aria-label="Menue oeffnen" aria-expanded="false">
@@ -80,7 +81,13 @@
           <button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Verlauf">Verlauf</button>
         </nav>
         <nav class="nav bottom-nav" aria-label="Nutzer und Einstellungen">
-          <button class="nav-button" type="button" data-view="settings" data-icon="settings" title="Einstellungen">Einstellungen</button>
+          <div id="profileDock" class="profile-dock">
+            <button id="profileDockButton" class="profile-dock-button" type="button" data-jump="profile" title="Profil" aria-label="Profil">
+              <span id="profileDockFace" class="profile-avatar is-empty" aria-hidden="true"></span>
+              <span id="profileDockName" class="profile-dock-name">Nutzer</span>
+            </button>
+            <button class="nav-button profile-dock-gear" type="button" data-view="settings" data-icon="settings" title="Einstellungen" aria-label="Einstellungen">Einstellungen</button>
+          </div>
         </nav>
         <div id="leftPanelResize" class="panel-resizer left-panel-resizer" role="separator" aria-orientation="vertical" aria-label="Linke Breite ändern"></div>
       </aside>
@@ -599,5 +606,6 @@
     <script src="/assets/browser-pane.js?v=browser-pane-20260709-2" type="module"></script>
     <script src="/assets/auth/passkey-ui.js" type="module"></script>
     <script src="/assets/view-chrome.js?v=view-chrome-20260716-2" type="module"></script>
+    <script src="/assets/profile-dock.js?v=profile-dock-20260717" type="module"></script>
   </body>
 </html>
