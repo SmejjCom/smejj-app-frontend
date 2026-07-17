@@ -49,7 +49,7 @@ async function hydrateAuthSession(view) {
 
 function markup() {
   return `<header class="account-header"><div><p class="eyebrow">${t("Konto & Datenschutz")}</p><h2>${t("Konto")}</h2><p class="subhead">${t("Identität, Sitzungen und Daten sicher verwalten. Secrets werden weder angezeigt noch exportiert.")}</p></div><span class="account-security">Lokal-first · fail-closed</span></header>
-  <div class="account-layout"><nav class="account-nav" aria-label="${t("Kontobereiche")}">
+  <div class="account-layout"><nav class="account-nav" role="tablist" aria-label="${t("Kontobereiche")}">
     ${nav("identity", "Profil")}${nav("security", "Anmeldung & Sicherheit")}${nav("privacy", "Datenschutz")}${nav("permissions", "Berechtigungen")}${nav("data", "Daten")}
   </nav><div class="account-content">
     ${panel("identity", "Profil", `${profilePictureMarkup()}<div class="account-grid"><label>${t("Name")}<input id="profileName" placeholder="${t("Dein Name")}"></label><label>${t("E-Mail")}<input id="profileEmail" placeholder="name@example.com" inputmode="email"></label><label>${t("Sprache")}<select id="language" aria-label="${t("Sprache")}">${languageOptionsMarkup()}</select></label><label>${t("Antwortmodus")}<select id="mode" aria-label="${t("Antwortmodus")}"><option value="safe">Free-safe</option><option value="byok">${t("BYOK vorbereitet")}</option><option value="local">${t("Lokal")}</option></select></label></div><div class="account-actions"><button id="saveProfile" type="button">${t("Profil speichern")}</button><button id="registerLocal" type="button">${t("Lokales Profil erstellen")}</button></div>`)}
@@ -62,6 +62,7 @@ function markup() {
 
 function bind(view) {
   activate(view, "identity");
+  bindTabKeys(view);
   view.addEventListener("click", (event) => {
     const tab = event.target.closest("[data-account-tab]");
     if (tab) return activate(view, tab.dataset.accountTab);
@@ -124,9 +125,42 @@ function exportLocalData(view) {
   output(view, t("Sicherer lokaler Export erstellt. Tokens, Passkeys und API-Schlüssel sind ausgeschlossen."));
 }
 
-function activate(view, id) {
-  view.querySelectorAll("[data-account-tab]").forEach((node) => node.classList.toggle("is-active", node.dataset.accountTab === id));
+function activate(view, id, { focusTab = false } = {}) {
+  view.querySelectorAll("[data-account-tab]").forEach((node) => {
+    const active = node.dataset.accountTab === id;
+    node.classList.toggle("is-active", active);
+    // aria-selected sagt den Zustand an, tabindex haelt nur den aktiven Tab in
+    // der Tab-Reihenfolge (roving tabindex) - sonst muesste man sich durch alle
+    // fuenf Tabs tabben, um zum Inhalt zu kommen.
+    node.setAttribute("aria-selected", String(active));
+    node.tabIndex = active ? 0 : -1;
+    if (active && focusTab) node.focus();
+  });
   view.querySelectorAll("[data-account-panel]").forEach((node) => { node.hidden = node.dataset.accountPanel !== id; });
+}
+
+// Pfeiltasten links/rechts wechseln den Tab, Home/End springen an den Rand.
+// Ohne das war die Tab-Leiste nur per Maus bedienbar.
+function bindTabKeys(view) {
+  const nav = view.querySelector(".account-nav");
+  nav?.addEventListener("keydown", (event) => {
+    const keys = ["ArrowRight", "ArrowLeft", "Home", "End"];
+    if (!keys.includes(event.key)) return;
+    const tabs = [...view.querySelectorAll("[data-account-tab]")];
+    const current = tabs.findIndex((tab) => tab.dataset.accountTab === activeTabId(view));
+    if (current < 0) return;
+    event.preventDefault();
+    const last = tabs.length - 1;
+    const next = event.key === "Home" ? 0
+      : event.key === "End" ? last
+        : event.key === "ArrowRight" ? (current === last ? 0 : current + 1)
+          : (current === 0 ? last : current - 1);
+    activate(view, tabs[next].dataset.accountTab, { focusTab: true });
+  });
+}
+
+function activeTabId(view) {
+  return view.querySelector("[data-account-tab].is-active")?.dataset.accountTab || "identity";
 }
 
 // Abmelden: Server-Session widerrufen und lokalen Token entfernen —
@@ -142,8 +176,12 @@ async function logoutSession(view) {
 
 function read(key) { try { return JSON.parse(localStorage.getItem(key) || "{}"); } catch { return {}; } }
 function output(view, text) { view.querySelector("#profileOutput").textContent = text; }
-function nav(id, label) { return `<button type="button" data-account-tab="${id}">${t(label)}</button>`; }
-function panel(id, title, body) { return `<section class="account-panel" data-account-panel="${id}"><h3>${t(title)}</h3>${body}</section>`; }
+// Tab-Muster nach WAI-ARIA: nur der aktive Tab ist per Tab-Taste erreichbar
+// (roving tabindex), zwischen den Tabs wird mit den Pfeiltasten gewechselt.
+// Vorher waren es fuenf namenlose Buttons ohne Bezug zum Panel - ein
+// Screenreader konnte weder die Gruppe noch den Zustand ansagen.
+function nav(id, label) { return `<button type="button" role="tab" id="account-tab-${id}" aria-controls="account-panel-${id}" aria-selected="false" tabindex="-1" data-account-tab="${id}">${t(label)}</button>`; }
+function panel(id, title, body) { return `<section class="account-panel" role="tabpanel" id="account-panel-${id}" aria-labelledby="account-tab-${id}" tabindex="0" data-account-panel="${id}"><h3>${t(title)}</h3>${body}</section>`; }
 function toggle(label, id, hint) { return `<label class="account-row"><span><strong>${t(label)}</strong><small>${t(hint)}</small></span><input id="${id}" type="checkbox"></label>`; }
 function permission(label, status) { return `<div class="account-row"><span><strong>${t(label)}</strong><small>${t(status)}</small></span><span class="permission-state">${t("Geschützt")}</span></div>`; }
 function dataAction(label, hint, id, text, danger = false) { return `<div class="account-row"><span><strong>${t(label)}</strong><small>${t(hint)}</small></span><button id="${id}" class="${danger ? "danger-action" : ""}" type="button">${t(text)}</button></div>`; }
