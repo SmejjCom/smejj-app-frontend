@@ -81,10 +81,22 @@
   white-space: nowrap;
 }
 
-/* Kompakte Sidebar: Avatar ueber Zahnrad, keine Textspalten. */
+/* Kompakte Sidebar: Avatar ueber Zahnrad, keine Textspalten.
+   styles.css setzt .sidebar.is-compact .profile-dock auf height:28px + overflow:hidden
+   (Stand vor dem Dock: eine einzige Zeile). Mit zwei gestapelten Zeilen wuerde das
+   Zahnrad abgeschnitten — deshalb hier Hoehe freigeben. */
 .sidebar.is-compact .profile-dock {
   flex-direction: column;
   gap: 0;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+.sidebar.is-compact .profile-dock .profile-avatar {
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
 }
 
 .sidebar.is-compact .profile-dock-name {
