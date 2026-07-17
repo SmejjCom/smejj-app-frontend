@@ -274,18 +274,30 @@
  * ausserhalb - und darin liegen Google Login, Passkey, Lokal anmelden und
  * Ausloggen. Das war die Ursache fuer "kann mich nicht anmelden".
  *
- * Der Fix hebt die width-100%-Regel NICHT global auf: 18 .premium-view-Ansichten
- * verlassen sich darauf. Er greift nur in .account-nav und gewinnt ueber
- * Spezifitaet (0,3,1 gegen 0,2,1), nicht ueber !important.
+ * Der Fix hebt die width-100%-Regel NICHT global auf: 17 weitere
+ * .premium-view-Ansichten verlassen sich darauf. Er greift nur in .account-nav.
  *
  * flex-wrap statt Scroller: so kann kein Tab mehr ausserhalb des sichtbaren
  * Bereichs landen - der Fehler wird strukturell unmoeglich statt zugedeckt.
  *
  * Bewusst hier und nicht in app-surfaces.css: diese Datei ist fuer die
  * Kontooberflaeche zustaendig (SRP) und faellt nicht unter den Start-Design-Lock.
+ *
+ * NACHTRAG 2026-07-18 - Spezifitaetsfehler der ersten Fassung korrigiert:
+ * Die erste Fassung nutzte `.account-nav` (0,1,0). Diese Datei enthaelt aber in
+ * Zeile 167 bereits `#profile .account-nav` (1,1,0) mit display:flex und
+ * overflow-x:auto. Ein ID-Selektor schlaegt jede Zahl von Klassen - flex-wrap
+ * kam nie an. Live gegen smejj.com/profile gemessen: flexWrap blieb "nowrap",
+ * scrollWidth 3413px. Der Fix muss dieselbe ID-Spezifitaet tragen und spaeter
+ * in der Datei stehen, dann gewinnt er ueber die Quellreihenfolge.
+ *
+ * Fuer den Button reicht `.premium-view .account-nav button` (0,3,1): der
+ * Gegenspieler in app-surfaces.css ist `.premium-view button` (0,2,1), und
+ * `#profile .account-nav button` (Zeile 174) setzt nur flex, keine width.
+ * Zur Sicherheit tragen beide Regeln hier trotzdem die #profile-Spezifitaet.
  */
 
-.account-nav {
+#profile .account-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -293,6 +305,7 @@
   height: auto;
 }
 
+#profile .account-nav button,
 .premium-view .account-nav button {
   width: auto;
   flex: 0 0 auto;
@@ -300,6 +313,7 @@
 }
 
 @media (max-width: 420px) {
+  #profile .account-nav button,
   .premium-view .account-nav button {
     flex: 1 1 auto;
     min-width: 0;

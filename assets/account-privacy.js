@@ -147,4 +147,8 @@ function panel(id, title, body) { return `<section class="account-panel" data-ac
 function toggle(label, id, hint) { return `<label class="account-row"><span><strong>${t(label)}</strong><small>${t(hint)}</small></span><input id="${id}" type="checkbox"></label>`; }
 function permission(label, status) { return `<div class="account-row"><span><strong>${t(label)}</strong><small>${t(status)}</small></span><span class="permission-state">${t("Geschützt")}</span></div>`; }
 function dataAction(label, hint, id, text, danger = false) { return `<div class="account-row"><span><strong>${t(label)}</strong><small>${t(hint)}</small></span><button id="${id}" class="${danger ? "danger-action" : ""}" type="button">${t(text)}</button></div>`; }
-function loadStyles() { if (document.querySelector('link[href="/assets/account-privacy.css"]')) return; const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/assets/account-privacy.css"; document.head.append(link); }
+// Versionsmarke: GitHub Pages liefert Assets mit max-age, ohne ?v= sieht der
+// Browser eine Aenderung erst nach Ablauf der Frist. Gleiche Konvention wie die
+// Stylesheet-Links in index.html. Bei jeder Aenderung an der CSS-Datei erhoehen.
+const STYLE_VERSION = "konto-tabs-20260718";
+function loadStyles() { const href = `/assets/account-privacy.css?v=${STYLE_VERSION}`; if (document.querySelector(`link[href^="/assets/account-privacy.css"]`)) return; const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href; document.head.append(link); }
