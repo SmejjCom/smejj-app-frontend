@@ -53,7 +53,7 @@ export function initProfileDockMenu() {
 }
 
 // Zeichnet den Kopf (Name/E-Mail) neu. Input: displayName, email. Output: void.
-export function renderProfileDockMenu(displayName, email) {
+export function renderProfileDockMenu(displayName, email, signedIn = true) {
   const nameNode = document.querySelector("#profileDockMenuName");
   const mailNode = document.querySelector("#profileDockMenuEmail");
   if (nameNode) nameNode.textContent = displayName;
@@ -61,6 +61,9 @@ export function renderProfileDockMenu(displayName, email) {
     mailNode.textContent = email || "";
     mailNode.hidden = !email;
   }
+  // Abgemeldet gibt es nichts abzumelden — sonst laeuft der Klick ins Leere.
+  const logout = document.querySelector('[data-dock-action="logout"]');
+  if (logout) logout.hidden = !signedIn;
 }
 
 function setOpen(button, menu, open) {

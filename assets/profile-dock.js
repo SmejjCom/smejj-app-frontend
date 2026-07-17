@@ -12,10 +12,13 @@
 import { STORAGE_KEYS } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
 import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=1";
-import { initProfileDockMenu, renderProfileDockMenu } from "./profile-dock-menu.js?v=1";
+import { initProfileDockMenu, renderProfileDockMenu } from "./profile-dock-menu.js?v=2";
 
 // Buttons, nach deren Klick sich Name/Session aendern koennen (app.js schreibt
 // localStorage synchron im Handler; das Neuzeichnen laeuft danach im Makrotask).
+// Schluessel aus account-sessions.js — bewusst dupliziert statt importiert:
+// das Dock soll ohne Auth-Modul startfaehig bleiben (fail-safe).
+const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
 const REFRESH_TRIGGERS = "#saveProfile, #registerLocal, #loginLocal, #logoutLocal, #clearLocal";
 
 // Initialisiert das Dock. Input: keiner. Output: void. Mehrfachaufruf ist sicher.
@@ -41,12 +44,13 @@ function render() {
   const button = document.querySelector("#profileDockButton");
   if (!face || !name || !button) return;
   const displayName = resolveDisplayName();
-  const picture = readProfilePicture();
+  const picture = isSignedIn() ? readProfilePicture() : "";
   const initial = displayName.trim().charAt(0);
   name.textContent = displayName;
   button.setAttribute("aria-label", `${t("Profil")}: ${displayName}`);
   button.setAttribute("title", displayName);
-  renderProfileDockMenu(displayName, read(STORAGE_KEYS.session).email || read(STORAGE_KEYS.profile).email || "");
+  const email = isSignedIn() ? (read(STORAGE_KEYS.session).email || read(STORAGE_KEYS.profile).email || "") : "";
+  renderProfileDockMenu(displayName, email, isSignedIn());
   face.replaceChildren();
   face.classList.toggle("has-picture", Boolean(picture));
   face.classList.toggle("is-empty", !picture && !initial);
@@ -65,10 +69,27 @@ function render() {
 // Ermittelt den anzuzeigenden Namen. Reihenfolge: Profilname > Session-E-Mail >
 // Profil-E-Mail > generischer Platzhalter. Output: String (nie leer).
 function resolveDisplayName() {
+  if (!isSignedIn()) return t("Nutzer");
   const profile = read(STORAGE_KEYS.profile);
   const session = read(STORAGE_KEYS.session);
   const candidate = profile.name || session.email || profile.email || "";
   return candidate.trim() || t("Nutzer");
+}
+
+// Angemeldet? Zwei Quellen, weil beide Anmeldewege existieren:
+// - Server-Sitzung (Google/Passkey/E-Mail): Zugangs-Token liegt lokal
+// - Lokales Profil: session.authenticated
+// WICHTIG (Live-Fehler 2026-07-17): Ohne diese Pruefung zeigte das Dock nach dem
+// Ausloggen weiter Name und Bild — der Nutzer hielt das Abmelden fuer kaputt.
+// Das gespeicherte Profil und das Bild bleiben erhalten, sie werden nur nicht
+// mehr angezeigt und kehren beim naechsten Anmelden zurueck.
+export function isSignedIn() {
+  try {
+    if (localStorage.getItem(AUTH_TOKEN_KEY)) return true;
+    return read(STORAGE_KEYS.session).authenticated === true;
+  } catch {
+    return false;
+  }
 }
 
 function read(key) {
