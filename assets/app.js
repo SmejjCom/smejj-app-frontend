@@ -31,7 +31,7 @@ const PANEL_WIDTH_KEYS = Object.freeze({
   right: "smejj.ui.rightPanelWidth.v9"
 });
 const PANEL_WIDTHS = Object.freeze({
-  default: 228,
+  default: 200,
   compact: 96,
   min: 188,
   close: 10,
@@ -296,7 +296,7 @@ function setPanelWidth(side, rawWidth, { persist = true } = {}) {
 
 function getPanelWidth(side) {
   const savedWidth = Number(localStorage.getItem(PANEL_WIDTH_KEYS[side])) || PANEL_WIDTHS.default;
-  return savedWidth === 306 ? PANEL_WIDTHS.default : savedWidth;
+  return [306, 228, 225].includes(savedWidth) ? PANEL_WIDTHS.default : savedWidth;
 }
 
 function setPanelOpen(side, open) {

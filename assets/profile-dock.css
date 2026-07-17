@@ -7,9 +7,13 @@
   align-items: center;
 }
 
+/* flex 0 1 auto (nicht 1 1 auto): Der Button nimmt nur die Breite, die er
+   braucht — so steht das Zahnrad direkt neben dem Namen statt am rechten Rand
+   (Freigabe 2026-07-17: "soll bisschen naeher kommen"). Bei langen Namen
+   schrumpft der Button und der Name wird mit Ellipse gekuerzt. */
 .profile-dock-button {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   gap: 8px;
   align-items: center;
   min-width: 0;
