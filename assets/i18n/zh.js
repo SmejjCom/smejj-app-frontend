@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "smejj.com 的新密码(至少 10 个字符):",
   "Passwort-Reset abgebrochen.": "密码重置已取消。",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "密码已更改。所有现有会话已结束——请重新登录。",
-  "Reset fehlgeschlagen.": "重置失败。"
+  "Reset fehlgeschlagen.": "重置失败。",
+  "Nutzer": "用户",
+  "Profilbild": "头像",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "仅保存在此设备上。会缩小为 256×256，不会传输给第三方。",
+  "Bild auswählen": "选择图片",
+  "Profilbild auswählen": "选择头像",
+  "Entfernen": "移除",
+  "Profilbild lokal gespeichert": "头像已保存在本地",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "头像已移除，将重新显示首字母。",
+  "Es ist kein Profilbild gespeichert.": "尚未保存头像。",
+  "Keine Datei ausgewaehlt.": "未选择文件。",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "仅允许 PNG、JPEG 或 WebP。",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "图片大于 8 MB，请选择更小的图片。",
+  "Bild konnte nicht gelesen werden.": "无法读取该图片。",
+  "Bildformat wurde nicht akzeptiert.": "图片格式未被接受。",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "压缩后图片仍然过大，请选择其他图片。",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "本地存储空间已满，头像未保存。"
 };

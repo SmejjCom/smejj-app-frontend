@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "smejj.com의 새 비밀번호(최소 10자):",
   "Passwort-Reset abgebrochen.": "비밀번호 재설정이 취소되었습니다.",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "비밀번호가 변경되었습니다. 이전 세션이 모두 종료되었습니다 — 다시 로그인하세요.",
-  "Reset fehlgeschlagen.": "재설정에 실패했습니다."
+  "Reset fehlgeschlagen.": "재설정에 실패했습니다.",
+  "Nutzer": "사용자",
+  "Profilbild": "프로필 사진",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "이 기기에만 저장됩니다. 256×256으로 축소되며 제3자에게 전송되지 않습니다.",
+  "Bild auswählen": "이미지 선택",
+  "Profilbild auswählen": "프로필 사진 선택",
+  "Entfernen": "제거",
+  "Profilbild lokal gespeichert": "프로필 사진을 기기에 저장했습니다",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "프로필 사진을 제거했습니다. 다시 이니셜이 표시됩니다.",
+  "Es ist kein Profilbild gespeichert.": "저장된 프로필 사진이 없습니다.",
+  "Keine Datei ausgewaehlt.": "선택된 파일이 없습니다.",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "PNG, JPEG 또는 WebP만 허용됩니다.",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "이미지가 8MB보다 큽니다. 더 작은 이미지를 선택하세요.",
+  "Bild konnte nicht gelesen werden.": "이미지를 읽을 수 없습니다.",
+  "Bildformat wurde nicht akzeptiert.": "이미지 형식이 허용되지 않았습니다.",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "압축해도 이미지가 너무 큽니다. 다른 이미지를 선택하세요.",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "로컬 저장 공간이 가득 찼습니다. 프로필 사진이 저장되지 않았습니다."
 };

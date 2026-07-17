@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "smejj.com-এর নতুন পাসওয়ার্ড (কমপক্ষে ১০ অক্ষর):",
   "Passwort-Reset abgebrochen.": "পাসওয়ার্ড রিসেট বাতিল হয়েছে।",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "পাসওয়ার্ড পরিবর্তিত হয়েছে। আগের সব সেশন শেষ করা হয়েছে — আবার লগইন করুন।",
-  "Reset fehlgeschlagen.": "রিসেট ব্যর্থ।"
+  "Reset fehlgeschlagen.": "রিসেট ব্যর্থ।",
+  "Nutzer": "ব্যবহারকারী",
+  "Profilbild": "প্রোফাইল ছবি",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "এই ডিভাইসেই থাকে। ২৫৬×২৫৬ আকারে ছোট করা হয় এবং তৃতীয় পক্ষকে দেওয়া হয় না।",
+  "Bild auswählen": "ছবি বাছাই করুন",
+  "Profilbild auswählen": "প্রোফাইল ছবি বাছাই করুন",
+  "Entfernen": "সরান",
+  "Profilbild lokal gespeichert": "প্রোফাইল ছবি স্থানীয়ভাবে সংরক্ষিত",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "প্রোফাইল ছবি সরানো হয়েছে। আবার আদ্যক্ষর দেখানো হবে।",
+  "Es ist kein Profilbild gespeichert.": "কোনো প্রোফাইল ছবি সংরক্ষিত নেই।",
+  "Keine Datei ausgewaehlt.": "কোনো ফাইল বাছাই করা হয়নি।",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "শুধু PNG, JPEG বা WebP অনুমোদিত।",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "ছবিটি ৮ MB-র বেশি। ছোট ছবি বাছাই করুন।",
+  "Bild konnte nicht gelesen werden.": "ছবিটি পড়া যায়নি।",
+  "Bildformat wurde nicht akzeptiert.": "ছবির ফরম্যাট গ্রহণ করা হয়নি।",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "সংকুচিত করেও ছবিটি খুব বড়। অন্য ছবি বাছাই করুন।",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "স্থানীয় স্টোরেজ পূর্ণ। প্রোফাইল ছবি সংরক্ষিত হয়নি।"
 };

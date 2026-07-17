@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "smejj.com के लिए नया पासवर्ड (कम से कम 10 अक्षर):",
   "Passwort-Reset abgebrochen.": "पासवर्ड रीसेट रद्द किया गया।",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "पासवर्ड बदल गया। सभी पिछले सत्र समाप्त कर दिए गए — कृपया फिर से लॉगिन करें।",
-  "Reset fehlgeschlagen.": "रीसेट विफल।"
+  "Reset fehlgeschlagen.": "रीसेट विफल।",
+  "Nutzer": "उपयोगकर्ता",
+  "Profilbild": "प्रोफ़ाइल चित्र",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "इस डिवाइस पर ही रहती है। 256×256 तक छोटी की जाती है और किसी तीसरे पक्ष को नहीं भेजी जाती।",
+  "Bild auswählen": "चित्र चुनें",
+  "Profilbild auswählen": "प्रोफ़ाइल चित्र चुनें",
+  "Entfernen": "हटाएँ",
+  "Profilbild lokal gespeichert": "प्रोफ़ाइल चित्र स्थानीय रूप से सहेजा गया",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "प्रोफ़ाइल चित्र हटा दिया गया। फिर से पहला अक्षर दिखाया जाएगा।",
+  "Es ist kein Profilbild gespeichert.": "कोई प्रोफ़ाइल चित्र सहेजा नहीं गया है।",
+  "Keine Datei ausgewaehlt.": "कोई फ़ाइल नहीं चुनी गई।",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "केवल PNG, JPEG या WebP की अनुमति है।",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "चित्र 8 MB से बड़ा है। कृपया छोटा चित्र चुनें।",
+  "Bild konnte nicht gelesen werden.": "चित्र पढ़ा नहीं जा सका।",
+  "Bildformat wurde nicht akzeptiert.": "चित्र प्रारूप स्वीकार नहीं किया गया।",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "संपीड़न के बाद भी चित्र बहुत बड़ा है। कृपया दूसरा चित्र चुनें।",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "स्थानीय संग्रहण भरा है। प्रोफ़ाइल चित्र सहेजा नहीं गया।"
 };

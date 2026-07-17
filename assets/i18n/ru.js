@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "Новый пароль для smejj.com (не менее 10 символов):",
   "Passwort-Reset abgebrochen.": "Сброс пароля отменён.",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "Пароль изменён. Все прежние сессии завершены — войдите заново.",
-  "Reset fehlgeschlagen.": "Сброс не выполнен."
+  "Reset fehlgeschlagen.": "Сброс не выполнен.",
+  "Nutzer": "Пользователь",
+  "Profilbild": "Фото профиля",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "Остаётся локально на этом устройстве. Уменьшается до 256×256 и не передаётся третьим лицам.",
+  "Bild auswählen": "Выбрать изображение",
+  "Profilbild auswählen": "Выбрать фото профиля",
+  "Entfernen": "Удалить",
+  "Profilbild lokal gespeichert": "Фото профиля сохранено локально",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "Фото профиля удалено. Снова показывается инициал.",
+  "Es ist kein Profilbild gespeichert.": "Фото профиля не сохранено.",
+  "Keine Datei ausgewaehlt.": "Файл не выбран.",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "Разрешены только PNG, JPEG или WebP.",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "Изображение больше 8 МБ. Выберите файл меньшего размера.",
+  "Bild konnte nicht gelesen werden.": "Не удалось прочитать изображение.",
+  "Bildformat wurde nicht akzeptiert.": "Формат изображения не принят.",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "Даже после сжатия изображение слишком большое. Выберите другое.",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Локальное хранилище заполнено. Фото профиля не сохранено."
 };

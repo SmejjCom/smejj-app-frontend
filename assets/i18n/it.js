@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "Nuova password per smejj.com (almeno 10 caratteri):",
   "Passwort-Reset abgebrochen.": "Reimpostazione della password annullata.",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "Password modificata. Tutte le sessioni precedenti sono state chiuse — accedi di nuovo.",
-  "Reset fehlgeschlagen.": "Reimpostazione non riuscita."
+  "Reset fehlgeschlagen.": "Reimpostazione non riuscita.",
+  "Nutzer": "Utente",
+  "Profilbild": "Immagine del profilo",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "Resta in locale su questo dispositivo. Ridimensionata a 256×256 e mai condivisa con terzi.",
+  "Bild auswählen": "Scegli immagine",
+  "Profilbild auswählen": "Scegli immagine del profilo",
+  "Entfernen": "Rimuovi",
+  "Profilbild lokal gespeichert": "Immagine del profilo salvata in locale",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "Immagine del profilo rimossa. Viene mostrata di nuovo l'iniziale.",
+  "Es ist kein Profilbild gespeichert.": "Nessuna immagine del profilo salvata.",
+  "Keine Datei ausgewaehlt.": "Nessun file selezionato.",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "Sono consentiti solo PNG, JPEG o WebP.",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "L'immagine supera 8 MB. Scegline una più piccola.",
+  "Bild konnte nicht gelesen werden.": "Impossibile leggere l'immagine.",
+  "Bildformat wurde nicht akzeptiert.": "Formato dell'immagine non accettato.",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "L'immagine resta troppo grande anche compressa. Scegline un'altra.",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "L'archivio locale è pieno. Immagine del profilo non salvata."
 };

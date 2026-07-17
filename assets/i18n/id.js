@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "Kata sandi baru untuk smejj.com (minimal 10 karakter):",
   "Passwort-Reset abgebrochen.": "Reset kata sandi dibatalkan.",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "Kata sandi diubah. Semua sesi sebelumnya diakhiri — silakan masuk lagi.",
-  "Reset fehlgeschlagen.": "Reset gagal."
+  "Reset fehlgeschlagen.": "Reset gagal.",
+  "Nutzer": "Pengguna",
+  "Profilbild": "Foto profil",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "Tetap lokal di perangkat ini. Diperkecil ke 256×256 dan tidak dikirim ke pihak ketiga.",
+  "Bild auswählen": "Pilih gambar",
+  "Profilbild auswählen": "Pilih foto profil",
+  "Entfernen": "Hapus",
+  "Profilbild lokal gespeichert": "Foto profil disimpan secara lokal",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "Foto profil dihapus. Inisial ditampilkan kembali.",
+  "Es ist kein Profilbild gespeichert.": "Tidak ada foto profil yang tersimpan.",
+  "Keine Datei ausgewaehlt.": "Tidak ada berkas yang dipilih.",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "Hanya PNG, JPEG, atau WebP yang diizinkan.",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "Gambar lebih besar dari 8 MB. Pilih gambar yang lebih kecil.",
+  "Bild konnte nicht gelesen werden.": "Gambar tidak dapat dibaca.",
+  "Bildformat wurde nicht akzeptiert.": "Format gambar tidak diterima.",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "Gambar tetap terlalu besar meski dikompresi. Pilih gambar lain.",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Penyimpanan lokal penuh. Foto profil tidak disimpan."
 };

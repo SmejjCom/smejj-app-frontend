@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "smejj.com için yeni parola (en az 10 karakter):",
   "Passwort-Reset abgebrochen.": "Parola sıfırlama iptal edildi.",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "Parola değiştirildi. Önceki tüm oturumlar sonlandırıldı — lütfen yeniden giriş yap.",
-  "Reset fehlgeschlagen.": "Sıfırlama başarısız."
+  "Reset fehlgeschlagen.": "Sıfırlama başarısız.",
+  "Nutzer": "Kullanıcı",
+  "Profilbild": "Profil fotoğrafı",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "Bu cihazda yerel kalır. 256×256 boyutuna küçültülür ve üçüncü taraflara aktarılmaz.",
+  "Bild auswählen": "Görsel seç",
+  "Profilbild auswählen": "Profil fotoğrafı seç",
+  "Entfernen": "Kaldır",
+  "Profilbild lokal gespeichert": "Profil fotoğrafı yerel olarak kaydedildi",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "Profil fotoğrafı kaldırıldı. Yeniden baş harf gösteriliyor.",
+  "Es ist kein Profilbild gespeichert.": "Kayıtlı profil fotoğrafı yok.",
+  "Keine Datei ausgewaehlt.": "Dosya seçilmedi.",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "Yalnızca PNG, JPEG veya WebP kullanılabilir.",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "Görsel 8 MB'tan büyük. Lütfen daha küçük bir görsel seçin.",
+  "Bild konnte nicht gelesen werden.": "Görsel okunamadı.",
+  "Bildformat wurde nicht akzeptiert.": "Görsel biçimi kabul edilmedi.",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "Görsel sıkıştırılsa da çok büyük kalıyor. Lütfen başka bir görsel seçin.",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Yerel depolama dolu. Profil fotoğrafı kaydedilmedi."
 };

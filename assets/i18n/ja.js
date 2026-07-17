@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "smejj.com の新しいパスワード(10文字以上):",
   "Passwort-Reset abgebrochen.": "パスワードリセットを中止しました。",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "パスワードを変更しました。以前のセッションはすべて終了しました — もう一度ログインしてください。",
-  "Reset fehlgeschlagen.": "リセットに失敗しました。"
+  "Reset fehlgeschlagen.": "リセットに失敗しました。",
+  "Nutzer": "ユーザー",
+  "Profilbild": "プロフィール画像",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "この端末内にのみ保存されます。256×256 に縮小され、第三者に送信されません。",
+  "Bild auswählen": "画像を選択",
+  "Profilbild auswählen": "プロフィール画像を選択",
+  "Entfernen": "削除",
+  "Profilbild lokal gespeichert": "プロフィール画像をこの端末に保存しました",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "プロフィール画像を削除しました。再びイニシャルが表示されます。",
+  "Es ist kein Profilbild gespeichert.": "プロフィール画像は保存されていません。",
+  "Keine Datei ausgewaehlt.": "ファイルが選択されていません。",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "PNG、JPEG、WebP のみ使用できます。",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "画像が 8 MB を超えています。より小さい画像を選択してください。",
+  "Bild konnte nicht gelesen werden.": "画像を読み込めませんでした。",
+  "Bildformat wurde nicht akzeptiert.": "画像形式が受け付けられませんでした。",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "圧縮しても画像が大きすぎます。別の画像を選択してください。",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "ローカルストレージの空き容量がありません。プロフィール画像は保存されませんでした。"
 };

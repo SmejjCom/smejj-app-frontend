@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "Nouveau mot de passe pour smejj.com (au moins 10 caractères) :",
   "Passwort-Reset abgebrochen.": "Réinitialisation du mot de passe annulée.",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "Mot de passe modifié. Toutes les sessions précédentes ont été fermées — veuillez vous reconnecter.",
-  "Reset fehlgeschlagen.": "Échec de la réinitialisation."
+  "Reset fehlgeschlagen.": "Échec de la réinitialisation.",
+  "Nutzer": "Utilisateur",
+  "Profilbild": "Photo de profil",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "Reste locale sur cet appareil. Redimensionnée en 256×256, jamais transmise à des tiers.",
+  "Bild auswählen": "Choisir une image",
+  "Profilbild auswählen": "Choisir une photo de profil",
+  "Entfernen": "Supprimer",
+  "Profilbild lokal gespeichert": "Photo de profil enregistrée localement",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "Photo de profil supprimée. L'initiale s'affiche à nouveau.",
+  "Es ist kein Profilbild gespeichert.": "Aucune photo de profil enregistrée.",
+  "Keine Datei ausgewaehlt.": "Aucun fichier sélectionné.",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "Seuls les formats PNG, JPEG ou WebP sont autorisés.",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "L'image dépasse 8 Mo. Choisissez-en une plus petite.",
+  "Bild konnte nicht gelesen werden.": "Impossible de lire l'image.",
+  "Bildformat wurde nicht akzeptiert.": "Le format de l'image n'a pas été accepté.",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "L'image reste trop volumineuse même compressée. Choisissez-en une autre.",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Le stockage local est plein. La photo de profil n'a pas été enregistrée."
 };

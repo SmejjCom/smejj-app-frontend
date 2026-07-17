@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "New password for smejj.com (at least 10 characters):",
   "Passwort-Reset abgebrochen.": "Password reset cancelled.",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "Password changed. All previous sessions were ended — please sign in again.",
-  "Reset fehlgeschlagen.": "Reset failed."
+  "Reset fehlgeschlagen.": "Reset failed.",
+  "Nutzer": "User",
+  "Profilbild": "Profile picture",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "Stays local on this device. Resized to 256×256 and never shared with third parties.",
+  "Bild auswählen": "Choose image",
+  "Profilbild auswählen": "Choose profile picture",
+  "Entfernen": "Remove",
+  "Profilbild lokal gespeichert": "Profile picture saved locally",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "Profile picture removed. Your initial is shown again.",
+  "Es ist kein Profilbild gespeichert.": "No profile picture is saved.",
+  "Keine Datei ausgewaehlt.": "No file selected.",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "Only PNG, JPEG or WebP are allowed.",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "Image is larger than 8 MB. Please choose a smaller one.",
+  "Bild konnte nicht gelesen werden.": "The image could not be read.",
+  "Bildformat wurde nicht akzeptiert.": "The image format was not accepted.",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "The image stays too large even compressed. Please choose another one.",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "Local storage is full. The profile picture was not saved."
 };

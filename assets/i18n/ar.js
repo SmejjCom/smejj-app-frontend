@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "كلمة مرور جديدة لـ smejj.com (10 أحرف على الأقل):",
   "Passwort-Reset abgebrochen.": "أُلغيت إعادة تعيين كلمة المرور.",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "تم تغيير كلمة المرور. أُنهيت جميع الجلسات السابقة — يرجى تسجيل الدخول مجددًا.",
-  "Reset fehlgeschlagen.": "فشلت إعادة التعيين."
+  "Reset fehlgeschlagen.": "فشلت إعادة التعيين.",
+  "Nutzer": "مستخدم",
+  "Profilbild": "صورة الملف الشخصي",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "يبقى محليًا على هذا الجهاز. يُصغَّر إلى 256×256 ولا يُشارَك مع أطراف أخرى.",
+  "Bild auswählen": "اختيار صورة",
+  "Profilbild auswählen": "اختيار صورة الملف الشخصي",
+  "Entfernen": "إزالة",
+  "Profilbild lokal gespeichert": "تم حفظ صورة الملف الشخصي محليًا",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "تمت إزالة صورة الملف الشخصي. سيظهر الحرف الأول مجددًا.",
+  "Es ist kein Profilbild gespeichert.": "لا توجد صورة ملف شخصي محفوظة.",
+  "Keine Datei ausgewaehlt.": "لم يتم اختيار أي ملف.",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "يُسمح فقط بصيغ PNG أو JPEG أو WebP.",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "حجم الصورة أكبر من 8 ميغابايت. يرجى اختيار صورة أصغر.",
+  "Bild konnte nicht gelesen werden.": "تعذّرت قراءة الصورة.",
+  "Bildformat wurde nicht akzeptiert.": "لم يتم قبول صيغة الصورة.",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "تظل الصورة كبيرة جدًا حتى بعد الضغط. يرجى اختيار صورة أخرى.",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "مساحة التخزين المحلية ممتلئة. لم يتم حفظ صورة الملف الشخصي."
 };

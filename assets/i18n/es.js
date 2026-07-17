@@ -222,5 +222,21 @@ export default {
   "Neues Passwort für smejj.com (mindestens 10 Zeichen):": "Nueva contraseña para smejj.com (al menos 10 caracteres):",
   "Passwort-Reset abgebrochen.": "Restablecimiento de contraseña cancelado.",
   "Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.": "Contraseña cambiada. Se cerraron todas las sesiones anteriores; inicia sesión de nuevo.",
-  "Reset fehlgeschlagen.": "Error al restablecer."
+  "Reset fehlgeschlagen.": "Error al restablecer.",
+  "Nutzer": "Usuario",
+  "Profilbild": "Foto de perfil",
+  "Bleibt lokal auf diesem Gerät. Wird auf 256×256 verkleinert und nicht an Dritte übertragen.": "Permanece en este dispositivo. Se reduce a 256×256 y no se transfiere a terceros.",
+  "Bild auswählen": "Elegir imagen",
+  "Profilbild auswählen": "Elegir foto de perfil",
+  "Entfernen": "Quitar",
+  "Profilbild lokal gespeichert": "Foto de perfil guardada localmente",
+  "Profilbild entfernt. Es wird wieder die Initiale angezeigt.": "Foto de perfil eliminada. Se vuelve a mostrar la inicial.",
+  "Es ist kein Profilbild gespeichert.": "No hay ninguna foto de perfil guardada.",
+  "Keine Datei ausgewaehlt.": "No se ha seleccionado ningún archivo.",
+  "Nur PNG, JPEG oder WebP sind erlaubt.": "Solo se permiten PNG, JPEG o WebP.",
+  "Bild ist groesser als 8 MB. Bitte kleineres Bild waehlen.": "La imagen supera los 8 MB. Elige una más pequeña.",
+  "Bild konnte nicht gelesen werden.": "No se ha podido leer la imagen.",
+  "Bildformat wurde nicht akzeptiert.": "No se ha aceptado el formato de la imagen.",
+  "Bild bleibt auch komprimiert zu gross. Bitte anderes Bild waehlen.": "La imagen sigue siendo demasiado grande incluso comprimida. Elige otra.",
+  "Lokaler Speicher ist voll. Profilbild wurde nicht gespeichert.": "El almacenamiento local está lleno. No se ha guardado la foto de perfil."
 };
