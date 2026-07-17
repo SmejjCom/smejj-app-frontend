@@ -2,7 +2,7 @@ import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js";
 import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { runClientChat } from "/assets/ai/chatClient.js?v=3";
-import { Icons, closeModal, openModal, renderEmptyState, setButtonIcon, showToast } from "./components.js";
+import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js";
 import { initComposerTools } from "./composer-tools.js?v=voice-20260716-2";
 import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
@@ -1334,6 +1334,7 @@ async function stream(url, body, output) {
     }
     output.scrollIntoView({ block: "end" });
   }
+  renderChatMarkdown(output);
 }
 
 async function readableError(response) {

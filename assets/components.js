@@ -1,3 +1,7 @@
+// Re-Export: so kann app.js seine bestehende Import-Zeile erweitern, ohne zu wachsen
+// (Ratchet-Baseline, scripts/check-guidelines.mjs).
+export { renderChatMarkdown } from "./chat-markdown.js?v=1";
+
 export const Icons = Object.freeze({
   plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
   home: '<svg viewBox="0 0 24 24"><path d="M12 5h7v14H5V5h7Z"/><path d="M15 3v4"/><path d="M9 3v4"/><path d="M9 13h6"/></svg>',
