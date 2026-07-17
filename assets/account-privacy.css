@@ -261,3 +261,47 @@
   outline: 2px solid #00ffef;
   outline-offset: 2px;
 }
+
+/* Fix: Konto-Tabs waren unerreichbar - kein Login moeglich (2026-07-17)
+ *
+ * Ursache: assets/app-surfaces.css enthaelt
+ *   @media (max-width: 760px) { .premium-view button { width: 100%; } }
+ * Die Regel ist fuer Formular-Buttons gedacht, trifft aber JEDEN Button in
+ * .premium-view - auch die Tabs in .account-nav. Da .account-nav ein
+ * nowrap-Scroller ist, wurde jeder Tab 684px breit. Live gemessen bei 720px:
+ *   scrollWidth 3438px / clientWidth 694px
+ * Sichtbar war nur "Profil". "Anmeldung & Sicherheit" lag bei x=704px, also
+ * ausserhalb - und darin liegen Google Login, Passkey, Lokal anmelden und
+ * Ausloggen. Das war die Ursache fuer "kann mich nicht anmelden".
+ *
+ * Der Fix hebt die width-100%-Regel NICHT global auf: 18 .premium-view-Ansichten
+ * verlassen sich darauf. Er greift nur in .account-nav und gewinnt ueber
+ * Spezifitaet (0,3,1 gegen 0,2,1), nicht ueber !important.
+ *
+ * flex-wrap statt Scroller: so kann kein Tab mehr ausserhalb des sichtbaren
+ * Bereichs landen - der Fehler wird strukturell unmoeglich statt zugedeckt.
+ *
+ * Bewusst hier und nicht in app-surfaces.css: diese Datei ist fuer die
+ * Kontooberflaeche zustaendig (SRP) und faellt nicht unter den Start-Design-Lock.
+ */
+
+.account-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  overflow-x: visible;
+  height: auto;
+}
+
+.premium-view .account-nav button {
+  width: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .premium-view .account-nav button {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
