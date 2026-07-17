@@ -9,6 +9,7 @@ import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v3";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
+import { collectConversationHistory } from "./chat-history-context.js";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
@@ -407,7 +408,8 @@ async function submitTask(task, { target = "#startLog" } = {}) {
       await stream(CLIENT_ROUTES.api.agent, {
         task,
         model: state.settings.model || "smejj 1.0",
-        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}) }
+        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}) },
+        history: collectConversationHistory()
       }, output);
       return showTaskIndicator("done");
     } catch (streamError) {
