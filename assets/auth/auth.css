@@ -196,6 +196,75 @@ h1 {
   font-size: 0.78rem;
 }
 
+/* Redesign 2026-07-18: Icon-Buttons, Provider-Stack, Passwort-Staerke.
+   Warmes smejj.com-Dark-Theme beibehalten (Konsistenz mit der restlichen App);
+   Layout und Komponenten folgen dem Mockup. Icons sind inline-SVG (kein CDN). */
+.auth-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.auth-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#authProviders .auth-button {
+  justify-content: flex-start;
+  font-weight: 500;
+}
+
+.auth-inline-note {
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: right;
+}
+
+.auth-terms {
+  margin: 12px 0 0;
+  color: rgba(246, 243, 238, 0.5);
+  text-align: center;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.auth-strength {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 8px 0 6px;
+}
+
+.auth-strength span {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background 0.2s;
+}
+
+.auth-strength[data-score="1"] span:nth-child(-n + 1),
+.auth-strength[data-score="2"] span:nth-child(-n + 2),
+.auth-strength[data-score="3"] span:nth-child(-n + 3),
+.auth-strength[data-score="4"] span:nth-child(-n + 4) {
+  background: #6fca8f;
+}
+
+.auth-strength[data-score="1"] span:nth-child(-n + 1) {
+  background: #e0a15a;
+}
+
+.auth-strength-note {
+  margin: 0 0 14px;
+  color: rgba(246, 243, 238, 0.56);
+  font-size: 0.78rem;
+}
+
 @media (max-width: 560px) {
   .auth-shell {
     width: min(100% - 20px, 520px);

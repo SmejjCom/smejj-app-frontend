@@ -248,6 +248,100 @@ async function handleUrlTokens() {
   }
 }
 
+// Startet einen One-Time-Handoff, damit der Token nach externem Login/Klick auf
+// smejj.com landet (gleiches Bearer-Prinzip wie bei Google). Ohne Handoff faellt
+// der Server auf die Control-Domain-Anmeldung zurueck.
+async function startHandoffQuery() {
+  const origin = window.location.origin;
+  try {
+    const start = await fetch(`${API_ORIGIN}/api/auth/session-handoff/start`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ returnOrigin: origin })
+    });
+    const handoff = await start.json();
+    if (handoff?.id) return { id: handoff.id, origin };
+  } catch { /* ohne Handoff: Fallback auf Control-Domain */ }
+  return { id: "", origin };
+}
+
+async function startGithubLogin() {
+  const button = document.querySelector("#githubLogin");
+  if (button) button.disabled = true;
+  status(t("GitHub Login wird gestartet …"));
+  try {
+    const { id, origin } = await startHandoffQuery();
+    const query = id ? `?handoff=${encodeURIComponent(id)}&returnOrigin=${encodeURIComponent(origin)}` : "";
+    window.location.assign(`${CLIENT_ROUTES.api.authGithub}${query}`);
+  } catch {
+    status(t("GitHub Login konnte nicht gestartet werden."), "error");
+    if (button) button.disabled = false;
+  }
+}
+
+async function requestMagicLink() {
+  const { email } = emailFormValues();
+  if (!email) { revealEmailForm(); return status(t("Bitte zuerst deine E-Mail-Adresse eingeben."), "error"); }
+  const button = document.querySelector("#magicLinkLogin");
+  if (button) button.disabled = true;
+  status(t("Anmeldelink wird gesendet …"));
+  try {
+    const { id, origin } = await startHandoffQuery();
+    const { ok, payload } = await postJson(CLIENT_ROUTES.api.authMagicLinkRequest, { email, handoff: id, returnOrigin: origin });
+    if (!ok) return status(errorText(payload, "Anmeldelink konnte nicht gesendet werden."), "error");
+    status(t("Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig)."), "success");
+  } catch {
+    status(t("Anmeldelink ist momentan nicht erreichbar."), "error");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+// Fail-closed-UX: nur serverseitig konfigurierte Login-Methoden sichtbar machen.
+// E-Mail und Passkey sind Basis und bleiben immer verfuegbar.
+async function applyAvailableMethods() {
+  let methods = {};
+  try {
+    const response = await fetch(CLIENT_ROUTES.api.authConfig);
+    const config = await response.json();
+    methods = { ...(config?.methods || {}), google: config?.methods?.google ?? config?.configured === true };
+  } catch { methods = { email: true, passkey: true }; }
+  for (const button of document.querySelectorAll("[data-method]")) {
+    const method = button.dataset.method;
+    if (method === "email" || method === "passkey") { button.hidden = false; continue; }
+    button.hidden = methods[method] !== true;
+  }
+}
+
+// Live-Passwortstaerke auf der Registrierungsseite (rein clientseitig, ehrlich:
+// Serverregel bleibt >= 10 Zeichen; scrypt-Hashing serverseitig).
+function scorePassword(pw) {
+  let score = 0;
+  if (pw.length >= 8) score += 1;
+  if (pw.length >= 12) score += 1;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score += 1;
+  if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score += 1;
+  return Math.min(4, score);
+}
+
+function setupPasswordStrength() {
+  const bar = document.querySelector("#pwStrength");
+  const note = document.querySelector("#pwStrengthNote");
+  const field = document.querySelector("#emailPassword");
+  if (!bar || !field) return;
+  const labels = ["Passwortstärke", "Schwach", "Okay", "Gut", "Stark"];
+  field.addEventListener("input", (event) => {
+    const pw = String(event.target.value || "");
+    const score = pw ? scorePassword(pw) : 0;
+    bar.dataset.score = String(score);
+    if (note) note.textContent = pw ? `${t(labels[score])} · ${t("mindestens 10 Zeichen")}` : t(labels[0]);
+  });
+}
+
+document.querySelector("#githubLogin")?.addEventListener("click", startGithubLogin);
+document.querySelector("#magicLinkLogin")?.addEventListener("click", requestMagicLink);
+applyAvailableMethods();
+setupPasswordStrength();
 document.querySelector("#googleLogin")?.addEventListener("click", startGoogleLogin);
 document.querySelector("#emailLogin")?.addEventListener("click", () => (mode === "register" ? submitEmailRegister() : submitEmailLogin()));
 document.querySelector("#emailFormSubmit")?.addEventListener("click", () => (mode === "register" ? submitEmailRegister() : submitEmailLogin()));
