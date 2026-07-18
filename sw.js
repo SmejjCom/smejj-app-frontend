@@ -1,9 +1,9 @@
-// v128 -> v129 (2026-07-18): panel-backdrop.js/.css neu im Shell-Cache.
-// PFLICHT, keine Kosmetik: app.js importiert panel-backdrop.js. Ohne Precache
+// v129 -> v130 (2026-07-18): shared/http-json.js neu im Shell-Cache.
+// PFLICHT, keine Kosmetik: app.js importiert shared/http-json.js. Ohne Precache
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v129";
+const CACHE_NAME = "smejj-shell-v130";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -69,6 +69,7 @@ const SHELL = [
   "/assets/ai/promptContextBuilder.js",
   "/assets/ai/chatClient.js",
   "/assets/shared/securityPolicy.js",
+  "/assets/shared/http-json.js",
   "/manifest.webmanifest",
   "/favicon.ico?v=112",
   "/apple-touch-icon.png",
