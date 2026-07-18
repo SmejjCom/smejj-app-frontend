@@ -376,11 +376,25 @@
      display: block;
 }
 
-/* Nach dem Upgrade steht der Hinweis im Fluss (kein Overlap mit der Leiste). */
+/* Nach dem Upgrade steht der Hinweis im Fluss (kein Overlap mit der Leiste).
+   Das Overlay zentriert per justify-content ALLES als einen Block — dadurch
+   hing die untere Leiste in der Bildmitte statt am unteren Rand. Zwei
+   auto-Margins teilen den Freiraum: das Zeichen bleibt mittig, Hinweis und
+   Leiste rutschen ganz nach unten. Bewusst EINE Regel pro Selektor — zwei
+   Regeln mit gleichem Selektor (margin:0 vs. margin-top:auto) waeren wieder
+   die Spezifitaetsfalle vom Konto-Tab-Fix. */
+
+.voice-mode-overlay[data-upgraded="true"] .voice-mode-logo {
+     margin-top: auto;
+}
 
 .voice-mode-overlay[data-upgraded="true"] .voice-mode-hint {
      position: static;
-     margin: 0;
+     margin: auto 0 0;
+}
+
+.voice-mode-overlay[data-upgraded="true"] .voice-mode-bar {
+     margin-bottom: 8px;
 }
 
 /* Code-Uebernahme aus Chat-Antworten in den Workspace. */
