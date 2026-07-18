@@ -11,6 +11,7 @@ import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260718";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
 import { collectConversationHistory } from "./chat-history-context.js";
+import { getJson, postJson } from "./shared/http-json.js";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
@@ -1095,13 +1096,19 @@ function refreshSessionStatus() {
 }
 
 async function initGoogleLogin() {
-  const config = await getJson(CLIENT_ROUTES.api.authConfig).catch(() => null);
+  // Performance: authConfig und authMe parallel holen statt hintereinander
+  // (kein Boot-Wasserfall). authMe wird ohnehin gebraucht; der In-Flight-Dedup
+  // in getJson faellt mit einem etwaigen parallelen Boot-Aufruf zusammen, sodass
+  // kein doppelter /api/auth/me entsteht. Gleiche Endpunkte, gleiche Antworten.
+  const [config, session] = await Promise.all([
+    getJson(CLIENT_ROUTES.api.authConfig).catch(() => null),
+    getJson(CLIENT_ROUTES.api.authMe).catch(() => ({ authenticated: false, user: null }))
+  ]);
   if (!config) {
     $("#googleSignIn").textContent = "Google Login: Control Server ist noch nicht online.";
     return writeOutput("#profileOutput", "Google Login wartet auf den Control Server.");
   }
   if (!config.configured) return void ($("#googleSignIn").textContent = "Google Login: Client-ID fehlt.");
-  const session = await getJson(CLIENT_ROUTES.api.authMe).catch(() => ({ authenticated: false, user: null }));
   if (session.authenticated && session.user) return showSignedIn(session.user);
   const container = $("#googleSignIn");
   container.innerHTML = "";
@@ -1248,38 +1255,6 @@ async function showJsonInLog(url) {
 
 async function showJson(target, url) {
   writeOutput(target, JSON.stringify(await getJson(url), null, 2));
-}
-
-async function getJson(url) {
-  try {
-    const response = await fetch(url);
-    const text = await response.text();
-    try {
-      return JSON.parse(text);
-    } catch {
-      return { ok: response.ok, status: response.status, text: text && !text.trimStart().startsWith("<") ? text : UI_COPY.localOnly };
-    }
-  } catch (error) {
-    return { ok: false, error: error.message || "Network request failed" };
-  }
-}
-
-async function postJson(url, body) {
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    const text = await response.text();
-    try {
-      return JSON.parse(text);
-    } catch {
-      return { ok: response.ok, status: response.status, text: text && !text.trimStart().startsWith("<") ? text : UI_COPY.localOnly };
-    }
-  } catch {
-    return { ok: false, error: "Network request failed" };
-  }
 }
 
 function addEntry(text, role, target = "#startLog") {
