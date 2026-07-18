@@ -206,6 +206,12 @@ h1 {
   gap: 10px;
 }
 
+/* Fail-closed: hidden-Attribut muss gegen die display-Regel gewinnen
+   (sonst wuerden nicht konfigurierte Login-Methoden sichtbar). */
+.auth-button[hidden] {
+  display: none;
+}
+
 .auth-ic {
   display: inline-flex;
   align-items: center;
