@@ -3,7 +3,7 @@
 // Zweck: initComposerTools() verdrahtet die Icon-Zeile des Start-Composers.
 import { showToast } from "./components.js";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue } from "./voice-speech-queue.js";
+import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=tts-sanitizer-20260720";
 
 const $ = (selector) => document.querySelector(selector);
 // Sprache dynamisch aus dem lang-Attribut der Seite (Fallback de-DE).
@@ -774,7 +774,8 @@ function toggleReadAloud() {
               return;
       }
       button?.classList.add("is-speaking");
-      speak(text, { onend: () => button?.classList.remove("is-speaking") });
+      // Stufe 1d: Quellen/URLs/Zeitstempel/Markdown nicht vorlesen (Anzeige bleibt).
+      speak(sanitizeForSpeech(text), { onend: () => button?.classList.remove("is-speaking") });
 }
 
 // --- Initialisierung ----------------------------------------------------------
