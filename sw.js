@@ -1,9 +1,11 @@
+// v130 -> v131 (2026-07-20): TTS-Sanitizer — voice-speech-queue.js, composer-tools.js,
+// app.js und index.html geaendert; Precache muss die neuen Versionen ausliefern.
 // v129 -> v130 (2026-07-18): shared/http-json.js neu im Shell-Cache.
 // PFLICHT, keine Kosmetik: app.js importiert shared/http-json.js. Ohne Precache
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v130";
+const CACHE_NAME = "smejj-shell-v131";
 const SHELL = [
   "/",
   "/assets/styles.css",
