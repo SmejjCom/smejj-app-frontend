@@ -4,6 +4,8 @@
 // beginnt die Sprachausgabe bereits mit dem ersten fertigen Satz; Folgesaetze
 // werden als Queue nacheinander gesprochen. Barge-in/Schliessen bricht die
 // Queue sofort ab. Free-only: nur speechSynthesis der Hosts, keine Dienste.
+// Stufe 1d: TTS-Sanitizer — Quellen, URLs, Zeitstempel und Markdown werden vor
+// der Sprachausgabe entfernt ("Anzeigen ja, vorlesen nein"); Anzeige unveraendert.
 
 // Satzenden: westliche Interpunktion (von Leerraum/Textende gefolgt) plus
 // CJK-Interpunktion (ohne Leerraum-Anforderung). Zu kurze Fragmente (z. B.
@@ -42,10 +44,82 @@ export function splitCompleteSentences(text, { flush = false, minChars = DEFAULT
   return { sentences, rest };
 }
 
+// --- TTS-Sanitizer ("Anzeigen ja, vorlesen nein") -----------------------------
+// Reine Ausgabe-Schicht direkt vor der TTS-Uebergabe: Der Chat zeigt Quellen,
+// URLs und Zeitstempel weiterhin an (Nachvollziehbarkeit), gesprochen werden
+// sie nicht — wie bei fuehrenden Sprachassistenten. Kein Eingriff in Anzeige,
+// Design, Backend oder Quellen-Logik.
+
+// Quellen-Label der 15 Oberflaechensprachen. Die Zeile wird ab dem Label bis zum
+// Zeilenende verworfen; greift am Textanfang, nach Zeilenumbruch oder nach
+// Satzzeichen (auch fuer gerenderte Anzeige-Texte, deren Zeilen zusammenfallen).
+const SOURCE_LINE = /(^|[\n.!?…)\]])[ \t]*(?:quellen?|sources?|fuentes?|fontes?|fonti|источники?|kaynak(?:lar)?|sumber|出典|情報源|来源|來源|출처|स्रोत|المصادر|المصدر|সূত্র|উৎস)\s*:[^\n]*/giu;
+const STAND_NOTE = /\(\s*(?:stand|as of)\s*:[^)]*\)/gi;
+const ISO_TIMESTAMP = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?/gi;
+const URL_PATTERN = /(?:https?:\/\/|www\.)[^\s<>()[\]{}"']+/gi;
+const MD_IMAGE = /!\[[^\]]*\]\([^)]*\)/g;
+const MD_LINK = /\[([^\]]+)\]\([^)]*\)/g;
+const MD_FENCE = /```[^\n]*/g;
+const MD_BOLD = /\*\*+|__+|~~+/g;
+const MD_EMPHASIS = /(^|[\s(])[*_]([^*_\n]+)[*_](?=$|[\s.,;:!?)])/g;
+const MD_HEADING = /^[ \t]{0,3}#{1,6}[ \t]+/gm;
+const MD_BULLET = /^[ \t]*[-*•][ \t]+/gm;
+const EMPTY_BRACKETS = /[([][\s,;:.\/-]*[)\]]/g;
+
+// Seitensprache fuer sprechfreundliche Zahlen: im Browser aus <html lang>,
+// in Tests/Node ueber die explizite Option { lang }.
+function speechPageLang(explicit) {
+  if (explicit) return String(explicit).toLowerCase();
+  if (typeof document !== "undefined") return (document.documentElement?.lang || "").toLowerCase();
+  return "";
+}
+
+// Macht Antworttext sprechfertig. Input: Anzeige-Text (Rohtext oder gerenderte
+// textContent-Fassung), optional { lang }. Output: bereinigter Sprechtext —
+// leer (""), wenn nach der Bereinigung nichts Sprechbares uebrig bleibt.
+// Idempotent und fail-safe: bei einem internen Fehler wird der Originaltext
+// gesprochen, damit die Sprachausgabe NIE ganz ausfaellt.
+export function sanitizeForSpeech(text, { lang } = {}) {
+  const raw = String(text || "");
+  try {
+    let out = raw
+      .replace(MD_IMAGE, " ")
+      .replace(MD_LINK, "$1")
+      .replace(SOURCE_LINE, "$1")
+      .replace(STAND_NOTE, " ")
+      .replace(ISO_TIMESTAMP, " ")
+      .replace(URL_PATTERN, " ")
+      .replace(MD_FENCE, " ")
+      .replace(MD_HEADING, "")
+      .replace(MD_BULLET, "")
+      .replace(MD_BOLD, "")
+      .replace(MD_EMPHASIS, "$1$2")
+      .replace(/`/g, "");
+    if (speechPageLang(lang).startsWith("de")) {
+      // Fuers Ohr: "17.6°C" -> "17,6 Grad" (deutsche TTS spricht das Komma natuerlich).
+      out = out
+        .replace(/(\d)\.(\d)/g, "$1,$2")
+        .replace(/\s*°\s*C\b/g, " Grad")
+        .replace(/\s*°\s*F\b/g, " Grad Fahrenheit")
+        .replace(/(\d)\s*°(?![CF\d])/g, "$1 Grad");
+    }
+    out = out.replace(EMPTY_BRACKETS, " ");
+    const lines = out
+      .split("\n")
+      .map((line) => line.replace(/[ \t]{2,}/g, " ").trim())
+      .filter((line) => /[\p{L}\p{N}]/u.test(line));
+    return lines.join("\n").trim();
+  } catch {
+    return raw; // fail-safe: lieber ungefiltert vorlesen als gar nicht
+  }
+}
+
 // Erzeugt eine Vorlese-Queue. Der Host liefert seine eigene speak-Funktion
 // (speakFn(text, { onstart, onend })) und seine stop-Funktion (stopFn()).
 // onQueueStart feuert beim tatsaechlichen Start des ERSTEN Satzes,
 // onQueueEnd genau einmal, wenn nach flush() alles fertig gesprochen ist.
+// Jeder Satz laeuft vor der TTS-Uebergabe durch sanitizeForSpeech; Saetze,
+// die danach leer sind (reine Quellen-/URL-Zeilen), werden still uebersprungen.
 export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, minChars = DEFAULT_MIN_CHARS } = {}) {
   const queue = [];
   let consumed = 0;      // Zeichen des Volltexts, die bereits in Saetze zerlegt wurden
@@ -58,21 +132,27 @@ export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, m
 
   const speakNext = () => {
     if (cancelled || speaking) return;
-    const sentence = queue.shift();
-    if (sentence === undefined) {
-      if (flushed && !ended) {
-        ended = true;
-        onQueueEnd?.();
+    let speech = "";
+    for (;;) {
+      const sentence = queue.shift();
+      if (sentence === undefined) {
+        if (flushed && !ended) {
+          ended = true;
+          onQueueEnd?.();
+        }
+        return;
       }
-      return;
+      // Nur fuers Auge (Quellen/URLs/Zeitstempel)? Still ueberspringen.
+      speech = sanitizeForSpeech(sentence);
+      if (speech) break;
     }
     speaking = true;
-    spoken += (spoken ? " " : "") + sentence;
+    spoken += (spoken ? " " : "") + speech;
     if (!started) {
       started = true;
       onQueueStart?.();
     }
-    speakFn(sentence, {
+    speakFn(speech, {
       onend: () => {
         speaking = false;
         if (!cancelled) speakNext();
