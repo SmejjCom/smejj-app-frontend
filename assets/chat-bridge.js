@@ -11,6 +11,13 @@ const LLM_API_KEY = process.env.SMEJJ_LLM_SALAD_API_KEY || process.env.SMEJJ_LLM
 const LLM_MODEL = process.env.SMEJJ_LLM_SALAD_MODEL || process.env.SMEJJ_LLM_MODEL || "tgi";
 const LLM_HEADER = process.env.SMEJJ_LLM_HEADER || (process.env.SMEJJ_LLM_SALAD_API_KEY ? "Salad-Api-Key" : "Authorization");
 const REQUEST_TIMEOUT_MS = Number(process.env.SMEJJ_CHAT_BRIDGE_TIMEOUT_MS || 60000);
+// Fast Lane (Welle 2, 0-Euro-Freigabe 2026-07-21): Groq Free-Tier NUR fuer schnelle
+// Konversationsantworten; Coding/Web bleiben auf der Deep Lane (GLM-5.2).
+// Fail-safe: ohne Key oder bei jedem Fehler greift unveraendert der bisherige Pfad.
+const GROQ_API_KEY = process.env.SMEJJ_LLM_GROQ_API_KEY || "";
+const GROQ_BASE_URL = trimUrl(process.env.SMEJJ_LLM_GROQ_BASE_URL || "https://api.groq.com/openai/v1");
+const GROQ_MODEL = process.env.SMEJJ_LLM_GROQ_MODEL || "llama-3.1-8b-instant";
+const FAST_LANE_TIMEOUT_MS = Number(process.env.SMEJJ_FAST_LANE_TIMEOUT_MS || 15000);
 const MAX_BODY_BYTES = 256 * 1024;
 const RATE_WINDOW_MS = 60_000;
 const RATE_PER_CLIENT = boundedInteger(process.env.SMEJJ_PUBLIC_AI_RATE_PER_MINUTE, 1, 600, 12);
@@ -18,7 +25,7 @@ const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_M
 const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
 const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260710-v96";
+const BRIDGE_VERSION = "20260721-v97-fast-lane";
 
 export function createChatBridgeServer() {
   return http.createServer(async (req, res) => {
@@ -48,6 +55,8 @@ function healthPayload() {
     modelConfigured: Boolean(LLM_BASE_URL && LLM_API_KEY && LLM_MODEL),
     controlConfigured: Boolean(CONTROL_ORIGIN),
     multiModelRouterEnabled: CONTROL_ROUTER_ENABLED,
+    fastLaneEnabled: fastLaneEnabled(),
+    fastLaneModel: fastLaneEnabled() ? `groq:${GROQ_MODEL}` : "",
     role: "stateless-chat-stream-bridge",
     costProfile: "cpu-only-no-gpu-no-storage",
     publicRateLimit: { perClientPerMinute: RATE_PER_CLIENT, globalPerMinute: RATE_GLOBAL },
@@ -96,8 +105,9 @@ function boundedInteger(value, min, max, fallback) {
 
 async function handleChat(req, res) {
   const body = await readJson(req);
-  if (await streamViaControl(res, "/api/chat", body)) return;
   const messages = Array.isArray(body.messages) ? body.messages : [{ role: "user", content: String(body.message || "") }];
+  if (await streamFastLane(res, hardenMessages(messages), "chat", body.model)) return;
+  if (await streamViaControl(res, "/api/chat", body)) return;
   return streamModel(res, hardenMessages(messages), "chat", body.model);
 }
 
@@ -105,8 +115,10 @@ async function handleAgent(req, res) {
   const body = await readJson(req);
   const task = String(body.task || body.message || "").trim();
   if (!task) return json(res, 400, { ok: false, error: "Missing task" });
-  if (await streamViaControl(res, "/api/agent", body)) return;
   const coding = isCodingTask(task);
+  const fastTask = !coding && !shouldSearchWeb(task);
+  if (fastTask && await streamFastLane(res, buildAgentMessages({ task, coding: false, webContext: "" }), "fast", body.model)) return;
+  if (await streamViaControl(res, "/api/agent", body)) return;
   const webContext = !coding && shouldSearchWeb(task) ? await buildWebContext(task) : "";
   const messages = buildAgentMessages({ task, coding, webContext });
   return streamModel(res, messages, coding ? "coding" : webContext ? "web" : "fast", body.model);
@@ -185,6 +197,60 @@ async function streamViaControl(res, route, body) {
     "x-smejj-model-backend": upstream.headers.get("x-smejj-model-backend") || "control-router",
     "x-smejj-model-id": upstream.headers.get("x-smejj-model-id") || "",
     "x-smejj-model-fallback": upstream.headers.get("x-smejj-model-fallback") || "false"
+  });
+  await pipeVisibleStream(upstream.body, res);
+  res.end();
+  return true;
+}
+
+export function fastLaneEnabled() {
+  return Boolean(GROQ_API_KEY && GROQ_BASE_URL && GROQ_MODEL);
+}
+
+// Schnelle Konversations-Spur: liefert true nur, wenn Groq erfolgreich streamt.
+// Bei false wurde noch KEIN Byte gesendet — der Aufrufer faellt auf den
+// bisherigen Pfad (Control-Router bzw. GLM-5.2 direkt) zurueck.
+export async function streamFastLane(res, messages, profile, requestedModel = "") {
+  if (!fastLaneEnabled()) return false;
+  if (/glm|kimi|cline/i.test(String(requestedModel || ""))) return false;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), Math.min(REQUEST_TIMEOUT_MS, FAST_LANE_TIMEOUT_MS));
+  let upstream;
+  try {
+    upstream = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
+        Authorization: `Bearer ${GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages,
+        stream: true,
+        temperature: 0.35,
+        max_tokens: profile === "fast" ? 700 : 1400
+      })
+    });
+  } catch {
+    clearTimeout(timer);
+    return false;
+  }
+  clearTimeout(timer);
+  if (!upstream.ok || !upstream.body) return false;
+  res.writeHead(200, {
+    ...securityHeaders(),
+    ...corsHeaders("https://smejj.com"),
+    "Content-Type": "text/event-stream; charset=utf-8",
+    "Cache-Control": "no-cache, no-transform",
+    Connection: "keep-alive",
+    "x-smejj-bridge": "chat-fast-lane",
+    "x-smejj-profile": profile,
+    "x-smejj-model-backend": `groq:${GROQ_MODEL}`,
+    "x-smejj-model-id": GROQ_MODEL,
+    "x-smejj-requested-model": String(requestedModel || ""),
+    "x-smejj-model-fallback": "false"
   });
   await pipeVisibleStream(upstream.body, res);
   res.end();
