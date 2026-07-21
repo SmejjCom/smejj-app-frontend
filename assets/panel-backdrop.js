@@ -15,7 +15,7 @@
 // Versionsmarke: GitHub Pages liefert Assets mit max-age. Ohne ?v= sieht ein
 // bestehender Nutzer die Aenderung erst nach Ablauf der Frist.
 // Bei jeder Aenderung an panel-backdrop.css erhoehen.
-const STYLE_VERSION = "panel-backdrop-20260718";
+const STYLE_VERSION = "panel-backdrop-20260721";
 
 function loadStyles() {
   if (document.querySelector('link[href^="/assets/panel-backdrop.css"]')) return;
