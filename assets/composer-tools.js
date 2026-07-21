@@ -4,6 +4,8 @@
 import { showToast } from "./components.js";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
 import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=tts-sanitizer-20260720";
+// Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
+import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
 
 const $ = (selector) => document.querySelector(selector);
 // Sprache dynamisch aus dem lang-Attribut der Seite (Fallback de-DE).
@@ -690,7 +692,11 @@ function openVoiceMode() {
       const mic = $("#voiceModeMic");
       if (mic) mic.title = "Stummschalten";
       const typedInput = $("#voiceModeInput");
-      if (typedInput) typedInput.value = "";
+      if (typedInput) {
+              typedInput.value = "";
+              // Sende-Button-Zustand nachziehen (Feld ist jetzt leer -> inaktiv).
+              typedInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
       overlay.hidden = false;
       if (!RecognitionCtor) {
               // iOS/Safari ohne Web-Speech-Erkennung: Overlay im Diktat-Fallback oeffnen
@@ -727,6 +733,7 @@ function upgradeVoiceOverlay() {
         + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
         + '</button>'
         + '<input id="voiceModeInput" type="text" placeholder="Frage schreiben ..." autocomplete="off">'
+        + `<button id="voiceModeSend" type="button" aria-label="Senden" title="Senden" disabled>${SEND_ICON_SVG}</button>`
         + '</div>'
         + '<button id="voiceModeMic" class="voice-mode-mic" type="button" aria-label="Mikrofon stummschalten" aria-pressed="false" title="Stummschalten">'
         + '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path class="voice-mic-slash" d="M4 4l16 16"/></svg>'
@@ -743,15 +750,15 @@ function bindVoiceMode() {
       $("#voiceModeClose")?.addEventListener("click", closeVoiceMode);
       $("#voiceModeMic")?.addEventListener("click", toggleVoiceMute);
       $("#voiceModeAttach")?.addEventListener("click", () => $("#composerFileInput")?.click());
-      $("#voiceModeInput")?.addEventListener("keydown", (event) => {
-              if (event.key !== "Enter") return;
-              const typedInput = event.currentTarget;
-              const task = typedInput.value.trim();
-              if (!task) return;
-              typedInput.value = "";
-              stopSpeaking();
-              // voiceModeSend loest die laufende Erkennung selbst ab (Identitaets-Guard).
-              voiceModeSend(task);
+      // Enter und Sende-Button senden identisch; voiceModeSend loest die
+      // laufende Erkennung selbst ab (Identitaets-Guard).
+      bindTypedSend({
+              input: $("#voiceModeInput"),
+              send: $("#voiceModeSend"),
+              onSubmit: (task) => {
+                      stopSpeaking();
+                      voiceModeSend(task);
+              }
       });
       document.addEventListener("keydown", (event) => {
               if (event.key === "Escape" && state.voiceModeActive) closeVoiceMode();

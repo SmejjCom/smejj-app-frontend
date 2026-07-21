@@ -1,3 +1,6 @@
+// v132 -> v133 (2026-07-21): Sende-Icon der Sprachwellen (wie ChatGPT) —
+// voice-typed-send.js neu im Shell-Cache; composer-tools.js/.css, voice-landing.js,
+// app.js und index.html geaendert; Precache muss die neuen Versionen ausliefern.
 // v131 -> v132 (2026-07-21): Chat-Verlauf (Welle 1) — chat-store.js + chat-history-view.js
 // neu im Shell-Cache; index.html laedt beide Module.
 // v130 -> v131 (2026-07-20): TTS-Sanitizer — voice-speech-queue.js, composer-tools.js,
@@ -7,7 +10,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v132";
+const CACHE_NAME = "smejj-shell-v133";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -51,6 +54,7 @@ const SHELL = [
   "/assets/view-chrome.js",
   "/assets/view-chrome.css",
   "/assets/composer-tools.js",
+  "/assets/voice-typed-send.js",
   "/assets/voice-speech-queue.js",
   "/assets/chat-store.js",
   "/assets/chat-history-view.js",

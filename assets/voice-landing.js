@@ -9,6 +9,8 @@
 import { CLIENT_ROUTES } from "./config.js";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
 import { createSpeechQueue } from "./voice-speech-queue.js";
+// Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
+import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
 
 const LANG_MAP = {
   de: "de-DE", en: "en-US", fr: "fr-FR", es: "es-ES", it: "it-IT",
@@ -18,21 +20,21 @@ const LANG_MAP = {
 
 // Kompakte UI-Texte pro Sprache (Schluessel siehe stringsFor()).
 const STRINGS = {
-  de: { open: "Sprachmodus", listening: "Ich höre zu ...", thinking: "Einen Moment ...", speaking: "Ich spreche ...", typeHint: "Frage unten eintippen — die Antwort wird vorgelesen.", placeholder: "Frage schreiben ...", micDenied: "Mikrofon nicht erlaubt — Frage unten eintippen.", noAnswer: "Keine Antwort erhalten — ich höre weiter zu.", error: "Verbindung fehlgeschlagen — bitte erneut versuchen.", close: "Beenden" },
-  en: { open: "Voice mode", listening: "I'm listening ...", thinking: "One moment ...", speaking: "I'm speaking ...", typeHint: "Type your question below — the answer will be read aloud.", placeholder: "Write a question ...", micDenied: "Microphone not allowed — type your question below.", noAnswer: "No answer received — still listening.", error: "Connection failed — please try again.", close: "Close" },
-  zh: { open: "语音模式", listening: "我在听 ...", thinking: "请稍等 ...", speaking: "我在说 ...", typeHint: "在下方输入问题——回答将朗读出来。", placeholder: "输入问题 ...", micDenied: "麦克风未授权——请在下方输入问题。", noAnswer: "未收到回答——继续聆听。", error: "连接失败——请重试。", close: "关闭" },
-  es: { open: "Modo de voz", listening: "Te escucho ...", thinking: "Un momento ...", speaking: "Estoy hablando ...", typeHint: "Escribe tu pregunta abajo: la respuesta se leera en voz alta.", placeholder: "Escribe una pregunta ...", micDenied: "Microfono no permitido: escribe tu pregunta abajo.", noAnswer: "Sin respuesta: sigo escuchando.", error: "Fallo de conexion: intentalo de nuevo.", close: "Cerrar" },
-  ar: { open: "وضع الصوت", listening: "أنا أستمع ...", thinking: "لحظة من فضلك ...", speaking: "أنا أتحدث ...", typeHint: "اكتب سؤالك في الأسفل — سيُقرأ الجواب بصوت عالٍ.", placeholder: "اكتب سؤالاً ...", micDenied: "الميكروفون غير مسموح — اكتب سؤالك في الأسفل.", noAnswer: "لم يصل جواب — ما زلت أستمع.", error: "فشل الاتصال — حاول مرة أخرى.", close: "إغلاق" },
-  fr: { open: "Mode vocal", listening: "Je vous ecoute ...", thinking: "Un instant ...", speaking: "Je parle ...", typeHint: "Ecrivez votre question ci-dessous — la reponse sera lue a voix haute.", placeholder: "Ecrire une question ...", micDenied: "Micro non autorise — ecrivez votre question ci-dessous.", noAnswer: "Pas de reponse — je continue d'ecouter.", error: "Echec de connexion — veuillez reessayer.", close: "Fermer" },
-  pt: { open: "Modo de voz", listening: "Estou a ouvir ...", thinking: "Um momento ...", speaking: "Estou a falar ...", typeHint: "Escreva a sua pergunta abaixo — a resposta sera lida em voz alta.", placeholder: "Escrever uma pergunta ...", micDenied: "Microfone nao permitido — escreva a pergunta abaixo.", noAnswer: "Sem resposta — continuo a ouvir.", error: "Falha de ligacao — tente novamente.", close: "Fechar" },
-  ru: { open: "Голосовой режим", listening: "Я слушаю ...", thinking: "Секунду ...", speaking: "Я говорю ...", typeHint: "Введите вопрос ниже — ответ будет озвучен.", placeholder: "Напишите вопрос ...", micDenied: "Микрофон не разрешён — введите вопрос ниже.", noAnswer: "Ответ не получен — продолжаю слушать.", error: "Ошибка соединения — попробуйте ещё раз.", close: "Закрыть" },
-  tr: { open: "Ses modu", listening: "Dinliyorum ...", thinking: "Bir saniye ...", speaking: "Konusuyorum ...", typeHint: "Sorunuzu asagiya yazin — yanit sesli okunacak.", placeholder: "Bir soru yazin ...", micDenied: "Mikrofona izin yok — sorunuzu asagiya yazin.", noAnswer: "Yanit alinamadi — dinlemeye devam ediyorum.", error: "Baglanti hatasi — lutfen tekrar deneyin.", close: "Kapat" },
-  ja: { open: "音声モード", listening: "聞いています ...", thinking: "少々お待ちください ...", speaking: "話しています ...", typeHint: "下に質問を入力してください——回答は読み上げられます。", placeholder: "質問を入力 ...", micDenied: "マイクが許可されていません——下に質問を入力してください。", noAnswer: "回答がありません——引き続き聞いています。", error: "接続に失敗しました——もう一度お試しください。", close: "閉じる" },
-  ko: { open: "음성 모드", listening: "듣고 있어요 ...", thinking: "잠시만요 ...", speaking: "말하고 있어요 ...", typeHint: "아래에 질문을 입력하세요 — 답변을 소리 내어 읽어 드립니다.", placeholder: "질문 입력 ...", micDenied: "마이크가 허용되지 않았습니다 — 아래에 질문을 입력하세요.", noAnswer: "답변이 없습니다 — 계속 듣고 있어요.", error: "연결 실패 — 다시 시도해 주세요.", close: "닫기" },
-  it: { open: "Modalita vocale", listening: "Ti ascolto ...", thinking: "Un attimo ...", speaking: "Sto parlando ...", typeHint: "Scrivi la tua domanda qui sotto: la risposta sara letta ad alta voce.", placeholder: "Scrivi una domanda ...", micDenied: "Microfono non consentito: scrivi la domanda qui sotto.", noAnswer: "Nessuna risposta: continuo ad ascoltare.", error: "Connessione non riuscita: riprova.", close: "Chiudi" },
-  hi: { open: "वॉइस मोड", listening: "मैं सुन रहा हूँ ...", thinking: "एक क्षण ...", speaking: "मैं बोल रहा हूँ ...", typeHint: "नीचे अपना प्रश्न लिखें — उत्तर ज़ोर से पढ़ा जाएगा।", placeholder: "प्रश्न लिखें ...", micDenied: "माइक्रोफ़ोन की अनुमति नहीं — नीचे प्रश्न लिखें।", noAnswer: "कोई उत्तर नहीं मिला — मैं सुनता रहूँगा।", error: "कनेक्शन विफल — कृपया पुनः प्रयास करें।", close: "बंद करें" },
-  id: { open: "Mode suara", listening: "Saya mendengarkan ...", thinking: "Sebentar ...", speaking: "Saya berbicara ...", typeHint: "Ketik pertanyaan Anda di bawah — jawaban akan dibacakan.", placeholder: "Tulis pertanyaan ...", micDenied: "Mikrofon tidak diizinkan — ketik pertanyaan di bawah.", noAnswer: "Tidak ada jawaban — masih mendengarkan.", error: "Koneksi gagal — silakan coba lagi.", close: "Tutup" },
-  bn: { open: "ভয়েস মোড", listening: "আমি শুনছি ...", thinking: "এক মুহূর্ত ...", speaking: "আমি বলছি ...", typeHint: "নীচে আপনার প্রশ্ন লিখুন — উত্তরটি জোরে পড়ে শোনানো হবে।", placeholder: "প্রশ্ন লিখুন ...", micDenied: "মাইক্রোফোনের অনুমতি নেই — নীচে প্রশ্ন লিখুন।", noAnswer: "কোনও উত্তর আসেনি — আমি শুনছি।", error: "সংযোগ ব্যর্থ — আবার চেষ্টা করুন।", close: "বন্ধ করুন" }
+  de: { open: "Sprachmodus", listening: "Ich höre zu ...", thinking: "Einen Moment ...", speaking: "Ich spreche ...", typeHint: "Frage unten eintippen — die Antwort wird vorgelesen.", placeholder: "Frage schreiben ...", micDenied: "Mikrofon nicht erlaubt — Frage unten eintippen.", noAnswer: "Keine Antwort erhalten — ich höre weiter zu.", error: "Verbindung fehlgeschlagen — bitte erneut versuchen.", close: "Beenden", send: "Senden" },
+  en: { open: "Voice mode", listening: "I'm listening ...", thinking: "One moment ...", speaking: "I'm speaking ...", typeHint: "Type your question below — the answer will be read aloud.", placeholder: "Write a question ...", micDenied: "Microphone not allowed — type your question below.", noAnswer: "No answer received — still listening.", error: "Connection failed — please try again.", close: "Close", send: "Send" },
+  zh: { open: "语音模式", listening: "我在听 ...", thinking: "请稍等 ...", speaking: "我在说 ...", typeHint: "在下方输入问题——回答将朗读出来。", placeholder: "输入问题 ...", micDenied: "麦克风未授权——请在下方输入问题。", noAnswer: "未收到回答——继续聆听。", error: "连接失败——请重试。", close: "关闭", send: "发送" },
+  es: { open: "Modo de voz", listening: "Te escucho ...", thinking: "Un momento ...", speaking: "Estoy hablando ...", typeHint: "Escribe tu pregunta abajo: la respuesta se leera en voz alta.", placeholder: "Escribe una pregunta ...", micDenied: "Microfono no permitido: escribe tu pregunta abajo.", noAnswer: "Sin respuesta: sigo escuchando.", error: "Fallo de conexion: intentalo de nuevo.", close: "Cerrar", send: "Enviar" },
+  ar: { open: "وضع الصوت", listening: "أنا أستمع ...", thinking: "لحظة من فضلك ...", speaking: "أنا أتحدث ...", typeHint: "اكتب سؤالك في الأسفل — سيُقرأ الجواب بصوت عالٍ.", placeholder: "اكتب سؤالاً ...", micDenied: "الميكروفون غير مسموح — اكتب سؤالك في الأسفل.", noAnswer: "لم يصل جواب — ما زلت أستمع.", error: "فشل الاتصال — حاول مرة أخرى.", close: "إغلاق", send: "إرسال" },
+  fr: { open: "Mode vocal", listening: "Je vous ecoute ...", thinking: "Un instant ...", speaking: "Je parle ...", typeHint: "Ecrivez votre question ci-dessous — la reponse sera lue a voix haute.", placeholder: "Ecrire une question ...", micDenied: "Micro non autorise — ecrivez votre question ci-dessous.", noAnswer: "Pas de reponse — je continue d'ecouter.", error: "Echec de connexion — veuillez reessayer.", close: "Fermer", send: "Envoyer" },
+  pt: { open: "Modo de voz", listening: "Estou a ouvir ...", thinking: "Um momento ...", speaking: "Estou a falar ...", typeHint: "Escreva a sua pergunta abaixo — a resposta sera lida em voz alta.", placeholder: "Escrever uma pergunta ...", micDenied: "Microfone nao permitido — escreva a pergunta abaixo.", noAnswer: "Sem resposta — continuo a ouvir.", error: "Falha de ligacao — tente novamente.", close: "Fechar", send: "Enviar" },
+  ru: { open: "Голосовой режим", listening: "Я слушаю ...", thinking: "Секунду ...", speaking: "Я говорю ...", typeHint: "Введите вопрос ниже — ответ будет озвучен.", placeholder: "Напишите вопрос ...", micDenied: "Микрофон не разрешён — введите вопрос ниже.", noAnswer: "Ответ не получен — продолжаю слушать.", error: "Ошибка соединения — попробуйте ещё раз.", close: "Закрыть", send: "Отправить" },
+  tr: { open: "Ses modu", listening: "Dinliyorum ...", thinking: "Bir saniye ...", speaking: "Konusuyorum ...", typeHint: "Sorunuzu asagiya yazin — yanit sesli okunacak.", placeholder: "Bir soru yazin ...", micDenied: "Mikrofona izin yok — sorunuzu asagiya yazin.", noAnswer: "Yanit alinamadi — dinlemeye devam ediyorum.", error: "Baglanti hatasi — lutfen tekrar deneyin.", close: "Kapat", send: "Gönder" },
+  ja: { open: "音声モード", listening: "聞いています ...", thinking: "少々お待ちください ...", speaking: "話しています ...", typeHint: "下に質問を入力してください——回答は読み上げられます。", placeholder: "質問を入力 ...", micDenied: "マイクが許可されていません——下に質問を入力してください。", noAnswer: "回答がありません——引き続き聞いています。", error: "接続に失敗しました——もう一度お試しください。", close: "閉じる", send: "送信" },
+  ko: { open: "음성 모드", listening: "듣고 있어요 ...", thinking: "잠시만요 ...", speaking: "말하고 있어요 ...", typeHint: "아래에 질문을 입력하세요 — 답변을 소리 내어 읽어 드립니다.", placeholder: "질문 입력 ...", micDenied: "마이크가 허용되지 않았습니다 — 아래에 질문을 입력하세요.", noAnswer: "답변이 없습니다 — 계속 듣고 있어요.", error: "연결 실패 — 다시 시도해 주세요.", close: "닫기", send: "보내기" },
+  it: { open: "Modalita vocale", listening: "Ti ascolto ...", thinking: "Un attimo ...", speaking: "Sto parlando ...", typeHint: "Scrivi la tua domanda qui sotto: la risposta sara letta ad alta voce.", placeholder: "Scrivi una domanda ...", micDenied: "Microfono non consentito: scrivi la domanda qui sotto.", noAnswer: "Nessuna risposta: continuo ad ascoltare.", error: "Connessione non riuscita: riprova.", close: "Chiudi", send: "Invia" },
+  hi: { open: "वॉइस मोड", listening: "मैं सुन रहा हूँ ...", thinking: "एक क्षण ...", speaking: "मैं बोल रहा हूँ ...", typeHint: "नीचे अपना प्रश्न लिखें — उत्तर ज़ोर से पढ़ा जाएगा।", placeholder: "प्रश्न लिखें ...", micDenied: "माइक्रोफ़ोन की अनुमति नहीं — नीचे प्रश्न लिखें।", noAnswer: "कोई उत्तर नहीं मिला — मैं सुनता रहूँगा।", error: "कनेक्शन विफल — कृपया पुनः प्रयास करें।", close: "बंद करें", send: "भेजें" },
+  id: { open: "Mode suara", listening: "Saya mendengarkan ...", thinking: "Sebentar ...", speaking: "Saya berbicara ...", typeHint: "Ketik pertanyaan Anda di bawah — jawaban akan dibacakan.", placeholder: "Tulis pertanyaan ...", micDenied: "Mikrofon tidak diizinkan — ketik pertanyaan di bawah.", noAnswer: "Tidak ada jawaban — masih mendengarkan.", error: "Koneksi gagal — silakan coba lagi.", close: "Tutup", send: "Kirim" },
+  bn: { open: "ভয়েস মোড", listening: "আমি শুনছি ...", thinking: "এক মুহূর্ত ...", speaking: "আমি বলছি ...", typeHint: "নীচে আপনার প্রশ্ন লিখুন — উত্তরটি জোরে পড়ে শোনানো হবে।", placeholder: "প্রশ্ন লিখুন ...", micDenied: "মাইক্রোফোনের অনুমতি নেই — নীচে প্রশ্ন লিখুন।", noAnswer: "কোনও উত্তর আসেনি — আমি শুনছি।", error: "সংযোগ ব্যর্থ — আবার চেষ্টা করুন।", close: "বন্ধ করুন", send: "পাঠান" }
 };
 
 // Sprachen ohne Leerzeichen-Wortgrenzen (Barge-in-Schwelle ueber Zeichenlaenge).
@@ -146,9 +148,17 @@ const CSS = `
 .voice-landing-bar { position: fixed; inset-inline: 0; margin-inline: auto;
   bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   display: flex; gap: 10px; align-items: center; width: min(640px, 92vw); }
-#voiceLandingInput { flex: 1; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.06); color: #f2f2ef; padding: 12px 18px; font-size: 15px; outline: none; }
+.voice-landing-input-wrap { flex: 1; display: flex; align-items: center; gap: 6px;
+  border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06); padding: 4px 5px 4px 18px; }
+#voiceLandingInput { flex: 1; min-width: 0; border: none; background: transparent;
+  color: #f2f2ef; padding: 8px 0; font-size: 15px; outline: none; }
 #voiceLandingInput::placeholder { color: #8b8b84; }
+#voiceLandingSend { width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; flex: none;
+  background: transparent; color: #f2f2ef; display: flex; align-items: center; justify-content: center; }
+#voiceLandingSend:hover { background: transparent; color: #ffffff; }
+#voiceLandingSend:disabled { background: transparent; color: rgba(242, 242, 239, 0.35); cursor: default; }
+#voiceLandingSend svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 #voiceLandingMic { width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.16); cursor: pointer;
   background: rgba(255, 255, 255, 0.06); color: #f2f2ef; display: flex; align-items: center; justify-content: center; flex: none; }
 #voiceLandingMic:hover { background: rgba(255, 255, 255, 0.12); }
@@ -171,6 +181,9 @@ const state = {
   requestId: 0,
   speechQueue: null
 };
+
+// Haelt den Aktiv-Zustand des Sende-Buttons aktuell (gesetzt in buildUi).
+let syncTypedSend = () => {};
 
 const lang = pageLang();
 const T = stringsFor(lang);
@@ -506,6 +519,7 @@ function openOverlay() {
   unlockSpeechSynthesis();
   const input = $id("voiceLandingInput");
   if (input) input.value = "";
+  syncTypedSend();
   overlay.hidden = false;
   if (!RecognitionCtor) {
     enterFallback(T.typeHint);
@@ -555,7 +569,10 @@ function buildUi() {
     + '<p id="voiceLandingTranscript" aria-live="polite"></p>'
     + `<p class="voice-landing-hint">${T.typeHint}</p>`
     + '<div class="voice-landing-bar">'
+    + '<div class="voice-landing-input-wrap">'
     + `<input id="voiceLandingInput" type="text" autocomplete="off" placeholder="${T.placeholder}">`
+    + `<button id="voiceLandingSend" type="button" aria-label="${T.send}" title="${T.send}" disabled>${SEND_ICON_SVG}</button>`
+    + '</div>'
     + `<button id="voiceLandingMic" type="button" aria-label="${T.open}" title="${T.open}">`
     + '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>'
     + "</button>"
@@ -567,13 +584,15 @@ function buildUi() {
   button.addEventListener("click", openOverlay);
   $id("voiceLandingClose").addEventListener("click", closeOverlay);
   $id("voiceLandingMic").addEventListener("click", restartListening);
-  $id("voiceLandingInput").addEventListener("keydown", (event) => {
-    if (event.key !== "Enter") return;
-    const task = event.currentTarget.value.trim();
-    if (!task) return;
-    event.currentTarget.value = "";
-    stopSpeaking();
-    sendTask(task); // loest laufende Erkennung selbst ab (Guard gegen onend-Race)
+  // Enter und Sende-Button (Pfeil nach oben, wie ChatGPT) senden identisch;
+  // sendTask loest die laufende Erkennung selbst ab (Guard gegen onend-Race).
+  syncTypedSend = bindTypedSend({
+    input: $id("voiceLandingInput"),
+    send: $id("voiceLandingSend"),
+    onSubmit: (task) => {
+      stopSpeaking();
+      sendTask(task);
+    }
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && state.active) closeOverlay();

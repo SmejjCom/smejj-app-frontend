@@ -3,7 +3,7 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { runClientChat } from "/assets/ai/chatClient.js?v=3";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=chat-markdown-20260717";
-import { initComposerTools } from "./composer-tools.js?v=tts-sanitizer-20260720";
+import { initComposerTools } from "./composer-tools.js?v=voice-send-20260721";
 import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v3";

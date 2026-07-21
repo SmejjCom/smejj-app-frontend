@@ -328,6 +328,28 @@
      color: rgba(246, 243, 238, 0.4);
 }
 
+/* Sende-Button (Pfeil nach oben, wie ChatGPT): ohne Hintergrund, transparent —
+   nur mit Text aktiv (Freigabe-Wortlaut 2026-07-21: "ohne Hintergrund und Transparent"). */
+
+#voiceModeSend {
+     background: transparent;
+}
+
+#voiceModeSend:hover {
+     background: transparent;
+     color: #ffffff;
+}
+
+#voiceModeSend:disabled {
+     background: transparent;
+     color: rgba(246, 243, 238, 0.35);
+     cursor: default;
+}
+
+#voiceModeSend svg {
+     stroke-width: 2.4;
+}
+
 .voice-mode-mic {
      display: grid;
      place-items: center;
