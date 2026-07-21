@@ -44,9 +44,18 @@
 
 /* 40 -> 75: das rechte Panel muss ueber dem Backdrop liegen, sonst dunkelt das
  * Backdrop es selbst ab, wenn beide Panels offen sind.
- * Reihenfolge jetzt: Inhalt < Backdrop 65 < Sidebar 70 < Browser-Panel 75. */
+ * Reihenfolge jetzt: Inhalt < Backdrop 65 < Sidebar 70 < Browser-Panel 75
+ * < Browser-Button 80. */
 .browser-panel {
   z-index: 75;
+}
+
+/* 45 -> 80: Der Ausloeser rechts oben muss ueber dem offenen Panel (75)
+ * bleiben, sonst verdeckt das Panel den Button und das Menue laesst sich nur
+ * noch per Backdrop/Escape schliessen. Links ist das laengst geloest:
+ * branding.css hebt .app-menu-button auf 75, ueber die Sidebar (70). */
+.browser-button {
+  z-index: 80;
 }
 
 @keyframes sidebar-backdrop-in {
