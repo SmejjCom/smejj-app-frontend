@@ -37,7 +37,7 @@ async function handleAutonomousRequest(event) {
   document.querySelector("#acUiChange").value = request.uiChange === true ? "true" : "false";
   document.querySelector("#acPreviewUrl").value = String(request.previewUrl || "");
   syncExecutionModeControls();
-  if (!sessionStorage.getItem(API_TOKEN_KEY)) {
+  if (!sessionStorage.getItem(API_TOKEN_KEY) && !appSessionToken()) {
     setNotice("Aufgabe vorbereitet. Bitte sicher anmelden; danach kann der Lauf gestartet werden.");
     return;
   }
@@ -444,9 +444,14 @@ async function api(url, { method = "GET", body } = {}) {
   return data;
 }
 
+function appSessionToken() {
+  try { return localStorage.getItem("smejj.auth.accessToken.v1") || ""; } catch { return ""; }
+}
+
 function authenticatedFetch(url, options = {}) {
   const headers = new Headers(options.headers || {});
-  const token = sessionStorage.getItem(API_TOKEN_KEY) || "";
+  // Eine Token-Welt: App-Login (localStorage) gilt auch fuer die Jobs-API (Welle 3).
+  const token = sessionStorage.getItem(API_TOKEN_KEY) || appSessionToken();
   if (token) headers.set("Authorization", `Bearer ${token}`);
   return fetch(url, { ...options, headers });
 }
