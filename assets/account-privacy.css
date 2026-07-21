@@ -1,3 +1,12 @@
+/* smejj.com — Kontobereich im Codex-Stil (Freigabe 2026-07-21).
+   Prinzip: schmale Navigation links mit Akzent-Markierung, rechts ruhige
+   Zeilen-Container (links steht, was es ist — rechts die Aktion/der Status).
+   Nutzt die Premium-Theme-Variablen; Markup und IDs bleiben unveraendert
+   (app.js-Boot-Bindings). Der Nav-Breiten-Fix von 2026-07-17/18 bleibt erhalten:
+   app-surfaces.css setzt mobil `.premium-view button { width:100% }` — die
+   Nav-Regeln hier tragen deshalb weiterhin #profile-Spezifitaet und mobil
+   wird die Navigation zur umbrechenden Chip-Leiste (kein Scroll-Verlust). */
+
 #profile.premium-view {
   padding: 72px clamp(14px, 4vw, 48px) 28px;
 }
@@ -7,61 +16,79 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
-  padding-bottom: 16px;
+  padding-bottom: 18px;
   border-bottom: 1px solid var(--premium-line);
 }
 
 #profile .account-header h2 {
-  margin: 4px 0 8px;
+  margin: 4px 0 6px;
   color: var(--premium-text);
-  font-size: clamp(28px, 4vw, 44px);
-  font-weight: 500;
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 550;
+  letter-spacing: -0.01em;
   line-height: 1.12;
 }
 
+#profile .account-header .subhead {
+  max-width: 62ch;
+}
+
 #profile .account-security {
-  padding: 8px 12px;
+  padding: 6px 12px;
   border: 1px solid var(--premium-line);
-  border-radius: 8px;
+  border-radius: 999px;
   background: rgba(255, 255, 255, 0.035);
   color: var(--premium-muted);
-  font-size: 13px;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 #profile .account-layout {
   display: grid;
-  grid-template-columns: 210px minmax(0, 820px);
+  grid-template-columns: 216px minmax(0, 760px);
   align-items: start;
-  gap: clamp(16px, 3vw, 32px);
+  gap: clamp(18px, 3vw, 40px);
+  padding-top: 22px;
 }
 
+/* Navigation: vertikale Liste, aktiver Eintrag mit Akzent-Innenkante */
 #profile .account-nav {
   position: sticky;
-  top: 0;
+  top: 12px;
   display: grid;
   gap: 2px;
-  padding: 6px;
-  border: 1px solid var(--premium-line);
-  border-radius: 8px;
-  background: var(--premium-surface);
 }
 
 #profile .account-nav button {
   justify-content: flex-start;
+  width: 100%;
   min-height: 38px;
+  padding: 0 12px;
   border-color: transparent;
-  border-radius: 6px;
+  border-radius: 8px;
   background: transparent;
+  color: var(--premium-muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: start;
+}
+
+#profile .account-nav button:hover {
+  color: var(--premium-text);
+  background: rgba(255, 255, 255, 0.045);
 }
 
 #profile .account-nav button.is-active {
   border-color: var(--premium-line);
   background: rgba(255, 255, 255, 0.065);
+  color: var(--premium-text);
+  box-shadow: inset 2.5px 0 0 rgba(0, 255, 239, 0.75);
 }
 
 #profile .account-panel {
   display: grid;
   gap: 14px;
+  min-width: 0;
 }
 
 #profile .account-panel[hidden] {
@@ -69,26 +96,40 @@
 }
 
 #profile .account-panel h3 {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 550;
+  margin: 0 0 2px;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
+/* Profil-Felder: eine ruhige Spalte statt gedraengtem Raster */
 #profile .account-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px 14px;
 }
 
+#profile .account-grid label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--premium-muted);
+}
+
+#profile .account-grid input,
+#profile .account-grid select {
+  min-height: 42px;
+  border-radius: 10px;
+}
+
+/* Zeilen-Container: Status, Listen, Aktionen */
 #profile .account-status,
 #profile .account-list {
   overflow: hidden;
   border: 1px solid var(--premium-line);
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 42%),
-    var(--premium-surface);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 12px 34px var(--premium-shadow);
+  border-radius: 12px;
+  background: var(--premium-surface);
 }
 
 #profile .account-status {
@@ -102,13 +143,18 @@
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  min-height: 68px;
-  padding: 13px 16px;
+  min-height: 62px;
+  padding: 12px 16px;
 }
 
 #profile .account-status div {
   display: grid;
-  gap: 4px;
+  gap: 3px;
+  align-content: center;
+}
+
+#profile .account-status strong {
+  font-size: 13.5px;
 }
 
 #profile .account-status div:nth-child(n + 3),
@@ -116,9 +162,18 @@
   border-top: 1px solid var(--premium-line);
 }
 
+#profile .account-status div:nth-child(even) {
+  border-left: 1px solid var(--premium-line);
+}
+
 #profile .account-row > span:first-child {
   display: grid;
-  gap: 4px;
+  gap: 3px;
+  min-width: 0;
+}
+
+#profile .account-row strong {
+  font-size: 14.5px;
 }
 
 #profile .account-row small,
@@ -129,88 +184,73 @@
   line-height: 1.45;
 }
 
+#profile .account-note {
+  max-width: 72ch;
+}
+
 #profile .account-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-#profile .permission-state {
-  padding: 6px 9px;
-  border: 1px solid var(--premium-line-strong);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.035);
-  color: var(--premium-text);
-  font-size: 12px;
+#profile .account-actions button,
+#profile .account-row button {
+  border-radius: 9px;
 }
 
-#profile .danger-action {
+/* Status-Chip (Berechtigungen): ruhige Pille statt Kastchen */
+#profile .permission-state {
+  flex: none;
+  padding: 4px 11px;
+  border: 1px solid rgba(0, 255, 239, 0.3);
+  border-radius: 999px;
+  background: rgba(0, 255, 239, 0.08);
+  color: var(--premium-text);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Gefaehrliches sieht gefaehrlich aus */
+#profile .danger-action,
+#profile #logoutLocal {
   border-color: rgba(255, 93, 93, 0.45);
   color: #ffb1b1;
 }
 
-@media (max-width: 760px) {
-  #profile.premium-view {
-    padding: 56px 12px 22px;
-  }
-
-  #profile .account-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding-bottom: 12px;
-  }
-
-  #profile .account-layout {
-    grid-template-columns: 1fr;
-  }
-
-  #profile .account-nav {
-    position: static;
-    display: flex;
-    overflow-x: auto;
-    padding: 5px;
-  }
-
-  #profile .account-nav button {
-    flex: none;
-  }
-
-  #profile .account-grid,
-  #profile .account-status {
-    grid-template-columns: 1fr;
-  }
-
-  #profile .account-status div:nth-child(n + 2) {
-    border-top: 1px solid var(--premium-line);
-  }
+#profile .danger-action:hover,
+#profile #logoutLocal:hover {
+  background: rgba(255, 93, 93, 0.12);
 }
 
-@media (max-width: 480px) {
-  #profile.premium-view {
-    padding: 52px 10px 20px;
-  }
-
-  #profile .account-row {
-    align-items: flex-start;
-    flex-direction: column;
-  }
+#profile .output {
+  min-height: 20px;
+  margin-top: 14px;
+  color: var(--premium-muted);
+  font-size: 13.5px;
 }
 
-/* Profilbild-Steuerung im Panel "Profil" (public/profile-picture-control.js).
-   Der native File-Input bleibt im DOM und fokussierbar (Tastatur/Screenreader),
-   sichtbar ist das gestylte Label. */
+/* Profilbild-Steuerung (public/profile-picture-control.js): nativer File-Input
+   bleibt fokussierbar, sichtbar ist das gestylte Label. */
 #profile .account-picture {
   display: flex;
   gap: 14px;
   align-items: center;
-  margin-bottom: 18px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border: 1px solid var(--premium-line);
+  border-radius: 12px;
+  background: var(--premium-surface);
 }
 
 #profile .account-picture .profile-avatar {
   flex: 0 0 auto;
-  width: 64px;
-  height: 64px;
-  font-size: 26px;
+  width: 56px;
+  height: 56px;
+  font-size: 23px;
 }
 
 #profile .account-picture-body {
@@ -262,57 +302,69 @@
   outline-offset: 2px;
 }
 
-/* Fix: Konto-Tabs waren unerreichbar - kein Login moeglich (2026-07-17)
- *
- * Ursache: assets/app-surfaces.css enthaelt
- *   @media (max-width: 760px) { .premium-view button { width: 100%; } }
- * Die Regel ist fuer Formular-Buttons gedacht, trifft aber JEDEN Button in
- * .premium-view - auch die Tabs in .account-nav. Da .account-nav ein
- * nowrap-Scroller ist, wurde jeder Tab 684px breit. Live gemessen bei 720px:
- *   scrollWidth 3438px / clientWidth 694px
- * Sichtbar war nur "Profil". "Anmeldung & Sicherheit" lag bei x=704px, also
- * ausserhalb - und darin liegen Google Login, Passkey, Lokal anmelden und
- * Ausloggen. Das war die Ursache fuer "kann mich nicht anmelden".
- *
- * Der Fix hebt die width-100%-Regel NICHT global auf: 17 weitere
- * .premium-view-Ansichten verlassen sich darauf. Er greift nur in .account-nav.
- *
- * flex-wrap statt Scroller: so kann kein Tab mehr ausserhalb des sichtbaren
- * Bereichs landen - der Fehler wird strukturell unmoeglich statt zugedeckt.
- *
- * Bewusst hier und nicht in app-surfaces.css: diese Datei ist fuer die
- * Kontooberflaeche zustaendig (SRP) und faellt nicht unter den Start-Design-Lock.
- *
- * NACHTRAG 2026-07-18 - Spezifitaetsfehler der ersten Fassung korrigiert:
- * Die erste Fassung nutzte `.account-nav` (0,1,0). Diese Datei enthaelt aber in
- * Zeile 167 bereits `#profile .account-nav` (1,1,0) mit display:flex und
- * overflow-x:auto. Ein ID-Selektor schlaegt jede Zahl von Klassen - flex-wrap
- * kam nie an. Live gegen smejj.com/profile gemessen: flexWrap blieb "nowrap",
- * scrollWidth 3413px. Der Fix muss dieselbe ID-Spezifitaet tragen und spaeter
- * in der Datei stehen, dann gewinnt er ueber die Quellreihenfolge.
- *
- * Fuer den Button reicht `.premium-view .account-nav button` (0,3,1): der
- * Gegenspieler in app-surfaces.css ist `.premium-view button` (0,2,1), und
- * `#profile .account-nav button` (Zeile 174) setzt nur flex, keine width.
- * Zur Sicherheit tragen beide Regeln hier trotzdem die #profile-Spezifitaet.
- */
+/* Mobil: Navigation als umbrechende Chip-Leiste (Fix 2026-07-17/18 —
+   niemals horizontaler Scroller, sonst liegen Tabs unerreichbar ausserhalb).
+   Die Regeln tragen #profile-Spezifitaet, damit app-surfaces.css
+   (`.premium-view button { width:100% }` mobil) sie nicht ueberstimmt. */
+@media (max-width: 760px) {
+  #profile.premium-view {
+    padding: 56px 12px 22px;
+  }
 
-#profile .account-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  overflow-x: visible;
-  height: auto;
+  #profile .account-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-bottom: 12px;
+  }
+
+  #profile .account-layout {
+    grid-template-columns: 1fr;
+  }
+
+  #profile .account-nav {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    overflow-x: visible;
+    height: auto;
+  }
+
+  #profile .account-nav button,
+  .premium-view .account-nav button {
+    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  #profile .account-nav button.is-active {
+    box-shadow: inset 0 -2px 0 rgba(0, 255, 239, 0.75);
+  }
+
+  #profile .account-grid,
+  #profile .account-status {
+    grid-template-columns: 1fr;
+  }
+
+  #profile .account-status div:nth-child(even) {
+    border-left: none;
+  }
+
+  #profile .account-status div:nth-child(n + 2) {
+    border-top: 1px solid var(--premium-line);
+  }
 }
 
-#profile .account-nav button,
-.premium-view .account-nav button {
-  width: auto;
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
+@media (max-width: 480px) {
+  #profile.premium-view {
+    padding: 52px 10px 20px;
+  }
 
-@media (max-width: 420px) {
+  #profile .account-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   #profile .account-nav button,
   .premium-view .account-nav button {
     flex: 1 1 auto;
