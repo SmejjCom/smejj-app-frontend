@@ -185,10 +185,13 @@ function applyValues(view, settings) {
 }
 
 function loadStyles() {
-  if (document.querySelector('link[href="/assets/settings-surface.css"]')) return;
+  // Versionsmarke wie in account-privacy.js: GitHub Pages liefert Assets mit
+  // max-age; ohne ?v= saehe ein offener Browser die neue Datei erst spaeter.
+  const href = "/assets/settings-surface.css?v=codex-20260721";
+  if (document.querySelector('link[href^="/assets/settings-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "/assets/settings-surface.css";
+  link.href = href;
   document.head.append(link);
 }
 
