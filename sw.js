@@ -1,3 +1,5 @@
+// v131 -> v132 (2026-07-21): Chat-Verlauf (Welle 1) — chat-store.js + chat-history-view.js
+// neu im Shell-Cache; index.html laedt beide Module.
 // v130 -> v131 (2026-07-20): TTS-Sanitizer — voice-speech-queue.js, composer-tools.js,
 // app.js und index.html geaendert; Precache muss die neuen Versionen ausliefern.
 // v129 -> v130 (2026-07-18): shared/http-json.js neu im Shell-Cache.
@@ -5,7 +7,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v131";
+const CACHE_NAME = "smejj-shell-v132";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -50,6 +52,8 @@ const SHELL = [
   "/assets/view-chrome.css",
   "/assets/composer-tools.js",
   "/assets/voice-speech-queue.js",
+  "/assets/chat-store.js",
+  "/assets/chat-history-view.js",
   "/assets/workspace-bridge.js",
   "/assets/storage/index.js",
   "/assets/storage/localWorkspace.js",
