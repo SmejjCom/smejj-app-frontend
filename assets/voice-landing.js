@@ -8,9 +8,17 @@
 // das Modul initialisiert sich nur auf Seiten OHNE App-Composer (#startSend).
 import { CLIENT_ROUTES } from "./config.js";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue } from "./voice-speech-queue.js";
+import { createSpeechQueue } from "./voice-speech-queue.js?v=blitz-20260726";
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
 import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
+// Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
+// und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
+import { normalizeSpeechText, isLikelyEcho, enoughForBarge } from "./voice-echo-filter.js";
+import { createSpeechInterrupt } from "./voice-vad.js";
+import { warmUpAgentConnection } from "./voice-warmup.js";
+
+// Re-Export fuer bestehende Nutzer der bisherigen Modul-API.
+export { normalizeSpeechText, isLikelyEcho, enoughForBarge };
 
 const LANG_MAP = {
   de: "de-DE", en: "en-US", fr: "fr-FR", es: "es-ES", it: "it-IT",
@@ -37,11 +45,6 @@ const STRINGS = {
   bn: { open: "ভয়েস মোড", listening: "আমি শুনছি ...", thinking: "এক মুহূর্ত ...", speaking: "আমি বলছি ...", typeHint: "নীচে আপনার প্রশ্ন লিখুন — উত্তরটি জোরে পড়ে শোনানো হবে।", placeholder: "প্রশ্ন লিখুন ...", micDenied: "মাইক্রোফোনের অনুমতি নেই — নীচে প্রশ্ন লিখুন।", noAnswer: "কোনও উত্তর আসেনি — আমি শুনছি।", error: "সংযোগ ব্যর্থ — আবার চেষ্টা করুন।", close: "বন্ধ করুন", send: "পাঠান" }
 };
 
-// Sprachen ohne Leerzeichen-Wortgrenzen (Barge-in-Schwelle ueber Zeichenlaenge).
-const NO_SPACE_LANGS = new Set(["zh", "ja"]);
-const BARGE_MIN_WORDS = 3;
-const BARGE_MIN_CHARS = 4;
-
 export function pageLang() {
   const raw = typeof document !== "undefined" ? (document.documentElement.lang || "de") : "de";
   return raw.split("-")[0].toLowerCase();
@@ -53,34 +56,6 @@ export function stringsFor(lang) {
 
 export function speechLangFor(lang) {
   return LANG_MAP[lang] || "en-US";
-}
-
-export function normalizeSpeechText(text) {
-  return (text || "")
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s]/gu, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-// Echo-Heuristik (wie composer-tools.js): Gehoertes, das (nahezu) vollstaendig in
-// der gerade vorgelesenen Antwort vorkommt, ist eigenes Lautsprecher-Echo.
-export function isLikelyEcho(heardText, spokenText) {
-  const heard = normalizeSpeechText(heardText);
-  if (!heard) return true;
-  const spoken = normalizeSpeechText(spokenText);
-  if (spoken.includes(heard)) return true;
-  const spokenWords = new Set(spoken.split(" "));
-  const heardWords = heard.split(" ");
-  const matches = heardWords.filter((word) => spokenWords.has(word)).length;
-  return matches / heardWords.length >= 0.6;
-}
-
-// Rausch-Schutz: genug Substanz fuer eine echte Unterbrechung?
-export function enoughForBarge(text, lang) {
-  const normalized = normalizeSpeechText(text);
-  if (NO_SPACE_LANGS.has(lang)) return normalized.replace(/\s/g, "").length >= BARGE_MIN_CHARS;
-  return normalized.split(" ").filter(Boolean).length >= BARGE_MIN_WORDS;
 }
 
 export function buildAgentPayload(task, lang) {
@@ -179,8 +154,15 @@ const state = {
   bargeRecognition: null,
   bargeConfirmed: false,
   requestId: 0,
-  speechQueue: null
+  speechQueue: null,
+  interrupt: null
 };
+
+// Mikrofonpegel-Ueberwachung beenden (Vorlese-Ende, Schliessen, vor Zuhoeren).
+function stopInterrupt() {
+  state.interrupt?.stop();
+  state.interrupt = null;
+}
 
 // Haelt den Aktiv-Zustand des Sende-Buttons aktuell (gesetzt in buildUi).
 let syncTypedSend = () => {};
@@ -254,6 +236,7 @@ function unlockSpeechSynthesis() {
 
 function enterFallback(message) {
   state.fallback = true;
+  stopInterrupt();
   stopBargeListener();
   try {
     state.recognition?.abort?.();
@@ -358,6 +341,9 @@ function startBargeListener(spokenText, failStreak = 0) {
 
 function listen() {
   if (!state.active || state.fallback) return;
+  // Mikrofon fuer die Erkennung freigeben (Pegel-Detektor und Barge-Listener
+  // duerfen nicht parallel laufen, sonst scheitert recognition.start() mobil).
+  stopInterrupt();
   stopBargeListener();
   setStatus("listening", T.listening);
   setTranscript("");
@@ -369,12 +355,24 @@ function listen() {
   let finalTranscript = "";
   recognition.onresult = (event) => {
     let interim = "";
+    let sawFinal = false;
     for (let index = event.resultIndex; index < event.results.length; index += 1) {
       const result = event.results[index];
-      if (result.isFinal) finalTranscript += result[0]?.transcript || "";
-      else interim += result[0]?.transcript || "";
+      if (result.isFinal) {
+        finalTranscript += result[0]?.transcript || "";
+        sawFinal = true;
+      } else {
+        interim += result[0]?.transcript || "";
+      }
     }
     setTranscript((finalTranscript + interim).trim());
+    // Stufe 1e: Beim finalen Ergebnis SOFORT senden statt auf onend zu warten —
+    // sendTask loest die Erkennung selbst ab (Identitaets-Guard in onend).
+    const task = finalTranscript.trim();
+    if (sawFinal && task && state.recognition === recognition) {
+      state.failStreak = 0;
+      sendTask(task);
+    }
   };
   recognition.onerror = (event) => {
     if (event.error === "not-allowed" || event.error === "service-not-allowed") {
@@ -434,14 +432,25 @@ async function sendTask(task) {
   const queue = createSpeechQueue({
     speakFn: speak,
     stopFn: () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); },
+    eagerFirst: true,
     onQueueStart: () => {
       if (!state.active || state.requestId !== requestId) return;
       setStatus("speaking", T.speaking);
       // Echo-Filter vergleicht live gegen alles bereits Gesprochene (Getter).
       startBargeListener(() => queue.spokenText());
+      // Stufe 1e: Mikrofonpegel-Detektor stoppt das Vorlesen sofort, wenn der
+      // Nutzer dazwischenspricht — auch dort, wo keine parallele Erkennung laeuft.
+      stopInterrupt();
+      state.interrupt = createSpeechInterrupt(() => {
+        if (!state.active || state.fallback || state.requestId !== requestId) return;
+        if (state.bargeConfirmed) return; // Wort-Barge-in hat schon uebernommen.
+        stopSpeaking();
+        listen();
+      });
     },
     onQueueEnd: () => {
       if (!state.active || state.requestId !== requestId) return;
+      stopInterrupt();
       if (state.bargeConfirmed) return; // Barge-Listener uebernimmt.
       stopBargeListener();
       if (state.fallback) {
@@ -498,6 +507,7 @@ function closeOverlay() {
   state.fallback = false;
   state.failStreak = 0;
   state.requestId += 1;
+  stopInterrupt();
   stopBargeListener();
   try {
     state.recognition?.abort?.();
@@ -516,6 +526,9 @@ function openOverlay() {
   state.active = true;
   state.fallback = false;
   state.failStreak = 0;
+  // Stufe 1e: Verbindung zum Antwort-Server schon jetzt aufbauen —
+  // die erste Antwort startet dadurch spuerbar frueher.
+  warmUpAgentConnection();
   unlockSpeechSynthesis();
   const input = $id("voiceLandingInput");
   if (input) input.value = "";
