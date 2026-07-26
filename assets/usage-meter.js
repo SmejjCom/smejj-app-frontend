@@ -106,4 +106,3 @@ export function usageSummary(storage = globalThis.localStorage, now = new Date()
     codingTasks: usage.codingTasks
   };
 }
-
