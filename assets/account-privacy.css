@@ -60,6 +60,15 @@
     linear-gradient(180deg, #fbfbf9, #f3f4f1);
 }
 
+/* Primaer-Knopf: app-surfaces.css (Start-Lock) faerbt #saveProfile per
+   ID-Regel dunkelmodus-weiss (weisser Text, durchscheinender Verlauf) — im
+   hellen Schema Kontrast ~1:1. Hier mit hoeherer Spezifitaet hell nachziehen. */
+#profile.premium-view[data-settings-theme="light"] #saveProfile {
+  border-color: rgba(15, 156, 139, 0.55);
+  background: linear-gradient(135deg, rgba(0, 200, 187, 0.20), rgba(98, 146, 255, 0.16));
+  color: #0b3f39;
+}
+
 /* Der leere Avatar (styles.css, Lock) zeichnet seine Figur cremefarben —
    auf hellem Grund unsichtbar. Nur im Konto-Bereich dunkel nachziehen. */
 #profile.premium-view[data-settings-theme="light"] .account-picture .profile-avatar.is-empty {
