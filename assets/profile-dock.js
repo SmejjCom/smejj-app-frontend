@@ -14,6 +14,7 @@ import { STORAGE_KEYS } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
 import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=1";
 import { initProfileDockMenu, renderProfileDockMenu } from "./profile-dock-menu.js?v=2";
+import { initUsageCapture } from "./usage-meter.js?v=1";
 
 // Buttons, nach deren Klick sich Name/Session aendern koennen (app.js schreibt
 // localStorage synchron im Handler; das Neuzeichnen laeuft danach im Makrotask).
@@ -27,6 +28,9 @@ export function initProfileDock() {
   const dock = document.querySelector("#profileDock");
   if (!dock || dock.dataset.profileDockReady) return;
   dock.dataset.profileDockReady = "true";
+  // Nutzungszaehler-Beobachter: hier eingehaengt, weil profile-dock.js auf der
+  // App-Shell laeuft und NICHT unter dem Start-Lock steht (Muster auth-gate.js).
+  initUsageCapture();
   initProfileDockMenu();
   render();
   window.addEventListener(PROFILE_PICTURE_EVENT, render);
