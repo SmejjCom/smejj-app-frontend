@@ -64,6 +64,22 @@ export function taskPreferences() {
   };
 }
 
+// Konto → Personalisierung ("Eigene Anweisungen"). Schluessel bewusst
+// dupliziert statt account-privacy.js zu importieren (gleiches Muster wie
+// auth-gate.js) — die Chat-Laufzeit bleibt ohne Konto-Modul startfaehig.
+// Fail-safe: Lesefehler duerfen den Chat nie blockieren; Kappung auf 1000
+// Zeichen schuetzt das Prompt-Budget.
+const ACCOUNT_PERSONAL_KEY = "smejj.personalization.v1";
+
+export function readAccountInstructions(storage = globalThis.localStorage) {
+  try {
+    const raw = JSON.parse(storage.getItem(ACCOUNT_PERSONAL_KEY) || "{}") || {};
+    return String(raw.instructions || "").trim().slice(0, 1000);
+  } catch {
+    return "";
+  }
+}
+
 export function buildPreferenceBlock() {
   const settings = readRuntimeSettings();
   const lines = [
@@ -72,6 +88,8 @@ export function buildPreferenceBlock() {
     `Projektkontext: ${settings.autoContext ? "verwenden" : "nur bei expliziter Referenz"}.`
   ];
   if (settings.personalization) lines.push(`Persoenliche Anweisung: ${settings.personalization}`);
+  const accountInstructions = readAccountInstructions();
+  if (accountInstructions) lines.push(`Eigene Anweisungen des Nutzers (Konto): ${accountInstructions}`);
   return lines.join("\n");
 }
 
