@@ -335,6 +335,15 @@
 
 #settings.premium-view[data-settings-theme="light"] .settings-links a { color: #0f9c8b; }
 
+/* Primaer-Knopf: app-surfaces.css (Start-Lock) faerbt #saveSettings per
+   ID-Regel dunkelmodus-weiss — im hellen Schema Kontrast ~1:1 (Befund
+   iPhone-PWA 2026-07-26). Hier mit hoeherer Spezifitaet hell nachziehen. */
+#settings.premium-view[data-settings-theme="light"] #saveSettings {
+  border-color: rgba(15, 156, 139, 0.55);
+  background: linear-gradient(135deg, rgba(0, 200, 187, 0.20), rgba(98, 146, 255, 0.16));
+  color: #0b3f39;
+}
+
 /* Mobil: Navigation als umbrechende Chip-Leiste. */
 @media (max-width: 760px) {
   #settings .settings-shell {
