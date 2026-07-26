@@ -1,3 +1,7 @@
+// v138 -> v139 (2026-07-26): Light-Mode Nachzug — Primaer-Knoepfe #saveProfile/
+// #saveSettings wurden von app-surfaces.css (Lock) dunkelmodus-weiss gefaerbt
+// und waren im hellen Schema unlesbar; account-privacy.css und
+// settings-surface.css liegen im Precache.
 // v137 -> v138 (2026-07-26): Konto-Light-Mode-Fix — account-privacy.css liegt
 // im Precache; im hellen Systemschema war die Konto-Ansicht dunkler Text auf
 // dunklem Glas (iPhone-PWA-Befund). Ohne Versionssprung erreicht der Fix
@@ -32,7 +36,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v138";
+const CACHE_NAME = "smejj-shell-v139";
 const SHELL = [
   "/",
   "/assets/styles.css",
