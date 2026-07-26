@@ -1,3 +1,7 @@
+// v137 -> v138 (2026-07-26): Konto-Light-Mode-Fix — account-privacy.css liegt
+// im Precache; im hellen Systemschema war die Konto-Ansicht dunkler Text auf
+// dunklem Glas (iPhone-PWA-Befund). Ohne Versionssprung erreicht der Fix
+// wiederkehrende Nutzer nicht.
 // v136 -> v137 (2026-07-26): Stufe A2+B — ai/fetch-retry.js (automatischer
 // Neuversuch bei Salad-Replika-Ausfall) und voice-premium-tts.js (Server-TTS
 // ueber WebAudio) neu im Shell-Cache; Importe von app.js, composer-tools.js
@@ -28,7 +32,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v137";
+const CACHE_NAME = "smejj-shell-v138";
 const SHELL = [
   "/",
   "/assets/styles.css",
