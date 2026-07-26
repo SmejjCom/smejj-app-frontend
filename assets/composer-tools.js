@@ -9,8 +9,10 @@ import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
-import { createSpeechInterrupt } from "./voice-vad.js";
+import { createSpeechInterrupt } from "./voice-vad.js?v=blitz2-20260726";
 import { warmUpAgentConnection } from "./voice-warmup.js";
+// Stufe 2a: Interim-Waechter — Sprech-Ende ~1 s frueher erkennen und senden.
+import { createSilenceWatchdog } from "./voice-endpoint.js";
 // Plus-Menue (Anhaenge) — ausgelagert, Verhalten unveraendert.
 import { bindPlusMenu } from "./composer-plus-menu.js";
 
@@ -416,6 +418,17 @@ function voiceModeListen() {
       recognition.interimResults = true;
       state.voiceRecognition = recognition;
       let finalTranscript = "";
+      // Stufe 2a: Kommen bei vorhandenem Text ~850 ms keine neuen Zwischen-
+      // ergebnisse, das Erkennungs-Ende sofort erzwingen (stop -> finales
+      // Ergebnis) statt die 1-2 s Browser-Endpause abzuwarten.
+      const watchdog = createSilenceWatchdog(() => {
+              if (state.voiceRecognition !== recognition) return;
+              try {
+                        recognition.stop();
+              } catch {
+                        // Recognition war bereits gestoppt.
+              }
+      });
       recognition.onresult = (event) => {
               let interim = "";
               let sawFinal = false;
@@ -428,11 +441,14 @@ function voiceModeListen() {
                                     interim += result[0]?.transcript || "";
                         }
               }
-              setVoiceModeTranscript((finalTranscript + interim).trim());
+              const heard = (finalTranscript + interim).trim();
+              setVoiceModeTranscript(heard);
+              watchdog.update(Boolean(heard));
               // Stufe 1e: Beim finalen Ergebnis SOFORT senden statt auf onend zu
               // warten — voiceModeSend loest die Erkennung selbst ab (Guard in onend).
               const task = finalTranscript.trim();
               if (sawFinal && task && state.voiceRecognition === recognition) {
+                        watchdog.stop();
                         state.voiceFailStreak = 0;
                         voiceModeSend(task);
               }
@@ -444,6 +460,7 @@ function voiceModeListen() {
               }
       };
       recognition.onend = () => {
+              watchdog.stop();
               // Nach abort() (z. B. getippte Frage) feuert onend trotzdem — nur die noch
               // aktive Erkennung darf den Loop fortsetzen, sonst hoert sie parallel zum
               // Denken/Vorlesen weiter und nimmt das eigene Echo als Frage auf.
@@ -537,12 +554,14 @@ function waitForAssistantReply(knownEntries) {
                         // Stufe 1e: Mikrofonpegel-Detektor stoppt das Vorlesen sofort,
                         // wenn der Nutzer dazwischenspricht (auch ohne parallele Erkennung).
                         stopInterrupt();
+                        // Stufe 2a: Zwei-Ebenen-Ausloeser — in den Sprechpausen zwischen
+                        // zwei Saetzen ist der Lautsprecher still, dort reicht normales Sprechen.
                         state.interrupt = createSpeechInterrupt(() => {
                                     if (!state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
                                     if (state.bargeConfirmed) return;
                                     stopSpeaking();
                                     voiceModeListen();
-                        });
+                        }, { isTtsActive: () => ("speechSynthesis" in window) && window.speechSynthesis.speaking === true });
               },
               onQueueEnd: () => {
                         if (!state.voiceModeActive) return;
