@@ -1,14 +1,30 @@
-/* smejj.com — Kontobereich im Codex-Stil (Freigabe 2026-07-21).
-   Prinzip: schmale Navigation links mit Akzent-Markierung, rechts ruhige
-   Zeilen-Container (links steht, was es ist — rechts die Aktion/der Status).
-   Nutzt die Premium-Theme-Variablen; Markup und IDs bleiben unveraendert
-   (app.js-Boot-Bindings). Der Nav-Breiten-Fix von 2026-07-17/18 bleibt erhalten:
-   app-surfaces.css setzt mobil `.premium-view button { width:100% }` — die
-   Nav-Regeln hier tragen deshalb weiterhin #profile-Spezifitaet und mobil
-   wird die Navigation zur umbrechenden Chip-Leiste (kein Scroll-Verlust). */
+/* smejj.com — Kontobereich im viereckigen Glas-Design (Freigabe 2026-07-26,
+   Mockup-Abnahme Betreiber). Prinzip: rechteckige Glasflaechen (keine runden
+   Ecken), Felder nur durch hauchduenne Linien getrennt, feine helle Kante oben
+   auf jeder Glasflaeche (iPhone-Glas-Look, eckig). Markup und IDs bleiben
+   unveraendert (app.js-Boot-Bindings). Der Nav-Breiten-Fix von 2026-07-17/18
+   bleibt erhalten: app-surfaces.css setzt mobil `.premium-view button
+   { width:100% }` — die Nav-Regeln tragen deshalb #profile-Spezifitaet und
+   mobil wird die Navigation zur umbrechenden Chip-Leiste. */
 
 #profile.premium-view {
   padding: 72px clamp(14px, 4vw, 48px) 28px;
+  /* Farbige Lichtflecken NUR in dieser Ansicht — die App-Huelle bleibt unberuehrt. */
+  background-image:
+    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.10), transparent 60%),
+    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.07), transparent 60%);
+}
+
+/* Glas-Grundfläche: durchscheinend, Weichzeichner, helle Kante oben, eckig. */
+#profile .account-nav,
+#profile .account-panel,
+#profile .output {
+  background: rgba(255, 255, 255, 0.045);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-top-color: rgba(255, 255, 255, 0.28);
+  border-radius: 0;
 }
 
 #profile .account-header {
@@ -17,14 +33,14 @@
   justify-content: space-between;
   gap: 20px;
   padding-bottom: 18px;
-  border-bottom: 1px solid var(--premium-line);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 #profile .account-header h2 {
   margin: 4px 0 6px;
-  color: var(--premium-text);
+  color: var(--premium-text, #eef1f2);
   font-size: clamp(26px, 3.5vw, 38px);
-  font-weight: 550;
+  font-weight: 650;
   letter-spacing: -0.01em;
   line-height: 1.12;
 }
@@ -34,61 +50,66 @@
 }
 
 #profile .account-security {
-  padding: 6px 12px;
-  border: 1px solid var(--premium-line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.035);
-  color: var(--premium-muted);
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-top-color: rgba(255, 255, 255, 0.28);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.045);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  color: var(--premium-muted, #9fa8ad);
   font-size: 12px;
   white-space: nowrap;
 }
 
 #profile .account-layout {
   display: grid;
-  grid-template-columns: 216px minmax(0, 760px);
+  grid-template-columns: 250px minmax(0, 820px);
   align-items: start;
   gap: clamp(18px, 3vw, 40px);
-  padding-top: 22px;
+  padding-top: 24px;
 }
 
-/* Navigation: vertikale Liste, aktiver Eintrag mit Akzent-Innenkante */
+/* Navigation links: eine Glasleiste, Punkte durch hauchduenne Linien getrennt,
+   aktiver Punkt mit Akzent-Balken links. */
 #profile .account-nav {
-  position: sticky;
-  top: 12px;
-  display: grid;
-  gap: 2px;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
 
 #profile .account-nav button {
-  justify-content: flex-start;
   width: 100%;
-  min-height: 38px;
-  padding: 0 12px;
-  border-color: transparent;
-  border-radius: 8px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 0;
   background: transparent;
-  color: var(--premium-muted);
+  color: var(--premium-muted, #9fa8ad);
   font-size: 14px;
   font-weight: 600;
   text-align: start;
+  cursor: pointer;
+}
+
+#profile .account-nav button:last-child {
+  border-bottom: 0;
 }
 
 #profile .account-nav button:hover {
-  color: var(--premium-text);
-  background: rgba(255, 255, 255, 0.045);
+  color: var(--premium-text, #eef1f2);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 #profile .account-nav button.is-active {
-  border-color: var(--premium-line);
-  background: rgba(255, 255, 255, 0.065);
-  color: var(--premium-text);
-  box-shadow: inset 2.5px 0 0 rgba(0, 255, 239, 0.75);
+  color: var(--premium-text, #eef1f2);
+  background: rgba(255, 255, 255, 0.085);
+  box-shadow: inset 3px 0 0 var(--premium-accent, #2dd4bf);
 }
 
 #profile .account-panel {
-  display: grid;
-  gap: 14px;
-  min-width: 0;
+  padding: 22px clamp(16px, 2.5vw, 28px) 24px;
 }
 
 #profile .account-panel[hidden] {
@@ -96,74 +117,42 @@
 }
 
 #profile .account-panel h3 {
-  margin: 0 0 2px;
-  font-size: 21px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  color: var(--premium-text, #eef1f2);
+  font-size: 20px;
+  font-weight: 650;
 }
 
-/* Profil-Felder: eine ruhige Spalte statt gedraengtem Raster */
-#profile .account-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 14px;
+#profile .account-subhead {
+  margin: 26px 0 10px;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-#profile .account-grid label {
-  display: grid;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--premium-muted);
+#profile .account-subhead:first-of-type {
+  margin-top: 0;
 }
 
-#profile .account-grid input,
-#profile .account-grid select {
-  min-height: 42px;
-  border-radius: 10px;
-}
-
-/* Zeilen-Container: Status, Listen, Aktionen */
-#profile .account-status,
+/* Zeilen-Listen: Felder nur durch hauchduenne Linien getrennt. */
 #profile .account-list {
-  overflow: hidden;
-  border: 1px solid var(--premium-line);
-  border-radius: 12px;
-  background: var(--premium-surface);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 0;
 }
 
-#profile .account-status {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-#profile .account-status div,
 #profile .account-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  min-height: 62px;
-  padding: 12px 16px;
+  gap: 16px;
+  padding: 15px 16px;
+  margin: 0;
 }
 
-#profile .account-status div {
-  display: grid;
-  gap: 3px;
-  align-content: center;
-}
-
-#profile .account-status strong {
-  font-size: 13.5px;
-}
-
-#profile .account-status div:nth-child(n + 3),
 #profile .account-row + .account-row {
-  border-top: 1px solid var(--premium-line);
-}
-
-#profile .account-status div:nth-child(even) {
-  border-left: 1px solid var(--premium-line);
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 #profile .account-row > span:first-child {
@@ -173,103 +162,306 @@
 }
 
 #profile .account-row strong {
+  color: var(--premium-text, #eef1f2);
   font-size: 14.5px;
+  font-weight: 650;
 }
 
-#profile .account-row small,
-#profile .account-note,
-#profile .account-status span {
-  color: var(--premium-muted);
+#profile .account-row small {
+  color: var(--premium-muted, #9fa8ad);
   font-size: 13px;
   line-height: 1.45;
 }
 
-#profile .account-note {
-  max-width: 72ch;
+/* Viereckige Schalter statt nackter Checkboxen. */
+#profile .account-row input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 46px;
+  height: 26px;
+  margin: 0;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.10);
+  position: relative;
+  cursor: pointer;
+}
+
+#profile .account-row input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: var(--premium-muted, #9fa8ad);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+#profile .account-row input[type="checkbox"]:checked {
+  background: var(--premium-accent, #2dd4bf);
+  border-color: var(--premium-accent, #2dd4bf);
+}
+
+#profile .account-row input[type="checkbox"]:checked::after {
+  transform: translateX(20px);
+  background: #04211c;
+}
+
+/* Status-Chips: ehrlicher Zustand statt toter Knoepfe. */
+#profile .state-badge,
+#profile .permission-state {
+  flex-shrink: 0;
+  padding: 5px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.085);
+  color: var(--premium-muted, #c6cdd1);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#profile .state-badge.is-ok {
+  background: rgba(45, 212, 191, 0.15);
+  border-color: rgba(45, 212, 191, 0.4);
+  color: #7ee8da;
+}
+
+/* Plan-Kopfzeile in Abo & Zahlungen. */
+#profile .account-plan {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  border-radius: 0;
+  background: rgba(45, 212, 191, 0.07);
+  box-shadow: inset 0 3px 0 var(--premium-accent, #2dd4bf);
+}
+
+#profile .account-plan .plan-name {
+  display: block;
+  margin: 4px 0 3px;
+  color: var(--premium-text, #eef1f2);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+#profile .account-plan small {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13px;
+}
+
+/* Eigene Anweisungen (Personalisierung). */
+#profile .account-textarea {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+#profile .account-textarea strong {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#profile .account-textarea textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 96px;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--premium-text, #eef1f2);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#profile .account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+  margin-top: 18px;
+}
+
+#profile .account-grid label {
+  display: grid;
+  gap: 8px;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#profile .account-grid input,
+#profile .account-grid select {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--premium-text, #eef1f2);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 #profile .account-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+  margin-top: 18px;
 }
 
 #profile .account-actions button,
 #profile .account-row button {
-  border-radius: 9px;
-}
-
-/* Status-Chip (Berechtigungen): ruhige Pille statt Kastchen */
-#profile .permission-state {
-  flex: none;
-  padding: 4px 11px;
-  border: 1px solid rgba(0, 255, 239, 0.3);
-  border-radius: 999px;
-  background: rgba(0, 255, 239, 0.08);
-  color: var(--premium-text);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-top-color: rgba(255, 255, 255, 0.28);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.085);
+  color: var(--premium-text, #eef1f2);
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
   white-space: nowrap;
 }
 
-/* Gefaehrliches sieht gefaehrlich aus */
-#profile .danger-action,
+#profile .account-actions button:hover,
+#profile .account-row button:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+#profile .account-row button {
+  flex-shrink: 0;
+  width: auto;
+}
+
 #profile #logoutLocal {
-  border-color: rgba(255, 93, 93, 0.45);
-  color: #ffb1b1;
+  border-color: rgba(255, 110, 100, 0.35);
+  background: transparent;
+  color: #ff8177;
 }
 
-#profile .danger-action:hover,
 #profile #logoutLocal:hover {
-  background: rgba(255, 93, 93, 0.12);
+  background: rgba(255, 110, 100, 0.12);
 }
 
-#profile .output {
-  min-height: 20px;
-  margin-top: 14px;
-  color: var(--premium-muted);
-  font-size: 13.5px;
+#profile .danger-action {
+  border-color: rgba(255, 110, 100, 0.35) !important;
+  background: transparent !important;
+  color: #ff8177 !important;
 }
 
-/* Profilbild-Steuerung (public/profile-picture-control.js): nativer File-Input
-   bleibt fokussierbar, sichtbar ist das gestylte Label. */
+#profile .danger-action:hover {
+  background: rgba(255, 110, 100, 0.12) !important;
+}
+
+#profile .account-status {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 0;
+}
+
+#profile .account-status div {
+  display: grid;
+  gap: 3px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+#profile .account-status div:nth-child(even) {
+  border-inline-start: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+#profile .account-status div:nth-child(n + 3) {
+  border-bottom: 0;
+}
+
+#profile .account-status strong {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#profile .account-status span {
+  color: var(--premium-text, #eef1f2);
+  font-size: 14px;
+}
+
+#profile .account-note {
+  margin: 14px 0 0;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Profilbild-Zeile (Markup aus profile-picture-control.js). */
 #profile .account-picture {
   display: flex;
-  gap: 14px;
   align-items: center;
-  padding: 14px 16px;
-  margin-bottom: 14px;
-  border: 1px solid var(--premium-line);
-  border-radius: 12px;
-  background: var(--premium-surface);
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 0;
 }
 
 #profile .account-picture .profile-avatar {
-  flex: 0 0 auto;
-  width: 56px;
-  height: 56px;
-  font-size: 23px;
+  width: 60px;
+  height: 60px;
+  border-radius: 0;
+  border: 1px solid rgba(45, 212, 191, 0.45);
 }
 
 #profile .account-picture-body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  gap: 3px;
   min-width: 0;
 }
 
 #profile .account-picture-body small {
-  opacity: 0.68;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 #profile .account-picture-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  margin-top: 8px;
+  gap: 10px;
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+
+#profile .account-picture-choose {
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-top-color: rgba(255, 255, 255, 0.28);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.085);
+  color: var(--premium-text, #eef1f2);
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#profile .account-picture-choose:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 
 #profile #profilePictureInput {
@@ -277,97 +469,93 @@
   width: 1px;
   height: 1px;
   overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-#profile .account-picture-choose {
-  display: inline-flex;
-  align-items: center;
-  padding: 7px 13px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.06);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-#profile .account-picture-choose:hover {
-  background: rgba(255, 255, 255, 0.11);
+  clip: rect(0 0 0 0);
 }
 
 #profile #profilePictureInput:focus-visible + .account-picture-choose {
-  outline: 2px solid #00ffef;
+  outline: 2px solid var(--premium-accent, #2dd4bf);
   outline-offset: 2px;
 }
 
-/* Mobil: Navigation als umbrechende Chip-Leiste (Fix 2026-07-17/18 —
-   niemals horizontaler Scroller, sonst liegen Tabs unerreichbar ausserhalb).
-   Die Regeln tragen #profile-Spezifitaet, damit app-surfaces.css
-   (`.premium-view button { width:100% }` mobil) sie nicht ueberstimmt. */
+#profile .output {
+  margin-top: 18px;
+  min-height: 46px;
+  padding: 13px 16px;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13.5px;
+}
+
+/* Mobil: Navigation wird zur umbrechenden Chip-Leiste — kein Scroll-Verlust. */
 @media (max-width: 760px) {
-  #profile.premium-view {
-    padding: 56px 12px 22px;
-  }
-
-  #profile .account-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding-bottom: 12px;
-  }
-
   #profile .account-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   #profile .account-nav {
-    position: static;
-    display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
     gap: 6px;
-    overflow-x: visible;
-    height: auto;
+    padding: 8px;
+    background: transparent;
+    border: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
-  #profile .account-nav button,
-  .premium-view .account-nav button {
+  #profile .account-nav button {
     width: auto;
-    flex: 0 0 auto;
-    white-space: nowrap;
+    padding: 9px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.045);
+    font-size: 13px;
   }
 
   #profile .account-nav button.is-active {
-    box-shadow: inset 0 -2px 0 rgba(0, 255, 239, 0.75);
+    box-shadow: inset 0 3px 0 var(--premium-accent, #2dd4bf);
   }
 
-  #profile .account-grid,
+  #profile .account-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   #profile .account-status {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   #profile .account-status div:nth-child(even) {
-    border-left: none;
+    border-inline-start: 0;
   }
 
-  #profile .account-status div:nth-child(n + 2) {
-    border-top: 1px solid var(--premium-line);
+  #profile .account-status div:nth-child(n + 3) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  }
+
+  #profile .account-status div:last-child {
+    border-bottom: 0;
+  }
+
+  #profile .account-picture {
+    flex-wrap: wrap;
+  }
+
+  #profile .account-picture-actions {
+    margin-inline-start: 0;
   }
 }
 
 @media (max-width: 480px) {
   #profile.premium-view {
-    padding: 52px 10px 20px;
+    padding-top: 64px;
   }
 
   #profile .account-row {
-    align-items: flex-start;
-    flex-direction: column;
+    flex-wrap: wrap;
   }
 
-  #profile .account-nav button,
-  .premium-view .account-nav button {
-    flex: 1 1 auto;
-    min-width: 0;
+  #profile .account-row button,
+  #profile .state-badge,
+  #profile .permission-state {
+    margin-inline-start: 0;
   }
 }
