@@ -2,8 +2,9 @@ import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js";
 import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { runClientChat } from "/assets/ai/chatClient.js?v=3";
+import { fetchStreamWithRetry } from "/assets/ai/fetch-retry.js"; // Stufe A2: Neuversuch bei Replika-Ausfall
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=chat-markdown-20260717";
-import { initComposerTools } from "./composer-tools.js?v=blitz2-20260726";
+import { initComposerTools } from "./composer-tools.js?v=stufeb-20260726";
 import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v3";
@@ -1291,12 +1292,14 @@ function clearThinkingState(output) {
 }
 
 async function stream(url, body, output) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
-
+  let response; // Stufe A2: Replika-Ausfall -> fetchStreamWithRetry versucht sofort neu.
+  try {
+    response = await fetchStreamWithRetry(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  } catch {
+    clearThinkingState(output);
+    output.textContent = "Verbindung zum Server unterbrochen — bitte gleich erneut versuchen.";
+    return;
+  }
   if (!response.ok || !response.body) {
     clearThinkingState(output);
     output.textContent = await readableError(response);
