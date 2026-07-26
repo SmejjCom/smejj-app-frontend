@@ -1,3 +1,7 @@
+// v136 -> v137 (2026-07-26): Stufe A2+B — ai/fetch-retry.js (automatischer
+// Neuversuch bei Salad-Replika-Ausfall) und voice-premium-tts.js (Server-TTS
+// ueber WebAudio) neu im Shell-Cache; Importe von app.js, composer-tools.js
+// und voice-landing.js — ohne Precache waere die App offline tot.
 // v135 -> v136 (2026-07-26): Sprachwelle Stufe 2a — voice-endpoint.js neu im
 // Shell-Cache (Interim-Waechter: Sprech-Ende ~1 s frueher; Import von
 // composer-tools.js und voice-landing.js — ohne Precache offline tot) und
@@ -24,7 +28,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v136";
+const CACHE_NAME = "smejj-shell-v137";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -74,7 +78,10 @@ const SHELL = [
   "/assets/voice-echo-filter.js",
   "/assets/voice-vad.js",
   "/assets/voice-endpoint.js",
+  "/assets/voice-premium-tts.js",
   "/assets/voice-warmup.js",
+  "/assets/ai/fetch-retry.js",
+  "/assets/composer-dictation.js",
   "/assets/chat-store.js",
   "/assets/chat-history-view.js",
   "/assets/workspace-bridge.js",
