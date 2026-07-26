@@ -14,6 +14,22 @@
 const SENTENCE_END = /([.!?…]+(?=\s|$))|([。！？؟]+)/g;
 const DEFAULT_MIN_CHARS = 4;
 
+// Stufe 1e: Der ALLERERSTE Sprech-Happen darf schon an einer Komma-/Semikolon-/
+// Doppelpunkt-Grenze beginnen (inkl. CJK-Komma), damit die Antwort hoerbar
+// frueher startet. Die Grenze muss von Leerraum gefolgt sein (CJK ausgenommen),
+// damit Zahlen wie "21,5" nie zerschnitten werden. Danach gilt Satz-Rhythmus.
+const CLAUSE_BOUNDARY = /([,;:—–](?=\s))|([、，；：])/;
+const EAGER_MIN_CHARS = 12;
+
+// Liefert den ersten sprechbaren Teilsatz (bis inkl. Grenzzeichen) oder "".
+export function splitFirstEagerClause(text, { minChars = EAGER_MIN_CHARS } = {}) {
+  const raw = String(text || "");
+  const match = CLAUSE_BOUNDARY.exec(raw);
+  if (!match) return "";
+  const clause = raw.slice(0, match.index + match[0].length);
+  return clause.trim().length >= minChars ? clause : "";
+}
+
 // Zerlegt den noch nicht konsumierten Text in fertige Saetze + Rest.
 // flush:true nimmt auch den letzten Rest ohne Satzzeichen als Satz.
 export function splitCompleteSentences(text, { flush = false, minChars = DEFAULT_MIN_CHARS } = {}) {
@@ -120,7 +136,9 @@ export function sanitizeForSpeech(text, { lang } = {}) {
 // onQueueEnd genau einmal, wenn nach flush() alles fertig gesprochen ist.
 // Jeder Satz laeuft vor der TTS-Uebergabe durch sanitizeForSpeech; Saetze,
 // die danach leer sind (reine Quellen-/URL-Zeilen), werden still uebersprungen.
-export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, minChars = DEFAULT_MIN_CHARS } = {}) {
+// eagerFirst: true laesst den ersten Sprech-Happen bereits an einer
+// Teilsatz-Grenze (Komma/Doppelpunkt) starten — schnellerer Sprachbeginn.
+export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, minChars = DEFAULT_MIN_CHARS, eagerFirst = false } = {}) {
   const queue = [];
   let consumed = 0;      // Zeichen des Volltexts, die bereits in Saetze zerlegt wurden
   let spoken = "";       // alles, was der TTS uebergeben wurde (Echo-Filter der Hosts)
@@ -168,6 +186,15 @@ export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, m
       if (text.length <= consumed) return;
       const { sentences, rest } = splitCompleteSentences(text.slice(consumed), { minChars });
       consumed = text.length - rest.length;
+      // Stufe 1e: Noch nichts gesprochen und kein fertiger Satz in Sicht?
+      // Dann den ersten Teilsatz (bis Komma/Doppelpunkt) sofort sprechen.
+      if (eagerFirst && !started && queue.length === 0 && sentences.length === 0) {
+        const clause = splitFirstEagerClause(rest);
+        if (clause) {
+          sentences.push(clause);
+          consumed += clause.length;
+        }
+      }
       for (const sentence of sentences) queue.push(sentence);
       speakNext();
     },
