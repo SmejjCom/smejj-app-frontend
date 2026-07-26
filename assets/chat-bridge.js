@@ -25,7 +25,7 @@ const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_M
 const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
 const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260721-v98-weather-fast-path";
+const BRIDGE_VERSION = "20260726-v99-premium-voice";
 
 export function createChatBridgeServer() {
   return http.createServer(async (req, res) => {
@@ -37,9 +37,11 @@ export function createChatBridgeServer() {
       if (url.pathname === "/health") return json(res, 200, healthPayload());
       if (req.method !== "POST") return json(res, 404, { ok: false, error: "Not found" });
       if (!cors["Access-Control-Allow-Origin"]) return json(res, 403, { ok: false, error: "Origin not allowed" });
-      if ((url.pathname === "/api/chat" || url.pathname === "/api/agent") && !allowModelRequest(req, res)) return;
+      if ((url.pathname === "/api/chat" || url.pathname === "/api/agent" || url.pathname === "/api/voice/tts") && !allowModelRequest(req, res)) return;
       if (url.pathname === "/api/chat") return await handleChat(req, res);
       if (url.pathname === "/api/agent") return await handleAgent(req, res);
+      if (url.pathname === "/api/voice/status") return await handleVoiceStatus(res);
+      if (url.pathname === "/api/voice/tts") return await handleVoiceTts(req, res);
       return json(res, 404, { ok: false, error: "Not found" });
     } catch (error) {
       return json(res, 500, { ok: false, error: error?.message || "Internal error" });
@@ -59,6 +61,7 @@ function healthPayload() {
     fastLaneModel: fastLaneEnabled() ? `groq:${GROQ_MODEL}` : "",
     role: "stateless-chat-stream-bridge",
     costProfile: "cpu-only-no-gpu-no-storage",
+    premiumVoiceConfigured: Boolean(trimUrl(process.env.SMEJJ_VOICE_TTS_ORIGIN || "")),
     publicRateLimit: { perClientPerMinute: RATE_PER_CLIENT, globalPerMinute: RATE_GLOBAL },
     startedAt: STARTED_AT.toISOString()
   };
@@ -572,6 +575,115 @@ function bridgeModelBackend() {
   if (/api\.z\.ai|bigmodel/i.test(LLM_BASE_URL) || /^glm-/i.test(LLM_MODEL)) return `zhipu:${LLM_MODEL}`;
   if (/salad\.cloud/i.test(LLM_BASE_URL)) return `salad:${LLM_MODEL}`;
   return `custom:${LLM_MODEL}`;
+}
+
+// --- Premium-Stimme (Stufe B): Proxy zum XTTS-Streaming-Worker ------------------
+// Die Bridge reicht Text an den Salad-GPU-Container smejj-voice-tts durch und
+// streamt das WAV-Audio zurueck an den Browser (Wiedergabe dort ueber WebAudio,
+// wodurch die Echounterdrueckung greift — Unterbrechen wie ChatGPT). Fail-safe:
+// Ohne konfigurierten oder laufenden Worker meldet /api/voice/status
+// premiumVoice:false und der Browser nutzt unveraendert seine eigene Stimme.
+// Kostenprofil: GPU nur waehrend aktiver Nutzung (Worker-Start ist Betreiber-
+// Entscheidung); die Bridge selbst bleibt CPU-only.
+const VOICE_TTS_ORIGIN = trimUrl(process.env.SMEJJ_VOICE_TTS_ORIGIN || "");
+const VOICE_TTS_TIMEOUT_MS = Number(process.env.SMEJJ_VOICE_TTS_TIMEOUT_MS || 20000);
+const VOICE_TTS_MAX_CHARS = boundedInteger(process.env.SMEJJ_VOICE_TTS_MAX_CHARS, 50, 2000, 500);
+const VOICE_STATUS_CACHE_MS = 30000;
+const XTTS_LANGS = new Set(["en", "es", "fr", "de", "it", "pt", "pl", "tr", "ru", "nl", "cs", "ar", "zh-cn", "hu", "ko", "ja", "hi"]);
+let xttsSpeakerCache = null;
+let voiceStatusCache = { at: 0, up: false };
+
+export function xttsLanguage(lang) {
+  const base = String(lang || "de").toLowerCase().split("-")[0];
+  if (base === "zh") return "zh-cn";
+  return XTTS_LANGS.has(base) ? base : "en";
+}
+
+async function xttsFetch(path, init = {}, timeoutMs = VOICE_TTS_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(`${VOICE_TTS_ORIGIN}${path}`, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Studio-Sprecher des XTTS-Workers einmal laden und im Prozess cachen.
+async function loadXttsSpeaker() {
+  if (xttsSpeakerCache) return xttsSpeakerCache;
+  const response = await xttsFetch("/studio_speakers", {}, 8000);
+  if (!response.ok) throw new Error(`studio_speakers ${response.status}`);
+  const speakers = await response.json();
+  const name = Object.keys(speakers || {})[0];
+  if (!name || !speakers[name]) throw new Error("kein Studio-Sprecher verfuegbar");
+  xttsSpeakerCache = { name, data: speakers[name] };
+  return xttsSpeakerCache;
+}
+
+async function handleVoiceStatus(res) {
+  if (!VOICE_TTS_ORIGIN) return json(res, 200, { ok: true, premiumVoice: false, reason: "not_configured" });
+  const now = Date.now();
+  if (now - voiceStatusCache.at < VOICE_STATUS_CACHE_MS) {
+    return json(res, 200, { ok: true, premiumVoice: voiceStatusCache.up });
+  }
+  let up = false;
+  try {
+    up = Boolean((await loadXttsSpeaker())?.name);
+  } catch {
+    up = false;
+    xttsSpeakerCache = null; // Worker weg — beim naechsten Versuch neu laden.
+  }
+  voiceStatusCache = { at: now, up };
+  return json(res, 200, { ok: true, premiumVoice: up });
+}
+
+async function handleVoiceTts(req, res) {
+  if (!VOICE_TTS_ORIGIN) return json(res, 503, { ok: false, error: "premium_voice_not_configured" });
+  const body = await readJson(req);
+  const text = String(body?.text || "").trim().slice(0, VOICE_TTS_MAX_CHARS);
+  if (!text) return json(res, 400, { ok: false, error: "Missing text" });
+  let speaker;
+  try {
+    speaker = await loadXttsSpeaker();
+  } catch (error) {
+    voiceStatusCache = { at: Date.now(), up: false };
+    return json(res, 503, { ok: false, error: `premium_voice_unavailable: ${error?.message || "worker"}` });
+  }
+  let upstream;
+  try {
+    upstream = await xttsFetch("/tts_stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text,
+        language: xttsLanguage(body?.language),
+        speaker_embedding: speaker.data.speaker_embedding,
+        gpt_cond_latent: speaker.data.gpt_cond_latent,
+        add_wav_header: true,
+        stream_chunk_size: 20
+      })
+    });
+  } catch (error) {
+    xttsSpeakerCache = null;
+    voiceStatusCache = { at: Date.now(), up: false };
+    return json(res, 502, { ok: false, error: `tts_upstream_failed: ${error?.message || "fetch"}` });
+  }
+  if (!upstream.ok || !upstream.body) {
+    return json(res, 502, { ok: false, error: `tts_upstream_${upstream.status}` });
+  }
+  res.writeHead(200, { "Content-Type": "audio/wav", "Cache-Control": "no-store", ...securityHeaders() });
+  const reader = upstream.body.getReader();
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      res.write(Buffer.from(value));
+    }
+  } catch {
+    // Klient hat abgebrochen (Barge-in) oder Worker-Stream riss ab — sauber beenden.
+  }
+  res.end();
 }
 
 if (process.env.SMEJJ_CHAT_BRIDGE_NO_START !== "1") {
