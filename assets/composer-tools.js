@@ -3,9 +3,16 @@
 // Zweck: initComposerTools() verdrahtet die Icon-Zeile des Start-Composers.
 import { showToast } from "./components.js";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=tts-sanitizer-20260720";
+import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=blitz-20260726";
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
 import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
+// Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
+// und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
+import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
+import { createSpeechInterrupt } from "./voice-vad.js";
+import { warmUpAgentConnection } from "./voice-warmup.js";
+// Plus-Menue (Anhaenge) — ausgelagert, Verhalten unveraendert.
+import { bindPlusMenu } from "./composer-plus-menu.js";
 
 const $ = (selector) => document.querySelector(selector);
 // Sprache dynamisch aus dem lang-Attribut der Seite (Fallback de-DE).
@@ -38,7 +45,8 @@ const state = {
       bargeRecognition: null,
       bargeConfirmed: false,
       speakerUtterance: null,
-      speechQueue: null
+      speechQueue: null,
+      interrupt: null
 };
 
 function speechSupported() {
@@ -122,59 +130,7 @@ function lastAssistantEntryText() {
       return "";
 }
 
-// --- Plus-Menue -------------------------------------------------------------
-
-function closePlusMenu() {
-      const menu = $("#composerPlusMenu");
-      const button = $("#composerPlusButton");
-      if (menu) menu.hidden = true;
-      if (button) button.setAttribute("aria-expanded", "false");
-}
-
-function bindPlusMenu() {
-      const button = $("#composerPlusButton");
-      const menu = $("#composerPlusMenu");
-      if (!button || !menu) return;
-      button.addEventListener("click", (event) => {
-              event.stopPropagation();
-              const open = menu.hidden;
-              menu.hidden = !open;
-              button.setAttribute("aria-expanded", String(open));
-      });
-      document.addEventListener("click", (event) => {
-              if (menu.hidden || event.target.closest(".plus-picker")) return;
-              closePlusMenu();
-      });
-      document.addEventListener("keydown", (event) => {
-              if (event.key === "Escape" && !menu.hidden) closePlusMenu();
-      });
-      menu.addEventListener("click", (event) => {
-              const item = event.target.closest("[data-composer-action], [data-jump]");
-              if (!item) return;
-              const action = item.dataset.composerAction;
-              if (action === "attach-file") $("#composerFileInput")?.click();
-              if (action === "attach-photo") $("#composerPhotoInput")?.click();
-              closePlusMenu();
-      });
-      bindAttachInput("#composerFileInput", "Anhang");
-      bindAttachInput("#composerPhotoInput", "Bild");
-}
-
-function bindAttachInput(selector, label) {
-      const fileInput = $(selector);
-      const input = composerInput();
-      if (!fileInput || !input) return;
-      fileInput.addEventListener("change", () => {
-              const files = Array.from(fileInput.files || []);
-              if (files.length === 0) return;
-              const references = files.map((file) => `[${label}: ${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)]`);
-              input.value = input.value ? `${input.value}\n${references.join("\n")}` : references.join("\n");
-              notifyInputChanged(input);
-              input.focus();
-              showToast(files.length === 1 ? `${label} hinzugefuegt: ${files[0].name}` : `${files.length} Dateien hinzugefuegt`);
-              fileInput.value = "";
-      });
-}
+// --- Plus-Menue: ausgelagert nach composer-plus-menu.js (800-Zeilen-Regel) ----
 
 // --- Mikrofon-Diktat --------------------------------------------------------
 
@@ -291,6 +247,7 @@ function closeVoiceMode() {
       // Sprachprofil-Flag zuruecknehmen — normale Chats antworten wieder ausfuehrlich.
       window.smejjVoiceModePreferences = null;
       clearVoiceTimers();
+      stopInterrupt();
       stopBargeListener();
       try {
               state.voiceRecognition?.abort?.();
@@ -310,6 +267,7 @@ function closeVoiceMode() {
 // die Antworten werden weiterhin vorgelesen.
 function enterVoiceFallback(message) {
       state.voiceFallback = true;
+      stopInterrupt();
       stopBargeListener();
       try {
               state.voiceRecognition?.abort?.();
@@ -338,27 +296,12 @@ function enterVoiceFallback(message) {
 // und das Gehoerte als neue Frage genommen. Ohne Erkennung (iOS-Fallback),
 // bei Stummschaltung oder Start-Fehler bleibt das bisherige Verhalten bestehen.
 
-const BARGE_MIN_WORDS = 3;
+// Echo-Filter und Barge-Schwelle kommen aus voice-echo-filter.js (Stufe 1e).
 
-function normalizeSpeechText(text) {
-      return (text || "")
-        .toLowerCase()
-        .replace(/[^\p{L}\p{N}\s]/gu, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-}
-
-// Echo-Heuristik: Der gehoerte Text gilt als eigenes Lautsprecher-Echo, wenn er
-// (nahezu) vollstaendig in der gerade vorgelesenen Antwort vorkommt.
-function isLikelyEcho(heardText, spokenText) {
-      const heard = normalizeSpeechText(heardText);
-      if (!heard) return true;
-      const spoken = normalizeSpeechText(spokenText);
-      if (spoken.includes(heard)) return true;
-      const spokenWords = new Set(spoken.split(" "));
-      const heardWords = heard.split(" ");
-      const matches = heardWords.filter((word) => spokenWords.has(word)).length;
-      return matches / heardWords.length >= 0.6;
+// Mikrofonpegel-Ueberwachung beenden (Vorlese-Ende, Schliessen, vor Zuhoeren).
+function stopInterrupt() {
+      state.interrupt?.stop();
+      state.interrupt = null;
 }
 
 function stopBargeListener() {
@@ -461,8 +404,9 @@ function startBargeListener(spokenText, failStreak = 0) {
 
 function voiceModeListen() {
       if (!state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
-      // Nur eine Erkennung gleichzeitig — ein noch laufender Barge-Listener wuerde
-      // recognition.start() scheitern lassen und faelschlich den Fallback ausloesen.
+      // Nur eine Erkennung gleichzeitig — ein noch laufender Barge-Listener oder
+      // Pegel-Detektor wuerde recognition.start() scheitern lassen (Fallback-Falle).
+      stopInterrupt();
       stopBargeListener();
       setVoiceModeStatus("listening", "Ich hoere zu ...");
       setVoiceModeTranscript("");
@@ -474,12 +418,24 @@ function voiceModeListen() {
       let finalTranscript = "";
       recognition.onresult = (event) => {
               let interim = "";
+              let sawFinal = false;
               for (let index = event.resultIndex; index < event.results.length; index += 1) {
                         const result = event.results[index];
-                        if (result.isFinal) finalTranscript += result[0]?.transcript || "";
-                        else interim += result[0]?.transcript || "";
+                        if (result.isFinal) {
+                                    finalTranscript += result[0]?.transcript || "";
+                                    sawFinal = true;
+                        } else {
+                                    interim += result[0]?.transcript || "";
+                        }
               }
               setVoiceModeTranscript((finalTranscript + interim).trim());
+              // Stufe 1e: Beim finalen Ergebnis SOFORT senden statt auf onend zu
+              // warten — voiceModeSend loest die Erkennung selbst ab (Guard in onend).
+              const task = finalTranscript.trim();
+              if (sawFinal && task && state.voiceRecognition === recognition) {
+                        state.voiceFailStreak = 0;
+                        voiceModeSend(task);
+              }
       };
       recognition.onerror = (event) => {
               if (event.error === "not-allowed" || event.error === "service-not-allowed") {
@@ -571,15 +527,26 @@ function waitForAssistantReply(knownEntries) {
       const queue = createSpeechQueue({
               speakFn: speak,
               stopFn: () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); },
+              eagerFirst: true,
               onQueueStart: () => {
                         if (!state.voiceModeActive) return;
                         setVoiceModeStatus("speaking", "Ich spreche ...");
                         // Barge-in: Waehrend des Vorlesens weiterhoeren; der Echo-Filter
                         // vergleicht live gegen alles bereits Gesprochene (Getter).
                         startBargeListener(() => queue.spokenText());
+                        // Stufe 1e: Mikrofonpegel-Detektor stoppt das Vorlesen sofort,
+                        // wenn der Nutzer dazwischenspricht (auch ohne parallele Erkennung).
+                        stopInterrupt();
+                        state.interrupt = createSpeechInterrupt(() => {
+                                    if (!state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
+                                    if (state.bargeConfirmed) return;
+                                    stopSpeaking();
+                                    voiceModeListen();
+                        });
               },
               onQueueEnd: () => {
                         if (!state.voiceModeActive) return;
+                        stopInterrupt();
                         // Reinsprechen erkannt: Der Barge-Listener uebernimmt (hoert zu Ende und sendet).
                         if (state.bargeConfirmed) return;
                         stopBargeListener();
@@ -650,6 +617,7 @@ function toggleVoiceMute() {
       state.voiceMuted = !state.voiceMuted;
       syncVoiceMicVisual();
       if (state.voiceMuted) {
+              stopInterrupt();
               stopBargeListener();
               try {
                         // stop() statt abort(): bereits Gesagtes wird noch abgeliefert und gesendet.
@@ -681,6 +649,9 @@ function openVoiceMode() {
       state.voiceMuted = false;
       state.voiceFallback = false;
       state.voiceFailStreak = 0;
+      // Stufe 1e: Verbindung zum Antwort-Server schon jetzt aufbauen —
+      // die erste Antwort startet dadurch spuerbar frueher.
+      warmUpAgentConnection();
       // Stufe 1c: app.js merged diese Praeferenz beim Senden — der Server antwortet
       // im Sprachprofil (kurz, gespraechig, ohne Markdown), solange der Modus offen ist.
       window.smejjVoiceModePreferences = { voiceMode: true };
@@ -788,7 +759,7 @@ function toggleReadAloud() {
 // --- Initialisierung ----------------------------------------------------------
 
 export function initComposerTools() {
-      bindPlusMenu();
+      bindPlusMenu({ getInput: composerInput, notifyInputChanged });
       bindVoiceMode();
       $('[data-start-tool="voice"]')?.addEventListener("click", toggleDictation);
       $('[data-start-tool="audio"]')?.addEventListener("click", openVoiceMode);
