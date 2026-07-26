@@ -15,7 +15,12 @@ export function initAccountPrivacySurface() {
   const view = document.querySelector("#profile");
   if (!view || view.dataset.accountPrivacyReady) return;
   view.dataset.accountPrivacyReady = "true";
+  // Mehrfach zeitversetzt: der app.js-Router (Start-Lock, nicht anfassbar)
+  // haengt beim Ansichtswechsel location.search wieder an — je nach Ladetempo
+  // gewinnt er das Rennen. Die spaeteren Durchlaeufe raeumen dann endgueltig auf.
   cleanLoginMarkers();
+  setTimeout(cleanLoginMarkers, 800);
+  setTimeout(cleanLoginMarkers, 2500);
   loadStyles();
   // Synchron rendern (i18n-Sprachcache): app.js-Boot-Bindings (#saveProfile,
   // #registerLocal, #loginLocal) finden die gerenderten Elemente vor.
