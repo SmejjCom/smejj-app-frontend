@@ -632,3 +632,25 @@
   text-transform: none;
   letter-spacing: normal;
 }
+
+/* Nutzungszaehler (Schritt 2, 2026-07-26): rechte Spalte der Nutzungs-Zeilen. */
+#profile .usage-count {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+#profile .usage-count strong {
+  font-size: 22px;
+  font-weight: 750;
+  color: #7ee8da;
+  line-height: 1.1;
+}
+
+#profile .usage-count small {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
