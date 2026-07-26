@@ -144,7 +144,9 @@ async function completeGoogleHandoff() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("handoff");
   if (!id) return false;
-  status(t("Google-Anmeldung wird abgeschlossen …"));
+  // Neutraler Text: der Handoff traegt Google-, GitHub- UND Magic-Link-Logins
+  // (Live-Befund 2026-07-25: "Google fehlgeschlagen" nach Magic-Link verwirrte).
+  status(t("Anmeldung läuft …"));
   try {
     const response = await fetch(`${API_ORIGIN}/api/auth/session-handoff/${encodeURIComponent(id)}`);
     const data = await response.json();
@@ -154,9 +156,9 @@ async function completeGoogleHandoff() {
       window.location.assign("/profile?login=ok");
       return true;
     }
-    status(t("Google-Anmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen."), "error");
+    status(t("Anmeldung fehlgeschlagen."), "error");
   } catch {
-    status(t("Google-Anmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen."), "error");
+    status(t("Anmeldung fehlgeschlagen."), "error");
   }
   return false;
 }
