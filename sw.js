@@ -1,3 +1,7 @@
+// v139 -> v140 (2026-07-26): Light-Mode Nachzug 2 — restliche Primaer-Knoepfe
+// (#projectCreate/#projectSave/#searchSubmit/#storageAgain) waren im hellen
+// Schema dunkelmodus-weiss und damit unlesbar; Fix jetzt zentral fuer alle
+// sechs Knoepfe in app-surfaces.css (liegt im Precache, braucht den Sprung).
 // v138 -> v139 (2026-07-26): Light-Mode Nachzug — Primaer-Knoepfe #saveProfile/
 // #saveSettings wurden von app-surfaces.css (Lock) dunkelmodus-weiss gefaerbt
 // und waren im hellen Schema unlesbar; account-privacy.css und
@@ -36,7 +40,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v139";
+const CACHE_NAME = "smejj-shell-v140";
 const SHELL = [
   "/",
   "/assets/styles.css",
