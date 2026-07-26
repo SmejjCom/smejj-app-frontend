@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from "./config.js";
-import { initServerSessionControls, fetchAuthenticatedUser, logoutCurrentSession } from "./account-sessions.js?v=3";
+import { initServerSessionControls, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession } from "./account-sessions.js?v=4";
 import { languageOptionsMarkup } from "./language-options.js?v=1";
 import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=1";
@@ -21,6 +21,18 @@ const STRIPE_PLAN_LINKS = {
   max: "https://buy.stripe.com/test_14AdRb7WC5Le6ik2McfIs02"
 };
 const SAFE_EXPORT_KEYS = [STORAGE_KEYS.profile, STORAGE_KEYS.settings, STORAGE_KEYS.session, STORAGE_KEYS.model];
+// Abo-Anzeige (Schritt 3b): checkoutRef kommt vom Control-Server
+// (/api/billing/status) und geht als client_reference_id an die Zahlungslinks.
+let billingCheckoutRef = "";
+const PLAN_LABELS = {
+  plus: "smejj Plus — 9 € / Monat",
+  pro: "smejj Pro — 19 € / Monat",
+  max: "smejj Max — 39 € / Monat"
+};
+function planLink(plan) {
+  const base = STRIPE_PLAN_LINKS[plan];
+  return billingCheckoutRef ? `${base}?client_reference_id=${billingCheckoutRef}` : base;
+}
 
 export function initAccountPrivacySurface() {
   const view = document.querySelector("#profile");
@@ -67,6 +79,26 @@ async function hydrateAuthSession(view) {
   if (sessionStatus) sessionStatus.textContent = `${t("angemeldet als")} ${user.email || user.name} (${user.method || "google"})`;
   const roleStatus = view.querySelector("#userRoleStatus");
   if (roleStatus) roleStatus.textContent = t("angemeldeter Nutzer");
+  hydrateBillingStatus(view); // asynchron, fail-safe: ohne Server bleibt Free stehen
+}
+
+// Abo & Zahlungen mit echtem Serverstand fuellen (Schritt 3b). Fail-safe:
+// Ohne Antwort (offline, 401, Storage-Stoerung) bleibt die Free-Anzeige stehen —
+// niemals ein Abo anzeigen, das der Server nicht bestaetigt hat.
+async function hydrateBillingStatus(view) {
+  const billing = await fetchBillingStatus();
+  if (!billing) return;
+  billingCheckoutRef = String(billing.checkoutRef || "");
+  const label = PLAN_LABELS[billing.plan];
+  if (!label) return; // plan "free" oder unbekannt: Anzeige unveraendert
+  const planName = view.querySelector('[data-account-panel="billing"] .plan-name');
+  if (planName) planName.textContent = billing.livemode ? label : `${label} (Test)`;
+  const planHint = view.querySelector('[data-account-panel="billing"] .account-plan small');
+  if (planHint) {
+    planHint.textContent = billing.cancelAtPeriodEnd
+      ? t("Gekündigt — läuft zum Periodenende aus.")
+      : t("Abo aktiv über Stripe. Monatlich kündbar.");
+  }
 }
 
 // Konto-Neuaufbau 2026-07-26 (Mockup-Abnahme Betreiber): 9 Bereiche wie bei
@@ -108,9 +140,9 @@ function bind(view) {
     if (event.target.closest("#modelsSettingsOpen")) location.href = "/settings";
     // Stripe-Checkout in neuem Tab (noopener: der Checkout bekommt keinen
     // Zugriff auf das smejj-Fenster).
-    if (event.target.closest("#planPlusOpen")) window.open(STRIPE_PLAN_LINKS.plus, "_blank", "noopener");
-    if (event.target.closest("#planProOpen")) window.open(STRIPE_PLAN_LINKS.pro, "_blank", "noopener");
-    if (event.target.closest("#planMaxOpen")) window.open(STRIPE_PLAN_LINKS.max, "_blank", "noopener");
+    if (event.target.closest("#planPlusOpen")) window.open(planLink("plus"), "_blank", "noopener");
+    if (event.target.closest("#planProOpen")) window.open(planLink("pro"), "_blank", "noopener");
+    if (event.target.closest("#planMaxOpen")) window.open(planLink("max"), "_blank", "noopener");
     if (event.target.closest("#savePersonalization")) savePersonalization(view);
     if (event.target.closest("#logoutLocal")) logoutSession(view);
   });
