@@ -1,3 +1,8 @@
+// v135 -> v136 (2026-07-26): Sprachwelle Stufe 2a — voice-endpoint.js neu im
+// Shell-Cache (Interim-Waechter: Sprech-Ende ~1 s frueher; Import von
+// composer-tools.js und voice-landing.js — ohne Precache offline tot) und
+// Zwei-Ebenen-VAD in voice-vad.js (Unterbrechen auf Handys ohne Echo-
+// unterdrueckung der System-TTS: Pausen empfindlich, TTS-Phasen robust).
 // v134 -> v135 (2026-07-26): Sprachwelle Blitz-Paket (Stufe 1e) — Warm-up,
 // Sofort-Senden, fruehes Lossprechen, Mikrofonpegel-Unterbrechung. Neu im
 // Shell-Cache: voice-echo-filter.js, voice-vad.js, voice-warmup.js,
@@ -19,7 +24,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v135";
+const CACHE_NAME = "smejj-shell-v136";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -68,6 +73,7 @@ const SHELL = [
   "/assets/voice-speech-queue.js",
   "/assets/voice-echo-filter.js",
   "/assets/voice-vad.js",
+  "/assets/voice-endpoint.js",
   "/assets/voice-warmup.js",
   "/assets/chat-store.js",
   "/assets/chat-history-view.js",
