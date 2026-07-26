@@ -179,7 +179,18 @@ function revealEmailForm() {
   return true;
 }
 
+// Das Formular wird per Button-Handler statt per form-submit abgeschickt, dadurch
+// prueft der Browser das type="email"-Feld nie von selbst. checkValidity() holt
+// genau diese Pruefung nach, damit ungueltige Eingaben nicht erst nach dem
+// Netzwerk-Roundtrip auffallen. Leere Eingabe bleibt bei der bestehenden Meldung.
+function emailFieldValid() {
+  const field = document.querySelector("#profileEmail");
+  if (!field || !String(field.value || "").trim()) return true;
+  return field.checkValidity();
+}
+
 async function submitEmailLogin() {
+  if (!emailFieldValid()) return status(t(ERROR_TEXT.email_invalid), "error");
   if (!revealEmailForm()) return;
   const { email, password } = emailFormValues();
   if (!email || !password) return status(t("Bitte E-Mail und Passwort eingeben."), "error");
@@ -196,6 +207,7 @@ async function submitEmailLogin() {
 }
 
 async function submitEmailRegister() {
+  if (!emailFieldValid()) return status(t(ERROR_TEXT.email_invalid), "error");
   if (!revealEmailForm()) return;
   const { email, password, name } = emailFormValues();
   if (!email || !password) return status(t("Bitte E-Mail und Passwort eingeben."), "error");
@@ -282,6 +294,7 @@ async function startGithubLogin() {
 async function requestMagicLink() {
   const { email } = emailFormValues();
   if (!email) { revealEmailForm(); return status(t("Bitte zuerst deine E-Mail-Adresse eingeben."), "error"); }
+  if (!emailFieldValid()) return status(t(ERROR_TEXT.email_invalid), "error");
   const button = document.querySelector("#magicLinkLogin");
   if (button) button.disabled = true;
   status(t("Anmeldelink wird gesendet …"));
