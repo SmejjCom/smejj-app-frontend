@@ -633,14 +633,16 @@ async function handleVoiceStatus(res) {
     return json(res, 200, { ok: true, premiumVoice: voiceStatusCache.up });
   }
   let up = false;
+  let reason = "";
   try {
     up = Boolean((await loadXttsSpeaker())?.name);
-  } catch {
+  } catch (error) {
     up = false;
+    reason = String(error?.message || "worker").slice(0, 80);
     xttsSpeakerCache = null; // Worker weg — beim naechsten Versuch neu laden.
   }
   voiceStatusCache = { at: now, up };
-  return json(res, 200, { ok: true, premiumVoice: up });
+  return json(res, 200, up ? { ok: true, premiumVoice: true } : { ok: true, premiumVoice: false, reason });
 }
 
 async function handleVoiceTts(req, res) {
