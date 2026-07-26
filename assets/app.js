@@ -3,7 +3,7 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { runClientChat } from "/assets/ai/chatClient.js?v=3";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=chat-markdown-20260717";
-import { initComposerTools } from "./composer-tools.js?v=voice-send-20260721";
+import { initComposerTools } from "./composer-tools.js?v=blitz-20260726";
 import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v3";
@@ -197,6 +197,7 @@ function bindModelPicker() {
   button.addEventListener("click", (event) => {
     event.stopPropagation();
     const open = menu.hidden;
+    if (open) { const p = $("#composerPlusMenu"), b = $("#composerPlusButton"); if (p) p.hidden = true; if (b) b.setAttribute("aria-expanded", "false"); }
     menu.hidden = !open;
     button.setAttribute("aria-expanded", String(open));
   });
@@ -331,6 +332,7 @@ function goToView(viewId, { replace = false } = {}) {
     history[method]({ viewId: resolvedViewId }, "", nextUrl);
   }
   updateCanonical();
+  if (resolvedViewId === "tools") refreshLiveSystemStatus();
   target.scrollIntoView({ block: "start" });
 }
 
@@ -427,6 +429,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
     }
     showTaskIndicator("done");
   } catch (error) {
+    clearThinkingState(output);
     const message = error?.message === "Failed to fetch"
       ? UI_COPY.chatOffline
       : error.message || "Aufgabe konnte nicht abgeschlossen werden.";
@@ -935,10 +938,14 @@ function updateAiStatus(result) {
   setText("#costAiMode", mode);
 }
 
+async function refreshLiveSystemStatus() {
+  refreshLocalWorkspaceStatus(); try { const h = await getJson(CLIENT_ROUTES.api.health); if (h) { if (h.storage) setText("#storageStatusText", h.storage); if (h.idrive) setText("#idriveStatusText", h.idrive); if (h.aiMode) setText("#aiModeText", h.aiMode); if (h.cost) setText("#costStatusText", h.cost); } const s = await getJson(CLIENT_ROUTES.api.storageStatus); if (s?.configured) setText("#idriveStatusText", `IDrive e2 (${s.bucket || "smejj-app"}) OK`); } catch {}
+}
+
 function bindTools() {
-  $("#capabilities").addEventListener("click", () => showJson("#toolOutput", CLIENT_ROUTES.api.capabilities));
-  $("#health").addEventListener("click", () => showJson("#toolOutput", CLIENT_ROUTES.api.health));
-  $("#freeGuard").addEventListener("click", () => {
+  $("#capabilities")?.addEventListener("click", () => showJson("#toolOutput", CLIENT_ROUTES.api.capabilities));
+  $("#health")?.addEventListener("click", () => showJson("#toolOutput", CLIENT_ROUTES.api.health));
+  $("#freeGuard")?.addEventListener("click", () => {
     writeOutput("#toolOutput", [
       "Free-Guard aktiv:",
       "- GitHub Free nur fuer Code/Doku.",
@@ -947,6 +954,7 @@ function bindTools() {
       "- Unsichere oder paid-risk Online-Schreibwege bleiben gesperrt."
     ].join("\n"));
   });
+  $("#localWorkspaceStatus")?.addEventListener("click", () => refreshLiveSystemStatus());
 }
 
 function bindCost() {
@@ -1260,7 +1268,12 @@ async function showJson(target, url) {
 function addEntry(text, role, target = "#startLog") {
   const node = document.createElement("article");
   node.className = `entry ${role}`;
-  node.textContent = text;
+  if (!text && role === "assistant") {
+    node.dataset.thinking = "true";
+    node.innerHTML = '<span class="thinking-dots">smejj denkt nach<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>';
+  } else {
+    node.textContent = text;
+  }
   const log = $(target) || $("#startLog");
   if (!log) return node;
   log.hidden = false;
@@ -1268,6 +1281,13 @@ function addEntry(text, role, target = "#startLog") {
   log.append(node);
   node.scrollIntoView({ block: "end" });
   return node;
+}
+
+function clearThinkingState(output) {
+  if (output && output.dataset?.thinking === "true") {
+    output.innerHTML = "";
+    delete output.dataset.thinking;
+  }
 }
 
 async function stream(url, body, output) {
@@ -1278,6 +1298,7 @@ async function stream(url, body, output) {
   });
 
   if (!response.ok || !response.body) {
+    clearThinkingState(output);
     output.textContent = await readableError(response);
     return;
   }
@@ -1298,6 +1319,7 @@ async function stream(url, body, output) {
         .map((line) => line.slice(6))
         .join("\n");
       if (!text || text === "[DONE]") continue;
+      clearThinkingState(output);
       try {
         const payload = JSON.parse(text);
         const delta = payload.choices?.[0]?.delta;
@@ -1308,6 +1330,7 @@ async function stream(url, body, output) {
     }
     output.scrollIntoView({ block: "end" });
   }
+  clearThinkingState(output);
   renderChatMarkdown(output);
 }
 
