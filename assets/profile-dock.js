@@ -9,6 +9,7 @@
 // Das Dock liest den Profil-Zustand ausschliesslich aus localStorage
 // (Single Source of Truth von app.js) und schreibt ihn nie zurueck.
 
+import "./auth-gate.js?v=1";
 import { STORAGE_KEYS } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
 import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=1";
