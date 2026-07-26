@@ -22,6 +22,10 @@ export const API_ORIGIN = resolveApiOrigin();
 const API_PATHS = {
   agent: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/agent",
   chat: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/chat",
+  // Zwei-Wege-Betrieb (Stufe C): Zeabur-Mietserver als automatische Reserve —
+  // faellt Salad aus (Community-Hardware), antwortet das Rechenzentrum.
+  agentFallback: "https://smejj-chat-bridge.zeabur.app/api/agent",
+  chatFallback: "https://smejj-chat-bridge.zeabur.app/api/chat",
   voiceStatus: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/status",
   voiceTts: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/tts",
     authConfig: "/api/auth/config",
