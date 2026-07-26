@@ -8,6 +8,23 @@
    mobil wird die Navigation zur umbrechenden Chip-Leiste. */
 
 #profile.premium-view {
+  /* Alle Glas-Werte als lokale Variablen (Fix 2026-07-26c): das Konto-Glas
+     kennt zwei Farbschemata; die dunklen Werte hier sind exakt die bisherigen. */
+  --konto-line: rgba(255, 255, 255, 0.13);
+  --konto-line-soft: rgba(255, 255, 255, 0.09);
+  --konto-edge: rgba(255, 255, 255, 0.28);
+  --konto-glass: rgba(255, 255, 255, 0.045);
+  --konto-glass-strong: rgba(255, 255, 255, 0.085);
+  --konto-glass-hover: rgba(255, 255, 255, 0.14);
+  --konto-hover-soft: rgba(255, 255, 255, 0.05);
+  --konto-switch-track: rgba(255, 255, 255, 0.10);
+  --konto-field-bg: rgba(0, 0, 0, 0.25);
+  --konto-danger-text: #ff8177;
+  --konto-danger-line: rgba(255, 110, 100, 0.35);
+  --konto-danger-hover: rgba(255, 110, 100, 0.12);
+  --konto-ok-text: #7ee8da;
+  --konto-ok-bg: rgba(45, 212, 191, 0.15);
+  --konto-ok-line: rgba(45, 212, 191, 0.4);
   padding: 72px clamp(14px, 4vw, 48px) 28px;
   /* Farbige Lichtflecken NUR in dieser Ansicht — die App-Huelle bleibt unberuehrt. */
   background-image:
@@ -15,15 +32,52 @@
     radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.07), transparent 60%);
 }
 
+/* Helles Farbschema (Befund iPhone-PWA 2026-07-26: Systemschema "hell" macht
+   --premium-text dunkel, die Konto-Flaechen ueberschrieben aber wegen
+   ID-Spezifitaet den hellen Hintergrund — dunkler Text auf dunklem Glas,
+   unlesbar). Fail-safe: der Grund ist hier deckend hell, unabhaengig davon,
+   was hinter der Ansicht liegt (der ::before-Unterbau liegt unter dem
+   body-Hintergrund und traegt nicht). */
+#profile.premium-view[data-settings-theme="light"] {
+  --konto-line: rgba(23, 25, 29, 0.16);
+  --konto-line-soft: rgba(23, 25, 29, 0.10);
+  --konto-edge: rgba(255, 255, 255, 0.9);
+  --konto-glass: rgba(255, 255, 255, 0.62);
+  --konto-glass-strong: rgba(255, 255, 255, 0.85);
+  --konto-glass-hover: #ffffff;
+  --konto-hover-soft: rgba(23, 25, 29, 0.045);
+  --konto-switch-track: rgba(23, 25, 29, 0.14);
+  --konto-field-bg: #ffffff;
+  --konto-danger-text: #b3261e;
+  --konto-danger-line: rgba(179, 38, 30, 0.4);
+  --konto-danger-hover: rgba(179, 38, 30, 0.08);
+  --konto-ok-text: #0c6b5e;
+  --konto-ok-bg: rgba(45, 212, 191, 0.16);
+  --konto-ok-line: rgba(12, 107, 94, 0.45);
+  background-image:
+    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.14), transparent 60%),
+    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.10), transparent 60%),
+    linear-gradient(180deg, #fbfbf9, #f3f4f1);
+}
+
+/* Der leere Avatar (styles.css, Lock) zeichnet seine Figur cremefarben —
+   auf hellem Grund unsichtbar. Nur im Konto-Bereich dunkel nachziehen. */
+#profile.premium-view[data-settings-theme="light"] .account-picture .profile-avatar.is-empty {
+  border-color: rgba(23, 25, 29, 0.35);
+  background:
+    radial-gradient(circle at 50% 37%, transparent 0 4px, rgba(23, 25, 29, 0.55) 4.5px 7px, transparent 7.5px),
+    radial-gradient(ellipse at 50% 82%, transparent 0 8px, rgba(23, 25, 29, 0.55) 8.5px 12px, transparent 12.5px);
+}
+
 /* Glas-Grundfläche: durchscheinend, Weichzeichner, helle Kante oben, eckig. */
 #profile .account-nav,
 #profile .account-panel,
 #profile .output {
-  background: rgba(255, 255, 255, 0.045);
+  background: var(--konto-glass);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
   backdrop-filter: blur(22px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-top-color: rgba(255, 255, 255, 0.28);
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
   border-radius: 0;
 }
 
@@ -33,7 +87,7 @@
   justify-content: space-between;
   gap: 20px;
   padding-bottom: 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  border-bottom: 1px solid var(--konto-line-soft);
 }
 
 #profile .account-header h2 {
@@ -51,10 +105,10 @@
 
 #profile .account-security {
   padding: 8px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-top-color: rgba(255, 255, 255, 0.28);
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.045);
+  background: var(--konto-glass);
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   color: var(--premium-muted, #9fa8ad);
@@ -83,7 +137,7 @@
   margin: 0;
   padding: 14px 16px;
   border: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  border-bottom: 1px solid var(--konto-line-soft);
   border-radius: 0;
   background: transparent;
   color: var(--premium-muted, #9fa8ad);
@@ -99,12 +153,12 @@
 
 #profile .account-nav button:hover {
   color: var(--premium-text, #eef1f2);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--konto-hover-soft);
 }
 
 #profile .account-nav button.is-active {
   color: var(--premium-text, #eef1f2);
-  background: rgba(255, 255, 255, 0.085);
+  background: var(--konto-glass-strong);
   box-shadow: inset 3px 0 0 #2dd4bf;
 }
 
@@ -138,7 +192,7 @@
 
 /* Zeilen-Listen: Felder nur durch hauchduenne Linien getrennt. */
 #profile .account-list {
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--konto-line-soft);
   border-radius: 0;
 }
 
@@ -152,7 +206,7 @@
 }
 
 #profile .account-row + .account-row {
-  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  border-top: 1px solid var(--konto-line-soft);
 }
 
 #profile .account-row > span:first-child {
@@ -181,9 +235,9 @@
   height: 26px;
   margin: 0;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid var(--konto-line);
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.10);
+  background: var(--konto-switch-track);
   position: relative;
   cursor: pointer;
 }
@@ -214,9 +268,9 @@
 #profile .permission-state {
   flex-shrink: 0;
   padding: 5px 11px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid var(--konto-line);
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.085);
+  background: var(--konto-glass-strong);
   color: var(--premium-muted, #c6cdd1);
   font-size: 11px;
   font-weight: 700;
@@ -226,9 +280,9 @@
 }
 
 #profile .state-badge.is-ok {
-  background: rgba(45, 212, 191, 0.15);
-  border-color: rgba(45, 212, 191, 0.4);
-  color: #7ee8da;
+  background: var(--konto-ok-bg);
+  border-color: var(--konto-ok-line);
+  color: var(--konto-ok-text);
 }
 
 /* Plan-Kopfzeile in Abo & Zahlungen. */
@@ -239,7 +293,7 @@
   gap: 16px;
   padding: 16px;
   margin-bottom: 16px;
-  border: 1px solid rgba(45, 212, 191, 0.4);
+  border: 1px solid var(--konto-ok-line);
   border-radius: 0;
   background: rgba(45, 212, 191, 0.07);
   box-shadow: inset 0 3px 0 #2dd4bf;
@@ -278,9 +332,9 @@
   resize: vertical;
   min-height: 96px;
   padding: 13px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid var(--konto-line);
   border-radius: 0;
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--konto-field-bg);
   color: var(--premium-text, #eef1f2);
   font-family: inherit;
   font-size: 15px;
@@ -308,9 +362,9 @@
 #profile .account-grid select {
   width: 100%;
   padding: 13px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid var(--konto-line);
   border-radius: 0;
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--konto-field-bg);
   color: var(--premium-text, #eef1f2);
   font-size: 15px;
   font-weight: 500;
@@ -328,10 +382,10 @@
 #profile .account-actions button,
 #profile .account-row button {
   padding: 10px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-top-color: rgba(255, 255, 255, 0.28);
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.085);
+  background: var(--konto-glass-strong);
   color: var(--premium-text, #eef1f2);
   font-size: 13.5px;
   font-weight: 650;
@@ -341,7 +395,7 @@
 
 #profile .account-actions button:hover,
 #profile .account-row button:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--konto-glass-hover);
 }
 
 #profile .account-row button {
@@ -350,29 +404,29 @@
 }
 
 #profile #logoutLocal {
-  border-color: rgba(255, 110, 100, 0.35);
+  border-color: var(--konto-danger-line);
   background: transparent;
-  color: #ff8177;
+  color: var(--konto-danger-text);
 }
 
 #profile #logoutLocal:hover {
-  background: rgba(255, 110, 100, 0.12);
+  background: var(--konto-danger-hover);
 }
 
 #profile .danger-action {
-  border-color: rgba(255, 110, 100, 0.35) !important;
+  border-color: var(--konto-danger-line) !important;
   background: transparent !important;
-  color: #ff8177 !important;
+  color: var(--konto-danger-text) !important;
 }
 
 #profile .danger-action:hover {
-  background: rgba(255, 110, 100, 0.12) !important;
+  background: var(--konto-danger-hover) !important;
 }
 
 #profile .account-status {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--konto-line-soft);
   border-radius: 0;
 }
 
@@ -380,11 +434,11 @@
   display: grid;
   gap: 3px;
   padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  border-bottom: 1px solid var(--konto-line-soft);
 }
 
 #profile .account-status div:nth-child(even) {
-  border-inline-start: 1px solid rgba(255, 255, 255, 0.09);
+  border-inline-start: 1px solid var(--konto-line-soft);
 }
 
 #profile .account-status div:nth-child(n + 3) {
@@ -417,7 +471,7 @@
   align-items: center;
   gap: 16px;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--konto-line-soft);
   border-radius: 0;
 }
 
@@ -449,10 +503,10 @@
 
 #profile .account-picture-choose {
   padding: 10px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-top-color: rgba(255, 255, 255, 0.28);
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.085);
+  background: var(--konto-glass-strong);
   color: var(--premium-text, #eef1f2);
   font-size: 13.5px;
   font-weight: 650;
@@ -461,7 +515,7 @@
 }
 
 #profile .account-picture-choose:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--konto-glass-hover);
 }
 
 #profile #profilePictureInput {
@@ -505,9 +559,9 @@
   #profile .account-nav button {
     width: auto;
     padding: 9px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.13);
+    border: 1px solid var(--konto-line);
     border-radius: 0;
-    background: rgba(255, 255, 255, 0.045);
+    background: var(--konto-glass);
     font-size: 13px;
   }
 
@@ -528,7 +582,7 @@
   }
 
   #profile .account-status div:nth-child(n + 3) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+    border-bottom: 1px solid var(--konto-line-soft);
   }
 
   #profile .account-status div:last-child {
