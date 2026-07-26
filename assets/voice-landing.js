@@ -514,7 +514,7 @@ async function sendTask(task) {
   let streamed = "";
   try {
     // Stufe A2: Bei stummer/ausgefallener Replika sofort neu versuchen.
-    const response = await fetchStreamWithRetry(CLIENT_ROUTES.api.agent, {
+    const response = await fetchStreamWithRetry([CLIENT_ROUTES.api.agent, CLIENT_ROUTES.api.agentFallback], {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(buildAgentPayload(task, lang))
