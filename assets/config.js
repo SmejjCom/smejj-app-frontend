@@ -22,6 +22,8 @@ export const API_ORIGIN = resolveApiOrigin();
 const API_PATHS = {
   agent: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/agent",
   chat: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/chat",
+  voiceStatus: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/status",
+  voiceTts: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/tts",
     authConfig: "/api/auth/config",
     browserFetch: "/api/browser/fetch",
     browserRemote: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/api/browser/remote",
