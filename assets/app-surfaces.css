@@ -645,6 +645,22 @@ body:has(.premium-view.is-active) .browser-panel-nav button:hover {
   color: #f9f6f1;
 }
 
+/* Menue- und Browser-Knopf liegen fixiert ueber der Ansichtsflaeche, gehoeren
+   aber zur Shell und erben deren Farbschema nicht. Im hellen Schema blieben sie
+   dadurch hell auf hell (Kontrast 1.03:1, praktisch unsichtbar). Das Icon zeichnet
+   sich ueber border/background statt currentColor, deshalb reicht color allein nicht. */
+body:has(.premium-view.is-active[data-settings-theme="light"]) .glass-icon {
+  color: #17191d;
+}
+
+body:has(.premium-view.is-active[data-settings-theme="light"]) .split-icon {
+  border-color: rgba(23, 25, 29, 0.72);
+}
+
+body:has(.premium-view.is-active[data-settings-theme="light"]) .split-icon span:first-child {
+  background: rgba(23, 25, 29, 0.58);
+}
+
 @media (max-width: 760px) {
   .premium-view .view-header {
     padding-bottom: 12px;
