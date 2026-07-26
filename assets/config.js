@@ -26,8 +26,11 @@ const API_PATHS = {
   // faellt Salad aus (Community-Hardware), antwortet das Rechenzentrum.
   agentFallback: "https://smejj-chat-bridge.zeabur.app/api/agent",
   chatFallback: "https://smejj-chat-bridge.zeabur.app/api/chat",
-  voiceStatus: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/status",
-  voiceTts: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/tts",
+  // Premium-Stimme laeuft ueber den Zeabur-Mietserver (CPU-Stimme Piper im
+  // Flat-Paket, kein GPU-Worker noetig) — die Bridge dort proxied zum
+  // internen Piper-Dienst.
+  voiceStatus: "https://smejj-chat-bridge.zeabur.app/api/voice/status",
+  voiceTts: "https://smejj-chat-bridge.zeabur.app/api/voice/tts",
     authConfig: "/api/auth/config",
     browserFetch: "/api/browser/fetch",
     browserRemote: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/api/browser/remote",
