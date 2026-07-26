@@ -13,8 +13,14 @@ import { createSpeechInterrupt } from "./voice-vad.js?v=blitz2-20260726";
 import { warmUpAgentConnection } from "./voice-warmup.js";
 // Stufe 2a: Interim-Waechter — Sprech-Ende ~1 s frueher erkennen und senden.
 import { createSilenceWatchdog } from "./voice-endpoint.js";
+// Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
+// Unterbrechen wie ChatGPT). Fail-safe: ohne Worker bleibt die Browser-Stimme.
+import { createPremiumVoice } from "./voice-premium-tts.js";
+import { CLIENT_ROUTES } from "./config.js";
 // Plus-Menue (Anhaenge) — ausgelagert, Verhalten unveraendert.
 import { bindPlusMenu } from "./composer-plus-menu.js";
+// Mikrofon-Diktat — ausgelagert (800-Zeilen-Regel), Verhalten unveraendert.
+import { createDictation } from "./composer-dictation.js";
 
 const $ = (selector) => document.querySelector(selector);
 // Sprache dynamisch aus dem lang-Attribut der Seite (Fallback de-DE).
@@ -31,9 +37,6 @@ const RecognitionCtor = typeof window !== "undefined"
       : null;
 
 const state = {
-      dictationActive: false,
-      dictationRecognition: null,
-      dictationBaseText: "",
       voiceModeActive: false,
       voiceMuted: false,
       voiceFallback: false,
@@ -70,7 +73,28 @@ function pickGermanVoice() {
         || null;
 }
 
+// Stufe B: Premium-Stimme des Servers (WebAudio) — nur im Sprachmodus aktiv,
+// Verfuegbarkeit wird beim Oeffnen geprueft; jeder Fehler faellt lautlos auf
+// die Browser-Stimme zurueck (Non-Regression).
+const premiumVoice = createPremiumVoice({
+      statusUrl: CLIENT_ROUTES.api.voiceStatus,
+      ttsUrl: CLIENT_ROUTES.api.voiceTts,
+      lang: SPEECH_BASE
+});
+let premiumVoiceOn = false;
+
 function speak(text, { onend, onstart } = {}) {
+      if (state.voiceModeActive && premiumVoiceOn && text) {
+              premiumVoice.speak(text, { onstart, onend }).catch(() => {
+                        premiumVoiceOn = false; // Worker weg -> Rest der Sitzung Browser-Stimme
+                        speakWithBrowser(text, { onend, onstart });
+              });
+              return null;
+      }
+      return speakWithBrowser(text, { onend, onstart });
+}
+
+function speakWithBrowser(text, { onend, onstart } = {}) {
       if (!synthesisSupported() || !text) {
               onend?.();
               return null;
@@ -97,6 +121,7 @@ function stopSpeaking() {
       // Auch die satzweise Vorlese-Queue abbrechen (Barge-in, X, getippte Frage).
       state.speechQueue?.cancel();
       state.speechQueue = null;
+      premiumVoice.cancel();
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 }
 
@@ -134,80 +159,18 @@ function lastAssistantEntryText() {
 
 // --- Plus-Menue: ausgelagert nach composer-plus-menu.js (800-Zeilen-Regel) ----
 
-// --- Mikrofon-Diktat --------------------------------------------------------
+// --- Mikrofon-Diktat (ausgelagert nach composer-dictation.js, 800-Zeilen-Regel) ---
 
-function setDictationVisual(active) {
-      $('[data-start-tool="voice"]')?.classList.toggle("is-recording", active);
-}
-
-function stopDictation() {
-      state.dictationActive = false;
-      setDictationVisual(false);
-      try {
-              state.dictationRecognition?.stop();
-      } catch {
-              // Recognition war bereits gestoppt.
-      }
-      state.dictationRecognition = null;
-}
-
-function startDictation() {
-      const input = composerInput();
-      if (!input || !speechSupported()) return;
-      const recognition = new RecognitionCtor();
-      recognition.lang = SPEECH_LANG;
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      state.dictationRecognition = recognition;
-      state.dictationActive = true;
-      state.dictationBaseText = input.value ? `${input.value.replace(/\s+$/, "")} ` : "";
-      setDictationVisual(true);
-      recognition.onresult = (event) => {
-              let interim = "";
-              for (let index = event.resultIndex; index < event.results.length; index += 1) {
-                        const result = event.results[index];
-                        const transcript = result[0]?.transcript || "";
-                        if (result.isFinal) {
-                                    state.dictationBaseText += `${transcript.trim()} `;
-                        } else {
-                                    interim += transcript;
-                        }
-              }
-              input.value = `${state.dictationBaseText}${interim}`.replace(/\s+$/, interim ? "" : " ").trimStart();
-              notifyInputChanged(input);
-      };
-      recognition.onerror = (event) => {
-              if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-                        stopDictation();
-                        showToast("Mikrofon-Zugriff verweigert. Bitte in den Browser-Einstellungen erlauben.", "warn");
-              }
-      };
-      recognition.onend = () => {
-              // Browser beendet die Erkennung nach Sprechpausen — solange aktiv, sofort neu starten.
-              if (!state.dictationActive) return;
-              try {
-                        recognition.start();
-              } catch {
-                        stopDictation();
-              }
-      };
-      try {
-              recognition.start();
-              showToast("Diktat aktiv — zum Beenden Mikrofon erneut klicken.");
-      } catch {
-              stopDictation();
-      }
-}
-
-function toggleDictation() {
-      if (state.voiceModeActive) closeVoiceMode();
-      if (state.dictationActive) {
-              stopDictation();
-              showToast("Diktat beendet.");
-              return;
-      }
-      startDictation();
-}
+const dictation = createDictation({
+      getInput: composerInput,
+      notifyInputChanged,
+      showToast,
+      RecognitionCtor,
+      lang: SPEECH_LANG,
+      speechSupported,
+      setVisual: (active) => $('[data-start-tool="voice"]')?.classList.toggle("is-recording", active),
+      onBeforeToggle: () => { if (state.voiceModeActive) closeVoiceMode(); }
+});
 
 // --- Sprachmodus (Gespraech wie ChatGPT Voice) -------------------------------
 
@@ -561,7 +524,7 @@ function waitForAssistantReply(knownEntries) {
                                     if (state.bargeConfirmed) return;
                                     stopSpeaking();
                                     voiceModeListen();
-                        }, { isTtsActive: () => ("speechSynthesis" in window) && window.speechSynthesis.speaking === true });
+                        }, { isTtsActive: () => premiumVoice.isSpeaking() || (("speechSynthesis" in window) && window.speechSynthesis.speaking === true) });
               },
               onQueueEnd: () => {
                         if (!state.voiceModeActive) return;
@@ -661,7 +624,7 @@ function toggleVoiceMute() {
 
 function openVoiceMode() {
       if (!synthesisSupported()) return;
-      if (state.dictationActive) stopDictation();
+      if (dictation.isActive()) dictation.stop();
       const overlay = $("#voiceModeOverlay");
       if (!overlay) return;
       state.voiceModeActive = true;
@@ -677,6 +640,12 @@ function openVoiceMode() {
       syncVoiceMicVisual();
       // Innerhalb der Klick-Geste: Sprachausgabe fuer iOS/Safari freischalten.
       unlockSpeechSynthesis();
+      // Stufe B: Premium-Stimme pruefen (laeuft der Server-TTS-Worker?) — asynchron,
+      // bis dahin und bei jedem Fehler gilt unveraendert die Browser-Stimme.
+      premiumVoiceOn = false;
+      premiumVoice.isAvailable().then((up) => {
+              if (state.voiceModeActive) premiumVoiceOn = up === true;
+      }).catch(() => {});
       const hint = overlay.querySelector(".voice-mode-hint");
       if (hint) hint.textContent = "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.";
       const mic = $("#voiceModeMic");
@@ -780,7 +749,7 @@ function toggleReadAloud() {
 export function initComposerTools() {
       bindPlusMenu({ getInput: composerInput, notifyInputChanged });
       bindVoiceMode();
-      $('[data-start-tool="voice"]')?.addEventListener("click", toggleDictation);
+      $('[data-start-tool="voice"]')?.addEventListener("click", () => dictation.toggle());
       $('[data-start-tool="audio"]')?.addEventListener("click", openVoiceMode);
       $('[data-start-tool="speaker"]')?.addEventListener("click", toggleReadAloud);
       if ("speechSynthesis" in window) window.speechSynthesis.getVoices();
