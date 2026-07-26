@@ -1,3 +1,6 @@
+// v142 -> v143 (2026-07-26): Premium-Stimme auf Zeabur-CPU (Piper, Flat-Paket)
+// — config.js zeigt voiceStatus/voiceTts auf die Zeabur-Bridge;
+// voice-premium-tts.js meldet die Sprache beim Status-Check (Sprach-Gate).
 // v141 -> v142 (2026-07-26): Stufe C Zwei-Wege-Betrieb — ai/fetch-retry.js
 // faellt bei totem Salad-Endpunkt automatisch auf den Zeabur-Mietserver
 // (smejj-chat-bridge.zeabur.app) zurueck; config.js (Fallback-Routen), app.js
@@ -48,7 +51,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v142";
+const CACHE_NAME = "smejj-shell-v143";
 const SHELL = [
   "/",
   "/assets/styles.css",
