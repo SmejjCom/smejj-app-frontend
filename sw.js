@@ -1,3 +1,11 @@
+// v141 -> v142 (2026-07-26): Stufe C Zwei-Wege-Betrieb — ai/fetch-retry.js
+// faellt bei totem Salad-Endpunkt automatisch auf den Zeabur-Mietserver
+// (smejj-chat-bridge.zeabur.app) zurueck; config.js (Fallback-Routen), app.js
+// und voice-landing.js reichen die Endpunkt-Listen durch.
+// v140 -> v141 (2026-07-26): Abo-Status (Schritt 3b) — account-privacy.js und
+// account-sessions.js zeigen den echten Abo-Plan vom Control-Server
+// (/api/billing/status) und haengen client_reference_id an die Stripe-
+// Zahlungslinks; beide Dateien liegen im Precache und brauchen den Sprung.
 // v139 -> v140 (2026-07-26): Light-Mode Nachzug 2 — restliche Primaer-Knoepfe
 // (#projectCreate/#projectSave/#searchSubmit/#storageAgain) waren im hellen
 // Schema dunkelmodus-weiss und damit unlesbar; Fix jetzt zentral fuer alle
@@ -40,7 +48,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v140";
+const CACHE_NAME = "smejj-shell-v142";
 const SHELL = [
   "/",
   "/assets/styles.css",
