@@ -15,6 +15,7 @@ export function initAccountPrivacySurface() {
   const view = document.querySelector("#profile");
   if (!view || view.dataset.accountPrivacyReady) return;
   view.dataset.accountPrivacyReady = "true";
+  cleanLoginMarkers();
   loadStyles();
   // Synchron rendern (i18n-Sprachcache): app.js-Boot-Bindings (#saveProfile,
   // #registerLocal, #loginLocal) finden die gerenderten Elemente vor.
@@ -216,6 +217,23 @@ async function logoutSession(view) {
   const roleStatus = view.querySelector("#userRoleStatus");
   if (roleStatus) roleStatus.textContent = "local-only";
   output(view, t("Abgemeldet. Die Sitzung wurde beendet."));
+}
+
+// Adressleiste aufraeumen: Die Login-Marker (?login=ok von der Anmeldeseite,
+// ?session-handoff-complete=1 vom Control-Server) sind nach dem Laden erledigt.
+// replaceState entfernt sie ohne Neuladen — wie bei ChatGPT/Claude. Reine
+// Kosmetik: Fehler hier duerfen die Kontoseite nie blockieren (fail-safe).
+function cleanLoginMarkers() {
+  try {
+    const url = new URL(window.location.href);
+    let dirty = false;
+    for (const key of ["login", "session-handoff-complete"]) {
+      if (url.searchParams.has(key)) { url.searchParams.delete(key); dirty = true; }
+    }
+    if (dirty) window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+  } catch {
+    // bewusst leer — Kosmetik darf nie stoeren
+  }
 }
 
 function read(key) { try { return JSON.parse(localStorage.getItem(key) || "{}"); } catch { return {}; } }
