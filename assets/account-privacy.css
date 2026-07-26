@@ -105,7 +105,7 @@
 #profile .account-nav button.is-active {
   color: var(--premium-text, #eef1f2);
   background: rgba(255, 255, 255, 0.085);
-  box-shadow: inset 3px 0 0 var(--premium-accent, #2dd4bf);
+  box-shadow: inset 3px 0 0 #2dd4bf;
 }
 
 #profile .account-panel {
@@ -200,8 +200,8 @@
 }
 
 #profile .account-row input[type="checkbox"]:checked {
-  background: var(--premium-accent, #2dd4bf);
-  border-color: var(--premium-accent, #2dd4bf);
+  background: #2dd4bf;
+  border-color: #2dd4bf;
 }
 
 #profile .account-row input[type="checkbox"]:checked::after {
@@ -242,7 +242,7 @@
   border: 1px solid rgba(45, 212, 191, 0.4);
   border-radius: 0;
   background: rgba(45, 212, 191, 0.07);
-  box-shadow: inset 0 3px 0 var(--premium-accent, #2dd4bf);
+  box-shadow: inset 0 3px 0 #2dd4bf;
 }
 
 #profile .account-plan .plan-name {
@@ -473,7 +473,7 @@
 }
 
 #profile #profilePictureInput:focus-visible + .account-picture-choose {
-  outline: 2px solid var(--premium-accent, #2dd4bf);
+  outline: 2px solid #2dd4bf;
   outline-offset: 2px;
 }
 
@@ -512,7 +512,7 @@
   }
 
   #profile .account-nav button.is-active {
-    box-shadow: inset 0 3px 0 var(--premium-accent, #2dd4bf);
+    box-shadow: inset 0 3px 0 #2dd4bf;
   }
 
   #profile .account-grid {
@@ -558,4 +558,14 @@
   #profile .permission-state {
     margin-inline-start: 0;
   }
+}
+
+/* Fix 2026-07-26b (Live-Befund): Ein globaler Label-Stil der Premium-Flaechen
+   setzt text-transform uppercase — Schalter-Zeilen (label.account-row) sollen
+   aber normale Schreibweise zeigen wie die div-Zeilen daneben. */
+#profile label.account-row,
+#profile label.account-row strong,
+#profile label.account-row small {
+  text-transform: none;
+  letter-spacing: normal;
 }
