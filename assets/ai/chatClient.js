@@ -8,10 +8,12 @@
 // Alle anderen Modi geben false zurueck — der bestehende fail-closed Server-Pfad
 // in app.js bleibt unveraendert zustaendig.
 import { validateByokConfig } from "./byok.js";
+import { API_ORIGIN, STORAGE_KEYS } from "../config.js";
 
 const MAX_HISTORY_MESSAGES = 12;
 const MAX_MESSAGE_CHARS = 8000;
 const SYSTEM_PROMPT = "Du bist der Assistent von smejj.com, einem AI Coding OS. Antworte hilfreich, korrekt und kompakt auf Deutsch, ausser der Nutzer schreibt in einer anderen Sprache.";
+const API_TOKEN_KEY = "smejj.apiToken.v1";
 
 const BYOK_HINT = [
   "BYOK ist noch nicht konfiguriert.",
@@ -169,6 +171,109 @@ async function runByokChat({ task, output, offlineNotice }) {
   return true;
 }
 
+async function runClineChat({ task, output, offlineNotice }) {
+  const token = sessionStorage.getItem(API_TOKEN_KEY) || "";
+  if (!token) {
+    output.textContent = "Bitte zuerst anmelden und Cline unter Einstellungen → Modelle verbinden.";
+    return true;
+  }
+  try {
+    const contextFiles = await resolveWorkspaceReferences(task);
+    const response = await fetch(`${API_ORIGIN}/api/providers/cline/chat`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ messages: buildMessages(task, offlineNotice, contextFiles) })
+    });
+    if (!response.ok || !response.body) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || error.error || `HTTP ${response.status}`);
+    }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let answer = "";
+    output.textContent = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const events = buffer.split("\n\n");
+      buffer = events.pop() || "";
+      for (const event of events) {
+        const line = event.split("\n").find((item) => item.startsWith("data:"));
+        const data = line?.replace(/^data:\s?/, "").trim() || "";
+        if (!data || data === "[DONE]") continue;
+        const payload = JSON.parse(data);
+        const choice = payload?.choices?.[0] || {};
+        if (choice.finish_reason === "error") throw new Error(choice.error?.message || "Cline stream error");
+        const delta = choice.delta?.content || choice.message?.content || "";
+        if (delta) {
+          answer += delta;
+          output.textContent = answer;
+        }
+      }
+    }
+    if (!answer) output.textContent = "(leere Antwort)";
+  } catch (error) {
+    output.textContent = `Cline-Fehler: ${String(error?.message || error).slice(0, 400)}`;
+  }
+  return true;
+}
+
+// Generischer BYOK-Anbieter (Multi-Provider, /api/keys). Aktiv, wenn im
+// Modell-Picker ein eigener Anbieter gewaehlt wurde (STORAGE_KEYS.model = "key:<id>").
+// Der Key bleibt serverseitig verschluesselt; hier laeuft nur der authentifizierte
+// Stream ueber die Control-Server-Route — kein Key im Browser.
+async function runProviderChat({ providerId, task, output, offlineNotice }) {
+  const token = sessionStorage.getItem(API_TOKEN_KEY) || "";
+  if (!token) {
+    output.textContent = "Bitte zuerst anmelden und den Anbieter unter Einstellungen → Modelle verbinden.";
+    return true;
+  }
+  try {
+    const contextFiles = await resolveWorkspaceReferences(task);
+    const response = await fetch(`${API_ORIGIN}/api/keys/${providerId}/chat`, {
+      method: "POST",
+      credentials: "include",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: buildMessages(task, offlineNotice, contextFiles) })
+    });
+    if (!response.ok || !response.body) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || error.error || `HTTP ${response.status}`);
+    }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let answer = "";
+    output.textContent = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const events = buffer.split("\n\n");
+      buffer = events.pop() || "";
+      for (const event of events) {
+        const line = event.split("\n").find((item) => item.startsWith("data:"));
+        const data = line?.replace(/^data:\s?/, "").trim() || "";
+        if (!data || data === "[DONE]") continue;
+        const payload = JSON.parse(data);
+        const choice = payload?.choices?.[0] || {};
+        const delta = choice.delta?.content || choice.message?.content || "";
+        if (delta) { answer += delta; output.textContent = answer; }
+      }
+    }
+    if (!answer) output.textContent = "(leere Antwort)";
+  } catch (error) {
+    output.textContent = `Anbieter-Fehler: ${String(error?.message || error).slice(0, 400)}`;
+  }
+  return true;
+}
+
 // Chrome Prompt API (lokales Modell im Browser) — API-Form variiert je Chrome-Version.
 async function createLocalSession() {
   const api = globalThis.LanguageModel || globalThis.ai?.languageModel;
@@ -284,9 +389,21 @@ export function attachCodeActions(output, documentRef = globalThis.document) {
  */
 export async function runClientChat({ task, model, output, offlineNotice = "" } = {}) {
   if (!task || !output) return false;
+  const clearThinking = () => {
+    if (output.dataset?.thinking === "true") {
+      output.innerHTML = "";
+      delete output.dataset.thinking;
+    }
+  };
   let handled = false;
-  if (model === "BYOK") handled = await runByokChat({ task, output, offlineNotice });
-  if (model === "local browser") handled = await runLocalBrowserChat({ task, output });
+  const selected = localStorage.getItem(STORAGE_KEYS.model) || "";
+  if (selected === "Cline") { clearThinking(); handled = await runClineChat({ task, output, offlineNotice }); }
+  if (!handled && selected.startsWith("key:")) {
+    const providerId = selected.slice(4);
+    if (/^[a-z][a-z0-9-]{1,40}$/.test(providerId)) { clearThinking(); handled = await runProviderChat({ providerId, task, output, offlineNotice }); }
+  }
+  if (!handled && model === "BYOK") { clearThinking(); handled = await runByokChat({ task, output, offlineNotice }); }
+  if (!handled && model === "local browser") { clearThinking(); handled = await runLocalBrowserChat({ task, output }); }
   if (handled) attachCodeActions(output);
   return handled;
 }
