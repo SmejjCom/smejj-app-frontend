@@ -25,7 +25,7 @@ const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_M
 const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
 const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260726-v99-premium-voice";
+const BRIDGE_VERSION = "20260726-v100-piper-cpu-voice";
 
 export function createChatBridgeServer() {
   return http.createServer(async (req, res) => {
@@ -40,7 +40,7 @@ export function createChatBridgeServer() {
       if ((url.pathname === "/api/chat" || url.pathname === "/api/agent" || url.pathname === "/api/voice/tts") && !allowModelRequest(req, res)) return;
       if (url.pathname === "/api/chat") return await handleChat(req, res);
       if (url.pathname === "/api/agent") return await handleAgent(req, res);
-      if (url.pathname === "/api/voice/status") return await handleVoiceStatus(res);
+      if (url.pathname === "/api/voice/status") return await handleVoiceStatus(req, res);
       if (url.pathname === "/api/voice/tts") return await handleVoiceTts(req, res);
       return json(res, 404, { ok: false, error: "Not found" });
     } catch (error) {
@@ -590,6 +590,18 @@ const VOICE_TTS_ORIGIN = trimUrl(process.env.SMEJJ_VOICE_TTS_ORIGIN || "");
 // GPU-Endpunkt). Die Bridge nutzt den bereits vorhandenen Org-API-Key.
 const VOICE_TTS_API_KEY = process.env.SMEJJ_VOICE_TTS_API_KEY || process.env.SMEJJ_LLM_SALAD_API_KEY || "";
 const VOICE_TTS_TIMEOUT_MS = Number(process.env.SMEJJ_VOICE_TTS_TIMEOUT_MS || 20000);
+// Upstream-Art: "xtts" (Salad-GPU-Worker) oder "piper" (CPU-Stimme auf dem
+// Zeabur-Mietserver — GET /?text=... liefert WAV; laeuft im Flat-Paket).
+const VOICE_TTS_KIND = String(process.env.SMEJJ_VOICE_TTS_KIND || "xtts").toLowerCase();
+// Piper spricht EINE Stimme je Instanz — nur freigegebene Sprachen bedienen,
+// alle anderen nutzen unveraendert die Browser-Stimme (leer = alle Sprachen).
+const VOICE_TTS_LANGS = new Set(String(process.env.SMEJJ_VOICE_TTS_LANGS || "")
+  .split(",").map((eintrag) => eintrag.trim().toLowerCase()).filter(Boolean));
+
+function voiceLangAllowed(lang) {
+  if (VOICE_TTS_LANGS.size === 0) return true;
+  return VOICE_TTS_LANGS.has(String(lang || "").toLowerCase().split("-")[0]);
+}
 const VOICE_TTS_MAX_CHARS = boundedInteger(process.env.SMEJJ_VOICE_TTS_MAX_CHARS, 50, 2000, 500);
 const VOICE_STATUS_CACHE_MS = 30000;
 const XTTS_LANGS = new Set(["en", "es", "fr", "de", "it", "pt", "pl", "tr", "ru", "nl", "cs", "ar", "zh-cn", "hu", "ko", "ja", "hi"]);
@@ -626,8 +638,24 @@ async function loadXttsSpeaker() {
   return xttsSpeakerCache;
 }
 
-async function handleVoiceStatus(res) {
+// Piper-Probe: liefert der CPU-Stimmen-Dienst hoerbares WAV fuer einen Mini-Text?
+async function probePiper() {
+  const response = await xttsFetch(`/?text=${encodeURIComponent("ok")}`, {}, 8000);
+  if (!response.ok) throw new Error(`piper ${response.status}`);
+  return true;
+}
+
+async function handleVoiceStatus(req, res) {
   if (!VOICE_TTS_ORIGIN) return json(res, 200, { ok: true, premiumVoice: false, reason: "not_configured" });
+  let language = "";
+  try {
+    language = String((await readJson(req))?.language || "");
+  } catch {
+    language = "";
+  }
+  if (language && !voiceLangAllowed(language)) {
+    return json(res, 200, { ok: true, premiumVoice: false, reason: "language_not_supported" });
+  }
   const now = Date.now();
   if (now - voiceStatusCache.at < VOICE_STATUS_CACHE_MS) {
     return json(res, 200, { ok: true, premiumVoice: voiceStatusCache.up });
@@ -635,7 +663,7 @@ async function handleVoiceStatus(res) {
   let up = false;
   let reason = "";
   try {
-    up = Boolean((await loadXttsSpeaker())?.name);
+    up = VOICE_TTS_KIND === "piper" ? await probePiper() : Boolean((await loadXttsSpeaker())?.name);
   } catch (error) {
     up = false;
     reason = String(error?.message || "worker").slice(0, 80);
@@ -645,11 +673,39 @@ async function handleVoiceStatus(res) {
   return json(res, 200, up ? { ok: true, premiumVoice: true } : { ok: true, premiumVoice: false, reason });
 }
 
+// WAV-Antwort eines Upstreams 1:1 an den Browser durchreichen.
+async function pipeWav(res, upstream) {
+  res.writeHead(200, { "Content-Type": "audio/wav", "Cache-Control": "no-store", ...securityHeaders() });
+  const reader = upstream.body.getReader();
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      res.write(Buffer.from(value));
+    }
+  } catch {
+    // Klient hat abgebrochen (Barge-in) oder Upstream-Stream riss ab — sauber beenden.
+  }
+  res.end();
+}
+
 async function handleVoiceTts(req, res) {
   if (!VOICE_TTS_ORIGIN) return json(res, 503, { ok: false, error: "premium_voice_not_configured" });
   const body = await readJson(req);
   const text = String(body?.text || "").trim().slice(0, VOICE_TTS_MAX_CHARS);
   if (!text) return json(res, 400, { ok: false, error: "Missing text" });
+  if (!voiceLangAllowed(body?.language)) return json(res, 400, { ok: false, error: "language_not_supported" });
+  if (VOICE_TTS_KIND === "piper") {
+    let upstream;
+    try {
+      upstream = await xttsFetch(`/?text=${encodeURIComponent(text)}`, {});
+    } catch (error) {
+      voiceStatusCache = { at: Date.now(), up: false };
+      return json(res, 502, { ok: false, error: `tts_upstream_failed: ${error?.message || "fetch"}` });
+    }
+    if (!upstream.ok || !upstream.body) return json(res, 502, { ok: false, error: `tts_upstream_${upstream.status}` });
+    return pipeWav(res, upstream);
+  }
   let speaker;
   try {
     speaker = await loadXttsSpeaker();
@@ -679,18 +735,7 @@ async function handleVoiceTts(req, res) {
   if (!upstream.ok || !upstream.body) {
     return json(res, 502, { ok: false, error: `tts_upstream_${upstream.status}` });
   }
-  res.writeHead(200, { "Content-Type": "audio/wav", "Cache-Control": "no-store", ...securityHeaders() });
-  const reader = upstream.body.getReader();
-  try {
-    for (;;) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      res.write(Buffer.from(value));
-    }
-  } catch {
-    // Klient hat abgebrochen (Barge-in) oder Worker-Stream riss ab — sauber beenden.
-  }
-  res.end();
+  return pipeWav(res, upstream);
 }
 
 if (process.env.SMEJJ_CHAT_BRIDGE_NO_START !== "1") {
