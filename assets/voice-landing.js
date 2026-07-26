@@ -19,6 +19,11 @@ import { createSpeechInterrupt } from "./voice-vad.js?v=blitz2-20260726";
 import { warmUpAgentConnection } from "./voice-warmup.js";
 // Stufe 2a: Interim-Waechter — Sprech-Ende ~1 s frueher erkennen und senden.
 import { createSilenceWatchdog } from "./voice-endpoint.js";
+// Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
+// Unterbrechen wie ChatGPT). Fail-safe: ohne Worker bleibt die Browser-Stimme.
+import { createPremiumVoice } from "./voice-premium-tts.js";
+// Stufe A2: automatischer Neuversuch, wenn eine Salad-Replika ausfaellt.
+import { fetchStreamWithRetry } from "./ai/fetch-retry.js";
 
 // Re-Export fuer bestehende Nutzer der bisherigen Modul-API.
 export { normalizeSpeechText, isLikelyEcho, enoughForBarge };
@@ -196,7 +201,27 @@ function pickVoice() {
     || null;
 }
 
+// Stufe B: Premium-Stimme des Servers (WebAudio) — Verfuegbarkeit wird beim
+// Oeffnen geprueft; jeder Fehler faellt lautlos auf die Browser-Stimme zurueck.
+const premiumVoice = createPremiumVoice({
+  statusUrl: CLIENT_ROUTES.api.voiceStatus,
+  ttsUrl: CLIENT_ROUTES.api.voiceTts,
+  lang
+});
+let premiumVoiceOn = false;
+
 function speak(text, { onstart, onend } = {}) {
+  if (state.active && premiumVoiceOn && text) {
+    premiumVoice.speak(text, { onstart, onend }).catch(() => {
+      premiumVoiceOn = false; // Worker weg -> Rest der Sitzung Browser-Stimme
+      speakWithBrowser(text, { onstart, onend });
+    });
+    return;
+  }
+  speakWithBrowser(text, { onstart, onend });
+}
+
+function speakWithBrowser(text, { onstart, onend } = {}) {
   if (!("speechSynthesis" in window) || !text) {
     onend?.();
     return;
@@ -221,6 +246,7 @@ function stopSpeaking() {
   // Auch die satzweise Vorlese-Queue abbrechen (Barge-in, Schliessen, neue Frage).
   state.speechQueue?.cancel();
   state.speechQueue = null;
+  premiumVoice.cancel();
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 }
 
@@ -466,7 +492,7 @@ async function sendTask(task) {
         if (state.bargeConfirmed) return; // Wort-Barge-in hat schon uebernommen.
         stopSpeaking();
         listen();
-      }, { isTtsActive: () => ("speechSynthesis" in window) && window.speechSynthesis.speaking === true });
+      }, { isTtsActive: () => premiumVoice.isSpeaking() || (("speechSynthesis" in window) && window.speechSynthesis.speaking === true) });
     },
     onQueueEnd: () => {
       if (!state.active || state.requestId !== requestId) return;
@@ -487,7 +513,8 @@ async function sendTask(task) {
   let reply = "";
   let streamed = "";
   try {
-    const response = await fetch(CLIENT_ROUTES.api.agent, {
+    // Stufe A2: Bei stummer/ausgefallener Replika sofort neu versuchen.
+    const response = await fetchStreamWithRetry(CLIENT_ROUTES.api.agent, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(buildAgentPayload(task, lang))
@@ -550,6 +577,12 @@ function openOverlay() {
   // die erste Antwort startet dadurch spuerbar frueher.
   warmUpAgentConnection();
   unlockSpeechSynthesis();
+  // Stufe B: Premium-Stimme pruefen (laeuft der Server-TTS-Worker?) — asynchron,
+  // bis dahin und bei jedem Fehler gilt unveraendert die Browser-Stimme.
+  premiumVoiceOn = false;
+  premiumVoice.isAvailable().then((up) => {
+    if (state.active) premiumVoiceOn = up === true;
+  }).catch(() => {});
   const input = $id("voiceLandingInput");
   if (input) input.value = "";
   syncTypedSend();
