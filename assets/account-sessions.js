@@ -39,8 +39,22 @@ const API = {
   sessionsRevoke: `${API_ORIGIN}/api/auth/sessions/revoke`,
   passwordChange: `${API_ORIGIN}/api/auth/email/password/change`,
   accountExport: `${API_ORIGIN}/api/auth/account/export`,
-  accountDelete: `${API_ORIGIN}/api/auth/account/delete`
+  accountDelete: `${API_ORIGIN}/api/auth/account/delete`,
+  billingStatus: `${API_ORIGIN}/api/billing/status`
 };
+
+// Abo-Status des angemeldeten Nutzers (oder null, fail-safe). Liefert Plan,
+// Status und checkoutRef (sha256 der E-Mail) — checkoutRef geht als
+// client_reference_id an die Stripe-Zahlungslinks, damit der Webhook die
+// Buchung dem Konto zuordnen kann. Keine Kartendaten, keine Secrets im UI.
+export async function fetchBillingStatus() {
+  if (!getToken()) return null;
+  try {
+    const response = await fetch(API.billingStatus, { headers: authHeaders() });
+    const data = await response.json();
+    return data && data.ok ? data : null;
+  } catch { return null; }
+}
 
 export function initServerSessionControls(view, output) {
   const security = view.querySelector('[data-account-panel="security"]');
