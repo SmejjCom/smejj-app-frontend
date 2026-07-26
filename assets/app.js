@@ -408,7 +408,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
     if (routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
     if (await runClientChat({ task, model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
     try {
-      await stream(CLIENT_ROUTES.api.agent, {
+      await stream([CLIENT_ROUTES.api.agent, CLIENT_ROUTES.api.agentFallback], {
         task,
         model: state.settings.model || "smejj 1.0",
         files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}) },
