@@ -15,6 +15,11 @@ const DEFAULT_ATTEMPTS = 2;
 const DEFAULT_FIRST_BYTE_TIMEOUT_MS = 6500;
 const DEFAULT_RETRY_DELAY_MS = 300;
 
+// url darf ein einzelner Endpunkt ODER eine Liste sein (Stufe C: Zwei-Wege-
+// Betrieb). Bei einer Liste wandert jeder Neuversuch zum naechsten Endpunkt —
+// Versuch 1 = Haupt-Server (Salad, am schnellsten), Versuch 2 = Reserve
+// (Zeabur-Mietserver im Rechenzentrum). So ist eine Antwort garantiert,
+// solange irgendein Server lebt.
 export async function fetchStreamWithRetry(url, init = {}, {
   attempts = DEFAULT_ATTEMPTS,
   firstByteTimeoutMs = DEFAULT_FIRST_BYTE_TIMEOUT_MS,
@@ -22,12 +27,16 @@ export async function fetchStreamWithRetry(url, init = {}, {
   fetchFn = globalThis.fetch,
   onRetry
 } = {}) {
+  const urls = (Array.isArray(url) ? url : [url]).filter(Boolean);
+  if (!urls.length) throw new Error("bridge_unreachable: keine Endpunkte");
+  const versuche = Math.max(attempts, urls.length);
   let lastReason = "";
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+  for (let attempt = 1; attempt <= versuche; attempt += 1) {
+    const ziel = urls[(attempt - 1) % urls.length];
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), firstByteTimeoutMs);
     try {
-      const response = await fetchFn(url, { ...init, signal: controller.signal });
+      const response = await fetchFn(ziel, { ...init, signal: controller.signal });
       clearTimeout(timer);
       if (response.ok && response.body) return response;
       // 4xx (ausser 429) sind endgueltig — Wiederholen wuerde nichts aendern.
@@ -37,7 +46,7 @@ export async function fetchStreamWithRetry(url, init = {}, {
       clearTimeout(timer);
       lastReason = error?.name === "AbortError" ? "timeout" : (error?.message || "network");
     }
-    if (attempt < attempts) {
+    if (attempt < versuche) {
       onRetry?.({ attempt, reason: lastReason });
       await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
     }
