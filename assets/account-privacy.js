@@ -6,6 +6,7 @@ import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMar
 import { clearProfilePicture } from "./profile-picture-store.js?v=1";
 import { applyAuthState } from "./account-auth-state.js?v=1";
 import { usageSummary } from "./usage-meter.js?v=1";
+import { initOnboardingWelcome } from "./onboarding-welcome.js?v=1";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const PERSONAL_KEY = "smejj.personalization.v1";
@@ -25,6 +26,9 @@ export function initAccountPrivacySurface() {
   const view = document.querySelector("#profile");
   if (!view || view.dataset.accountPrivacyReady) return;
   view.dataset.accountPrivacyReady = "true";
+  // Onboarding ZUERST: es liest den Login-Marker aus der Adresse, BEVOR die
+  // Bereinigung unten ihn entfernt (erscheint nur einmal, smejj.onboarding.v1).
+  initOnboardingWelcome(STRIPE_PLAN_LINKS);
   // Mehrfach zeitversetzt: der app.js-Router (Start-Lock, nicht anfassbar)
   // haengt beim Ansichtswechsel location.search wieder an — je nach Ladetempo
   // gewinnt er das Rennen. Die spaeteren Durchlaeufe raeumen dann endgueltig auf.
