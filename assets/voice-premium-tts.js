@@ -51,7 +51,9 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
       const response = await fetchFn(statusUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: "{}"
+        // Sprache mitgeben: der Server bedient ggf. nur bestimmte Sprachen
+        // (CPU-Stimme mit fester Stimme) — sonst bleibt die Browser-Stimme.
+        body: JSON.stringify({ language: lang })
       });
       const payload = await response.json();
       value = payload?.premiumVoice === true;
