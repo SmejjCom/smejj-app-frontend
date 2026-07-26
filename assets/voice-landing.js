@@ -6,6 +6,7 @@
 // Fail-Streak -> Tipp-Fallback (iOS/Safari), TTS-Unlock in der Klick-Geste,
 // Barge-in mit Echo-Textfilter und Restart-Bremse. Startseite/App unberuehrt —
 // das Modul initialisiert sich nur auf Seiten OHNE App-Composer (#startSend).
+import "./auth-gate.js?v=1";
 import { CLIENT_ROUTES } from "./config.js";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
 import { createSpeechQueue } from "./voice-speech-queue.js?v=blitz-20260726";
@@ -14,8 +15,10 @@ import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { normalizeSpeechText, isLikelyEcho, enoughForBarge } from "./voice-echo-filter.js";
-import { createSpeechInterrupt } from "./voice-vad.js";
+import { createSpeechInterrupt } from "./voice-vad.js?v=blitz2-20260726";
 import { warmUpAgentConnection } from "./voice-warmup.js";
+// Stufe 2a: Interim-Waechter — Sprech-Ende ~1 s frueher erkennen und senden.
+import { createSilenceWatchdog } from "./voice-endpoint.js";
 
 // Re-Export fuer bestehende Nutzer der bisherigen Modul-API.
 export { normalizeSpeechText, isLikelyEcho, enoughForBarge };
@@ -353,6 +356,17 @@ function listen() {
   recognition.interimResults = true;
   state.recognition = recognition;
   let finalTranscript = "";
+  // Stufe 2a: Kommen bei vorhandenem Text ~850 ms keine neuen Zwischen-
+  // ergebnisse, das Erkennungs-Ende sofort erzwingen (stop -> finales Ergebnis)
+  // statt die 1-2 s Browser-Endpause abzuwarten.
+  const watchdog = createSilenceWatchdog(() => {
+    if (state.recognition !== recognition) return;
+    try {
+      recognition.stop();
+    } catch {
+      // Recognition war bereits gestoppt.
+    }
+  });
   recognition.onresult = (event) => {
     let interim = "";
     let sawFinal = false;
@@ -365,11 +379,14 @@ function listen() {
         interim += result[0]?.transcript || "";
       }
     }
-    setTranscript((finalTranscript + interim).trim());
+    const heard = (finalTranscript + interim).trim();
+    setTranscript(heard);
+    watchdog.update(Boolean(heard));
     // Stufe 1e: Beim finalen Ergebnis SOFORT senden statt auf onend zu warten —
     // sendTask loest die Erkennung selbst ab (Identitaets-Guard in onend).
     const task = finalTranscript.trim();
     if (sawFinal && task && state.recognition === recognition) {
+      watchdog.stop();
       state.failStreak = 0;
       sendTask(task);
     }
@@ -380,6 +397,7 @@ function listen() {
     }
   };
   recognition.onend = () => {
+    watchdog.stop();
     // Nach abort() (z. B. getippte Frage) feuert onend trotzdem — nur die noch
     // aktive Erkennung darf den Loop fortsetzen, sonst hoert sie parallel zum
     // Vorlesen weiter und nimmt das eigene Echo als Frage auf.
@@ -441,12 +459,14 @@ async function sendTask(task) {
       // Stufe 1e: Mikrofonpegel-Detektor stoppt das Vorlesen sofort, wenn der
       // Nutzer dazwischenspricht — auch dort, wo keine parallele Erkennung laeuft.
       stopInterrupt();
+      // Stufe 2a: Zwei-Ebenen-Ausloeser — in den Sprechpausen zwischen zwei
+      // Saetzen ist der Lautsprecher still, dort reicht normales Sprechen.
       state.interrupt = createSpeechInterrupt(() => {
         if (!state.active || state.fallback || state.requestId !== requestId) return;
         if (state.bargeConfirmed) return; // Wort-Barge-in hat schon uebernommen.
         stopSpeaking();
         listen();
-      });
+      }, { isTtsActive: () => ("speechSynthesis" in window) && window.speechSynthesis.speaking === true });
     },
     onQueueEnd: () => {
       if (!state.active || state.requestId !== requestId) return;
