@@ -233,5 +233,5 @@ function dataAction(label, hint, id, text, danger = false) { return `<div class=
 // Versionsmarke: GitHub Pages liefert Assets mit max-age, ohne ?v= sieht der
 // Browser eine Aenderung erst nach Ablauf der Frist. Gleiche Konvention wie die
 // Stylesheet-Links in index.html. Bei jeder Aenderung an der CSS-Datei erhoehen.
-const STYLE_VERSION = "konto-glas-20260726";
+const STYLE_VERSION = "konto-glas-20260726b";
 function loadStyles() { const href = `/assets/account-privacy.css?v=${STYLE_VERSION}`; if (document.querySelector(`link[href^="/assets/account-privacy.css"]`)) return; const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href; document.head.append(link); }
