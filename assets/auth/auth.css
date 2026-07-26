@@ -74,19 +74,8 @@ html, body {
 .auth-brand-mark {
   width: 26px;
   height: 26px;
-  border-radius: 7px;
-  background: linear-gradient(135deg, #2fd4c9, #1f8fd4);
+  background: url("/icons/smejj_favicon.svg") center / contain no-repeat;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-brand-mark::after {
-  content: "</>";
-  color: #06131a;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
 }
 
 /* Inhalt: schmale, zentrierte Spalte statt Karte */
