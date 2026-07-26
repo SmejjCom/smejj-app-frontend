@@ -586,6 +586,9 @@ function bridgeModelBackend() {
 // Kostenprofil: GPU nur waehrend aktiver Nutzung (Worker-Start ist Betreiber-
 // Entscheidung); die Bridge selbst bleibt CPU-only.
 const VOICE_TTS_ORIGIN = trimUrl(process.env.SMEJJ_VOICE_TTS_ORIGIN || "");
+// Der TTS-Worker laeuft mit Salad-Gateway-Authentifizierung (kein offener
+// GPU-Endpunkt). Die Bridge nutzt den bereits vorhandenen Org-API-Key.
+const VOICE_TTS_API_KEY = process.env.SMEJJ_VOICE_TTS_API_KEY || process.env.SMEJJ_LLM_SALAD_API_KEY || "";
 const VOICE_TTS_TIMEOUT_MS = Number(process.env.SMEJJ_VOICE_TTS_TIMEOUT_MS || 20000);
 const VOICE_TTS_MAX_CHARS = boundedInteger(process.env.SMEJJ_VOICE_TTS_MAX_CHARS, 50, 2000, 500);
 const VOICE_STATUS_CACHE_MS = 30000;
@@ -602,8 +605,10 @@ export function xttsLanguage(lang) {
 async function xttsFetch(path, init = {}, timeoutMs = VOICE_TTS_TIMEOUT_MS) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const headers = { ...(init.headers || {}) };
+  if (VOICE_TTS_API_KEY) headers["Salad-Api-Key"] = VOICE_TTS_API_KEY;
   try {
-    return await fetch(`${VOICE_TTS_ORIGIN}${path}`, { ...init, signal: controller.signal });
+    return await fetch(`${VOICE_TTS_ORIGIN}${path}`, { ...init, headers, signal: controller.signal });
   } finally {
     clearTimeout(timer);
   }
