@@ -32,9 +32,19 @@ export function markOnboardingDone(storage = globalThis.localStorage) {
   }
 }
 
-// Baut die Begruessung als Overlay ueber der Kontoseite.
+// Baut die Begruessung als Overlay ueber der Kontoseite. Prueft sofort und
+// kurz danach erneut: beim direkten Aufruf von /profile?login=ok bootet die
+// App ueber den GitHub-Pages-404-Fallback zuerst unter "/" — der Login-Marker
+// steht erst nach der Routen-Wiederherstellung wieder in der Adresse, und die
+// Marker-Bereinigung in account-privacy.js raeumt ihn ab 800 ms weg.
 // Input: planLinks { plus, pro, max } (Stripe-Zahlungslinks). Output: void.
 export function initOnboardingWelcome(planLinks = {}, doc = globalThis.document) {
+  tryShowOnboarding(planLinks, doc);
+  setTimeout(() => tryShowOnboarding(planLinks, doc), 300);
+  setTimeout(() => tryShowOnboarding(planLinks, doc), 600);
+}
+
+function tryShowOnboarding(planLinks, doc) {
   try {
     if (!doc || doc.querySelector(".onboarding-overlay")) return;
     if (!shouldShowOnboarding()) return;
