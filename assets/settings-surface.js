@@ -1,6 +1,7 @@
 import { STORAGE_KEYS } from "./config.js";
 import { initSettingsRuntime } from "./settings-runtime.js?v=3";
 import { initClineProviderSurface } from "./provider-settings.js?v=1";
+import { initApiKeysSurface } from "./api-keys-surface.js?v=1";
 import { LANGUAGE_OPTIONS } from "./language-options.js?v=1";
 import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 
@@ -59,6 +60,7 @@ function render(view) {
   view.innerHTML = markup();
   view.setAttribute("lang", uiLanguage());
   view.setAttribute("dir", uiDirection());
+  initApiKeysSurface(view);
   initClineProviderSurface(view);
   applyValues(view, readSettings());
   activate(view, activeTab);
