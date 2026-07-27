@@ -25,7 +25,7 @@ const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_M
 const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
 const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260726-v100-piper-cpu-voice";
+const BRIDGE_VERSION = "20260726-v101-piper-synthesize";
 
 export function createChatBridgeServer() {
   return http.createServer(async (req, res) => {
@@ -639,12 +639,13 @@ async function loadXttsSpeaker() {
 }
 
 // Piper-Probe: liefert der CPU-Stimmen-Dienst hoerbares WAV fuer einen Mini-Text?
-// piper.http_server (1.6): POST / mit Rohtext -> audio/wav; GET / ist nur die Demo-Seite.
+// piper.http_server (1.6): POST /synthesize mit JSON {text} -> audio/wav
+// (belegt durch die eingebaute Demo-Seite); GET / ist nur die Demo-Seite.
 async function piperSpeak(text, timeoutMs) {
-  return xttsFetch("/", {
+  return xttsFetch("/synthesize", {
     method: "POST",
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
-    body: text
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
   }, timeoutMs);
 }
 
