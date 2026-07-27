@@ -60,7 +60,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v146";
+const CACHE_NAME = "smejj-shell-v147";
 const SHELL = [
   "/",
   "/assets/styles.css",
