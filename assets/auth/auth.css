@@ -204,6 +204,35 @@ a:focus-visible {
 .auth-inline-note { text-align: left; margin: 0 0 12px; }
 .auth-inline-note a { color: var(--auth-accent); text-decoration: none; font-weight: 600; }
 
+/* "Passwort vergessen?" ist eine Aktion, kein Ziel — als <button> ausgezeichnet
+   (vorher <a href="#">, das ohne JavaScript ins Leere lief). Sieht unveraendert
+   aus, ist aber fuer Tastatur und Screenreader korrekt. */
+.auth-linkbutton {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--auth-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+.auth-linkbutton:focus-visible {
+  outline: 2px solid var(--auth-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Hinweis plus Weg zurueck in die App, wenn schon eine Sitzung besteht. */
+.auth-signedin {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+.auth-signedin .auth-note { margin: 0; }
+.auth-signedin .auth-button { text-decoration: none; }
+
 .auth-terms {
   font-size: 12px;
   color: var(--auth-muted);
