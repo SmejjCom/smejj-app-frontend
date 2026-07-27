@@ -27,6 +27,9 @@ Languages (15, worldwide coverage; German is the root page, English is the x-def
 - bn: https://smejj.com/bn/ (বাংলা)
 
 Useful endpoints:
-- https://smejj.com/api/health
-- https://smejj.com/api/storage/status
 - https://smejj.com/sitemap.xml (includes hreflang alternates for all 15 languages)
+- https://smejj.com/robots.txt
+
+Note: smejj.com is served as a static site by GitHub Pages and exposes no
+public API under https://smejj.com/api/. Application requests go to the
+control server, which requires authentication and is metered — do not crawl it.
