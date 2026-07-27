@@ -204,6 +204,43 @@ function syncVoiceMicVisual() {
       }
 }
 
+// Fokusfuehrung des Sprachmodus (QA-Welle 2, Befund W2-03): Das Overlay meldet
+// sich als role="dialog" aria-modal="true", holte den Tastaturfokus aber nicht
+// zu sich und gab ihn beim Schliessen nicht zurueck — Tastatur- und Screenreader-
+// Nutzende blieben hinter dem Dialog haengen. Nur der Fokus aendert sich;
+// Zustaende, Bedienelemente und sichtbares Verhalten bleiben unveraendert.
+let voiceReturnFocus = null;
+
+// Tab/Shift+Tab bleiben im Dialog; Escape bleibt dem bestehenden Handler.
+function voiceTrapFocus(event) {
+      if (event.key !== "Tab") return;
+      const overlay = $("#voiceModeOverlay");
+      if (!overlay || overlay.hidden) return;
+      const ziele = [...overlay.querySelectorAll("button, input, textarea, select, [href]")]
+              .filter((element) => !element.disabled && element.getBoundingClientRect().width > 0);
+      if (!ziele.length) return;
+      const [erstes, letztes] = [ziele[0], ziele[ziele.length - 1]];
+      const amAnfang = document.activeElement === erstes || document.activeElement === overlay;
+      if (event.shiftKey ? amAnfang : document.activeElement === letztes) {
+              event.preventDefault();
+              (event.shiftKey ? letztes : erstes).focus();
+      }
+}
+
+function voiceFocusEnter(overlay) {
+      voiceReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      overlay.tabIndex = -1;
+      overlay.focus({ preventScroll: true });
+      document.addEventListener("keydown", voiceTrapFocus, true);
+}
+
+function voiceFocusLeave() {
+      document.removeEventListener("keydown", voiceTrapFocus, true);
+      const ziel = voiceReturnFocus;
+      voiceReturnFocus = null;
+      if (ziel && document.contains(ziel)) ziel.focus({ preventScroll: true });
+}
+
 function closeVoiceMode() {
       state.voiceModeActive = false;
       state.voiceMuted = false;
@@ -225,6 +262,7 @@ function closeVoiceMode() {
       syncVoiceMicVisual();
       const overlay = $("#voiceModeOverlay");
       if (overlay) overlay.hidden = true;
+      voiceFocusLeave();
 }
 
 // Diktat-Fallback (z. B. iOS/Safari): Die Spracherkennung ist hier nicht nutzbar —
@@ -657,6 +695,7 @@ function openVoiceMode() {
               typedInput.dispatchEvent(new Event("input", { bubbles: true }));
       }
       overlay.hidden = false;
+      voiceFocusEnter(overlay);
       if (!RecognitionCtor) {
               // iOS/Safari ohne Web-Speech-Erkennung: Overlay im Diktat-Fallback oeffnen
               // statt den Sprachmodus komplett zu verweigern.
