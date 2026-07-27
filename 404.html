@@ -11,17 +11,36 @@
   <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
   <script>
-    // SPA-Fallback fuer GitHub Pages: App-Routen (ohne Dateiendung) zur Shell umleiten.
+    // SPA-Fallback fuer GitHub Pages: NUR bekannte App-Routen zur Shell umleiten.
+    //
+    // Vorher galt "jeder Pfad ohne Punkt ist eine App-Route". Dadurch landete
+    // auch ein Tippfehler (/gibtesnicht123) in der App, fand dort keine Ansicht
+    // und bekam die generische Fehlerseite "Aktion blockiert — Wenn
+    // Konfiguration, Kostenstatus oder Provider unklar ist, stoppt smejj.com
+    // sicher." Ein Vertipper wurde damit als Kosten- oder Providerproblem
+    // dargestellt, und die echte 404-Seite war praktisch unerreichbar
+    // (QA-Welle 1, Befund F-05).
+    //
+    // ROUTES muss mit VIEW_PATHS/PATH_VIEWS in public/app.js uebereinstimmen.
+    // Neue App-Ansicht angelegt? Dann hier ebenfalls eintragen, sonst zeigt
+    // ihr Direktaufruf die 404-Seite.
     (function () {
-      var path = location.pathname;
-      if (path.replace(/\/$/, "") === "/home") {
+      var ROUTES = [
+        "/home", "/chat", "/search", "/websites", "/smejj-claw", "/automation",
+        "/chat-history", "/browser", "/code", "/projects", "/files", "/storage",
+        "/memory", "/ai", "/cost", "/status", "/settings", "/profile",
+        "/offline", "/error"
+      ];
+      var path = location.pathname.replace(/\/+$/, "") || "/";
+      if (ROUTES.indexOf(path) === -1) return; // unbekannt: echte 404-Seite zeigen
+      if (path === "/home") {
         location.replace("/");
         return;
       }
-      if (/^\/[a-z0-9-]+(\/[a-z0-9-]+)*\/?$/i.test(path) && path.indexOf(".") === -1) {
+      try {
         sessionStorage.setItem("smejj-restore-route", path + location.search + location.hash);
-        location.replace("/");
-      }
+      } catch (e) {}
+      location.replace("/");
     })();
   </script>
   <title>404 — Seite nicht gefunden | smejj.com</title>
