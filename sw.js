@@ -1,3 +1,6 @@
+// v145 -> v146 (2026-07-27): Salad-Abloesung abgeschlossen — Betreiber hat den
+// Groq-Key auf Zeabur hinterlegt (gemessen 0,3-0,8 s, schneller als Salad);
+// Chat/Agent primaer Zeabur, Salad nur noch Reserve.
 // v144 -> v145 (2026-07-26): Tempo-Korrektur nach Live-Messung — Chat/Agent
 // zurueck auf Salad-primaer (Groq-Schnellspur 0,8 s; Zeabur ohne Groq-Key
 // 2,2 s). Zeabur bleibt Reserve + Stimme; Wechsel auf Zeabur-primaer folgt,
@@ -57,7 +60,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v145";
+const CACHE_NAME = "smejj-shell-v146";
 const SHELL = [
   "/",
   "/assets/styles.css",
