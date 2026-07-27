@@ -639,9 +639,19 @@ async function loadXttsSpeaker() {
 }
 
 // Piper-Probe: liefert der CPU-Stimmen-Dienst hoerbares WAV fuer einen Mini-Text?
+// piper.http_server (1.6): POST / mit Rohtext -> audio/wav; GET / ist nur die Demo-Seite.
+async function piperSpeak(text, timeoutMs) {
+  return xttsFetch("/", {
+    method: "POST",
+    headers: { "Content-Type": "text/plain; charset=utf-8" },
+    body: text
+  }, timeoutMs);
+}
+
 async function probePiper() {
-  const response = await xttsFetch(`/?text=${encodeURIComponent("ok")}`, {}, 8000);
-  if (!response.ok) throw new Error(`piper ${response.status}`);
+  const response = await piperSpeak("ok", 8000);
+  const typ = String(response.headers.get("content-type") || "");
+  if (!response.ok || !/audio|octet-stream|wav/i.test(typ)) throw new Error(`piper ${response.status} ${typ.slice(0, 30)}`);
   return true;
 }
 
@@ -698,7 +708,7 @@ async function handleVoiceTts(req, res) {
   if (VOICE_TTS_KIND === "piper") {
     let upstream;
     try {
-      upstream = await xttsFetch(`/?text=${encodeURIComponent(text)}`, {});
+      upstream = await piperSpeak(text);
     } catch (error) {
       voiceStatusCache = { at: Date.now(), up: false };
       return json(res, 502, { ok: false, error: `tts_upstream_failed: ${error?.message || "fetch"}` });
