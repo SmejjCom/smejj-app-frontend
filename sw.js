@@ -1,3 +1,5 @@
+// v143 -> v144 (2026-07-26): Salad-Abloesung Schritt 1 — Zeabur ist Haupt-
+// Endpunkt fuer Chat/Agent (config.js Tausch), Salad nur noch Reserve.
 // v142 -> v143 (2026-07-26): Premium-Stimme auf Zeabur-CPU (Piper, Flat-Paket)
 // — config.js zeigt voiceStatus/voiceTts auf die Zeabur-Bridge;
 // voice-premium-tts.js meldet die Sprache beim Status-Check (Sprach-Gate).
@@ -51,7 +53,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v143";
+const CACHE_NAME = "smejj-shell-v144";
 const SHELL = [
   "/",
   "/assets/styles.css",
