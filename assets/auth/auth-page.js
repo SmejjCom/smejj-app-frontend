@@ -93,6 +93,28 @@ async function postJson(url, body) {
   return { ok: response.ok, status: response.status, payload };
 }
 
+// Kontoadresse nur angedeutet anzeigen: die Anmeldeseite wird oft auf geteilten
+// Geraeten geoeffnet, und der volle Klartext gab dort die Adresse preis.
+// "wof.kadavanich@example.com" -> "wo…@example.com"
+function maskEmail(value) {
+  const raw = String(value || "");
+  const at = raw.indexOf("@");
+  if (at < 1) return raw;
+  const local = raw.slice(0, at);
+  const visible = local.slice(0, Math.min(2, local.length));
+  return `${visible}…${raw.slice(at)}`;
+}
+
+function showSignedIn(user) {
+  const box = document.querySelector("#signedInBox");
+  const note = document.querySelector("#signedInNote");
+  if (!box || !note) return false;
+  const label = user.email ? maskEmail(user.email) : (user.name || "smejj.com Nutzer");
+  note.textContent = `${t("Bereits angemeldet als")} ${label}.`;
+  box.hidden = false;
+  return true;
+}
+
 async function refreshSession() {
   const token = getToken();
   if (!token) return;
@@ -100,7 +122,11 @@ async function refreshSession() {
     const response = await fetch(CLIENT_ROUTES.api.authMe, { headers: authHeaders() });
     const data = await response.json();
     if (data.authenticated && data.user) {
-      status(`${t("Bereits angemeldet:")} ${data.user.email || data.user.name || "smejj.com Nutzer"}.`, "success");
+      // Bei bestehender Sitzung fuehrt ein deutlicher Knopf zurueck in die App;
+      // die Statuszeile bleibt nur als Rueckfallebene, falls der Block fehlt.
+      if (!showSignedIn(data.user)) {
+        status(`${t("Bereits angemeldet als")} ${maskEmail(data.user.email) || data.user.name || "smejj.com Nutzer"}.`, "success");
+      }
     }
   } catch {
     /* nicht kritisch: Startzustand */
