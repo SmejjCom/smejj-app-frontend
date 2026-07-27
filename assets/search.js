@@ -1,4 +1,8 @@
 import { CLIENT_ROUTES } from "./config.js";
+// Chats kommen aus dem Speicher, nicht aus dem DOM (QA-Welle 2, Befund W2-01).
+// WICHTIG: derselbe Pfad wie in chat-history-view.js — ein abweichender
+// Spezifizierer (z. B. "./chat-store.js") erzeugt eine ZWEITE Modulinstanz.
+import { listChats, openChat } from "/assets/chat-store.js";
 
 const STATIC_RESULTS = Object.freeze([
   ["Arbeitsbereiche", "Neu", "Neuer Chat oder neue Aufgabe starten", "start", "neu chat aufgabe start"],
@@ -41,7 +45,7 @@ export function initGlobalSearch({ $, goToView, showTaskIndicator, showToast, st
   log.addEventListener("click", (event) => {
     const button = event.target.closest("[data-search-view]");
     if (!button) return;
-    openResult({ view: button.dataset.searchView, label: button.dataset.searchLabel, jobId: button.dataset.searchJobId }, goToView, showTaskIndicator, showToast);
+    openResult({ view: button.dataset.searchView, label: button.dataset.searchLabel, jobId: button.dataset.searchJobId, chatId: button.dataset.searchChatId }, goToView, showTaskIndicator, showToast);
   });
   document.addEventListener("keydown", (event) => {
     if (event.key.toLowerCase() !== "k" || (!event.metaKey && !event.ctrlKey)) return;
@@ -59,9 +63,20 @@ async function findResults(query, state, workspace) {
     workspace.listProjects().catch(() => []),
     loadJobRows()
   ]);
-  const chatRows = Array.from(document.querySelectorAll("#startLog .entry"))
-    .slice(-50)
-    .map((entry, index) => ["Chats", entry.textContent?.slice(0, 120) || `Chat ${index + 1}`, "Chat-Verlauf", "chatHistory", entry.textContent || ""]);
+  // Vorher las diese Stelle "#startLog .entry", also nur die Nachrichten der
+  // GERADE geoeffneten Unterhaltung. Alle uebrigen gespeicherten Chats waren
+  // damit unauffindbar (QA-Welle 2, Befund W2-01). Jetzt wird derselbe Speicher
+  // durchsucht, den auch der Verlauf nutzt.
+  const chatRows = (await listChats().catch(() => [])).map((chat) => {
+    const messages = Array.isArray(chat.messages) ? chat.messages : [];
+    const volltext = messages.map((message) => message?.text || "").join(" ");
+    const treffer = messages.find((message) => String(message?.text || "").toLowerCase().includes(needle));
+    const detail = treffer
+      ? String(treffer.text).replace(/\s+/g, " ").trim().slice(0, 90)
+      : `${messages.length} Nachrichten`;
+    const titel = String(chat.title || "").trim() || "Unterhaltung ohne Titel";
+    return ["Chats", titel, detail, "chatHistory", `${titel} ${volltext}`, undefined, chat.id];
+  });
   const dynamic = [
     ...projectRows.map((project) => ["Projekte", project.name || project.id, `Projekt ${project.id}`, "projects", `${project.id} ${project.name} ${project.syncStatus}`]),
     ...jobRows.map((job) => ["Aufgaben", job.task || job.id, `${job.status} - ${job.id}`, "automation", `${job.id} ${job.task} ${job.status}`, job.id]),
@@ -71,7 +86,7 @@ async function findResults(query, state, workspace) {
   ];
   return [...STATIC_RESULTS, ...dynamic]
     .filter(([, label, detail,, text]) => `${label} ${detail} ${text}`.toLowerCase().includes(needle))
-    .map(([group, label, detail, view, _text, jobId]) => ({ group, label, detail, view, jobId }));
+    .map(([group, label, detail, view, _text, jobId, chatId]) => ({ group, label, detail, view, jobId, chatId }));
 }
 
 async function loadJobRows() {
@@ -106,6 +121,7 @@ function renderResults(log, results, query) {
       button.dataset.searchView = item.view;
       button.dataset.searchLabel = item.label;
       if (item.jobId) button.dataset.searchJobId = item.jobId;
+      if (item.chatId) button.dataset.searchChatId = item.chatId;
       button.textContent = `${item.label} - ${item.detail}`;
       section.append(button);
     }
@@ -122,7 +138,14 @@ function empty(text) {
 
 function openResult(result, goToView, showTaskIndicator, showToast) {
   showTaskIndicator("done");
-  goToView(result.view);
+  // Ein Chat-Treffer oeffnet die Unterhaltung selbst; openChat() wechselt dabei
+  // eigenstaendig zur Startansicht. Schlaegt das fehl, bleibt der Verlauf als
+  // Rueckfallebene — ein Treffer darf nie ins Leere fuehren.
+  if (result.chatId) {
+    openChat(result.chatId).then((ok) => { if (!ok) goToView("chatHistory"); }).catch(() => goToView("chatHistory"));
+  } else {
+    goToView(result.view);
+  }
   if (result.jobId) window.dispatchEvent(new CustomEvent("smejj:job-selected", { detail: { jobId: result.jobId } }));
   showToast?.(`${result.label || "Treffer"} geoeffnet`);
 }
