@@ -25,7 +25,7 @@ const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_M
 const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
 const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260726-v101-piper-synthesize";
+const BRIDGE_VERSION = "20260726-v102-piper-riff-probe";
 
 export function createChatBridgeServer() {
   return http.createServer(async (req, res) => {
@@ -650,9 +650,19 @@ async function piperSpeak(text, timeoutMs) {
 }
 
 async function probePiper() {
-  const response = await piperSpeak("ok", 8000);
-  const typ = String(response.headers.get("content-type") || "");
-  if (!response.ok || !/audio|octet-stream|wav/i.test(typ)) throw new Error(`piper ${response.status} ${typ.slice(0, 30)}`);
+  // Echter Satz statt Mini-Text (der http_server beantwortet Winz-Eingaben mit
+  // der Demo-Seite) und harte RIFF-Kopf-Pruefung statt Content-Type-Raten.
+  const response = await piperSpeak("Guten Tag.", 8000);
+  if (!response.ok || !response.body) throw new Error(`piper ${response.status}`);
+  const reader = response.body.getReader();
+  const { value } = await reader.read();
+  try {
+    await reader.cancel();
+  } catch {
+    // Reststream verwerfen ist optional.
+  }
+  const kopf = value && value.length >= 4 ? String.fromCharCode(value[0], value[1], value[2], value[3]) : "";
+  if (kopf !== "RIFF") throw new Error(`piper kein RIFF (${kopf || "leer"})`);
   return true;
 }
 
