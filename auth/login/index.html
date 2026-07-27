@@ -4,7 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#101113">
     <title>Anmelden · smejj.com</title>
+    <!-- Favicon-Verweise fehlen hier bewusst noch (QA-Welle 1, Befund F-10):
+         Das Ergaenzen wuerde einen neuen Eintrag in
+         docs/frontend/favicon-lock-manifest.json erzeugen. Der Favicon-Lock ist
+         fail-closed und erlaubt eine Manifest-Aktualisierung nur nach einer
+         eigenen, ausdruecklichen schriftlichen Bestaetigung des Betreibers
+         (docs/frontend/FAVICON_LOCK.md). Diese Bestaetigung steht aus. -->
     <link rel="stylesheet" href="/assets/auth/auth.css?v=logo-20260725">
   </head>
   <body data-auth-mode="login">
@@ -14,11 +21,20 @@
         <h1 id="authTitle">Willkommen zurück</h1>
         <p class="auth-subhead">Melde dich an, um weiterzumachen.</p>
 
+        <!-- Sichtbar nur bei bestehender Sitzung: bis QA-Welle 1 landeten
+             Angemeldete hier in einer Sackgasse — volles Anmeldeformular, kein
+             Weg zurueck in die App, und die Kontoadresse stand offen als
+             Statuszeile (Befund F-09). -->
+        <div class="auth-signedin" id="signedInBox" hidden>
+          <p class="auth-note" id="signedInNote"></p>
+          <a class="auth-button primary" id="continueToApp" href="/">Weiter zu smejj.com</a>
+        </div>
+
         <label class="auth-field" for="profileEmail">E-Mail<input id="profileEmail" type="email" autocomplete="email" placeholder="name@example.com"></label>
         <input id="profileName" type="hidden" value="">
         <div id="emailFormGroup" hidden>
           <label class="auth-field" for="emailPassword">Passwort<input id="emailPassword" type="password" autocomplete="current-password" placeholder="Mindestens 10 Zeichen"></label>
-          <p class="auth-note auth-inline-note"><a href="#" id="passwordResetLink">Passwort vergessen?</a></p>
+          <p class="auth-note auth-inline-note"><button type="button" class="auth-linkbutton" id="passwordResetLink">Passwort vergessen?</button></p>
         </div>
 
         <div class="auth-stack">
