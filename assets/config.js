@@ -20,12 +20,12 @@ function resolveApiOrigin() {
 export const API_ORIGIN = resolveApiOrigin();
 
 const API_PATHS = {
-  agent: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/agent",
-  chat: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/chat",
-  // Zwei-Wege-Betrieb (Stufe C): Zeabur-Mietserver als automatische Reserve —
-  // faellt Salad aus (Community-Hardware), antwortet das Rechenzentrum.
-  agentFallback: "https://smejj-chat-bridge.zeabur.app/api/agent",
-  chatFallback: "https://smejj-chat-bridge.zeabur.app/api/chat",
+  // Salad-Abloesung (2026-07-26): Der Zeabur-Mietserver (Rechenzentrum, Flat-
+  // Paket) ist HAUPT-Endpunkt; die Salad-Bridge bleibt nur noch als Reserve.
+  agent: "https://smejj-chat-bridge.zeabur.app/api/agent",
+  chat: "https://smejj-chat-bridge.zeabur.app/api/chat",
+  agentFallback: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/agent",
+  chatFallback: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/chat",
   // Premium-Stimme laeuft ueber den Zeabur-Mietserver (CPU-Stimme Piper im
   // Flat-Paket, kein GPU-Worker noetig) — die Bridge dort proxied zum
   // internen Piper-Dienst.
