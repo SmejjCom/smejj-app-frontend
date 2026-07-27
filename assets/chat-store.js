@@ -11,7 +11,9 @@
 // Es werden keine Secrets gespeichert, nur sichtbarer Chat-Inhalt lokal im
 // Browser des Nutzers (Free-only: kein Server, keine Kosten).
 
-import { renderChatMarkdown } from "/assets/chat-markdown.js";
+// Versionierter Pfad wie in components.js (QA-Welle 1, Befund F-07) — sonst laedt
+// der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
+import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 
 const DB_NAME = "smejj-chats";
 const DB_VERSION = 1;

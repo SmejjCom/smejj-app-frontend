@@ -7,7 +7,9 @@
 // Bedienung ohne Blockier-Dialoge: Umbenennen als Inline-Eingabe, Loeschen als
 // Zwei-Schritt-Bestaetigung direkt in der Zeile (keine window.confirm/prompt).
 
-import { listChats, openChat, renameChat, deleteChat, activeChatId } from "/assets/chat-store.js";
+// Versionierter Pfad wie in index.html (QA-Welle 1, Befund F-07): Ein abweichender
+// Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js mit eigenem Zustand.
+import { listChats, openChat, renameChat, deleteChat, activeChatId } from "/assets/chat-store.js?v=verlauf-20260721";
 
 const STYLE_ID = "chatHistoryStyles";
 let confirmingId = "";

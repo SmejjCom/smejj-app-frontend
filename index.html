@@ -3,6 +3,19 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Sicherheitsregeln (QA-Welle 1, Befund F-04). GitHub Pages Free kann keine
+         eigenen HTTP-Header setzen, deshalb steht die Content-Security-Policy hier
+         als Meta-Angabe. Die App enthaelt bewusst KEIN Inline-Skript und KEINEN
+         Inline-Style — dadurch kommt sie ohne 'unsafe-inline' fuer Skripte aus.
+         connect-src listet jeden Host, den die App kontaktieren darf: die eigenen
+         Dienste aus assets/config.js und die BYOK-Ziele aus
+         assets/shared/securityPolicy.js. WER DORT EINEN HOST AENDERT, MUSS IHN HIER
+         EINTRAGEN — sonst blockiert der Browser die Verbindung. Der Test
+         tests/csp-hosts.test.mjs erzwingt genau das.
+         frame-ancestors fehlt absichtlich: In einer Meta-CSP ignorieren Browser die
+         Angabe. Den Klickjacking-Schutz uebernimmt der Rahmenwaechter in app.js. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="theme-color" content="#f7f7f4">
     <meta name="description" content="smejj.com ist ein schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben.">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,23 +40,15 @@
     <meta name="twitter:image" content="https://smejj.com/og-image.png">
     <meta name="twitter:image:alt" content="smejj.com">
     <link rel="canonical" href="https://smejj.com/">
-    <link rel="alternate" hreflang="de" href="https://smejj.com/">
-    <link rel="alternate" hreflang="en" href="https://smejj.com/en/">
-    <link rel="alternate" hreflang="zh" href="https://smejj.com/zh/">
-    <link rel="alternate" hreflang="es" href="https://smejj.com/es/">
-    <link rel="alternate" hreflang="ar" href="https://smejj.com/ar/">
-    <link rel="alternate" hreflang="fr" href="https://smejj.com/fr/">
-    <link rel="alternate" hreflang="pt" href="https://smejj.com/pt/">
-    <link rel="alternate" hreflang="ru" href="https://smejj.com/ru/">
-    <link rel="alternate" hreflang="tr" href="https://smejj.com/tr/">
-    <link rel="alternate" hreflang="ja" href="https://smejj.com/ja/">
-    <link rel="alternate" hreflang="ko" href="https://smejj.com/ko/">
-    <link rel="alternate" hreflang="it" href="https://smejj.com/it/">
-    <link rel="alternate" hreflang="hi" href="https://smejj.com/hi/">
-    <link rel="alternate" hreflang="id" href="https://smejj.com/id/">
-    <link rel="alternate" hreflang="bn" href="https://smejj.com/bn/">
-    <link rel="alternate" hreflang="x-default" href="https://smejj.com/en/">
-    <title>smejj.com</title>
+    <!-- Kein hreflang-Block mehr (QA-Welle 1, Befund F-06). Vorher beanspruchte
+         diese Seite hreflang="de" fuer "/", waehrend alle 15 Sprachseiten dieselbe
+         Sprache fuer "/de/" beanspruchen. Zwei URLs fuer eine Sprache, und "/" kam
+         im Cluster der Sprachseiten selbst nicht vor — eine nicht-wechselseitige
+         Auszeichnung, die Suchmaschinen komplett verwerfen. "/" ist die App-Huelle,
+         keine lokalisierte Inhaltsseite; der Sprach-Cluster gehoert den 15
+         Landingpages, die untereinander bereits vollstaendig wechselseitig sind.
+         Die Sprachen bleiben ueber sitemap.xml auffindbar. -->
+    <title>smejj.com — KI- und Code-Assistent</title>
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/favicon.ico?v=112" sizes="any">
     <link rel="icon" href="/icons/smejj_favicon.svg?v=112" type="image/svg+xml">
@@ -58,6 +63,31 @@
     <link rel="stylesheet" href="/assets/view-chrome.css?v=view-chrome-20260716-2">
     <link rel="stylesheet" href="/assets/profile-dock.css?v=profile-dock-20260717-4">
     <link rel="stylesheet" href="/assets/chat-markdown.css?v=chat-markdown-20260717">
+    <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
+         sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
+         Fragen stehen auf den Landingpages, nicht hier. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "name": "smejj.com",
+            "url": "https://smejj.com/",
+            "inLanguage": ["de", "en", "zh", "es", "ar", "fr", "pt", "ru", "tr", "ja", "ko", "it", "hi", "id", "bn"]
+          },
+          {
+            "@type": "SoftwareApplication",
+            "name": "smejj.com",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Web",
+            "url": "https://smejj.com/",
+            "inLanguage": "de",
+            "description": "smejj.com ist ein schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben."
+          }
+        ]
+      }
+    </script>
   </head>
   <body data-left-menu-state="closed">
     <button id="appMenuButton" class="glass-icon app-menu-button" type="button" aria-label="Menue oeffnen" aria-expanded="false">
