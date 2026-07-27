@@ -1,3 +1,8 @@
+// v147 -> v148 (2026-07-27): Stufe 2 — browser-context.js im Precache; Seiten-
+// inhalt einer im Auftrag genannten Adresse geht in den Modellkontext.
+// v146 -> v147 (2026-07-27): Startseite antwortet im Gespraechsfaden statt auf
+// /automation zu springen (autonomous-intent.js). Nur live gesetzt, weil die
+// Datei damals unter dem Start-Lock stand; hier mit v148 nachgezogen.
 // v145 -> v146 (2026-07-27): Salad-Abloesung abgeschlossen — Betreiber hat den
 // Groq-Key auf Zeabur hinterlegt (gemessen 0,3-0,8 s, schneller als Salad);
 // Chat/Agent primaer Zeabur, Salad nur noch Reserve.
@@ -60,7 +65,7 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v147";
+const CACHE_NAME = "smejj-shell-v148";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -100,6 +105,7 @@ const SHELL = [
   "/assets/autonomous-coding.js",
   "/assets/autonomous-coding.css",
   "/assets/autonomous-intent.js",
+  "/assets/browser-context.js",
   "/assets/search.js",
   "/assets/view-chrome.js",
   "/assets/view-chrome.css",

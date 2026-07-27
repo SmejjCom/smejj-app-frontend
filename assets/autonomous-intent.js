@@ -105,8 +105,13 @@ function renderRunOffer({ request, output, goToView, eventTarget }) {
   log.append(card);
 }
 
-// Erste sichere Web-Adresse im Text. Immer https, niemals mit Zugangsdaten.
-function firstSafeUrl(text) {
+/**
+ * Erste sichere Web-Adresse im Text. Immer https, niemals mit Zugangsdaten.
+ * Oeffentlich, weil browser-context.js dieselbe Erkennung fuer den
+ * Seiten-Kontext braucht — eine Regel, eine Quelle.
+ * @param {string} text Freitext. @returns {string} URL oder "".
+ */
+export function firstSafeUrl(text) {
   const source = String(text || "");
   const explicit = source.match(EXPLICIT_URL);
   const candidate = explicit ? explicit[0].replace(/^https?:\/\//i, "") : bareCandidate(source);

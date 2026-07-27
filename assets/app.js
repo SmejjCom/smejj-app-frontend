@@ -12,6 +12,7 @@ import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260718";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
 import { collectConversationHistory } from "./chat-history-context.js";
+import { groundTask } from "./browser-context.js";
 import { getJson, postJson } from "./shared/http-json.js";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -406,10 +407,10 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   const output = addEntry("", "assistant", target);
   try {
     if (routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
-    if (await runClientChat({ task, model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
+    if (await runClientChat({ task: await groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
     try {
       await stream([CLIENT_ROUTES.api.agent, CLIENT_ROUTES.api.agentFallback], {
-        task,
+        task: await groundTask(task),
         model: state.settings.model || "smejj 1.0",
         files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}) },
         history: collectConversationHistory()
