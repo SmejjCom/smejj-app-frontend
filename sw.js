@@ -1,3 +1,9 @@
+// v188 -> v189 (2026-07-28): Der v188-Fix kam im Browser nicht an. index.html
+// laedt browser-pane.js und maus-panel.js mit ?v=-Query — unter der ALTEN Query
+// behaelt der Browser seine alte Kopie, egal was am Pfad neu ist (dieselbe
+// Falle wie v184/v185). Jetzt browser-pane.js ?v=browser-pane-20260728-3 und
+// maus-panel.js ?v=2; maus-panel.js importiert exakt dieselbe Query, sonst
+// waeren es zwei Modul-Instanzen mit getrenntem state.
 // v187 -> v188 (2026-07-28): Wurzelfix zur "Ungueltige URL."-Meldung. v187
 // raeumte nur localStorage — zu spaet, browser-pane.js hatte den alten
 // Maus-Tab da schon im Speicher. Jetzt werden wiederhergestellte Maus-Tabs in
@@ -295,7 +301,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v188";
+const CACHE_NAME = "smejj-shell-v189";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
