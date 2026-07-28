@@ -1,10 +1,9 @@
 import { STORAGE_KEYS } from "./config.js";
-import { initSettingsRuntime } from "./settings-runtime.js?v=3";
+import { initSettingsRuntime, SETTINGS_VERSION } from "./settings-runtime.js?v=4";
 import { initClineProviderSurface } from "./provider-settings.js?v=1";
 import { initApiKeysSurface } from "./api-keys-surface.js?v=1";
 import { LANGUAGE_OPTIONS } from "./language-options.js?v=1";
 import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
-import { SETTINGS_VERSION } from "./settings-runtime.js";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",

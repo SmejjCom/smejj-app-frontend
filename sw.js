@@ -1,3 +1,9 @@
+// v183 -> v184 (2026-07-28): Der Fix aus v183 kam im Browser nicht an. Zwei
+// Ursachen, beide im Live-Test gefunden: settings-surface.js importierte
+// settings-runtime.js unter ZWEI Adressen (mit und ohne ?v=3) — in ES-Modulen
+// sind das zwei getrennte Instanzen. Und die alte Query ?v=3 liess Browser die
+// alte Datei behalten. Jetzt EIN Import mit ?v=4.
+//
 // v182 -> v183 (2026-07-28): Nachbesserung an v182. Der neue Standard fuer den
 // Reasoning-Aufwand erreichte Bestandsnutzer NICHT: die Oberflaeche schreibt alle
 // Voreinstellungen mit, also stand bei praktisch jedem "high" im Speicher, ohne
@@ -262,7 +268,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v183";
+const CACHE_NAME = "smejj-shell-v184";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
