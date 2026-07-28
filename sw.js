@@ -65,6 +65,16 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
+// v152 -> v153 (2026-07-28): PFLICHT, keine Kosmetik. Sieben importierte Module
+// fehlten im Precache — darunter chat-history-context.js, das app.js SELBST
+// importiert. Offline lieferte der Fetch-Handler dafuer den Rueckfall "/"
+// (index.html), der Browser bekam HTML statt JavaScript und brach das Modul ab:
+// die App war offline tot. Neu aufgenommen: account-sessions.js,
+// api-keys-surface.js, chat-history-context.js, i18n/ui.js, language-options.js,
+// onboarding-welcome.js, usage-meter.js. Gegen Rueckfall abgesichert durch
+// scripts/check-precache-imports.mjs (verfolgt den Importgraph).
+// Ausserdem: der letzte fruehe Control-Server-Aufruf (/api/auth/me aus
+// autonomous-coding.js) laeuft jetzt nach dem ersten Bildaufbau.
 // v151 -> v152 (2026-07-27): Korrektur an deferred-start.js. Zwei rAF allein
 // reichen nicht — rAF laeuft VOR dem Malen. Live gemessen starteten im warmen
 // Wiederbesuch sechs Aufrufe bei 142-160 ms, waehrend der Bildaufbau erst bei
@@ -84,11 +94,19 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v152";
+const CACHE_NAME = "smejj-shell-v153";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
   "/assets/deferred-start.js",
+  "/assets/ai/providers-catalog.js",
+  "/assets/account-sessions.js",
+  "/assets/api-keys-surface.js",
+  "/assets/chat-history-context.js",
+  "/assets/i18n/ui.js",
+  "/assets/language-options.js",
+  "/assets/onboarding-welcome.js",
+  "/assets/usage-meter.js",
   "/assets/app-surfaces.css",
   "/assets/settings-surface.css",
   "/assets/account-privacy.css",

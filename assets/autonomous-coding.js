@@ -1,4 +1,5 @@
 import { API_ORIGIN, CLIENT_ROUTES } from "./config.js";
+import { afterFirstPaint } from "./deferred-start.js";
 
 const API_TOKEN_KEY = "smejj.apiToken.v1";
 const ACTIVE_STATUSES = new Set(["open", "queued", "planning", "fast_path", "starting_worker", "running", "verifying"]);
@@ -24,7 +25,12 @@ export function initAutonomousCodingSurface() {
   window.addEventListener("message", handleSessionHandoff);
   window.addEventListener("smejj:job-selected", (event) => selectJob(event.detail?.jobId));
   window.addEventListener("smejj:autonomous-request", handleAutonomousRequest);
-  refreshSession().catch(showError);
+  // Erst nach dem ersten Bildaufbau: /api/auth/me gehoert nicht in den Ladepfad
+  // eines normalen Seitenaufrufs (Architekturregel). Letzter frueher Aufruf,
+  // gemessen 11 ms vor dem Bildaufbau; Freigabe Betreiber 2026-07-28
+  // ("Mach komplett fertig, lass nicht offen"). Die Oberflaeche steht sofort,
+  // nur der Anmeldezustand kommt kurz danach.
+  afterFirstPaint([() => refreshSession().catch(showError)]);
 }
 
 async function handleAutonomousRequest(event) {
