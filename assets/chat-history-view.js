@@ -84,7 +84,7 @@ function renderItem(chat, isActive) {
 
   const main = document.createElement("div");
   main.className = "chat-history-main";
-  main.title = "Unterhaltung oeffnen";
+  main.title = "Unterhaltung öffnen";
   const title = document.createElement("div");
   title.className = "chat-history-title";
   title.textContent = chat.title || "Unterhaltung";
@@ -100,7 +100,7 @@ function renderItem(chat, isActive) {
 
   const openButton = document.createElement("button");
   openButton.type = "button";
-  openButton.textContent = "Oeffnen";
+  openButton.textContent = "Öffnen";
   openButton.addEventListener("click", () => { openChat(chat.id).catch(() => {}); });
 
   const renameButton = document.createElement("button");
@@ -110,7 +110,7 @@ function renderItem(chat, isActive) {
 
   const deleteButton = document.createElement("button");
   deleteButton.type = "button";
-  deleteButton.textContent = confirmingId === chat.id ? "Wirklich loeschen?" : "Loeschen";
+  deleteButton.textContent = confirmingId === chat.id ? "Wirklich löschen?" : "Löschen";
   if (confirmingId === chat.id) deleteButton.classList.add("is-danger");
   deleteButton.addEventListener("click", async () => {
     if (confirmingId !== chat.id) {

@@ -14,6 +14,7 @@ import { routeAutonomousRequest } from "./autonomous-intent.js";
 import { collectConversationHistory } from "./chat-history-context.js";
 import { groundTask } from "./browser-context.js";
 import { afterFirstPaint } from "./deferred-start.js";
+import { applyViewTitle } from "./view-title.js";
 import { getJson, postJson } from "./shared/http-json.js";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -334,6 +335,7 @@ function goToView(viewId, { replace = false } = {}) {
     history[method]({ viewId: resolvedViewId }, "", nextUrl);
   }
   updateCanonical();
+  applyViewTitle(target, resolvedViewId); // Seitentitel je Ansicht (W2-05)
   if (resolvedViewId === "tools") refreshLiveSystemStatus();
   target.scrollIntoView({ block: "start" });
 }
@@ -629,15 +631,19 @@ function bindLocalWorkspace() {
 
 function bindProjects() {
   $("#projectCreate").addEventListener("click", async () => {
-    const { project, manifest } = await workspace.createProject({
-      name: "smejj.com Projekt",
+    // W2-09: Klick legte vorher sofort ein Projekt an; Abbrechen legt nichts an.
+    const eingabe = window.prompt("Wie soll das Projekt heissen?", "Mein Projekt");
+    if (eingabe === null) return;
+    const { project } = await workspace.createProject({
+      name: eingabe.trim().slice(0, 80) || "smejj.com Projekt",
       ownerUserId: state.session.userId || PROJECT_ROLES.localOnly
     });
     state.currentProjectId = project.id;
     localStorage.setItem(STORAGE_KEYS.currentProject, project.id);
     refreshLocalWorkspaceStatus();
     await refreshProjectList();
-    writeOutput("#projectOutput", JSON.stringify({ ok: true, project, manifest }, null, 2));
+    writeOutput("#projectOutput", `Projekt „${project.name}" angelegt (${project.id}).`); // W2-07: kein Roh-JSON
+    showToast("Projekt angelegt.");
   });
 
   $("#projectRefresh").addEventListener("click", refreshProjectList);
@@ -649,8 +655,8 @@ function bindProjects() {
       state.currentProjectId = projectId;
       localStorage.setItem(STORAGE_KEYS.currentProject, projectId);
       refreshLocalWorkspaceStatus();
-      writeOutput("#projectOutput", JSON.stringify({ ok: true, activeProject: result.project }, null, 2));
-      showToast("Projekt geoeffnet.");
+      writeOutput("#projectOutput", `Projekt „${result.project?.name || projectId}" geöffnet.`);
+      showToast("Projekt geöffnet.");
     } catch (error) {
       writeOutput("#projectOutput", JSON.stringify({ ok: false, error: error.message }, null, 2));
     }

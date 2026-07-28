@@ -6,14 +6,14 @@ import { listChats, openChat } from "/assets/chat-store.js?v=verlauf-20260721";
 
 const STATIC_RESULTS = Object.freeze([
   ["Arbeitsbereiche", "Neu", "Neuer Chat oder neue Aufgabe starten", "start", "neu chat aufgabe start"],
-  ["Arbeitsbereiche", "Coding", "Code schreiben, pruefen und umbauen", "smejjClaw", "coding code programmieren terminal"],
-  ["Arbeitsbereiche", "Projekte", "Projekt oeffnen oder wechseln", "projects", "projekt projekte workspace"],
+  ["Arbeitsbereiche", "Coding", "Code schreiben, prüfen und umbauen", "smejjClaw", "coding code programmieren terminal"],
+  ["Arbeitsbereiche", "Projekte", "Projekt öffnen oder wechseln", "projects", "projekt projekte workspace"],
   ["Arbeitsbereiche", "Dateien", "Projektdateien und Uploads finden", "files", "dateien files uploads quellen"],
   ["Arbeitsbereiche", "Verlauf", "Alte Chats und Aufgaben finden", "chatHistory", "verlauf history chat task"],
   ["Einstellungen", "Einstellungen", "Konto, Modelle, API-Keys und Sprache", "settings", "settings einstellungen konto modell api key"],
-  ["Einstellungen", "Kosten & Limits", "Kostenstatus und Limits pruefen", "cost", "kosten limits budget"],
-  ["Einstellungen", "Nutzer", "Lokalen Nutzer und Login pruefen", "profile", "nutzer login konto profil"],
-  ["Werkzeuge", "Browser", "Websites oeffnen und pruefen", "websites", "browser websites web"],
+  ["Einstellungen", "Kosten & Limits", "Kostenstatus und Limits prüfen", "cost", "kosten limits budget"],
+  ["Einstellungen", "Nutzer", "Lokalen Nutzer und Login prüfen", "profile", "nutzer login konto profil"],
+  ["Werkzeuge", "Browser", "Websites öffnen und prüfen", "websites", "browser websites web"],
   ["Werkzeuge", "Quellen", "Referenzen und Projektdateien", "files", "quellen referenzen links dokumente"],
   ["Werkzeuge", "GitHub", "Repository, Branch und Commit-Status", "settings", "github repo branch commit pr"],
   ["Werkzeuge", "Vorschau", "App oder Website Preview", "browser", "vorschau preview app website"],
@@ -105,8 +105,8 @@ async function loadJobRows() {
 
 function renderResults(log, results, query) {
   log.replaceChildren();
-  if (!query.trim()) return log.append(empty("Suche ueber Chats, Projekte, Dateien, Code, Quellen und Verlauf. Enter oeffnet den besten Treffer."));
-  if (!results.length) return log.append(empty("Keine lokalen Treffer. Nutze Browser/Quellen fuer Websuche."));
+  if (!query.trim()) return log.append(empty("Suche über Chats, Projekte, Dateien, Code, Quellen und Verlauf. Enter öffnet den besten Treffer."));
+  if (!results.length) return log.append(empty("Keine lokalen Treffer. Nutze Browser/Quellen für die Websuche."));
   const groups = results.reduce((map, item) => map.set(item.group, [...(map.get(item.group) || []), item]), new Map());
   for (const [group, items] of groups.entries()) {
     const section = document.createElement("section");

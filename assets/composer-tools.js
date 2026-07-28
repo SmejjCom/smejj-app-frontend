@@ -278,13 +278,13 @@ function enterVoiceFallback(message) {
               // Recognition war bereits gestoppt.
       }
       state.voiceRecognition = null;
-      setVoiceModeStatus("muted", message || "Spracherkennung nicht verfuegbar — Frage unten eintippen.");
+      setVoiceModeStatus("muted", message || "Spracherkennung nicht verfügbar — Frage unten eintippen.");
       const overlay = $("#voiceModeOverlay");
       if (overlay) overlay.dataset.muted = "true";
       const mic = $("#voiceModeMic");
       if (mic) {
               mic.classList.add("is-muted");
-              mic.title = "Spracherkennung nicht verfuegbar";
+              mic.title = "Spracherkennung nicht verfügbar";
       }
       const hint = document.querySelector("#voiceModeOverlay .voice-mode-hint");
       if (hint) hint.textContent = "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.";
@@ -351,7 +351,7 @@ function startBargeListener(spokenText, failStreak = 0) {
                         // bis zur Sprechpause, dann als neue Frage senden.
                         state.bargeConfirmed = true;
                         stopSpeaking();
-                        setVoiceModeStatus("listening", "Ich hoere zu ...");
+                        setVoiceModeStatus("listening", "Ich höre zu ...");
               }
               setVoiceModeTranscript(heard);
               // Nach der Unterbrechung beendet die erste finale Phrase die Aufnahme.
@@ -411,7 +411,7 @@ function voiceModeListen() {
       // Pegel-Detektor wuerde recognition.start() scheitern lassen (Fallback-Falle).
       stopInterrupt();
       stopBargeListener();
-      setVoiceModeStatus("listening", "Ich hoere zu ...");
+      setVoiceModeStatus("listening", "Ich höre zu ...");
       setVoiceModeTranscript("");
       const recognition = new RecognitionCtor();
       recognition.lang = SPEECH_LANG;
@@ -604,7 +604,7 @@ function waitForAssistantReply(knownEntries) {
                                     setVoiceModeStatus("muted", "Mikrofon aus");
                                     return;
                         }
-                        setVoiceModeStatus("listening", "Keine Antwort erhalten — ich hoere weiter zu.");
+                        setVoiceModeStatus("listening", "Keine Antwort erhalten — ich höre weiter zu.");
                         voiceModeListen();
                         return;
               }
@@ -631,7 +631,7 @@ function waitForAssistantReply(knownEntries) {
 function toggleVoiceMute() {
       if (!state.voiceModeActive) return;
       if (state.voiceFallback) {
-              showToast("Spracherkennung ist auf diesem Geraet nicht verfuegbar — bitte das Eingabefeld nutzen.");
+              showToast("Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.");
               return;
       }
       state.voiceMuted = !state.voiceMuted;
@@ -699,7 +699,7 @@ function openVoiceMode() {
       if (!RecognitionCtor) {
               // iOS/Safari ohne Web-Speech-Erkennung: Overlay im Diktat-Fallback oeffnen
               // statt den Sprachmodus komplett zu verweigern.
-              enterVoiceFallback("Spracherkennung ist auf diesem Geraet nicht verfuegbar — Frage unten eintippen.");
+              enterVoiceFallback("Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.");
               return;
       }
       voiceModeListen();
@@ -727,7 +727,7 @@ function upgradeVoiceOverlay() {
       const bar = document.createElement("div");
       bar.className = "voice-mode-bar";
       bar.innerHTML = '<div class="voice-mode-input-wrap">'
-        + '<button id="voiceModeAttach" type="button" aria-label="Datei anhaengen" title="Datei anhaengen">'
+        + '<button id="voiceModeAttach" type="button" aria-label="Datei anhängen" title="Datei anhängen">'
         + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
         + '</button>'
         + '<input id="voiceModeInput" type="text" placeholder="Frage schreiben ..." autocomplete="off">'
