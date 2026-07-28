@@ -1,13 +1,13 @@
 {
-  "name": "smejj.com Code",
+  "name": "smejj.com — KI- und Code-Assistent",
   "short_name": "smejj.com",
   "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f6f7f9",
-  "theme_color": "#1f2937",
-  "description": "Free-safe PWA shell for smejj.com Code.",
+  "theme_color": "#f7f7f4",
+  "description": "KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben — direkt im Browser.",
   "icons": [
     {
       "src": "/icons/pwa-192x192.png",

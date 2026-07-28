@@ -1,7 +1,7 @@
 // smejj.com — Composer-Werkzeuge der Startseite (Plus-Menue, Diktat, Sprachmodus, Vorlesen).
 // Alles laeuft lokal im Browser (Web Speech API + speechSynthesis) — free-only, keine externen Dienste.
 // Zweck: initComposerTools() verdrahtet die Icon-Zeile des Start-Composers.
-import { showToast } from "./components.js";
+import { showToast } from "./components.js?v=chat-markdown-20260717"; // versioniert wie app.js (F-07)
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
 import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=blitz-20260726";
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.

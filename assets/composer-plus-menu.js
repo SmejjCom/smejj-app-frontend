@@ -1,7 +1,9 @@
 // smejj.com — Plus-Menue des Start-Composers (Anhaenge: Datei + Bild).
 // Ausgelagert aus composer-tools.js (800-Zeilen-Regel, Stufe 1e) — Verhalten
 // unveraendert: Menue oeffnen/schliessen, Anhaenge als Text-Referenz einfuegen.
-import { showToast } from "./components.js";
+// Versionierter Pfad wie in app.js (QA-Welle 1, Befund F-07) — ein Schutztest
+// verlangt die Cache-Version dort ausdruecklich, also zieht dieser Import nach.
+import { showToast } from "./components.js?v=chat-markdown-20260717";
 
 const $ = (selector) => document.querySelector(selector);
 

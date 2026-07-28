@@ -8,7 +8,10 @@
 // blockierende Seiten (Google, GitHub, ...) kommen als sichere, serverseitig
 // umgeschriebene Ansicht ueber /api/browser/fetch. Fail-closed: ohne Server
 // wird direkt eingebettet und "In neuem Tab oeffnen" angeboten.
-import { CLIENT_ROUTES } from "./config.js?v=browser-pane-20260709-2";
+// Ohne Version wie alle 25 uebrigen Importe (QA-Welle 1, Befund F-07): Der
+// abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
+// instanzen mit getrennten CLIENT_ROUTES.
+import { CLIENT_ROUTES } from "./config.js";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,

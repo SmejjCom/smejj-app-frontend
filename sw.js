@@ -65,7 +65,11 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
-const CACHE_NAME = "smejj-shell-v148";
+// v148 -> v149 (2026-07-28): Klickjacking-Schutz — frame-guard.js neu im
+// Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
+// das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
+// Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
+const CACHE_NAME = "smejj-shell-v149";
 const SHELL = [
   "/",
   "/assets/styles.css",
@@ -85,6 +89,7 @@ const SHELL = [
   "/assets/components.js",
   "/assets/chat-markdown.js",
   "/assets/chat-markdown.css",
+  "/assets/frame-guard.js",
   "/assets/app.js",
   "/assets/left-menu-state.js",
   "/assets/panel-backdrop.js",
