@@ -273,7 +273,21 @@ a:focus-visible {
   margin-top: auto;
 }
 
-.auth-legal a { color: var(--auth-muted); }
+/* Klickflaeche mindestens 24x24 px (F-21): "Datenschutz" und "Impressum" waren
+   71x14 bzw. 62x14 px. Nur die Flaeche waechst, das Schriftbild bleibt. */
+.auth-legal a {
+  color: var(--auth-muted);
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+/* Auch "Konto erstellen" / "Anmelden" in der Fusszeile (war 102x17 px). */
+.auth-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
 
 /* Passwortstaerke (Registrierung) */
 .auth-strength {

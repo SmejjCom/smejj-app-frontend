@@ -403,6 +403,22 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(32, 32, 29, 0.08);
 }
 
+/* Eigener Fokusstil (QA-Welle 1, Befund F-17). Vorher gab es Fokusregeln NUR
+   fuer input/select/textarea; Knoepfe und Links verliessen sich auf den
+   Standardring des Browsers. Der ist in Chrome sichtbar (mit echter
+   Tastaturbedienung geprueft), faellt aber je nach Browser unterschiedlich aus
+   und geht auf dunklem Grund leicht unter. Zwei Ringe uebereinander — heller
+   Kern, dunkler Saum — bleiben auf hellem UND dunklem Hintergrund erkennbar
+   und erfuellen WCAG 2.4.7 unabhaengig vom Browser.
+   Nur :focus-visible: Mausklicks erzeugen weiterhin keinen Ring, das sichtbare
+   Verhalten aendert sich fuer Zeigergeraete also nicht. */
+:where(button, a[href], summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid #f6f3ee;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.85);
+  border-radius: 6px;
+}
+
 textarea {
   min-height: 160px;
   resize: vertical;
@@ -1546,9 +1562,17 @@ button:hover {
   color: rgba(246, 243, 238, 0.6);
 }
 
+/* Klickflaeche mindestens 24x24 px (QA-Welle 1, Befund F-21; WCAG 2.2 AA
+   "Target Size (Minimum)"). Gemessen waren "Impressum" 74x16 und
+   "Datenschutz" 84x16 — zu klein zum sicheren Treffen auf Beruehrgeraeten.
+   inline-flex mit min-height vergroessert nur die Flaeche, nicht die Schrift;
+   das Schriftbild bleibt unveraendert. */
 .legal-links a {
   color: #8fc7ff;
   margin-left: 8px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 
 /* Nur fuer Screenreader/SEO sichtbar (H1 der Startseite) — pixel-identisches Rendering. */
