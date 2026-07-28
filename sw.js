@@ -1,3 +1,20 @@
+// v159 -> v160 (2026-07-28): QA-Welle 1, Befund F-24 — cache-first fuer die
+// Precache-Dateien. Bisher war ALLES network-first: die ~95 vorab gespeicherten
+// Dateien wurden online bei jedem Aufruf erneut angefragt (gemessen: 104
+// Anfragen je Seitenaufruf, davon ~90 Precache-Assets). Jetzt beantwortet der
+// Cache Anfragen auf Precache-Pfade direkt; HTML (Navigationen und .html) und
+// /api/ bleiben network-first. WICHTIG dadurch: eine Aenderung an einer
+// Precache-Datei erreicht Bestandsnutzer NUR noch ueber einen Versionssprung
+// hier (CACHE_NAME) — das war schon immer die dokumentierte Pflicht (siehe
+// alle Eintraege unten), ist jetzt aber zwingend statt nur wichtig.
+// ignoreSearch beim Cache-Treffer: index.html laedt einige Module mit
+// ?v=-Kennung, der Precache speichert ohne — beides ist nach einem
+// Versionssprung derselbe Stand.
+// Ausserdem (Messbefund derselben Pruefung): auth-gate.js (Import aus
+// profile-dock.js mit ?v=1 — dem Import-Waechter dadurch entgangen) und
+// api-keys-surface.css (zur Laufzeit als <link> eingehaengt) fehlten im
+// Precache. Offline haette der Rueckfall fuer beide "/" (HTML) geliefert und
+// das Modul bzw. den Stil zerstoert. Beide neu in SHELL.
 // v156 -> v157 (2026-07-28): renderEmptyState fehlte in der zweiten Funktion
 // von local-workspace-surface.js. Jetzt jede Funktion einzeln gegengeprueft.
 // v155 -> v156 (2026-07-28): Nachbesserung der Aufteilung — setText und
@@ -112,7 +129,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v159";
+const CACHE_NAME = "smejj-shell-v160";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -127,6 +144,8 @@ const SHELL = [
   "/assets/ai/providers-catalog.js",
   "/assets/account-sessions.js",
   "/assets/api-keys-surface.js",
+  "/assets/api-keys-surface.css",
+  "/assets/auth-gate.js",
   "/assets/chat-history-context.js",
   "/assets/i18n/ui.js",
   "/assets/language-options.js",
@@ -237,6 +256,16 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// Precache-Pfade ohne Query — fuer den cache-first-Abgleich (F-24).
+const PRECACHE_PATHS = new Set(SHELL.map((entry) => new URL(entry, "https://smejj.com").pathname));
+
+// HTML bleibt network-first: Navigationen und .html-Seiten sollen Aenderungen
+// sofort sehen; nur fuer sie ist der Netz-Rundweg den Preis wert.
+function isHtmlRequest(request, url) {
+  if (request.mode === "navigate" || request.destination === "document") return true;
+  return url.pathname === "/" || url.pathname.endsWith(".html") || url.pathname.endsWith("/");
+}
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -247,6 +276,15 @@ self.addEventListener("fetch", (event) => {
   }
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(fetch(request));
+    return;
+  }
+  // Cache-first NUR fuer vorab gespeicherte Nicht-HTML-Dateien gleicher Herkunft.
+  // Der Cache-Inhalt haengt am CACHE_NAME: jeder Deploy einer Precache-Datei
+  // MUSS die Version oben hochzaehlen, sonst sehen Bestandsnutzer den alten Stand.
+  if (url.origin === self.location.origin && !isHtmlRequest(request, url) && PRECACHE_PATHS.has(url.pathname)) {
+    event.respondWith(
+      caches.match(request, { ignoreSearch: true }).then((cached) => cached || fetch(request))
+    );
     return;
   }
   event.respondWith(fetch(request).catch(() => caches.match(request).then((cached) => cached || caches.match("/"))));
