@@ -1,5 +1,9 @@
 import { STORAGE_KEYS } from "./config.js";
 
+// Version des gespeicherten Einstellungsstands. Erhoehen, wenn ein Feld seine
+// Bedeutung aendert und ein alter Wert nicht mehr als bewusste Wahl gelten darf.
+export const SETTINGS_VERSION = 2;
+
 const SAFE_VALUES = {
   theme: new Set(["system", "dark", "light"]),
   startView: new Set(["last", "start", "projects"]),
@@ -118,7 +122,17 @@ export function notifyTaskState(state, message) {
 
 function normalize(input = {}) {
   const settings = { ...DEFAULTS };
+  // Einmalige Umstellung auf Version 2 (2026-07-28): Bis Version 1 war
+  // reasoningEffort folgenlos — nur ein Satz im Prompt. Die Oberflaeche schrieb
+  // dabei ALLE Voreinstellungen mit, also steht bei praktisch jedem
+  // Bestandsnutzer "high", ohne dass es je jemand bewusst gewaehlt hat. Seit der
+  // Wert einen echten API-Parameter steuert, waere es falsch, diesen
+  // mitgeschriebenen Wert als Wunsch zu lesen: er wuerde K3 ungefragt von 8,6 s
+  // auf 13,9 s verlangsamen. Aeltere Staende bekommen darum einmalig den neuen
+  // Standard; wer die Stufe danach setzt, behaelt sie (settingsVersion 2).
+  const veraltet = Number(input?.settingsVersion || 0) < SETTINGS_VERSION;
   for (const [key, values] of Object.entries(SAFE_VALUES)) {
+    if (key === "reasoningEffort" && veraltet) continue;
     if (values.has(input[key])) settings[key] = input[key];
   }
   for (const key of ["autoContext", "runChecks", "browserPreview", "networkAccess", "notifyComplete", "notifyApproval", "notifyError", "diagnostics"]) {

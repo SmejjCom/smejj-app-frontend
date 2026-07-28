@@ -4,11 +4,14 @@ import { initClineProviderSurface } from "./provider-settings.js?v=1";
 import { initApiKeysSurface } from "./api-keys-surface.js?v=1";
 import { LANGUAGE_OPTIONS } from "./language-options.js?v=1";
 import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
+import { SETTINGS_VERSION } from "./settings-runtime.js";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
   fontSize: "medium", startView: "last", confirmations: "balanced",
-  responseStyle: "balanced", reasoningEffort: "high", personalization: "",
+  // reasoningEffort: siehe settings-runtime.js — seit 2026-07-28 steuert der
+  // Wert einen echten API-Parameter, darum "medium" als Standard.
+  responseStyle: "balanced", reasoningEffort: "medium", personalization: "",
   autoContext: true, runChecks: true, browserPreview: true, networkAccess: false,
   notifyComplete: true, notifyApproval: true, notifyError: true,
   offlineCache: true, diagnostics: false
@@ -175,7 +178,9 @@ function activate(view, id) {
 }
 
 function save(view, message) {
-  const next = { ...readSettings(), settingsVersion: 1 };
+  // Version 2: ab hier gilt reasoningEffort als bewusste Wahl (siehe die
+  // einmalige Umstellung in settings-runtime.js).
+  const next = { ...readSettings(), settingsVersion: SETTINGS_VERSION };
   for (const [key, id] of Object.entries(FIELDS)) {
     const field = view.querySelector(`#${id}`);
     if (field) next[key] = field.type === "checkbox" ? field.checked : field.value;
@@ -187,7 +192,19 @@ function save(view, message) {
 }
 
 function readSettings() {
-  try { return { ...DEFAULTS, language: savedUiLanguage(), ...JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "{}") }; }
+  try {
+    const gespeichert = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "{}");
+    const zusammen = { ...DEFAULTS, language: savedUiLanguage(), ...gespeichert };
+    // Dieselbe einmalige Umstellung wie in settings-runtime.js: ein vor
+    // Version 2 gespeicherter Reasoning-Aufwand war folgenlos und ist keine
+    // bewusste Wahl. Sonst zeigte die Oberflaeche "Hoch" an, waehrend der
+    // Server nach der Umstellung "Mittel" verwendet — Anzeige und Wirkung
+    // duerfen nicht auseinanderlaufen.
+    if (Number(gespeichert?.settingsVersion || 0) < SETTINGS_VERSION) {
+      zusammen.reasoningEffort = DEFAULTS.reasoningEffort;
+    }
+    return zusammen;
+  }
   catch { return { ...DEFAULTS }; }
 }
 
