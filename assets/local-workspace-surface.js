@@ -7,7 +7,7 @@
 import { STORAGE_KEYS } from "./config.js";
 
 export function bindLocalWorkspace(deps) {
-  const { $, state, workspace, showToast, writeOutput } = deps;
+  const { $, state, workspace, showToast, writeOutput, setText, renderEmptyState } = deps;
   $("#createLocalProject").addEventListener("click", async () => {
     const name = state.profile.name ? `${state.profile.name} Workspace` : "smejj.com Local Workspace";
     const { project, manifest } = await workspace.createProject({ name });
@@ -81,7 +81,7 @@ export async function ensureProject(deps) {
 }
 
 export function refreshLocalWorkspaceStatus(deps) {
-  const { $, state, workspace } = deps;
+  const { $, state, workspace, setText } = deps;
   const status = workspace.status();
   setText("#storageStatusChip", `Storage: ${status.storage}`);
   setText("#workspaceStatusChip", `Workspace: ${status.offline ? "offline" : status.syncStatus}`);

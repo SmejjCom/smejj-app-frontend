@@ -55,7 +55,7 @@ boot();
 
 // Buendelt, was projects-surface.js aus der App braucht — eine Stelle statt neun.
 function projektAbhaengigkeiten() {
-  const basis = { $, state, workspace, showToast, writeOutput };
+  const basis = { $, state, workspace, showToast, writeOutput, setText, renderEmptyState };
   return { ...basis, renderProjectCards, renderEmptyState, ensureProject: () => ensureProject(basis), refreshLocalWorkspaceStatus: () => refreshLocalWorkspaceStatus(basis) };
 }
 

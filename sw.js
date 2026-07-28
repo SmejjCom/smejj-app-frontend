@@ -1,3 +1,6 @@
+// v155 -> v156 (2026-07-28): Nachbesserung der Aufteilung — setText und
+// renderEmptyState wurden von local-workspace-surface.js benutzt, aber nicht
+// mitgereicht (Live-Befund: ReferenceError). Jetzt ausdruecklich in deps.
 // v154 -> v155 (2026-07-28): app.js aufgeteilt (1411 -> 800 Zeilen, Ratchet-
 // Ausnahme entfernt). Die sieben neuen Module sind PFLICHT im Precache — app.js
 // importiert sie; ohne Precache waere die App offline tot.
@@ -107,7 +110,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v155";
+const CACHE_NAME = "smejj-shell-v156";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
