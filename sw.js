@@ -65,6 +65,10 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
+// v151 -> v152 (2026-07-27): Korrektur an deferred-start.js. Zwei rAF allein
+// reichen nicht — rAF laeuft VOR dem Malen. Live gemessen starteten im warmen
+// Wiederbesuch sechs Aufrufe bei 142-160 ms, waehrend der Bildaufbau erst bei
+// 168 ms lag. Jetzt wird das Paint-Ereignis des Browsers selbst abgewartet.
 // v150 -> v151 (2026-07-27): Die letzten drei Control-Server-Startaufrufe
 // (/api/auth/me aus account-privacy.js, /api/keys aus api-keys-surface.js,
 // /api/providers/cline/models+status aus provider-settings.js) laufen erst nach
@@ -80,7 +84,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v151";
+const CACHE_NAME = "smejj-shell-v152";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

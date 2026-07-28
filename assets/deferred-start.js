@@ -38,11 +38,40 @@ export async function afterFirstPaint(tasks, { timeoutMs = DEFAULT_TIMEOUT_MS, s
 }
 
 function waitForPaint(scope, timeoutMs) {
+  return Promise.race([firstContentfulPaint(scope), rafThenTask(scope), delay(scope, timeoutMs)]);
+}
+
+// Genaueste Quelle: der Browser meldet den ersten Inhaltsaufbau selbst.
+// `buffered: true` liefert das Ereignis auch dann, wenn es schon vorbei ist.
+//
+// Gemessen am 2026-07-27: zwei requestAnimationFrame allein reichen NICHT.
+// rAF-Rueckrufe laufen VOR dem Malen ihres Frames — bei einem schnellen
+// Wiederbesuch (Service Worker warm) starteten die Aufrufe dadurch bei
+// 142-160 ms, waehrend der Bildaufbau erst bei 168 ms lag. Genau der Fehler,
+// den diese Datei verhindern soll.
+function firstContentfulPaint(scope) {
+  const Observer = scope.PerformanceObserver;
+  if (typeof Observer !== "function") return new Promise(() => {});
+  return new Promise((resolve) => {
+    try {
+      const observer = new Observer((list) => {
+        if (!list.getEntries().some((entry) => entry.name === "first-contentful-paint")) return;
+        observer.disconnect();
+        resolve();
+      });
+      observer.observe({ type: "paint", buffered: true });
+    } catch {
+      // Ohne Paint-Beobachtung greifen die beiden anderen Wege.
+    }
+  });
+}
+
+// Rueckfallweg ohne PerformanceObserver: nach dem Bildwechsel noch einen
+// Aufgabenwechsel abwarten — der laeuft garantiert NACH dem Malen.
+function rafThenTask(scope) {
   const raf = typeof scope.requestAnimationFrame === "function" ? scope.requestAnimationFrame.bind(scope) : null;
   if (!raf) return delay(scope, 0);
-  // Zwei Bildwechsel: nach dem zweiten ist der erste Bildaufbau sicher durch.
-  const painted = new Promise((resolve) => raf(() => raf(() => resolve())));
-  return Promise.race([painted, delay(scope, timeoutMs)]);
+  return new Promise((resolve) => raf(() => raf(() => (scope.setTimeout || setTimeout)(resolve, 0))));
 }
 
 function waitForIdle(scope, timeoutMs) {
