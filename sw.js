@@ -1,3 +1,13 @@
+// v166 -> v167 (2026-07-28): Nachbesserung am Ueberlaufmenue der
+// Nachrichten-Aktionen (Live-Befund): es klappte auch dann nach oben, wenn dort
+// gar kein Platz war, und wurde am oberen Rand des Chat-Logs abgeschnitten.
+// Jetzt werden beide Seiten gemessen. chat-actions.js liegt cache-first im
+// Precache — ohne Versionssprung erreicht der Fix Bestandsnutzer nicht.
+// v165 -> v166 (2026-07-28): QA-Welle 1, Befund F-23 — die drei toten Knoepfe
+// #saveSettings, #showOfflinePage und #showErrorPage sind entfernt (Freigabe
+// Betreiber "mach es bitte komplett fertig"). Betroffen sind index.html,
+// app.js und settings-surface.js; alle drei liegen im Precache und brauchen
+// den Versionssprung, sonst sehen Bestandsnutzer die Knoepfe weiter.
 // v164 -> v165 (2026-07-28): Aktionen pro Chat-Nachricht (Kopieren, Bearbeiten,
 // Neu generieren, Bewerten, Vorlesen, Abzweigen, "Ab hier loeschen" mit
 // Rueckgaengig, Versionswahl). PFLICHT im Precache, keine Kosmetik: index.html
@@ -160,7 +170,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v165";
+const CACHE_NAME = "smejj-shell-v167";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

@@ -528,23 +528,18 @@ function bindCost() {
   });
 }
 
+// Entfernt am 2026-07-28 (Freigabe Betreiber: "mach es bitte komplett fertig"):
+// #saveSettings, #showOfflinePage und #showErrorPage waren tot. Grund:
+// premium-surfaces.js ruft initSettingsSurface() VOR bindSettings() auf, und
+// settings-surface.js ersetzt die komplette #settings-Sektion per innerHTML.
+// Die Handler hingen deshalb an leeren Platzhaltern, die es nur gab, damit
+// $("#saveSettings") nicht null liefert und boot() nicht mitten drin abbricht.
+// Gespeichert wird heute von settings-surface.js selbst (Autosave, sichtbar an
+// #settingsSaveStatus). Die Sprach- und Modus-Felder werden weiterhin hier
+// vorbelegt — das ist der einzige lebende Teil dieser Funktion.
 function bindSettings() {
   $("#settingsLanguage").value = state.settings.language || "de";
   $("#settingsMode").value = state.settings.mode || "safe";
-  $("#saveSettings").addEventListener("click", () => {
-    state.settings = {
-      language: $("#settingsLanguage").value,
-      mode: $("#settingsMode").value,
-      model: state.settings.model || "smejj 1.0"
-    };
-    localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
-    $("#language").value = state.settings.language;
-    $("#mode").value = state.settings.mode;
-    writeOutput("#settingsOutput", "Einstellungen lokal gespeichert.");
-    showToast("Einstellungen gespeichert.");
-  });
-  $("#showOfflinePage").addEventListener("click", () => goToView("offline"));
-  $("#showErrorPage").addEventListener("click", () => goToView("error"));
 }
 
 

@@ -117,7 +117,15 @@ function markup() {
         toggle("Diagnoseinformationen anzeigen", "settingsDiagnostics", "Technische Statusdetails in Nicht-Start-Bereichen."),
         action("Systemstatus", "Verbindungen, Modelle und Betrieb prüfen.", "Status öffnen", "tools"),
         `<div class="settings-row"><div class="settings-row-copy"><strong>${t("Rechtliches")}</strong><span>${t("Anbieter und Datenschutz.")}</span></div><div class="settings-links"><a href="/impressum.html">${t("Impressum")}</a><a href="/datenschutz.html">${t("Datenschutz")}</a></div></div>`])}
-    </div></div><div hidden aria-hidden="true"><button id="saveSettings" type="button"></button><button id="showOfflinePage" type="button"></button><button id="showErrorPage" type="button"></button><div id="settingsOutput"></div></div>`;
+    </div></div>`;
+  // Hier standen bis 2026-07-28 drei leere Platzhalter-Knoepfe (#saveSettings,
+  // #showOfflinePage, #showErrorPage) und #settingsOutput. Sie waren nur da,
+  // damit bindSettings() in app.js nicht auf null lief, nachdem diese Funktion
+  // die #settings-Sektion aus index.html per innerHTML ersetzt hat. Die
+  // zugehoerigen Handler sind entfernt; gespeichert wird von save() hier im
+  // Modul (Autosave, Anzeige an #settingsSaveStatus). #settingsLanguage und
+  // #settingsMode erzeugt diese Funktion selbst — bindSettings() belegt sie
+  // weiterhin vor und findet sie deshalb.
 }
 
 function panel(id, title, description, rows) {

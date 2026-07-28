@@ -390,19 +390,31 @@ function toggleMenu(entry, trigger) {
   trigger.closest(".msg-actions")?.append(menu);
   trigger.setAttribute("aria-expanded", "true");
   openMenu = { menu, trigger };
-  placeMenu(menu);
+  placeMenu(menu, trigger);
   menu.querySelector(".msg-menu-item")?.focus();
 }
 
 // Das Chat-Log scrollt (overflow: auto). Bei der letzten Nachricht wuerde ein
-// nach unten geoeffnetes Menue abgeschnitten — dann klappt es nach oben.
-function placeMenu(menu) {
+// nach unten geoeffnetes Menue unten abgeschnitten — dann klappt es nach oben.
+//
+// Live-Befund 2026-07-28: nach oben klappen darf nur, wer oben auch Platz hat.
+// Bei der ERSTEN Nachricht im Log war unten zu wenig Raum, oben aber genauso
+// wenig — das Menue klappte hoch und wurde am oberen Rand abgeschnitten. Es
+// werden deshalb beide Seiten gemessen; reicht keine, bleibt es unten und der
+// Nutzer scrollt im Log dorthin.
+const MENU_LUFT = 8;
+
+function placeMenu(menu, trigger) {
   try {
     const container = log();
-    if (!container || typeof menu.getBoundingClientRect !== "function") return;
-    const menuBox = menu.getBoundingClientRect();
+    const bar = trigger?.closest?.(".msg-actions");
+    if (!container || !bar || typeof menu.getBoundingClientRect !== "function") return;
     const containerBox = container.getBoundingClientRect();
-    if (menuBox.bottom > containerBox.bottom && menuBox.height < containerBox.height) {
+    const barBox = bar.getBoundingClientRect();
+    const hoehe = menu.getBoundingClientRect().height;
+    const platzUnten = containerBox.bottom - barBox.bottom;
+    const platzOben = barBox.top - containerBox.top;
+    if (platzUnten < hoehe + MENU_LUFT && platzOben >= hoehe + MENU_LUFT) {
       menu.classList.add("is-up");
     }
   } catch {
