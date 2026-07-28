@@ -1,3 +1,8 @@
+// v160 -> v161 (2026-07-28): CSP-Haertung — static-pages.css neu im Precache.
+// Die 20 statischen Seiten (Rechtstexte, 404, Sprach-Startseiten) laden ihren
+// Stil jetzt per <link> aus /assets/static-pages.css statt als <style>-Block;
+// der eigene Node-Server sendet style-src 'self' und blockierte Inline-Stil.
+// Ohne Precache waeren diese Seiten offline unformatiert.
 // v159 -> v160 (2026-07-28): QA-Welle 1, Befund F-24 — cache-first fuer die
 // Precache-Dateien. Bisher war ALLES network-first: die ~95 vorab gespeicherten
 // Dateien wurden online bei jedem Aufruf erneut angefragt (gemessen: 104
@@ -129,10 +134,11 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v160";
+const CACHE_NAME = "smejj-shell-v161";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
+  "/assets/static-pages.css",
   "/assets/deferred-start.js",
   "/assets/google-login.js",
   "/assets/free-coding-fallback.js",
