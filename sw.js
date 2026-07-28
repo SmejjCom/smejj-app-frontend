@@ -1,3 +1,8 @@
+// v153 -> v154 (2026-07-28): view-title.js neu im Shell-Cache. PFLICHT, keine
+// Kosmetik: app.js importiert das Modul (Seitentitel je Ansicht, QA-Welle 2
+// Befund W2-05). Ohne Precache findet der Import offline nichts, der
+// Fetch-Handler liefert als Fallback "/" und der Browser bricht app.js
+// komplett ab — die App waere offline tot (siehe v130-Hinweis).
 // v147 -> v148 (2026-07-27): Stufe 2 — browser-context.js im Precache; Seiten-
 // inhalt einer im Auftrag genannten Adresse geht in den Modellkontext.
 // v146 -> v147 (2026-07-27): Startseite antwortet im Gespraechsfaden statt auf
@@ -65,6 +70,11 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
+// v153 -> v154 (2026-07-28): Logikfehler in deferred-start.js behoben. Der
+// Rueckfallweg (zwei rAF + setTimeout) rannte per Promise.race GEGEN die
+// Paint-Beobachtung — und war beim warmen Wiederbesuch schneller als der echte
+// Bildaufbau: sechs Aufrufe bei 112 ms, Bildaufbau erst bei 140 ms. Der
+// Rueckfall gilt jetzt nur noch, wenn es PerformanceObserver gar nicht gibt.
 // v152 -> v153 (2026-07-28): PFLICHT, keine Kosmetik. Sieben importierte Module
 // fehlten im Precache — darunter chat-history-context.js, das app.js SELBST
 // importiert. Offline lieferte der Fetch-Handler dafuer den Rueckfall "/"
@@ -94,7 +104,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v153";
+const CACHE_NAME = "smejj-shell-v154";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -121,6 +131,7 @@ const SHELL = [
   "/assets/chat-markdown.js",
   "/assets/frame-guard.js",
   "/assets/app.js",
+  "/assets/view-title.js",
   "/assets/left-menu-state.js",
   "/assets/panel-backdrop.js",
   "/assets/premium-surfaces.js",

@@ -37,8 +37,17 @@ export async function afterFirstPaint(tasks, { timeoutMs = DEFAULT_TIMEOUT_MS, s
   }
 }
 
+// Wichtig: Der Rueckfallweg darf NICHT gegen die Paint-Beobachtung rennen.
+// Genau das war der Fehler in v152 — `Promise.race` liess den schnelleren
+// gewinnen, und zwei rAF plus setTimeout sind bei einem warmen Wiederbesuch
+// schneller als der echte Bildaufbau. Live gemessen: sechs Aufrufe bei 112 ms,
+// Bildaufbau erst bei 140 ms. Der Rueckfall gilt nur, wenn es die Beobachtung
+// gar nicht gibt. Das Zeitlimit bleibt als einziger Notausgang.
 function waitForPaint(scope, timeoutMs) {
-  return Promise.race([firstContentfulPaint(scope), rafThenTask(scope), delay(scope, timeoutMs)]);
+  const gemalt = typeof scope.PerformanceObserver === "function"
+    ? firstContentfulPaint(scope)
+    : rafThenTask(scope);
+  return Promise.race([gemalt, delay(scope, timeoutMs)]);
 }
 
 // Genaueste Quelle: der Browser meldet den ersten Inhaltsaufbau selbst.
