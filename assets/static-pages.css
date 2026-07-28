@@ -43,6 +43,11 @@ html.p-recht main {
 }
 html.p-recht h1 { font-size: 1.8rem; margin-bottom: 0.2em; overflow-wrap: break-word; hyphens: auto; }
 html.p-recht h2 { font-size: 1.15rem; margin-top: 2em; }
+/* Lange deutsche Woerter ("Datenschutzerklaerung") sprengen bei starkem Zoom
+ * die Zeile: bei 200 % auf einem 390-px-Handy bleiben 195 CSS-px, das Wort
+ * braucht mehr. Ohne Umbruch entsteht Querscrollen auf der ganzen Seite
+ * (gemessen live, 2026-07-28). Gilt fuer alle Seiten mit p-recht. */
+html.p-recht p, html.p-recht dd, html.p-recht li { overflow-wrap: break-word; }
 html.p-recht h3 { font-size: 1rem; margin-top: 1.4em; }
 html.p-recht a { color: #8fc7ff; }
 /* min-height: der Logo-Link mass 30x23 px und blieb damit 1 px unter der
