@@ -1,13 +1,29 @@
-// v178 -> v179 (2026-07-28): Spurwahl und Zeitbudget. Die Tiefspur wird nur
-// noch gewaehlt, wenn die Seite NICHT geladen werden konnte; sonst steht ihr
-// Inhalt schon in der Frage und die Schnellspur ist rund zehnmal schneller
-// (gemessen 0,49-1,01 s statt 4,9-7,8 s bei 6,5 s Limit). fetch-retry.js gibt
-// der Tiefspur ein eigenes Budget.
-// v177 -> v178 (2026-07-28): Quellenliste sagt "1 Seite fuer diese Frage
-// geladen" statt "1 Quelle" — gegroundet wird die Frage, nicht die Antwort.
+// v179 -> v180 (2026-07-28): Kimi K3 im Modell-Menue. Der Picker im Eingabefeld
+// ist eine fest verdrahtete Liste (index.html + MODEL_MODES in app.js) — die
+// Server-Registry kannte K3 laengst, der Nutzer kam ueber die Oberflaeche aber
+// nicht heran. Ein Menueeintrag, eine Zeile Zuordnung, sonst nichts: Startseite,
+// Eingabefeld und Design bleiben unveraendert. Freigabe des Betreibers lag vor.
+//
+// v178 -> v179 (2026-07-28): Spurwahl und Zeitbudget. Gemessen gegen die
+// Live-Bridge: Schnellspur 0,49-1,01 s bis zum ersten Byte, Tiefspur 4,9-7,8 s —
+// bei einem gemeinsamen Limit von 6,5 s in fetch-retry.js. Deshalb endeten
+// ausgerechnet Fragen MIT Web-Adresse oft in "Verbindung zum Server
+// unterbrochen". browser-context.js waehlt die Tiefspur jetzt nur noch, wenn die
+// Seite NICHT geladen werden konnte (sonst steht ihr Inhalt schon in der Frage
+// und die Schnellspur liest ihn mit); fetch-retry.js gibt der Tiefspur ein
+// eigenes Budget. Beide Dateien liegen cache-first im Precache.
+// v177 -> v178 (2026-07-28): Ehrlichere Beschriftung der Quellenliste.
+// Gegroundet wird die FRAGE. Scheitert der Antwortstrom danach (live erlebt:
+// "Verbindung zum Server unterbrochen"), waere "Quellen dieser Antwort" eine
+// Behauptung, die nicht stimmt. Jetzt "1 Seite fuer diese Frage geladen".
 // v176 -> v177 (2026-07-28): "Quellen anzeigen" pro Antwort. browser-context.js
-// merkt sich, WELCHE Seite es geladen hat; chat-actions.js ordnet sie ueber die
-// Frage davor zu und zeigt sie unter der Antwort. Nur bei echtem Grounding.
+// merkt sich jetzt, WELCHE Seite es geladen hat (vorher wurde die Herkunft nach
+// dem Einweben in die Frage verworfen); chat-actions.js ordnet sie ueber die
+// Frage davor zu und zeigt sie auf Wunsch unter der Antwort. Der Menuepunkt
+// erscheint nur bei echtem Grounding. browser-context.js, chat-actions.js,
+// chat-actions-menu.js, chat-messages.js, chat-store.js und start-styles.css
+// liegen cache-first im Precache — ohne Versionssprung erreicht die Aenderung
+// Bestandsnutzer nicht.
 // v175 -> v176 (2026-07-28): static-pages.css — Wortumbruch fuer lange Woerter.
 // Bei 200 %% Zoom auf einem 390-px-Handy (195 CSS-px) sprengte
 // "Datenschutzerklaerung" die Zeile und erzeugte Querscrollen auf der ganzen Seite.
@@ -225,7 +241,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v179";
+const CACHE_NAME = "smejj-shell-v180";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

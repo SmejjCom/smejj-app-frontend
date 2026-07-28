@@ -44,6 +44,9 @@ const MODEL_MODES = Object.freeze({
   // werden unter Einstellungen -> KI-Provider (/ai) verwaltet.
   "smejj 1.0": AI_MODES.disabled,
   "GLM-5.2": AI_MODES.glm52Vault, "Kimi K2.7": AI_MODES.kimiK27Vault,
+  // K3 hat keinen Modell-Vault (nur API) und laeuft ueber einen Anbieter-Key —
+  // darum byok wie Cline, nicht *Vault wie GLM-5.2 und K2.7.
+  "Kimi K3": AI_MODES.byok,
   "Cline": AI_MODES.byok
 });
 
