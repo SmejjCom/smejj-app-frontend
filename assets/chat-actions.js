@@ -291,7 +291,9 @@ function toMessage(entry) {
     raw: meta.raw,
     createdAt: meta.createdAt,
     model: meta.model,
-    rating: meta.rating
+    rating: meta.rating,
+    versions: meta.versions,
+    active: meta.active
   };
 }
 

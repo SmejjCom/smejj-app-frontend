@@ -3018,6 +3018,12 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
   position: relative;
   display: flex;
   align-items: center;
+  /* Umbrechen statt quetschen. Gemessen 2026-07-28 auf 375 px mit Touch-Maßen:
+     fuenf Aktionen, zwei Versionspfeile und das Label "Version 2 von 3" ergeben
+     rund 366 px und Flexbox schrumpfte die Knoepfe von 42 auf 37 px — unter das
+     Touch-Ziel des Projekts. Jetzt wandert der Versionswaehler in eine zweite
+     Zeile und die Knoepfe behalten ihre Groesse. */
+  flex-wrap: wrap;
   gap: 2px;
   margin: -3px 0 2px;
   max-width: min(980px, 100%);
@@ -3037,6 +3043,8 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /* Nie schrumpfen: ein Touch-Ziel, das sich der Zeile anpasst, ist keins. */
+  flex: 0 0 auto;
   width: 42px;
   height: 42px;
   min-height: 42px;

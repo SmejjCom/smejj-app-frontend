@@ -132,9 +132,22 @@ export function rawOf(entry) {
 }
 
 /**
+ * Zeiger auf die angezeigte Fassung in eine gueltige Position bringen.
+ * Wurden beim Speichern alte Fassungen abgeschnitten, verschiebt sich der
+ * Zeiger mit — sonst zeigte der Waehler auf eine Fassung, die es nicht gibt.
+ * @param {number} index
+ * @param {number} length
+ * @returns {number}
+ */
+export function clampVersionIndex(index, length) {
+  if (!Number.isFinite(index) || !Number.isFinite(length) || length <= 0) return 0;
+  return Math.max(0, Math.min(Math.trunc(index), length - 1));
+}
+
+/**
  * Metadaten von aussen setzen (Wiederherstellung aus dem Verlauf-Speicher).
  * @param {Element} entry
- * @param {{raw?: string, createdAt?: string, model?: string, versions?: Array, rating?: string}} seed
+ * @param {{raw?: string, createdAt?: string, model?: string, versions?: Array, active?: number, rating?: string}} seed
  */
 export function seedMeta(entry, seed = {}) {
   const meta = metaOf(entry);
@@ -142,8 +155,14 @@ export function seedMeta(entry, seed = {}) {
   if (seed.raw) meta.raw = String(seed.raw);
   if (seed.createdAt) meta.createdAt = String(seed.createdAt);
   if (seed.model) meta.model = String(seed.model);
-  if (Array.isArray(seed.versions)) meta.versions = seed.versions;
   if (seed.rating) meta.rating = String(seed.rating);
+  if (Array.isArray(seed.versions)) {
+    meta.versions = seed.versions
+      .filter((version) => version && typeof version === "object")
+      .map((version) => ({ raw: String(version.raw || ""), html: String(version.html || "") }));
+    const gewuenscht = Number.isInteger(seed.active) ? seed.active : meta.versions.length - 1;
+    meta.active = clampVersionIndex(gewuenscht, meta.versions.length);
+  }
 }
 
 /**

@@ -17,7 +17,7 @@ import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und
 // Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
 // Verlauf kein Markdown kopieren und keinen Zeitstempel zeigen.
-import { metaOf, seedMeta } from "/assets/chat-messages.js?v=1";
+import { clampVersionIndex, metaOf, seedMeta } from "/assets/chat-messages.js?v=1";
 
 const DB_NAME = "smejj-chats";
 const DB_VERSION = 1;
@@ -27,6 +27,11 @@ const ACTIVE_KEY_LAST = "smejj.chat.lastActiveId.v1";
 const MAX_CHATS = 100;
 const MAX_TITLE = 60;
 const SAVE_DEBOUNCE_MS = 600;
+// Obergrenze fuer gespeicherte Antwort-Fassungen je Nachricht (2026-07-28).
+// Jede Fassung traegt Rohtext UND gerendertes HTML; ohne Grenze waechst der
+// lokale Speicher bei haeufigem "Neu generieren" unbegrenzt. Acht Fassungen
+// deckt jede realistische Nutzung ab; aeltere fallen der Reihe nach weg.
+const MAX_VERSIONS = 8;
 
 let dbPromise = null;
 let saveTimer = null;
@@ -94,6 +99,14 @@ function readEntries() {
   if (!log) return [];
   return Array.from(log.querySelectorAll(":scope > .entry")).map((node) => {
     const meta = metaOf(node) || {};
+    // Die jüngsten Fassungen behalten: sie sind die, zwischen denen ein Nutzer
+    // noch wechselt. Der Zeiger wird auf die gekuerzte Liste umgerechnet.
+    const alle = Array.isArray(meta.versions) ? meta.versions : [];
+    const versions = alle.slice(-MAX_VERSIONS).map((version) => ({
+      raw: String(version?.raw || ""),
+      html: String(version?.html || "")
+    }));
+    const verworfen = alle.length - versions.length;
     return {
       role: node.classList.contains("user") ? "user" : "assistant",
       text: String(node.textContent || ""),
@@ -101,7 +114,9 @@ function readEntries() {
       raw: String(meta.raw || ""),
       createdAt: String(meta.createdAt || ""),
       model: String(meta.model || ""),
-      rating: String(meta.rating || "")
+      rating: String(meta.rating || ""),
+      versions,
+      active: clampVersionIndex((Number(meta.active) || 0) - verworfen, versions.length)
     };
   }).filter((entry) => entry.text.trim().length > 0);
 }
@@ -241,7 +256,10 @@ function renderEntriesInto(log, messages) {
         raw: message.raw || (message.role === "assistant" && message.html ? "" : message.text),
         createdAt: message.createdAt,
         model: message.model,
-        rating: message.rating
+        rating: message.rating,
+        // Fassungen mitgeben, damit "Version 2 von 3" ein Neuladen ueberlebt.
+        versions: message.versions,
+        active: message.active
       });
     }
     log.hidden = messages.length === 0;

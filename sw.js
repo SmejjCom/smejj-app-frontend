@@ -1,3 +1,11 @@
+// v169 -> v171 (2026-07-28): Antwort-Fassungen ueberleben ein Neuladen
+// (chat-store.js speichert versions + active, Obergrenze acht) und die
+// Aktionsleiste bricht um statt die Touch-Ziele auf 37 px zu quetschen
+// (start-styles.css). chat-store.js, chat-messages.js, chat-actions.js und
+// start-styles.css liegen cache-first im Precache — ohne Versionssprung
+// erreicht die Aenderung Bestandsnutzer nicht.
+// v170 ist von einer parallel laufenden Aufgabe belegt (Statusseite) und noch
+// nicht live; deshalb springt dieser Stand von v169 direkt auf v171.
 // v168 -> v169 (2026-07-28): Nachbesserung am Ueberlaufmenue der
 // Nachrichten-Aktionen (Live-Befund). Das Menue lag in der Aktionsleiste und
 // damit in #startLog, das overflow: auto hat — bei der ersten Antwort passte es
@@ -184,7 +192,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v169";
+const CACHE_NAME = "smejj-shell-v171";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
