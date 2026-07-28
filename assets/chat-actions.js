@@ -22,7 +22,7 @@
 // Fail-safe: jeder Fehler bleibt lokal; der Chat funktioniert unveraendert
 // weiter (Non-Regression-Pflicht). Kein Netzverkehr, keine Serverlast.
 
-import { addVersion, entriesFrom, entriesUpTo, isEntry, metaOf, nextAssistantEntry, nodesFrom, observeLog, previousUserEntry, rawOf, roleOf, setRating } from "/assets/chat-messages.js?v=1";
+import { addVersion, entriesUpTo, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=1";
 import { barSpecFor, buildMenu, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=1";
 import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=1";
 import { createChatFrom, openChat } from "/assets/chat-store.js?v=verlauf-20260721";
@@ -196,29 +196,21 @@ function resubmit(text) {
   return true;
 }
 
-// Fassungen der bisherigen Antwort merken, damit sie nach dem neuen Lauf als
-// Version 1 erreichbar bleibt. Bearbeiten und Neu generieren loeschen nichts.
-function stashVersions(assistantEntry) {
-  if (!assistantEntry) {
-    pendingVersions = [];
-    return;
-  }
-  const meta = metaOf(assistantEntry);
-  pendingVersions = meta.versions.length
-    ? meta.versions.slice()
-    : [{ raw: rawOf(assistantEntry), html: assistantEntry.innerHTML }];
+// Plan anwenden: Fassungen merken, Knoten entfernen, Frage erneut senden.
+// Die Entscheidung selbst liegt in chat-messages.js und ist dort geprueft.
+function applyResubmitPlan(plan) {
+  pendingVersions = plan.stash;
+  for (const node of plan.entfernen) node.remove();
+  if (!resubmit(plan.text)) pendingVersions = null;
 }
 
 function regenerate(entry) {
-  const question = previousUserEntry(entry);
-  if (!question) {
+  const plan = planRegenerate(entry);
+  if (!plan.ok) {
     showToast("Zu dieser Antwort gibt es keine Frage im Verlauf.", "warn");
     return;
   }
-  stashVersions(entry);
-  const text = rawOf(question);
-  for (const node of nodesFrom(question)) node.remove();
-  if (!resubmit(text)) pendingVersions = null;
+  applyResubmitPlan(plan);
 }
 
 function startEdit(entry) {
@@ -255,16 +247,14 @@ function cancelEdit(editor) {
 
 function commitEdit(editor) {
   const entry = entryById(editor.dataset.for);
-  const text = editor.querySelector("textarea")?.value?.trim() || "";
-  if (!entry || !text) {
+  const plan = planEdit(entry, editor.querySelector("textarea")?.value);
+  if (!plan.ok) {
     cancelEdit(editor);
     return;
   }
-  stashVersions(nextAssistantEntry(entry));
   editor.remove();
   entry.classList.remove("is-editing");
-  for (const node of nodesFrom(entry)) node.remove();
-  if (!resubmit(text)) pendingVersions = null;
+  applyResubmitPlan(plan);
 }
 
 function speakEntry(entry) {
@@ -322,23 +312,16 @@ function clearUndo() {
 function removeFrom(entry) {
   const container = log();
   if (!container) return;
-  const nodes = nodesFrom(entry);
-  const anchor = entry.previousElementSibling;
-  const count = nodes.filter(isEntry).length;
-  for (const node of nodes) node.remove();
+  const plan = planRemoval(entry);
+  for (const node of plan.nodes) node.remove();
   clearUndo();
   const bar = document.createElement("div");
   bar.className = "msg-undo";
   bar.setAttribute("role", "status");
-  bar.innerHTML = `<span>${count === 1 ? "1 Nachricht gelöscht" : `${count} Nachrichten gelöscht`}</span>`
+  bar.innerHTML = `<span>${plan.anzahl === 1 ? "1 Nachricht gelöscht" : `${plan.anzahl} Nachrichten gelöscht`}</span>`
     + '<button type="button" class="msg-undo-button" data-act="undo">Rückgängig</button>';
   container.append(bar);
-  undoState = {
-    bar,
-    nodes,
-    anchor,
-    timer: setTimeout(clearUndo, UNDO_MS)
-  };
+  undoState = { bar, nodes: plan.nodes, anchor: plan.anker, timer: setTimeout(clearUndo, UNDO_MS) };
   container.hidden = !container.querySelector(".entry");
 }
 
@@ -348,12 +331,7 @@ function undoRemoval() {
   const container = log();
   clearUndo();
   if (!container) return;
-  let cursor = anchor;
-  for (const node of nodes) {
-    if (cursor) cursor.after(node);
-    else container.prepend(node);
-    cursor = node;
-  }
+  restoreNodes(container, nodes, anchor);
   container.hidden = false;
   refreshBars();
 }
@@ -447,9 +425,7 @@ function moveMenuFocus(step) {
   if (!openMenu) return;
   const items = Array.from(openMenu.menu.querySelectorAll(".msg-menu-item"));
   if (!items.length) return;
-  const current = items.indexOf(document.activeElement);
-  const next = (current + step + items.length) % items.length;
-  items[next].focus();
+  items[nextMenuIndex(items.indexOf(document.activeElement), step, items.length)].focus();
 }
 
 // --- Verdrahtung ------------------------------------------------------------
@@ -520,17 +496,12 @@ function onSettled() {
   if (!pendingVersions) return;
   const busy = document.body.classList.contains("task-indicator-active")
     && !document.body.classList.contains("task-indicator-done");
-  if (busy) return;
-  const entries = Array.from(log()?.querySelectorAll(":scope > .entry") || []);
-  const last = entries[entries.length - 1];
-  if (!last || roleOf(last) !== "assistant" || last.dataset.thinking === "true") return;
-  const raw = rawOf(last);
-  if (!raw.trim()) return;
-  const meta = metaOf(last);
-  meta.versions = pendingVersions.slice();
+  const plan = planSettle(Array.from(log()?.querySelectorAll(":scope > .entry") || []), busy);
+  if (!plan.ok) return;
+  metaOf(plan.ziel).versions = pendingVersions.slice();
   pendingVersions = null;
-  addVersion(last, { raw, html: last.innerHTML });
-  ensureBar(last);
+  addVersion(plan.ziel, { raw: plan.raw, html: plan.ziel.innerHTML });
+  ensureBar(plan.ziel);
 }
 
 function onLogChanged(entries) {

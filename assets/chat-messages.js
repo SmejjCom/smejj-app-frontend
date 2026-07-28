@@ -272,6 +272,131 @@ export function listEntries(log) {
   return Array.from(log.querySelectorAll(":scope > .entry")).map((entry) => ({ entry, meta: metaOf(entry) }));
 }
 
+// --- Ableitungen fuer die Aktionen ------------------------------------------
+//
+// Diese Funktionen entscheiden, WAS passiert; das Anwenden auf das DOM bleibt in
+// chat-actions.js. Getrennt, weil chat-actions.js seine Abhaengigkeiten ueber
+// absolute /assets/-Pfade laedt (sonst entstehen zweite Modulinstanzen) und
+// deshalb in node nicht importierbar ist. So sind Loeschen, Bearbeiten,
+// Neu generieren und der Versionswechsel echt pruefbar statt nur als
+// Quelltext-Muster.
+
+/**
+ * Welche Fassungen muessen gesichert werden, bevor eine Antwort ersetzt wird?
+ * Hat die Antwort noch keine Fassungsliste, wird sie selbst zur ersten Fassung.
+ * @param {Element|null} assistantEntry
+ * @returns {Array<{raw: string, html: string}>}
+ */
+export function versionsToStash(assistantEntry) {
+  if (!assistantEntry) return [];
+  const meta = metaOf(assistantEntry);
+  if (meta.versions.length) return meta.versions.slice();
+  return [{ raw: rawOf(assistantEntry), html: String(assistantEntry.innerHTML || "") }];
+}
+
+/**
+ * "Neu generieren": dieselbe Frage erneut stellen.
+ * @param {Element} entry - die Antwort, auf die geklickt wurde
+ * @returns {{ok: false, grund: string}|{ok: true, text: string, stash: Array, entfernen: Element[]}}
+ */
+export function planRegenerate(entry) {
+  const frage = previousUserEntry(entry);
+  if (!frage) return { ok: false, grund: "keine_frage" };
+  return {
+    ok: true,
+    text: rawOf(frage),
+    stash: versionsToStash(entry),
+    // Die Frage wird mit entfernt: das erneute Senden legt sie neu an.
+    entfernen: nodesFrom(frage)
+  };
+}
+
+/**
+ * "Bearbeiten" absenden: geaenderte Frage erneut stellen, alte Antwort sichern.
+ * @param {Element} entry - die eigene Nachricht
+ * @param {string} text - der bearbeitete Text
+ * @returns {{ok: false, grund: string}|{ok: true, text: string, stash: Array, entfernen: Element[]}}
+ */
+export function planEdit(entry, text) {
+  const sauber = String(text || "").trim();
+  if (!entry || !sauber) return { ok: false, grund: "leer" };
+  return {
+    ok: true,
+    text: sauber,
+    stash: versionsToStash(nextAssistantEntry(entry)),
+    entfernen: nodesFrom(entry)
+  };
+}
+
+/**
+ * "Ab hier loeschen": was verschwindet, und wo wird es beim Rueckgaengig wieder
+ * eingehaengt?
+ * @param {Element} entry
+ * @returns {{nodes: Element[], anker: Element|null, anzahl: number}}
+ */
+export function planRemoval(entry) {
+  const nodes = nodesFrom(entry);
+  return {
+    nodes,
+    anker: entry?.previousElementSibling || null,
+    anzahl: nodes.filter(isEntry).length
+  };
+}
+
+/**
+ * Rueckgaengig: Knoten in ihrer alten Reihenfolge wieder einhaengen.
+ * @param {Element} container
+ * @param {Element[]} nodes
+ * @param {Element|null} anker - Knoten, hinter dem eingefuegt wird (null = ganz vorn)
+ * @returns {number} Anzahl wieder eingehaengter Knoten
+ */
+export function restoreNodes(container, nodes, anker) {
+  if (!container || !Array.isArray(nodes)) return 0;
+  let cursor = anker;
+  let anzahl = 0;
+  for (const node of nodes) {
+    if (cursor) cursor.after(node);
+    else container.prepend(node);
+    cursor = node;
+    anzahl += 1;
+  }
+  return anzahl;
+}
+
+/**
+ * Nachbarindex in einem Menue, umlaufend.
+ * @param {number} current - aktueller Index, -1 wenn nichts fokussiert ist
+ * @param {number} step - +1 oder -1
+ * @param {number} length
+ * @returns {number}
+ */
+export function nextMenuIndex(current, step, length) {
+  if (!Number.isFinite(length) || length <= 0) return 0;
+  const aktuell = Number(current);
+  // Kein Punkt fokussiert (indexOf liefert -1): Pfeil-ab beginnt oben,
+  // Pfeil-auf unten. Ohne diesen Fall landete Pfeil-auf auf dem VORLETZTEN
+  // Punkt — gefunden beim Schreiben der Verhaltenstests 2026-07-28.
+  if (!Number.isInteger(aktuell) || aktuell < 0) return step > 0 ? 0 : length - 1;
+  return ((aktuell + step) % length + length) % length;
+}
+
+/**
+ * Traegt die neueste Antwort ihre gemerkten Fassungen? Entscheidet, ob nach dem
+ * Ende eines Streams die Versionsliste gesetzt werden darf.
+ * @param {Element[]} entries - alle Nachrichten des Logs
+ * @param {boolean} busy - laeuft noch eine Aufgabe?
+ * @returns {{ok: false, grund: string}|{ok: true, ziel: Element, raw: string}}
+ */
+export function planSettle(entries, busy) {
+  if (busy) return { ok: false, grund: "laeuft_noch" };
+  const last = Array.isArray(entries) ? entries[entries.length - 1] : null;
+  if (!last || roleOf(last) !== "assistant") return { ok: false, grund: "keine_antwort" };
+  if (last.dataset?.thinking === "true") return { ok: false, grund: "denkt_noch" };
+  const raw = rawOf(last);
+  if (!raw.trim()) return { ok: false, grund: "leer" };
+  return { ok: true, ziel: last, raw };
+}
+
 /**
  * Beobachter starten: sichert Rohtexte, waehrend der Stream laeuft.
  * @param {Element} log - der Chat-Container (#startLog)

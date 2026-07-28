@@ -1,3 +1,10 @@
+// v172 -> v174 (2026-07-28): Die Entscheidungen der Nachrichten-Aktionen
+// (Loeschen, Rueckgaengig, Bearbeiten, Neu generieren, Menue-Tastatur,
+// Versionswechsel) liegen jetzt als pruefbare Funktionen in chat-messages.js;
+// chat-actions.js wendet sie nur noch an. Kein Verhaltenswechsel ausser einem
+// dabei gefundenen Randfall: Pfeil-auf ohne fokussierten Menuepunkt landete auf
+// dem VORLETZTEN statt dem letzten Punkt. Beide Dateien liegen cache-first im
+// Precache.
 // v171 -> v172 (2026-07-28): Pflicht-Sprung. Die Statusseite (status.html,
 // status.js) kam in denselben v171 wie die Chat-Fassungen einer parallelen
 // Sitzung — zwei verschiedene Precache-Listen unter EINEM Cache-Namen. Wer v171
@@ -200,7 +207,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v172";
+const CACHE_NAME = "smejj-shell-v174";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
