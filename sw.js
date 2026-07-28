@@ -1,3 +1,9 @@
+// v167 -> v168 (2026-07-28): Live-Fehler behoben — app.js benutzte PANEL_WIDTHS,
+// ohne es zu kennen. Bei der Aufteilung wanderte die Konstante nach
+// panel-layout.js, wurde dort aber nicht exportiert. Folge: JEDES Auf- und
+// Zuklappen der Seitenleiste warf "PANEL_WIDTHS is not defined", und
+// syncLeftMenuState/syncBackdrop liefen danach nicht mehr. Beide Dateien
+// liegen im Precache und brauchen den Versionssprung.
 // v166 -> v167 (2026-07-28): Nachbesserung am Ueberlaufmenue der
 // Nachrichten-Aktionen (Live-Befund): es klappte auch dann nach oben, wenn dort
 // gar kein Platz war, und wurde am oberen Rand des Chat-Logs abgeschnitten.
@@ -170,7 +176,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v167";
+const CACHE_NAME = "smejj-shell-v168";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

@@ -18,7 +18,7 @@ import { initGoogleLogin } from "./google-login.js";
 import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
 import { bindUploads, validateBrowserUpload } from "./uploads-surface.js";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
-import { bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js";
+import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
 import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js";
 import { applyViewTitle } from "./view-title.js";

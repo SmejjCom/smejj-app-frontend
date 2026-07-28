@@ -9,7 +9,12 @@ const PANEL_WIDTH_KEYS = Object.freeze({
   left: "smejj.ui.leftPanelWidth.v9",
   right: "smejj.ui.rightPanelWidth.v9"
 });
-const PANEL_WIDTHS = Object.freeze({
+// Exportiert seit 2026-07-28: public/app.js benutzt PANEL_WIDTHS in
+// setMenuOpen und setBrowserPanelOpen, hat die Konstante bei der Aufteilung
+// aber nicht mitbekommen. Live warf jedes Auf- und Zuklappen deshalb
+// "PANEL_WIDTHS is not defined" — und der Rest der Funktion
+// (syncLeftMenuState, syncBackdrop) lief danach nicht mehr.
+export const PANEL_WIDTHS = Object.freeze({
   default: 200,
   compact: 96,
   min: 188,
