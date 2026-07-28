@@ -14,6 +14,13 @@ import { routeAutonomousRequest } from "./autonomous-intent.js";
 import { collectConversationHistory } from "./chat-history-context.js";
 import { groundTask } from "./browser-context.js";
 import { afterFirstPaint } from "./deferred-start.js";
+import { initGoogleLogin } from "./google-login.js";
+import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
+import { bindUploads, validateBrowserUpload } from "./uploads-surface.js";
+import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
+import { bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js";
+import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
+import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js";
 import { applyViewTitle } from "./view-title.js";
 import { getJson, postJson } from "./shared/http-json.js";
 const $ = (selector) => document.querySelector(selector);
@@ -32,18 +39,6 @@ const state = {
 const workspace = createLocalWorkspace();
 const aiRouter = createAiRouter();
 let taskIndicatorTimer;
-const PANEL_WIDTH_KEYS = Object.freeze({
-  left: "smejj.ui.leftPanelWidth.v9",
-  right: "smejj.ui.rightPanelWidth.v9"
-});
-const PANEL_WIDTHS = Object.freeze({
-  default: 200,
-  compact: 96,
-  min: 188,
-  close: 10,
-  max: 520,
-  centerMin: 120
-});
 const MODEL_MODES = Object.freeze({
   // Nur echte Modelle im Picker; Verbindungsarten (local browser, BYOK)
   // werden unter Einstellungen -> KI-Provider (/ai) verwaltet.
@@ -51,64 +46,18 @@ const MODEL_MODES = Object.freeze({
   "GLM-5.2": AI_MODES.glm52Vault, "Kimi K2.7": AI_MODES.kimiK27Vault,
   "Cline": AI_MODES.byok
 });
-const UPLOAD_LIMITS = Object.freeze({
-  maxBytes: 1_000_000,
-  maxCount: 8,
-  allowedTypes: new Set([
-    "application/json",
-    "image/svg+xml",
-    "text/css",
-    "text/html",
-    "text/javascript",
-    "text/markdown",
-    "text/plain"
-  ])
-});
-const VIEW_ALIASES = Object.freeze({
-  chat: "start",
-  home: "start",
-  providers: "ai",
-  provider: "ai",
-  storage: "storageView"
-});
-const ALIAS_PATHS = Object.freeze({
-  chat: "/",
-  home: "/",
-  providers: "/ai",
-  provider: "/ai",
-  storage: "/storage"
-});
-const VIEW_PATHS = Object.freeze({
-  start: "/",
-  search: "/search",
-  websites: "/websites",
-  smejjClaw: "/smejj-claw",
-  automation: "/automation",
-  chatHistory: "/chat-history",
-  browser: "/browser",
-  code: "/code",
-  projects: "/projects",
-  files: "/files",
-  storageView: "/storage",
-  memory: "/memory",
-  ai: "/ai",
-  cost: "/cost",
-  tools: "/status",
-  settings: "/settings",
-  profile: "/profile",
-  offline: "/offline",
-  error: "/error"
-});
-const PATH_VIEWS = Object.freeze({
-  ...Object.fromEntries(Object.entries(VIEW_PATHS).map(([viewId, path]) => [path, viewId])),
-  "/chat": "start"
-});
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
 boot();
+
+// Buendelt, was projects-surface.js aus der App braucht — eine Stelle statt neun.
+function projektAbhaengigkeiten() {
+  const basis = { $, state, workspace, showToast, writeOutput };
+  return { ...basis, renderProjectCards, renderEmptyState, ensureProject: () => ensureProject(basis), refreshLocalWorkspaceStatus: () => refreshLocalWorkspaceStatus(basis) };
+}
 
 function boot() {
   restorePanelWidths();
@@ -118,11 +67,11 @@ function boot() {
   bindSearch();
   bindSidebarActions();
   bindCodeTools();
-  bindLocalWorkspace();
-  bindUploads();
+  bindLocalWorkspace(projektAbhaengigkeiten());
+  bindUploads({ $, state, writeOutput });
   bindMemory();
   bindAi();
-  bindProjects();
+  bindProjects(projektAbhaengigkeiten());
   enhancePremiumSurfaces();
   bindStoragePanel();
   bindCost();
@@ -131,12 +80,12 @@ function boot() {
   bindProfile();
   bindModelPicker();
   hydrateProfile();
-  refreshProjectList().catch(() => {});
+  refreshProjectList(projektAbhaengigkeiten()).catch(() => {});
   $("#memoryText").value = state.memory;
   $("#ragText").value = state.rag;
-  refreshLocalWorkspaceStatus();
+  refreshLocalWorkspaceStatus(projektAbhaengigkeiten());
   afterFirstPaint([
-    () => initGoogleLogin().catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")),
+    () => initGoogleLogin({ $, state, writeOutput, refreshSessionStatus }).catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")),
     () => refreshSessionStatus(),
     () => { refreshKimiVaultStatus({ quiet: true }).catch(() => {}); refreshGlmVaultStatus({ quiet: true }).catch(() => {}); }
   ]);
@@ -169,8 +118,8 @@ function bindNavigation() {
   const syncBackdrop = initPanelBackdrop({ backdrop, sidebar, browserPanel, menuButton, browserButton, setMenuOpen, setBrowserPanelOpen });
   menuButton?.addEventListener("click", () => setMenuOpen(!sidebar?.classList.contains("is-open")));
   browserButton?.addEventListener("click", () => setBrowserPanelOpen(!browserPanel?.classList.contains("is-open")));
-  bindPanelResize("#leftPanelResize", "left");
-  bindPanelResize("#rightPanelResize", "right");
+  bindPanelResize("#leftPanelResize", "left", { $ });
+  bindPanelResize("#rightPanelResize", "right", { $ });
   for (const button of $$(".nav-button")) {
     button.addEventListener("click", () => {
       goToView(button.dataset.view);
@@ -257,61 +206,6 @@ function applySelectedModel(model, { persist = true, quiet = false } = {}) {
   void quiet; // Auswahl-Meldungen bewusst entfernt (Nutzer-Anweisung 2026-07-03).
 }
 
-function bindPanelResize(selector, side) {
-  const handle = $(selector);
-  if (!handle) return;
-  handle.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    document.body.classList.add("is-resizing-panel");
-    handle.setPointerCapture?.(event.pointerId);
-    const move = (moveEvent) => {
-      const width = side === "left" ? moveEvent.clientX : window.innerWidth - moveEvent.clientX;
-      setPanelWidth(side, width);
-    };
-    const stop = () => {
-      document.body.classList.remove("is-resizing-panel");
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", stop);
-    };
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", stop, { once: true });
-  });
-}
-
-function restorePanelWidths() {
-  setPanelWidth("left", getPanelWidth("left"), { persist: false });
-  setPanelWidth("right", getPanelWidth("right"), { persist: false });
-}
-
-function setPanelWidth(side, rawWidth, { persist = true } = {}) {
-  if (rawWidth < PANEL_WIDTHS.close) {
-    setPanelOpen(side, false);
-    return;
-  }
-  const maxWidth = Math.max(PANEL_WIDTHS.min, Math.min(PANEL_WIDTHS.max, window.innerWidth - PANEL_WIDTHS.centerMin));
-  const width = side === "left"
-    ? Math.round(Math.min(Math.max(rawWidth, PANEL_WIDTHS.compact), maxWidth))
-    : Math.round(Math.min(Math.max(rawWidth, PANEL_WIDTHS.min), maxWidth));
-  const prop = side === "left" ? "--left-panel-width" : "--right-panel-width";
-  document.documentElement.style.setProperty(prop, `${width}px`);
-  applyPanelCompact(side, width, side === "left" ? PANEL_WIDTHS.min - 1 : PANEL_WIDTHS.compact);
-  if (persist) localStorage.setItem(PANEL_WIDTH_KEYS[side], String(width));
-}
-
-function getPanelWidth(side) {
-  const savedWidth = Number(localStorage.getItem(PANEL_WIDTH_KEYS[side])) || PANEL_WIDTHS.default;
-  return [306, 228, 225].includes(savedWidth) ? PANEL_WIDTHS.default : savedWidth;
-}
-
-function setPanelOpen(side, open) {
-  const panel = side === "left" ? $(".sidebar") : $("#browserPanel");
-  const button = side === "left" ? $("#appMenuButton") : $("#browserButton");
-  panel?.classList.toggle("is-open", open);
-  document.body.classList.toggle(`${side}-panel-open`, open);
-  button?.setAttribute("aria-expanded", String(open));
-  if (side === "left") syncLeftMenuState();
-}
-
 function hydrateComponents() {
   for (const button of $$(".nav-button")) {
     if (!button.dataset.icon) continue;
@@ -359,19 +253,6 @@ function applyPendingRestoreRoute() {
   if (pending.startsWith("/") && !pending.startsWith("//")) history.replaceState(null, "", pending);
 }
 
-function getViewFromUrl() {
-  if (location.hash) return location.hash.replace(/^#\/?/, "") || "start";
-  if (location.pathname === "/") return "start";
-  return PATH_VIEWS[location.pathname.replace(/\/$/, "")] || location.pathname.replace(/^\/+/, "");
-}
-
-function updateCanonical() {
-  // App-Routen liefern auf GitHub Pages HTTP 404 (SPA-Fallback); nur "/"
-  // antwortet mit 200 — der Canonical bleibt deshalb immer auf der Root-URL.
-  const canonical = document.querySelector('link[rel="canonical"]');
-  if (canonical) canonical.href = "https://smejj.com/";
-}
-
 function bindStartComposer() {
   const input = $("#startMessage");
   const send = $("#startSend");
@@ -389,7 +270,7 @@ function bindStartComposer() {
   };
   send.addEventListener("click", submit);
   initComposerTools();
-  initWorkspaceBridge({ workspace, ensureProject, showToast });
+  initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" || event.shiftKey) return;
@@ -425,7 +306,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
         if (codingJob?.ok) output.textContent = `${formatFreeCodingJob(codingJob)}\n\n`;
         const executorResult = await runFreeExecutorIfAppTask(task);
         if (executorResult?.ok) {
-          saveFreeExecutorArtifact(executorResult);
+          saveFreeExecutorArtifact(executorResult, state);
           output.textContent += `${formatFreeExecutorResult(executorResult)}\n\n`;
         }
       }
@@ -442,94 +323,6 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   }
 }
 
-function isFreeCodingFallbackTask(task) {
-  const text = String(task || "").toLowerCase();
-  if (/\b(wetter|heute|aktuell|nachricht|news|preis|kurs|boerse|börse|internet|web|quelle|oeffnungszeit|öffnungszeit)\b/i.test(text)) return false;
-  if (/https?:\/\//i.test(text) && !/\b(fetch|proxy|iframe|browser|render|crawler|scraper)\b/i.test(text)) return false;
-  if (/```/.test(text)) return true;
-  if (/\b(refactor|debug|stack ?trace|compile|dockerfile|commit|deploy|npm |pnpm |yarn |git )\b/i.test(text)) return true;
-  return /\b(schreib|erstelle|implementier|programmier|code|coden|baue|fix|behebe)\b/i.test(text)
-    && /\b(funktion|function|klasse|class|script|komponente|component|endpoint|modul|module|css|html|javascript|typescript|python|react|node|bug|fehler|datei|file|repo|app|projekt|website|seite)\b/i.test(text);
-}
-
-function saveFreeExecutorArtifact(executor) {
-  try {
-    const { project, taskCapsule, files, objects, verification, rollback, memory, worker } = executor;
-    localStorage.setItem("smejj.freeExecutor.lastArtifact.v1", JSON.stringify({ savedAt: new Date().toISOString(), project, taskCapsule, files, objects, verification, rollback, memory, worker }));
-  } catch {
-  }
-}
-
-async function runFreeExecutorIfAppTask(task) {
-  const text = String(task || "").toLowerCase();
-  if (!/\b(app|projekt|project|todo|website|seite|programm|erstell|baue|build)\b/i.test(text) || /\b(function|funktion|klasse|class|snippet|nur code|add\(a,b\)|add\(a, b\))\b/i.test(text)) return null;
-  const payload = {
-    task,
-    projectId: state.currentProjectId || "project_smejj",
-    workerMode: "planner-vault",
-    startWorker: false,
-    budgetApproved: false,
-    maxUsd: 0,
-    persistToIdrive: false
-  };
-  const result = await postJson(CLIENT_ROUTES.api.freeExecutor, payload);
-  return result?.ok ? result.executor : null;
-}
-
-function formatFreeExecutorResult(executor) {
-  const tests = executor.verification?.testResults || [];
-  const passed = tests.filter((test) => test.passed).length;
-  const files = executor.files || [];
-  const objects = executor.objects || [];
-  return [
-    "Free Executor fertig.",
-    `Projekt: ${executor.project?.title || "Mini-App"}`,
-    `Dateien erzeugt: ${files.length}`,
-    `Artefakte bereit: ${objects.length}`,
-    `Tests: ${passed}/${tests.length} bestanden`,
-    `Browser-Smoke: ${executor.verification?.browser || "static_html_smoke_passed"}`,
-    `Patch: ${executor.patch?.status || "generated"}`,
-    `Rollback-Dateien: ${executor.rollback?.affectedFiles?.length || 0}`,
-    `Memory: ${executor.memory?.status || "blocked_until_verified_success"}`,
-    `IDrive: ${executor.idrive?.ok ? `${executor.idrive.objectCount} Objekte gespeichert` : "write-plan-only"}`,
-    `GPU/Salad/Paid: ${executor.worker?.gpuStarted ? "gestartet" : "aus"}`
-  ].join("\n");
-}
-
-async function createFreeCodingJob(task) {
-  const payload = {
-    task,
-    projectId: state.currentProjectId || "project_smejj",
-    workerMode: "planner-vault",
-    startWorker: false,
-    budgetApproved: false,
-    maxUsd: 0,
-    persistToIdrive: false
-  };
-  const result = await postJson(CLIENT_ROUTES.api.jobs, payload);
-  return result?.ok ? result : null;
-}
-
-function formatFreeCodingJob(result) {
-  const flow = result.codingFlow || {};
-  const plan = result.freeCodingPlan || {};
-  const capsule = result.job?.taskCapsule || flow.taskCapsule || {};
-  const verification = flow.verification || {};
-  const worker = flow.worker || {};
-  const commands = Array.isArray(verification.commands) ? verification.commands.join(", ") : "build, typecheck, tests";
-  const selectedFiles = plan.repoPack?.selectedFiles?.length || 0;
-  return [
-    "Free-Coding-Job vorbereitet.",
-    `Task Capsule: ${capsule.rootPrefix || "bereit"}`,
-    `Repo-Pack/Context: ${flow.repoPack?.strategy || "targeted-repo-pack"}`,
-    `Dateien im Plan: ${selectedFiles}`,
-    `Patch-Plan: ${plan.patchPlan?.status || "awaiting_worker_or_local_executor"}`,
-    `Pruefung: ${commands}`,
-    `Rollback: ${flow.rollback?.prepared ? "vorbereitet" : "pflichtig"}`,
-    `Memory: ${flow.memory?.status || "blocked_until_verified_success"}`,
-    `GPU/Salad: ${worker.inferenceStarted ? "gestartet" : "aus"}`
-  ].join("\n");
-}
 
 function bindSidebarActions() {
   $("#storage")?.addEventListener("click", () => showJsonInLog(CLIENT_ROUTES.api.storageStatus));
@@ -565,204 +358,7 @@ function bindCodeTools() {
   });
 }
 
-function bindLocalWorkspace() {
-  $("#createLocalProject").addEventListener("click", async () => {
-    const name = state.profile.name ? `${state.profile.name} Workspace` : "smejj.com Local Workspace";
-    const { project, manifest } = await workspace.createProject({ name });
-    state.currentProjectId = project.id;
-    localStorage.setItem(STORAGE_KEYS.currentProject, project.id);
-    refreshLocalWorkspaceStatus();
-    showToast("Lokales Projekt erstellt.");
-    writeOutput("#codeOutput", JSON.stringify({ ok: true, project, manifest }, null, 2));
-  });
 
-  $("#saveWorkspaceFile").addEventListener("click", async () => {
-    const projectId = await ensureProject();
-    const filePath = $("#filePath").value.trim() || "workspace/notes.txt";
-    const result = await workspace.saveFile(projectId, filePath, $("#editor").value);
-    refreshLocalWorkspaceStatus();
-    showToast("Datei lokal gespeichert.");
-    writeOutput("#codeOutput", JSON.stringify({
-      ok: true,
-      path: result.object.path,
-      sha256: result.object.sha256,
-      objectKey: result.object.objectKey,
-      manifestVersion: result.manifest.version
-    }, null, 2));
-  });
-
-  $("#snapshotWorkspace").addEventListener("click", async () => {
-    const projectId = await ensureProject();
-    const result = await workspace.snapshot(projectId);
-    refreshLocalWorkspaceStatus();
-    showToast("Snapshot erzeugt.");
-    writeOutput("#codeOutput", JSON.stringify({
-      ok: true,
-      snapshotId: result.id,
-      files: result.manifest.files,
-      manifest: result.manifest
-    }, null, 2));
-  });
-
-  $("#restoreWorkspace").addEventListener("click", async () => {
-    try {
-      const projectId = await ensureProject();
-      const manifest = await workspace.getManifest(projectId);
-      const result = await workspace.restore(manifest);
-      refreshLocalWorkspaceStatus();
-      showToast("Projekt aus Manifest wiederhergestellt.");
-      writeOutput("#codeOutput", JSON.stringify(result, null, 2));
-    } catch (error) {
-      writeOutput("#codeOutput", JSON.stringify({ ok: false, error: error.message }, null, 2));
-    }
-  });
-
-  $("#workspaceStatus").addEventListener("click", () => {
-    writeOutput("#codeOutput", JSON.stringify(workspace.status(), null, 2));
-  });
-
-  $("#localWorkspaceStatus").addEventListener("click", () => {
-    writeOutput("#toolOutput", JSON.stringify(workspace.status(), null, 2));
-  });
-
-  window.addEventListener("online", refreshLocalWorkspaceStatus);
-  window.addEventListener("offline", refreshLocalWorkspaceStatus);
-}
-
-function bindProjects() {
-  $("#projectCreate").addEventListener("click", async () => {
-    // W2-09: Klick legte vorher sofort ein Projekt an; Abbrechen legt nichts an.
-    const eingabe = window.prompt("Wie soll das Projekt heissen?", "Mein Projekt");
-    if (eingabe === null) return;
-    const { project } = await workspace.createProject({
-      name: eingabe.trim().slice(0, 80) || "smejj.com Projekt",
-      ownerUserId: state.session.userId || PROJECT_ROLES.localOnly
-    });
-    state.currentProjectId = project.id;
-    localStorage.setItem(STORAGE_KEYS.currentProject, project.id);
-    refreshLocalWorkspaceStatus();
-    await refreshProjectList();
-    writeOutput("#projectOutput", `Projekt „${project.name}" angelegt (${project.id}).`); // W2-07: kein Roh-JSON
-    showToast("Projekt angelegt.");
-  });
-
-  $("#projectRefresh").addEventListener("click", refreshProjectList);
-
-  $("#projectOpen").addEventListener("click", async () => {
-    try {
-      const projectId = selectedProjectId();
-      const result = await workspace.openProject(projectId, { localOnly: true });
-      state.currentProjectId = projectId;
-      localStorage.setItem(STORAGE_KEYS.currentProject, projectId);
-      refreshLocalWorkspaceStatus();
-      writeOutput("#projectOutput", `Projekt „${result.project?.name || projectId}" geöffnet.`);
-      showToast("Projekt geöffnet.");
-    } catch (error) {
-      writeOutput("#projectOutput", JSON.stringify({ ok: false, error: error.message }, null, 2));
-    }
-  });
-
-  $("#projectSave").addEventListener("click", async () => {
-    try {
-      const projectId = await ensureProject();
-      const result = await workspace.saveFile(projectId, "workspace/project-note.txt", `Gespeichert: ${new Date().toISOString()}`);
-      await refreshProjectList();
-      writeOutput("#projectOutput", JSON.stringify({ ok: true, manifestVersion: result.manifest.version, sha256: result.object.sha256 }, null, 2));
-      showToast("Projekt lokal gespeichert.");
-    } catch (error) {
-      writeOutput("#projectOutput", JSON.stringify({ ok: false, error: error.message }, null, 2));
-    }
-  });
-
-  $("#projectSnapshot").addEventListener("click", async () => {
-    const projectId = await ensureProject();
-    const result = await workspace.snapshot(projectId);
-    writeOutput("#projectOutput", JSON.stringify({ ok: true, snapshot: result.id, files: result.manifest.files }, null, 2));
-  });
-
-  $("#projectManifest").addEventListener("click", async () => {
-    try {
-      const projectId = await ensureProject();
-      writeOutput("#projectOutput", JSON.stringify(await workspace.getManifest(projectId), null, 2));
-    } catch (error) {
-      writeOutput("#projectOutput", JSON.stringify({ ok: false, error: error.message }, null, 2));
-    }
-  });
-
-  $("#projectExport").addEventListener("click", async () => {
-    try {
-      const projectId = await ensureProject();
-      const bundle = await workspace.exportProject(projectId, { localOnly: true });
-      const text = JSON.stringify(bundle, null, 2);
-      localStorage.setItem(STORAGE_KEYS.lastExport, text);
-      downloadText(`${projectId}.smejj-project.json`, text);
-      writeOutput("#projectOutput", JSON.stringify({ ok: true, exported: projectId, secretsIncluded: false }, null, 2));
-    } catch (error) {
-      writeOutput("#projectOutput", JSON.stringify({ ok: false, error: error.message }, null, 2));
-    }
-  });
-
-  $("#projectImport").addEventListener("click", async () => {
-    try {
-      const file = $("#projectImportFile").files?.[0];
-      const text = file ? await file.text() : localStorage.getItem(STORAGE_KEYS.lastExport);
-      if (!text) throw new Error("Keine Import-Datei oder lokaler Export gefunden.");
-      const result = await workspace.importProject(JSON.parse(text));
-      state.currentProjectId = result.project.id;
-      localStorage.setItem(STORAGE_KEYS.currentProject, result.project.id);
-      await refreshProjectList();
-      refreshLocalWorkspaceStatus();
-      writeOutput("#projectOutput", JSON.stringify({ ok: true, importedProject: result.project }, null, 2));
-      showToast("Projekt importiert.");
-    } catch (error) {
-      writeOutput("#projectOutput", JSON.stringify({ ok: false, error: error.message }, null, 2));
-    }
-  });
-
-  $("#projectDelete").addEventListener("click", async () => {
-    try {
-      const projectId = selectedProjectId();
-      const confirmed = window.confirm(`Projekt ${projectId} wirklich lokal loeschen? Immutable Objects bleiben erhalten.`);
-      const result = await workspace.deleteProject(projectId, { confirmed, localOnly: true });
-      if (state.currentProjectId === projectId) {
-        state.currentProjectId = "";
-        localStorage.removeItem(STORAGE_KEYS.currentProject);
-      }
-      await refreshProjectList();
-      refreshLocalWorkspaceStatus();
-      writeOutput("#projectOutput", JSON.stringify(result, null, 2));
-      showToast("Projekt geloescht.");
-    } catch (error) {
-      writeOutput("#projectOutput", JSON.stringify({ ok: false, error: error.message }, null, 2));
-    }
-  });
-}
-
-async function refreshProjectList() {
-  const projects = await workspace.listProjects();
-  const select = $("#projectSelect");
-  if (select) {
-    select.innerHTML = "";
-    for (const project of projects) {
-      const option = document.createElement("option");
-      option.value = project.id;
-      option.textContent = `${project.name} (${project.syncStatus})`;
-      option.selected = project.id === state.currentProjectId;
-      select.append(option);
-    }
-  }
-  if (!projects.length) {
-    renderEmptyState("#projectList", "Keine Projekte", "Erstelle ein lokales Projekt oder importiere ein smejj-Projekt.");
-    return;
-  }
-  renderProjectCards(projects);
-}
-
-function selectedProjectId() {
-  const selected = $("#projectSelect")?.value || state.currentProjectId;
-  if (!selected) throw new Error("Kein Projekt ausgewaehlt.");
-  return selected;
-}
 
 function bindStoragePanel() {
   $("#storagePanelCheck").addEventListener("click", () => showJson("#storagePanelOutput", CLIENT_ROUTES.api.storageStatus));
@@ -810,59 +406,6 @@ async function refreshGlmVaultStatus(options = {}) {
   return result;
 }
 
-function bindUploads() {
-  $("#upload").addEventListener("change", async (event) => {
-    state.uploads = [];
-    const files = Array.from(event.target.files || []);
-    if (files.length > UPLOAD_LIMITS.maxCount) {
-      $("#upload").value = "";
-      return writeOutput("#fileOutput", "Upload blockiert: zu viele Dateien.");
-    }
-    for (const file of files) {
-      const safe = validateBrowserUpload(file);
-      if (!safe.ok) {
-        $("#upload").value = "";
-        state.uploads = [];
-        $("#uploadList").value = "";
-        return writeOutput("#fileOutput", `Upload blockiert: ${safe.reason}`);
-      }
-      const text = await file.text().catch(() => "");
-      state.uploads.push({
-        name: safe.name,
-        bytes: file.size,
-        type: safe.type,
-        preview: text.slice(0, 2000)
-      });
-    }
-    $("#uploadList").value = state.uploads
-      .map((file) => `${file.name} | ${file.bytes} bytes | ${file.type}`)
-      .join("\n");
-    writeOutput("#fileOutput", "Uploads sind lokal gestaged. Dauerhafte Speicherung gehoert in IDrive e2 und bleibt serverseitig geschuetzt.");
-  });
-  $("#storageAgain").addEventListener("click", () => showJson("#fileOutput", CLIENT_ROUTES.api.storageStatus));
-  $("#downloadUploadManifest").addEventListener("click", () => {
-    downloadText("smejj-upload-manifest.json", JSON.stringify({
-      generatedAt: new Date().toISOString(),
-      uploads: state.uploads.map(({ name, bytes, type }) => ({ name, bytes, type }))
-    }, null, 2));
-  });
-}
-
-function validateBrowserUpload(file) {
-  const type = String(file.type || "application/octet-stream").toLowerCase();
-  if (file.size > UPLOAD_LIMITS.maxBytes) return { ok: false, reason: "Datei ist groesser als 1 MB." };
-  if (!UPLOAD_LIMITS.allowedTypes.has(type)) return { ok: false, reason: `MIME-Typ nicht erlaubt (${type}).` };
-  return {
-    ok: true,
-    name: String(file.name || "upload.txt")
-      .replace(/\\/g, "/")
-      .split("/")
-      .pop()
-      .replace(/[^A-Za-z0-9._-]/g, "_")
-      .slice(0, 120) || "upload.txt",
-    type
-  };
-}
 
 function bindMemory() {
   $("#saveMemory").addEventListener("click", () => {
@@ -947,7 +490,7 @@ function updateAiStatus(result) {
 }
 
 async function refreshLiveSystemStatus() {
-  refreshLocalWorkspaceStatus(); try { const h = await getJson(CLIENT_ROUTES.api.health); if (h) { if (h.storage) setText("#storageStatusText", h.storage); if (h.idrive) setText("#idriveStatusText", h.idrive); if (h.aiMode) setText("#aiModeText", h.aiMode); if (h.cost) setText("#costStatusText", h.cost); } const s = await getJson(CLIENT_ROUTES.api.storageStatus); if (s?.configured) setText("#idriveStatusText", `IDrive e2 (${s.bucket || "smejj-app"}) OK`); } catch {}
+  refreshLocalWorkspaceStatus(projektAbhaengigkeiten()); try { const h = await getJson(CLIENT_ROUTES.api.health); if (h) { if (h.storage) setText("#storageStatusText", h.storage); if (h.idrive) setText("#idriveStatusText", h.idrive); if (h.aiMode) setText("#aiModeText", h.aiMode); if (h.cost) setText("#costStatusText", h.cost); } const s = await getJson(CLIENT_ROUTES.api.storageStatus); if (s?.configured) setText("#idriveStatusText", `IDrive e2 (${s.bucket || "smejj-app"}) OK`); } catch {}
 }
 
 function bindTools() {
@@ -1005,37 +548,6 @@ function bindSettings() {
   $("#showErrorPage").addEventListener("click", () => goToView("error"));
 }
 
-async function ensureProject() {
-  if (state.currentProjectId) return state.currentProjectId;
-  const { project } = await workspace.createProject({ name: "smejj.com Local Workspace" });
-  state.currentProjectId = project.id;
-  localStorage.setItem(STORAGE_KEYS.currentProject, project.id);
-  return project.id;
-}
-
-function refreshLocalWorkspaceStatus() {
-  const status = workspace.status();
-  setText("#storageStatusChip", `Storage: ${status.storage}`);
-  setText("#workspaceStatusChip", `Workspace: ${status.offline ? "offline" : status.syncStatus}`);
-  setText("#idriveStatusChip", "IDrive: presigned spaeter");
-  setText("#aiStatusChip", "KI: disabled");
-  setText("#costStatusChip", "Kosten: 0 EUR Risiko");
-  setText("#storageStatusText", status.storage);
-  setText("#workspaceStatusText", status.offline ? "offline nutzbar" : "lokal bereit");
-  setText("#idriveStatusText", status.idriveStatus);
-  setText("#aiModeText", status.aiMode);
-  setText("#costStatusText", status.costStatus);
-  setText("#syncStatusText", status.syncStatus);
-  setText("#homeWorkspaceSummary", status.offline ? "offline nutzbar" : "lokal bereit");
-  setText("#homeAiSummary", status.aiMode);
-  setText("#homeCostSummary", status.costStatus);
-  setText("#homeStorageSummary", "IDrive e2 Hauptspeicher / lokal gecached");
-  setText("#costAiMode", status.aiMode);
-  if (!state.currentProjectId) {
-    renderEmptyState("#projectOutput", "Noch kein Projekt", "Erstelle ein lokales Projekt, um Manifest, Dateien und Snapshots zu testen.");
-  }
-  refreshSessionStatus();
-}
 
 function bindProfile() {
   $("#registerLocal").addEventListener("click", async () => {
@@ -1111,129 +623,6 @@ function refreshSessionStatus() {
   refreshProfileDock();
 }
 
-async function initGoogleLogin() {
-  // Performance: authConfig und authMe parallel holen statt hintereinander
-  // (kein Boot-Wasserfall). authMe wird ohnehin gebraucht; der In-Flight-Dedup
-  // in getJson faellt mit einem etwaigen parallelen Boot-Aufruf zusammen, sodass
-  // kein doppelter /api/auth/me entsteht. Gleiche Endpunkte, gleiche Antworten.
-  const [config, session] = await Promise.all([
-    getJson(CLIENT_ROUTES.api.authConfig).catch(() => null),
-    getJson(CLIENT_ROUTES.api.authMe).catch(() => ({ authenticated: false, user: null }))
-  ]);
-  if (!config) {
-    $("#googleSignIn").textContent = "Google Login: Control Server ist noch nicht online.";
-    return writeOutput("#profileOutput", "Google Login wartet auf den Control Server.");
-  }
-  if (!config.configured) return void ($("#googleSignIn").textContent = "Google Login: Client-ID fehlt.");
-  if (session.authenticated && session.user) return showSignedIn(session.user);
-  const container = $("#googleSignIn");
-  container.innerHTML = "";
-  const button = document.createElement("button");
-  button.type = "button";
-  button.textContent = "Google Login starten";
-  button.addEventListener("click", async () => {
-    button.disabled = true;
-    button.textContent = "Google Login wird geladen...";
-    try {
-      await renderGoogleLogin(config);
-    } catch (error) {
-      button.disabled = false;
-      button.textContent = "Google Login starten";
-      writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.");
-    }
-  });
-  container.append(button);
-}
-
-async function renderGoogleLogin(config) {
-  await loadGoogleIdentity();
-  const container = $("#googleSignIn");
-  container.innerHTML = "";
-  google.accounts.id.initialize({
-    client_id: config.clientId,
-    callback: handleGoogleCredential,
-    ux_mode: "popup",
-    use_fedcm_for_button: true,
-    use_fedcm_for_prompt: true
-  });
-  const renderFallbackButton = () => {
-    if (container.querySelector("iframe")) return;
-    container.innerHTML = "";
-    const redirectButton = document.createElement("button");
-    redirectButton.type = "button";
-    redirectButton.textContent = "Google Login im Hauptfenster";
-    redirectButton.addEventListener("click", () => {
-      window.location.href = `${CLIENT_ROUTES.api.authGoogle}?mode=redirect`;
-    });
-    container.append(redirectButton);
-    google.accounts.id.renderButton(container, {
-      theme: "outline",
-      size: "large",
-      text: "signin_with",
-      shape: "rectangular"
-    });
-  };
-  const status = document.createElement("span");
-  status.textContent = "Google Kontoauswahl wird geoeffnet...";
-  container.append(status);
-  google.accounts.id.prompt((notification) => {
-    if (notification?.isNotDisplayed?.() || notification?.isSkippedMoment?.()) renderFallbackButton();
-  });
-  setTimeout(() => {
-    if (container.textContent.includes("Google Kontoauswahl")) renderFallbackButton();
-  }, 2500);
-}
-
-async function handleGoogleCredential(response) {
-  const result = await postJson(CLIENT_ROUTES.api.authGoogle, { credential: response.credential });
-  if (result.authenticated && result.user) {
-    showSignedIn(result.user);
-    return;
-  }
-  writeOutput("#profileOutput", result.error || "Google Login fehlgeschlagen.");
-}
-
-function showSignedIn(user) {
-  $("#profileName").value = user.name || "";
-  $("#profileEmail").value = user.email || "";
-  state.profile = { name: user.name || "", email: user.email || "" };
-  $("#googleSignIn").innerHTML = "";
-  const button = document.createElement("button");
-  button.type = "button";
-  button.textContent = `Google: ${user.email} abmelden`;
-  button.addEventListener("click", async () => {
-    await postJson(CLIENT_ROUTES.api.authLogout, {});
-    state.session = { authenticated: false, mode: PROJECT_ROLES.localOnly };
-    localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));
-    refreshSessionStatus();
-    $("#googleSignIn").textContent = "Abgemeldet. Seite neu laden fuer Google Login.";
-    writeOutput("#profileOutput", "Google Session beendet.");
-  });
-  $("#googleSignIn").append(button);
-  state.session = {
-    authenticated: true,
-    mode: "google-session",
-    userId: user.email ? `user_${user.email.toLowerCase().replace(/[^a-z0-9]+/g, "_")}` : "google_user",
-    email: user.email,
-    startedAt: new Date().toISOString()
-  };
-  localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));
-  refreshSessionStatus();
-  writeOutput("#profileOutput", `Google Login aktiv fuer ${user.email}.`);
-}
-
-function loadGoogleIdentity() {
-  return new Promise((resolve, reject) => {
-    if (window.google?.accounts?.id) return resolve();
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-    script.onload = resolve;
-    script.onerror = () => reject(new Error("Google Login Script konnte nicht geladen werden."));
-    document.head.append(script);
-  });
-}
 
 function hydrateProfile() {
   $("#profileName").value = state.profile.name || "";

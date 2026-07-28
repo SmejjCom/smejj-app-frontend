@@ -1,3 +1,6 @@
+// v154 -> v155 (2026-07-28): app.js aufgeteilt (1411 -> 800 Zeilen, Ratchet-
+// Ausnahme entfernt). Die sieben neuen Module sind PFLICHT im Precache — app.js
+// importiert sie; ohne Precache waere die App offline tot.
 // v153 -> v154 (2026-07-28): view-title.js neu im Shell-Cache. PFLICHT, keine
 // Kosmetik: app.js importiert das Modul (Seitentitel je Ansicht, QA-Welle 2
 // Befund W2-05). Ohne Precache findet der Import offline nichts, der
@@ -104,11 +107,18 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v154";
+const CACHE_NAME = "smejj-shell-v155";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
   "/assets/deferred-start.js",
+  "/assets/google-login.js",
+  "/assets/free-coding-fallback.js",
+  "/assets/uploads-surface.js",
+  "/assets/projects-surface.js",
+  "/assets/panel-layout.js",
+  "/assets/local-workspace-surface.js",
+  "/assets/view-routes.js",
   "/assets/ai/providers-catalog.js",
   "/assets/account-sessions.js",
   "/assets/api-keys-surface.js",
