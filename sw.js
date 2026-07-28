@@ -1,3 +1,11 @@
+// v184 -> v185 (2026-07-28): Dritter Anlauf, und diesmal an der Wurzel. Die
+// Cache-Query steckte nicht nur an settings-runtime.js, sondern eine Ebene
+// hoeher: premium-surfaces.js importierte settings-surface.js?v=3, und DAS zog
+// die alte Laufzeit mit. Im Live-Test sichtbar geworden ueber
+// performance.getEntriesByType — geladen waren beide Fassungen nebeneinander.
+// Lehre: Bei geschachtelten Modul-Queries muss die Kette von OBEN gebumpt
+// werden, sonst haelt der oberste Cache-Eintrag die ganze Kette alt.
+//
 // v183 -> v184 (2026-07-28): Der Fix aus v183 kam im Browser nicht an. Zwei
 // Ursachen, beide im Live-Test gefunden: settings-surface.js importierte
 // settings-runtime.js unter ZWEI Adressen (mit und ohne ?v=3) — in ES-Modulen
@@ -268,7 +276,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v184";
+const CACHE_NAME = "smejj-shell-v185";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
