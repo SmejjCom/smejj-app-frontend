@@ -39,6 +39,14 @@ export function initGlobalSearch({ $, goToView, showTaskIndicator, showToast, st
   });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
+    // W2-11: Ein Klick auf "Suchen" mit leerem Feld bewirkte gar nichts — kein
+    // Treffer, keine Meldung, kein Hinweis. Jetzt sagt die Ansicht, was fehlt,
+    // und der Fokus springt ins Suchfeld.
+    if (!input.value.trim()) {
+      log.replaceChildren(empty("Bitte einen Suchbegriff eingeben."));
+      input.focus();
+      return;
+    }
     if (!latest.length) return run().catch(() => {});
     openResult(latest[0], goToView, showTaskIndicator, showToast);
   });
