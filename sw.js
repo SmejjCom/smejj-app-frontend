@@ -1,3 +1,9 @@
+// v186 -> v187 (2026-07-28): maus-panel.js leert beim Start eine gespeicherte
+// /maus-replay.html-Adresse. Beim Wiederherstellen verliert der Maus-Tab seinen
+// Modus, browser-pane.js schickte die relative Adresse dann durch den
+// Server-Proxy, und im Panel stand "Ungueltige URL." UEBER einer korrekt
+// laufenden Wiedergabe. maus-panel.js liegt im Precache — ohne Versionssprung
+// erreicht der Fix Bestandsnutzer nicht.
 // v185 -> v186 (2026-07-28): maus-panel.js in den Precache. index.html laedt es
 // als Modul-Skript (Zeile 655), es fehlte aber in SHELL — offline brach der
 // Import ab und der Maus-Knopf war tot. check:precache-imports meldete trotzdem
@@ -283,7 +289,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v186";
+const CACHE_NAME = "smejj-shell-v187";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

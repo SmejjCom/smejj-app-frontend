@@ -31,6 +31,7 @@ const MAUS_MODE = "maus-replay";
 if (typeof document !== "undefined") init();
 
 function init() {
+  vergessenerMausTabAufraeumen();
   window.addEventListener("smejj:maus-replay-request", (event) => openMausReplay(event.detail || {}));
   // Capture-Phase wie der Browser-Knopf in browser-pane.js — derselbe Grund:
   // kein anderer Klick-Handler (z. B. der generische data-jump) soll zuerst greifen.
@@ -39,6 +40,33 @@ function init() {
     event.preventDefault();
     openMausReplay();
   }, true);
+}
+
+// Der Maus-Tab wird wie jeder andere Tab gespeichert — beim Wiederherstellen
+// geht sein Modus aber verloren, und browser-pane.js wuerde die relative
+// Adresse "/maus-replay.html" durch den Server-Proxy schicken. Der lehnt sie
+// als "Ungueltige URL." ab, und im Panel stand eine Fehlermeldung ueber einer
+// funktionierenden Wiedergabe (live gesehen 2026-07-28). Deshalb hier beim
+// Start die gespeicherte Adresse leeren: der Tab kommt leer zurueck, der
+// Maus-Knopf oeffnet die Wiedergabe sauber neu.
+const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
+
+function vergessenerMausTabAufraeumen() {
+  try {
+    const gespeichert = JSON.parse(localStorage.getItem(TABS_STORAGE_KEY) || "null");
+    if (!gespeichert?.tabs?.length) return;
+    let geaendert = false;
+    for (const eintrag of gespeichert.tabs) {
+      if (!String(eintrag?.url || "").startsWith("/maus-replay.html")) continue;
+      eintrag.url = "";
+      eintrag.history = [];
+      eintrag.historyIndex = -1;
+      geaendert = true;
+    }
+    if (geaendert) localStorage.setItem(TABS_STORAGE_KEY, JSON.stringify(gespeichert));
+  } catch {
+    // Kaputter oder gesperrter Speicher darf den Maus-Knopf nie blockieren.
+  }
 }
 
 /**
