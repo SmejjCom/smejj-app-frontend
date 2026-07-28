@@ -245,7 +245,11 @@ async function submitEmailRegister() {
   try {
     const { ok, payload } = await postJson(EMAIL_API.register, { email, password, name });
     if (!ok) return status(errorText(payload, "Registrierung fehlgeschlagen."), "error");
-    if (payload.mail?.sent) {
+    // Nicht mehr payload.mail.sent: das sagte, ob GENAU FUER DIESE Adresse eine
+    // Mail rausging — und war damit fuer bestehende Konten anders als fuer neue
+    // (Konto-Enumeration, Befund 2026-07-28). verificationMailExpected haengt
+    // nur an der Serverkonfiguration und ist fuer beide Faelle gleich.
+    if (payload.verificationMailExpected) {
       status(t("Konto angelegt. Bitte bestätige deine E-Mail-Adresse über den zugesandten Link."), "success");
     } else {
       status(t("Konto angelegt. Du kannst dich jetzt mit E-Mail und Passwort anmelden."), "success");

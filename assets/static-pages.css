@@ -104,3 +104,43 @@ html.p-sprachstart nav.langs a { color: #1c1c1a; text-decoration: none; border-b
 html.p-sprachstart nav.langs a:hover { border-color: #1c1c1a; }
 html.p-sprachstart footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid #e6e6e0; font-size: 13.5px; color: #6b6b64; display: flex; flex-wrap: wrap; gap: 8px 18px; }
 html.p-sprachstart footer a { color: #6b6b64; }
+
+/* ===== Betriebsstatus (html.p-status, zusaetzlich zu p-recht) =====
+ * Die Zustaende sind IMMER auch als Wort ausgeschrieben ("laeuft", "gestoert",
+ * "nicht erreichbar"). Farbe und Symbol sind Zugabe — niemals der einzige
+ * Traeger der Aussage (Barrierefreiheit, WCAG 1.4.1).
+ */
+html.p-status .status-gesamt {
+  font-size: 1.05rem;
+  margin: 0 0 1.2em;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+html.p-status .status-gesamt[data-stufe="ok"] { border-color: rgba(95, 176, 154, 0.55); }
+html.p-status .status-gesamt[data-stufe="teilweise"] { border-color: rgba(230, 184, 92, 0.55); }
+html.p-status .status-gesamt[data-stufe="aus"] { border-color: rgba(226, 122, 122, 0.6); }
+
+html.p-status .status-liste { list-style: none; margin: 0; padding: 0; }
+html.p-status .status-zeile { padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.07); }
+html.p-status .status-zeile:first-child { border-top: 0; padding-top: 0; }
+html.p-status .status-kopf { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 10px; }
+html.p-status .status-punkt { font-size: 0.8rem; line-height: 1; }
+html.p-status .ist-ok .status-punkt { color: #6fc9ad; }
+html.p-status .ist-gestoert .status-punkt { color: #e6b85c; }
+html.p-status .ist-unerreichbar .status-punkt { color: #e27a7a; }
+html.p-status .status-wert { margin-left: auto; font-size: 0.9rem; color: rgba(246, 243, 238, 0.72); }
+html.p-status .status-text { margin: 4px 0 0; font-size: 0.92rem; color: rgba(246, 243, 238, 0.7); }
+
+html.p-status .status-fuss {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px;
+  margin: 1.2em 0 0; padding-top: 1em; border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+html.p-status .status-knopf {
+  font: inherit; font-size: 0.92rem; color: #f6f3ee; cursor: pointer;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px; padding: 8px 18px; min-height: 24px;
+}
+html.p-status .status-knopf:hover { background: rgba(255, 255, 255, 0.12); }
+html.p-status .status-stand { font-size: 0.85rem; color: rgba(246, 243, 238, 0.55); }

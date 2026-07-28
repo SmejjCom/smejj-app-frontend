@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de" class="p-recht p-status">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101113">
+    <meta name="description" content="Betriebsstatus von smejj.com – laufen Anmeldung, Chat und Browser-Ansicht gerade?">
+    <!-- Der Status ist ein Momentwert; eine Suchmaschine soll ihn nicht als
+         Seiteninhalt indexieren. Erreichbar bleibt die Seite trotzdem fuer
+         jeden, der den Link hat — sie steht in jeder Fusszeile. -->
+    <meta name="robots" content="noindex,follow">
+    <!-- Ohne diese Regel blockiert der eigene Node-Server die drei Abfragen:
+         er sendet connect-src 'self'. Live setzt GitHub Pages keine CSP, dort
+         gilt die Meta-Angabe unten. Die drei Hosts sind dieselben wie in
+         index.html — wer dort einen aendert, muss ihn auch hier eintragen. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; connect-src 'self' https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud https://smejj-chat-bridge.zeabur.app https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud">
+    <link rel="canonical" href="https://smejj.com/status.html">
+    <title>Betriebsstatus – smejj.com</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/favicon.ico?v=112" sizes="any">
+    <link rel="icon" href="/icons/smejj_favicon.svg?v=112" type="image/svg+xml">
+    <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
+    <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+    <link rel="stylesheet" href="/assets/static-pages.css">
+  </head>
+  <body>
+    <main>
+      <a class="legal-brand" href="/" aria-label="smejj.com Startseite">
+        <img src="/icons/smejj_icon.svg" alt="smejj.com" width="2000" height="1532">
+      </a>
+      <h1>Betriebsstatus</h1>
+
+      <p id="statusGesamt" class="status-gesamt" role="status" aria-live="polite" data-stufe="laeuft">
+        Dienste werden geprüft …
+      </p>
+
+      <div class="card">
+        <ul id="statusListe" class="status-liste">
+          <li class="status-zeile">
+            <div class="status-kopf">
+              <span class="status-punkt" aria-hidden="true">·</span>
+              <strong>Wird geladen …</strong>
+            </div>
+            <p class="status-text">
+              Ohne aktiviertes JavaScript kann diese Seite die Dienste nicht abfragen.
+            </p>
+          </li>
+        </ul>
+        <p class="status-fuss">
+          <button id="statusErneut" type="button" class="status-knopf">Jetzt neu prüfen</button>
+          <span id="statusStand" class="status-stand"></span>
+        </p>
+      </div>
+
+      <h2>Was diese Seite misst</h2>
+      <div class="card">
+        <p>
+          Diese Seite fragt die Dienste <strong>direkt aus Ihrem Browser</strong> ab.
+          Es gibt keinen Status-Server dazwischen. Das hat zwei Folgen: Die Seite
+          funktioniert auch dann noch, wenn alle Dienste ausgefallen sind — und
+          was Sie hier sehen, ist Ihre eigene Verbindung, nicht ein Mittelwert
+          über alle Nutzer. Liegt es an Ihrem Netz, zeigt die Seite das genauso an.
+        </p>
+        <p>
+          Geprüft wird nur die Erreichbarkeit. Es werden keine Anmeldedaten
+          gesendet, keine Modelle aufgerufen und keine Kosten ausgelöst.
+          Die Anzeige aktualisiert sich jede Minute von selbst, solange dieser
+          Reiter im Vordergrund ist.
+        </p>
+      </div>
+
+      <h2>Wenn etwas nicht läuft</h2>
+      <div class="card">
+        <p>
+          Ist <strong>Anmeldung und Konto</strong> gestört, lädt smejj.com weiterhin,
+          aber Anmelden und Kontofunktionen antworten nicht. Ist <strong>Chat und
+          Assistent</strong> gestört, bleibt die Oberfläche bedienbar, Antworten
+          bleiben aus. Die <strong>Browser-Ansicht</strong> ist eine Zusatzfunktion;
+          fällt sie aus, ist der Rest der App nicht betroffen.
+        </p>
+        <p>
+          Die Seiten selbst liegen auf einem anderen System als die Dienste. Deshalb
+          bleibt smejj.com lesbar, auch wenn hier unten alles rot ist.
+        </p>
+      </div>
+
+      <footer>
+        <a href="/">Startseite</a>
+        <a href="/impressum.html">Impressum</a>
+        <a href="/datenschutz.html">Datenschutz</a>
+      </footer>
+    </main>
+    <script src="/assets/status.js" type="module"></script>
+  </body>
+</html>

@@ -23,7 +23,9 @@ const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
 const LOGIN_URL = "/auth/login/";
 
 // Oeffentliche Pfade: hier leitet das Gate nie um.
-const PUBLIC_PATHS = [/^\/auth\//, /^\/datenschutz/, /^\/impressum/, /^\/maus-replay/];
+// /status ist ausdruecklich oeffentlich: Wer wissen will, ob der Anmeldedienst
+// laeuft, kann sich per Definition gerade nicht anmelden.
+const PUBLIC_PATHS = [/^\/auth\//, /^\/datenschutz/, /^\/impressum/, /^\/maus-replay/, /^\/status/];
 
 // Oeffentlicher Pfad? Input: pathname (String). Output: boolean.
 export function isPublicPath(pathname) {
