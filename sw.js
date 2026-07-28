@@ -1,3 +1,9 @@
+// v180 -> v181 (2026-07-28): Reihenfolge im Modell-Menue nach Vorgabe des
+// Betreibers: smejj 1.0, Kimi K3, GLM-5.2, Cline, Kimi K2.7. Nur die Abfolge der
+// Menueeintraege in index.html; Beschriftungen, Zuordnung und Design unveraendert.
+// Die Namen bleiben ausdruecklich lang ("Kimi K3", "Kimi K2.7") — kuerzere Labels
+// wuerden gespeicherte Nutzerwahlen entwerten (MODEL_MODES-Schluessel).
+//
 // v179 -> v180 (2026-07-28): Kimi K3 im Modell-Menue. Der Picker im Eingabefeld
 // ist eine fest verdrahtete Liste (index.html + MODEL_MODES in app.js) — die
 // Server-Registry kannte K3 laengst, der Nutzer kam ueber die Oberflaeche aber
@@ -241,7 +247,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v180";
+const CACHE_NAME = "smejj-shell-v181";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
