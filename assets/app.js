@@ -12,7 +12,7 @@ import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260718";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
 import { collectConversationHistory } from "./chat-history-context.js";
-import { groundTask } from "./browser-context.js";
+import { groundTask, modelForTask } from "./browser-context.js";
 import { afterFirstPaint } from "./deferred-start.js";
 import { initGoogleLogin } from "./google-login.js";
 import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
@@ -294,7 +294,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
     try {
       await stream([CLIENT_ROUTES.api.agent, CLIENT_ROUTES.api.agentFallback], {
         task: await groundTask(task),
-        model: state.settings.model || "smejj 1.0",
+        model: modelForTask(task, state.settings.model) || "smejj 1.0",
         files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}) },
         history: collectConversationHistory()
       }, output);
@@ -322,7 +322,6 @@ async function submitTask(task, { target = "#startLog" } = {}) {
     hideTaskIndicator();
   }
 }
-
 
 function bindSidebarActions() {
   $("#storage")?.addEventListener("click", () => showJsonInLog(CLIENT_ROUTES.api.storageStatus));

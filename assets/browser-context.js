@@ -18,6 +18,12 @@
 import { CLIENT_ROUTES } from "./config.js";
 import { firstSafeUrl } from "./autonomous-intent.js";
 
+// Modelle, bei denen die Bridge ihre werkzeuglose Schnellspur ueberspringt und
+// an den Control Server weiterreicht — dort laeuft echtes Tool-Calling.
+// Der Vertrag steht in chat-bridge.js: /glm|kimi|cline/ im angefragten Modell.
+const TIEFSPUR_MODELL = "GLM-5.2";
+const TIEFSPUR_ERKANNT = /glm|kimi|cline/i;
+
 const MAX_CONTEXT_CHARS = 4000;
 const FETCH_TIMEOUT_MS = 8000;
 
@@ -135,4 +141,19 @@ function decodeBasicEntities(text) {
     .replace(/&gt;/gi, ">")
     .replace(/&quot;/gi, '"')
     .replace(/&#0?39;|&apos;/gi, "'");
+}
+
+/**
+ * Waehlt das Modell fuer eine Aufgabe. Nennt sie eine Web-Adresse, muss die
+ * Tiefspur ran: die Schnellspur der Bridge kennt keine Werkzeuge und wuerde den
+ * Seiteninhalt raten statt lesen (Befund 2026-07-28: "I-MILD.com" statt des
+ * echten Titels). Alles andere bleibt unveraendert bei der Wahl des Nutzers.
+ * @param {string} task Freitext des Nutzers.
+ * @param {string} gewaehlt Aktuell gewaehltes Modell.
+ * @returns {string} Modell fuer diese eine Anfrage.
+ */
+export function modelForTask(task, gewaehlt) {
+  const aktuell = String(gewaehlt || "");
+  if (TIEFSPUR_ERKANNT.test(aktuell)) return aktuell;
+  return firstSafeUrl(String(task || "")) ? TIEFSPUR_MODELL : aktuell;
 }
