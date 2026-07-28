@@ -1,3 +1,14 @@
+// v164 -> v165 (2026-07-28): Aktionen pro Chat-Nachricht (Kopieren, Bearbeiten,
+// Neu generieren, Bewerten, Vorlesen, Abzweigen, "Ab hier loeschen" mit
+// Rueckgaengig, Versionswahl). PFLICHT im Precache, keine Kosmetik: index.html
+// laedt chat-actions.js, das chat-messages.js und chat-actions-menu.js
+// importiert — ohne Precache findet der Import offline nichts, der Fetch-Handler
+// liefert als Rueckfall "/" (HTML) und der Browser bricht das Modul ab.
+// chat-store.js importiert seit dieser Aenderung ebenfalls chat-messages.js
+// (Rohtext und Zeitstempel im gespeicherten Verlauf), es haengt also auch der
+// Chat-Verlauf daran. start-styles.css enthaelt neu chat-actions.css und
+// braucht den Versionssprung, sonst bleibt die Leiste bei Bestandsnutzern
+// unformatiert.
 // v163 -> v164 (2026-07-28): Barrierefreiheit — zugeklappte Panels sind nicht
 // mehr per Tastatur erreichbar (panel-layout.js). Gemessen bei der Zoom-
 // pruefung: 11 von 22 Tab-Stationen lagen ausserhalb des Bildes (zugeklappte
@@ -149,7 +160,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v164";
+const CACHE_NAME = "smejj-shell-v165";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -221,6 +232,9 @@ const SHELL = [
   "/assets/composer-dictation.js",
   "/assets/chat-store.js",
   "/assets/chat-history-view.js",
+  "/assets/chat-messages.js",
+  "/assets/chat-actions.js",
+  "/assets/chat-actions-menu.js",
   "/assets/workspace-bridge.js",
   "/assets/storage/index.js",
   "/assets/storage/localWorkspace.js",

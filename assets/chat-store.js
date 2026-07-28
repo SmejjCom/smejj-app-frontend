@@ -14,6 +14,10 @@
 // Versionierter Pfad wie in components.js (QA-Welle 1, Befund F-07) — sonst laedt
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
+// Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und
+// Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
+// Verlauf kein Markdown kopieren und keinen Zeitstempel zeigen.
+import { metaOf, seedMeta } from "/assets/chat-messages.js?v=1";
 
 const DB_NAME = "smejj-chats";
 const DB_VERSION = 1;
@@ -88,11 +92,18 @@ function startLog() {
 function readEntries() {
   const log = startLog();
   if (!log) return [];
-  return Array.from(log.querySelectorAll(":scope > .entry")).map((node) => ({
-    role: node.classList.contains("user") ? "user" : "assistant",
-    text: String(node.textContent || ""),
-    html: node.classList.contains("user") ? "" : String(node.innerHTML || "")
-  })).filter((entry) => entry.text.trim().length > 0);
+  return Array.from(log.querySelectorAll(":scope > .entry")).map((node) => {
+    const meta = metaOf(node) || {};
+    return {
+      role: node.classList.contains("user") ? "user" : "assistant",
+      text: String(node.textContent || ""),
+      html: node.classList.contains("user") ? "" : String(node.innerHTML || ""),
+      raw: String(meta.raw || ""),
+      createdAt: String(meta.createdAt || ""),
+      model: String(meta.model || ""),
+      rating: String(meta.rating || "")
+    };
+  }).filter((entry) => entry.text.trim().length > 0);
 }
 
 function titleFrom(messages) {
@@ -182,6 +193,34 @@ export async function deleteChat(id) {
   return true;
 }
 
+/**
+ * Neuen Chat aus vorgegebenen Nachrichten anlegen ("Ab hier neuen Chat starten").
+ * Der bisherige Chat bleibt unveraendert erhalten — es wird nichts geloescht und
+ * nichts ueberschrieben; der neue Chat bekommt eine eigene Kennung.
+ * @param {Array<{role: string, text: string}>} messages
+ * @returns {Promise<string>} Kennung des neuen Chats, leer bei Misserfolg
+ */
+export async function createChatFrom(messages) {
+  const list = Array.isArray(messages)
+    ? messages.filter((message) => String(message?.text || "").trim().length > 0)
+    : [];
+  if (!list.length) return "";
+  const id = newId();
+  const now = new Date().toISOString();
+  await tx("readwrite", (store) => store.put({
+    id,
+    title: titleFrom(list),
+    titleEdited: false,
+    createdAt: now,
+    updatedAt: now,
+    model: safeModelName(),
+    messages: list
+  }));
+  await pruneOld().catch(() => {});
+  notifyChanged();
+  return id;
+}
+
 function renderEntriesInto(log, messages) {
   restoring = true;
   try {
@@ -196,6 +235,14 @@ function renderEntriesInto(log, messages) {
         if (message.role === "assistant") renderChatMarkdown(node);
       }
       log.append(node);
+      // Rohtext und Zeitstempel zurueckgeben, sonst koennte die Aktionsleiste
+      // eines wiederhergestellten Chats nur den gerenderten Text kopieren.
+      seedMeta(node, {
+        raw: message.raw || (message.role === "assistant" && message.html ? "" : message.text),
+        createdAt: message.createdAt,
+        model: message.model,
+        rating: message.rating
+      });
     }
     log.hidden = messages.length === 0;
     document.querySelector("#start")?.classList.toggle("has-start-chat", messages.length > 0);
