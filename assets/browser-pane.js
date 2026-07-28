@@ -53,7 +53,7 @@ const state = {
   lastRemoteRefitAt: 0
 };
 
-const refs = {};
+export const refs = {};
 
 // Live-Browser (interaktive Remote-Session) — Details in browser-pane-session.js.
 const sessionClient = createBrowserSessionClient({ routes: CLIENT_ROUTES });
@@ -86,7 +86,7 @@ function init() {
 
 // --- Pane oeffnen/schliessen -------------------------------------------------
 
-function openPane() {
+export function openPane() {
   mountOnce();
   const panel = document.getElementById("browserPanel");
   panel?.classList.add("is-open", "is-browser-mode");
@@ -333,11 +333,11 @@ function scheduleRemoteRefit() {
 
 // --- Tabs --------------------------------------------------------------------
 
-function activeTab() {
+export function activeTab() {
   return state.tabs.find((tab) => tab.id === state.activeId) || null;
 }
 
-function addTab({ url = "", focusAddress = false } = {}) {
+export function addTab({ url = "", focusAddress = false } = {}) {
   if (state.tabs.length >= MAX_TABS) {
     showHint(`Tab-Limit erreicht (${MAX_TABS}). Bitte einen Tab schliessen.`);
     return null;
@@ -413,7 +413,7 @@ export function normalizeAgentBrowserUrl(input) {
   }
 }
 
-function commitHistory(tab, url, push) {
+export function commitHistory(tab, url, push) {
   if (!push) return;
   tab.history = tab.history.slice(0, tab.historyIndex + 1);
   tab.history.push(url);
@@ -568,7 +568,7 @@ function stepHistory(delta) {
   navigate(tab, tab.history[nextIndex], { push: false });
 }
 
-function setFrame(tab, { src = "", srcdoc = "", mode }) {
+export function setFrame(tab, { src = "", srcdoc = "", mode }) {
   tab.frame?.remove();
   const frame = document.createElement("iframe");
   frame.className = "bp-frame";
@@ -666,7 +666,7 @@ function schedulePersist() {
 
 // --- Rendering ---------------------------------------------------------------
 
-function render() {
+export function render() {
   if (!state.mounted) return;
   const active = activeTab();
 
@@ -726,7 +726,7 @@ function showHint(text) {
 
 // --- Persistenz ---------------------------------------------------------------
 
-function persistTabs() {
+export function persistTabs() {
   try {
     localStorage.setItem(TABS_STORAGE_KEY, JSON.stringify({
       activeId: state.activeId,

@@ -98,6 +98,13 @@
     <button id="browserButton" class="glass-icon browser-button" type="button" aria-label="Browser oeffnen" aria-expanded="false" title="Browser">
       <span class="split-icon" aria-hidden="true"><span></span><span></span></span>
     </button>
+    <!-- Freigabe "Maus-Sichtbarkeit" (Wof Kadavanich, 2026-07-28): oeffnet die
+         Maus-Engine-Wiedergabe direkt im rechten Browser-Panel (kein neues
+         CSS, kein neues Layout — dieselben Klassen wie #browserButton).
+         Logik ausschliesslich in public/maus-panel.js. -->
+    <button id="mausButton" class="glass-icon browser-button" type="button" aria-label="Maus-Wiedergabe oeffnen" title="Maus">
+      <img src="/icons/maus-cursor.png" alt="" aria-hidden="true" width="20" height="20">
+    </button>
     <div id="sidebarBackdrop" class="sidebar-backdrop" hidden></div>
     <main class="shell">
       <aside class="sidebar">
@@ -642,6 +649,7 @@
     <script src="/assets/app.js?v=stufec-20260726" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260709-2" type="module"></script>
+    <script src="/assets/maus-panel.js?v=1" type="module"></script>
     <script src="/assets/auth/passkey-ui.js" type="module"></script>
     <script src="/assets/view-chrome.js?v=view-chrome-20260716-2" type="module"></script>
     <script src="/assets/profile-dock.js?v=profile-dock-20260717-6" type="module"></script>
