@@ -65,21 +65,25 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
+// v149 -> v150 (2026-07-27): Ladezeit — start-styles.css buendelt die acht
+// render-blockierenden Stylesheets der Startseite (die acht Einzeldateien sind
+// dadurch aus dem Precache raus, sie werden von keiner Seite mehr geladen);
+// deferred-start.js schiebt die fuenf Control-Server-Startaufrufe hinter den
+// ersten Bildaufbau. PFLICHT im Precache: app.js und premium-surfaces.js
+// importieren deferred-start.js — ohne Precache waere die App offline tot.
 // v148 -> v149 (2026-07-28): Klickjacking-Schutz — frame-guard.js neu im
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v149";
+const CACHE_NAME = "smejj-shell-v150";
 const SHELL = [
   "/",
-  "/assets/styles.css",
-  "/assets/branding.css",
+  "/assets/start-styles.css",
+  "/assets/deferred-start.js",
   "/assets/app-surfaces.css",
   "/assets/settings-surface.css",
   "/assets/account-privacy.css",
   "/assets/panel-backdrop.css",
-  "/assets/composer-tools.css",
-  "/assets/browser-pane.css",
   "/assets/browser-pane.js",
   "/assets/browser-pane-render.js",
   "/assets/browser-pane-session.js",
@@ -88,7 +92,6 @@ const SHELL = [
   "/assets/config.js",
   "/assets/components.js",
   "/assets/chat-markdown.js",
-  "/assets/chat-markdown.css",
   "/assets/frame-guard.js",
   "/assets/app.js",
   "/assets/left-menu-state.js",
@@ -98,13 +101,11 @@ const SHELL = [
   "/assets/settings-runtime.js",
   "/assets/provider-settings.js",
   "/assets/cline-model-menu.js",
-  "/assets/cline-model-menu.css",
   "/assets/provider-settings.css",
   "/assets/account-privacy.js",
   "/assets/profile-dock.js",
   "/assets/profile-dock-menu.js",
   "/assets/account-auth-state.js",
-  "/assets/profile-dock.css",
   "/assets/profile-picture-store.js",
   "/assets/profile-picture-control.js",
   "/assets/autonomous-coding.js",
@@ -113,7 +114,6 @@ const SHELL = [
   "/assets/browser-context.js",
   "/assets/search.js",
   "/assets/view-chrome.js",
-  "/assets/view-chrome.css",
   "/assets/composer-tools.js",
   "/assets/composer-plus-menu.js",
   "/assets/voice-typed-send.js",

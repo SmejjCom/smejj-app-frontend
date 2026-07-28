@@ -13,6 +13,7 @@ import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260718
 import { routeAutonomousRequest } from "./autonomous-intent.js";
 import { collectConversationHistory } from "./chat-history-context.js";
 import { groundTask } from "./browser-context.js";
+import { afterFirstPaint } from "./deferred-start.js";
 import { getJson, postJson } from "./shared/http-json.js";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -128,17 +129,16 @@ function boot() {
   bindTools();
   bindProfile();
   bindModelPicker();
-  initGoogleLogin().catch((error) => {
-    writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.");
-  });
   hydrateProfile();
-  refreshSessionStatus();
   refreshProjectList().catch(() => {});
   $("#memoryText").value = state.memory;
   $("#ragText").value = state.rag;
   refreshLocalWorkspaceStatus();
-  refreshKimiVaultStatus({ quiet: true }).catch(() => {});
-  refreshGlmVaultStatus({ quiet: true }).catch(() => {});
+  afterFirstPaint([
+    () => initGoogleLogin().catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")),
+    () => refreshSessionStatus(),
+    () => { refreshKimiVaultStatus({ quiet: true }).catch(() => {}); refreshGlmVaultStatus({ quiet: true }).catch(() => {}); }
+  ]);
   applyPendingRestoreRoute();
   restoreViewFromUrl();
 }

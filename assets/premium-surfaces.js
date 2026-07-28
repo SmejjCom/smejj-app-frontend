@@ -3,6 +3,7 @@ import { applyServerAiStatus } from "/assets/storage/index.js";
 import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=5";
 import { initSettingsSurface } from "./settings-surface.js?v=3";
 import { initAccountPrivacySurface } from "./account-privacy.js?v=2";
+import { afterFirstPaint } from "./deferred-start.js";
 
 export function enhancePremiumSurfaces() {
   loadPremiumStyles();
@@ -12,7 +13,9 @@ export function enhancePremiumSurfaces() {
   initSettingsSurface();
   initAccountPrivacySurface();
   initAutonomousCodingSurface();
-  syncServerAiStatus();
+  // Erst nach dem ersten Bildaufbau: /api/health gehoert nicht in den Ladepfad
+  // eines normalen Seitenaufrufs (Architekturregel, Befund 2026-07-27).
+  afterFirstPaint([() => syncServerAiStatus()]);
 }
 
 // Holt den echten Server-AI-Zustand vom Control-Server (/api/health) und
