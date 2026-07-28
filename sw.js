@@ -1,3 +1,10 @@
+// v185 -> v186 (2026-07-28): maus-panel.js in den Precache. index.html laedt es
+// als Modul-Skript (Zeile 655), es fehlte aber in SHELL — offline brach der
+// Import ab und der Maus-Knopf war tot. check:precache-imports meldete trotzdem
+// OK, weil es nur Modul-IMPORTE ab den Precache-Eintraegen verfolgt und
+// <script src>-Tags in index.html gar nicht ansieht. Genau diese Luecke ist
+// jetzt geschlossen: der Pruefer liest die Skript-Tags mit.
+//
 // v184 -> v185 (2026-07-28): Dritter Anlauf, und diesmal an der Wurzel. Die
 // Cache-Query steckte nicht nur an settings-runtime.js, sondern eine Ebene
 // hoeher: premium-surfaces.js importierte settings-surface.js?v=3, und DAS zog
@@ -276,7 +283,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v185";
+const CACHE_NAME = "smejj-shell-v186";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -289,6 +296,7 @@ const SHELL = [
   "/assets/projects-surface.js",
   "/assets/panel-layout.js",
   "/assets/local-workspace-surface.js",
+  "/assets/maus-panel.js",
   "/assets/view-routes.js",
   "/assets/ai/providers-catalog.js",
   "/assets/account-sessions.js",
