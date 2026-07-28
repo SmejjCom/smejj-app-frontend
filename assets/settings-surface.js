@@ -75,9 +75,12 @@ function handleChange(view, event) {
 }
 
 function markup() {
-  const nav = GROUPS.map(([id, label]) => `<button type="button" class="settings-nav-button" data-settings-tab="${id}" aria-controls="settings-${id}">${t(label)}</button>`).join("");
+  // ARIA-Reiter wie auf der Kontoseite (QA-Welle 2, Befund W2-04): role=tab,
+  // aria-selected und tablist-Container — vorher waren es zehn nackte Knoepfe,
+  // deren aktiver Zustand nur farblich erkennbar war.
+  const nav = GROUPS.map(([id, label]) => `<button type="button" role="tab" id="settings-tab-${id}" class="settings-nav-button" data-settings-tab="${id}" aria-controls="settings-${id}" aria-selected="false" tabindex="-1">${t(label)}</button>`).join("");
   return `<header class="settings-header"><div><p class="eyebrow">${t("Einstellungen")}</p><h2>${t("Einstellungen")}</h2><p class="subhead">${t("Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.")}</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">${t("Lokal gespeichert")}</div></header>
-    <div class="settings-shell"><nav class="settings-nav" aria-label="${t("Einstellungsbereiche")}">${nav}</nav><div class="settings-content">
+    <div class="settings-shell"><nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${nav}</nav><div class="settings-content">
       ${panel("general", "Allgemein", "Grundlegendes Verhalten der App.", [
         select("Sprache", "settingsLanguage", LANGUAGE_OPTIONS, false),
         select("Beim Öffnen anzeigen", "settingsStartView", [["last", "Letzte Ansicht"], ["start", "Startseite"], ["projects", "Projekte"]]),
@@ -94,7 +97,7 @@ function markup() {
         select("Reasoning-Aufwand", "settingsReasoningEffort", [["medium", "Mittel"], ["high", "Hoch"], ["max", "Maximal"]]),
         action("Modellverwaltung", "Standardmodell, BYOK und lokale Modelle.", "KI-Modelle öffnen", "ai")])}
       ${panel("personalization", "Personalisierung", "Dauerhafte Hinweise für Antworten und Zusammenarbeit.", [
-        `<div class="settings-row settings-row-stack"><div class="settings-row-copy"><strong>${t("Persönliche Anweisungen")}</strong></div><textarea id="settingsPersonalization" maxlength="4000" placeholder="${t("Zum Beispiel: Antworte auf Deutsch und erkläre Entscheidungen kurz.")}"></textarea></div>`])}
+        `<div class="settings-row settings-row-stack"><div class="settings-row-copy"><strong id="settingsPersonalizationLabel">${t("Persönliche Anweisungen")}</strong></div><textarea id="settingsPersonalization" aria-labelledby="settingsPersonalizationLabel" maxlength="4000" placeholder="${t("Zum Beispiel: Antworte auf Deutsch und erkläre Entscheidungen kurz.")}"></textarea></div>`])}
       ${panel("coding", "Coding", "Standards für Coding-Aufgaben und Verifikation.", [
         toggle("Prüfungen automatisch ausführen", "settingsRunChecks", "Build, Typecheck, Lint und Tests vor Abschluss."),
         toggle("Browser-Vorschau bei UI-Aufgaben", "settingsBrowserPreview", "Visuelle Prüfung und Screenshots."),
@@ -155,7 +158,10 @@ function activate(view, id) {
   view.querySelectorAll("[data-settings-tab]").forEach((button) => {
     const active = button.dataset.settingsTab === id;
     button.classList.toggle("is-active", active);
-    button.setAttribute("aria-current", active ? "page" : "false");
+    // W2-04: aria-selected + Rovingtabindex wie auf der Kontoseite; Screenreader
+    // sagen damit "Reiter, ausgewaehlt" an statt zehn zusammenhangloser Knoepfe.
+    button.setAttribute("aria-selected", active ? "true" : "false");
+    button.tabIndex = active ? 0 : -1;
   });
   view.querySelectorAll("[data-settings-panel]").forEach((panelNode) => { panelNode.hidden = panelNode.dataset.settingsPanel !== id; });
 }
