@@ -170,12 +170,18 @@ export function buildSourcePanel(doc, sources, now = new Date()) {
   const panel = doc.createElement("div");
   panel.className = "msg-sources";
   panel.setAttribute("role", "group");
-  panel.setAttribute("aria-label", "Quellen dieser Antwort");
+  // Bewusst "fuer diese Frage geladen" und nicht "Quellen dieser Antwort":
+  // Gegroundet wird die FRAGE. Scheitert der Antwortstrom danach (Live-Befund
+  // 2026-07-28: "Verbindung zum Server unterbrochen"), waere "Quelle dieser
+  // Antwort" eine Behauptung, die nicht stimmt — die Seite wurde geladen, die
+  // Antwort beruht aber nicht darauf.
+  panel.setAttribute("aria-label", "Für diese Frage geladene Seiten");
 
   const kopf = doc.createElement("div");
   kopf.className = "msg-sources-head";
   const titel = doc.createElement("span");
-  titel.textContent = sources.length === 1 ? "1 Quelle" : `${sources.length} Quellen`;
+  const anzahl = sources.length === 1 ? "1 Seite" : `${sources.length} Seiten`;
+  titel.textContent = `${anzahl} für diese Frage geladen`;
   const schliessen = doc.createElement("button");
   schliessen.type = "button";
   schliessen.className = "msg-sources-close";

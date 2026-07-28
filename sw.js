@@ -1,3 +1,5 @@
+// v177 -> v178 (2026-07-28): Quellenliste sagt "1 Seite fuer diese Frage
+// geladen" statt "1 Quelle" — gegroundet wird die Frage, nicht die Antwort.
 // v176 -> v177 (2026-07-28): "Quellen anzeigen" pro Antwort. browser-context.js
 // merkt sich, WELCHE Seite es geladen hat; chat-actions.js ordnet sie ueber die
 // Frage davor zu und zeigt sie unter der Antwort. Nur bei echtem Grounding.
@@ -218,7 +220,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v177";
+const CACHE_NAME = "smejj-shell-v178";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
