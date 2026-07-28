@@ -213,20 +213,23 @@ async function resolveRunViaRunId(runId) {
   });
   if (response.status === 401) throw new Error("Bitte zuerst auf smejj.com anmelden.");
   const data = await response.json().catch(() => ({}));
+  if (data.status === "laeuft") throw new Error("Lauf laeuft noch — bitte 'Live mitschauen' benutzen oder gleich erneut laden.");
   const result = data.result || data.run || data;
   const capsuleRef = result.capsuleRef || data.capsuleRef;
   const planId = result.planId || data.planId;
   if (!capsuleRef || !planId) throw new Error("runId liefert keine capsuleRef/planId (Lauf noch nicht fertig?).");
-  return { capsuleRef, planId };
+  // Der Control-Server legt Async-Ergebnisse in SEINEM eigenen Speicher ab und
+  // gibt sie hier inklusive Aktionsprotokoll zurueck. Dieser Weg ist unabhaengig
+  // davon, in welches Konto die Engine ihre Artefakte schreibt — deshalb ist er
+  // die verlaessliche Quelle fuer die Schritte.
+  return { capsuleRef, planId, protocol: Array.isArray(result.actionLog) ? result : null };
 }
 
-async function loadRun({ capsuleRef, planId, runId }) {
-  let ref = capsuleRef;
-  let plan = planId;
-  if (runId && (!ref || !plan)) ({ capsuleRef: ref, planId: plan } = await resolveRunViaRunId(runId));
-  if (!ref || !plan) throw new Error("Bitte capsuleRef + planId (oder runId) angeben.");
-  const prefix = resultPrefix(ref, plan);
-
+// Artefakte (Screenshots + Protokoll-Kopie) liegen auf IDrive e2 und werden ueber
+// den auth-gated Presign-Leseweg geholt. Bewusst SEPARAT von loadRun: schlaegt
+// dieser Weg fehl (z. B. weil Engine und Control-Server auf unterschiedliche
+// Konten zeigen), bleibt die Wiedergabe ueber den Lauf-Status trotzdem moeglich.
+async function loadArtifacts(prefix) {
   const manifest = await (await fetchObject(`${prefix}/manifest.json`)).json();
   const objects = Array.isArray(manifest.objects) ? manifest.objects : [];
 
@@ -242,7 +245,37 @@ async function loadRun({ capsuleRef, planId, runId }) {
     const bytes = await gunzipBytes(await fetchObject(object.key));
     shots.push({ name: match[1], url: URL.createObjectURL(new Blob([bytes], { type: "image/png" })) });
   }
-  return { capsuleRef: ref, planId: plan, protocol, shots };
+  return { protocol, shots };
+}
+
+export async function loadRun({ capsuleRef, planId, runId }, {
+  resolveRun = resolveRunViaRunId,
+  ladeArtefakte = loadArtifacts
+} = {}) {
+  let ref = capsuleRef;
+  let plan = planId;
+  let protocol = null;
+  if (runId) {
+    const resolved = await resolveRun(runId);
+    ref = ref || resolved.capsuleRef;
+    plan = plan || resolved.planId;
+    protocol = resolved.protocol;
+  }
+  if (!ref || !plan) throw new Error("Bitte capsuleRef + planId (oder runId) angeben.");
+  const prefix = resultPrefix(ref, plan);
+
+  const artefakte = await ladeArtefakte(prefix).catch((error) => ({ error }));
+  // Artefakt-Protokoll hat Vorrang (enthaelt die Screenshot-Zuordnung);
+  // fehlt es, traegt das Protokoll aus dem Lauf-Status die Wiedergabe.
+  if (artefakte.protocol) protocol = artefakte.protocol;
+  if (!protocol) throw artefakte.error || new Error("Kein Aktionsprotokoll gefunden.");
+  return {
+    capsuleRef: ref,
+    planId: plan,
+    protocol,
+    shots: artefakte.shots || [],
+    hinweis: artefakte.error ? `Screenshots nicht ladbar (${String(artefakte.error.message || artefakte.error).slice(0, 120)}) — Wiedergabe zeigt die Schritte ohne Bilder.` : ""
+  };
 }
 
 // --- Live-Modus (Stufe B) ------------------------------------------------------
@@ -511,7 +544,9 @@ async function onLoadRun(event, { silent = false } = {}) {
     refs.stageEmpty.style.display = "grid";
     refs.cursor.classList.remove("is-hidden");
     buildStepList();
-    setMessage(`Lauf geladen: ${run.capsuleRef} / ${run.planId} — ${state.steps.length} Schritte, ${run.shots.length} Screenshots.`, "ok");
+    const basis = `Lauf geladen: ${run.capsuleRef} / ${run.planId} — ${state.steps.length} Schritte, ${run.shots.length} Screenshots.`;
+    // Teil-Erfolg ehrlich benennen statt als voll gelungen darzustellen.
+    setMessage(run.hinweis ? `${basis} ${run.hinweis}` : basis, run.hinweis ? "warn" : "ok");
     goTo(0);
     playLoop();
   } catch (error) {

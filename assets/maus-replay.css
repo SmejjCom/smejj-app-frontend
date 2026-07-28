@@ -12,6 +12,7 @@
   --replay-accent: #4da3ff;
   --replay-ok: #3ecf8e;
   --replay-error: #ff6b6b;
+  --replay-warn: #e8b339;
 }
 
 * { box-sizing: border-box; }
@@ -79,6 +80,9 @@ body.maus-replay-body {
 .replay-message { min-height: 20px; font-size: 0.85rem; color: var(--replay-muted); margin: 0 2px 10px; }
 .replay-message.is-error { color: var(--replay-error); }
 .replay-message.is-ok { color: var(--replay-ok); }
+/* Teil-Erfolg: Schritte spielen, aber Screenshots fehlen — bewusst eigene
+   Farbe, damit ein unvollstaendiger Lauf nicht wie ein voll gelungener aussieht. */
+.replay-message.is-warn { color: var(--replay-warn); }
 
 .replay-stage-wrap {
   background: var(--replay-panel);
