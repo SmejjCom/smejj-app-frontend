@@ -81,7 +81,7 @@ export async function ensureProject(deps) {
 }
 
 export function refreshLocalWorkspaceStatus(deps) {
-  const { $, state, workspace, setText } = deps;
+  const { $, state, workspace, setText, renderEmptyState, refreshSessionStatus } = deps;
   const status = workspace.status();
   setText("#storageStatusChip", `Storage: ${status.storage}`);
   setText("#workspaceStatusChip", `Workspace: ${status.offline ? "offline" : status.syncStatus}`);

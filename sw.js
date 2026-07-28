@@ -1,3 +1,5 @@
+// v156 -> v157 (2026-07-28): renderEmptyState fehlte in der zweiten Funktion
+// von local-workspace-surface.js. Jetzt jede Funktion einzeln gegengeprueft.
 // v155 -> v156 (2026-07-28): Nachbesserung der Aufteilung — setText und
 // renderEmptyState wurden von local-workspace-surface.js benutzt, aber nicht
 // mitgereicht (Live-Befund: ReferenceError). Jetzt ausdruecklich in deps.
@@ -110,7 +112,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v156";
+const CACHE_NAME = "smejj-shell-v157";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
