@@ -1,3 +1,10 @@
+// v162 -> v163 (2026-07-28): Offline-Fix in local-workspace-surface.js. Erste
+// echte Offline-MESSUNG (Netz per DevTools-Protokoll abgeschaltet) zeigte:
+// die Shell laedt in 99 ms aus dem Cache, aber die online/offline-Listener
+// bekamen die Statusfunktion direkt uebergeben — der Browser reicht dann das
+// Event als deps herein und die Anzeige warf beim Netzwechsel. Die Datei liegt
+// im Precache und braucht den Versionssprung, sonst erreicht der Fix
+// Bestandsnutzer nicht.
 // v161 -> v162 (2026-07-28): Feldmessung — field-vitals.js schreibt LCP, INP,
 // CLS und TTFB echter Besuche NUR LOKAL mit (kein Netzverkehr, keine Last fuer
 // den Control Server). PFLICHT im Precache: usage-meter.js importiert das Modul.
@@ -137,7 +144,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v162";
+const CACHE_NAME = "smejj-shell-v163";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

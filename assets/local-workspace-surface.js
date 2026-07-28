@@ -67,8 +67,14 @@ export function bindLocalWorkspace(deps) {
     writeOutput("#toolOutput", JSON.stringify(workspace.status(), null, 2));
   });
 
-  window.addEventListener("online", refreshLocalWorkspaceStatus);
-  window.addEventListener("offline", refreshLocalWorkspaceStatus);
+  // Offline-Messung 2026-07-28: die Listener bekamen frueher die Funktion
+  // direkt uebergeben — der Browser reicht dann das Event-Objekt als `deps`
+  // herein, `deps.workspace` ist undefined und die Statusanzeige wirft
+  // "Cannot read properties of undefined (reading 'status')". Genau der
+  // Moment, in dem die Anzeige gebraucht wird (Netz weg / Netz zurueck),
+  // war dadurch der einzige, in dem sie ausfiel. Jetzt mit deps.
+  window.addEventListener("online", () => refreshLocalWorkspaceStatus(deps));
+  window.addEventListener("offline", () => refreshLocalWorkspaceStatus(deps));
 }
 
 export async function ensureProject(deps) {
