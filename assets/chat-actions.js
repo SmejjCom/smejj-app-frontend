@@ -387,38 +387,57 @@ function toggleMenu(entry, trigger) {
   const meta = metaOf(entry);
   const menu = buildMenu(document, meta);
   menu.dataset.for = meta.id;
-  trigger.closest(".msg-actions")?.append(menu);
+  // Das Menue haengt am BODY, nicht in der Leiste.
+  //
+  // Live-Befund 2026-07-28: #startLog hat overflow: auto. Ein Menue darin wird
+  // an der Kante des Logs abgeschnitten — bei der ersten Antwort passte es
+  // weder darunter noch darueber, und bei kurzem Verlauf konnte das Log auch
+  // nicht weiter scrollen. Am Viewport ausgerichtet gibt es dieses Problem
+  // nicht; das macht ChatGPT genauso. Die Zuordnung laeuft ueber dataset.for,
+  // deshalb funktioniert die Klick-Auswertung unveraendert.
+  document.body.append(menu);
   trigger.setAttribute("aria-expanded", "true");
   openMenu = { menu, trigger };
   placeMenu(menu, trigger);
   menu.querySelector(".msg-menu-item")?.focus();
 }
 
-// Das Chat-Log scrollt (overflow: auto). Bei der letzten Nachricht wuerde ein
-// nach unten geoeffnetes Menue unten abgeschnitten — dann klappt es nach oben.
-//
-// Live-Befund 2026-07-28: nach oben klappen darf nur, wer oben auch Platz hat.
-// Bei der ERSTEN Nachricht im Log war unten zu wenig Raum, oben aber genauso
-// wenig — das Menue klappte hoch und wurde am oberen Rand abgeschnitten. Es
-// werden deshalb beide Seiten gemessen; reicht keine, bleibt es unten und der
-// Nutzer scrollt im Log dorthin.
 const MENU_LUFT = 8;
 
+// Menue am Ausloeser ausrichten: darunter, wenn es passt, sonst darueber.
+// Bezug ist der Viewport, nicht das scrollende Log.
 function placeMenu(menu, trigger) {
   try {
-    const container = log();
-    const bar = trigger?.closest?.(".msg-actions");
-    if (!container || !bar || typeof menu.getBoundingClientRect !== "function") return;
-    const containerBox = container.getBoundingClientRect();
-    const barBox = bar.getBoundingClientRect();
-    const hoehe = menu.getBoundingClientRect().height;
-    const platzUnten = containerBox.bottom - barBox.bottom;
-    const platzOben = barBox.top - containerBox.top;
-    if (platzUnten < hoehe + MENU_LUFT && platzOben >= hoehe + MENU_LUFT) {
-      menu.classList.add("is-up");
+    if (typeof menu.getBoundingClientRect !== "function") return;
+    const bar = trigger.closest(".msg-actions");
+    const ankerBox = (bar || trigger).getBoundingClientRect();
+    const box = menu.getBoundingClientRect();
+    // Nur messen, was wirklich messbar ist: in eingebetteten, nicht
+    // dargestellten Ansichten meldet der Browser innerHeight als 0 — mit 0
+    // gerechnet landete das Menue ausserhalb des Bildes.
+    const sichtHoehe = window.innerHeight || document.documentElement?.clientHeight || 0;
+    const sichtBreite = window.innerWidth || document.documentElement?.clientWidth || 0;
+
+    // Eigene Nachrichten liegen rechts: das Menue an der rechten Kante ausrichten.
+    const rechtsBuendig = Boolean(bar?.classList.contains("is-user"));
+    let top = ankerBox.bottom + 4;
+    let left = rechtsBuendig ? ankerBox.right - box.width : ankerBox.left;
+
+    if (sichtHoehe > 0) {
+      const platzUnten = sichtHoehe - ankerBox.bottom;
+      if (platzUnten < box.height + MENU_LUFT && ankerBox.top >= box.height + MENU_LUFT) {
+        top = ankerBox.top - box.height - 4;
+      }
+      top = Math.max(MENU_LUFT, Math.min(top, sichtHoehe - box.height - MENU_LUFT));
     }
+    if (sichtBreite > 0) {
+      left = Math.max(MENU_LUFT, Math.min(left, sichtBreite - box.width - MENU_LUFT));
+    }
+
+    menu.style.top = `${Math.round(top)}px`;
+    menu.style.left = `${Math.round(left)}px`;
   } catch {
-    /* Ausrichtung ist Kosmetik: im Zweifel bleibt das Menue unten */
+    /* Ausrichtung ist Kosmetik: im Zweifel steht das Menue oben links */
   }
 }
 
@@ -526,6 +545,10 @@ function init() {
     document.addEventListener("click", onClick, false);
     document.addEventListener("keydown", onKeydown, false);
     window.addEventListener("smejj:chats-changed", () => refreshBars());
+    // Das Menue liegt am Viewport, nicht in der Nachricht. Scrollt das Log oder
+    // aendert sich die Fenstergroesse, wuerde es von seinem Ausloeser abdriften.
+    container.addEventListener("scroll", () => closeMenu(), { passive: true });
+    window.addEventListener("resize", () => closeMenu());
     refreshBars();
   } catch {
     /* fail-safe: ohne Aktionsleiste laeuft der Chat unveraendert weiter */

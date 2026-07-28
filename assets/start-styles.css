@@ -3133,28 +3133,22 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
   color: rgba(246, 243, 238, 0.62);
 }
 
-/* Ueberlaufmenue */
+/* Ueberlaufmenue.
+   Liegt am BODY und ist am Viewport ausgerichtet, nicht in der Leiste:
+   #startLog hat overflow: auto und schnitt das Menue an seiner Kante ab (Live-
+   Befund 2026-07-28 — bei der ersten Antwort passte es weder darunter noch
+   darueber). Position setzt chat-actions.js beim Oeffnen. */
 .msg-menu {
-  position: absolute;
-  top: calc(100% + 4px);
+  position: fixed;
+  top: 0;
   left: 0;
-  z-index: 40;
+  z-index: 60;
   min-width: 236px;
   padding: 5px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 12px;
   background: #1b1c1f;
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.46);
-}
-
-.msg-menu.is-up {
-  top: auto;
-  bottom: calc(100% + 4px);
-}
-
-.msg-actions.is-user .msg-menu {
-  right: 0;
-  left: auto;
 }
 
 .msg-menu-head {
