@@ -22,8 +22,14 @@
 // Fail-safe: jeder Fehler bleibt lokal; der Chat funktioniert unveraendert
 // weiter (Non-Regression-Pflicht). Kein Netzverkehr, keine Serverlast.
 
-import { addVersion, entriesUpTo, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=1";
-import { barSpecFor, buildMenu, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=1";
+import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=1";
+import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=1";
+// OHNE ?v=-Kennung — app.js importiert "./browser-context.js" (also
+// /assets/browser-context.js). Ein anderer Spezifizierer erzeugt eine ZWEITE
+// Modulinstanz mit eigenem Quellen-Gedaechtnis; der Menuepunkt "Quellen
+// anzeigen" waere dann nie erschienen. Beim lokalen Test 2026-07-28 genau so
+// passiert.
+import { groundingFor } from "/assets/browser-context.js";
 import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=1";
 import { createChatFrom, openChat } from "/assets/chat-store.js?v=verlauf-20260721";
 import { showToast } from "/assets/components.js?v=chat-markdown-20260717";
@@ -282,6 +288,7 @@ function toMessage(entry) {
     createdAt: meta.createdAt,
     model: meta.model,
     rating: meta.rating,
+    sources: meta.sources,
     versions: meta.versions,
     active: meta.active
   };
@@ -334,6 +341,27 @@ function undoRemoval() {
   restoreNodes(container, nodes, anchor);
   container.hidden = false;
   refreshBars();
+}
+
+// Quellenliste unter der Antwort ein- und ausblenden. Wie Leiste und Editor ein
+// GESCHWISTER der Nachricht — sonst landeten die Adressen im gespeicherten
+// Verlauf und im Modellkontext.
+function toggleSources(entry) {
+  const meta = metaOf(entry);
+  const vorhanden = sourcePanelOf(entry);
+  if (vorhanden) {
+    vorhanden.remove();
+    return;
+  }
+  if (!meta.sources.length) return;
+  const panel = buildSourcePanel(document, meta.sources);
+  panel.dataset.for = meta.id;
+  (barOf(entry) || entry).after(panel);
+}
+
+function sourcePanelOf(entry) {
+  const meta = metaOf(entry);
+  return log()?.querySelector(`.msg-sources[data-for="${meta.id}"]`) || null;
 }
 
 function showVersion(entry, index) {
@@ -431,6 +459,7 @@ function moveMenuFocus(step) {
 // --- Verdrahtung ------------------------------------------------------------
 
 const HANDLERS = {
+  sources: (entry) => toggleSources(entry),
   copy: (entry, button) => copyText(rawOf(entry), button),
   "copy-plain": (entry) => copyText(toPlainText(rawOf(entry))),
   edit: (entry) => startEdit(entry),
@@ -458,6 +487,7 @@ function onClick(event) {
   }
   const act = control.dataset.act;
   if (act === "undo") return undoRemoval();
+  if (act === "sources-close") return control.closest(".msg-sources")?.remove();
   if (act === "edit-cancel") return cancelEdit(control.closest(".msg-editor"));
   if (act === "edit-send") return commitEdit(control.closest(".msg-editor"));
   const entry = entryForControl(control);
@@ -492,7 +522,30 @@ function onKeydown(event) {
 }
 
 // Nach dem Ende eines Streams die gemerkten Fassungen an die neue Antwort haengen.
+// Quellen der fertigen Antwort zuordnen.
+//
+// browser-context.js merkt sich je AUFTRAGSTEXT, welche Seite es geladen hat.
+// Die Zuordnung laeuft deshalb ueber die Frage direkt vor der Antwort — nicht
+// ueber "die letzte Quelle", die bei schnellem Nachfassen zur falschen Antwort
+// gehoeren koennte.
+function attachSources() {
+  try {
+    const entries = Array.from(log()?.querySelectorAll(":scope > .entry") || []);
+    const last = entries[entries.length - 1];
+    if (!last || last.classList.contains("user") || hasSources(last)) return;
+    const frage = previousUserEntry(last);
+    if (!frage) return;
+    const quelle = groundingFor(rawOf(frage));
+    if (!quelle) return;
+    addSources(last, [quelle]);
+    ensureBar(last);
+  } catch {
+    /* ohne Quellenangabe bleibt die Antwort unveraendert nutzbar */
+  }
+}
+
 function onSettled() {
+  attachSources();
   if (!pendingVersions) return;
   const busy = document.body.classList.contains("task-indicator-active")
     && !document.body.classList.contains("task-indicator-done");

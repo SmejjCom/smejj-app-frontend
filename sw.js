@@ -1,3 +1,6 @@
+// v176 -> v177 (2026-07-28): "Quellen anzeigen" pro Antwort. browser-context.js
+// merkt sich, WELCHE Seite es geladen hat; chat-actions.js ordnet sie ueber die
+// Frage davor zu und zeigt sie unter der Antwort. Nur bei echtem Grounding.
 // v175 -> v176 (2026-07-28): static-pages.css — Wortumbruch fuer lange Woerter.
 // Bei 200 %% Zoom auf einem 390-px-Handy (195 CSS-px) sprengte
 // "Datenschutzerklaerung" die Zeile und erzeugte Querscrollen auf der ganzen Seite.
@@ -215,7 +218,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v176";
+const CACHE_NAME = "smejj-shell-v177";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

@@ -10,10 +10,10 @@
 // ueber absolute /assets/-Pfade (sonst entstehen zweite Modulinstanzen) und ist
 // damit in node nicht importierbar — pruefbare Logik gehoert deshalb hierher.
 //
-// Bewusst NICHT enthalten: "Quellen anzeigen". Das Frontend fuehrt bisher keine
-// Quellenliste pro Antwort mit (browser-context.js webt den Seitenkontext in die
-// Frage ein, ohne ihn der Antwort zuzuordnen). Ein Menuepunkt, der geraten
-// darstellt, woher eine Aussage kommt, waere schlechter als keiner.
+// "Quellen anzeigen" erscheint NUR, wenn die Antwort wirklich eine Seite als
+// Grundlage hatte. browser-context.js merkt sich seit dem 2026-07-28, welche
+// Seite es geladen hat; ohne Treffer bleibt der Punkt weg. Ein Menuepunkt, der
+// geraten darstellt, woher eine Aussage kommt, waere schlechter als keiner.
 //
 // Reine Logik ohne Browser: menuItemsFor und formatStamp sind ohne DOM pruefbar.
 
@@ -21,6 +21,7 @@ const WEEKDAYS = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Fr
 const DAY_MS = 86_400_000;
 
 const ITEMS = Object.freeze({
+  sources: { act: "sources", label: "Quellen anzeigen", icon: "book" },
   plain: { act: "copy-plain", label: "Ohne Formatierung kopieren", icon: "text" },
   speak: { act: "speak", label: "Vorlesen", icon: "volume" },
   fork: { act: "fork", label: "Ab hier neuen Chat starten", icon: "fork" },
@@ -30,11 +31,13 @@ const ITEMS = Object.freeze({
 /**
  * Welche Menuepunkte gehoeren zu dieser Rolle?
  * @param {"user"|"assistant"} role
+ * @param {boolean} [hatQuellen] - nur dann erscheint "Quellen anzeigen"
  * @returns {Array<{act: string, label: string, icon: string, danger?: boolean}>}
  */
-export function menuItemsFor(role) {
+export function menuItemsFor(role, hatQuellen = false) {
   if (role === "user") return [ITEMS.fork, ITEMS.remove];
-  return [ITEMS.plain, ITEMS.speak, ITEMS.fork, ITEMS.remove];
+  const punkte = [ITEMS.plain, ITEMS.speak, ITEMS.fork, ITEMS.remove];
+  return hatQuellen ? [ITEMS.sources, ...punkte] : punkte;
 }
 
 // Belegung der sichtbaren Leiste. Icon-only wie bei ChatGPT: mit Textlabels
@@ -125,11 +128,85 @@ export function headerTextFor(meta, now = new Date()) {
 }
 
 const ICONS = Object.freeze({
+  book: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v14H6.5A2.5 2.5 0 0 0 4 19.5Z"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H19v4H6.5A2.5 2.5 0 0 1 4 19.5Z"/></svg>',
   text: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14"/><path d="M5 12h14"/><path d="M5 18h9"/></svg>',
   volume: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10H4Z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>',
   fork: '<svg viewBox="0 0 24 24"><path d="M7 4v7a4 4 0 0 0 4 4h6"/><path d="m14 12 3 3-3 3"/><circle cx="7" cy="4" r="1.6"/></svg>',
   trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M6 7l1 12h10l1-12"/></svg>'
 });
+
+/**
+ * Kurzform einer Adresse fuer die Anzeige: Host plus gekuerzter Pfad.
+ * @param {string} url
+ * @returns {string}
+ */
+export function shortUrl(url) {
+  const roh = String(url || "");
+  const ohneSchema = roh.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+  return ohneSchema.length > 58 ? `${ohneSchema.slice(0, 57)}…` : ohneSchema;
+}
+
+/**
+ * Wie ist der Abruf ausgegangen? Ein HTTP 404 ist eine echte Auskunft und wird
+ * genauso gezeigt wie ein Erfolg — verschweigen waere schlechter.
+ * @param {{ok: boolean, status: number}} quelle
+ * @returns {string}
+ */
+export function sourceStatusText(quelle) {
+  const status = Number(quelle?.status) || 0;
+  if (quelle?.ok) return status ? `geladen · HTTP ${status}` : "geladen";
+  return status ? `Fehler · HTTP ${status}` : "nicht ladbar";
+}
+
+/**
+ * Quellenliste einer Antwort aufbauen. Zeigt, was wirklich abgerufen wurde:
+ * Adresse, Titel, Abrufergebnis und Zeitpunkt.
+ * @param {Document} doc
+ * @param {Array<{url: string, title: string, status: number, ok: boolean, abgerufenAm: string}>} sources
+ * @param {Date} [now]
+ * @returns {Element}
+ */
+export function buildSourcePanel(doc, sources, now = new Date()) {
+  const panel = doc.createElement("div");
+  panel.className = "msg-sources";
+  panel.setAttribute("role", "group");
+  panel.setAttribute("aria-label", "Quellen dieser Antwort");
+
+  const kopf = doc.createElement("div");
+  kopf.className = "msg-sources-head";
+  const titel = doc.createElement("span");
+  titel.textContent = sources.length === 1 ? "1 Quelle" : `${sources.length} Quellen`;
+  const schliessen = doc.createElement("button");
+  schliessen.type = "button";
+  schliessen.className = "msg-sources-close";
+  schliessen.dataset.act = "sources-close";
+  schliessen.setAttribute("aria-label", "Quellen ausblenden");
+  schliessen.textContent = "Ausblenden";
+  kopf.append(titel, schliessen);
+  panel.append(kopf);
+
+  for (const quelle of sources) {
+    const zeile = doc.createElement("div");
+    zeile.className = "msg-source";
+    const link = doc.createElement("a");
+    link.className = "msg-source-url";
+    link.href = quelle.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = quelle.title ? quelle.title : shortUrl(quelle.url);
+    const zusatz = doc.createElement("span");
+    zusatz.className = "msg-source-meta";
+    const teile = [];
+    if (quelle.title) teile.push(shortUrl(quelle.url));
+    teile.push(sourceStatusText(quelle));
+    const stempel = formatStamp(quelle.abgerufenAm, now);
+    if (stempel) teile.push(`abgerufen ${stempel}`);
+    zusatz.textContent = teile.join(" · ");
+    zeile.append(link, zusatz);
+    panel.append(zeile);
+  }
+  return panel;
+}
 
 /**
  * Menue aufbauen. Reine Erzeugung — das Einhaengen und die Klicks liegen im
@@ -151,7 +228,7 @@ export function buildMenu(doc, meta, now = new Date()) {
     head.textContent = header;
     menu.append(head);
   }
-  for (const item of menuItemsFor(meta?.role)) {
+  for (const item of menuItemsFor(meta?.role, (meta?.sources?.length || 0) > 0)) {
     if (item.danger) {
       const line = doc.createElement("div");
       line.className = "msg-menu-line";

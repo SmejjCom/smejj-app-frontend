@@ -3302,6 +3302,81 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
   outline-offset: 1px;
 }
 
+/* Quellen einer Antwort. Wie Leiste und Editor ein Geschwister der Nachricht,
+   damit die Adressen nicht im gespeicherten Verlauf und im Modellkontext landen. */
+.msg-sources {
+  max-width: min(980px, 100%);
+  margin: 0 0 6px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.msg-sources-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: rgba(246, 243, 238, 0.62);
+}
+
+.msg-sources-close {
+  padding: 2px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.78);
+  font: inherit;
+  font-size: 12px;
+  min-height: 0;
+  cursor: pointer;
+}
+
+.msg-sources-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.msg-sources-close:focus-visible {
+  outline: 2px solid var(--menu-icon-active-color, #00ffef);
+  outline-offset: 1px;
+}
+
+.msg-source {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 0;
+}
+
+.msg-source + .msg-source {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.msg-source-url {
+  color: #9ecbf0;
+  font-size: 13px;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.msg-source-url:hover {
+  text-decoration: underline;
+}
+
+.msg-source-url:focus-visible {
+  outline: 2px solid var(--menu-icon-active-color, #00ffef);
+  outline-offset: 2px;
+}
+
+.msg-source-meta {
+  font-size: 12px;
+  color: rgba(246, 243, 238, 0.56);
+  overflow-wrap: anywhere;
+}
+
 /* "Ab hier loeschen" ist umkehrbar — fuenf Sekunden lang. */
 .msg-undo {
   display: flex;

@@ -31,6 +31,40 @@ const FETCH_TIMEOUT_MS = 8000;
 // gegroundet (Client-Chat, dann Server-Stream) — die Seite wird nur einmal geholt.
 let memo = { task: "", value: "" };
 
+// Quellen-Gedaechtnis (2026-07-28): Bis hierher wusste NUR diese Datei, welche
+// Seite eine Antwort begruendet hat — der Kontext wurde in die Frage gewebt und
+// die Herkunft danach verworfen. Deshalb konnte die Nachrichten-Leiste kein
+// "Quellen anzeigen" bieten, ohne zu raten.
+//
+// Jetzt bleibt je Auftragstext gemerkt, WAS tatsaechlich geladen wurde. Rein
+// lokal im Speicher der Seite, kein Netzverkehr, keine Persistenz hier — der
+// Chat-Verlauf uebernimmt das Speichern.
+const MAX_QUELLEN = 30;
+const quellen = new Map();
+
+function merkeQuelle(task, context) {
+  if (!context) return;
+  quellen.set(String(task), {
+    url: String(context.url || ""),
+    title: String(context.title || ""),
+    status: Number(context.status) || 0,
+    ok: context.ok === true,
+    error: String(context.error || ""),
+    abgerufenAm: new Date().toISOString()
+  });
+  // Aeltesten Eintrag verwerfen, damit die Karte in langen Sitzungen nicht waechst.
+  while (quellen.size > MAX_QUELLEN) quellen.delete(quellen.keys().next().value);
+}
+
+/**
+ * Welche Seite hat diesen Auftrag begruendet?
+ * @param {string} task - der Auftragstext, wie er gesendet wurde
+ * @returns {{url: string, title: string, status: number, ok: boolean, error: string, abgerufenAm: string}|null}
+ */
+export function groundingFor(task) {
+  return quellen.get(String(task || "")) || null;
+}
+
 /**
  * Reichert eine Aufgabe um den Inhalt einer darin genannten Seite an.
  * @param {string} task Freitext des Nutzers.
@@ -44,6 +78,10 @@ export async function groundTask(task, deps = {}) {
   const url = firstSafeUrl(text);
   if (!url) return text;
   const context = await fetchPageContext(url, deps);
+  // Nur merken, was wirklich in die Frage eingeflossen ist. Ein gescheiterter
+  // Abruf (context === null) begruendet keine Antwort und darf spaeter auch
+  // nicht als Quelle auftauchen.
+  merkeQuelle(text, context);
   const value = context ? buildGroundedTask(text, context) : text;
   memo = { task: text, value };
   return value;

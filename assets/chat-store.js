@@ -115,6 +115,9 @@ function readEntries() {
       createdAt: String(meta.createdAt || ""),
       model: String(meta.model || ""),
       rating: String(meta.rating || ""),
+      // Quellen, die diese Antwort begruendet haben — sonst waere nach einem
+      // Neuladen nicht mehr nachvollziehbar, worauf sie beruht.
+      sources: Array.isArray(meta.sources) ? meta.sources : [],
       versions,
       active: clampVersionIndex((Number(meta.active) || 0) - verworfen, versions.length)
     };
@@ -257,6 +260,7 @@ function renderEntriesInto(log, messages) {
         createdAt: message.createdAt,
         model: message.model,
         rating: message.rating,
+        sources: message.sources,
         // Fassungen mitgeben, damit "Version 2 von 3" ein Neuladen ueberlebt.
         versions: message.versions,
         active: message.active

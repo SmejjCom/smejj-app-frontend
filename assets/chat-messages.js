@@ -96,7 +96,9 @@ export function metaOf(entry) {
     raw: "",
     versions: [],
     active: 0,
-    rating: ""
+    rating: "",
+    // Seiten, die diese Antwort begruendet haben (browser-context.js).
+    sources: []
   };
   META.set(entry, meta);
   if (entry.dataset) entry.dataset.msgId = meta.id;
@@ -156,6 +158,7 @@ export function seedMeta(entry, seed = {}) {
   if (seed.createdAt) meta.createdAt = String(seed.createdAt);
   if (seed.model) meta.model = String(seed.model);
   if (seed.rating) meta.rating = String(seed.rating);
+  if (Array.isArray(seed.sources)) meta.sources = normalisiereQuellen(seed.sources);
   if (Array.isArray(seed.versions)) {
     meta.versions = seed.versions
       .filter((version) => version && typeof version === "object")
@@ -176,6 +179,53 @@ export function addVersion(entry, version) {
   if (!meta || !version) return;
   meta.versions.push({ raw: String(version.raw || ""), html: String(version.html || "") });
   meta.active = meta.versions.length - 1;
+}
+
+/**
+ * Quellenangaben auf das Noetige zurechtstutzen. Nur Eintraege mit echter
+ * Adresse zaehlen — eine Quelle ohne Adresse ist keine.
+ * @param {Array} liste
+ * @returns {Array<{url: string, title: string, status: number, ok: boolean, abgerufenAm: string}>}
+ */
+export function normalisiereQuellen(liste) {
+  if (!Array.isArray(liste)) return [];
+  return liste
+    .filter((quelle) => quelle && typeof quelle === "object" && String(quelle.url || "").trim())
+    .map((quelle) => ({
+      url: String(quelle.url),
+      title: String(quelle.title || ""),
+      status: Number(quelle.status) || 0,
+      ok: quelle.ok === true,
+      abgerufenAm: String(quelle.abgerufenAm || "")
+    }));
+}
+
+/**
+ * Quellen einer Antwort zuordnen. Idempotent: dieselbe Adresse kommt nicht
+ * zweimal hinein, damit ein erneutes Auffrischen die Liste nicht aufblaeht.
+ * @param {Element} entry
+ * @param {Array} liste
+ * @returns {number} Anzahl der Quellen danach
+ */
+export function addSources(entry, liste) {
+  const meta = metaOf(entry);
+  if (!meta) return 0;
+  const vorhanden = new Set(meta.sources.map((quelle) => quelle.url));
+  for (const quelle of normalisiereQuellen(liste)) {
+    if (vorhanden.has(quelle.url)) continue;
+    vorhanden.add(quelle.url);
+    meta.sources.push(quelle);
+  }
+  return meta.sources.length;
+}
+
+/**
+ * Hat diese Nachricht belegbare Quellen?
+ * @param {Element} entry
+ * @returns {boolean}
+ */
+export function hasSources(entry) {
+  return (metaOf(entry)?.sources?.length || 0) > 0;
 }
 
 /**
