@@ -1,4 +1,5 @@
 import { API_ORIGIN, STORAGE_KEYS } from "./config.js";
+import { afterFirstPaint } from "./deferred-start.js";
 
 const TOKEN_KEY = "smejj.apiToken.v1";
 const CLINE_MODEL_KEY = "smejj.cline.model.v1";
@@ -19,7 +20,8 @@ export function initClineProviderSurface(view) {
   setTimeout(() => {
     if (localStorage.getItem(STORAGE_KEYS.model) === "Cline") activateClineSelection();
   }, 0);
-  load(root).catch((error) => status(root, friendlyError(error), true));
+  // Erst nach dem ersten Bildaufbau (Architekturregel, Befund 2026-07-27).
+  afterFirstPaint([() => load(root).catch((error) => status(root, friendlyError(error), true))]);
 }
 
 function markup() {

@@ -4,6 +4,7 @@
 // in der Liste nur maskiert (letzte 4 Zeichen), Vollanzeige nur einmal direkt
 // nach dem Anlegen. Alle sichtbaren Texte über t() (Deutsch als Basis).
 // Additiv: bestehender Cline-Fluss (provider-settings.js) bleibt unberührt.
+import { afterFirstPaint } from "./deferred-start.js";
 import { API_ORIGIN, STORAGE_KEYS } from "./config.js";
 import { PROVIDER_CATALOG, catalogProvider, selectableProviders } from "./ai/providers-catalog.js?v=1";
 import { t } from "./i18n/ui.js?v=3";
@@ -24,7 +25,8 @@ export function initApiKeysSurface(view) {
   root.addEventListener("input", (event) => { if (event.target.matches(".ak-search")) filterList(root); });
   root.addEventListener("change", (event) => { if (event.target.id === "akProviderSelect") onProviderChange(root); });
   root.addEventListener("submit", (event) => { event.preventDefault(); if (event.target.id === "akAddForm") submitKey(root); });
-  refresh(root).catch((error) => status(root, friendlyError(error), true));
+  // Erst nach dem ersten Bildaufbau (Architekturregel, Befund 2026-07-27).
+  afterFirstPaint([() => refresh(root).catch((error) => status(root, friendlyError(error), true))]);
 }
 
 function markup() {

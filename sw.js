@@ -65,6 +65,11 @@
 // findet der Import offline nichts, der Fetch-Handler liefert als Fallback "/"
 // (index.html), und der Browser bricht app.js komplett ab - die App waere
 // offline tot. Non-Regression laut Change-Lock.
+// v150 -> v151 (2026-07-27): Die letzten drei Control-Server-Startaufrufe
+// (/api/auth/me aus account-privacy.js, /api/keys aus api-keys-surface.js,
+// /api/providers/cline/models+status aus provider-settings.js) laufen erst nach
+// dem ersten Bildaufbau. Alle drei Dateien liegen im Precache und brauchen den
+// Versionssprung, sonst erreicht der Fix wiederkehrende Nutzer nicht.
 // v149 -> v150 (2026-07-27): Ladezeit — start-styles.css buendelt die acht
 // render-blockierenden Stylesheets der Startseite (die acht Einzeldateien sind
 // dadurch aus dem Precache raus, sie werden von keiner Seite mehr geladen);
@@ -75,7 +80,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v150";
+const CACHE_NAME = "smejj-shell-v151";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

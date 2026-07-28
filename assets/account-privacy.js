@@ -4,6 +4,7 @@ import { languageOptionsMarkup } from "./language-options.js?v=1";
 import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=1";
 import { clearProfilePicture } from "./profile-picture-store.js?v=1";
+import { afterFirstPaint } from "./deferred-start.js";
 import { applyAuthState } from "./account-auth-state.js?v=1";
 import { usageSummary } from "./usage-meter.js?v=1";
 import { initOnboardingWelcome } from "./onboarding-welcome.js?v=1";
@@ -59,7 +60,10 @@ export function initAccountPrivacySurface() {
   bind(view);
   initProfilePictureControl(view, (text) => output(view, text));
   initServerSessionControls(view, (text) => output(view, text));
-  hydrateAuthSession(view); // angemeldeten Nutzer (Google/E-Mail/Passkey) anzeigen
+  // Erst nach dem ersten Bildaufbau: /api/auth/me gehoert nicht in den Ladepfad
+  // (Architekturregel, Befund 2026-07-27). Die Oberflaeche steht sofort, nur die
+  // Nutzerdaten kommen kurz danach.
+  afterFirstPaint([() => hydrateAuthSession(view)]);
 }
 
 // Zeigt den serverseitig angemeldeten Nutzer an: Name/E-Mail vorbelegen und
