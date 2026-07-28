@@ -1,3 +1,9 @@
+// v187 -> v188 (2026-07-28): Wurzelfix zur "Ungueltige URL."-Meldung. v187
+// raeumte nur localStorage — zu spaet, browser-pane.js hatte den alten
+// Maus-Tab da schon im Speicher. Jetzt werden wiederhergestellte Maus-Tabs in
+// BEIDEN Ablagen geleert, bevor das Panel oeffnet. browser-pane.js exportiert
+// dafuer sein state-Objekt (nur das Schluesselwort, 0 Netto-Zeilen). Beide
+// Dateien liegen im Precache.
 // v186 -> v187 (2026-07-28): maus-panel.js leert beim Start eine gespeicherte
 // /maus-replay.html-Adresse. Beim Wiederherstellen verliert der Maus-Tab seinen
 // Modus, browser-pane.js schickte die relative Adresse dann durch den
@@ -289,7 +295,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v187";
+const CACHE_NAME = "smejj-shell-v188";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

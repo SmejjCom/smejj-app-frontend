@@ -43,7 +43,7 @@ const REMOTE_REFIT_DEBOUNCE_MS = 600;
 const REMOTE_REFIT_MIN_DELTA_PX = 64;
 const REMOTE_REFIT_MIN_INTERVAL_MS = 1500;
 
-const state = {
+export const state = {
   tabs: [],
   activeId: "",
   nextId: 1,

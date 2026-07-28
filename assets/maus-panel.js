@@ -24,7 +24,7 @@
 // und auch nicht verstecken darf (fail-closed: echte Fehlermeldung, kein
 // erfundener Erfolg).
 
-import { openPane, activeTab, addTab, setFrame, commitHistory, persistTabs, render, refs } from "./browser-pane.js?v=browser-pane-20260709-2";
+import { openPane, activeTab, addTab, setFrame, commitHistory, persistTabs, render, refs, state } from "./browser-pane.js?v=browser-pane-20260709-2";
 
 const MAUS_MODE = "maus-replay";
 
@@ -43,30 +43,39 @@ function init() {
 }
 
 // Der Maus-Tab wird wie jeder andere Tab gespeichert — beim Wiederherstellen
-// geht sein Modus aber verloren, und browser-pane.js wuerde die relative
-// Adresse "/maus-replay.html" durch den Server-Proxy schicken. Der lehnt sie
-// als "Ungueltige URL." ab, und im Panel stand eine Fehlermeldung ueber einer
-// funktionierenden Wiedergabe (live gesehen 2026-07-28). Deshalb hier beim
-// Start die gespeicherte Adresse leeren: der Tab kommt leer zurueck, der
-// Maus-Knopf oeffnet die Wiedergabe sauber neu.
+// geht sein Modus aber verloren (restoreTabs setzt mode:""), und der Frame ist
+// noch leer. openPane() holt genau solche Tabs mit
+// `if (tab?.url && !tab.frame) navigate(...)` nach — und navigate() schickt
+// alles durch den Server-Proxy, der die relative Adresse "/maus-replay.html"
+// fail-closed als "Ungueltige URL." ablehnt. Ergebnis (live gesehen
+// 2026-07-28): eine Fehlermeldung UEBER einer korrekt laufenden Wiedergabe.
+//
+// Deshalb werden wiederhergestellte Maus-Tabs beim Start geleert — im Speicher
+// UND in localStorage. Der Tab kommt leer zurueck, der Maus-Knopf oeffnet die
+// Wiedergabe sauber neu. Nur Leeren, nie Schliessen: ein fremder Tab des
+// Nutzers wird dabei nicht angefasst.
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
+const MAUS_PFAD = "/maus-replay.html";
 
 function vergessenerMausTabAufraeumen() {
+  for (const tab of state?.tabs || []) leereWennMaus(tab);
   try {
     const gespeichert = JSON.parse(localStorage.getItem(TABS_STORAGE_KEY) || "null");
     if (!gespeichert?.tabs?.length) return;
-    let geaendert = false;
-    for (const eintrag of gespeichert.tabs) {
-      if (!String(eintrag?.url || "").startsWith("/maus-replay.html")) continue;
-      eintrag.url = "";
-      eintrag.history = [];
-      eintrag.historyIndex = -1;
-      geaendert = true;
+    if (gespeichert.tabs.filter(leereWennMaus).length) {
+      localStorage.setItem(TABS_STORAGE_KEY, JSON.stringify(gespeichert));
     }
-    if (geaendert) localStorage.setItem(TABS_STORAGE_KEY, JSON.stringify(gespeichert));
   } catch {
     // Kaputter oder gesperrter Speicher darf den Maus-Knopf nie blockieren.
   }
+}
+
+function leereWennMaus(tab) {
+  if (!String(tab?.url || "").startsWith(MAUS_PFAD)) return false;
+  tab.url = "";
+  tab.history = [];
+  tab.historyIndex = -1;
+  return true;
 }
 
 /**
