@@ -99,10 +99,13 @@
       <span class="split-icon" aria-hidden="true"><span></span><span></span></span>
     </button>
     <!-- Freigabe "Maus-Sichtbarkeit" (Wof Kadavanich, 2026-07-28): oeffnet die
-         Maus-Engine-Wiedergabe direkt im rechten Browser-Panel (kein neues
-         CSS, kein neues Layout — dieselben Klassen wie #browserButton).
-         Logik ausschliesslich in public/maus-panel.js. -->
-    <button id="mausButton" class="glass-icon browser-button" type="button" aria-label="Maus-Wiedergabe oeffnen" title="Maus">
+         Maus-Engine-Wiedergabe direkt im rechten Browser-Panel (dieselben
+         Klassen wie #browserButton). .browser-button setzt "right: 0" fest,
+         darum hier ein Inline-style (per CSP style-src 'unsafe-inline'
+         erlaubt, keine gesperrte CSS-Datei angefasst), das den Knopf um
+         Breite+Abstand nach links versetzt — sonst liegt er deckungsgleich
+         auf #browserButton. Logik ausschliesslich in public/maus-panel.js. -->
+    <button id="mausButton" class="glass-icon browser-button" type="button" aria-label="Maus-Wiedergabe oeffnen" title="Maus" style="right: 36px;">
       <img src="/icons/maus-cursor.png" alt="" aria-hidden="true" width="20" height="20">
     </button>
     <div id="sidebarBackdrop" class="sidebar-backdrop" hidden></div>
