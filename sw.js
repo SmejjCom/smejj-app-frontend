@@ -1,3 +1,8 @@
+// v163 -> v164 (2026-07-28): Barrierefreiheit — zugeklappte Panels sind nicht
+// mehr per Tastatur erreichbar (panel-layout.js). Gemessen bei der Zoom-
+// pruefung: 11 von 22 Tab-Stationen lagen ausserhalb des Bildes (zugeklappte
+// Seitenleiste bei -208 px, Browser-Panel bei 1309 px). Jetzt 0 von 22.
+// panel-layout.js liegt im Precache und braucht den Versionssprung.
 // v162 -> v163 (2026-07-28): Offline-Fix in local-workspace-surface.js. Erste
 // echte Offline-MESSUNG (Netz per DevTools-Protokoll abgeschaltet) zeigte:
 // die Shell laedt in 99 ms aus dem Cache, aber die online/offline-Listener
@@ -144,7 +149,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v163";
+const CACHE_NAME = "smejj-shell-v164";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
