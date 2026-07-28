@@ -1,3 +1,8 @@
+// v178 -> v179 (2026-07-28): Spurwahl und Zeitbudget. Die Tiefspur wird nur
+// noch gewaehlt, wenn die Seite NICHT geladen werden konnte; sonst steht ihr
+// Inhalt schon in der Frage und die Schnellspur ist rund zehnmal schneller
+// (gemessen 0,49-1,01 s statt 4,9-7,8 s bei 6,5 s Limit). fetch-retry.js gibt
+// der Tiefspur ein eigenes Budget.
 // v177 -> v178 (2026-07-28): Quellenliste sagt "1 Seite fuer diese Frage
 // geladen" statt "1 Quelle" — gegroundet wird die Frage, nicht die Antwort.
 // v176 -> v177 (2026-07-28): "Quellen anzeigen" pro Antwort. browser-context.js
@@ -220,7 +225,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v178";
+const CACHE_NAME = "smejj-shell-v179";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

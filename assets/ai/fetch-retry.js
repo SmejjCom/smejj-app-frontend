@@ -15,6 +15,30 @@ const DEFAULT_ATTEMPTS = 2;
 const DEFAULT_FIRST_BYTE_TIMEOUT_MS = 6500;
 const DEFAULT_RETRY_DELAY_MS = 300;
 
+// Die Tiefspur (GLM/Kimi/Cline ueber den Control Server) ist bauartbedingt
+// langsamer als die Schnellspur. Gemessen am 2026-07-28 gegen die Live-Bridge:
+// Schnellspur 0,49-1,01 s bis zum ersten Byte, Tiefspur 4,9-7,8 s. Mit einem
+// gemeinsamen Budget von 6,5 s brach ausgerechnet die Tiefspur regelmaessig ab
+// ("Verbindung zum Server unterbrochen"), obwohl der Server sauber geantwortet
+// haette. Sie bekommt deshalb ein eigenes, grosszuegiges Budget.
+//
+// Seit derselben Messung waehlt browser-context.js die Tiefspur nur noch, wenn
+// die Seite NICHT geladen werden konnte — dieser Weg ist also die Ausnahme.
+const DEEP_LANE_FIRST_BYTE_TIMEOUT_MS = 15000;
+const DEEP_LANE_MODEL = /"model"\s*:\s*"[^"]*(glm|kimi|cline)/i;
+
+/**
+ * Wieviel Zeit bis zum ersten Byte? Ohne ausdrueckliche Vorgabe entscheidet die
+ * angefragte Spur — erkennbar am Modellnamen im Anfragekoerper.
+ * @param {{body?: unknown}} init
+ * @param {number} tiefspurMs
+ * @returns {number}
+ */
+export function firstByteBudgetFor(init, tiefspurMs = DEEP_LANE_FIRST_BYTE_TIMEOUT_MS) {
+  const body = typeof init?.body === "string" ? init.body : "";
+  return DEEP_LANE_MODEL.test(body) ? tiefspurMs : DEFAULT_FIRST_BYTE_TIMEOUT_MS;
+}
+
 // url darf ein einzelner Endpunkt ODER eine Liste sein (Stufe C: Zwei-Wege-
 // Betrieb). Bei einer Liste wandert jeder Neuversuch zum naechsten Endpunkt —
 // Versuch 1 = Haupt-Server (Salad, am schnellsten), Versuch 2 = Reserve
@@ -22,19 +46,21 @@ const DEFAULT_RETRY_DELAY_MS = 300;
 // solange irgendein Server lebt.
 export async function fetchStreamWithRetry(url, init = {}, {
   attempts = DEFAULT_ATTEMPTS,
-  firstByteTimeoutMs = DEFAULT_FIRST_BYTE_TIMEOUT_MS,
+  firstByteTimeoutMs,
   retryDelayMs = DEFAULT_RETRY_DELAY_MS,
   fetchFn = globalThis.fetch,
   onRetry
 } = {}) {
   const urls = (Array.isArray(url) ? url : [url]).filter(Boolean);
   if (!urls.length) throw new Error("bridge_unreachable: keine Endpunkte");
+  // Ausdrueckliche Vorgabe gewinnt; sonst entscheidet die angefragte Spur.
+  const budgetMs = Number.isFinite(firstByteTimeoutMs) ? firstByteTimeoutMs : firstByteBudgetFor(init);
   const versuche = Math.max(attempts, urls.length);
   let lastReason = "";
   for (let attempt = 1; attempt <= versuche; attempt += 1) {
     const ziel = urls[(attempt - 1) % urls.length];
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), firstByteTimeoutMs);
+    const timer = setTimeout(() => controller.abort(), budgetMs);
     try {
       const response = await fetchFn(ziel, { ...init, signal: controller.signal });
       clearTimeout(timer);

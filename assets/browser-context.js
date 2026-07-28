@@ -182,16 +182,36 @@ function decodeBasicEntities(text) {
 }
 
 /**
- * Waehlt das Modell fuer eine Aufgabe. Nennt sie eine Web-Adresse, muss die
- * Tiefspur ran: die Schnellspur der Bridge kennt keine Werkzeuge und wuerde den
- * Seiteninhalt raten statt lesen (Befund 2026-07-28: "I-MILD.com" statt des
- * echten Titels). Alles andere bleibt unveraendert bei der Wahl des Nutzers.
- * @param {string} task Freitext des Nutzers.
+ * Waehlt das Modell fuer eine Aufgabe.
+ *
+ * Nennt die Aufgabe eine Web-Adresse, brauchte es bisher IMMER die Tiefspur: die
+ * Schnellspur der Bridge kennt keine Werkzeuge und wuerde den Seiteninhalt raten
+ * statt lesen (Befund 2026-07-28: "I-MILD.com" statt des echten Titels).
+ *
+ * Gemessen am 2026-07-28 kostet das aber sehr viel: die Tiefspur brauchte 4,9 bis
+ * 7,8 s bis zum ersten Byte, waehrend fetch-retry.js nach 6,5 s abbricht. Ergebnis
+ * fuer den Nutzer: ausgerechnet Fragen MIT Adresse endeten oft in "Verbindung zum
+ * Server unterbrochen". Das Budget des Projekts verlangt unter 1 s.
+ *
+ * Entscheidend ist: seit Stufe 2 steht der Seiteninhalt bereits IN der Frage.
+ * Dann braucht niemand mehr Werkzeuge — die Schnellspur liest ihn einfach mit.
+ * Nachgemessen mit derselben gegroundeten Anfrage: 0,49 / 0,49 / 1,01 s statt
+ * 4,9 s, und die Antwort war inhaltlich richtig ("Example Domain").
+ *
+ * Die Tiefspur bleibt daher genau fuer den Fall, fuer den sie gedacht war: die
+ * Seite konnte NICHT geladen werden, es gibt keinen Inhalt in der Frage, und nur
+ * echtes Tool-Calling kann noch etwas ausrichten.
+ *
+ * @param {string} task Freitext des Nutzers (ungegroundet, wie eingegeben).
  * @param {string} gewaehlt Aktuell gewaehltes Modell.
  * @returns {string} Modell fuer diese eine Anfrage.
  */
 export function modelForTask(task, gewaehlt) {
   const aktuell = String(gewaehlt || "");
   if (TIEFSPUR_ERKANNT.test(aktuell)) return aktuell;
-  return firstSafeUrl(String(task || "")) ? TIEFSPUR_MODELL : aktuell;
+  const text = String(task || "");
+  if (!firstSafeUrl(text)) return aktuell;
+  // groundTask laeuft in app.js VOR dieser Wahl (gleiches Objektliteral, Zeile
+  // darueber). Liegt hier eine Quelle vor, steckt der Seiteninhalt in der Frage.
+  return groundingFor(text) ? aktuell : TIEFSPUR_MODELL;
 }
