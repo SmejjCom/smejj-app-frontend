@@ -10,9 +10,15 @@ const SAFE_VALUES = {
   confirmations: new Set(["strict", "balanced", "trusted"])
 };
 
+// reasoningEffort war bis 2026-07-28 reiner Prompt-Hinweis und stand deshalb
+// folgenlos auf "high". Seit K3 steuert der Wert einen echten API-Parameter
+// (reasoning_effort). Gemessen: "high" kostet 13,9 s bis zum ersten Zeichen,
+// "medium" nur 8,6 s. Der Standard ist darum "medium" — wer mehr Tiefe will,
+// stellt sie in den Einstellungen ausdruecklich ein. So bleibt das gemessene
+// Tempo erhalten, statt es durch einen nie bewusst gewaehlten Wert zu verlieren.
 const DEFAULTS = Object.freeze({
   theme: "system", startView: "last", density: "comfortable", fontSize: "medium",
-  responseStyle: "balanced", reasoningEffort: "high", confirmations: "balanced",
+  responseStyle: "balanced", reasoningEffort: "medium", confirmations: "balanced",
   personalization: "", autoContext: true, runChecks: true, browserPreview: true,
   networkAccess: false, notifyComplete: true, notifyApproval: true,
   notifyError: true, diagnostics: false

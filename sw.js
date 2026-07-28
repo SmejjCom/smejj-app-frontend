@@ -1,3 +1,11 @@
+// v181 -> v182 (2026-07-28): Reasoning-Aufwand wird echt wirksam. Der Wert aus
+// Einstellungen -> Modelle war bisher nur ein Satz im Prompt; fuer Kimi K3 steuert
+// er jetzt den API-Parameter reasoning_effort (Mittel->low, Hoch->high,
+// Maximal->max). Der Standard wechselt von high auf medium, damit das
+// gemessene Tempo erhalten bleibt (8,6 s statt 13,9 s bis zum ersten Zeichen) —
+// wer mehr Tiefe will, stellt sie ausdruecklich ein. Nur settings-runtime.js
+// geaendert; Startseite, Eingabefeld und Design unveraendert.
+//
 // v180 -> v181 (2026-07-28): Reihenfolge im Modell-Menue nach Vorgabe des
 // Betreibers: smejj 1.0, Kimi K3, GLM-5.2, Cline, Kimi K2.7. Nur die Abfolge der
 // Menueeintraege in index.html; Beschriftungen, Zuordnung und Design unveraendert.
@@ -247,7 +255,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v181";
+const CACHE_NAME = "smejj-shell-v182";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
