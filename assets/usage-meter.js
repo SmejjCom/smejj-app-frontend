@@ -10,6 +10,8 @@
 // geschluckt. Kein Eintrag in SAFE_EXPORT_KEYS noetig; account-privacy.js
 // exportiert den Schluessel explizit mit.
 
+import { initFieldVitals } from "./field-vitals.js";
+
 const USAGE_KEY = "smejj.usage.v1";
 const COUNTER_KEYS = ["messages", "voiceSeconds", "codingTasks"];
 
@@ -67,6 +69,9 @@ export function initUsageCapture(doc = globalThis.document) {
   try {
     if (!doc || doc.__smejjUsageCapture) return;
     doc.__smejjUsageCapture = true;
+    // Geschwindigkeit echter Besuche mitschreiben — rein lokal, ohne Netzverkehr
+    // und ohne Last fuer den Control Server (siehe public/field-vitals.js).
+    initFieldVitals();
     let armed = false;
     const arm = () => { armed = true; };
     doc.addEventListener("pointerdown", arm, { once: true, capture: true });
@@ -97,6 +102,7 @@ export function initUsageCapture(doc = globalThis.document) {
 }
 
 // Anzeigetexte fuer die Kontoseite: ganze Sprachminuten (aufgerundet ab 30 s).
+
 export function usageSummary(storage = globalThis.localStorage, now = new Date()) {
   const usage = readUsage(storage, now);
   return {

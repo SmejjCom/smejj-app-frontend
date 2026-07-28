@@ -1,3 +1,6 @@
+// v161 -> v162 (2026-07-28): Feldmessung — field-vitals.js schreibt LCP, INP,
+// CLS und TTFB echter Besuche NUR LOKAL mit (kein Netzverkehr, keine Last fuer
+// den Control Server). PFLICHT im Precache: usage-meter.js importiert das Modul.
 // v160 -> v161 (2026-07-28): CSP-Haertung — static-pages.css neu im Precache.
 // Die 20 statischen Seiten (Rechtstexte, 404, Sprach-Startseiten) laden ihren
 // Stil jetzt per <link> aus /assets/static-pages.css statt als <style>-Block;
@@ -134,12 +137,13 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v161";
+const CACHE_NAME = "smejj-shell-v162";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
   "/assets/static-pages.css",
   "/assets/deferred-start.js",
+  "/assets/field-vitals.js",
   "/assets/google-login.js",
   "/assets/free-coding-fallback.js",
   "/assets/uploads-surface.js",
