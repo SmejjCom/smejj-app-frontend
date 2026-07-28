@@ -45,7 +45,11 @@ html.p-recht h1 { font-size: 1.8rem; margin-bottom: 0.2em; overflow-wrap: break-
 html.p-recht h2 { font-size: 1.15rem; margin-top: 2em; }
 html.p-recht h3 { font-size: 1rem; margin-top: 1.4em; }
 html.p-recht a { color: #8fc7ff; }
-html.p-recht .legal-brand { display: inline-flex; width: 30px; margin-bottom: 18px; padding: 0; background: transparent; }
+/* min-height: der Logo-Link mass 30x23 px und blieb damit 1 px unter der
+ * WCAG-2.2-Mindestzielgroesse (Restbefund aus QA-Welle 1, F-21 — die
+ * Fusszeilen-Links waren dort schon gefixt, der Logo-Link nicht). Gilt
+ * zentral fuer alle Seiten mit p-recht. */
+html.p-recht .legal-brand { display: inline-flex; align-items: center; min-height: 24px; width: 30px; margin-bottom: 18px; padding: 0; background: transparent; }
 html.p-recht .legal-brand img { display: block; width: 100%; height: auto; aspect-ratio: 2000 / 1532.335; object-fit: contain; background: transparent; }
 html.p-recht .card {
   background: rgba(255, 255, 255, 0.04);
@@ -144,3 +148,12 @@ html.p-status .status-knopf {
 }
 html.p-status .status-knopf:hover { background: rgba(255, 255, 255, 0.12); }
 html.p-status .status-stand { font-size: 0.85rem; color: rgba(246, 243, 238, 0.55); }
+
+/* ===== Hilfeseite (html.p-hilfe, zusaetzlich zu p-recht) ===== */
+html.p-hilfe .hilfe-vorspann { color: rgba(246, 243, 238, 0.78); margin: 0 0 1.4em; }
+html.p-hilfe .hilfe-inhalt { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 1em; padding-bottom: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+html.p-hilfe .hilfe-inhalt a { font-size: 0.92rem; display: inline-flex; align-items: center; min-height: 24px; }
+html.p-hilfe .hilfe-liste { margin: 0; }
+html.p-hilfe .hilfe-liste dt { font-weight: 600; margin-top: 1em; }
+html.p-hilfe .hilfe-liste dt:first-child { margin-top: 0; }
+html.p-hilfe .hilfe-liste dd { margin: 2px 0 0; color: rgba(246, 243, 238, 0.72); font-size: 0.95rem; }

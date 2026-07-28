@@ -23,9 +23,12 @@ const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
 const LOGIN_URL = "/auth/login/";
 
 // Oeffentliche Pfade: hier leitet das Gate nie um.
-// /status ist ausdruecklich oeffentlich: Wer wissen will, ob der Anmeldedienst
-// laeuft, kann sich per Definition gerade nicht anmelden.
-const PUBLIC_PATHS = [/^\/auth\//, /^\/datenschutz/, /^\/impressum/, /^\/maus-replay/, /^\/status/];
+// /status.html ist ausdruecklich oeffentlich: Wer wissen will, ob der
+// Anmeldedienst laeuft, kann sich per Definition gerade nicht anmelden.
+// GENAU diese Datei, kein Praefix: die App hat unter "/status" eine EIGENE,
+// anmeldepflichtige Ansicht (VIEW_PATHS.tools in view-routes.js). Ein
+// Praefix-Muster wuerde sie mit oeffnen.
+const PUBLIC_PATHS = [/^\/auth\//, /^\/datenschutz/, /^\/impressum/, /^\/maus-replay/, /^\/status\.html$/, /^\/hilfe\.html$/];
 
 // Oeffentlicher Pfad? Input: pathname (String). Output: boolean.
 export function isPublicPath(pathname) {
