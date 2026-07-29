@@ -1,3 +1,8 @@
+// v189 -> v190 (2026-07-28): Das Aufraeumen der Maus-Tabs lief nie. Der
+// init()-Aufruf stand oberhalb der const-Deklarationen von maus-panel.js —
+// temporale Totzone, ReferenceError, vom catch fuer gesperrten localStorage
+// lautlos verschluckt. Alle Checks waren gruen; gefunden nur per Live-Messung.
+// Start jetzt am Dateiende, maus-panel.js auf ?v=3.
 // v188 -> v189 (2026-07-28): Der v188-Fix kam im Browser nicht an. index.html
 // laedt browser-pane.js und maus-panel.js mit ?v=-Query — unter der ALTEN Query
 // behaelt der Browser seine alte Kopie, egal was am Pfad neu ist (dieselbe
@@ -301,7 +306,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v189";
+const CACHE_NAME = "smejj-shell-v190";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

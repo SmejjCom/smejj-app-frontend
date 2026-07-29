@@ -28,8 +28,6 @@ import { openPane, activeTab, addTab, setFrame, commitHistory, persistTabs, rend
 
 const MAUS_MODE = "maus-replay";
 
-if (typeof document !== "undefined") init();
-
 function init() {
   vergessenerMausTabAufraeumen();
   window.addEventListener("smejj:maus-replay-request", (event) => openMausReplay(event.detail || {}));
@@ -77,6 +75,13 @@ function leereWennMaus(tab) {
   tab.historyIndex = -1;
   return true;
 }
+
+// Start ganz am Ende, NICHT oben: init() liest die const-Werte dieser Datei.
+// Stand der Aufruf weiter oben, lagen sie noch in der temporalen Totzone, der
+// Zugriff warf einen ReferenceError — und der catch in
+// vergessenerMausTabAufraeumen() verschluckte ihn lautlos. Das Aufraeumen lief
+// dadurch nie, obwohl alle Checks gruen waren (live gefunden 2026-07-28).
+if (typeof document !== "undefined") init();
 
 /**
  * Zeigt die Maus-Engine-Wiedergabe direkt im rechten Panel — bewusst OHNE den
