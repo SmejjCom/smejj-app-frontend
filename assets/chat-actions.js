@@ -30,7 +30,15 @@ import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } fr
 // anzeigen" waere dann nie erschienen. Beim lokalen Test 2026-07-28 genau so
 // passiert.
 import { groundingFor } from "/assets/browser-context.js";
-import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=1";
+// EXAKT dieselbe Kennung wie in composer-tools.js und voice-landing.js.
+// Bis 2026-07-29 stand hier ?v=1 — der Browser lud voice-speech-queue.js
+// dadurch ZWEIMAL (live gemessen: zwei Eintraege in
+// performance.getEntriesByType("resource"), 4,3 KB doppelt) und hielt zwei
+// getrennte Modulinstanzen mit eigenem Zustand. Hier wird nur die reine
+// Funktion sanitizeForSpeech benutzt, es ging also nichts kaputt; die
+// Warteschlange aus demselben Modul haette es zerrissen. Gleiche Falle wie bei
+// settings-runtime.js in sw v184/v185.
+import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=blitz-20260726";
 import { createChatFrom, openChat } from "/assets/chat-store.js?v=verlauf-20260721";
 import { showToast } from "/assets/components.js?v=chat-markdown-20260717";
 
