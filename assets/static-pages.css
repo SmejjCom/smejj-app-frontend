@@ -162,3 +162,23 @@ html.p-hilfe .hilfe-liste { margin: 0; }
 html.p-hilfe .hilfe-liste dt { font-weight: 600; margin-top: 1em; }
 html.p-hilfe .hilfe-liste dt:first-child { margin-top: 0; }
 html.p-hilfe .hilfe-liste dd { margin: 2px 0 0; color: rgba(246, 243, 238, 0.72); font-size: 0.95rem; }
+
+/*
+ * Qualitaetsverlauf (verlauf.html). Nutzt bewusst die p-status-Grundlagen
+ * (status-gesamt, status-liste, status-zeile) weiter — es ist dieselbe Art
+ * Seite. Neu sind nur die drei Zeilen-Bausteine und die Stufen-Farben, die
+ * hier eine andere Bedeutung haben als beim Betriebsstatus: nicht
+ * "Dienst erreichbar", sondern "Budget eingehalten".
+ * Farbe ist nie der einzige Traeger der Aussage — die Zahl steht daneben.
+ */
+html.p-status .status-gesamt[data-stufe="gut"] { border-color: rgba(95, 176, 154, 0.55); }
+html.p-status .status-gesamt[data-stufe="gerissen"] { border-color: rgba(230, 184, 92, 0.55); }
+html.p-status .status-gesamt[data-stufe="kritisch"] { border-color: rgba(226, 122, 122, 0.6); }
+html.p-status .verlauf-kopf { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 12px; }
+html.p-status .verlauf-zeit { font-size: 0.9rem; color: rgba(246, 243, 238, 0.72); font-variant-numeric: tabular-nums; }
+html.p-status .verlauf-punktzahl { margin-left: auto; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+html.p-status .status-zeile[data-stufe="gut"] .verlauf-punktzahl { color: #6fc9ad; }
+html.p-status .status-zeile[data-stufe="gerissen"] .verlauf-punktzahl { color: #e6b85c; }
+html.p-status .status-zeile[data-stufe="kritisch"] .verlauf-punktzahl { color: #e27a7a; }
+html.p-status .verlauf-details { margin: 4px 0 0; font-size: 0.92rem; color: rgba(246, 243, 238, 0.7); font-variant-numeric: tabular-nums; }
+html.p-status .verlauf-stand { margin: 1em 0 0; padding-top: 0.9em; border-top: 1px solid rgba(255, 255, 255, 0.07); font-size: 0.87rem; color: rgba(246, 243, 238, 0.6); }

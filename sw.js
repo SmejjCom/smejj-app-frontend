@@ -332,7 +332,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v193";
+const CACHE_NAME = "smejj-shell-v194";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -451,6 +451,9 @@ const SHELL = [
   "/status.html",
   "/hilfe.html",
   "/assets/status.js",
+  "/verlauf.html",
+  "/assets/verlauf.js",
+  "/verlauf-messwerte.json",
   "/impressum.html",
   "/datenschutz.html",
   "/en/legal-notice.html",
