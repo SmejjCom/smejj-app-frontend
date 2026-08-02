@@ -74,7 +74,18 @@ export async function fetchStreamWithRetry(url, init = {}, {
   // aber lebendig" die einzige verbliebene Moeglichkeit, und Abbrechen ist dann
   // strikt schlechter als Warten.
   const letzterBudgetMs = explizit ? budgetMs : Math.max(budgetMs, DEEP_LANE_FIRST_BYTE_TIMEOUT_MS);
-  const versuche = Math.max(attempts, urls.length);
+  // JEDER ENDPUNKT EINMAL, PLUS EIN ZWEITER ANLAUF (Live-Messung 2026-08-02).
+  // Gemessen an Coding-Fragen ueber die Live-Kette: die Bruecke antwortete bei
+  // 2 von 6 Anfragen mit HTTP 503 ("Model backend is not configured" — ihre
+  // eigene Tiefspur ist nicht konfiguriert, und wenn der Control-Router
+  // aussetzt, faellt sie ins Leere), der Reserve-Endpunkt bei 1 von 3 mit 502.
+  // Beide Ausfaelle sind kurz und unabhaengig. Mit genau einem Versuch je
+  // Endpunkt trifft man beide schlechten Wuerfe zusammen in rund 11 % der
+  // Faelle — der Nutzer sieht dann "Verbindung zum Server unterbrochen",
+  // obwohl ein einziger weiterer Anlauf gereicht haette.
+  // Ein zusaetzlicher Durchgang kostet nichts, wo ohnehin keine Antwort kam
+  // (4xx ausser 429 wird weiterhin NICHT wiederholt, siehe unten).
+  const versuche = Math.max(attempts, urls.length > 1 ? urls.length + 1 : urls.length);
   let lastReason = "";
   for (let attempt = 1; attempt <= versuche; attempt += 1) {
     const ziel = urls[(attempt - 1) % urls.length];
