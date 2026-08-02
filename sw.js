@@ -1,3 +1,10 @@
+// v195 -> v196 (2026-08-02): Sprachwelle Stufe 3a jetzt auch auf der Startseite.
+// composer-tools.js reicht dem Waechter den erkannten TEXT statt eines Ja/Nein
+// (adaptive Wartezeit) und macht den Denk-Laut scharf. Damit importiert eine
+// Precache-Datei erstmals voice-thinking-cue.js — die Datei MUSS deshalb in den
+// SHELL, sonst liefert der Rueckfall offline "/" (HTML) statt JavaScript und
+// bricht composer-tools.js komplett ab. Genau davor warnt check:precache-imports;
+// die Pruefung hat die Luecke gemeldet, bevor sie live ging.
 // v194 -> v195 (2026-08-02): Sprachwelle Stufe 3a. Zwei Aenderungen im
 // Precache: voice-endpoint.js (semantisches Sprech-Ende — die Wartezeit nach
 // dem letzten Wort richtet sich nach dem Gesagten statt starr 850 ms zu sein)
@@ -343,7 +350,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v195";
+const CACHE_NAME = "smejj-shell-v196";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -410,6 +417,7 @@ const SHELL = [
   "/assets/voice-echo-filter.js",
   "/assets/voice-vad.js",
   "/assets/voice-endpoint.js",
+  "/assets/voice-thinking-cue.js",
   "/assets/voice-premium-tts.js",
   "/assets/voice-warmup.js",
   "/assets/ai/fetch-retry.js",

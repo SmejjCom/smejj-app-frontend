@@ -11,8 +11,10 @@ import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
 import { createSpeechInterrupt } from "./voice-vad.js?v=blitz2-20260726";
 import { warmUpAgentConnection } from "./voice-warmup.js";
-// Stufe 2a: Interim-Waechter — Sprech-Ende ~1 s frueher erkennen und senden.
+// Stufe 2a/3a: Interim-Waechter — Sprech-Ende erkennen; seit 3a richtet sich die
+// Wartezeit nach dem Gesagten. Denk-Laut fuellt die Stille bis zur Antwort.
 import { createSilenceWatchdog } from "./voice-endpoint.js";
+import { createThinkingCue } from "./voice-thinking-cue.js";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
 // Unterbrechen wie ChatGPT). Fail-safe: ohne Worker bleibt die Browser-Stimme.
 import { createPremiumVoice } from "./voice-premium-tts.js";
@@ -444,7 +446,7 @@ function voiceModeListen() {
               }
               const heard = (finalTranscript + interim).trim();
               setVoiceModeTranscript(heard);
-              watchdog.update(Boolean(heard));
+              watchdog.update(heard); // Stufe 3a: Text statt Ja/Nein -> adaptive Wartezeit
               // Stufe 1e: Beim finalen Ergebnis SOFORT senden statt auf onend zu
               // warten — voiceModeSend loest die Erkennung selbst ab (Guard in onend).
               const task = finalTranscript.trim();
@@ -586,6 +588,9 @@ function waitForAssistantReply(knownEntries) {
               }
       });
       state.speechQueue = queue;
+      // Stufe 3a: Antwort ueber 700 ms -> hoerbar Bescheid sagen statt schweigen. Der Laut
+      // prueft beim Feuern selbst, ob die Antwort schon laeuft (spokenText) — daher keine Entwarnung noetig.
+      createThinkingCue({ delayMs: 700, antwortLaeuft: () => queue.isCancelled() || queue.spokenText().length > 0, sagen: () => { if (state.voiceModeActive) queue.sayAhead("Einen Moment ..."); } }).arm();
       const finish = () => {
               if (!state.voiceModeActive) return;
               if (taskRunning() && Date.now() - startedAt < 120000) {
