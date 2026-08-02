@@ -1,3 +1,14 @@
+// v196 -> v197 (2026-08-02): "Verbindung zum Server unterbrochen" behoben.
+// Live im Browser reproduziert: Fragen mit einer Web-Adresse schlugen zweimal
+// fehl, erst der dritte Versuch kam durch. Ursache: fetch-retry.js entscheidet
+// das Zeitbudget am MODELLNAMEN im Anfragekoerper — welche Spur der Server
+// nimmt, haengt aber an der FRAGE. Steht dort "smejj 1.0", galten 6,5 s,
+// obwohl die Frage ueber den Control Server lief und dort gemessene ~15 s bis
+// zum ersten Byte braucht. Der Klient gab nach 2 x 6,5 s auf, obwohl der Server
+// eine Sekunde spaeter geantwortet haette. Jetzt bleibt der schnelle Wechsel auf
+// den Reserve-Endpunkt erhalten, aber der LETZTE Versuch wartet lange.
+// fetch-retry.js liegt cache-first im Precache — ohne Versionssprung erreicht
+// der Fix Bestandsnutzer nicht.
 // v195 -> v196 (2026-08-02): Sprachwelle Stufe 3a jetzt auch auf der Startseite.
 // composer-tools.js reicht dem Waechter den erkannten TEXT statt eines Ja/Nein
 // (adaptive Wartezeit) und macht den Denk-Laut scharf. Damit importiert eine
@@ -350,7 +361,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v196";
+const CACHE_NAME = "smejj-shell-v197";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
