@@ -1,3 +1,14 @@
+// v194 -> v195 (2026-08-02): Sprachwelle Stufe 3a. Zwei Aenderungen im
+// Precache: voice-endpoint.js (semantisches Sprech-Ende — die Wartezeit nach
+// dem letzten Wort richtet sich nach dem Gesagten statt starr 850 ms zu sein)
+// und voice-speech-queue.js (sayAhead: eine Ansage kann VOR der Antwort in
+// dieselbe Warteschlange, damit sie nicht hineinredet). Ohne diesen
+// Versionssprung bekaemen Bestandsnutzer beide Dateien weiter aus dem Cache —
+// cache-first seit v160. Der alte Aufrufweg von voice-endpoint.js bleibt
+// unveraendert, damit die eingefrorene composer-tools.js (Start-Lock) exakt ihr
+// heutiges Verhalten behaelt. NICHT im Precache: voice-thinking-cue.js
+// (Denk-Laut) — nur voice-landing.js importiert es, und voice-landing.js steht
+// selbst nicht im SHELL; beide kommen aus dem Netz, der Stand bleibt stimmig.
 // v192 -> v193 (2026-07-29): EIN Modul, EINE Kennung. chat-actions.js
 // importierte voice-speech-queue.js?v=1, waehrend composer-tools.js und
 // voice-landing.js ?v=blitz-20260726 nutzen — live gemessen wurde die Datei
@@ -332,7 +343,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v194";
+const CACHE_NAME = "smejj-shell-v195";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

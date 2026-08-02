@@ -18,7 +18,12 @@ import { normalizeSpeechText, isLikelyEcho, enoughForBarge } from "./voice-echo-
 import { createSpeechInterrupt } from "./voice-vad.js?v=blitz2-20260726";
 import { warmUpAgentConnection } from "./voice-warmup.js";
 // Stufe 2a: Interim-Waechter — Sprech-Ende ~1 s frueher erkennen und senden.
+// OHNE ?v= — dieselbe Kennung wie in public/composer-tools.js. Zwei Kennungen
+// waeren zwei Modulinstanzen mit getrenntem Zustand (check:module-queries).
+// Der Cache wird ueber die Version in sw.js gebrochen, nicht ueber die Import-URL.
 import { createSilenceWatchdog } from "./voice-endpoint.js";
+// Stufe 3a: Denk-Laut, damit zwischen Frage und Antwort nicht nur Stille steht.
+import { createThinkingCue } from "./voice-thinking-cue.js";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
 // Unterbrechen wie ChatGPT). Fail-safe: ohne Worker bleibt die Browser-Stimme.
 import { createPremiumVoice } from "./voice-premium-tts.js";
@@ -407,7 +412,10 @@ function listen() {
     }
     const heard = (finalTranscript + interim).trim();
     setTranscript(heard);
-    watchdog.update(Boolean(heard));
+    // Stufe 3a: den TEXT uebergeben statt nur "da ist etwas". Der Waechter
+    // wartet dadurch kurz nach einem fertigen Satz und laenger nach einem
+    // Bindewort — statt immer starre 850 ms (voice-endpoint.js: idleFor).
+    watchdog.update(heard);
     // Stufe 1e: Beim finalen Ergebnis SOFORT senden statt auf onend zu warten —
     // sendTask loest die Erkennung selbst ab (Identitaets-Guard in onend).
     const task = finalTranscript.trim();
@@ -473,12 +481,19 @@ async function sendTask(task) {
   // Stufe 1c: satzweises Vorlesen — die Ausgabe beginnt mit dem ersten fertigen
   // Satz, waehrend der Rest der Antwort noch streamt (voice-speech-queue.js).
   stopSpeaking();
+  // Stufe 3a: Der Denk-Laut wird weiter unten scharf gemacht. Er muss hier
+  // bereits deklariert sein, weil onQueueStart ihn entschaerft — und
+  // onQueueStart kann feuern, bevor die Zuweisung durchgelaufen ist.
+  let cue = null;
   const queue = createSpeechQueue({
     speakFn: speak,
     stopFn: () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); },
     eagerFirst: true,
     onQueueStart: () => {
       if (!state.active || state.requestId !== requestId) return;
+      // Ab hier ist wirklich Ton zu hoeren — der Denk-Laut wird nicht mehr
+      // gebraucht und darf auf keinen Fall noch dazwischenreden.
+      cue?.disarm();
       setStatus("speaking", T.speaking);
       // Echo-Filter vergleicht live gegen alles bereits Gesprochene (Getter).
       startBargeListener(() => queue.spokenText());
@@ -510,6 +525,19 @@ async function sendTask(task) {
     }
   });
   state.speechQueue = queue;
+  // Stufe 3a: Braucht die Antwort laenger als 700 ms, sagt die Sprachwelle
+  // hoerbar Bescheid statt zu schweigen — dieselbe Zeile, die oben schon im
+  // Status steht, in allen 14 Sprachen bereits uebersetzt. Ist der Server
+  // schnell, wird der Laut nie gesprochen (disarm in onQueueStart).
+  cue = createThinkingCue({
+    delayMs: 700,
+    antwortLaeuft: () => queue.isCancelled() || queue.spokenText().length > 0,
+    sagen: () => {
+      if (!state.active || state.requestId !== requestId) return;
+      queue.sayAhead(T.thinking);
+    }
+  });
+  cue.arm();
   let reply = "";
   let streamed = "";
   try {
@@ -528,6 +556,10 @@ async function sendTask(task) {
   } catch {
     reply = "";
   }
+  // Stufe 3a: Ab hier ist die Antwort da (oder ausgeblieben). In BEIDEN Faellen
+  // darf der Denk-Laut nicht mehr feuern — sonst spricht die Sprachwelle
+  // "Einen Moment ..." in eine bereits laufende Antwort oder ins Zuhoeren hinein.
+  cue.disarm();
   if (!state.active || state.requestId !== requestId) {
     queue.cancel();
     return;

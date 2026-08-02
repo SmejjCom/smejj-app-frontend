@@ -198,6 +198,22 @@ export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, m
       for (const sentence of sentences) queue.push(sentence);
       speakNext();
     },
+    // Stufe 3a: Eine wortwoertliche Ansage VOR der Antwort einreihen (Denk-Laut,
+    // siehe voice-thinking-cue.js). Sie laeuft bewusst durch dieselbe
+    // Warteschlange — dadurch kann sie nicht in die Antwort hineinreden, und der
+    // Echo-Filter kennt sie ueber spokenText() als eigene Ausgabe.
+    // Greift NUR, solange nichts Echtes gesprochen wird und der Stream noch
+    // laeuft: sonst wuerde der Laut nach der Antwort kommen statt davor.
+    // Rueckgabe: true, wenn die Ansage eingereiht wurde.
+    sayAhead(text) {
+      if (cancelled || started || flushed) return false;
+      if (queue.length > 0) return false;
+      const ansage = String(text || "").trim();
+      if (!ansage) return false;
+      queue.push(ansage);
+      speakNext();
+      return true;
+    },
     // Stream fertig: Rest (auch ohne Satzzeichen) sprechen, danach onQueueEnd.
     flush(fullText) {
       if (cancelled) return;
