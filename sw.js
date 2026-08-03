@@ -1,3 +1,9 @@
+// v200 -> v201 (2026-08-02): Sprachwelle Stufe 2 — Barge-in-Schwellen nach
+// Messung verschaerft. voice-echo-filter.js: BARGE_MIN_WORDS 2 -> 3 (das live
+// gemessene Selbst-Echo "smeeting nach" hatte genau zwei Woerter) und
+// Echo-Deckungsschwelle 0.6 -> 0.5 (der Fall hatte exakt 50 % und rutschte
+// durch). Wirkt auf Startseite UND 14 Sprachseiten ueber die geteilte Naht.
+// Nur der Precache-Sprung liegt in sw.js; die Logik liegt in der freien Datei.
 // v199 -> v200 (2026-08-02): Sprachwelle brach sich selbst ab. Der Denk-
 // Platzhalter aus app.js ("smejj denkt nach ...") ist ein normaler
 // .entry.assistant und galt dem Sprachmodus als Antwort: Status nach 68 ms auf
@@ -388,7 +394,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v200";
+const CACHE_NAME = "smejj-shell-v201";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
