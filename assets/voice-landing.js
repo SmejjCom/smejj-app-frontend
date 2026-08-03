@@ -25,6 +25,8 @@ import { createSilenceWatchdog } from "./voice-endpoint.js";
 // Stufe 3: Rueckfrage statt Blindantwort + Doppel-Sende-Schutz (geteilte Naht
 // mit der Startseite; Muster aus dem ChatGPT-Live-Vergleich 2026-08-03).
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
+// Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
+import { createServerEar, createEarSend } from "./voice-ear.js";
 // Stufe 3a: Denk-Laut, damit zwischen Frage und Antwort nicht nur Stille steht.
 import { createThinkingCue } from "./voice-thinking-cue.js";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
@@ -187,6 +189,17 @@ const lang = pageLang();
 const T = stringsFor(lang);
 // Stufe 3: dieselbe erkannte Frage nicht zweimal senden (onresult UND onend liefern).
 const doppelschutz = createDoppelschutz();
+// Stufe 4: Server-Ohr (Groq Whisper ueber die Bridge) — fail-safe, siehe voice-ear.js.
+const serverEar = createServerEar({ url: CLIENT_ROUTES.api.voiceTranscribe });
+const earSend = createEarSend({
+  ear: serverEar,
+  istAktiv: () => state.active && !state.fallback,
+  zeigeDenken: () => setStatus("thinking", T.thinking),
+  zeigeTranskript: (text) => setTranscript(text),
+  sollNachfragenFn: sollNachfragen,
+  nachfragen: () => nachfragenStattSenden(),
+  senden: (task) => sendTask(task)
+});
 const SPEECH_LANG = speechLangFor(lang);
 const RecognitionCtor = typeof window !== "undefined"
   ? (window.SpeechRecognition || window.webkitSpeechRecognition || null)
@@ -274,6 +287,7 @@ function unlockSpeechSynthesis() {
 }
 
 function enterFallback(message) {
+  serverEar.cancel();
   state.fallback = true;
   stopInterrupt();
   stopBargeListener();
@@ -449,12 +463,10 @@ function listen() {
     if (sawFinal && task && state.recognition === recognition) {
       watchdog.stop();
       state.failStreak = 0;
-      // Stufe 3: Wirkt das Transkript verhoert, nachfragen statt senden.
-      if (sollNachfragen({ text: task, confidence: bestConfidence })) {
-        nachfragenStattSenden();
-        return;
-      }
-      sendTask(task);
+      // Laufende Erkennung abloesen — earSend wartet aufs Server-Ohr.
+      state.recognition = null;
+      try { recognition.abort(); } catch { /* bereits gestoppt */ }
+      earSend(task, bestConfidence);
     }
   };
   recognition.onerror = (event) => {
@@ -473,12 +485,7 @@ function listen() {
     const task = finalTranscript.trim();
     if (task) {
       state.failStreak = 0;
-      // Stufe 3: gleiche Rueckfrage-Entscheidung wie im onresult-Pfad.
-      if (sollNachfragen({ text: task, confidence: bestConfidence })) {
-        nachfragenStattSenden();
-        return;
-      }
-      sendTask(task);
+      earSend(task, bestConfidence);
       return;
     }
     if (Date.now() - state.listenStartedAt < 1500) {
@@ -495,6 +502,7 @@ function listen() {
   state.listenStartedAt = Date.now();
   try {
     recognition.start();
+    serverEar.start(); // Stufe 4: parallel aufnehmen (leise, fail-safe)
   } catch {
     enterFallback(T.typeHint);
   }
@@ -633,6 +641,7 @@ async function sendTask(task, { getippt = false } = {}) {
 // --- Overlay / Einstieg ---------------------------------------------------------
 
 function closeOverlay() {
+  serverEar.cancel();
   state.active = false;
   state.fallback = false;
   state.failStreak = 0;

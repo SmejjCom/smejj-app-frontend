@@ -32,6 +32,7 @@ const API_PATHS = {
   // internen Piper-Dienst.
   voiceStatus: "https://smejj-chat-bridge.zeabur.app/api/voice/status",
   voiceTts: "https://smejj-chat-bridge.zeabur.app/api/voice/tts",
+  voiceTranscribe: "https://smejj-chat-bridge.zeabur.app/api/voice/transcribe",
     authConfig: "/api/auth/config",
     browserFetch: "/api/browser/fetch",
     browserRemote: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/api/browser/remote",

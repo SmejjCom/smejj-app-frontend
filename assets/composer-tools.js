@@ -13,6 +13,8 @@ import { createBrowserTts } from "./voice-browser-tts.js";
 // Stufe 3: Rueckfrage statt Blindantwort + Doppel-Sende-Schutz (wie ChatGPT,
 // Live-Vergleich 2026-08-03) — geteilte Naht mit den 14 Sprachseiten.
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
+// Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
+import { createServerEar, createEarSend } from "./voice-ear.js";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
@@ -79,6 +81,18 @@ function synthesisSupported() {
 const browserTts = createBrowserTts({ lang: SPEECH_LANG, base: SPEECH_BASE, supported: synthesisSupported });
 // Doppel-Sende-Schutz (Stufe 3): dieselbe erkannte Frage nicht zweimal senden.
 const doppelschutz = createDoppelschutz();
+// Stufe 4: Server-Ohr (Groq Whisper ueber die Bridge) — fail-safe, siehe voice-ear.js.
+const serverEar = createServerEar({ url: CLIENT_ROUTES.api.voiceTranscribe });
+const earSend = createEarSend({
+      ear: serverEar,
+      istAktiv: () => state.voiceModeActive && !state.voiceFallback,
+      istStumm: () => state.voiceMuted,
+      zeigeDenken: () => setVoiceModeStatus("thinking", "Einen Moment ..."),
+      zeigeTranskript: setVoiceModeTranscript,
+      sollNachfragenFn: sollNachfragen,
+      nachfragen: () => nachfragenStattSenden(),
+      senden: (task) => voiceModeSend(task)
+});
 
 // Stufe B: Premium-Stimme des Servers (WebAudio) — nur im Sprachmodus aktiv,
 // Verfuegbarkeit wird beim Oeffnen geprueft; jeder Fehler faellt lautlos auf
@@ -118,8 +132,7 @@ function notifyInputChanged(input) {
 }
 
 function lastAssistantEntryText() {
-      // Auch hier gilt: der Denk-Platzhalter ist keine Antwort. Ohne den
-      // Ausschluss las der Vorlesen-Knopf waehrend des Denkens "smejj denkt nach" vor.
+      // Denk-Platzhalter ist keine Antwort (sonst las der Vorlesen-Knopf ihn vor).
       const entries = document.querySelectorAll(ANSWER_SELECTOR);
       for (let index = entries.length - 1; index >= 0; index -= 1) {
               const text = entries[index].textContent.trim();
@@ -179,6 +192,7 @@ function syncVoiceMicVisual() {
 const voiceFocus = createVoiceFocusTrap();
 
 function closeVoiceMode() {
+      serverEar.cancel();
       state.voiceModeActive = false;
       state.voiceMuted = false;
       state.voiceFallback = false;
@@ -206,6 +220,7 @@ function closeVoiceMode() {
 // das Overlay bleibt offen, Fragen kommen ueber das Eingabefeld unten,
 // die Antworten werden weiterhin vorgelesen.
 function enterVoiceFallback(message) {
+      serverEar.cancel();
       state.voiceFallback = true;
       stopInterrupt();
       stopBargeListener();
@@ -243,11 +258,9 @@ function enterVoiceFallback(message) {
 // unterlaufen den Text-Echo-Filter. Gilt fuer BEIDE Wege (Wort + Pegel).
 const BARGE_GRACE_MS = 700;
 
-// Nur ECHTE Antworten zaehlen: app.js haengt beim Absenden einen Platzhalter
-// ("smejj denkt nach ...", data-thinking="true") als .entry.assistant an. Ohne
-// den Ausschluss hielt der Sprachmodus ihn fuer die Antwort (gemessen 2026-08-02):
-// Platzhalter vorgelesen, Mikrofon in der Denkphase offen -> Selbstabbruch,
-// erste ~20 Zeichen jeder Antwort verschluckt, Denk-Laut kam nie.
+// Nur ECHTE Antworten zaehlen: app.js haengt beim Absenden einen Denk-Platzhalter
+// (data-thinking="true") als .entry.assistant an — ohne den Ausschluss hielt der
+// Sprachmodus ihn fuer die Antwort (Selbstabbruch, gemessen 2026-08-02).
 const ANSWER_SELECTOR = '#startLog .entry.assistant:not([data-thinking="true"])';
 
 // Mikrofonpegel-Ueberwachung beenden (Vorlese-Ende, Schliessen, vor Zuhoeren).
@@ -357,10 +370,8 @@ function startBargeListener(spokenText, failStreak = 0) {
       }
 }
 
-// Stufe 3: Rueckfrage statt Blindantwort (Muster aus dem ChatGPT-Live-Vergleich).
-// Ein fast sicher verhoertes Transkript geht NICHT an den Server — die
-// Sprachwelle sagt hoerbar Bescheid und hoert danach einfach weiter zu.
-// Niemals still verwerfen: der Nutzer erfaehrt sofort, dass er wiederholen soll.
+// Stufe 3: Rueckfrage statt Blindantwort — hoerbar Bescheid sagen und weiter
+// zuhoeren; niemals still verwerfen (Lehre aus dem alten 0.6-Gate).
 function nachfragenStattSenden() {
       // Laufende Erkennung abloesen (abort -> onend ignoriert sie per Guard).
       const aktive = state.voiceRecognition;
@@ -392,8 +403,7 @@ function voiceModeListen() {
       recognition.interimResults = true;
       state.voiceRecognition = recognition;
       let finalTranscript = "";
-      // Stufe 3: beste Konfidenz der finalen Ergebnisse — Grundlage der
-      // Rueckfrage-Entscheidung (sollNachfragen). NaN = Browser liefert keine.
+      // Stufe 3: beste Konfidenz der finalen Ergebnisse (NaN = Browser liefert keine).
       let bestConfidence = NaN;
       // Stufe 2a: Kommen bei vorhandenem Text ~850 ms keine neuen Zwischen-
       // ergebnisse, das Erkennungs-Ende sofort erzwingen (stop -> finales
@@ -429,12 +439,10 @@ function voiceModeListen() {
               if (sawFinal && task && !state.voiceMuted && state.voiceRecognition === recognition) {
                         watchdog.stop();
                         state.voiceFailStreak = 0;
-                        // Stufe 3: Wirkt das Transkript verhoert, nachfragen statt senden.
-                        if (sollNachfragen({ text: task, confidence: bestConfidence })) {
-                                    nachfragenStattSenden();
-                                    return;
-                        }
-                        voiceModeSend(task);
+                        // Laufende Erkennung abloesen — earSend wartet aufs Server-Ohr.
+                        state.voiceRecognition = null;
+                        try { recognition.abort(); } catch { /* bereits gestoppt */ }
+                        earSend(task, bestConfidence);
               }
       };
       recognition.onerror = (event) => {
@@ -457,12 +465,7 @@ function voiceModeListen() {
               const task = finalTranscript.trim();
               if (task) {
                         state.voiceFailStreak = 0;
-                        // Stufe 3: gleiche Rueckfrage-Entscheidung wie im onresult-Pfad.
-                        if (sollNachfragen({ text: task, confidence: bestConfidence })) {
-                                    nachfragenStattSenden();
-                                    return;
-                        }
-                        voiceModeSend(task);
+                        earSend(task, bestConfidence);
                         return;
               }
               // Endet die Erkennung mehrfach sofort ohne Ergebnis (typisch iOS/Safari),
@@ -482,6 +485,7 @@ function voiceModeListen() {
       state.voiceListenStartedAt = Date.now();
       try {
               recognition.start();
+              serverEar.start(); // Stufe 4: parallel aufnehmen (leise, fail-safe)
       } catch {
               enterVoiceFallback("Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.");
       }
@@ -494,13 +498,11 @@ function voiceModeSend(task, { getippt = false } = {}) {
               closeVoiceMode();
               return;
       }
-      // Stufe 3: Erkannte Duplikate nicht doppelt senden (onresult UND onend
-      // koennen dieselbe Aeusserung liefern; ChatGPT stolperte im Test genauso).
-      // Getippte Fragen sind Absicht und laufen ungeprueft durch.
+      // Stufe 3: erkannte Duplikate nicht doppelt senden (onresult UND onend
+      // liefern dieselbe Aeusserung); getippte Fragen sind Absicht.
       if (!getippt && doppelschutz.blockiert(task)) {
               stopBargeListener();
-              // Noch laufende Erkennung abloesen, sonst scheitert der Neustart
-              // (nur eine Erkennung gleichzeitig — Guard in onend ignoriert sie).
+              // Laufende Erkennung abloesen, sonst scheitert der Neustart.
               const aktive = state.voiceRecognition;
               state.voiceRecognition = null;
               try {
@@ -548,10 +550,8 @@ function waitForAssistantReply(knownEntries) {
       // Stufe 1c: satzweises Vorlesen — die Ausgabe beginnt mit dem ersten fertigen
       // Satz, waehrend der Rest der Antwort noch streamt (voice-speech-queue.js).
       stopSpeaking();
-      // Das Mikrofon geht NICHT mehr beim ersten Sprech-Happen auf, sondern erst,
-      // wenn echter Antworttext gesprochen wird. Der Denk-Laut ("Einen Moment ...")
-      // laeuft durch dieselbe Queue — wuerde er das Mikrofon oeffnen, hoerte sich
-      // die Ausgabe wieder selbst zu. Idempotent: mehrfacher Aufruf schaltet einmal.
+      // Mikrofon erst bei ECHTEM Antworttext oeffnen — nie beim Denk-Laut,
+      // sonst hoert sich die Ausgabe selbst zu. Idempotent.
       let queue = null;
       let bargeArmed = false;
       const armBargeIn = () => {
@@ -670,6 +670,7 @@ function toggleVoiceMute() {
       state.voiceMuted = !state.voiceMuted;
       syncVoiceMicVisual();
       if (state.voiceMuted) {
+              serverEar.cancel();
               stopInterrupt();
               stopBargeListener();
               try {

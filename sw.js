@@ -1,3 +1,13 @@
+// v202 -> v203 (2026-08-03): Sprachwelle Stufe 4 — das Groq-Ohr. Waehrend die
+// Web-Speech-Erkennung zuhoert, nimmt ein MediaRecorder parallel auf; die
+// Bridge transkribiert ueber Groq Whisper (Welle-2-Zugang, 0-Euro-Deckel) und
+// das praezise Transkript ersetzt das oft verhoerte Web-Speech-Ergebnis —
+// fail-safe: ohne Bridge-Route/Schluessel bleibt alles wie bisher.
+// voice-ear.js NEU im SHELL (importiert von composer-tools.js und
+// voice-landing.js; ohne Precache-Eintrag liefert der Rueckfall offline "/"
+// (HTML) statt JavaScript und bricht die Module ab). config.js ergaenzt die
+// Route. Freigabe des Betreibers ("B / Ja" zur Entscheidungsvorlage
+// ENTSCHEIDUNG_SPRACHSERVER_KOSTEN_2026-08-03.md, Variante B) vom 2026-08-03.
 // v201 -> v202 (2026-08-03): Sprachwelle Stufe 3 — Rueckfrage statt Blindantwort.
 // Befund aus dem ChatGPT-Live-Vergleich: auch dort wird Umgebung/Fremdsprache
 // als Text mitgehoert; die Rettung ist eine Rueckfrage statt einer Blindantwort.
@@ -403,7 +413,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v202";
+const CACHE_NAME = "smejj-shell-v203";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -470,6 +480,7 @@ const SHELL = [
   "/assets/voice-overlay-ui.js",
   "/assets/voice-browser-tts.js",
   "/assets/voice-clarify.js",
+  "/assets/voice-ear.js",
   "/assets/voice-speech-queue.js",
   "/assets/voice-echo-filter.js",
   "/assets/voice-vad.js",
