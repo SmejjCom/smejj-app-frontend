@@ -20,13 +20,18 @@ function resolveApiOrigin() {
 export const API_ORIGIN = resolveApiOrigin();
 
 const API_PATHS = {
-  // Salad-Abloesung ABGESCHLOSSEN (2026-07-27): Groq-Schluessel liegt auf
-  // Zeabur (gemessen 0,3-0,8 s erster Token — schneller als Salad). Der
-  // Zeabur-Mietserver ist Haupt-Endpunkt, die Salad-Bridge nur noch Reserve.
-  agent: "https://smejj-chat-bridge.zeabur.app/api/agent",
-  chat: "https://smejj-chat-bridge.zeabur.app/api/chat",
-  agentFallback: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/agent",
-  chatFallback: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/chat",
+  // RUECKTAUSCH (Betreiber-Auftrag 2026-08-03, "behebe Fehler" Chat-Qualitaet):
+  // Die Zeabur-Bridge ist seit 2026-07-29 auf v104 eingefroren (ZEABUR_API_TOKEN
+  // fehlt) — v104 wirft den mitgeschickten Gespraechsverlauf weg und hat kein
+  // Projektwissen. Live-Fehlbild: "Privat konto?" wurde ohne Kontext als Frage
+  // ueber smejj.com beantwortet. Die Salad-Bridge laedt ihren Code bei jedem
+  // Start frisch aus dem Frontend-Repo und traegt v111 (Verlauf + RAG + 70B-
+  // Schnellspur). Salad ist darum Haupt-Endpunkt, Zeabur nur noch Reserve, bis
+  // der Betreiber-Token den Zeabur-Gleichstand erlaubt.
+  agent: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/agent",
+  chat: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/chat",
+  agentFallback: "https://smejj-chat-bridge.zeabur.app/api/agent",
+  chatFallback: "https://smejj-chat-bridge.zeabur.app/api/chat",
   // Premium-Stimme laeuft ueber den Zeabur-Mietserver (CPU-Stimme Piper im
   // Flat-Paket, kein GPU-Worker noetig) — die Bridge dort proxied zum
   // internen Piper-Dienst.

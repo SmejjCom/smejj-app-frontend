@@ -2955,6 +2955,18 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
   margin: 2px 0;
 }
 
+/* Links aus chat-markdown.js (Betreiber-Auftrag 2026-08-03: klickbar).
+   currentColor + Unterstrich: bleibt in hell und dunkel lesbar, kein neuer Farbwert. */
+.entry.assistant .chat-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.entry.assistant .chat-link:hover {
+  opacity: 0.8;
+}
+
 .entry.assistant code {
   padding: 1px 5px;
   border-radius: 5px;
