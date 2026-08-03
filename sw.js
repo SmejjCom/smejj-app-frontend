@@ -1,3 +1,11 @@
+// v207 -> v208 (2026-08-04): Gespraechsgedaechtnis an drei Stellen repariert.
+// (1) Der Wartetext "smejj denkt nach..." ging als juengste Assistenten-Antwort
+//     in jede Anfrage mit, und die aktuelle Frage stand doppelt darin.
+// (2) Der Reserve-Server (v104, eingefroren) kennt `history` in /api/agent nicht
+//     und warf den Verlauf weg — die Reserve laeuft jetzt ueber /api/chat.
+// (3) Der Sprach-Modus schickte GAR KEINEN Verlauf mit (voice-conversation.js NEU).
+// Dazu: Projektwissen findet jetzt auch das Thema einer Anschlussfrage.
+
 // v206 -> v207 (2026-08-03): Nacharbeit zum Split-View, beide Restpunkte aus
 // der Abschlussmeldung (Freigabe Wof Kadavanich, 2026-08-03: "Ja").
 // 1) Wegklicken: Ist der Split-View offen UND zusaetzlich das linke Menue,
@@ -445,7 +453,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v207";
+const CACHE_NAME = "smejj-shell-v208";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -513,6 +521,7 @@ const SHELL = [
   "/assets/voice-overlay-ui.js",
   "/assets/voice-browser-tts.js",
   "/assets/voice-clarify.js",
+  "/assets/voice-conversation.js",
   "/assets/voice-ear.js",
   "/assets/voice-speech-queue.js",
   "/assets/voice-echo-filter.js",
@@ -521,6 +530,7 @@ const SHELL = [
   "/assets/voice-thinking-cue.js",
   "/assets/voice-premium-tts.js",
   "/assets/voice-warmup.js",
+  "/assets/ai/chat-stream.js",
   "/assets/ai/fetch-retry.js",
   "/assets/composer-dictation.js",
   "/assets/chat-store.js",

@@ -2,7 +2,7 @@ import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js";
 import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { runClientChat } from "/assets/ai/chatClient.js?v=3";
-import { fetchStreamWithRetry } from "/assets/ai/fetch-retry.js"; // Stufe A2: Neuversuch bei Replika-Ausfall
+import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=chat-markdown-20260717";
 import { initComposerTools } from "./composer-tools.js?v=stufeb-20260726";
 import { initGlobalSearch } from "./search.js";
@@ -11,7 +11,7 @@ import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.j
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
-import { collectConversationHistory } from "./chat-history-context.js";
+import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js";
 import { lesbarerStatus } from "./system-status-text.js";
 import { groundTask, modelForTask } from "./browser-context.js";
 import { afterFirstPaint } from "./deferred-start.js";
@@ -296,12 +296,18 @@ async function submitTask(task, { target = "#startLog" } = {}) {
     if (routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
     if (await runClientChat({ task: await groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
     try {
-      await stream([CLIENT_ROUTES.api.agent, CLIENT_ROUTES.api.agentFallback], {
+      const anfrage = {
         task: await groundTask(task),
         model: modelForTask(task, state.settings.model) || "smejj 1.0",
         files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}) },
-        history: collectConversationHistory()
-      }, output);
+        history: buildRequestHistory(task)
+      };
+      // Die Reserve laeuft ueber /api/chat: ihr Stand kennt `history` in
+      // /api/agent nicht (siehe buildChatTargets / buildReserveChatRequest).
+      await streamChatAnswer(
+        buildChatTargets({ primary: CLIENT_ROUTES.api.agent, reserve: CLIENT_ROUTES.api.chatFallback }, anfrage),
+        anfrage, output, { renderMarkdown: renderChatMarkdown, offlineNotice: UI_COPY.chatOffline }
+      );
       return showTaskIndicator("done");
     } catch (streamError) {
       output.textContent = "";
@@ -676,69 +682,6 @@ function addEntry(text, role, target = "#startLog") {
   log.append(node);
   node.scrollIntoView({ block: "end" });
   return node;
-}
-
-function clearThinkingState(output) {
-  if (output && output.dataset?.thinking === "true") {
-    output.innerHTML = "";
-    delete output.dataset.thinking;
-  }
-}
-
-async function stream(url, body, output) {
-  let response; // Stufe A2: Replika-Ausfall -> fetchStreamWithRetry versucht sofort neu.
-  try {
-    response = await fetchStreamWithRetry(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  } catch {
-    clearThinkingState(output);
-    output.textContent = "Verbindung zum Server unterbrochen — bitte gleich erneut versuchen.";
-    return;
-  }
-  if (!response.ok || !response.body) {
-    clearThinkingState(output);
-    output.textContent = await readableError(response);
-    return;
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const events = buffer.split("\n\n");
-    buffer = events.pop() || "";
-    for (const event of events) {
-      const text = event.split("\n")
-        .filter((line) => line.startsWith("data: "))
-        .map((line) => line.slice(6))
-        .join("\n");
-      if (!text || text === "[DONE]") continue;
-      clearThinkingState(output);
-      try {
-        const payload = JSON.parse(text);
-        const delta = payload.choices?.[0]?.delta;
-        output.textContent += delta?.content || delta?.reasoning_content || "";
-      } catch {
-        output.textContent += text;
-      }
-    }
-    output.scrollIntoView({ block: "end" });
-  }
-  clearThinkingState(output);
-  renderChatMarkdown(output);
-}
-
-async function readableError(response) {
-  const text = await response.text();
-  try {
-    const payload = JSON.parse(text);
-    return payload.error || text;
-  } catch {
-    return !text || text.trimStart().startsWith("<") ? UI_COPY.chatOffline : text;
-  }
 }
 
 function writeOutput(selector, text) {

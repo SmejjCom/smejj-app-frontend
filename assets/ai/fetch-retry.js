@@ -39,6 +39,24 @@ export function firstByteBudgetFor(init, tiefspurMs = DEEP_LANE_FIRST_BYTE_TIMEO
   return DEEP_LANE_MODEL.test(body) ? tiefspurMs : DEFAULT_FIRST_BYTE_TIMEOUT_MS;
 }
 
+/**
+ * Normalisiert die Endpunkt-Angabe.
+ *
+ * Ein Eintrag darf eine Adresse sein ODER `{ url, body }`. Der zweite Fall ist
+ * fuer Endpunkte da, die dieselbe Frage in einer ANDEREN Form brauchen: der
+ * Reserve-Server steht auf einem aelteren Stand und liest den Gespraechsverlauf
+ * nur ueber /api/chat (siehe buildReserveChatRequest in chat-history-context.js).
+ * Ohne eigenen Rumpf je Endpunkt haette die Reserve stumm ohne Verlauf geantwortet.
+ *
+ * @param {string|Array<string|{url: string, body?: unknown}>} url
+ * @returns {Array<{url: string, body?: unknown}>}
+ */
+export function normalizeTargets(url) {
+  return (Array.isArray(url) ? url : [url])
+    .map((entry) => (typeof entry === "string" ? { url: entry } : entry))
+    .filter((entry) => entry && typeof entry.url === "string" && entry.url);
+}
+
 // url darf ein einzelner Endpunkt ODER eine Liste sein (Stufe C: Zwei-Wege-
 // Betrieb). Bei einer Liste wandert jeder Neuversuch zum naechsten Endpunkt —
 // Versuch 1 = Haupt-Server (Salad, am schnellsten), Versuch 2 = Reserve
@@ -51,7 +69,7 @@ export async function fetchStreamWithRetry(url, init = {}, {
   fetchFn = globalThis.fetch,
   onRetry
 } = {}) {
-  const urls = (Array.isArray(url) ? url : [url]).filter(Boolean);
+  const urls = normalizeTargets(url);
   if (!urls.length) throw new Error("bridge_unreachable: keine Endpunkte");
   // Ausdrueckliche Vorgabe gewinnt; sonst entscheidet die angefragte Spur.
   const explizit = Number.isFinite(firstByteTimeoutMs);
@@ -89,10 +107,17 @@ export async function fetchStreamWithRetry(url, init = {}, {
   let lastReason = "";
   for (let attempt = 1; attempt <= versuche; attempt += 1) {
     const ziel = urls[(attempt - 1) % urls.length];
+    // Endpunkte mit eigenem Rumpf bekommen auch ihr eigenes Zeitbudget: die Spur
+    // wird am Modellnamen IM RUMPF erkannt, und der kann sich je Ziel unterscheiden.
+    const anfrage = ziel.body === undefined ? init : { ...init, body: ziel.body };
+    const zielBudgetMs = explizit || ziel.body === undefined ? budgetMs : firstByteBudgetFor(anfrage);
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), attempt === versuche ? letzterBudgetMs : budgetMs);
+    const timer = setTimeout(
+      () => controller.abort(),
+      attempt === versuche ? Math.max(zielBudgetMs, letzterBudgetMs) : zielBudgetMs
+    );
     try {
-      const response = await fetchFn(ziel, { ...init, signal: controller.signal });
+      const response = await fetchFn(ziel.url, { ...anfrage, signal: controller.signal });
       clearTimeout(timer);
       if (response.ok && response.body) return response;
       // 4xx (ausser 429) sind endgueltig — Wiederholen wuerde nichts aendern.

@@ -18,10 +18,29 @@ export const CLIENT_HISTORY_MAX_MESSAGE_CHARS = 4_000;
 // nur verwirren (z. B. Fehlertexte des Frontends).
 const SKIP_PATTERNS = [
   /^Chat-Stream aktuell nicht erreichbar/i,
-  /^Einen Moment/i
+  /^Einen Moment/i,
+  // Der Wartetext der laufenden Antwort (siehe unten, dataset.thinking). Das
+  // Muster ist die zweite Sicherung fuer den Fall, dass ein Aufrufer nur den
+  // Text und nicht den Knoten hat.
+  /^smejj denkt nach/i
 ];
 
+/**
+ * Der Platzhalter der noch laufenden Antwort ist KEIN Gespraechsinhalt.
+ *
+ * Gefunden am 2026-08-04: app.js legt vor dem Absenden zwei Eintraege an — die
+ * Frage des Nutzers und den leeren Antwort-Knoten. Der leere Knoten traegt aber
+ * sichtbaren Text ("smejj denkt nach..."), und collectConversationHistory las
+ * ihn als Assistenten-Antwort mit. Jede Anfrage trug damit eine erfundene
+ * Antwort als JUENGSTE Nachricht in den Verlauf — genau die Stelle, an der ein
+ * Modell am staerksten abschaut. Der Knoten ist an dataset.thinking erkennbar.
+ */
+function isPlaceholder(node) {
+  return node?.dataset?.thinking === "true";
+}
+
 function entryText(node) {
+  if (isPlaceholder(node)) return "";
   const text = (node?.textContent || "").trim();
   if (!text) return "";
   if (SKIP_PATTERNS.some((pattern) => pattern.test(text))) return "";
@@ -45,4 +64,79 @@ export function collectConversationHistory(scope = document, logSelector = "#sta
   }
   // Nur die juengsten Nachrichten senden (Kontext + BYOK-Kosten begrenzen).
   return history.slice(-CLIENT_HISTORY_MAX_MESSAGES);
+}
+
+/**
+ * Verlauf OHNE die gerade gestellte Frage.
+ *
+ * app.js schreibt die Frage in das Log, BEVOR es sendet — sie steht danach also
+ * doppelt in der Anfrage: einmal am Ende des Verlaufs und einmal als `task`, das
+ * der Server ohnehin als letzte Nachricht anhaengt. Ein Modell, das dieselbe
+ * Frage zweimal hintereinander sieht, liest das als Nachhaken.
+ *
+ * @param {string} task - die gerade gestellte Frage
+ * @param {Document|HTMLElement} [scope=document]
+ * @param {string} [logSelector="#startLog"]
+ * @returns {Array<{role: "user"|"assistant", content: string}>}
+ */
+export function buildRequestHistory(task, scope = document, logSelector = "#startLog") {
+  const history = collectConversationHistory(scope, logSelector);
+  const current = String(task || "").trim().slice(0, CLIENT_HISTORY_MAX_MESSAGE_CHARS);
+  const last = history[history.length - 1];
+  if (current && last?.role === "user" && last.content === current) history.pop();
+  return history;
+}
+
+/**
+ * Baut die Anfrage fuer den RESERVE-Endpunkt.
+ *
+ * Warum die Reserve eine andere Form braucht (live gemessen am 2026-08-04):
+ * Der Reserve-Server (Zeabur) haengt seit 2026-07-29 auf Version v104 fest, weil
+ * sein Deploy einen Token braucht, den nur der Betreiber anlegen darf. v104
+ * kennt das Feld `history` in /api/agent noch nicht und WIRFT ES WEG. Gemessen
+ * an derselben Konversation:
+ *
+ *   /api/agent  + history  -> "Die Bank of America ist eine der groessten
+ *                              Banken in den USA..."   (Kontext verloren)
+ *   /api/chat   + messages -> "Die Bank of America bietet AUCH verschiedene
+ *                              Optionen fuer die Eroeffnung eines Kontos..."
+ *                                                      (Kontext gehalten)
+ *
+ * `/api/chat` nimmt den Verlauf seit jeher als `messages` entgegen — dieser Weg
+ * funktioniert also auch auf dem eingefrorenen Stand, ohne Deploy und ohne
+ * Token. Die Reserve bleibt damit auf ihrer Schnellspur (0,5 s bis zum ersten
+ * Byte gemessen) und verliert nur noch das Projektwissen, das v104 gar nicht
+ * hat — und "kein Kontext" ist der ausdruecklich sichere Zustand.
+ *
+ * Faellt der Token spaeter doch an und zieht die Reserve auf Gleichstand, bleibt
+ * dieser Weg richtig: /api/chat versteht `messages` in jeder Version.
+ *
+ * @param {{task?: string, history?: Array, model?: string}} request
+ * @returns {{messages: Array<{role: string, content: string}>, model: string}}
+ */
+export function buildReserveChatRequest({ task = "", history = [], model = "" } = {}) {
+  const messages = Array.isArray(history) ? history.filter((m) => m?.role && typeof m.content === "string") : [];
+  const current = String(task || "").trim();
+  return {
+    messages: current ? [...messages, { role: "user", content: current }] : messages,
+    model: String(model || "")
+  };
+}
+
+/**
+ * Haupt- und Reserve-Endpunkt mit je EIGENEM Anfragerumpf.
+ *
+ * Die beiden Server stehen auf verschiedenen Staenden und verstehen deshalb
+ * verschiedene Anfrageformen; fetchStreamWithRetry nimmt darum { url, body }
+ * statt einer blossen Adressliste.
+ *
+ * @param {{primary: string, reserve?: string}} routes
+ * @param {object} anfrage Rumpf fuer /api/agent
+ * @returns {Array<{url: string, body: string}>} fertig serialisiert
+ */
+export function buildChatTargets({ primary, reserve } = {}, anfrage = {}) {
+  const targets = [];
+  if (primary) targets.push({ url: primary, body: JSON.stringify(anfrage) });
+  if (reserve) targets.push({ url: reserve, body: JSON.stringify(buildReserveChatRequest(anfrage)) });
+  return targets;
 }

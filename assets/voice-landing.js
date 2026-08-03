@@ -27,6 +27,8 @@ import { createSilenceWatchdog } from "./voice-endpoint.js";
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
 import { createServerEar, createEarSend } from "./voice-ear.js";
+import { buildReserveChatRequest } from "./chat-history-context.js";
+import { appendVoiceTurn, buildAgentPayload } from "./voice-conversation.js";
 // Stufe 3a: Denk-Laut, damit zwischen Frage und Antwort nicht nur Stille steht.
 import { createThinkingCue } from "./voice-thinking-cue.js";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
@@ -76,11 +78,10 @@ export function speechLangFor(lang) {
   return LANG_MAP[lang] || "en-US";
 }
 
-export function buildAgentPayload(task, lang) {
-  // Stufe 1c: voiceMode signalisiert dem Control-Server das Sprachprofil
-  // (kurze, gespraechige Antworten ohne Markdown, 1-3 Saetze).
-  return { task, model: "smejj 1.0", files: [], preferences: { uiLanguage: lang, voiceMode: true } };
-}
+// Das Gespraechsgedaechtnis des Sprach-Modus liegt in voice-conversation.js,
+// damit es ohne Browser pruefbar ist. Re-Export, weil bestehende Aufrufer
+// buildAgentPayload aus diesem Modul beziehen.
+export { appendVoiceTurn, buildAgentPayload };
 
 // SSE-Antwort der Bridge einsammeln (nur sichtbarer content, kein reasoning).
 // onText (optional) erhaelt nach jedem Chunk den bisherigen Gesamttext (Stufe 1c).
@@ -173,7 +174,11 @@ const state = {
   bargeConfirmed: false,
   requestId: 0,
   speechQueue: null,
-  interrupt: null
+  interrupt: null,
+  // Gespraechsgedaechtnis der laufenden Sprach-Sitzung (siehe appendVoiceTurn).
+  // Beginnt mit jedem Oeffnen des Overlays neu: eine Sprach-Sitzung ist ein
+  // eigenes Gespraech, kein Anhang an den getippten Chat.
+  verlauf: []
 };
 
 // Mikrofonpegel-Ueberwachung beenden (Vorlese-Ende, Schliessen, vor Zuhoeren).
@@ -601,10 +606,17 @@ async function sendTask(task, { getippt = false } = {}) {
   let streamed = "";
   try {
     // Stufe A2: Bei stummer/ausgefallener Replika sofort neu versuchen.
-    const response = await fetchStreamWithRetry([CLIENT_ROUTES.api.agent, CLIENT_ROUTES.api.agentFallback], {
+    // Der Reserve-Endpunkt bekommt seine eigene Anfrageform: sein Stand kennt
+    // `history` in /api/agent nicht und wuerde den Verlauf wegwerfen
+    // (buildReserveChatRequest in chat-history-context.js erklaert die Messung).
+    const nutzlast = buildAgentPayload(task, lang, state.verlauf);
+    const response = await fetchStreamWithRetry([
+      { url: CLIENT_ROUTES.api.agent, body: JSON.stringify(nutzlast) },
+      { url: CLIENT_ROUTES.api.chatFallback, body: JSON.stringify(buildReserveChatRequest(nutzlast)) }
+    ], {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(buildAgentPayload(task, lang))
+      body: JSON.stringify(nutzlast)
     });
     if (response.ok && response.body) {
       reply = await readAgentReply(response, (partial) => {
@@ -633,6 +645,10 @@ async function sendTask(task, { getippt = false } = {}) {
     listen();
     return;
   }
+  // Wendung erst JETZT merken: nur eine wirklich gelieferte Antwort gehoert in
+  // den Verlauf. Waere sie oben schon eingetragen, truege ein abgebrochener
+  // oder verworfener Durchlauf eine Antwort ein, die nie gesprochen wurde.
+  state.verlauf = appendVoiceTurn(appendVoiceTurn(state.verlauf, "user", task), "assistant", streamed || reply);
   // Stream fertig: Rest in die Queue (gleiche, ungetrimmte Textbasis wie push),
   // onQueueEnd schliesst den Loop ab.
   queue.flush(streamed || reply);
@@ -665,6 +681,7 @@ function openOverlay() {
   state.active = true;
   state.fallback = false;
   state.failStreak = 0;
+  state.verlauf = [];
   // Stufe 1e: Verbindung zum Antwort-Server schon jetzt aufbauen —
   // die erste Antwort startet dadurch spuerbar frueher.
   warmUpAgentConnection();
