@@ -6,6 +6,8 @@ import { showToast } from "./components.js?v=chat-markdown-20260717"; // version
 import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=blitz-20260726";
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
 import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
+// Overlay-Gestalt und Fokusfuehrung — ausgelagert (800-Zeilen-Regel).
+import { upgradeVoiceOverlay, createVoiceFocusTrap } from "./voice-overlay-ui.js";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
@@ -51,6 +53,10 @@ const state = {
       voiceTimeoutTimer: null,
       bargeRecognition: null,
       bargeConfirmed: false,
+      // Schonfrist: die ersten Millisekunden der eigenen Ausgabe zaehlen nie
+      // als Unterbrechung (sonst haelt sich die Ausgabe selbst an). Wird beim
+      // Scharfschalten des Barge-in gesetzt; ein abgelaufener Wert ist wirkungslos.
+      bargeGraceUntil: 0,
       speakerUtterance: null,
       speechQueue: null,
       interrupt: null
@@ -151,7 +157,9 @@ function notifyInputChanged(input) {
 }
 
 function lastAssistantEntryText() {
-      const entries = document.querySelectorAll("#startLog .entry.assistant");
+      // Auch hier gilt: der Denk-Platzhalter ist keine Antwort. Ohne den
+      // Ausschluss las der Vorlesen-Knopf waehrend des Denkens "smejj denkt nach" vor.
+      const entries = document.querySelectorAll(ANSWER_SELECTOR);
       for (let index = entries.length - 1; index >= 0; index -= 1) {
               const text = entries[index].textContent.trim();
               if (text) return text;
@@ -206,42 +214,8 @@ function syncVoiceMicVisual() {
       }
 }
 
-// Fokusfuehrung des Sprachmodus (QA-Welle 2, Befund W2-03): Das Overlay meldet
-// sich als role="dialog" aria-modal="true", holte den Tastaturfokus aber nicht
-// zu sich und gab ihn beim Schliessen nicht zurueck — Tastatur- und Screenreader-
-// Nutzende blieben hinter dem Dialog haengen. Nur der Fokus aendert sich;
-// Zustaende, Bedienelemente und sichtbares Verhalten bleiben unveraendert.
-let voiceReturnFocus = null;
-
-// Tab/Shift+Tab bleiben im Dialog; Escape bleibt dem bestehenden Handler.
-function voiceTrapFocus(event) {
-      if (event.key !== "Tab") return;
-      const overlay = $("#voiceModeOverlay");
-      if (!overlay || overlay.hidden) return;
-      const ziele = [...overlay.querySelectorAll("button, input, textarea, select, [href]")]
-              .filter((element) => !element.disabled && element.getBoundingClientRect().width > 0);
-      if (!ziele.length) return;
-      const [erstes, letztes] = [ziele[0], ziele[ziele.length - 1]];
-      const amAnfang = document.activeElement === erstes || document.activeElement === overlay;
-      if (event.shiftKey ? amAnfang : document.activeElement === letztes) {
-              event.preventDefault();
-              (event.shiftKey ? letztes : erstes).focus();
-      }
-}
-
-function voiceFocusEnter(overlay) {
-      voiceReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      overlay.tabIndex = -1;
-      overlay.focus({ preventScroll: true });
-      document.addEventListener("keydown", voiceTrapFocus, true);
-}
-
-function voiceFocusLeave() {
-      document.removeEventListener("keydown", voiceTrapFocus, true);
-      const ziel = voiceReturnFocus;
-      voiceReturnFocus = null;
-      if (ziel && document.contains(ziel)) ziel.focus({ preventScroll: true });
-}
+// Fokusfuehrung ausgelagert nach voice-overlay-ui.js (800-Zeilen-Regel).
+const voiceFocus = createVoiceFocusTrap();
 
 function closeVoiceMode() {
       state.voiceModeActive = false;
@@ -264,7 +238,7 @@ function closeVoiceMode() {
       syncVoiceMicVisual();
       const overlay = $("#voiceModeOverlay");
       if (overlay) overlay.hidden = true;
-      voiceFocusLeave();
+      voiceFocus.leave();
 }
 
 // Diktat-Fallback (z. B. iOS/Safari): Die Spracherkennung ist hier nicht nutzbar —
@@ -302,6 +276,27 @@ function enterVoiceFallback(message) {
 // bei Stummschaltung oder Start-Fehler bleibt das bisherige Verhalten bestehen.
 
 // Echo-Filter und Barge-Schwelle kommen aus voice-echo-filter.js (Stufe 1e).
+
+// Schonfrist am Anfang der eigenen Sprachausgabe. Gemessen am 2026-08-02: In den
+// ersten Sekundenbruchteilen liefert die Erkennung fast nur den eigenen
+// Lautsprecher, und der Text-Echo-Filter greift dort am schlechtesten (kurze
+// Bruchstuecke haben zu wenig Wortdeckung mit dem Gesprochenen). Fuehrende
+// Assistenten sperren dieses Fenster hart — hier ebenso: erst danach kann eine
+// Unterbrechung ausgeloest werden. Gilt fuer BEIDE Wege (Worterkennung und
+// Pegel-Detektor), damit kein Weg das Fenster umgeht.
+const BARGE_GRACE_MS = 700;
+
+// Welcher Eintrag im Log ist eine ECHTE Antwort?
+// app.js haengt beim Absenden sofort einen Platzhalter an ("smejj denkt nach ..."),
+// technisch ein ganz normaler `.entry.assistant` mit data-thinking="true"; erst
+// wenn echter Text eintrifft, entfernt app.js (clearThinkingState) das Attribut.
+// Ohne diesen Ausschluss hielt der Sprachmodus den Platzhalter fuer die Antwort —
+// gemessen am 2026-08-02: Status nach 68 ms auf "Ich spreche ...", "smejj denkt
+// nach" wurde vorgelesen, das Mikrofon ging mitten in der Denkphase auf, die
+// Erkennung hoerte den eigenen Lautsprecher ("smeeting nach") und brach die
+// Antwort ab; zusaetzlich verschluckte die Sprech-Queue die ersten ~20 Zeichen
+// der echten Antwort und der Denk-Laut kam nie. EIN Selektor, vier Fehler.
+const ANSWER_SELECTOR = '#startLog .entry.assistant:not([data-thinking="true"])';
 
 // Mikrofonpegel-Ueberwachung beenden (Vorlese-Ende, Schliessen, vor Zuhoeren).
 function stopInterrupt() {
@@ -345,6 +340,9 @@ function startBargeListener(spokenText, failStreak = 0) {
               }
               const heard = `${finalTranscript} ${interim}`.trim();
               if (!state.bargeConfirmed) {
+                        // Schonfrist: was in den ersten BARGE_GRACE_MS der eigenen Ausgabe
+                        // hereinkommt, ist praktisch immer der eigene Lautsprecher.
+                        if (Date.now() < state.bargeGraceUntil) return;
                         const words = normalizeSpeechText(heard).split(" ").filter(Boolean);
                         if (words.length < BARGE_MIN_WORDS) return;
                         // spokenText darf ein Getter sein (Stufe 1c: waechst satzweise mit).
@@ -450,7 +448,7 @@ function voiceModeListen() {
               // Stufe 1e: Beim finalen Ergebnis SOFORT senden statt auf onend zu
               // warten — voiceModeSend loest die Erkennung selbst ab (Guard in onend).
               const task = finalTranscript.trim();
-              if (sawFinal && task && state.voiceRecognition === recognition) {
+              if (sawFinal && task && !state.voiceMuted && state.voiceRecognition === recognition) {
                         watchdog.stop();
                         state.voiceFailStreak = 0;
                         voiceModeSend(task);
@@ -470,14 +468,18 @@ function voiceModeListen() {
               if (state.voiceRecognition !== recognition) return;
               state.voiceRecognition = null;
               if (!state.voiceModeActive || state.voiceFallback) return;
+              // Stummschalten heisst Stummschalten: Der Mikrofon-Knopf darf NIE senden.
+              // Vorher stand das Senden vor dieser Pruefung — ein Klick auf "stumm"
+              // schickte den halben Erkennungsrest (Geraeusch, fremde Sprache, eigenes
+              // Echo) als neue Frage ab und warf die laufende Antwort weg. Genau das
+              // hat der Betreiber am 2026-08-02 als "dann spricht sie nicht mehr" gemeldet.
+              if (state.voiceMuted) return;
               const task = finalTranscript.trim();
               if (task) {
                         state.voiceFailStreak = 0;
-                        // Auch bei Stummschaltung: bereits Gesagtes wird noch gesendet (wie ChatGPT).
-                voiceModeSend(task);
+                        voiceModeSend(task);
                         return;
               }
-              if (state.voiceMuted) return;
               // Endet die Erkennung mehrfach sofort ohne Ergebnis (typisch iOS/Safari),
               // nicht endlos neu starten, sondern in den Diktat-Fallback wechseln.
               if (Date.now() - state.voiceListenStartedAt < 1500) {
@@ -518,7 +520,7 @@ function voiceModeSend(task) {
       }
       setVoiceModeStatus("thinking", "Einen Moment ...");
       setVoiceModeTranscript(task);
-      const knownEntries = document.querySelectorAll("#startLog .entry.assistant").length;
+      const knownEntries = document.querySelectorAll(ANSWER_SELECTOR).length;
       input.value = task;
       notifyInputChanged(input);
       send.click();
@@ -537,34 +539,53 @@ function waitForAssistantReply(knownEntries) {
   // zuverlaessiges Antwort-Ende-Signal ohne Aenderung an der start-gelockten app.js.
   const taskRunning = () => document.body.classList.contains("task-indicator-active");
       const currentReply = () => {
-              const entries = document.querySelectorAll("#startLog .entry.assistant");
+              const entries = document.querySelectorAll(ANSWER_SELECTOR);
               const latest = entries[entries.length - 1];
               return latest && entries.length > knownEntries ? latest.textContent.trim() : "";
       };
       // Stufe 1c: satzweises Vorlesen — die Ausgabe beginnt mit dem ersten fertigen
       // Satz, waehrend der Rest der Antwort noch streamt (voice-speech-queue.js).
       stopSpeaking();
-      const queue = createSpeechQueue({
+      // Das Mikrofon geht NICHT mehr beim ersten Sprech-Happen auf, sondern erst,
+      // wenn echter Antworttext gesprochen wird. Der Denk-Laut ("Einen Moment ...")
+      // laeuft durch dieselbe Queue — wuerde er das Mikrofon oeffnen, hoerte sich
+      // die Ausgabe wieder selbst zu. Idempotent: mehrfacher Aufruf schaltet einmal.
+      let queue = null;
+      let bargeArmed = false;
+      const armBargeIn = () => {
+              if (bargeArmed || !state.voiceModeActive) return;
+              // Nur echter Antworttext zaehlt — nicht der Platzhalter, nicht der Denk-Laut.
+              if (!currentReply() || !queue?.spokenText()) return;
+              bargeArmed = true;
+              setVoiceModeStatus("speaking", "Ich spreche ...");
+              state.bargeGraceUntil = Date.now() + BARGE_GRACE_MS;
+              // Barge-in: Waehrend des Vorlesens weiterhoeren; der Echo-Filter
+              // vergleicht live gegen alles bereits Gesprochene (Getter).
+              startBargeListener(() => queue.spokenText());
+              // Stufe 1e: Mikrofonpegel-Detektor stoppt das Vorlesen sofort,
+              // wenn der Nutzer dazwischenspricht (auch ohne parallele Erkennung).
+              stopInterrupt();
+              // Stufe 2a: Zwei-Ebenen-Ausloeser — in den Sprechpausen zwischen
+              // zwei Saetzen ist der Lautsprecher still, dort reicht normales Sprechen.
+              state.interrupt = createSpeechInterrupt(() => {
+                        if (!state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
+                        if (state.bargeConfirmed) return;
+                        stopSpeaking();
+                        voiceModeListen();
+              }, {
+                        isTtsActive: () => premiumVoice.isSpeaking() || (("speechSynthesis" in window) && window.speechSynthesis.speaking === true),
+                        // Dieselbe Schonfrist wie bei der Worterkennung: in dieser Zeit
+                        // lernt der Detektor das eigene Echo ein und kann nicht ausloesen.
+                        warmupMs: BARGE_GRACE_MS
+              });
+      };
+      queue = createSpeechQueue({
               speakFn: speak,
               stopFn: () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); },
               eagerFirst: true,
               onQueueStart: () => {
                         if (!state.voiceModeActive) return;
-                        setVoiceModeStatus("speaking", "Ich spreche ...");
-                        // Barge-in: Waehrend des Vorlesens weiterhoeren; der Echo-Filter
-                        // vergleicht live gegen alles bereits Gesprochene (Getter).
-                        startBargeListener(() => queue.spokenText());
-                        // Stufe 1e: Mikrofonpegel-Detektor stoppt das Vorlesen sofort,
-                        // wenn der Nutzer dazwischenspricht (auch ohne parallele Erkennung).
-                        stopInterrupt();
-                        // Stufe 2a: Zwei-Ebenen-Ausloeser — in den Sprechpausen zwischen
-                        // zwei Saetzen ist der Lautsprecher still, dort reicht normales Sprechen.
-                        state.interrupt = createSpeechInterrupt(() => {
-                                    if (!state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
-                                    if (state.bargeConfirmed) return;
-                                    stopSpeaking();
-                                    voiceModeListen();
-                        }, { isTtsActive: () => premiumVoice.isSpeaking() || (("speechSynthesis" in window) && window.speechSynthesis.speaking === true) });
+                        armBargeIn();
               },
               onQueueEnd: () => {
                         if (!state.voiceModeActive) return;
@@ -623,7 +644,12 @@ function waitForAssistantReply(knownEntries) {
       };
       state.voiceObserver = new MutationObserver(() => {
               // Fertige Saetze sofort sprechen, waehrend die Antwort weiter streamt.
-              if (state.voiceModeActive) queue.push(currentReply());
+              if (state.voiceModeActive) {
+                        queue.push(currentReply());
+                        // Nachziehen, falls die Queue schon mit dem Denk-Laut gestartet ist:
+                        // onQueueStart feuert nur einmal, das Scharfschalten muss hier passieren.
+                        armBargeIn();
+              }
               scheduleSettle();
       });
       state.voiceObserver.observe(log, { childList: true, subtree: true, characterData: true });
@@ -645,8 +671,10 @@ function toggleVoiceMute() {
               stopInterrupt();
               stopBargeListener();
               try {
-                        // stop() statt abort(): bereits Gesagtes wird noch abgeliefert und gesendet.
-                state.voiceRecognition?.stop?.();
+                        // abort() statt stop(): Stummschalten verwirft das Gehoerte, es wird
+                        // NICHT mehr als Frage abgeschickt. Die laufende Sprachausgabe bleibt
+                        // bewusst unangetastet — "stumm" schaltet nur den Eingang ab.
+                        state.voiceRecognition?.abort?.();
               } catch {
                         // Recognition war bereits gestoppt.
               }
@@ -658,8 +686,15 @@ function toggleVoiceMute() {
               setVoiceModeStatus("thinking", "Einen Moment ...");
               return;
       }
-      if ("speechSynthesis" in window && window.speechSynthesis.speaking) {
-              setVoiceModeStatus("speaking", "Ich spreche ...");
+      // Laeuft noch eine Antwort (Denken ODER Sprechen)? Dann NICHT zuhoeren
+      // anfangen — sonst nimmt das Mikrofon den eigenen Lautsprecher auf.
+      // speechSynthesis.speaking allein genuegt nicht: die Premium-Stimme laeuft
+      // ueber WebAudio und meldet dort immer false.
+      const audioPlaying = premiumVoice.isSpeaking()
+        || (("speechSynthesis" in window) && window.speechSynthesis.speaking === true);
+      if (audioPlaying || state.speechQueue?.isActive?.() === true) {
+              if (audioPlaying) setVoiceModeStatus("speaking", "Ich spreche ...");
+              else setVoiceModeStatus("thinking", "Einen Moment ...");
               return;
       }
       voiceModeListen();
@@ -700,7 +735,7 @@ function openVoiceMode() {
               typedInput.dispatchEvent(new Event("input", { bubbles: true }));
       }
       overlay.hidden = false;
-      voiceFocusEnter(overlay);
+      voiceFocus.enter(overlay);
       if (!RecognitionCtor) {
               // iOS/Safari ohne Web-Speech-Erkennung: Overlay im Diktat-Fallback oeffnen
               // statt den Sprachmodus komplett zu verweigern.
@@ -710,46 +745,8 @@ function openVoiceMode() {
       voiceModeListen();
 }
 
-// Baut das Overlay einmalig auf das neue Layout um (animiertes smejj.com Zeichen,
-// untere Leiste mit Eingabefeld, Mikrofon-Stummschalter und Beenden-Button).
-// Das index.html-Markup bleibt unveraendert — das Upgrade passiert rein im Browser.
-function upgradeVoiceOverlay() {
-      const overlay = $("#voiceModeOverlay");
-      if (!overlay || overlay.dataset.upgraded === "true") return;
-      overlay.dataset.upgraded = "true";
-      overlay.dataset.muted = "false";
-      const wave = overlay.querySelector(".voice-mode-wave");
-      if (wave) {
-              const logo = document.createElement("div");
-              logo.className = "voice-mode-logo";
-              logo.setAttribute("aria-hidden", "true");
-              logo.innerHTML = '<svg viewBox="0 0 220 160">'
-                + '<g class="voice-logo-left"><path d="M82 30 L38 80 L82 130"/><circle class="voice-logo-dot-a" cx="106" cy="63" r="11"/></g>'
-                + '<g class="voice-logo-right"><path d="M138 30 L182 80 L138 130"/><circle class="voice-logo-dot-b" cx="114" cy="97" r="11"/></g>'
-                + '</svg>';
-              wave.replaceWith(logo);
-      }
-      const bar = document.createElement("div");
-      bar.className = "voice-mode-bar";
-      bar.innerHTML = '<div class="voice-mode-input-wrap">'
-        + '<button id="voiceModeAttach" type="button" aria-label="Datei anhängen" title="Datei anhängen">'
-        + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
-        + '</button>'
-        + '<input id="voiceModeInput" type="text" placeholder="Frage schreiben ..." autocomplete="off">'
-        + `<button id="voiceModeSend" type="button" aria-label="Senden" title="Senden" disabled>${SEND_ICON_SVG}</button>`
-        + '</div>'
-        + '<button id="voiceModeMic" class="voice-mode-mic" type="button" aria-label="Mikrofon stummschalten" aria-pressed="false" title="Stummschalten">'
-        + '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path class="voice-mic-slash" d="M4 4l16 16"/></svg>'
-        + '</button>';
-      overlay.appendChild(bar);
-      const close = overlay.querySelector("#voiceModeClose");
-      if (close) bar.appendChild(close);
-      const hint = overlay.querySelector(".voice-mode-hint");
-      if (hint) hint.textContent = "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.";
-}
-
 function bindVoiceMode() {
-      upgradeVoiceOverlay();
+      upgradeVoiceOverlay({ sendIcon: SEND_ICON_SVG });
       $("#voiceModeClose")?.addEventListener("click", closeVoiceMode);
       $("#voiceModeMic")?.addEventListener("click", toggleVoiceMute);
       $("#voiceModeAttach")?.addEventListener("click", () => $("#composerFileInput")?.click());

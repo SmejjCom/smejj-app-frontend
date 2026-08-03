@@ -12,6 +12,7 @@ import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260718";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
 import { collectConversationHistory } from "./chat-history-context.js";
+import { lesbarerStatus } from "./system-status-text.js";
 import { groundTask, modelForTask } from "./browser-context.js";
 import { afterFirstPaint } from "./deferred-start.js";
 import { initGoogleLogin } from "./google-login.js";
@@ -482,17 +483,17 @@ function bindAi() {
 function updateAiStatus(result) {
   const mode = result.mode || AI_MODES.disabled;
   const cost = result.costStatus || "0 EUR Risiko / blockiert";
-  setText("#aiStatusChip", `KI: ${mode}`);
+  setText("#aiStatusChip", `KI: ${lesbarerStatus(mode)}`);
   setText("#costStatusChip", `Kosten: ${cost}`);
-  setText("#aiModeText", mode);
+  setText("#aiModeText", lesbarerStatus(mode));
   setText("#costStatusText", cost);
-  setText("#homeAiSummary", mode);
+  setText("#homeAiSummary", lesbarerStatus(mode));
   setText("#homeCostSummary", cost);
-  setText("#costAiMode", mode);
+  setText("#costAiMode", lesbarerStatus(mode));
 }
 
 async function refreshLiveSystemStatus() {
-  refreshLocalWorkspaceStatus(projektAbhaengigkeiten()); try { const h = await getJson(CLIENT_ROUTES.api.health); if (h) { if (h.storage) setText("#storageStatusText", h.storage); if (h.idrive) setText("#idriveStatusText", h.idrive); if (h.aiMode) setText("#aiModeText", h.aiMode); if (h.cost) setText("#costStatusText", h.cost); } const s = await getJson(CLIENT_ROUTES.api.storageStatus); if (s?.configured) setText("#idriveStatusText", `IDrive e2 (${s.bucket || "smejj-app"}) OK`); } catch {}
+  refreshLocalWorkspaceStatus(projektAbhaengigkeiten()); try { const h = await getJson(CLIENT_ROUTES.api.health); if (h) { if (h.storage) setText("#storageStatusText", lesbarerStatus(h.storage)); if (h.idrive) setText("#idriveStatusText", lesbarerStatus(h.idrive)); if (h.aiMode) setText("#aiModeText", lesbarerStatus(h.aiMode)); if (h.cost) setText("#costStatusText", lesbarerStatus(h.cost)); } const s = await getJson(CLIENT_ROUTES.api.storageStatus); if (s?.configured) setText("#idriveStatusText", `IDrive e2 (${s.bucket || "smejj-app"}) OK`); } catch {}
 }
 
 function bindTools() {
