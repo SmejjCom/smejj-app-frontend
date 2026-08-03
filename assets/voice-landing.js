@@ -22,6 +22,9 @@ import { warmUpAgentConnection } from "./voice-warmup.js";
 // waeren zwei Modulinstanzen mit getrenntem Zustand (check:module-queries).
 // Der Cache wird ueber die Version in sw.js gebrochen, nicht ueber die Import-URL.
 import { createSilenceWatchdog } from "./voice-endpoint.js";
+// Stufe 3: Rueckfrage statt Blindantwort + Doppel-Sende-Schutz (geteilte Naht
+// mit der Startseite; Muster aus dem ChatGPT-Live-Vergleich 2026-08-03).
+import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 3a: Denk-Laut, damit zwischen Frage und Antwort nicht nur Stille steht.
 import { createThinkingCue } from "./voice-thinking-cue.js";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
@@ -182,6 +185,8 @@ let syncTypedSend = () => {};
 
 const lang = pageLang();
 const T = stringsFor(lang);
+// Stufe 3: dieselbe erkannte Frage nicht zweimal senden (onresult UND onend liefern).
+const doppelschutz = createDoppelschutz();
 const SPEECH_LANG = speechLangFor(lang);
 const RecognitionCtor = typeof window !== "undefined"
   ? (window.SpeechRecognition || window.webkitSpeechRecognition || null)
@@ -373,6 +378,24 @@ function startBargeListener(spokenText, failStreak = 0) {
 
 // --- Zuhoeren -> Senden -> Vorlesen -------------------------------------------
 
+// Stufe 3: Rueckfrage statt Blindantwort — ein fast sicher verhoertes Transkript
+// geht NICHT an den Server; die Seite sagt hoerbar Bescheid und hoert weiter zu.
+function nachfragenStattSenden() {
+  const aktive = state.recognition;
+  state.recognition = null;
+  try {
+    aktive?.abort?.();
+  } catch {
+    // Recognition war bereits gestoppt.
+  }
+  setStatus("speaking", T.speaking);
+  speak(clarifyLine(lang), {
+    onend: () => {
+      if (state.active && !state.fallback) listen();
+    }
+  });
+}
+
 function listen() {
   if (!state.active || state.fallback) return;
   // Mikrofon fuer die Erkennung freigeben (Pegel-Detektor und Barge-Listener
@@ -387,6 +410,8 @@ function listen() {
   recognition.interimResults = true;
   state.recognition = recognition;
   let finalTranscript = "";
+  // Stufe 3: beste Konfidenz der finalen Ergebnisse (NaN = Browser liefert keine).
+  let bestConfidence = NaN;
   // Stufe 2a: Kommen bei vorhandenem Text ~850 ms keine neuen Zwischen-
   // ergebnisse, das Erkennungs-Ende sofort erzwingen (stop -> finales Ergebnis)
   // statt die 1-2 s Browser-Endpause abzuwarten.
@@ -406,6 +431,8 @@ function listen() {
       if (result.isFinal) {
         finalTranscript += result[0]?.transcript || "";
         sawFinal = true;
+        const c = result[0]?.confidence;
+        if (Number.isFinite(c)) bestConfidence = Number.isFinite(bestConfidence) ? Math.max(bestConfidence, c) : c;
       } else {
         interim += result[0]?.transcript || "";
       }
@@ -422,6 +449,11 @@ function listen() {
     if (sawFinal && task && state.recognition === recognition) {
       watchdog.stop();
       state.failStreak = 0;
+      // Stufe 3: Wirkt das Transkript verhoert, nachfragen statt senden.
+      if (sollNachfragen({ text: task, confidence: bestConfidence })) {
+        nachfragenStattSenden();
+        return;
+      }
       sendTask(task);
     }
   };
@@ -441,6 +473,11 @@ function listen() {
     const task = finalTranscript.trim();
     if (task) {
       state.failStreak = 0;
+      // Stufe 3: gleiche Rueckfrage-Entscheidung wie im onresult-Pfad.
+      if (sollNachfragen({ text: task, confidence: bestConfidence })) {
+        nachfragenStattSenden();
+        return;
+      }
       sendTask(task);
       return;
     }
@@ -463,8 +500,22 @@ function listen() {
   }
 }
 
-async function sendTask(task) {
+async function sendTask(task, { getippt = false } = {}) {
   if (!state.active) return;
+  // Stufe 3: erkannte Duplikate nicht doppelt senden (onresult UND onend
+  // koennen dieselbe Aeusserung liefern). Getippte Fragen sind Absicht.
+  if (!getippt && doppelschutz.blockiert(task)) {
+    stopBargeListener();
+    const doppelt = state.recognition;
+    state.recognition = null;
+    try {
+      doppelt?.abort?.();
+    } catch {
+      // Recognition war bereits gestoppt.
+    }
+    listen();
+    return;
+  }
   stopBargeListener();
   // Laufende Erkennung abloesen (abort -> onend wird durch den Guard ignoriert).
   const active = state.recognition;
@@ -689,7 +740,7 @@ function buildUi() {
     send: $id("voiceLandingSend"),
     onSubmit: (task) => {
       stopSpeaking();
-      sendTask(task);
+      sendTask(task, { getippt: true });
     }
   });
   document.addEventListener("keydown", (event) => {

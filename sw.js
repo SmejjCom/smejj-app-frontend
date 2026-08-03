@@ -1,3 +1,12 @@
+// v201 -> v202 (2026-08-03): Sprachwelle Stufe 3 — Rueckfrage statt Blindantwort.
+// Befund aus dem ChatGPT-Live-Vergleich: auch dort wird Umgebung/Fremdsprache
+// als Text mitgehoert; die Rettung ist eine Rueckfrage statt einer Blindantwort.
+// voice-clarify.js NEU im SHELL (Rueckfrage-Regel, 15 Sprachzeilen, Doppel-
+// Sende-Schutz), voice-browser-tts.js NEU im SHELL (aus composer-tools.js
+// ausgelagert, 800-Zeilen-Regel) — beide werden von composer-tools.js und
+// voice-landing.js importiert; ohne Precache-Eintrag liefert der Rueckfall
+// offline "/" (HTML) statt JavaScript und bricht die Module ab.
+// Freigabe des Betreibers ("Freigabe Stufe 3") vom 2026-08-03.
 // v200 -> v201 (2026-08-02): Sprachwelle Stufe 2 — Barge-in-Schwellen nach
 // Messung verschaerft. voice-echo-filter.js: BARGE_MIN_WORDS 2 -> 3 (das live
 // gemessene Selbst-Echo "smeeting nach" hatte genau zwei Woerter) und
@@ -394,7 +403,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v201";
+const CACHE_NAME = "smejj-shell-v202";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -459,6 +468,8 @@ const SHELL = [
   "/assets/composer-plus-menu.js",
   "/assets/voice-typed-send.js",
   "/assets/voice-overlay-ui.js",
+  "/assets/voice-browser-tts.js",
+  "/assets/voice-clarify.js",
   "/assets/voice-speech-queue.js",
   "/assets/voice-echo-filter.js",
   "/assets/voice-vad.js",

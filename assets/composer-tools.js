@@ -8,6 +8,11 @@ import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=
 import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
 // Overlay-Gestalt und Fokusfuehrung — ausgelagert (800-Zeilen-Regel).
 import { upgradeVoiceOverlay, createVoiceFocusTrap } from "./voice-overlay-ui.js";
+// Browser-Sprachausgabe (Stimmwahl, Safari-resume, iOS-Unlock) — ausgelagert (800-Zeilen-Regel).
+import { createBrowserTts } from "./voice-browser-tts.js";
+// Stufe 3: Rueckfrage statt Blindantwort + Doppel-Sende-Schutz (wie ChatGPT,
+// Live-Vergleich 2026-08-03) — geteilte Naht mit den 14 Sprachseiten.
+import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
@@ -46,18 +51,14 @@ const state = {
       voiceFallback: false,
       voiceFailStreak: 0,
       voiceListenStartedAt: 0,
-      synthesisUnlocked: false,
       voiceRecognition: null,
       voiceObserver: null,
       voiceSettleTimer: null,
       voiceTimeoutTimer: null,
       bargeRecognition: null,
       bargeConfirmed: false,
-      // Schonfrist: die ersten Millisekunden der eigenen Ausgabe zaehlen nie
-      // als Unterbrechung (sonst haelt sich die Ausgabe selbst an). Wird beim
-      // Scharfschalten des Barge-in gesetzt; ein abgelaufener Wert ist wirkungslos.
+      // Schonfrist der eigenen Ausgabe — gesetzt beim Scharfschalten des Barge-in.
       bargeGraceUntil: 0,
-      speakerUtterance: null,
       speechQueue: null,
       interrupt: null
 };
@@ -74,12 +75,10 @@ function synthesisSupported() {
       return false;
 }
 
-function pickGermanVoice() {
-      const voices = window.speechSynthesis.getVoices() || [];
-      return voices.find((voice) => voice.lang === SPEECH_LANG)
-        || voices.find((voice) => (voice.lang || "").startsWith(SPEECH_BASE))
-        || null;
-}
+// Browser-Stimme (Stimmwahl, Safari-resume, iOS-Unlock) — voice-browser-tts.js.
+const browserTts = createBrowserTts({ lang: SPEECH_LANG, base: SPEECH_BASE, supported: synthesisSupported });
+// Doppel-Sende-Schutz (Stufe 3): dieselbe erkannte Frage nicht zweimal senden.
+const doppelschutz = createDoppelschutz();
 
 // Stufe B: Premium-Stimme des Servers (WebAudio) — nur im Sprachmodus aktiv,
 // Verfuegbarkeit wird beim Oeffnen geprueft; jeder Fehler faellt lautlos auf
@@ -95,34 +94,11 @@ function speak(text, { onend, onstart } = {}) {
       if (state.voiceModeActive && premiumVoiceOn && text) {
               premiumVoice.speak(text, { onstart, onend }).catch(() => {
                         premiumVoiceOn = false; // Worker weg -> Rest der Sitzung Browser-Stimme
-                        speakWithBrowser(text, { onend, onstart });
+                        browserTts.speak(text, { onend, onstart });
               });
               return null;
       }
-      return speakWithBrowser(text, { onend, onstart });
-}
-
-function speakWithBrowser(text, { onend, onstart } = {}) {
-      if (!synthesisSupported() || !text) {
-              onend?.();
-              return null;
-      }
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = SPEECH_LANG;
-      const voice = pickGermanVoice();
-      if (voice) utterance.voice = voice;
-      utterance.onstart = () => onstart?.();
-      utterance.onend = () => onend?.();
-      utterance.onerror = () => onend?.();
-      window.speechSynthesis.speak(utterance);
-      try {
-              // iOS/Safari pausiert die Synthese manchmal direkt nach speak() — resume ist dort Pflicht.
-              window.speechSynthesis.resume();
-      } catch {
-              // resume ist nur fuer den Safari-Suspend-Fall noetig.
-      }
-      return utterance;
+      return browserTts.speak(text, { onend, onstart });
 }
 
 function stopSpeaking() {
@@ -131,21 +107,6 @@ function stopSpeaking() {
       state.speechQueue = null;
       premiumVoice.cancel();
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-}
-
-// iOS/Safari: Die Sprachausgabe muss einmal innerhalb einer echten Nutzergeste
-// gestartet werden, sonst bleiben spaetere automatische Antworten stumm.
-// Eine leere Utterance mit Lautstaerke 0 ist unhoerbar und schaltet sie frei.
-function unlockSpeechSynthesis() {
-      if (state.synthesisUnlocked || !("speechSynthesis" in window)) return;
-      state.synthesisUnlocked = true;
-      try {
-              const utterance = new SpeechSynthesisUtterance(" ");
-              utterance.volume = 0;
-              window.speechSynthesis.speak(utterance);
-      } catch {
-              // Der Unlock ist optional — Chrome/Edge funktionieren auch ohne.
-      }
 }
 
 function composerInput() {
@@ -277,25 +238,16 @@ function enterVoiceFallback(message) {
 
 // Echo-Filter und Barge-Schwelle kommen aus voice-echo-filter.js (Stufe 1e).
 
-// Schonfrist am Anfang der eigenen Sprachausgabe. Gemessen am 2026-08-02: In den
-// ersten Sekundenbruchteilen liefert die Erkennung fast nur den eigenen
-// Lautsprecher, und der Text-Echo-Filter greift dort am schlechtesten (kurze
-// Bruchstuecke haben zu wenig Wortdeckung mit dem Gesprochenen). Fuehrende
-// Assistenten sperren dieses Fenster hart — hier ebenso: erst danach kann eine
-// Unterbrechung ausgeloest werden. Gilt fuer BEIDE Wege (Worterkennung und
-// Pegel-Detektor), damit kein Weg das Fenster umgeht.
+// Schonfrist am Anfang der eigenen Sprachausgabe (gemessen 2026-08-02): dort
+// hoert die Erkennung fast nur den eigenen Lautsprecher, und kurze Bruchstuecke
+// unterlaufen den Text-Echo-Filter. Gilt fuer BEIDE Wege (Wort + Pegel).
 const BARGE_GRACE_MS = 700;
 
-// Welcher Eintrag im Log ist eine ECHTE Antwort?
-// app.js haengt beim Absenden sofort einen Platzhalter an ("smejj denkt nach ..."),
-// technisch ein ganz normaler `.entry.assistant` mit data-thinking="true"; erst
-// wenn echter Text eintrifft, entfernt app.js (clearThinkingState) das Attribut.
-// Ohne diesen Ausschluss hielt der Sprachmodus den Platzhalter fuer die Antwort —
-// gemessen am 2026-08-02: Status nach 68 ms auf "Ich spreche ...", "smejj denkt
-// nach" wurde vorgelesen, das Mikrofon ging mitten in der Denkphase auf, die
-// Erkennung hoerte den eigenen Lautsprecher ("smeeting nach") und brach die
-// Antwort ab; zusaetzlich verschluckte die Sprech-Queue die ersten ~20 Zeichen
-// der echten Antwort und der Denk-Laut kam nie. EIN Selektor, vier Fehler.
+// Nur ECHTE Antworten zaehlen: app.js haengt beim Absenden einen Platzhalter
+// ("smejj denkt nach ...", data-thinking="true") als .entry.assistant an. Ohne
+// den Ausschluss hielt der Sprachmodus ihn fuer die Antwort (gemessen 2026-08-02):
+// Platzhalter vorgelesen, Mikrofon in der Denkphase offen -> Selbstabbruch,
+// erste ~20 Zeichen jeder Antwort verschluckt, Denk-Laut kam nie.
 const ANSWER_SELECTOR = '#startLog .entry.assistant:not([data-thinking="true"])';
 
 // Mikrofonpegel-Ueberwachung beenden (Vorlese-Ende, Schliessen, vor Zuhoeren).
@@ -405,6 +357,27 @@ function startBargeListener(spokenText, failStreak = 0) {
       }
 }
 
+// Stufe 3: Rueckfrage statt Blindantwort (Muster aus dem ChatGPT-Live-Vergleich).
+// Ein fast sicher verhoertes Transkript geht NICHT an den Server — die
+// Sprachwelle sagt hoerbar Bescheid und hoert danach einfach weiter zu.
+// Niemals still verwerfen: der Nutzer erfaehrt sofort, dass er wiederholen soll.
+function nachfragenStattSenden() {
+      // Laufende Erkennung abloesen (abort -> onend ignoriert sie per Guard).
+      const aktive = state.voiceRecognition;
+      state.voiceRecognition = null;
+      try {
+              aktive?.abort?.();
+      } catch {
+              // Recognition war bereits gestoppt.
+      }
+      setVoiceModeStatus("speaking", "Ich spreche ...");
+      speak(clarifyLine(SPEECH_BASE), {
+              onend: () => {
+                        if (state.voiceModeActive && !state.voiceMuted && !state.voiceFallback) voiceModeListen();
+              }
+      });
+}
+
 function voiceModeListen() {
       if (!state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
       // Nur eine Erkennung gleichzeitig — ein noch laufender Barge-Listener oder
@@ -419,6 +392,9 @@ function voiceModeListen() {
       recognition.interimResults = true;
       state.voiceRecognition = recognition;
       let finalTranscript = "";
+      // Stufe 3: beste Konfidenz der finalen Ergebnisse — Grundlage der
+      // Rueckfrage-Entscheidung (sollNachfragen). NaN = Browser liefert keine.
+      let bestConfidence = NaN;
       // Stufe 2a: Kommen bei vorhandenem Text ~850 ms keine neuen Zwischen-
       // ergebnisse, das Erkennungs-Ende sofort erzwingen (stop -> finales
       // Ergebnis) statt die 1-2 s Browser-Endpause abzuwarten.
@@ -438,6 +414,8 @@ function voiceModeListen() {
                         if (result.isFinal) {
                                     finalTranscript += result[0]?.transcript || "";
                                     sawFinal = true;
+                                    const c = result[0]?.confidence;
+                                    if (Number.isFinite(c)) bestConfidence = Number.isFinite(bestConfidence) ? Math.max(bestConfidence, c) : c;
                         } else {
                                     interim += result[0]?.transcript || "";
                         }
@@ -451,6 +429,11 @@ function voiceModeListen() {
               if (sawFinal && task && !state.voiceMuted && state.voiceRecognition === recognition) {
                         watchdog.stop();
                         state.voiceFailStreak = 0;
+                        // Stufe 3: Wirkt das Transkript verhoert, nachfragen statt senden.
+                        if (sollNachfragen({ text: task, confidence: bestConfidence })) {
+                                    nachfragenStattSenden();
+                                    return;
+                        }
                         voiceModeSend(task);
               }
       };
@@ -468,15 +451,17 @@ function voiceModeListen() {
               if (state.voiceRecognition !== recognition) return;
               state.voiceRecognition = null;
               if (!state.voiceModeActive || state.voiceFallback) return;
-              // Stummschalten heisst Stummschalten: Der Mikrofon-Knopf darf NIE senden.
-              // Vorher stand das Senden vor dieser Pruefung — ein Klick auf "stumm"
-              // schickte den halben Erkennungsrest (Geraeusch, fremde Sprache, eigenes
-              // Echo) als neue Frage ab und warf die laufende Antwort weg. Genau das
-              // hat der Betreiber am 2026-08-02 als "dann spricht sie nicht mehr" gemeldet.
+              // Stummschalten heisst Stummschalten: der Mikrofon-Knopf darf NIE senden
+              // (stand das Senden davor, warf ein Mute-Klick die Antwort weg; 2026-08-02).
               if (state.voiceMuted) return;
               const task = finalTranscript.trim();
               if (task) {
                         state.voiceFailStreak = 0;
+                        // Stufe 3: gleiche Rueckfrage-Entscheidung wie im onresult-Pfad.
+                        if (sollNachfragen({ text: task, confidence: bestConfidence })) {
+                                    nachfragenStattSenden();
+                                    return;
+                        }
                         voiceModeSend(task);
                         return;
               }
@@ -502,11 +487,28 @@ function voiceModeListen() {
       }
 }
 
-function voiceModeSend(task) {
+function voiceModeSend(task, { getippt = false } = {}) {
       const input = composerInput();
       const send = $("#startSend");
       if (!input || !send) {
               closeVoiceMode();
+              return;
+      }
+      // Stufe 3: Erkannte Duplikate nicht doppelt senden (onresult UND onend
+      // koennen dieselbe Aeusserung liefern; ChatGPT stolperte im Test genauso).
+      // Getippte Fragen sind Absicht und laufen ungeprueft durch.
+      if (!getippt && doppelschutz.blockiert(task)) {
+              stopBargeListener();
+              // Noch laufende Erkennung abloesen, sonst scheitert der Neustart
+              // (nur eine Erkennung gleichzeitig — Guard in onend ignoriert sie).
+              const aktive = state.voiceRecognition;
+              state.voiceRecognition = null;
+              try {
+                        aktive?.abort?.();
+              } catch {
+                        // Recognition war bereits gestoppt.
+              }
+              voiceModeListen();
               return;
       }
       stopBargeListener();
@@ -717,7 +719,7 @@ function openVoiceMode() {
       window.smejjVoiceModePreferences = { voiceMode: true };
       syncVoiceMicVisual();
       // Innerhalb der Klick-Geste: Sprachausgabe fuer iOS/Safari freischalten.
-      unlockSpeechSynthesis();
+      browserTts.unlock();
       // Stufe B: Premium-Stimme pruefen (laeuft der Server-TTS-Worker?) — asynchron,
       // bis dahin und bei jedem Fehler gilt unveraendert die Browser-Stimme.
       premiumVoiceOn = false;
@@ -757,7 +759,7 @@ function bindVoiceMode() {
               send: $("#voiceModeSend"),
               onSubmit: (task) => {
                       stopSpeaking();
-                      voiceModeSend(task);
+                      voiceModeSend(task, { getippt: true });
               }
       });
       document.addEventListener("keydown", (event) => {
