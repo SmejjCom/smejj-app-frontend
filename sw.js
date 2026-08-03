@@ -1,3 +1,18 @@
+// v206 -> v207 (2026-08-03): Nacharbeit zum Split-View, beide Restpunkte aus
+// der Abschlussmeldung (Freigabe Wof Kadavanich, 2026-08-03: "Ja").
+// 1) Wegklicken: Ist der Split-View offen UND zusaetzlich das linke Menue,
+//    schloss ein Klick neben das Menue beides. Jetzt entscheidet
+//    backdropCloseTarget() in panel-backdrop.js: im Split-View faellt nur das
+//    Menue zu, das Panel bleibt stehen. Ausserhalb des Split-Views bleibt es
+//    beim bisherigen "alles zu" (Non-Regression Sidebar-Fix 2026-07-18).
+//    Escape bleibt bewusst unveraendert — das ist eine ausdrueckliche
+//    Nutzeraktion und schliesst weiterhin beides.
+// 2) Restzustand: Schliessen ueber Browser-Knopf/Backdrop/Navigation laeuft
+//    durch app.js und nicht durch closePane(); body.browser-pane-open,
+//    .is-browser-mode und --right-panel-width blieben stehen. Der Waechter
+//    raeumt diesen Rest jetzt ab (unsichtbar, aber der Zustand log).
+// Geaendert: panel-backdrop.js (?v=panel-backdrop-20260803 in app.js),
+// browser-pane-backdrop.js (?v=2 in index.html).
 // v205 -> v206 (2026-08-03): Browser-Panel klappte beim Klick ins Schreibfeld
 // zu. Live in Chrome bewiesen: Im Split-View blieb das Abdunkel-Backdrop aus
 // panel-backdrop.js (#sidebarBackdrop, inset 0, z 65) ueber dem linken
@@ -430,7 +445,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v206";
+const CACHE_NAME = "smejj-shell-v207";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

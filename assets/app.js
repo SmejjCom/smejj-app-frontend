@@ -9,7 +9,7 @@ import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v3";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
-import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260718";
+import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
 import { collectConversationHistory } from "./chat-history-context.js";
 import { lesbarerStatus } from "./system-status-text.js";

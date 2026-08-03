@@ -26,6 +26,26 @@ function loadStyles() {
 }
 
 /**
+ * Entscheidet, was ein Klick auf das Backdrop schliessen darf.
+ *
+ * Freigabe Wof Kadavanich, 2026-08-03 ("Ja" zur Nacharbeitsliste, Punkt 2):
+ * Ist der Browser-Split-View offen und wird zusaetzlich das linke Menue
+ * geoeffnet, soll ein Klick neben das Menue nur das Menue schliessen. Das
+ * Panel bleibt stehen, bis der Nutzer es selbst zumacht (X, Browser-Knopf,
+ * Escape, Navigation) — dieselbe Zusage wie beim Split-View-Waechter.
+ *
+ * Ausserhalb des Split-Views bleibt es beim bisherigen Verhalten ("alles zu"),
+ * damit das Wegklicken des Menues nicht kaputtgeht (Non-Regression zum
+ * Sidebar-Fix vom 2026-07-18).
+ *
+ * @param {{splitView: boolean, menuOpen: boolean}} zustand
+ * @returns {"menu" | "all"}
+ */
+export function backdropCloseTarget({ splitView, menuOpen }) {
+  return splitView && menuOpen ? "menu" : "all";
+}
+
+/**
  * Verdrahtet das Backdrop mit den beiden Panels.
  *
  * @param {object} options
@@ -65,7 +85,16 @@ export function initPanelBackdrop({
     setBrowserPanelOpen(false);
   };
 
-  backdrop?.addEventListener("click", closeAll);
+  const closeFromBackdrop = () => {
+    const target = backdropCloseTarget({
+      splitView: Boolean(document.body?.classList.contains("browser-pane-open")),
+      menuOpen: Boolean(sidebar?.classList.contains("is-open"))
+    });
+    if (target === "menu") setMenuOpen(false);
+    else closeAll();
+  };
+
+  backdrop?.addEventListener("click", closeFromBackdrop);
 
   // Escape schliesst offene Panels und gibt den Fokus an den Ausloeser zurueck.
   // Ohne das blieb das Menue fuer Tastaturnutzer eine Sackgasse.
