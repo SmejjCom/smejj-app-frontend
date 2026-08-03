@@ -1,3 +1,9 @@
+// v203 -> v204 (2026-08-03): Groq-Ohr AKTIV — die Transkriptions-Route zeigt
+// auf die Salad-Bridge (v106, per GitHub-Pull + Container-Neustart deployt,
+// der historische Welle-2-Weg; der Zeabur-Weg haengt weiter am Betreiber-Token).
+// Live gemessen: say-erzeugtes Deutsch kam wortwoertlich inkl. Satzzeichen
+// zurueck. Nur config.js aendert sich — der Versionssprung bringt sie in den
+// Precache der wiederkehrenden Nutzer.
 // v202 -> v203 (2026-08-03): Sprachwelle Stufe 4 — das Groq-Ohr. Waehrend die
 // Web-Speech-Erkennung zuhoert, nimmt ein MediaRecorder parallel auf; die
 // Bridge transkribiert ueber Groq Whisper (Welle-2-Zugang, 0-Euro-Deckel) und
@@ -413,7 +419,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v203";
+const CACHE_NAME = "smejj-shell-v204";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

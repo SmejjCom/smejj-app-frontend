@@ -32,7 +32,9 @@ const API_PATHS = {
   // internen Piper-Dienst.
   voiceStatus: "https://smejj-chat-bridge.zeabur.app/api/voice/status",
   voiceTts: "https://smejj-chat-bridge.zeabur.app/api/voice/tts",
-  voiceTranscribe: "https://smejj-chat-bridge.zeabur.app/api/voice/transcribe",
+  // Stufe 4: Das Ohr zeigt auf die Salad-Bridge — dort ist v106 mit der
+  // Transkriptions-Route live (Zeabur bleibt bis zum Token-Deploy auf v104).
+  voiceTranscribe: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/transcribe",
     authConfig: "/api/auth/config",
     browserFetch: "/api/browser/fetch",
     browserRemote: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/api/browser/remote",
