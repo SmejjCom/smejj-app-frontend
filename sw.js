@@ -1,3 +1,14 @@
+// v205 -> v206 (2026-08-03): Browser-Panel klappte beim Klick ins Schreibfeld
+// zu. Live in Chrome bewiesen: Im Split-View blieb das Abdunkel-Backdrop aus
+// panel-backdrop.js (#sidebarBackdrop, inset 0, z 65) ueber dem linken
+// Arbeitsbereich stehen — elementFromPoint auf dem Schreibfeld traf das
+// Backdrop, und dessen Wegklick-Handler schloss das Panel. NEU im SHELL:
+// browser-pane-backdrop.js (index.html laedt es mit ?v=1) unterdrueckt das
+// Backdrop im Split-View; das Panel schliesst nur noch manuell (X, Knopf,
+// Escape, Navigation). Ausnahme linkes Menue offen: Backdrop bleibt, damit
+// Abdunkeln/Wegklicken des Menues erhalten bleiben (Non-Regression).
+// Freigabe Wof Kadavanich, 2026-08-03: "soll immer an bleiben bis ich manuel
+// zu klappe".
 // v203 -> v204 (2026-08-03): Groq-Ohr AKTIV — die Transkriptions-Route zeigt
 // auf die Salad-Bridge (v106, per GitHub-Pull + Container-Neustart deployt,
 // der historische Welle-2-Weg; der Zeabur-Weg haengt weiter am Betreiber-Token).
@@ -419,7 +430,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v205";
+const CACHE_NAME = "smejj-shell-v206";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -450,6 +461,7 @@ const SHELL = [
   "/assets/account-privacy.css",
   "/assets/panel-backdrop.css",
   "/assets/browser-pane.js",
+  "/assets/browser-pane-backdrop.js",
   "/assets/browser-pane-render.js",
   "/assets/browser-pane-session.js",
   "/assets/auth/passkey.js",
