@@ -1,3 +1,11 @@
+// v213 -> v214 (2026-08-04): Konto-Formulare im HELLEN Schema repariert.
+// Zwei eigene Fehler, beim Nachpruefen gefunden:
+// (1) Die Formularflaeche nutzte `var(--konto-panel, …)` — die Variable gibt es
+//     nicht, der weisse Rueckfallwert galt also immer. Jetzt --konto-glass,
+//     das BEIDE Schemata kennt.
+// (2) Der Fokusring hing an --konto-edge, im hellen Schema rgba(255,255,255,0.9)
+//     — ein weisser Ring auf hellem Grund ist kein Ring. Jetzt die Akzentfarbe.
+
 // v211 -> v212 (2026-08-04): Nachbesserung am Konto-Loeschformular. Die
 // Beschriftung "Zur Bestätigung KONTO LÖSCHEN eingeben" brach in DREI Zeilen —
 // das Label ist eine Flex-Spalte, und das darin stehende <code>-Element wurde
@@ -501,7 +509,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v213";
+const CACHE_NAME = "smejj-shell-v214";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

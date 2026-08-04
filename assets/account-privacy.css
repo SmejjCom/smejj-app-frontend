@@ -667,7 +667,11 @@
   padding: 18px;
   border: 1px solid var(--konto-line);
   border-top-color: var(--konto-edge);
-  background: var(--konto-panel, rgba(255, 255, 255, 0.03));
+  /* --konto-glass, nicht ein eigener Wert: die Variable kennt BEIDE Farbschemata.
+     Hier stand zuerst `var(--konto-panel, rgba(255,255,255,0.03))` — die Variable
+     gibt es gar nicht, der weisse Rueckfallwert galt also immer und haette im
+     hellen Schema eine fremde Flaeche erzeugt. */
+  background: var(--konto-glass);
 }
 
 #profile .account-inline-form label {
@@ -693,8 +697,12 @@
   text-transform: none;
 }
 
+/* Fokusring in der Akzentfarbe, nicht in --konto-edge: die Kante ist im HELLEN
+   Schema rgba(255,255,255,0.9) — ein weisser Ring auf hellem Grund ist kein Ring.
+   #2dd4bf traegt in beiden Schemata und ist dieselbe Farbe wie beim Bildwaehler
+   weiter oben in dieser Datei. */
 #profile .account-inline-form input:focus-visible {
-  outline: 2px solid var(--konto-edge);
+  outline: 2px solid #2dd4bf;
   outline-offset: 2px;
 }
 
