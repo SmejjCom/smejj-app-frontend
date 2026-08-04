@@ -530,7 +530,14 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v215";
+// v215 -> v216 (2026-08-04): Sichtbarer Arbeitsfortschritt im Chat
+// (ai/chat-stream.js + chat-markdown.css) und autonomer Lauf IM Faden
+// statt Ansichtswechsel (NEU autonomous-thread-run.js, dynamisch aus
+// autonomous-intent.js geladen — deshalb ein eigener Precache-Eintrag,
+// sonst waere er offline tot). Beide Dateien liegen cache-first im
+// Precache; ohne Versionssprung erreicht die Aenderung wiederkehrende
+// Nutzer nie (caches.match laeuft mit ignoreSearch).
+const CACHE_NAME = "smejj-shell-v216";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -589,6 +596,7 @@ const SHELL = [
   "/assets/autonomous-coding.js",
   "/assets/autonomous-coding.css",
   "/assets/autonomous-intent.js",
+  "/assets/autonomous-thread-run.js",
   "/assets/browser-context.js",
   "/assets/search.js",
   "/assets/view-chrome.js",

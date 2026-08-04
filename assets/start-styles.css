@@ -3130,6 +3130,53 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
   40% { opacity: 1; transform: scale(1.2); }
 }
 
+/* --- Arbeitsschritte waehrend der Antwort (Befund 2026-08-04) ------------
+   Der Nutzer sah sekundenlang nichts, waehrend im Hintergrund gesucht wurde,
+   und hielt die Antwort fuer beendet. Diese Liste macht die Arbeit sichtbar.
+   Bewusst zurueckhaltend: sie ist Beiwerk, nicht die Antwort. */
+.chat-schritte {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.86em;
+  opacity: 0.78;
+  padding-block: 2px;
+}
+
+.chat-schritt {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1.45;
+  /* Lange Suchbegriffe duerfen die Zeile nicht sprengen. */
+  overflow-wrap: anywhere;
+}
+
+.chat-schritt-stand {
+  white-space: nowrap;
+  opacity: 0.72;
+}
+
+/* Ein laufender Schritt pulsiert leicht — der Unterschied zu "fertig" muss
+   auch ohne Farbe erkennbar sein (der Haken traegt die Aussage). */
+.chat-schritt[data-zustand="laeuft"] .chat-schritt-stand {
+  animation: chat-schritt-puls 1.4s ease-in-out infinite;
+}
+
+.chat-schritt[data-zustand="fertig"] {
+  opacity: 0.9;
+}
+
+@keyframes chat-schritt-puls {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.95; }
+}
+
+/* Bewegung nur, wenn der Nutzer sie nicht abbestellt hat. */
+@media (prefers-reduced-motion: reduce) {
+  .chat-schritt[data-zustand="laeuft"] .chat-schritt-stand { animation: none; }
+}
+
 /* ---- chat-actions.css ---- */
 /* smejj.com — Aktionen pro Chat-Nachricht (2026-07-28).
  *

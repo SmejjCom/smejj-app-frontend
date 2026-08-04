@@ -92,8 +92,31 @@ function renderRunOffer({ request, output, goToView, eventTarget }) {
   start.type = "button";
   start.textContent = "Autonomen Lauf starten";
   start.style.padding = "0 16px";
-  start.addEventListener("click", () => {
+
+  // Statuszeile IM Faden. Sie ersetzt den Ansichtswechsel als Rueckmeldung.
+  const stand = document.createElement("p");
+  stand.style.margin = "10px 0 0";
+  stand.hidden = true;
+
+  start.addEventListener("click", async () => {
     start.disabled = true;
+    start.textContent = "Autonomer Lauf läuft …";
+    stand.hidden = false;
+    stand.textContent = "Auftrag wird eingereicht …";
+
+    // Betreiber-Befund 2026-08-04: Der Klick warf den Nutzer auf eine andere
+    // Seite. Der Lauf startet jetzt HIER. Fail-safe: klappt das nicht, wird
+    // wie bisher die Automatik-Ansicht geoeffnet — der bewaehrte Weg bleibt.
+    let imFaden = false;
+    try {
+      const { starteImFaden } = await import("./autonomous-thread-run.js?v=1");
+      imFaden = await starteImFaden({ request, karte: stand });
+    } catch {
+      imFaden = false;
+    }
+    if (imFaden) return;
+
+    stand.textContent = "Der Lauf wird im Bereich „Automatik“ fortgesetzt.";
     start.textContent = "Autonomer Lauf wird geöffnet ...";
     // Reihenfolge zwingend: erst die Ansicht oeffnen, dann das Ereignis senden —
     // die Automatik-Oberflaeche fuellt sonst ein noch nicht sichtbares Formular.
@@ -101,7 +124,7 @@ function renderRunOffer({ request, output, goToView, eventTarget }) {
     eventTarget.dispatchEvent(new CustomEvent("smejj:autonomous-request", { detail: request }));
   }, { once: true });
 
-  card.append(hint, start);
+  card.append(hint, start, stand);
   log.append(card);
 }
 
