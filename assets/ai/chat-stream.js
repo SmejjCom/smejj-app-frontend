@@ -146,7 +146,12 @@ export async function readableError(response, offlineNotice = "") {
   const text = await response.text();
   try {
     const payload = JSON.parse(text);
-    return payload.error || text;
+    // `hinweis` VOR `error`: `error` ist eine Maschinen-Kennung. Live gesehen am
+    // 2026-08-04 beim ersten Durchlauf der Anmeldepflicht — im Chat stand nackt
+    // "authentication_required". Der Nutzer erfaehrt daraus nicht, was zu tun
+    // ist. Der Server schickt den Klartext in `hinweis` mit; der gehoert
+    // angezeigt, die Kennung nur als letzter Rueckfall.
+    return payload.hinweis || payload.error || text;
   } catch {
     return !text || text.trimStart().startsWith("<") ? offlineNotice : text;
   }

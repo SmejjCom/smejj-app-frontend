@@ -1,3 +1,8 @@
+// v217 -> v218 (2026-08-04): Klartext statt Maschinen-Kennung. Beim ersten
+// Live-Durchlauf der Anmeldepflicht stand im Chat nackt "authentication_required".
+// readableError nimmt jetzt `hinweis` vor `error` — der Server schickt den
+// Klartext ohnehin mit. ai/chat-stream.js liegt cache-first im Precache.
+
 // v216 -> v217 (2026-08-04): Anmeldepflicht an der Chat-Bruecke.
 // Gemessen: ein curl mit dem Kopf "Origin: https://smejj.com" bekam die volle
 // Antwort — der Origin-Kopf wirkt nur im Browser. Das Frontend schickt jetzt
@@ -546,7 +551,7 @@
 // sonst waere er offline tot). Beide Dateien liegen cache-first im
 // Precache; ohne Versionssprung erreicht die Aenderung wiederkehrende
 // Nutzer nie (caches.match laeuft mit ignoreSearch).
-const CACHE_NAME = "smejj-shell-v217";
+const CACHE_NAME = "smejj-shell-v218";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
