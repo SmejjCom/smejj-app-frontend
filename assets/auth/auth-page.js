@@ -281,7 +281,12 @@ async function handleUrlTokens() {
   // eindeutig ablehnt. Ohne diesen Satz stuende der Nutzer wortlos wieder auf
   // der Anmeldeseite und hielte es fuer einen Fehler — genau so ist es dem
   // Betreiber am 2026-08-04 ergangen, nur ohne Umleitung.
+  //
+  // ERST die Sprache, DANN die Meldung: t() faellt auf den deutschen Quelltext
+  // zurueck, solange das Woerterbuch nicht geladen ist. Live gesehen — die Seite
+  // stand englisch da und der Hinweis darunter deutsch.
   if (params.get("abgelaufen")) {
+    await loadUiLanguage(savedUiLanguage()).catch(() => {});
     status(t("Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an."), "error");
   }
   if (params.get("verify")) {
