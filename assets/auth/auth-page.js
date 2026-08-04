@@ -285,11 +285,80 @@ async function handleUrlTokens() {
     const emailField = document.querySelector("#profileEmail");
     if (emailField && email) emailField.value = email;
     revealEmailForm();
-    const newPassword = window.prompt(t("Neues Passwort für smejj.com (mindestens 10 Zeichen):")) || "";
-    if (!newPassword) return status(t("Passwort-Reset abgebrochen."), "error");
-    const { ok, payload } = await postJson(EMAIL_API.resetConfirm, { email, token: params.get("reset"), newPassword });
-    status(ok ? t("Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden.") : errorText(payload, "Reset fehlgeschlagen."), ok ? "success" : "error");
+    startPasswordReset(params.get("reset"), email);
   }
+}
+
+/**
+ * Neues Passwort im SEITENFORMULAR setzen, nicht im Browser-Dialog.
+ *
+ * Bis 2026-08-04 fragte dieser Weg das neue Passwort mit `window.prompt()` ab.
+ * Vier Gruende, warum das gerade auf dem Konto-Wiederherstellungsweg falsch war:
+ *   1. Ein prompt()-Feld maskiert NICHT — das neue Passwort stand im Klartext
+ *      auf dem Bildschirm, sichtbar fuer jeden daneben und fuer jede Aufnahme.
+ *   2. Passwortverwaltungen kennen den Dialog nicht: kein Vorschlag, kein
+ *      Speichern, kein Einfuegen. Genau hier braucht man sie am dringendsten.
+ *   3. Der Dialog blockiert die ganze Seite; Chrome bietet nach Wiederholung
+ *      "weitere Dialoge unterdruecken" an — danach ist der Weg tot.
+ *   4. Kein zweites Feld: bei einem unsichtbaren Tippfehler sperrt man sich aus
+ *      dem eigenen Konto aus, und der Reset-Token ist verbraucht.
+ *
+ * Das Formular ist schon da (#emailFormGroup mit maskiertem #emailPassword) —
+ * es wird nur auf "neues Passwort" umgestellt und ein Bestaetigungsfeld ergaenzt.
+ */
+function startPasswordReset(token, email) {
+  const feld = document.querySelector("#emailPassword");
+  const knopf = document.querySelector("#emailLogin");
+  if (!feld || !knopf) return status(t("Passwort-Reset ist auf dieser Seite nicht verfügbar."), "error");
+
+  feld.value = "";
+  feld.autocomplete = "new-password";
+  feld.placeholder = t("Neues Passwort, mindestens 10 Zeichen");
+  const bestaetigung = zweitesPasswortfeld(feld);
+  knopf.textContent = t("Neues Passwort setzen");
+  document.querySelector("#passwordResetLink")?.closest("p")?.setAttribute("hidden", "");
+  status(t("Bitte ein neues Passwort vergeben."));
+  feld.focus();
+
+  const senden = async () => {
+    const neu = feld.value;
+    if (neu !== bestaetigung.value) return status(t("Die beiden Passwörter stimmen nicht überein."), "error");
+    if (!neu) return status(t("Bitte ein neues Passwort eingeben."), "error");
+    knopf.disabled = true;
+    const { ok, payload } = await postJson(EMAIL_API.resetConfirm, { email, token, newPassword: neu });
+    knopf.disabled = false;
+    if (!ok) return status(errorText(payload, "Reset fehlgeschlagen."), "error");
+    // Der verbrauchte Token gehoert nicht laenger in Adresszeile und Verlauf.
+    window.history.replaceState({}, "", window.location.pathname);
+    status(t("Passwort geändert. Alle bisherigen Sitzungen wurden beendet – bitte neu anmelden."), "success");
+  };
+
+  // Der Knopf traegt sonst den Anmelde-Handler; im Reset-Modus muss NUR dieser
+  // Weg laufen. Ein Klon ersetzt den Knopf samt aller bisherigen Handler.
+  const frisch = knopf.cloneNode(true);
+  knopf.replaceWith(frisch);
+  frisch.addEventListener("click", senden);
+  for (const eingabe of [feld, bestaetigung]) {
+    eingabe.addEventListener("keydown", (event) => { if (event.key === "Enter") senden(); });
+  }
+}
+
+/** Bestaetigungsfeld neben das Passwortfeld haengen (einmalig). */
+function zweitesPasswortfeld(feld) {
+  const vorhanden = document.querySelector("#emailPasswordRepeat");
+  if (vorhanden) return vorhanden;
+  const label = document.createElement("label");
+  label.className = "auth-field";
+  label.setAttribute("for", "emailPasswordRepeat");
+  label.textContent = t("Passwort wiederholen");
+  const eingabe = document.createElement("input");
+  eingabe.id = "emailPasswordRepeat";
+  eingabe.type = "password";
+  eingabe.autocomplete = "new-password";
+  eingabe.placeholder = t("Zur Sicherheit noch einmal");
+  label.append(eingabe);
+  feld.closest("label")?.after(label);
+  return eingabe;
 }
 
 // Startet einen One-Time-Handoff, damit der Token nach externem Login/Klick auf
