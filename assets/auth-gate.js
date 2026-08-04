@@ -15,7 +15,7 @@
 // gilt der Besucher als abgemeldet und landet auf der Anmeldeseite. Lieber
 // einmal zu viel anmelden als die Anmelde-Pflicht still verlieren.
 
-import { STORAGE_KEYS } from "./config.js";
+import { API_ORIGIN, STORAGE_KEYS } from "./config.js";
 
 // Schluessel wie in account-sessions.js/profile-dock.js — bewusst dupliziert,
 // damit das Gate ohne Auth-Modul startfaehig bleibt (gleiches Muster wie Dock).
@@ -73,4 +73,71 @@ export function enforceAuthGate(win) {
   return true;
 }
 
-if (typeof window !== "undefined") enforceAuthGate(window);
+// --- Gilt das Token ueberhaupt noch? -------------------------------------------
+//
+// Befund 2026-08-04, im angemeldeten Browser des Betreibers gemessen:
+// `hasSession` prueft nur, OB ein Token im Speicher liegt — nie, ob es gilt.
+// Sein Browser trug ein Token, das der Server ablehnt (`/api/auth/me` ->
+// authenticated=false). Die App liess ihn also herein, der Server kannte ihn
+// nicht. Sichtbar wurde das erst, als die Chat-Bruecke eine Anmeldung verlangte:
+// jede Frage kam als "Bitte anmelden" zurueck, obwohl er angemeldet zu sein
+// schien. Ein Token ueberlebt eben laenger als die Sitzung dahinter — es
+// laeuft ab, oder der Server bekommt beim Neuaufsetzen ein neues Geheimnis.
+//
+// ZWEI REGELN, beide wichtig:
+//  1. NUR eine eindeutige Absage zaehlt (HTTP 200 mit authenticated=false).
+//     Netzfehler, Zeitueberschreitung, 5xx: NICHTS tun. Wer offline ist oder
+//     einen Serveraussetzer erwischt, darf nicht abgemeldet werden — das waere
+//     schlimmer als der Fehler, den diese Pruefung behebt.
+//  2. Sie laeuft NACH dem Rendern und blockiert nichts. Die Seite soll nicht
+//     auf einen Netzaufruf warten.
+const SESSION_CHECK_TIMEOUT_MS = 8000;
+
+/**
+ * Fragt den Server, ob das gespeicherte Token noch gilt, und meldet ab, wenn es
+ * eindeutig nicht mehr gilt.
+ *
+ * @param {object} win window-artiges Objekt
+ * @param {{fetchFn?: Function, apiOrigin?: string, jetztPruefen?: boolean}} [deps]
+ * @returns {Promise<"kein-token"|"gueltig"|"abgelaufen"|"unklar"|"oeffentlich">}
+ */
+export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, apiOrigin = API_ORIGIN } = {}) {
+  let token = "";
+  try {
+    token = win.localStorage.getItem(AUTH_TOKEN_KEY) || "";
+  } catch {
+    return "kein-token"; // Storage gesperrt: das Gate hat schon entschieden.
+  }
+  if (!token || !apiOrigin) return "kein-token";
+
+  let urteil = null;
+  try {
+    const antwort = await fetchFn(`${apiOrigin}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+      signal: AbortSignal.timeout(SESSION_CHECK_TIMEOUT_MS)
+    });
+    if (!antwort.ok) return "unklar"; // 5xx o. ae. — keine Aussage ueber das Token.
+    urteil = (await antwort.json())?.authenticated;
+  } catch {
+    return "unklar"; // offline oder Zeitueberschreitung: nichts tun.
+  }
+  if (urteil !== false) return "gueltig";
+
+  // Eindeutig abgelaufen: Token weg, damit die App nicht weiter so tut als ob.
+  try {
+    win.localStorage.removeItem(AUTH_TOKEN_KEY);
+  } catch {
+    // Storage gesperrt — die Umleitung unten wirkt trotzdem.
+  }
+  if (isPublicPath(win.location.pathname)) return "abgelaufen";
+  // `abgelaufen=1` sagt der Anmeldeseite, dass sie den Grund nennen soll —
+  // eine wortlose Umleitung wirkt wie ein Fehler.
+  win.location.replace(`${LOGIN_URL}?abgelaufen=1`);
+  return "abgelaufen";
+}
+
+if (typeof window !== "undefined") {
+  const umgeleitet = enforceAuthGate(window);
+  // Nur wenn die Seite bleibt: sonst pruefen wir eine Seite, die gerade geht.
+  if (!umgeleitet) verifyStoredSession(window).catch(() => {});
+}

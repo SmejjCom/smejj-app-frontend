@@ -277,6 +277,13 @@ async function requestPasswordReset() {
 async function handleUrlTokens() {
   const params = new URLSearchParams(window.location.search);
   const email = params.get("email") || "";
+  // `abgelaufen=1` setzt auth-gate.js, wenn der Server das gespeicherte Token
+  // eindeutig ablehnt. Ohne diesen Satz stuende der Nutzer wortlos wieder auf
+  // der Anmeldeseite und hielte es fuer einen Fehler — genau so ist es dem
+  // Betreiber am 2026-08-04 ergangen, nur ohne Umleitung.
+  if (params.get("abgelaufen")) {
+    status(t("Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an."), "error");
+  }
   if (params.get("verify")) {
     const { ok, payload } = await postJson(EMAIL_API.verify, { email, token: params.get("verify") });
     status(ok ? t("E-Mail-Adresse bestätigt. Du kannst dich jetzt anmelden.") : errorText(payload, "Bestätigung fehlgeschlagen."), ok ? "success" : "error");

@@ -314,4 +314,5 @@ export default {
   "Terminal": "Terminale",
   "Coding": "Programmazione",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Ad esempio: Rispondi in modo breve e in italiano. Spiega i termini tecnici in modo semplice.",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "La tua sessione è scaduta. Accedi di nuovo.",
 };

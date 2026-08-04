@@ -314,4 +314,5 @@ export default {
   "Terminal": "Terminal",
   "Coding": "Développement",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Par exemple : Réponds brièvement et en français. Explique simplement les termes techniques.",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Votre session a expiré. Veuillez vous reconnecter.",
 };

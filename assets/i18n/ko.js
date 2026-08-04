@@ -314,4 +314,5 @@ export default {
   "Terminal": "터미널",
   "Coding": "코딩",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "예: 한국어로 간결하게 답해 주세요. 전문 용어는 쉽게 설명해 주세요.",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "세션이 만료되었습니다. 다시 로그인해 주세요.",
 };

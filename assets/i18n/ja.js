@@ -314,4 +314,5 @@ export default {
   "Terminal": "ターミナル",
   "Coding": "コーディング",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "例：日本語で簡潔に答えてください。専門用語はやさしく説明してください。",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "セッションの有効期限が切れました。もう一度サインインしてください。",
 };

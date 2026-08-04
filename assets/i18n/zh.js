@@ -314,4 +314,5 @@ export default {
   "Terminal": "终端",
   "Coding": "编程",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "例如：请用中文简短回答，并简单解释专业术语。",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "登录状态已过期，请重新登录。",
 };

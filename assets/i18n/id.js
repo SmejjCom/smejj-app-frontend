@@ -314,4 +314,5 @@ export default {
   "Terminal": "Terminal",
   "Coding": "Coding",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Misalnya: Jawab singkat dan dalam bahasa Indonesia. Jelaskan istilah teknis secara sederhana.",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Sesi Anda telah berakhir. Silakan masuk lagi.",
 };

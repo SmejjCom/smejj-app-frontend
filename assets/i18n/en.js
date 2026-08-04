@@ -314,4 +314,5 @@ export default {
   "Terminal": "Terminal",
   "Coding": "Coding",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "e.g. Answer briefly and in English. Explain technical terms simply.",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Your session has expired. Please sign in again.",
 };

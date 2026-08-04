@@ -314,4 +314,5 @@ export default {
   "Terminal": "Терминал",
   "Coding": "Программирование",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Например: Отвечай кратко и по-русски. Объясняй технические термины просто.",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Срок сессии истёк. Пожалуйста, войдите снова.",
 };

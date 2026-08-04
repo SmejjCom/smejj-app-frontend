@@ -314,4 +314,5 @@ export default {
   "Terminal": "الطرفية",
   "Coding": "البرمجة",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "مثال: أجب باختصار وبالعربية. واشرح المصطلحات التقنية ببساطة.",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
 };

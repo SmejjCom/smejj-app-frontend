@@ -314,4 +314,5 @@ export default {
   "Terminal": "Terminal",
   "Coding": "Kodlama",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Örneğin: Kısa ve Türkçe yanıtla. Teknik terimleri basitçe açıkla.",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
 };

@@ -314,4 +314,5 @@ export default {
   "Terminal": "টার্মিনাল",
   "Coding": "কোডিং",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "যেমন: সংক্ষেপে এবং বাংলায় উত্তর দিন। কারিগরি শব্দ সহজভাবে ব্যাখ্যা করুন।",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "আপনার সেশনের মেয়াদ শেষ হয়েছে। অনুগ্রহ করে আবার সাইন ইন করুন।",
 };

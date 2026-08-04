@@ -314,4 +314,5 @@ export default {
   "Terminal": "टर्मिनल",
   "Coding": "कोडिंग",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "उदाहरण: संक्षेप में और हिन्दी में उत्तर दें। तकनीकी शब्द सरलता से समझाएँ।",
+  "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "आपका सत्र समाप्त हो गया है। कृपया दोबारा साइन इन करें।",
 };

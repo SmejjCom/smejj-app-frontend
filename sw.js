@@ -1,3 +1,13 @@
+// v218 -> v219 (2026-08-04): Eine abgelaufene Anmeldung zeigt sich jetzt.
+// Befund im angemeldeten Browser des Betreibers: sein Token lag im Speicher,
+// der Server lehnte es ab (/api/auth/me -> authenticated=false). auth-gate.js
+// prueft nur das VORHANDENSEIN — die App liess ihn herein, der Server kannte
+// ihn nicht. Sichtbar wurde das erst, als die Bruecke eine Anmeldung verlangte:
+// jede Frage kam als "Bitte anmelden" zurueck. verifyStoredSession() prueft das
+// Token jetzt nebenher und meldet NUR bei einer eindeutigen Absage ab; ein
+// Netzaussetzer meldet niemanden ab. auth-gate.js und auth-page.js liegen
+// cache-first im Precache.
+
 // v217 -> v218 (2026-08-04): Klartext statt Maschinen-Kennung. Beim ersten
 // Live-Durchlauf der Anmeldepflicht stand im Chat nackt "authentication_required".
 // readableError nimmt jetzt `hinweis` vor `error` — der Server schickt den
@@ -551,7 +561,7 @@
 // sonst waere er offline tot). Beide Dateien liegen cache-first im
 // Precache; ohne Versionssprung erreicht die Aenderung wiederkehrende
 // Nutzer nie (caches.match laeuft mit ignoreSearch).
-const CACHE_NAME = "smejj-shell-v218";
+const CACHE_NAME = "smejj-shell-v219";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
