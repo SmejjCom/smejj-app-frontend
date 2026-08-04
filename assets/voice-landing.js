@@ -38,6 +38,7 @@ import { createThinkingCue } from "./voice-thinking-cue.js";
 import { createPremiumVoice } from "./voice-premium-tts.js";
 // Stufe A2: automatischer Neuversuch, wenn eine Salad-Replika ausfaellt.
 import { fetchStreamWithRetry } from "./ai/fetch-retry.js";
+import { bridgeAuthHeaders } from "./ai/chat-stream.js";
 
 // Re-Export fuer bestehende Nutzer der bisherigen Modul-API.
 export { normalizeSpeechText, isLikelyEcho, enoughForBarge };
@@ -617,7 +618,7 @@ async function sendTask(task, { getippt = false } = {}) {
       { url: CLIENT_ROUTES.api.chatFallback, body: JSON.stringify(buildReserveChatRequest(nutzlast)) }
     ], {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() },
       body: JSON.stringify(nutzlast)
     });
     if (response.ok && response.body) {

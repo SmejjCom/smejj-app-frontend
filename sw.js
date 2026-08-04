@@ -1,3 +1,12 @@
+// v216 -> v217 (2026-08-04): Anmeldepflicht an der Chat-Bruecke.
+// Gemessen: ein curl mit dem Kopf "Origin: https://smejj.com" bekam die volle
+// Antwort — der Origin-Kopf wirkt nur im Browser. Das Frontend schickt jetzt
+// den Sitzungs-Token mit (ai/chat-stream.js, voice-landing.js), die Bruecke
+// verlangt ihn (Bridge v114). Beide Dateien liegen cache-first im Precache;
+// ohne diesen Sprung schickten Bestandsnutzer keinen Token und saehen 401.
+// Freigabe Wof Kadavanich, 2026-08-04: "Anmeldepflicht jetzt live stellen
+// (Frontend und Bridge in einer Welle)".
+
 // v214 -> v215 (2026-08-04): Seitengewicht — Modell-Bereiche laden erst bei
 // Bedarf. GEMESSEN, nicht geschaetzt: der Erstbesuch wog 311 KB gegen ein
 // Budget von 300 KB, und er wuchs (v209 noch 308 KB). Die Aufschluesselung
@@ -537,7 +546,7 @@
 // sonst waere er offline tot). Beide Dateien liegen cache-first im
 // Precache; ohne Versionssprung erreicht die Aenderung wiederkehrende
 // Nutzer nie (caches.match laeuft mit ignoreSearch).
-const CACHE_NAME = "smejj-shell-v216";
+const CACHE_NAME = "smejj-shell-v217";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
