@@ -1,7 +1,15 @@
 import { STORAGE_KEYS } from "./config.js";
 import { initSettingsRuntime, SETTINGS_VERSION } from "./settings-runtime.js?v=4";
-import { initClineProviderSurface } from "./provider-settings.js?v=1";
-import { initApiKeysSurface } from "./api-keys-surface.js?v=1";
+// api-keys-surface.js und provider-settings.js werden BEWUSST nicht statisch
+// importiert (Seitengewicht, Freigabe Wof Kadavanich 2026-08-04). Beide rendern
+// ausschliesslich in das Panel "models", und der Startreiter ist "general" —
+// bis der Nutzer dorthin wechselt, wird ihr Code nie gebraucht. Zusammen mit
+// ihrem selbst nachgeladenen CSS sind das 13,8 KB, die jeder Seitenaufruf
+// bisher mitschleppte. Sie bleiben im Precache: beim Reiterwechsel kommen sie
+// aus dem Cache, also ohne Netz und ohne spuerbare Wartezeit.
+// Geprueft vor dem Umbau: app.js (Start-Lock) bindet KEINE der von ihnen
+// erzeugten Kennungen (ak*, apiKeysSurface, cline*) — die Boot-Bindings von
+// app.js koennen dadurch nichts verlieren.
 import { LANGUAGE_OPTIONS } from "./language-options.js?v=1";
 import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 
@@ -77,8 +85,8 @@ function render(view) {
   view.innerHTML = markup();
   view.setAttribute("lang", uiLanguage());
   view.setAttribute("dir", uiDirection());
-  initApiKeysSurface(view);
-  initClineProviderSurface(view);
+  // Die beiden Modell-Panels holt activate() weiter unten nach — aber nur,
+  // wenn der Reiter "models" wirklich dran ist.
   applyValues(view, readSettings());
   zeigeAktiveSprache(view);
   activate(view, activeTab);
@@ -185,8 +193,28 @@ function handleClick(view, event) {
   } else if (jump) document.querySelector(`[data-view="${jump}"]`)?.click();
 }
 
+// Holt die beiden Modell-Bereiche beim ersten Wechsel auf den Reiter "models".
+// Kein eigener Zwischenspeicher noetig: der Browser liefert ein zweites
+// import() aus dem Modulspeicher, und beide init-Funktionen steigen von selbst
+// aus, wenn ihr Wurzelelement bereits steht (idempotent).
+// Fail-safe wie im ganzen Modul: schlaegt ein Import fehl (offline, Cache
+// geraeumt), bleiben die uebrigen Einstellungen vollstaendig bedienbar.
+async function ladeModellBereiche(view) {
+  try {
+    const [schluessel, cline] = await Promise.all([
+      import("./api-keys-surface.js?v=1"),
+      import("./provider-settings.js?v=1")
+    ]);
+    schluessel.initApiKeysSurface(view);
+    cline.initClineProviderSurface(view);
+  } catch {
+    /* fail-safe: Einstellungen bleiben ohne diese beiden Bereiche nutzbar */
+  }
+}
+
 function activate(view, id) {
   activeTab = id;
+  if (id === "models") void ladeModellBereiche(view);
   view.querySelectorAll("[data-settings-tab]").forEach((button) => {
     const active = button.dataset.settingsTab === id;
     button.classList.toggle("is-active", active);

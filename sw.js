@@ -1,3 +1,24 @@
+// v214 -> v215 (2026-08-04): Seitengewicht — Modell-Bereiche laden erst bei
+// Bedarf. GEMESSEN, nicht geschaetzt: der Erstbesuch wog 311 KB gegen ein
+// Budget von 300 KB, und er wuchs (v209 noch 308 KB). Die Aufschluesselung
+// ueber 119 Ressourcen zeigte api-keys-surface.js (6,9 KB), provider-
+// settings.js (3,7 KB) und ihr selbst nachgeladenes CSS (3,2 KB) im Ladepfad
+// JEDES Seitenaufrufs — obwohl beide ausschliesslich in das Einstellungs-Panel
+// "models" rendern und der Startreiter "general" ist.
+// settings-surface.js (NICHT unter Start-Lock) importiert sie jetzt dynamisch,
+// ausgeloest von activate("models"). Beide bleiben im Precache: beim
+// Reiterwechsel kommen sie aus dem Cache, ohne Netz und ohne Wartezeit.
+// Vor dem Umbau geprueft: app.js (Start-Lock) bindet KEINE ihrer Kennungen
+// (ak*, apiKeysSurface, cline*), und applyValues() greift nicht darauf zu —
+// die Boot-Bindings koennen dadurch nichts verlieren. Aussehen und Bedienung
+// bleiben unveraendert; nur der Zeitpunkt des Ladens aendert sich.
+// Der Versionssprung ist noetig, weil settings-surface.js cache-first im
+// Precache liegt — ohne ihn behielten Bestandsnutzer die alte Fassung.
+// Freigabe Wof Kadavanich, 2026-08-04: "Du darfst das Gewicht des Erstbesuchs
+// von 311 KB unter das Budget von 300 KB bringen. ... Module später laden,
+// aufteilen, entbündeln. ... Aussehen und Bedienung der Startseite bleiben
+// unverändert. Keine Funktion darf wegfallen."
+
 // v213 -> v214 (2026-08-04): Konto-Formulare im HELLEN Schema repariert.
 // Zwei eigene Fehler, beim Nachpruefen gefunden:
 // (1) Die Formularflaeche nutzte `var(--konto-panel, …)` — die Variable gibt es
@@ -509,7 +530,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v214";
+const CACHE_NAME = "smejj-shell-v215";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
