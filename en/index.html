@@ -3,6 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Schutz wie auf der Startseite (Befund 2026-08-04): Diese Seiten
+         entstanden ohne CSP und ohne Referrer-Regel, waehrend public/index.html
+         beides trug. Merkregel: Schutz, der an EINER Seite haengt, ist keine
+         Richtlinie. Wortlaut bewusst identisch zur Startseite — eine Quelle,
+         kein zweiter Sicherheitsstand, der auseinanderlaufen kann. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud https://smejj-control.zeabur.app https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="theme-color" content="#f7f7f4">
     <meta name="description" content="smejj.com is a fast AI and code assistant for chat, programming, and agent tasks. An autonomous AI coding OS that runs in your browser — available worldwide in 15 languages.">
     <meta name="keywords" content="smejj.com, AI assistant, code assistant, AI coding, autonomous agents, AI chat, developer tools">

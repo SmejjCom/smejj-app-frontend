@@ -28,7 +28,24 @@ const LOGIN_URL = "/auth/login/";
 // GENAU diese Datei, kein Praefix: die App hat unter "/status" eine EIGENE,
 // anmeldepflichtige Ansicht (VIEW_PATHS.tools in view-routes.js). Ein
 // Praefix-Muster wuerde sie mit oeffnen.
-const PUBLIC_PATHS = [/^\/auth\//, /^\/datenschutz/, /^\/impressum/, /^\/maus-replay/, /^\/status\.html$/, /^\/hilfe\.html$/];
+// Die 15 Sprach-Landeseiten (/en/, /ja/, /ar/, …) sind oeffentliche Werbeseiten:
+// sie tragen robots "index,follow" und stehen mit hreflang in der Sitemap — sie
+// SIND der Einstieg aus der Suche, und ihr einziger Knopf fuehrt erst in die App.
+//
+// Befund 2026-08-04, live reproduziert: Sie laden voice-landing.js, und das
+// importiert dieses Gate. Weil kein Muster passte, landete JEDER abgemeldete
+// Besucher aus der Suche sofort auf /auth/login/ und sah die Seite nie. Die
+// Seite lud sichtbar und verschwand dann — der Widerspruch stand also zwischen
+// "bitte indexieren" und "bitte nicht ansehen".
+// Freigabe des Betreibers am 2026-08-04: oeffentlich machen.
+//
+// Bewusst eng: nur das Verzeichnis selbst, nicht alles darunter. Ein
+// Praefix-Muster (/^\/en\//) wuerde jede kuenftige Unterseite mit oeffnen —
+// dieselbe Falle, die bei /status.html schon einmal bedacht wurde.
+const LANGUAGE_CODES = "ar|bn|de|en|es|fr|hi|id|it|ja|ko|pt|ru|tr|zh";
+const LANGUAGE_LANDING = new RegExp(`^/(?:${LANGUAGE_CODES})/(?:index\\.html)?$`);
+
+const PUBLIC_PATHS = [/^\/auth\//, /^\/datenschutz/, /^\/impressum/, /^\/maus-replay/, /^\/status\.html$/, /^\/hilfe\.html$/, LANGUAGE_LANDING];
 
 // Oeffentlicher Pfad? Input: pathname (String). Output: boolean.
 export function isPublicPath(pathname) {
