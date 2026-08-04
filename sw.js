@@ -1,3 +1,12 @@
+// v210 -> v211 (2026-08-04): Konto-Sicherheit ohne Browser-Dialoge.
+// account-sessions.js fragte Passwoerter mit window.prompt() ab — unmaskiert,
+// im Klartext auf dem Schirm, ohne Passwortverwaltung, ohne Wiederholfeld.
+// Passwortwechsel und Kontoloeschung laufen jetzt in Seitenformularen
+// (account-privacy.css ergaenzt). Beide Dateien liegen cache-first im
+// Precache — ohne diesen Versionssprung behalten Bestandsnutzer die alte
+// Fassung (caches.match ignoreSearch, ein ?v=-Sprung allein wirkt NICHT).
+// Freigabe des Betreibers vom 2026-08-04.
+
 // v209 -> v210 (2026-08-04): Sprache wurde ungefragt auf Deutsch gestellt.
 // Live gemessen im A-bis-Z-Test mit einem en-US-Browser: die Oberflaeche lief
 // korrekt englisch, die Sprachauswahl in den Einstellungen zeigte aber
@@ -484,7 +493,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v210";
+const CACHE_NAME = "smejj-shell-v211";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

@@ -654,3 +654,50 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+/* Konto-Formulare im Seitenfluss (2026-08-04).
+   Passwortwechsel und Kontoloeschung liefen bis dahin ueber Browser-Dialoge —
+   die maskieren nicht und kennen keine Passwortverwaltung. Die Felder liegen
+   jetzt hier, in derselben Optik wie der Rest der Konto-Ansicht. */
+#profile .account-inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
+  background: var(--konto-panel, rgba(255, 255, 255, 0.03));
+}
+
+#profile .account-inline-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+#profile .account-inline-form input {
+  padding: 11px 14px;
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+#profile .account-inline-form input:focus-visible {
+  outline: 2px solid var(--konto-edge);
+  outline-offset: 2px;
+}
+
+#profile .account-inline-form code {
+  padding: 1px 6px;
+  border: 1px solid var(--konto-line-soft);
+  font-size: 0.95em;
+}
+
+#profile .account-inline-form .account-actions {
+  margin-top: 4px;
+}

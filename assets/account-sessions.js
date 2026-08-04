@@ -82,10 +82,10 @@ export function initServerSessionControls(view, output) {
 
   security.querySelector("#serverSessionsLoad").addEventListener("click", () => loadSessions(view, output));
   security.querySelector("#serverSessionsRevokeOthers").addEventListener("click", () => revokeOthers(view, output));
-  security.querySelector("#serverPasswordChange").addEventListener("click", () => changePassword(output));
+  security.querySelector("#serverPasswordChange").addEventListener("click", () => changePasswordForm(security.querySelector("#serverSessionsBlock"), output));
   security.querySelector("#serverLogout").addEventListener("click", () => serverLogout(output));
   data?.querySelector("#serverAccountExport").addEventListener("click", () => exportAccount(output));
-  data?.querySelector("#serverAccountDelete").addEventListener("click", () => deleteAccount(output));
+  data?.querySelector("#serverAccountDelete").addEventListener("click", () => deleteAccountForm(data.querySelector("#serverAccountBlock"), output));
 }
 
 async function api(url, options = {}) {
@@ -124,16 +124,59 @@ async function revokeOthers(view, output) {
   if (result.ok) loadSessions(view, output);
 }
 
-async function changePassword(output) {
-  const currentPassword = window.prompt("Aktuelles Passwort:") || "";
-  if (!currentPassword) return output("Passwortänderung abgebrochen.");
-  const newPassword = window.prompt("Neues Passwort (mindestens 10 Zeichen):") || "";
-  if (!newPassword) return output("Passwortänderung abgebrochen.");
-  const result = await postJson(API.passwordChange, { currentPassword, newPassword });
-  if (result.status === 401) return output("Bitte zuerst mit E-Mail und Passwort anmelden.");
-  output(result.ok
-    ? "Passwort geändert. Alle anderen Sitzungen wurden beendet."
-    : `Passwortänderung fehlgeschlagen (${result.payload.error || result.status}).`);
+// --- Passwort ändern ----------------------------------------------------------
+//
+// Bis 2026-08-04 fragte dieser Weg beide Passwörter mit `window.prompt()` ab.
+// Ein prompt()-Feld maskiert NICHT: das alte und das neue Passwort standen im
+// Klartext auf dem Bildschirm. Dazu kannte keine Passwortverwaltung den Dialog,
+// er blockierte die Seite, und ohne Wiederholfeld setzte ein unsichtbarer
+// Tippfehler ein Passwort, das niemand mehr kennt — bei sofort beendeten
+// anderen Sitzungen. Derselbe Befund wie auf der Anmeldeseite
+// (public/auth/auth-page.js), hier nur hinter der Anmeldung.
+
+function toggleForm(id, block) {
+  const vorhanden = block.querySelector(`#${id}`);
+  if (vorhanden) {
+    vorhanden.remove();
+    return null;
+  }
+  return block;
+}
+
+// Exportiert, damit die Schutztests das VERHALTEN pruefen koennen und nicht nur
+// den Quelltext: der teuerste Fehler waere ein Serveraufruf trotz falscher Eingabe.
+export function changePasswordForm(block, output) {
+  if (!toggleForm("passwordChangeForm", block)) return;
+  block.insertAdjacentHTML("beforeend", `
+    <form id="passwordChangeForm" class="account-inline-form" autocomplete="on">
+      <label for="pwCurrent">Aktuelles Passwort<input id="pwCurrent" type="password" autocomplete="current-password" required></label>
+      <label for="pwNew">Neues Passwort<input id="pwNew" type="password" autocomplete="new-password" minlength="10" placeholder="Mindestens 10 Zeichen" required></label>
+      <label for="pwRepeat">Neues Passwort wiederholen<input id="pwRepeat" type="password" autocomplete="new-password" required></label>
+      <div class="account-actions">
+        <button id="pwSubmit" type="submit">Passwort ändern</button>
+        <button id="pwCancel" type="button">Abbrechen</button>
+      </div>
+    </form>`);
+  const form = block.querySelector("#passwordChangeForm");
+  form.querySelector("#pwCancel").addEventListener("click", () => { form.remove(); output("Passwortänderung abgebrochen."); });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const currentPassword = form.querySelector("#pwCurrent").value;
+    const newPassword = form.querySelector("#pwNew").value;
+    const repeat = form.querySelector("#pwRepeat").value;
+    // Beide Prüfungen laufen VOR dem Serveraufruf: ein Tippfehler darf keinen
+    // Fehlversuch auf dem Konto erzeugen (der Server zählt Fehlversuche).
+    if (!currentPassword || !newPassword) return output("Bitte alle Felder ausfüllen.");
+    if (newPassword !== repeat) return output("Die beiden neuen Passwörter stimmen nicht überein.");
+    const knopf = form.querySelector("#pwSubmit");
+    knopf.disabled = true;
+    const result = await postJson(API.passwordChange, { currentPassword, newPassword });
+    knopf.disabled = false;
+    if (result.status === 401) return output("Bitte zuerst mit E-Mail und Passwort anmelden.");
+    if (!result.ok) return output(`Passwortänderung fehlgeschlagen (${result.payload.error || result.status}).`);
+    form.remove();
+    output("Passwort geändert. Alle anderen Sitzungen wurden beendet.");
+  });
 }
 
 async function serverLogout(output) {
@@ -155,18 +198,50 @@ async function exportAccount(output) {
   output("Server-Datenexport erstellt. Secrets sind ausgeschlossen.");
 }
 
-async function deleteAccount(output) {
-  if (!window.confirm("Konto wirklich löschen? Alle Sitzungen werden beendet und der Login wird dauerhaft deaktiviert.")) {
-    return output("Löschung abgebrochen. Keine Daten wurden verändert.");
-  }
-  const confirmText = window.prompt('Zur Bestätigung exakt "KONTO LÖSCHEN" eingeben:') || "";
-  const password = window.prompt("Aktuelles Passwort zur Bestätigung:") || "";
-  const result = await postJson(API.accountDelete, { confirmText, password });
-  if (result.status === 401) return output("Bitte zuerst mit E-Mail und Passwort anmelden.");
-  if (result.ok) clearToken();
-  output(result.ok
-    ? "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert."
-    : `Löschung fehlgeschlagen (${result.payload.error || result.status}).`);
+// --- Konto löschen ------------------------------------------------------------
+//
+// Der unumkehrbarste Weg der ganzen Oberfläche — und bis 2026-08-04 lief er über
+// drei gestapelte Browser-Dialoge (confirm + zwei prompt), von denen einer das
+// Passwort im Klartext zeigte. Chrome bietet nach dem zweiten Dialog an, weitere
+// zu unterdrücken; wer das anklickte, kam nie ans Passwortfeld und stand vor
+// einer Aktion, die scheinbar nichts tat.
+//
+// Die Zwei-Stufen-Bremse bleibt und wird sogar strenger: Der wörtliche
+// Bestätigungstext wird jetzt SCHON IM BROWSER geprüft (der Server verlangt
+// exakt "KONTO LÖSCHEN", emailAuthService.js:201). Vorher ging jede Eingabe ans
+// Netz — auch ein leeres Feld, wenn jemand den Dialog wegklickte.
+const LOESCH_WORT = "KONTO LÖSCHEN";
+
+export function deleteAccountForm(block, output) {
+  if (!toggleForm("accountDeleteForm", block)) return output("Löschung abgebrochen. Keine Daten wurden verändert.");
+  block.insertAdjacentHTML("beforeend", `
+    <form id="accountDeleteForm" class="account-inline-form" autocomplete="on">
+      <p class="account-note"><strong>Das lässt sich nicht rückgängig machen.</strong> Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.</p>
+      <label for="delConfirm">Zur Bestätigung <code>${LOESCH_WORT}</code> eingeben<input id="delConfirm" type="text" autocomplete="off" spellcheck="false" required></label>
+      <label for="delPassword">Aktuelles Passwort<input id="delPassword" type="password" autocomplete="current-password" required></label>
+      <div class="account-actions">
+        <button id="delSubmit" class="danger-action" type="submit">Konto endgültig löschen</button>
+        <button id="delCancel" type="button">Abbrechen</button>
+      </div>
+    </form>`);
+  const form = block.querySelector("#accountDeleteForm");
+  form.querySelector("#delCancel").addEventListener("click", () => { form.remove(); output("Löschung abgebrochen. Keine Daten wurden verändert."); });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const confirmText = form.querySelector("#delConfirm").value.trim();
+    const password = form.querySelector("#delPassword").value;
+    if (confirmText !== LOESCH_WORT) return output(`Bitte exakt „${LOESCH_WORT}“ eingeben. Es wurde nichts gelöscht.`);
+    if (!password) return output("Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.");
+    const knopf = form.querySelector("#delSubmit");
+    knopf.disabled = true;
+    const result = await postJson(API.accountDelete, { confirmText, password });
+    knopf.disabled = false;
+    if (result.status === 401) return output("Bitte zuerst mit E-Mail und Passwort anmelden.");
+    if (!result.ok) return output(`Löschung fehlgeschlagen (${result.payload.error || result.status}).`);
+    clearToken();
+    form.remove();
+    output("Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.");
+  });
 }
 
 function formatDate(value) {
