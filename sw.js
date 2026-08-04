@@ -1,3 +1,22 @@
+// v209 -> v210 (2026-08-04): Sprache wurde ungefragt auf Deutsch gestellt.
+// Live gemessen im A-bis-Z-Test mit einem en-US-Browser: die Oberflaeche lief
+// korrekt englisch, die Sprachauswahl in den Einstellungen zeigte aber
+// "Deutsch". Ursache ist app.js (Start-Lock, bindSettings): sie belegt
+// #settingsLanguage NACH dem Render von settings-surface.js mit
+// `state.settings.language || "de"` — ohne gespeicherte Wahl also "de", waehrend
+// die Laufzeit die erkannte Browsersprache nutzt. Weil die Autospeicherung ALLE
+// Felder wegschreibt, hat schon ein Wechsel des Farbschemas dem Nutzer "de"
+// festgeschrieben; beim naechsten Besuch stand die ganze App auf Deutsch,
+// obwohl er nie eine Sprache gewaehlt hat. Betrifft jeden nicht-deutschen
+// Nutzer. Gefixt in settings-surface.js (Start-Lock unberuehrt): save() nimmt
+// die Sprache aus der Laufzeit statt aus dem Feld, eine echte Nutzerwahl geht
+// ueber sprachwahlVomNutzer, und zeigeAktiveSprache() holt die Anzeige nach dem
+// app.js-Boot zurueck. settings-surface.js liegt cache-first im Precache — ohne
+// diesen Versionssprung erreicht der Fix Bestandsnutzer nie (der Cache-Treffer
+// laeuft mit ignoreSearch, ein ?v=-Sprung allein wirkt daher NICHT).
+// Freigabe Wof Kadavanich, 2026-08-04: "Wenn du Fehler findest, behebe sie
+// sofort, deploye erneut und teste live weiter, bis alles stabil, sicher und
+// zuverlaessig funktioniert."
 // v208 -> v209 (2026-08-04): Verlauf-Speicher heilt sich selbst — Auslieferung.
 // chat-store.js liegt cache-first im Precache; ohne Versionssprung behielten
 // wiederkehrende Nutzer die alte Datei fuer immer (caches.match ignoreSearch,
@@ -465,7 +484,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v209";
+const CACHE_NAME = "smejj-shell-v210";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

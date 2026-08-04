@@ -37,6 +37,9 @@ const FIELDS = {
 };
 
 let activeTab = "general";
+// Nur gesetzt, wenn der Nutzer die Sprache SELBST umgestellt hat. Trennt die
+// bewusste Wahl vom Feldwert, den app.js (Start-Lock) nachtraeglich belegt.
+let sprachwahlVomNutzer = null;
 
 export function initSettingsSurface() {
   const view = document.querySelector("#settings");
@@ -54,6 +57,18 @@ export function initSettingsSurface() {
   loadUiLanguage(savedUiLanguage()).then((language) => {
     if (view.getAttribute("lang") !== language) render(view);
   });
+  // app.js (Start-Lock, bindSettings) belegt #settingsLanguage NACH diesem
+  // Render mit `state.settings.language || "de"`. Diese Zeile holt die Anzeige
+  // einmalig zurueck auf die Sprache, die wirklich laeuft — sonst stand dort
+  // "Deutsch" auf englischer Oberflaeche. Ein Microtask genuegt: er laeuft,
+  // wenn der synchrone boot()-Aufrufstapel von app.js abgearbeitet ist.
+  queueMicrotask(() => zeigeAktiveSprache(view));
+}
+
+// Haelt die Sprachauswahl mit der tatsaechlich aktiven Sprache im Gleichklang.
+function zeigeAktiveSprache(view) {
+  const feld = view.querySelector("#settingsLanguage");
+  if (feld && feld.value !== uiLanguage()) feld.value = uiLanguage();
 }
 
 // Rendert die komplette Oberflaeche in der aktiven UI-Sprache.
@@ -65,11 +80,15 @@ function render(view) {
   initApiKeysSurface(view);
   initClineProviderSurface(view);
   applyValues(view, readSettings());
+  zeigeAktiveSprache(view);
   activate(view, activeTab);
   view.querySelector("#settingsPersonalization")?.addEventListener("input", debounce(() => save(view), 350));
 }
 
 function handleChange(view, event) {
+  // Erst die Wahl merken, dann speichern: save() nimmt die Sprache bewusst
+  // nicht aus dem Feld (siehe dort), sonst ginge genau diese Wahl verloren.
+  if (event.target?.id === "settingsLanguage") sprachwahlVomNutzer = event.target.value;
   save(view);
   if (event.target?.id === "settingsLanguage") {
     loadUiLanguage(event.target.value).then(() => render(view));
@@ -158,6 +177,9 @@ function handleClick(view, event) {
   if (jump === "reset") {
     localStorage.removeItem(STORAGE_KEYS.settings);
     applyValues(view, DEFAULTS);
+    // Zuruecksetzen ist eine bewusste Nutzeraktion und stellt wie bisher die
+    // Quellsprache her — save() nimmt die Sprache sonst aus der Laufzeit.
+    sprachwahlVomNutzer = DEFAULTS.language;
     save(view, t("Standardeinstellungen wiederhergestellt"));
     loadUiLanguage(DEFAULTS.language).then(() => render(view));
   } else if (jump) document.querySelector(`[data-view="${jump}"]`)?.click();
@@ -184,6 +206,16 @@ function save(view, message) {
     const field = view.querySelector(`#${id}`);
     if (field) next[key] = field.type === "checkbox" ? field.checked : field.value;
   }
+  // Die Sprache kommt NICHT aus dem Feld, sondern aus der Laufzeit.
+  // Grund (live gemessen am 2026-08-04): app.js belegt #settingsLanguage nach
+  // unserem Render mit `state.settings.language || "de"` vor. Ohne gespeicherte
+  // Wahl ist das "de", waehrend die Oberflaeche in der erkannten Browsersprache
+  // laeuft. Das Feld log damit — und weil hier jede Einstellungsaenderung ALLE
+  // Felder wegschreibt, hat ein blosser Wechsel des Farbschemas einem
+  // englischsprachigen Nutzer ungefragt "de" festgeschrieben; beim naechsten
+  // Besuch stand die ganze App auf Deutsch. uiLanguage() ist die Sprache, die
+  // wirklich gilt; eine echte Nutzerwahl kommt ueber sprachwahlVomNutzer herein.
+  next.language = sprachwahlVomNutzer || uiLanguage();
   localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(next));
   window.dispatchEvent(new CustomEvent("smejj:settings-changed", { detail: { settings: next } }));
   const status = view.querySelector("#settingsSaveStatus");
