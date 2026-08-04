@@ -1,3 +1,11 @@
+// v211 -> v212 (2026-08-04): Nachbesserung am Konto-Loeschformular. Die
+// Beschriftung "Zur Bestätigung KONTO LÖSCHEN eingeben" brach in DREI Zeilen —
+// das Label ist eine Flex-Spalte, und das darin stehende <code>-Element wurde
+// eine eigene Zeile. Live im Browser gesehen. Beschriftung jetzt ein einziges
+// Textstueck, die nicht mehr gebrauchte code-Regel in account-privacy.css ist
+// raus. Beide Dateien liegen cache-first im Precache — ohne diesen Sprung
+// behalten Bestandsnutzer die umbrechende Fassung.
+
 // v210 -> v211 (2026-08-04): Konto-Sicherheit ohne Browser-Dialoge.
 // account-sessions.js fragte Passwoerter mit window.prompt() ab — unmaskiert,
 // im Klartext auf dem Schirm, ohne Passwortverwaltung, ohne Wiederholfeld.
@@ -493,7 +501,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v211";
+const CACHE_NAME = "smejj-shell-v212";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

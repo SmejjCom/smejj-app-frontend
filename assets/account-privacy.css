@@ -698,12 +698,6 @@
   outline-offset: 2px;
 }
 
-#profile .account-inline-form code {
-  padding: 1px 6px;
-  border: 1px solid var(--konto-line-soft);
-  font-size: 0.95em;
-}
-
 #profile .account-inline-form .account-actions {
   margin-top: 4px;
 }

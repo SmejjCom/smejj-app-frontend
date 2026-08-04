@@ -217,9 +217,10 @@ export function deleteAccountForm(block, output) {
   block.insertAdjacentHTML("beforeend", `
     <form id="accountDeleteForm" class="account-inline-form" autocomplete="on">
       <p class="account-note"><strong>Das lässt sich nicht rückgängig machen.</strong> Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.</p>
-      <!-- Beschriftung in EIN span: das Label ist eine Flex-Spalte, sonst wird
-           jedes Textstueck eine eigene Zeile ("Zur Bestätigung" / Wort / "eingeben"). -->
-      <label for="delConfirm"><span>Zur Bestätigung <code>${LOESCH_WORT}</code> eingeben</span><input id="delConfirm" type="text" autocomplete="off" spellcheck="false" required></label>
+      <!-- Beschriftung als EIN Textstueck. Das Label ist eine Flex-Spalte: jedes
+           weitere Element darin wuerde eine eigene Zeile — live gesehen, als hier
+           noch ein <code>-Element stand ("Zur Bestätigung" / Wort / "eingeben"). -->
+      <label for="delConfirm">Zur Bestätigung „${LOESCH_WORT}“ eingeben<input id="delConfirm" type="text" autocomplete="off" spellcheck="false" required></label>
       <label for="delPassword">Aktuelles Passwort<input id="delPassword" type="password" autocomplete="current-password" required></label>
       <div class="account-actions">
         <button id="delSubmit" class="danger-action" type="submit">Konto endgültig löschen</button>
