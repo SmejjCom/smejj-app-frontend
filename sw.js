@@ -1,3 +1,15 @@
+// v208 -> v209 (2026-08-04): Verlauf-Speicher heilt sich selbst — Auslieferung.
+// chat-store.js liegt cache-first im Precache; ohne Versionssprung behielten
+// wiederkehrende Nutzer die alte Datei fuer immer (caches.match ignoreSearch,
+// siehe unten). Der Fix selbst: fehlt der Objektspeicher `chats`, feuerte
+// onupgradeneeded NIE wieder, jede Transaktion warf NotFoundError, und weil
+// alle Aufrufer fail-safe abfangen, war der Verlauf in diesem Browser
+// dauerhaft und lautlos tot. v208 ging ohne diese Datei live (der Deploy
+// kopiert gezielt einzelne Dateien) — dieser Sprung holt sie nach.
+// Freigabe Wof Kadavanich, 2026-08-04: "Ja" + "Nach der Umsetzung bitte live
+// gehen, live testen und pruefen, ob alles richtig funktioniert."
+// NUR chat-store.js aendert sich — kein Eingriff in Startseite oder Design.
+
 // v207 -> v208 (2026-08-04): Gespraechsgedaechtnis an drei Stellen repariert.
 // (1) Der Wartetext "smejj denkt nach..." ging als juengste Assistenten-Antwort
 //     in jede Anfrage mit, und die aktuelle Frage stand doppelt darin.
@@ -453,7 +465,7 @@
 // Shell-Cache. PFLICHT, keine Kosmetik: index.html und beide Auth-Seiten laden
 // das Modul; ohne Precache findet der Import offline nichts. Zusammen mit der
 // Meta-CSP aus derselben Freigabe (QA-Welle 1, Befund F-04).
-const CACHE_NAME = "smejj-shell-v208";
+const CACHE_NAME = "smejj-shell-v209";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

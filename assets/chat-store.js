@@ -37,23 +37,50 @@ let dbPromise = null;
 let saveTimer = null;
 let restoring = false;
 
-function openDb() {
-  if (dbPromise) return dbPromise;
-  dbPromise = new Promise((resolve, reject) => {
+function ensureStore(db) {
+  if (db.objectStoreNames.contains(STORE)) return;
+  const store = db.createObjectStore(STORE, { keyPath: "id" });
+  store.createIndex("updatedAt", "updatedAt");
+}
+
+// Ohne `version` wird der vorhandene Stand geoeffnet (und die Datenbank beim
+// allerersten Mal auf Version 1 angelegt). Eine feste Version waere hier falsch:
+// nach einer Selbstheilung steht die Datenbank hoeher, und ein Oeffnen mit der
+// kleineren Zahl wuerde dauerhaft mit VersionError scheitern.
+function openAt(version) {
+  return new Promise((resolve, reject) => {
     try {
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
-      request.onupgradeneeded = () => {
-        const db = request.result;
-        if (!db.objectStoreNames.contains(STORE)) {
-          const store = db.createObjectStore(STORE, { keyPath: "id" });
-          store.createIndex("updatedAt", "updatedAt");
-        }
-      };
+      const request = version ? indexedDB.open(DB_NAME, version) : indexedDB.open(DB_NAME);
+      request.onupgradeneeded = () => ensureStore(request.result);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
+      request.onblocked = () => reject(new Error("indexeddb blockiert"));
     } catch (error) {
       reject(error);
     }
+  });
+}
+
+function openDb() {
+  if (dbPromise) return dbPromise;
+  // Selbstheilung (2026-08-03, live nachgestellt): Bricht der allererste Aufbau
+  // ab — Tab zu waehrend onupgradeneeded, Speicher-Raeumung, Quota-Fehler —,
+  // bleibt die Datenbank auf ihrer Version stehen, aber OHNE den Objektspeicher.
+  // onupgradeneeded feuert dann nie wieder, jede Transaktion wirft NotFoundError,
+  // und weil alle Aufrufer fail-safe abfangen, ist der Verlauf in diesem Browser
+  // dauerhaft und lautlos tot. Darum: fehlt der Speicher, einmal eine Version
+  // hoeher nachziehen und ihn dabei anlegen.
+  dbPromise = openAt(null).then((db) => {
+    if (db.objectStoreNames.contains(STORE)) return db;
+    const next = Math.max(db.version, DB_VERSION) + 1;
+    db.close();
+    return openAt(next);
+  }).catch((error) => {
+    // Den fehlgeschlagenen Versuch nicht festhalten: sonst bliebe der Verlauf
+    // auch nach einer nur voruebergehenden Stoerung (Datenbank kurz gesperrt)
+    // fuer den Rest der Sitzung tot.
+    dbPromise = null;
+    throw error;
   });
   return dbPromise;
 }
