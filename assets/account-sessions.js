@@ -21,6 +21,13 @@ export async function fetchAuthenticatedUser() {
   try {
     const response = await fetch(API.me, { headers: authHeaders() });
     const data = await response.json();
+    // Gleitende Verlaengerung (Freigabe C, 2026-08-05): der Server legt jeder
+    // gueltigen Antwort ein frisches Token mit voller Laufzeit bei. Nur ein
+    // BESTEHENDES localStorage-Token wird ersetzt — Passkey-Sitzungen speichern
+    // bewusst session-only und bleiben unangetastet (getToken() war leer).
+    if (data.authenticated && data.accessToken) {
+      try { localStorage.setItem(TOKEN_KEY, data.accessToken); } catch { /* Storage gesperrt */ }
+    }
     return data.authenticated && data.user ? data.user : null;
   } catch { return null; }
 }

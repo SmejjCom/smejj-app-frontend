@@ -575,7 +575,11 @@
 // und lehnte dann ab), voice-premium-tts.js bekommt ein 3-s-Zeitbudget bis zum
 // ersten Ton plus Anmelde-Header. Beide Dateien liegen cache-first im
 // Precache — ohne Versionssprung erreicht der Fix wiederkehrende Nutzer nie.
-const CACHE_NAME = "smejj-shell-v222";
+// v222 -> v223 (2026-08-05, Freigabe C): dauerhaft eingeloggt — /api/auth/me
+// liefert bei jeder Nutzung ein frisches Token (180 Tage), account-sessions.js
+// speichert es (nur bestehende localStorage-Tokens; Passkey bleibt
+// session-only). Import-Query auf ?v=6, damit auch der HTTP-Cache mitzieht.
+const CACHE_NAME = "smejj-shell-v223";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
