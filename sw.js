@@ -561,7 +561,12 @@
 // sonst waere er offline tot). Beide Dateien liegen cache-first im
 // Precache; ohne Versionssprung erreicht die Aenderung wiederkehrende
 // Nutzer nie (caches.match laeuft mit ignoreSearch).
-const CACHE_NAME = "smejj-shell-v219";
+// v219 -> v220 (2026-08-04): Qualitaetsseite sagt jetzt das Alter der Messdaten
+// und nimmt das Sechs-Stunden-Versprechen zurueck (es gibt keinen Zeitplan).
+// Ausserdem frische Messwerte: 98,04 %, 0 kritische Verstoesse. verlauf.js
+// und verlauf-messwerte.json liegen cache-first im Precache — ohne
+// Versionssprung saehen wiederkehrende Nutzer weiter den alten Stand.
+const CACHE_NAME = "smejj-shell-v220";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
