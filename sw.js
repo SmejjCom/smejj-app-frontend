@@ -1,7 +1,7 @@
-// v223 -> v224 (2026-08-05): Zeitbudget — die ROUTE entscheidet, nicht der
-// Modellname. /api/agent braucht gemessen 4704 ms bis zu den Kopfzeilen gegen
-// 6500 ms Budget, bekommt jetzt 15 s; /api/chat bleibt 6,5 s. Der Sprung bringt
-// ai/fetch-retry.js aus dem Precache zu Bestandsnutzern. Freigabe 2026-08-05.
+// v224 -> v225 (2026-08-05): Arbeitssignal — der Klient zeigt ab 1200 ms Stille
+// "Anfrage laeuft" mit Sekundenzaehler; der erste Server-Schritt kommt gemessen
+// erst nach 5750 ms (ai/chat-stream.js). Davor v224: Zeitbudget nach der ROUTE
+// statt am Modellnamen, /api/agent 15 s. Beide Freigaben Betreiber 2026-08-05.
 
 // v218 -> v219 (2026-08-04): Eine abgelaufene Anmeldung zeigt sich jetzt.
 // Befund im angemeldeten Browser des Betreibers: sein Token lag im Speicher,
@@ -584,7 +584,7 @@
 // liefert bei jeder Nutzung ein frisches Token (180 Tage), account-sessions.js
 // speichert es (nur bestehende localStorage-Tokens; Passkey bleibt
 // session-only). Import-Query auf ?v=6, damit auch der HTTP-Cache mitzieht.
-const CACHE_NAME = "smejj-shell-v224";
+const CACHE_NAME = "smejj-shell-v225";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
