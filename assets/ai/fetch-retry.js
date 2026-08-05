@@ -28,13 +28,35 @@ const DEEP_LANE_FIRST_BYTE_TIMEOUT_MS = 15000;
 const DEEP_LANE_MODEL = /"model"\s*:\s*"[^"]*(glm|kimi|cline)/i;
 
 /**
+ * Die Route /api/agent ist bauartbedingt langsam, unabhaengig vom Modellnamen.
+ *
+ * GEMESSEN am 2026-08-05 im angemeldeten Browser, Zeit bis zu den ANTWORT-
+ * KOPFZEILEN (nicht bis zum Ende):
+ *   "Welche Hauptstadt hat Italien?"            852 ms
+ *   "Auf welchen Servern laeuft smejj.com?"    4704 ms
+ * Gegen ein Budget von 6500 ms bleiben im zweiten Fall nur 1,8 s Luft. Die
+ * Bruecke laeuft dabei ueber den Werkzeug-Pfad (Projektwissen, Spurwahl,
+ * Control Server), und dessen Latenz schwankt: dieselben /health-Aufrufe lagen
+ * an diesem Tag zwischen 258 ms und 864 ms. Genau dort riss es sporadisch, und
+ * der Nutzer las "Verbindung zum Server unterbrochen", obwohl der Server
+ * weiterarbeitete und die Antwort Sekunden spaeter fertig war.
+ *
+ * Warum die Route und nicht der Modellname: Der Modellname sagt, WELCHES Modell
+ * antwortet — nicht, ob vorher gesucht und eine Seite geholt wird. Das
+ * entscheidet die Route. /api/chat bleibt darum unveraendert schnell budgetiert.
+ */
+const DEEP_LANE_ROUTE = /\/api\/agent(?:[/?#]|$)/;
+
+/**
  * Wieviel Zeit bis zum ersten Byte? Ohne ausdrueckliche Vorgabe entscheidet die
- * angefragte Spur — erkennbar am Modellnamen im Anfragekoerper.
+ * angefragte Spur — erkennbar an der Route ODER am Modellnamen im Anfragekoerper.
  * @param {{body?: unknown}} init
  * @param {number} tiefspurMs
+ * @param {string} url Zieladresse; leer = nur der Rumpf entscheidet (Rueckwaertskompatibel)
  * @returns {number}
  */
-export function firstByteBudgetFor(init, tiefspurMs = DEEP_LANE_FIRST_BYTE_TIMEOUT_MS) {
+export function firstByteBudgetFor(init, tiefspurMs = DEEP_LANE_FIRST_BYTE_TIMEOUT_MS, url = "") {
+  if (DEEP_LANE_ROUTE.test(String(url || ""))) return tiefspurMs;
   const body = typeof init?.body === "string" ? init.body : "";
   return DEEP_LANE_MODEL.test(body) ? tiefspurMs : DEFAULT_FIRST_BYTE_TIMEOUT_MS;
 }
@@ -73,7 +95,9 @@ export async function fetchStreamWithRetry(url, init = {}, {
   if (!urls.length) throw new Error("bridge_unreachable: keine Endpunkte");
   // Ausdrueckliche Vorgabe gewinnt; sonst entscheidet die angefragte Spur.
   const explizit = Number.isFinite(firstByteTimeoutMs);
-  const budgetMs = explizit ? firstByteTimeoutMs : firstByteBudgetFor(init);
+  // Die Route zaehlt mit: alle Ziele einer Anfrage tragen dieselbe (Haupt- und
+  // Reserve-Server unterscheiden sich im Wirt, nicht im Pfad).
+  const budgetMs = explizit ? firstByteTimeoutMs : firstByteBudgetFor(init, DEEP_LANE_FIRST_BYTE_TIMEOUT_MS, urls[0].url);
   // DER LETZTE VERSUCH IST GEDULDIG (Live-Befund 2026-08-02).
   // firstByteBudgetFor entscheidet am MODELLNAMEN im Anfragekoerper — welche
   // Spur der Server nimmt, haengt aber an der FRAGE: alles mit Suchbedarf oder
@@ -110,7 +134,9 @@ export async function fetchStreamWithRetry(url, init = {}, {
     // Endpunkte mit eigenem Rumpf bekommen auch ihr eigenes Zeitbudget: die Spur
     // wird am Modellnamen IM RUMPF erkannt, und der kann sich je Ziel unterscheiden.
     const anfrage = ziel.body === undefined ? init : { ...init, body: ziel.body };
-    const zielBudgetMs = explizit || ziel.body === undefined ? budgetMs : firstByteBudgetFor(anfrage);
+    const zielBudgetMs = explizit || ziel.body === undefined
+      ? budgetMs
+      : firstByteBudgetFor(anfrage, DEEP_LANE_FIRST_BYTE_TIMEOUT_MS, ziel.url);
     const controller = new AbortController();
     const timer = setTimeout(
       () => controller.abort(),
