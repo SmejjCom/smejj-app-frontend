@@ -566,7 +566,11 @@
 // Ausserdem frische Messwerte: 98,04 %, 0 kritische Verstoesse. verlauf.js
 // und verlauf-messwerte.json liegen cache-first im Precache — ohne
 // Versionssprung saehen wiederkehrende Nutzer weiter den alten Stand.
-const CACHE_NAME = "smejj-shell-v220";
+// smejj-shell-v221 -> smejj-shell-v221 (2026-08-04): /verlauf-messwerte.json kommt jetzt
+// netz-zuerst statt cache-first (LIVE_DATEN_PFADE). Ohne das waere die
+// freigegebene automatische Qualitaetsmessung wirkungslos gewesen —
+// wiederkehrende Nutzer haetten ewig den alten Stand gesehen.
+const CACHE_NAME = "smejj-shell-v221";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -719,6 +723,12 @@ self.addEventListener("activate", (event) => {
 // Precache-Pfade ohne Query — fuer den cache-first-Abgleich (F-24).
 const PRECACHE_PATHS = new Set(SHELL.map((entry) => new URL(entry, "https://smejj.com").pathname));
 
+// Dateien, die sich ohne Deploy aendern: netz-zuerst, Cache nur als Rueckfall.
+// Sie bleiben im Precache (damit sie offline ueberhaupt da sind), werden online
+// aber immer frisch geholt. Wer hier etwas eintraegt, muss sich sicher sein,
+// dass die Datei klein ist und ihr Inhalt wirklich veraltet.
+const LIVE_DATEN_PFADE = new Set(["/verlauf-messwerte.json"]);
+
 // HTML bleibt network-first: Navigationen und .html-Seiten sollen Aenderungen
 // sofort sehen; nur fuer sie ist der Netz-Rundweg den Preis wert.
 function isHtmlRequest(request, url) {
@@ -736,6 +746,31 @@ self.addEventListener("fetch", (event) => {
   }
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(fetch(request));
+    return;
+  }
+  // MESSDATEN SIND KEINE ASSETS: netz-zuerst, Cache nur als Rueckfall.
+  //
+  // Befund 2026-08-04: /verlauf-messwerte.json lag cache-first im Precache. Die
+  // Datei aendert sich aber bei JEDER Messung — cache-first haette bedeutet,
+  // dass ein automatischer Messlauf die Nutzer nie erreicht, solange nicht
+  // jemand von Hand CACHE_NAME hochzaehlt. Genau daran waere die Automatik
+  // gescheitert, ohne dass es jemand gemerkt haette.
+  //
+  // Netz-zuerst mit Cache-Rueckfall ist hier das Richtige: online immer der
+  // frische Stand, offline der letzte bekannte. Die Seite selbst bleibt im
+  // Precache und damit offline lesbar; nur ihre Zahlen kommen live.
+  if (url.origin === self.location.origin && LIVE_DATEN_PFADE.has(url.pathname)) {
+    event.respondWith(
+      fetch(request)
+        .then((antwort) => {
+          if (antwort && antwort.ok) {
+            const kopie = antwort.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, kopie)).catch(() => {});
+          }
+          return antwort;
+        })
+        .catch(() => caches.match(request, { ignoreSearch: true }))
+    );
     return;
   }
   // Cache-first NUR fuer vorab gespeicherte Nicht-HTML-Dateien gleicher Herkunft.
