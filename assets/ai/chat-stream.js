@@ -126,6 +126,87 @@ export function zeigeSchritt(output, schritt) {
   zeile.append(anhang);
 }
 
+// ---------------------------------------------------------------------------
+// Das erste Lebenszeichen
+//
+// GEMESSEN am 2026-08-05 an einer echten Werkzeug-Frage ("Was sind heute die
+// wichtigsten Schlagzeilen aus Berlin?"), im angemeldeten Browser:
+//
+//        0 ms .. 5750 ms   NICHTS — nur "smejj denkt nach ..."
+//     5750 ms   erster Server-Schritt (Suche laeuft)
+//     6575 ms   Suche fertig, 1 Treffer
+//     8549 ms   Seite wird gelesen
+//    19061 ms   erster Antworttext
+//    28022 ms   fertig
+//
+// Die Schritte selbst arbeiten gut — sie beginnen nur spaet. Davor liegen
+// 5,75 Sekunden Stille, und genau das ist der vom Betreiber gemeldete blinde
+// Fleck ("dann denkt man, es hat aufgehoert, aber im Hintergrund arbeitet es
+// weiter").
+//
+// WARUM KLIENTSEITIG und nicht als frueherer Schritt vom Server:
+// Bruecke (chat-bridge.js) und Control Server (src/server.js) schreiben ihre
+// Antwort-Kopfzeilen beide erst, wenn die naechste Stufe geantwortet hat — und
+// sie fuellen dabei die Diagnose-Kopfzeilen x-smejj-model-backend, -model-id
+// und -fallback aus genau dieser Antwort. Frueher senden hiesse, diese Werte zu
+// verlieren; sie sind aber das Mittel, mit dem sich hinterher belegen laesst,
+// WELCHES Modell geantwortet hat. Der Klient dagegen weiss ab dem Absenden
+// Bescheid, kostet nichts und beruehrt die Streaming-Kette nicht.
+//
+// Erst nach kurzer Stille: Eine Schnellspur-Antwort kommt in rund 850 ms. Wer
+// sofort ein Wartesymbol zeigt, blinkt bei jeder schnellen Frage unnoetig.
+const WARTESIGNAL_AB_MS = 1200;
+
+/**
+ * Zeigt nach kurzer Stille ein Lebenszeichen und zaehlt die Sekunden mit.
+ *
+ * Alle Zeitgeber sind einspeisbar, damit der Test sie treiben kann statt zu warten.
+ *
+ * @param {HTMLElement} output Antwort-Knoten; die Zeile kommt in die Schrittliste davor
+ * @returns {Function} entfernt das Signal wieder (mehrfach aufrufbar)
+ */
+export function starteWartesignal(output, {
+  verzoegern = setTimeout, abbrechen = clearTimeout,
+  takten = setInterval, stoppen = clearInterval,
+  jetzt = () => Date.now(), abMs = WARTESIGNAL_AB_MS
+} = {}) {
+  if (!output || typeof document === "undefined") return () => {};
+  let zeile = null;
+  let takt = null;
+  const beginn = jetzt();
+
+  const zeigen = () => {
+    const liste = schrittListe(output);
+    if (!liste) return;
+    zeile = document.createElement("div");
+    zeile.className = "chat-schritt";
+    zeile.dataset.schritt = "wartesignal";
+    zeile.dataset.zustand = "laeuft";
+    zeile.textContent = "⏳ Anfrage laeuft";
+    const stand = document.createElement("span");
+    stand.className = "chat-schritt-stand";
+    stand.dataset.stand = "true";
+    // Der Sekundenzaehler ist fuer das AUGE. Die Liste traegt aria-live
+    // "polite" — ein tickender Zaehler wuerde sonst jede Sekunde vorgelesen
+    // und machte die Anzeige fuer Screenreader unbenutzbar.
+    stand.setAttribute("aria-hidden", "true");
+    stand.textContent = " …";
+    zeile.append(stand);
+    liste.append(zeile);
+    takt = takten(() => {
+      stand.textContent = ` … ${Math.round((jetzt() - beginn) / 1000)} s`;
+    }, 1000);
+  };
+
+  const wecker = verzoegern(zeigen, abMs);
+  return () => {
+    abbrechen(wecker);
+    if (takt) { stoppen(takt); takt = null; }
+    zeile?.remove();
+    zeile = null;
+  };
+}
+
 /**
  * Der Wartetext ("smejj denkt nach ...") steht als innerHTML im Antwort-Knoten
  * und muss weg, sobald echter Text kommt — sonst klebt die Antwort daran.
@@ -169,6 +250,9 @@ export async function readableError(response, offlineNotice = "") {
  * @param {{renderMarkdown?: Function, offlineNotice?: string}} deps
  */
 export async function streamChatAnswer(url, body, output, { renderMarkdown, offlineNotice = "" } = {}) {
+  // Ab dem Absenden sichtbar arbeiten — der Server meldet sich erst nach
+  // gemessenen 5,75 s (siehe starteWartesignal).
+  const stoppeWartesignal = starteWartesignal(output);
   let response; // Stufe A2: Replika-Ausfall -> fetchStreamWithRetry versucht sofort neu.
   try {
     response = await fetchStreamWithRetry(url, {
@@ -177,11 +261,13 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
       body: JSON.stringify(body)
     });
   } catch {
+    stoppeWartesignal();
     clearThinkingState(output);
     output.textContent = "Verbindung zum Server unterbrochen — bitte gleich erneut versuchen.";
     return;
   }
   if (!response.ok || !response.body) {
+    stoppeWartesignal();
     clearThinkingState(output);
     output.textContent = await readableError(response, offlineNotice);
     return;
@@ -203,6 +289,9 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
         .map((line) => line.slice(6))
         .join("\n");
       if (!text || text === "[DONE]") continue;
+      // Ab dem ersten echten Ereignis uebernimmt der Server die Anzeige —
+      // egal ob es ein Arbeitsschritt oder schon Antworttext ist.
+      stoppeWartesignal();
       clearThinkingState(output);
       try {
         const payload = JSON.parse(text);
@@ -219,6 +308,8 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
     }
     output.scrollIntoView({ block: "end" });
   }
+  // Auch wenn der Strom ohne ein einziges Ereignis endet: das Signal muss weg.
+  stoppeWartesignal();
   clearThinkingState(output);
   renderMarkdown?.(output);
 }
