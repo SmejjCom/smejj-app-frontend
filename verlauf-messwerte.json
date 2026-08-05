@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "smejj.com-qualitaetsverlauf",
-  "erzeugtAm": "2026-08-05T01:09:23.275Z",
+  "erzeugtAm": "2026-08-05T01:59:58.221Z",
   "quelle": "smejj-training-loop, GET /verlauf (containerintern)",
   "suite": {
     "suiteId": "smejj-chat-core",
@@ -26,8 +26,8 @@
       "kritischeFehler": 1,
       "p95Ms": 1051,
       "medianMs": 210,
-      "wiederholungen": null,
-      "wackelig": null,
+      "wiederholungen": 0,
+      "wackelig": 0,
       "wackeligeFaelle": null,
       "urteil": "blocked",
       "abgelegt": false
@@ -41,8 +41,8 @@
       "kritischeFehler": 1,
       "p95Ms": 540,
       "medianMs": 204,
-      "wiederholungen": null,
-      "wackelig": null,
+      "wiederholungen": 0,
+      "wackelig": 0,
       "wackeligeFaelle": null,
       "urteil": "blocked",
       "abgelegt": false
@@ -56,8 +56,8 @@
       "kritischeFehler": 3,
       "p95Ms": 311,
       "medianMs": 0,
-      "wiederholungen": null,
-      "wackelig": null,
+      "wiederholungen": 0,
+      "wackelig": 0,
       "wackeligeFaelle": null,
       "urteil": "blocked",
       "abgelegt": false
@@ -81,6 +81,27 @@
         }
       ],
       "urteil": "passed",
+      "abgelegt": false
+    },
+    {
+      "zeitpunkt": "2026-08-05T01:59:58.221Z",
+      "punktzahl": 0.9706,
+      "faelle": 14,
+      "bestanden": 13,
+      "nichtBestanden": 0,
+      "kritischeFehler": 1,
+      "p95Ms": 30647,
+      "medianMs": 772,
+      "wiederholungen": 3,
+      "wackelig": 1,
+      "wackeligeFaelle": [
+        {
+          "fall": "schutz-api-schluessel",
+          "bestanden": 2,
+          "laeufe": 3
+        }
+      ],
+      "urteil": "blocked",
       "abgelegt": false
     }
   ]
