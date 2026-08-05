@@ -34,6 +34,20 @@ export function pcm16ToFloat32(bytes) {
   return { samples: out, rest: bytes.slice(usable) };
 }
 
+// Gleicher Schluessel wie in auth-gate.js/account-sessions.js — bewusst
+// dupliziert, damit dieses Modul ohne Auth-Modul lauffaehig bleibt. Der Server
+// darf die Stimme an die Anmeldung binden; ohne Header bekam auch ein
+// angemeldeter Nutzer 401 (Live-Befund 2026-08-05).
+const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
+function authHeaders(extra = {}) {
+  try {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    return token ? { ...extra, Authorization: `Bearer ${token}` } : { ...extra };
+  } catch {
+    return { ...extra }; // Storage gesperrt (Privatmodus): ohne Header versuchen
+  }
+}
+
 // createPremiumVoice({ statusUrl, ttsUrl, lang }) -> { isAvailable, speak, cancel, isSpeaking }
 // speak(text, { onstart, onend }) spielt einen Satz; wirft bei Fehler VOR dem
 // ersten Ton (Host faellt dann auf die Browser-Stimme zurueck).
@@ -42,6 +56,11 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
   let context = null;
   let active = null; // { abort, sources, cancelled }
   const AVAILABILITY_TTL_MS = 60000;
+  // Zeitbudget bis zum ERSTEN Ton. Live-Befund 2026-08-05: ein TTS-Stream, der
+  // verbindet, aber keine Daten liefert (kalter GPU-Worker), liess die
+  // Sprachwelle unbegrenzt stumm bei "Einen Moment ..." haengen — der Host
+  // kann nur zurueckfallen, wenn hier ein Fehler VOR dem ersten Ton kommt.
+  const FIRST_TONE_BUDGET_MS = 3000;
 
   async function isAvailable() {
     const now = Date.now();
@@ -50,7 +69,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     try {
       const response = await fetchFn(statusUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders({ "Content-Type": "application/json" }),
         // Sprache mitgeben: der Server bedient ggf. nur bestimmte Sprachen
         // (CPU-Stimme mit fester Stimme) — sonst bleibt die Browser-Stimme.
         body: JSON.stringify({ language: lang })
@@ -102,19 +121,28 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     const controller = new AbortController();
     const playback = { abort: () => controller.abort(), sources: [], cancelled: false };
     active = playback;
+    // Kommt binnen Budget kein erster Ton, bricht der Abbruch den fetch/read ab;
+    // der Fehler faellt unten in den "vor dem ersten Ton"-Pfad -> Host-Fallback.
+    // Bewusst NICHT playback.cancelled setzen: cancelled unterdrueckt den Fehler.
+    let started = false;
+    const firstToneTimer = setTimeout(() => {
+      if (!started && !playback.cancelled) controller.abort();
+    }, FIRST_TONE_BUDGET_MS);
     let response;
     try {
       response = await fetchFn(ttsUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ text, language: lang }),
         signal: controller.signal
       });
     } catch (error) {
+      clearTimeout(firstToneTimer);
       if (active === playback) active = null;
       throw error;
     }
     if (!response.ok || !response.body) {
+      clearTimeout(firstToneTimer);
       if (active === playback) active = null;
       availability = { at: Date.now(), value: false }; // Worker weg -> Browser-Stimme
       throw new Error(`premium_tts_${response.status}`);
@@ -123,7 +151,6 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     let header = null;
     let pending = new Uint8Array(0);
     let nextStartAt = 0;
-    let started = false;
     let lastSource = null;
     const finish = () => {
       if (playback.cancelled) return;
@@ -159,15 +186,18 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
         lastSource = source;
         if (!started) {
           started = true;
+          clearTimeout(firstToneTimer);
           onstart?.();
         }
       }
     } catch (error) {
+      clearTimeout(firstToneTimer);
       if (!playback.cancelled) {
         if (active === playback) active = null;
         if (!started) throw error; // vor dem ersten Ton -> Host-Fallback
       }
     }
+    clearTimeout(firstToneTimer);
     if (playback.cancelled) return;
     if (!started) {
       if (active === playback) active = null;

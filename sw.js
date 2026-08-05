@@ -570,7 +570,12 @@
 // netz-zuerst statt cache-first (LIVE_DATEN_PFADE). Ohne das waere die
 // freigegebene automatische Qualitaetsmessung wirkungslos gewesen —
 // wiederkehrende Nutzer haetten ewig den alten Stand gesehen.
-const CACHE_NAME = "smejj-shell-v221";
+// v221 -> v222 (2026-08-05, Freigabe A): Premium-Stimme repariert — config.js
+// schickt voiceStatus/voiceTts zur Salad-Bridge (Zeabur meldete "verfuegbar"
+// und lehnte dann ab), voice-premium-tts.js bekommt ein 3-s-Zeitbudget bis zum
+// ersten Ton plus Anmelde-Header. Beide Dateien liegen cache-first im
+// Precache — ohne Versionssprung erreicht der Fix wiederkehrende Nutzer nie.
+const CACHE_NAME = "smejj-shell-v222";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

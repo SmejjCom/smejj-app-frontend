@@ -35,8 +35,12 @@ const API_PATHS = {
   // Premium-Stimme laeuft ueber den Zeabur-Mietserver (CPU-Stimme Piper im
   // Flat-Paket, kein GPU-Worker noetig) — die Bridge dort proxied zum
   // internen Piper-Dienst.
-  voiceStatus: "https://smejj-chat-bridge.zeabur.app/api/voice/status",
-  voiceTts: "https://smejj-chat-bridge.zeabur.app/api/voice/tts",
+  // Stimme zur SALAD-Bridge wie voiceTranscribe (Freigabe A, 2026-08-05).
+  // Die eingefrorene Zeabur-Bridge meldete "premiumVoice: true", ohne den
+  // Worker zu pruefen, und lehnte das eigentliche Sprechen dann ab — jede
+  // Sitzung lief in einen toten Premium-Pfad. Die Salad-Bridge prueft ehrlich.
+  voiceStatus: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/status",
+  voiceTts: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/tts",
   // Stufe 4: Das Ohr zeigt auf die Salad-Bridge — dort ist v106 mit der
   // Transkriptions-Route live (Zeabur bleibt bis zum Token-Deploy auf v104).
   voiceTranscribe: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/transcribe",
