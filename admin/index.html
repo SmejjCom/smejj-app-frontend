@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="de" class="p-404">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <!-- Bruecke zur Operations Console: Die Konsole liegt bewusst NICHT auf
+       smejj.com, sondern im Control-Server (kein Frontend-Deploy, kein
+       Service-Worker, kein Start-Lock-Risiko — siehe adminUiRoutes.js im
+       Repo smejj.com-app). Diese Seite macht die Adresse nur merkbar:
+       smejj.com/admin leitet weiter. Zugang entscheidet die Konsole selbst
+       (Sitzung + Adminrolle, fail-closed) — die Adresse ist kein Geheimnis. -->
+  <meta http-equiv="refresh" content="0; url=https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud/admin">
+  <link rel="icon" href="/favicon.ico?v=112" sizes="any">
+  <link rel="icon" href="/icons/smejj_favicon.svg?v=112" type="image/svg+xml">
+  <title>Adminbereich — smejj.com</title>
+  <link rel="stylesheet" href="/assets/static-pages.css">
+</head>
+<body>
+  <main>
+    <a class="error-brand" href="/" aria-label="smejj.com Startseite">
+      <img src="/icons/smejj_icon.svg" alt="smejj.com" width="2000" height="1532">
+    </a>
+    <h1>Adminbereich</h1>
+    <p>Du wirst zur Operations Console weitergeleitet &hellip;</p>
+    <a href="https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud/admin">Weiter zur Operations Console</a>
+    <p>Zugang nur f&uuml;r Betreiber-Konten &mdash; bitte vorher auf smejj.com anmelden, die Konsole nutzt dieselbe Sitzung.</p>
+  </main>
+</body>
+</html>
