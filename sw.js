@@ -1,3 +1,18 @@
+// v226 -> v227 (2026-08-05): die Einwilligung liess sich gar nicht erteilen.
+// Beim Bau der Erfassungsroute gemessen: der Server verlangt neben dem Hash
+// auch einen Geltungsbereich (`repository`), sonst wirft createConsentGrant
+// consent_repository_invalid und die Route antwortet 400. v226 schickte keinen
+// mit — der Schalter war fail-closed, aber er konnte NICHTS erteilen. Der
+// Widerruf fehlte zusaetzlich die withdrawalId.
+//
+// Der Geltungsbereich wird jetzt nicht hier festgelegt, sondern aus der
+// Antwort des Hinweis-Endpunkts uebernommen; ein zweiter Ort waere ein zweiter
+// Ort, der driften kann. Die withdrawalId wird fuer den Widerruf frisch beim
+// Server geholt statt aus dem lokalen Speicher: wer seinen Browserspeicher
+// leert, muss trotzdem widerrufen koennen. account-sessions.js und
+// account-privacy.js liegen cache-first im Precache. Freigabe Betreiber
+// 2026-08-05.
+
 // v225 -> v226 (2026-08-05): Trainings-Einwilligung. Die Datenschutzerklaerung
 // nennt jetzt, dass NUR die Fragen als Trainingsdaten dienen koennen, nie die
 // Antworten (die stammen aus Fremdmodellen), und dass Fragen mit Zugangsdaten
@@ -596,7 +611,7 @@
 // liefert bei jeder Nutzung ein frisches Token (180 Tage), account-sessions.js
 // speichert es (nur bestehende localStorage-Tokens; Passkey bleibt
 // session-only). Import-Query auf ?v=6, damit auch der HTTP-Cache mitzieht.
-const CACHE_NAME = "smejj-shell-v226";
+const CACHE_NAME = "smejj-shell-v227";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

@@ -50,7 +50,8 @@ const API = {
   billingStatus: `${API_ORIGIN}/api/billing/status`,
   trainingNotice: `${API_ORIGIN}/api/training/consent/notice`,
   trainingConsent: `${API_ORIGIN}/api/training/consent`,
-  trainingConsentRevoke: `${API_ORIGIN}/api/training/consent/revoke`
+  trainingConsentRevoke: `${API_ORIGIN}/api/training/consent/revoke`,
+  trainingConsentDecision: `${API_ORIGIN}/api/training/consent/decision`
 };
 
 // Abo-Status des angemeldeten Nutzers (oder null, fail-safe). Liefert Plan,
@@ -283,7 +284,14 @@ export async function fetchTrainingNotice() {
     const response = await fetch(API.trainingNotice);
     if (!response.ok) return null;
     const data = await response.json();
-    return data?.ok === true && /^[a-f0-9]{64}$/.test(String(data.privacyNoticeSha256 || "")) ? data : null;
+    // BEIDE Pflichtfelder pruefen, nicht nur den Hash. Fehlt `repository`,
+    // scheitert jeder Grant serverseitig mit 400 — dann ist der Hinweis
+    // unbrauchbar und "nicht verfuegbar" die ehrlichere Antwort als eine
+    // Oberflaeche, die eine Einwilligung anbietet, die nie ankommt.
+    const brauchbar = data?.ok === true
+      && /^[a-f0-9]{64}$/.test(String(data.privacyNoticeSha256 || ""))
+      && String(data.repository || "").trim().length > 0;
+    return brauchbar ? data : null;
   } catch {
     return null;
   }
@@ -296,12 +304,21 @@ export async function fetchTrainingNotice() {
  * darum werden sie hier auch nicht einzeln angeboten. Das entspricht der
  * Datenschutzerklaerung: "dreifach getrennt", aber gemeinsam erteilt.
  */
-export async function grantTrainingConsent(privacyNoticeSha256) {
+// Beide Aufrufe nehmen den GANZEN Hinweis, nicht nur den Hash.
+//
+// Die erste Fassung schickte nur den Hash — und der Server verlangt zusaetzlich
+// einen Geltungsbereich (`repository`). Ohne ihn wirft createConsentGrant
+// consent_repository_invalid und die Route antwortet 400: die Einwilligung war
+// technisch unmoeglich, waehrend die Oberflaeche sie anbot. Der Geltungsbereich
+// wird darum nicht hier festgelegt, sondern aus der Antwort des Servers
+// uebernommen — ein zweiter Ort waere ein zweiter Ort, der driften kann.
+export async function grantTrainingConsent(hinweis) {
   return api(API.trainingConsent, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      privacyNoticeSha256,
+      privacyNoticeSha256: hinweis?.privacyNoticeSha256,
+      repository: hinweis?.repository,
       captureReviewConsent: true,
       modelTrainingConsent: true,
       sourceRightsConfirmed: true
@@ -310,10 +327,36 @@ export async function grantTrainingConsent(privacyNoticeSha256) {
 }
 
 /** Einwilligung widerrufen — mit Wirkung fuer die Zukunft (Art. 7 Abs. 3 DSGVO). */
-export async function revokeTrainingConsent(privacyNoticeSha256) {
+/**
+ * Der Widerruf braucht die `withdrawalId` der erteilten Einwilligung.
+ *
+ * Sie wird beim Erteilen zurueckgegeben — aber sie wird hier ABSICHTLICH nicht
+ * aus dem lokalen Speicher gelesen, sondern frisch beim Server geholt. Wer
+ * seinen Browserspeicher leert, muss trotzdem widerrufen koennen; eine
+ * Einwilligung, die man nur mit dem richtigen localStorage-Eintrag
+ * zurueckziehen kann, waere praktisch unwiderruflich.
+ */
+export async function revokeTrainingConsent(hinweis) {
+  const entscheidung = await fetchTrainingConsentDecision(hinweis);
+  const withdrawalId = entscheidung?.consent?.withdrawalId;
+  if (!withdrawalId) return { ok: false, status: 0, payload: { error: "consent_grant_not_found" } };
   return api(API.trainingConsentRevoke, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ privacyNoticeSha256 })
+    body: JSON.stringify({
+      privacyNoticeSha256: hinweis?.privacyNoticeSha256,
+      repository: hinweis?.repository,
+      withdrawalId
+    })
   });
+}
+
+/** Der aktuelle Stand der Einwilligung, serverseitig aufgeloest. */
+export async function fetchTrainingConsentDecision(hinweis) {
+  const abfrage = new URLSearchParams({
+    repository: String(hinweis?.repository || ""),
+    privacyNoticeSha256: String(hinweis?.privacyNoticeSha256 || "")
+  });
+  const antwort = await api(`${API.trainingConsentDecision}?${abfrage}`, { method: "GET" });
+  return antwort?.ok === true ? antwort.payload : null;
 }

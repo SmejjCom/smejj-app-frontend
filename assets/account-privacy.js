@@ -236,9 +236,11 @@ async function saveConsent(view) {
     return;
   }
 
+  // Der ganze Hinweis geht mit, nicht nur der Hash: der Server verlangt auch
+  // den Geltungsbereich, und er nennt ihn selbst im Hinweis.
   const antwort = training
-    ? await grantTrainingConsent(hinweis.privacyNoticeSha256)
-    : await revokeTrainingConsent(hinweis.privacyNoticeSha256);
+    ? await grantTrainingConsent(hinweis)
+    : await revokeTrainingConsent(hinweis);
 
   consent.serverConsentGranted = training && antwort.ok === true;
   consent.privacyNoticeSha256 = hinweis.privacyNoticeSha256;
