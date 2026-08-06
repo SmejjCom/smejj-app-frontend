@@ -5,6 +5,7 @@ import { runClientChat } from "/assets/ai/chatClient.js?v=3";
 import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=chat-markdown-20260717";
 import { initComposerTools } from "./composer-tools.js?v=stufeb-20260726";
+import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=1";
 import { initGlobalSearch } from "./search.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v3";
@@ -266,13 +267,16 @@ function bindStartComposer() {
     input.style.height = input.value ? `${Math.min(input.scrollHeight, 324)}px` : "48px";
   };
   const submit = async () => {
-    const task = input.value.trim();
+    // Riesen-Einfuegungen liegen als Chips ueber der Eingabezeile und werden
+    // erst hier wieder mit dem getippten Text zu EINER Aufgabe verbunden.
+    const task = composePastedTask(input.value.trim());
     if (!task) return;
     input.value = "";
     resizeInput();
     await submitTask(task, { target: "#startLog" });
   };
   send.addEventListener("click", submit);
+  bindPasteAttach({ getInput: () => input });
   initComposerTools();
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);

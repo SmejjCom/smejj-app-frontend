@@ -611,10 +611,16 @@
 // liefert bei jeder Nutzung ein frisches Token (180 Tage), account-sessions.js
 // speichert es (nur bestehende localStorage-Tokens; Passkey bleibt
 // session-only). Import-Query auf ?v=6, damit auch der HTTP-Cache mitzieht.
-const CACHE_NAME = "smejj-shell-v227";
+// v227 -> v228 (2026-08-06, Konkurrenz-Radar V1): Riesen-Einfuegung wird
+// Anhang-Chip — composer-paste-attach.js NEU im SHELL (importiert von app.js),
+// app.js verbindet Chips beim Senden, start-styles.css bekommt die Chip-Optik.
+// Alle drei liegen cache-first im Precache — ohne Versionssprung saehen
+// Bestandsnutzer den neuen Import nie und app.js braeche beim Laden ab.
+const CACHE_NAME = "smejj-shell-v228";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
+  "/assets/composer-paste-attach.js",
   "/assets/static-pages.css",
   "/assets/deferred-start.js",
   "/assets/field-vitals.js",

@@ -3601,3 +3601,51 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
     transition: none;
   }
 }
+
+/* Riesen-Einfuegung als Anhang-Chip (Konkurrenz-Radar V1, 2026-08-06) */
+.paste-attach-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px 0;
+}
+
+.paste-attach-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  padding: 6px 8px 6px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(246, 243, 238, 0.82);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.paste-attach-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.paste-attach-restore,
+.paste-attach-remove {
+  border: 0;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.62);
+  font: inherit;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.paste-attach-restore:hover,
+.paste-attach-remove:hover {
+  color: rgba(246, 243, 238, 0.95);
+}
+
+.paste-attach-remove {
+  font-size: 18px;
+  line-height: 1;
+}
