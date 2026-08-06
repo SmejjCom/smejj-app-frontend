@@ -1,3 +1,15 @@
+// v225 -> v226 (2026-08-05): Trainings-Einwilligung. Die Datenschutzerklaerung
+// nennt jetzt, dass NUR die Fragen als Trainingsdaten dienen koennen, nie die
+// Antworten (die stammen aus Fremdmodellen), und dass Fragen mit Zugangsdaten
+// ganz verworfen statt bereinigt werden. account-privacy.js schaltet die
+// Einwilligung nicht mehr nur lokal um, sondern beim Server;
+// account-sessions.js traegt die drei Aufrufe samt Token.
+//
+// Die Oberflaeche bleibt bis zum Control-Release fail-closed: der Endpunkt
+// antwortet noch nicht, und dann zeigt sie "nicht verfuegbar" statt einer
+// Einwilligung, die nirgends ankommt. Beide Dateien liegen cache-first im
+// Precache — darum der Versionssprung. Freigabe Betreiber 2026-08-05.
+
 // v224 -> v225 (2026-08-05): Arbeitssignal — der Klient zeigt ab 1200 ms Stille
 // "Anfrage laeuft" mit Sekundenzaehler; der erste Server-Schritt kommt gemessen
 // erst nach 5750 ms (ai/chat-stream.js). Davor v224: Zeitbudget nach der ROUTE
@@ -584,7 +596,7 @@
 // liefert bei jeder Nutzung ein frisches Token (180 Tage), account-sessions.js
 // speichert es (nur bestehende localStorage-Tokens; Passkey bleibt
 // session-only). Import-Query auf ?v=6, damit auch der HTTP-Cache mitzieht.
-const CACHE_NAME = "smejj-shell-v225";
+const CACHE_NAME = "smejj-shell-v226";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

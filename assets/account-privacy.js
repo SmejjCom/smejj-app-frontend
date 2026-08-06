@@ -1,5 +1,6 @@
 import { STORAGE_KEYS } from "./config.js";
-import { initServerSessionControls, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession } from "./account-sessions.js?v=6";
+import { initServerSessionControls, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
+  fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=7";
 import { languageOptionsMarkup } from "./language-options.js?v=1";
 import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=1";
@@ -123,7 +124,7 @@ function markup() {
     ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
     ${panel("billing", "Abo & Zahlungen", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">Free — 0 €</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div><div class="account-list">${dataAction("Plus — 9 € / Monat", "1 000 Nachrichten, Premium-Stimme, schnellere Antworten.", "planPlusOpen", "Abonnieren (Test)")}${dataAction("Pro — 19 € / Monat", "Unbegrenzte Nachrichten, Coding-Agent & Projekte.", "planProOpen", "Abonnieren (Test)")}${dataAction("Max — 39 € / Monat", "5× Limits, früher Zugriff auf Neues, direkter Support.", "planMaxOpen", "Abonnieren (Test)")}</div><p class="account-note">${t("Bezahlung läuft über Stripe — Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Monatlich kündbar. Aktuell Stripe-TESTMODUS: Buchungen sind Proben ohne echte Abbuchung (Testkarte 4242 4242 4242 4242). Echt geschaltet wird nach der Stripe-Konto-Aktivierung.")}</p>`)}
     ${panel("usage", "Nutzung & Limits", `<div class="account-list">${usageRow("Nachrichten", "Aufbauphase: ohne Limit.", "usageMessages")}${usageRow("Sprachminuten (Premium-Stimme)", "Zählt erst, wenn die Premium-Stimme aktiv ist.", "usageVoice")}${usageRow("Coding-Aufgaben", "Nur erfolgreich gestartete Läufe zählen.", "usageCoding")}</div><p class="account-note" id="usagePeriodNote">${t("Zähler laufen nur auf diesem Gerät und setzen sich jeden Monat automatisch zurück. Mit den Plänen bekommt jede Zeile einen Balken: verbraucht und noch offen.")}</p>`)}
-    ${panel("data", "Daten & Datenschutz", `<h4 class="account-subhead">${t("Datenschutz")}</h4><div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Eine lokale Auswahl ersetzt keine serverseitige, signierte Einwilligung.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.")}</p><h4 class="account-subhead">${t("Berechtigungen")}</h4><div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div><h4 class="account-subhead">${t("Daten verwalten")}</h4><div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">${t("Datenschutzerklärung öffnen")}</button></div>`)}
+    ${panel("data", "Daten & Datenschutz", `<h4 class="account-subhead">${t("Datenschutz")}</h4><div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.")}</p><h4 class="account-subhead">${t("Berechtigungen")}</h4><div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div><h4 class="account-subhead">${t("Daten verwalten")}</h4><div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">${t("Datenschutzerklärung öffnen")}</button></div>`)}
   </div></div><div id="profileOutput" class="output" role="status" aria-live="polite"></div>`;
 }
 
@@ -205,18 +206,58 @@ function hydrateUsage(view) {
   }
 }
 
-function saveConsent(view) {
+async function saveConsent(view) {
+  const training = view.querySelector("#privacyTraining").checked;
   const consent = {
     schemaVersion: 1,
     memory: view.querySelector("#privacyMemory").checked,
-    training: view.querySelector("#privacyTraining").checked,
+    training,
     diagnostics: view.querySelector("#privacyDiagnostics").checked,
     localOnly: true,
     serverConsentGranted: false,
     updatedAt: new Date().toISOString()
   };
+
+  // Die Trainings-Einwilligung wird SERVERSEITIG erteilt oder widerrufen. Der
+  // lokale Schalter allein zaehlt nicht — er war frueher genau das, und die
+  // Beschriftung sagte es auch: "ersetzt keine serverseitige, signierte
+  // Einwilligung". Jetzt loest er sie aus.
+  //
+  // Fail-closed in jeder Richtung: ohne geltenden Datenschutzhinweis, ohne
+  // Anmeldung oder bei jedem Serverfehler bleibt serverConsentGranted false und
+  // der Schalter springt zurueck. Eine Oberflaeche, die Zustimmung anzeigt, die
+  // der Server nicht kennt, waere die schlimmste Variante.
+  const hinweis = await fetchTrainingNotice();
+  if (!hinweis) {
+    consent.training = false;
+    localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
+    view.querySelector("#privacyTraining").checked = false;
+    output(view, t("Einwilligung derzeit nicht möglich: der Datenschutzhinweis ist nicht abrufbar."));
+    return;
+  }
+
+  const antwort = training
+    ? await grantTrainingConsent(hinweis.privacyNoticeSha256)
+    : await revokeTrainingConsent(hinweis.privacyNoticeSha256);
+
+  consent.serverConsentGranted = training && antwort.ok === true;
+  consent.privacyNoticeSha256 = hinweis.privacyNoticeSha256;
+  if (training && !antwort.ok) consent.training = false;
   localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
-  output(view, consent.training ? t("Lokale Präferenz gespeichert. Training bleibt serverseitig gesperrt.") : t("Datenschutzpräferenz lokal gespeichert."));
+  view.querySelector("#privacyTraining").checked = consent.training;
+
+  if (!antwort.ok) {
+    const grund = antwort.status === 401
+      ? t("Bitte zuerst anmelden.")
+      : antwort.payload?.error === "consent_privacy_notice_not_current"
+        ? t("Der Datenschutzhinweis hat sich geändert — bitte erneut öffnen und bestätigen.")
+        : t("Der Server hat die Einwilligung nicht angenommen.");
+    output(view, grund);
+    return;
+  }
+  output(view, training
+    ? t("Einwilligung erteilt und signiert hinterlegt. Jederzeit widerrufbar.")
+    : t("Einwilligung widerrufen — mit Wirkung für die Zukunft."));
 }
 
 function savePersonalization(view) {

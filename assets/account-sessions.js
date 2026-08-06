@@ -47,7 +47,10 @@ const API = {
   passwordChange: `${API_ORIGIN}/api/auth/email/password/change`,
   accountExport: `${API_ORIGIN}/api/auth/account/export`,
   accountDelete: `${API_ORIGIN}/api/auth/account/delete`,
-  billingStatus: `${API_ORIGIN}/api/billing/status`
+  billingStatus: `${API_ORIGIN}/api/billing/status`,
+  trainingNotice: `${API_ORIGIN}/api/training/consent/notice`,
+  trainingConsent: `${API_ORIGIN}/api/training/consent`,
+  trainingConsentRevoke: `${API_ORIGIN}/api/training/consent/revoke`
 };
 
 // Abo-Status des angemeldeten Nutzers (oder null, fail-safe). Liefert Plan,
@@ -260,4 +263,57 @@ function formatDate(value) {
 
 function escapeHtml(text) {
   return String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// ---------------------------------------------------------------------------
+// Trainings-Einwilligung. Sie liegt hier und nicht in account-privacy.js, weil
+// Token- und Authorization-Handling bewusst in diesem Modul bleiben — die
+// Oberflaeche sieht nur das Ergebnis.
+// ---------------------------------------------------------------------------
+
+/**
+ * Den geltenden Datenschutzhinweis holen (ohne Anmeldung).
+ *
+ * Ohne seinen Hash ist keine Einwilligung moeglich: der Server vergleicht ihn
+ * und antwortet sonst 409. Fail-closed: bei jedem Fehler null — die Oberflaeche
+ * bietet die Einwilligung dann gar nicht erst an, statt sie scheitern zu lassen.
+ */
+export async function fetchTrainingNotice() {
+  try {
+    const response = await fetch(API.trainingNotice);
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data?.ok === true && /^[a-f0-9]{64}$/.test(String(data.privacyNoticeSha256 || "")) ? data : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Einwilligung erteilen — alle drei Teile zusammen.
+ *
+ * Der Server stellt keine Teil-Einwilligung aus (consent_explicit_scope_required),
+ * darum werden sie hier auch nicht einzeln angeboten. Das entspricht der
+ * Datenschutzerklaerung: "dreifach getrennt", aber gemeinsam erteilt.
+ */
+export async function grantTrainingConsent(privacyNoticeSha256) {
+  return api(API.trainingConsent, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      privacyNoticeSha256,
+      captureReviewConsent: true,
+      modelTrainingConsent: true,
+      sourceRightsConfirmed: true
+    })
+  });
+}
+
+/** Einwilligung widerrufen — mit Wirkung fuer die Zukunft (Art. 7 Abs. 3 DSGVO). */
+export async function revokeTrainingConsent(privacyNoticeSha256) {
+  return api(API.trainingConsentRevoke, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ privacyNoticeSha256 })
+  });
 }
