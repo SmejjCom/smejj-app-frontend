@@ -192,7 +192,10 @@ function safeModelName() {
 async function pruneOld() {
   const chats = await listChats();
   if (chats.length <= MAX_CHATS) return;
-  const surplus = chats.slice(MAX_CHATS);
+  // Angepinnte Chats sind von der Aufraeumung ausgenommen — wer pinnt, sagt
+  // ausdruecklich "behalten". Durch die Sortierung (Pins zuerst) stehen sie
+  // ohnehin vor der Kappungsgrenze; der Filter sichert den Extremfall ab.
+  const surplus = chats.slice(MAX_CHATS).filter((chat) => chat.pinned !== true);
   for (const chat of surplus) {
     await tx("readwrite", (store) => store.delete(chat.id)).catch(() => {});
   }
@@ -204,7 +207,20 @@ export async function listChats() {
     request.onsuccess = () => resolve(request.result || []);
     request.onerror = () => reject(request.error);
   })).catch(() => []);
-  return chats.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  // Angepinnte zuerst (Konkurrenz-Radar V4), innerhalb der Gruppen neueste oben.
+  return chats.sort((a, b) => ((b.pinned === true) - (a.pinned === true)) || String(b.updatedAt).localeCompare(String(a.updatedAt)));
+}
+
+// Anpinnen/Loesen (Konkurrenz-Radar V4, 2026-08-06). updatedAt bleibt bewusst
+// unveraendert: Anpinnen ist keine inhaltliche Aenderung, und ein frisches
+// updatedAt wuerde den Chat nach dem Loesen faelschlich nach oben sortieren.
+export async function togglePinChat(id) {
+  const chat = await getChat(id);
+  if (!chat) return false;
+  chat.pinned = chat.pinned !== true;
+  await tx("readwrite", (store) => store.put(chat));
+  notifyChanged();
+  return chat.pinned;
 }
 
 export function getChat(id) {

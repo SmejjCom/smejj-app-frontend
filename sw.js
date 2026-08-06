@@ -616,7 +616,13 @@
 // app.js verbindet Chips beim Senden, start-styles.css bekommt die Chip-Optik.
 // Alle drei liegen cache-first im Precache — ohne Versionssprung saehen
 // Bestandsnutzer den neuen Import nie und app.js braeche beim Laden ab.
-const CACHE_NAME = "smejj-shell-v228";
+// v228 -> v229 (2026-08-06, Konkurrenz-Radar V4 Stufe 1): Verlauf anpinnen —
+// chat-store.js bekommt togglePinChat + Pins-zuerst-Sortierung (Pins sind von
+// der 100er-Aufraeumung ausgenommen), chat-history-view.js den Anpinnen-Knopf.
+// ALLE chat-store-Importeure (chat-actions, search, chat-history-view,
+// index.html) springen gemeinsam auf ?v=pin-20260806 — ein abweichender
+// Spezifizierer erzeugte eine ZWEITE Store-Instanz mit eigenem Zustand.
+const CACHE_NAME = "smejj-shell-v229";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

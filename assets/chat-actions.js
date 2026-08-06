@@ -39,7 +39,7 @@ import { groundingFor } from "/assets/browser-context.js";
 // Warteschlange aus demselben Modul haette es zerrissen. Gleiche Falle wie bei
 // settings-runtime.js in sw v184/v185.
 import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=blitz-20260726";
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=verlauf-20260721";
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=pin-20260806";
 import { showToast } from "/assets/components.js?v=chat-markdown-20260717";
 
 const SETTLE_MS = 900;

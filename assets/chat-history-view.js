@@ -9,7 +9,7 @@
 
 // Versionierter Pfad wie in index.html (QA-Welle 1, Befund F-07): Ein abweichender
 // Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js mit eigenem Zustand.
-import { listChats, openChat, renameChat, deleteChat, activeChatId } from "/assets/chat-store.js?v=verlauf-20260721";
+import { listChats, openChat, renameChat, deleteChat, activeChatId, togglePinChat } from "/assets/chat-store.js?v=pin-20260806";
 
 const STYLE_ID = "chatHistoryStyles";
 let confirmingId = "";
@@ -35,6 +35,8 @@ function injectStyles() {
     .chat-history-item { display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
       border: 1px solid rgba(255,255,255,.12); border-radius: 12px; padding: 12px 14px; }
     .chat-history-item.is-active { border-color: rgba(120,220,232,.55); }
+    .chat-history-item.is-pinned { background: rgba(255,255,255,.04); }
+    .chat-history-pin { margin-right: 6px; opacity: .85; }
     .chat-history-main { flex: 1 1 260px; min-width: 200px; cursor: pointer; }
     .chat-history-title { font-weight: 600; overflow-wrap: anywhere; }
     .chat-history-meta { font-size: .85em; opacity: .7; margin-top: 2px; }
@@ -79,7 +81,7 @@ async function render() {
 
 function renderItem(chat, isActive) {
   const item = document.createElement("div");
-  item.className = `chat-history-item${isActive ? " is-active" : ""}`;
+  item.className = `chat-history-item${isActive ? " is-active" : ""}${chat.pinned === true ? " is-pinned" : ""}`;
   item.dataset.chatId = chat.id;
 
   const main = document.createElement("div");
@@ -87,7 +89,14 @@ function renderItem(chat, isActive) {
   main.title = "Unterhaltung öffnen";
   const title = document.createElement("div");
   title.className = "chat-history-title";
-  title.textContent = chat.title || "Unterhaltung";
+  if (chat.pinned === true) {
+    const pin = document.createElement("span");
+    pin.className = "chat-history-pin";
+    pin.setAttribute("aria-label", "Angepinnt");
+    pin.textContent = "📌";
+    title.append(pin);
+  }
+  title.append(document.createTextNode(chat.title || "Unterhaltung"));
   const meta = document.createElement("div");
   meta.className = "chat-history-meta";
   const count = Array.isArray(chat.messages) ? chat.messages.length : 0;
@@ -102,6 +111,15 @@ function renderItem(chat, isActive) {
   openButton.type = "button";
   openButton.textContent = "Öffnen";
   openButton.addEventListener("click", () => { openChat(chat.id).catch(() => {}); });
+
+  const pinButton = document.createElement("button");
+  pinButton.type = "button";
+  pinButton.textContent = chat.pinned === true ? "Lösen" : "Anpinnen";
+  pinButton.title = chat.pinned === true ? "Nicht mehr oben festhalten" : "Oben festhalten";
+  pinButton.addEventListener("click", async () => {
+    await togglePinChat(chat.id).catch(() => {});
+    render();
+  });
 
   const renameButton = document.createElement("button");
   renameButton.type = "button";
@@ -126,7 +144,7 @@ function renderItem(chat, isActive) {
     render();
   });
 
-  actions.append(openButton, renameButton, deleteButton);
+  actions.append(openButton, pinButton, renameButton, deleteButton);
   item.append(main, actions);
   return item;
 }
