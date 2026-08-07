@@ -216,7 +216,12 @@
   async function zeigeSupport() {
     laedt("Support-Vorgänge werden geholt …");
     const [alle, eigene] = await Promise.all([A.impersonationListe(), A.eigeneVorgaenge()]);
-    if (!alle.ok && !eigene.ok) return zeigeFehler(alle.fehler || eigene.fehler);
+    // Jeder Abruf zaehlt fuer sich. Frueher stand hier "&&" — die Seite galt
+    // also schon als heil, wenn EINER von beiden ging. Ein toter Endpunkt sah
+    // dadurch aus wie "0 Vorgaenge" — genau so blieb der 404 auf
+    // /api/admin/impersonation/list unbemerkt.
+    if (!alle.ok) return zeigeFehler(alle.fehler);
+    if (!eigene.ok) meldung(eigene.fehler, true);
     seite.innerHTML = V.support({
       impersonations: (alle.data || {}).impersonations || [],
       total: (alle.data || {}).total || 0,
