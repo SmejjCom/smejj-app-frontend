@@ -14,7 +14,14 @@
 // Nichts wird geloescht: Alle Bedienelemente bleiben im DOM und damit
 // funktionsfaehig — sie werden nur zustandsabhaengig ein-/ausgeblendet.
 
-const LOGIN_CONTROLS = ["#googleSignIn", "#passkeyLogin", "#passkeyRegister", "#loginLocal"];
+const LOGIN_CONTROLS = ["#googleSignIn", "#passkeyLogin", "#loginLocal"];
+// "Passkey einrichten" gehoert NICHT zu den Anmelde-Wegen (Befund 2026-08-07):
+// Das Einrichten verlangt serverseitig eine Sitzung — ohne sie antwortet
+// /api/auth/passkey/register/options mit 401. Der Knopf stand aber in
+// LOGIN_CONTROLS und war damit genau dann sichtbar, wenn er nicht funktionieren
+// KANN, und ausgeblendet, sobald er funktioniert haette. Er ist unerreichbar
+// gewesen: angemeldet unsichtbar, abgemeldet wirkungslos.
+const ANGEMELDET_CONTROLS = ["#passkeyRegister"];
 const LOGOUT_CONTROLS = ["#logoutLocal"];
 const EMAIL_ONLY_BLOCK = "#serverSessionsBlock";
 
@@ -26,6 +33,7 @@ export function applyAuthState(view, user) {
   const method = String(user?.method || (user ? "google" : "")).toLowerCase();
   view.dataset.authState = authenticated ? "authenticated" : "anonymous";
   toggle(view, LOGIN_CONTROLS, !authenticated);
+  toggle(view, ANGEMELDET_CONTROLS, authenticated);
   toggle(view, LOGOUT_CONTROLS, authenticated);
   // Server-Sitzungsverwaltung ergibt nur fuer E-Mail-Konten Sinn.
   toggle(view, [EMAIL_ONLY_BLOCK], authenticated && method === "email");
