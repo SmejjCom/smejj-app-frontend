@@ -111,7 +111,74 @@
    *
    * @returns {Promise<boolean>} true = bestaetigt, der Weg ist frei.
    */
+  /** base64url -> ArrayBuffer (WebAuthn will Bytes, der Server schickt Text). */
+  function ausBase64Url(wert) {
+    const roh = atob(String(wert).replace(/-/g, "+").replace(/_/g, "/"));
+    const bytes = new Uint8Array(roh.length);
+    for (let i = 0; i < roh.length; i++) bytes[i] = roh.charCodeAt(i);
+    return bytes.buffer;
+  }
+
+  function nachBase64Url(puffer) {
+    const bytes = new Uint8Array(puffer);
+    let roh = "";
+    for (let i = 0; i < bytes.length; i++) roh += String.fromCharCode(bytes[i]);
+    return btoa(roh).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  /**
+   * Bestaetigung per Passkey. Liefert true nur bei bestandener Pruefung.
+   *
+   * Gibt bei JEDEM Hindernis still false zurueck — der Aufrufer faellt dann auf
+   * den Mail-Code zurueck. Ein Passkey, der nicht klappt, darf niemanden
+   * aussperren.
+   */
+  async function passkeyVersuch() {
+    // Passkeys haengen an der Domain (rpId smejj.com). Auf dem Rueckfallweg
+    // ueber den Control-Server (*.salad.cloud) sind sie nicht ansprechbar —
+    // dort erst gar nicht fragen, sonst sieht der Nutzer eine Fehlermeldung
+    // fuer etwas, das dort nie funktionieren kann.
+    if (!/(^|\.)smejj\.com$/.test(location.hostname)) return false;
+    if (!window.PublicKeyCredential || !navigator.credentials) return false;
+
+    const optionen = await sendeDirekt("/api/admin/step-up/passkey/options", {});
+    if (!optionen.ok) return false;          // u. a. 409 = kein Passkey hinterlegt
+    const d = optionen.data || {};
+    let antwort;
+    try {
+      antwort = await navigator.credentials.get({
+        publicKey: {
+          challenge: ausBase64Url(d.challenge),
+          rpId: d.rpId,
+          timeout: d.timeout,
+          userVerification: d.userVerification,
+          allowCredentials: (d.allowCredentials || []).map(function (s) {
+            return { type: "public-key", id: ausBase64Url(s.id) };
+          })
+        }
+      });
+    } catch {
+      return false;                          // abgebrochen oder kein Geraet
+    }
+    if (!antwort) return false;
+
+    const geprueft = await sendeDirekt("/api/admin/step-up/passkey/verify", {
+      challengeToken: d.challengeToken,
+      id: antwort.id,
+      response: {
+        authenticatorData: nachBase64Url(antwort.response.authenticatorData),
+        clientDataJSON: nachBase64Url(antwort.response.clientDataJSON),
+        signature: nachBase64Url(antwort.response.signature)
+      }
+    });
+    return Boolean(geprueft.ok);
+  }
+
   async function bestaetigungEinholen() {
+    // Zuerst der starke Weg: nicht abtippbar, nicht abfischbar, kein Postfach
+    // noetig. Klappt er nicht, kommt der Mail-Code — leise, ohne Fehlermeldung.
+    if (await passkeyVersuch()) return true;
+
     const anforderung = await sendeDirekt("/api/admin/step-up/request", {});
     const dialog = baueStepUpDialog();
     // Jeder Rueckgabeweg raeumt den Dialog ab — bliebe das Overlay stehen,
