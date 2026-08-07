@@ -170,6 +170,16 @@ function setVoiceModeTranscript(text) {
       if (transcript) transcript.textContent = text;
 }
 
+// Live-Mitschrift der Antwort (Konkurrenz-Radar V2, 2026-08-06): Die Antwort
+// streamt sichtbar unter der Welle mit statt nur als "Ich spreche ...".
+// Bewusst NUR Text (textContent) — kein HTML aus dem Log uebernehmen.
+function setVoiceModeReply(text) {
+      const reply = $("#voiceModeReply");
+      if (!reply || reply.textContent === text) return;
+      reply.textContent = text;
+      reply.scrollTop = reply.scrollHeight;
+}
+
 function clearVoiceTimers() {
       clearTimeout(state.voiceSettleTimer);
       clearTimeout(state.voiceTimeoutTimer);
@@ -211,6 +221,7 @@ function closeVoiceMode() {
       state.voiceRecognition = null;
       stopSpeaking();
       syncVoiceMicVisual();
+      setVoiceModeReply("");
       const overlay = $("#voiceModeOverlay");
       if (overlay) overlay.hidden = true;
       voiceFocus.leave();
@@ -524,6 +535,8 @@ function voiceModeSend(task, { getippt = false } = {}) {
       }
       setVoiceModeStatus("thinking", "Einen Moment ...");
       setVoiceModeTranscript(task);
+      // Neue Frage: die Mitschrift der vorigen Antwort raeumen.
+      setVoiceModeReply("");
       const knownEntries = document.querySelectorAll(ANSWER_SELECTOR).length;
       input.value = task;
       notifyInputChanged(input);
@@ -638,6 +651,7 @@ function waitForAssistantReply(knownEntries) {
               }
               // Stream fertig: Rest in die Queue, onQueueEnd schliesst den Loop ab.
               queue.flush(reply);
+              setVoiceModeReply(reply); // V2: vollstaendige Antwort steht in der Mitschrift
       };
       const scheduleSettle = () => {
               clearTimeout(state.voiceSettleTimer);
@@ -647,7 +661,9 @@ function waitForAssistantReply(knownEntries) {
       state.voiceObserver = new MutationObserver(() => {
               // Fertige Saetze sofort sprechen, waehrend die Antwort weiter streamt.
               if (state.voiceModeActive) {
-                        queue.push(currentReply());
+                        const replyNow = currentReply();
+                        queue.push(replyNow);
+                        setVoiceModeReply(replyNow); // V2: Antwort laeuft sichtbar mit
                         // Nachziehen, falls die Queue schon mit dem Denk-Laut gestartet ist:
                         // onQueueStart feuert nur einmal, das Scharfschalten muss hier passieren.
                         armBargeIn();

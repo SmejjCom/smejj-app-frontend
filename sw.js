@@ -622,7 +622,12 @@
 // ALLE chat-store-Importeure (chat-actions, search, chat-history-view,
 // index.html) springen gemeinsam auf ?v=pin-20260806 — ein abweichender
 // Spezifizierer erzeugte eine ZWEITE Store-Instanz mit eigenem Zustand.
-const CACHE_NAME = "smejj-shell-v229";
+// v229 -> v230 (2026-08-06, Konkurrenz-Radar V2): Live-Mitschrift im
+// Sprachmodus — die Antwort streamt als Text sichtbar unter der Welle mit
+// (#voiceModeReply in index.html, setVoiceModeReply in composer-tools.js,
+// Optik in start-styles.css). app.js zieht die composer-tools-Import-Query
+// auf ?v=voice-mitschrift-20260806 mit, damit auch der HTTP-Cache springt.
+const CACHE_NAME = "smejj-shell-v230";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

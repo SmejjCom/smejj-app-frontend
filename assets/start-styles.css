@@ -1922,6 +1922,23 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
      line-height: 1.5;
 }
 
+/* Live-Mitschrift der Antwort im Sprachmodus (Konkurrenz-Radar V2) */
+.voice-mode-reply {
+     max-width: 640px;
+     max-height: 38vh;
+     overflow-y: auto;
+     margin: 0;
+     font-size: 15px;
+     color: rgba(246, 243, 238, 0.85);
+     line-height: 1.55;
+     white-space: pre-wrap;
+     overflow-wrap: anywhere;
+}
+
+.voice-mode-reply:empty {
+     display: none;
+}
+
 .voice-mode-close {
      display: grid;
      place-items: center;
