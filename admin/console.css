@@ -333,3 +333,33 @@ tbody tr.klickbar{cursor:pointer;}
   border-color:var(--sm-accent-border);}
 .dlg-feld-gross{min-height:92px;resize:vertical;}
 select.dlg-feld{cursor:pointer;}
+
+/* ---------- Modul AP · Autopiloten (Stufe 9) ----------
+   Master-Detail: links die Automatiken mit Ampelpunkt, rechts die Akte des
+   gewaehlten. Die Punkte sind bewusst viereckig — das ganze Haus ist es
+   (--radius:0 mit !important), und ein Status-Wuerfel liest sich wie eine LED. */
+.ap-wrap{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;align-items:start;}
+@media (max-width:960px){.ap-wrap{grid-template-columns:1fr;}}
+.ap-liste{display:flex;flex-direction:column;gap:6px;}
+.ap-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;
+  border:1px solid var(--sm-border);background:var(--sm-card);color:var(--sm-ink);}
+.ap-item:hover{border-color:var(--sm-border-strong);}
+.ap-item.on{border-color:var(--sm-accent-border);background:var(--sm-accent-soft);}
+.ap-item .t{min-width:0;}
+.ap-item .t b{display:block;font-size:13px;}
+.ap-item .t span{font-size:11px;color:var(--sm-ink-dim);}
+.ap-dot{width:12px;height:12px;flex:none;}
+.ap-dot.gruen{background:var(--sm-ok);box-shadow:0 0 10px var(--sm-ok);}
+.ap-dot.gelb{background:var(--sm-warn);box-shadow:0 0 10px var(--sm-warn);}
+.ap-dot.rot{background:var(--sm-danger);box-shadow:0 0 10px var(--sm-danger);}
+.ap-dot.grau{background:var(--sm-ink-faint);}
+.ap-detail{display:flex;flex-direction:column;gap:12px;min-width:0;}
+.ap-detail-kopf{display:flex;align-items:center;gap:12px;}
+.ap-detail-kopf h2{margin:0;font-size:20px;}
+.ap-kurz{margin:0;color:var(--sm-ink-dim);font-size:13.5px;line-height:1.55;}
+.ap-funktionen{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;
+  font-size:13px;line-height:1.55;}
+.ap-bedienung{display:flex;flex-direction:column;gap:14px;font-size:13px;}
+.ap-anleitung{margin-top:6px;padding:10px 12px;background:var(--sm-field);
+  border:1px solid var(--sm-border);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:12px;line-height:1.6;word-break:break-word;color:var(--sm-ink);}
