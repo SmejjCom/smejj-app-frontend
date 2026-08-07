@@ -48,11 +48,31 @@
 
   // ---- A · Übersicht ---------------------------------------------------------
 
+  /**
+   * Sicherheitsalarme aus den geladenen Audit-Eintraegen zaehlen.
+   *
+   * Bewusst KEIN eigener Endpunkt: die Alarme stehen ohnehin als
+   * `security.alarm` in der Hash-Kette, und die Uebersicht laedt sie schon.
+   * Gezaehlt wird deshalb nur der GELADENE Ausschnitt — die Beschriftung sagt
+   * das auch. "0" heisst hier "keiner in den letzten N Eintraegen", nicht
+   * "nie einer gewesen"; alles andere waere eine falsche Beruhigung.
+   */
+  function alarmLage(audit) {
+    const eintraege = (audit && audit.entries) || [];
+    const alarme = eintraege.filter(function (eintrag) { return eintrag && eintrag.action === "security.alarm"; });
+    return {
+      anzahl: alarme.length,
+      geprueft: eintraege.length,
+      letzter: alarme[0] || null   // Audit-Seite liefert neueste zuerst
+    };
+  }
+
   function uebersicht(d) {
     const index = d.nutzer && d.nutzer.index ? d.nutzer.index : {};
     const kette = d.audit && d.audit.chain ? d.audit.chain : {};
     const systeme = (d.compliance && d.compliance.systeme) || [];
     const pflichtig = systeme.filter((s) => s.transparenzpflicht).length;
+    const alarm = alarmLage(d.audit);
 
     const kacheln = '<div class="kpis">'
       + kachel("Konten", index.count == null ? "—" : String(index.count),
@@ -65,6 +85,11 @@
         kette.ok ? "lueckenlos geprueft" : String(kette.reason || ""), kette.ok ? "up" : "dn")
       + kachel("KI-Systeme", String(systeme.length),
         pflichtig + " mit Transparenzpflicht")
+      + kachel("Sicherheitsalarme", String(alarm.anzahl),
+        alarm.anzahl > 0
+          ? "zuletzt " + A.zeit(alarm.letzter.at)
+          : "keiner in den letzten " + alarm.geprueft + " Eintraegen",
+        alarm.anzahl > 0 ? "dn" : "up")
       + '</div>';
 
     const dienste = tabelle(["Bereich", "Stand", "Anmerkung"], [
@@ -79,7 +104,17 @@
         + '</td><td>Löschen und Rollenvergabe nur mit vier Augen</td></tr>',
       '<tr><td><b>Offene Freigaben</b></td><td>' + ((d.freigaben || 0) > 0
         ? pille(String(d.freigaben) + " warten", "warn") : pille("keine", "ok"))
-        + '</td><td>Anträge verfallen nach 24 Stunden</td></tr>'
+        + '</td><td>Anträge verfallen nach 24 Stunden</td></tr>',
+      // Die Wache meldet MUSTER, nicht Einzelvorgaenge: gedrosselte Anfragen an
+      // der Vortuer und falsche Step-up-Codes. Ein Alarm heisst "abgewehrt und
+      // auffaellig oft", nicht "eingebrochen".
+      '<tr><td><b>Sicherheitswache</b></td><td>' + (alarm.anzahl > 0
+        ? pille(String(alarm.anzahl) + (alarm.anzahl === 1 ? " Alarm" : " Alarme"), "bad")
+        : pille("ruhig", "ok"))
+        + '</td><td>' + (alarm.anzahl > 0
+          ? e("zuletzt " + String((alarm.letzter && alarm.letzter.target) || "") + " — " + String((alarm.letzter && alarm.letzter.reason) || ""))
+          : "Abgewehrte Muster stehen als security.alarm im Audit-Log")
+        + '</td></tr>'
     ]);
 
     return kopf("A", "Cockpit", "Übersicht",
