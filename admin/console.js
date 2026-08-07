@@ -61,12 +61,48 @@
   const nav = document.getElementById("nav");
   const seite = document.getElementById("seite");
 
+  // ---- Adressen ohne # ---------------------------------------------------------
+  // Auf smejj.com liegt jede Seite als eigener Ordner (admin/<seite>/index.html,
+  // erzeugt vom Spiegel-Skript) — die Links sind ECHTE Links, jede Adresse ist
+  // teilbar und neu ladbar. Der Rueckfallweg ueber den Control-Server hat diese
+  // Ordner nicht; dort bleibt die alte #-Route erhalten, damit die Konsole im
+  // Notfall weiter bedienbar ist, ohne die (gesperrte) Auslieferung anzufassen.
+  const PFAD_MODUS = /(^|\.)smejj\.com$/.test(location.hostname);
+
+  function seitenLink(pfad) {
+    if (!PFAD_MODUS) return "#" + pfad;
+    return pfad === "uebersicht" ? "/admin/" : "/admin/" + pfad + "/";
+  }
+
+  /** Wohin navigieren — im Pfad-Modus als echte Navigation, sonst per Hash. */
+  function geheZu(pfadTeil) {
+    if (!PFAD_MODUS) { location.hash = "#" + pfadTeil; return; }
+    if (pfadTeil.indexOf("akte/") === 0) {
+      // Die Akte hat bewusst KEINEN eigenen Ordner: sie verlangt bei jedem
+      // Einstieg einen protokollierten Grund. Als Anhang der Nutzerliste
+      // uebersteht sie das Neuladen, ohne die Grund-Pflicht zu umgehen.
+      location.href = "/admin/nutzer/?akte=" + encodeURIComponent(pfadTeil.slice("akte/".length));
+      return;
+    }
+    location.href = seitenLink(pfadTeil);
+  }
+
+  /** Das Ziel aus der Adresse lesen — Pfad zuerst, alte #-Links bleiben gueltig. */
+  function aktuellerPfad() {
+    if (!PFAD_MODUS) return (location.hash || "#uebersicht").replace(/^#/, "");
+    const akte = new URLSearchParams(location.search).get("akte");
+    if (akte) return "akte/" + akte;
+    const teil = location.pathname.replace(/^\/admin\/?/, "").replace(/\/$/, "");
+    if (teil) return teil;
+    return (location.hash || "#uebersicht").replace(/^#/, "");
+  }
+
   function schreibeNav(aktiv) {
     let gruppe = null;
     nav.innerHTML = SEITEN.map(function (s) {
       let vorsatz = "";
       if (s.gruppe !== gruppe) { gruppe = s.gruppe; vorsatz = '<div class="rail-group">' + A.escapeHtml(s.gruppe) + '</div>'; }
-      return vorsatz + '<a class="rail-item' + (s.pfad === aktiv ? " on" : "") + '" href="#' + s.pfad + '">'
+      return vorsatz + '<a class="rail-item' + (s.pfad === aktiv ? " on" : "") + '" href="' + seitenLink(s.pfad) + '">'
         + '<span class="ltr">' + s.id + '</span><span>' + A.escapeHtml(s.name) + '</span></a>';
     }).join("");
   }
@@ -132,7 +168,7 @@
       minLaenge: 3,
       okText: "Akte öffnen"
     });
-    if (grund === null) { location.hash = "#nutzer"; return; }
+    if (grund === null) { geheZu("nutzer"); return; }
     if (String(grund).trim().length < 3) {
       seite.innerHTML = V.fehlerblock("Ohne Grund keine Einsicht. Bitte mindestens drei Zeichen angeben.")
         + '<div class="bar"><span class="btn zurueck" id="zurueckKnopf">← Zurück zur Liste</span></div>';
@@ -212,7 +248,7 @@
   function bindeNutzerAktionen() {
     document.querySelectorAll("tr.klickbar").forEach(function (zeile) {
       zeile.addEventListener("click", function () {
-        location.hash = "#akte/" + encodeURIComponent(zeile.getAttribute("data-akte"));
+        geheZu("akte/" + zeile.getAttribute("data-akte"));
       });
     });
     const feld = document.getElementById("sucheFeld");
@@ -304,7 +340,7 @@
             + "Antrag: " + antwort.data.approval.id, false);
           return;
         }
-        location.hash = "#nutzer";
+        geheZu("nutzer");
       });
     });
   }
@@ -380,7 +416,7 @@
 
   function bindeZurueck() {
     const knopf = document.getElementById("zurueckKnopf");
-    if (knopf) knopf.addEventListener("click", function () { location.hash = "#nutzer"; });
+    if (knopf) knopf.addEventListener("click", function () { geheZu("nutzer"); });
   }
 
   function bindeZeitraum() {
@@ -399,7 +435,14 @@
   // ---- Routing ----------------------------------------------------------------
 
   function route() {
-    const ziel = (location.hash || "#uebersicht").replace(/^#/, "");
+    const ziel = aktuellerPfad();
+    // Ein alter #-Link auf der neuen Auslieferung: Adresse still bereinigen,
+    // damit Lesezeichen und geteilte Links ab jetzt ohne # weiterwandern.
+    if (PFAD_MODUS && location.hash) {
+      history.replaceState(null, "", ziel.indexOf("akte/") === 0
+        ? "/admin/nutzer/?akte=" + encodeURIComponent(ziel.slice("akte/".length))
+        : seitenLink(ziel));
+    }
     if (ziel.indexOf("akte/") === 0) {
       schreibeNav("nutzer");
       setzeKopf("Nutzerakte");
@@ -444,7 +487,9 @@
     const stufe = document.getElementById("stufe");
     stufe.textContent = "Stufe " + (antwort.data.stage || 2)
       + (antwort.data.writable ? " · schreibend" : " · nur lesend");
-    window.addEventListener("hashchange", route);
+    // Im Pfad-Modus ist jeder Seitenwechsel eine echte Navigation — es gibt
+    // nichts zu beobachten. Der Hash-Horcher bleibt dem Rueckfallweg vorbehalten.
+    if (!PFAD_MODUS) window.addEventListener("hashchange", route);
     route();
   }
 
