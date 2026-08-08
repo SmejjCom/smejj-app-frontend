@@ -363,3 +363,21 @@ select.dlg-feld{cursor:pointer;}
 .ap-anleitung{margin-top:6px;padding:10px 12px;background:var(--sm-field);
   border:1px solid var(--sm-border);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:12px;line-height:1.6;word-break:break-word;color:var(--sm-ink);}
+
+/* Konkurrenz-Radar (Stufe 10) — Vorschlaege zum Durchklicken. */
+.radar-vorschlag { border: 1px solid rgba(255,255,255,.12); border-radius: 12px; padding: 14px 16px; margin: 0 0 12px; }
+.radar-kopf { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.radar-feld { display: grid; grid-template-columns: 210px 1fr; gap: 12px; padding: 5px 0; }
+.radar-feld b { opacity: .75; font-weight: 600; }
+.radar-meta .radar-feld { padding: 3px 0; }
+.radar-beleg { margin-top: 8px; opacity: .7; font-size: .9em; }
+.radar-knoepfe { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.radar-knoepfe .btn.on { border-color: rgba(120,220,232,.7); }
+.radar-beob { margin: 0; padding-left: 20px; }
+.radar-beob li { margin: 6px 0; }
+.radar-export { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 12px;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 12px; }
+
+@media (max-width: 720px) {
+  .radar-feld { grid-template-columns: 1fr; gap: 2px; }
+}

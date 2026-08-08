@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "aktualisiert": "2026-08-06",
+  "hinweis": "Datengrundlage der Radar-Ansicht in der Operations Console. Wird bei jedem Radar-Bericht ergaenzt. Quelle der Wahrheit bleibt docs/konkurrenz-radar/ im Arbeits-Repo.",
+  "berichte": [
+    {
+      "id": "2026-08-05-01",
+      "nummer": 1,
+      "titel": "Radar-Bericht 01",
+      "datum": "2026-08-05",
+      "zeitraum": "Ende Mai bis 5. August 2026 (~10 Wochen)",
+      "beobachtet": ["ChatGPT", "Gemini", "Kimi", "Claude", "Perplexity", "Copilot", "Grok"],
+      "quellenart": "Offizielle Release Notes und Blogs, App-Store-Texte, seriöse Tech-Presse. Kein Login, kein Scraping.",
+      "vorschlaege": [
+        {
+          "id": "V1",
+          "titel": "Riesen-Einfügung wird Anhang-Chip",
+          "konkurrent": "ChatGPT wandelt seit 04.08. eingefügten Text über 10.000 Zeichen automatisch in einen Anhang um; die Eingabezeile bleibt schlank, der Text ist per Klick zurückholbar.",
+          "wirHeute": "Eingefügter Langtext landete komplett in der Eingabezeile; sie wuchs unbegrenzt.",
+          "aenderung": "Ab 8.000 Zeichen als Chip neben der Büroklammer darstellen, mit Rückweg „als Text einfügen“.",
+          "aufwand": "Klein (1 Tag). Risiko klein — rein additiv.",
+          "status": "umgesetzt",
+          "belegt": "live als sw v228, Commit b4678d7"
+        },
+        {
+          "id": "V2",
+          "titel": "Live-Mitschrift im Sprachmodus",
+          "konkurrent": "ChatGPTs Sprachmodus „GPT-Live“ (08.07.) streamt Gesagtes und Antwort als Text mit — die Sprach-Ansicht ist keine Blackbox mehr.",
+          "wirHeute": "Das Overlay zeigte nur die Fünf-Balken-Welle; die Antwort war erst nach dem Beenden im Verlauf zu sehen.",
+          "aenderung": "Unter der Welle das laufende Transkript und die Antwort mitlaufen lassen (Daten waren bereits vorhanden).",
+          "aufwand": "Mittel (2–3 Tage). Risiko mittel — Sprachmodus hat Fehlerhistorie.",
+          "status": "umgesetzt",
+          "belegt": "live als sw v230, Commit 51d4ecb"
+        },
+        {
+          "id": "V3",
+          "titel": "Modellwahl: „Schnell / Auto / Gründlich“ statt Modellnamen",
+          "konkurrent": "Breiter Trend weg von Modellnamen: ChatGPT-Desktop zeigt einen Regler „Faster ↔ Smarter“ (Juli); Gemini blendet die Standard-Option aus und bietet nur noch „Extended thinking“ (27.07.).",
+          "wirHeute": "Ein Text-Chip „smejj 1.0“ mit Modellliste dahinter. Modellnamen sagen Nutzern nichts und haben intern schon Routing-Fehler verursacht.",
+          "aenderung": "Chip auf drei verständliche Stufen umstellen: Schnell (70B-Schnellspur), Auto (Standard-Routing), Gründlich (Denk-Modus). Modellnamen nur noch im Experten-Blick.",
+          "aufwand": "Mittel (2 Tage). Risiko mittel — berührt das Modell-Routing, mit Eval-Suite gegenmessen.",
+          "status": "freigegeben",
+          "belegt": "Freigabe 2026-08-06 inkl. Start-Lock; Umsetzung läuft"
+        },
+        {
+          "id": "V4",
+          "titel": "Verlauf: Anpinnen und breitere Suche",
+          "konkurrent": "ChatGPT: eine Suche über Chats, Projekte, Bilder und Dokumente (14.07.). Moonshot (Kimi Code): Sessions anpinnen, Verlaufsfilter, Archiv.",
+          "wirHeute": "Verlauf war eine rein chronologische Liste; die Suche fand Chats, aber keine Projektdateien.",
+          "aenderung": "Stufe 1: Chats anpinnen (Angepinnte oben). Stufe 2: Suche auf Projekt- und Dateinamen ausweiten.",
+          "aufwand": "Stufe 1 klein (1 Tag), Stufe 2 mittel. Risiko klein — additiv.",
+          "status": "umgesetzt",
+          "belegt": "Stufe 1 live als sw v229 (11c5fd3), Stufe 2 live als sw v232 (17d3c21)"
+        },
+        {
+          "id": "V5",
+          "titel": "Quellen-Panel: Belege dauerhaft mitführen",
+          "konkurrent": "Perplexity hat ein „Source Context Panel“ eingeführt (27.07.): Belegquellen bleiben dauerhaft neben der Antwort statt nur als Fußnoten.",
+          "wirHeute": "Der Knopf „Quellen“ führte zur Datei-Ansicht — eine Quellenliste gab es gar nicht.",
+          "aenderung": "Links aus den Antworten sammeln, oben in der Quellen-Ansicht zeigen, Zähler an den Panel-Knopf.",
+          "aufwand": "Mittel (2 Tage). Risiko klein — eigenständiges Panel.",
+          "status": "umgesetzt",
+          "belegt": "live als sw v234, Commit ab6da57"
+        }
+      ],
+      "beobachtungen": [
+        "Unser Seitenleisten-Layout ist der von Nutzern erzwungene Standard: OpenAI entfernte im Juli Verlauf und Projekte aus der Sidebar und baute nach Protest binnen einer Woche zurück (17.–20.07.). Nicht anfassen.",
+        "Schlanker Sprachmodus bestätigt: Grok stellt seine 3D-Avatare ein (24.07.), Begründung Fokus auf Kern-Chat. Unsere Welle+X-Lösung liegt im Trend.",
+        "Keine Einigkeit bei der Modellwahl-Platzierung: Google nimmt sie aus der Eingabezeile heraus, OpenAI lässt sie drin und vereinfacht nur. Konsens ist allein die Vereinfachung.",
+        "Strategie-Trend des Sommers sind Agenten-Flächen (Gemini Spark, Copilot Tasks, Kimi Agent-Schwarm, ChatGPT Work). Für uns wäre das Status-Panel der natürliche Ort für eine Aufgaben-Ansicht.",
+        "Beobachtungsliste: Gemini bereitet Stimmen-Regler vor (nur Teardown, nicht live). ChatGPT löst Canvas angeblich in Inline-Blöcke auf (nur Blog-Quellen, Belastbarkeit mittel) — im nächsten Radar erneut prüfen."
+      ]
+    }
+  ]
+}
