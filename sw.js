@@ -638,7 +638,13 @@
 // Kennungen aus einer festen Positivliste, rein lokal in localStorage, kein
 // fetch/sendBeacon, keine Zeitstempel je Klick. Auswertung als Knopf
 // "Icon-Nutzung" in der Status-Ansicht (per JS eingehaengt).
-const CACHE_NAME = "smejj-shell-v233";
+// v233 -> v234 (2026-08-06, Konkurrenz-Radar V5): Quellen-Panel.
+// quellen-panel.js NEU im SHELL (importiert von profile-dock.js). Sammelt die
+// Links aus den angezeigten Antworten, zeigt sie oben in der Datei-Ansicht
+// (dorthin fuehrt der Quellen-Knopf) und setzt einen Zaehler an den Knopf in
+// der rechten Panel-Leiste. Nichts wird gespeichert — die Liste wird bei jeder
+// Aenderung frisch aus dem angezeigten Chat gelesen.
+const CACHE_NAME = "smejj-shell-v234";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -666,6 +672,7 @@ const SHELL = [
   "/assets/onboarding-welcome.js",
   "/assets/usage-meter.js",
   "/assets/icon-nutzung.js",
+  "/assets/quellen-panel.js",
   "/assets/app-surfaces.css",
   "/assets/settings-surface.css",
   "/assets/account-privacy.css",

@@ -14,6 +14,9 @@ import "./auth-gate.js?v=1";
 // eingehaengt statt per <script> in index.html, weil die Startseite unter dem
 // Start-Lock steht — gleiches Muster wie auth-gate.js eine Zeile darueber.
 import "./icon-nutzung.js?v=1";
+// Quellen-Panel (Konkurrenz-Radar V5) — ebenfalls hier eingehaengt, damit
+// index.html unter dem Start-Lock bleibt.
+import "./quellen-panel.js?v=1";
 import { STORAGE_KEYS } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
 import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=1";
