@@ -85,3 +85,49 @@ export function createVoiceFocusTrap() {
     }
   };
 }
+
+// --- Anzeige des Overlays ----------------------------------------------------
+// Am 2026-08-08 aus composer-tools.js hierher gezogen (die Datei war auf 816
+// Zeilen gewachsen, Limit 800). Es sind reine Schreiber auf den Dialog: sie
+// lesen keinen Zustand und entscheiden nichts. Genau deshalb gehoeren sie in
+// diese Schicht — "WIE der Dialog aussieht" — und nicht in den
+// Zustandsautomaten. Verhalten unveraendert.
+
+/** Betriebsart (steuert die Animation per CSS) und die Zeile darunter. */
+export function setVoiceModeStatus(mode, text) {
+  const overlay = document.querySelector("#voiceModeOverlay");
+  const status = document.querySelector("#voiceModeStatus");
+  if (overlay) overlay.dataset.mode = mode;
+  if (status) status.textContent = text;
+}
+
+/** Was der Mensch gerade gesagt hat. */
+export function setVoiceModeTranscript(text) {
+  const transcript = document.querySelector("#voiceModeTranscript");
+  if (transcript) transcript.textContent = text;
+}
+
+// Live-Mitschrift der Antwort (Konkurrenz-Radar V2, 2026-08-06): Die Antwort
+// streamt sichtbar unter der Welle mit statt nur als "Ich spreche ...".
+// Bewusst NUR Text (textContent) — kein HTML aus dem Log uebernehmen.
+export function setVoiceModeReply(text) {
+  const reply = document.querySelector("#voiceModeReply");
+  if (!reply || reply.textContent === text) return;
+  reply.textContent = text;
+  reply.scrollTop = reply.scrollHeight;
+}
+
+/**
+ * Stummschaltung sichtbar machen. Der Zustand kommt als Parameter herein —
+ * diese Schicht haelt bewusst keinen eigenen.
+ */
+export function zeigeMikrofonZustand(stumm) {
+  const overlay = document.querySelector("#voiceModeOverlay");
+  const mic = document.querySelector("#voiceModeMic");
+  if (overlay) overlay.dataset.muted = String(stumm);
+  if (mic) {
+    mic.classList.toggle("is-muted", stumm);
+    mic.setAttribute("aria-pressed", String(stumm));
+    mic.title = stumm ? "Stummschaltung aufheben" : "Stummschalten";
+  }
+}

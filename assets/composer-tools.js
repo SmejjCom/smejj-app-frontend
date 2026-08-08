@@ -7,7 +7,10 @@ import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
 import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
 // Overlay-Gestalt und Fokusfuehrung — ausgelagert (800-Zeilen-Regel).
-import { upgradeVoiceOverlay, createVoiceFocusTrap } from "./voice-overlay-ui.js";
+import {
+  upgradeVoiceOverlay, createVoiceFocusTrap,
+  setVoiceModeStatus, setVoiceModeTranscript, setVoiceModeReply, zeigeMikrofonZustand
+} from "./voice-overlay-ui.js";
 // Browser-Sprachausgabe (Stimmwahl, Safari-resume, iOS-Unlock) — ausgelagert (800-Zeilen-Regel).
 import { createBrowserTts } from "./voice-browser-tts.js";
 // Stufe 3: Rueckfrage statt Blindantwort + Doppel-Sende-Schutz (wie ChatGPT,
@@ -158,28 +161,6 @@ const dictation = createDictation({
 
 // --- Sprachmodus (Gespraech wie ChatGPT Voice) -------------------------------
 
-function setVoiceModeStatus(mode, text) {
-      const overlay = $("#voiceModeOverlay");
-      const status = $("#voiceModeStatus");
-      if (overlay) overlay.dataset.mode = mode;
-      if (status) status.textContent = text;
-}
-
-function setVoiceModeTranscript(text) {
-      const transcript = $("#voiceModeTranscript");
-      if (transcript) transcript.textContent = text;
-}
-
-// Live-Mitschrift der Antwort (Konkurrenz-Radar V2, 2026-08-06): Die Antwort
-// streamt sichtbar unter der Welle mit statt nur als "Ich spreche ...".
-// Bewusst NUR Text (textContent) — kein HTML aus dem Log uebernehmen.
-function setVoiceModeReply(text) {
-      const reply = $("#voiceModeReply");
-      if (!reply || reply.textContent === text) return;
-      reply.textContent = text;
-      reply.scrollTop = reply.scrollHeight;
-}
-
 function clearVoiceTimers() {
       clearTimeout(state.voiceSettleTimer);
       clearTimeout(state.voiceTimeoutTimer);
@@ -187,16 +168,8 @@ function clearVoiceTimers() {
       state.voiceObserver = null;
 }
 
-function syncVoiceMicVisual() {
-      const overlay = $("#voiceModeOverlay");
-      const mic = $("#voiceModeMic");
-      if (overlay) overlay.dataset.muted = String(state.voiceMuted);
-      if (mic) {
-              mic.classList.toggle("is-muted", state.voiceMuted);
-              mic.setAttribute("aria-pressed", String(state.voiceMuted));
-              mic.title = state.voiceMuted ? "Stummschaltung aufheben" : "Stummschalten";
-      }
-}
+// Der Zustand bleibt HIER, die Darstellung steht im Overlay-Modul.
+const syncVoiceMicVisual = () => zeigeMikrofonZustand(state.voiceMuted);
 
 // Fokusfuehrung ausgelagert nach voice-overlay-ui.js (800-Zeilen-Regel).
 const voiceFocus = createVoiceFocusTrap();
