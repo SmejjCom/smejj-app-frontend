@@ -627,7 +627,7 @@
 // (#voiceModeReply in index.html, setVoiceModeReply in composer-tools.js,
 // Optik in start-styles.css). app.js zieht die composer-tools-Import-Query
 // auf ?v=voice-mitschrift-20260806 mit, damit auch der HTTP-Cache springt.
-const CACHE_NAME = "smejj-shell-v230";
+const CACHE_NAME = "smejj-shell-v231";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
