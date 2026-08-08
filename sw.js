@@ -627,7 +627,12 @@
 // (#voiceModeReply in index.html, setVoiceModeReply in composer-tools.js,
 // Optik in start-styles.css). app.js zieht die composer-tools-Import-Query
 // auf ?v=voice-mitschrift-20260806 mit, damit auch der HTTP-Cache springt.
-const CACHE_NAME = "smejj-shell-v231";
+// v231 -> v232 (2026-08-06, Konkurrenz-Radar V4 Stufe 2): Die Suche findet
+// jetzt auch PROJEKT-DATEIEN. Vorher durchsuchte search.js nur state.uploads
+// (die fluechtigen Uploads der laufenden Sitzung) — die Dateien in den
+// Projekt-Manifesten waren unauffindbar. Neue Gruppe "Projekt-Dateien" mit
+// 20-s-Cache, weil findResults() bei jedem Tastendruck laeuft.
+const CACHE_NAME = "smejj-shell-v232";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
