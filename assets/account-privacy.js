@@ -287,6 +287,10 @@ function exportLocalData(view) {
   data.data[PERSONAL_KEY] = read(PERSONAL_KEY);
   data.data[NOTIFY_KEY] = read(NOTIFY_KEY);
   data.data["smejj.usage.v1"] = read("smejj.usage.v1");
+  // Anonyme Icon-Nutzungszaehlung (Konkurrenz-Radar Ausbaustufe 5): gehoert in
+  // die Auskunft, auch wenn sie keine Personenbezuege enthaelt — was auf dem
+  // Geraet liegt, muss der Export zeigen.
+  data.data["smejj.iconNutzung.v1"] = read("smejj.iconNutzung.v1");
   const blob = new Blob([`${JSON.stringify(data, null, 2)}\n`], { type: "application/json" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob); link.download = "smejj.com-local-data-export.json"; link.click();

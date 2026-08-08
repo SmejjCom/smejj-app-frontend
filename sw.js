@@ -632,7 +632,13 @@
 // (die fluechtigen Uploads der laufenden Sitzung) — die Dateien in den
 // Projekt-Manifesten waren unauffindbar. Neue Gruppe "Projekt-Dateien" mit
 // 20-s-Cache, weil findResults() bei jedem Tastendruck laeuft.
-const CACHE_NAME = "smejj-shell-v232";
+// v232 -> v233 (2026-08-06, Konkurrenz-Radar Ausbaustufe 5): anonyme
+// Icon-Nutzungsmessung. icon-nutzung.js NEU im SHELL (importiert von
+// profile-dock.js, damit index.html unter dem Start-Lock bleibt). Zaehlt nur
+// Kennungen aus einer festen Positivliste, rein lokal in localStorage, kein
+// fetch/sendBeacon, keine Zeitstempel je Klick. Auswertung als Knopf
+// "Icon-Nutzung" in der Status-Ansicht (per JS eingehaengt).
+const CACHE_NAME = "smejj-shell-v233";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -659,6 +665,7 @@ const SHELL = [
   "/assets/language-options.js",
   "/assets/onboarding-welcome.js",
   "/assets/usage-meter.js",
+  "/assets/icon-nutzung.js",
   "/assets/app-surfaces.css",
   "/assets/settings-surface.css",
   "/assets/account-privacy.css",
