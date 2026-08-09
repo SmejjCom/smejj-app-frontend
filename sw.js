@@ -644,7 +644,15 @@
 // (dorthin fuehrt der Quellen-Knopf) und setzt einen Zaehler an den Knopf in
 // der rechten Panel-Leiste. Nichts wird gespeichert — die Liste wird bei jeder
 // Aenderung frisch aus dem angezeigten Chat gelesen.
-const CACHE_NAME = "smejj-shell-v234";
+// v234 -> v235 (2026-08-09, Konkurrenz-Radar V3 Stufe 2): Modellwahl-
+// Chip zeigt "Schnell/Auto/Gruendlich" statt Modellnamen. Modellnamen (GLM-5.2,
+// Kimi K2.7, Cline, Kimi K3) bleiben unter "Modelle (erweitert)" im selben Menue
+// erreichbar (BYOK/Vault-Betrieb unveraendert). Die Stufe geht als
+// preferences.stufe an die Bruecke (v125, bereits live seit 2026-08-08).
+// Freigabe Betreiber 2026-08-06/2026-08-08: vorher/nachher npm run eval:models
+// gefahren (3 Laeufe, Score 99-100%%, identisches Modell-Routing je Fall — der
+// eine "Regression"-Ausschlag war Kimi-Latenzrauschen, kein Code-Effekt).
+const CACHE_NAME = "smejj-shell-v235";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

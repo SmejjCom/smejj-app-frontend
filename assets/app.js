@@ -41,6 +41,21 @@ const state = {
 const workspace = createLocalWorkspace();
 const aiRouter = createAiRouter();
 let taskIndicatorTimer;
+// Antwortstufen (Konkurrenz-Radar V3, Freigabe Betreiber 2026-08-06,
+// Container-Neustart 2026-08-08): der Chip zeigt normalen Nutzern nur noch
+// "Schnell/Auto/Gruendlich" statt Modellnamen. Modellnamen (GLM-5.2, Kimi K2.7,
+// Cline, Kimi K3) bleiben als "Modelle (erweitert)" im selben Menue erreichbar —
+// wer sie waehlt, verlaesst bewusst den Live-Pfad fuer BYOK/Vault-Betrieb; die
+// Stufe gilt nur auf dem normalen Live-Pfad ("smejj 1.0"/disabled) und wird an
+// die Bruecke als preferences.stufe gereicht (siehe public/chat-bridge.js,
+// leseStufe). Ein unbekannter Wert und fehlende Angabe verhalten sich dort
+// identisch zum bisherigen Zustand (Fail-Safe der Bruecke).
+const STUFE_KEY = "smejj.stufe.v1";
+const STUFE_LABEL = Object.freeze({ schnell: "Schnell", auto: "Auto", gruendlich: "Gründlich" });
+function normalizeStufe(value) {
+  return Object.hasOwn(STUFE_LABEL, value) ? value : "auto";
+}
+
 const MODEL_MODES = Object.freeze({
   // Nur echte Modelle im Picker; Verbindungsarten (local browser, BYOK)
   // werden unter Einstellungen -> KI-Provider (/ai) verwaltet.
@@ -150,6 +165,7 @@ function bindModelPicker() {
   const button = $("#modelPickerButton");
   const menu = $("#modelPickerMenu");
   if (!button || !menu) return;
+  state.settings = { ...state.settings, stufe: normalizeStufe(localStorage.getItem(STUFE_KEY) || state.settings.stufe) };
   applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) || state.settings.model || "smejj 1.0", { persist: false, quiet: true }); window.addEventListener("smejj:model-selected", (event) => applySelectedModel(event.detail?.model));
   button.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -159,13 +175,14 @@ function bindModelPicker() {
     button.setAttribute("aria-expanded", String(open));
   });
   const selectItem = (item) => {
-    applySelectedModel(item.dataset.model);
+    if (Object.hasOwn(item.dataset, "stufe")) applySelectedStufe(item.dataset.stufe);
+    else applySelectedModel(item.dataset.model);
     menu.hidden = true;
     button.setAttribute("aria-expanded", "false");
     showTaskIndicator("done");
   };
   const selectFromEvent = (event) => {
-    const item = event.target.closest("[data-model]");
+    const item = event.target.closest("[data-model], [data-stufe]");
     if (!item || item.hasAttribute("data-submenu-trigger")) return; // Untermenue (cline-model-menu.js) uebernimmt Trigger.
     event.stopPropagation();
     event.preventDefault();
@@ -173,7 +190,7 @@ function bindModelPicker() {
   };
   menu.addEventListener("pointerdown", selectFromEvent, true);
   menu.addEventListener("click", selectFromEvent, true);
-  for (const item of menu.querySelectorAll("[data-model]:not([data-submenu-trigger])")) {
+  for (const item of menu.querySelectorAll("[data-model]:not([data-submenu-trigger]), [data-stufe]")) {
     const handleItemSelect = (event) => {
       event.stopPropagation();
       event.preventDefault();
@@ -183,7 +200,7 @@ function bindModelPicker() {
     item.addEventListener("click", handleItemSelect);
   }
   menu.addEventListener("click", (event) => {
-    const item = event.target.closest("[data-model]");
+    const item = event.target.closest("[data-model], [data-stufe]");
     if (!item || item.hasAttribute("data-submenu-trigger")) return;
     selectItem(item);
   });
@@ -198,7 +215,7 @@ function applySelectedModel(model, { persist = true, quiet = false } = {}) {
   const selectedModel = Object.hasOwn(MODEL_MODES, model) ? model : "smejj 1.0";
   const mode = MODEL_MODES[selectedModel] || AI_MODES.disabled;
   const button = $("#modelPickerButton");
-  if (button) button.textContent = selectedModel;
+  if (button) button.textContent = selectedModel === "smejj 1.0" ? STUFE_LABEL[normalizeStufe(state.settings.stufe)] : selectedModel;
   state.settings = { ...state.settings, model: selectedModel };
   if (persist) localStorage.setItem(STORAGE_KEYS.model, selectedModel);
   const aiModeSelect = $("#aiModeSelect");
@@ -209,6 +226,17 @@ function applySelectedModel(model, { persist = true, quiet = false } = {}) {
     costStatus: mode === AI_MODES.disabled ? "0 EUR Risiko / blockiert" : "0 EUR Risiko / lokal"
   });
   void quiet; // Auswahl-Meldungen bewusst entfernt (Nutzer-Anweisung 2026-07-03).
+}
+
+// Eine Stufe waehlen heisst: zurueck auf den normalen Live-Pfad
+// ("smejj 1.0"/disabled) UND die Stufe merken. Ein zuvor gewaehltes
+// BYOK-/Vault-Modell (GLM-5.2 etc.) wird dabei bewusst verlassen — genau das
+// ist der Zweck des Chips fuer normale Nutzer.
+function applySelectedStufe(stufe) {
+  const selected = normalizeStufe(stufe);
+  state.settings = { ...state.settings, stufe: selected };
+  localStorage.setItem(STUFE_KEY, selected);
+  applySelectedModel("smejj 1.0");
 }
 
 function hydrateComponents() {
@@ -303,7 +331,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
       const anfrage = {
         task: await groundTask(task),
         model: modelForTask(task, state.settings.model) || "smejj 1.0",
-        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}) },
+        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { stufe: normalizeStufe(state.settings.stufe), ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}) },
         history: buildRequestHistory(task)
       };
       // Die Reserve laeuft ueber /api/chat: ihr Stand kennt `history` in
