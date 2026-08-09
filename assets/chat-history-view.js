@@ -138,13 +138,18 @@ function injectStyles() {
       border: 1px solid rgba(255,255,255,.16); border-radius: 9px; padding: 7px 13px; cursor: pointer;
       min-height: 0; }
 
-    .chat-history-empty { opacity: .75; padding: 26px 2px; }
+    .chat-history-empty { opacity: .75; padding: 26px 2px 14px; }
+    .ch-leer-aktion { padding: 0 2px 8px; }
 
     @media (max-width: 600px) {
       /* Auch hier gilt: gegen ".premium-view button" gewinnt nur ein Selektor
          mit #chatHistory. Ohne das blieb der Knopf live 249 px breit. */
       #chatHistory .ch-neu { font-size: 0; padding: 12px 15px; }
       #chatHistory .ch-neu::after { content: "＋ Neu"; font-size: 14px; }
+      /* Im leeren Verlauf steht der Knopf allein — dort ist Platz fuer die
+         volle Beschriftung, und sie ist dort auch noetiger. */
+      #chatHistory .ch-leer-aktion .ch-neu { font-size: 14px; padding: 12px 17px; }
+      #chatHistory .ch-leer-aktion .ch-neu::after { content: none; }
       /* Die Chip-Leiste laeuft auf dem Handy in EINE wischbare Zeile. Der
          weiche Rand rechts ist der einzige Hinweis darauf, dass dort noch
          etwas kommt — ohne ihn sieht die Leiste am Rand einfach zu Ende aus. */
@@ -455,7 +460,17 @@ function zeichne(target) {
   if (!ziel) return;
 
   if (!alleChats.length) {
-    ziel.replaceChildren(bausteinLeer("Noch keine gespeicherten Unterhaltungen. Neue Chats werden hier automatisch abgelegt."));
+    // Beim Loeschen-Test auf dem Handy aufgefallen: Wer seinen letzten Chat
+    // loescht, sass hier in einer Sackgasse — mit den Karten verschwand auch
+    // der Kopf, also der einzige Knopf, der von dieser Ansicht aus weiterfuehrt.
+    // Ein Suchfeld waere bei null Chats sinnlos, der Knopf ist es nicht.
+    const leer = document.createDocumentFragment();
+    leer.append(bausteinLeer("Noch keine gespeicherten Unterhaltungen. Neue Chats werden hier automatisch abgelegt."));
+    const platz = document.createElement("div");
+    platz.className = "ch-leer-aktion";
+    platz.append(bausteinNeuKnopf());
+    leer.append(platz);
+    ziel.replaceChildren(leer);
     return;
   }
 
@@ -566,15 +581,20 @@ function bausteinKopf(gefunden, gesamt) {
   });
   feld.append(eingabe);
 
+  kopf.append(feld, bausteinNeuKnopf());
+  return kopf;
+}
+
+// Eigener Baustein, weil der Knopf an ZWEI Stellen steht: neben dem Suchfeld
+// und allein im leeren Verlauf (dort ist er der einzige Weg nach vorn).
+function bausteinNeuKnopf() {
   const neuKnopf = document.createElement("button");
   neuKnopf.type = "button";
   neuKnopf.className = "ch-neu";
   neuKnopf.textContent = "＋ Neuer Chat";
   neuKnopf.title = "Neue Unterhaltung beginnen";
   neuKnopf.addEventListener("click", () => { try { newChat(); } catch { /* fail-safe */ } });
-
-  kopf.append(feld, neuKnopf);
-  return kopf;
+  return neuKnopf;
 }
 
 function bausteinChips(aufbereitet) {
