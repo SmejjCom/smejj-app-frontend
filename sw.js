@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v248); v236 bis
-// v247 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v249); v236 bis
+// v248 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -92,7 +92,14 @@
 // "Abbrechen"-Knopf lag dadurch komplett ausserhalb der Karte (rechte Kante
 // 463 px) und war nicht erreichbar. Jetzt eigene Zeile fuers Feld, die
 // Knoepfe teilen sich die naechste, alle drei mindestens 44 px hoch.
-const CACHE_NAME = "smejj-shell-v247";
+//
+// v247 -> v248 (2026-08-09): Die Knopf-Regeln des Verlaufs kamen live gar
+// nicht an. app-surfaces.css bringt `.premium-view button` mit — Spezifitaet
+// (0,2,0); eine blosse Klasse wie `.ch-neu` (0,1,0) verliert dagegen. Live
+// gemessen: "Neuer Chat" war 249 px breit statt 74 (die Handy-Kurzform kam
+// nie an), das Suchfeld daneben schrumpfte auf 58 px, die Chips waren eckig
+// statt rund. Alle Knopf-Regeln haengen jetzt an #chatHistory.
+const CACHE_NAME = "smejj-shell-v248";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

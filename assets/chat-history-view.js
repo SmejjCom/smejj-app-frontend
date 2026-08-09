@@ -66,18 +66,29 @@ function injectStyles() {
       border-radius: 12px; padding: 12px 14px 12px 42px; outline: none; transition: .16s; }
     .ch-suche input:focus { border-color: rgba(120,220,232,.5); background: rgba(255,255,255,.075);
       box-shadow: 0 0 0 4px rgba(120,220,232,.09); }
-    .ch-neu { font: inherit; font-size: 14px; font-weight: 600; color: #06181c;
+    /* ALLE Knopf-Regeln haengen an #chatHistory. Grund, live gemessen
+       (2026-08-09): app-surfaces.css bringt ".premium-view button" mit —
+       Spezifitaet (0,2,0). Eine blosse Klasse wie ".ch-neu" (0,1,0) verliert
+       dagegen, egal in welcher Reihenfolge die Stylesheets stehen. Live war
+       der Knopf dadurch 249 px breit statt 74 (die Handy-Regel "font-size: 0"
+       kam nie an), das Suchfeld daneben schrumpfte auf 58 px, und die Chips
+       waren eckig statt rund. Auf einer Teststrecke ohne die Stylesheets der
+       App faellt das NICHT auf — dort greift jede Regel.
+       (Keine Backticks in diesem Block: er steht selbst in einem
+       Template-Literal, ein Backtick wuerde es beenden.) */
+    #chatHistory .ch-neu { font: inherit; font-size: 14px; font-weight: 600; color: #06181c;
       background: #78dce8; border: 0; border-radius: 12px; padding: 12px 17px; cursor: pointer; white-space: nowrap; }
-    .ch-neu:hover { filter: brightness(1.08); }
+    #chatHistory .ch-neu:hover { filter: brightness(1.08); }
 
     .ch-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
-    .ch-chip { font: inherit; font-size: 13px; color: inherit; opacity: .72;
+    #chatHistory .ch-chip { font: inherit; font-size: 13px; color: inherit; opacity: .72;
       background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.10);
-      border-radius: 999px; padding: 6px 13px; cursor: pointer; transition: .14s; }
-    .ch-chip:hover { background: rgba(255,255,255,.09); opacity: 1; }
-    .ch-chip[aria-pressed="true"] { background: rgba(120,220,232,.16);
+      border-radius: 999px; padding: 6px 13px; cursor: pointer; transition: .14s;
+      min-height: 0; }
+    #chatHistory .ch-chip:hover { background: rgba(255,255,255,.09); opacity: 1; }
+    #chatHistory .ch-chip[aria-pressed="true"] { background: rgba(120,220,232,.16);
       border-color: rgba(120,220,232,.45); color: #78dce8; opacity: 1; }
-    .ch-chip .ch-n { opacity: .55; margin-left: 5px; font-variant-numeric: tabular-nums; }
+    #chatHistory .ch-chip .ch-n { opacity: .55; margin-left: 5px; font-variant-numeric: tabular-nums; }
 
     .ch-gruppe { font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
       opacity: .42; margin: 24px 0 9px; display: flex; align-items: center; gap: 10px; }
@@ -98,33 +109,36 @@ function injectStyles() {
     .ch-pin { color: #78dce8; margin-right: 6px; }
     .ch-karte mark { background: rgba(120,220,232,.28); color: inherit; border-radius: 3px; padding: 0 2px; }
 
-    .ch-mehr { position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
-      width: 32px; height: 32px; border-radius: 9px; border: 0; background: none; color: inherit;
-      opacity: 0; font-size: 18px; line-height: 1; cursor: pointer; transition: .14s; }
-    .ch-karte:hover .ch-mehr, .ch-mehr:focus-visible { opacity: .55; }
-    .ch-mehr:hover { background: rgba(255,255,255,.10); opacity: 1 !important; }
+    #chatHistory .ch-mehr { position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
+      width: 32px; height: 32px; min-height: 0; border-radius: 9px; border: 0; background: none; color: inherit;
+      opacity: 0; font-size: 18px; line-height: 1; cursor: pointer; transition: .14s; padding: 0; }
+    #chatHistory .ch-karte:hover .ch-mehr, #chatHistory .ch-mehr:focus-visible { opacity: .55; }
+    #chatHistory .ch-mehr:hover { background: rgba(255,255,255,.10); opacity: 1 !important; }
 
     .ch-menu { position: absolute; right: 9px; top: calc(50% + 20px); z-index: 40; min-width: 196px;
       background: #161d1f; border: 1px solid rgba(255,255,255,.16); border-radius: 12px; padding: 5px;
       box-shadow: 0 18px 48px rgba(0,0,0,.6); }
-    .ch-menu button { display: block; width: 100%; font: inherit; font-size: 14px; color: inherit;
+    #chatHistory .ch-menu button { display: block; width: 100%; font: inherit; font-size: 14px; color: inherit;
       background: none; border: 0; padding: 9px 11px; border-radius: 8px; cursor: pointer; text-align: left; }
-    .ch-menu button:hover { background: rgba(255,255,255,.09); }
-    .ch-menu button.is-danger { color: #ff8a8a; }
-    .ch-menu button.is-danger:hover { background: rgba(255,120,120,.13); }
+    #chatHistory .ch-menu button:hover { background: rgba(255,255,255,.09); }
+    #chatHistory .ch-menu button.is-danger { color: #ff8a8a; }
+    #chatHistory .ch-menu button.is-danger:hover { background: rgba(255,120,120,.13); }
     .ch-menu hr { border: 0; border-top: 1px solid rgba(255,255,255,.10); margin: 5px 3px; }
 
     .ch-umbenennen { display: flex; gap: 8px; margin-top: 10px; }
     .ch-umbenennen input { flex: 1; font: inherit; color: inherit; background: rgba(0,0,0,.35);
       border: 1px solid rgba(255,255,255,.25); border-radius: 9px; padding: 7px 11px; }
-    .ch-umbenennen button { font: inherit; color: inherit; background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.16); border-radius: 9px; padding: 7px 13px; cursor: pointer; }
+    #chatHistory .ch-umbenennen button { font: inherit; color: inherit; background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.16); border-radius: 9px; padding: 7px 13px; cursor: pointer;
+      min-height: 0; }
 
     .chat-history-empty { opacity: .75; padding: 26px 2px; }
 
     @media (max-width: 600px) {
-      .ch-neu { font-size: 0; padding: 12px 15px; }
-      .ch-neu::after { content: "＋ Neu"; font-size: 14px; }
+      /* Auch hier gilt: gegen ".premium-view button" gewinnt nur ein Selektor
+         mit #chatHistory. Ohne das blieb der Knopf live 249 px breit. */
+      #chatHistory .ch-neu { font-size: 0; padding: 12px 15px; }
+      #chatHistory .ch-neu::after { content: "＋ Neu"; font-size: 14px; }
       /* Die Chip-Leiste laeuft auf dem Handy in EINE wischbare Zeile. Der
          weiche Rand rechts ist der einzige Hinweis darauf, dass dort noch
          etwas kommt — ohne ihn sieht die Leiste am Rand einfach zu Ende aus. */
@@ -132,17 +146,17 @@ function injectStyles() {
         mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
         -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
       .ch-chips::-webkit-scrollbar { display: none; }
-      .ch-chip { flex: 0 0 auto; }
+      #chatHistory .ch-chip { flex: 0 0 auto; }
       .ch-titel { -webkit-line-clamp: 2; }
       .ch-meta { white-space: nowrap; overflow: hidden; }
       /* 32 px sind fuer einen Finger zu wenig — Apple und Google nennen 44 px
          als Untergrenze. Die Karte waechst dadurch nicht: der Knopf ragt in
          den Innenabstand, den padding-right ohnehin freihaelt. */
       .ch-karte { padding-right: 52px; }
-      .ch-mehr { opacity: .55; width: 44px; height: 44px; right: 4px; font-size: 20px; }
+      #chatHistory .ch-mehr { opacity: .55; width: 44px; height: 44px; right: 4px; font-size: 20px; }
       /* Dieselbe 44-px-Untergrenze gilt fuer die Eintraege im Menue — dort
          liegt "Loeschen" direkt unter "Umbenennen", da zaehlt jeder Pixel. */
-      .ch-menu button { min-height: 44px; padding: 11px 13px; }
+      #chatHistory .ch-menu button { min-height: 44px; padding: 11px 13px; }
       /* Umbenennen stand auf dem Handy in EINER Zeile: Eingabefeld, Speichern
          und Abbrechen brauchen zusammen 426 px, die Karte bietet 265 px. Der
          "Abbrechen"-Knopf lag dadurch bei 375 px Fensterbreite komplett
@@ -151,7 +165,7 @@ function injectStyles() {
          Knoepfe teilen sich die naechste. */
       .ch-umbenennen { flex-wrap: wrap; }
       .ch-umbenennen input { flex: 1 1 100%; min-height: 44px; }
-      .ch-umbenennen button { flex: 1 1 0; min-height: 44px; }
+      #chatHistory .ch-umbenennen button { flex: 1 1 0; min-height: 44px; }
     }
   `;
   document.head.append(style);
