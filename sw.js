@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v250); v236 bis
-// v249 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v251); v236 bis
+// v250 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -105,7 +105,13 @@
 // fuellte jeder Knopf die volle Zeile: "Neuer Chat" 249 px breit, Suchfeld auf
 // 58 px gequetscht, jeder Themen-Chip ein eigener Balken untereinander. Die
 // Knopf-Regeln setzen jetzt ausdruecklich width: auto.
-const CACHE_NAME = "smejj-shell-v249";
+//
+// v249 -> v250 (2026-08-09): Das "⋯"-Menue verschwand wieder, wenn man einen
+// Chat geoeffnet hatte und in den Verlauf zurueckkam. Es haengt IN der Karte
+// und ueberlebt kein replaceChildren; ein verzoegertes Neuzeichnen lief
+// hinein. Behandelt wird die Wirkung, nicht das Rennen: solange ein Menue
+// offen ist, wird nicht gezeichnet — das Zeichnen wird nachgeholt.
+const CACHE_NAME = "smejj-shell-v250";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

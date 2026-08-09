@@ -436,8 +436,21 @@ async function render() {
   zeichne(target);
 }
 
+// Ein offenes Menue haengt IN der Karte und ueberlebt kein replaceChildren.
+// Live auf dem Handy gemessen (2026-08-09): nach dem Oeffnen eines Chats und
+// der Rueckkehr in den Verlauf verschwand das gerade angetippte "⋯"-Menue nach
+// gut 100 ms wieder — ein verzoegertes Neuzeichnen lief hinein. Welcher der
+// mehreren verzoegerten Ausloeser genau traf, ist ein Rennen und wechselt;
+// darum wird hier nicht die Quelle behandelt, sondern die Wirkung: Solange ein
+// Menue offen ist, wird nicht gezeichnet. Das Neuzeichnen wird vorgemerkt und
+// nachgeholt, sobald das Menue zu ist.
+let zeichnenAusstehend = false;
+
 function zeichne(target) {
-  menuSchliessen();
+  if (offenesMenu) {
+    zeichnenAusstehend = true;
+    return;
+  }
   const ziel = target || host();
   if (!ziel) return;
 
@@ -681,6 +694,12 @@ function menuSchliessen() {
   }
   clearTimeout(confirmTimer);
   confirmingId = "";
+  // Waehrend das Menue offen war, wurde ein Neuzeichnen zurueckgestellt
+  // (siehe zeichne). Jetzt ist der Weg frei.
+  if (zeichnenAusstehend) {
+    zeichnenAusstehend = false;
+    zeichne();
+  }
 }
 
 function oeffneMenu(karte, chat) {
