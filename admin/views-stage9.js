@@ -134,7 +134,7 @@
       + V.kachelBlock("Grün", String(d.gruen || 0), "läuft nachweislich", (d.gruen || 0) > 0 ? "up" : "")
       + V.kachelBlock("Gelb", String(d.gelb || 0), "verspätet, Schonfrist läuft")
       + V.kachelBlock("Rot", String(d.rot || 0), (d.rot || 0) > 0 ? "sofort ansehen" : "keiner", (d.rot || 0) > 0 ? "dn" : "up")
-      + V.kachelBlock("Keine Messung", String(d.grau || 0), "Herzschlag noch nicht angeschlossen")
+      + V.kachelBlock("Keine Messung", String(d.grau || 0), "hat noch nie gemeldet")
       + ((d.wartung || 0) > 0
         ? V.kachelBlock("Wartung", String(d.wartung), "stummgeschaltet, kein Alarm")
         : "")
