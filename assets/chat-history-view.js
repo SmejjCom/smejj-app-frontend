@@ -58,6 +58,17 @@ function injectStyles() {
   const style = document.createElement("style");
   style.id = STYLE_ID;
   style.textContent = `
+    /* Der Container der Ansicht liegt in einem GRID. Grid-Items haben
+       min-width: auto und wachsen mit ihrem breitesten Kind — die Chip-Leiste
+       steht auf nowrap und war live 372 px breit. Damit zog sie den ganzen
+       Container auf 406 px, obwohl das Fenster 375 px hat: Karten, Kopf und
+       Ueberschrift ragten nach rechts hinaus, und die Leiste wischte NICHT,
+       weil sie nie zu eng wurde. Mit min-width: 0 darf der Container wieder
+       schrumpfen — dann greift overflow-x, und alles passt.
+       Auf einer Teststrecke ohne die App faellt das nicht auf: dort ist der
+       Container ein normaler Block und begrenzt sich von selbst. */
+    #chatHistory .output { min-width: 0; }
+
     .ch-kopf { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
     .ch-suche { flex: 1; position: relative; display: flex; align-items: center; }
     .ch-suche svg { position: absolute; left: 14px; opacity: .42; pointer-events: none; }

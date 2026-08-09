@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v252); v236 bis
-// v251 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v253); v236 bis
+// v252 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -117,7 +117,14 @@
 // damit der "Neuer Chat"-Knopf, der einzige Weg von dieser Ansicht nach vorn.
 // Der Knopf steht jetzt auch im leeren Verlauf (ohne Suchfeld, das dort
 // sinnlos waere), auf dem Handy mit voller Beschriftung.
-const CACHE_NAME = "smejj-shell-v251";
+//
+// v251 -> v252 (2026-08-09): Die wischbare Chip-Leiste wischte live NIE — sie
+// zog stattdessen die ganze Ansicht ueber den Bildschirmrand. Der Container
+// der Ansicht liegt in einem GRID, und Grid-Items haben min-width: auto: die
+// Leiste steht auf nowrap, war 372 px breit und dehnte den Container auf
+// 406 px bei 375 px Fenster. Karten, Kopf und Ueberschrift ragten hinaus.
+// Mit min-width: 0 darf der Container schrumpfen, dann greift overflow-x.
+const CACHE_NAME = "smejj-shell-v252";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
