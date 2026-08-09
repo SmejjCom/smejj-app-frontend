@@ -27,6 +27,11 @@
 // Versionierter Pfad wie in index.html (QA-Welle 1, Befund F-07): Ein abweichender
 // Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js mit eigenem Zustand.
 import { listChats, openChat, renameChat, deleteChat, activeChatId, togglePinChat, newChat } from "/assets/chat-store.js?v=pin-20260806";
+// Holt fuer Chats ohne eigenen Titel einen aus der Bruecke. Von HIER importiert
+// und nicht aus index.html, damit die Startseite unter dem Start-Lock bleibt
+// (gleiches Muster wie icon-nutzung.js in profile-dock.js). Das Modul meldet
+// seine Ergebnisse ueber "smejj:chats-changed" — die Ansicht zeichnet dann neu.
+import "/assets/chat-title-auto.js";
 
 const STYLE_ID = "chatHistoryStyles";
 const MAX_TITEL = 62;
@@ -205,7 +210,9 @@ function ersterSatz(text) {
 
 function anzeigeTitel(chat) {
   // Von Hand vergebene Titel bleiben unberuehrt — das ist eine Nutzerentscheidung.
-  if (chat.titleEdited === true) return String(chat.title || "Unterhaltung");
+  // Ebenso die von der Bruecke erzeugten (chat-title-auto.js): sie sind bereits
+  // kurz und auf den Punkt, jede weitere Regel wuerde sie nur verschlimmbessern.
+  if (chat.titleEdited === true || chat.titleAuto === true) return String(chat.title || "Unterhaltung");
 
   const roh = ersteFrage(chat) || String(chat.title || "");
   const sauber = ohneBallast(roh);

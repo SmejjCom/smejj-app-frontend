@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v242); v236 bis
-// v241 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v243); v236 bis
+// v242 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -55,7 +55,13 @@
 // Wort ab, der Such-Platzhalter wurde abgeschnitten, "⋯" und die Menue-
 // Eintraege lagen mit 32 bzw. 35 px unter der 44-px-Untergrenze fuer Touch,
 // und die wischbare Chip-Leiste sah am Rand aus, als waere sie zu Ende.
-const CACHE_NAME = "smejj-shell-v241";
+//
+// v241 -> v242 (2026-08-09): Auto-Titel aus der Bruecke. chat-title-auto.js NEU
+// im SHELL (importiert von chat-history-view.js, damit index.html unter dem
+// Start-Lock bleibt). Holt fuer Chats ohne eigenen Titel einen kurzen aus
+// /api/chat — seriell, nur bei offener Verlauf-Ansicht, hoechstens acht je
+// Runde: die Bruecke teilt ihr Kontingent mit dem echten Chat.
+const CACHE_NAME = "smejj-shell-v242";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -141,6 +147,7 @@ const SHELL = [
   "/assets/composer-dictation.js",
   "/assets/chat-store.js",
   "/assets/chat-history-view.js",
+  "/assets/chat-title-auto.js",
   "/assets/chat-messages.js",
   "/assets/chat-actions.js",
   "/assets/chat-actions-menu.js",

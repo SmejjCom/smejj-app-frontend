@@ -231,6 +231,34 @@ export function getChat(id) {
   })).catch(() => null);
 }
 
+/**
+ * Titel setzen, den die Bruecke erzeugt hat (chat-title-auto.js).
+ *
+ * Bewusst NICHT renameChat: das setzt `titleEdited` und wuerde damit behaupten,
+ * der Nutzer haette den Titel selbst vergeben — danach wuerde ihn nie wieder
+ * etwas anfassen. Hier wird stattdessen `titleAuto` gesetzt; ein von Hand
+ * vergebener Titel (`titleEdited`) bleibt immer unangetastet und gewinnt.
+ *
+ * `updatedAt` bleibt wie beim Anpinnen unveraendert: eine Umbenennung ist keine
+ * inhaltliche Aenderung, und ein frisches Datum wuerde den Chat faelschlich
+ * nach oben sortieren.
+ *
+ * @param {string} id
+ * @param {string} title
+ * @returns {Promise<boolean>} false, wenn der Chat fehlt oder von Hand benannt ist
+ */
+export async function setAutoTitle(id, title) {
+  const chat = await getChat(id);
+  if (!chat || chat.titleEdited === true) return false;
+  const sauber = String(title || "").replace(/\s+/g, " ").trim().slice(0, MAX_TITLE);
+  if (!sauber) return false;
+  chat.title = sauber;
+  chat.titleAuto = true;
+  await tx("readwrite", (store) => store.put(chat));
+  notifyChanged();
+  return true;
+}
+
 export async function renameChat(id, title) {
   const chat = await getChat(id);
   if (!chat) return false;
