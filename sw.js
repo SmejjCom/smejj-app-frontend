@@ -22,14 +22,34 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v238); v236 und
-// v237 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v241); v236 bis
+// v240 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
 // Eigene Nummer statt v236, damit ein spaeterer Deploy des Modellwahl-Chips
 // nicht faelschlich als schon ausgeliefert gilt.
-const CACHE_NAME = "smejj-shell-v237";
+//
+// v237 -> v238 (2026-08-09): in sechs Ansichten stand die Ueberschrift zweimal
+// untereinander — `<p class="eyebrow">Verlauf</p>` ueber `<h2>Verlauf</h2>`
+// (auch Suche, Websites, Coding, Automatisierung, Nutzer). Das Eyebrow ist als
+// KATEGORIE ueber einem abweichenden Titel gedacht ("Browser" / "Lokaler
+// Browser"); wo beide gleich lauteten, war es reine Dopplung. Nur diese sechs
+// Zeilen sind entfernt, die zwoelf sinnvollen Paare bleiben. index.html liegt
+// cache-first im Precache — daher der Versionssprung.
+//
+// v238 -> v239 (2026-08-09): Themen-Zuordnung im Verlauf berichtigt (Meldung
+// des Betreibers: "Bank-Chat gehoert zu Finanzen"). Ein Anhang ist ein
+// TRANSPORTWEG, kein Thema — "Bilder" stand an erster Stelle und ueberstimmte
+// den Inhalt. Ausserdem neu getrennt: Website-Pruefungen ("geh browser X teste
+// ob…") sind jetzt "Websites", "Tests" bleibt den Modell-Prueflaeufen.
+//
+// v239 -> v240 (2026-08-09): drei weitere Themen-Grenzfaelle, vom Betreiber
+// zur Entscheidung freigegeben. Neu: "Wissen" (Hauptstadt-Fragen — ob eine
+// harmlose Frage ein Prueflauf war, ist nicht erkennbar; "Tests" verlangt
+// jetzt ein eindeutiges Signal), "Einkauf" (Produktsuche statt Recherche)
+// und "Rechnen".
+const CACHE_NAME = "smejj-shell-v240";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
