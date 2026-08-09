@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v239); v236 bis
-// v238 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v240); v236 bis
+// v239 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -37,7 +37,13 @@
 // Browser"); wo beide gleich lauteten, war es reine Dopplung. Nur diese sechs
 // Zeilen sind entfernt, die zwoelf sinnvollen Paare bleiben. index.html liegt
 // cache-first im Precache — daher der Versionssprung.
-const CACHE_NAME = "smejj-shell-v238";
+//
+// v238 -> v239 (2026-08-09): Themen-Zuordnung im Verlauf berichtigt (Meldung
+// des Betreibers: "Bank-Chat gehoert zu Finanzen"). Ein Anhang ist ein
+// TRANSPORTWEG, kein Thema — "Bilder" stand an erster Stelle und ueberstimmte
+// den Inhalt. Ausserdem neu getrennt: Website-Pruefungen ("geh browser X teste
+// ob…") sind jetzt "Websites", "Tests" bleibt den Modell-Prueflaeufen.
+const CACHE_NAME = "smejj-shell-v239";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

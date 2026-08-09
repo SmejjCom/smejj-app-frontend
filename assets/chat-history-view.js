@@ -235,25 +235,48 @@ function anzeigeVorschau(chat) {
   return rest ? anWortgrenze(rest, MAX_VORSCHAU) : "";
 }
 
-// Themen regelbasiert. Die Reihenfolge entscheidet: "Schreibe eine ESM-Funktion"
-// ist Technik, nicht Texte; "Hauptstadt von Italien" ist ein Test, keine Recherche.
+// Themen regelbasiert. Die Reihenfolge entscheidet, und sie ist an den 35
+// echten Chats geprueft:
+//
+//   - "Ein Buero in Berlin kostet 1.200.000 Euro" trifft Immobilien UND
+//     Finanzen. Es geht um eine Immobilie — Immobilien steht darum zuerst.
+//   - "Geh chrome Browser Bank of America" trifft Finanzen UND Websites.
+//     Der Browser ist nur der Weg, die Bank das Thema — Finanzen zuerst.
+//   - "geh browser iMild.com teste ob alles fehlerfrei ist" ist eine
+//     WEBSITE-Pruefung, kein Modell-Prueflauf. "Tests" ist den Prueflaeufen
+//     vorbehalten (Regressionstest, "antworte nur mit", Hauptstadt-Fragen);
+//     alles mit Browser/Webseite gehoert zu Websites.
+//   - `\.com` taugt NICHT als Website-Merkmal: "Sag mir, was smejj.com ist"
+//     ist eine Frage ueber das Projekt, keine Seitenpruefung.
+//   - "Schreibe eine ESM-Funktion" ist Technik, nicht Texte.
+//   - "Hauptstadt von Italien" ist ein Test, keine Recherche.
 const THEMEN = Object.freeze([
-  ["Bilder", /\[anhang:|screenshot|\bfoto\b|\.jpe?g|\.png\b/i],
-  ["Tests", /\bregressionstest\b|\bantworte nur mit\b|hauptstadt von|\bteste? ob\b|\btestlauf\b/i],
   ["Wetter", /\bwetter\b|\btemperatur\b|vorhersage|\bregnet\b/i],
   ["Immobilien", /\bwohnung|\bb[üu]ro|\bmiete\b|immobilie|makler|quadratmeter|neubau|\bzimmer\b/i],
-  ["Finanzen", /\bbank\b|\bkonto\b|kredit|\bzins|finanzierung|eigenkapital|steuer|\bllc\b|\bgmbh\b|\brate\b|\beuro\b/i],
-  ["Technik", /\bcode\b|funktion|javascript|\bnode\b|\bapi\b|server|datenbank|\bindex\b|deploy|\bbug\b|fehlerfrei/i],
+  ["Finanzen", /\bbank\b|\bkonto\b|kredit|\bzins|finanzierung|eigenkapital|steuer|\bllc\b|\bgmbh\b|\brate\b|\beuro\b|ueberweisung|überweisung/i],
+  ["Tests", /\bregressionstest\b|\bantworte nur mit\b|hauptstadt von|\btestlauf\b/i],
+  ["Technik", /\bcode\b|funktion|javascript|\bnode\b|\bapi\b|datenbank|\bindex\b|constraint|deploy|\bbug\b/i],
+  ["Websites", /\bbrowser\b|webseite|website|fehlerfrei|\bseite\b.*\bpr[üu]f/i],
   ["Texte", /\bschreibe?\b|schlagzeile|formuliere|übersetze|zusammenfass/i],
   ["Recherche", /kennst du|\bwer ist\b|recherch|\bquellen\b|\bsuch/i]
 ]);
 
+// Ein Anhang ist ein TRANSPORTWEG, kein Thema. Vorher stand "Bilder" an erster
+// Stelle und hat den Inhalt ueberstimmt: der Chat "[Anhang: IMG_4911.jpeg]
+// @/Users/… Geh chrome Browser Bank of America" landete unter Bilder statt
+// unter Finanzen. Jetzt greift "Bilder" nur noch, wenn inhaltlich gar nichts
+// erkennbar ist — dann ist das Bild tatsaechlich die Hauptsache.
+const NUR_BILD = /\[anhang:|screenshot|\bfoto\b|\.jpe?g\b|\.png\b|\.heic\b/i;
+
 function themaVon(chat) {
-  const probe = `${chat.title || ""} ${ersteFrage(chat)}`.slice(0, 400);
+  const roh = `${chat.title || ""} ${ersteFrage(chat)}`.slice(0, 400);
+  // Auf dem BEREINIGTEN Text pruefen: sonst schlaegt ein Dateipfad wie
+  // "@/Users/alanbest/Downloads/IMG_4911.HEIC" als Bild-Treffer an.
+  const probe = ohneBallast(roh);
   for (const [name, muster] of THEMEN) {
     if (muster.test(probe)) return name;
   }
-  return "Allgemein";
+  return NUR_BILD.test(roh) ? "Bilder" : "Allgemein";
 }
 
 /* ------------------------------------------------------------------ *
