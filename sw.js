@@ -22,14 +22,22 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v238); v236 und
-// v237 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v239); v236 bis
+// v238 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
 // Eigene Nummer statt v236, damit ein spaeterer Deploy des Modellwahl-Chips
 // nicht faelschlich als schon ausgeliefert gilt.
-const CACHE_NAME = "smejj-shell-v237";
+//
+// v237 -> v238 (2026-08-09): in sechs Ansichten stand die Ueberschrift zweimal
+// untereinander — `<p class="eyebrow">Verlauf</p>` ueber `<h2>Verlauf</h2>`
+// (auch Suche, Websites, Coding, Automatisierung, Nutzer). Das Eyebrow ist als
+// KATEGORIE ueber einem abweichenden Titel gedacht ("Browser" / "Lokaler
+// Browser"); wo beide gleich lauteten, war es reine Dopplung. Nur diese sechs
+// Zeilen sind entfernt, die zwoelf sinnvollen Paare bleiben. index.html liegt
+// cache-first im Precache — daher der Versionssprung.
+const CACHE_NAME = "smejj-shell-v238";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
