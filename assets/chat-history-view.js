@@ -249,16 +249,30 @@ function anzeigeVorschau(chat) {
 //   - `\.com` taugt NICHT als Website-Merkmal: "Sag mir, was smejj.com ist"
 //     ist eine Frage ueber das Projekt, keine Seitenpruefung.
 //   - "Schreibe eine ESM-Funktion" ist Technik, nicht Texte.
-//   - "Hauptstadt von Italien" ist ein Test, keine Recherche.
+//   - "Such mir eine Spiegel" ist eine PRODUKTSUCHE, keine Recherche — sie
+//     stand nur dort, weil "such" dieselbe Regel traf wie "Kennst du …".
+//     Einkauf steht darum vor Recherche. Recherche behaelt "such" aber, sonst
+//     verliert "Kannst du Internet nicht greifen …" seinen Bezug.
+//   - "Hauptstadt von Italien" ist WISSEN, nicht Tests. Ob eine harmlose Frage
+//     ein Prueflauf war, laesst sich nicht zuverlaessig erkennen — und sie
+//     faelschlich als Test zu etikettieren ist die anmassendere Annahme.
+//     "Tests" verlangt jetzt ein eindeutiges Signal (Regressionstest,
+//     "antworte nur mit", "Stufe X … Test").
+//   - "Ein Buero … 1.200.000 Euro … Monatsrate" ist auch eine Rechnung, aber
+//     zuerst eine Immobilienfrage — Rechnen steht deshalb hinter Immobilien
+//     und Finanzen und verlangt eine echte Rechenform ("7 mal 8").
 const THEMEN = Object.freeze([
   ["Wetter", /\bwetter\b|\btemperatur\b|vorhersage|\bregnet\b/i],
   ["Immobilien", /\bwohnung|\bb[üu]ro|\bmiete\b|immobilie|makler|quadratmeter|neubau|\bzimmer\b/i],
   ["Finanzen", /\bbank\b|\bkonto\b|kredit|\bzins|finanzierung|eigenkapital|steuer|\bllc\b|\bgmbh\b|\brate\b|\beuro\b|ueberweisung|überweisung/i],
-  ["Tests", /\bregressionstest\b|\bantworte nur mit\b|hauptstadt von|\btestlauf\b/i],
+  ["Rechnen", /\d\s*(mal|plus|minus|geteilt)\s*\d|\bwie viel ist\b|prozent von|\bausrechnen\b/i],
+  ["Tests", /\bregressionstest\b|\bantworte nur mit\b|\btestlauf\b|\bstufe [a-z]\b.*\btest/i],
+  ["Wissen", /hauptstadt von|\bhauptstadt\b|\bwer war\b|\bwann wurde\b|\bwas bedeutet\b/i],
   ["Technik", /\bcode\b|funktion|javascript|\bnode\b|\bapi\b|datenbank|\bindex\b|constraint|deploy|\bbug\b/i],
   ["Websites", /\bbrowser\b|webseite|website|fehlerfrei|\bseite\b.*\bpr[üu]f/i],
   ["Texte", /\bschreibe?\b|schlagzeile|formuliere|übersetze|zusammenfass/i],
-  ["Recherche", /kennst du|\bwer ist\b|recherch|\bquellen\b|\bsuch/i]
+  ["Einkauf", /\bsuch mir\b|\bkaufen\b|\bbestellen\b|\bpreis\b|\bangebot\b/i],
+  ["Recherche", /kennst du|\bwer ist\b|recherch|\bquellen\b|\bsuch|\binternet\b/i]
 ]);
 
 // Ein Anhang ist ein TRANSPORTWEG, kein Thema. Vorher stand "Bilder" an erster
