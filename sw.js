@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v246); v236 bis
-// v245 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v247); v236 bis
+// v246 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -79,7 +79,13 @@
 // weil Nachricht 2 danach fragte. Jetzt gehen nur noch die erste Frage und die
 // erste Antwort an die Bruecke; ein zweites Thema KANN so nicht mehr im
 // Kontext stehen.
-const CACHE_NAME = "smejj-shell-v245";
+//
+// v245 -> v246 (2026-08-09): Auch Chats mit nur Frage und Antwort bekommen
+// einen Titel (MIN_NACHRICHTEN 4 -> 2). Neu ist ein Sparfilter dagegen: ist
+// die erste Frage kurz und ohne Ballast, IST sie schon der beste Titel —
+// "Was ist 7 mal 8?" wurde von der Bruecke sonst zu "Mathematische
+// Multiplikationsergebnisse". Das spart zugleich Anfragen.
+const CACHE_NAME = "smejj-shell-v246";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

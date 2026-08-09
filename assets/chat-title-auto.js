@@ -36,7 +36,25 @@ import { listChats, setAutoTitle } from "/assets/chat-store.js?v=pin-20260806";
 import { CLIENT_ROUTES } from "/assets/config.js";
 import { bridgeAuthHeaders } from "/assets/ai/chat-stream.js";
 
-const MIN_NACHRICHTEN = 4;
+// Zwei Nachrichten genuegen — genau so viele gehen ohnehin an die Bruecke.
+// Der Wert stand bei vier, weil ein Chat mit nur einer Frage und einem
+// Platzhalter keinen guten Titel hergibt; das faengt jetzt der Platzhalter-
+// Filter in der Vorschau ab, und gemessen wurden sechs von sieben kurzen Chats
+// dadurch besser ("ich suche eine buroe: 1 oder 2 Zimmer in Eine Neue…" ->
+// "Buero in Silicon Valley").
+const MIN_NACHRICHTEN = 2;
+
+// Eine kurze, vollstaendige Frage IST bereits der beste Titel. Gemessen:
+//
+//   "Was ist 7 mal 8?"          -> "Mathematische Multiplikationsergebnisse"
+//   "Kennst du Mueslueim Akdeniz?" -> "Mueslueim Akdeniz Informationen"
+//
+// Beide Male hat die Bruecke den Titel abstrakter und laenger gemacht. Wo die
+// erste Frage kurz genug ist, um ungekuerzt in die Karte zu passen, bleibt sie
+// stehen — das spart zugleich einen Anfragezyklus. Ausnahme: steckt Ballast
+// darin (Anhang-Praefix, Dateipfad), ist die Frage kein Titel, egal wie kurz.
+const KURZ_GENUG_ZEICHEN = 30;
+const BALLAST = /^\[anhang:|@"|@\//i;
 const PAUSE_MS = 1200;          // zwischen zwei Titeln
 const ZEITBUDGET_MS = 8000;     // je Anfrage
 const MAX_JE_RUNDE = 8;         // eine geoeffnete Ansicht loest hoechstens so viele aus
@@ -74,7 +92,11 @@ let laeuft = false;
 
 function brauchtTitel(chat) {
   if (!chat || chat.titleEdited === true || chat.titleAuto === true) return false;
-  return Array.isArray(chat.messages) && chat.messages.length >= MIN_NACHRICHTEN;
+  if (!Array.isArray(chat.messages) || chat.messages.length < MIN_NACHRICHTEN) return false;
+  const frage = String(chat.messages.find((n) => n?.role === "user")?.text || "").replace(/\s+/g, " ").trim();
+  // Kurz und ohne Ballast: die Frage ist der Titel. Nichts zu holen.
+  if (frage && frage.length <= KURZ_GENUG_ZEICHEN && !BALLAST.test(frage)) return false;
+  return true;
 }
 
 // Eine Vorrede ist kein Titel. An Modellausgaben geprueft: auf "Antworte NUR
