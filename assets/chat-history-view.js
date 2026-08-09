@@ -143,6 +143,15 @@ function injectStyles() {
       /* Dieselbe 44-px-Untergrenze gilt fuer die Eintraege im Menue — dort
          liegt "Loeschen" direkt unter "Umbenennen", da zaehlt jeder Pixel. */
       .ch-menu button { min-height: 44px; padding: 11px 13px; }
+      /* Umbenennen stand auf dem Handy in EINER Zeile: Eingabefeld, Speichern
+         und Abbrechen brauchen zusammen 426 px, die Karte bietet 265 px. Der
+         "Abbrechen"-Knopf lag dadurch bei 375 px Fensterbreite komplett
+         ausserhalb der Karte (Messung: rechte Kante 463 px) und war nicht mehr
+         erreichbar. Jetzt bekommt das Feld eine eigene Zeile, die beiden
+         Knoepfe teilen sich die naechste. */
+      .ch-umbenennen { flex-wrap: wrap; }
+      .ch-umbenennen input { flex: 1 1 100%; min-height: 44px; }
+      .ch-umbenennen button { flex: 1 1 0; min-height: 44px; }
     }
   `;
   document.head.append(style);

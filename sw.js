@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v247); v236 bis
-// v246 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v248); v236 bis
+// v247 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -85,7 +85,14 @@
 // die erste Frage kurz und ohne Ballast, IST sie schon der beste Titel —
 // "Was ist 7 mal 8?" wurde von der Bruecke sonst zu "Mathematische
 // Multiplikationsergebnisse". Das spart zugleich Anfragen.
-const CACHE_NAME = "smejj-shell-v246";
+//
+// v246 -> v247 (2026-08-09): Umbenennen war auf dem Handy nicht bedienbar.
+// Eingabefeld, "Speichern" und "Abbrechen" standen in EINER Zeile und
+// brauchen zusammen 426 px — die Karte bietet bei 375 px nur 265 px. Der
+// "Abbrechen"-Knopf lag dadurch komplett ausserhalb der Karte (rechte Kante
+// 463 px) und war nicht erreichbar. Jetzt eigene Zeile fuers Feld, die
+// Knoepfe teilen sich die naechste, alle drei mindestens 44 px hoch.
+const CACHE_NAME = "smejj-shell-v247";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
