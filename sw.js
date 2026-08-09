@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v243); v236 bis
-// v242 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v244); v236 bis
+// v243 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -61,7 +61,12 @@
 // Start-Lock bleibt). Holt fuer Chats ohne eigenen Titel einen kurzen aus
 // /api/chat — seriell, nur bei offener Verlauf-Ansicht, hoechstens acht je
 // Runde: die Bruecke teilt ihr Kontingent mit dem echten Chat.
-const CACHE_NAME = "smejj-shell-v242";
+//
+// v242 -> v243 (2026-08-09): Die Auto-Titel griffen den auffaelligsten
+// NEBENPUNKT statt der Eroeffnungsfrage — "Welche Bank fuer meine iMild LLC?"
+// wurde zu "Banken in Silizium Valley". Jetzt vier statt sechs Nachrichten je
+// Anfrage, und der Auftrag verankert den Titel an der ERSTEN Frage.
+const CACHE_NAME = "smejj-shell-v243";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

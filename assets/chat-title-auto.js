@@ -42,11 +42,28 @@ const ZEITBUDGET_MS = 8000;     // je Anfrage
 const MAX_JE_RUNDE = 8;         // eine geoeffnete Ansicht loest hoechstens so viele aus
 const MAX_WOERTER = 6;
 const MAX_ZEICHEN = 60;
-const NACHRICHTEN_JE_ANFRAGE = 6;
+// Vier statt sechs Nachrichten, und der Auftrag verankert den Titel
+// ausdruecklich an der ERSTEN Frage. Beides zusammen an echten Chats gemessen:
+//
+//   "Welche Bank fuer meine iMild LLC?" (spaeter im Chat: Banken in Silicon
+//   Valley)     6 Nachrichten -> "Banken in Silizium Valley"   FALSCH
+//               4 + Auftrag   -> "Bank fuer iMild LLC"          richtig
+//
+//   "smeeting nach\"" (ab Nachricht 2 geht es ums Fahrradfahren)
+//               6 Nachrichten -> "Fahrradfahren in der Stadt"   FALSCH
+//               4 + Auftrag   -> "Smeeting und Kommunikation"   richtig
+//
+// Die bereits guten Titel blieben dabei unveraendert ("Bank of America
+// Ueberweisung", "Wohnung in San Francisco") — die Schaerfung kostet nichts.
+// Ursache war kein Halluzinieren: das Modell griff den auffaelligsten
+// NEBENPUNKT aus dem mitgeschickten Verlauf statt der Eroeffnungsfrage.
+const NACHRICHTEN_JE_ANFRAGE = 4;
 const ZEICHEN_JE_NACHRICHT = 600;
 
-const AUFTRAG = "Gib dieser Unterhaltung einen kurzen Titel aus maximal 5 Woertern. "
-  + "Antworte NUR mit dem Titel, ohne Anfuehrungszeichen, ohne Punkt am Ende.";
+const AUFTRAG = "Worum geht es in dieser Unterhaltung hauptsaechlich? "
+  + "Nimm im Zweifel das Thema der ERSTEN Frage. "
+  + "Antworte NUR mit einem Titel aus maximal 5 Woertern, "
+  + "ohne Anfuehrungszeichen, ohne Punkt am Ende.";
 
 let laeuft = false;
 
