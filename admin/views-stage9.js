@@ -39,6 +39,50 @@
     return wann + " — " + wie;
   }
 
+  // 90-Tage-Balken wie auf den Status-Seiten der grossen Anbieter — nur ehrlich:
+  // eine Zelle je KALENDERTAG, grau heisst "an diesem Tag nichts gemessen"
+  // (bei einem Montags-Autopiloten sind sechs graue Zellen pro Woche normal).
+  function tageBalken(a) {
+    const jeTag = {};
+    (a.tage || []).forEach(function (t) { jeTag[t.tag] = t; });
+    const zellen = [];
+    const heute = Date.now();
+    for (let i = 89; i >= 0; i -= 1) {
+      const tag = new Date(heute - i * 86400000).toISOString().slice(0, 10);
+      const t = jeTag[tag];
+      const klasse = !t ? "leer" : (t.fehler > 0 ? "bad" : "ok");
+      const titel = !t
+        ? tag + " · nichts gemessen"
+        : tag + " · " + (t.ok + t.fehler) + " Läufe, " + t.fehler + " Fehler";
+      zellen.push('<span class="ap-tag ' + klasse + '" title="' + e(titel) + '"></span>');
+    }
+    const q = a.erfolgsquote90;
+    const quote = q
+      ? "Erfolgsquote der gemessenen Läufe: <b>" + e(String(q.prozent).replace(".", ",")) + " %</b>"
+        + ' <span class="s">(' + q.laeufe + " Läufe an " + q.tage + " gemessenen Tagen)</span>"
+      : '<span class="s">Noch keine Läufe in der Tages-Statistik.</span>';
+    return '<div class="pb"><div class="ap-tage">' + zellen.join("") + "</div>"
+      + '<div class="ap-tage-achse"><span>vor 90 Tagen</span><span>heute</span></div>'
+      + '<div class="ap-quote">' + quote + "</div></div>";
+  }
+
+  function vorfallBlock(vorfaelle) {
+    if (!vorfaelle || !vorfaelle.length) {
+      return V.panelBlock("Vorfall-Protokoll", "jede Rot-Phase, von wann bis wann",
+        '<div class="pb"><div class="leer">Kein Vorfall aufgezeichnet. Jede künftige Rot-Phase landet hier — mit Beginn, Ende, Dauer und Grund.</div></div>');
+    }
+    const zeilen = vorfaelle.map(function (v) {
+      const offen = v.bis === null || v.bis === undefined;
+      return "<tr><td><b>" + e(v.name || v.id) + "</b></td>"
+        + "<td>" + e(A.zeit(v.von)) + "</td>"
+        + "<td>" + (offen ? pille("läuft noch", "bad") : e(A.zeit(v.bis))) + "</td>"
+        + "<td>" + (offen || !Number.isFinite(v.dauerMs) ? "—" : e(A.dauer(v.dauerMs / 1000))) + "</td>"
+        + "<td>" + e(v.grund || "—") + "</td></tr>";
+    });
+    return V.panelBlock("Vorfall-Protokoll", "jede Rot-Phase, von wann bis wann",
+      V.tabelleBlock(["Autopilot", "Von", "Bis", "Dauer", "Grund"], zeilen));
+  }
+
   function liste(autopiloten, auswahlId) {
     return '<div class="ap-liste">' + autopiloten.map(function (a) {
       return '<a class="ap-item' + (a.id === auswahlId ? " on" : "") + '" data-ap="' + e(a.id) + '">'
@@ -98,6 +142,7 @@
       + '<div class="ap-detail-kopf">' + punkt(a.ampel) + "<h2>" + e(a.name) + "</h2>" + ampelPille(a.ampel) + "</div>"
       + '<p class="ap-kurz">' + e(a.kurz) + "</p>"
       + grund
+      + V.panelBlock("Zuverlässigkeit", "die letzten 90 Tage, ein Kästchen je Tag", tageBalken(a))
       + V.panelBlock("Steckbrief", null, steckbrief)
       + V.panelBlock("Was macht er genau?", null, '<div class="pb">' + funktionen + "</div>")
       + V.panelBlock("Bedienung", "Klartext statt toter Knöpfe", '<div class="pb">' + bedienung + "</div>")
@@ -141,6 +186,7 @@
       + "</div>"
       + '<div class="stack">' + lage
       + '<div class="ap-wrap">' + liste(alle, auswahl ? auswahl.id : null) + detail(auswahl) + "</div>"
+      + vorfallBlock(d.vorfaelle)
       + "</div>";
   }
 

@@ -372,3 +372,14 @@ select.dlg-feld{cursor:pointer;}
   background:var(--sm-accent-soft);border:1px solid var(--sm-accent-border);color:var(--sm-accent-text);}
 .ap-knoepfe .btn:hover{background:var(--sm-card-strong);}
 .ap-knopf-hinweis{flex-basis:100%;color:var(--sm-ink-faint);}
+
+/* Profi-Ausbau (2026-08-09): 90-Tage-Balken + Vorfall-Protokoll. Ein Kaestchen
+   je Kalendertag; grau = nichts gemessen (bei Wochen-Automatiken der Normalfall,
+   deshalb KEINE Warnfarbe). Flex statt Grid: 90 Zellen sollen die Breite fuellen. */
+.ap-tage{display:flex;gap:2px;align-items:stretch;height:26px;}
+.ap-tag{flex:1 1 0;min-width:2px;background:var(--sm-ink-faint);opacity:.35;}
+.ap-tag.ok{background:var(--sm-ok);opacity:.9;}
+.ap-tag.bad{background:var(--sm-danger);opacity:1;}
+.ap-tage-achse{display:flex;justify-content:space-between;margin-top:5px;
+  font-size:10.5px;color:var(--sm-ink-faint);}
+.ap-quote{margin-top:10px;font-size:13px;}
