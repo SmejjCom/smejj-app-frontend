@@ -120,12 +120,24 @@ function injectStyles() {
     @media (max-width: 600px) {
       .ch-neu { font-size: 0; padding: 12px 15px; }
       .ch-neu::after { content: "＋ Neu"; font-size: 14px; }
-      .ch-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+      /* Die Chip-Leiste laeuft auf dem Handy in EINE wischbare Zeile. Der
+         weiche Rand rechts ist der einzige Hinweis darauf, dass dort noch
+         etwas kommt — ohne ihn sieht die Leiste am Rand einfach zu Ende aus. */
+      .ch-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px;
+        mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
       .ch-chips::-webkit-scrollbar { display: none; }
       .ch-chip { flex: 0 0 auto; }
       .ch-titel { -webkit-line-clamp: 2; }
       .ch-meta { white-space: nowrap; overflow: hidden; }
-      .ch-mehr { opacity: .55; }
+      /* 32 px sind fuer einen Finger zu wenig — Apple und Google nennen 44 px
+         als Untergrenze. Die Karte waechst dadurch nicht: der Knopf ragt in
+         den Innenabstand, den padding-right ohnehin freihaelt. */
+      .ch-karte { padding-right: 52px; }
+      .ch-mehr { opacity: .55; width: 44px; height: 44px; right: 4px; font-size: 20px; }
+      /* Dieselbe 44-px-Untergrenze gilt fuer die Eintraege im Menue — dort
+         liegt "Loeschen" direkt unter "Umbenennen", da zaehlt jeder Pixel. */
+      .ch-menu button { min-height: 44px; padding: 11px 13px; }
     }
   `;
   document.head.append(style);
@@ -486,9 +498,11 @@ function bausteinKopf(gefunden, gesamt) {
   eingabe.autocomplete = "off";
   eingabe.value = suchbegriff;
   eingabe.setAttribute("aria-label", "Verlauf durchsuchen");
+  // Auf dem Handy passt "18 Unterhaltungen durchsuchen…" nicht ins Feld und
+  // wird abgeschnitten ("… durchs"). Dort die kurze Fassung.
   eingabe.placeholder = gefunden === gesamt
-    ? `${gesamt} Unterhaltungen durchsuchen…`
-    : `${gefunden} von ${gesamt} Unterhaltungen`;
+    ? (schmalerSchirm() ? "Durchsuchen…" : `${gesamt} Unterhaltungen durchsuchen…`)
+    : `${gefunden} von ${gesamt}${schmalerSchirm() ? "" : " Unterhaltungen"}`;
   eingabe.addEventListener("input", () => {
     suchbegriff = eingabe.value;
     const stand = eingabe.selectionStart;
@@ -551,6 +565,18 @@ function bausteinGruppe(titel) {
   return kopf;
 }
 
+// Auf 375 px passt "Donnerstag, 09:13 · 30 Nachrichten" nicht in eine Zeile —
+// gemessen brach der Text mitten im Wort ab ("30 Nachrich"). CSS kann hier
+// nicht helfen, weil die Zeile aus mehreren Elementen besteht; also wird das
+// lange Wort auf schmalen Schirmen gar nicht erst geschrieben.
+function schmalerSchirm() {
+  try {
+    return window.matchMedia("(max-width: 600px)").matches;
+  } catch {
+    return false;
+  }
+}
+
 function bausteinKarte(eintrag, aktiv, nadel) {
   const { chat } = eintrag;
   const karte = document.createElement("div");
@@ -581,7 +607,7 @@ function bausteinKarte(eintrag, aktiv, nadel) {
   tag.textContent = eintrag.thema;
   const anzahl = Array.isArray(chat.messages) ? chat.messages.length : 0;
   const rest = document.createElement("span");
-  rest.textContent = `${zeitText(chat.updatedAt)} · ${anzahl} Nachrichten`;
+  rest.textContent = `${zeitText(chat.updatedAt)} · ${anzahl} ${schmalerSchirm() ? "Nachr." : "Nachrichten"}`;
   meta.append(tag, rest);
 
   const mehr = document.createElement("button");
@@ -744,9 +770,19 @@ function bind() {
   });
   window.addEventListener("popstate", () => { if (isHistoryViewVisible()) setTimeout(render, 60); });
   window.addEventListener("smejj:chats-changed", () => { if (isHistoryViewVisible()) render(); });
-  // Der Umbruch zwischen Handy- und Desktop-Anordnung geschieht rein in CSS;
-  // neu gezeichnet wird nur, um ein offenes Menue nicht falsch stehen zu lassen.
-  window.addEventListener("resize", () => { if (offenesMenu) menuSchliessen(); });
+  // Der Umbruch geschieht groesstenteils in CSS. Zwei Texte haengen aber am
+  // JavaScript ("30 Nachr." und der kurze Platzhalter) — die muessen beim
+  // Drehen des Geraets mitwechseln. Neu gezeichnet wird nur beim echten
+  // Wechsel der Schwelle, nicht bei jedem Pixel.
+  let warSchmal = schmalerSchirm();
+  window.addEventListener("resize", () => {
+    if (offenesMenu) menuSchliessen();
+    const jetztSchmal = schmalerSchirm();
+    if (jetztSchmal !== warSchmal) {
+      warSchmal = jetztSchmal;
+      if (isHistoryViewVisible() || location.pathname === "/chat-history") zeichne();
+    }
+  });
   if (isHistoryViewVisible() || location.pathname === "/chat-history") render();
 }
 

@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v241); v236 bis
-// v240 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v242); v236 bis
+// v241 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -49,7 +49,13 @@
 // harmlose Frage ein Prueflauf war, ist nicht erkennbar; "Tests" verlangt
 // jetzt ein eindeutiges Signal), "Einkauf" (Produktsuche statt Recherche)
 // und "Rechnen".
-const CACHE_NAME = "smejj-shell-v240";
+//
+// v240 -> v241 (2026-08-09): Handy-Ansicht nachgemessen (375 px, echte
+// Geraete-Emulation). Vier Befunde behoben: "30 Nachrichten" brach mitten im
+// Wort ab, der Such-Platzhalter wurde abgeschnitten, "⋯" und die Menue-
+// Eintraege lagen mit 32 bzw. 35 px unter der 44-px-Untergrenze fuer Touch,
+// und die wischbare Chip-Leiste sah am Rand aus, als waere sie zu Ende.
+const CACHE_NAME = "smejj-shell-v241";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
