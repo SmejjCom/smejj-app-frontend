@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v244); v236 bis
-// v243 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v245); v236 bis
+// v244 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -66,7 +66,14 @@
 // NEBENPUNKT statt der Eroeffnungsfrage — "Welche Bank fuer meine iMild LLC?"
 // wurde zu "Banken in Silizium Valley". Jetzt vier statt sechs Nachrichten je
 // Anfrage, und der Auftrag verankert den Titel an der ERSTEN Frage.
-const CACHE_NAME = "smejj-shell-v243";
+//
+// v243 -> v244 (2026-08-09): persistActive() ersetzt den gespeicherten Chat
+// VOLLSTAENDIG — was im Objektliteral fehlt, ist nach dem naechsten Speichern
+// weg. Es fehlten `pinned` (bestehender Fehler: wer einen angehefteten Chat
+// oeffnete und weiterschrieb, verlor die Anheftung) und `titleAuto` (ein
+// geholter Titel wurde wieder durch die erste Frage ersetzt). Beide werden
+// jetzt weitergetragen.
+const CACHE_NAME = "smejj-shell-v244";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

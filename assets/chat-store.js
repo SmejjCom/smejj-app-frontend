@@ -166,10 +166,17 @@ async function persistActive() {
     setActiveChatId(id);
   }
   const existing = await tx("readonly", (store) => store.get(id)).catch(() => null);
+  // Dieses Objekt ERSETZT den gespeicherten Chat vollstaendig — was hier nicht
+  // steht, ist danach weg. Bis 2026-08-09 fehlten `pinned` und (neu) `titleAuto`:
+  // wer einen angehefteten Chat oeffnete und weiterschrieb, verlor beim naechsten
+  // Speichern die Anheftung, und ein von der Bruecke geholter Titel wurde wieder
+  // durch die erste Frage ersetzt.
   const chat = {
     id,
-    title: existing && existing.titleEdited ? existing.title : titleFrom(messages),
+    title: existing && (existing.titleEdited || existing.titleAuto) ? existing.title : titleFrom(messages),
     titleEdited: Boolean(existing && existing.titleEdited),
+    titleAuto: Boolean(existing && existing.titleAuto),
+    pinned: existing?.pinned === true,
     createdAt: existing && existing.createdAt ? existing.createdAt : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     model: safeModelName(),
