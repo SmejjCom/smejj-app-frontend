@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aktualisiert": "2026-08-06",
+  "aktualisiert": "2026-08-09",
   "hinweis": "Datengrundlage der Radar-Ansicht in der Operations Console. Wird bei jedem Radar-Bericht ergaenzt. Quelle der Wahrheit bleibt docs/konkurrenz-radar/ im Arbeits-Repo.",
   "berichte": [
     {
@@ -9,7 +9,15 @@
       "titel": "Radar-Bericht 01",
       "datum": "2026-08-05",
       "zeitraum": "Ende Mai bis 5. August 2026 (~10 Wochen)",
-      "beobachtet": ["ChatGPT", "Gemini", "Kimi", "Claude", "Perplexity", "Copilot", "Grok"],
+      "beobachtet": [
+        "ChatGPT",
+        "Gemini",
+        "Kimi",
+        "Claude",
+        "Perplexity",
+        "Copilot",
+        "Grok"
+      ],
       "quellenart": "Offizielle Release Notes und Blogs, App-Store-Texte, seriöse Tech-Presse. Kein Login, kein Scraping.",
       "vorschlaege": [
         {
@@ -39,8 +47,8 @@
           "wirHeute": "Ein Text-Chip „smejj 1.0“ mit Modellliste dahinter. Modellnamen sagen Nutzern nichts und haben intern schon Routing-Fehler verursacht.",
           "aenderung": "Chip auf drei verständliche Stufen umstellen: Schnell (70B-Schnellspur), Auto (Standard-Routing), Gründlich (Denk-Modus). Modellnamen nur noch im Experten-Blick.",
           "aufwand": "Mittel (2 Tage). Risiko mittel — berührt das Modell-Routing, mit Eval-Suite gegenmessen.",
-          "status": "freigegeben",
-          "belegt": "Freigabe 2026-08-06 inkl. Start-Lock; Umsetzung läuft"
+          "status": "umgesetzt",
+          "belegt": "live als sw v235 (Frontend-Repo, Bridge v125 2b09ee5 + Chip bd9c1c0), sw v236 lokal; 3 Eval-Laeufe 99-100%, identisches Routing je Fall"
         },
         {
           "id": "V4",
