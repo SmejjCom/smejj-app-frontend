@@ -76,15 +76,21 @@ function injectStyles() {
        App faellt das NICHT auf — dort greift jede Regel.
        (Keine Backticks in diesem Block: er steht selbst in einem
        Template-Literal, ein Backtick wuerde es beenden.) */
+    /* width: auto ist hier PFLICHT, nicht Kosmetik: app-surfaces.css setzt
+       ".premium-view button { width: 100% }" unterhalb von 760 px. Ohne diese
+       Zeile fuellt jeder Knopf die volle Zeilenbreite — live gemessen war
+       "Neuer Chat" 249 px breit und drueckte das Suchfeld auf 58 px, und jeder
+       Chip stand als eigener Balken untereinander statt in einer Reihe. */
     #chatHistory .ch-neu { font: inherit; font-size: 14px; font-weight: 600; color: #06181c;
-      background: #78dce8; border: 0; border-radius: 12px; padding: 12px 17px; cursor: pointer; white-space: nowrap; }
+      background: #78dce8; border: 0; border-radius: 12px; padding: 12px 17px; cursor: pointer;
+      white-space: nowrap; width: auto; min-height: 0; }
     #chatHistory .ch-neu:hover { filter: brightness(1.08); }
 
     .ch-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
     #chatHistory .ch-chip { font: inherit; font-size: 13px; color: inherit; opacity: .72;
       background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.10);
       border-radius: 999px; padding: 6px 13px; cursor: pointer; transition: .14s;
-      min-height: 0; }
+      min-height: 0; width: auto; }
     #chatHistory .ch-chip:hover { background: rgba(255,255,255,.09); opacity: 1; }
     #chatHistory .ch-chip[aria-pressed="true"] { background: rgba(120,220,232,.16);
       border-color: rgba(120,220,232,.45); color: #78dce8; opacity: 1; }
