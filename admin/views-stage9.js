@@ -19,7 +19,8 @@
     gruen: { text: "GRÜN · läuft", ton: "ok" },
     gelb: { text: "GELB · verspätet", ton: "warn" },
     rot: { text: "ROT · Ausfall", ton: "bad" },
-    grau: { text: "KEINE MESSUNG", ton: "dim" }
+    grau: { text: "KEINE MESSUNG", ton: "dim" },
+    wartung: { text: "WARTUNG · stummgeschaltet", ton: "acc" }
   };
 
   function ampelPille(farbe) {
@@ -65,7 +66,21 @@
       + (a.funktionen || []).map(function (f) { return "<li>" + e(f) + "</li>"; }).join("")
       + "</ul>";
 
+    // Echte Knöpfe zuerst, Anleitungen darunter. Die Knöpfe können nur, was
+    // dieser Server wirklich kann — für alles andere bleibt die Anleitung
+    // stehen, statt eine Attrappe hinzustellen.
+    const knoepfe = '<div class="ap-knoepfe">'
+      + (a.id === "brueckenwaechter"
+        ? '<span class="btn" data-apPruefen="' + e(a.id) + '">Jetzt prüfen</span>'
+        : "")
+      + (a.wartung
+        ? '<span class="btn" data-apWartungAus="' + e(a.id) + '">Wartung beenden</span>'
+        : '<span class="btn" data-apWartungEin="' + e(a.id) + '">In Wartung setzen</span>')
+      + '<span class="s ap-knopf-hinweis">Jede Änderung braucht eine frische Bestätigung und steht danach im Audit-Log.</span>'
+      + "</div>";
+
     const bedienung = '<div class="ap-bedienung">'
+      + knoepfe
       + "<div><b>So startest du ihn von Hand:</b>"
       + '<div class="ap-anleitung">' + e(a.startAnleitung || "—") + "</div></div>"
       + "<div><b>So schaltest du ihn aus:</b>"
@@ -120,6 +135,9 @@
       + V.kachelBlock("Gelb", String(d.gelb || 0), "verspätet, Schonfrist läuft")
       + V.kachelBlock("Rot", String(d.rot || 0), (d.rot || 0) > 0 ? "sofort ansehen" : "keiner", (d.rot || 0) > 0 ? "dn" : "up")
       + V.kachelBlock("Keine Messung", String(d.grau || 0), "Herzschlag noch nicht angeschlossen")
+      + ((d.wartung || 0) > 0
+        ? V.kachelBlock("Wartung", String(d.wartung), "stummgeschaltet, kein Alarm")
+        : "")
       + "</div>"
       + '<div class="stack">' + lage
       + '<div class="ap-wrap">' + liste(alle, auswahl ? auswahl.id : null) + detail(auswahl) + "</div>"
