@@ -42,22 +42,27 @@ const ZEITBUDGET_MS = 8000;     // je Anfrage
 const MAX_JE_RUNDE = 8;         // eine geoeffnete Ansicht loest hoechstens so viele aus
 const MAX_WOERTER = 6;
 const MAX_ZEICHEN = 60;
-// Vier statt sechs Nachrichten, und der Auftrag verankert den Titel
-// ausdruecklich an der ERSTEN Frage. Beides zusammen an echten Chats gemessen:
+// NUR die erste Frage und die erste Antwort.
 //
-//   "Welche Bank fuer meine iMild LLC?" (spaeter im Chat: Banken in Silicon
-//   Valley)     6 Nachrichten -> "Banken in Silizium Valley"   FALSCH
-//               4 + Auftrag   -> "Bank fuer iMild LLC"          richtig
+// Dieser Wert stand erst bei sechs, dann bei vier — beide Male mischte das
+// Modell ein NEBENTHEMA in den Titel, weil die Chats des Betreibers das Thema
+// oft schon ab Nachricht 2 wechseln. Der Auftrag unten bittet zwar um die
+// erste Frage, aber Bitten reicht nicht; an allen 28 Chats gemessen:
 //
-//   "smeeting nach\"" (ab Nachricht 2 geht es ums Fahrradfahren)
-//               6 Nachrichten -> "Fahrradfahren in der Stadt"   FALSCH
-//               4 + Auftrag   -> "Smeeting und Kommunikation"   richtig
+//   "Schreibe eine ESM-Funktion parseBudget(value)…"  (Nachricht 2 fragt nach
+//   Vorteilen des Fahrradfahrens)
+//        4 Nachrichten -> "Fahrradfahren und Code"    FALSCH
+//        2 Nachrichten -> "Parse Budget Funktion"     richtig
 //
-// Die bereits guten Titel blieben dabei unveraendert ("Bank of America
-// Ueberweisung", "Wohnung in San Francisco") — die Schaerfung kostet nichts.
-// Ursache war kein Halluzinieren: das Modell griff den auffaelligsten
-// NEBENPUNKT aus dem mitgeschickten Verlauf statt der Eroeffnungsfrage.
-const NACHRICHTEN_JE_ANFRAGE = 4;
+//   "wie ist Wetter heute in Sacramento"
+//        4 Nachrichten -> "Wetter in Kalifornien"     Stadt verloren
+//        2 Nachrichten -> "Wetter in Sacramento"      richtig
+//
+// Mit zwei Nachrichten KANN kein zweites Thema im Kontext stehen — das loest
+// den Fehler strukturell statt ihn zu erbitten. Preis: ein Titel wurde etwas
+// unschaerfer ("Bank of America Ueberweisung" -> "Online Banküberweisung
+// vorbereiten"). Drei klare Gewinne gegen einen leichten Verlust.
+const NACHRICHTEN_JE_ANFRAGE = 2;
 const ZEICHEN_JE_NACHRICHT = 600;
 
 const AUFTRAG = "Worum geht es in dieser Unterhaltung hauptsaechlich? "

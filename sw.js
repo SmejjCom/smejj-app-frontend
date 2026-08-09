@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v245); v236 bis
-// v244 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v246); v236 bis
+// v245 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -73,7 +73,13 @@
 // oeffnete und weiterschrieb, verlor die Anheftung) und `titleAuto` (ein
 // geholter Titel wurde wieder durch die erste Frage ersetzt). Beide werden
 // jetzt weitergetragen.
-const CACHE_NAME = "smejj-shell-v244";
+//
+// v244 -> v245 (2026-08-09): Auto-Titel mischten weiterhin ein Nebenthema —
+// "Schreibe eine ESM-Funktion parseBudget…" wurde zu "Fahrradfahren und Code",
+// weil Nachricht 2 danach fragte. Jetzt gehen nur noch die erste Frage und die
+// erste Antwort an die Bruecke; ein zweites Thema KANN so nicht mehr im
+// Kontext stehen.
+const CACHE_NAME = "smejj-shell-v245";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
