@@ -527,12 +527,26 @@
   background: var(--konto-glass-hover);
 }
 
+/* Der native File-Input wird verborgen; bedient wird der sichtbare Knopf
+   daneben (.account-picture-choose, 167x44). Zwei Dinge, die 2026-08-09
+   auffielen, als der Touch-Waechter ihn mit 30x44 meldete:
+
+   - `min-height` schlaegt `height`, egal wie spezifisch die height-Regel ist.
+     app-surfaces.css setzt `.premium-view input { min-height: 50px }`, damit
+     blieb das Feld 44+ px hoch statt 1 px. Deshalb hier ausdruecklich
+     min-height: 1px.
+   - Verborgen war er trotzdem, aber allein durch `clip` — eine veraltete
+     Eigenschaft, die nur bei position: absolute wirkt. Faellt eine der beiden
+     weg, stuende ein natives Datei-Widget mitten in der Konto-Ansicht.
+     clip-path ist der moderne Ersatz und sichert es doppelt ab. */
 #profile #profilePictureInput {
   position: absolute;
   width: 1px;
   height: 1px;
+  min-height: 1px;
   overflow: hidden;
   clip: rect(0 0 0 0);
+  clip-path: inset(50%);
 }
 
 #profile #profilePictureInput:focus-visible + .account-picture-choose {
