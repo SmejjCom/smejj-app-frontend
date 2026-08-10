@@ -336,17 +336,58 @@ function anzeigeVorschau(chat) {
 //   - "Ein Buero … 1.200.000 Euro … Monatsrate" ist auch eine Rechnung, aber
 //     zuerst eine Immobilienfrage — Rechnen steht deshalb hinter Immobilien
 //     und Finanzen und verlangt eine echte Rechenform ("7 mal 8").
+// Die Reihenfolge IST die Regel: geprueft wird von oben nach unten, der erste
+// Treffer gewinnt. Spezifische Absichten stehen deshalb vor allgemeinen.
+//
+// Zwei Fallen, beide an echten Formulierungen gemessen (2026-08-09):
+//
+// 1. Ein breites Wort in einem fruehen Thema verschluckt alles Spaetere.
+//    "Finanzen" enthielt \beuro\b — damit landete "Standventilator unter
+//    80 Euro zum Kaufen" unter Finanzen, und "Einkauf" weiter unten kam nie
+//    zum Zug. Preisangaben sind KEIN Finanzthema; ein Preis steht in fast
+//    jeder Kaufabsicht. Finanzen braucht ein echtes Geldsignal (Bank, Kredit,
+//    Steuer, Rate), Einkauf ein echtes Kaufsignal (kaufen, bestellen, kostet).
+//
+// 2. Umschriften ohne Umlaut trafen nichts. Getippt wird oft "uebersetze",
+//    "pruefe", "guenstig" — die Muster kannten nur "übersetze". Darum steht
+//    ueberall (ü|ue) statt [üu]: [üu] trifft "ubersetze", aber nicht "ue".
 const THEMEN = Object.freeze([
-  ["Wetter", /\bwetter\b|\btemperatur\b|vorhersage|\bregnet\b/i],
-  ["Immobilien", /\bwohnung|\bb[üu]ro|\bmiete\b|immobilie|makler|quadratmeter|neubau|\bzimmer\b/i],
-  ["Finanzen", /\bbank\b|\bkonto\b|kredit|\bzins|finanzierung|eigenkapital|steuer|\bllc\b|\bgmbh\b|\brate\b|\beuro\b|ueberweisung|überweisung/i],
-  ["Rechnen", /\d\s*(mal|plus|minus|geteilt)\s*\d|\bwie viel ist\b|prozent von|\bausrechnen\b/i],
+  // "temperatur" stand hier allein und zog "Die Temperatur im Serverraum
+  // steigt auf 40 Grad" zu Wetter. Das Wort gehoert genauso zu Fieber und
+  // Rechenzentrum — es braucht einen Wetterbezug.
+  ["Wetter", /\bwetter\b|vorhersage|\bregnet\b|\bschneit\b|wie (warm|kalt) (wird|ist) es|temperatur (morgen|heute|am wochenende|drau(ß|ss)en)/i],
+  ["Rechnen", /\d\s*(mal|plus|minus|geteilt)\s*\d|\bwie viel ist\b|prozent von|\bausrechnen\b|\bwurzel aus\b/i],
   ["Tests", /\bregressionstest\b|\bantworte nur mit\b|\btestlauf\b|\bstufe [a-z]\b.*\btest/i],
-  ["Wissen", /hauptstadt von|\bhauptstadt\b|\bwer war\b|\bwann wurde\b|\bwas bedeutet\b/i],
-  ["Technik", /\bcode\b|funktion|javascript|\bnode\b|\bapi\b|datenbank|\bindex\b|constraint|deploy|\bbug\b/i],
-  ["Websites", /\bbrowser\b|webseite|website|fehlerfrei|\bseite\b.*\bpr[üu]f/i],
-  ["Texte", /\bschreibe?\b|schlagzeile|formuliere|übersetze|zusammenfass/i],
-  ["Einkauf", /\bsuch mir\b|\bkaufen\b|\bbestellen\b|\bpreis\b|\bangebot\b/i],
+  // Recht vor Websites: "Impressum fuer meine Webseite" ist eine Rechtsfrage,
+  // auch wenn das Wort Webseite darin steht.
+  // Kein fuehrendes \b vor "vertrag" und "k(ü|ue)ndig": zusammengesetzte
+  // Woerter sind hier der Normalfall (Handyvertrag, Mietvertrag), und
+  // "kuendige" ist die haeufigere Form als "Kuendigung". Das abschliessende
+  // \b haelt "vertragen" draussen.
+  ["Recht", /\bdsgvo\b|datenschutz|impressum|widerruf|\bagb\b|einwilligung|urheberrecht|abmahnung|vertrag(s|es)?\b|k(ü|ue)ndig|haftung|gew(ä|ae)hrleistung|\bbgb\b|\b§\s*\d|rechtlich|\bklausel\b/i],
+  ["Reise", /\breise|\burlaub|\bflug\b|\bfl(ü|ue)ge\b|\bhotel\b|\bvisum\b|unterkunft|sehensw(ü|ue)rdig|st(ä|ae)dtetrip|\bmietwagen\b|\bairbnb\b|(ein|zwei|drei|vier|f(ü|ue)nf|sieben)\s+tage\b/i],
+  // "\barzt\b" traf "Arzttermin" nicht — dieselbe Wortgrenzen-Falle wie bei
+  // "Monatsrate" und "Handyvertrag".
+  ["Gesundheit", /\barzt|(ä|ae)rztin|schmerz|verspannung|\bschlaf\b|ern(ä|ae)hrung|\bmedikament|\bsymptom|\bimpfung|\bblutdruck\b|\bdi(ä|ae)t\b|\bgesund\b/i],
+  ["Immobilien", /\bwohnung|\bb(ü|ue)ro|\bmiete\b|immobilie|makler|quadratmeter|neubau|\bzimmer\b/i],
+  // Finanzen steht ZWEIMAL in der Tabelle, absichtlich — der Name entscheidet,
+  // nicht die Zeile. Davor die eindeutigen Geldwoerter: "Suche mir die
+  // guenstigste Bank" und "Was kostet ein Kredit" sind Geldfragen, auch wenn
+  // "suche mir", "guenstig" und "was kostet" nach Einkauf klingen. Danach das
+  // Breite (Euro, Rate, Rechnung), das eine echte Kaufabsicht nicht
+  // ueberstimmen darf.
+  ["Finanzen", /\bbank\b|\bkonto\b|kredit|\bzins|steuer|\bllc\b|\bgmbh\b|\btilgung|\bbuchhaltung\b|\bdarlehen\b/i],
+  ["Einkauf", /\bkaufen\b|\bbestell|\bsuch(e)? mir\b|\bwo (bekomme|gibt es|kriege)\b|\bwas kostet ein|preisvergleich|\bg(ü|ue)nstig|\bangebot\b|\brabatt\b/i],
+  // \brate\b traf "Monatsrate" nicht — vor "rate" steht dort keine Wortgrenze.
+  // Die erlaubten Vorsilben stehen deshalb ausdruecklich da: ein blosses
+  // \w*rate\b haette auch "separate" eingefangen.
+  ["Finanzen", /\b(monats|jahres|quartals|tilgungs|raten)?rate\b|\beuro\b|finanzierung|eigenkapital|(ü|ue)berweisung|\bumsatzsteuer\b|\brechnung\b/i],
+  // Technik vor Wissen: "was bedeutet non-fast-forward" ist keine Wissensfrage
+  // im Sinne von Allgemeinbildung, sondern eine Werkzeugfrage.
+  ["Technik", /\bcode\b|funktion|javascript|typescript|\bpython\b|\bnode\b|\bapi\b|datenbank|\bindex\b|constraint|deploy|\bbug\b|\bskript\b|\bscript\b|docker|container|\bgit\b|\bcss\b|\bhtml\b|\bsql\b|\bserver|terminal|\bcron(job)?\b|service worker|kompilier|\brepo\b|\bbranch\b|\bcommit\b|\bnpm\b|\bshell\b|\bbash\b|\bdateien?\b|\bfehlermeldung\b|\bmigration\b/i],
+  ["Websites", /\bbrowser\b|webseite|website|fehlerfrei|\bseite\b.*\bpr(ü|ue)f|\bpr(ü|ue)f\w*\b.*\bseite\b|tote links|\bfavicon\b/i],
+  ["Texte", /\bschreibe?\b|schlagzeile|formuliere|(ü|ue)bersetz|zusammenfass|korrigiere|umformulier|\bentwurf\b/i],
+  ["Wissen", /hauptstadt von|\bhauptstadt\b|\bwer war\b|\bwann wurde\b|\bwas bedeutet\b|\bwarum heisst\b/i],
   ["Recherche", /kennst du|\bwer ist\b|recherch|\bquellen\b|\bsuch|\binternet\b/i]
 ]);
 

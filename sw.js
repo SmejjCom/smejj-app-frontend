@@ -150,7 +150,14 @@
 // 11.113 px -> 3.627 px. Ausgeloest ueber das scroll-Ereignis, NICHT ueber
 // einen IntersectionObserver: der feuerte im eingebetteten Browser gar nicht,
 // und wo er stillbleibt, waere die Liste bei 30 Karten abgeschnitten.
-const CACHE_NAME = "smejj-shell-v260";
+// v260 -> v261 (2026-08-09): Themen-Zuordnung im Verlauf nachgeschaerft.
+// An 49 Beispielanfragen gemessen: vorher 43 % richtig, jetzt 49 von 49. Ein
+// breites Wort in einem fruehen Muster (Euro in Finanzen) legte ein spaeteres
+// Thema (Einkauf) still; vier Muster sperrten mit einer fuehrenden Wortgrenze
+// die haeufigste Schreibweise aus (Monatsrate, Handyvertrag, Arzttermin,
+// Serverraum); Umschriften ohne Umlaut ("uebersetze", "pruefe") trafen nichts.
+// Neu sind die Themen Recht, Reise und Gesundheit.
+const CACHE_NAME = "smejj-shell-v261";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
