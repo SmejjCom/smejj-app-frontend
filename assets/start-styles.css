@@ -749,6 +749,13 @@ body.right-panel-open .workspace {
   right: env(safe-area-inset-right);
 }
 
+/* Stand bis 2026-08-09 als style="right: 36px" im HTML. Inline schlaegt jede
+   Media-Query — die Handy-Regel weiter unten haette den Knopf nie verschieben
+   koennen. Deshalb hier, wo sie ueberschreibbar ist. */
+#mausButton {
+  right: calc(env(safe-area-inset-right) + 36px);
+}
+
 .split-icon {
   position: relative;
   display: block;
@@ -1597,6 +1604,55 @@ button:hover {
   border: 0;
 }
 
+/* Touch-Ziele auf schmalen Schirmen (2026-08-09).
+   Live gemessen bei 375 px mit echter Geraete-Emulation: die vier Icons der
+   Kopfleiste waren 28x28, die fuenf Knoepfe der Eingabezeile 30x38 bzw. 34x38 —
+   deutlich unter den 44 px, die Apple und Google fuer Touch nennen. Auf dem
+   Desktop bleibt alles wie es war, die Regeln greifen nur unterhalb 600 px.
+
+   Die Doppelklasse gibt den Regeln Gewicht 0,2,0: app-surfaces.css bringt
+   `.premium-view button` (0,1,1) mit und setzt mobil width: 100%. Auf der
+   Startseite greift das zwar nicht, aber die Knoepfe wandern erfahrungsgemaess. */
+@media (max-width: 600px) {
+  .glass-icon.glass-icon {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+
+  /* Der Maus-Knopf steht links neben dem Browser-Knopf. Mit 28 px genuegten
+     36 px Abstand; bei 44 px wuerden sich beide ueberlappen. */
+  #mausButton {
+    right: calc(env(safe-area-inset-right) + 44px);
+  }
+
+  /* Eingabezeile: Hoehe fuer alle Knoepfe der Reihe (auch den Modell-Chip,
+     der sonst als einziger 38 px hoch bliebe), Breite nur fuer die Symbole —
+     der Chip traegt Text und muss mitwachsen duerfen. */
+  .prompt-actions .ghost-button.ghost-button,
+  .prompt-actions .send-button.send-button {
+    height: 44px;
+    min-height: 44px;
+  }
+
+  .prompt-actions .ghost-button.icon-button,
+  .prompt-actions .send-button.send-button {
+    width: 44px;
+  }
+
+  /* Gemessen 2026-08-09: mit 44er Knoepfen braucht die Reihe 382 px bei 375 px
+     Fenster. Sie wird dabei NICHT gequetscht, sondern zieht die ganze Spalte
+     hinaus — `.home-feed` ist ein Grid-Item und hat damit min-width: auto,
+     waechst also mit seinem breitesten Kind (dieselbe Ursache wie bei der
+     Chip-Leiste des Verlaufs, sw v252). Statt am Container zu drehen, wird
+     hier der Platz beschafft: engere Abstaende, schmaleres Polster. Gemessen
+     bleiben danach ueber 20 px Luft. */
+  .prompt-actions {
+    gap: 4px;
+    padding: 0 6px;
+  }
+}
+
 /* ---- cline-model-menu.css ---- */
 /* smejj.com — Cline-Untermenue im Modell-Picker (Codex-Stil).
    Design-Sprache identisch zum bestehenden .model-menu (dunkel, Glas, dezente Linien). */
@@ -1760,6 +1816,17 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
 @media (max-width: 560px) {
   .app-brand-logo {
     --app-brand-expanded-width: 76px;
+  }
+}
+
+/* Das Logo sitzt fest neben dem Menue-Knopf. Wachsen beide auf 44 px (siehe
+   styles.css, 2026-08-09), reichen die bisherigen 36 px Abstand nicht mehr —
+   der Menue-Knopf endet dann erst bei 44. */
+@media (max-width: 600px) {
+  .app-brand-logo {
+    width: 44px;
+    height: 44px;
+    left: calc(env(safe-area-inset-left) + 48px);
   }
 }
 
