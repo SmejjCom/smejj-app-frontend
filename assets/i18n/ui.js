@@ -75,7 +75,7 @@ export async function loadUiLanguage(language) {
     return currentLanguage;
   }
   try {
-    const bundle = await import(`./${next}.js?v=6`);
+    const bundle = await import(`./${next}.js?v=8`);
     messages = bundle.default || null;
     currentLanguage = messages ? next : SOURCE_LANGUAGE;
     writeCache(currentLanguage, messages);
