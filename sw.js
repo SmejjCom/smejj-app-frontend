@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v255); v236 bis
-// v254 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v256); v236 bis
+// v255 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -137,7 +137,7 @@
 // genommen. (2) Die Chip-Leiste sprang beim Neuzeichnen zurueck an den
 // Anfang: wer nach rechts wischte und dort einen Chip antippte, verlor ihn
 // aus dem Blick. Die Wischposition wird jetzt uebernommen.
-const CACHE_NAME = "smejj-shell-v254";
+const CACHE_NAME = "smejj-shell-v255";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

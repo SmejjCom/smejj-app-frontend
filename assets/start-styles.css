@@ -3342,11 +3342,11 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
       hat aber pointer: fine — ohne die zweite Abfrage wuerde die neue, hoeher
       gewichtete Regel die kompakten 28 px ueberschreiben. Deshalb wird der
       Maus-Fall darunter ausdruecklich wiederhergestellt.
-   Versionspfeile bleiben bewusst bei ihren 34 px — sie sind nicht Teil der
-   Aktionsleiste im engeren Sinn und wurden hier nicht beauftragt. */
+   Die Versionspfeile gehen mit (waren 34 px): sie stehen in derselben Leiste
+   und werden mit demselben Daumen getroffen. */
 @media (max-width: 600px) {
-  #startLog .msg-act:not(.msg-version-step),
-  .msg-actions .msg-act.msg-act:not(.msg-version-step) {
+  #startLog .msg-act,
+  .msg-actions .msg-act.msg-act {
     width: 44px;
     height: 44px;
     min-height: 44px;
@@ -3354,11 +3354,21 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
 }
 
 @media (max-width: 600px) and (pointer: fine) {
-  #startLog .msg-act:not(.msg-version-step),
-  .msg-actions .msg-act.msg-act:not(.msg-version-step) {
+  #startLog .msg-act,
+  .msg-actions .msg-act.msg-act {
     width: 28px;
     height: 28px;
     min-height: 28px;
+  }
+
+  /* Die Pfeile sind mit Maus kleiner als die Aktionen. Der ID-Anker muss hier
+     doppelt gewichtet sein: `#startLog .msg-act` (1,1,0) wuerde eine blosse
+     Klassenregel fuer die Pfeile sonst schlagen, obwohl sie spaeter steht. */
+  #startLog .msg-version-step.msg-version-step,
+  .msg-actions .msg-version-step.msg-version-step.msg-version-step {
+    width: 22px;
+    height: 22px;
+    min-height: 22px;
   }
 }
 
