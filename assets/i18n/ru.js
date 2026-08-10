@@ -323,4 +323,7 @@ export default {
   "Einwilligung derzeit nicht möglich: der Datenschutzhinweis ist nicht abrufbar.": "Сейчас согласие невозможно: уведомление о конфиденциальности недоступно.",
   "Der Datenschutzhinweis hat sich geändert — bitte erneut öffnen und bestätigen.": "Уведомление о конфиденциальности изменилось — откройте и подтвердите его снова.",
   "Der Server hat die Einwilligung nicht angenommen.": "Сервер не принял согласие.",
+  "Sprachminuten (Premium-Stimme)": "Минуты голоса (премиум-голос)",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "Учитывается только при активном премиум-голосе.",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "Естественное звучание через сервер smejj — включается в настройках.",
 };

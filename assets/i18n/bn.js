@@ -323,4 +323,7 @@ export default {
   "Einwilligung derzeit nicht möglich: der Datenschutzhinweis ist nicht abrufbar.": "এই মুহূর্তে সম্মতি দেওয়া সম্ভব নয়: গোপনীয়তা বিজ্ঞপ্তি পাওয়া যাচ্ছে না।",
   "Der Datenschutzhinweis hat sich geändert — bitte erneut öffnen und bestätigen.": "গোপনীয়তা বিজ্ঞপ্তি পরিবর্তিত হয়েছে — অনুগ্রহ করে আবার খুলে নিশ্চিত করুন।",
   "Der Server hat die Einwilligung nicht angenommen.": "সার্ভার সম্মতি গ্রহণ করেনি।",
+  "Sprachminuten (Premium-Stimme)": "ভয়েস মিনিট (প্রিমিয়াম ভয়েস)",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "প্রিমিয়াম ভয়েস সক্রিয় থাকলেই কেবল গণনা হয়।",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj সার্ভারের মাধ্যমে স্বাভাবিক ধ্বনি — সেটিংসে চালু করুন।",
 };

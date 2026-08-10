@@ -323,4 +323,7 @@ export default {
   "Einwilligung derzeit nicht möglich: der Datenschutzhinweis ist nicht abrufbar.": "現在、同意できません。プライバシー通知を取得できません。",
   "Der Datenschutzhinweis hat sich geändert — bitte erneut öffnen und bestätigen.": "プライバシー通知が変更されました。もう一度開いて確認してください。",
   "Der Server hat die Einwilligung nicht angenommen.": "サーバーが同意を受け付けませんでした。",
+  "Sprachminuten (Premium-Stimme)": "音声の利用時間（プレミアム音声）",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "プレミアム音声が有効なときのみカウントされます。",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj サーバーによる自然な音声 — 設定で有効にします。",
 };

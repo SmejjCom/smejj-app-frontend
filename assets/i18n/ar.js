@@ -323,4 +323,7 @@ export default {
   "Einwilligung derzeit nicht möglich: der Datenschutzhinweis ist nicht abrufbar.": "لا يمكن منح الموافقة حاليًا: إشعار الخصوصية غير متاح.",
   "Der Datenschutzhinweis hat sich geändert — bitte erneut öffnen und bestätigen.": "تغيّر إشعار الخصوصية — يُرجى فتحه وتأكيده من جديد.",
   "Der Server hat die Einwilligung nicht angenommen.": "لم يقبل الخادم الموافقة.",
+  "Sprachminuten (Premium-Stimme)": "دقائق الصوت (الصوت المميّز)",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "لا يُحتسب إلا عند تفعيل الصوت المميّز.",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "صوت طبيعي عبر خادم smejj — يُفعَّل من الإعدادات.",
 };

@@ -323,4 +323,7 @@ export default {
   "Einwilligung derzeit nicht möglich: der Datenschutzhinweis ist nicht abrufbar.": "현재 동의할 수 없습니다: 개인정보 처리방침을 불러올 수 없습니다.",
   "Der Datenschutzhinweis hat sich geändert — bitte erneut öffnen und bestätigen.": "개인정보 처리방침이 변경되었습니다 — 다시 열어 확인해 주세요.",
   "Der Server hat die Einwilligung nicht angenommen.": "서버가 동의를 수락하지 않았습니다.",
+  "Sprachminuten (Premium-Stimme)": "음성 사용 시간(프리미엄 음성)",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "프리미엄 음성이 활성화된 경우에만 집계됩니다.",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj 서버를 통한 자연스러운 음성 — 설정에서 활성화합니다.",
 };

@@ -323,4 +323,7 @@ export default {
   "Einwilligung derzeit nicht möglich: der Datenschutzhinweis ist nicht abrufbar.": "Şu anda onay verilemiyor: gizlilik bildirimine erişilemiyor.",
   "Der Datenschutzhinweis hat sich geändert — bitte erneut öffnen und bestätigen.": "Gizlilik bildirimi değişti — lütfen tekrar açıp onayla.",
   "Der Server hat die Einwilligung nicht angenommen.": "Sunucu onayı kabul etmedi.",
+  "Sprachminuten (Premium-Stimme)": "Ses dakikaları (premium ses)",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "Yalnızca premium ses etkinken sayılır.",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj sunucusu üzerinden doğal ses — ayarlardan etkinleştirilir.",
 };

@@ -323,4 +323,7 @@ export default {
   "Einwilligung derzeit nicht möglich: der Datenschutzhinweis ist nicht abrufbar.": "Consent is currently not possible: the privacy notice cannot be retrieved.",
   "Der Datenschutzhinweis hat sich geändert — bitte erneut öffnen und bestätigen.": "The privacy notice has changed — please open and confirm it again.",
   "Der Server hat die Einwilligung nicht angenommen.": "The server did not accept the consent.",
+  "Sprachminuten (Premium-Stimme)": "Voice minutes (premium voice)",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "Only counts once the premium voice is active.",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "Natural sound via the smejj server — enabled in settings.",
 };

@@ -323,4 +323,7 @@ export default {
   "Einwilligung derzeit nicht möglich: der Datenschutzhinweis ist nicht abrufbar.": "Saat ini persetujuan tidak dapat diberikan: pemberitahuan privasi tidak dapat diakses.",
   "Der Datenschutzhinweis hat sich geändert — bitte erneut öffnen und bestätigen.": "Pemberitahuan privasi telah berubah — silakan buka dan konfirmasi lagi.",
   "Der Server hat die Einwilligung nicht angenommen.": "Server tidak menerima persetujuan.",
+  "Sprachminuten (Premium-Stimme)": "Menit suara (suara premium)",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "Hanya dihitung saat suara premium aktif.",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "Suara alami melalui server smejj — diaktifkan di pengaturan.",
 };
