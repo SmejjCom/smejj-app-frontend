@@ -842,6 +842,24 @@ function zeigeUmbenennen(karte, chat) {
   eingabe.select();
 }
 
+// Aus dem Titel einen brauchbaren Dateinamen machen.
+//
+// Live gemessen: "Rate 25 % / Zins: 3,8 % 🏦 Uebersicht" wurde zu
+// "Rate 25   Zins 38   Uebersicht" — die Sonderzeichen fielen ersatzlos weg
+// und hinterliessen Mehrfach-Leerzeichen, und aus "3,8" wurde "38". Darum:
+// verbotene Zeichen durch ein Leerzeichen ERSETZEN statt zu loeschen, danach
+// zusammenfassen. Das Komma bleibt erlaubt, es traegt hier Bedeutung; der
+// Punkt nicht, der gehoert der Dateiendung.
+function dateiname(titel) {
+  const sauber = String(titel || "")
+    .replace(/[^\p{L}\p{N} ,_-]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 50)
+    .trim();
+  return sauber || "unterhaltung";
+}
+
 // Sichern als Markdown: rein lokal, keine Uebertragung. Der Verlauf war bisher
 // nur im Browser gefangen — ohne Ausweg bei einem Geraetewechsel.
 function sichereAlsMarkdown(chat) {
@@ -855,7 +873,7 @@ function sichereAlsMarkdown(chat) {
     const url = URL.createObjectURL(datei);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${anzeigeTitel(chat).replace(/[^\p{L}\p{N} _-]/gu, "").slice(0, 50).trim() || "unterhaltung"}.md`;
+    link.download = `${dateiname(anzeigeTitel(chat))}.md`;
     document.body.append(link);
     link.click();
     link.remove();

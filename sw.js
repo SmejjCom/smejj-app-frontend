@@ -137,7 +137,13 @@
 // genommen. (2) Die Chip-Leiste sprang beim Neuzeichnen zurueck an den
 // Anfang: wer nach rechts wischte und dort einen Chip antippte, verlor ihn
 // aus dem Blick. Die Wischposition wird jetzt uebernommen.
-const CACHE_NAME = "smejj-shell-v256";
+//
+// v254 -> v255 (2026-08-09): Der Dateiname des Markdown-Exports war unschoen.
+// Verbotene Zeichen fielen ersatzlos weg: "Rate 25 % / Zins: 3,8 % Uebersicht"
+// wurde zu "Rate 25   Zins 38   Uebersicht" — Mehrfach-Leerzeichen, und aus
+// 3,8 wurde 38. Jetzt werden sie durch ein Leerzeichen ersetzt und
+// zusammengefasst; das Komma bleibt erlaubt.
+const CACHE_NAME = "smejj-shell-v255";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
