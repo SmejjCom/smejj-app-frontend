@@ -107,6 +107,8 @@ function injectStyles() {
       border-color: rgba(120,220,232,.45); color: #78dce8; opacity: 1; }
     #chatHistory .ch-chip .ch-n { opacity: .55; margin-left: 5px; font-variant-numeric: tabular-nums; }
 
+    .ch-zaehler { font-size: 12.5px; opacity: .5; margin: 10px 2px 0; font-variant-numeric: tabular-nums; }
+
     .ch-gruppe { font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
       opacity: .42; margin: 24px 0 9px; display: flex; align-items: center; gap: 10px; }
     .ch-gruppe::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.10); }
@@ -501,6 +503,17 @@ function zeichne(target) {
   const stueck = document.createDocumentFragment();
   stueck.append(bausteinKopf(treffer.length, aufbereitet.length));
   stueck.append(bausteinChips(aufbereitet));
+  // Die Trefferzahl stand bisher NUR im Platzhalter des Suchfelds — und der ist
+  // genau dann verdeckt, wenn man sie braucht: sobald etwas eingetippt ist.
+  // Live auf dem Handy gesehen: "berlin" im Feld, zwei Karten in der Liste, und
+  // nirgends stand, dass es zwei von fuenf sind. Darum eine eigene Zeile, die
+  // nur erscheint, wenn wirklich gefiltert wird.
+  if ((nadel || themenFilter) && treffer.length) {
+    const zaehler = document.createElement("div");
+    zaehler.className = "ch-zaehler";
+    zaehler.textContent = `${treffer.length} von ${aufbereitet.length} Unterhaltungen`;
+    stueck.append(zaehler);
+  }
 
   if (!treffer.length) {
     stueck.append(bausteinLeer(nadel ? `Nichts gefunden für „${suchbegriff.trim()}".` : "In diesem Thema liegt nichts."));

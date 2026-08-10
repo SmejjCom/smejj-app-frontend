@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v253); v236 bis
-// v252 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v254); v236 bis
+// v253 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -124,7 +124,13 @@
 // Leiste steht auf nowrap, war 372 px breit und dehnte den Container auf
 // 406 px bei 375 px Fenster. Karten, Kopf und Ueberschrift ragten hinaus.
 // Mit min-width: 0 darf der Container schrumpfen, dann greift overflow-x.
-const CACHE_NAME = "smejj-shell-v252";
+//
+// v252 -> v253 (2026-08-09): Waehrend einer Suche war die Trefferzahl
+// unsichtbar. Sie stand nur im Platzhalter des Suchfelds — und der ist genau
+// dann verdeckt, wenn etwas eingetippt ist. Live gesehen: "berlin" im Feld,
+// zwei Karten, und nirgends stand "2 von 5". Jetzt eine eigene Zeile, die nur
+// bei aktiver Suche oder aktivem Themen-Filter erscheint.
+const CACHE_NAME = "smejj-shell-v253";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
