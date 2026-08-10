@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v258); v236 bis
-// v257 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v264); v236 bis
+// v263 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -143,21 +143,39 @@
 // wurde zu "Rate 25   Zins 38   Uebersicht" — Mehrfach-Leerzeichen, und aus
 // 3,8 wurde 38. Jetzt werden sie durch ein Leerzeichen ersetzt und
 // zusammengefasst; das Komma bleibt erlaubt.
-// v257 -> v258 (2026-08-09): Die Verlauf-Liste zeichnet nicht mehr alle Chats
-// auf einmal. Erster Block 30 Karten, der Rest kommt beim Scrollen nachgeladen
+//
+// ACHTUNG (2026-08-09, zweite Kollision): v256 und v257 sind live vergeben —
+// eine Parallelsitzung ("Chat-Aktionsknoepfe auf 44 px") hat sie direkt ins
+// Frontend-Repo deployt, ohne sie hier einzutragen. Deshalb springt der
+// Verlauf-Deploy auf v258. Wer als naechstes deployt: erst
+// `curl .../smejj-app-frontend/main/sw.js | grep CACHE_NAME` gegen diese
+// Datei halten, dann hochzaehlen (v259).
+//
+// v257 -> v258 (2026-08-09): Die Liste zeichnet nicht mehr alle Chats auf
+// einmal. Erster Block 30 Karten, der Rest kommt beim Scrollen nachgeladen
 // (angehaengt, nie neu gezeichnet — sonst springt die Scrollposition).
 // Gemessen bei 100 Chats: erster Aufbau 26 ms -> 10 ms, Seitenhoehe
-// 11.113 px -> 3.627 px. Ausgeloest ueber das scroll-Ereignis, NICHT ueber
-// einen IntersectionObserver: der feuerte im eingebetteten Browser gar nicht,
-// und wo er stillbleibt, waere die Liste bei 30 Karten abgeschnitten.
+// 11.113 px -> 3.627 px. Ausgeloest wird ueber das scroll-Ereignis, NICHT
+// ueber einen IntersectionObserver: der feuerte im Test gar nicht, und wo er
+// stillbleibt, waere die Liste bei 30 Karten abgeschnitten.
+//
 // v260 -> v261 (2026-08-09): Themen-Zuordnung im Verlauf nachgeschaerft.
-// An 49 Beispielanfragen gemessen: vorher 43 % richtig, jetzt 49 von 49. Ein
-// breites Wort in einem fruehen Muster (Euro in Finanzen) legte ein spaeteres
-// Thema (Einkauf) still; vier Muster sperrten mit einer fuehrenden Wortgrenze
-// die haeufigste Schreibweise aus (Monatsrate, Handyvertrag, Arzttermin,
-// Serverraum); Umschriften ohne Umlaut ("uebersetze", "pruefe") trafen nichts.
+// An 49 Beispielanfragen gemessen: vorher 43 % richtig, jetzt 49 von 49.
+// Drei Ursachen, alle in tests/verlauf-themen.test.mjs festgehalten:
+// ein breites Wort in einem fruehen Muster (\beuro\b in Finanzen) legte ein
+// spaeteres Thema (Einkauf) still; vier Muster hatten ein fuehrendes \b, das
+// genau die haeufigste Schreibweise aussperrte (Monatsrate, Handyvertrag,
+// Arzttermin, Serverraum); und Umschriften ohne Umlaut ("uebersetze",
+// "pruefe") trafen nichts, weil [üu] die Folge "ue" nicht deckt.
 // Neu sind die Themen Recht, Reise und Gesundheit.
-const CACHE_NAME = "smejj-shell-v267";
+//
+// KLARSTELLUNG (2026-08-09, beim Zusammenfuehren): der Hinweis oben zu v256
+// und v257 nennt eine Parallelsitzung, die "ohne Eintrag hier" deployt habe.
+// Eingetragen war es — nur an der vorgesehenen Stelle: v254 bis v263 stehen
+// in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
+// Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
+// Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
+const CACHE_NAME = "smejj-shell-v268";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -178,7 +196,6 @@ const SHELL = [
   "/assets/api-keys-surface.js",
   "/assets/api-keys-surface.css",
   "/assets/auth-gate.js",
-  "/assets/offline-banner.js",
   "/assets/chat-history-context.js",
   "/assets/system-status-text.js",
   "/assets/i18n/ui.js",
@@ -245,8 +262,6 @@ const SHELL = [
   "/assets/chat-store.js",
   "/assets/chat-history-view.js",
   "/assets/chat-history-text.js",
-  "/assets/chat-history-format.js",
-  "/assets/chat-history-cards.js",
   "/assets/chat-title-auto.js",
   "/assets/chat-messages.js",
   "/assets/chat-actions.js",

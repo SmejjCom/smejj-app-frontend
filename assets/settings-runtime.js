@@ -110,22 +110,6 @@ export function shouldConfirm(action) {
   return action?.external === true || action?.destructive === true || action?.sensitive === true;
 }
 
-// Notification-Berechtigung anfragen. MUSS aus einer Nutzergeste heraus
-// aufgerufen werden (Browser ignorieren requestPermission sonst). Vorher (Audit
-// 2026-08-09) wurde sie NIE aufgerufen -> notifyTaskState war toter Code, weil
-// permission nie "granted" wurde. Idempotent: bei bereits erteilter/abgelehnter
-// Berechtigung wird nicht erneut gefragt.
-export async function ensureNotificationPermission() {
-  if (typeof Notification === "undefined") return false;
-  if (Notification.permission === "granted") return true;
-  if (Notification.permission === "denied") return false;
-  try {
-    return (await Notification.requestPermission()) === "granted";
-  } catch {
-    return false;
-  }
-}
-
 export function notifyTaskState(state, message) {
   const settings = readRuntimeSettings();
   const allowed = (state === "complete" && settings.notifyComplete)
