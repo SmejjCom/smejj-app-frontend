@@ -72,19 +72,23 @@
 
   function vorfallBlock(vorfaelle) {
     if (!vorfaelle || !vorfaelle.length) {
-      return V.panelBlock("Vorfall-Protokoll", "jede Rot-Phase, von wann bis wann",
-        '<div class="pb"><div class="leer">Kein Vorfall aufgezeichnet. Jede künftige Rot-Phase landet hier — mit Beginn, Ende, Dauer und Grund.</div></div>');
+      return V.panelBlock("Vorfall-Protokoll", "jede Rot- und Gelb-Phase, von wann bis wann",
+        '<div class="pb"><div class="leer">Kein Vorfall aufgezeichnet. Jede künftige Rot- oder Gelb-Phase landet hier — mit Beginn, Ende, Dauer und Grund.</div></div>');
     }
     const zeilen = vorfaelle.map(function (v) {
       const offen = v.bis === null || v.bis === undefined;
+      // Vorfaelle ohne art stammen aus der Zeit, als nur Rot protokolliert
+      // wurde — sie waren also Ausfaelle.
+      const gelb = v.art === "gelb";
       return "<tr><td><b>" + e(v.name || v.id) + "</b></td>"
+        + "<td>" + (gelb ? pille("Verspätung", "warn") : pille("Ausfall", "bad")) + "</td>"
         + "<td>" + e(A.zeit(v.von)) + "</td>"
-        + "<td>" + (offen ? pille("läuft noch", "bad") : e(A.zeit(v.bis))) + "</td>"
+        + "<td>" + (offen ? pille("läuft noch", gelb ? "warn" : "bad") : e(A.zeit(v.bis))) + "</td>"
         + "<td>" + (offen || !Number.isFinite(v.dauerMs) ? "—" : e(A.dauer(v.dauerMs / 1000))) + "</td>"
         + "<td>" + e(v.grund || "—") + "</td></tr>";
     });
-    return V.panelBlock("Vorfall-Protokoll", "jede Rot-Phase, von wann bis wann",
-      V.tabelleBlock(["Autopilot", "Von", "Bis", "Dauer", "Grund"], zeilen));
+    return V.panelBlock("Vorfall-Protokoll", "jede Rot- und Gelb-Phase, von wann bis wann",
+      V.tabelleBlock(["Autopilot", "Art", "Von", "Bis", "Dauer", "Grund"], zeilen));
   }
 
   function liste(autopiloten, auswahlId) {
