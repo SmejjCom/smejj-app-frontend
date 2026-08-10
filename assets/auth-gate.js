@@ -64,12 +64,25 @@ export function hasSession(storage) {
   }
 }
 
+// Anmelde-Adresse MIT Rueckkehr-Ziel: Wer auf /verlauf wollte, soll nach dem
+// Login auch dort ankommen, nicht auf einer Standardseite. Das Ziel wandert
+// als ?next= mit; die Anmeldeseite prueft es (nur app-eigene Pfade) und leitet
+// nach dem Login dorthin. "/" und "/index.html" bleiben weg — der Chat ist
+// ohnehin das Standardziel, die Adresse bleibt so kurz wie bisher.
+export function loginUrlFuer(win, extraQuery = "") {
+  const ziel = `${win.location.pathname || ""}${win.location.search || ""}`;
+  const teile = [extraQuery];
+  if (ziel && ziel !== "/" && ziel !== "/index.html") teile.push(`next=${encodeURIComponent(ziel)}`);
+  const query = teile.filter(Boolean).join("&");
+  return query ? `${LOGIN_URL}?${query}` : LOGIN_URL;
+}
+
 // Prueft die aktuelle Seite und leitet Abgemeldete zur Anmeldung.
 // Input: window-artiges Objekt (fuer Tests). Output: true = umgeleitet.
 export function enforceAuthGate(win) {
   if (isPublicPath(win.location.pathname)) return false;
   if (hasSession(win.localStorage)) return false;
-  win.location.replace(LOGIN_URL);
+  win.location.replace(loginUrlFuer(win));
   return true;
 }
 
@@ -132,7 +145,7 @@ export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, api
   if (isPublicPath(win.location.pathname)) return "abgelaufen";
   // `abgelaufen=1` sagt der Anmeldeseite, dass sie den Grund nennen soll —
   // eine wortlose Umleitung wirkt wie ein Fehler.
-  win.location.replace(`${LOGIN_URL}?abgelaufen=1`);
+  win.location.replace(loginUrlFuer(win, "abgelaufen=1"));
   return "abgelaufen";
 }
 

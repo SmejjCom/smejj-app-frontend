@@ -137,7 +137,7 @@
 // genommen. (2) Die Chip-Leiste sprang beim Neuzeichnen zurueck an den
 // Anfang: wer nach rechts wischte und dort einen Chip antippte, verlor ihn
 // aus dem Blick. Die Wischposition wird jetzt uebernommen.
-const CACHE_NAME = "smejj-shell-v255";
+const CACHE_NAME = "smejj-shell-v256";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

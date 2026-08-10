@@ -44,6 +44,27 @@ function errorText(payload, fallback) {
   return t(ERROR_TEXT[payload?.error] || payload?.error || fallback);
 }
 
+// Wohin nach erfolgreichem Login? Das Gate (auth-gate.js) haengt die
+// urspruenglich gewuenschte Seite als ?next= an. Es zaehlen NUR app-eigene
+// Pfade: genau ein fuehrender Schraegstrich (kein "//host" und kein "/\host",
+// beides liest der Browser als fremde Adresse — offene Weiterleitung), und
+// nichts unter /auth (Schleife). Standard ist der Chat ("/"), nicht mehr
+// /profile — Befund Betreiber 2026-08-09: nach dem Login stand er auf der
+// Kontoseite und musste den Chat selbst suchen.
+function nextTarget() {
+  const raw = new URLSearchParams(window.location.search).get("next") || "";
+  if (/^\/(?![/\\])/.test(raw) && !raw.startsWith("/auth")) return raw;
+  return "/";
+}
+
+// Weiterleitung nach FRISCHEM Login. Der Marker ?login=ok bleibt erhalten:
+// onboarding-welcome.js liest ihn (einmalige Begruessung), account-privacy.js
+// raeumt ihn danach aus der Adresszeile.
+function gotoAfterLogin() {
+  const ziel = nextTarget();
+  window.location.assign(`${ziel}${ziel.includes("?") ? "&" : "?"}login=ok`);
+}
+
 // Uebersetzt die statische Auth-Seite (Text-Knoten, Placeholder, Titel) in die
 // gespeicherte UI-Sprache. Eigenstaendige Seite ausserhalb des Start-Locks:
 // lang/dir duerfen hier global gesetzt werden (RTL fuer Arabisch).
@@ -122,6 +143,18 @@ async function refreshSession() {
     const response = await fetch(CLIENT_ROUTES.api.authMe, { headers: authHeaders() });
     const data = await response.json();
     if (data.authenticated && data.user) {
+      // Wer schon angemeldet ist, hat auf der Anmeldeseite nichts zu suchen:
+      // sofort in die App (bzw. zum ?next=-Ziel), so machen es claude.ai und
+      // Co. Stehen bleibt die Seite nur fuer echte Aufgaben-Links (E-Mail-
+      // Bestaetigung, Passwort-Reset) und auf der Registrierungsseite.
+      // replace(): die Anmeldeseite gehoert nicht in den Zurueck-Verlauf,
+      // sonst klemmt der Zurueck-Knopf in einer Umleitungsschleife.
+      const params = new URLSearchParams(window.location.search);
+      const aufgabe = params.get("verify") || params.get("reset") || params.get("abgelaufen");
+      if (mode === "login" && !aufgabe) {
+        window.location.replace(nextTarget());
+        return;
+      }
       // Bei bestehender Sitzung fuehrt ein deutlicher Knopf zurueck in die App;
       // die Statuszeile bleibt nur als Rueckfallebene, falls der Block fehlt.
       if (!showSignedIn(data.user)) {
@@ -179,7 +212,7 @@ async function completeGoogleHandoff() {
     if (data.state === "completed" && data.accessToken) {
       setToken(data.accessToken);
       status(t("Angemeldet. Weiterleitung …"), "success");
-      window.location.assign("/profile?login=ok");
+      gotoAfterLogin();
       return true;
     }
     status(t("Anmeldung fehlgeschlagen."), "error");
@@ -228,7 +261,7 @@ async function submitEmailLogin() {
     if (!ok) return status(errorText(payload, "Anmeldung fehlgeschlagen."), "error");
     if (payload.accessToken) setToken(payload.accessToken);
     status(t("Angemeldet. Weiterleitung …"), "success");
-    window.location.assign("/profile?login=ok");
+    gotoAfterLogin();
   } catch {
     status(t("Anmeldung ist momentan nicht erreichbar."), "error");
   }
