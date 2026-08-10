@@ -143,7 +143,14 @@
 // wurde zu "Rate 25   Zins 38   Uebersicht" — Mehrfach-Leerzeichen, und aus
 // 3,8 wurde 38. Jetzt werden sie durch ein Leerzeichen ersetzt und
 // zusammengefasst; das Komma bleibt erlaubt.
-const CACHE_NAME = "smejj-shell-v257";
+// v257 -> v258 (2026-08-09): Die Verlauf-Liste zeichnet nicht mehr alle Chats
+// auf einmal. Erster Block 30 Karten, der Rest kommt beim Scrollen nachgeladen
+// (angehaengt, nie neu gezeichnet — sonst springt die Scrollposition).
+// Gemessen bei 100 Chats: erster Aufbau 26 ms -> 10 ms, Seitenhoehe
+// 11.113 px -> 3.627 px. Ausgeloest ueber das scroll-Ereignis, NICHT ueber
+// einen IntersectionObserver: der feuerte im eingebetteten Browser gar nicht,
+// und wo er stillbleibt, waere die Liste bei 30 Karten abgeschnitten.
+const CACHE_NAME = "smejj-shell-v258";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
