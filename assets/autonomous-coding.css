@@ -253,3 +253,21 @@
     display: none;
   }
 }
+
+/* Touch-Ziele auf schmalen Schirmen (2026-08-09). Die Ansicht bringt eigene
+   Knopf- und Feldregeln mit (40 bzw. 42 px) und wird deshalb von der
+   `.premium-view`-Regel in app-surfaces.css nicht erfasst — #automation ist
+   eine klassische `.view`. Live gemessen bei 375 px: 12 Elemente unter 44 px,
+   alle breit genug und nur zu flach. */
+@media (max-width: 600px) {
+  .autonomous-coding button {
+    min-height: 44px;
+  }
+
+  .ac-form-grid input,
+  .ac-form-grid select,
+  .ac-form-grid textarea,
+  .ac-follow-up input {
+    min-height: 44px;
+  }
+}

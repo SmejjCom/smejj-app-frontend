@@ -688,3 +688,24 @@ body:has(.premium-view.is-active[data-settings-theme="light"]) .split-icon span:
     border-radius: 8px;
   }
 }
+
+/* Touch-Ziele der Ansichten auf schmalen Schirmen (2026-08-09).
+   Live gemessen bei 375 px ueber alle 15 Ansichten: die Aktionsknoepfe waren
+   40 px hoch (325x40, 351x40, 311x40), die Reiter von Einstellungen und Konto
+   ebenfalls 40, die Formularfelder 42. Breit genug waren sie alle — es fehlte
+   nur Hoehe. Apple und Google nennen 44 px als Untergrenze.
+
+   Die Reiter brauchen keine eigene Regel: sie sind `.premium-view button` und
+   holen ihre Hoehe von hier. */
+@media (max-width: 600px) {
+  .premium-view button,
+  .premium-view .more-actions summary {
+    min-height: 44px;
+  }
+
+  .premium-view input:not([type="checkbox"]):not([type="radio"]),
+  .premium-view select,
+  .premium-view textarea {
+    min-height: 44px;
+  }
+}
