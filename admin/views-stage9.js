@@ -50,7 +50,11 @@
     for (let i = 89; i >= 0; i -= 1) {
       const tag = new Date(heute - i * 86400000).toISOString().slice(0, 10);
       const t = jeTag[tag];
-      const klasse = !t ? "leer" : (t.fehler > 0 ? "bad" : "ok");
+      // Kein "leer" als Klassenname: die Konsole hat bereits ein globales
+      // .leer (Leerzustands-Absatz mit 22px Padding), das die 90 schmalen
+      // Zellen zu 32px-Bloecken aufpumpen wuerde — am 2026-08-09 live gesehen.
+      // Die Basisklasse .ap-tag IST bereits der "nichts gemessen"-Look.
+      const klasse = !t ? "" : (t.fehler > 0 ? "bad" : "ok");
       const titel = !t
         ? tag + " · nichts gemessen"
         : tag + " · " + (t.ok + t.fehler) + " Läufe, " + t.fehler + " Fehler";
