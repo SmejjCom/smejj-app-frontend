@@ -326,4 +326,6 @@ export default {
   "Sprachminuten (Premium-Stimme)": "Minutos de voz (voz premium)",
   "Zählt erst, wenn die Premium-Stimme aktiv ist.": "Solo cuenta cuando la voz premium está activa.",
   "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "Sonido natural a través del servidor de smejj: se activa en los ajustes.",
+  "Konto-E-Mail": "Correo electrónico de la cuenta",
+  "Datum": "Fecha",
 };

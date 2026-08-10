@@ -22,6 +22,13 @@ const STRIPE_PLAN_LINKS = {
   pro: "https://buy.stripe.com/test_28E6oJ2Ci4HabCE72sfIs01",
   max: "https://buy.stripe.com/test_14AdRb7WC5Le6ik2McfIs02"
 };
+// Kuendigungsbutton nach § 312k BGB ("Verträge hier kündigen"): fuehrt zum
+// Stripe-Kundenportal, in dem der Kunde das laufende Abo selbst kuendigt. Der
+// Link wird — wie die Zahlungslinks — nach der Stripe-Konto-Aktivierung vom
+// Betreiber eingetragen (Stripe Dashboard → Einstellungen → Kundenportal →
+// "Link teilen"). BETREIBER-TODO: leer lassen, bis der echte Portal-Link
+// vorliegt; solange greift der Mailto-Notweg in handleCancelSubscription().
+const STRIPE_BILLING_PORTAL_URL = "";
 const SAFE_EXPORT_KEYS = [STORAGE_KEYS.profile, STORAGE_KEYS.settings, STORAGE_KEYS.session, STORAGE_KEYS.model];
 // Abo-Anzeige (Schritt 3b): checkoutRef kommt vom Control-Server
 // (/api/billing/status) und geht als client_reference_id an die Zahlungslinks.
@@ -122,7 +129,7 @@ function markup() {
     ${panel("apps", "Verbundene Apps", `<div class="account-list">${dataAction("KI-Modelle & API-Keys", "GLM-5.2 aktiv · eigene Schlüssel und Modellwahl liegen in den Einstellungen.", "modelsSettingsOpen", "Einstellungen öffnen")}${statusRow("GitHub", "Für Coding: über die rechte Seitenleiste der App verbunden.", "In der App", true)}${statusRow("Google Drive", "Dateien direkt in den Chat holen.", "Bald verfügbar")}${statusRow("Google Kalender", "Termine ansehen und vorlesen lassen — nur lesend.", "Bald verfügbar")}${statusRow("Slack", "Zusammenfassungen aus Kanälen holen.", "Bald verfügbar")}</div><p class="account-note">${t("Apps sehen nur, was du ausdrücklich freigibst — Zugriff jederzeit widerrufbar.")}</p>`)}
     ${panel("notifications", "Benachrichtigungen", `<div class="account-list">${toggle("Coding-Agent fertig", "notifyAgentDone", "Meldung, wenn eine lange Aufgabe abgeschlossen ist.")}${toggle("Antwort fertig", "notifyReplyDone", "Wenn du die App verlassen hast, während smejj noch arbeitet.")}${toggle("Limit fast erreicht", "notifyLimit80", "Hinweis bei 80 % — Limits starten erst mit den Plänen.")}${statusRow("Sicherheitswarnungen", "Neue Anmeldung, neues Gerät — immer per E-Mail.", "Immer an", true)}${statusRow("Rechnungen & Zahlungen", "Kommt mit den Bezahl-Plänen.", "Immer an", true)}</div><p class="account-note">${t("Diese Auswahl gilt auf diesem Gerät.")}</p>`)}
     ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
-    ${panel("billing", "Abo & Zahlungen", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">Free — 0 €</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div><div class="account-list">${dataAction("Plus — 9 € / Monat", "1 000 Nachrichten, Premium-Stimme, schnellere Antworten.", "planPlusOpen", "Abonnieren (Test)")}${dataAction("Pro — 19 € / Monat", "Unbegrenzte Nachrichten, Coding-Agent & Projekte.", "planProOpen", "Abonnieren (Test)")}${dataAction("Max — 39 € / Monat", "5× Limits, früher Zugriff auf Neues, direkter Support.", "planMaxOpen", "Abonnieren (Test)")}</div><p class="account-note">${t("Bezahlung läuft über Stripe — Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Monatlich kündbar. Aktuell Stripe-TESTMODUS: Buchungen sind Proben ohne echte Abbuchung (Testkarte 4242 4242 4242 4242). Echt geschaltet wird nach der Stripe-Konto-Aktivierung.")}</p>`)}
+    ${panel("billing", "Abo & Zahlungen", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">Free — 0 €</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div><p class="account-note">${t("Alle Preise sind Gesamtpreise pro Monat inkl. gesetzlicher Umsatzsteuer. Das kostenpflichtige Abo hat eine Laufzeit von einem Monat und verlängert sich automatisch um jeweils einen weiteren Monat, bis du kündigst. Jederzeit zum Ende des bezahlten Monats kündbar.")}</p><div class="account-list">${dataAction("Plus — 9 € / Monat", "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.", "planPlusOpen", "Zahlungspflichtig abonnieren")}${dataAction("Pro — 19 € / Monat", "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.", "planProOpen", "Zahlungspflichtig abonnieren")}${dataAction("Max — 39 € / Monat", "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.", "planMaxOpen", "Zahlungspflichtig abonnieren")}</div><p class="account-note">${t("Mit „Zahlungspflichtig abonnieren“ wirst du zum Zahlungsdienstleister Stripe weitergeleitet und schließt dort ein kostenpflichtiges Abo ab. Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Es gelten unsere")} <a href="/agb.html">${t("AGB")}</a> ${t("und die")} <a href="/widerruf.html">${t("Widerrufsbelehrung")}</a>. ${t("Aktuell Stripe-TESTMODUS: Buchungen sind Proben ohne echte Abbuchung (Testkarte 4242 4242 4242 4242). Echt geschaltet wird nach der Stripe-Konto-Aktivierung.")}</p><div class="account-actions"><button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}
     ${panel("usage", "Nutzung & Limits", `<div class="account-list">${usageRow("Nachrichten", "Aufbauphase: ohne Limit.", "usageMessages")}${usageRow("Sprachminuten (Premium-Stimme)", "Zählt erst, wenn die Premium-Stimme aktiv ist.", "usageVoice")}${usageRow("Coding-Aufgaben", "Nur erfolgreich gestartete Läufe zählen.", "usageCoding")}</div><p class="account-note" id="usagePeriodNote">${t("Zähler laufen nur auf diesem Gerät und setzen sich jeden Monat automatisch zurück. Mit den Plänen bekommt jede Zeile einen Balken: verbraucht und noch offen.")}</p>`)}
     ${panel("data", "Daten & Datenschutz", `<h4 class="account-subhead">${t("Datenschutz")}</h4><div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.")}</p><h4 class="account-subhead">${t("Berechtigungen")}</h4><div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div><h4 class="account-subhead">${t("Daten verwalten")}</h4><div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">${t("Datenschutzerklärung öffnen")}</button></div>`)}
   </div></div><div id="profileOutput" class="output" role="status" aria-live="polite"></div>`;
@@ -148,6 +155,7 @@ function bind(view) {
     if (event.target.closest("#planPlusOpen")) window.open(planLink("plus"), "_blank", "noopener");
     if (event.target.closest("#planProOpen")) window.open(planLink("pro"), "_blank", "noopener");
     if (event.target.closest("#planMaxOpen")) window.open(planLink("max"), "_blank", "noopener");
+    if (event.target.closest("#planCancelOpen")) handleCancelSubscription(view);
     if (event.target.closest("#savePersonalization")) savePersonalization(view);
     if (event.target.closest("#logoutLocal")) logoutSession(view);
   });
@@ -260,6 +268,36 @@ async function saveConsent(view) {
   output(view, training
     ? t("Einwilligung erteilt und signiert hinterlegt. Jederzeit widerrufbar.")
     : t("Einwilligung widerrufen — mit Wirkung für die Zukunft."));
+}
+
+// Kuendigung nach § 312k BGB: Der Button fuehrt den Kunden direkt zur
+// Kuendigungsmoeglichkeit. Bevorzugt oeffnet sich das Stripe-Kundenportal
+// (Selbst-Kuendigung mit sofortiger Bestaetigung). Solange der Portal-Link noch
+// nicht gesetzt ist (Testphase), bleibt ein rechtssicherer Notweg: eine
+// vorbereitete Kuendigungs-E-Mail, aus der Vertrag und Kuendigungswunsch klar
+// hervorgehen. Fail-safe: darf die Kontoseite nie blockieren.
+function handleCancelSubscription(view) {
+  if (STRIPE_BILLING_PORTAL_URL) {
+    window.open(STRIPE_BILLING_PORTAL_URL, "_blank", "noopener");
+    output(view, t("Kündigung: Im Stripe-Kundenportal kannst du dein Abo sofort kündigen."));
+    return;
+  }
+  // Die Erklaerung laeuft durch t(), obwohl es dafuer bis auf Weiteres nur die
+  // deutsche Fassung gibt: eine Kuendigungserklaerung ist ein Rechtstext, ihre
+  // Uebersetzung gehoert zur Anwaltspruefung (Vorlage in
+  // docs/RECHTSTEXTE_SPRACHEN_ANWALTSVORLAGE_2026-08-10.md). Ohne t() muesste
+  // man dafuer spaeter Code anfassen; so wird nur der Wortlaut eingetragen.
+  // Fehlt eine Uebersetzung, faellt t() auf den deutschen Text zurueck — der
+  // Zustand bleibt also exakt der heutige.
+  const betreff = encodeURIComponent(t("Kündigung meines smejj.com Abonnements"));
+  // Die Feldnamen sind keine rechtliche Aussage und deshalb schon uebersetzt.
+  const felder = [t("Konto-E-Mail"), t("Name"), t("Datum")].map((f) => `${f}: `).join("\n");
+  const koerper = encodeURIComponent(
+    t("Hiermit kündige ich mein kostenpflichtiges smejj.com Abonnement zum nächstmöglichen Zeitpunkt.") +
+    "\n\n" + felder
+  );
+  window.location.href = `mailto:s@smejj.com?subject=${betreff}&body=${koerper}`;
+  output(view, t("Kündigung: Eine vorbereitete E-Mail wurde geöffnet. Wir bestätigen den Eingang und das Vertragsende in Textform."));
 }
 
 function savePersonalization(view) {

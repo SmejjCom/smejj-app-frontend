@@ -326,4 +326,6 @@ export default {
   "Sprachminuten (Premium-Stimme)": "वॉइस मिनट (प्रीमियम आवाज़)",
   "Zählt erst, wenn die Premium-Stimme aktiv ist.": "यह तभी गिना जाता है जब प्रीमियम आवाज़ सक्रिय हो।",
   "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj सर्वर के ज़रिए स्वाभाविक ध्वनि — सेटिंग्स में सक्रिय करें।",
+  "Konto-E-Mail": "खाता ईमेल",
+  "Datum": "दिनांक",
 };

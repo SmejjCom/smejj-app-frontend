@@ -326,4 +326,6 @@ export default {
   "Sprachminuten (Premium-Stimme)": "Ses dakikaları (premium ses)",
   "Zählt erst, wenn die Premium-Stimme aktiv ist.": "Yalnızca premium ses etkinken sayılır.",
   "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj sunucusu üzerinden doğal ses — ayarlardan etkinleştirilir.",
+  "Konto-E-Mail": "Hesap e-postası",
+  "Datum": "Tarih",
 };

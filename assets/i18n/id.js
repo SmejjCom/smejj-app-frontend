@@ -326,4 +326,6 @@ export default {
   "Sprachminuten (Premium-Stimme)": "Menit suara (suara premium)",
   "Zählt erst, wenn die Premium-Stimme aktiv ist.": "Hanya dihitung saat suara premium aktif.",
   "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "Suara alami melalui server smejj — diaktifkan di pengaturan.",
+  "Konto-E-Mail": "Email akun",
+  "Datum": "Tanggal",
 };

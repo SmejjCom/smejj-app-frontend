@@ -326,4 +326,6 @@ export default {
   "Sprachminuten (Premium-Stimme)": "语音分钟数（高级语音）",
   "Zählt erst, wenn die Premium-Stimme aktiv ist.": "仅在高级语音启用时计数。",
   "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "通过 smejj 服务器实现自然音色 — 在设置中启用。",
+  "Konto-E-Mail": "账户电子邮箱",
+  "Datum": "日期",
 };

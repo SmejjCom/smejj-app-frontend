@@ -326,4 +326,6 @@ export default {
   "Sprachminuten (Premium-Stimme)": "音声の利用時間（プレミアム音声）",
   "Zählt erst, wenn die Premium-Stimme aktiv ist.": "プレミアム音声が有効なときのみカウントされます。",
   "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj サーバーによる自然な音声 — 設定で有効にします。",
+  "Konto-E-Mail": "アカウントのメールアドレス",
+  "Datum": "日付",
 };
