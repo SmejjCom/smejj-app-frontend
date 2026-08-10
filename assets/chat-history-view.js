@@ -32,13 +32,16 @@ import { listChats, openChat, renameChat, deleteChat, activeChatId, togglePinCha
 // (gleiches Muster wie icon-nutzung.js in profile-dock.js). Das Modul meldet
 // seine Ergebnisse ueber "smejj:chats-changed" — die Ansicht zeichnet dann neu.
 import "/assets/chat-title-auto.js";
-// Textaufbereitung, Themen, Suche und Markdown-Export — ausgelagert am
-// 2026-08-10 (800-Zeilen-Regel). Alles darin ist zustandsfrei; die Ansicht
-// hier behaelt Zustand, Zeichnen und Bedienung.
+// Zusammenfuehrung zweier paralleler Aufteilungen (2026-08-10): die reinen
+// Anzeige-Helfer UND Themen/Export wohnen in chat-history-text.js (der live
+// ausgelieferte Schnitt); die zustandsbehafteten Karten-Bausteine in
+// chat-history-cards.js (Factory, der Zustand bleibt hier). format.js — die
+// Teilmenge von text.js aus dem zweiten Schnitt — ist entfallen.
 import {
-  anzeigeTitel, anzeigeVorschau, themaVon, zeitText, gruppeVon,
-  volltext, trefferAusschnitt, mitHervorhebung, sichereAlsMarkdown
+  anzeigeTitel, anzeigeVorschau, ersteFrage, gruppeVon, mitHervorhebung,
+  ohneBallast, trefferAusschnitt, volltext, zeitText, themaVon, sichereAlsMarkdown
 } from "/assets/chat-history-text.js";
+import { createCardBuilders } from "/assets/chat-history-cards.js?v=split-20260810";
 
 const STYLE_ID = "chatHistoryStyles";
 
@@ -47,6 +50,16 @@ let confirmTimer = null;
 let suchbegriff = "";
 let themenFilter = "";
 let offenesMenu = null;
+
+// Karten-Bausteine (chat-history-cards.js) an den Zustand DIESER Ansicht
+// binden: sie lesen Suchbegriff/Themenfilter/offenes Menue ueber Getter und
+// schreiben ueber Setter zurueck — der eine Wahrheitsort bleibt hier.
+const { entdoppeln, bausteinLeer, bausteinGruppe, bausteinNeuKnopf, schmalerSchirm, bausteinKopf, bausteinChips, bausteinKarte } = createCardBuilders({
+  getSuchbegriff: () => suchbegriff, setSuchbegriff: (wert) => { suchbegriff = wert; },
+  getThemenFilter: () => themenFilter, setThemenFilter: (wert) => { themenFilter = wert; },
+  getOffenesMenu: () => offenesMenu,
+  zeichne, host, menuSchliessen, oeffneMenu
+});
 
 function view() {
   return document.querySelector("#chatHistory");
@@ -208,6 +221,17 @@ function injectStyles() {
   `;
   document.head.append(style);
 }
+
+/* ------------------------------------------------------------------ *
+ *  Titel, Vorschau, Thema — alles nur fuer die ANZEIGE.
+ *  Der gespeicherte chat.title bleibt unveraendert.
+ * ------------------------------------------------------------------ */
+
+
+
+/* ------------------------------------------------------------------ *
+ *  Zeit
+ * ------------------------------------------------------------------ */
 
 
 /* ------------------------------------------------------------------ *
@@ -437,187 +461,6 @@ function beobachteMarke(ziel) {
   // Ist die Liste kuerzer als der Bildschirm, wird nie gescrollt — dann muss
   // der naechste Block sofort kommen.
   requestAnimationFrame(pruefeNachladen);
-}
-
-// Vier der 34 echten Chats hiessen "Geh browser iMild.com teste ob alles
-// fehlerfrei ist?" — zwei davon mit derselben Vorschau. Nur wo Titel UND
-// Vorschau zusammenfallen, bekommt der Titel die Uhrzeit dazu; sonst wuerde
-// jede Karte unnoetig mit einer Zeitangabe belastet, die ohnehin in der
-// Fusszeile steht.
-function entdoppeln(aufbereitet) {
-  const zaehler = new Map();
-  for (const eintrag of aufbereitet) {
-    const schluessel = `${eintrag.titel} ${eintrag.vorschau}`;
-    zaehler.set(schluessel, (zaehler.get(schluessel) || 0) + 1);
-  }
-  for (const eintrag of aufbereitet) {
-    const schluessel = `${eintrag.titel} ${eintrag.vorschau}`;
-    if (zaehler.get(schluessel) < 2) continue;
-    const datum = new Date(eintrag.chat.updatedAt);
-    if (!Number.isFinite(datum.getTime())) continue;
-    eintrag.titel += ` · ${datum.toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}`;
-  }
-}
-
-function bausteinLeer(text) {
-  const leer = document.createElement("div");
-  leer.className = "chat-history-empty";
-  leer.textContent = text;
-  return leer;
-}
-
-function bausteinKopf(gefunden, gesamt) {
-  const kopf = document.createElement("div");
-  kopf.className = "ch-kopf";
-
-  const feld = document.createElement("div");
-  feld.className = "ch-suche";
-  feld.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.6-3.6"></path></svg>';
-
-  const eingabe = document.createElement("input");
-  eingabe.type = "search";
-  eingabe.autocomplete = "off";
-  eingabe.value = suchbegriff;
-  eingabe.setAttribute("aria-label", "Verlauf durchsuchen");
-  // Auf dem Handy passt "18 Unterhaltungen durchsuchen…" nicht ins Feld und
-  // wird abgeschnitten ("… durchs"). Dort die kurze Fassung.
-  eingabe.placeholder = gefunden === gesamt
-    ? (schmalerSchirm() ? "Durchsuchen…" : `${gesamt} Unterhaltungen durchsuchen…`)
-    : `${gefunden} von ${gesamt}${schmalerSchirm() ? "" : " Unterhaltungen"}`;
-  eingabe.addEventListener("input", () => {
-    suchbegriff = eingabe.value;
-    const stand = eingabe.selectionStart;
-    zeichne();
-    // Nach dem Neuzeichnen ist das Feld ein neues Element — Fokus zurueckholen,
-    // sonst bricht das Tippen nach dem ersten Zeichen ab.
-    const neu = host()?.querySelector(".ch-suche input");
-    if (neu) {
-      neu.focus();
-      try { neu.setSelectionRange(stand, stand); } catch { /* search-Feld ohne Auswahl */ }
-    }
-  });
-  feld.append(eingabe);
-
-  kopf.append(feld, bausteinNeuKnopf());
-  return kopf;
-}
-
-// Eigener Baustein, weil der Knopf an ZWEI Stellen steht: neben dem Suchfeld
-// und allein im leeren Verlauf (dort ist er der einzige Weg nach vorn).
-function bausteinNeuKnopf() {
-  const neuKnopf = document.createElement("button");
-  neuKnopf.type = "button";
-  neuKnopf.className = "ch-neu";
-  neuKnopf.textContent = "＋ Neuer Chat";
-  neuKnopf.title = "Neue Unterhaltung beginnen";
-  neuKnopf.addEventListener("click", () => { try { newChat(); } catch { /* fail-safe */ } });
-  return neuKnopf;
-}
-
-function bausteinChips(aufbereitet) {
-  const leiste = document.createElement("div");
-  leiste.className = "ch-chips";
-
-  const zaehler = new Map();
-  for (const eintrag of aufbereitet) zaehler.set(eintrag.thema, (zaehler.get(eintrag.thema) || 0) + 1);
-  const sortiert = [...zaehler.entries()].sort((a, b) => b[1] - a[1]);
-
-  const machChip = (name, beschriftung, anzahl) => {
-    const chip = document.createElement("button");
-    chip.type = "button";
-    chip.className = "ch-chip";
-    chip.setAttribute("aria-pressed", themenFilter === name ? "true" : "false");
-    chip.append(document.createTextNode(beschriftung));
-    const n = document.createElement("span");
-    n.className = "ch-n";
-    n.textContent = String(anzahl);
-    chip.append(n);
-    chip.addEventListener("click", () => {
-      themenFilter = themenFilter === name ? "" : name;
-      zeichne();
-    });
-    return chip;
-  };
-
-  leiste.append(machChip("", "Alle", aufbereitet.length));
-  for (const [name, anzahl] of sortiert) leiste.append(machChip(name, name, anzahl));
-  return leiste;
-}
-
-function bausteinGruppe(titel) {
-  const kopf = document.createElement("div");
-  kopf.className = "ch-gruppe";
-  kopf.textContent = titel;
-  return kopf;
-}
-
-// Auf 375 px passt "Donnerstag, 09:13 · 30 Nachrichten" nicht in eine Zeile —
-// gemessen brach der Text mitten im Wort ab ("30 Nachrich"). CSS kann hier
-// nicht helfen, weil die Zeile aus mehreren Elementen besteht; also wird das
-// lange Wort auf schmalen Schirmen gar nicht erst geschrieben.
-function schmalerSchirm() {
-  try {
-    return window.matchMedia("(max-width: 600px)").matches;
-  } catch {
-    return false;
-  }
-}
-
-function bausteinKarte(eintrag, aktiv, nadel) {
-  const { chat } = eintrag;
-  const karte = document.createElement("div");
-  karte.className = `ch-karte${chat.id === aktiv ? " is-active" : ""}`;
-  karte.dataset.chatId = chat.id;
-  karte.title = "Unterhaltung öffnen";
-
-  const titel = document.createElement("div");
-  titel.className = "ch-titel";
-  if (chat.pinned === true) {
-    const pin = document.createElement("span");
-    pin.className = "ch-pin";
-    pin.setAttribute("aria-label", "Angeheftet");
-    pin.textContent = "📌";
-    titel.append(pin);
-  }
-  titel.append(mitHervorhebung(eintrag.titel, nadel));
-
-  const vorschauText = (nadel && trefferAusschnitt(chat, nadel)) || eintrag.vorschau;
-  const vorschau = document.createElement("div");
-  vorschau.className = "ch-vorschau";
-  vorschau.append(mitHervorhebung(vorschauText, nadel));
-
-  const meta = document.createElement("div");
-  meta.className = "ch-meta";
-  const tag = document.createElement("span");
-  tag.className = "ch-tag";
-  tag.textContent = eintrag.thema;
-  const anzahl = Array.isArray(chat.messages) ? chat.messages.length : 0;
-  const rest = document.createElement("span");
-  rest.textContent = `${zeitText(chat.updatedAt)} · ${anzahl} ${schmalerSchirm() ? "Nachr." : "Nachrichten"}`;
-  meta.append(tag, rest);
-
-  const mehr = document.createElement("button");
-  mehr.type = "button";
-  mehr.className = "ch-mehr";
-  mehr.textContent = "⋯";
-  mehr.title = "Weitere Aktionen";
-  mehr.setAttribute("aria-label", "Weitere Aktionen");
-  mehr.addEventListener("click", (event) => {
-    event.stopPropagation();
-    const warOffen = offenesMenu && offenesMenu.dataset.chatId === chat.id;
-    menuSchliessen();
-    if (!warOffen) oeffneMenu(karte, chat);
-  });
-
-  karte.addEventListener("click", (event) => {
-    if (event.target.closest(".ch-menu, .ch-mehr, .ch-umbenennen")) return;
-    openChat(chat.id).catch(() => {});
-  });
-
-  karte.append(titel);
-  if (vorschauText) karte.append(vorschau);
-  karte.append(meta, mehr);
-  return karte;
 }
 
 /* ------------------------------------------------------------------ *

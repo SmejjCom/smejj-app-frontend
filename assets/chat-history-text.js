@@ -342,6 +342,8 @@ function sichereAlsMarkdown(chat) {
 }
 
 export {
+  ersteFrage,
+  ohneBallast,
   anzeigeTitel,
   anzeigeVorschau,
   themaVon,
