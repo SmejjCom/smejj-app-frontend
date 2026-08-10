@@ -1828,6 +1828,15 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
     height: 44px;
     left: calc(env(safe-area-inset-left) + 48px);
   }
+
+  /* Bei offenem linken Menue zeigt das Logo die Wortmarke und ist dann breiter,
+     aber nur so hoch wie --app-brand-expanded-height (28 px). Live nachgemessen
+     2026-08-09: in genau diesem Zustand war es 76x28 und damit als einziges
+     Kopf-Element wieder unter dem Touch-Ziel. Die Breite bleibt der Wortmarke
+     ueberlassen, die Hoehe nicht. */
+  body[data-left-menu-state="expanded"] .app-brand-logo {
+    height: 44px;
+  }
 }
 
 /* ---- composer-tools.css ---- */

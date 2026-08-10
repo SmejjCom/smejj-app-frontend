@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v257); v236 bis
-// v256 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v258); v236 bis
+// v257 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -143,7 +143,7 @@
 // wurde zu "Rate 25   Zins 38   Uebersicht" — Mehrfach-Leerzeichen, und aus
 // 3,8 wurde 38. Jetzt werden sie durch ein Leerzeichen ersetzt und
 // zusammengefasst; das Komma bleibt erlaubt.
-const CACHE_NAME = "smejj-shell-v256";
+const CACHE_NAME = "smejj-shell-v257";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
