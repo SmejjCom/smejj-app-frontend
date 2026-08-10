@@ -157,7 +157,7 @@
 // die haeufigste Schreibweise aus (Monatsrate, Handyvertrag, Arzttermin,
 // Serverraum); Umschriften ohne Umlaut ("uebersetze", "pruefe") trafen nichts.
 // Neu sind die Themen Recht, Reise und Gesundheit.
-const CACHE_NAME = "smejj-shell-v266";
+const CACHE_NAME = "smejj-shell-v267";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -178,6 +178,7 @@ const SHELL = [
   "/assets/api-keys-surface.js",
   "/assets/api-keys-surface.css",
   "/assets/auth-gate.js",
+  "/assets/offline-banner.js",
   "/assets/chat-history-context.js",
   "/assets/system-status-text.js",
   "/assets/i18n/ui.js",
@@ -243,6 +244,9 @@ const SHELL = [
   "/assets/composer-dictation.js",
   "/assets/chat-store.js",
   "/assets/chat-history-view.js",
+  "/assets/chat-history-text.js",
+  "/assets/chat-history-format.js",
+  "/assets/chat-history-cards.js",
   "/assets/chat-title-auto.js",
   "/assets/chat-messages.js",
   "/assets/chat-actions.js",

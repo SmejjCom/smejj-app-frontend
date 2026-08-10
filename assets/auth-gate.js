@@ -16,6 +16,12 @@
 // einmal zu viel anmelden als die Anmelde-Pflicht still verlieren.
 
 import { API_ORIGIN, STORAGE_KEYS } from "./config.js";
+import { initOfflineBanner } from "./offline-banner.js";
+
+// App-Shell-weiter Offline-Hinweis (Audit 2026-08-09). Hier eingehaengt, weil das
+// Gate ohnehin auf allen App- und Landeseiten laeuft (profile-dock.js,
+// voice-landing.js) und index.html/app.js unter dem Start-Lock stehen.
+initOfflineBanner();
 
 // Schluessel wie in account-sessions.js/profile-dock.js — bewusst dupliziert,
 // damit das Gate ohne Auth-Modul startfaehig bleibt (gleiches Muster wie Dock).

@@ -63,10 +63,11 @@ function tryShowOnboarding(planLinks, doc) {
         <p class="onboarding-sub">${t("Dein Free-Plan ist aktiv — in der Aufbauphase ist alles frei. Du kannst jederzeit wechseln, alles ist monatlich kündbar.")}</p>
         <div class="onboarding-plans">
           <div class="onboarding-plan is-current"><span><strong>Free — 0 €</strong><small>${t("50 Nachrichten/Monat · Basis-Stimme")}</small></span><span class="onboarding-badge">${t("Aktiv")}</span></div>
-          <div class="onboarding-plan"><span><strong>Plus — 9 € / ${t("Monat")}</strong><small>${t("1 000 Nachrichten · Premium-Stimme")}</small></span><button id="onboardingPlus" type="button">${t("Abonnieren (Test)")}</button></div>
-          <div class="onboarding-plan"><span><strong>Pro — 19 € / ${t("Monat")}</strong><small>${t("Unbegrenzt · Coding-Agent")}</small></span><button id="onboardingPro" type="button">${t("Abonnieren (Test)")}</button></div>
-          <div class="onboarding-plan"><span><strong>Max — 39 € / ${t("Monat")}</strong><small>${t("5× Limits · direkter Support")}</small></span><button id="onboardingMax" type="button">${t("Abonnieren (Test)")}</button></div>
+          <div class="onboarding-plan"><span><strong>Plus — 9 € / ${t("Monat")}</strong><small>${t("1 000 Nachrichten · Premium-Stimme")}</small></span><button id="onboardingPlus" type="button">${t("Zahlungspflichtig abonnieren")}</button></div>
+          <div class="onboarding-plan"><span><strong>Pro — 19 € / ${t("Monat")}</strong><small>${t("Unbegrenzt · Coding-Agent")}</small></span><button id="onboardingPro" type="button">${t("Zahlungspflichtig abonnieren")}</button></div>
+          <div class="onboarding-plan"><span><strong>Max — 39 € / ${t("Monat")}</strong><small>${t("5× Limits · direkter Support")}</small></span><button id="onboardingMax" type="button">${t("Zahlungspflichtig abonnieren")}</button></div>
         </div>
+        <p class="onboarding-fineprint">${t("Alle Preise sind Gesamtpreise pro Monat inkl. gesetzlicher Umsatzsteuer. Monatliche Laufzeit, verlängert sich automatisch, jederzeit zum Monatsende kündbar. Zahlung über Stripe; es gelten")} <a href="/agb.html" target="_blank" rel="noopener">${t("AGB")}</a> ${t("und")} <a href="/widerruf.html" target="_blank" rel="noopener">${t("Widerrufsbelehrung")}</a>.</p>
         <div class="onboarding-actions">
           <span class="onboarding-note">${t("Kein Zahlungsmittel nötig — Free läuft sofort.")}</span>
           <button id="onboardingStart" type="button" class="onboarding-primary">${t("Los geht’s")} →</button>
