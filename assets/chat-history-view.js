@@ -170,7 +170,11 @@ function injectStyles() {
         mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
         -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
       .ch-chips::-webkit-scrollbar { display: none; }
-      #chatHistory .ch-chip { flex: 0 0 auto; }
+      /* min-height: 0 oben ist noetig, um ".premium-view button" zu ueber-
+         stimmen — es nimmt den Chips aber auch die 44 px, die dort richtig
+         waren. Auf dem Handy gemessen: 34 px, also 10 unter der Touch-Grenze.
+         Hier also wieder hinein; am Schreibtisch bleiben sie kompakt. */
+      #chatHistory .ch-chip { flex: 0 0 auto; min-height: 44px; }
       .ch-titel { -webkit-line-clamp: 2; }
       .ch-meta { white-space: nowrap; overflow: hidden; }
       /* 32 px sind fuer einen Finger zu wenig — Apple und Google nennen 44 px
@@ -543,7 +547,18 @@ function zeichne(target) {
     stueck.append(bausteinKarte(eintrag, aktiv, nadel));
   }
 
+  // Die Chip-Leiste wird bei jedem Zeichnen neu gebaut und beginnt dann wieder
+  // ganz links. Auf dem Handy passen nur drei der acht Chips ins Bild: Wer nach
+  // rechts wischt und dort "Wissen" antippt, sah die Leiste zurueckspringen —
+  // der gerade gewaehlte Chip war aus dem Blick, zum Abwaehlen musste man
+  // erneut wischen. Darum die Wischposition uebernehmen.
+  const alteLeiste = ziel.querySelector(".ch-chips");
+  const wischPosition = alteLeiste ? alteLeiste.scrollLeft : 0;
   ziel.replaceChildren(stueck);
+  if (wischPosition) {
+    const neueLeiste = ziel.querySelector(".ch-chips");
+    if (neueLeiste) neueLeiste.scrollLeft = wischPosition;
+  }
 }
 
 // Vier der 34 echten Chats hiessen "Geh browser iMild.com teste ob alles

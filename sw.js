@@ -130,6 +130,13 @@
 // dann verdeckt, wenn etwas eingetippt ist. Live gesehen: "berlin" im Feld,
 // zwei Karten, und nirgends stand "2 von 5". Jetzt eine eigene Zeile, die nur
 // bei aktiver Suche oder aktivem Themen-Filter erscheint.
+//
+// v253 -> v254 (2026-08-09): Zwei Handy-Befunde am Themen-Filter. (1) Die
+// Chips waren 34 px hoch statt 44 — das min-height: 0, mit dem sie
+// ".premium-view button" ueberstimmen, hatte ihnen auch die Touch-Groesse
+// genommen. (2) Die Chip-Leiste sprang beim Neuzeichnen zurueck an den
+// Anfang: wer nach rechts wischte und dort einen Chip antippte, verlor ihn
+// aus dem Blick. Die Wischposition wird jetzt uebernommen.
 const CACHE_NAME = "smejj-shell-v254";
 const SHELL = [
   "/",
