@@ -1,0 +1,94 @@
+# smejj.com — Qualitaetsmessung aus der Cloud (Umzug von Mac-cron, Nr. 2).
+#
+# WARUM HIER (im oeffentlichen Frontend-Repo): Regel A der Policy
+# GITHUB_KOSTENFREI verbietet CI im privaten App-Repo (Pre-Push-Waechter
+# blockiert dort). Hier sind Actions-Minuten unbegrenzt kostenlos — und das
+# Messergebnis wird ohnehin in DIESES Repo veroeffentlicht.
+#
+# PARALLELBETRIEB: Der Mac-cron (7:10/19:10 Ortszeit) bleibt AKTIV, bis dieser
+# Weg bewiesen ist. Doppelte Messungen sind harmlos.
+#
+# BRAUCHT DREI SECRETS (dieses Repo -> Settings -> Secrets -> Actions):
+#   SMEJJ_APP_REPO_TOKEN          Fine-grained PAT, Repo smejj.com-app,
+#                                 Contents: Read (dasselbe wie beim Spiegel)
+#   SALAD_API_KEY                 fuer mint-eval-token.mjs (Anmelde-Nachweis
+#                                 aus dem Salad-Env — der Livetest-Weg)
+#   SMEJJ_AUTOPILOT_KEY_MESSUNG   Herzschlag-Schluessel (Wert qualitaetsmessung
+#                                 aus ~/.config/smejj.com/autopilot-keys.env)
+# Die Veroeffentlichung ins EIGENE Repo braucht kein Secret — das erledigt
+# der eingebaute GITHUB_TOKEN (permissions: contents: write).
+name: Qualitaetsmessung (Cloud)
+
+on:
+  schedule:
+    - cron: "10 14 * * *"   # 7:10 Ortszeit (America/Los_Angeles, Sommerzeit)
+    - cron: "10 2 * * *"    # 19:10 Ortszeit
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: qualitaetsmessung
+  cancel-in-progress: false
+
+jobs:
+  messen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Secrets pruefen (fail-closed mit klarer Meldung)
+        env:
+          APP_TOKEN: ${{ secrets.SMEJJ_APP_REPO_TOKEN }}
+          SALAD_API_KEY: ${{ secrets.SALAD_API_KEY }}
+        run: |
+          FEHLT=""
+          [ -z "$APP_TOKEN" ] && FEHLT="$FEHLT SMEJJ_APP_REPO_TOKEN"
+          [ -z "$SALAD_API_KEY" ] && FEHLT="$FEHLT SALAD_API_KEY"
+          if [ -n "$FEHLT" ]; then
+            echo "::error::Secrets fehlen:$FEHLT — anlegen unter Settings -> Secrets -> Actions, dann erneut starten."
+            exit 1
+          fi
+
+      - name: Frontend-Repo holen (Ziel der Live-Veroeffentlichung)
+        uses: actions/checkout@v4
+
+      - name: Frontend dort bereitstellen, wo das Skript es erwartet
+        run: |
+          ln -s "$GITHUB_WORKSPACE" "$HOME/smejj-app-frontend"
+          git config user.name "smejj-qualitaetsmessung"
+          git config user.email "smejjcom@gmail.com"
+
+      - name: App-Repo holen (enthaelt Messlauf und Pruefsuite)
+        env:
+          APP_TOKEN: ${{ secrets.SMEJJ_APP_REPO_TOKEN }}
+        run: git clone --depth 1 "https://x-access-token:${APP_TOKEN}@github.com/SmejjCom/smejj.com-app.git" "$HOME/app"
+
+      - name: Node bereitstellen
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Messlauf (dasselbe Skript wie auf dem Mac, nur Live-Veroeffentlichung)
+        env:
+          SALAD_API_KEY: ${{ secrets.SALAD_API_KEY }}
+          SALAD_ORGANIZATION_NAME: smejjcom
+          SALAD_PROJECT_NAME: default
+          SMEJJ_MESSLAUF_NUR_LIVE: "1"
+        run: /bin/bash "$HOME/app/scripts/verlauf/messlauf-taeglich.sh"
+
+      - name: Herzschlag an die Autopiloten-Ampel (Erfolg wie Fehler)
+        if: always()
+        env:
+          AP_KEY: ${{ secrets.SMEJJ_AUTOPILOT_KEY_MESSUNG }}
+          AP_STATUS: ${{ job.status == 'success' && 'ok' || 'fehler' }}
+        run: |
+          if [ -z "$AP_KEY" ]; then
+            echo "Kein Herzschlag-Schluessel hinterlegt (Secret SMEJJ_AUTOPILOT_KEY_MESSUNG) — Ampel misst weiter nur den Mac-Lauf."
+            exit 0
+          fi
+          curl -fsS --connect-timeout 10 -m 800 --retry 12 --retry-delay 60 \
+            -X POST "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud/api/autopilot/heartbeat" \
+            -H "Content-Type: application/json" \
+            -d "{\"id\":\"qualitaetsmessung\",\"key\":\"${AP_KEY}\",\"status\":\"${AP_STATUS}\",\"meldung\":\"Cloud-Lauf (GitHub Actions): ${AP_STATUS}\"}" \
+            >/dev/null || echo "Herzschlag nicht zugestellt — der Lauf selbst zaehlt trotzdem."
