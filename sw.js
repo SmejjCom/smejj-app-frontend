@@ -157,7 +157,7 @@
 // die haeufigste Schreibweise aus (Monatsrate, Handyvertrag, Arzttermin,
 // Serverraum); Umschriften ohne Umlaut ("uebersetze", "pruefe") trafen nichts.
 // Neu sind die Themen Recht, Reise und Gesundheit.
-const CACHE_NAME = "smejj-shell-v263";
+const CACHE_NAME = "smejj-shell-v264";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
