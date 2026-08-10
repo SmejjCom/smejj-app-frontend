@@ -1653,6 +1653,17 @@ button:hover {
   }
 }
 
+/* Linkes Menue und Browser-Panel: 44 px hohe Eintraege auf schmalen Schirmen
+   (2026-08-09). Gemessen waren 178x36 bzw. 179x36 — breit genug zum Treffen,
+   es fehlte nur Hoehe. Der Anker `.sidebar` gibt Gewicht 0,2,0 und schlaegt
+   damit sowohl `.nav-button` (0,1,0) als auch `.premium-view button` (0,1,1). */
+@media (max-width: 600px) {
+  .sidebar .nav-button,
+  .browser-panel-nav button {
+    min-height: 44px;
+  }
+}
+
 /* ---- cline-model-menu.css ---- */
 /* smejj.com — Cline-Untermenue im Modell-Picker (Codex-Stil).
    Design-Sprache identisch zum bestehenden .model-menu (dunkel, Glas, dezente Linien). */
@@ -3021,6 +3032,21 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
   color: #ff9d9d !important;
 }
 
+
+/* Profil-Chip (93x42) und Zahnrad (34x36) waren die letzten beiden Ziele der
+   unteren Leiste unter 44 px. Beim Zahnrad fehlte auch Breite: es traegt nur
+   ein Symbol und wuchs deshalb nicht mit. Gemessen 2026-08-09 bei 375 px. */
+@media (max-width: 600px) {
+  .profile-dock .profile-dock-button {
+    min-height: 44px;
+  }
+
+  .profile-dock .profile-dock-gear {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
 /* ---- chat-markdown.css ---- */
 /* smejj.com — Darstellung der gerenderten Chat-Antworten (public/chat-markdown.js).
    Eigene Datei, weil public/styles.css per Ratchet-Baseline nicht wachsen darf.
@@ -3784,4 +3810,12 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
 .paste-attach-remove {
   font-size: 18px;
   line-height: 1;
+}
+
+/* Die Eintraege des Ueberlaufmenues waren 209x42 — zwei Pixel unter dem Ziel
+   (Polster 7 px plus 13-px-Zeile). Gemessen 2026-08-09 bei 375 px. */
+@media (max-width: 600px) {
+  .msg-menu .msg-menu-item {
+    min-height: 44px;
+  }
 }

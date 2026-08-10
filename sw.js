@@ -150,7 +150,7 @@
 // 11.113 px -> 3.627 px. Ausgeloest ueber das scroll-Ereignis, NICHT ueber
 // einen IntersectionObserver: der feuerte im eingebetteten Browser gar nicht,
 // und wo er stillbleibt, waere die Liste bei 30 Karten abgeschnitten.
-const CACHE_NAME = "smejj-shell-v258";
+const CACHE_NAME = "smejj-shell-v259";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
