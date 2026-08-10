@@ -3329,6 +3329,39 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
   }
 }
 
+/* Schmale Schirme: 44x44 statt 42x42 (Apple HIG und Material nennen 44 bzw.
+   48 dp als Untergrund; 42 war knapp darunter). Gemessen 2026-08-09 live bei
+   375 px mit Geraete-Emulation: alle Aktionsknoepfe lagen bei 42x42.
+
+   Zwei Fallen, die den Selektor erklaeren:
+   1. app-surfaces.css setzt unterhalb 760 px `.premium-view button { width:
+      100% }` (Spezifitaet 0,1,1). Eine blosse `.msg-act`-Klassenregel (0,1,0)
+      verliert dagegen. Darum ein ID-Anker plus eine doppelt gewichtete
+      Klassenvariante fuer Leisten ausserhalb von #startLog.
+   2. Der Desktop soll unveraendert bleiben. Ein schmales Fenster AM RECHNER
+      hat aber pointer: fine — ohne die zweite Abfrage wuerde die neue, hoeher
+      gewichtete Regel die kompakten 28 px ueberschreiben. Deshalb wird der
+      Maus-Fall darunter ausdruecklich wiederhergestellt.
+   Versionspfeile bleiben bewusst bei ihren 34 px — sie sind nicht Teil der
+   Aktionsleiste im engeren Sinn und wurden hier nicht beauftragt. */
+@media (max-width: 600px) {
+  #startLog .msg-act:not(.msg-version-step),
+  .msg-actions .msg-act.msg-act:not(.msg-version-step) {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 600px) and (pointer: fine) {
+  #startLog .msg-act:not(.msg-version-step),
+  .msg-actions .msg-act.msg-act:not(.msg-version-step) {
+    width: 28px;
+    height: 28px;
+    min-height: 28px;
+  }
+}
+
 .msg-version-label {
   font-size: 12px;
   line-height: 1;

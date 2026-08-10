@@ -22,8 +22,8 @@
 // ACHTUNG (2026-08-09): Der Modellwahl-Chip oben ist NOCH NICHT LIVE. Live
 // gepusht wurde v235 — mit der Cache-Version aus dem gemeinsamen Arbeitsbaum,
 // aber ohne die Dateien, die dazugehoerten. Wer app.js, index.html oder
-// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v254); v236 bis
-// v253 sind verbraucht.
+// chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v255); v236 bis
+// v254 sind verbraucht.
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
@@ -130,7 +130,7 @@
 // dann verdeckt, wenn etwas eingetippt ist. Live gesehen: "berlin" im Feld,
 // zwei Karten, und nirgends stand "2 von 5". Jetzt eine eigene Zeile, die nur
 // bei aktiver Suche oder aktivem Themen-Filter erscheint.
-const CACHE_NAME = "smejj-shell-v253";
+const CACHE_NAME = "smejj-shell-v254";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
