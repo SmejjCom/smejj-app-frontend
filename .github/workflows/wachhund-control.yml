@@ -1,0 +1,91 @@
+# smejj.com — Wachhund fuer den Control-Server (Waechter des Waechters).
+#
+# WARUM ES DIESEN WORKFLOW GIBT: Die Autopiloten-Ampel, die Alarm-Wache und
+# die Rot-Mail wohnen ALLE im Control-Server auf Salad. Faellt der Server (oder
+# ganz Salad) aus, stirbt der Alarm mit dem Patienten — genau dann kaeme keine
+# Mail. Dieser Wachhund laeuft deshalb bewusst WOANDERS (GitHub Actions) und
+# braucht weder Konto noch Schluessel: /api/health ist oeffentlich, der Alarm
+# ist ein GitHub-Issue, und GitHub verschickt die Mail dazu selbst.
+#
+# WAS ER BEWUSST TOLERIERT: Salad verteilt den Container mehrmals taeglich neu;
+# dabei antwortet das Gateway 7 bis 25 Minuten lang mit 503 (gemessen
+# 2026-08-07). Der Wachhund prueft darum bis zu 26 Minuten lang jede Minute,
+# bevor er Alarm schlaegt. Schlimmster Fall bis zur Mail: ~56 Minuten
+# (30-Minuten-Takt + 26 Minuten Geduld) — dafuer gibt es keinen Fehlalarm bei
+# jeder normalen Reallokation.
+#
+# EIN ISSUE JE AUSFALL: offenes Issue mit Label "wachhund" = Alarm laeuft schon,
+# kein zweites. Wird der Server wieder gesund, schliesst der Wachhund das Issue
+# (auch das ist eine Mail: Entwarnung).
+name: Wachhund Control-Server
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+concurrency:
+  group: wachhund-control
+  cancel-in-progress: false
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    env:
+      GESUNDHEIT: "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud/api/health"
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Control-Server pruefen (26 Minuten Geduld fuer Salad-Reallokation)
+        id: probe
+        run: |
+          for i in $(seq 1 26); do
+            if curl -fsS -m 20 "$GESUNDHEIT" | grep -q '"ok": *true'; then
+              echo "gesund=ja" >> "$GITHUB_OUTPUT"
+              echo "Gesund nach Versuch $i."
+              exit 0
+            fi
+            echo "Versuch $i/26 fehlgeschlagen — warte 60 s."
+            sleep 60
+          done
+          echo "gesund=nein" >> "$GITHUB_OUTPUT"
+          echo "26 Minuten lang keine gesunde Antwort — das ist keine Reallokation mehr."
+
+      - name: Alarm schlagen (ein Issue je Ausfall)
+        if: steps.probe.outputs.gesund == 'nein'
+        run: |
+          OFFEN=$(gh issue list --label wachhund --state open --json number --jq 'length')
+          if [ "$OFFEN" -gt 0 ]; then
+            echo "Alarm laeuft bereits ($OFFEN offenes Issue) — kein zweites."
+            exit 0
+          fi
+          gh label create wachhund --description "Automatischer Alarm des Control-Server-Wachhunds" --color D93F0B 2>/dev/null || true
+          # YAML entfernt die Block-Einrueckung selbst — im Skript steht der
+          # Text linksbuendig, GitHub rendert ihn also als normalen Markdown.
+          cat <<'TEXT' > /tmp/wachhund-alarm.md
+          Der Wachhund (GitHub Actions) hat 26 Minuten lang jede Minute `/api/health` geprueft — keine gesunde Antwort. Das ist laenger als jede gemessene Salad-Reallokation (7-25 min).
+
+          **Was das bedeutet:** Auch die Autopiloten-Ampel, die Alarm-Wache und die Rot-Mail sind gerade tot — sie wohnen in diesem Server. Diese Meldung ist der einzige Alarm, der jetzt noch funktioniert.
+
+          **Erste Handgriffe:**
+          1. Salad-Portal oeffnen: Zustand der Container-Gruppe `smejj-control` pruefen (creating/running).
+          2. `https://smejj.com/admin/autopiloten/` laedt die Ampel — bleibt sie leer, bestaetigt das den Ausfall.
+          3. Nach der Rueckkehr: Ampel pruefen, ob alle Herzschlaege wieder eintreffen.
+
+          Dieses Issue schliesst sich von selbst, sobald der Wachhund den Server wieder gesund sieht.
+          TEXT
+          gh issue create \
+            --title "ALARM: Control-Server antwortet seit ueber 26 Minuten nicht" \
+            --label wachhund \
+            --body-file /tmp/wachhund-alarm.md
+
+      - name: Entwarnung (offene Alarm-Issues schliessen)
+        if: steps.probe.outputs.gesund == 'ja'
+        run: |
+          for NUMMER in $(gh issue list --label wachhund --state open --json number --jq '.[].number'); do
+            gh issue close "$NUMMER" --comment "Entwarnung: Der Wachhund sieht den Control-Server wieder gesund. (Automatisch geschlossen.)"
+          done
