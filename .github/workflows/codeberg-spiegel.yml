@@ -40,7 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Zugaenge pruefen und hinterlegen (fail-closed)
+      - name: Zugaenge pruefen und hinterlegen
+        id: zugang
         env:
           APP_TOKEN: ${{ secrets.SMEJJ_APP_REPO_TOKEN }}
           CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
@@ -49,9 +50,17 @@ jobs:
           [ -z "$APP_TOKEN" ] && FEHLT="$FEHLT SMEJJ_APP_REPO_TOKEN"
           [ -z "$CODEBERG_TOKEN" ] && FEHLT="$FEHLT CODEBERG_TOKEN"
           if [ -n "$FEHLT" ]; then
-            echo "::error::Secrets fehlen:$FEHLT — anlegen unter Settings -> Secrets -> Actions, dann erneut starten."
-            exit 1
+            # Bewusst KEIN Fehlschlag: bis der Betreiber die Secrets anlegt,
+            # wuerde der Zeitplan sonst taeglich rote Laeufe und Fehler-Mails
+            # erzeugen — Alarm fuer einen bekannten, gewollten Zustand.
+            # Der Mac-cron misst waehrenddessen weiter; die Ampel bleibt ehrlich,
+            # weil dieser Lauf dann auch KEINEN Herzschlag sendet.
+            echo "konfiguriert=nein" >> "$GITHUB_OUTPUT"
+            echo "## Noch nicht konfiguriert" >> "$GITHUB_STEP_SUMMARY"
+            echo "Es fehlen die Secrets:$FEHLT — anlegen unter Settings -> Secrets and variables -> Actions. Bis dahin spiegelt weiter der Mac-cron." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
+          echo "konfiguriert=ja" >> "$GITHUB_OUTPUT"
           git config --global credential.helper store
           {
             printf 'https://x-access-token:%s@github.com\n' "$APP_TOKEN"
@@ -59,18 +68,20 @@ jobs:
           } > "$HOME/.git-credentials"
 
       - name: App-Repo holen (alle Zweige — der Spiegel spiegelt alles)
+        if: steps.zugang.outputs.konfiguriert == 'ja'
         run: |
           git clone https://github.com/SmejjCom/smejj.com-app.git "$HOME/app"
           git -C "$HOME/app" fetch origin '+refs/heads/*:refs/remotes/origin/*' --tags
 
       - name: Spiegeln (dasselbe Skript wie auf dem Mac)
+        if: steps.zugang.outputs.konfiguriert == 'ja'
         env:
           CODEBERG_PROTOKOLL: https
           CODEBERG_USER: smejj
         run: cd "$HOME/app" && /bin/bash scripts/deploy/codeberg_spiegel_sync.sh alles
 
       - name: Herzschlag an die Autopiloten-Ampel (Erfolg wie Fehler)
-        if: always()
+        if: always() && steps.zugang.outputs.konfiguriert == 'ja'
         env:
           AP_KEY: ${{ secrets.SMEJJ_AUTOPILOT_KEY_SPIEGEL }}
           AP_STATUS: ${{ job.status == 'success' && 'ok' || 'fehler' }}

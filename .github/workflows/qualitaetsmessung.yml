@@ -37,7 +37,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
-      - name: Secrets pruefen (fail-closed mit klarer Meldung)
+      - name: Secrets pruefen (still ueberspringen, solange nicht konfiguriert)
+        id: zugang
         env:
           APP_TOKEN: ${{ secrets.SMEJJ_APP_REPO_TOKEN }}
           SALAD_API_KEY: ${{ secrets.SALAD_API_KEY }}
@@ -46,30 +47,41 @@ jobs:
           [ -z "$APP_TOKEN" ] && FEHLT="$FEHLT SMEJJ_APP_REPO_TOKEN"
           [ -z "$SALAD_API_KEY" ] && FEHLT="$FEHLT SALAD_API_KEY"
           if [ -n "$FEHLT" ]; then
-            echo "::error::Secrets fehlen:$FEHLT — anlegen unter Settings -> Secrets -> Actions, dann erneut starten."
-            exit 1
+            # Bewusst KEIN Fehlschlag (siehe codeberg-spiegel.yml): keine taeglichen
+            # Fehler-Mails fuer einen bekannten Zustand; der Mac-cron misst weiter,
+            # und ohne Herzschlag aus diesem Lauf bleibt die Ampel ehrlich.
+            echo "konfiguriert=nein" >> "$GITHUB_OUTPUT"
+            echo "## Noch nicht konfiguriert" >> "$GITHUB_STEP_SUMMARY"
+            echo "Es fehlen die Secrets:$FEHLT — anlegen unter Settings -> Secrets and variables -> Actions. Bis dahin misst weiter der Mac-cron." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
+          echo "konfiguriert=ja" >> "$GITHUB_OUTPUT"
 
       - name: Frontend-Repo holen (Ziel der Live-Veroeffentlichung)
+        if: steps.zugang.outputs.konfiguriert == 'ja'
         uses: actions/checkout@v4
 
       - name: Frontend dort bereitstellen, wo das Skript es erwartet
+        if: steps.zugang.outputs.konfiguriert == 'ja'
         run: |
           ln -s "$GITHUB_WORKSPACE" "$HOME/smejj-app-frontend"
           git config user.name "smejj-qualitaetsmessung"
           git config user.email "smejjcom@gmail.com"
 
       - name: App-Repo holen (enthaelt Messlauf und Pruefsuite)
+        if: steps.zugang.outputs.konfiguriert == 'ja'
         env:
           APP_TOKEN: ${{ secrets.SMEJJ_APP_REPO_TOKEN }}
         run: git clone --depth 1 "https://x-access-token:${APP_TOKEN}@github.com/SmejjCom/smejj.com-app.git" "$HOME/app"
 
       - name: Node bereitstellen
+        if: steps.zugang.outputs.konfiguriert == 'ja'
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Messlauf (dasselbe Skript wie auf dem Mac, nur Live-Veroeffentlichung)
+        if: steps.zugang.outputs.konfiguriert == 'ja'
         env:
           SALAD_API_KEY: ${{ secrets.SALAD_API_KEY }}
           SALAD_ORGANIZATION_NAME: smejjcom
@@ -78,7 +90,7 @@ jobs:
         run: /bin/bash "$HOME/app/scripts/verlauf/messlauf-taeglich.sh"
 
       - name: Herzschlag an die Autopiloten-Ampel (Erfolg wie Fehler)
-        if: always()
+        if: always() && steps.zugang.outputs.konfiguriert == 'ja'
         env:
           AP_KEY: ${{ secrets.SMEJJ_AUTOPILOT_KEY_MESSUNG }}
           AP_STATUS: ${{ job.status == 'success' && 'ok' || 'fehler' }}
