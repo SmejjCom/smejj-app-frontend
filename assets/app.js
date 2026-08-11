@@ -331,7 +331,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
       const anfrage = {
         task: await groundTask(task),
         model: modelForTask(task, state.settings.model) || "smejj 1.0",
-        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { stufe: normalizeStufe(state.settings.stufe), ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}) },
+        files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { stufe: normalizeStufe(state.settings.stufe), ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}), ...(window.smejjBildAnhang?.take?.() || {}) },
         history: buildRequestHistory(task)
       };
       // Die Reserve laeuft ueber /api/chat: ihr Stand kennt `history` in

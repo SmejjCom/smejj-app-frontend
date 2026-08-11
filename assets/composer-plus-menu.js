@@ -4,6 +4,7 @@
 // Versionierter Pfad wie in app.js (QA-Welle 1, Befund F-07) — ein Schutztest
 // verlangt die Cache-Version dort ausdruecklich, also zieht dieser Import nach.
 import { showToast } from "./components.js?v=chat-markdown-20260717";
+import { bindBildAnhang } from "./composer-bild-anhang.js";
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -65,5 +66,7 @@ export function bindPlusMenu({ getInput, notifyInputChanged }) {
     closePlusMenu();
   });
   bindAttachInput("#composerFileInput", "Anhang", getInput, notifyInputChanged);
-  bindAttachInput("#composerPhotoInput", "Bild", getInput, notifyInputChanged);
+  // Fotos tragen seit Stufe 1 (Bild-Verstehen) echten Bildinhalt statt nur
+  // einer Text-Referenz — siehe composer-bild-anhang.js.
+  bindBildAnhang("#composerPhotoInput", getInput, notifyInputChanged);
 }
