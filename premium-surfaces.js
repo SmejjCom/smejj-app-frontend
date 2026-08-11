@@ -100,8 +100,8 @@ function renderModelRegistry(registry) {
   if (registry.auto?.active) {
     const option = document.createElement("option");
     option.value = "auto";
-    option.textContent = "Auto";
-    option.dataset.modelName = "Auto";
+    option.textContent = "smejj 1.0";
+    option.dataset.modelName = "smejj 1.0";
     option.dataset.runtimeAvailable = "true";
     select.append(option);
   }

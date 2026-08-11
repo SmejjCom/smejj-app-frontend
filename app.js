@@ -232,6 +232,7 @@ function applySelectedModel(model, { persist = true, quiet = false } = {}) {
   });
   void quiet; // Auswahl-Meldungen bewusst entfernt (Nutzer-Anweisung 2026-07-03).
 }
+window.smejjApplyModel = applySelectedModel;
 
 // Eine Stufe waehlen heisst: zurueck auf den normalen Live-Pfad
 // ("smejj 1.0"/disabled) UND die Stufe merken. Ein zuvor gewaehltes

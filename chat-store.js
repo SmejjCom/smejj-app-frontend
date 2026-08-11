@@ -190,7 +190,8 @@ async function persistActive() {
 
 function safeModelName() {
   try {
-    return localStorage.getItem("smejj.model.selected.v2") || "smejj 1.0";
+    const model = localStorage.getItem("smejj.model.v1") || localStorage.getItem("smejj.model.selected.v2") || "smejj 1.0";
+    return (model === "auto" || model === "Auto") ? "smejj 1.0" : model;
   } catch {
     return "smejj 1.0";
   }
@@ -373,6 +374,10 @@ export function newChat() {
   document.querySelector("#start")?.classList.remove("has-start-chat");
   setActiveChatId(newId());
   notifyChanged();
+  if (typeof window.smejjApplyModel === "function") {
+    const currentModel = localStorage.getItem("smejj.model.v1") || "smejj 1.0";
+    window.smejjApplyModel(currentModel, { persist: false, quiet: true });
+  }
 }
 
 function goToStart() {
