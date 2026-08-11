@@ -570,11 +570,11 @@ textarea {
 .toast-root {
   position: fixed;
   right: 16px;
-  bottom: 16px;
+  bottom: 84px;
   z-index: 20;
   display: grid;
   gap: 8px;
-  width: min(360px, calc(100vw - 32px));
+  width: min(360px, calc(100vw - 32px)); pointer-events: none;
 }
 
 .toast {
@@ -584,7 +584,7 @@ textarea {
   color: #173a30;
   padding: 12px 14px;
   font-weight: 700;
-  box-shadow: 0 12px 30px rgba(23, 32, 51, 0.12);
+  box-shadow: 0 12px 30px rgba(23, 32, 51, 0.12); pointer-events: auto;
 }
 
 .modal-root[hidden] {

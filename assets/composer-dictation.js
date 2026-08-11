@@ -62,7 +62,6 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     };
     try {
       recognition.start();
-      showToast("Diktat aktiv — zum Beenden Mikrofon erneut klicken.");
     } catch {
       stop();
     }
@@ -72,7 +71,6 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     onBeforeToggle?.();
     if (state.active) {
       stop();
-      showToast("Diktat beendet.");
       return;
     }
     start();
