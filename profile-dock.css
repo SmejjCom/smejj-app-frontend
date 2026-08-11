@@ -1,0 +1,221 @@
+/* smejj.com — Profil-Dock (linke Navigation unten): Profilbild + Name + Zahnrad.
+   Eigene Datei, weil public/styles.css per Ratchet-Baseline nicht wachsen darf.
+   Basisregeln (.profile-dock, .profile-avatar) stehen weiterhin in styles.css;
+   hier folgen nur die Ergaenzungen fuer Bild, Name und Zahnrad-Spalte. */
+
+.profile-dock {
+  align-items: center;
+}
+
+/* flex 0 1 auto (nicht 1 1 auto): Der Button nimmt nur die Breite, die er
+   braucht — so steht das Zahnrad direkt neben dem Namen statt am rechten Rand
+   (Freigabe 2026-07-17: "soll bisschen naeher kommen"). Bei langen Namen
+   schrumpft der Button und der Name wird mit Ellipse gekuerzt. */
+.profile-dock-button {
+  display: flex;
+  flex: 0 1 auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.78);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.profile-dock-button:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f6f3ee;
+}
+
+.profile-dock-button:focus-visible {
+  outline: 2px solid #00ffef;
+  outline-offset: 2px;
+}
+
+.profile-dock-name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.16;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-dock .profile-avatar {
+  flex: 0 0 auto;
+}
+
+/* Mit Bild: Verlauf und Initiale weichen dem Foto. */
+.profile-avatar.has-picture {
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid rgba(246, 243, 238, 0.22);
+  background: none;
+}
+
+.profile-dock-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+/* Zahnrad: nur Icon (Beschriftung bleibt fuer Screenreader im DOM). */
+.profile-dock-gear {
+  flex: 0 0 auto;
+  justify-content: center;
+  width: 34px;
+  min-width: 34px;
+  padding: 0;
+}
+
+.profile-dock-gear .nav-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Kompakte Sidebar: Avatar ueber Zahnrad, keine Textspalten.
+   styles.css setzt .sidebar.is-compact .profile-dock auf height:28px + overflow:hidden
+   (Stand vor dem Dock: eine einzige Zeile). Mit zwei gestapelten Zeilen wuerde das
+   Zahnrad abgeschnitten — deshalb hier Hoehe freigeben. */
+.sidebar.is-compact .profile-dock {
+  flex-direction: column;
+  gap: 0;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+.sidebar.is-compact .profile-dock .profile-avatar {
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+}
+
+.sidebar.is-compact .profile-dock-name {
+  display: none;
+}
+
+.sidebar.is-compact .profile-dock-button {
+  justify-content: center;
+  width: 100%;
+  padding: 0;
+}
+
+.sidebar.is-compact .profile-dock-gear {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-dock-button {
+    transition: none;
+  }
+}
+
+/* Avatar-Menue: Ausloggen einen Klick vom Avatar entfernt (Freigabe 2026-07-17).
+   Oeffnet nach OBEN, weil das Dock am unteren Rand der Sidebar sitzt. */
+.profile-dock {
+  position: relative;
+}
+
+/* position: fixed + Anhaengen an <body> (siehe profile-dock-menu.js): Die Sidebar
+   hat overflow:hidden UND transform — beides wuerde das Menue abschneiden.
+   Die Koordinaten setzt das Modul beim Oeffnen. */
+.profile-dock-menu {
+  position: fixed;
+  z-index: 80; /* ueber der Sidebar (z-index 70), sonst liegt das Menue dahinter */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* Feste Breite: Das Menue haengt am <body>, "100%" waere hier die Fensterbreite
+     (live gemessen: 885px statt 208px). */
+  width: 232px;
+  max-width: calc(100vw - 16px);
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: #1b1c1f;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+}
+
+.profile-dock-menu[hidden] {
+  display: none;
+}
+
+.profile-dock-menu-head {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 4px;
+}
+
+.profile-dock-menu-head strong {
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-dock-menu-head span {
+  overflow: hidden;
+  color: rgba(246, 243, 238, 0.6);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-dock-menu [role="menuitem"] {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.86);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+}
+
+.profile-dock-menu [role="menuitem"]:hover,
+.profile-dock-menu [role="menuitem"]:focus-visible {
+  background: rgba(255, 255, 255, 0.09);
+  color: #f6f3ee;
+  outline: none;
+}
+
+/* Ausloggen bleibt bewusst unauffaellig rot: erkennbar, aber kein Alarm. */
+.profile-dock-menu-logout {
+  margin-top: 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0 0 8px 8px !important;
+  color: #ff9d9d !important;
+}
+
+
+/* Profil-Chip (93x42) und Zahnrad (34x36) waren die letzten beiden Ziele der
+   unteren Leiste unter 44 px. Beim Zahnrad fehlte auch Breite: es traegt nur
+   ein Symbol und wuchs deshalb nicht mit. Gemessen 2026-08-09 bei 375 px. */
+@media (max-width: 600px) {
+  .profile-dock .profile-dock-button {
+    min-height: 44px;
+  }
+
+  .profile-dock .profile-dock-gear {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

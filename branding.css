@@ -1,0 +1,97 @@
+.app-menu-button {
+  z-index: 75;
+}
+
+.sidebar {
+  border-right: 0;
+}
+
+.app-brand-logo {
+  --app-brand-expanded-width: 80px;
+  --app-brand-expanded-height: 28px;
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 0px);
+  left: calc(env(safe-area-inset-left) + 36px);
+  z-index: 74;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  line-height: 0;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-brand-logo img {
+  grid-area: 1 / 1;
+  display: block;
+  object-fit: contain;
+}
+
+.app-brand-icon {
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  visibility: visible;
+  opacity: 1;
+}
+
+.app-brand-wordmark {
+  width: 100%;
+  height: auto;
+  max-height: 19px;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+body[data-left-menu-state="expanded"] .app-brand-logo {
+  width: min(var(--app-brand-expanded-width), calc(var(--left-panel-width) - 52px));
+  height: var(--app-brand-expanded-height);
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body[data-left-menu-state="expanded"] .app-brand-icon {
+  visibility: hidden;
+  opacity: 0;
+}
+
+body[data-left-menu-state="expanded"] .app-brand-wordmark {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (max-width: 560px) {
+  .app-brand-logo {
+    --app-brand-expanded-width: 76px;
+  }
+}
+
+/* Das Logo sitzt fest neben dem Menue-Knopf. Wachsen beide auf 44 px (siehe
+   styles.css, 2026-08-09), reichen die bisherigen 36 px Abstand nicht mehr —
+   der Menue-Knopf endet dann erst bei 44. */
+@media (max-width: 600px) {
+  .app-brand-logo {
+    width: 44px;
+    height: 44px;
+    left: calc(env(safe-area-inset-left) + 48px);
+  }
+
+  /* Bei offenem linken Menue zeigt das Logo die Wortmarke und ist dann breiter,
+     aber nur so hoch wie --app-brand-expanded-height (28 px). Live nachgemessen
+     2026-08-09: in genau diesem Zustand war es 76x28 und damit als einziges
+     Kopf-Element wieder unter dem Touch-Ziel. Die Breite bleibt der Wortmarke
+     ueberlassen, die Hoehe nicht. */
+  body[data-left-menu-state="expanded"] .app-brand-logo {
+    height: 44px;
+  }
+}

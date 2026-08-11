@@ -1,0 +1,20 @@
+{
+  "webcredentials": {
+    "apps": [
+      "REPLACE_APPLE_TEAM_ID.com.smejj.app"
+    ]
+  },
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "REPLACE_APPLE_TEAM_ID.com.smejj.app"
+        ],
+        "components": [
+          { "/": "/*" }
+        ]
+      }
+    ]
+  }
+}

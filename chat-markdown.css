@@ -1,0 +1,247 @@
+/* smejj.com — Darstellung der gerenderten Chat-Antworten (public/chat-markdown.js).
+   Eigene Datei, weil public/styles.css per Ratchet-Baseline nicht wachsen darf.
+   Bewusst zurueckhaltend: Das Antwort-Design bleibt wie bisher, nur Auszeichnung
+   wird sichtbar (fett/kursiv/Code) statt als Sternchen. */
+
+.entry.assistant p {
+  margin: 0 0 10px;
+}
+
+.entry.assistant p:last-child {
+  margin-bottom: 0;
+}
+
+.entry.assistant strong {
+  font-weight: 700;
+}
+
+.entry.assistant .chat-list {
+  margin: 0 0 10px;
+  padding-left: 20px;
+}
+
+.entry.assistant .chat-list li {
+  margin: 2px 0;
+}
+
+/* Links aus chat-markdown.js (Betreiber-Auftrag 2026-08-03: klickbar).
+   currentColor + Unterstrich: bleibt in hell und dunkel lesbar, kein neuer Farbwert. */
+.entry.assistant .chat-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.entry.assistant .chat-link:hover {
+  opacity: 0.8;
+}
+
+.entry.assistant code {
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.09);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.92em;
+}
+
+.entry.assistant .chat-code {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.entry.assistant .chat-code code {
+  padding: 0;
+  background: none;
+  white-space: pre;
+}
+
+/* Kopieren-Knopf am Codeblock (public/chat-code-copy.js).
+   Der Wrapper traegt die Positionierung, damit das <pre> seinen
+   horizontalen Ueberlauf behaelt und der Knopf beim Scrollen stehen bleibt. */
+.chat-code-wrap {
+  position: relative;
+  margin: 0 0 10px;
+}
+
+/* Spezifitaet mit `.entry.assistant` davor, sonst gewinnt die Grundregel
+   `.entry.assistant .chat-code { padding: 10px 12px }` weiter oben und der Knopf
+   legt sich ueber die erste Codezeile. Live gemessen 2026-07-29: 17 px
+   Ueberlappung, sichtbar erst bei langen Zeilen. */
+.entry.assistant .chat-code-wrap .chat-code {
+  margin: 0;
+  /* Platz fuer den Knopf. Der Wert haengt an seiner Hoehe und wird bei
+     praezisem Zeigegeraet unten mitverkleinert. */
+  padding-top: 52px;
+}
+
+/* Zwei Regeln aus dem Projektstandard, beide keine Kosmetik:
+
+   1. NICHT an :hover haengen. Eine reine Hover-Bedienung existiert fuer
+      Tastatur-, Touch- und Screenreader-Nutzer nicht (WCAG 2.1.1). Der Knopf
+      ist immer da, nur zurueckhaltend gefaerbt.
+   2. styles.css setzt projektweit `button { min-height: 42px }` als Touch-Ziel.
+      Das bleibt die Voreinstellung — nur wo ein praezises Zeigegeraet vorhanden
+      ist, wird der Knopf kompakt. Browser ohne pointer-Abfrage behalten das
+      groessere, sichere Ziel. Gemessen 2026-07-29 auf 375 px: ohne diese Regel
+      mass der Knopf 31x23 px. */
+.chat-code-copy {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  background: rgba(20, 20, 20, 0.55);
+  color: rgba(246, 243, 238, 0.62);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
+}
+
+@media (pointer: fine) {
+  .entry.assistant .chat-code-wrap .chat-code {
+    padding-top: 37px;
+  }
+
+  .chat-code-copy {
+    min-width: 0;
+    min-height: 26px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+}
+
+/* Beschriftung aus CSS, NICHT als Textknoten: chat-store.js speichert
+   entry.textContent und chat-history-context.js baut daraus den Modellkontext —
+   ein geschriebenes "Kopieren" waere mitten im Code gelandet. */
+.chat-code-copy::after {
+  content: "Kopieren";
+}
+
+.chat-code-copy.is-done::after {
+  content: "Kopiert";
+}
+
+.chat-code-wrap:hover .chat-code-copy,
+.chat-code-wrap:focus-within .chat-code-copy {
+  color: rgba(246, 243, 238, 0.85);
+}
+
+.chat-code-copy:hover,
+.chat-code-copy:focus-visible {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  color: #f6f3ee;
+}
+
+.chat-code-copy:focus-visible {
+  outline: 2px solid var(--menu-icon-active-color, #00ffef);
+  outline-offset: 1px;
+}
+
+.chat-code-copy.is-done {
+  color: #7fe0a8;
+}
+
+.chat-code-copy-icon {
+  display: inline-flex;
+}
+
+.chat-code-copy svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Schmale Geraete: nur das Symbol. Mit Beschriftung frisst der Knopf sonst die
+   halbe Breite des Codeblocks. Der Name bleibt ueber aria-label erhalten. */
+@media (max-width: 430px) {
+  .chat-code-copy::after {
+    content: none;
+  }
+}
+
+.entry.assistant[data-thinking="true"] {
+  color: rgba(255, 255, 255, 0.65);
+  font-style: italic;
+  padding: 6px 10px;
+}
+
+.thinking-dots .dot {
+  animation: thinkingDot 1.4s infinite ease-in-out both;
+  display: inline-block;
+  margin-left: 1px;
+}
+
+.thinking-dots .dot:nth-child(1) { animation-delay: 0s; }
+.thinking-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes thinkingDot {
+  0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1.2); }
+}
+
+/* --- Arbeitsschritte waehrend der Antwort (Befund 2026-08-04) ------------
+   Der Nutzer sah sekundenlang nichts, waehrend im Hintergrund gesucht wurde,
+   und hielt die Antwort fuer beendet. Diese Liste macht die Arbeit sichtbar.
+   Bewusst zurueckhaltend: sie ist Beiwerk, nicht die Antwort. */
+.chat-schritte {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.86em;
+  opacity: 0.78;
+  padding-block: 2px;
+}
+
+.chat-schritt {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1.45;
+  /* Lange Suchbegriffe duerfen die Zeile nicht sprengen. */
+  overflow-wrap: anywhere;
+}
+
+.chat-schritt-stand {
+  white-space: nowrap;
+  opacity: 0.72;
+}
+
+/* Ein laufender Schritt pulsiert leicht — der Unterschied zu "fertig" muss
+   auch ohne Farbe erkennbar sein (der Haken traegt die Aussage). */
+.chat-schritt[data-zustand="laeuft"] .chat-schritt-stand {
+  animation: chat-schritt-puls 1.4s ease-in-out infinite;
+}
+
+.chat-schritt[data-zustand="fertig"] {
+  opacity: 0.9;
+}
+
+@keyframes chat-schritt-puls {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.95; }
+}
+
+/* Bewegung nur, wenn der Nutzer sie nicht abbestellt hat. */
+@media (prefers-reduced-motion: reduce) {
+  .chat-schritt[data-zustand="laeuft"] .chat-schritt-stand { animation: none; }
+}
