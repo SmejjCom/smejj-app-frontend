@@ -140,10 +140,16 @@ async function refreshSession() {
   const token = getToken();
   if (!token) return;
   try {
-    const response = await fetch(CLIENT_ROUTES.api.authMe, { headers: authHeaders() });
+    const response = await fetch(`${API_ORIGIN}${CLIENT_ROUTES.api.authMe}`, { headers: authHeaders() });
     const data = await response.json();
     if (data.authenticated && data.user) {
       if (data.accessToken) setToken(data.accessToken);
+      const params = new URLSearchParams(window.location.search);
+      const mode = params.get("mode") || "login";
+      if (!params.has("verify") && !params.has("reset") && mode === "login") {
+        window.location.replace(nextTarget());
+        return;
+      }
       // Bei bestehender Sitzung fuehrt ein deutlicher Knopf zurueck in die App;
       // die Statuszeile bleibt nur als Rueckfallebene, falls der Block fehlt.
       if (!showSignedIn(data.user)) {
@@ -433,7 +439,7 @@ async function startGithubLogin() {
   try {
     const { id, origin } = await startHandoffQuery();
     const query = id ? `?handoff=${encodeURIComponent(id)}&returnOrigin=${encodeURIComponent(origin)}` : "";
-    window.location.assign(`${CLIENT_ROUTES.api.authGithub}${query}`);
+    window.location.assign(`${API_ORIGIN}${CLIENT_ROUTES.api.authGithub}${query}`);
   } catch {
     status(t("GitHub Login konnte nicht gestartet werden."), "error");
     if (button) button.disabled = false;
@@ -449,7 +455,7 @@ async function requestMagicLink() {
   status(t("Anmeldelink wird gesendet …"));
   try {
     const { id, origin } = await startHandoffQuery();
-    const { ok, payload } = await postJson(CLIENT_ROUTES.api.authMagicLinkRequest, { email, handoff: id, returnOrigin: origin });
+    const { ok, payload } = await postJson(`${API_ORIGIN}${CLIENT_ROUTES.api.authMagicLinkRequest}`, { email, handoff: id, returnOrigin: origin });
     if (!ok) return status(errorText(payload, "Anmeldelink konnte nicht gesendet werden."), "error");
     status(t("Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig)."), "success");
   } catch {
