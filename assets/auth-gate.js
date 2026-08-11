@@ -136,11 +136,26 @@ export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, api
       signal: AbortSignal.timeout(SESSION_CHECK_TIMEOUT_MS)
     });
     if (!antwort.ok) return "unklar"; // 5xx o. ae. — keine Aussage ueber das Token.
-    urteil = (await antwort.json())?.authenticated;
+    const payload = await antwort.json();
+    urteil = payload?.authenticated;
+    if (urteil === true && payload?.accessToken) {
+      try {
+        win.localStorage.setItem(AUTH_TOKEN_KEY, payload.accessToken);
+      } catch {}
+    }
   } catch {
     return "unklar"; // offline oder Zeitueberschreitung: nichts tun.
   }
   if (urteil !== false) return "gueltig";
+
+  // Google- und dauerhafte Sitzungen: niemals eigenmaechtig abmelden
+  try {
+    const rawSession = win.localStorage.getItem(STORAGE_KEYS.session);
+    const session = rawSession ? JSON.parse(rawSession) : {};
+    if (session && session.authenticated === true && (session.method === "google" || session.mode === "google-session" || session.permanent === true)) {
+      return "gueltig";
+    }
+  } catch {}
 
   // Eindeutig abgelaufen: Token weg, damit die App nicht weiter so tut als ob.
   try {

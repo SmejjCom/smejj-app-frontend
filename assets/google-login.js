@@ -93,6 +93,11 @@ async function handleGoogleCredential(response, deps) {
   const { writeOutput } = deps;
   const result = await postJson(CLIENT_ROUTES.api.authGoogle, { credential: response.credential });
   if (result.authenticated && result.user) {
+    if (result.accessToken) {
+      try {
+        localStorage.setItem("smejj.auth.accessToken.v1", result.accessToken);
+      } catch {}
+    }
     showSignedIn(result.user, deps);
     return;
   }
@@ -110,6 +115,7 @@ function showSignedIn(user, deps) {
   button.textContent = `Google: ${user.email} abmelden`;
   button.addEventListener("click", async () => {
     await postJson(CLIENT_ROUTES.api.authLogout, {});
+    try { localStorage.removeItem("smejj.auth.accessToken.v1"); } catch {}
     state.session = { authenticated: false, mode: PROJECT_ROLES.localOnly };
     localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));
     refreshSessionStatus();
@@ -122,6 +128,8 @@ function showSignedIn(user, deps) {
     mode: "google-session",
     userId: user.email ? `user_${user.email.toLowerCase().replace(/[^a-z0-9]+/g, "_")}` : "google_user",
     email: user.email,
+    method: "google",
+    permanent: true,
     startedAt: new Date().toISOString()
   };
   localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));

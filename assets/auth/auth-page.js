@@ -143,6 +143,7 @@ async function refreshSession() {
     const response = await fetch(CLIENT_ROUTES.api.authMe, { headers: authHeaders() });
     const data = await response.json();
     if (data.authenticated && data.user) {
+      if (data.accessToken) setToken(data.accessToken);
       // Wer schon angemeldet ist, hat auf der Anmeldeseite nichts zu suchen:
       // sofort in die App (bzw. zum ?next=-Ziel), so machen es claude.ai und
       // Co. Stehen bleibt die Seite nur fuer echte Aufgaben-Links (E-Mail-
@@ -211,6 +212,20 @@ async function completeGoogleHandoff() {
     const data = await response.json();
     if (data.state === "completed" && data.accessToken) {
       setToken(data.accessToken);
+      try {
+        const user = data.user || {};
+        const session = {
+          authenticated: true,
+          mode: "google-session",
+          userId: user.email ? `user_${user.email.toLowerCase().replace(/[^a-z0-9]+/g, "_")}` : "google_user",
+          email: user.email,
+          method: "google",
+          permanent: true,
+          startedAt: new Date().toISOString()
+        };
+        localStorage.setItem("smejj.session.v1", JSON.stringify(session));
+        if (user.email) localStorage.setItem("smejj.profile.v1", JSON.stringify({ name: user.name || "", email: user.email }));
+      } catch {}
       status(t("Angemeldet. Weiterleitung …"), "success");
       gotoAfterLogin();
       return true;
