@@ -160,7 +160,7 @@ async function startGoogleLogin() {
   if (button) button.disabled = true;
   status(t("Google Login wird gestartet …"));
   try {
-    const response = await fetch(CLIENT_ROUTES.api.authConfig);
+    const response = await fetch(`${API_ORIGIN}${CLIENT_ROUTES.api.authConfig}`);
     const config = await response.json();
     if (!response.ok || config.configured !== true) {
       status(t("Google Login ist serverseitig noch nicht konfiguriert. Nutze bis dahin Passkey."), "error");
@@ -460,17 +460,26 @@ async function requestMagicLink() {
 }
 
 // Fail-closed-UX: nur serverseitig konfigurierte Login-Methoden sichtbar machen.
-// E-Mail und Passkey sind Basis und bleiben immer verfuegbar.
+// Google, E-Mail und Passkey sind Basis-Methoden und bleiben immer verfuegbar.
 async function applyAvailableMethods() {
-  let methods = {};
+  let methods = { google: true, email: true, passkey: true };
   try {
-    const response = await fetch(CLIENT_ROUTES.api.authConfig);
+    const response = await fetch(`${API_ORIGIN}${CLIENT_ROUTES.api.authConfig}`);
     const config = await response.json();
-    methods = { ...(config?.methods || {}), google: config?.methods?.google ?? config?.configured === true };
-  } catch { methods = { email: true, passkey: true }; }
+    methods = {
+      google: true,
+      email: true,
+      passkey: true,
+      github: config?.methods?.github === true,
+      magicLink: config?.methods?.magicLink === true,
+      apple: config?.methods?.apple === true,
+      ...(config?.methods || {}),
+      google: config?.methods?.google ?? true
+    };
+  } catch { methods = { google: true, email: true, passkey: true }; }
   for (const button of document.querySelectorAll("[data-method]")) {
     const method = button.dataset.method;
-    if (method === "email" || method === "passkey") { button.hidden = false; continue; }
+    if (method === "email" || method === "passkey" || method === "google") { button.hidden = false; continue; }
     button.hidden = methods[method] !== true;
   }
 }
