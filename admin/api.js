@@ -27,12 +27,9 @@
   // Gleicher Schluessel wie assets/auth-page.js und assets/account-sessions.js —
   // wer sich auf smejj.com anmeldet, ist damit auch in der Konsole angemeldet.
   const TOKEN_KEY = "smejj.auth.accessToken.v1";
-  const CONTROL_ORIGIN = "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud";
-  // ZWEITER HOST (Befund 2026-08-11): Der Salad-Control fiel ganztaegig
-  // knotenweise aus, und die Konsole war blind, obwohl der Zeabur-Control
-  // gesund lief — beide fuehren dasselbe Release und teilen sich die Ablage
-  // auf IDrive e2. Faellt einer aus, uebernimmt der andere.
-  const ZWEIT_ORIGIN = "https://smejj-control.zeabur.app";
+  const CONTROL_ORIGIN = "https://smejj-control.zeabur.app";
+  // ZWEITER HOST (Fallback): Der Salad-Control als Ausweich-Host.
+  const ZWEIT_ORIGIN = "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud";
   // Der einmal gefundene gesunde Host gilt fuer die ganze Browser-Sitzung —
   // sonst wechselte jede Anfrage muenzwurfartig zwischen zwei Servern, deren
   // Step-up-Fenster (15 Minuten) jeweils nur lokal gilt.
