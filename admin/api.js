@@ -28,19 +28,52 @@
   // wer sich auf smejj.com anmeldet, ist damit auch in der Konsole angemeldet.
   const TOKEN_KEY = "smejj.auth.accessToken.v1";
   const CONTROL_ORIGIN = "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud";
+  // ZWEITER HOST (Befund 2026-08-11): Der Salad-Control fiel ganztaegig
+  // knotenweise aus, und die Konsole war blind, obwohl der Zeabur-Control
+  // gesund lief — beide fuehren dasselbe Release und teilen sich die Ablage
+  // auf IDrive e2. Faellt einer aus, uebernimmt der andere.
+  const ZWEIT_ORIGIN = "https://smejj-control.zeabur.app";
+  // Der einmal gefundene gesunde Host gilt fuer die ganze Browser-Sitzung —
+  // sonst wechselte jede Anfrage muenzwurfartig zwischen zwei Servern, deren
+  // Step-up-Fenster (15 Minuten) jeweils nur lokal gilt.
+  const AKTIV_KEY = "smejj.admin.apiOrigin.aktiv.v1";
 
-  /** Leer = gleiche Herkunft (Control-Server). Sonst die Adresse der API. */
-  const API_BASIS = (function () {
+  let apiBasis = CONTROL_ORIGIN;
+  let umschaltbar = false;
+  (function () {
     try {
-      // Auf dem Control-Server selbst bleibt alles relativ.
-      if (location.origin === CONTROL_ORIGIN) return "";
+      // Auf einem der Control-Server selbst bleibt alles relativ.
+      if (location.origin === CONTROL_ORIGIN || location.origin === ZWEIT_ORIGIN) { apiBasis = ""; return; }
       // Zum Messen und fuer die lokale Entwicklung uebersteuerbar — derselbe
-      // Schluessel, den auch assets/config.js kennt.
+      // Schluessel, den auch assets/config.js kennt. Ein ausdruecklicher
+      // Wunsch schlaegt das automatische Ausweichen.
       const eigen = localStorage.getItem("smejj.apiOrigin.v1");
-      if (eigen && /^https?:\/\//.test(eigen)) return eigen.replace(/\/+$/, "");
-    } catch { /* Storage gesperrt: Standard unten */ }
-    return CONTROL_ORIGIN;
+      if (eigen && /^https?:\/\//.test(eigen)) { apiBasis = eigen.replace(/\/+$/, ""); return; }
+      umschaltbar = true;
+      const gemerkt = sessionStorage.getItem(AKTIV_KEY);
+      if (gemerkt === CONTROL_ORIGIN || gemerkt === ZWEIT_ORIGIN) apiBasis = gemerkt;
+    } catch { /* Storage gesperrt: Standard bleibt */ }
   })();
+
+  /**
+   * Wann darf eine gescheiterte Anfrage auf den anderen Host ausweichen?
+   * Status 0 (Netz/CSP) und 503 (Gateway ohne lebende Instanz) heissen: die
+   * Anfrage hat den Server NIE erreicht — Wiederholen ist auch fuer
+   * schreibende Aktionen gefahrlos. 502/504 koennen dagegen bedeuten, dass
+   * der Server schon gearbeitet hat; dort weicht nur LESEN aus, sonst
+   * koennte ein Doppel-POST z. B. zweimal loeschen.
+   */
+  function darfAusweichen(antwort, nurSicher) {
+    if (!umschaltbar) return false;
+    if (antwort.status === 0 || antwort.status === 503) return true;
+    if (!nurSicher && (antwort.status === 502 || antwort.status === 504)) return true;
+    return false;
+  }
+
+  function wechselHost() {
+    apiBasis = (apiBasis === CONTROL_ORIGIN) ? ZWEIT_ORIGIN : CONTROL_ORIGIN;
+    try { sessionStorage.setItem(AKTIV_KEY, apiBasis); } catch { /* egal */ }
+  }
 
   function token() {
     try { return localStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; }
@@ -48,7 +81,7 @@
 
   /** Vollstaendige Adresse fuer einen API-Pfad. */
   function url(pfad) {
-    return API_BASIS + pfad;
+    return apiBasis + pfad;
   }
 
   /**
@@ -68,7 +101,7 @@
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
-  async function holeDirekt(pfad) {
+  async function holeEinmal(pfad) {
     try {
       const antwort = await fetch(url(pfad), { headers: kopf(), cache: "no-store" });
       const text = await antwort.text();
@@ -79,6 +112,21 @@
     } catch (error) {
       return { ok: false, status: 0, data: {}, fehler: "Keine Verbindung zum Control-Server: " + String(error && error.message || error) };
     }
+  }
+
+  async function holeDirekt(pfad) {
+    const erste = await holeEinmal(pfad);
+    if (erste.ok || !darfAusweichen(erste, false)) return erste;
+    const vorher = apiBasis;
+    wechselHost();
+    const zweite = await holeEinmal(pfad);
+    if (!zweite.ok && darfAusweichen(zweite, false)) {
+      // Beide Hosts unerreichbar: zurueck zum bevorzugten, damit die Sitzung
+      // nicht auf dem Ausweichhost kleben bleibt, wenn der Hauptweg heilt.
+      apiBasis = vorher;
+      try { sessionStorage.setItem(AKTIV_KEY, apiBasis); } catch { /* egal */ }
+    }
+    return zweite;
   }
 
   // Auch LESEN kann an der Bestaetigungspflicht scheitern (seit 2026-08-06).
@@ -330,7 +378,7 @@
     return "deine Admin-E-Mail-Adresse";
   }
 
-  async function sendeDirekt(pfad, koerper) {
+  async function sendeEinmal(pfad, koerper) {
     try {
       const antwort = await fetch(url(pfad), {
         method: "POST",
@@ -345,6 +393,21 @@
     } catch (error) {
       return { ok: false, status: 0, data: {}, fehler: "Keine Verbindung: " + String(error && error.message || error) };
     }
+  }
+
+  async function sendeDirekt(pfad, koerper) {
+    const erste = await sendeEinmal(pfad, koerper);
+    // Schreibend: nur ausweichen, wenn die Anfrage den Server nie erreicht
+    // hat (0/503) — siehe darfAusweichen.
+    if (erste.ok || !darfAusweichen(erste, true)) return erste;
+    const vorher = apiBasis;
+    wechselHost();
+    const zweite = await sendeEinmal(pfad, koerper);
+    if (!zweite.ok && darfAusweichen(zweite, true)) {
+      apiBasis = vorher;
+      try { sessionStorage.setItem(AKTIV_KEY, apiBasis); } catch { /* egal */ }
+    }
+    return zweite;
   }
 
   // Step-up: verlangt der Server fuer eine aendernde Aktion einen frischen
