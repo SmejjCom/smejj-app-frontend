@@ -37,6 +37,7 @@ export function setButtonIcon(button, icon) {
 }
 
 export function showToast(message, tone = "info") {
+  if (tone === "info") return;
   const root = document.querySelector("#toastRoot");
   if (!root) return;
   const toast = document.createElement("div");
