@@ -25,13 +25,17 @@
     // Neue App-Ansicht angelegt? Dann hier ebenfalls eintragen, sonst zeigt
     // ihr Direktaufruf die 404-Seite.
     (function () {
+      var path = location.pathname.replace(/\/+$/, "") || "/";
+      if (path.indexOf("/admin") === 0) {
+        location.replace("/admin/");
+        return;
+      }
       var ROUTES = [
         "/home", "/chat", "/search", "/websites", "/smejj-claw", "/automation",
         "/chat-history", "/browser", "/code", "/projects", "/files", "/storage",
         "/memory", "/ai", "/cost", "/status", "/settings", "/profile",
         "/offline", "/error"
       ];
-      var path = location.pathname.replace(/\/+$/, "") || "/";
       if (ROUTES.indexOf(path) === -1) return; // unbekannt: echte 404-Seite zeigen
       if (path === "/home") {
         location.replace("/");
