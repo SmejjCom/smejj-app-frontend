@@ -31,12 +31,11 @@ const BILDER_HEALTH_TIMEOUT_MS = 2500;
 const BILDER_MAX_B64 = 4_000_000;
 
 // Mal-Auftrag = Mal-Verb UND Motivwort in der Frage (deutsch/englisch).
-// Bewusst eng: eine normale Frage ohne beides darf NIE die Bild-Spur nehmen.
-const BILDER_VERB = /\b(zeichne|zeichnen|male|malen|erstelle|erstellen|generiere|generieren|erzeuge|erzeugen|draw|paint|generate|create|make)\b/i;
+const BILDER_VERB = /\b(zeichne|zeichnen|zeichen|zeichene|zeig|zeige|zeigen|male|malen|erstelle|erstellen|erstell|generiere|generieren|generier|erzeuge|erzeugen|erzeug|mach|mache|machen|bau|bauen|draw|paint|generate|create|make|kannst|kann|moechte|möchte|will)\b/i;
 const BILDER_MOTIV = /\b(bild(er|es)?|foto(s)?|grafik(en)?|illustration(en)?|zeichnung(en)?|logo(s)?|skizze(n)?|gem(ae|ä)lde|image(s)?|picture(s)?|photo(s)?|drawing(s)?|sketch(es)?)\b/i;
 
 // Video-Auftrag = Video-Verb UND Video-Motivwort in der Frage.
-const VIDEO_VERB = /\b(zeichne|zeichnen|male|malen|erstelle|erstellen|generiere|generieren|erzeuge|erzeugen|draw|paint|generate|create|make|produce)\b/i;
+const VIDEO_VERB = /\b(zeichne|zeichnen|zeichen|zeichene|zeig|zeige|zeigen|male|malen|erstelle|erstellen|erstell|generiere|generieren|generier|erzeuge|erzeugen|erzeug|mach|mache|machen|bau|bauen|draw|paint|generate|create|make|produce|kannst|kann|moechte|möchte|will)\b/i;
 const VIDEO_MOTIV = /\b(video(s)?|film(e|s)?|animation(en)?|clip(s)?|mp4|movie(s)?)\b/i;
 
 // SVG-Absicherung: Modellausgabe ist NICHT vertrauenswuerdig. Verboten ist
@@ -58,14 +57,18 @@ const BILDER_SYSTEM_PROMPT = [
 export function erkenneBildAuftrag(task) {
   const text = String(task || "").trim();
   if (!text || text.length > 600) return "";
-  return BILDER_VERB.test(text) && BILDER_MOTIV.test(text) ? text : "";
+  if (/\b(unterschied|was ist|wie geht|bedeutung|erkläre|erklare|definition)\b/i.test(text)) return "";
+  if (BILDER_MOTIV.test(text) && (BILDER_VERB.test(text) || /\b(von|zu|aus|mit|über|ueber|eines|ein|eine|einen)\b/i.test(text))) return text;
+  return "";
 }
 
 // Liefert den Video-Prompt oder "" wenn kein Video-Auftrag.
 export function erkenneVideoAuftrag(task) {
   const text = String(task || "").trim();
   if (!text || text.length > 600) return "";
-  return VIDEO_VERB.test(text) && VIDEO_MOTIV.test(text) ? text : "";
+  if (/\b(unterschied|was ist|wie geht|bedeutung|erkläre|erklare|definition)\b/i.test(text)) return "";
+  if (VIDEO_MOTIV.test(text) && (VIDEO_VERB.test(text) || /\b(von|zu|aus|mit|über|ueber|eines|ein|eine|einen)\b/i.test(text))) return text;
+  return "";
 }
 
 // Zieht das SVG aus der Modellantwort und prueft es hart. "" = unbrauchbar.
