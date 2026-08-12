@@ -3890,3 +3890,17 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
     min-height: 44px;
   }
 }
+
+/* Erzeugte Videos aus chat-markdown.js (Video-Erstellung 2026-08-12).
+   Ersetzt ![video](URL) durch einen interaktiven HTML5-Player. */
+.entry.assistant .chat-video {
+  display: block;
+  width: 100%;
+  max-width: min(100%, 512px);
+  height: auto;
+  margin: 6px 0 12px;
+  border-radius: 12px;
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
