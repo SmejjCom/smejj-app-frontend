@@ -204,6 +204,29 @@ function bilderSchritt(res, zustand, text) {
 export async function streamBilderLane(res, body, task, deps) {
   const videoPrompt = erkenneVideoAuftrag(task);
   if (videoPrompt) {
+    if (await videoWorkerBereit()) {
+      bilderSseKopf(res, deps, body, "video-erzeugung", "video-worker:wan2.1");
+      res.write(`data: ${JSON.stringify({ smejj_schritt: { art: "video", zustand: "laeuft", text: "Erzeuge Video (Video-Worker aktiv) ..." } })}\n\n`);
+      try {
+        const workerRes = await fetch(`${VIDEO_WORKER_URL}/erzeuge`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...(VIDEO_WORKER_KEY ? { "x-smejj-key": VIDEO_WORKER_KEY } : {}) },
+          body: JSON.stringify({ prompt: videoPrompt }),
+          signal: AbortSignal.timeout(deps?.timeoutMs || 30000)
+        });
+        const data = await workerRes.json();
+        if (data?.ok && data?.video_url) {
+          res.write(`data: ${JSON.stringify({ smejj_schritt: { art: "video", zustand: "fertig", text: "Video erfolgreich generiert" } })}\n\n`);
+          bilderSendeInhalt(res, `🎬 **Video-Erstellung für smejj 1.0**\n\nAuftrag: *"${videoPrompt}"*\n\n![video](${data.video_url})`);
+          res.write("data: [DONE]\n\n");
+          res.end();
+          return true;
+        }
+      } catch {
+        /* Fallback auf Status-Antwort */
+      }
+    }
+
     bilderSseKopf(res, deps, body, "video-hinweis", "smejj-video-engine");
     res.write(`data: ${JSON.stringify({ smejj_schritt: { art: "video", zustand: "laeuft", text: "Video-Erstellung angefordert — prüfe Video-Engine Infrastruktur" } })}\n\n`);
     const antwortText = `🎬 **Video-Erstellung für smejj 1.0 (Infrastruktur-Status)**\n\n` +
