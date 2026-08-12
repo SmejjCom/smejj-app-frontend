@@ -43,8 +43,22 @@
       "<tr><td><b>DPO & LoRA Training</b></td><td>Aktiv 24/7</td><td>Selbstverbesserung auf IDrive e2 S3 Storage</td></tr>"
     ]);
 
+    const liveFreigabeBanner = '<div class="note glass" style="border: 2px solid var(--sm-accent); background: rgba(0, 255, 239, 0.08); margin-bottom: 16px; padding: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">'
+      + '<div style="display: flex; align-items: center; gap: 14px;">'
+      + '<div style="font-size: 28px;">🚀</div>'
+      + '<div>'
+      + '<div style="font-weight: bold; color: var(--sm-accent-text); font-size: 16px;">Werkstatt-Autopilot & Live-Schalten</div>'
+      + '<div style="color: var(--sm-ink-dim); font-size: 13px; margin-top: 2px;">Hier siehst du autonom entwickelte Funktionen & kannst sie mit 1 Klick live schalten.</div>'
+      + '</div>'
+      + '</div>'
+      + '<a href="/admin/freigaben/" class="btn" style="background: var(--sm-accent); color: #000; font-weight: bold; text-decoration: none; padding: 8px 18px; border-radius: 4px; display: inline-block;">'
+      + '1-Klick Live-Freigaben öffnen →'
+      + '</a>'
+      + '</div>';
+
     return V.kopfBlock("CK", "Cockpit", "Executive Command Cockpit",
       "Das zentrale Führungs-Cockpit für smejj.com — Alle Überlebens-Kennzahlen auf einen Blick.")
+      + liveFreigabeBanner
       + kpis
       + '<div class="stack">' + healthStatus
       + V.panelBlock("Geschwindigkeits- & Latenz-Budgets", "Echtzeit-Messwerte gegen harte Garantien", perfTable)

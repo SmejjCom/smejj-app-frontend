@@ -496,6 +496,58 @@
     // Im Pfad-Modus ist jeder Seitenwechsel eine echte Navigation — es gibt
     // nichts zu beobachten. Der Hash-Horcher bleibt dem Rueckfallweg vorbehalten.
     if (!PFAD_MODUS) window.addEventListener("hashchange", route);
+
+    // Initialisiere die Admin-Suchleiste im Topbar
+    const searchInput = document.getElementById("adminSearchInput");
+    const searchResults = document.getElementById("adminSearchResults");
+    if (searchInput && searchResults) {
+      const SUCH_MAP = [
+        { pfad: "freigaben", begriff: "🚀 Live-Schalten & Freigaben (Werkstatt-Autopilot, Merge, Releases)", gruppe: "Überblick" },
+        { pfad: "autopiloten", begriff: "Autopiloten-Cockpit (30 Autopiloten, Herzschlag, Wächter)", gruppe: "Betrieb" },
+        { pfad: "uebersicht", begriff: "Executive Command Cockpit (Latenzen, Status, 0€ Cost Gate)", gruppe: "Überblick" },
+        { pfad: "nutzer", begriff: "Nutzerverwaltung & Konten", gruppe: "Menschen" },
+        { pfad: "rollen", begriff: "Rollen & Rechte (Schreibrechte, Step-Up Auth)", gruppe: "Menschen" },
+        { pfad: "modelle", begriff: "KI-Modell Arena & smejj 1.0 Status", gruppe: "Produkt" },
+        { pfad: "kosten", begriff: "Kostenkontrolle & 0,00 EUR Policy", gruppe: "Geld" },
+        { pfad: "audit", begriff: "Audit-Log & Replay-Historie", gruppe: "Recht" }
+      ];
+
+      searchInput.addEventListener("input", function () {
+        const q = String(this.value || "").trim().toLowerCase();
+        if (!q) { searchResults.style.display = "none"; return; }
+        const treffer = SUCH_MAP.filter(function (s) {
+          return s.begriff.toLowerCase().indexOf(q) >= 0 || s.pfad.indexOf(q) >= 0 || s.gruppe.toLowerCase().indexOf(q) >= 0;
+        });
+        if (!treffer.length) {
+          searchResults.innerHTML = '<div style="color:var(--sm-ink-faint);padding:8px;font-size:12px;">Keine Treffer gefunden</div>';
+        } else {
+          searchResults.innerHTML = treffer.map(function (t) {
+            return '<div class="search-item" data-pfad="' + t.pfad + '" style="padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--sm-border);display:flex;flex-direction:column;gap:2px;">'
+              + '<span style="font-weight:bold;color:var(--sm-accent-text);font-size:13px;">' + A.escapeHtml(t.begriff) + '</span>'
+              + '<span style="font-size:11px;color:var(--sm-ink-dim);">' + A.escapeHtml(t.gruppe) + ' · /admin/' + t.pfad + '/</span>'
+              + '</div>';
+          }).join("");
+        }
+        searchResults.style.display = "block";
+      });
+
+      searchResults.addEventListener("click", function (evt) {
+        const item = evt.target.closest(".search-item");
+        if (item) {
+          const pfad = item.getAttribute("data-pfad");
+          searchResults.style.display = "none";
+          searchInput.value = "";
+          geheZu(pfad);
+        }
+      });
+
+      document.addEventListener("click", function (evt) {
+        if (!searchInput.contains(evt.target) && !searchResults.contains(evt.target)) {
+          searchResults.style.display = "none";
+        }
+      });
+    }
+
     route();
   }
 
