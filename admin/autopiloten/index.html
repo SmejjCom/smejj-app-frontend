@@ -37,6 +37,10 @@
     <header class="topbar">
       <div class="crumb">Operations Console · <b id="crumb">Übersicht</b></div>
       <div class="spacer"></div>
+      <div class="admin-search-box" style="position:relative;margin-right:12px;">
+        <input type="search" id="adminSearchInput" placeholder="🔍 Suchen (Live, Freigaben, Autopilot)..." style="background:rgba(5,6,8,0.7);border:1px solid var(--sm-accent-border);color:var(--sm-ink);padding:6px 14px;font-size:13px;width:260px;outline:none;" />
+        <div id="adminSearchResults" style="display:none;position:absolute;top:36px;right:0;width:340px;background:#151b2e;border:1px solid var(--sm-accent-border);box-shadow:0 8px 30px rgba(0,0,0,0.8);z-index:9999;padding:8px;"></div>
+      </div>
       <div class="pill" id="indexStand">Index —</div>
       <div class="pill" id="ketteStand">Kette —</div>
     </header>

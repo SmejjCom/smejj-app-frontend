@@ -497,9 +497,26 @@
     // nichts zu beobachten. Der Hash-Horcher bleibt dem Rueckfallweg vorbehalten.
     if (!PFAD_MODUS) window.addEventListener("hashchange", route);
 
-    // Initialisiere die Admin-Suchleiste im Topbar
-    const searchInput = document.getElementById("adminSearchInput");
-    const searchResults = document.getElementById("adminSearchResults");
+    // Initialisiere die Admin-Suchleiste im Topbar (dynamische Erzeugung falls Alt-HTML geladen)
+    let searchInput = document.getElementById("adminSearchInput");
+    let searchResults = document.getElementById("adminSearchResults");
+    if (!searchInput) {
+      const topbar = document.querySelector(".topbar");
+      if (topbar) {
+        const spacer = topbar.querySelector(".spacer");
+        const box = document.createElement("div");
+        box.className = "admin-search-box";
+        box.style.cssText = "position:relative;margin-right:12px;display:flex;align-items:center;";
+        box.innerHTML = '<input type="search" id="adminSearchInput" placeholder="🔍 Suchen (Live, Freigaben, Autopilot)..." style="background:rgba(5,6,8,0.85);border:1px solid var(--sm-accent-border);color:var(--sm-ink);padding:6px 14px;font-size:13px;width:260px;outline:none;" /><div id="adminSearchResults" style="display:none;position:absolute;top:36px;right:0;width:340px;background:#151b2e;border:1px solid var(--sm-accent-border);box-shadow:0 8px 30px rgba(0,0,0,0.85);z-index:9999;padding:8px;"></div>';
+        if (spacer && spacer.nextSibling) {
+          topbar.insertBefore(box, spacer.nextSibling);
+        } else {
+          topbar.appendChild(box);
+        }
+        searchInput = document.getElementById("adminSearchInput");
+        searchResults = document.getElementById("adminSearchResults");
+      }
+    }
     if (searchInput && searchResults) {
       const SUCH_MAP = [
         { pfad: "freigaben", begriff: "🚀 Live-Schalten & Freigaben (Werkstatt-Autopilot, Merge, Releases)", gruppe: "Überblick" },
