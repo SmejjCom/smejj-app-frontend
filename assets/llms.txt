@@ -1,0 +1,35 @@
+# smejj.com
+
+smejj.com is a free-safe AI and code assistant platform shell: AI chat, autonomous coding, and agent workflows in the browser (PWA).
+
+Core rules:
+- GitHub.com is Free-plan-only source code and documentation.
+- GitHub Pages serves the public PWA shell and static assets; Spaceship.com provides domain and DNS.
+- IDrive e2 / S3-compatible storage is the primary store for files, media, models, backups, deployment artifacts, and central data.
+- Paid or trial-based platform services are not core architecture; Cloudflare is not used.
+- If AI inference is unavailable or paid-risk, the app must fail closed.
+
+Languages (15, worldwide coverage; German is the root page, English is the x-default fallback):
+- de: https://smejj.com/ (Deutsch)
+- en: https://smejj.com/en/ (English, global fallback)
+- zh: https://smejj.com/zh/ (中文)
+- es: https://smejj.com/es/ (Español)
+- ar: https://smejj.com/ar/ (العربية)
+- fr: https://smejj.com/fr/ (Français)
+- pt: https://smejj.com/pt/ (Português)
+- ru: https://smejj.com/ru/ (Русский)
+- tr: https://smejj.com/tr/ (Türkçe)
+- ja: https://smejj.com/ja/ (日本語)
+- ko: https://smejj.com/ko/ (한국어)
+- it: https://smejj.com/it/ (Italiano)
+- hi: https://smejj.com/hi/ (हिन्दी)
+- id: https://smejj.com/id/ (Bahasa Indonesia)
+- bn: https://smejj.com/bn/ (বাংলা)
+
+Useful endpoints:
+- https://smejj.com/sitemap.xml (includes hreflang alternates for all 15 languages)
+- https://smejj.com/robots.txt
+
+Note: smejj.com is served as a static site by GitHub Pages and exposes no
+public API under https://smejj.com/api/. Application requests go to the
+control server, which requires authentication and is metered — do not crawl it.

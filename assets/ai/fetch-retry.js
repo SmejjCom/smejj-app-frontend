@@ -1,0 +1,162 @@
+// smejj.com — Automatischer Neuversuch fuer Streaming-Anfragen (Stufe A2).
+// Hintergrund: Die Chat-Bridge laeuft auf SaladCloud-Community-Hardware; einzelne
+// Rechner fallen ohne Vorwarnung aus (Salad-Doku: 90-95 % Zuverlaessigkeit pro
+// Knoten). Mit mehreren Replikas hinter dem Load-Balancer landet ein sofortiger
+// Neuversuch auf einer gesunden Instanz — der Nutzer wartet nie wieder endlos
+// auf eine stumme Verbindung. Free-only, reine Browser-Logik.
+//
+// Verhalten: Kommt innerhalb von firstByteTimeoutMs KEIN Antwortkopf (Server
+// haengt/weg) oder liefert der Server 5xx/429, wird bis zu attempts-mal neu
+// versucht. Sobald der Antwortkopf da ist, laeuft das Streaming ohne Timeout
+// weiter (lange Antworten werden nie abgeschnitten). Echte Klientenfehler
+// (400er ausser 429) werden NICHT wiederholt, sondern direkt zurueckgegeben.
+
+const DEFAULT_ATTEMPTS = 2;
+const DEFAULT_FIRST_BYTE_TIMEOUT_MS = 6500;
+const DEFAULT_RETRY_DELAY_MS = 300;
+
+// Die Tiefspur (GLM/Kimi/Cline ueber den Control Server) ist bauartbedingt
+// langsamer als die Schnellspur. Gemessen am 2026-07-28 gegen die Live-Bridge:
+// Schnellspur 0,49-1,01 s bis zum ersten Byte, Tiefspur 4,9-7,8 s. Mit einem
+// gemeinsamen Budget von 6,5 s brach ausgerechnet die Tiefspur regelmaessig ab
+// ("Verbindung zum Server unterbrochen"), obwohl der Server sauber geantwortet
+// haette. Sie bekommt deshalb ein eigenes, grosszuegiges Budget.
+//
+// Seit derselben Messung waehlt browser-context.js die Tiefspur nur noch, wenn
+// die Seite NICHT geladen werden konnte — dieser Weg ist also die Ausnahme.
+const DEEP_LANE_FIRST_BYTE_TIMEOUT_MS = 15000;
+const DEEP_LANE_MODEL = /"model"\s*:\s*"[^"]*(glm|kimi|cline)/i;
+
+/**
+ * Die Route /api/agent ist bauartbedingt langsam, unabhaengig vom Modellnamen.
+ *
+ * GEMESSEN am 2026-08-05 im angemeldeten Browser, Zeit bis zu den ANTWORT-
+ * KOPFZEILEN (nicht bis zum Ende):
+ *   "Welche Hauptstadt hat Italien?"            852 ms
+ *   "Auf welchen Servern laeuft smejj.com?"    4704 ms
+ * Gegen ein Budget von 6500 ms bleiben im zweiten Fall nur 1,8 s Luft. Die
+ * Bruecke laeuft dabei ueber den Werkzeug-Pfad (Projektwissen, Spurwahl,
+ * Control Server), und dessen Latenz schwankt: dieselben /health-Aufrufe lagen
+ * an diesem Tag zwischen 258 ms und 864 ms. Genau dort riss es sporadisch, und
+ * der Nutzer las "Verbindung zum Server unterbrochen", obwohl der Server
+ * weiterarbeitete und die Antwort Sekunden spaeter fertig war.
+ *
+ * Warum die Route und nicht der Modellname: Der Modellname sagt, WELCHES Modell
+ * antwortet — nicht, ob vorher gesucht und eine Seite geholt wird. Das
+ * entscheidet die Route. /api/chat bleibt darum unveraendert schnell budgetiert.
+ */
+const DEEP_LANE_ROUTE = /\/api\/agent(?:[/?#]|$)/;
+
+/**
+ * Wieviel Zeit bis zum ersten Byte? Ohne ausdrueckliche Vorgabe entscheidet die
+ * angefragte Spur — erkennbar an der Route ODER am Modellnamen im Anfragekoerper.
+ * @param {{body?: unknown}} init
+ * @param {number} tiefspurMs
+ * @param {string} url Zieladresse; leer = nur der Rumpf entscheidet (Rueckwaertskompatibel)
+ * @returns {number}
+ */
+export function firstByteBudgetFor(init, tiefspurMs = DEEP_LANE_FIRST_BYTE_TIMEOUT_MS, url = "") {
+  if (DEEP_LANE_ROUTE.test(String(url || ""))) return tiefspurMs;
+  const body = typeof init?.body === "string" ? init.body : "";
+  return DEEP_LANE_MODEL.test(body) ? tiefspurMs : DEFAULT_FIRST_BYTE_TIMEOUT_MS;
+}
+
+/**
+ * Normalisiert die Endpunkt-Angabe.
+ *
+ * Ein Eintrag darf eine Adresse sein ODER `{ url, body }`. Der zweite Fall ist
+ * fuer Endpunkte da, die dieselbe Frage in einer ANDEREN Form brauchen: der
+ * Reserve-Server steht auf einem aelteren Stand und liest den Gespraechsverlauf
+ * nur ueber /api/chat (siehe buildReserveChatRequest in chat-history-context.js).
+ * Ohne eigenen Rumpf je Endpunkt haette die Reserve stumm ohne Verlauf geantwortet.
+ *
+ * @param {string|Array<string|{url: string, body?: unknown}>} url
+ * @returns {Array<{url: string, body?: unknown}>}
+ */
+export function normalizeTargets(url) {
+  return (Array.isArray(url) ? url : [url])
+    .map((entry) => (typeof entry === "string" ? { url: entry } : entry))
+    .filter((entry) => entry && typeof entry.url === "string" && entry.url);
+}
+
+// url darf ein einzelner Endpunkt ODER eine Liste sein (Stufe C: Zwei-Wege-
+// Betrieb). Bei einer Liste wandert jeder Neuversuch zum naechsten Endpunkt —
+// Versuch 1 = Haupt-Server (Salad, am schnellsten), Versuch 2 = Reserve
+// (Zeabur-Mietserver im Rechenzentrum). So ist eine Antwort garantiert,
+// solange irgendein Server lebt.
+export async function fetchStreamWithRetry(url, init = {}, {
+  attempts = DEFAULT_ATTEMPTS,
+  firstByteTimeoutMs,
+  retryDelayMs = DEFAULT_RETRY_DELAY_MS,
+  fetchFn = globalThis.fetch,
+  onRetry
+} = {}) {
+  const urls = normalizeTargets(url);
+  if (!urls.length) throw new Error("bridge_unreachable: keine Endpunkte");
+  // Ausdrueckliche Vorgabe gewinnt; sonst entscheidet die angefragte Spur.
+  const explizit = Number.isFinite(firstByteTimeoutMs);
+  // Die Route zaehlt mit: alle Ziele einer Anfrage tragen dieselbe (Haupt- und
+  // Reserve-Server unterscheiden sich im Wirt, nicht im Pfad).
+  const budgetMs = explizit ? firstByteTimeoutMs : firstByteBudgetFor(init, DEEP_LANE_FIRST_BYTE_TIMEOUT_MS, urls[0].url);
+  // DER LETZTE VERSUCH IST GEDULDIG (Live-Befund 2026-08-02).
+  // firstByteBudgetFor entscheidet am MODELLNAMEN im Anfragekoerper — welche
+  // Spur der Server nimmt, haengt aber an der FRAGE: alles mit Suchbedarf oder
+  // Web-Adresse geht ueber den Control Server und braucht dort gemessene ~15 s
+  // bis zum ersten Byte. Steht im Modellfeld nicht glm/kimi/cline, galten
+  // trotzdem 6,5 s — der Klient gab nach 2 x 6,5 s auf und zeigte "Verbindung
+  // zum Server unterbrochen", obwohl der Server eine Sekunde spaeter geantwortet
+  // haette. Live im Browser reproduziert: zwei Fehlversuche, dritter Versuch OK
+  // (da griff der Suchcache).
+  // Die Spur laesst sich im Klienten nicht zuverlaessig vorhersagen, und eine
+  // dritte Kopie der Suchwort-Liste waere genau der Fehler, den
+  // tests/websuche-absicht-gleichlauf.test.mjs verhindern soll. Deshalb bleibt
+  // der SCHNELLE Wechsel auf den Reserve-Endpunkt erhalten (dafuer sind die
+  // 6,5 s da: eine tote Replika soll nicht warten lassen) — nur der letzte
+  // Versuch wartet lange. Haben alle Endpunkte schnell versagt, ist "langsam
+  // aber lebendig" die einzige verbliebene Moeglichkeit, und Abbrechen ist dann
+  // strikt schlechter als Warten.
+  const letzterBudgetMs = explizit ? budgetMs : Math.max(budgetMs, DEEP_LANE_FIRST_BYTE_TIMEOUT_MS);
+  // JEDER ENDPUNKT EINMAL, PLUS EIN ZWEITER ANLAUF (Live-Messung 2026-08-02).
+  // Gemessen an Coding-Fragen ueber die Live-Kette: die Bruecke antwortete bei
+  // 2 von 6 Anfragen mit HTTP 503 ("Model backend is not configured" — ihre
+  // eigene Tiefspur ist nicht konfiguriert, und wenn der Control-Router
+  // aussetzt, faellt sie ins Leere), der Reserve-Endpunkt bei 1 von 3 mit 502.
+  // Beide Ausfaelle sind kurz und unabhaengig. Mit genau einem Versuch je
+  // Endpunkt trifft man beide schlechten Wuerfe zusammen in rund 11 % der
+  // Faelle — der Nutzer sieht dann "Verbindung zum Server unterbrochen",
+  // obwohl ein einziger weiterer Anlauf gereicht haette.
+  // Ein zusaetzlicher Durchgang kostet nichts, wo ohnehin keine Antwort kam
+  // (4xx ausser 429 wird weiterhin NICHT wiederholt, siehe unten).
+  const versuche = Math.max(attempts, urls.length > 1 ? urls.length + 1 : urls.length);
+  let lastReason = "";
+  for (let attempt = 1; attempt <= versuche; attempt += 1) {
+    const ziel = urls[(attempt - 1) % urls.length];
+    // Endpunkte mit eigenem Rumpf bekommen auch ihr eigenes Zeitbudget: die Spur
+    // wird am Modellnamen IM RUMPF erkannt, und der kann sich je Ziel unterscheiden.
+    const anfrage = ziel.body === undefined ? init : { ...init, body: ziel.body };
+    const zielBudgetMs = explizit || ziel.body === undefined
+      ? budgetMs
+      : firstByteBudgetFor(anfrage, DEEP_LANE_FIRST_BYTE_TIMEOUT_MS, ziel.url);
+    const controller = new AbortController();
+    const timer = setTimeout(
+      () => controller.abort(),
+      attempt === versuche ? Math.max(zielBudgetMs, letzterBudgetMs) : zielBudgetMs
+    );
+    try {
+      const response = await fetchFn(ziel.url, { ...anfrage, signal: controller.signal });
+      clearTimeout(timer);
+      if (response.ok && response.body) return response;
+      // 4xx (ausser 429) sind endgueltig — Wiederholen wuerde nichts aendern.
+      if (response.status >= 400 && response.status < 500 && response.status !== 429) return response;
+      lastReason = `HTTP ${response.status}`;
+    } catch (error) {
+      clearTimeout(timer);
+      lastReason = error?.name === "AbortError" ? "timeout" : (error?.message || "network");
+    }
+    if (attempt < versuche) {
+      onRetry?.({ attempt, reason: lastReason });
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+    }
+  }
+  throw new Error(`bridge_unreachable: ${lastReason}`);
+}

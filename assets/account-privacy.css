@@ -1,0 +1,725 @@
+/* smejj.com — Kontobereich im viereckigen Glas-Design (Freigabe 2026-07-26,
+   Mockup-Abnahme Betreiber). Prinzip: rechteckige Glasflaechen (keine runden
+   Ecken), Felder nur durch hauchduenne Linien getrennt, feine helle Kante oben
+   auf jeder Glasflaeche (iPhone-Glas-Look, eckig). Markup und IDs bleiben
+   unveraendert (app.js-Boot-Bindings). Der Nav-Breiten-Fix von 2026-07-17/18
+   bleibt erhalten: app-surfaces.css setzt mobil `.premium-view button
+   { width:100% }` — die Nav-Regeln tragen deshalb #profile-Spezifitaet und
+   mobil wird die Navigation zur umbrechenden Chip-Leiste. */
+
+#profile.premium-view {
+  /* Alle Glas-Werte als lokale Variablen (Fix 2026-07-26c): das Konto-Glas
+     kennt zwei Farbschemata; die dunklen Werte hier sind exakt die bisherigen. */
+  --konto-line: rgba(255, 255, 255, 0.13);
+  --konto-line-soft: rgba(255, 255, 255, 0.09);
+  --konto-edge: rgba(255, 255, 255, 0.28);
+  --konto-glass: rgba(255, 255, 255, 0.045);
+  --konto-glass-strong: rgba(255, 255, 255, 0.085);
+  --konto-glass-hover: rgba(255, 255, 255, 0.14);
+  --konto-hover-soft: rgba(255, 255, 255, 0.05);
+  --konto-switch-track: rgba(255, 255, 255, 0.10);
+  --konto-field-bg: rgba(0, 0, 0, 0.25);
+  --konto-danger-text: #ff8177;
+  --konto-danger-line: rgba(255, 110, 100, 0.35);
+  --konto-danger-hover: rgba(255, 110, 100, 0.12);
+  --konto-ok-text: #7ee8da;
+  --konto-ok-bg: rgba(45, 212, 191, 0.15);
+  --konto-ok-line: rgba(45, 212, 191, 0.4);
+  padding: 72px clamp(14px, 4vw, 48px) 28px;
+  /* Farbige Lichtflecken NUR in dieser Ansicht — die App-Huelle bleibt unberuehrt. */
+  background-image:
+    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.10), transparent 60%),
+    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.07), transparent 60%);
+}
+
+/* Helles Farbschema (Befund iPhone-PWA 2026-07-26: Systemschema "hell" macht
+   --premium-text dunkel, die Konto-Flaechen ueberschrieben aber wegen
+   ID-Spezifitaet den hellen Hintergrund — dunkler Text auf dunklem Glas,
+   unlesbar). Fail-safe: der Grund ist hier deckend hell, unabhaengig davon,
+   was hinter der Ansicht liegt (der ::before-Unterbau liegt unter dem
+   body-Hintergrund und traegt nicht). */
+#profile.premium-view[data-settings-theme="light"] {
+  --konto-line: rgba(23, 25, 29, 0.16);
+  --konto-line-soft: rgba(23, 25, 29, 0.10);
+  --konto-edge: rgba(255, 255, 255, 0.9);
+  --konto-glass: rgba(255, 255, 255, 0.62);
+  --konto-glass-strong: rgba(255, 255, 255, 0.85);
+  --konto-glass-hover: #ffffff;
+  --konto-hover-soft: rgba(23, 25, 29, 0.045);
+  --konto-switch-track: rgba(23, 25, 29, 0.14);
+  --konto-field-bg: #ffffff;
+  --konto-danger-text: #b3261e;
+  --konto-danger-line: rgba(179, 38, 30, 0.4);
+  --konto-danger-hover: rgba(179, 38, 30, 0.08);
+  --konto-ok-text: #0c6b5e;
+  --konto-ok-bg: rgba(45, 212, 191, 0.16);
+  --konto-ok-line: rgba(12, 107, 94, 0.45);
+  background-image:
+    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.14), transparent 60%),
+    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.10), transparent 60%),
+    linear-gradient(180deg, #fbfbf9, #f3f4f1);
+}
+
+/* Primaer-Knopf: app-surfaces.css (Start-Lock) faerbt #saveProfile per
+   ID-Regel dunkelmodus-weiss (weisser Text, durchscheinender Verlauf) — im
+   hellen Schema Kontrast ~1:1. Hier mit hoeherer Spezifitaet hell nachziehen. */
+#profile.premium-view[data-settings-theme="light"] #saveProfile {
+  border-color: rgba(15, 156, 139, 0.55);
+  background: linear-gradient(135deg, rgba(0, 200, 187, 0.20), rgba(98, 146, 255, 0.16));
+  color: #0b3f39;
+}
+
+/* Der leere Avatar (styles.css, Lock) zeichnet seine Figur cremefarben —
+   auf hellem Grund unsichtbar. Nur im Konto-Bereich dunkel nachziehen. */
+#profile.premium-view[data-settings-theme="light"] .account-picture .profile-avatar.is-empty {
+  border-color: rgba(23, 25, 29, 0.35);
+  background:
+    radial-gradient(circle at 50% 37%, transparent 0 4px, rgba(23, 25, 29, 0.55) 4.5px 7px, transparent 7.5px),
+    radial-gradient(ellipse at 50% 82%, transparent 0 8px, rgba(23, 25, 29, 0.55) 8.5px 12px, transparent 12.5px);
+}
+
+/* Glas-Grundfläche: durchscheinend, Weichzeichner, helle Kante oben, eckig. */
+#profile .account-nav,
+#profile .account-panel,
+#profile .output {
+  background: var(--konto-glass);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
+  border-radius: 0;
+}
+
+#profile .account-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--konto-line-soft);
+}
+
+#profile .account-header h2 {
+  margin: 4px 0 6px;
+  color: var(--premium-text, #eef1f2);
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+}
+
+#profile .account-header .subhead {
+  max-width: 62ch;
+}
+
+#profile .account-security {
+  padding: 8px 16px;
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
+  border-radius: 0;
+  background: var(--konto-glass);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+#profile .account-layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 820px);
+  align-items: start;
+  gap: clamp(18px, 3vw, 40px);
+  padding-top: 24px;
+}
+
+/* Navigation links: eine Glasleiste, Punkte durch hauchduenne Linien getrennt,
+   aktiver Punkt mit Akzent-Balken links. */
+#profile .account-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+#profile .account-nav button {
+  width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--konto-line-soft);
+  border-radius: 0;
+  background: transparent;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+}
+
+#profile .account-nav button:last-child {
+  border-bottom: 0;
+}
+
+#profile .account-nav button:hover {
+  color: var(--premium-text, #eef1f2);
+  background: var(--konto-hover-soft);
+}
+
+#profile .account-nav button.is-active {
+  color: var(--premium-text, #eef1f2);
+  background: var(--konto-glass-strong);
+  box-shadow: inset 3px 0 0 #2dd4bf;
+}
+
+#profile .account-panel {
+  padding: 22px clamp(16px, 2.5vw, 28px) 24px;
+}
+
+#profile .account-panel[hidden] {
+  display: none;
+}
+
+#profile .account-panel h3 {
+  margin: 0 0 14px;
+  color: var(--premium-text, #eef1f2);
+  font-size: 20px;
+  font-weight: 650;
+}
+
+#profile .account-subhead {
+  margin: 26px 0 10px;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#profile .account-subhead:first-of-type {
+  margin-top: 0;
+}
+
+/* Zeilen-Listen: Felder nur durch hauchduenne Linien getrennt. */
+#profile .account-list {
+  border: 1px solid var(--konto-line-soft);
+  border-radius: 0;
+}
+
+#profile .account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 16px;
+  margin: 0;
+}
+
+#profile .account-row + .account-row {
+  border-top: 1px solid var(--konto-line-soft);
+}
+
+#profile .account-row > span:first-child {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+#profile .account-row strong {
+  color: var(--premium-text, #eef1f2);
+  font-size: 14.5px;
+  font-weight: 650;
+}
+
+#profile .account-row small {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Viereckige Schalter statt nackter Checkboxen. */
+#profile .account-row input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 46px;
+  height: 26px;
+  margin: 0;
+  flex-shrink: 0;
+  border: 1px solid var(--konto-line);
+  border-radius: 0;
+  background: var(--konto-switch-track);
+  position: relative;
+  cursor: pointer;
+}
+
+#profile .account-row input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: var(--premium-muted, #9fa8ad);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+#profile .account-row input[type="checkbox"]:checked {
+  background: #2dd4bf;
+  border-color: #2dd4bf;
+}
+
+#profile .account-row input[type="checkbox"]:checked::after {
+  transform: translateX(20px);
+  background: #04211c;
+}
+
+/* Status-Chips: ehrlicher Zustand statt toter Knoepfe. */
+#profile .state-badge,
+#profile .permission-state {
+  flex-shrink: 0;
+  padding: 5px 11px;
+  border: 1px solid var(--konto-line);
+  border-radius: 0;
+  background: var(--konto-glass-strong);
+  color: var(--premium-muted, #c6cdd1);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#profile .state-badge.is-ok {
+  background: var(--konto-ok-bg);
+  border-color: var(--konto-ok-line);
+  color: var(--konto-ok-text);
+}
+
+/* Plan-Kopfzeile in Abo & Zahlungen. */
+#profile .account-plan {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--konto-ok-line);
+  border-radius: 0;
+  background: rgba(45, 212, 191, 0.07);
+  box-shadow: inset 0 3px 0 #2dd4bf;
+}
+
+#profile .account-plan .plan-name {
+  display: block;
+  margin: 4px 0 3px;
+  color: var(--premium-text, #eef1f2);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+#profile .account-plan small {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13px;
+}
+
+/* Eigene Anweisungen (Personalisierung). */
+#profile .account-textarea {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+#profile .account-textarea strong {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#profile .account-textarea textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 96px;
+  padding: 13px 14px;
+  border: 1px solid var(--konto-line);
+  border-radius: 0;
+  background: var(--konto-field-bg);
+  color: var(--premium-text, #eef1f2);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#profile .account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+  margin-top: 18px;
+}
+
+#profile .account-grid label {
+  display: grid;
+  gap: 8px;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#profile .account-grid input,
+#profile .account-grid select {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--konto-line);
+  border-radius: 0;
+  background: var(--konto-field-bg);
+  color: var(--premium-text, #eef1f2);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+#profile .account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+#profile .account-actions button,
+#profile .account-row button {
+  padding: 10px 18px;
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
+  border-radius: 0;
+  background: var(--konto-glass-strong);
+  color: var(--premium-text, #eef1f2);
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#profile .account-actions button:hover,
+#profile .account-row button:hover {
+  background: var(--konto-glass-hover);
+}
+
+#profile .account-row button {
+  flex-shrink: 0;
+  width: auto;
+}
+
+#profile #logoutLocal {
+  border-color: var(--konto-danger-line);
+  background: transparent;
+  color: var(--konto-danger-text);
+}
+
+#profile #logoutLocal:hover {
+  background: var(--konto-danger-hover);
+}
+
+#profile .danger-action {
+  border-color: var(--konto-danger-line) !important;
+  background: transparent !important;
+  color: var(--konto-danger-text) !important;
+}
+
+#profile .danger-action:hover {
+  background: var(--konto-danger-hover) !important;
+}
+
+#profile .account-status {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--konto-line-soft);
+  border-radius: 0;
+}
+
+#profile .account-status div {
+  display: grid;
+  gap: 3px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--konto-line-soft);
+}
+
+#profile .account-status div:nth-child(even) {
+  border-inline-start: 1px solid var(--konto-line-soft);
+}
+
+#profile .account-status div:nth-child(n + 3) {
+  border-bottom: 0;
+}
+
+#profile .account-status strong {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#profile .account-status span {
+  color: var(--premium-text, #eef1f2);
+  font-size: 14px;
+}
+
+#profile .account-note {
+  margin: 14px 0 0;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Profilbild-Zeile (Markup aus profile-picture-control.js). */
+#profile .account-picture {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--konto-line-soft);
+  border-radius: 0;
+}
+
+#profile .account-picture .profile-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 0;
+  border: 1px solid rgba(45, 212, 191, 0.45);
+}
+
+#profile .account-picture-body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+#profile .account-picture-body small {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+#profile .account-picture-actions {
+  display: flex;
+  gap: 10px;
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+
+#profile .account-picture-choose {
+  padding: 10px 18px;
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
+  border-radius: 0;
+  background: var(--konto-glass-strong);
+  color: var(--premium-text, #eef1f2);
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#profile .account-picture-choose:hover {
+  background: var(--konto-glass-hover);
+}
+
+/* Der native File-Input wird verborgen; bedient wird der sichtbare Knopf
+   daneben (.account-picture-choose, 167x44). Zwei Dinge, die 2026-08-09
+   auffielen, als der Touch-Waechter ihn mit 30x44 meldete:
+
+   - `min-height` schlaegt `height`, egal wie spezifisch die height-Regel ist.
+     app-surfaces.css setzt `.premium-view input { min-height: 50px }`, damit
+     blieb das Feld 44+ px hoch statt 1 px. Deshalb hier ausdruecklich
+     min-height: 1px.
+   - Verborgen war er trotzdem, aber allein durch `clip` — eine veraltete
+     Eigenschaft, die nur bei position: absolute wirkt. Faellt eine der beiden
+     weg, stuende ein natives Datei-Widget mitten in der Konto-Ansicht.
+     clip-path ist der moderne Ersatz und sichert es doppelt ab. */
+#profile #profilePictureInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+}
+
+#profile #profilePictureInput:focus-visible + .account-picture-choose {
+  outline: 2px solid #2dd4bf;
+  outline-offset: 2px;
+}
+
+#profile .output {
+  margin-top: 18px;
+  min-height: 46px;
+  padding: 13px 16px;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13.5px;
+}
+
+/* Mobil: Navigation wird zur umbrechenden Chip-Leiste — kein Scroll-Verlust. */
+@media (max-width: 760px) {
+  #profile .account-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #profile .account-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px;
+    background: transparent;
+    border: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  #profile .account-nav button {
+    width: auto;
+    padding: 9px 14px;
+    border: 1px solid var(--konto-line);
+    border-radius: 0;
+    background: var(--konto-glass);
+    font-size: 13px;
+  }
+
+  #profile .account-nav button.is-active {
+    box-shadow: inset 0 3px 0 #2dd4bf;
+  }
+
+  #profile .account-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #profile .account-status {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #profile .account-status div:nth-child(even) {
+    border-inline-start: 0;
+  }
+
+  #profile .account-status div:nth-child(n + 3) {
+    border-bottom: 1px solid var(--konto-line-soft);
+  }
+
+  #profile .account-status div:last-child {
+    border-bottom: 0;
+  }
+
+  #profile .account-picture {
+    flex-wrap: wrap;
+  }
+
+  #profile .account-picture-actions {
+    margin-inline-start: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  #profile.premium-view {
+    padding-top: 64px;
+  }
+
+  #profile .account-row {
+    flex-wrap: wrap;
+  }
+
+  #profile .account-row button,
+  #profile .state-badge,
+  #profile .permission-state {
+    margin-inline-start: 0;
+  }
+}
+
+/* Fix 2026-07-26b (Live-Befund): Ein globaler Label-Stil der Premium-Flaechen
+   setzt text-transform uppercase — Schalter-Zeilen (label.account-row) sollen
+   aber normale Schreibweise zeigen wie die div-Zeilen daneben. */
+#profile label.account-row,
+#profile label.account-row strong,
+#profile label.account-row small {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Nutzungszaehler (Schritt 2, 2026-07-26): rechte Spalte der Nutzungs-Zeilen. */
+#profile .usage-count {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+#profile .usage-count strong {
+  font-size: 22px;
+  font-weight: 750;
+  color: #7ee8da;
+  line-height: 1.1;
+}
+
+#profile .usage-count small {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Konto-Formulare im Seitenfluss (2026-08-04).
+   Passwortwechsel und Kontoloeschung liefen bis dahin ueber Browser-Dialoge —
+   die maskieren nicht und kennen keine Passwortverwaltung. Die Felder liegen
+   jetzt hier, in derselben Optik wie der Rest der Konto-Ansicht. */
+#profile .account-inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
+  /* --konto-glass, nicht ein eigener Wert: die Variable kennt BEIDE Farbschemata.
+     Hier stand zuerst `var(--konto-panel, rgba(255,255,255,0.03))` — die Variable
+     gibt es gar nicht, der weisse Rueckfallwert galt also immer und haette im
+     hellen Schema eine fremde Flaeche erzeugt. */
+  background: var(--konto-glass);
+}
+
+#profile .account-inline-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+/* Exakt die Optik der vorhandenen Konto-Felder (.account-grid input, Zeile 370):
+   gleiche Polsterung, gleiche Linie, gleicher Feldgrund. Ein eigener Stil waere
+   hier ein zweiter Ort, an dem das Konto-Glas gepflegt werden muesste. */
+#profile .account-inline-form input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--konto-line);
+  border-radius: 0;
+  background: var(--konto-field-bg);
+  color: var(--premium-text, #eef1f2);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Fokusring in der Akzentfarbe, nicht in --konto-edge: die Kante ist im HELLEN
+   Schema rgba(255,255,255,0.9) — ein weisser Ring auf hellem Grund ist kein Ring.
+   #2dd4bf traegt in beiden Schemata und ist dieselbe Farbe wie beim Bildwaehler
+   weiter oben in dieser Datei. */
+#profile .account-inline-form input:focus-visible {
+  outline: 2px solid #2dd4bf;
+  outline-offset: 2px;
+}
+
+#profile .account-inline-form .account-actions {
+  margin-top: 4px;
+}

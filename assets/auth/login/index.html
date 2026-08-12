@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Schutz wie auf der Startseite. Bis 2026-08-04 fehlte er hier: ausgerechnet
+         die Seite, ueber die E-Mail, Passwort, OAuth-Rueckkehr und der
+         Passkey-Ablauf laufen, hatte weder CSP noch Referrer-Regel.
+         frame-ancestors steht bewusst nicht hier — die Direktive wirkt nur als
+         HTTP-Kopf, den GitHub Pages nicht setzen kann; dafuer gibt es
+         frame-guard.js (siehe dort). -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; connect-src 'self' https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud https://smejj-control.zeabur.app">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#101113">
+    <title>Anmelden · smejj.com</title>
+    <!-- Favicon-Verweise (QA-Welle 1, Befund F-10) — identisch mit allen anderen
+         Seiten; ergaenzt mit der Freigabe "smejj.com 100 % fertig" (2026-07-28),
+         der zugehoerige Eintrag in docs/frontend/favicon-lock-manifest.json ist
+         mit derselben Freigabe nachgezogen. -->
+    <link rel="icon" href="/favicon.ico?v=112" sizes="any">
+    <link rel="icon" href="/icons/smejj_favicon.svg?v=112" type="image/svg+xml">
+    <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
+    <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+    <link rel="stylesheet" href="/assets/auth/auth.css?v=logo-20260725">
+  </head>
+  <body data-auth-mode="login">
+    <main class="auth-shell">
+      <a class="auth-brand" id="homeLink" href="/" aria-label="smejj.com Startseite"><span class="auth-brand-mark" aria-hidden="true"></span><span>smejj.com</span></a>
+      <section class="auth-card" aria-labelledby="authTitle">
+        <h1 id="authTitle">Willkommen zurück</h1>
+        <p class="auth-subhead">Melde dich an, um weiterzumachen.</p>
+
+        <!-- Sichtbar nur bei bestehender Sitzung: bis QA-Welle 1 landeten
+             Angemeldete hier in einer Sackgasse — volles Anmeldeformular, kein
+             Weg zurueck in die App, und die Kontoadresse stand offen als
+             Statuszeile (Befund F-09). -->
+        <div class="auth-signedin" id="signedInBox" hidden>
+          <p class="auth-note" id="signedInNote"></p>
+          <a class="auth-button primary" id="continueToApp" href="/">Weiter zu smejj.com</a>
+        </div>
+
+        <label class="auth-field" for="profileEmail">E-Mail<input id="profileEmail" type="email" autocomplete="email" placeholder="name@example.com"></label>
+        <input id="profileName" type="hidden" value="">
+        <div id="emailFormGroup" hidden>
+          <label class="auth-field" for="emailPassword">Passwort<input id="emailPassword" type="password" autocomplete="current-password" placeholder="Mindestens 10 Zeichen"></label>
+          <p class="auth-note auth-inline-note"><button type="button" class="auth-linkbutton" id="passwordResetLink">Passwort vergessen?</button></p>
+        </div>
+
+        <div class="auth-stack">
+          <button class="auth-button primary" id="emailLogin" type="button">Weiter</button>
+        </div>
+        <p class="auth-note">Wir fragen danach nur, was nötig ist: Passwort, Passkey oder Login-Link.</p>
+
+        <div class="auth-divider"><span>oder</span></div>
+
+        <div class="auth-stack" id="authProviders">
+          <button class="auth-button secondary" id="googleLogin" type="button" data-method="google">
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.788 5.108a9 9 0 1 0 3.212 6.892h-8"/></svg></span>Mit Google anmelden
+          </button>
+          <button class="auth-button secondary" id="appleLogin" type="button" data-method="apple" hidden>
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.286 7.008c-3.216 0 -4.286 3.23 -4.286 5.92c0 3.229 2.143 8.072 4.286 8.072c1.165 -.05 1.799 -.538 3.214 -.538c1.406 0 1.607 .538 3.214 .538s4.286 -3.229 4.286 -5.381c-.03 -.011 -2.649 -.434 -2.679 -3.23c-.02 -2.335 2.589 -3.179 2.679 -3.228c-1.096 -1.606 -3.101 -1.643 -3.607 -1.643c-1.586 0 -2.607 .538 -3.214 .538c-.607 0 -1.607 -.538 -2.679 -.538z"/><path d="M12 4a2 2 0 0 0 2 -2a2 2 0 0 0 -2 2"/></svg></span>Mit Apple anmelden
+          </button>
+          <button class="auth-button secondary" id="githubLogin" type="button" data-method="github" hidden>
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6.1a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6.1c-.6 .6 -.6 1.2 -.5 2v3.5"/></svg></span>Mit GitHub anmelden
+          </button>
+          <button class="auth-button secondary" id="passkeyLogin" type="button" data-method="passkey">
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.977a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.977a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0z"/><path d="M15 9h.01"/></svg></span>Mit Passkey anmelden
+          </button>
+          <button class="auth-button secondary" id="magicLinkLogin" type="button" data-method="magicLink" hidden>
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/></svg></span>Link per E-Mail schicken
+          </button>
+        </div>
+
+        <p class="auth-status" id="profileOutput" role="status" aria-live="polite"></p><span id="sessionStatus" hidden></span>
+        <p class="auth-footer">Neu hier? <a href="/auth/register/">Konto erstellen</a></p>
+      </section>
+      <p class="auth-legal"><a href="/datenschutz.html">Datenschutz</a> · <a href="/impressum.html">Impressum</a></p>
+    </main>
+    <script type="module" src="/assets/frame-guard.js?v=1"></script>
+    <script type="module" src="/assets/auth/auth-page.js?v=google-fix-20260812"></script>
+    <script type="module" src="/assets/auth/passkey-ui.js"></script>
+  </body>
+</html>

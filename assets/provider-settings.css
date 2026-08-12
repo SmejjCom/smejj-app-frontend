@@ -1,0 +1,13 @@
+#settings .cline-provider { gap:14px; }
+#settings .cline-grid { display:grid; grid-template-columns:minmax(220px,1fr) minmax(260px,1.35fr); gap:12px; }
+#settings .cline-grid label { display:grid; gap:7px; color:var(--premium-muted); font-size:13px; }
+#settings .cline-grid input,
+#settings .cline-grid select { width:100%; min-height:42px; text-transform:none; }
+#settings .cline-actions { display:flex; flex-wrap:wrap; gap:8px; }
+#settings .cline-actions button { min-height:38px; padding:0 13px; font-size:13px; }
+#settings .cline-status { margin:0; color:var(--premium-muted); font-size:13px; line-height:1.5; }
+#settings .cline-status[data-error="true"] { color:#ffb9b9; }
+@media (max-width:680px) {
+  #settings .cline-grid { grid-template-columns:1fr; }
+  #settings .cline-actions { display:grid; grid-template-columns:1fr 1fr; }
+}

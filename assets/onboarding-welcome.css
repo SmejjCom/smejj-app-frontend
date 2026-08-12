@@ -1,0 +1,152 @@
+/* smejj.com — Willkommens-Onboarding (Schritt 5, 2026-07-26): einmaliges
+   Overlay nach dem ersten Login. Gleiche Glas-Formensprache wie das Konto,
+   bewusst dunkel (Modal ueber abgedunkelter Seite). Eigene Datei wegen
+   800-Zeilen-Regel und Single Responsibility. */
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(5, 7, 8, 0.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.onboarding-card {
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 26px 26px 22px;
+  background: rgba(20, 25, 28, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-top-color: rgba(255, 255, 255, 0.32);
+  border-radius: 0;
+  color: #eef1f2;
+}
+
+.onboarding-eyebrow {
+  margin: 0 0 6px;
+  color: #7ee8da;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.onboarding-card h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #eef1f2;
+}
+
+.onboarding-sub {
+  margin: 0 0 18px;
+  color: #9fa8ad;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.onboarding-plans {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.onboarding-plan {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 14px;
+}
+
+.onboarding-plan + .onboarding-plan {
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.onboarding-plan.is-current {
+  background: rgba(45, 212, 191, 0.08);
+  box-shadow: inset 3px 0 0 #2dd4bf;
+}
+
+.onboarding-plan > span:first-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.onboarding-plan strong {
+  color: #eef1f2;
+  font-size: 14.5px;
+  font-weight: 650;
+}
+
+.onboarding-plan small {
+  color: #9fa8ad;
+  font-size: 12.5px;
+}
+
+.onboarding-badge {
+  flex-shrink: 0;
+  padding: 5px 11px;
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  background: rgba(45, 212, 191, 0.15);
+  color: #7ee8da;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.onboarding-plan button {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-top-color: rgba(255, 255, 255, 0.32);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.09);
+  color: #eef1f2;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.onboarding-plan button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.onboarding-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.onboarding-note {
+  color: #9fa8ad;
+  font-size: 12.5px;
+}
+
+.onboarding-primary {
+  padding: 12px 22px;
+  border: 1px solid #eceeee;
+  border-radius: 0;
+  background: #eceeee;
+  color: #101314;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .onboarding-actions {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+}

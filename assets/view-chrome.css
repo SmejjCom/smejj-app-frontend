@@ -1,0 +1,178 @@
+/* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
+   und Schliessen-X (ganz oben rechts). Ohne Hintergrund, transparent, schmal,
+   leicht fett; besetzt keinen Platz. Nur auf Views ausser #start; die
+   Startseite bleibt unveraendert (Design-Lock).
+   Hinweis: !important ist hier bewusst gesetzt, weil generische Button-Regeln
+   der Premium-Flaechen (app-surfaces/settings-surface) sonst Hintergrund,
+   Rahmen, Hoehe und SVG-Groesse ueberschreiben. */
+
+.view.has-view-chrome {
+  position: relative;
+  padding-top: 52px;
+}
+
+.view-chrome {
+  position: absolute;
+  top: 8px;
+  left: 14px;
+  right: 14px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.view .view-chrome button,
+.premium-view .view-chrome button {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 8px;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #4a4a43;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.view .view-chrome button:hover,
+.premium-view .view-chrome button:hover {
+  opacity: 1;
+  background: transparent !important;
+}
+
+.view .view-chrome button:focus-visible,
+.premium-view .view-chrome button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.view .view-chrome button svg,
+.premium-view .view-chrome button svg {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  flex: none !important;
+}
+
+/* Dunkle Premium-Views: helle Icons ueber die vorhandenen Premium-Variablen. */
+.premium-view .view-chrome button {
+  color: var(--premium-text, #f8f6f2);
+}
+
+@media (max-width: 640px) {
+  .view.has-view-chrome {
+    padding-top: 46px;
+  }
+
+  .view-chrome {
+    top: 6px;
+    left: 10px;
+    right: 10px;
+  }
+}
+
+/* Touch-Ziel auf schmalen Schirmen (2026-08-09). Gemessen bei 375 px in ALLEN
+   15 Ansichten: Zurueck und Schliessen waren 32x32 — die kleinsten Ziele der
+   App. Das Symbol bleibt 20 px, nur die Flaeche waechst.
+
+   Das !important ist nicht Zierde: die Regel oben setzt width/height selbst mit
+   !important (um die Knopf-Grundregeln der Ansichten zu schlagen), und dagegen
+   kommt eine normale Deklaration nicht an. */
+@media (max-width: 600px) {
+  .view .view-chrome button,
+  .premium-view .view-chrome button {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  /* Die Leiste liegt absolut ueber dem Inhalt. Wird sie 12 px hoeher, muss der
+     Inhalt entsprechend tiefer anfangen, sonst deckt der Knopf die Ueberschrift. */
+  .view.has-view-chrome,
+  .premium-view.has-view-chrome {
+    padding-top: 58px;
+  }
+}
+
+/* Grundposition des Maus-Knopfs. Stand bis 2026-08-09 als style="right: 36px"
+   im HTML — inline schlaegt jede Media-Query, die Handy-Regel unten waere
+   wirkungslos geblieben. */
+#mausButton {
+  right: calc(env(safe-area-inset-right) + 36px);
+}
+
+/* Die folgenden zwei Bloecke standen bis 2026-08-09 in styles.css und sind
+   hierher gezogen, als die Ratchet-Grenze dort riss. Sie gehoeren ohnehin
+   eher hierher: es ist die Groesse der App-Chrome, nicht des Grundgeruests.
+   Die Kaskade aendert sich dadurch nicht — view-chrome.css liegt im selben
+   Buendel NACH styles.css, und die Selektoren tragen ihr Gewicht selbst. */
+
+/* Touch-Ziele auf schmalen Schirmen (2026-08-09).
+   Live gemessen bei 375 px mit echter Geraete-Emulation: die vier Icons der
+   Kopfleiste waren 28x28, die fuenf Knoepfe der Eingabezeile 30x38 bzw. 34x38 —
+   deutlich unter den 44 px, die Apple und Google fuer Touch nennen. Auf dem
+   Desktop bleibt alles wie es war, die Regeln greifen nur unterhalb 600 px.
+
+   Die Doppelklasse gibt den Regeln Gewicht 0,2,0: app-surfaces.css bringt
+   `.premium-view button` (0,1,1) mit und setzt mobil width: 100%. Auf der
+   Startseite greift das zwar nicht, aber die Knoepfe wandern erfahrungsgemaess. */
+@media (max-width: 600px) {
+  .glass-icon.glass-icon {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+
+  /* Der Maus-Knopf steht links neben dem Browser-Knopf. Mit 28 px genuegten
+     36 px Abstand; bei 44 px wuerden sich beide ueberlappen. */
+  #mausButton {
+    right: calc(env(safe-area-inset-right) + 44px);
+  }
+
+  /* Eingabezeile: Hoehe fuer alle Knoepfe der Reihe (auch den Modell-Chip,
+     der sonst als einziger 38 px hoch bliebe), Breite nur fuer die Symbole —
+     der Chip traegt Text und muss mitwachsen duerfen. */
+  .prompt-actions .ghost-button.ghost-button,
+  .prompt-actions .send-button.send-button {
+    height: 44px;
+    min-height: 44px;
+  }
+
+  .prompt-actions .ghost-button.icon-button,
+  .prompt-actions .send-button.send-button {
+    width: 44px;
+  }
+
+  /* Gemessen 2026-08-09: mit 44er Knoepfen braucht die Reihe 382 px bei 375 px
+     Fenster. Sie wird dabei NICHT gequetscht, sondern zieht die ganze Spalte
+     hinaus — `.home-feed` ist ein Grid-Item und hat damit min-width: auto,
+     waechst also mit seinem breitesten Kind (dieselbe Ursache wie bei der
+     Chip-Leiste des Verlaufs, sw v252). Statt am Container zu drehen, wird
+     hier der Platz beschafft: engere Abstaende, schmaleres Polster. Gemessen
+     bleiben danach ueber 20 px Luft. */
+  .prompt-actions {
+    gap: 4px;
+    padding: 0 6px;
+  }
+}
+
+/* Linkes Menue und Browser-Panel: 44 px hohe Eintraege auf schmalen Schirmen
+   (2026-08-09). Gemessen waren 178x36 bzw. 179x36 — breit genug zum Treffen,
+   es fehlte nur Hoehe. Der Anker `.sidebar` gibt Gewicht 0,2,0 und schlaegt
+   damit sowohl `.nav-button` (0,1,0) als auch `.premium-view button` (0,1,1). */
+@media (max-width: 600px) {
+  .sidebar .nav-button,
+  .browser-panel-nav button {
+    min-height: 44px;
+  }
+}

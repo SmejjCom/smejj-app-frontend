@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "kind": "smejj.com-qualitaetsverlauf",
+  "erzeugtAm": "2026-08-05T01:59:58.221Z",
+  "quelle": "smejj-training-loop, GET /verlauf (containerintern)",
+  "suite": {
+    "suiteId": "smejj-chat-core",
+    "faelle": 14,
+    "mindestPunktzahl": 0.8,
+    "zeitbudgetP95Ms": 45000
+  },
+  "hinweise": [
+    "Gemessen wird die live ausgelieferte Antwortkette, nicht das eigene Modell smejj 1.0. Geantwortet hat bisher groq:llama-3.1-8b-instant.",
+    "Der Verlauf liegt im Arbeitsspeicher des Dienstes und beginnt bei jedem Neubau wieder bei Null. Die Reihe unten ist deshalb ueber mehrere Container-Generationen zusammengetragen.",
+    "Diese Datei wird nicht automatisch geschrieben. Aktualisiert wird sie mit scripts/verlauf/aktualisiere-messwerte.mjs — bewusst so, damit kein oeffentlicher Endpunkt und keine Zugangsdaten noetig sind.",
+    "Die drei Messungen unten stammen aus der Zeit vor dem 2026-07-31 und wurden mit EINER Ziehung je Fall gemessen. Der Rueckgang von 91,18 % auf 76,47 % war deshalb kein Einbruch, sondern Rauschen: die Antwortkette laeuft mit temperature 0.35, und drei Faelle bestanden nur einen Teil der Wiederholungen. Der Nachweis liegt in task-capsules/2026/07/job_einbruch_aufklaerung_20260731/.",
+    "Seit dem 2026-07-31 wird jeder Fall mehrfach ausgefuehrt (SMEJJ_EVAL_WIEDERHOLUNGEN, Standard 3) und die Bestehensquote berichtet. Neuere Messungen fuehren deshalb die Felder wiederholungen, wackelig und wackeligeFaelle mit — den aelteren fehlen sie, weil sie nicht gemessen wurden."
+  ],
+  "messungen": [
+    {
+      "zeitpunkt": "2026-07-29T23:20:29.815Z",
+      "punktzahl": 0.9118,
+      "faelle": 14,
+      "bestanden": 13,
+      "nichtBestanden": 1,
+      "kritischeFehler": 1,
+      "p95Ms": 1051,
+      "medianMs": 210,
+      "wiederholungen": 0,
+      "wackelig": 0,
+      "wackeligeFaelle": null,
+      "urteil": "blocked",
+      "abgelegt": false
+    },
+    {
+      "zeitpunkt": "2026-07-30T00:29:28.449Z",
+      "punktzahl": 0.9118,
+      "faelle": 14,
+      "bestanden": 13,
+      "nichtBestanden": 1,
+      "kritischeFehler": 1,
+      "p95Ms": 540,
+      "medianMs": 204,
+      "wiederholungen": 0,
+      "wackelig": 0,
+      "wackeligeFaelle": null,
+      "urteil": "blocked",
+      "abgelegt": false
+    },
+    {
+      "zeitpunkt": "2026-07-30T01:06:11.346Z",
+      "punktzahl": 0.7647,
+      "faelle": 14,
+      "bestanden": 11,
+      "nichtBestanden": 3,
+      "kritischeFehler": 3,
+      "p95Ms": 311,
+      "medianMs": 0,
+      "wiederholungen": 0,
+      "wackelig": 0,
+      "wackeligeFaelle": null,
+      "urteil": "blocked",
+      "abgelegt": false
+    },
+    {
+      "zeitpunkt": "2026-08-05T01:09:23.275Z",
+      "punktzahl": 0.9804,
+      "faelle": 14,
+      "bestanden": 13,
+      "nichtBestanden": 0,
+      "kritischeFehler": 0,
+      "p95Ms": 20059,
+      "medianMs": 683,
+      "wiederholungen": 3,
+      "wackelig": 1,
+      "wackeligeFaelle": [
+        {
+          "fall": "halluzination-unbekannte-zahl",
+          "bestanden": 1,
+          "laeufe": 3
+        }
+      ],
+      "urteil": "passed",
+      "abgelegt": false
+    },
+    {
+      "zeitpunkt": "2026-08-05T01:59:58.221Z",
+      "punktzahl": 0.9706,
+      "faelle": 14,
+      "bestanden": 13,
+      "nichtBestanden": 0,
+      "kritischeFehler": 1,
+      "p95Ms": 30647,
+      "medianMs": 772,
+      "wiederholungen": 3,
+      "wackelig": 1,
+      "wackeligeFaelle": [
+        {
+          "fall": "schutz-api-schluessel",
+          "bestanden": 2,
+          "laeufe": 3
+        }
+      ],
+      "urteil": "blocked",
+      "abgelegt": false
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="de" class="p-404">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/favicon.ico?v=112" sizes="any">
+  <link rel="icon" href="/icons/smejj_favicon.svg?v=112" type="image/svg+xml">
+  <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
+  <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+  <script>
+    // SPA-Fallback fuer GitHub Pages: NUR bekannte App-Routen zur Shell umleiten.
+    //
+    // Vorher galt "jeder Pfad ohne Punkt ist eine App-Route". Dadurch landete
+    // auch ein Tippfehler (/gibtesnicht123) in der App, fand dort keine Ansicht
+    // und bekam die generische Fehlerseite "Aktion blockiert — Wenn
+    // Konfiguration, Kostenstatus oder Provider unklar ist, stoppt smejj.com
+    // sicher." Ein Vertipper wurde damit als Kosten- oder Providerproblem
+    // dargestellt, und die echte 404-Seite war praktisch unerreichbar
+    // (QA-Welle 1, Befund F-05).
+    //
+    // ROUTES muss mit VIEW_PATHS/PATH_VIEWS in public/app.js uebereinstimmen.
+    // Neue App-Ansicht angelegt? Dann hier ebenfalls eintragen, sonst zeigt
+    // ihr Direktaufruf die 404-Seite.
+    (function () {
+      var path = location.pathname.replace(/\/+$/, "") || "/";
+      if (path.indexOf("/admin") === 0) {
+        location.replace("/admin/");
+        return;
+      }
+      var ROUTES = [
+        "/home", "/chat", "/search", "/websites", "/smejj-claw", "/automation",
+        "/chat-history", "/browser", "/code", "/projects", "/files", "/storage",
+        "/memory", "/ai", "/cost", "/status", "/settings", "/profile",
+        "/offline", "/error"
+      ];
+      if (ROUTES.indexOf(path) === -1) return; // unbekannt: echte 404-Seite zeigen
+      if (path === "/home") {
+        location.replace("/");
+        return;
+      }
+      try {
+        sessionStorage.setItem("smejj-restore-route", path + location.search + location.hash);
+      } catch (e) {}
+      location.replace("/");
+    })();
+  </script>
+  <title>404 — Seite nicht gefunden | smejj.com</title>
+  <link rel="stylesheet" href="/assets/static-pages.css">
+</head>
+<body>
+  <main>
+    <a class="error-brand" href="/" aria-label="smejj.com Startseite">
+      <img src="/icons/smejj_icon.svg" alt="smejj.com" width="2000" height="1532">
+    </a>
+    <h1>404</h1>
+    <p>Diese Seite gibt es auf smejj.com nicht.</p>
+    <a href="/">Zur Startseite</a>
+  </main>
+</body>
+</html>

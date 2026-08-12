@@ -1,0 +1,711 @@
+/* Premium app surfaces. Loaded only for non-start views via premium-surfaces.js. */
+.premium-view {
+  --premium-line: rgba(255, 255, 255, 0.13);
+  --premium-line-strong: rgba(0, 255, 239, 0.26);
+  --premium-surface: rgba(255, 255, 255, 0.075);
+  --premium-text: #f8f6f2;
+  --premium-muted: rgba(248, 246, 242, 0.64);
+  --premium-soft: rgba(248, 246, 242, 0.42);
+  position: relative;
+  align-content: start;
+  gap: clamp(14px, 2.2vw, 22px);
+  overflow: auto;
+}
+
+.premium-view::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(0, 255, 239, 0.09), transparent 28%),
+    linear-gradient(225deg, rgba(80, 126, 255, 0.1), transparent 30%);
+}
+
+.premium-view .view-header {
+  display: grid;
+  gap: 10px;
+  max-width: min(920px, 100%);
+}
+
+.premium-view .eyebrow {
+  margin: 0;
+  color: rgba(0, 255, 239, 0.78);
+  font-size: 12px;
+}
+
+.premium-view .view-header h2 {
+  max-width: 880px;
+  margin: 0;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1;
+}
+
+.premium-view .subhead {
+  max-width: 760px;
+  margin: 0;
+  color: var(--premium-muted);
+  font-size: clamp(15px, 1.8vw, 20px);
+  line-height: 1.45;
+}
+
+.premium-view .toolbar,
+.premium-view .panel-grid,
+.premium-view .status-grid,
+.premium-view .search-shell,
+.premium-view .search-log,
+.premium-view .output,
+.premium-view .empty-state,
+.premium-view .surface,
+.premium-view .feed-item {
+  border-color: var(--premium-line);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.045)),
+    rgba(10, 12, 15, 0.42);
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(28px) saturate(1.25);
+  -webkit-backdrop-filter: blur(28px) saturate(1.25);
+}
+
+.premium-view .toolbar,
+.premium-view .panel-grid,
+.premium-view .status-grid {
+  border: 1px solid var(--premium-line);
+  border-radius: 22px;
+  padding: clamp(12px, 2vw, 18px);
+}
+
+.premium-view .toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.premium-view label {
+  color: var(--premium-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.premium-view input,
+.premium-view select,
+.premium-view textarea {
+  min-height: 50px;
+  border-color: var(--premium-line);
+  border-radius: 16px;
+  background: rgba(6, 8, 11, 0.42);
+  color: var(--premium-text);
+}
+
+.premium-view textarea {
+  min-height: 180px;
+}
+
+.system-model-field {
+  grid-column: 1 / -1;
+}
+
+#systemModelSelect {
+  width: min(420px, 100%);
+}
+
+.model-registry-panel {
+  display: grid;
+  border-block: 1px solid var(--premium-line);
+}
+
+.model-registry-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.4fr) minmax(90px, 0.7fr) minmax(120px, 1fr) minmax(78px, auto);
+  align-items: center;
+  gap: 14px;
+  min-height: 58px;
+  padding: 8px 2px;
+  color: var(--premium-muted);
+  font-size: 13px;
+}
+
+.model-registry-row + .model-registry-row {
+  border-top: 1px solid var(--premium-line);
+}
+
+.model-registry-row strong,
+.model-registry-row div > span {
+  display: block;
+}
+
+.model-registry-row strong {
+  color: var(--premium-text);
+  font-size: 15px;
+}
+
+.model-registry-row div > span {
+  margin-top: 2px;
+  color: var(--premium-soft);
+}
+
+.model-state {
+  justify-self: end;
+  color: var(--premium-muted);
+  font-weight: 700;
+}
+
+.model-state::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: #8a9099;
+}
+
+.model-state-ready::before {
+  background: #4bd48a;
+}
+
+.model-state-fallback-only::before {
+  background: #f1bd59;
+}
+
+.premium-view input:focus,
+.premium-view select:focus,
+.premium-view textarea:focus {
+  border-color: var(--premium-line-strong);
+  box-shadow: 0 0 0 4px rgba(0, 255, 239, 0.1);
+}
+
+.premium-view button,
+.premium-view .more-actions summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-color: var(--premium-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--premium-text);
+  padding: 0 18px;
+  font-size: 15px;
+  font-weight: 750;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.premium-view button:hover,
+.premium-view .more-actions summary:hover {
+  border-color: var(--premium-line-strong);
+  background: rgba(0, 255, 239, 0.12);
+  color: #ffffff;
+}
+
+#projects #projectCreate,
+#projects #projectSave,
+#search #searchSubmit,
+#settings #saveSettings,
+#profile #saveProfile,
+#files #storageAgain {
+  border-color: rgba(0, 255, 239, 0.46);
+  background: linear-gradient(135deg, rgba(0, 255, 239, 0.22), rgba(98, 146, 255, 0.16));
+  color: #faffff;
+}
+
+.premium-view .output,
+.premium-view .search-empty,
+.premium-view .entry {
+  border-radius: 20px;
+  color: rgba(248, 246, 242, 0.78);
+  line-height: 1.5;
+}
+
+.premium-view .output:empty::before {
+  content: "Bereit.";
+  color: var(--premium-soft);
+}
+
+.project-card-list {
+  display: grid;
+  gap: 10px;
+}
+
+.project-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+  border: 1px solid var(--premium-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 14px 16px;
+}
+
+.project-card strong,
+.project-card span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.project-card strong {
+  color: var(--premium-text);
+}
+
+.project-card span {
+  color: var(--premium-muted);
+  font-size: 13px;
+}
+
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.project-meta span {
+  border: 1px solid var(--premium-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 6px 9px;
+}
+
+.more-actions {
+  position: relative;
+}
+
+.more-actions summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.more-actions summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 12;
+  display: grid;
+  gap: 6px;
+  min-width: 220px;
+  border: 1px solid var(--premium-line);
+  border-radius: 18px;
+  background: rgba(18, 20, 24, 0.92);
+  padding: 8px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(28px) saturate(1.2);
+  -webkit-backdrop-filter: blur(28px) saturate(1.2);
+}
+
+.more-actions:not([open]) .more-menu {
+  display: none;
+}
+
+.more-menu button {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.more-menu .danger-action {
+  color: #ffb4aa;
+}
+
+.more-menu .danger-action:hover {
+  border-color: rgba(255, 114, 99, 0.45);
+  background: rgba(255, 75, 56, 0.12);
+}
+
+#search .search-shell {
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: min(960px, 100%);
+  border-radius: 24px;
+  padding: 14px;
+}
+
+#search .search-box input {
+  min-height: 62px;
+  border-radius: 18px;
+  font-size: clamp(20px, 2.8vw, 34px);
+  font-weight: 800;
+}
+
+#search .search-log {
+  width: min(960px, 100%);
+}
+
+.modal {
+  border-color: rgba(255, 255, 255, 0.16);
+  border-radius: 22px;
+  background: rgba(19, 21, 25, 0.9);
+}
+
+@media (max-width: 760px) {
+  .premium-view {
+    padding: 56px 12px 22px;
+  }
+
+  .premium-view .view-header h2 {
+    font-size: 32px;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+
+  .premium-view .toolbar,
+  .premium-view .panel-grid,
+  .premium-view .status-grid,
+  #search .search-shell {
+    border-radius: 18px;
+    padding: 12px;
+  }
+
+  .premium-view .toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .premium-view button,
+  .premium-view .more-actions summary {
+    width: 100%;
+  }
+
+  #search .search-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .project-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .model-registry-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 12px;
+  }
+
+  .model-registry-row > span:not(.model-state) {
+    grid-column: 1;
+  }
+
+  .model-state {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .project-meta {
+    justify-content: flex-start;
+  }
+
+  .more-menu {
+    position: static;
+    margin-top: 8px;
+  }
+}
+
+/* Unified non-start design: same quiet geometry and line language as #start. */
+.premium-view {
+  --premium-line: rgba(255, 255, 255, 0.14);
+  --premium-line-strong: rgba(255, 255, 255, 0.28);
+  --premium-surface: #101216;
+  --premium-surface-raised: #14171c;
+  --premium-control: #0b0d11;
+  --premium-text: #f9f6f1;
+  --premium-muted: rgba(246, 243, 238, 0.66);
+  --premium-soft: rgba(246, 243, 238, 0.44);
+  --premium-accent: rgba(246, 243, 238, 0.88);
+  --premium-shadow: rgba(0, 0, 0, 0.28);
+  gap: 16px;
+  background: transparent;
+  color: var(--premium-text);
+}
+
+.premium-view::before {
+  background: linear-gradient(180deg, rgba(15, 17, 18, 0.97) 0%, #090a0c 72%, #050608 100%);
+}
+
+.premium-view .eyebrow {
+  color: var(--premium-soft);
+  letter-spacing: 0.12em;
+}
+
+.premium-view .view-header {
+  gap: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--premium-line);
+}
+
+.premium-view .view-header h2 {
+  max-width: 820px;
+  color: var(--premium-text);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 500;
+  line-height: 1.12;
+}
+
+.premium-view .subhead {
+  color: var(--premium-muted);
+  font-size: clamp(14px, 1.7vw, 17px);
+}
+
+.premium-view .toolbar,
+.premium-view .panel-grid,
+.premium-view .status-grid,
+.premium-view .search-shell,
+.premium-view .search-log,
+.premium-view .output,
+.premium-view .empty-state,
+.premium-view .surface,
+.premium-view .feed-item,
+.premium-view .project-card,
+.premium-view .more-menu,
+.premium-view .modal {
+  border: 1px solid var(--premium-line);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 42%),
+    var(--premium-surface);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 12px 34px var(--premium-shadow);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.premium-view .toolbar,
+.premium-view .panel-grid,
+.premium-view .status-grid {
+  border-radius: 8px;
+  padding: clamp(12px, 2vw, 16px);
+}
+
+.premium-view .panel-grid,
+.premium-view .status-grid {
+  gap: 1px;
+  overflow: hidden;
+  background: var(--premium-line);
+  padding: 1px;
+}
+
+.premium-view .panel-grid > *,
+.premium-view .status-grid > * {
+  min-width: 0;
+  background: var(--premium-surface);
+  padding: 14px;
+}
+
+.premium-view label {
+  color: var(--premium-muted);
+  letter-spacing: 0.04em;
+}
+
+.premium-view input,
+.premium-view select,
+.premium-view textarea {
+  min-height: 44px;
+  border: 1px solid var(--premium-line);
+  border-radius: 8px;
+  background: var(--premium-control);
+  color: var(--premium-text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.premium-view input:focus,
+.premium-view select:focus,
+.premium-view textarea:focus {
+  border-color: var(--premium-line-strong);
+  outline: 2px solid rgba(255, 255, 255, 0.09);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.premium-view button,
+.premium-view .more-actions summary {
+  min-height: 40px;
+  border: 1px solid var(--premium-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--premium-text);
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.premium-view button:hover,
+.premium-view .more-actions summary:hover {
+  border-color: var(--premium-line-strong);
+  background: rgba(255, 255, 255, 0.085);
+  color: #ffffff;
+}
+
+#projects #projectCreate,
+#projects #projectSave,
+#search #searchSubmit,
+#settings #saveSettings,
+#profile #saveProfile,
+#files #storageAgain {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.065));
+  color: #ffffff;
+}
+
+.premium-view .output,
+.premium-view .search-empty,
+.premium-view .entry {
+  border-radius: 8px;
+  color: rgba(246, 243, 238, 0.78);
+}
+
+.premium-view .project-meta span,
+.premium-view .model-state,
+.premium-view .ac-state {
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.premium-view .model-registry-panel,
+.premium-view .model-registry-row + .model-registry-row,
+.premium-view .ac-command,
+.premium-view .ac-jobs,
+.premium-view .ac-detail {
+  border-color: var(--premium-line);
+}
+
+.premium-view .more-menu {
+  border-radius: 8px;
+  background: var(--premium-surface-raised);
+}
+
+.premium-view#search .search-shell,
+.premium-view#search .search-box input {
+  border-radius: 8px;
+}
+
+.premium-view#search .search-box input {
+  font-size: clamp(18px, 2.5vw, 28px);
+  font-weight: 500;
+}
+
+.premium-view .autonomous-coding button,
+.premium-view .ac-form-grid input,
+.premium-view .ac-form-grid select,
+.premium-view .ac-form-grid textarea,
+.premium-view .ac-follow-up input,
+.premium-view .ac-table-wrap,
+.premium-view .ac-verification,
+.premium-view .ac-diff {
+  border-color: var(--premium-line);
+  border-radius: 8px;
+  background: var(--premium-control);
+  color: var(--premium-text);
+}
+
+.premium-view .autonomous-coding .ac-primary {
+  border-color: var(--premium-line-strong);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.premium-view[data-settings-theme="light"] {
+  --premium-line: rgba(23, 25, 29, 0.16);
+  --premium-line-strong: rgba(23, 25, 29, 0.32);
+  --premium-surface: #ffffff;
+  --premium-surface-raised: #f3f3ef;
+  --premium-control: #f7f7f4;
+  --premium-text: #17191d;
+  --premium-muted: rgba(23, 25, 29, 0.68);
+  --premium-soft: rgba(23, 25, 29, 0.46);
+  --premium-shadow: rgba(23, 25, 29, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(247, 247, 244, 0.96)),
+    repeating-linear-gradient(90deg, rgba(22, 22, 22, 0.025) 0 1px, transparent 1px 96px);
+}
+
+.premium-view[data-settings-theme="light"]::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(247, 247, 244, 0.96)),
+    repeating-linear-gradient(90deg, rgba(22, 22, 22, 0.025) 0 1px, transparent 1px 96px);
+}
+
+#projects.premium-view[data-settings-theme="light"] #projectCreate,
+#projects.premium-view[data-settings-theme="light"] #projectSave,
+#search.premium-view[data-settings-theme="light"] #searchSubmit,
+#settings.premium-view[data-settings-theme="light"] #saveSettings,
+#profile.premium-view[data-settings-theme="light"] #saveProfile,
+#files.premium-view[data-settings-theme="light"] #storageAgain {
+  border-color: rgba(15, 156, 139, 0.55);
+  background: linear-gradient(135deg, rgba(0, 200, 187, 0.2), rgba(98, 146, 255, 0.16));
+  color: #0b3f39;
+}
+
+body:has(.premium-view.is-active) .sidebar,
+body:has(.premium-view.is-active) .browser-panel {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: #090a0c;
+  box-shadow: none;
+}
+
+body:has(.premium-view.is-active) .nav-button,
+body:has(.premium-view.is-active) .browser-panel-nav button {
+  border-radius: 8px;
+  color: rgba(246, 243, 238, 0.68);
+}
+
+body:has(.premium-view.is-active) .nav-button.is-active,
+body:has(.premium-view.is-active) .browser-panel-nav button:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.065);
+  color: #f9f6f1;
+}
+
+/* Menue- und Browser-Knopf liegen fixiert ueber der Ansichtsflaeche, gehoeren
+   aber zur Shell und erben deren Farbschema nicht. Im hellen Schema blieben sie
+   dadurch hell auf hell (Kontrast 1.03:1, praktisch unsichtbar). Das Icon zeichnet
+   sich ueber border/background statt currentColor, deshalb reicht color allein nicht. */
+body:has(.premium-view.is-active[data-settings-theme="light"]) .glass-icon {
+  color: #17191d;
+}
+
+body:has(.premium-view.is-active[data-settings-theme="light"]) .split-icon {
+  border-color: rgba(23, 25, 29, 0.72);
+}
+
+body:has(.premium-view.is-active[data-settings-theme="light"]) .split-icon span:first-child {
+  background: rgba(23, 25, 29, 0.58);
+}
+
+@media (max-width: 760px) {
+  .premium-view .view-header {
+    padding-bottom: 12px;
+  }
+
+  .premium-view .view-header h2 {
+    font-size: 30px;
+  }
+
+  .premium-view .toolbar,
+  .premium-view .panel-grid,
+  .premium-view .status-grid,
+  .premium-view#search .search-shell {
+    border-radius: 8px;
+  }
+}
+
+/* Touch-Ziele der Ansichten auf schmalen Schirmen (2026-08-09).
+   Live gemessen bei 375 px ueber alle 15 Ansichten: die Aktionsknoepfe waren
+   40 px hoch (325x40, 351x40, 311x40), die Reiter von Einstellungen und Konto
+   ebenfalls 40, die Formularfelder 42. Breit genug waren sie alle — es fehlte
+   nur Hoehe. Apple und Google nennen 44 px als Untergrenze.
+
+   Die Reiter brauchen keine eigene Regel: sie sind `.premium-view button` und
+   holen ihre Hoehe von hier. */
+@media (max-width: 600px) {
+  .premium-view button,
+  .premium-view .more-actions summary {
+    min-height: 44px;
+  }
+
+  .premium-view input:not([type="checkbox"]):not([type="radio"]),
+  .premium-view select,
+  .premium-view textarea {
+    min-height: 44px;
+  }
+}

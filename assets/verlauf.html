@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="de" class="p-recht p-status">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101113">
+    <meta name="description" content="Qualitätsverlauf von smejj.com – wie gut sind die Antworten, gemessen rund um die Uhr?">
+    <!-- Messwerte sind kein Seiteninhalt fuer Suchmaschinen. Anders als
+         status.html steht diese Seite NICHT in PUBLIC_PATHS von auth-gate.js:
+         Qualitaetszahlen des eigenen Modells gehoeren hinter die Anmeldung. -->
+    <meta name="robots" content="noindex,nofollow">
+    <!-- connect-src bleibt 'self': die Messwerte sind eine statische Datei
+         derselben Herkunft. Kein Dienst wird angefragt, damit diese Seite auch
+         bei komplettem Dienstausfall vollstaendig funktioniert. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; connect-src 'self'">
+    <link rel="canonical" href="https://smejj.com/verlauf.html">
+    <title>Qualitätsverlauf – smejj.com</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <!-- ABSICHTLICH KEINE Favicon-Verweise. Der Favicon-Lock
+         (docs/frontend/favicon-lock-manifest.json) friert die Liste aller Seiten
+         MIT Favicon-Verweisen ein; eine neue Seite darin wuerde ihn verletzen und
+         braeuchte eine ausdrueckliche schriftliche Freigabe des Betreibers. Das
+         Tab-Symbol erscheint trotzdem, weil Browser /favicon.ico von selbst
+         anfragen. Wer hier Verweise ergaenzt, muss vorher die Freigabe einholen
+         und den Lock neu einfrieren — nicht einfach hinzufuegen. -->
+    <link rel="stylesheet" href="/assets/static-pages.css">
+  </head>
+  <body>
+    <main>
+      <a class="legal-brand" href="/" aria-label="smejj.com Startseite">
+        <img src="/icons/smejj_icon.svg" alt="smejj.com" width="2000" height="1532">
+      </a>
+      <h1>Qualitätsverlauf</h1>
+
+      <p id="verlaufGesamt" class="status-gesamt" role="status" aria-live="polite" data-stufe="unbekannt">
+        Messwerte werden geladen …
+      </p>
+
+      <div class="card">
+        <ul id="verlaufListe" class="status-liste">
+          <li class="status-zeile" data-stufe="unbekannt">
+            <div class="verlauf-kopf"><span class="verlauf-zeit">–</span><strong class="verlauf-punktzahl">–</strong></div>
+            <p class="verlauf-details">Wird geladen …</p>
+          </li>
+        </ul>
+        <p id="verlaufStand" class="verlauf-stand"></p>
+      </div>
+
+      <h2>Was hier gemessen wird</h2>
+      <div class="card">
+        <!-- Hier stand bis zum 2026-08-04 „Alle sechs Stunden läuft ein
+             Prüflauf“. Das war ein Versprechen, das das System nicht hält: die
+             Messwerte werden von Hand eingespielt, und zwischen dem 30.07. und
+             dem 04.08. hat das niemand getan. Die Seite zeigte trotzdem ein
+             fünf Tage altes Urteil als aktuellen Zustand. Ein Versprechen, das
+             niemand einlöst, ist schlimmer als gar keins — deshalb steht hier
+             jetzt, wie es wirklich läuft. -->
+        <p>
+          Ein Prüflauf geht über <strong>14 feste Aufgaben</strong> gegen die
+          Antwortkette, die smejj.com wirklich ausliefert. Gewertet wird nicht
+          „klingt gut“, sondern ob die Antwort nachprüfbare Bedingungen erfüllt.
+          Jede Aufgabe hat mindestens eine <strong>kritische</strong> Bedingung;
+          reißt eine davon, gilt der ganze Lauf als nicht bestanden — auch bei
+          hoher Punktzahl.
+        </p>
+        <p>
+          <strong>Wann gemessen wird:</strong> Ein Prüflauf wird von Hand
+          angestoßen, nicht nach Zeitplan. Oben steht deshalb immer, wie alt die
+          Zahlen sind. Sind sie älter als 24 Stunden, sagt die Seite das
+          ausdrücklich — dann beschreiben sie einen früheren Stand und nicht den
+          von heute.
+        </p>
+        <p>
+          Gefordert sind mindestens <strong>80 %</strong> Punktzahl und
+          <strong>null kritische Fehler</strong>.
+        </p>
+      </div>
+
+      <h2>Was hier <em>nicht</em> gemessen wird</h2>
+      <div class="card">
+        <p>
+          Diese Zahlen bewerten <strong>nicht das eigene Modell smejj 1.0</strong>.
+          Geantwortet hat bisher ein eingekauftes Fremdmodell. smejj 1.0 ist am
+          Antworten nicht beteiligt und wird derzeit auch <strong>nicht
+          trainiert</strong> — der Trainingszyklus ist ausgeschaltet, und
+          Ausgaben von Fremdmodell-Schnittstellen sind laut eigener
+          Trainingsdaten-Richtlinie als Trainingsmaterial gesperrt.
+        </p>
+        <p>
+          Diese Messung ist die <strong>Vorbedingung</strong> für ein eigenes
+          Modell, nicht sein Ersatz: sie ist der Maßstab, den smejj 1.0 bestehen
+          muss, bevor es Fremdmodelle ersetzen darf.
+        </p>
+      </div>
+
+      <h2>Warum das ein Stand ist und kein Livestrom</h2>
+      <div class="card">
+        <p>
+          Seite und Messwerte sind <strong>statische Dateien</strong>. Der
+          Messdienst hat absichtlich keine öffentliche Adresse — so entsteht
+          keine Dauerlast, keine zusätzliche Angriffsfläche und kein Punkt, der
+          smejj.com mit sich reißen kann. Diese Seite funktioniert auch dann
+          vollständig, wenn alle Dienste ausgefallen sind.
+        </p>
+        <p>
+          Der Preis dafür ist offen benannt: die Zahlen sind ein Stand, keine
+          Echtzeit. Wann sie erhoben wurden, steht oben in der Karte.
+        </p>
+      </div>
+
+      <footer>
+        <a href="/">Startseite</a>
+        <a href="/status.html">Betriebsstatus</a>
+        <a href="/impressum.html">Impressum</a>
+        <a href="/datenschutz.html">Datenschutz</a>
+      </footer>
+    </main>
+    <script src="/assets/verlauf.js" type="module"></script>
+  </body>
+</html>

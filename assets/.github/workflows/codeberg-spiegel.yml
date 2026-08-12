@@ -1,0 +1,100 @@
+# smejj.com — Codeberg-Spiegel aus der Cloud (Umzug von Mac-cron, Nr. 2).
+#
+# WARUM HIER (im oeffentlichen Frontend-Repo): Regel A der Policy
+# GITHUB_KOSTENFREI verbietet CI im privaten App-Repo — der Pre-Push-Waechter
+# blockiert Workflows dort wirklich (am 2026-08-09 gemessen). Im oeffentlichen
+# Repo sind Actions-Minuten unbegrenzt kostenlos.
+#
+# WARUM UEBERHAUPT: Der Spiegel lief als cron auf dem Mac — Laptop zu = keine
+# Sicherung (Klumpenrisiko). Dieser Lauf ist davon unabhaengig.
+#
+# PARALLELBETRIEB: Der Mac-cron (4:20 Uhr Ortszeit) bleibt AKTIV, bis dieser
+# Weg bewiesen ist. Beide senden denselben Herzschlag "codeberg-spiegel".
+#
+# BRAUCHT DREI SECRETS (dieses Repo -> Settings -> Secrets -> Actions):
+#   SMEJJ_APP_REPO_TOKEN          Fine-grained PAT: Repos der Org lesen
+#                                 (mindestens smejj.com-app, smejj-control,
+#                                 smejj-site, imild-site; Contents: Read)
+#   CODEBERG_TOKEN                Codeberg-Zugriffs-Token mit Schreibrecht
+#                                 (Nutzer smejj)
+#   SMEJJ_AUTOPILOT_KEY_SPIEGEL   Herzschlag-Schluessel (Wert codeberg-spiegel
+#                                 aus ~/.config/smejj.com/autopilot-keys.env)
+# Ohne die ersten beiden bricht der Lauf mit klarer Meldung ab; ohne den
+# dritten laeuft er, meldet aber nicht an die Ampel.
+name: Codeberg-Spiegel (Cloud)
+
+on:
+  schedule:
+    - cron: "20 11 * * *"   # 4:20 Ortszeit (America/Los_Angeles, Sommerzeit)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeberg-spiegel
+  cancel-in-progress: false
+
+jobs:
+  spiegeln:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Zugaenge pruefen und hinterlegen
+        id: zugang
+        env:
+          APP_TOKEN: ${{ secrets.SMEJJ_APP_REPO_TOKEN }}
+          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+        run: |
+          FEHLT=""
+          [ -z "$APP_TOKEN" ] && FEHLT="$FEHLT SMEJJ_APP_REPO_TOKEN"
+          [ -z "$CODEBERG_TOKEN" ] && FEHLT="$FEHLT CODEBERG_TOKEN"
+          if [ -n "$FEHLT" ]; then
+            # Bewusst KEIN Fehlschlag: bis der Betreiber die Secrets anlegt,
+            # wuerde der Zeitplan sonst taeglich rote Laeufe und Fehler-Mails
+            # erzeugen — Alarm fuer einen bekannten, gewollten Zustand.
+            # Der Mac-cron misst waehrenddessen weiter; die Ampel bleibt ehrlich,
+            # weil dieser Lauf dann auch KEINEN Herzschlag sendet.
+            echo "konfiguriert=nein" >> "$GITHUB_OUTPUT"
+            echo "## Noch nicht konfiguriert" >> "$GITHUB_STEP_SUMMARY"
+            echo "Es fehlen die Secrets:$FEHLT — anlegen unter Settings -> Secrets and variables -> Actions. Bis dahin spiegelt weiter der Mac-cron." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "konfiguriert=ja" >> "$GITHUB_OUTPUT"
+          git config --global credential.helper store
+          {
+            printf 'https://x-access-token:%s@github.com\n' "$APP_TOKEN"
+            printf 'https://smejj:%s@codeberg.org\n' "$CODEBERG_TOKEN"
+          } > "$HOME/.git-credentials"
+
+      - name: App-Repo holen (alle Zweige — der Spiegel spiegelt alles)
+        if: steps.zugang.outputs.konfiguriert == 'ja'
+        run: |
+          git clone https://github.com/SmejjCom/smejj.com-app.git "$HOME/app"
+          git -C "$HOME/app" fetch origin '+refs/heads/*:refs/remotes/origin/*' --tags
+
+      - name: Spiegeln (dasselbe Skript wie auf dem Mac)
+        if: steps.zugang.outputs.konfiguriert == 'ja'
+        env:
+          CODEBERG_PROTOKOLL: https
+          CODEBERG_USER: smejj
+        run: cd "$HOME/app" && /bin/bash scripts/deploy/codeberg_spiegel_sync.sh alles
+
+      - name: Herzschlag an die Autopiloten-Ampel (Erfolg wie Fehler)
+        if: always() && steps.zugang.outputs.konfiguriert == 'ja'
+        env:
+          AP_KEY: ${{ secrets.SMEJJ_AUTOPILOT_KEY_SPIEGEL }}
+          AP_STATUS: ${{ job.status == 'success' && 'ok' || 'fehler' }}
+        run: |
+          if [ -z "$AP_KEY" ]; then
+            echo "Kein Herzschlag-Schluessel hinterlegt (Secret SMEJJ_AUTOPILOT_KEY_SPIEGEL) — Ampel misst weiter nur den Mac-Lauf."
+            exit 0
+          fi
+          # Wiederholungen wie auf dem Mac: das Salad-Gateway antwortet waehrend
+          # einer Reallokation 7-25 Minuten lang mit 503; ein verschluckter
+          # Herzschlag faerbt die Ampel spaeter FAELSCHLICH rot.
+          curl -fsS --connect-timeout 10 -m 800 --retry 12 --retry-delay 60 \
+            -X POST "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud/api/autopilot/heartbeat" \
+            -H "Content-Type: application/json" \
+            -d "{\"id\":\"codeberg-spiegel\",\"key\":\"${AP_KEY}\",\"status\":\"${AP_STATUS}\",\"meldung\":\"Cloud-Lauf (GitHub Actions): ${AP_STATUS}\"}" \
+            >/dev/null || echo "Herzschlag nicht zugestellt — der Lauf selbst zaehlt trotzdem."
