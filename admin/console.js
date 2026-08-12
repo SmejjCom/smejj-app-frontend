@@ -523,22 +523,48 @@
     }
     if (searchInput && searchResults) {
       const SUCH_MAP = [
-        { pfad: "freigaben", begriff: "🚀 Live-Schalten & Freigaben (Werkstatt-Autopilot, Merge, Releases)", gruppe: "Überblick" },
-        { pfad: "autopiloten", begriff: "Autopiloten-Cockpit (30 Autopiloten, Herzschlag, Wächter)", gruppe: "Betrieb" },
-        { pfad: "uebersicht", begriff: "Executive Command Cockpit (Latenzen, Status, 0€ Cost Gate)", gruppe: "Überblick" },
-        { pfad: "nutzer", begriff: "Nutzerverwaltung & Konten", gruppe: "Menschen" },
-        { pfad: "rollen", begriff: "Rollen & Rechte (Schreibrechte, Step-Up Auth)", gruppe: "Menschen" },
-        { pfad: "modelle", begriff: "KI-Modell Arena & smejj 1.0 Status", gruppe: "Produkt" },
-        { pfad: "kosten", begriff: "Kostenkontrolle & 0,00 EUR Policy", gruppe: "Geld" },
-        { pfad: "audit", begriff: "Audit-Log & Replay-Historie", gruppe: "Recht" }
+        { pfad: "freigaben", begriff: "🚀 Live-Schalten & Freigaben (Werkstatt-Autopilot, Merge, Releases)", gruppe: "Überblick", synonyme: ["live", "schalten", "freigabe", "freigaben", "merge", "deploy", "release", "werkstatt", "autopilot", "autonom", "code"] },
+        { pfad: "autopiloten", begriff: "Autopiloten-Cockpit (30 Autopiloten, Herzschlag, Wächter)", gruppe: "Betrieb", synonyme: ["autopilot", "autopiloten", "roboter", "ki", "herzschlag", "status", "30", "monitoring", "wächter"] },
+        { pfad: "uebersicht", begriff: "Executive Command Cockpit (Latenzen, Status, 0€ Cost Gate)", gruppe: "Überblick", synonyme: ["übersicht", "uebersicht", "cockpit", "home", "start", "dashboard", "status"] },
+        { pfad: "nutzer", begriff: "Nutzerverwaltung & Konten", gruppe: "Menschen", synonyme: ["nutzer", "user", "konto", "konten", "profile", "mitglieder", "verwaltung"] },
+        { pfad: "rollen", begriff: "Rollen & Rechte (Schreibrechte, Step-Up Auth)", gruppe: "Menschen", synonyme: ["rolle", "rollen", "rechte", "berechtigung", "stepup", "admin", "owner"] },
+        { pfad: "modelle", begriff: "KI-Modell Arena & smejj 1.0 Status", gruppe: "Produkt", synonyme: ["modell", "modelle", "kimi", "glm", "salad", "arena", "provider", "ki", "ai"] },
+        { pfad: "kosten", begriff: "Kostenkontrolle & 0,00 EUR Policy", gruppe: "Geld", synonyme: ["kosten", "geld", "budget", "billing", "preis", "0€", "free", "kostenlos"] },
+        { pfad: "schluessel", begriff: "Schlüssel & Geheimnisse (API-Keys & Tokens)", gruppe: "Sicherheit", synonyme: ["schlüssel", "schluessel", "key", "keys", "token", "geheimnis", "api", "auth", "secret"] },
+        { pfad: "deploy", begriff: "Deployments & Release-Verlauf", gruppe: "Betrieb", synonyme: ["deploy", "deployment", "release", "zeabur", "idrive", "version", "live", "build"] },
+        { pfad: "audit", begriff: "Audit-Log & Replay-Historie", gruppe: "Recht", synonyme: ["audit", "log", "logs", "historie", "events", "replay", "nachweis"] },
+        { pfad: "dsgvo", begriff: "DSGVO & Datenschutz Export/Löschung", gruppe: "Recht", synonyme: ["dsgvo", "gdpr", "datenschutz", "löschen", "export", "privacy"] },
+        { pfad: "compliance", begriff: "EU AI Act Compliance & Transparenz", gruppe: "Recht", synonyme: ["compliance", "eu", "ai act", "gesetz", "recht", "transparenz"] },
+        { pfad: "abrechnung", begriff: "Abrechnung, Abos & Zahlungen", gruppe: "Geld", synonyme: ["rechnung", "abos", "abo", "zahlung", "stripe", "sub"] },
+        { pfad: "jobs", begriff: "Background Jobs & Autopilot Läufe", gruppe: "Betrieb", synonyme: ["jobs", "job", "queue", "hintergrund", "läufe", "cron"] },
+        { pfad: "worker", begriff: "Worker Kapazität & Server Last", gruppe: "Betrieb", synonyme: ["worker", "kapazität", "server", "cpu", "ram", "last"] },
+        { pfad: "support", begriff: "Support & Admin Impersonation", gruppe: "Menschen", synonyme: ["support", "hilfe", "ticket", "impersonation", "kundenservice"] }
       ];
 
+      function normalisiere(str) {
+        return String(str || "").toLowerCase().replace(/[-_.,/()]/g, " ").replace(/\s+/g, " ").trim();
+      }
+
       searchInput.addEventListener("input", function () {
-        const q = String(this.value || "").trim().toLowerCase();
-        if (!q) { searchResults.style.display = "none"; return; }
+        const raw = String(this.value || "").trim();
+        if (!raw) { searchResults.style.display = "none"; return; }
+        
+        const qNorm = normalisiere(raw);
+        const qWaerter = qNorm.split(" ").filter(Boolean);
+
         const treffer = SUCH_MAP.filter(function (s) {
-          return s.begriff.toLowerCase().indexOf(q) >= 0 || s.pfad.indexOf(q) >= 0 || s.gruppe.toLowerCase().indexOf(q) >= 0;
+          const begriffNorm = normalisiere(s.begriff);
+          const pfadNorm = normalisiere(s.pfad);
+          const gruppeNorm = normalisiere(s.gruppe);
+          const synNorm = (s.synonyme || []).map(normalisiere).join(" ");
+          const vollText = begriffNorm + " " + pfadNorm + " " + gruppeNorm + " " + synNorm;
+
+          // Pruefe ob ALLE gesuchten Woerter im Volltext enthalten sind
+          return qWaerter.every(function (w) {
+            return vollText.indexOf(w) >= 0;
+          });
         });
+
         if (!treffer.length) {
           searchResults.innerHTML = '<div style="color:var(--sm-ink-faint);padding:8px;font-size:12px;">Keine Treffer gefunden</div>';
         } else {
