@@ -21,9 +21,11 @@
 const BILDER_API_KEY = process.env.SMEJJ_LLM_GROQ_API_KEY || "";
 const BILDER_BASE_URL = String(process.env.SMEJJ_LLM_GROQ_BASE_URL || "https://api.groq.com/openai/v1").replace(/\/+$/, "");
 const BILDER_MODEL = process.env.SMEJJ_BILDER_MODEL || process.env.SMEJJ_LLM_GROQ_MODEL || "llama-3.3-70b-versatile";
-// Der eigene Bild-Maler (Zeabur-intern, keine Public Domain).
+// Der eigene Bild-Maler & Video-Maler (Zeabur-intern, keine Public Domain).
 const BILDER_WORKER_URL = String(process.env.SMEJJ_BILDER_WORKER_URL || "http://smejj-bild-maler.zeabur.internal:8080").replace(/\/+$/, "");
 const BILDER_WORKER_KEY = process.env.SMEJJ_BILDER_WORKER_KEY || "";
+const VIDEO_WORKER_URL = String(process.env.SMEJJ_VIDEO_WORKER_URL || "http://smejj-video-worker.zeabur.internal:8080").replace(/\/+$/, "");
+const VIDEO_WORKER_KEY = process.env.SMEJJ_VIDEO_WORKER_KEY || "";
 // Malen ist langsam (CPU): eigenes Budget statt REQUEST_TIMEOUT_MS.
 const BILDER_FOTO_TIMEOUT_MS = Number(process.env.SMEJJ_BILDER_FOTO_TIMEOUT_MS || 150000);
 const BILDER_HEALTH_TIMEOUT_MS = 2500;
@@ -89,6 +91,18 @@ async function bilderMalerBereit() {
   if (!BILDER_WORKER_URL) return false;
   try {
     const antwort = await fetch(`${BILDER_WORKER_URL}/health`, { signal: AbortSignal.timeout(BILDER_HEALTH_TIMEOUT_MS) });
+    if (!antwort.ok) return false;
+    return (await antwort.json())?.bereit === true;
+  } catch {
+    return false;
+  }
+}
+
+// Fragt den Video-Maler, ob er wach und bereit ist.
+async function videoWorkerBereit() {
+  if (!VIDEO_WORKER_URL) return false;
+  try {
+    const antwort = await fetch(`${VIDEO_WORKER_URL}/health`, { signal: AbortSignal.timeout(BILDER_HEALTH_TIMEOUT_MS) });
     if (!antwort.ok) return false;
     return (await antwort.json())?.bereit === true;
   } catch {
