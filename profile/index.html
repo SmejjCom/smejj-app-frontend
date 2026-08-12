@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101113">
+  <meta name="description" content="Konto- & Profileinstellungen auf smejj.com – Modellverwaltung, Sicherheit & Passkeys.">
+  <meta name="robots" content="noindex, follow">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://smejj-control.zeabur.app; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; manifest-src 'self'">
+  <link rel="canonical" href="https://smejj.com/profile/">
+  <title>Konto & Einstellungen – smejj.com</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/favicon.ico?v=112" sizes="any">
+  <link rel="icon" href="/icons/smejj_favicon.svg?v=112" type="image/svg+xml">
+  <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
+  <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+  <link rel="stylesheet" href="/assets/static-pages.css">
+  <style>
+    :root {
+      --cyan-accent: #02fdfd;
+      --cyan-glow: rgba(2, 253, 253, 0.25);
+    }
+    body {
+      background: radial-gradient(circle at 50% 10%, rgba(2, 253, 253, 0.08), transparent 45%),
+                  linear-gradient(180deg, #090b10 0%, #0d0f17 100%);
+      color: #e8eaed;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .profile-card {
+      background: rgba(16, 20, 32, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(2, 253, 253, 0.3);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6), 0 0 24px var(--cyan-glow);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 580px;
+      padding: 32px;
+      box-sizing: border-box;
+    }
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+    .brand-header img {
+      width: 32px;
+      height: 32px;
+    }
+    .brand-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    h1 {
+      font-size: 1.6rem;
+      margin: 0 0 8px;
+      color: #ffffff;
+    }
+    p.desc {
+      color: #9aa0a6;
+      font-size: 0.95rem;
+      margin: 0 0 24px;
+      line-height: 1.5;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--cyan-accent);
+      color: #050608;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 16px var(--cyan-accent);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e8eaed;
+      font-weight: 500;
+      padding: 12px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+  <script>
+    (function() {
+      try {
+        sessionStorage.setItem("smejj-restore-route", "/profile");
+      } catch (e) {}
+      window.location.replace("/?view=profile");
+    })();
+  </script>
+</head>
+<body>
+  <div class="profile-card">
+    <a href="/" class="brand-header">
+      <img src="/icons/smejj_icon.svg" alt="smejj.com">
+      <span class="brand-title">smejj.com</span>
+    </a>
+    <h1>Konto & Einstellungen</h1>
+    <p class="desc">Profil, KI-Modelle & Sicherheitseinstellungen werden im Arbeitsbereich geladen …</p>
+    <div class="btn-group">
+      <a href="/?view=profile" class="btn-primary">Zu den Einstellungen</a>
+      <a href="/auth/login/" class="btn-secondary">Anmelden</a>
+    </div>
+  </div>
+</body>
+</html>

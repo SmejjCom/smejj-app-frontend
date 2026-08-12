@@ -36,17 +36,6 @@
   opacity: 0.8;
 }
 
-/* Erzeugte Bilder aus chat-markdown.js (Bilder-Zeichnen 2026-08-12).
-   Nur data:-URLs der eigenen Bruecke; volle Breite bis 512 px, damit ein
-   1024er-Bild die Chatspalte nicht sprengt. */
-.entry.assistant .chat-image {
-  display: block;
-  max-width: min(100%, 512px);
-  height: auto;
-  margin: 4px 0 10px;
-  border-radius: 12px;
-}
-
 .entry.assistant code {
   padding: 1px 5px;
   border-radius: 5px;

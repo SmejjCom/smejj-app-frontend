@@ -78,16 +78,20 @@
     radial-gradient(ellipse at 50% 82%, transparent 0 8px, rgba(23, 25, 29, 0.55) 8.5px 12px, transparent 12.5px);
 }
 
-/* Glas-Grundfläche: durchscheinend, Weichzeichner, helle Kante oben, eckig. */
+/* Glas-Grundfläche: Cyan Light-Leak Beleuchtungsrahmen, Weichzeichner, edle Radien */
 #profile .account-nav,
 #profile .account-panel,
 #profile .output {
   background: var(--konto-glass);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
   backdrop-filter: blur(22px) saturate(150%);
-  border: 1px solid var(--konto-line);
-  border-top-color: var(--konto-edge);
-  border-radius: 0;
+  border: 1px solid rgba(2, 253, 253, 0.35);
+  border-top-color: rgba(126, 232, 218, 0.6);
+  border-radius: 16px;
+  box-shadow: 
+    0 0 35px rgba(2, 253, 253, 0.25),
+    0 0 60px rgba(45, 212, 191, 0.12),
+    inset 0 0 15px rgba(2, 253, 253, 0.08);
 }
 
 #profile .account-header {
@@ -167,8 +171,9 @@
 
 #profile .account-nav button.is-active {
   color: var(--premium-text, #eef1f2);
-  background: var(--konto-glass-strong);
-  box-shadow: inset 3px 0 0 #2dd4bf;
+  background: rgba(2, 253, 253, 0.12);
+  box-shadow: inset 3px 0 0 #02fdfd, 0 0 15px rgba(2, 253, 253, 0.25);
+  font-weight: 700;
 }
 
 #profile .account-panel {
@@ -723,3 +728,46 @@
 #profile .account-inline-form .account-actions {
   margin-top: 4px;
 }
+
+/* Light-Leak Rahmen-Beleuchtung (weicher, warmer Lichtschein in Logo-Farbe #2dd4bf) */
+#profile .account-panel,
+#profile .account-nav,
+.onboarding-card {
+  position: relative;
+  box-shadow: 
+    0 0 25px rgba(45, 212, 191, 0.28),
+    0 0 60px rgba(126, 232, 218, 0.15),
+    inset 0 0 15px rgba(45, 212, 191, 0.12);
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+#profile .account-panel::before,
+.onboarding-card::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.35) 0%, rgba(126, 232, 218, 0.1) 45%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 50%;
+  filter: blur(10px);
+}
+
+#profile .account-panel::after,
+.onboarding-card::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 50%;
+  filter: blur(10px);
+}
+
