@@ -497,19 +497,19 @@
     // nichts zu beobachten. Der Hash-Horcher bleibt dem Rueckfallweg vorbehalten.
     if (!PFAD_MODUS) window.addEventListener("hashchange", route);
 
-    // Initialisiere die Admin-Suchleiste im Topbar (dynamische Erzeugung falls Alt-HTML geladen)
+    // Initialisiere die Admin-Suchleiste im Topbar (linksbündig nach Breadcrumb)
     let searchInput = document.getElementById("adminSearchInput");
     let searchResults = document.getElementById("adminSearchResults");
     if (!searchInput) {
       const topbar = document.querySelector(".topbar");
       if (topbar) {
-        const spacer = topbar.querySelector(".spacer");
+        const crumb = topbar.querySelector(".crumb");
         const box = document.createElement("div");
         box.className = "admin-search-box";
-        box.style.cssText = "position:relative;margin-right:12px;display:flex;align-items:center;";
-        box.innerHTML = '<input type="search" id="adminSearchInput" placeholder="🔍 Suchen (Live, Freigaben, Autopilot)..." style="background:rgba(5,6,8,0.85);border:1px solid var(--sm-accent-border);color:var(--sm-ink);padding:6px 14px;font-size:13px;width:260px;outline:none;" /><div id="adminSearchResults" style="display:none;position:absolute;top:36px;right:0;width:340px;background:#151b2e;border:1px solid var(--sm-accent-border);box-shadow:0 8px 30px rgba(0,0,0,0.85);z-index:9999;padding:8px;"></div>';
-        if (spacer && spacer.nextSibling) {
-          topbar.insertBefore(box, spacer.nextSibling);
+        box.style.cssText = "position:relative;flex:1;max-width:440px;margin:0 16px;display:flex;align-items:center;";
+        box.innerHTML = '<input type="search" id="adminSearchInput" placeholder="🔍 Suchen (Live, Freigaben, Autopilot)..." style="background:rgba(5,6,8,0.85);border:1px solid var(--sm-accent-border);color:var(--sm-ink);padding:7px 16px;font-size:13px;width:100%;outline:none;border-radius:20px!important;box-shadow:0 2px 10px rgba(0,0,0,0.4);" /><div id="adminSearchResults" style="display:none;position:absolute;top:40px;left:0;width:100%;max-width:480px;background:#151b2e;border:1px solid var(--sm-accent-border);box-shadow:0 12px 40px rgba(0,0,0,0.9);z-index:9999;padding:8px;border-radius:8px!important;"></div>';
+        if (crumb && crumb.nextSibling) {
+          topbar.insertBefore(box, crumb.nextSibling);
         } else {
           topbar.appendChild(box);
         }
