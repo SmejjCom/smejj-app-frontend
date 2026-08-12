@@ -20,36 +20,20 @@ function resolveApiOrigin() {
 export const API_ORIGIN = resolveApiOrigin();
 
 const API_PATHS = {
-  // RUECKTAUSCH (Betreiber-Auftrag 2026-08-03, "behebe Fehler" Chat-Qualitaet):
-  // Die Zeabur-Bridge ist seit 2026-07-29 auf v104 eingefroren (ZEABUR_API_TOKEN
-  // fehlt) — v104 wirft den mitgeschickten Gespraechsverlauf weg und hat kein
-  // Projektwissen. Live-Fehlbild: "Privat konto?" wurde ohne Kontext als Frage
-  // ueber smejj.com beantwortet. Die Salad-Bridge laedt ihren Code bei jedem
-  // Start frisch aus dem Frontend-Repo und traegt v111 (Verlauf + RAG + 70B-
-  // Schnellspur). Salad ist darum Haupt-Endpunkt, Zeabur nur noch Reserve, bis
-  // der Betreiber-Token den Zeabur-Gleichstand erlaubt.
-  agent: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/agent",
-  chat: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/chat",
-  agentFallback: "https://smejj-chat-bridge.zeabur.app/api/agent",
-  chatFallback: "https://smejj-chat-bridge.zeabur.app/api/chat",
-  // Premium-Stimme laeuft ueber den Zeabur-Mietserver (CPU-Stimme Piper im
-  // Flat-Paket, kein GPU-Worker noetig) — die Bridge dort proxied zum
-  // internen Piper-Dienst.
-  // Stimme zur SALAD-Bridge wie voiceTranscribe (Freigabe A, 2026-08-05).
-  // Die eingefrorene Zeabur-Bridge meldete "premiumVoice: true", ohne den
-  // Worker zu pruefen, und lehnte das eigentliche Sprechen dann ab — jede
-  // Sitzung lief in einen toten Premium-Pfad. Die Salad-Bridge prueft ehrlich.
-  voiceStatus: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/status",
-  voiceTts: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/tts",
-  // Stufe 4: Das Ohr zeigt auf die Salad-Bridge — dort ist v106 mit der
-  // Transkriptions-Route live (Zeabur bleibt bis zum Token-Deploy auf v104).
-  voiceTranscribe: "https://starfruit-thyme-cblgn6u06ca2z9d5.salad.cloud/api/voice/transcribe",
-    authConfig: "/api/auth/config",
-    browserFetch: "/api/browser/fetch",
-    browserRemote: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/api/browser/remote",
-    browserSession: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/api/browser/session",
-    browserSessionAct: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/api/browser/session/act",
-    browserSessionClose: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/api/browser/session/close",
+  // 100% Zeabur Primary Operating Path (Salad-Exit 2026-08-11):
+  agent: "https://smejj-chat-bridge.zeabur.app/api/agent",
+  chat: "https://smejj-chat-bridge.zeabur.app/api/chat",
+  agentFallback: "https://smejj-control.zeabur.app/api/agent",
+  chatFallback: "https://smejj-control.zeabur.app/api/chat",
+  voiceStatus: "https://smejj-chat-bridge.zeabur.app/api/voice/status",
+  voiceTts: "https://smejj-chat-bridge.zeabur.app/api/voice/tts",
+  voiceTranscribe: "https://smejj-chat-bridge.zeabur.app/api/voice/transcribe",
+  authConfig: "/api/auth/config",
+  browserFetch: "/api/browser/fetch",
+  browserRemote: "/api/browser/remote",
+  browserSession: "/api/browser/session",
+  browserSessionAct: "/api/browser/session/act",
+  browserSessionClose: "/api/browser/session/close",
     authGoogle: "/api/auth/google",
     authGithub: "/api/auth/github",
     authMagicLinkRequest: "/api/auth/magic-link/request",

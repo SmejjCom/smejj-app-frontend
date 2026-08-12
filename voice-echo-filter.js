@@ -19,6 +19,12 @@ export const BARGE_MIN_CHARS = 4;
 // Sprachen ohne Leerzeichen-Wortgrenzen (Schwelle ueber Zeichenlaenge).
 const NO_SPACE_LANGS = new Set(["zh", "ja"]);
 
+// Expressive Befehlswörter für sofortigen Abbruch (1-Wort-Barge-in wie ChatGPT / Gemini).
+const STOP_COMMANDS = new Set([
+  "stopp", "stop", "halt", "nein", "no", "warte", "moment", "pause", "ruhe",
+  "quiet", "cancel", "abbrechen", "schweig", "silence", "arrête", "basta"
+]);
+
 export function normalizeSpeechText(text) {
   return (text || "")
     .toLowerCase()
@@ -29,32 +35,28 @@ export function normalizeSpeechText(text) {
 
 // Echo-Heuristik: Der gehoerte Text gilt als eigenes Lautsprecher-Echo, wenn er
 // (nahezu) vollstaendig in der gerade vorgelesenen Antwort vorkommt.
-//
-// Stufe 2 (2026-08-02): Schwelle 0.6 -> 0.5. Live gemessen: "smeeting nach"
-// (verhoertes "denkt nach" aus dem eigenen Lautsprecher) hatte exakt 50 %
-// Wortdeckung und rutschte an der 60-%-Schwelle vorbei — die Antwort wurde
-// abgebrochen und der Muell als Frage gesendet. Halbe Deckung mit dem gerade
-// Gesprochenen ist im Zweifel Echo: eine verschluckte echte Unterbrechung
-// kostet den Nutzer ein erneutes Reinsprechen, eine durchgerutschte falsche
-// kostet die ganze Antwort. Der Preis ist bewusst: Wer mit den Worten der
-// Antwort selbst unterbricht ("was heisst Umweltfreundlichkeit?"), braucht
-// jetzt mehr eigene Woerter — BARGE_MIN_WORDS 3 sorgt fuer genug Substanz.
+// Ausdrückliche Befehlswörter gelten NIE als Echo, sondern lösen den Abbruch sofort aus.
 export function isLikelyEcho(heardText, spokenText) {
   const heard = normalizeSpeechText(heardText);
   if (!heard) return true;
+  const heardWords = heard.split(" ");
+  if (heardWords.some((word) => STOP_COMMANDS.has(word))) return false;
   const spoken = normalizeSpeechText(spokenText);
   if (spoken.includes(heard)) return true;
   const spokenWords = new Set(spoken.split(" "));
-  const heardWords = heard.split(" ");
   const matches = heardWords.filter((word) => spokenWords.has(word)).length;
   return matches / heardWords.length >= 0.5;
 }
 
 // Rausch-Schutz: genug Substanz fuer eine echte Unterbrechung?
+// Befehlswörter lösen bereits ab 1 Wort aus; normale Sätze ab 2 Wörtern.
 export function enoughForBarge(text, lang) {
   const normalized = normalizeSpeechText(text);
+  const words = normalized.split(" ").filter(Boolean);
+  if (words.length === 0) return false;
+  if (words.some((word) => STOP_COMMANDS.has(word))) return true;
   if (NO_SPACE_LANGS.has((lang || "").toLowerCase())) {
     return normalized.replace(/\s/g, "").length >= BARGE_MIN_CHARS;
   }
-  return normalized.split(" ").filter(Boolean).length >= BARGE_MIN_WORDS;
+  return words.length >= BARGE_MIN_WORDS;
 }

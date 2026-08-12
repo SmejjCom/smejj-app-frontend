@@ -237,10 +237,8 @@ function enterVoiceFallback(message) {
 
 // Echo-Filter und Barge-Schwelle kommen aus voice-echo-filter.js (Stufe 1e).
 
-// Schonfrist am Anfang der eigenen Sprachausgabe (gemessen 2026-08-02): dort
-// hoert die Erkennung fast nur den eigenen Lautsprecher, und kurze Bruchstuecke
-// unterlaufen den Text-Echo-Filter. Gilt fuer BEIDE Wege (Wort + Pegel).
-const BARGE_GRACE_MS = 700;
+// Schonfrist am Anfang der eigenen Sprachausgabe (200 ms fuer blitzschnelle Unterbrechung wie ChatGPT/Gemini):
+const BARGE_GRACE_MS = 200;
 
 // Nur ECHTE Antworten zaehlen: app.js haengt beim Absenden einen Denk-Platzhalter
 // (data-thinking="true") als .entry.assistant an — ohne den Ausschluss hielt der
@@ -543,7 +541,7 @@ function waitForAssistantReply(knownEntries) {
       const armBargeIn = () => {
               if (bargeArmed || !state.voiceModeActive) return;
               // Nur echter Antworttext zaehlt — nicht der Platzhalter, nicht der Denk-Laut.
-              if (!currentReply() || !queue?.spokenText()) return;
+              if (!currentReply()) return;
               bargeArmed = true;
               setVoiceModeStatus("speaking", "Ich spreche ...");
               state.bargeGraceUntil = Date.now() + BARGE_GRACE_MS;

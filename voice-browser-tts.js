@@ -11,9 +11,11 @@ export function createBrowserTts({ lang, base, supported } = {}) {
 
   const pickVoice = () => {
     const voices = window.speechSynthesis.getVoices() || [];
-    return voices.find((voice) => voice.lang === lang)
-      || voices.find((voice) => (voice.lang || "").startsWith(base))
-      || null;
+    const matching = voices.filter((v) => v.lang === lang || (v.lang || "").startsWith(base));
+    if (matching.length === 0) return null;
+    // Bevorzuge natürliche/neuronale Premium-Stimmen (Natural, Neural, Enhanced, Google) für menschlichen Klang:
+    const natural = matching.find((v) => /\b(natural|neural|premium|enhanced|google)\b/i.test(v.name));
+    return natural || matching[0];
   };
 
   return {
