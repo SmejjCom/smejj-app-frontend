@@ -101,7 +101,7 @@ function goTo(path) {
 // kein Sitzungsdatum, und "Lokale Daten loeschen" bleibt der Weg dafuer.
 async function logout() {
   try {
-    const module = await import("./account-sessions.js?v=7");
+    const module = await import("./account-sessions.js?v=8");
     await module.logoutCurrentSession();
   } catch {
     /* fail-safe: auch ohne Server-Antwort lokal abmelden */

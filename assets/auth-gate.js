@@ -51,7 +51,9 @@ const LOGIN_URL = "/auth/login/";
 const LANGUAGE_CODES = "ar|bn|de|en|es|fr|hi|id|it|ja|ko|pt|ru|tr|zh";
 const LANGUAGE_LANDING = new RegExp(`^/(?:${LANGUAGE_CODES})/(?:index\\.html)?$`);
 
-const PUBLIC_PATHS = [/^\/auth\//, /^\/datenschutz/, /^\/impressum/, /^\/maus-replay/, /^\/status\.html$/, /^\/hilfe\.html$/, LANGUAGE_LANDING];
+// /danke-abo.html ist der Ruecksprung aus dem Stripe-Checkout: Wer gerade
+// bezahlt hat, darf die Bestaetigung nie an einer Login-Umleitung verlieren.
+const PUBLIC_PATHS = [/^\/auth\//, /^\/datenschutz/, /^\/impressum/, /^\/maus-replay/, /^\/status\.html$/, /^\/hilfe\.html$/, /^\/danke-abo\.html$/, LANGUAGE_LANDING];
 
 // Oeffentlicher Pfad? Input: pathname (String). Output: boolean.
 export function isPublicPath(pathname) {

@@ -1,6 +1,6 @@
 import { STORAGE_KEYS } from "./config.js";
 import { initServerSessionControls, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
-  fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=7";
+  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=8";
 import { languageOptionsMarkup } from "./language-options.js?v=1";
 import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=1";
@@ -13,10 +13,8 @@ import { initOnboardingWelcome } from "./onboarding-welcome.js?v=1";
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const PERSONAL_KEY = "smejj.personalization.v1";
 const NOTIFY_KEY = "smejj.notifications.v1";
-// Stripe-Zahlungslinks (Testmodus, Konto acct_1TxXHLQddyxzPlSc, angelegt
-// 2026-07-26 mit Freigabe des Betreibers). Zahlungslinks brauchen keinerlei
-// Schluessel im Frontend — Stripe hostet den Checkout. Nach der Konto-
-// Aktivierung bei Stripe werden hier nur die Live-Links eingetragen.
+// Stripe-Zahlungslinks (LIVE, Konto acct_1TxXHLQddyxzPlSc). Zahlungslinks
+// brauchen keinerlei Schluessel im Frontend — Stripe hostet den Checkout.
 const STRIPE_PLAN_LINKS = {
   plus: "https://buy.stripe.com/5kQaEZ2Cic9C5egbiIfIs00",
   pro: "https://buy.stripe.com/28E6oJ2Ci4HabCE72sfIs01",
@@ -33,6 +31,10 @@ const SAFE_EXPORT_KEYS = [STORAGE_KEYS.profile, STORAGE_KEYS.settings, STORAGE_K
 // Abo-Anzeige (Schritt 3b): checkoutRef kommt vom Control-Server
 // (/api/billing/status) und geht als client_reference_id an die Zahlungslinks.
 let billingCheckoutRef = "";
+// Letzter bestaetigter Serverstand — entscheidet, ob Plan-Knoepfe einen NEUEN
+// Checkout starten (free) oder ins Kundenportal fuehren (aktives Abo: ein
+// zweiter Zahlungslink wuerde ein zweites, paralleles Abo anlegen).
+let billingAktuell = null;
 const PLAN_LABELS = {
   plus: "smejj Plus — 9 € / Monat",
   pro: "smejj Pro — 19 € / Monat",
@@ -113,16 +115,87 @@ async function hydrateBillingStatus(view) {
   const billing = await fetchBillingStatus();
   if (!billing) return;
   billingCheckoutRef = String(billing.checkoutRef || "");
+  billingAktuell = billing;
+  renderBillingState(view, billing);
+}
+
+// Serverstand -> Panel: aktueller Plan gross und klar, Verlaengerungs- bzw.
+// Auslaufdatum, "Abo verwalten"-Knopf, aktueller Plan in der Liste markiert.
+function renderBillingState(view, billing) {
+  const panel = view.querySelector('[data-account-panel="billing"]');
+  if (!panel) return;
   const label = PLAN_LABELS[billing.plan];
-  if (!label) return; // plan "free" oder unbekannt: Anzeige unveraendert
-  const planName = view.querySelector('[data-account-panel="billing"] .plan-name');
-  if (planName) planName.textContent = billing.livemode ? label : `${label} (Test)`;
-  const planHint = view.querySelector('[data-account-panel="billing"] .account-plan small');
-  if (planHint) {
-    planHint.textContent = billing.cancelAtPeriodEnd
-      ? t("Gekündigt — läuft zum Periodenende aus.")
-      : t("Abo aktiv über Stripe. Monatlich kündbar.");
+  const aktiv = Boolean(label);
+  const planName = panel.querySelector(".plan-name");
+  const planHint = panel.querySelector(".account-plan small");
+  const badge = panel.querySelector(".account-plan .state-badge");
+  const manage = panel.querySelector("#planManageOpen");
+  if (!aktiv) {
+    // Free (auch: Abo ausgelaufen): Standard-Anzeige und Abo-Knoepfe herstellen.
+    if (manage) manage.hidden = true;
+    for (const knopfId of ["planPlusOpen", "planProOpen", "planMaxOpen"]) {
+      const knopf = panel.querySelector(`#${knopfId}`);
+      if (!knopf) continue;
+      knopf.textContent = t("Zahlungspflichtig abonnieren");
+      knopf.disabled = false;
+    }
+    return;
   }
+  const datum = billing.periodEnd
+    ? new Date(billing.periodEnd).toLocaleDateString(uiLanguage(), { day: "numeric", month: "long", year: "numeric" })
+    : "";
+  if (planName) planName.textContent = billing.livemode === false ? `${label} (Test)` : label;
+  if (planHint) {
+    if (billing.cancelAtPeriodEnd) {
+      planHint.textContent = datum
+        ? t("Gekündigt — dein Abo läuft noch bis {datum}.").replace("{datum}", datum)
+        : t("Gekündigt — läuft zum Periodenende aus.");
+    } else if (billing.status === "past_due") {
+      planHint.textContent = t("Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.");
+    } else {
+      planHint.textContent = datum
+        ? t("Aktiv — verlängert sich am {datum}.").replace("{datum}", datum)
+        : t("Abo aktiv über Stripe. Monatlich kündbar.");
+    }
+  }
+  if (badge) badge.textContent = billing.cancelAtPeriodEnd ? t("Läuft aus") : t("Aktiv");
+  if (manage) manage.hidden = false;
+  // Plan-Liste: eigener Plan markiert, andere Plaene wechseln uebers Portal.
+  for (const [plan, knopfId] of [["plus", "planPlusOpen"], ["pro", "planProOpen"], ["max", "planMaxOpen"]]) {
+    const knopf = panel.querySelector(`#${knopfId}`);
+    if (!knopf) continue;
+    if (plan === billing.plan) {
+      knopf.textContent = t("Dein Plan");
+      knopf.disabled = true;
+    } else {
+      knopf.textContent = t("Plan wechseln");
+    }
+  }
+}
+
+// Kundenportal oeffnen: bevorzugt eine direkte Portal-Sitzung vom Server
+// (ohne erneute Anmeldung). Rueckfall ist der oeffentliche Portal-Login-Link —
+// dort schickt Stripe einen Code an die Konto-E-Mail.
+async function openBillingPortal(view) {
+  output(view, t("Einen Moment — das Abo-Portal wird geöffnet …"));
+  const portal = await requestBillingPortal();
+  if (portal.ok) {
+    window.open(portal.url, "_blank", "noopener");
+    output(view, t("Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen."));
+    return;
+  }
+  window.open(STRIPE_BILLING_PORTAL_URL, "_blank", "noopener");
+  output(view, t("Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode."));
+}
+
+// Plan-Knopf: ohne aktives Abo startet der Stripe-Checkout; mit aktivem Abo
+// fuehrt der Weg ins Portal (ein zweiter Zahlungslink wuerde ein zweites,
+// paralleles Abo anlegen — die Umstellung gehoert zu Stripe).
+function startOrSwitchPlan(view, plan) {
+  const aktiverPlan = billingAktuell?.plan;
+  if (PLAN_LABELS[aktiverPlan]) return openBillingPortal(view);
+  window.open(planLink(plan), "_blank", "noopener");
+  output(view, t("Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar."));
 }
 
 // Konto-Neuaufbau 2026-07-26 (Mockup-Abnahme Betreiber): 9 Bereiche wie bei
@@ -141,7 +214,7 @@ function markup() {
     ${panel("apps", "Verbundene Apps", `<div class="account-list">${dataAction("KI-Modelle & API-Keys", "GLM-5.2 aktiv · eigene Schlüssel und Modellwahl liegen in den Einstellungen.", "modelsSettingsOpen", "Einstellungen öffnen")}${statusRow("GitHub", "Für Coding: über die rechte Seitenleiste der App verbunden.", "In der App", true)}${statusRow("Google Drive", "Dateien direkt in den Chat holen.", "Bald verfügbar")}${statusRow("Google Kalender", "Termine ansehen und vorlesen lassen — nur lesend.", "Bald verfügbar")}${statusRow("Slack", "Zusammenfassungen aus Kanälen holen.", "Bald verfügbar")}</div><p class="account-note">${t("Apps sehen nur, was du ausdrücklich freigibst — Zugriff jederzeit widerrufbar.")}</p>`)}
     ${panel("notifications", "Benachrichtigungen", `<div class="account-list">${toggle("Coding-Agent fertig", "notifyAgentDone", "Meldung, wenn eine lange Aufgabe abgeschlossen ist.")}${toggle("Antwort fertig", "notifyReplyDone", "Wenn du die App verlassen hast, während smejj noch arbeitet.")}${toggle("Limit fast erreicht", "notifyLimit80", "Hinweis bei 80 % — Limits starten erst mit den Plänen.")}${statusRow("Sicherheitswarnungen", "Neue Anmeldung, neues Gerät — immer per E-Mail.", "Immer an", true)}${statusRow("Rechnungen & Zahlungen", "Kommt mit den Bezahl-Plänen.", "Immer an", true)}</div><p class="account-note">${t("Diese Auswahl gilt auf diesem Gerät.")}</p>`)}
     ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
-    ${panel("billing", "Abo & Zahlungen", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">Free — 0 €</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div><p class="account-note">${t("Alle Preise sind Gesamtpreise pro Monat inkl. gesetzlicher Umsatzsteuer. Das kostenpflichtige Abo hat eine Laufzeit von einem Monat und verlängert sich automatisch um jeweils einen weiteren Monat, bis du kündigst. Jederzeit zum Ende des bezahlten Monats kündbar.")}</p><div class="account-list">${dataAction("Plus — 9 € / Monat", "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.", "planPlusOpen", "Zahlungspflichtig abonnieren")}${dataAction("Pro — 19 € / Monat", "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.", "planProOpen", "Zahlungspflichtig abonnieren")}${dataAction("Max — 39 € / Monat", "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.", "planMaxOpen", "Zahlungspflichtig abonnieren")}</div><p class="account-note">${t("Mit „Zahlungspflichtig abonnieren“ wirst du zum Zahlungsdienstleister Stripe weitergeleitet und schließt dort ein kostenpflichtiges Abo ab. Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Es gelten unsere")} <a href="/agb.html">${t("AGB")}</a> ${t("und die")} <a href="/widerruf.html">${t("Widerrufsbelehrung")}</a>. ${t("Aktuell Stripe-TESTMODUS: Buchungen sind Proben ohne echte Abbuchung (Testkarte 4242 4242 4242 4242). Echt geschaltet wird nach der Stripe-Konto-Aktivierung.")}</p><div class="account-actions"><button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}
+    ${panel("billing", "Abo & Zahlungen", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">Free — 0 €</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div><p class="account-note">${t("Alle Preise sind Gesamtpreise pro Monat inkl. gesetzlicher Umsatzsteuer. Das kostenpflichtige Abo hat eine Laufzeit von einem Monat und verlängert sich automatisch um jeweils einen weiteren Monat, bis du kündigst. Jederzeit zum Ende des bezahlten Monats kündbar.")}</p><div class="account-list">${dataAction("Plus — 9 € / Monat", "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.", "planPlusOpen", "Zahlungspflichtig abonnieren")}${dataAction("Pro — 19 € / Monat", "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.", "planProOpen", "Zahlungspflichtig abonnieren")}${dataAction("Max — 39 € / Monat", "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.", "planMaxOpen", "Zahlungspflichtig abonnieren")}</div><p class="account-note">${t("Mit „Zahlungspflichtig abonnieren“ wirst du zum Zahlungsdienstleister Stripe weitergeleitet und schließt dort ein kostenpflichtiges Abo ab. Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Nach der Zahlung bekommst du eine Bestätigung per E-Mail. Es gelten unsere")} <a href="/agb.html">${t("AGB")}</a> ${t("und die")} <a href="/widerruf.html">${t("Widerrufsbelehrung")}</a>.</p><div class="account-actions"><button id="planManageOpen" type="button" hidden>${t("Abo verwalten — Rechnungen, Plan & Kündigung")}</button><button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}
     ${panel("usage", "Nutzung & Limits", `<div class="account-list">${usageRow("Nachrichten", "Aufbauphase: ohne Limit.", "usageMessages")}${usageRow("Sprachminuten (Premium-Stimme)", "Zählt erst, wenn die Premium-Stimme aktiv ist.", "usageVoice")}${usageRow("Coding-Aufgaben", "Nur erfolgreich gestartete Läufe zählen.", "usageCoding")}</div><p class="account-note" id="usagePeriodNote">${t("Zähler laufen nur auf diesem Gerät und setzen sich jeden Monat automatisch zurück. Mit den Plänen bekommt jede Zeile einen Balken: verbraucht und noch offen.")}</p>`)}
     ${panel("data", "Daten & Datenschutz", `<h4 class="account-subhead">${t("Datenschutz")}</h4><div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.")}</p><h4 class="account-subhead">${t("Berechtigungen")}</h4><div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div><h4 class="account-subhead">${t("Daten verwalten")}</h4><div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">${t("Datenschutzerklärung öffnen")}</button></div>`)}
   </div></div><div id="profileOutput" class="output" role="status" aria-live="polite"></div>`;
@@ -156,6 +229,9 @@ function bind(view) {
       // Frische Zaehler bei jedem Oeffnen des Nutzungs-Bereichs (Chat kann
       // waehrenddessen weitergezaehlt haben).
       if (tab.dataset.accountTab === "usage") hydrateUsage(view);
+      // Frischer Abo-Stand bei jedem Oeffnen (z. B. direkt nach Checkout
+      // oder Portal-Aenderung — sonst zeigt der Bereich bis zum Reload alt).
+      if (tab.dataset.accountTab === "billing") hydrateBillingStatus(view);
       return activate(view, tab.dataset.accountTab);
     }
     if (event.target.closest("#accountExport")) exportLocalData(view);
@@ -164,9 +240,10 @@ function bind(view) {
     if (event.target.closest("#modelsSettingsOpen")) location.href = "/settings";
     // Stripe-Checkout in neuem Tab (noopener: der Checkout bekommt keinen
     // Zugriff auf das smejj-Fenster).
-    if (event.target.closest("#planPlusOpen")) window.open(planLink("plus"), "_blank", "noopener");
-    if (event.target.closest("#planProOpen")) window.open(planLink("pro"), "_blank", "noopener");
-    if (event.target.closest("#planMaxOpen")) window.open(planLink("max"), "_blank", "noopener");
+    if (event.target.closest("#planPlusOpen")) startOrSwitchPlan(view, "plus");
+    if (event.target.closest("#planProOpen")) startOrSwitchPlan(view, "pro");
+    if (event.target.closest("#planMaxOpen")) startOrSwitchPlan(view, "max");
+    if (event.target.closest("#planManageOpen")) openBillingPortal(view);
     if (event.target.closest("#planCancelOpen")) handleCancelSubscription(view);
     if (event.target.closest("#savePersonalization")) savePersonalization(view);
     if (event.target.closest("#logoutLocal")) logoutSession(view);
@@ -289,6 +366,9 @@ async function saveConsent(view) {
 // vorbereitete Kuendigungs-E-Mail, aus der Vertrag und Kuendigungswunsch klar
 // hervorgehen. Fail-safe: darf die Kontoseite nie blockieren.
 function handleCancelSubscription(view) {
+  // Mit aktivem Abo geht es direkt in die eigene Portal-Sitzung (ohne
+  // erneute Stripe-Anmeldung); sonst ueber den oeffentlichen Login-Link.
+  if (PLAN_LABELS[billingAktuell?.plan]) return openBillingPortal(view);
   if (STRIPE_BILLING_PORTAL_URL) {
     window.open(STRIPE_BILLING_PORTAL_URL, "_blank", "noopener");
     output(view, t("Kündigung: Im Stripe-Kundenportal kannst du dein Abo sofort kündigen."));

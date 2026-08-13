@@ -71,6 +71,7 @@ const API = {
   accountExport: `${API_ORIGIN}/api/auth/account/export`,
   accountDelete: `${API_ORIGIN}/api/auth/account/delete`,
   billingStatus: `${API_ORIGIN}/api/billing/status`,
+  billingPortal: `${API_ORIGIN}/api/billing/portal`,
   trainingNotice: `${API_ORIGIN}/api/training/consent/notice`,
   trainingConsent: `${API_ORIGIN}/api/training/consent`,
   trainingConsentRevoke: `${API_ORIGIN}/api/training/consent/revoke`,
@@ -88,6 +89,19 @@ export async function fetchBillingStatus() {
     const data = await response.json();
     return data && data.ok ? data : null;
   } catch { return null; }
+}
+
+// Stripe-Kundenportal-Sitzung anfordern (Abo verwalten, Plan wechseln,
+// kuendigen, Rechnungen). Liefert { ok, url } oder { ok: false, error } —
+// wirft nie; die Oberflaeche entscheidet ueber den Rueckfallweg.
+export async function requestBillingPortal() {
+  if (!getToken()) return { ok: false, error: "not_authenticated" };
+  try {
+    const response = await fetch(API.billingPortal, { method: "POST", headers: authHeaders() });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok && data.ok && data.url) return { ok: true, url: data.url };
+    return { ok: false, error: data.error || `http_${response.status}` };
+  } catch { return { ok: false, error: "network" }; }
 }
 
 export function initServerSessionControls(view, output) {
