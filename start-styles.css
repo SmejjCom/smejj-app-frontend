@@ -2134,16 +2134,71 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
    Stumm: Das Zeichen bleibt bewusst farbig und animiert — der Sprachmodus
    laeuft weiter, nur das Mikrofon ist aus (Signal traegt der rote Mic-Button). */
 
-.voice-mode-overlay[data-mode="thinking"] .voice-logo-left,
-.voice-mode-overlay[data-mode="thinking"] .voice-logo-right,
-.voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a,
+/* Denken = Dialog-Puls (Betreiber-Auftrag + Freigabe 2026-08-13).
+
+   Vorher wurde die Bewegung beim Denken LANGSAMER (2,4 s -> 3,6 s) — genau in
+   dem Moment, wo der Nutzer wissen will, ob gearbeitet wird, wirkte das
+   Zeichen am totesten ("dieser Moment, wo arbeitet ... soll rechts links
+   bewegen wie zwei Menschen reden"). Jetzt schwingen die Klammern abwechselnd
+   deutlich aufeinander zu (±15 px statt ±7) und die Punkte blinken versetzt
+   wie ein Wortwechsel — ein Herzschlag-Takt von 1,1 s. Hoeren bleibt ruhig,
+   Sprechen bleibt gruen: die drei Zustaende sind jetzt auf einen Blick
+   unterscheidbar. */
+
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-left {
+     animation: voice-puls-left 1.1s ease-in-out infinite;
+}
+
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-right {
+     animation: voice-puls-right 1.1s ease-in-out infinite;
+}
+
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a {
+     animation: voice-puls-dot-a 1.1s ease-in-out infinite;
+}
+
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b {
-     animation-duration: 3.6s;
+     animation: voice-puls-dot-b 1.1s ease-in-out infinite;
+}
+
+@keyframes voice-puls-left {
+     0%, 100% { transform: translateX(0) scale(1); }
+     25% { transform: translateX(15px) scale(1.08); }
+     50% { transform: translateX(0) scale(1); }
+}
+
+@keyframes voice-puls-right {
+     0%, 50% { transform: translateX(0) scale(1); }
+     75% { transform: translateX(-15px) scale(1.08); }
+     100% { transform: translateX(0) scale(1); }
+}
+
+@keyframes voice-puls-dot-a {
+     0%, 45%, 100% { opacity: 0.3; }
+     20% { opacity: 1; }
+}
+
+@keyframes voice-puls-dot-b {
+     0%, 55%, 100% { opacity: 0.3; }
+     75% { opacity: 1; }
 }
 
 .voice-mode-overlay[data-mode="thinking"] .voice-mode-logo::before {
-     background: radial-gradient(circle, rgba(246, 243, 238, 0.2) 0%, rgba(246, 243, 238, 0) 70%);
-     animation-duration: 4.5s;
+     background: radial-gradient(circle, rgba(20, 224, 220, 0.3) 0%, rgba(20, 224, 220, 0) 70%);
+     animation-duration: 1.1s;
+}
+
+/* Bewegung nur, wenn der Nutzer sie nicht abbestellt hat — der Puls ist die
+   kraeftigste Animation der App und braucht diese Bremse zwingend. */
+@media (prefers-reduced-motion: reduce) {
+     .voice-logo-left, .voice-logo-right, .voice-logo-dot-a, .voice-logo-dot-b,
+     .voice-mode-overlay[data-mode="thinking"] .voice-logo-left,
+     .voice-mode-overlay[data-mode="thinking"] .voice-logo-right,
+     .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a,
+     .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b,
+     .voice-mode-logo::before {
+          animation: none;
+     }
 }
 
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-logo path {
@@ -2986,10 +3041,11 @@ body::after {
    soll sich automatisch anpassen, nicht unter Feldern bleiben"). Bis dahin
    galt margin-left: 0 — die Sidebar ist position:fixed und lag als Overlay
    ueber dem Inhalt, sodass Text und Eingabezeile unter der Spur verschwanden.
-   Nur am breiten Schirm: darunter bleibt die Sidebar die Schublade mit
-   Abdunkeln (siehe panel-backdrop.css), und ein Schieben wuerde die Mitte
-   erdruecken. */
-@media (min-width: 921px) {
+   Schwelle 681 px — dieselbe Grenze, an der styles.css schon die rechte Seite
+   schiebt. Der erste Versuch stand bei 921 px und griff auf dem Bildschirm des
+   Betreibers (915 px Fensterbreite) genau NICHT. Darunter bleibt die Sidebar
+   die Schublade mit Abdunkeln (siehe panel-backdrop.css). */
+@media (min-width: 681px) {
   body.left-panel-open .workspace {
     margin-left: min(var(--left-panel-width), calc(100vw - 120px));
   }
@@ -3574,6 +3630,49 @@ body:has(#browserPanel.is-open) #mausButton {
   .chat-schritt[data-zustand="laeuft"] .chat-schritt-stand { animation: none; }
 }
 
+/* Zitate und Hinweiskaesten (Befund 2026-08-13).
+   Der Renderer kannte "> Text" nicht — im Chat stand woertlich "&gt; Text",
+   bei JEDER Modellantwort mit Zitat und in der Video-Statusmeldung. Farben
+   kommen aus currentColor, damit heller und dunkler Modus ohne zweite Regel
+   funktionieren (Lehre: ::before-Unterbau traegt nie). */
+.entry.assistant .chat-zitat {
+  margin: 10px 0;
+  padding: 2px 0 2px 14px;
+  border-left: 3px solid rgba(127, 127, 127, 0.45);
+  opacity: 0.85;
+  font-style: italic;
+}
+
+.entry.assistant .chat-hinweis {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  border-left-width: 3px;
+  background: rgba(127, 127, 127, 0.08);
+}
+
+.entry.assistant .chat-hinweis-titel {
+  font-weight: 600;
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+
+/* Die Art faerbt nur den linken Rand und den Titel — der Textkoerper bleibt
+   in der Vorlesefarbe, damit er auf beiden Hintergruenden lesbar ist. */
+.entry.assistant .chat-hinweis[data-art="note"] { border-left-color: #4a90d9; }
+.entry.assistant .chat-hinweis[data-art="note"] .chat-hinweis-titel { color: #4a90d9; }
+.entry.assistant .chat-hinweis[data-art="tip"] { border-left-color: #3fa66a; }
+.entry.assistant .chat-hinweis[data-art="tip"] .chat-hinweis-titel { color: #3fa66a; }
+.entry.assistant .chat-hinweis[data-art="important"] { border-left-color: #8b6bd9; }
+.entry.assistant .chat-hinweis[data-art="important"] .chat-hinweis-titel { color: #8b6bd9; }
+.entry.assistant .chat-hinweis[data-art="warning"] { border-left-color: #d99b3f; }
+.entry.assistant .chat-hinweis[data-art="warning"] .chat-hinweis-titel { color: #d99b3f; }
+.entry.assistant .chat-hinweis[data-art="caution"] { border-left-color: #d9614a; }
+.entry.assistant .chat-hinweis[data-art="caution"] .chat-hinweis-titel { color: #d9614a; }
+
 /* ---- chat-actions.css ---- */
 /* smejj.com — Aktionen pro Chat-Nachricht (2026-07-28).
  *
@@ -4097,17 +4196,3 @@ body:has(#browserPanel.is-open) #mausButton {
     min-height: 44px;
   }
 }
-
-/* --- Denken = Dialog-Puls (Betreiber-Freigabe 2026-08-13) ---
-   Quelle: public/composer-tools.css im Arbeitsrepo (ba12c14). Anhang ans
-   Buendel bis zum naechsten bundle-start-styles-Lauf. */
-.voice-mode-overlay[data-mode="thinking"] .voice-logo-left { animation: voice-puls-left 1.1s ease-in-out infinite; }
-.voice-mode-overlay[data-mode="thinking"] .voice-logo-right { animation: voice-puls-right 1.1s ease-in-out infinite; }
-.voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a { animation: voice-puls-dot-a 1.1s ease-in-out infinite; }
-.voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b { animation: voice-puls-dot-b 1.1s ease-in-out infinite; }
-@keyframes voice-puls-left { 0%, 100% { transform: translateX(0) scale(1); } 25% { transform: translateX(15px) scale(1.08); } 50% { transform: translateX(0) scale(1); } }
-@keyframes voice-puls-right { 0%, 50% { transform: translateX(0) scale(1); } 75% { transform: translateX(-15px) scale(1.08); } 100% { transform: translateX(0) scale(1); } }
-@keyframes voice-puls-dot-a { 0%, 45%, 100% { opacity: 0.3; } 20% { opacity: 1; } }
-@keyframes voice-puls-dot-b { 0%, 55%, 100% { opacity: 0.3; } 75% { opacity: 1; } }
-.voice-mode-overlay[data-mode="thinking"] .voice-mode-logo::before { background: radial-gradient(circle, rgba(20, 224, 220, 0.3) 0%, rgba(20, 224, 220, 0) 70%); animation-duration: 1.1s; }
-@media (prefers-reduced-motion: reduce) { .voice-logo-left, .voice-logo-right, .voice-logo-dot-a, .voice-logo-dot-b, .voice-mode-overlay[data-mode="thinking"] .voice-logo-left, .voice-mode-overlay[data-mode="thinking"] .voice-logo-right, .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a, .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b, .voice-mode-logo::before { animation: none; } }

@@ -218,10 +218,11 @@ body::after {
    soll sich automatisch anpassen, nicht unter Feldern bleiben"). Bis dahin
    galt margin-left: 0 — die Sidebar ist position:fixed und lag als Overlay
    ueber dem Inhalt, sodass Text und Eingabezeile unter der Spur verschwanden.
-   Nur am breiten Schirm: darunter bleibt die Sidebar die Schublade mit
-   Abdunkeln (siehe panel-backdrop.css), und ein Schieben wuerde die Mitte
-   erdruecken. */
-@media (min-width: 921px) {
+   Schwelle 681 px — dieselbe Grenze, an der styles.css schon die rechte Seite
+   schiebt. Der erste Versuch stand bei 921 px und griff auf dem Bildschirm des
+   Betreibers (915 px Fensterbreite) genau NICHT. Darunter bleibt die Sidebar
+   die Schublade mit Abdunkeln (siehe panel-backdrop.css). */
+@media (min-width: 681px) {
   body.left-panel-open .workspace {
     margin-left: min(var(--left-panel-width), calc(100vw - 120px));
   }
