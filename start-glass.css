@@ -41,7 +41,8 @@
   width: min(760px, calc(100% - 24px));
   margin: 0 auto;
   border: 1px solid rgba(126, 232, 218, 0.32);
-  border-radius: 24px;
+  /* Betreiber-Regel 2026-08-13: das gesamte Design ist viereckig. */
+  border-radius: 0;
   padding: 6px 10px 6px;
   background:
     linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(45, 212, 191, 0.03) 46%, transparent 72%),
@@ -105,7 +106,8 @@
   min-height: 44px;
   padding: 10px 18px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 999px;
+  /* Betreiber-Regel 2026-08-13: das gesamte Design ist viereckig. */
+  border-radius: 0;
   background: rgba(17, 23, 30, 0.5);
   color: rgba(200, 209, 218, 0.92);
   font-size: 13.5px;
@@ -120,6 +122,37 @@
   border-color: rgba(50, 246, 234, 0.5);
   color: #f0f6f5;
   box-shadow: 0 0 16px rgba(45, 212, 191, 0.18);
+}
+
+/* ── Rand-Icons: 44-px-Touchziele auch auf dem Desktop (2026-08-13) ──
+   Mobil (<600px) stehen die 44er schon im start-styles-Buendel; hier ziehen
+   Menue-, Browser- und Maus-Knopf auf allen Breiten nach. Doppelklasse gibt
+   Gewicht 0,2,0 wie beim Buendel-Vorbild. */
+
+.glass-icon.glass-icon {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+}
+
+/* Der Maus-Knopf traegt right:36px als Inline-Stil (CSP-Hash, index.html ist
+   Start-Lock) — mit 44-px-Knoepfen ueberlappt das den Browser-Knopf, darum
+   hier per !important daneben gesetzt: 48px = 44px Knopf + Luft. */
+#mausButton {
+  right: calc(env(safe-area-inset-right) + 48px) !important;
+}
+
+/* Das Logo sass bei left:36px neben dem 28er-Menue-Knopf; der endet jetzt
+   bei 44. Gleicher Zug wie die Mobil-Regel im Buendel (left: +48px), und als
+   Klickziel waechst es selbst auf 44. */
+.app-brand-logo {
+  left: calc(env(safe-area-inset-left) + 48px);
+  width: 44px;
+  height: 44px;
+}
+
+body[data-left-menu-state="expanded"] .app-brand-logo {
+  height: 44px;
 }
 
 /* ── Mobil ────────────────────────────────────────────────────────── */
