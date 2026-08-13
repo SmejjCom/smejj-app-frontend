@@ -68,19 +68,29 @@ function schrittText(schritt) {
   return `${art}: ${schritt.text}${markt}`;
 }
 
-/** Die Liste entsteht erst, wenn wirklich ein Schritt gemeldet wird. */
-function schrittListe(output) {
-  // RUECKWAERTS suchen statt nur das direkte Geschwister: chat-actions.js
-  // fuegt Aktions-Knoepfe als EIGENE Geschwister ein — mit ihnen dazwischen
-  // fand diese Funktion ihre Liste nie wieder und legte pro Meldung eine neue
-  // an (der Stapel-Fehler, live gesehen 2026-08-12). Ein user-Eintrag beendet
-  // die Suche: fremde Fragen bekommen nie unsere Liste.
+/**
+ * Sucht die zu dieser Antwort gehoerende Schrittliste — ohne sie anzulegen.
+ *
+ * RUECKWAERTS statt nur das direkte Geschwister: chat-actions.js fuegt
+ * Aktions-Knoepfe als EIGENE Geschwister ein — mit ihnen dazwischen fand die
+ * Suche ihre Liste nie wieder und legte pro Meldung eine neue an (der
+ * Stapel-Fehler, live gesehen 2026-08-12). Ein user-Eintrag beendet die Suche:
+ * fremde Fragen bekommen nie unsere Liste.
+ */
+function findeSchrittListe(output) {
   let davor = output?.previousElementSibling;
   while (davor) {
     if (davor.dataset?.smejjSchritte === "true") return davor;
     if (davor.classList?.contains("user")) break;
     davor = davor.previousElementSibling;
   }
+  return null;
+}
+
+/** Die Liste entsteht erst, wenn wirklich ein Schritt gemeldet wird. */
+function schrittListe(output) {
+  const vorhanden = findeSchrittListe(output);
+  if (vorhanden) return vorhanden;
   if (!output?.parentElement) return null;
   const liste = document.createElement("article");
   liste.className = "entry assistant chat-schritte";
@@ -156,6 +166,123 @@ export function zeigeSchritt(output, schritt) {
       liste.append(karte);
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Nach der Arbeit: zusammenfalten
+//
+// Betreiber-Befund 2026-08-13 (Screenshot einer Buero-Suche in Castro Valley):
+// achtzehn Zeilen "Suche: … / Lese: … ✓ nichts gefunden" standen nach dem Ende
+// offen im Verlauf — mehr Bildschirm als die Antwort selbst. Waehrend der
+// Arbeit ist genau das der Sinn der Liste (siehe oben). Danach ist es Laerm:
+// ChatGPT, Claude und Gemini falten ihre Werkzeugprotokolle in EINE Zeile.
+//
+// Bewusst natives <details>/<summary>: Aufklappen ohne eine Zeile JavaScript,
+// tastaturbedienbar, von Screenreadern als solches angesagt — und ohne neue
+// CSS-Regel. Letzteres ist kein Schoenheitsargument: public/start-styles.css
+// steht unter dem Start-Lock, eine Regel dort haette Betreiber-Freigabe
+// gebraucht (scripts/check-start-lock.mjs).
+// ---------------------------------------------------------------------------
+
+/** Menschliche Kurzfassung: was wurde eigentlich getan? */
+function faltTitel(arten, ohneFund) {
+  const teile = [];
+  const suchen = arten.filter((a) => a === "suche").length;
+  const seiten = arten.filter((a) => a === "seite").length;
+  const rest = arten.length - suchen - seiten;
+  if (suchen) teile.push(`${suchen} ${suchen === 1 ? "Suche" : "Suchen"}`);
+  if (seiten) teile.push(`${seiten} ${seiten === 1 ? "Seite" : "Seiten"} gelesen`);
+  if (rest) teile.push(`${rest} ${rest === 1 ? "Schritt" : "Schritte"}`);
+  // Die Null-Meldung MUSS in die zugeklappte Zeile: sonst versteckt das Falten
+  // genau die Information, dass die Antwort auf nichts steht.
+  const fund = ohneFund && ohneFund === arten.length ? " — ohne Fund" : "";
+  return `Arbeitsschritte: ${teile.join(", ") || arten.length}${fund}`;
+}
+
+/**
+ * Faltet die Schrittliste zu einer aufklappbaren Zeile zusammen.
+ *
+ * Wird NUR am Ende des Stroms aufgerufen. Danach greift zeigeSchritt nicht mehr
+ * auf diese Liste zu: eine neue Frage schiebt einen user-Eintrag dazwischen,
+ * und findeSchrittListe bricht dort ab.
+ *
+ * @param {HTMLElement} output Antwort-Knoten
+ * @param {number} [ohneFund] wie viele Schritte nichts geliefert haben
+ * @returns {HTMLElement|null} die gefaltete Liste, oder null wenn nichts zu falten war
+ */
+export function falteSchritte(output, ohneFund = 0) {
+  if (typeof document === "undefined") return null;
+  const liste = findeSchrittListe(output);
+  if (!liste || liste.dataset?.gefaltet === "true") return null;
+  // Das Wartesignal ist kein Arbeitsschritt — es zaehlt nicht mit und wird
+  // ohnehin schon vom Stopp-Aufruf entfernt.
+  const zeilen = [...(liste.children || [])].filter(
+    (k) => k.dataset?.schritt && k.dataset.schritt !== "wartesignal"
+  );
+  if (!zeilen.length) return null;
+
+  const details = document.createElement("details");
+  details.className = "chat-schritte-falte";
+  const titel = document.createElement("summary");
+  // BEWUSST NICHT .chat-schritt: diese Klasse setzt display:flex, und ein
+  // <summary> verliert damit sein Aufklapp-Dreieck (display:list-item). Ohne
+  // Klasse erbt die Zeile Schriftgroesse und Deckkraft von .chat-schritte und
+  // behaelt den Marker — genau das, was sie braucht.
+  titel.className = "chat-schritte-titel";
+  titel.textContent = faltTitel(zeilen.map((z) => z.dataset.schritt.split("|")[0]), ohneFund);
+  details.append(titel);
+  // Erst herausnehmen, dann anhaengen: im echten DOM verschiebt append von
+  // allein, ein Testdoppel muss es nicht nachbauen.
+  for (const zeile of zeilen) { zeile.remove(); details.append(zeile); }
+  liste.append(details);
+  liste.dataset.gefaltet = "true";
+  // Der Ticker ist vorbei — ein "polite"-Bereich, der sich nicht mehr aendert,
+  // braucht die Ansage nicht.
+  liste.setAttribute?.("aria-live", "off");
+  return liste;
+}
+
+// ---------------------------------------------------------------------------
+// Wenn keine Quelle etwas liefert
+//
+// Derselbe Screenshot, der eigentliche Schaden: alle sechs Portale (LoopNet,
+// Crexi, Craigslist) lieferten "nichts gefunden" — sie sperren maschinelle
+// Zugriffe. Das Modell hatte da bereits "Ich suche direkt nach konkreten
+// Angeboten auf den gaengigen US-Plattformen." geschrieben und hoerte danach
+// auf. Der Nutzer sah eine Ankuendigung, kein Ergebnis, und keinen Grund.
+//
+// Der Hinweis wird KLIENTSEITIG angehaengt, weil nur hier beides zugleich
+// bekannt ist: der Ausgang jedes Schrittes und der fertige Antworttext.
+// ---------------------------------------------------------------------------
+
+export const QUELLEN_LEER_HINWEIS = [
+  "",
+  "",
+  "**Keine der abgefragten Quellen hat Daten geliefert** — die Antwort oben steht deshalb auf nichts.",
+  "Haeufigster Grund ist nicht, dass es nichts gibt: viele grosse Portale sperren maschinelle Zugriffe.",
+  "Bitte die Frage anders stellen, eine andere Quelle nennen oder das Portal direkt oeffnen."
+].join("\n");
+
+/**
+ * Entscheidet, ob die Antwort einen ehrlichen Schlusssatz braucht.
+ *
+ * Beide Bedingungen muessen zutreffen, sonst schwatzt der Hinweis dazwischen:
+ *   - es gab Schritte, und JEDER ging leer aus (ein einziger Fund genuegt,
+ *     damit das Modell etwas zu berichten hatte),
+ *   - und die Antwort ist zu kurz, um selbst eine zu sein. Ein Modell, das aus
+ *     eigenem Wissen ausfuehrlich antwortet, bekommt keine Belehrung.
+ *
+ * @param {{gesamt?: number, ohneFund?: number, antwort?: string}} lage
+ * @returns {string} anzuhaengender Text, oder "" wenn nichts fehlt
+ */
+export function quellenHinweis({ gesamt = 0, ohneFund = 0, antwort = "" } = {}) {
+  if (gesamt < 1 || ohneFund < gesamt) return "";
+  return antwort.trim().length > 400 ? "" : QUELLEN_LEER_HINWEIS;
+}
+
+/** Ein "fertig"-Schritt ging leer aus — dieselbe Regel, die die Zeile anzeigt. */
+function schrittOhneFund(schritt) {
+  return schritt?.zustand === "fertig" && !schritt.stand && !(schritt.treffer > 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -308,6 +435,10 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  // Ausgang der Werkzeugarbeit — gebraucht wird er erst ganz am Ende, fuer die
+  // gefaltete Titelzeile und fuer die Frage, ob die Antwort auf nichts steht.
+  let schritteFertig = 0;
+  let schritteOhneFundZahl = 0;
 
   while (true) {
     const { value, done } = await reader.read();
@@ -329,6 +460,10 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
         const payload = JSON.parse(text);
         // Arbeitsschritt: gehoert in die Schrittliste, NICHT in die Antwort.
         if (payload.smejj_schritt) {
+          if (payload.smejj_schritt.zustand === "fertig") {
+            schritteFertig += 1;
+            if (schrittOhneFund(payload.smejj_schritt)) schritteOhneFundZahl += 1;
+          }
           zeigeSchritt(output, payload.smejj_schritt);
           continue;
         }
@@ -343,5 +478,11 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // Auch wenn der Strom ohne ein einziges Ereignis endet: das Signal muss weg.
   stoppeWartesignal();
   clearThinkingState(output);
+  // VOR renderMarkdown: der Renderer liest textContent und ersetzt innerHTML —
+  // danach angehaengter Text bliebe roher Stern-Text.
+  output.textContent += quellenHinweis({
+    gesamt: schritteFertig, ohneFund: schritteOhneFundZahl, antwort: output.textContent
+  });
   renderMarkdown?.(output);
+  falteSchritte(output, schritteOhneFundZahl);
 }
