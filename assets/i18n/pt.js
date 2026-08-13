@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "Explique este código para mim",
   "Suche im Web und fasse zusammen": "Pesquise na web e resuma",
   "Zeichne mir ein Bild": "Desenhe uma imagem para mim",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "Como posso ajudar?",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "Descreva uma tarefa ou faça uma pergunta.",
 };

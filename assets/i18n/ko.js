@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "이 코드를 설명해 줘",
   "Suche im Web und fasse zusammen": "웹에서 검색해서 요약해 줘",
   "Zeichne mir ein Bild": "그림을 그려 줘",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "무엇을 도와드릴까요?",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "작업을 설명하거나 질문해 주세요.",
 };

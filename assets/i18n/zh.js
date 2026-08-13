@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "给我解释这段代码",
   "Suche im Web und fasse zusammen": "搜索网络并总结",
   "Zeichne mir ein Bild": "帮我画一张图",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "有什么可以帮您？",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "描述一个任务或提出一个问题。",
 };

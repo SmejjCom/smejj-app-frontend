@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "Объясни мне этот код",
   "Suche im Web und fasse zusammen": "Поищи в интернете и подведи итог",
   "Zeichne mir ein Bild": "Нарисуй мне картинку",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "Чем я могу помочь?",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "Опишите задачу или задайте вопрос.",
 };

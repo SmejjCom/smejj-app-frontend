@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "Jelaskan kode ini kepada saya",
   "Suche im Web und fasse zusammen": "Cari di web dan rangkum",
   "Zeichne mir ein Bild": "Buatkan gambar untuk saya",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "Ada yang bisa saya bantu?",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "Jelaskan tugas atau ajukan pertanyaan.",
 };
