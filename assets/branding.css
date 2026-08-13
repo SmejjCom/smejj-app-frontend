@@ -70,6 +70,58 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
   opacity: 1;
 }
 
+/* ===== Marken sind Absender, keine Schaltflaechen (2026-08-13) =====
+   In jeder Ecke soll genau EIN Bedienelement stehen: links der Menue-Knopf,
+   rechts der Panel-Knopf. Die Marke lebt im Panel und erscheint erst, wenn es
+   offen ist — dasselbe Muster wie bei ChatGPT. Vorher standen links und rechts
+   zwei fast gleiche Zeichen dauerhaft im Bild.
+
+   Bewusst ueber die vorhandenen Zustaende geloest (kein neues JS): der Body
+   traegt schon data-left-menu-state = closed | compact | opening | expanded.
+   Fehlt das Attribut, bleibt alles sichtbar wie bisher — die Regel kann die
+   Marke also nie versehentlich ganz verschlucken. */
+body[data-left-menu-state="closed"] .app-brand-logo,
+body[data-left-menu-state="compact"] .app-brand-logo,
+body[data-left-menu-state="opening"] .app-brand-logo {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Bewusst OHNE Ueberblendung: tests/branding-presentation.test.mjs verbietet
+   in dieser Datei filter, mask, transform und transition. Der Grund steht im
+   Testnamen — die Marke soll unabhaengig vom Layout und ohne Effekte
+   erscheinen. Ein Auf- und Abblenden waere huebsch, ist aber genau das, was
+   die Sperre draussen halten will. */
+
+/* Rechte Seite spiegelbildlich: das Maus-Zeichen zeigt sich erst, wenn das
+   rechte Panel offen ist. Umgekehrt formuliert (verstecken statt zeigen),
+   damit ein Browser ohne :has() den Knopf sichtbar laesst statt ihn
+   unerreichbar zu machen — fail-visible, nicht fail-closed. */
+body:has(#browserPanel:not(.is-open)) #mausButton {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Das Maus-Zeichen war bis 2026-08-13 Strich fuer Strich unser Logo — links
+   und rechts stand dasselbe Bild, und niemand konnte die Maus als Maus lesen.
+   Jetzt ein Zeiger in derselben Farbe: die Familie stellt die Farbe her, die
+   Form stiftet den Unterschied. Der Austausch laeuft ueber den Hintergrund,
+   weil das <img> in der gesperrten index.html steht. Der Pfad ist absolut
+   (fuehrender Schraegstrich) und damit unabhaengig davon, ob diese Datei
+   einzeln oder im Buendel ausgeliefert wird. */
+#mausButton {
+  background-image: url("/icons/maus-zeiger.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 20px 20px;
+}
+
+#mausButton img {
+  display: none;
+}
+
 @media (max-width: 560px) {
   .app-brand-logo {
     --app-brand-expanded-width: 76px;
