@@ -19,7 +19,7 @@ import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Verlauf kein Markdown kopieren und keinen Zeitstempel zeigen.
 import { clampVersionIndex, metaOf, seedMeta } from "/assets/chat-messages.js?v=1";
 // Besitzer-Logik separat und Node-testbar (tests/chat-owner.test.mjs).
-import { OWNER_KEY, ownerDecision, sessionUserId } from "/assets/chat-owner.js?v=1";
+import { OWNER_KEY, gehoertNutzer, ownerDecision, sessionUserId } from "/assets/chat-owner.js?v=2";
 
 const DB_NAME = "smejj-chats";
 const DB_VERSION = 1;
@@ -125,22 +125,52 @@ function setActiveChatId(id) {
 // wessen Verlauf hier liegt; meldet sich ein ANDERES Konto an, wird der fremde
 // Verlauf geleert. Bestandsgeraete ohne Merker: der Verlauf gehoert dem gerade
 // angemeldeten Nutzer, nichts wird geloescht (Migration).
-// Output: false = Aufraeumen war noetig, schlug aber fehl → Restore ueberspringen,
-// damit ein fremder Verlauf keinesfalls angezeigt wird. Sonst true.
+// Wer ist gerade angemeldet? Kurzform fuer die vielen Aufrufstellen.
+function aktuellerNutzer() {
+  return sessionUserId(localStorage);
+}
+
+function geraeteBesitzer() {
+  try { return localStorage.getItem(OWNER_KEY) || ""; } catch { return ""; }
+}
+
+// Stufe 2 (2026-08-13): Kontowechsel LOESCHT NICHTS MEHR.
+//
+// Stufe 1 leerte beim Wechsel die ganze Datenbank — sicher, aber teuer: Wer sich
+// abwechselnd mit zwei Konten anmeldet, verlor jedes Mal alles. Jetzt bekommt
+// jeder Chat einen `ownerId`; beim ersten Start unter Stufe 2 wird der Altbestand
+// EINMAL auf den Geraete-Besitzer aus Stufe 1 beschriftet. Danach filtert die
+// Liste, statt zu loeschen.
+//
+// Output: false = die Beschriftung war noetig, schlug aber fehl → dann lieber
+// nichts wiederherstellen, als fremde Chats zu zeigen (fail-closed).
 async function enforceChatOwner() {
-  let owner = "";
-  try { owner = localStorage.getItem(OWNER_KEY) || ""; } catch { return true; }
-  const userId = sessionUserId(localStorage);
-  const decision = ownerDecision(owner, userId);
-  if (decision === "nichts") return true;
-  if (decision === "leeren-und-uebernehmen") {
+  const userId = aktuellerNutzer();
+  if (!userId) return true; // abgemeldet: nichts anfassen, nichts anzeigen
+  const owner = geraeteBesitzer();
+  const wechsel = ownerDecision(owner, userId) === "leeren-und-uebernehmen";
+  try {
+    // Altbestand ohne Besitzer beschriften: Er gehoert dem VORHERIGEN Besitzer
+    // (Stufe-1-Marke), sonst dem aktuellen Nutzer (frisches Geraet).
+    const erbe = owner || userId;
+    const offen = await tx("readonly", (store) => new Promise((resolve, reject) => {
+      const request = store.getAll();
+      request.onsuccess = () => resolve((request.result || []).filter((chat) => !chat.ownerId));
+      request.onerror = () => reject(request.error);
+    }));
+    for (const chat of offen) {
+      await tx("readwrite", (store) => store.put({ ...chat, ownerId: erbe }));
+    }
+  } catch {
+    return false;
+  }
+  // Beim Kontowechsel den Zeiger auf den zuletzt offenen Chat fallen lassen —
+  // er zeigt auf einen Chat des anderen Kontos.
+  if (wechsel) {
     try {
-      await tx("readwrite", (store) => store.clear());
       sessionStorage.removeItem(ACTIVE_KEY_SESSION);
       localStorage.removeItem(ACTIVE_KEY_LAST);
-    } catch {
-      return false; // Besitzer NICHT umschreiben: Schutz greift beim naechsten Start erneut
-    }
+    } catch { /* fluechtig weiter */ }
   }
   try { localStorage.setItem(OWNER_KEY, userId); } catch { /* dann erneut beim naechsten Start */ }
   return true;
@@ -194,7 +224,19 @@ async function persistActive() {
     id = newId();
     setActiveChatId(id);
   }
-  const existing = await tx("readonly", (store) => store.get(id)).catch(() => null);
+  let existing = await getChat(id);
+  if (!existing) {
+    // Entweder neu — oder der Zeiger steht auf einem Chat, der einem anderen
+    // Konto gehoert. Dann NICHT ueberschreiben, sondern eine eigene Kennung
+    // nehmen: sonst koennte man fremde Unterhaltungen ueberschreiben, ohne sie
+    // je zu sehen. Unterschieden wird das am rohen Datenbank-Treffer.
+    const roh = await tx("readonly", (store) => store.get(id)).catch(() => null);
+    if (roh) {
+      id = newId();
+      setActiveChatId(id);
+    }
+    existing = null;
+  }
   // Dieses Objekt ERSETZT den gespeicherten Chat vollstaendig — was hier nicht
   // steht, ist danach weg. Bis 2026-08-09 fehlten `pinned` und (neu) `titleAuto`:
   // wer einen angehefteten Chat oeffnete und weiterschrieb, verlor beim naechsten
@@ -202,6 +244,10 @@ async function persistActive() {
   // durch die erste Frage ersetzt.
   const chat = {
     id,
+    // Stufe 2: Besitzer mitschreiben. Ein bereits gesetzter Besitzer bleibt
+    // stehen — sonst wuerde ein fremder Chat durch blosses Weiterschreiben den
+    // Eigentuemer wechseln.
+    ownerId: String(existing?.ownerId || aktuellerNutzer() || ""),
     title: existing && (existing.titleEdited || existing.titleAuto) ? existing.title : titleFrom(messages),
     titleEdited: Boolean(existing && existing.titleEdited),
     titleAuto: Boolean(existing && existing.titleAuto),
@@ -226,6 +272,10 @@ function safeModelName() {
   }
 }
 
+// Aufraeumen zaehlt seit Stufe 2 PRO KONTO: listChats liefert nur die eigenen.
+// Fremde Chats fallen der Grenze also nie zum Opfer — auf einem Geraet mit zwei
+// Konten liegen im Extremfall 2 x MAX_CHATS Unterhaltungen. Das ist gewollt:
+// Lieber etwas mehr lokaler Speicher als der Verlust fremder Verlaeufe.
 async function pruneOld() {
   const chats = await listChats();
   if (chats.length <= MAX_CHATS) return;
@@ -244,8 +294,12 @@ export async function listChats() {
     request.onsuccess = () => resolve(request.result || []);
     request.onerror = () => reject(request.error);
   })).catch(() => []);
+  // Stufe 2: nur die eigenen Chats. Ohne Sitzung bleibt die Liste leer.
+  const userId = aktuellerNutzer();
+  const alt = geraeteBesitzer();
+  const eigene = chats.filter((chat) => gehoertNutzer(chat, userId, alt));
   // Angepinnte zuerst (Konkurrenz-Radar V4), innerhalb der Gruppen neueste oben.
-  return chats.sort((a, b) => ((b.pinned === true) - (a.pinned === true)) || String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  return eigene.sort((a, b) => ((b.pinned === true) - (a.pinned === true)) || String(b.updatedAt).localeCompare(String(a.updatedAt)));
 }
 
 // Anpinnen/Loesen (Konkurrenz-Radar V4, 2026-08-06). updatedAt bleibt bewusst
@@ -260,12 +314,16 @@ export async function togglePinChat(id) {
   return chat.pinned;
 }
 
+// Stufe 2: Ein Chat, der einem anderen Konto gehoert, wird behandelt, als gaebe
+// es ihn nicht. Das deckt AUCH den Weg ueber eine geratene oder gemerkte Kennung
+// ab — die Liste zu filtern allein waere nur eine Sichtblende.
 export function getChat(id) {
   return tx("readonly", (store) => new Promise((resolve, reject) => {
     const request = store.get(String(id || ""));
     request.onsuccess = () => resolve(request.result || null);
     request.onerror = () => reject(request.error);
-  })).catch(() => null);
+  })).then((chat) => (chat && gehoertNutzer(chat, aktuellerNutzer(), geraeteBesitzer()) ? chat : null))
+    .catch(() => null);
 }
 
 /**
@@ -308,6 +366,8 @@ export async function renameChat(id, title) {
 }
 
 export async function deleteChat(id) {
+  // Nur eigene Chats loeschen (Stufe 2). getChat liefert fuer fremde null.
+  if (!(await getChat(id))) return false;
   await tx("readwrite", (store) => store.delete(String(id || "")));
   if (activeChatId() === id) {
     try {
@@ -335,6 +395,7 @@ export async function createChatFrom(messages) {
   const now = new Date().toISOString();
   await tx("readwrite", (store) => store.put({
     id,
+    ownerId: aktuellerNutzer(),
     title: titleFrom(list),
     titleEdited: false,
     createdAt: now,
