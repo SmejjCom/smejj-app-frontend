@@ -139,9 +139,21 @@
           <dt>Ohne Internet</dt>
           <dd>Die Oberfläche und Ihr Verlauf bleiben lesbar. Neue Antworten brauchen eine Verbindung; das sagt die App dann auch.</dd>
           <dt>Etwas fehlt oder ist kaputt</dt>
-          <dd>Schreiben Sie an die Adresse im <a href="/impressum.html">Impressum</a>.</dd>
+          <dd>Am schnellsten über das Formular direkt hierunter — oder an die Adresse im <a href="/impressum.html">Impressum</a>.</dd>
         </dl>
       </div>
+
+      <h2 id="support">Direkt an den Support schreiben</h2>
+      <div class="card">
+        <p>Beschreiben Sie kurz Ihr Problem. Sie bekommen in Sekunden eine automatische Antwort unserer KI — ehrlich gekennzeichnet, und ein Mensch liest mit. Dafür müssen Sie angemeldet sein.</p>
+        <form id="supportForm">
+          <p><label for="supportBetreff">Betreff<br><input id="supportBetreff" type="text" maxlength="140" required placeholder="z. B. Anmelden geht nicht"></label></p>
+          <p><label for="supportText">Was geht nicht?<br><textarea id="supportText" rows="5" maxlength="4000" required placeholder="Was haben Sie versucht, was ist passiert?"></textarea></label></p>
+          <p><button id="supportSenden" type="submit">An den Support senden</button></p>
+        </form>
+        <div id="supportAusgabe" class="card support-ausgabe" hidden></div>
+      </div>
+      <script src="/hilfe-support.js" defer></script>
 
       <footer>
         <a href="/">Startseite</a>
