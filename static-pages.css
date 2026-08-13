@@ -195,6 +195,35 @@ html.p-status .status-knopf:hover {
   box-shadow: 0 0 16px rgba(45, 212, 191, 0.22);
 }
 
+/* ===== Rechts- und Hilfeseiten im Cyan-Cockpit der 15-Screen-Vorlage =====
+ * Fortsetzung der begonnenen Status-Umstellung (Block oben): dieselbe
+ * Bildsprache — kuehler Verlauf, Cyan-Schimmer oben, Glas-Karten, Cyan-Links.
+ * Bewusst zurueckhaltender als die Status-Seite: hier wird viel GELESEN,
+ * darum kein Blur auf den Karten (Rechtstexte muessen gestochen bleiben)
+ * und der Schimmer traegt nur den Kopf, nicht den Fliesstext.
+ * Die Sprach-Startseiten (p-sprachstart) bleiben unberuehrt — ihr Hintergrund
+ * ist fail-closed an themeColor aus locales.json gekoppelt. */
+html.p-recht body {
+  background:
+    radial-gradient(760px 480px at 82% -6%, rgba(45, 212, 191, 0.14), transparent 62%),
+    radial-gradient(620px 460px at -10% 30%, rgba(13, 185, 210, 0.08), transparent 64%),
+    linear-gradient(180deg, #0c1119 0%, #070b11 68%, #04070b 100%);
+}
+html.p-recht h1 {
+  color: #f6fffe;
+  text-shadow: 0 0 20px rgba(45, 212, 191, 0.18);
+}
+html.p-recht a { color: #7ee8da; }
+html.p-recht .card {
+  border-color: rgba(45, 212, 191, 0.34);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(45, 212, 191, 0.02)),
+    rgba(17, 23, 32, 0.82);
+  box-shadow: 0 0 18px rgba(45, 212, 191, 0.12);
+}
+html.p-recht .note { border-left-color: rgba(45, 212, 191, 0.55); }
+html.p-recht footer { border-top-color: rgba(45, 212, 191, 0.22); }
+
 /* ===== Hilfeseite (html.p-hilfe, zusaetzlich zu p-recht) ===== */
 html.p-hilfe .hilfe-vorspann { color: rgba(246, 243, 238, 0.78); margin: 0 0 1.4em; }
 html.p-hilfe .hilfe-inhalt { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 1em; padding-bottom: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
