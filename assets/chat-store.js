@@ -594,6 +594,14 @@ export async function importChat(chat) {
   const userId = aktuellerNutzer();
   if (!userId || !chat || typeof chat !== "object" || !chat.id) return false;
   if (!gehoertNutzer(chat, userId, geraeteBesitzer())) return false;
+  // Grabstein vom Server (Stufe 3): Der Chat wurde auf einem anderen Geraet
+  // geloescht — hier ebenfalls entfernen. Direkt in der Datenbank, NICHT ueber
+  // deleteChat: das wuerde die Loeschung erneut zum Server melden (Kreis).
+  if (chat.geloescht === true) {
+    await tx("readwrite", (store) => store.delete(String(chat.id)));
+    notifyChanged();
+    return true;
+  }
   await tx("readwrite", (store) => store.put({ ...chat, ownerId: userId }));
   notifyChanged();
   return true;
