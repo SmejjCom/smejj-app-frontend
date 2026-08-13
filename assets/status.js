@@ -26,7 +26,10 @@ export const DIENSTE = Object.freeze([
     id: "control",
     name: "Anmeldung und Konto",
     beschreibung: "Anmelden, Konto, Schlüssel, Aufträge.",
-    url: "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud/api/health",
+    // Seit dem Zeabur-Umzug melden sich Nutzer HIER an — die alte Salad-Adresse
+    // zu messen war eine Falschmessung: sie haette "laeuft" gezeigt, selbst wenn
+    // der echte Anmelde-Server tot ist (korrigiert 2026-08-13, Salad-Abschaltung).
+    url: "https://smejj-control.zeabur.app/api/health",
     kritisch: true
   },
   {
@@ -40,6 +43,11 @@ export const DIENSTE = Object.freeze([
     id: "browser",
     name: "Browser-Ansicht",
     beschreibung: "Fremde Seiten im rechten Bereich anzeigen.",
+    // BEWUSST noch Salad: Der Zeabur-Ersatz (smejj-remote-browser) hat ein
+    // kaputtes Abbild und keine Domain — dieser Eintrag misst den Dienst, der
+    // die Ansicht WIRKLICH traegt. Bei der Salad-Abschaltung MUSS er umgestellt
+    // oder entfernt werden, sonst zeigt die Statusseite dauerhaft rot
+    // (Checkliste: docs/salad-abschaltung-checkliste.md).
     url: "https://loganberry-fruit-e3n6k5n10h68cawn.salad.cloud/health",
     kritisch: false
   }

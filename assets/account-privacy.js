@@ -47,6 +47,18 @@ export function initAccountPrivacySurface() {
   const view = document.querySelector("#profile");
   if (!view || view.dataset.accountPrivacyReady) return;
   view.dataset.accountPrivacyReady = "true";
+  // Salad-Abschied (2026-08-13): Bei Bestandsnutzern kann ein frueherer
+  // Failover eine *.salad.cloud-Adresse als API-Ziel hinterlassen haben
+  // (Befund "Konsole zeigte den alten Host"). Nach der Abschaltung waere die
+  // App fuer genau diese Nutzer tot — darum wird der Alt-Eintrag hier einmalig
+  // entfernt; config.js faellt dann auf den Zeabur-Standard zurueck.
+  try {
+    for (const speicher of [localStorage, sessionStorage]) {
+      if ((speicher.getItem("smejj.apiOrigin.v1") || "").includes("salad.cloud")) {
+        speicher.removeItem("smejj.apiOrigin.v1");
+      }
+    }
+  } catch { /* Speicher gesperrt: der Standard greift ohnehin */ }
   // Onboarding ZUERST: es liest den Login-Marker aus der Adresse, BEVOR die
   // Bereinigung unten ihn entfernt (erscheint nur einmal, smejj.onboarding.v1).
   initOnboardingWelcome(STRIPE_PLAN_LINKS);
