@@ -73,12 +73,31 @@ export function initPanelBackdrop({
   // styles.css hat `[hidden] { display: none !important }` - dagegen gewinnt
   // keine normale Regel. Vorher setzte app.js hidden=true in JEDEM Zweig,
   // auch beim Oeffnen. Genau das war der Fehler.
+  // Eine SCHUBLADE braucht das Abdunkeln, eine SPUR nicht (2026-08-13).
+  // Befund des Betreibers: "wenn ich ins Schreibfeld klicke, gehen beide
+  // Seiten zu". Ursache gemessen mit elementFromPoint — an der Stelle des
+  // Eingabefelds lag #sidebarBackdrop, nicht das Feld. Das Backdrop spannt
+  // ueber den ganzen Schirm, und sein Klick schliesst beide Seiten. Fuer die
+  // breite Schublade ist das richtig (sie deckt den Inhalt zu), fuer eine
+  // 28-px-Spur ist es eine Falle: die Spur deckt nichts zu, der Inhalt daneben
+  // muss bedienbar bleiben.
+  const drawerOpen = (panel) => Boolean(panel?.classList.contains("is-open"))
+    && !panel.classList.contains("is-compact");
+
   const syncBackdrop = () => {
     if (!backdrop) return;
-    const anyPanelOpen = Boolean(sidebar?.classList.contains("is-open"))
-      || Boolean(browserPanel?.classList.contains("is-open"));
-    backdrop.hidden = !anyPanelOpen;
+    backdrop.hidden = !(drawerOpen(sidebar) || drawerOpen(browserPanel));
   };
+
+  // Der Zustand "Spur" entsteht auch OHNE Auf-/Zuklappen — beim Ziehen am Rand
+  // setzt applyPanelCompact nur die Klasse. Ohne diesen Beobachter bliebe das
+  // Backdrop aus dem Schubladen-Zustand liegen und deckte den Inhalt weiter zu.
+  if (typeof MutationObserver !== "undefined") {
+    for (const panel of [sidebar, browserPanel].filter(Boolean)) {
+      new MutationObserver(syncBackdrop)
+        .observe(panel, { attributes: true, attributeFilter: ["class"] });
+    }
+  }
 
   const closeAll = () => {
     setMenuOpen(false);
