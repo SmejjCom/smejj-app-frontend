@@ -3067,6 +3067,21 @@ body:has(#browserPanel.is-open) #mausButton {
   padding-top: 64px;
 }
 
+/* Eine SPUR ist Rahmen, eine SCHUBLADE ist Overlay (2026-08-13, Nacht-Modus).
+   Auf dem Handy blieb die Mitte auch bei schmaler Spur unter der Leiste: die
+   680-px-Regel in styles.css setzt beide Raender auf 0, weil sie fuer die
+   breite Schublade mit Abdunkeln gedacht ist. Eine 28-px-Spur ist aber keine
+   Schublade — sie steht dauerhaft und darf den Text nicht verdecken. Darum
+   weicht die Mitte IMMER aus, wenn die Seite im Spur-Zustand ist; die
+   Schublade bleibt Overlay wie bisher. */
+body.left-panel-open:has(.sidebar.is-compact) .workspace {
+  margin-left: min(var(--left-panel-width), calc(100vw - 120px));
+}
+
+body.right-panel-open:has(#browserPanel.is-compact) .workspace {
+  margin-right: min(var(--right-panel-width), calc(100vw - 120px));
+}
+
 /* ---- profile-dock.css ---- */
 /* smejj.com — Profil-Dock (linke Navigation unten): Profilbild + Name + Zahnrad.
    Eigene Datei, weil public/styles.css per Ratchet-Baseline nicht wachsen darf.
