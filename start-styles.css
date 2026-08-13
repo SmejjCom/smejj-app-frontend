@@ -835,9 +835,9 @@ body.task-indicator-done .split-icon span:last-child {
    siehe measure:touch:app), gleiche Abstaende, oben Inhalt, unten Profil. */
 .sidebar.is-compact {
   padding-top: 84px;
-  padding-right: 8px;
-  padding-bottom: 12px;
-  padding-left: 8px;
+  padding-right: 2px;
+  padding-bottom: 10px;
+  padding-left: 2px;
 }
 
 .sidebar.is-compact .nav-button span:not(.button-icon):not(.profile-avatar),
@@ -862,10 +862,12 @@ body.task-indicator-done .split-icon span:last-child {
   font-size: 12px;
 }
 
+/* 16 px wie das Zeichen im Menue-Knopf (.split-icon) — Betreiber-Wunsch
+   2026-08-13: die Spur-Zeichen sollen dessen Groesse haben. */
 .sidebar.is-compact .button-icon svg,
 .browser-panel.is-compact .browser-panel-nav button svg {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 }
 
 .sidebar.is-compact .nav {
@@ -979,7 +981,7 @@ body.is-resizing-panel .panel-resizer::before {
    Sprache sprechen. */
 .browser-panel.is-compact {
   padding-top: 30px;
-  padding-right: 8px; padding-bottom: 12px; padding-left: 8px;
+  padding-right: 2px; padding-bottom: 10px; padding-left: 2px;
 }
 
 .browser-panel.is-compact .browser-panel-nav button {
@@ -3075,9 +3077,9 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 .sidebar.is-compact .profile-dock .profile-avatar {
-  width: 26px;
-  height: 26px;
-  font-size: 13px;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
 }
 
 .sidebar.is-compact .profile-dock-name {
