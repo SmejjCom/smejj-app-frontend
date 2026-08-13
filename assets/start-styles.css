@@ -3997,3 +3997,14 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
     min-height: 44px;
   }
 }
+
+/* --- Tabellen aus chat-markdown.js (Befund 2026-08-13, Betreiber-Freigabe) ---
+   Quelle: public/chat-markdown.css im Arbeitsrepo. Als Anhang ans Ende des
+   Buendels, weil der naechste bundle-start-styles-Lauf die Quelle ohnehin
+   mitnimmt — dieser Block ist die Live-Fassung bis dahin. */
+.entry.assistant .chat-table-wrap { overflow-x: auto; margin: 10px 0; -webkit-overflow-scrolling: touch; }
+.entry.assistant .chat-table { border-collapse: collapse; width: 100%; font-size: 0.95em; }
+.entry.assistant .chat-table th, .entry.assistant .chat-table td { padding: 7px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid rgba(127, 127, 127, 0.25); }
+.entry.assistant .chat-table th { font-weight: 600; white-space: nowrap; border-bottom-width: 2px; }
+.entry.assistant .chat-table tbody tr:nth-child(even) { background: rgba(127, 127, 127, 0.06); }
+.entry.assistant .chat-table tbody tr:last-child td { border-bottom: none; }

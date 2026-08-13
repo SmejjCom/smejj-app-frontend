@@ -36,6 +36,50 @@
   opacity: 0.8;
 }
 
+/* Tabellen aus chat-markdown.js (Befund 2026-08-13: sieben echte Angebote
+   standen als "| # | Lage | …" im Chat, weil der Renderer keine Tabellen
+   kannte). Ohne diese Regeln stehen die Spalten zwar richtig, kleben aber
+   aneinander — "225 sq ft700 $" war live lesbar.
+
+   Bewusst ohne neue Farbwerte: currentColor mit niedriger Deckkraft traegt in
+   hell UND dunkel, genau wie beim Link darueber. */
+.entry.assistant .chat-table-wrap {
+  /* Eine breite Tabelle darf nie den ganzen Chat seitlich verschieben. */
+  overflow-x: auto;
+  margin: 10px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.entry.assistant .chat-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.95em;
+}
+
+.entry.assistant .chat-table th,
+.entry.assistant .chat-table td {
+  padding: 7px 12px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.25);
+}
+
+.entry.assistant .chat-table th {
+  font-weight: 600;
+  white-space: nowrap;
+  border-bottom-width: 2px;
+}
+
+/* Zebra hilft beim Wandern entlang einer langen Zeile — sechs Spalten mit
+   Adresse, Flaeche und Preis sind sonst schwer zu verfolgen. */
+.entry.assistant .chat-table tbody tr:nth-child(even) {
+  background: rgba(127, 127, 127, 0.06);
+}
+
+.entry.assistant .chat-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 /* Schimmernder Bild-Platzhalter, waehrend der Bild-Maler arbeitet
    (chat-stream.js legt ihn an und entfernt ihn bei "fertig"). Bewusst in
    Bildgroesse: der Nutzer sieht, WO sein Bild entsteht — statt Stapel-Zeilen. */
