@@ -312,4 +312,9 @@ export default {
   "Coding": "코딩",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "예: 한국어로 간결하게 답해 주세요. 전문 용어는 쉽게 설명해 주세요.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "세션이 만료되었습니다. 다시 로그인해 주세요.",
+  // Beispiel-Chips der Glas-Startseite (2026-08-13).
+  "Baue mir eine kleine Web-App": "작은 웹 앱을 만들어 줘",
+  "Erkläre mir diesen Code": "이 코드를 설명해 줘",
+  "Suche im Web und fasse zusammen": "웹에서 검색해서 요약해 줘",
+  "Zeichne mir ein Bild": "그림을 그려 줘",
 };

@@ -312,4 +312,9 @@ export default {
   "Coding": "Programação",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Por exemplo: Responde de forma breve e em português. Explica os termos técnicos de modo simples.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "A tua sessão expirou. Inicia sessão novamente.",
+  // Beispiel-Chips der Glas-Startseite (2026-08-13).
+  "Baue mir eine kleine Web-App": "Crie um pequeno app web para mim",
+  "Erkläre mir diesen Code": "Explique este código para mim",
+  "Suche im Web und fasse zusammen": "Pesquise na web e resuma",
+  "Zeichne mir ein Bild": "Desenhe uma imagem para mim",
 };

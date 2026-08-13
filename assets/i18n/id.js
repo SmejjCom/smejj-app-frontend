@@ -312,4 +312,9 @@ export default {
   "Coding": "Coding",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Misalnya: Jawab singkat dan dalam bahasa Indonesia. Jelaskan istilah teknis secara sederhana.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Sesi Anda telah berakhir. Silakan masuk lagi.",
+  // Beispiel-Chips der Glas-Startseite (2026-08-13).
+  "Baue mir eine kleine Web-App": "Buatkan saya aplikasi web kecil",
+  "Erkläre mir diesen Code": "Jelaskan kode ini kepada saya",
+  "Suche im Web und fasse zusammen": "Cari di web dan rangkum",
+  "Zeichne mir ein Bild": "Buatkan gambar untuk saya",
 };

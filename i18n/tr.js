@@ -312,4 +312,9 @@ export default {
   "Coding": "Kodlama",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Örneğin: Kısa ve Türkçe yanıtla. Teknik terimleri basitçe açıkla.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
+  // Beispiel-Chips der Glas-Startseite (2026-08-13).
+  "Baue mir eine kleine Web-App": "Bana küçük bir web uygulaması yap",
+  "Erkläre mir diesen Code": "Bana bu kodu açıkla",
+  "Suche im Web und fasse zusammen": "Web'de ara ve özetle",
+  "Zeichne mir ein Bild": "Bana bir resim çiz",
 };

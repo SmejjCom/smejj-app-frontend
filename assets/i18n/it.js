@@ -312,4 +312,9 @@ export default {
   "Coding": "Programmazione",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Ad esempio: Rispondi in modo breve e in italiano. Spiega i termini tecnici in modo semplice.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "La tua sessione è scaduta. Accedi di nuovo.",
+  // Beispiel-Chips der Glas-Startseite (2026-08-13).
+  "Baue mir eine kleine Web-App": "Costruiscimi una piccola web app",
+  "Erkläre mir diesen Code": "Spiegami questo codice",
+  "Suche im Web und fasse zusammen": "Cerca sul web e riassumi",
+  "Zeichne mir ein Bild": "Disegnami un'immagine",
 };

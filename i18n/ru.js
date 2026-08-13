@@ -312,4 +312,9 @@ export default {
   "Coding": "Программирование",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Например: Отвечай кратко и по-русски. Объясняй технические термины просто.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Срок сессии истёк. Пожалуйста, войдите снова.",
+  // Beispiel-Chips der Glas-Startseite (2026-08-13).
+  "Baue mir eine kleine Web-App": "Создай мне небольшое веб-приложение",
+  "Erkläre mir diesen Code": "Объясни мне этот код",
+  "Suche im Web und fasse zusammen": "Поищи в интернете и подведи итог",
+  "Zeichne mir ein Bild": "Нарисуй мне картинку",
 };

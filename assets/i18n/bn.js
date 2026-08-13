@@ -312,4 +312,9 @@ export default {
   "Coding": "কোডিং",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "যেমন: সংক্ষেপে এবং বাংলায় উত্তর দিন। কারিগরি শব্দ সহজভাবে ব্যাখ্যা করুন।",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "আপনার সেশনের মেয়াদ শেষ হয়েছে। অনুগ্রহ করে আবার সাইন ইন করুন।",
+  // Beispiel-Chips der Glas-Startseite (2026-08-13).
+  "Baue mir eine kleine Web-App": "আমার জন্য একটি ছোট ওয়েব অ্যাপ বানাও",
+  "Erkläre mir diesen Code": "আমাকে এই কোডটি বুঝিয়ে দাও",
+  "Suche im Web und fasse zusammen": "ওয়েবে খুঁজে সারসংক্ষেপ দাও",
+  "Zeichne mir ein Bild": "আমার জন্য একটি ছবি আঁকো",
 };

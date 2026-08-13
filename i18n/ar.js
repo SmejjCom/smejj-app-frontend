@@ -312,4 +312,9 @@ export default {
   "Coding": "البرمجة",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "مثال: أجب باختصار وبالعربية. واشرح المصطلحات التقنية ببساطة.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
+  // Beispiel-Chips der Glas-Startseite (2026-08-13).
+  "Baue mir eine kleine Web-App": "ابنِ لي تطبيق ويب صغيرًا",
+  "Erkläre mir diesen Code": "اشرح لي هذا الكود",
+  "Suche im Web und fasse zusammen": "ابحث في الويب ولخّص",
+  "Zeichne mir ein Bild": "ارسم لي صورة",
 };

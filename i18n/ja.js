@@ -312,4 +312,9 @@ export default {
   "Coding": "コーディング",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "例：日本語で簡潔に答えてください。専門用語はやさしく説明してください。",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "セッションの有効期限が切れました。もう一度サインインしてください。",
+  // Beispiel-Chips der Glas-Startseite (2026-08-13).
+  "Baue mir eine kleine Web-App": "小さなWebアプリを作って",
+  "Erkläre mir diesen Code": "このコードを説明して",
+  "Suche im Web und fasse zusammen": "ウェブで検索して要約して",
+  "Zeichne mir ein Bild": "絵を描いて",
 };

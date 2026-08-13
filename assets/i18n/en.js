@@ -312,4 +312,9 @@ export default {
   "Coding": "Coding",
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "e.g. Answer briefly and in English. Explain technical terms simply.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Your session has expired. Please sign in again.",
+  // Beispiel-Chips der Glas-Startseite (2026-08-13).
+  "Baue mir eine kleine Web-App": "Build me a small web app",
+  "Erkläre mir diesen Code": "Explain this code to me",
+  "Suche im Web und fasse zusammen": "Search the web and summarize",
+  "Zeichne mir ein Bild": "Draw me a picture",
 };
