@@ -68,6 +68,7 @@
          node scripts/build/bundle-start-styles.mjs -->
     <link rel="stylesheet" href="/assets/start-styles.css?v=paste-attach-20260806">
     <link rel="stylesheet" href="/assets/search-overlay.css?v=suche-overlay-20260813">
+    <link rel="stylesheet" href="/assets/start-glass.css?v=glas-20260813">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -164,7 +165,7 @@
           <h1 class="visually-hidden">smejj.com — KI- und Code-Assistent</h1>
           <div class="home-feed">
             <header class="home-hero">
-              <h2>Was sollen wir in smejj entwickeln?</h2>
+              <h2>Was sollen wir in <span class="start-markenwort">smejj</span> entwickeln?</h2>
             </header>
             <div id="startLog" class="start-log" aria-label="Start Chat" hidden></div>
             <section class="prompt-glass" aria-label="Start Eingabe">
@@ -227,6 +228,12 @@
                 </button>
               </div>
             </section>
+            <div class="start-chips" aria-label="Beispiele zum Losklicken">
+              <button type="button">Baue mir eine kleine Web-App</button>
+              <button type="button">Erkläre mir diesen Code</button>
+              <button type="button">Suche im Web und fasse zusammen</button>
+              <button type="button">Zeichne mir ein Bild</button>
+            </div>
             <section class="feed-list" aria-label="Feed" hidden>
               <article class="feed-item">
                 <strong>Willkommen zurück</strong>
@@ -665,6 +672,7 @@
       <p class="voice-mode-hint">Sprich einfach — zum Beenden X druecken oder Escape.</p>
     </div>
     <script src="/assets/frame-guard.js?v=1" type="module"></script>
+    <script src="/assets/start-chips.js?v=glas-20260813" defer></script>
     <script src="/assets/app.js?v=stufen-chip-20260809" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>

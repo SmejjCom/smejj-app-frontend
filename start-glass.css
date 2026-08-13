@@ -1,0 +1,140 @@
+/* smejj.com — Glas-Startseite (Screen 1), Freigabe:
+   docs/approvals/2026-08-13-startseite-glas-design-freigabe.md
+   Laedt NACH dem start-styles-Buendel und ueberschreibt nur Screen 1.
+   styles.css bleibt unangetastet (Ratchet 1589). */
+
+/* ── Leerer Zustand: Begruessung + Kapsel mittig ─────────────────── */
+
+#start:not(.has-start-chat) .home-feed {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(18px, 3vh, 26px);
+  padding: 24px 16px;
+  background:
+    radial-gradient(820px 520px at 18% -12%, rgba(45, 212, 191, 0.13), transparent 62%),
+    radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
+    linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%);
+}
+
+#start:not(.has-start-chat) .home-hero {
+  display: block;
+  min-height: 0;
+  padding: 0 16px;
+}
+
+#start:not(.has-start-chat) .home-hero h2 {
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.home-hero .start-markenwort {
+  color: #35e0d0;
+  text-shadow: 0 0 18px rgba(45, 212, 191, 0.35);
+}
+
+/* ── Eingabe-Kapsel: Glas statt Kante — gilt in beiden Zustaenden ── */
+
+.prompt-glass {
+  width: min(760px, calc(100% - 24px));
+  margin: 0 auto;
+  border: 1px solid rgba(126, 232, 218, 0.32);
+  border-radius: 24px;
+  padding: 6px 10px 6px;
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(45, 212, 191, 0.03) 46%, transparent 72%),
+    rgba(17, 23, 30, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 26px rgba(45, 212, 191, 0.14),
+    0 14px 40px rgba(0, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+}
+
+.prompt-glass:focus-within {
+  border-color: rgba(50, 246, 234, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 34px rgba(45, 212, 191, 0.26),
+    0 14px 40px rgba(0, 0, 0, 0.42);
+}
+
+/* Laufender Chat: Kapsel bleibt Kapsel, nur breiter und unten angedockt. */
+#start.has-start-chat .prompt-glass {
+  width: min(980px, calc(100% - 20px));
+  margin: 0 auto 10px;
+}
+
+.prompt-glass textarea {
+  height: auto;
+  min-height: 44px;
+  padding: 10px 12px 6px;
+  font-size: 16.5px;
+  line-height: 1.5;
+}
+
+.prompt-actions {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Vorlesen wohnt jetzt nur noch im Antwort-Menue („speak" in
+   chat-actions-menu.js) — der dritte Audio-Knopf verwirrte nur. */
+.prompt-glass [data-start-tool="speaker"] {
+  display: none;
+}
+
+/* ── Beispiel-Chips: die Leerflaeche arbeitet ─────────────────────── */
+
+.start-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-width: 760px;
+  padding: 0 16px;
+}
+
+#start.has-start-chat .start-chips {
+  display: none;
+}
+
+.start-chips button {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(17, 23, 30, 0.5);
+  color: rgba(200, 209, 218, 0.92);
+  font-size: 13.5px;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  transition: border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+
+.start-chips button:hover,
+.start-chips button:focus-visible {
+  border-color: rgba(50, 246, 234, 0.5);
+  color: #f0f6f5;
+  box-shadow: 0 0 16px rgba(45, 212, 191, 0.18);
+}
+
+/* ── Mobil ────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  #start:not(.has-start-chat) .home-hero h2 {
+    font-size: 22px;
+  }
+
+  .prompt-glass {
+    width: calc(100% - 16px);
+  }
+
+  /* Auf kleinen Schirmen reichen zwei Chips. */
+  .start-chips button:nth-child(n + 3) {
+    display: none;
+  }
+}
