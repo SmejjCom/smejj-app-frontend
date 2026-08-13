@@ -818,12 +818,6 @@ body.task-indicator-done .split-icon span:last-child {
   -webkit-backdrop-filter: blur(30px) saturate(1.35);
 }
 
-/* Schmale Spur (2026-08-13, Betreiber: "sieht klein und nicht gut aus").
-   Vorher war die Spur die zusammengedrueckte Fassung des offenen Menues:
-   28 px hohe Zeilen, 14 px Zeichen, kein Rand — sie sah gequetscht aus statt
-   aufgeraeumt. Jetzt eine eigene Ansicht nach dem Vorbild der Spur von
-   ChatGPT: Rand ringsum, Zeichen in 44-px-Feldern (unsere Touch-Groesse,
-   siehe measure:touch:app), gleiche Abstaende, oben Inhalt, unten Profil. */
 .sidebar.is-compact {
   padding-top: 84px;
   padding-right: 0;
@@ -853,14 +847,10 @@ body.task-indicator-done .split-icon span:last-child {
   font-size: 12px;
 }
 
-/* 16 px wie das Zeichen im Menue-Knopf (.split-icon), aber mit kraeftigerem
-   Strich (2.4 statt 1.9) — Betreiber 2026-08-13: "Icons fetter". Bei 16 px
-   traegt die Strichstaerke die Lesbarkeit, nicht die Flaeche. */
 .sidebar.is-compact .button-icon svg,
 .browser-panel.is-compact .browser-panel-nav button svg {
   width: 16px;
   height: 16px;
-  stroke-width: 2.4;
 }
 
 .sidebar.is-compact .nav {
@@ -877,7 +867,6 @@ body.task-indicator-done .split-icon span:last-child {
 .browser-panel.is-compact .browser-panel-nav button {
   min-height: 44px;
   height: 44px;
-  border-radius: 12px;
 }
 
 .sidebar.is-compact .profile-dock {
@@ -969,9 +958,6 @@ body.is-resizing-panel .panel-resizer::before {
   -webkit-backdrop-filter: blur(30px) saturate(1.35);
 }
 
-/* Rechte Spur spiegelbildlich zur linken (2026-08-13): gleicher Rand,
-   gleiche Abstaende, gleiche 44-px-Felder — beide Seiten sollen dieselbe
-   Sprache sprechen. */
 .browser-panel.is-compact {
   padding-top: 30px;
   padding-right: 0; padding-bottom: 10px; padding-left: 0;
@@ -1600,23 +1586,4 @@ button:hover {
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* Aussenkante der App: ein zarter Lichtsaum in der Logo-Farbe #02fdfd —
-   dasselbe Cyan-Light-Leak wie die Anmeldekarte (public/auth/auth.css,
-   .auth-card), nur schwaecher: dort umrandet es eine kleine Karte, hier die
-   ganze Flaeche. Die erste Fassung (0.14/0.10/0.06) war dem Betreiber am
-   2026-08-13 live zu schwach — jetzt gut die Haelfte der Anmeldekarte.
-   Reine Deko, deshalb fixiert, ohne Mausfang
-   und ohne eigene Groesse — die Kante folgt immer dem Fenster. */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 2147483000;
-  pointer-events: none;
-  box-shadow:
-    inset 0 0 0 1px rgba(2, 253, 253, 0.3),
-    inset 0 0 26px rgba(2, 253, 253, 0.22),
-    inset 0 0 72px rgba(45, 212, 191, 0.13);
 }

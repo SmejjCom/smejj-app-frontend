@@ -176,3 +176,69 @@
     min-height: 44px;
   }
 }
+
+/* Aussenkante der App: ein zarter Lichtsaum in der Logo-Farbe #02fdfd —
+   dasselbe Cyan-Light-Leak wie die Anmeldekarte (public/auth/auth.css,
+   .auth-card), nur schwaecher: dort umrandet es eine kleine Karte, hier die
+   ganze Flaeche. Die erste Fassung (0.14/0.10/0.06) war dem Betreiber am
+   2026-08-13 live zu schwach — jetzt gut die Haelfte der Anmeldekarte.
+   Reine Deko, deshalb fixiert, ohne Mausfang
+   und ohne eigene Groesse — die Kante folgt immer dem Fenster. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(2, 253, 253, 0.3),
+    inset 0 0 26px rgba(2, 253, 253, 0.22),
+    inset 0 0 72px rgba(45, 212, 191, 0.13);
+}
+
+/* ===== Schmale Spur: was styles.css nicht mehr aufnehmen darf =====
+   styles.css steht an seiner Ratchet-Baseline (1589 Zeilen, siehe
+   scripts/check-guidelines.mjs) — neue Regeln der App-Chrome gehoeren hierher.
+   Die Werte in styles.css sind nur geaendert, nicht vermehrt worden. */
+
+/* Kraeftigerer Strich in der Spur (Betreiber 2026-08-13, "Icons fetter"):
+   bei 16 px traegt die Strichstaerke die Lesbarkeit, nicht die Flaeche. */
+.sidebar.is-compact .button-icon svg,
+.browser-panel.is-compact .browser-panel-nav button svg {
+  stroke-width: 2.4;
+}
+
+.sidebar.is-compact .nav-button,
+.sidebar.is-compact .profile-dock,
+.browser-panel.is-compact .browser-panel-nav button {
+  border-radius: 12px;
+}
+
+/* Die Mitte weicht den Seiten aus (Betreiber 2026-08-13: "Mittlere Schrift
+   soll sich automatisch anpassen, nicht unter Feldern bleiben"). Bis dahin
+   galt margin-left: 0 — die Sidebar ist position:fixed und lag als Overlay
+   ueber dem Inhalt, sodass Text und Eingabezeile unter der Spur verschwanden.
+   Nur am breiten Schirm: darunter bleibt die Sidebar die Schublade mit
+   Abdunkeln (siehe panel-backdrop.css), und ein Schieben wuerde die Mitte
+   erdruecken. */
+@media (min-width: 921px) {
+  body.left-panel-open .workspace {
+    margin-left: min(var(--left-panel-width), calc(100vw - 120px));
+  }
+}
+
+/* Das Maus-Zeichen gehoert IN die rechte Spur, nicht daneben (Betreiber
+   2026-08-13: "Maus bleibt draussen ... soll auch automatisch in rechte Seite
+   reingehen"). Grundstellung ist 36 px links vom Panel-Knopf; bei offenem
+   Panel rueckt es in dessen Spalte, eine Zeile darunter. */
+body:has(#browserPanel.is-open) #mausButton {
+  top: calc(env(safe-area-inset-top) + 32px);
+  right: env(safe-area-inset-right);
+}
+
+/* In der schmalen rechten Spur sitzt das Maus-Zeichen in der obersten Zeile.
+   Die Liste darunter muss tiefer beginnen, sonst liegt das erste Zeichen
+   (Browser) unter dem Zeiger — beim ersten Bau genau so passiert. */
+.browser-panel.is-compact {
+  padding-top: 64px;
+}
