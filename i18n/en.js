@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "Explain this code to me",
   "Suche im Web und fasse zusammen": "Search the web and summarize",
   "Zeichne mir ein Bild": "Draw me a picture",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "How can I help?",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "Describe a task or ask a question.",
 };

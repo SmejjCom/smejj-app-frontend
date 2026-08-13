@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "Bana bu kodu açıkla",
   "Suche im Web und fasse zusammen": "Web'de ara ve özetle",
   "Zeichne mir ein Bild": "Bana bir resim çiz",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "Nasıl yardımcı olabilirim?",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "Bir görev tanımlayın veya bir soru sorun.",
 };

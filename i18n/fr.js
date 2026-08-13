@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "Explique-moi ce code",
   "Suche im Web und fasse zusammen": "Cherche sur le web et résume",
   "Zeichne mir ein Bild": "Dessine-moi une image",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "Comment puis-je aider ?",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "Décrivez une tâche ou posez une question.",
 };

@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "اشرح لي هذا الكود",
   "Suche im Web und fasse zusammen": "ابحث في الويب ولخّص",
   "Zeichne mir ein Bild": "ارسم لي صورة",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "كيف يمكنني المساعدة؟",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "صف مهمة أو اطرح سؤالاً.",
 };

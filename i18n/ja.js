@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "このコードを説明して",
   "Suche im Web und fasse zusammen": "ウェブで検索して要約して",
   "Zeichne mir ein Bild": "絵を描いて",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "何をお手伝いしましょうか？",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "タスクを説明するか、質問してください。",
 };

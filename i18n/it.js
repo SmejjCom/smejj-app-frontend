@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "Spiegami questo codice",
   "Suche im Web und fasse zusammen": "Cerca sul web e riassumi",
   "Zeichne mir ein Bild": "Disegnami un'immagine",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "Come posso aiutarti?",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "Descrivi un compito o fai una domanda.",
 };

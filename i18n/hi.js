@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "मुझे यह कोड समझाओ",
   "Suche im Web und fasse zusammen": "वेब पर खोजो और सारांश दो",
   "Zeichne mir ein Bild": "मेरे लिए एक चित्र बनाओ",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "मैं कैसे मदद कर सकता हूँ?",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "कोई कार्य बताइए या कोई प्रश्न पूछिए।",
 };

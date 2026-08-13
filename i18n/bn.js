@@ -317,4 +317,7 @@ export default {
   "Erkläre mir diesen Code": "আমাকে এই কোডটি বুঝিয়ে দাও",
   "Suche im Web und fasse zusammen": "ওয়েবে খুঁজে সারসংক্ষেপ দাও",
   "Zeichne mir ein Bild": "আমার জন্য একটি ছবি আঁকো",
+  // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
+  "Womit kann ich helfen?": "আমি কীভাবে সাহায্য করতে পারি?",
+  "Beschreibe eine Aufgabe oder stelle eine Frage.": "একটি কাজ বর্ণনা করুন বা একটি প্রশ্ন করুন।",
 };
