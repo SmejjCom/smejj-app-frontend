@@ -172,11 +172,17 @@ export function renderProjectCards(projects) {
 }
 
 function loadPremiumStyles() {
-  if (document.querySelector('link[href="/assets/app-surfaces.css"]')) return;
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href = "/assets/app-surfaces.css";
-  document.head.append(link);
+  // Reihenfolge traegt Bedeutung: design-cyan-views.css kommt NACH
+  // app-surfaces.css in den Kopf und gewinnt darum bei gleicher Spezifitaet —
+  // das Cyan-Cockpit (Screens 4-14, Betreiber-Freigabe 2026-08-13) legt sich
+  // ueber den Premium-Unterbau, ersetzt ihn aber nicht.
+  for (const href of ["/assets/app-surfaces.css", "/assets/design-cyan-views.css"]) {
+    if (document.querySelector(`link[href="${href}"]`)) continue;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    document.head.append(link);
+  }
 }
 
 function enhanceProjectActions() {

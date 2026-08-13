@@ -11,6 +11,11 @@
 // style-src-Regeln. Eingehaengt ueber auth-gate.js (App-Shell + Landeseiten).
 
 let bannerEl = null;
+// Gewollter Zustand, nicht DOM-Zustand: showBanner stellt erst im naechsten
+// Animationsrahmen sichtbar. Kam dazwischen schon das online-Ereignis, wuerde
+// der Rahmen das Verstecken ueberschreiben — der Banner klemmte dann sichtbar,
+// obwohl laengst wieder Netz da ist (live beobachtet 2026-08-13).
+let sollSichtbar = false;
 
 function ensureBanner() {
   if (bannerEl) return bannerEl;
@@ -39,12 +44,14 @@ function ensureBanner() {
 }
 
 function showBanner() {
+  sollSichtbar = true;
   const el = ensureBanner();
   if (!el.isConnected && document.body) document.body.appendChild(el);
-  requestAnimationFrame(() => { el.style.transform = "translateY(0)"; });
+  requestAnimationFrame(() => { if (sollSichtbar) el.style.transform = "translateY(0)"; });
 }
 
 function hideBanner() {
+  sollSichtbar = false;
   if (bannerEl) bannerEl.style.transform = "translateY(100%)";
 }
 
