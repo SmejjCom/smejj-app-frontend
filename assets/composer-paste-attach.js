@@ -5,6 +5,32 @@
 // Chip in die Eingabezeile zurueck. Versionierter Import wie in app.js —
 // der Schutztest aus QA-Welle 1 (F-07) verlangt die Cache-Version dort.
 import { showToast } from "./components.js?v=chat-markdown-20260717";
+// Bild-Einfuegen (2026-08-14): der Betreiber fuegte einen Screenshot per
+// Cmd+V ein und nichts passierte — dieser Handler kannte nur Text. Bilder
+// laufen jetzt ueber DENSELBEN Weg wie der Datei-Waehler (eine Quelle).
+import { uebernehmeBildDatei } from "./composer-bild-anhang.js";
+
+/**
+ * Bilddateien aus einer Zwischenablage. Pur und testbar: macOS liefert den
+ * Screenshot je nach Weg in `files` ODER als item mit getAsFile().
+ * @param {DataTransfer|null} clipboardData
+ * @returns {File[]}
+ */
+export function bildDateienAusClipboard(clipboardData) {
+  const dateien = [];
+  for (const file of clipboardData?.files || []) {
+    if (String(file?.type || "").startsWith("image/")) dateien.push(file);
+  }
+  if (!dateien.length) {
+    for (const item of clipboardData?.items || []) {
+      if (item?.kind === "file" && String(item.type || "").startsWith("image/")) {
+        const file = item.getAsFile?.();
+        if (file) dateien.push(file);
+      }
+    }
+  }
+  return dateien;
+}
 
 // ChatGPT wandelt ab 10.000 Zeichen; wir greifen etwas frueher, weil die
 // Start-Eingabezeile mit ihrer grossen Schrift schneller unlesbar wird.
@@ -87,6 +113,14 @@ export function bindPasteAttach({ getInput }) {
   const input = getInput();
   if (!input) return;
   input.addEventListener("paste", (event) => {
+    // Bilder ZUERST: ein eingefuegter Screenshot traegt oft auch einen
+    // Text-Teil (Dateiname) — der darf den Bild-Weg nicht verdecken.
+    const bilder = bildDateienAusClipboard(event.clipboardData);
+    if (bilder.length) {
+      event.preventDefault();
+      void uebernehmeBildDatei(bilder[0], input, notifyInputChanged, { herkunft: "Einfuegen" });
+      return;
+    }
     const text = event.clipboardData?.getData("text/plain") || "";
     if (text.length < SCHWELLE) return;
     event.preventDefault();

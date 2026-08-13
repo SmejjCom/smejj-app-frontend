@@ -59,6 +59,36 @@ async function verkleinere(file) {
 }
 
 /**
+ * Gemeinsamer Kern fuer ALLE Wege, auf denen ein Bild hereinkommt (Datei-
+ * Wahl, Einfuegen, spaeter Drag&Drop): verkleinern, als Anhang vormerken,
+ * Referenzzeile in die Eingabe schreiben, Rueckmeldung zeigen.
+ *
+ * Herausgezogen am 2026-08-14: Der Betreiber fuegte einen Screenshot per
+ * Cmd+V ins Schreibfeld ein und NICHTS passierte — es gab schlicht keinen
+ * Einfuege-Weg fuer Bilder, nur den Datei-Waehler im Plus-Menue. Eine
+ * Funktion, zwei Absender (composer-paste-attach.js ruft sie beim Paste).
+ */
+export async function uebernehmeBildDatei(file, input, notifyInputChanged, { herkunft = "Datei" } = {}) {
+  if (!file || !input) return false;
+  const name = file.name || `${herkunft.toLowerCase()}-bild.png`;
+  let dataUrl = "";
+  try {
+    dataUrl = await verkleinere(file);
+  } catch {
+    dataUrl = "";
+  }
+  if (dataUrl) pending = { dataUrl, name };
+  const referenz = dataUrl
+    ? `[Bild angehaengt: ${name}]`
+    : `[Bild: ${name} (${Math.max(1, Math.round((file.size || 0) / 1024))} KB)]`;
+  input.value = input.value ? `${input.value}\n${referenz}` : referenz;
+  notifyInputChanged(input);
+  input.focus();
+  showToast(dataUrl ? `Bild angehaengt: ${name}` : `Bild zu gross fuer den Anhang: ${name}`);
+  return Boolean(dataUrl);
+}
+
+/**
  * Uebernimmt das change-Event des Foto-Inputs. Nur das ERSTE Bild wird als
  * Inhalt angehaengt (die Bruecke nimmt ein Bild pro Frage); weitere Dateien
  * bleiben wie bisher reine Text-Referenzen.
@@ -72,21 +102,12 @@ export function bindBildAnhang(selector, getInput, notifyInputChanged) {
     fileInput.value = "";
     if (files.length === 0) return;
     const [erstes, ...rest] = files;
-    let dataUrl = "";
-    try {
-      dataUrl = await verkleinere(erstes);
-    } catch {
-      dataUrl = "";
+    await uebernehmeBildDatei(erstes, input, notifyInputChanged);
+    if (rest.length) {
+      const referenzen = rest.map((file) => `[Bild: ${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)]`);
+      input.value = `${input.value}\n${referenzen.join("\n")}`;
+      notifyInputChanged(input);
     }
-    if (dataUrl) pending = { dataUrl, name: erstes.name };
-    const referenzen = [
-      dataUrl ? `[Bild angehaengt: ${erstes.name}]` : `[Bild: ${erstes.name} (${Math.max(1, Math.round(erstes.size / 1024))} KB)]`,
-      ...rest.map((file) => `[Bild: ${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)]`)
-    ];
-    input.value = input.value ? `${input.value}\n${referenzen.join("\n")}` : referenzen.join("\n");
-    notifyInputChanged(input);
-    input.focus();
-    showToast(dataUrl ? `Bild angehaengt: ${erstes.name}` : `Bild zu gross fuer den Anhang: ${erstes.name}`);
   });
 }
 
