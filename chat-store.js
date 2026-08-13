@@ -24,9 +24,14 @@ import { OWNER_KEY, gehoertNutzer, ownerDecision, sessionUserId } from "/assets/
 const DB_NAME = "smejj-chats";
 const DB_VERSION = 1;
 const STORE = "chats";
+// Projekte (2026-08-13): benannte Sammlungen, jeder Chat kann zu genau einem
+// Projekt gehoeren (chat.projectId). Eigener Object-Store in DERSELBEN
+// Datenbank — ein zweites DB-Handle waere nur ein zweiter Fehlerort.
+const PROJEKT_STORE = "projekte";
 const ACTIVE_KEY_SESSION = "smejj.chat.activeId.v1";
 const ACTIVE_KEY_LAST = "smejj.chat.lastActiveId.v1";
 const MAX_CHATS = 100;
+const MAX_PROJEKTE = 50;
 const MAX_TITLE = 60;
 const SAVE_DEBOUNCE_MS = 600;
 // Obergrenze fuer gespeicherte Antwort-Fassungen je Nachricht (2026-07-28).
@@ -40,9 +45,16 @@ let saveTimer = null;
 let restoring = false;
 
 function ensureStore(db) {
-  if (db.objectStoreNames.contains(STORE)) return;
-  const store = db.createObjectStore(STORE, { keyPath: "id" });
-  store.createIndex("updatedAt", "updatedAt");
+  // Je Store einzeln pruefen: eine Bestands-Datenbank hat "chats" schon,
+  // bekommt hier aber beim Heilungs-Upgrade den Projekt-Store nachgelegt.
+  if (!db.objectStoreNames.contains(STORE)) {
+    const store = db.createObjectStore(STORE, { keyPath: "id" });
+    store.createIndex("updatedAt", "updatedAt");
+  }
+  if (!db.objectStoreNames.contains(PROJEKT_STORE)) {
+    const projekte = db.createObjectStore(PROJEKT_STORE, { keyPath: "id" });
+    projekte.createIndex("updatedAt", "updatedAt");
+  }
 }
 
 // Ohne `version` wird der vorhandene Stand geoeffnet (und die Datenbank beim
@@ -72,8 +84,11 @@ function openDb() {
   // und weil alle Aufrufer fail-safe abfangen, ist der Verlauf in diesem Browser
   // dauerhaft und lautlos tot. Darum: fehlt der Speicher, einmal eine Version
   // hoeher nachziehen und ihn dabei anlegen.
+  // Derselbe Weg ist auch die MIGRATION fuer Projekte (2026-08-13): eine
+  // Bestands-Datenbank hat den "projekte"-Store noch nicht — dann einmal eine
+  // Version hoeher nachziehen, ensureStore legt ihn dabei an.
   dbPromise = openAt(null).then((db) => {
-    if (db.objectStoreNames.contains(STORE)) return db;
+    if (db.objectStoreNames.contains(STORE) && db.objectStoreNames.contains(PROJEKT_STORE)) return db;
     const next = Math.max(db.version, DB_VERSION) + 1;
     db.close();
     return openAt(next);
@@ -87,10 +102,10 @@ function openDb() {
   return dbPromise;
 }
 
-function tx(mode, work) {
+function tx(storeName, mode, work) {
   return openDb().then((db) => new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE, mode);
-    const store = transaction.objectStore(STORE);
+    const transaction = db.transaction(storeName, mode);
+    const store = transaction.objectStore(storeName);
     const result = work(store);
     transaction.oncomplete = () => resolve(result && result.result !== undefined ? result.result : result);
     transaction.onerror = () => reject(transaction.error);
@@ -153,13 +168,13 @@ async function enforceChatOwner() {
     // Altbestand ohne Besitzer beschriften: Er gehoert dem VORHERIGEN Besitzer
     // (Stufe-1-Marke), sonst dem aktuellen Nutzer (frisches Geraet).
     const erbe = owner || userId;
-    const offen = await tx("readonly", (store) => new Promise((resolve, reject) => {
+    const offen = await tx(STORE, "readonly", (store) => new Promise((resolve, reject) => {
       const request = store.getAll();
       request.onsuccess = () => resolve((request.result || []).filter((chat) => !chat.ownerId));
       request.onerror = () => reject(request.error);
     }));
     for (const chat of offen) {
-      await tx("readwrite", (store) => store.put({ ...chat, ownerId: erbe }));
+      await tx(STORE, "readwrite", (store) => store.put({ ...chat, ownerId: erbe }));
     }
   } catch {
     return false;
@@ -244,7 +259,7 @@ async function persistActive() {
     // Konto gehoert. Dann NICHT ueberschreiben, sondern eine eigene Kennung
     // nehmen: sonst koennte man fremde Unterhaltungen ueberschreiben, ohne sie
     // je zu sehen. Unterschieden wird das am rohen Datenbank-Treffer.
-    const roh = await tx("readonly", (store) => store.get(id)).catch(() => null);
+    const roh = await tx(STORE, "readonly", (store) => store.get(id)).catch(() => null);
     if (roh) {
       id = newId();
       setActiveChatId(id);
@@ -266,12 +281,16 @@ async function persistActive() {
     titleEdited: Boolean(existing && existing.titleEdited),
     titleAuto: Boolean(existing && existing.titleAuto),
     pinned: existing?.pinned === true,
+    // Projekt-Zugehoerigkeit uebernehmen — dieselbe Falle wie bei pinned und
+    // titleAuto (siehe oben): fehlt die Zeile, wirft jeder Tastendruck den
+    // Chat lautlos aus seinem Projekt.
+    projectId: String(existing?.projectId || ""),
     createdAt: existing && existing.createdAt ? existing.createdAt : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     model: safeModelName(),
     messages
   };
-  await tx("readwrite", (store) => store.put(chat));
+  await tx(STORE, "readwrite", (store) => store.put(chat));
   await pruneOld().catch(() => {});
   notifyChanged();
   return chat;
@@ -298,12 +317,12 @@ async function pruneOld() {
   // ohnehin vor der Kappungsgrenze; der Filter sichert den Extremfall ab.
   const surplus = chats.slice(MAX_CHATS).filter((chat) => chat.pinned !== true);
   for (const chat of surplus) {
-    await tx("readwrite", (store) => store.delete(chat.id)).catch(() => {});
+    await tx(STORE, "readwrite", (store) => store.delete(chat.id)).catch(() => {});
   }
 }
 
 export async function listChats() {
-  const chats = await tx("readonly", (store) => new Promise((resolve, reject) => {
+  const chats = await tx(STORE, "readonly", (store) => new Promise((resolve, reject) => {
     const request = store.getAll();
     request.onsuccess = () => resolve(request.result || []);
     request.onerror = () => reject(request.error);
@@ -323,7 +342,7 @@ export async function togglePinChat(id) {
   const chat = await getChat(id);
   if (!chat) return false;
   chat.pinned = chat.pinned !== true;
-  await tx("readwrite", (store) => store.put(chat));
+  await tx(STORE, "readwrite", (store) => store.put(chat));
   notifyChanged();
   return chat.pinned;
 }
@@ -332,7 +351,7 @@ export async function togglePinChat(id) {
 // es ihn nicht. Das deckt AUCH den Weg ueber eine geratene oder gemerkte Kennung
 // ab — die Liste zu filtern allein waere nur eine Sichtblende.
 export function getChat(id) {
-  return tx("readonly", (store) => new Promise((resolve, reject) => {
+  return tx(STORE, "readonly", (store) => new Promise((resolve, reject) => {
     const request = store.get(String(id || ""));
     request.onsuccess = () => resolve(request.result || null);
     request.onerror = () => reject(request.error);
@@ -363,7 +382,7 @@ export async function setAutoTitle(id, title) {
   if (!sauber) return false;
   chat.title = sauber;
   chat.titleAuto = true;
-  await tx("readwrite", (store) => store.put(chat));
+  await tx(STORE, "readwrite", (store) => store.put(chat));
   notifyChanged();
   return true;
 }
@@ -374,7 +393,7 @@ export async function renameChat(id, title) {
   chat.title = String(title || "").replace(/\s+/g, " ").trim().slice(0, MAX_TITLE) || chat.title;
   chat.titleEdited = true;
   chat.updatedAt = new Date().toISOString();
-  await tx("readwrite", (store) => store.put(chat));
+  await tx(STORE, "readwrite", (store) => store.put(chat));
   notifyChanged();
   return true;
 }
@@ -382,7 +401,7 @@ export async function renameChat(id, title) {
 export async function deleteChat(id) {
   // Nur eigene Chats loeschen (Stufe 2). getChat liefert fuer fremde null.
   if (!(await getChat(id))) return false;
-  await tx("readwrite", (store) => store.delete(String(id || "")));
+  await tx(STORE, "readwrite", (store) => store.delete(String(id || "")));
   // Stufe 3: das Loeschen dem Konto melden (chat-sync.js reicht es zum Server
   // weiter). Eigenes Ereignis statt Import — der Store kennt den Sync nicht.
   try { window.dispatchEvent(new CustomEvent("smejj:chat-geloescht", { detail: { id: String(id || "") } })); } catch { /* still */ }
@@ -410,11 +429,15 @@ export async function createChatFrom(messages) {
   if (!list.length) return "";
   const id = newId();
   const now = new Date().toISOString();
-  await tx("readwrite", (store) => store.put({
+  await tx(STORE, "readwrite", (store) => store.put({
     id,
     ownerId: aktuellerNutzer(),
     title: titleFrom(list),
     titleEdited: false,
+    // Der Abzweig beginnt bewusst OHNE Projekt: "Ab hier neuen Chat" ist ein
+    // Neuanfang, keine Fortsetzung — die einfachste Regel, die niemanden
+    // ueberrascht.
+    projectId: "",
     createdAt: now,
     updatedAt: now,
     model: safeModelName(),
@@ -564,7 +587,10 @@ function init() {
         if (restoreErlaubt !== false) restoreOnBoot().catch(() => {});
         // Stufe 3: Sync nachladen — dynamisch und fail-safe. Fehlt die Datei
         // (offline, alter Cache), laeuft der Verlauf einfach lokal weiter.
-        import("/assets/chat-sync.js?v=1").catch(() => {});
+        // ?v=2: Projekte-Sync (2026-08-13). Ohne den Bump haelt der
+        // HTTP-Cache die alte Fassung fest — die Datei ist nicht im
+        // Service-Worker-Buendel und erneuert sich sonst nie zuverlaessig.
+        import("/assets/chat-sync.js?v=2").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */
@@ -598,13 +624,139 @@ export async function importChat(chat) {
   // geloescht — hier ebenfalls entfernen. Direkt in der Datenbank, NICHT ueber
   // deleteChat: das wuerde die Loeschung erneut zum Server melden (Kreis).
   if (chat.geloescht === true) {
-    await tx("readwrite", (store) => store.delete(String(chat.id)));
+    await tx(STORE, "readwrite", (store) => store.delete(String(chat.id)));
     notifyChanged();
     return true;
   }
-  await tx("readwrite", (store) => store.put({ ...chat, ownerId: userId }));
+  await tx(STORE, "readwrite", (store) => store.put({ ...chat, ownerId: userId }));
   notifyChanged();
   return true;
 }
 
-window.smejjChatStore = { listChats, getChat, openChat, newChat, renameChat, deleteChat, activeChatId, importChat };
+/* ------------------------------------------------------------------ *
+ *  Projekte (2026-08-13): benannte Sammlungen fuer Chats.
+ *
+ *  Dieselben Grundsaetze wie bei den Chats: fail-safe (jeder Fehler laesst
+ *  die App unveraendert weiter laufen), Besitzerprüfung ueber gehoertNutzer,
+ *  Loeschung wandert als Ereignis zum Sync (Grabstein auf dem Server).
+ *  Ein geloeschtes Projekt fasst seine Chats NICHT an — die Ansicht behandelt
+ *  eine projectId ohne lebendes Projekt als "kein Projekt".
+ * ------------------------------------------------------------------ */
+
+function neueProjektId() {
+  return `proj_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function notifyProjekteChanged() {
+  window.dispatchEvent(new CustomEvent("smejj:projekte-geaendert"));
+}
+
+function sauberProjektName(name) {
+  return String(name || "").replace(/\s+/g, " ").trim().slice(0, MAX_TITLE);
+}
+
+export async function listProjekte() {
+  const projekte = await tx(PROJEKT_STORE, "readonly", (store) => new Promise((resolve, reject) => {
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  })).catch(() => []);
+  // Nur die eigenen — dieselbe Regel wie listChats. Sortiert nach Name; die
+  // Ansicht sortiert die Gruppen selbst nach dem juengsten enthaltenen Chat.
+  const userId = aktuellerNutzer();
+  const alt = geraeteBesitzer();
+  return projekte
+    .filter((projekt) => gehoertNutzer(projekt, userId, alt))
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "de"));
+}
+
+export function getProjekt(id) {
+  return tx(PROJEKT_STORE, "readonly", (store) => new Promise((resolve, reject) => {
+    const request = store.get(String(id || ""));
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  })).then((projekt) => (projekt && gehoertNutzer(projekt, aktuellerNutzer(), geraeteBesitzer()) ? projekt : null))
+    .catch(() => null);
+}
+
+/** @returns {Promise<string>} Kennung des neuen Projekts, leer bei Misserfolg */
+export async function erstelleProjekt(name) {
+  const sauber = sauberProjektName(name);
+  if (!sauber) return "";
+  const vorhandene = await listProjekte();
+  if (vorhandene.length >= MAX_PROJEKTE) return "";
+  const now = new Date().toISOString();
+  const projekt = {
+    id: neueProjektId(),
+    ownerId: aktuellerNutzer(),
+    name: sauber,
+    createdAt: now,
+    updatedAt: now
+  };
+  const ok = await tx(PROJEKT_STORE, "readwrite", (store) => store.put(projekt)).then(() => true).catch(() => false);
+  if (!ok) return "";
+  notifyProjekteChanged();
+  return projekt.id;
+}
+
+export async function benenneProjektUm(id, name) {
+  const projekt = await getProjekt(id);
+  if (!projekt) return false;
+  const sauber = sauberProjektName(name);
+  if (!sauber) return false;
+  projekt.name = sauber;
+  // Anders als beim Chat-Umbenennen bumpt der Name hier updatedAt: es ist die
+  // EINZIGE inhaltliche Aenderung, die ein Projekt kennt — ohne frischen
+  // Zeitstempel wuerde Last-Write-Wins sie nie auf andere Geraete tragen.
+  projekt.updatedAt = new Date().toISOString();
+  await tx(PROJEKT_STORE, "readwrite", (store) => store.put(projekt));
+  notifyProjekteChanged();
+  return true;
+}
+
+export async function loescheProjekt(id) {
+  if (!(await getProjekt(id))) return false;
+  await tx(PROJEKT_STORE, "readwrite", (store) => store.delete(String(id || "")));
+  // Loeschung dem Sync melden — Spiegel von smejj:chat-geloescht.
+  try { window.dispatchEvent(new CustomEvent("smejj:projekt-geloescht", { detail: { id: String(id || "") } })); } catch { /* still */ }
+  notifyProjekteChanged();
+  return true;
+}
+
+/** Chat einem Projekt zuordnen ("" = kein Projekt). */
+export async function setzeChatProjekt(chatId, projektId) {
+  const chat = await getChat(chatId);
+  if (!chat) return false;
+  chat.projectId = String(projektId || "");
+  // updatedAt MUSS mitwandern: die Zuordnung reist nur per Last-Write-Wins zu
+  // anderen Geraeten. Preis: der Chat sortiert sich ueberall nach oben.
+  chat.updatedAt = new Date().toISOString();
+  await tx(STORE, "readwrite", (store) => store.put(chat));
+  notifyChanged();
+  return true;
+}
+
+/**
+ * Projekt von einem anderen Geraet uebernehmen — Spiegel von importChat:
+ * nie fremdes Material uebernehmen, Grabstein loescht direkt in der Datenbank
+ * (NICHT ueber loescheProjekt — das wuerde die Loeschung erneut zum Server
+ * melden, ein Kreisverkehr).
+ */
+export async function importProjekt(projekt) {
+  const userId = aktuellerNutzer();
+  if (!userId || !projekt || typeof projekt !== "object" || !projekt.id) return false;
+  if (!gehoertNutzer(projekt, userId, geraeteBesitzer())) return false;
+  if (projekt.geloescht === true) {
+    await tx(PROJEKT_STORE, "readwrite", (store) => store.delete(String(projekt.id)));
+    notifyProjekteChanged();
+    return true;
+  }
+  await tx(PROJEKT_STORE, "readwrite", (store) => store.put({ ...projekt, ownerId: userId }));
+  notifyProjekteChanged();
+  return true;
+}
+
+window.smejjChatStore = {
+  listChats, getChat, openChat, newChat, renameChat, deleteChat, activeChatId, importChat,
+  listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt, importProjekt
+};

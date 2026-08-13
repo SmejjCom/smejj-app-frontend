@@ -341,6 +341,43 @@ function sichereAlsMarkdown(chat) {
   }
 }
 
+/* ------------------------------------------------------------------ *
+ *  Projekte (2026-08-13)
+ * ------------------------------------------------------------------ */
+
+// Chats den Projekten zuordnen — pure Funktion, Node-testbar
+// (tests/projekt-gruppen.test.mjs). Vertrag: angeheftete Chats sind VOR dem
+// Aufruf herausgefiltert (die 📌-Gruppe gewinnt, jeder Chat erscheint genau
+// einmal). `chats` sind die aufbereiteten Eintraege der Ansicht ({chat, ...}).
+//
+// Die Fallback-Regel wohnt HIER und nur hier: eine projectId, zu der kein
+// lebendes Projekt existiert (geloescht, anderes Konto, nie angekommen),
+// bedeutet "kein Projekt" — reine Anzeige-Entscheidung, die Daten bleiben
+// unangetastet und heilen sich beim naechsten Sync von selbst.
+function projektGruppen(eintraege, projekte) {
+  const lebend = new Map();
+  for (const projekt of Array.isArray(projekte) ? projekte : []) {
+    if (projekt && projekt.id) lebend.set(String(projekt.id), { projekt, chats: [] });
+  }
+  const ohneProjekt = [];
+  for (const eintrag of Array.isArray(eintraege) ? eintraege : []) {
+    const gruppe = lebend.get(String(eintrag?.chat?.projectId || ""));
+    if (gruppe) gruppe.chats.push(eintrag);
+    else ohneProjekt.push(eintrag);
+  }
+  // Gruppen mit Inhalt nach dem juengsten enthaltenen Chat (die Eintraege
+  // kommen bereits absteigend sortiert an — der erste ist der juengste).
+  // Leere Projekte dahinter nach Name: unsichtbar waeren sie unloeschbar.
+  const gruppen = [...lebend.values()].sort((a, b) => {
+    const aLeer = a.chats.length === 0;
+    const bLeer = b.chats.length === 0;
+    if (aLeer !== bLeer) return aLeer ? 1 : -1;
+    if (aLeer) return String(a.projekt.name || "").localeCompare(String(b.projekt.name || ""), "de");
+    return String(b.chats[0].chat.updatedAt || "").localeCompare(String(a.chats[0].chat.updatedAt || ""));
+  });
+  return { projektGruppen: gruppen, ohneProjekt };
+}
+
 export {
   ersteFrage,
   ohneBallast,
@@ -349,6 +386,7 @@ export {
   themaVon,
   zeitText,
   gruppeVon,
+  projektGruppen,
   volltext,
   trefferAusschnitt,
   mitHervorhebung,

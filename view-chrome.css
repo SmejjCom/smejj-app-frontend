@@ -14,8 +14,13 @@
 .view-chrome {
   position: absolute;
   top: 8px;
-  left: 14px;
-  right: 14px;
+  /* In den Ecken sitzen die FIXEN Knoepfe der App (Menue links, Browser-Panel
+     rechts, styles.css .glass-icon). Die Leiste muss neben ihnen beginnen,
+     nicht unter ihnen: mit 14px lag das Schliessen-X exakt auf dem
+     Browser-Knopf (Betreiber-Befund 2026-08-13, gemessen 34px Ueberlappung
+     bei 375px). 48px = 28px Knopf + Luft; die Handy-Werte stehen unten. */
+  left: calc(env(safe-area-inset-left) + 48px);
+  right: calc(env(safe-area-inset-right) + 48px);
   z-index: 5;
   display: flex;
   align-items: center;
@@ -77,8 +82,11 @@
 
   .view-chrome {
     top: 6px;
-    left: 10px;
-    right: 10px;
+    /* Auf schmalen Schirmen sind die Ecken-Knoepfe 44px (Touch-Regel unten):
+       52px = 44px Knopf + Luft. Gemessen bei 375px: X endet bei 323px, der
+       Browser-Knopf beginnt bei 331px — 8px frei statt 34px Ueberdeckung. */
+    left: calc(env(safe-area-inset-left) + 52px);
+    right: calc(env(safe-area-inset-right) + 52px);
   }
 }
 

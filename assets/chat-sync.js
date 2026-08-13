@@ -20,6 +20,12 @@ const PUSH_ENTPRELLUNG_MS = 4000;
 let serverSagtNein = false;
 let pushTimer = null;
 let laeuft = false;
+// Projekte (2026-08-13) haben einen EIGENEN Nein-Schalter: ein 503 der
+// Projekt-Route darf den Chat-Sync nicht mit abschalten — und ein 404
+// (Backend noch nicht ausgerollt) ist gar kein Nein, nur ein "noch nicht".
+let serverSagtNeinProjekte = false;
+let pushProjekteTimer = null;
+let projekteLaufen = false;
 
 function token() {
   try { return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; }
@@ -93,6 +99,71 @@ async function loescheAufServer(chatId) {
   } catch { /* still */ }
 }
 
+/* ------------------------------------------------------------------ *
+ *  Projekte (2026-08-13): dieselbe Mechanik wie die Chats — Pull beim
+ *  Start, entprellter Push, Loeschung folgt dem Ereignis. Reihenfolge
+ *  gegenueber dem Chat-Pull ist egal: die Verlauf-Ansicht behandelt eine
+ *  projectId ohne lebendes Projekt als "kein Projekt" und heilt sich,
+ *  sobald das Projekt ankommt.
+ * ------------------------------------------------------------------ */
+
+async function pullProjekte() {
+  const kopf = kopfzeilen();
+  const s = store();
+  if (!kopf || !s || typeof s.importProjekt !== "function" || serverSagtNeinProjekte) return;
+  let antwort;
+  try {
+    antwort = await fetch(`${API_ORIGIN}/api/projekte`, { headers: kopf });
+  } catch { return; }
+  if (antwort.status === 404) return; // Backend noch nicht ausgerollt: still
+  if (antwort.status === 503) { serverSagtNeinProjekte = true; return; }
+  if (!antwort.ok) return;
+  let daten;
+  try { daten = await antwort.json(); } catch { return; }
+  for (const fern of daten.projekte || []) {
+    try {
+      const lokal = await s.getProjekt(fern.id);
+      const lokalStand = Date.parse(String(lokal?.updatedAt || "")) || 0;
+      const fernStand = Date.parse(String(fern.updatedAt || "")) || 0;
+      if (!lokal && fernStand) await s.importProjekt(fern);
+      else if (lokal && fernStand > lokalStand) await s.importProjekt(fern);
+    } catch { /* ein einzelnes Projekt darf den Rest nicht stoppen */ }
+  }
+}
+
+async function pushProjekte() {
+  const kopf = kopfzeilen();
+  const s = store();
+  if (!kopf || !s || typeof s.listProjekte !== "function" || serverSagtNeinProjekte || projekteLaufen) return;
+  projekteLaufen = true;
+  try {
+    const projekte = await s.listProjekte(); // nur eigene
+    for (const projekt of projekte) {
+      const antwort = await fetch(`${API_ORIGIN}/api/projekte`, {
+        method: "PUT",
+        headers: kopf,
+        body: JSON.stringify({ projekt })
+      });
+      if (antwort.status === 404) break; // Backend noch nicht da: aufhoeren, nicht merken
+      if (antwort.status === 503) { serverSagtNeinProjekte = true; break; }
+    }
+  } catch { /* still: naechster Anlauf beim naechsten Ereignis */ }
+  projekteLaufen = false;
+}
+
+function planeProjektePush() {
+  clearTimeout(pushProjekteTimer);
+  pushProjekteTimer = setTimeout(() => { pushProjekte(); }, PUSH_ENTPRELLUNG_MS);
+}
+
+async function loescheProjektAufServer(projektId) {
+  const kopf = kopfzeilen();
+  if (!kopf || serverSagtNeinProjekte) return;
+  try {
+    await fetch(`${API_ORIGIN}/api/projekte?id=${encodeURIComponent(projektId)}`, { method: "DELETE", headers: kopf });
+  } catch { /* still */ }
+}
+
 function init() {
   if (!token()) return; // abgemeldet: gar nicht erst anfangen
   window.addEventListener("smejj:chats-changed", planePush);
@@ -100,8 +171,16 @@ function init() {
     const id = ereignis?.detail?.id;
     if (id) loescheAufServer(id);
   });
+  window.addEventListener("smejj:projekte-geaendert", planeProjektePush);
+  window.addEventListener("smejj:projekt-geloescht", (ereignis) => {
+    const id = ereignis?.detail?.id;
+    if (id) loescheProjektAufServer(id);
+  });
   // Pull erst, wenn der chat-store sein window-Objekt gesetzt hat.
-  setTimeout(() => { pull().then(() => planePush()); }, 1500);
+  setTimeout(() => {
+    pull().then(() => planePush());
+    pullProjekte().then(() => planeProjektePush());
+  }, 1500);
 }
 
 init();

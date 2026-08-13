@@ -26,7 +26,10 @@
 
 // Versionierter Pfad wie in index.html (QA-Welle 1, Befund F-07): Ein abweichender
 // Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js mit eigenem Zustand.
-import { listChats, openChat, renameChat, deleteChat, activeChatId, togglePinChat, newChat } from "/assets/chat-store.js?v=pin-20260806";
+import {
+  listChats, openChat, renameChat, deleteChat, activeChatId, togglePinChat, newChat,
+  listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
+} from "/assets/chat-store.js?v=pin-20260806";
 // Holt fuer Chats ohne eigenen Titel einen aus der Bruecke. Von HIER importiert
 // und nicht aus index.html, damit die Startseite unter dem Start-Lock bleibt
 // (gleiches Muster wie icon-nutzung.js in profile-dock.js). Das Modul meldet
@@ -39,7 +42,8 @@ import "/assets/chat-title-auto.js";
 // Teilmenge von text.js aus dem zweiten Schnitt — ist entfallen.
 import {
   anzeigeTitel, anzeigeVorschau, ersteFrage, gruppeVon, mitHervorhebung,
-  ohneBallast, trefferAusschnitt, volltext, zeitText, themaVon, sichereAlsMarkdown
+  ohneBallast, trefferAusschnitt, volltext, zeitText, themaVon, sichereAlsMarkdown,
+  projektGruppen
 } from "/assets/chat-history-text.js";
 import { createCardBuilders } from "/assets/chat-history-cards.js?v=split-20260810";
 
@@ -54,11 +58,11 @@ let offenesMenu = null;
 // Karten-Bausteine (chat-history-cards.js) an den Zustand DIESER Ansicht
 // binden: sie lesen Suchbegriff/Themenfilter/offenes Menue ueber Getter und
 // schreiben ueber Setter zurueck — der eine Wahrheitsort bleibt hier.
-const { entdoppeln, bausteinLeer, bausteinGruppe, bausteinNeuKnopf, schmalerSchirm, bausteinKopf, bausteinChips, bausteinKarte } = createCardBuilders({
+const { entdoppeln, bausteinLeer, bausteinGruppe, bausteinNeuKnopf, schmalerSchirm, bausteinKopf, bausteinChips, bausteinKarte, bausteinProjektGruppe } = createCardBuilders({
   getSuchbegriff: () => suchbegriff, setSuchbegriff: (wert) => { suchbegriff = wert; },
   getThemenFilter: () => themenFilter, setThemenFilter: (wert) => { themenFilter = wert; },
   getOffenesMenu: () => offenesMenu,
-  zeichne, host, menuSchliessen, oeffneMenu
+  zeichne, host, menuSchliessen, oeffneMenu, oeffneProjektMenu
 });
 
 function view() {
@@ -169,6 +173,29 @@ function injectStyles() {
       border: 1px solid rgba(255,255,255,.16); border-radius: 9px; padding: 7px 13px; cursor: pointer;
       min-height: 0; }
 
+    /* Projekte (2026-08-13). Der Gruppenkopf ist ein Flex-Container mit
+       ::after als Trennlinie; der ⋯-Knopf bekommt order: 2 und steht damit
+       HINTER der Linie am rechten Rand. position: relative, weil das
+       Projekt-Menue (.ch-menu) absolut am Kopf haengt. */
+    .ch-gruppe.ch-projekt { position: relative; opacity: .72; }
+    .ch-projekt .ch-projekt-name { color: #78dce8; }
+    .ch-projekt .ch-projekt-leer { font-weight: 400; text-transform: none; letter-spacing: 0; opacity: .6; }
+    /* Auch hier gilt: gegen ".premium-view button" gewinnt nur #chatHistory. */
+    #chatHistory .ch-proj-mehr { order: 2; width: 28px; height: 28px; min-height: 0; border: 0;
+      border-radius: 8px; background: none; color: inherit; opacity: .45; font-size: 16px;
+      line-height: 1; cursor: pointer; transition: .14s; padding: 0; }
+    #chatHistory .ch-proj-mehr:hover { background: rgba(255,255,255,.10); opacity: 1; }
+    .ch-projekt .ch-menu { top: calc(100% + 4px); }
+    .ch-projekt-umbenennen { margin: 2px 0 10px; }
+    .ch-projekt-neu { display: flex; gap: 8px; padding: 4px; }
+    .ch-projekt-neu input { flex: 1; min-width: 0; font: inherit; color: inherit;
+      background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.25);
+      border-radius: 9px; padding: 7px 11px; }
+    #chatHistory .ch-projekt-neu button { font: inherit; color: inherit; background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.16); border-radius: 9px; padding: 7px 13px; cursor: pointer;
+      min-height: 0; width: auto; }
+    #chatHistory .ch-menu button.is-gewaehlt { color: #78dce8; }
+
     /* Die Marke am Listenende ist der Messpunkt fuers Nachladen: kommt sie in
        die Naehe des Bildrands, kommt der naechste Block. Eine echte Hoehe
        macht die Abstandsrechnung verlaesslich. */
@@ -217,6 +244,11 @@ function injectStyles() {
       .ch-umbenennen { flex-wrap: wrap; }
       .ch-umbenennen input { flex: 1 1 100%; min-height: 44px; }
       #chatHistory .ch-umbenennen button { flex: 1 1 0; min-height: 44px; }
+      /* Projekte: dieselbe 44-px-Untergrenze fuer Finger. */
+      #chatHistory .ch-proj-mehr { width: 44px; height: 44px; opacity: .55; font-size: 18px; }
+      .ch-projekt-neu { flex-wrap: wrap; }
+      .ch-projekt-neu input { flex: 1 1 100%; min-height: 44px; }
+      #chatHistory .ch-projekt-neu button { flex: 1 1 0; min-height: 44px; }
     }
   `;
   document.head.append(style);
@@ -239,12 +271,14 @@ function injectStyles() {
  * ------------------------------------------------------------------ */
 
 let alleChats = [];
+let alleProjekte = [];
 
 async function render() {
   const target = host();
   if (!target) return;
   injectStyles();
   alleChats = await listChats();
+  alleProjekte = await listProjekte();
   zeichne(target);
 }
 
@@ -329,9 +363,24 @@ function zeichne(target) {
     for (const eintrag of angeheftet) stueck.append(bausteinKarte(eintrag, aktiv, nadel));
   }
 
+  // Projekte (2026-08-13): nach den Angehefteten, vor den Datumsgruppen —
+  // aber NICHT waehrend Suche oder Themenfilter (dort zaehlt die Fundstelle,
+  // dieselbe Regel wie bei den Angehefteten). Projektgruppen stehen wie die
+  // Angehefteten immer vollstaendig da; nachgeladen wird nur die Zeitliste
+  // der Chats ohne Projekt — das Lazy-Loading bleibt dadurch unangetastet.
+  let ohneProjektRest = rest;
+  if (!nadel && !themenFilter && alleProjekte.length) {
+    const aufgeteilt = projektGruppen(rest, alleProjekte);
+    ohneProjektRest = aufgeteilt.ohneProjekt;
+    for (const gruppe of aufgeteilt.projektGruppen) {
+      stueck.append(bausteinProjektGruppe(gruppe.projekt, gruppe.chats.length));
+      for (const eintrag of gruppe.chats) stueck.append(bausteinKarte(eintrag, aktiv, nadel));
+    }
+  }
+
   // Angeheftete stehen immer vollstaendig da: es sind wenige, und sie sind
   // ausdruecklich als wichtig markiert. Nachgeladen wird nur die Zeitliste.
-  nachladeZustand = { rest, index: 0, letzteGruppe: "", aktiv, nadel };
+  nachladeZustand = { rest: ohneProjektRest, index: 0, letzteGruppe: "", aktiv, nadel };
   stueck.append(naechsteKarten());
   const marke = document.createElement("div");
   marke.className = "ch-marke";
@@ -474,6 +523,7 @@ function menuSchliessen() {
   }
   clearTimeout(confirmTimer);
   confirmingId = "";
+  confirmingProjektId = "";
   // Waehrend das Menue offen war, wurde ein Neuzeichnen zurueckgestellt
   // (siehe zeichne). Jetzt ist der Weg frei.
   if (zeichnenAusstehend) {
@@ -504,6 +554,12 @@ function oeffneMenu(karte, chat) {
     render();
   }));
   menu.append(eintrag("✎ Umbenennen", () => { menuSchliessen(); zeigeUmbenennen(karte, chat); }));
+  // Projekte (2026-08-13): Zuordnung ueber einen kleinen Picker an der Karte.
+  const istZugeordnet = Boolean(chat.projectId) && alleProjekte.some((projekt) => projekt.id === chat.projectId);
+  menu.append(eintrag(istZugeordnet ? "📁 Projekt ändern…" : "📁 Zu Projekt…", () => {
+    menuSchliessen();
+    zeigeProjektPicker(karte, chat);
+  }));
   menu.append(eintrag("⤓ Als Markdown sichern", () => { menuSchliessen(); sichereAlsMarkdown(chat); }));
   menu.append(document.createElement("hr"));
 
@@ -563,6 +619,156 @@ function zeigeUmbenennen(karte, chat) {
   eingabe.select();
 }
 
+/* ------------------------------------------------------------------ *
+ *  Projekte (2026-08-13): Menue am Gruppenkopf + Picker an der Karte.
+ *  Beide nutzen dasselbe offenesMenu-Handle wie das Chat-Menue — damit
+ *  greifen Render-Sperre (zeichne) und Outside-Click-Schliessen mit.
+ * ------------------------------------------------------------------ */
+
+let confirmingProjektId = "";
+
+function oeffneProjektMenu(kopf, projekt) {
+  const menu = document.createElement("div");
+  menu.className = "ch-menu ch-projekt-menu";
+  menu.dataset.projektId = projekt.id;
+  menu.addEventListener("click", (event) => event.stopPropagation());
+
+  const eintrag = (text, aktion, gefaehrlich) => {
+    const knopf = document.createElement("button");
+    knopf.type = "button";
+    knopf.textContent = text;
+    if (gefaehrlich) knopf.classList.add("is-danger");
+    knopf.addEventListener("click", aktion);
+    return knopf;
+  };
+
+  menu.append(eintrag("✎ Umbenennen", () => { menuSchliessen(); zeigeProjektUmbenennen(kopf, projekt); }));
+  menu.append(document.createElement("hr"));
+
+  // Zweistufig wie beim Chat — mit dem Hinweis, dass die Chats NICHT
+  // mitgeloescht werden (sie rutschen in die Datumsgruppen zurueck).
+  const loeschen = eintrag("🗑 Löschen…", async () => {
+    if (confirmingProjektId !== projekt.id) {
+      confirmingProjektId = projekt.id;
+      loeschen.textContent = "🗑 Wirklich? Chats bleiben erhalten";
+      clearTimeout(confirmTimer);
+      confirmTimer = setTimeout(() => { menuSchliessen(); }, 4000);
+      return;
+    }
+    menuSchliessen();
+    await loescheProjekt(projekt.id).catch(() => {});
+    render();
+  }, true);
+  menu.append(loeschen);
+
+  kopf.append(menu);
+  offenesMenu = menu;
+}
+
+function zeigeProjektUmbenennen(kopf, projekt) {
+  if (kopf.querySelector(".ch-umbenennen")) return;
+  const zeile = document.createElement("div");
+  zeile.className = "ch-umbenennen ch-projekt-umbenennen";
+  zeile.addEventListener("click", (event) => event.stopPropagation());
+
+  const eingabe = document.createElement("input");
+  eingabe.type = "text";
+  eingabe.maxLength = 60;
+  eingabe.value = projekt.name || "";
+  eingabe.setAttribute("aria-label", "Neuer Projektname");
+
+  const speichern = document.createElement("button");
+  speichern.type = "button";
+  speichern.textContent = "Speichern";
+  const abbrechen = document.createElement("button");
+  abbrechen.type = "button";
+  abbrechen.textContent = "Abbrechen";
+
+  const senden = async () => {
+    await benenneProjektUm(projekt.id, eingabe.value).catch(() => {});
+    render();
+  };
+  speichern.addEventListener("click", senden);
+  abbrechen.addEventListener("click", () => zeile.remove());
+  eingabe.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") senden();
+    if (event.key === "Escape") zeile.remove();
+  });
+
+  zeile.append(eingabe, speichern, abbrechen);
+  kopf.after(zeile);
+  eingabe.focus();
+  eingabe.select();
+}
+
+// Picker: Chat einem Projekt zuordnen. Bei null Projekten direkt die
+// Eingabe fuer das erste — ein leerer Picker waere eine Sackgasse.
+function zeigeProjektPicker(karte, chat) {
+  const menu = document.createElement("div");
+  menu.className = "ch-menu ch-projekt-picker";
+  menu.dataset.chatId = chat.id;
+  menu.addEventListener("click", (event) => event.stopPropagation());
+
+  const eintrag = (text, aktion, aktivGewaehlt) => {
+    const knopf = document.createElement("button");
+    knopf.type = "button";
+    knopf.textContent = text;
+    if (aktivGewaehlt) knopf.classList.add("is-gewaehlt");
+    knopf.addEventListener("click", aktion);
+    return knopf;
+  };
+
+  const zuordnen = async (projektId) => {
+    menuSchliessen();
+    await setzeChatProjekt(chat.id, projektId).catch(() => {});
+    render();
+  };
+
+  for (const projekt of alleProjekte) {
+    const gewaehlt = chat.projectId === projekt.id;
+    menu.append(eintrag(`${gewaehlt ? "✓ " : ""}📁 ${projekt.name}`, () => zuordnen(gewaehlt ? "" : projekt.id), gewaehlt));
+  }
+  if (chat.projectId && alleProjekte.some((projekt) => projekt.id === chat.projectId)) {
+    menu.append(eintrag("Kein Projekt", () => zuordnen("")));
+  }
+  if (alleProjekte.length) menu.append(document.createElement("hr"));
+
+  const neu = eintrag("＋ Neues Projekt…", () => {
+    // Menue-Inhalt gegen die Eingabezeile tauschen — kein zweites Overlay.
+    menu.replaceChildren();
+    const zeile = document.createElement("div");
+    zeile.className = "ch-projekt-neu";
+    const eingabe = document.createElement("input");
+    eingabe.type = "text";
+    eingabe.maxLength = 60;
+    eingabe.placeholder = "Projektname";
+    eingabe.setAttribute("aria-label", "Name des neuen Projekts");
+    const anlegen = document.createElement("button");
+    anlegen.type = "button";
+    anlegen.textContent = "Anlegen";
+    const senden = async () => {
+      const name = eingabe.value;
+      menuSchliessen();
+      const projektId = await erstelleProjekt(name).catch(() => "");
+      if (projektId) await setzeChatProjekt(chat.id, projektId).catch(() => {});
+      render();
+    };
+    anlegen.addEventListener("click", senden);
+    eingabe.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") senden();
+      if (event.key === "Escape") menuSchliessen();
+    });
+    zeile.append(eingabe, anlegen);
+    menu.append(zeile);
+    eingabe.focus();
+  });
+  menu.append(neu);
+
+  karte.append(menu);
+  offenesMenu = menu;
+  if (!alleProjekte.length) neu.click();
+}
+
 
 /* ------------------------------------------------------------------ *
  *  Anbindung
@@ -576,13 +782,16 @@ function isHistoryViewVisible() {
 function bind() {
   document.addEventListener("click", (event) => {
     if (event.target.closest('[data-view="chatHistory"]')) setTimeout(render, 60);
-    if (offenesMenu && !event.target.closest(".ch-menu, .ch-mehr")) menuSchliessen();
+    if (offenesMenu && !event.target.closest(".ch-menu, .ch-mehr, .ch-proj-mehr")) menuSchliessen();
   }, true);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && offenesMenu) menuSchliessen();
   });
   window.addEventListener("popstate", () => { if (isHistoryViewVisible()) setTimeout(render, 60); });
   window.addEventListener("smejj:chats-changed", () => { if (isHistoryViewVisible()) render(); });
+  // Projekte aendern sich auch ohne Chat-Aenderung (Anlegen, Umbenennen,
+  // Loeschen, Sync-Import) — dann ebenfalls neu zeichnen.
+  window.addEventListener("smejj:projekte-geaendert", () => { if (isHistoryViewVisible()) render(); });
   // Der Umbruch geschieht groesstenteils in CSS. Zwei Texte haengen aber am
   // JavaScript ("30 Nachr." und der kurze Platzhalter) — die muessen beim
   // Drehen des Geraets mitwechseln. Neu gezeichnet wird nur beim echten
