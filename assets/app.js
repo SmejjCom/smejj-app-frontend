@@ -7,6 +7,7 @@ import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, set
 import { initComposerTools } from "./composer-tools.js?v=voice-mitschrift-20260806";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=1";
 import { initGlobalSearch } from "./search.js";
+import { openSearchOverlay } from "./search-overlay.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v3";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
@@ -142,9 +143,12 @@ function bindNavigation() {
   bindPanelResize("#rightPanelResize", "right", { $ });
   for (const button of $$(".nav-button")) {
     button.addEventListener("click", () => {
-      goToView(button.dataset.view);
       setMenuOpen(false);
       setBrowserPanelOpen(false);
+      // Suche oeffnet als Overlay ueber der aktuellen Ansicht (wie Cmd+K);
+      // die Such-Seite bleibt Rueckfallebene, falls das Overlay fehlt.
+      if (button.dataset.view === "search" && openSearchOverlay()) return;
+      goToView(button.dataset.view);
     });
   }
   for (const button of $$("[data-jump]")) {

@@ -3,6 +3,9 @@ import { CLIENT_ROUTES } from "./config.js";
 // WICHTIG: derselbe Pfad wie in chat-history-view.js — ein abweichender
 // Spezifizierer (z. B. "./chat-store.js") erzeugt eine ZWEITE Modulinstanz.
 import { listChats, openChat } from "/assets/chat-store.js?v=pin-20260806";
+// Overlay-Logik (Cmd+K, Rendern, Tastatur) wohnt in search-overlay.js — diese
+// Datei bleibt klein und die Such-Seite hier ist nur noch die Rueckfallebene.
+import { initSearchOverlay, toggleSearchOverlay } from "./search-overlay.js";
 
 const STATIC_RESULTS = Object.freeze([
   ["Arbeitsbereiche", "Neu", "Neuer Chat oder neue Aufgabe starten", "start", "neu chat aufgabe start"],
@@ -58,8 +61,15 @@ export function initGlobalSearch({ $, goToView, showTaskIndicator, showToast, st
   document.addEventListener("keydown", (event) => {
     if (event.key.toLowerCase() !== "k" || (!event.metaKey && !event.ctrlKey)) return;
     event.preventDefault();
+    // Overlay zuerst; die Such-Seite bleibt Rueckfallebene, falls das
+    // Overlay-Markup fehlt. Ein Cmd+K darf nie ins Leere gehen.
+    if (toggleSearchOverlay()) return;
     goToView("search");
     requestAnimationFrame(() => input.focus());
+  });
+  initSearchOverlay({
+    findResults: (query) => findResults(query, state, workspace),
+    openResult: (result) => openResult(result, goToView, showTaskIndicator, showToast)
   });
   renderResults(log, [], "");
 }
@@ -83,7 +93,9 @@ async function findResults(query, state, workspace) {
       ? String(treffer.text).replace(/\s+/g, " ").trim().slice(0, 90)
       : `${messages.length} Nachrichten`;
     const titel = String(chat.title || "").trim() || "Unterhaltung ohne Titel";
-    return ["Chats", titel, detail, "chatHistory", `${titel} ${volltext}`, undefined, chat.id];
+    // Das Chat-Objekt reist mit: das Overlay zeigt damit Treffer-Ausschnitt,
+    // Zeitstempel und den aufbereiteten Titel (chat-history-text.js).
+    return ["Chats", titel, detail, "chatHistory", `${titel} ${volltext}`, undefined, chat.id, chat];
   });
   // Erst nach den Projekten: die Dateiliste haengt an ihnen.
   const fileRows = await loadProjectFileRows(workspace, projectRows).catch(() => []);
@@ -97,7 +109,7 @@ async function findResults(query, state, workspace) {
   ];
   return [...STATIC_RESULTS, ...dynamic]
     .filter(([, label, detail,, text]) => `${label} ${detail} ${text}`.toLowerCase().includes(needle))
-    .map(([group, label, detail, view, _text, jobId, chatId]) => ({ group, label, detail, view, jobId, chatId }));
+    .map(([group, label, detail, view, _text, jobId, chatId, chat]) => ({ group, label, detail, view, jobId, chatId, chat }));
 }
 
 // Projekt-Dateien (Konkurrenz-Radar V4 Stufe 2, 2026-08-06): Bisher fand die

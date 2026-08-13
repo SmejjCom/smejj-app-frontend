@@ -1,0 +1,202 @@
+/* Such-Overlay (Cmd+K) — eigene Datei, weil public/styles.css am
+   Ratchet-Limit (1589 Zeilen) eingefroren ist (scripts/check-guidelines.mjs).
+   Farben folgen dem Cyan-Cockpit (design-cyan.css), aber mit eigenen Werten:
+   die --design-*-Variablen leben dort im Scope .premium-view und sind hier
+   nicht verfuegbar. */
+
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80; /* ueber Sidebar (70) und Modellmenue (60) */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: min(12vh, 96px) 16px 16px;
+}
+
+.search-overlay[hidden] {
+  display: none;
+}
+
+body.search-overlay-open {
+  overflow: hidden;
+}
+
+.search-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 10, 0.62);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.search-overlay-panel {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(680px, 100%);
+  max-height: min(72vh, 640px);
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.58);
+  border-radius: 14px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.065), rgba(45, 212, 191, 0.025) 42%, transparent 70%),
+    rgba(19, 24, 33, 0.97);
+  box-shadow:
+    0 0 24px rgba(45, 212, 191, 0.28),
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(126, 232, 218, 0.22);
+}
+
+.search-overlay-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(45, 212, 191, 0.26);
+}
+
+.search-overlay-form input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #f6f3ee;
+  font-size: 17px;
+}
+
+.search-overlay-form input::placeholder {
+  color: rgba(151, 158, 171, 0.78);
+}
+
+.search-overlay-close {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid rgba(45, 212, 191, 0.32);
+  border-radius: 10px;
+  background: rgba(6, 10, 16, 0.82);
+  color: rgba(126, 232, 218, 0.9);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.search-overlay-log {
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 8px;
+}
+
+.search-overlay-group {
+  display: grid;
+  gap: 2px;
+}
+
+.search-overlay-group h3 {
+  margin: 0;
+  padding: 6px 10px 4px;
+  color: rgba(126, 232, 218, 0.78);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.search-overlay-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #f6f3ee;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.search-overlay-row .row-title {
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.search-overlay-row .row-meta {
+  align-self: center;
+  color: rgba(151, 158, 171, 0.85);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.search-overlay-row .row-detail {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  color: rgba(246, 243, 238, 0.62);
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Maus-Hover und Tastatur-Auswahl sehen gleich aus — es gibt EINE Markierung. */
+.search-overlay-row.is-active {
+  border-color: rgba(45, 212, 191, 0.4);
+  background: rgba(45, 212, 191, 0.14);
+}
+
+.search-overlay-log mark {
+  border-radius: 3px;
+  padding: 0 1px;
+  background: rgba(50, 246, 234, 0.3);
+  color: #eafffb;
+}
+
+.search-overlay-empty {
+  padding: 14px;
+  color: rgba(246, 243, 238, 0.72);
+}
+
+.search-overlay-hints {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 8px 12px;
+  border-top: 1px solid rgba(45, 212, 191, 0.2);
+  color: rgba(151, 158, 171, 0.85);
+  font-size: 12px;
+}
+
+.search-overlay-hints kbd {
+  display: inline-block;
+  min-width: 18px;
+  margin-right: 4px;
+  padding: 1px 5px;
+  border: 1px solid rgba(126, 232, 218, 0.3);
+  border-radius: 5px;
+  background: rgba(6, 10, 16, 0.82);
+  color: rgba(126, 232, 218, 0.9);
+  font-family: inherit;
+  font-size: 11px;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .search-overlay {
+    padding: 8px;
+  }
+
+  .search-overlay-panel {
+    max-height: calc(100dvh - 16px);
+  }
+
+  .search-overlay-hints {
+    display: none; /* Tastatur-Hinweise nuetzen auf dem Handy nichts */
+  }
+}

@@ -67,6 +67,7 @@
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
     <link rel="stylesheet" href="/assets/start-styles.css?v=paste-attach-20260806">
+    <link rel="stylesheet" href="/assets/search-overlay.css?v=suche-overlay-20260813">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -640,6 +641,17 @@
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <header><h3 id="modalTitle"></h3><button type="button" data-close-modal>Schließen</button></header>
         <div id="modalBody" class="modal-body"></div>
+      </section>
+    </div>
+    <div id="searchOverlay" class="search-overlay" hidden>
+      <div class="search-overlay-backdrop" data-search-close></div>
+      <section class="search-overlay-panel" role="dialog" aria-modal="true" aria-label="Suche">
+        <form id="searchOverlayForm" class="search-overlay-form" role="search">
+          <input id="searchOverlayQuery" type="search" placeholder="Chats, Projekte, Dateien durchsuchen …" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <button type="button" class="search-overlay-close" data-search-close aria-label="Suche schließen" title="Schließen (Esc)">Esc</button>
+        </form>
+        <div id="searchOverlayLog" class="search-overlay-log" aria-live="polite"></div>
+        <p class="search-overlay-hints" aria-hidden="true"><span><kbd>↑</kbd><kbd>↓</kbd> wählen</span><span><kbd>Enter</kbd> öffnen</span><span><kbd>Esc</kbd> schließen</span></p>
       </section>
     </div>
     <div id="voiceModeOverlay" class="voice-mode-overlay" data-mode="listening" role="dialog" aria-modal="true" aria-label="Sprachmodus" hidden>
