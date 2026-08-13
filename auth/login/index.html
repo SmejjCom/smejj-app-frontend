@@ -398,20 +398,9 @@ a:focus-visible {
           <a class="auth-button primary" id="continueToApp" href="/">Weiter zu smejj.com</a>
         </div>
 
-        <label class="auth-field" for="profileEmail">E-Mail<input id="profileEmail" type="email" autocomplete="email" placeholder="name@example.com"></label>
-        <input id="profileName" type="hidden" value="">
-        <div id="emailFormGroup" hidden>
-          <label class="auth-field" for="emailPassword">Passwort<input id="emailPassword" type="password" autocomplete="current-password" placeholder="Mindestens 10 Zeichen"></label>
-          <p class="auth-note auth-inline-note"><button type="button" class="auth-linkbutton" id="passwordResetLink">Passwort vergessen?</button></p>
-        </div>
-
-        <div class="auth-stack">
-          <button class="auth-button primary" id="emailLogin" type="button">Weiter</button>
-        </div>
-        <p class="auth-note">Wir fragen danach nur, was nötig ist: Passwort, Passkey oder Login-Link.</p>
-
-        <div class="auth-divider"><span>oder</span></div>
-
+        <!-- Express-Reihenfolge wie auf der Registrierungsseite (und wie bei
+             Claude/ChatGPT): 1-Klick-Wege zuerst, E-Mail darunter. Befund
+             2026-08-12: Login hatte als einzige Seite E-Mail zuerst. -->
         <div class="auth-stack" id="authProviders">
           <button class="auth-button secondary" id="googleLogin" type="button" data-method="google">
             <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.788 5.108a9 9 0 1 0 3.212 6.892h-8"/></svg></span>Mit Google anmelden
@@ -429,6 +418,20 @@ a:focus-visible {
             <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/></svg></span>Link per E-Mail schicken
           </button>
         </div>
+
+        <div class="auth-divider"><span>oder mit E-Mail</span></div>
+
+        <label class="auth-field" for="profileEmail">E-Mail<input id="profileEmail" type="email" autocomplete="email" placeholder="name@example.com"></label>
+        <input id="profileName" type="hidden" value="">
+        <div id="emailFormGroup" hidden>
+          <label class="auth-field" for="emailPassword">Passwort<input id="emailPassword" type="password" autocomplete="current-password" placeholder="Mindestens 10 Zeichen"></label>
+          <p class="auth-note auth-inline-note"><button type="button" class="auth-linkbutton" id="passwordResetLink">Passwort vergessen?</button></p>
+        </div>
+
+        <div class="auth-stack">
+          <button class="auth-button primary" id="emailLogin" type="button">Weiter</button>
+        </div>
+        <p class="auth-note">Wir fragen danach nur, was nötig ist: Passwort, Passkey oder Login-Link.</p>
 
         <p class="auth-status" id="profileOutput" role="status" aria-live="polite"></p><span id="sessionStatus" hidden></span>
         <p class="auth-footer">Neu hier? <a href="/auth/register/">Konto erstellen</a></p>

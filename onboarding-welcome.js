@@ -42,6 +42,24 @@ export function initOnboardingWelcome(planLinks = {}, doc = globalThis.document)
   tryShowOnboarding(planLinks, doc);
   setTimeout(() => tryShowOnboarding(planLinks, doc), 300);
   setTimeout(() => tryShowOnboarding(planLinks, doc), 600);
+  // Express-Gefuehl nach dem Login (2026-08-12): Cursor blinkt direkt im
+  // Eingabefeld — wie bei Claude/ChatGPT. Nur wenn KEIN Overlay offen ist;
+  // sonst uebernimmt der Schliessen-Klick des Overlays den Fokus.
+  setTimeout(() => { if (!doc?.querySelector(".onboarding-overlay")) focusComposer(doc); }, 700);
+}
+
+// Fokus ins Chat-Eingabefeld — still scheitern, wenn es (z. B. auf /profile)
+// nicht existiert oder der Nutzer schon woanders tippt.
+function focusComposer(doc = globalThis.document) {
+  try {
+    const params = new URLSearchParams(globalThis.location?.search || "");
+    if (!params.has("login") && !params.has("session-handoff-complete")) return; // nur nach frischem Login
+    const feld = doc.querySelector("#startMessage");
+    const aktiv = doc.activeElement;
+    if (feld && (!aktiv || aktiv === doc.body)) feld.focus();
+  } catch {
+    // Fokus ist Komfort — nie blockieren.
+  }
 }
 
 function tryShowOnboarding(planLinks, doc) {
@@ -81,6 +99,9 @@ function tryShowOnboarding(planLinks, doc) {
       if (event.target.closest("#onboardingStart") || event.target === overlay) {
         markOnboardingDone();
         overlay.remove();
+        // Direkt weitertippen koennen: Fokus ins Eingabefeld (ohne Marker-
+        // Bedingung — der Marker ist nach 800 ms schon weggeraeumt).
+        try { doc.querySelector("#startMessage")?.focus(); } catch { /* Komfort */ }
       }
     });
   } catch {
