@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "smejj.com-qualitaetsverlauf",
-  "erzeugtAm": "2026-08-13T02:10:05.283Z",
+  "erzeugtAm": "2026-08-13T14:10:03.727Z",
   "quelle": "smejj-training-loop, GET /verlauf (containerintern)",
   "suite": {
     "suiteId": "smejj-chat-core",
@@ -105,17 +105,28 @@
       "abgelegt": false
     },
     {
-      "zeitpunkt": "2026-08-13T02:10:05.283Z",
-      "punktzahl": 1,
+      "zeitpunkt": "2026-08-13T14:10:03.727Z",
+      "punktzahl": 0.9837,
       "faelle": 14,
-      "bestanden": 14,
+      "bestanden": 12,
       "nichtBestanden": 0,
       "kritischeFehler": 0,
-      "p95Ms": 35818,
-      "medianMs": 975,
+      "p95Ms": 22114,
+      "medianMs": 978,
       "wiederholungen": 3,
-      "wackelig": 0,
-      "wackeligeFaelle": null,
+      "wackelig": 2,
+      "wackeligeFaelle": [
+        {
+          "fall": "antwortsprache-deutsch",
+          "bestanden": 2,
+          "laeufe": 3
+        },
+        {
+          "fall": "halluzination-unbekannte-zahl",
+          "bestanden": 2,
+          "laeufe": 3
+        }
+      ],
       "urteil": "passed",
       "abgelegt": false
     }
