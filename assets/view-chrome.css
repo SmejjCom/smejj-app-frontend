@@ -258,3 +258,15 @@ body.left-panel-open:has(.sidebar.is-compact) .workspace {
 body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   margin-right: min(var(--right-panel-width), calc(100vw - 120px));
 }
+
+/* Auf dem Handy schiebt nur EINE Spur (2026-08-13, gemessen bei 375 px):
+   die Eingabereihe braucht dort 344 px. Mit einer Spur bleiben 347 px — es
+   passt. Mit beiden Spuren blieben 319 px, und die Reihe zog die Spalte 25 px
+   aus dem Bild (dieselbe Ursache wie 2026-08-09: `.home-feed` ist Grid-Item
+   mit min-width: auto). Die linke Spur ist die Hauptnavigation und schiebt;
+   die rechte bleibt auf schmalen Schirmen ein Overlay. */
+@media (max-width: 600px) {
+  body.right-panel-open:has(#browserPanel.is-compact) .workspace {
+    margin-right: 0;
+  }
+}
