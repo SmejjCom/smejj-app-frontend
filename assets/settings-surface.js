@@ -126,7 +126,7 @@ function markup() {
     <div class="settings-shell"><nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${nav}</nav><div class="settings-content">
       ${panel("general", "Allgemein", "Grundlegendes Verhalten der App.", [
         select("Sprache", "settingsLanguage", LANGUAGE_OPTIONS, false),
-        select("Beim Öffnen anzeigen", "settingsStartView", [["last", "Letzte Ansicht"], ["start", "Startseite"], ["projects", "Projekte"]]),
+        select("Beim Öffnen anzeigen", "settingsStartView", [["last", "Letzte Ansicht"], ["start", "Startseite"], ["projects", "Arbeitsbereich"]]),
         select("Sicherheitsmodus", "settingsMode", [["safe", "Free-safe"], ["byok", "BYOK vorbereitet"], ["local", "Lokal"]])])}
       ${panel("appearance", "Darstellung", "Gilt nur außerhalb der geschützten Startseite.", [
         select("Farbschema", "settingsTheme", [["system", "System"], ["dark", "Dunkel"], ["light", "Hell"]]),

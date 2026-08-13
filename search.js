@@ -10,7 +10,10 @@ import { initSearchOverlay, toggleSearchOverlay } from "./search-overlay.js";
 const STATIC_RESULTS = Object.freeze([
   ["Arbeitsbereiche", "Neu", "Neuer Chat oder neue Aufgabe starten", "start", "neu chat aufgabe start"],
   ["Arbeitsbereiche", "Coding", "Code schreiben, prüfen und umbauen", "smejjClaw", "coding code programmieren terminal"],
-  ["Arbeitsbereiche", "Projekte", "Projekt öffnen oder wechseln", "projects", "projekt projekte workspace"],
+  // "Arbeitsbereich" statt "Projekte" (2026-08-13): "Projekte" heisst seit dem
+  // Verlauf-Ausbau die Chat-Sammlung. Die alten Suchwoerter bleiben stehen —
+  // wer "projekt" tippt, soll diese Flaeche weiterhin finden.
+  ["Arbeitsbereiche", "Arbeitsbereich", "Lokale Dateien und Snapshots öffnen", "projects", "arbeitsbereich workspace projekt projekte dateien"],
   ["Arbeitsbereiche", "Dateien", "Projektdateien und Uploads finden", "files", "dateien files uploads quellen"],
   ["Arbeitsbereiche", "Verlauf", "Alte Chats und Aufgaben finden", "chatHistory", "verlauf history chat task"],
   ["Einstellungen", "Einstellungen", "Konto, Modelle, API-Keys und Sprache", "settings", "settings einstellungen konto modell api key"],
@@ -100,7 +103,7 @@ async function findResults(query, state, workspace) {
   // Erst nach den Projekten: die Dateiliste haengt an ihnen.
   const fileRows = await loadProjectFileRows(workspace, projectRows).catch(() => []);
   const dynamic = [
-    ...projectRows.map((project) => ["Projekte", project.name || project.id, `Projekt ${project.id}`, "projects", `${project.id} ${project.name} ${project.syncStatus}`]),
+    ...projectRows.map((project) => ["Arbeitsbereich", project.name || project.id, `Projekt ${project.id}`, "projects", `${project.id} ${project.name} ${project.syncStatus}`]),
     ...fileRows,
     ...jobRows.map((job) => ["Aufgaben", job.task || job.id, `${job.status} - ${job.id}`, "automation", `${job.id} ${job.task} ${job.status}`, job.id]),
     ...chatRows,
