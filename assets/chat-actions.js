@@ -204,11 +204,34 @@ function flashCopied(button) {
    Zwischenablage: HTML fuer Docs/Word/Mail (echte Absaetze, Fett, Listen —
    kompakt, keine Leerzeilen) und Text fuer alles andere. Das Ziel sucht
    sich die passende selbst aus. */
-function htmlOf(entry) {
+function escapeHtml(text) {
+  return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/* Absaetze aus dem Rohtext bauen: Leerzeile trennt Absaetze, einfacher
+   Umbruch wird <br>. Noetig fuer Antworten OHNE Markdown-Zeichen —
+   chat-markdown laesst die als Rohtext stehen (MARKERS-Fruehausstieg), und
+   rohe Zeilenumbrueche fallen in HTML zu Leerzeichen zusammen. Genau das war
+   der "Textsalat" beim zweiten Docs-Versuch des Betreibers: erst zu viel
+   Abstand, dann gar keiner.  */
+function absaetzeAusText(text) {
+  return String(text || "")
+    .split(/\n{2,}/)
+    .map((absatz) => absatz.trim())
+    .filter(Boolean)
+    .map((absatz) => `<p>${escapeHtml(absatz).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
+function htmlOf(entry, raw) {
   const klon = entry?.cloneNode?.(true);
   if (!klon) return "";
   for (const chrome of klon.querySelectorAll(".msg-actions, .msg-menu, .msg-meta, .chat-code-actions, button")) chrome.remove();
-  return String(klon.innerHTML || "").trim();
+  const html = String(klon.innerHTML || "").trim();
+  // Nur DOM-HTML verwenden, wenn es echte Bloecke traegt — sonst aus dem
+  // Rohtext bauen, damit die Absatzstruktur nie verloren geht.
+  if (/<(p|ul|ol|pre|h\d|table|blockquote)\b/i.test(html)) return html;
+  return absaetzeAusText(raw ?? klon.textContent);
 }
 
 async function copyText(text, button, html = "") {
@@ -533,7 +556,7 @@ function sendeDaumenSignal(entry, richtung) {
 
 const HANDLERS = {
   sources: (entry) => toggleSources(entry),
-  copy: (entry, button) => copyText(rawOf(entry), button, htmlOf(entry)),
+  copy: (entry, button) => copyText(rawOf(entry), button, htmlOf(entry, rawOf(entry))),
   "copy-plain": (entry) => copyText(toPlainText(rawOf(entry))),
   edit: (entry) => startEdit(entry),
   regen: (entry) => regenerate(entry),
