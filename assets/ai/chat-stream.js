@@ -329,6 +329,45 @@ function schrittOhneFund(schritt) {
 }
 
 // ---------------------------------------------------------------------------
+// Zwischengerede gehoert nicht in die Antwort
+//
+// GEMESSEN am 2026-08-13 an derselben Buero-Suche, live im angemeldeten
+// Browser. Was als Antwort dastand, war das Selbstgespraech des Modells
+// zwischen den Werkzeugaufrufen, ohne Absatz aneinandergeklebt:
+//
+//   "Ich suche jetzt gezielt nach konkreten, anklickbaren Exposés. Lassen Sie
+//    mich verschiedene spezifische Suchen durchführen.Ich habe jetzt gute
+//    Ansätze gefunden. Lassen Sie mich die konkreten LoopNet-Exposés
+//    aufrufen … Es ist wichtig, ehrlich zu sein über den Stand und nichts zu
+//    erfinden. … Craigslist-Einzelpost-URLs sind"
+//
+// Ursache: control-server/src/llm/toolLoop.js streamt den sichtbaren Text
+// JEDER Runde sofort durch (pumpRound). Nur die letzte Runde ist die Antwort;
+// die Runden davor sind Arbeitsnotizen. ChatGPT und Claude zeigen genau die
+// nicht.
+//
+// Der Klient kann das selbst entscheiden, ohne dass der Control-Server sich
+// aendern muss: Ein Werkzeugschritt mit "laeuft" beweist, dass der Text davor
+// VOR einem Werkzeugaufruf geschrieben wurde — also Arbeitsnotiz war, nicht
+// Antwort. Die letzte Runde laeuft ohne Werkzeuge (MAX_ROUNDS), auf sie folgt
+// nie ein Schritt; ihr Text bleibt deshalb immer stehen.
+//
+// Nichts geht verloren: der zuletzt verworfene Text wird aufgehoben und
+// zurueckgeholt, falls am Ende gar keine Antwort steht (abgebrochener Lauf).
+// Lieber eine Arbeitsnotiz als eine leere Blase.
+// ---------------------------------------------------------------------------
+
+/**
+ * Nimmt den bisher geschriebenen Text aus der Antwort heraus und gibt ihn zurueck.
+ * @param {HTMLElement} output @returns {string} der entfernte Text
+ */
+export function verwirfArbeitsnotiz(output) {
+  const bisher = output?.textContent || "";
+  if (bisher) output.textContent = "";
+  return bisher;
+}
+
+// ---------------------------------------------------------------------------
 // Das erste Lebenszeichen
 //
 // GEMESSEN am 2026-08-05 an einer echten Werkzeug-Frage ("Was sind heute die
@@ -482,6 +521,9 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // gefaltete Titelzeile und fuer die Frage, ob die Antwort auf nichts steht.
   let schritteFertig = 0;
   let schritteOhneFundZahl = 0;
+  // Rettungsanker: die zuletzt verworfene Arbeitsnotiz. Bleibt am Ende gar
+  // nichts stehen (abgebrochener Lauf), kommt sie zurueck.
+  let letzteNotiz = "";
 
   while (true) {
     const { value, done } = await reader.read();
@@ -506,6 +548,10 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
           if (payload.smejj_schritt.zustand === "fertig") {
             schritteFertig += 1;
             if (schrittOhneFund(payload.smejj_schritt)) schritteOhneFundZahl += 1;
+          } else {
+            // Ein beginnender Schritt beweist: was bisher dasteht, wurde VOR
+            // einem Werkzeugaufruf geschrieben — Arbeitsnotiz, nicht Antwort.
+            letzteNotiz = verwirfArbeitsnotiz(output) || letzteNotiz;
           }
           zeigeSchritt(output, payload.smejj_schritt);
           continue;
@@ -521,6 +567,9 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // Auch wenn der Strom ohne ein einziges Ereignis endet: das Signal muss weg.
   stoppeWartesignal();
   clearThinkingState(output);
+  // Der Lauf endete ohne Schlussantwort (alle Runden gingen in Werkzeuge).
+  // Dann ist die letzte Arbeitsnotiz besser als eine leere Blase.
+  if (!output.textContent.trim() && letzteNotiz.trim()) output.textContent = letzteNotiz;
   // VOR renderMarkdown: der Renderer liest textContent und ersetzt innerHTML —
   // danach angehaengter Text bliebe roher Stern-Text.
   output.textContent += quellenHinweis({
