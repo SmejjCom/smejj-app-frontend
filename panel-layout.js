@@ -70,9 +70,27 @@ function rememberPanelOpen(panel) {
 // standen nach jedem Neuladen wieder zu, obwohl "1" gemerkt war. Darum ein
 // kleiner Zaehler statt eines Schalters: mehrmals zurueckdrehen, aber gedeckelt,
 // damit aus einem Streit keine Endlosschleife wird.
-const RUECKDREH_FENSTER_MS = 10000;
+// 45 statt 10 Sekunden (Betreiber-Befund 2026-08-13, zweiter Anlauf): Der
+// verzoegerte App-Start (deferred-start, Anmelde-Pruefung vorweg) klappt die
+// Seiten auf langsamen Maschinen auch NACH Sekunde 10 noch zu — genau dann
+// endete das alte Fenster, und die Seiten standen wieder zu. Der Zaehler
+// (max 5 je Seite) bleibt die eigentliche Bremse gegen Endlos-Streit.
+const RUECKDREH_FENSTER_MS = 45000;
 const RUECKDREH_MAX = 5;
 const rueckdrehZaehler = { left: 0, right: 0 };
+
+// Der AKTUELLE Merker, nicht der Schnappschuss vom Modul-Laden: Klappt der
+// Nutzer eine Seite von Hand zu, schreibt der Beobachter "0" — der Schnapp-
+// schuss wuesste davon nichts und wuerde sie ihm wieder aufdraengen.
+// (Das Boot-Zuklappen selbst schreibt dank nutzerNah-Wache nie.)
+function gemerktJetzt(side) {
+  try {
+    const wert = localStorage.getItem(PANEL_OPEN_KEYS[side]);
+    return wert === null ? GEMERKT_BEIM_START[side] : wert;
+  } catch {
+    return GEMERKT_BEIM_START[side];
+  }
+}
 
 function bootZuklappenZuruedrehen(panel) {
   const side = panelSide(panel);
@@ -80,7 +98,7 @@ function bootZuklappenZuruedrehen(panel) {
   if (nutzerNah()) return;
   if (performance.now() > RUECKDREH_FENSTER_MS) return;
   if (panel.classList.contains("is-open")) return;
-  if (GEMERKT_BEIM_START[side] !== "1") return;
+  if (gemerktJetzt(side) !== "1") return;
   if (typeof window !== "undefined" && window.innerWidth < RESTORE_MIN_WIDTH) return;
   rueckdrehZaehler[side] += 1;
   setPanelOpen(side, true);
@@ -101,11 +119,15 @@ const GEMERKT_BEIM_START = (() => {
   return werte;
 })();
 
-export function restorePanelOpen(doc = document, gemerkt = GEMERKT_BEIM_START) {
+export function restorePanelOpen(doc = document, gemerkt = null) {
   if (typeof window !== "undefined" && window.innerWidth < RESTORE_MIN_WIDTH) return 0;
   let restored = 0;
   for (const side of ["left", "right"]) {
-    if (gemerkt[side] !== "1") continue;
+    // Ohne uebergebene Werte gilt der AKTUELLE Merker (siehe gemerktJetzt):
+    // die spaeten Wiederhol-Anlaeufe unten duerfen ein von Hand zugeklapptes
+    // Panel nicht wieder aufdraengen.
+    const wunsch = gemerkt ? gemerkt[side] : gemerktJetzt(side);
+    if (wunsch !== "1") continue;
     const panel = side === "left" ? doc.querySelector(".sidebar") : doc.querySelector("#browserPanel");
     if (!panel || panel.classList.contains("is-open")) continue;
     setPanelOpen(side, true);
@@ -245,8 +267,19 @@ if (typeof document !== "undefined" && typeof MutationObserver !== "undefined") 
   const start = () => {
     watchPanelReachability();
     const wiederherstellen = () => requestAnimationFrame(() => restorePanelOpen());
-    if (document.readyState === "complete") wiederherstellen();
-    else window.addEventListener("load", wiederherstellen, { once: true });
+    // MEHRERE spaete Anlaeufe (Betreiber-Befund 2026-08-13): der verzoegerte
+    // App-Start klappt die Seiten auch lange nach `load` noch zu — ein
+    // einzelner Wiederhersteller direkt bei `load` wurde ueberrollt. Die
+    // Anlaeufe lesen den AKTUELLEN Merker; klappt der Nutzer von Hand zu
+    // (Merker "0"), fasst keiner von ihnen die Seite mehr an.
+    const wiederherstellenMitNachschlag = () => {
+      wiederherstellen();
+      for (const verzoegerung of [2000, 6000, 15000, 30000]) {
+        setTimeout(wiederherstellen, verzoegerung);
+      }
+    };
+    if (document.readyState === "complete") wiederherstellenMitNachschlag();
+    else window.addEventListener("load", wiederherstellenMitNachschlag, { once: true });
   };
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", start);
