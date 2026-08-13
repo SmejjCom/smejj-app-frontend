@@ -263,6 +263,7 @@ const SHELL = [
   "/assets/composer-dictation.js",
   "/assets/chat-store.js",
   "/assets/chat-owner.js",
+  "/assets/chat-sync.js",
   "/assets/chat-history-view.js",
   "/assets/chat-history-text.js",
   "/assets/chat-history-cards.js",

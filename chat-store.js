@@ -383,6 +383,9 @@ export async function deleteChat(id) {
   // Nur eigene Chats loeschen (Stufe 2). getChat liefert fuer fremde null.
   if (!(await getChat(id))) return false;
   await tx("readwrite", (store) => store.delete(String(id || "")));
+  // Stufe 3: das Loeschen dem Konto melden (chat-sync.js reicht es zum Server
+  // weiter). Eigenes Ereignis statt Import — der Store kennt den Sync nicht.
+  try { window.dispatchEvent(new CustomEvent("smejj:chat-geloescht", { detail: { id: String(id || "") } })); } catch { /* still */ }
   if (activeChatId() === id) {
     try {
       sessionStorage.removeItem(ACTIVE_KEY_SESSION);
@@ -559,6 +562,9 @@ function init() {
       .then((restoreErlaubt) => {
         bindObserver();
         if (restoreErlaubt !== false) restoreOnBoot().catch(() => {});
+        // Stufe 3: Sync nachladen — dynamisch und fail-safe. Fehlt die Datei
+        // (offline, alter Cache), laeuft der Verlauf einfach lokal weiter.
+        import("/assets/chat-sync.js?v=1").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */
@@ -571,4 +577,26 @@ if (document.readyState === "loading") {
   init();
 }
 
-window.smejjChatStore = { listChats, getChat, openChat, newChat, renameChat, deleteChat, activeChatId };
+/**
+ * Chat von einem anderen Geraet uebernehmen (Stufe 3, chat-sync.js).
+ * Schreibt NUR, wenn der Chat dem angemeldeten Konto gehoert — der Server
+ * filtert zwar schon per Sitzung, aber lokal gilt dieselbe Regel nochmal
+ * (nie fremdes Material in die eigene Datenbank uebernehmen).
+ * KEIN notifyChanged-Ausloesen des Sync-Push: importierte Chats sind gerade vom
+ * Server gekommen; sie sofort zurueckzuschicken waere ein Kreisverkehr. Die
+ * Verlauf-Ansicht wird trotzdem informiert (eigenes, stilles Ereignis reicht
+ * nicht — sie hoert auf smejj:chats-changed; der Push entprellt und der Server
+ * ueberspringt Gleichstaende, damit bleibt der Kreis einmalig).
+ * @param {object} chat  kompletter Chat-Datensatz vom Server
+ * @returns {Promise<boolean>}
+ */
+export async function importChat(chat) {
+  const userId = aktuellerNutzer();
+  if (!userId || !chat || typeof chat !== "object" || !chat.id) return false;
+  if (!gehoertNutzer(chat, userId, geraeteBesitzer())) return false;
+  await tx("readwrite", (store) => store.put({ ...chat, ownerId: userId }));
+  notifyChanged();
+  return true;
+}
+
+window.smejjChatStore = { listChats, getChat, openChat, newChat, renameChat, deleteChat, activeChatId, importChat };
