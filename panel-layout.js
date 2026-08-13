@@ -113,10 +113,10 @@ export function restorePanelOpen(doc = document, gemerkt = GEMERKT_BEIM_START) {
 // (syncLeftMenuState, syncBackdrop) lief danach nicht mehr.
 export const PANEL_WIDTHS = Object.freeze({
   default: 200,
-  // 48 statt 96 (Betreiber 2026-08-13, "von links nach ist zu breit"): die
-  // Spur soll genau die Spalte des 28-px-Menue-Knopfs fassen — 44-px-Feld
-  // plus 2 px Rand je Seite, wie die Icon-Leiste von ChatGPT.
-  compact: 48,
+  // 40 statt anfangs 96 (Betreiber 2026-08-13, zweimal nachgeschaerft:
+  // "zu breit", dann "immer noch breit"): nur noch die Spalte des
+  // Menue-Knopfs, wie die Icon-Leiste von ChatGPT.
+  compact: 40,
   min: 188,
   close: 10,
   max: 520,
@@ -169,9 +169,9 @@ export function setPanelWidth(side, rawWidth, { persist = true } = {}) {
 
 export function getPanelWidth(side) {
   const savedWidth = Number(localStorage.getItem(PANEL_WIDTH_KEYS[side])) || PANEL_WIDTHS.default;
-  // 96 war bis 2026-08-13 die schmalste Spur — wer sie eingestellt hatte,
-  // meinte "so schmal wie moeglich" und bekommt jetzt die neue 48er-Spur.
-  if (savedWidth === 96) return PANEL_WIDTHS.compact;
+  // 96 bzw. 48 waren fruehere schmalste Spuren — wer sie eingestellt hatte,
+  // meinte "so schmal wie moeglich" und bekommt die jeweils aktuelle Spur.
+  if (savedWidth === 96 || savedWidth === 48) return PANEL_WIDTHS.compact;
   return [306, 228, 225].includes(savedWidth) ? PANEL_WIDTHS.default : savedWidth;
 }
 
