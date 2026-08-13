@@ -166,11 +166,25 @@ async function enforceChatOwner() {
   }
   // Beim Kontowechsel den Zeiger auf den zuletzt offenen Chat fallen lassen —
   // er zeigt auf einen Chat des anderen Kontos.
+  //
+  // UND das Sichtbare mit abraeumen. Live-Befund 2026-08-13 (in genau diesem
+  // Modul entstanden): Nach dem Wechsel stand die Unterhaltung des VORIGEN
+  // Kontos noch im Fenster. Der Beobachter speicherte sie beim naechsten
+  // Tastendruck brav ab — unter dem NEUEN Konto. So wanderten 30 fremde
+  // Nachrichten in einen fremden Verlauf, obwohl Liste und Zugriff sauber
+  // gefiltert waren. Wer den Besitzer wechselt, muss auch den Bildschirm
+  // leeren, sonst ist die Trennung nur halb.
   if (wechsel) {
     try {
       sessionStorage.removeItem(ACTIVE_KEY_SESSION);
       localStorage.removeItem(ACTIVE_KEY_LAST);
     } catch { /* fluechtig weiter */ }
+    const log = startLog();
+    if (log) {
+      log.innerHTML = "";
+      log.hidden = true;
+      document.querySelector("#start")?.classList.remove("has-start-chat");
+    }
   }
   try { localStorage.setItem(OWNER_KEY, userId); } catch { /* dann erneut beim naechsten Start */ }
   return true;
