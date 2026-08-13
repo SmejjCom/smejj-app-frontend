@@ -161,6 +161,9 @@ function refreshBars(entries) {
   const list = entries || Array.from(log()?.querySelectorAll(":scope > .entry") || []);
   for (const entry of list) {
     if (entry.classList.contains("is-editing")) continue;
+    // Status-Elemente (Arbeitsschritte/Fortschritt) sind KEINE Nachrichten —
+    // Kopieren/Daumen darunter wirkte doppelt und unprofessionell (2026-08-12).
+    if (entry.classList.contains("chat-schritte")) continue;
     ensureBar(entry);
   }
 }
