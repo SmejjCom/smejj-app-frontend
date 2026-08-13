@@ -98,6 +98,44 @@ function setToken(token) {
   try { if (token) localStorage.setItem(TOKEN_KEY, token); } catch { /* Storage gesperrt: nur diese Sitzung */ }
 }
 
+// Eine frische Anmeldung raeumt die ALTE Identitaet weg, bevor die neue gilt.
+//
+// Live-Befund 2026-08-13 (geteiltes Geraet): Nach der Anmeldung mit einem
+// ZWEITEN Konto war Sekunden spaeter wieder das erste angemeldet — der alte
+// 180-Tage-Token im localStorage und das Sitzungs-Cookie der Control-Domain
+// ueberlebten den Wechsel und wurden beim naechsten /api/auth/me einfach
+// verlaengert. Person B sass damit unbemerkt in der Sitzung von Person A.
+//
+// Der Zeitpunkt ist entscheidend: Das Raeumen gehoert an den BEGINN einer
+// Anmeldung, nicht ans Ende. Danach haette der Server dem neuen Konto bereits
+// ein Cookie ausgestellt — ein Abmelden wuerde genau dieses frische Cookie
+// wieder wegwerfen. Vorher ist die Lage eindeutig: Was hier liegt, gehoert zur
+// alten Anmeldung und soll weg.
+//
+// Fail-safe: Scheitert das Abmelden (offline, Server weg), werden die lokalen
+// Schluessel trotzdem geleert — lieber einmal zu viel abgemeldet.
+async function raeumeAlteIdentitaet() {
+  let alt = "";
+  try { alt = localStorage.getItem(TOKEN_KEY) || ""; } catch { alt = ""; }
+  try {
+    await fetch(CLIENT_ROUTES.api.authLogout, {
+      method: "POST",
+      credentials: "include",
+      headers: alt ? { Authorization: `Bearer ${alt}` } : {}
+    });
+  } catch { /* Abmelden ist Kuer, Aufraeumen ist Pflicht */ }
+  const zuLeeren = [
+    [localStorage, TOKEN_KEY],
+    [sessionStorage, TOKEN_KEY],
+    [sessionStorage, "smejj.apiToken.v1"],
+    [localStorage, "smejj.session.v1"],
+    [localStorage, "smejj.profile.v1"]
+  ];
+  for (const [speicher, schluessel] of zuLeeren) {
+    try { speicher.removeItem(schluessel); } catch { /* Storage gesperrt */ }
+  }
+}
+
 function authHeaders(extra = {}) {
   const token = getToken();
   return token ? { ...extra, Authorization: `Bearer ${token}` } : { ...extra };
@@ -172,6 +210,8 @@ async function startGoogleLogin() {
       status(t("Google Login ist serverseitig noch nicht konfiguriert. Nutze bis dahin Passkey."), "error");
       return;
     }
+    // Alte Anmeldung raeumen, BEVOR wir zu Google gehen (siehe raeumeAlteIdentitaet).
+    await raeumeAlteIdentitaet();
     // One-Time-Handoff starten, damit der Token nach der Google-Anmeldung auf
     // smejj.com landet (gleiches Bearer-Prinzip wie beim E-Mail-Login).
     const origin = window.location.origin;
@@ -266,6 +306,7 @@ async function submitEmailLogin() {
   if (!email || !password) return status(t("Bitte E-Mail und Passwort eingeben."), "error");
   status(t("Anmeldung läuft …"));
   try {
+    await raeumeAlteIdentitaet();
     const { ok, payload } = await postJson(EMAIL_API.login, { email, password });
     if (!ok) return status(errorText(payload, "Anmeldung fehlgeschlagen."), "error");
     if (payload.accessToken) setToken(payload.accessToken);
@@ -437,6 +478,7 @@ async function startGithubLogin() {
   if (button) button.disabled = true;
   status(t("GitHub Login wird gestartet …"));
   try {
+    await raeumeAlteIdentitaet();
     const { id, origin } = await startHandoffQuery();
     const query = id ? `?handoff=${encodeURIComponent(id)}&returnOrigin=${encodeURIComponent(origin)}` : "";
     window.location.assign(`${CLIENT_ROUTES.api.authGithub}${query}`);
@@ -454,6 +496,7 @@ async function requestMagicLink() {
   if (button) button.disabled = true;
   status(t("Anmeldelink wird gesendet …"));
   try {
+    await raeumeAlteIdentitaet();
     const { id, origin } = await startHandoffQuery();
     const { ok, payload } = await postJson(CLIENT_ROUTES.api.authMagicLinkRequest, { email, handoff: id, returnOrigin: origin });
     if (!ok) return status(errorText(payload, "Anmeldelink konnte nicht gesendet werden."), "error");
