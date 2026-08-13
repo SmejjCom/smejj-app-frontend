@@ -4097,3 +4097,17 @@ body:has(#browserPanel.is-open) #mausButton {
     min-height: 44px;
   }
 }
+
+/* --- Denken = Dialog-Puls (Betreiber-Freigabe 2026-08-13) ---
+   Quelle: public/composer-tools.css im Arbeitsrepo (ba12c14). Anhang ans
+   Buendel bis zum naechsten bundle-start-styles-Lauf. */
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-left { animation: voice-puls-left 1.1s ease-in-out infinite; }
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-right { animation: voice-puls-right 1.1s ease-in-out infinite; }
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a { animation: voice-puls-dot-a 1.1s ease-in-out infinite; }
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b { animation: voice-puls-dot-b 1.1s ease-in-out infinite; }
+@keyframes voice-puls-left { 0%, 100% { transform: translateX(0) scale(1); } 25% { transform: translateX(15px) scale(1.08); } 50% { transform: translateX(0) scale(1); } }
+@keyframes voice-puls-right { 0%, 50% { transform: translateX(0) scale(1); } 75% { transform: translateX(-15px) scale(1.08); } 100% { transform: translateX(0) scale(1); } }
+@keyframes voice-puls-dot-a { 0%, 45%, 100% { opacity: 0.3; } 20% { opacity: 1; } }
+@keyframes voice-puls-dot-b { 0%, 55%, 100% { opacity: 0.3; } 75% { opacity: 1; } }
+.voice-mode-overlay[data-mode="thinking"] .voice-mode-logo::before { background: radial-gradient(circle, rgba(20, 224, 220, 0.3) 0%, rgba(20, 224, 220, 0) 70%); animation-duration: 1.1s; }
+@media (prefers-reduced-motion: reduce) { .voice-logo-left, .voice-logo-right, .voice-logo-dot-a, .voice-logo-dot-b, .voice-mode-overlay[data-mode="thinking"] .voice-logo-left, .voice-mode-overlay[data-mode="thinking"] .voice-logo-right, .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a, .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b, .voice-mode-logo::before { animation: none; } }

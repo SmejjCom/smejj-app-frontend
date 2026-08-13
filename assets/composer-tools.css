@@ -287,16 +287,71 @@
    Stumm: Das Zeichen bleibt bewusst farbig und animiert — der Sprachmodus
    laeuft weiter, nur das Mikrofon ist aus (Signal traegt der rote Mic-Button). */
 
-.voice-mode-overlay[data-mode="thinking"] .voice-logo-left,
-.voice-mode-overlay[data-mode="thinking"] .voice-logo-right,
-.voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a,
+/* Denken = Dialog-Puls (Betreiber-Auftrag + Freigabe 2026-08-13).
+
+   Vorher wurde die Bewegung beim Denken LANGSAMER (2,4 s -> 3,6 s) — genau in
+   dem Moment, wo der Nutzer wissen will, ob gearbeitet wird, wirkte das
+   Zeichen am totesten ("dieser Moment, wo arbeitet ... soll rechts links
+   bewegen wie zwei Menschen reden"). Jetzt schwingen die Klammern abwechselnd
+   deutlich aufeinander zu (±15 px statt ±7) und die Punkte blinken versetzt
+   wie ein Wortwechsel — ein Herzschlag-Takt von 1,1 s. Hoeren bleibt ruhig,
+   Sprechen bleibt gruen: die drei Zustaende sind jetzt auf einen Blick
+   unterscheidbar. */
+
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-left {
+     animation: voice-puls-left 1.1s ease-in-out infinite;
+}
+
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-right {
+     animation: voice-puls-right 1.1s ease-in-out infinite;
+}
+
+.voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a {
+     animation: voice-puls-dot-a 1.1s ease-in-out infinite;
+}
+
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b {
-     animation-duration: 3.6s;
+     animation: voice-puls-dot-b 1.1s ease-in-out infinite;
+}
+
+@keyframes voice-puls-left {
+     0%, 100% { transform: translateX(0) scale(1); }
+     25% { transform: translateX(15px) scale(1.08); }
+     50% { transform: translateX(0) scale(1); }
+}
+
+@keyframes voice-puls-right {
+     0%, 50% { transform: translateX(0) scale(1); }
+     75% { transform: translateX(-15px) scale(1.08); }
+     100% { transform: translateX(0) scale(1); }
+}
+
+@keyframes voice-puls-dot-a {
+     0%, 45%, 100% { opacity: 0.3; }
+     20% { opacity: 1; }
+}
+
+@keyframes voice-puls-dot-b {
+     0%, 55%, 100% { opacity: 0.3; }
+     75% { opacity: 1; }
 }
 
 .voice-mode-overlay[data-mode="thinking"] .voice-mode-logo::before {
-     background: radial-gradient(circle, rgba(246, 243, 238, 0.2) 0%, rgba(246, 243, 238, 0) 70%);
-     animation-duration: 4.5s;
+     background: radial-gradient(circle, rgba(20, 224, 220, 0.3) 0%, rgba(20, 224, 220, 0) 70%);
+     animation-duration: 1.1s;
+}
+
+/* Bewegung nur, wenn der Nutzer sie nicht abbestellt hat — der Puls ist die
+   kraeftigste Animation der App und braucht diese Bremse zwingend. */
+@media (prefers-reduced-motion: reduce) {
+     .voice-logo-left, .voice-logo-right, .voice-logo-dot-a, .voice-logo-dot-b,
+     .voice-mode-overlay[data-mode="thinking"] .voice-logo-left,
+     .voice-mode-overlay[data-mode="thinking"] .voice-logo-right,
+     .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a,
+     .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b,
+     .voice-mode-logo::before {
+          animation: none;
+     }
 }
 
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-logo path {
