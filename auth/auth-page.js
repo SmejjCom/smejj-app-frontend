@@ -140,7 +140,7 @@ async function refreshSession() {
   const token = getToken();
   if (!token) return;
   try {
-    const response = await fetch(`${API_ORIGIN}${CLIENT_ROUTES.api.authMe}`, { headers: authHeaders() });
+    const response = await fetch(CLIENT_ROUTES.api.authMe, { headers: authHeaders() });
     const data = await response.json();
     if (data.authenticated && data.user) {
       if (data.accessToken) setToken(data.accessToken);
@@ -166,7 +166,7 @@ async function startGoogleLogin() {
   if (button) button.disabled = true;
   status(t("Google Login wird gestartet …"));
   try {
-    const response = await fetch(`${API_ORIGIN}${CLIENT_ROUTES.api.authConfig}`);
+    const response = await fetch(CLIENT_ROUTES.api.authConfig);
     const config = await response.json();
     if (!response.ok || config.configured !== true) {
       status(t("Google Login ist serverseitig noch nicht konfiguriert. Nutze bis dahin Passkey."), "error");
@@ -439,7 +439,7 @@ async function startGithubLogin() {
   try {
     const { id, origin } = await startHandoffQuery();
     const query = id ? `?handoff=${encodeURIComponent(id)}&returnOrigin=${encodeURIComponent(origin)}` : "";
-    window.location.assign(`${API_ORIGIN}${CLIENT_ROUTES.api.authGithub}${query}`);
+    window.location.assign(`${CLIENT_ROUTES.api.authGithub}${query}`);
   } catch {
     status(t("GitHub Login konnte nicht gestartet werden."), "error");
     if (button) button.disabled = false;
@@ -455,7 +455,7 @@ async function requestMagicLink() {
   status(t("Anmeldelink wird gesendet …"));
   try {
     const { id, origin } = await startHandoffQuery();
-    const { ok, payload } = await postJson(`${API_ORIGIN}${CLIENT_ROUTES.api.authMagicLinkRequest}`, { email, handoff: id, returnOrigin: origin });
+    const { ok, payload } = await postJson(CLIENT_ROUTES.api.authMagicLinkRequest, { email, handoff: id, returnOrigin: origin });
     if (!ok) return status(errorText(payload, "Anmeldelink konnte nicht gesendet werden."), "error");
     status(t("Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig)."), "success");
   } catch {
@@ -470,7 +470,7 @@ async function requestMagicLink() {
 async function applyAvailableMethods() {
   let methods = { google: true, email: true, passkey: true };
   try {
-    const response = await fetch(`${API_ORIGIN}${CLIENT_ROUTES.api.authConfig}`);
+    const response = await fetch(CLIENT_ROUTES.api.authConfig);
     const config = await response.json();
     methods = {
       google: true,

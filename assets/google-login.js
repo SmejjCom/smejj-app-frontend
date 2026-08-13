@@ -68,7 +68,7 @@ async function renderGoogleLogin(config, deps) {
     redirectButton.type = "button";
     redirectButton.textContent = "Google Login im Hauptfenster";
     redirectButton.addEventListener("click", () => {
-      window.location.href = `${API_ORIGIN}${CLIENT_ROUTES.api.authGoogle}?mode=redirect`;
+      window.location.href = `${CLIENT_ROUTES.api.authGoogle}?mode=redirect`;
     });
     container.append(redirectButton);
     google.accounts.id.renderButton(container, {
