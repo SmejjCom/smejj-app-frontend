@@ -53,11 +53,23 @@ export function appendVoiceTurn(history, role, content) {
 export function buildAgentPayload(task, lang, history = []) {
   // Stufe 1c: voiceMode signalisiert dem Control-Server das Sprachprofil
   // (kurze, gespraechige Antworten ohne Markdown, 1-3 Saetze).
+  //
+  // Bild-Anhang (2026-08-14): Ein im Sprachmodus eingefuegter Screenshot wird
+  // von voice-overlay-ui.js vorgemerkt — abgeholt wurde er aber nur vom
+  // Start-Sendeweg (app.js), im Sprachweg ging er stumm verloren. take()
+  // liefert genau einmal; ohne Anhang (und in Node-Tests ohne window) bleibt
+  // die Payload byteidentisch wie bisher. Die Bruecke liest
+  // preferences.bildDataUrl (chat-bridge-vision.js) auf beiden Wegen gleich.
+  const anhang = typeof window !== "undefined" ? window.smejjBildAnhang?.take?.() : null;
   return {
     task,
     model: "smejj 1.0",
     files: [],
-    preferences: { uiLanguage: lang, voiceMode: true },
+    preferences: {
+      uiLanguage: lang,
+      voiceMode: true,
+      ...(anhang?.bildDataUrl ? { bildDataUrl: anhang.bildDataUrl } : {})
+    },
     history: Array.isArray(history) ? history : []
   };
 }

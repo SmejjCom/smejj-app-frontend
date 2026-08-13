@@ -39,6 +39,27 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
     + '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path class="voice-mic-slash" d="M4 4l16 16"/></svg>'
     + '</button>';
   overlay.appendChild(bar);
+  // Bild-Einfuegen auch im Sprachmodus (Betreiber-Test 2026-08-14: ein in das
+  // Sprachfeld eingefuegter Screenshot wurde stumm verschluckt — der
+  // Paste-Weg hing nur am Start-Schreibfeld). Dieselbe Kette wie dort:
+  // Bilddatei erkennen, verkleinern, als Anhang vormerken, Referenzzeile ins
+  // Feld. buildAgentPayload (voice-conversation.js) holt den Anhang beim
+  // Senden ab. Dynamische Importe, damit dieses Anzeige-Modul ohne die
+  // Bild-Kette ladbar bleibt (fail-safe: scheitert der Import, bleibt das
+  // Verhalten wie vorher).
+  const eingabe = bar.querySelector("#voiceModeInput");
+  eingabe?.addEventListener("paste", async (event) => {
+    try {
+      const [{ bildDateienAusClipboard }, { uebernehmeBildDatei }] = await Promise.all([
+        import("./composer-paste-attach.js?v=1"),
+        import("./composer-bild-anhang.js?v=1")
+      ]);
+      const bilder = bildDateienAusClipboard(event.clipboardData);
+      if (!bilder.length) return;
+      event.preventDefault();
+      await uebernehmeBildDatei(bilder[0], eingabe, (el) => el.dispatchEvent(new Event("input", { bubbles: true })), { herkunft: "Einfuegen" });
+    } catch { /* Bild-Kette nicht ladbar: Einfuegen verhaelt sich wie bisher */ }
+  });
   const close = overlay.querySelector("#voiceModeClose");
   if (close) bar.appendChild(close);
   const hint = overlay.querySelector(".voice-mode-hint");
