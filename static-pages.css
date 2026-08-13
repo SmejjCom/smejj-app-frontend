@@ -94,7 +94,10 @@ html.p-404 .error-brand { display: inline-flex; width: 30px; margin-bottom: 2rem
 html.p-404 .error-brand img { display: block; width: 100%; height: auto; aspect-ratio: 2000 / 1532.335; object-fit: contain; background: transparent; }
 html.p-404 h1 { font-size: 3rem; margin: 0 0 0.5rem; }
 html.p-404 p { color: #9aa0a6; margin: 0 0 1.5rem; }
-html.p-404 a { color: #8ab4f8; text-decoration: none; border: 1px solid #3c4043; border-radius: 999px; padding: 0.6rem 1.4rem; display: inline-block; }
+/* Knopf-Regel steht NACH dem Cockpit-Block und gewann per Reihenfolge —
+ * darum hier direkt in Cyan (2026-08-13, mit dem Cockpit-Umbau). */
+html.p-404 a { color: #7ee8da; text-decoration: none; border: 1px solid rgba(45, 212, 191, 0.45); border-radius: 999px; padding: 0.6rem 1.4rem; display: inline-block; }
+html.p-404 a:hover { border-color: #32f6ea; box-shadow: 0 0 14px rgba(45, 212, 191, 0.22); }
 
 /* ===== Sprach-Startseiten (html.p-sprachstart) ===== */
 html.p-sprachstart { color-scheme: light; }
