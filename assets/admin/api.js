@@ -28,27 +28,17 @@
   // wer sich auf smejj.com anmeldet, ist damit auch in der Konsole angemeldet.
   const TOKEN_KEY = "smejj.auth.accessToken.v1";
   const CONTROL_ORIGIN = "https://smejj-control.zeabur.app";
-  // ZWEITER HOST (Fallback): Der Salad-Control als Ausweich-Host.
-  const ZWEIT_ORIGIN = "https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud";
-  // Der einmal gefundene gesunde Host gilt fuer die ganze Browser-Sitzung —
-  // sonst wechselte jede Anfrage muenzwurfartig zwischen zwei Servern, deren
-  // Step-up-Fenster (15 Minuten) jeweils nur lokal gilt.
   const AKTIV_KEY = "smejj.admin.apiOrigin.aktiv.v1";
 
   let apiBasis = CONTROL_ORIGIN;
   let umschaltbar = false;
   (function () {
     try {
-      // Auf einem der Control-Server selbst bleibt alles relativ.
-      if (location.origin === CONTROL_ORIGIN || location.origin === ZWEIT_ORIGIN) { apiBasis = ""; return; }
-      // Zum Messen und fuer die lokale Entwicklung uebersteuerbar — derselbe
-      // Schluessel, den auch assets/config.js kennt. Ein ausdruecklicher
-      // Wunsch schlaegt das automatische Ausweichen.
+      sessionStorage.removeItem(AKTIV_KEY);
+      if (location.origin === CONTROL_ORIGIN) { apiBasis = ""; return; }
       const eigen = localStorage.getItem("smejj.apiOrigin.v1");
       if (eigen && /^https?:\/\//.test(eigen)) { apiBasis = eigen.replace(/\/+$/, ""); return; }
-      umschaltbar = true;
-      const gemerkt = sessionStorage.getItem(AKTIV_KEY);
-      if (gemerkt === CONTROL_ORIGIN || gemerkt === ZWEIT_ORIGIN) apiBasis = gemerkt;
+      apiBasis = CONTROL_ORIGIN;
     } catch { /* Storage gesperrt: Standard bleibt */ }
   })();
 

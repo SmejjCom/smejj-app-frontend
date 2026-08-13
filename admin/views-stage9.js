@@ -146,27 +146,11 @@
         + "<td>" + (l.meldung ? e(l.meldung) : '<span class="s">—</span>') + "</td></tr>";
     });
 
-    const ergebnissePanel = V.panelBlock("Fortschritt & Lerneffekt", "Was hat dieser Autopilot trainiert oder analysiert?",
-      '<div class="pb"><p style="margin:0"><b>🎓 Verarbeiteter Kontext / Training:</b><br>' + e(a.trainiert || "Kontinuierliche System-Analyse & Datenverarbeitung") + '</p></div>');
-
-    const verbesserungenPanel = V.panelBlock("Messbare Verbesserungen", "Welcher Mehrwert wurde erzielt?",
-      '<div class="pb"><p style="margin:0"><b>🚀 Erreichter Fortschritt:</b><br>' + e(a.verbessert || "100% Stabilität & verifizierter Dauerbetrieb") + '</p></div>');
-
-    const neuigkeitenListe = (a.neuigkeiten || ["24/7 Dauerbetrieb aktiv & verifiziert"]).map(function (n) {
-      return "<li>" + e(n) + "</li>";
-    }).join("");
-
-    const neuigkeitenPanel = V.panelBlock("Neuigkeiten & Live-Aktivitäten", "Klartext-Bericht zu den jüngsten Aktionen",
-      '<div class="pb"><ul class="ap-funktionen" style="margin:0">' + neuigkeitenListe + "</ul></div>");
-
     return '<div class="ap-detail">'
       + '<div class="ap-detail-kopf">' + punkt(a.ampel) + "<h2>" + e(a.name) + "</h2>" + ampelPille(a.ampel) + "</div>"
       + '<p class="ap-kurz">' + e(a.kurz) + "</p>"
       + grund
       + V.panelBlock("Zuverlässigkeit", "die letzten 90 Tage, ein Kästchen je Tag", tageBalken(a))
-      + ergebnissePanel
-      + verbesserungenPanel
-      + neuigkeitenPanel
       + V.panelBlock("Steckbrief", null, steckbrief)
       + V.panelBlock("Was macht er genau?", null, '<div class="pb">' + funktionen + "</div>")
       + V.panelBlock("Bedienung", "Klartext statt toter Knöpfe", '<div class="pb">' + bedienung + "</div>")

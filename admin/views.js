@@ -336,73 +336,16 @@
         + '</td></tr>';
     });
 
-    const werkstattCard = '<div class="panel glass" style="border: 2px solid var(--sm-accent); margin-bottom: 20px;">'
-      + '<div class="ph" style="background: rgba(0, 255, 239, 0.08); padding: 14px 18px; border-bottom: 1px solid var(--sm-accent-border); display: flex; align-items: center; justify-content: space-between;">'
-      + '<div><b style="font-size: 16px; color: var(--sm-accent-text);">🚀 Werkstatt-Autopilot & Feature-Freigaben</b>'
-      + '<div style="font-size: 12px; color: var(--sm-ink-dim); margin-top: 2px;">Vollautomatisch von der KI programmierte Funktionen mit 1 Häkchen prüfen und live schalten.</div></div>'
-      + '<span class="pill ok">100% Autonom Ready</span>'
-      + '</div>'
-      + '<div style="padding: 20px;">'
-      + '<div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--sm-border); padding: 16px; border-radius: 6px; margin-bottom: 16px;">'
-      + '<div style="display: flex; align-items: center; gap: 12px;">'
-      + '<input type="checkbox" id="autoLiveCheckbox" checked style="width: 22px; height: 22px; accent-color: var(--sm-accent); cursor: pointer;" />'
-      + '<label for="autoLiveCheckbox" style="font-weight: bold; font-size: 14px; cursor: pointer; color: var(--sm-ink);">'
-      + '✓ Automatische Live-Schaltung für alle Autopilot-Features aktiviert'
-      + '</label>'
-      + '</div>'
-      + '<div style="font-size: 12.5px; color: var(--sm-ink-dim); margin-top: 8px; margin-left: 34px;">'
-      + 'Sobald Autopilot 30 (Werkstatt) ein Feature fertig programmiert und alle Tests grün bestanden hat, wird es direkt freigegeben.'
-      + '</div>'
-      + '</div>'
-      + '<div style="display: flex; gap: 12px; align-items: center; background: #121827; padding: 14px; border-radius: 6px; border: 1px solid var(--sm-accent-border);">'
-      + '<span style="font-size: 20px;">⚡</span>'
-      + '<div style="flex: 1;">'
-      + '<div style="font-size: 13px; font-weight: bold; color: var(--sm-accent-text);">Aktueller Werkstatt-Status</div>'
-      + '<div style="font-size: 12px; color: var(--sm-ink-dim);">Alle 31 Autopiloten aktiv & verifiziert. Keine ausstehenden manuellen Blockaden. Du musst nichts manuell freigeben.</div>'
-      + '</div>'
-      + '<button class="btn" style="background: var(--sm-accent); color: #000; font-weight: bold; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;" onclick="alert(\'Werkstatt-Autopilot ist zu 100% grün. Alle 5 neuen Features sind bereits live!\')">Jetzt Status prüfen</button>'
-      + '</div>'
-      + '<div style="margin-top: 18px; border-top: 1px solid var(--sm-border); padding-top: 14px;">'
-      + '<div style="font-size: 13px; font-weight: bold; color: var(--sm-ink); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">'
-      + '<span>📦 Vom Autopiloten neu programmierte & aktivierte Funktionen</span>'
-      + '<span class="pill ok">5 Features Live</span>'
-      + '</div>'
-      + '<div style="display: grid; gap: 8px;">'
-      + '<div style="background: rgba(255,255,255,0.02); border: 1px solid var(--sm-border); padding: 10px 14px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">'
-      + '<div><b style="font-size: 13px; color: var(--sm-accent-text);">🔍 Topbar Admin-Suchleiste (v287)</b><div style="font-size: 11px; color: var(--sm-ink-dim);">Schnellsuche für alle 28 Admin-Module & Live-Schalten</div></div>'
-      + '<span class="pill ok">Live & Aktiv</span>'
-      + '</div>'
-      + '<div style="background: rgba(255,255,255,0.02); border: 1px solid var(--sm-border); padding: 10px 14px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">'
-      + '<div><b style="font-size: 13px; color: var(--sm-accent-text);">🚀 1-Klick Live-Schalten & Werkstatt-Karte (v290)</b><div style="font-size: 11px; color: var(--sm-ink-dim);">Häkchen-Steuerung für autonom generierte Features</div></div>'
-      + '<span class="pill ok">Live & Aktiv</span>'
-      + '</div>'
-      + '<div style="background: rgba(255,255,255,0.02); border: 1px solid var(--sm-border); padding: 10px 14px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">'
-      + '<div><b style="font-size: 13px; color: var(--sm-accent-text);">🌈 Autopilot-Herzschlag & Rainbow-Engine (v283)</b><div style="font-size: 11px; color: var(--sm-ink-dim);">24/7 Dauerbetrieb & visuelle Qualitätsmessung</div></div>'
-      + '<span class="pill ok">Live & Aktiv</span>'
-      + '</div>'
-      + '<div style="background: rgba(255,255,255,0.02); border: 1px solid var(--sm-border); padding: 10px 14px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">'
-      + '<div><b style="font-size: 13px; color: var(--sm-accent-text);">🎙️ Sprachwelle & Voice-Steuerung (v280)</b><div style="font-size: 11px; color: var(--sm-ink-dim);">Echtzeit Sprachsteuerung & Audio-Wellen-Synthesizer</div></div>'
-      + '<span class="pill ok">Live & Aktiv</span>'
-      + '</div>'
-      + '<div style="background: rgba(255,255,255,0.02); border: 1px solid var(--sm-border); padding: 10px 14px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">'
-      + '<div><b style="font-size: 13px; color: var(--sm-accent-text);">🔐 Dauerhafte Google-Anmeldung & Session-Vault (v281)</b><div style="font-size: 11px; color: var(--sm-ink-dim);">Nahtloses Login ohne erneute Eingabe von Anmeldedaten</div></div>'
-      + '<span class="pill ok">Live & Aktiv</span>'
-      + '</div>'
-      + '</div>'
-      + '</div>'
-      + '</div>'
-      + '</div>';
-
     const hinweis = '<div class="note glass"><div class="nx">⇄</div><div>'
-      + '<div class="nt">Vier-Augen-Prinzip & Admin-Sicherheit</div>'
+      + '<div class="nt">Zwei Augen reichen hier nicht</div>'
       + '<div class="ns">Löschen und Rollenvergabe brauchen die Freigabe einer zweiten Person. '
       + 'Wer beantragt, kann nicht selbst freigeben — auch der Owner nicht. Ein Antrag verfällt nach 24 Stunden.'
       + '</div></div></div>';
 
-    return kopf("Y", "Freigaben", "Live-Schalten & Vier-Augen-Prinzip",
-      "Hier steuerst du 1-Klick-Live-Freigaben für Autopilot-Funktionen und Sicherheitsanträge.")
-      + '<div class="stack">' + werkstattCard + hinweis
-      + panel("Sicherheitsanträge & Protokoll", (d.total || 0) + " insgesamt",
+    return kopf("Y", "Freigaben", "Vier-Augen-Prinzip",
+      "Anträge, die eine zweite Person bestätigen muss. Bis dahin ist nichts passiert.")
+      + '<div class="stack">' + hinweis
+      + panel("Anträge", (d.total || 0) + " insgesamt",
         tabelle(["Beantragt", "Aktion", "Ziel", "Grund", "Von", "Stand", ""], zeilen)) + '</div>';
   }
 

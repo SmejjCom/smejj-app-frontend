@@ -31,8 +31,7 @@
     (window.adminStage6 || {}).seiten || {},
     (window.adminStage7 || {}).seiten || {},
     (window.adminStage8 || {}).seiten || {},
-    (window.adminStage9 || {}).seiten || {},
-    (window.adminStageCockpit || {}).seiten || {}
+    (window.adminStage9 || {}).seiten || {}
   );
   Object.keys(ANGEMELDET).forEach(function (pfad) {
     SEITEN.push({ id: ANGEMELDET[pfad].id, pfad: pfad, gruppe: ANGEMELDET[pfad].gruppe, name: ANGEMELDET[pfad].name });
@@ -496,105 +495,6 @@
     // Im Pfad-Modus ist jeder Seitenwechsel eine echte Navigation — es gibt
     // nichts zu beobachten. Der Hash-Horcher bleibt dem Rueckfallweg vorbehalten.
     if (!PFAD_MODUS) window.addEventListener("hashchange", route);
-
-    // Initialisiere die Admin-Suchleiste ganz links in der Kopfleiste (vor Breadcrumb)
-    let searchInput = document.getElementById("adminSearchInput");
-    let searchResults = document.getElementById("adminSearchResults");
-    if (!searchInput) {
-      const topbar = document.querySelector(".topbar");
-      if (topbar) {
-        const box = document.createElement("div");
-        box.className = "admin-search-box";
-        box.style.cssText = "position:relative;display:flex;align-items:center;min-width:320px;max-width:480px;margin-right:14px;";
-        box.innerHTML = '<input type="search" id="adminSearchInput" placeholder="🔍 Suchen (Live, Freigaben, Autopilot)..." style="background:rgba(5,6,8,0.85);border:1px solid var(--sm-accent-border);color:var(--sm-ink);padding:7px 16px;font-size:13px;width:100%;outline:none;border-radius:20px!important;box-shadow:0 2px 10px rgba(0,0,0,0.4);" /><div id="adminSearchResults" style="display:none;position:absolute;top:40px;left:0;width:100%;max-width:480px;background:#151b2e;border:1px solid var(--sm-accent-border);box-shadow:0 12px 40px rgba(0,0,0,0.9);z-index:9999;padding:8px;border-radius:8px!important;"></div>';
-        const divider = document.createElement("div");
-        divider.style.cssText = "height:18px;width:1px;background:var(--sm-border);margin-right:14px;";
-        
-        if (topbar.firstChild) {
-          topbar.insertBefore(divider, topbar.firstChild);
-          topbar.insertBefore(box, divider);
-        } else {
-          topbar.appendChild(box);
-          topbar.appendChild(divider);
-        }
-        searchInput = document.getElementById("adminSearchInput");
-        searchResults = document.getElementById("adminSearchResults");
-      }
-    }
-    if (searchInput && searchResults) {
-      const SUCH_MAP = [
-        { pfad: "freigaben", begriff: "🚀 Live-Schalten & Freigaben (Werkstatt-Autopilot, Merge, Releases)", gruppe: "Überblick", synonyme: ["live", "schalten", "freigabe", "freigaben", "merge", "deploy", "release", "werkstatt", "autopilot", "autonom", "code"] },
-        { pfad: "autopiloten", begriff: "Autopiloten-Cockpit (30 Autopiloten, Herzschlag, Wächter)", gruppe: "Betrieb", synonyme: ["autopilot", "autopiloten", "roboter", "ki", "herzschlag", "status", "30", "monitoring", "wächter"] },
-        { pfad: "uebersicht", begriff: "Executive Command Cockpit (Latenzen, Status, 0€ Cost Gate)", gruppe: "Überblick", synonyme: ["übersicht", "uebersicht", "cockpit", "home", "start", "dashboard", "status"] },
-        { pfad: "nutzer", begriff: "Nutzerverwaltung & Konten", gruppe: "Menschen", synonyme: ["nutzer", "user", "konto", "konten", "profile", "mitglieder", "verwaltung"] },
-        { pfad: "rollen", begriff: "Rollen & Rechte (Schreibrechte, Step-Up Auth)", gruppe: "Menschen", synonyme: ["rolle", "rollen", "rechte", "berechtigung", "stepup", "admin", "owner"] },
-        { pfad: "modelle", begriff: "KI-Modell Arena & smejj 1.0 Status", gruppe: "Produkt", synonyme: ["modell", "modelle", "kimi", "glm", "salad", "arena", "provider", "ki", "ai"] },
-        { pfad: "kosten", begriff: "Kostenkontrolle & 0,00 EUR Policy", gruppe: "Geld", synonyme: ["kosten", "geld", "budget", "billing", "preis", "0€", "free", "kostenlos"] },
-        { pfad: "schluessel", begriff: "Schlüssel & Geheimnisse (API-Keys & Tokens)", gruppe: "Sicherheit", synonyme: ["schlüssel", "schluessel", "key", "keys", "token", "geheimnis", "api", "auth", "secret"] },
-        { pfad: "deploy", begriff: "Deployments & Release-Verlauf", gruppe: "Betrieb", synonyme: ["deploy", "deployment", "release", "zeabur", "idrive", "version", "live", "build"] },
-        { pfad: "audit", begriff: "Audit-Log & Replay-Historie", gruppe: "Recht", synonyme: ["audit", "log", "logs", "historie", "events", "replay", "nachweis"] },
-        { pfad: "dsgvo", begriff: "DSGVO & Datenschutz Export/Löschung", gruppe: "Recht", synonyme: ["dsgvo", "gdpr", "datenschutz", "löschen", "export", "privacy"] },
-        { pfad: "compliance", begriff: "EU AI Act Compliance & Transparenz", gruppe: "Recht", synonyme: ["compliance", "eu", "ai act", "gesetz", "recht", "transparenz"] },
-        { pfad: "abrechnung", begriff: "Abrechnung, Abos & Zahlungen", gruppe: "Geld", synonyme: ["rechnung", "abos", "abo", "zahlung", "stripe", "sub"] },
-        { pfad: "jobs", begriff: "Background Jobs & Autopilot Läufe", gruppe: "Betrieb", synonyme: ["jobs", "job", "queue", "hintergrund", "läufe", "cron"] },
-        { pfad: "worker", begriff: "Worker Kapazität & Server Last", gruppe: "Betrieb", synonyme: ["worker", "kapazität", "server", "cpu", "ram", "last"] },
-        { pfad: "support", begriff: "Support & Admin Impersonation", gruppe: "Menschen", synonyme: ["support", "hilfe", "ticket", "impersonation", "kundenservice"] }
-      ];
-
-      function normalisiere(str) {
-        return String(str || "").toLowerCase().replace(/[-_.,/()]/g, " ").replace(/\s+/g, " ").trim();
-      }
-
-      searchInput.addEventListener("input", function () {
-        const raw = String(this.value || "").trim();
-        if (!raw) { searchResults.style.display = "none"; return; }
-        
-        const qNorm = normalisiere(raw);
-        const qWaerter = qNorm.split(" ").filter(Boolean);
-
-        const treffer = SUCH_MAP.filter(function (s) {
-          const begriffNorm = normalisiere(s.begriff);
-          const pfadNorm = normalisiere(s.pfad);
-          const gruppeNorm = normalisiere(s.gruppe);
-          const synNorm = (s.synonyme || []).map(normalisiere).join(" ");
-          const vollText = begriffNorm + " " + pfadNorm + " " + gruppeNorm + " " + synNorm;
-
-          // Pruefe ob ALLE gesuchten Woerter im Volltext enthalten sind
-          return qWaerter.every(function (w) {
-            return vollText.indexOf(w) >= 0;
-          });
-        });
-
-        if (!treffer.length) {
-          searchResults.innerHTML = '<div style="color:var(--sm-ink-faint);padding:8px;font-size:12px;">Keine Treffer gefunden</div>';
-        } else {
-          searchResults.innerHTML = treffer.map(function (t) {
-            return '<div class="search-item" data-pfad="' + t.pfad + '" style="padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--sm-border);display:flex;flex-direction:column;gap:2px;">'
-              + '<span style="font-weight:bold;color:var(--sm-accent-text);font-size:13px;">' + A.escapeHtml(t.begriff) + '</span>'
-              + '<span style="font-size:11px;color:var(--sm-ink-dim);">' + A.escapeHtml(t.gruppe) + ' · /admin/' + t.pfad + '/</span>'
-              + '</div>';
-          }).join("");
-        }
-        searchResults.style.display = "block";
-      });
-
-      searchResults.addEventListener("click", function (evt) {
-        const item = evt.target.closest(".search-item");
-        if (item) {
-          const pfad = item.getAttribute("data-pfad");
-          searchResults.style.display = "none";
-          searchInput.value = "";
-          geheZu(pfad);
-        }
-      });
-
-      document.addEventListener("click", function (evt) {
-        if (!searchInput.contains(evt.target) && !searchResults.contains(evt.target)) {
-          searchResults.style.display = "none";
-        }
-      });
-    }
-
     route();
   }
 
