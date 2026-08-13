@@ -826,9 +826,9 @@ body.task-indicator-done .split-icon span:last-child {
    siehe measure:touch:app), gleiche Abstaende, oben Inhalt, unten Profil. */
 .sidebar.is-compact {
   padding-top: 84px;
-  padding-right: 2px;
+  padding-right: 0;
   padding-bottom: 10px;
-  padding-left: 2px;
+  padding-left: 0;
 }
 
 .sidebar.is-compact .nav-button span:not(.button-icon):not(.profile-avatar),
@@ -974,7 +974,7 @@ body.is-resizing-panel .panel-resizer::before {
    Sprache sprechen. */
 .browser-panel.is-compact {
   padding-top: 30px;
-  padding-right: 2px; padding-bottom: 10px; padding-left: 2px;
+  padding-right: 0; padding-bottom: 10px; padding-left: 0;
 }
 
 .browser-panel.is-compact .browser-panel-nav button {
