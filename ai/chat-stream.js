@@ -120,10 +120,30 @@ export function zeigeSchritt(output, schritt) {
     anhang.dataset.stand = "true";
   }
   anhang.className = "chat-schritt-stand";
+  // `stand` (z. B. "läuft … 40 s") erlaubt dem Server, dieselbe Zeile mit
+  // wachsendem Fortschritt zu aktualisieren — vorher bekam jede 10-s-Meldung
+  // einen neuen Text und damit eine NEUE Zeile (Stapel-Fehler, 2026-08-12).
   anhang.textContent = fertig
-    ? (schritt.treffer > 0 ? ` ✓ ${schritt.treffer} Treffer` : " ✓ nichts gefunden")
-    : " läuft …";
+    ? (schritt.stand ? ` ✓ ${schritt.stand}` : schritt.treffer > 0 ? ` ✓ ${schritt.treffer} Treffer` : " ✓ nichts gefunden")
+    : ` ${schritt.stand || "läuft …"}`;
   zeile.append(anhang);
+  // Bild-Platzhalter: waehrend der Bild-Maler arbeitet, schimmert eine leere
+  // Bildkarte (wie bei Midjourney/ChatGPT); bei "fertig" verschwindet sie —
+  // das echte Bild folgt direkt darunter als normale Antwort.
+  if (schritt.platzhalter === "bild") {
+    let karte = null;
+    for (const kind of liste.children || []) {
+      if (kind.dataset?.platzhalter === "bild") { karte = kind; break; }
+    }
+    if (fertig) {
+      karte?.remove();
+    } else if (!karte) {
+      karte = document.createElement("div");
+      karte.className = "chat-bild-platzhalter";
+      karte.dataset.platzhalter = "bild";
+      liste.append(karte);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

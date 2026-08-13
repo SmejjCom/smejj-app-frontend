@@ -36,6 +36,28 @@
   opacity: 0.8;
 }
 
+/* Schimmernder Bild-Platzhalter, waehrend der Bild-Maler arbeitet
+   (chat-stream.js legt ihn an und entfernt ihn bei "fertig"). Bewusst in
+   Bildgroesse: der Nutzer sieht, WO sein Bild entsteht — statt Stapel-Zeilen. */
+.entry.assistant .chat-bild-platzhalter {
+  width: min(100%, 512px);
+  aspect-ratio: 1 / 1;
+  margin: 8px 0 4px;
+  border-radius: 12px;
+  background: linear-gradient(110deg, rgba(255, 255, 255, 0.05) 30%, rgba(255, 255, 255, 0.14) 50%, rgba(255, 255, 255, 0.05) 70%);
+  background-size: 200% 100%;
+  animation: chat-bild-schimmer 1.6s linear infinite;
+}
+
+@keyframes chat-bild-schimmer {
+  to { background-position: -200% 0; }
+}
+
+/* Bewegung nur, wenn der Nutzer sie nicht abbestellt hat. */
+@media (prefers-reduced-motion: reduce) {
+  .entry.assistant .chat-bild-platzhalter { animation: none; }
+}
+
 /* Erzeugte Bilder aus chat-markdown.js (Bilder-Zeichnen 2026-08-12).
    Nur data:-URLs der eigenen Bruecke; volle Breite bis 512 px, damit ein
    1024er-Bild die Chatspalte nicht sprengt. */
