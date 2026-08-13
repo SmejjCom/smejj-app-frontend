@@ -60,22 +60,29 @@ function rememberPanelOpen(panel) {
   }
 }
 
-// Ein Boot-Zuklappen (ohne Eingabe) wird einmal je Seite zurueckgedreht, wenn
-// der Nutzer die Seite offen hinterlassen hat. Zeitlich begrenzt, damit ein
-// spaeteres programmatisches Zuklappen (z. B. Ansichtswechsel) nicht ewig
-// dagegen ankaempfen muss.
+// Ein Boot-Zuklappen (ohne Eingabe) wird zurueckgedreht, wenn der Nutzer die
+// Seite offen hinterlassen hat. Zeitlich begrenzt, damit ein spaeteres
+// programmatisches Zuklappen nicht ewig dagegen ankaempfen muss.
+//
+// Der Start klappt MEHRMALS zu, nicht einmal (Befund 2026-08-13, angemeldeter
+// Betreiber): erst app.js beim Boot, danach die wiederhergestellte Ansicht.
+// Mit einem einmaligen Rueckdreher gewann der zweite Zugriff — die Seiten
+// standen nach jedem Neuladen wieder zu, obwohl "1" gemerkt war. Darum ein
+// kleiner Zaehler statt eines Schalters: mehrmals zurueckdrehen, aber gedeckelt,
+// damit aus einem Streit keine Endlosschleife wird.
 const RUECKDREH_FENSTER_MS = 10000;
-const bereitsZurueckgedreht = { left: false, right: false };
+const RUECKDREH_MAX = 5;
+const rueckdrehZaehler = { left: 0, right: 0 };
 
 function bootZuklappenZuruedrehen(panel) {
   const side = panelSide(panel);
-  if (bereitsZurueckgedreht[side]) return;
+  if (rueckdrehZaehler[side] >= RUECKDREH_MAX) return;
   if (nutzerNah()) return;
   if (performance.now() > RUECKDREH_FENSTER_MS) return;
   if (panel.classList.contains("is-open")) return;
   if (GEMERKT_BEIM_START[side] !== "1") return;
   if (typeof window !== "undefined" && window.innerWidth < RESTORE_MIN_WIDTH) return;
-  bereitsZurueckgedreht[side] = true;
+  rueckdrehZaehler[side] += 1;
   setPanelOpen(side, true);
 }
 
