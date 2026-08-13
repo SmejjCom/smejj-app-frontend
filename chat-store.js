@@ -18,6 +18,8 @@ import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
 // Verlauf kein Markdown kopieren und keinen Zeitstempel zeigen.
 import { clampVersionIndex, metaOf, seedMeta } from "/assets/chat-messages.js?v=1";
+// Besitzer-Logik separat und Node-testbar (tests/chat-owner.test.mjs).
+import { OWNER_KEY, ownerDecision, sessionUserId } from "/assets/chat-owner.js?v=1";
 
 const DB_NAME = "smejj-chats";
 const DB_VERSION = 1;
@@ -115,6 +117,33 @@ function setActiveChatId(id) {
   } catch {
     /* Speicher nicht verfuegbar: Verlauf arbeitet dann nur fluechtig */
   }
+}
+
+// ---- Verlauf gehoert einem Konto (Stufe 1, docs/verlauf-pro-konto-plan.md) ----
+// Live-Befund 2026-08-12: Der Verlauf haengt am GERAET — ein zweites Konto am
+// selben Browser sah die Chats des ersten. Ein Besitzer-Merker haelt fest,
+// wessen Verlauf hier liegt; meldet sich ein ANDERES Konto an, wird der fremde
+// Verlauf geleert. Bestandsgeraete ohne Merker: der Verlauf gehoert dem gerade
+// angemeldeten Nutzer, nichts wird geloescht (Migration).
+// Output: false = Aufraeumen war noetig, schlug aber fehl → Restore ueberspringen,
+// damit ein fremder Verlauf keinesfalls angezeigt wird. Sonst true.
+async function enforceChatOwner() {
+  let owner = "";
+  try { owner = localStorage.getItem(OWNER_KEY) || ""; } catch { return true; }
+  const userId = sessionUserId(localStorage);
+  const decision = ownerDecision(owner, userId);
+  if (decision === "nichts") return true;
+  if (decision === "leeren-und-uebernehmen") {
+    try {
+      await tx("readwrite", (store) => store.clear());
+      sessionStorage.removeItem(ACTIVE_KEY_SESSION);
+      localStorage.removeItem(ACTIVE_KEY_LAST);
+    } catch {
+      return false; // Besitzer NICHT umschreiben: Schutz greift beim naechsten Start erneut
+    }
+  }
+  try { localStorage.setItem(OWNER_KEY, userId); } catch { /* dann erneut beim naechsten Start */ }
+  return true;
 }
 
 function startLog() {
@@ -445,11 +474,17 @@ function bindObserver() {
 
 function init() {
   try {
-    bindObserver();
     bindNewChatButton();
     bindLogoSpaNavigation();
     bindUnloadGuard();
-    restoreOnBoot().catch(() => {});
+    // Besitzer-Pruefung VOR Observer und Restore: erst wenn klar ist, wessen
+    // Verlauf hier liegt, darf gespeichert oder wiederhergestellt werden.
+    enforceChatOwner()
+      .catch(() => true)
+      .then((restoreErlaubt) => {
+        bindObserver();
+        if (restoreErlaubt !== false) restoreOnBoot().catch(() => {});
+      });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */
   }
