@@ -541,9 +541,24 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // nichts stehen (abgebrochener Lauf), kommt sie zurueck.
   let letzteNotiz = "";
 
+  // Stille-Waechter: Nach einem Container-Ersatz haelt der Load-Balancer die
+  // tote SSE-Verbindung offen (live gesehen 2026-08-13: Schrittzeile fror
+  // minutenlang bei "laeuft ... 60 s" ein, reader.read() wartete endlos). Die
+  // Bruecke tickt bei echter Arbeit alle ~10 s — 45 s Stille heisst: tot.
+  // Hinweis: Hintergrund-Tabs drosseln Timer, dort feuert die Uhr spaeter —
+  // unkritisch, weil dort auch niemand auf die eingefrorene Zeile schaut.
+  const STILLE_LIMIT_MS = 45_000;
+  const liesMitStilleUhr = () => {
+    let uhr;
+    return Promise.race([
+      reader.read(),
+      new Promise((_, ablehnen) => { uhr = setTimeout(() => ablehnen(new Error("stille-limit")), STILLE_LIMIT_MS); })
+    ]).finally(() => clearTimeout(uhr));
+  };
+
   try {
   while (true) {
-    const { value, done } = await reader.read();
+    const { value, done } = await liesMitStilleUhr();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
     const events = buffer.split("\n\n");
@@ -585,7 +600,17 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
     // Live gesehen 2026-08-13: Bruecken-Neustart mitten im Bild-Streamen —
     // ohne Saeuberung stehen 131.072 Zeichen base64-Rohtext in der Blase.
     stoppeWartesignal();
+    clearThinkingState(output);
     output.textContent = entferneAbgerisseneMedien(output.textContent);
+    if (abriss?.message === "stille-limit") {
+      reader.cancel().catch(() => {});
+      const bisher = output.textContent.trim();
+      const hinweis = "Die Verbindung ist eingeschlafen — bitte sende die Frage einfach noch einmal.";
+      output.textContent = bisher ? `${bisher}\n\n${hinweis}` : hinweis;
+      renderMarkdown?.(output);
+      falteSchritte(output, schritteOhneFundZahl);
+      return;
+    }
     throw abriss;
   }
   // Auch wenn der Strom ohne ein einziges Ereignis endet: das Signal muss weg.
