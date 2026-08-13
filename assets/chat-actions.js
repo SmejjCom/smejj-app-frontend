@@ -20,7 +20,10 @@
 // Start-Lock und an der 800-Zeilen-Grenze.
 //
 // Fail-safe: jeder Fehler bleibt lokal; der Chat funktioniert unveraendert
-// weiter (Non-Regression-Pflicht). Kein Netzverkehr, keine Serverlast.
+// weiter (Non-Regression-Pflicht). Kein Netzverkehr — mit EINER seit
+// 2026-08-13 dokumentierten Ausnahme: ein gesetzter Daumen schickt ein
+// Qualitaets-Signal an den Control-Server (Daten-Schwungrad). Auch das
+// fail-safe: scheitert der Versand, bleibt die Bewertung lokal sichtbar.
 
 import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=1";
 import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=1";
@@ -467,6 +470,35 @@ function moveMenuFocus(step) {
   items[nextMenuIndex(items.indexOf(document.activeElement), step, items.length)].focus();
 }
 
+// --- Daten-Schwungrad -------------------------------------------------------
+//
+// Ein GESETZTER Daumen (nicht das Abwaehlen) meldet Frage + Antwort an den
+// Control-Server. Der speichert nur PII-bereinigte Kostproben; "nicht
+// hilfreich" landet von dort im Werkstatt-Backlog. Gleiche Kennungen wie in
+// auth-gate.js (TOKEN) und hilfe-support.js (CONTROL) — bewusst dieselben
+// Konstanten, damit ein Schluesselwechsel alle drei Stellen gemeinsam findet.
+const FEEDBACK_TOKEN_KEY = "smejj.auth.accessToken.v1";
+const FEEDBACK_URL = "https://smejj-control.zeabur.app/api/feedback";
+
+function sendeDaumenSignal(entry, richtung) {
+  try {
+    if (metaOf(entry)?.rating !== richtung) return; // abgewaehlt — kein Signal
+    const token = window.localStorage?.getItem(FEEDBACK_TOKEN_KEY) || "";
+    if (!token) return;
+    const frage = previousUserEntry(entry);
+    fetch(FEEDBACK_URL, {
+      method: "POST",
+      keepalive: true,
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+      body: JSON.stringify({
+        signalType: richtung === "up" ? "thumbs_up" : "thumbs_down",
+        prompt: toPlainText(frage ? rawOf(frage) : "").slice(0, 2000),
+        antwort: toPlainText(rawOf(entry)).slice(0, 4000)
+      })
+    }).catch(() => {});
+  } catch { /* Fail-safe: die Bewertung bleibt lokal sichtbar, der Chat laeuft */ }
+}
+
 // --- Verdrahtung ------------------------------------------------------------
 
 const HANDLERS = {
@@ -481,10 +513,12 @@ const HANDLERS = {
   "rate-up": (entry, button) => {
     setRating(entry, "up");
     syncRating(button.closest(".msg-actions"), metaOf(entry));
+    sendeDaumenSignal(entry, "up");
   },
   "rate-down": (entry, button) => {
     setRating(entry, "down");
     syncRating(button.closest(".msg-actions"), metaOf(entry));
+    sendeDaumenSignal(entry, "down");
   },
   "version-prev": (entry) => showVersion(entry, metaOf(entry).active - 1),
   "version-next": (entry) => showVersion(entry, metaOf(entry).active + 1)
