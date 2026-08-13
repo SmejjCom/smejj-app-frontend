@@ -66,8 +66,31 @@ export function routeAutonomousRequest({ task, output, goToView, eventTarget }) 
       detail: { url: request.previewUrl, task: request.task }
     }));
   }
-  renderRunOffer({ request, output, goToView, eventTarget });
+  if (bietetAutonomenLaufAn(task)) renderRunOffer({ request, output, goToView, eventTarget });
   return false;
+}
+
+/**
+ * Wird der autonome Lauf ueberhaupt angeboten?
+ *
+ * Betreiber-Befund 2026-08-13: Unter einer schlichten Immobilien-Suche stand
+ * die Karte "Dieser Auftrag kann als geprüfte Task Capsule autonom laufen" mit
+ * einem Startknopf — der Nutzer verstand nicht, was das soll. Zu Recht: die
+ * Erkennung genuegte sich mit einem Verb ("Suche") plus einem Allerweltswort
+ * ("Link"), also traf sie fast jede Frage. Ein Werkzeug, das sich ungefragt
+ * unter jede Antwort stellt, wirkt nicht maechtig, sondern unfertig.
+ *
+ * Ab jetzt gilt die enge Regel: angeboten wird nur, wenn der Auftrag SELBST
+ * nach eigenstaendiger Ausfuehrung verlangt ("autonom", "eigenstaendig",
+ * "komplett", "von Anfang bis Ende", "bis alles funktioniert"). Wer den Lauf
+ * will, bekommt ihn weiterhin auf Klick; wer nur eine Frage stellt, bekommt
+ * eine Antwort.
+ *
+ * @param {string} task Freitext aus dem Startfeld.
+ * @returns {boolean}
+ */
+export function bietetAutonomenLaufAn(task) {
+  return AUTONOMY_MARKERS.test(String(task || ""));
 }
 
 // Angebotskarte unter der Antwort: der autonome Lauf startet erst auf Klick.

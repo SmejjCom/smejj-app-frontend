@@ -62,10 +62,53 @@ export function bridgeAuthHeaders(storage = globalThis.localStorage) {
 
 const SCHRITT_SYMBOL = { suche: "🔍", seite: "📄" };
 
-function schrittText(schritt) {
+/**
+ * Nur eine echte, vollstaendige Web-Adresse wird zum Link.
+ *
+ * Betreiber 2026-08-13: "wenn Link geben soll, immer klickbar sein". Bisher
+ * standen die gelesenen Adressen als toter Text da — man konnte sie nur
+ * abtippen. Die Schranke bleibt trotzdem eng: der Text kommt aus der
+ * Modellausgabe, deshalb Pflichtpraefix http(s), keine Zugangsdaten, und der
+ * Beschriftungstext geht weiterhin ausschliesslich ueber textContent.
+ *
+ * @param {string} text @returns {string} sichere URL oder ""
+ */
+function sichereSchrittUrl(text) {
+  const roh = String(text || "").trim();
+  if (!/^https?:\/\//i.test(roh)) return "";
+  try {
+    const url = new URL(roh);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return "";
+    return url.username || url.password ? "" : url.toString();
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Schreibt die Beschriftung einer Schrittzeile — die Adresse als anklickbarer
+ * Link, alles andere als Text. NIE innerHTML: der Knoten wird gebaut, nicht
+ * zusammengeklebt, damit Modellausgabe niemals Markup werden kann.
+ */
+function beschrifteZeile(zeile, schritt) {
   const art = schritt.art === "suche" ? "Suche" : schritt.art === "seite" ? "Lese" : schritt.art;
-  const markt = schritt.markt ? ` · Markt ${schritt.markt}` : "";
-  return `${art}: ${schritt.text}${markt}`;
+  zeile.textContent = `${SCHRITT_SYMBOL[schritt.art] || "•"} ${art}: `;
+  const ziel = sichereSchrittUrl(schritt.text);
+  const teil = document.createElement(ziel ? "a" : "span");
+  if (ziel) {
+    teil.className = "chat-link";
+    teil.setAttribute("href", ziel);
+    teil.setAttribute("target", "_blank");
+    // noopener: die Zielseite darf nie an unser window kommen.
+    teil.setAttribute("rel", "noopener noreferrer");
+  }
+  teil.textContent = schritt.text;
+  zeile.append(teil);
+  if (schritt.markt) {
+    const markt = document.createElement("span");
+    markt.textContent = ` · Markt ${schritt.markt}`;
+    zeile.append(markt);
+  }
 }
 
 /**
@@ -124,8 +167,8 @@ export function zeigeSchritt(output, schritt) {
     zeile = document.createElement("div");
     zeile.className = "chat-schritt";
     zeile.dataset.schritt = kennung;
-    // textContent, nie innerHTML: Der Suchbegriff kommt aus der Modellausgabe.
-    zeile.textContent = `${SCHRITT_SYMBOL[schritt.art] || "•"} ${schrittText(schritt)}`;
+    // Gebaut, nie zusammengeklebt: Der Suchbegriff kommt aus der Modellausgabe.
+    beschrifteZeile(zeile, schritt);
     liste.append(zeile);
   }
   const fertig = schritt.zustand === "fertig";
