@@ -197,12 +197,42 @@ function flashCopied(button) {
   }, COPY_FEEDBACK_MS);
 }
 
-async function copyText(text, button) {
+/* Beim Einfuegen in Google Docs standen riesige Luecken zwischen den
+   Absaetzen (Betreiber-Befund 2026-08-13): der Chat kopierte nur rohes
+   Markdown, dessen Leerzeilen in Docs zu leeren Absaetzen werden — plus
+   Docs' eigenem Absatzabstand. Profis legen deshalb ZWEI Fassungen in die
+   Zwischenablage: HTML fuer Docs/Word/Mail (echte Absaetze, Fett, Listen —
+   kompakt, keine Leerzeilen) und Text fuer alles andere. Das Ziel sucht
+   sich die passende selbst aus. */
+function htmlOf(entry) {
+  const klon = entry?.cloneNode?.(true);
+  if (!klon) return "";
+  for (const chrome of klon.querySelectorAll(".msg-actions, .msg-menu, .msg-meta, .chat-code-actions, button")) chrome.remove();
+  return String(klon.innerHTML || "").trim();
+}
+
+async function copyText(text, button, html = "") {
+  // Mehr als eine Leerzeile hintereinander traegt nie Bedeutung — weg damit.
+  const kompakt = String(text || "").replace(/\n{3,}/g, "\n\n").trim();
   try {
-    await navigator.clipboard.writeText(text);
+    if (html && navigator.clipboard.write && typeof ClipboardItem !== "undefined") {
+      await navigator.clipboard.write([new ClipboardItem({
+        "text/plain": new Blob([kompakt], { type: "text/plain" }),
+        "text/html": new Blob([html], { type: "text/html" })
+      })]);
+    } else {
+      await navigator.clipboard.writeText(kompakt);
+    }
     flashCopied(button);
   } catch {
-    showToast("Kopieren wurde vom Browser abgelehnt.", "warn");
+    // Manche Browser lehnen ClipboardItem ab, erlauben aber writeText —
+    // erst der zweite Fehlschlag ist ein echter.
+    try {
+      await navigator.clipboard.writeText(kompakt);
+      flashCopied(button);
+    } catch {
+      showToast("Kopieren wurde vom Browser abgelehnt.", "warn");
+    }
   }
 }
 
@@ -503,7 +533,7 @@ function sendeDaumenSignal(entry, richtung) {
 
 const HANDLERS = {
   sources: (entry) => toggleSources(entry),
-  copy: (entry, button) => copyText(rawOf(entry), button),
+  copy: (entry, button) => copyText(rawOf(entry), button, htmlOf(entry)),
   "copy-plain": (entry) => copyText(toPlainText(rawOf(entry))),
   edit: (entry) => startEdit(entry),
   regen: (entry) => regenerate(entry),
