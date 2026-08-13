@@ -827,11 +827,17 @@ body.task-indicator-done .split-icon span:last-child {
   -webkit-backdrop-filter: blur(30px) saturate(1.35);
 }
 
+/* Schmale Spur (2026-08-13, Betreiber: "sieht klein und nicht gut aus").
+   Vorher war die Spur die zusammengedrueckte Fassung des offenen Menues:
+   28 px hohe Zeilen, 14 px Zeichen, kein Rand — sie sah gequetscht aus statt
+   aufgeraeumt. Jetzt eine eigene Ansicht nach dem Vorbild der Spur von
+   ChatGPT: Rand ringsum, Zeichen in 44-px-Feldern (unsere Touch-Groesse,
+   siehe measure:touch:app), gleiche Abstaende, oben Inhalt, unten Profil. */
 .sidebar.is-compact {
-  padding-top: 30px;
-  padding-right: 0;
-  padding-bottom: 0;
-  padding-left: 0;
+  padding-top: 84px;
+  padding-right: 8px;
+  padding-bottom: 12px;
+  padding-left: 8px;
 }
 
 .sidebar.is-compact .nav-button span:not(.button-icon):not(.profile-avatar),
@@ -858,24 +864,25 @@ body.task-indicator-done .split-icon span:last-child {
 
 .sidebar.is-compact .button-icon svg,
 .browser-panel.is-compact .browser-panel-nav button svg {
-  width: 14px;
-  height: 14px;
+  width: 20px;
+  height: 20px;
 }
 
 .sidebar.is-compact .nav {
-  gap: 0;
+  gap: 4px;
 }
 
 .sidebar.is-compact .bottom-nav {
-  gap: 0;
-  padding-top: 0;
+  gap: 4px;
+  padding-top: 8px;
 }
 
 .sidebar.is-compact .nav-button,
 .sidebar.is-compact .profile-dock,
 .browser-panel.is-compact .browser-panel-nav button {
-  min-height: 28px;
-  height: 28px;
+  min-height: 44px;
+  height: 44px;
+  border-radius: 12px;
 }
 
 .sidebar.is-compact .profile-dock {
@@ -967,9 +974,12 @@ body.is-resizing-panel .panel-resizer::before {
   -webkit-backdrop-filter: blur(30px) saturate(1.35);
 }
 
+/* Rechte Spur spiegelbildlich zur linken (2026-08-13): gleicher Rand,
+   gleiche Abstaende, gleiche 44-px-Felder — beide Seiten sollen dieselbe
+   Sprache sprechen. */
 .browser-panel.is-compact {
   padding-top: 30px;
-  padding-right: 0; padding-bottom: 0; padding-left: 0;
+  padding-right: 8px; padding-bottom: 12px; padding-left: 8px;
 }
 
 .browser-panel.is-compact .browser-panel-nav button {
@@ -987,7 +997,7 @@ body.is-resizing-panel .panel-resizer::before {
 }
 
 .browser-panel.is-compact .browser-panel-nav {
-  gap: 0;
+  gap: 4px;
 }
 
 .browser-panel.is-open {
@@ -1787,11 +1797,20 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
    Fehlt das Attribut, bleibt alles sichtbar wie bisher — die Regel kann die
    Marke also nie versehentlich ganz verschlucken. */
 body[data-left-menu-state="closed"] .app-brand-logo,
-body[data-left-menu-state="compact"] .app-brand-logo,
 body[data-left-menu-state="opening"] .app-brand-logo {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
+}
+
+/* In der schmalen Spur ist das Zeichen der oberste Eintrag — so macht es das
+   Vorbild von ChatGPT, und ohne Marke waere die Spur eine anonyme Icon-Leiste.
+   Mittig statt links, weil in einer 96 px schmalen Spur sonst der Menue-Knopf
+   danebensteht; eine Zeile tiefer, damit sich beide nicht beruehren. Gerechnet
+   statt mit transform verschoben — transform ist in dieser Datei gesperrt. */
+body[data-left-menu-state="compact"] .app-brand-logo {
+  top: calc(env(safe-area-inset-top) + 44px);
+  left: calc(env(safe-area-inset-left) + (min(var(--left-panel-width), 100vw - 28px) - 28px) / 2);
 }
 
 /* Bewusst OHNE Ueberblendung: tests/branding-presentation.test.mjs verbietet
@@ -3056,9 +3075,9 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 .sidebar.is-compact .profile-dock .profile-avatar {
-  width: 22px;
-  height: 22px;
-  font-size: 12px;
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
 }
 
 .sidebar.is-compact .profile-dock-name {
@@ -3215,6 +3234,50 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 
 .entry.assistant .chat-link:hover {
   opacity: 0.8;
+}
+
+/* Tabellen aus chat-markdown.js (Befund 2026-08-13: sieben echte Angebote
+   standen als "| # | Lage | …" im Chat, weil der Renderer keine Tabellen
+   kannte). Ohne diese Regeln stehen die Spalten zwar richtig, kleben aber
+   aneinander — "225 sq ft700 $" war live lesbar.
+
+   Bewusst ohne neue Farbwerte: currentColor mit niedriger Deckkraft traegt in
+   hell UND dunkel, genau wie beim Link darueber. */
+.entry.assistant .chat-table-wrap {
+  /* Eine breite Tabelle darf nie den ganzen Chat seitlich verschieben. */
+  overflow-x: auto;
+  margin: 10px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.entry.assistant .chat-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.95em;
+}
+
+.entry.assistant .chat-table th,
+.entry.assistant .chat-table td {
+  padding: 7px 12px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.25);
+}
+
+.entry.assistant .chat-table th {
+  font-weight: 600;
+  white-space: nowrap;
+  border-bottom-width: 2px;
+}
+
+/* Zebra hilft beim Wandern entlang einer langen Zeile — sechs Spalten mit
+   Adresse, Flaeche und Preis sind sonst schwer zu verfolgen. */
+.entry.assistant .chat-table tbody tr:nth-child(even) {
+  background: rgba(127, 127, 127, 0.06);
+}
+
+.entry.assistant .chat-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /* Schimmernder Bild-Platzhalter, waehrend der Bild-Maler arbeitet
@@ -3997,14 +4060,3 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
     min-height: 44px;
   }
 }
-
-/* --- Tabellen aus chat-markdown.js (Befund 2026-08-13, Betreiber-Freigabe) ---
-   Quelle: public/chat-markdown.css im Arbeitsrepo. Als Anhang ans Ende des
-   Buendels, weil der naechste bundle-start-styles-Lauf die Quelle ohnehin
-   mitnimmt — dieser Block ist die Live-Fassung bis dahin. */
-.entry.assistant .chat-table-wrap { overflow-x: auto; margin: 10px 0; -webkit-overflow-scrolling: touch; }
-.entry.assistant .chat-table { border-collapse: collapse; width: 100%; font-size: 0.95em; }
-.entry.assistant .chat-table th, .entry.assistant .chat-table td { padding: 7px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid rgba(127, 127, 127, 0.25); }
-.entry.assistant .chat-table th { font-weight: 600; white-space: nowrap; border-bottom-width: 2px; }
-.entry.assistant .chat-table tbody tr:nth-child(even) { background: rgba(127, 127, 127, 0.06); }
-.entry.assistant .chat-table tbody tr:last-child td { border-bottom: none; }

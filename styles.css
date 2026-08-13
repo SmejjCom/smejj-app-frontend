@@ -818,11 +818,17 @@ body.task-indicator-done .split-icon span:last-child {
   -webkit-backdrop-filter: blur(30px) saturate(1.35);
 }
 
+/* Schmale Spur (2026-08-13, Betreiber: "sieht klein und nicht gut aus").
+   Vorher war die Spur die zusammengedrueckte Fassung des offenen Menues:
+   28 px hohe Zeilen, 14 px Zeichen, kein Rand — sie sah gequetscht aus statt
+   aufgeraeumt. Jetzt eine eigene Ansicht nach dem Vorbild der Spur von
+   ChatGPT: Rand ringsum, Zeichen in 44-px-Feldern (unsere Touch-Groesse,
+   siehe measure:touch:app), gleiche Abstaende, oben Inhalt, unten Profil. */
 .sidebar.is-compact {
-  padding-top: 30px;
-  padding-right: 0;
-  padding-bottom: 0;
-  padding-left: 0;
+  padding-top: 84px;
+  padding-right: 8px;
+  padding-bottom: 12px;
+  padding-left: 8px;
 }
 
 .sidebar.is-compact .nav-button span:not(.button-icon):not(.profile-avatar),
@@ -849,24 +855,25 @@ body.task-indicator-done .split-icon span:last-child {
 
 .sidebar.is-compact .button-icon svg,
 .browser-panel.is-compact .browser-panel-nav button svg {
-  width: 14px;
-  height: 14px;
+  width: 20px;
+  height: 20px;
 }
 
 .sidebar.is-compact .nav {
-  gap: 0;
+  gap: 4px;
 }
 
 .sidebar.is-compact .bottom-nav {
-  gap: 0;
-  padding-top: 0;
+  gap: 4px;
+  padding-top: 8px;
 }
 
 .sidebar.is-compact .nav-button,
 .sidebar.is-compact .profile-dock,
 .browser-panel.is-compact .browser-panel-nav button {
-  min-height: 28px;
-  height: 28px;
+  min-height: 44px;
+  height: 44px;
+  border-radius: 12px;
 }
 
 .sidebar.is-compact .profile-dock {
@@ -958,9 +965,12 @@ body.is-resizing-panel .panel-resizer::before {
   -webkit-backdrop-filter: blur(30px) saturate(1.35);
 }
 
+/* Rechte Spur spiegelbildlich zur linken (2026-08-13): gleicher Rand,
+   gleiche Abstaende, gleiche 44-px-Felder — beide Seiten sollen dieselbe
+   Sprache sprechen. */
 .browser-panel.is-compact {
   padding-top: 30px;
-  padding-right: 0; padding-bottom: 0; padding-left: 0;
+  padding-right: 8px; padding-bottom: 12px; padding-left: 8px;
 }
 
 .browser-panel.is-compact .browser-panel-nav button {
@@ -978,7 +988,7 @@ body.is-resizing-panel .panel-resizer::before {
 }
 
 .browser-panel.is-compact .browser-panel-nav {
-  gap: 0;
+  gap: 4px;
 }
 
 .browser-panel.is-open {

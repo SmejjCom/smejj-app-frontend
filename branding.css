@@ -81,11 +81,20 @@ body[data-left-menu-state="expanded"] .app-brand-wordmark {
    Fehlt das Attribut, bleibt alles sichtbar wie bisher — die Regel kann die
    Marke also nie versehentlich ganz verschlucken. */
 body[data-left-menu-state="closed"] .app-brand-logo,
-body[data-left-menu-state="compact"] .app-brand-logo,
 body[data-left-menu-state="opening"] .app-brand-logo {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
+}
+
+/* In der schmalen Spur ist das Zeichen der oberste Eintrag — so macht es das
+   Vorbild von ChatGPT, und ohne Marke waere die Spur eine anonyme Icon-Leiste.
+   Mittig statt links, weil in einer 96 px schmalen Spur sonst der Menue-Knopf
+   danebensteht; eine Zeile tiefer, damit sich beide nicht beruehren. Gerechnet
+   statt mit transform verschoben — transform ist in dieser Datei gesperrt. */
+body[data-left-menu-state="compact"] .app-brand-logo {
+  top: calc(env(safe-area-inset-top) + 44px);
+  left: calc(env(safe-area-inset-left) + (min(var(--left-panel-width), 100vw - 28px) - 28px) / 2);
 }
 
 /* Bewusst OHNE Ueberblendung: tests/branding-presentation.test.mjs verbietet
