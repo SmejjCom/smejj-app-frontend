@@ -460,6 +460,22 @@ export function clearThinkingState(output) {
 }
 
 /**
+ * Ein abgerissener Bild-/Video-Strom hinterlaesst ein `![...](data:...`-Markdown
+ * ohne schliessende Klammer — dann steht 100+ KB base64 als Rohtext im Chat.
+ * Das Fragment wird abgeschnitten und durch einen verstaendlichen Satz ersetzt.
+ */
+export function entferneAbgerisseneMedien(text) {
+  const roh = String(text || "");
+  const start = roh.lastIndexOf("![");
+  if (start === -1) return roh;
+  const rest = roh.slice(start);
+  const klammer = rest.indexOf("](data:");
+  if (klammer === -1 || rest.indexOf(")", klammer) !== -1) return roh;
+  const art = rest.slice(klammer).startsWith("](data:video") ? "Video" : "Bild";
+  return `${roh.slice(0, start).trimEnd()}\n\nDie ${art}-Übertragung ist abgerissen — bitte fordere es einfach noch einmal an.`;
+}
+
+/**
  * Fehlertext einer nicht angenommenen Antwort, so lesbar wie moeglich.
  * Eine HTML-Seite (typisch fuer ein Gateway) ist fuer Nutzer wertlos — dann
  * lieber der eigene Offline-Hinweis.
@@ -525,6 +541,7 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // nichts stehen (abgebrochener Lauf), kommt sie zurueck.
   let letzteNotiz = "";
 
+  try {
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
@@ -564,9 +581,17 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
     }
     output.scrollIntoView({ block: "end" });
   }
+  } catch (abriss) {
+    // Live gesehen 2026-08-13: Bruecken-Neustart mitten im Bild-Streamen —
+    // ohne Saeuberung stehen 131.072 Zeichen base64-Rohtext in der Blase.
+    stoppeWartesignal();
+    output.textContent = entferneAbgerisseneMedien(output.textContent);
+    throw abriss;
+  }
   // Auch wenn der Strom ohne ein einziges Ereignis endet: das Signal muss weg.
   stoppeWartesignal();
   clearThinkingState(output);
+  output.textContent = entferneAbgerisseneMedien(output.textContent);
   // Der Lauf endete ohne Schlussantwort (alle Runden gingen in Werkzeuge).
   // Dann ist die letzte Arbeitsnotiz besser als eine leere Blase.
   if (!output.textContent.trim() && letzteNotiz.trim()) output.textContent = letzteNotiz;
