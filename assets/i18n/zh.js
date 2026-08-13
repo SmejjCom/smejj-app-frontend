@@ -323,10 +323,14 @@ export default {
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "例如：请用中文简短回答，并简单解释专业术语。",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "登录状态已过期，请重新登录。",
   // Beispiel-Chips der Glas-Startseite (2026-08-13).
-  "Baue mir eine kleine Web-App": "帮我做一个小型网页应用",
-  "Erkläre mir diesen Code": "给我解释这段代码",
-  "Suche im Web und fasse zusammen": "搜索网络并总结",
-  "Zeichne mir ein Bild": "帮我画一张图",
+  "Code schreiben": "写代码",
+  "Schreibe Code für:": "帮我写代码：",
+  "Text verbessern": "润色文字",
+  "Verbessere diesen Text:": "帮我润色这段文字：",
+  "Recherchieren": "做调研",
+  "Recherchiere für mich:": "帮我调研：",
+  "Bild erstellen": "生成图片",
+  "Erstelle ein Bild von:": "帮我生成一张图片：",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "有什么可以帮您？",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "描述一个任务或提出一个问题。",

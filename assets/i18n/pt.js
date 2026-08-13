@@ -323,10 +323,14 @@ export default {
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Por exemplo: Responde de forma breve e em português. Explica os termos técnicos de modo simples.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "A tua sessão expirou. Inicia sessão novamente.",
   // Beispiel-Chips der Glas-Startseite (2026-08-13).
-  "Baue mir eine kleine Web-App": "Crie um pequeno app web para mim",
-  "Erkläre mir diesen Code": "Explique este código para mim",
-  "Suche im Web und fasse zusammen": "Pesquise na web e resuma",
-  "Zeichne mir ein Bild": "Desenhe uma imagem para mim",
+  "Code schreiben": "Escrever código",
+  "Schreibe Code für:": "Escreva código para:",
+  "Text verbessern": "Melhorar um texto",
+  "Verbessere diesen Text:": "Melhore este texto:",
+  "Recherchieren": "Pesquisar",
+  "Recherchiere für mich:": "Pesquise isto para mim:",
+  "Bild erstellen": "Criar uma imagem",
+  "Erstelle ein Bild von:": "Crie uma imagem de:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "Como posso ajudar?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "Descreva uma tarefa ou faça uma pergunta.",

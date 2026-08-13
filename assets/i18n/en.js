@@ -323,10 +323,14 @@ export default {
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "e.g. Answer briefly and in English. Explain technical terms simply.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Your session has expired. Please sign in again.",
   // Beispiel-Chips der Glas-Startseite (2026-08-13).
-  "Baue mir eine kleine Web-App": "Build me a small web app",
-  "Erkläre mir diesen Code": "Explain this code to me",
-  "Suche im Web und fasse zusammen": "Search the web and summarize",
-  "Zeichne mir ein Bild": "Draw me a picture",
+  "Code schreiben": "Write code",
+  "Schreibe Code für:": "Write code for:",
+  "Text verbessern": "Improve text",
+  "Verbessere diesen Text:": "Improve this text:",
+  "Recherchieren": "Research",
+  "Recherchiere für mich:": "Research this for me:",
+  "Bild erstellen": "Create an image",
+  "Erstelle ein Bild von:": "Create an image of:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "How can I help?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "Describe a task or ask a question.",

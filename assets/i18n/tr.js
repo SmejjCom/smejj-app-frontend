@@ -323,10 +323,14 @@ export default {
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Örneğin: Kısa ve Türkçe yanıtla. Teknik terimleri basitçe açıkla.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
   // Beispiel-Chips der Glas-Startseite (2026-08-13).
-  "Baue mir eine kleine Web-App": "Bana küçük bir web uygulaması yap",
-  "Erkläre mir diesen Code": "Bana bu kodu açıkla",
-  "Suche im Web und fasse zusammen": "Web'de ara ve özetle",
-  "Zeichne mir ein Bild": "Bana bir resim çiz",
+  "Code schreiben": "Kod yazmak",
+  "Schreibe Code für:": "Şunun için kod yaz:",
+  "Text verbessern": "Metni iyileştirmek",
+  "Verbessere diesen Text:": "Bu metni iyileştir:",
+  "Recherchieren": "Araştırmak",
+  "Recherchiere für mich:": "Bunu benim için araştır:",
+  "Bild erstellen": "Görsel oluşturmak",
+  "Erstelle ein Bild von:": "Şunun görselini oluştur:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "Nasıl yardımcı olabilirim?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "Bir görev tanımlayın veya bir soru sorun.",

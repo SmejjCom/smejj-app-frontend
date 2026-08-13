@@ -323,10 +323,14 @@ export default {
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Par exemple : Réponds brièvement et en français. Explique simplement les termes techniques.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "Votre session a expiré. Veuillez vous reconnecter.",
   // Beispiel-Chips der Glas-Startseite (2026-08-13).
-  "Baue mir eine kleine Web-App": "Crée-moi une petite application web",
-  "Erkläre mir diesen Code": "Explique-moi ce code",
-  "Suche im Web und fasse zusammen": "Cherche sur le web et résume",
-  "Zeichne mir ein Bild": "Dessine-moi une image",
+  "Code schreiben": "Écrire du code",
+  "Schreibe Code für:": "Écris du code pour :",
+  "Text verbessern": "Améliorer un texte",
+  "Verbessere diesen Text:": "Améliore ce texte :",
+  "Recherchieren": "Rechercher",
+  "Recherchiere für mich:": "Fais une recherche sur :",
+  "Bild erstellen": "Créer une image",
+  "Erstelle ein Bild von:": "Crée une image de :",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "Comment puis-je aider ?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "Décrivez une tâche ou posez une question.",

@@ -13,9 +13,15 @@ if (hero) hero.textContent = t(hero.textContent.trim());
 if (feld && feld.placeholder) feld.placeholder = t(feld.placeholder.trim());
 if (feld) {
   document.querySelectorAll(".start-chips button").forEach((knopf) => {
+    // Der Knopf traegt zwei Texte: die kurze Taetigkeit als Aufschrift und in
+    // data-chip den Satzanfang, der ins Feld wandert. Beide werden uebersetzt.
+    const vorlage = knopf.dataset.chip || knopf.textContent.trim();
     knopf.textContent = t(knopf.textContent.trim());
     knopf.addEventListener("click", () => {
-      feld.value = knopf.textContent.trim();
+      const satz = t(vorlage);
+      // Nach dem vollbreiten Doppelpunkt (CJK) kein Leerzeichen — dort waere es
+      // ein Satzzeichenfehler; sonst trennt es die Vorlage vom Weitergetippten.
+      feld.value = satz.endsWith("：") ? satz : `${satz} `;
       // input-Ereignis, damit die vorhandene Autogroesse des Feldes mitzieht.
       feld.dispatchEvent(new Event("input", { bubbles: true }));
       feld.focus();
