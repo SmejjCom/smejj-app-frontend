@@ -19,14 +19,30 @@
 
   const PRIO_TON = { critical: "bad", high: "warn", medium: "", low: "dim" };
 
+  // V.tabelleBlock erwartet FERTIGE <tr>-Zeilen, keine Zellen-Listen — es fügt
+  // sie mit join("") zusammen. Ein Array von Arrays wird dabei still zu
+  // kommagetrenntem Text (live gesehen 2026-08-14: die halbe Tabelle stand als
+  // Fließtext über der Kopfzeile). Dieser Helfer macht aus Zellen eine Zeile;
+  // die Zellen sind bereits fertiges HTML und werden hier NICHT erneut escaped.
+  function zeile(zellen) {
+    return "<tr>" + zellen.map(function (z) { return "<td>" + z + "</td>"; }).join("") + "</tr>";
+  }
+
+  /** Tabelle aus Zellen-Listen. Der einzige Weg, hier eine Tabelle zu bauen. */
+  function tabelle(spalten, reihen) {
+    return V.tabelleBlock(spalten, reihen.map(zeile));
+  }
+
   /** Eine Kennzahl, die als {wert, grund} kommt: Zahl ODER ehrliche Lücke. */
   function ungemessenZeile(name, feld) {
     return [e(name), '<span class="dim">nicht gemessen — ' + e(feld && feld.grund ? feld.grund : "ohne Grund") + "</span>"];
   }
 
+  // Reiner Text, kein HTML: V.kachelBlock escaped seinen Wert, ein <span> würde
+  // dort wörtlich als Zeichenkette erscheinen (live gesehen 2026-08-14).
   function zahl(wert, nachsatz) {
-    if (wert === null || wert === undefined) return '<span class="dim">—</span>';
-    return e(String(wert) + (nachsatz || ""));
+    if (wert === null || wert === undefined) return "—";
+    return String(wert) + (nachsatz || "");
   }
 
   function systemBlock(d) {
@@ -34,7 +50,7 @@
     const b = s.bestandteile || {};
     // Der Score ist EINE Zahl — und darunter steht, woraus er besteht. Eine
     // Einzelzahl ohne Zerlegung ist ein Gefühl, keine Messung.
-    const zerlegung = V.tabelleBlock(["Bestandteil", "Wert", "Was es bedeutet"], [
+    const zerlegung = tabelle(["Bestandteil", "Wert", "Was es bedeutet"], [
       ["Abdeckung", zahl(b.abdeckung, " %"), "Anteil der KI-Aktionen, die überhaupt geprüft wurden"],
       ["Autopiloten grün", zahl(b.ampelAnteil, " %"), "Anteil der Automatiken mit gemessenem, pünktlichem Lauf"],
       ["Funktions-Parität", zahl(b.paritaet, " %"), "Anteil der Konkurrenzfunktionen, die smejj auch hat"]
@@ -50,8 +66,10 @@
     const zeilen = arten.map(function (a) {
       return [e(a.art), String(a.aktionen), String(a.gemessen), a.note === null ? "—" : String(a.note) + "/100", String(a.funde)];
     });
-    const tabelle = zeilen.length
-      ? V.tabelleBlock(["Art", "Aktionen", "davon gemessen", "Note", "Funde"], zeilen)
+    // NICHT "tabelle" nennen: das wuerde den Helfer oben verdecken und die
+    // Seite in ihrer eigenen Zeile abstuerzen lassen (Temporal Dead Zone).
+    const artenTabelle = zeilen.length
+      ? tabelle(["Art", "Aktionen", "davon gemessen", "Note", "Funde"], zeilen)
       : '<div class="pb"><p class="dim">Seit dem letzten Neustart wurde noch keine KI-Aktion gemeldet. '
         + "Der Zähler beginnt bei jedem Deploy neu — das ist kein Ausfall.</p></div>";
 
@@ -62,7 +80,7 @@
         + " — dort gilt jedes Ergebnis als »nicht gemessen«, nie als gut.</div></div></div>"
       : "";
 
-    return V.panelBlock("Qualität je Medientyp", (q.pruefer || 0) + " Prüfer angemeldet: " + e((q.medientypen || []).join(", ")), tabelle)
+    return V.panelBlock("Qualität je Medientyp", (q.pruefer || 0) + " Prüfer angemeldet: " + e((q.medientypen || []).join(", ")), artenTabelle)
       + luecke;
   }
 
@@ -77,7 +95,7 @@
         a.freigabe === "betreiber" ? pille("Betreiber entscheidet", "acc") : pille("automatisch", "ok")
       ];
     });
-    const lebenslauf = V.tabelleBlock(["Zustand", "Zahl"], [
+    const lebenslauf = tabelle(["Zustand", "Zahl"], [
       ["neu erkannt", String(v.neuAusKonkurrenz || 0)],
       ungemessenZeile("laufend", v.laufend),
       ungemessenZeile("erfolgreich abgeschlossen", v.erledigt),
@@ -85,7 +103,7 @@
     ]);
     return V.panelBlock("Die wichtigsten Verbesserungen", "nach Score sortiert",
       zeilen.length
-        ? V.tabelleBlock(["Verbesserung", "Score", "Priorität", "Zuständig", "Freigabe"], zeilen)
+        ? tabelle(["Verbesserung", "Score", "Priorität", "Zuständig", "Freigabe"], zeilen)
         : '<div class="pb"><p class="dim">Keine offenen Verbesserungen erkannt.</p></div>')
       + V.panelBlock("Lebenslauf der Aufgaben", "was noch keine Ablage hat, steht als Lücke da", lebenslauf);
   }
@@ -97,9 +115,9 @@
     });
     const vorteile = (k.vorteile || []).map(function (v) { return [e(v.name), e(v.beleg || "")]; });
     return V.panelBlock("Was den anderen voraus ist", "Funktionen, die smejj fehlen",
-      luecken.length ? V.tabelleBlock(["Funktion", "Wer hat sie"], luecken) : '<div class="pb"><p class="dim">Keine Lücke bekannt.</p></div>')
+      luecken.length ? tabelle(["Funktion", "Wer hat sie"], luecken) : '<div class="pb"><p class="dim">Keine Lücke bekannt.</p></div>')
       + V.panelBlock("Wo smejj vorne liegt", "das hier nicht kaputtmachen",
-        vorteile.length ? V.tabelleBlock(["Funktion", "Beleg im Quelltext"], vorteile) : '<div class="pb"><p class="dim">Kein eigener Vorteil erfasst.</p></div>')
+        vorteile.length ? tabelle(["Funktion", "Beleg im Quelltext"], vorteile) : '<div class="pb"><p class="dim">Kein eigener Vorteil erfasst.</p></div>')
       + '<div class="note glass"><div class="nx">◆</div><div><div class="nt">Woher der Konkurrenz-Stand kommt</div>'
       + '<div class="ns">Stand ' + e(k.stand || "?") + " · " + e(k.herkunft || "")
       + ". Das ist eine gepflegte Liste, keine Live-Messung — sie wird als solche ausgewiesen, damit niemand sie für gemessen hält.</div></div></div>";
@@ -109,7 +127,7 @@
     const a = d.abnahme || {};
     const zeilen = (a.kriterien || []).map(function (k) { return [e(k.id), e(k.name)]; });
     return V.panelBlock("Woran eine »erledigt«-Meldung gemessen wird", "fehlt ein Beleg, gilt die Aufgabe als offen",
-      V.tabelleBlock(["Kriterium", "Frage"], zeilen))
+      tabelle(["Kriterium", "Frage"], zeilen))
       + '<div class="pb"><p>' + e(a.hinweis || "") + "</p></div>";
   }
 
@@ -120,10 +138,10 @@
     });
     const t = d.testing || {};
     return V.panelBlock("Offene Vorfälle", "was gerade rot ist und noch nicht wieder grün wurde",
-      zeilen.length ? V.tabelleBlock(["Autopilot", "Art", "Seit", "Grund"], zeilen)
+      zeilen.length ? tabelle(["Autopilot", "Art", "Seit", "Grund"], zeilen)
         : '<div class="pb"><p>Kein offener Vorfall. ' + (h.geheilteVorfaelle || 0) + " frühere Vorfälle sind wieder geschlossen.</p></div>")
       + V.panelBlock("Prüfungen im Takt", "alle 30 Minuten, mit kaputter UND gesunder Probe",
-        V.tabelleBlock(["Was", "Zahl"], [
+        tabelle(["Was", "Zahl"], [
           ["Selbsttests je Durchgang", String(t.selbsttestsImTakt || 0)],
           ungemessenZeile("Prüfsuite", t.suite)
         ]));
