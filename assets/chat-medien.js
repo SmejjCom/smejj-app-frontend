@@ -61,6 +61,86 @@ export function adresseFuer(basis, id) {
   return `${basis}?id=${encodeURIComponent(id)}`;
 }
 
+// Hier merkt sich ein angezeigtes Medium seine ECHTE Adresse, waehrend im src
+// ein blob: steht. Siehe rehydriereMedien() weiter unten.
+export const ADRESSE_ATTRIBUT = "data-smejj-adresse";
+
+/** Zeigt diese Quelle auf ein ausgelagertes Medium? */
+export function istMedienAdresse(quelle) {
+  return /\/api\/chat-medien\?id=/.test(String(quelle || ""));
+}
+
+/**
+ * Gibt jedem angezeigten Medium seine echte Adresse zurueck.
+ *
+ * MUSS vor jedem Speichern laufen. Ohne diesen Schritt landete ein blob: im
+ * gespeicherten html — und genau daran sind die vier Videos im Konto gestorben,
+ * die diese ganze Arbeit ausgeloest haben. Bewusst OHNE Netz und ohne
+ * await: eine reine DOM-Umschrift kann nicht scheitern, und damit kann auch
+ * kein Speichern in den kaputten Zustand hineinlaufen.
+ */
+export function entwaessere(knoten) {
+  let zurueck = 0;
+  if (!knoten?.querySelectorAll) return zurueck;
+  for (const el of knoten.querySelectorAll(`[${ADRESSE_ATTRIBUT}]`)) {
+    const adresse = el.getAttribute(ADRESSE_ATTRIBUT);
+    el.removeAttribute(ADRESSE_ATTRIBUT);
+    if (adresse) { el.setAttribute("src", adresse); zurueck += 1; }
+  }
+  return zurueck;
+}
+
+async function holeMedium(adresse) {
+  const schluessel = token();
+  if (!schluessel) return null;
+  try {
+    const antwort = await fetch(adresse, { headers: { Authorization: `Bearer ${schluessel}` } });
+    if (!antwort.ok) return null;
+    return await antwort.blob();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Holt ausgelagerte Medien und zeigt sie ueber eine blob:-Adresse an.
+ *
+ * WARUM DIESER UMWEG (gemessen live 2026-08-14, mit securitypolicyviolation
+ * belegt): Die Seite laeuft unter `img-src 'self' data: blob:`. Der
+ * Control-Server ist eine ANDERE Herkunft — ein <img src="https://smejj-
+ * control…"> wird von der Sicherheitsrichtlinie hart abgewiesen, das Bild
+ * bleibt leer (0x0). Und selbst ohne die Richtlinie koennte ein <img> den
+ * Anmelde-Schluessel gar nicht mitschicken; die Route verlangt ihn (von aussen
+ * antwortet sie mit 401).
+ *
+ * Ein fetch kann beides: Schluessel mitgeben und das Ergebnis als blob:
+ * anbieten — und blob: ist ausdruecklich erlaubt. Der Umweg loest also die
+ * Sicherheitsrichtlinie UND die Anmeldung auf einmal, ohne dass eine
+ * eingefrorene Datei angefasst werden muss.
+ *
+ * Fail-safe: Was sich nicht holen laesst, bleibt unveraendert stehen.
+ */
+export async function rehydriereMedien(knoten, { holen = holeMedium } = {}) {
+  if (!knoten?.querySelectorAll) return { geholt: 0, gescheitert: 0 };
+  const offen = [];
+  for (const el of knoten.querySelectorAll("img, video")) {
+    if (istMedienAdresse(el.getAttribute("src"))) offen.push(el);
+  }
+  let geholt = 0;
+  let gescheitert = 0;
+  for (const el of offen) {
+    const adresse = el.getAttribute("src");
+    const daten = await holen(adresse);
+    if (!daten) { gescheitert += 1; continue; }
+    // Erst merken, dann umschalten: waere die Reihenfolge andersherum und
+    // etwas ginge dazwischen schief, stuende ein blob: ohne Rueckweg da.
+    el.setAttribute(ADRESSE_ATTRIBUT, adresse);
+    el.setAttribute("src", URL.createObjectURL(daten));
+    geholt += 1;
+  }
+  return { geholt, gescheitert };
+}
+
 /**
  * Sammelt die Medien EINES Eintrags, die noch als data:-URL vorliegen.
  *
@@ -114,6 +194,9 @@ async function ladeHoch(basis, dataUrl) {
  * @returns {Promise<{ausgelagert: number, gescheitert: number}>}
  */
 export async function lagereMedienAus(knoten, { basis = medienUrl(), hochladen = ladeHoch } = {}) {
+  // ZUERST die Anzeige-blobs zurueckdrehen — sonst wanderte beim naechsten
+  // Speichern ein blob: ins html, und der Verlauf haette wieder eine Leiche.
+  entwaessere(knoten);
   const offen = findeAuslagerbare(knoten);
   if (!basis || offen.length === 0) return { ausgelagert: 0, gescheitert: 0 };
   let ausgelagert = 0;

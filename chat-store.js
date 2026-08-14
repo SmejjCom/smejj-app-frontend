@@ -270,6 +270,15 @@ async function medienAuslagern() {
   } catch { /* fail-safe: lieber ein grosser Chat als gar keiner */ }
 }
 
+// Gegenstueck zu medienAuslagern: holt beim Wiederherstellen, was ausgelagert
+// wurde. Still und ohne Netz-Zwang — kommt nichts, bleibt die Adresse stehen.
+async function medienHolen(log) {
+  try {
+    const { rehydriereMedien } = await import("./chat-medien.js?v=1");
+    await rehydriereMedien(log);
+  } catch { /* fail-safe: lieber ein leeres Bild als ein kaputter Verlauf */ }
+}
+
 async function persistActive() {
   await medienAuslagern();
   const messages = readEntries();
@@ -505,6 +514,13 @@ function renderEntriesInto(log, messages) {
     document.querySelector("#start")?.classList.toggle("has-start-chat", messages.length > 0);
     const last = log.lastElementChild;
     if (last) last.scrollIntoView({ block: "end" });
+    // Ausgelagerte Medien holen. Im gespeicherten html steht nur die kurze
+    // Serveradresse; die kann ein <img> nicht selbst laden — die
+    // Sicherheitsrichtlinie der Seite laesst nur 'self', data: und blob: zu,
+    // und den Anmelde-Schluessel koennte ein <img> ohnehin nicht mitschicken.
+    // Darum holt chat-medien.js das Medium per fetch und zeigt es als blob:.
+    // Ohne await: das Wiederherstellen soll nicht auf das Netz warten.
+    medienHolen(log);
   } finally {
     setTimeout(() => { restoring = false; }, 50);
   }
