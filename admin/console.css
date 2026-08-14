@@ -378,13 +378,13 @@ select.dlg-feld{cursor:pointer;}
 .ap-item.on{border-color:var(--sm-accent-border);background:var(--sm-accent-soft);}
 .ap-item .t{min-width:0;}
 .ap-item .t b{display:block;font-size:15.5px;}
-.ap-item .t span{display:block;font-size:13.5px;color:var(--sm-ink-faint);}
+.ap-item .t > span{display:block;font-size:13.5px;color:var(--sm-ink-faint);}
 /* Die Heute-Zeile ist die erste Frage, die man stellt — also heller als der
    Steckbrief darunter (Ort/Zeitplan), aber leiser als der Name. */
-.ap-item .t span.h{color:var(--sm-ink-dim);margin:3px 0 1px;}
+.ap-item .t > span.h{color:var(--sm-ink-dim);margin:3px 0 1px;}
 /* Laufende Nummer vor dem Namen: da, aber leise. Tabellenziffern, damit
    die Namen in der Liste trotz zweistelliger Nummern buendig starten. */
-.ap-nr{color:var(--sm-ink-dim);font-weight:500;margin-right:8px;
+.ap-nr{display:inline;color:var(--sm-ink-dim);font-weight:500;margin-right:8px;
   font-variant-numeric:tabular-nums;}
 .ap-dot{width:12px;height:12px;flex:none;}
 .ap-dot.gruen{background:var(--sm-ok);box-shadow:0 0 10px var(--sm-ok);}
