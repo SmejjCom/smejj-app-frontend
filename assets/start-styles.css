@@ -4542,10 +4542,19 @@ body.search-overlay-open {
 
 .start-chips {
   display: flex;
+  /* Umbruch BLEIBT erlaubt: auf schmalen Schirmen ist eine zweite Zeile
+     richtig; nowrap wuerde die Chips dort zusammenquetschen. */
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-  max-width: 760px;
+  /* 760 px reichten fuer vier Chips. Mit dem fuenften ("Video generieren",
+     2026-08-14) brauchen sie 743 px NETTO — die 32 px Innenabstand kippten
+     damit genau einen Chip in die zweite Zeile. 940 px geben Luft, bewusst
+     mehr als die ~775 px, die Deutsch braucht: die Beschriftungen sind
+     uebersetzt, und "Générer des images" oder "Создать изображения" tragen
+     breiter auf. Die Eingabe-Kapsel darueber bleibt bei 760 px — die Chips
+     duerfen breiter stehen, sie sind kein Eingabefeld. */
+  max-width: 940px;
   padding: 0 16px;
 }
 
@@ -4561,7 +4570,9 @@ body.search-overlay-open {
   border-radius: 0;
   background: rgba(17, 23, 30, 0.5);
   color: rgba(200, 209, 218, 0.92);
-  font-size: 13.5px;
+  /* 14 px statt 13,5: Betreiber-Regel "nie unter 14 px" (er liest ohne
+     Brille). Die Chips waren die letzte Stelle der Startseite darunter. */
+  font-size: 14px;
   cursor: pointer;
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
