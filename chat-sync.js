@@ -27,6 +27,46 @@ let serverSagtNeinProjekte = false;
 let pushProjekteTimer = null;
 let projekteLaufen = false;
 
+// STILLER DATENVERLUST, sichtbar gemacht (Befund 2026-08-14).
+//
+// Bis heute prueften beide Sende-Wege NUR auf 503. Ein 400 — der Server sagt
+// "diesen Chat nehme ich nicht" (zu gross, ungueltiger Zeitstempel) — fiel
+// durch das `catch` und war fuer niemanden sichtbar. Gemessen: jeder Chat mit
+// einem erzeugten Bild lag mit ~585 KB ueber dem 512-KB-Deckel und wurde
+// KOMPLETT abgewiesen; der Nutzer hielt ihn fuer gesichert, obwohl er den
+// Server nie erreichte. (Die Medien-Auslagerung nimmt die Hauptursache weg —
+// aber ein stiller Verlust darf grundsaetzlich nicht mehr moeglich sein.)
+//
+// Gemeldet wird EINMAL JE CHAT und Sitzung: `push()` laeuft nach jeder
+// Aenderung, eine Meldung je Durchlauf waere alle vier Sekunden ein Hinweis.
+const abgewiesen = new Set();
+
+async function meldeAbweisung(kennung, status, grund) {
+  if (abgewiesen.has(kennung)) return;
+  abgewiesen.add(kennung);
+  try {
+    const { showToast } = await import("/assets/components.js?v=chat-markdown-20260717");
+    const text = grund === "chat_zu_gross"
+      ? "Ein Chat ist zu gross und wurde NICHT gesichert — er bleibt nur auf diesem Geraet."
+      : `Ein Chat konnte nicht gesichert werden (${status}${grund ? `: ${grund}` : ""}) — er bleibt nur auf diesem Geraet.`;
+    showToast(text, "warn");
+  } catch {
+    // Selbst wenn der Hinweis nicht angezeigt werden kann, soll der Grund
+    // auffindbar sein — eine stille Ablehnung ist das, was hier abgestellt wird.
+    console.warn(`smejj Verlauf-Sync: Chat ${kennung} abgewiesen (${status}${grund ? ` ${grund}` : ""})`);
+  }
+}
+
+/** Grund aus der Antwort holen, ohne dass ein kaputter Rumpf etwas kaputt macht. */
+async function grundAus(antwort) {
+  try {
+    const daten = await antwort.clone().json();
+    return String(daten?.error || "");
+  } catch {
+    return "";
+  }
+}
+
 function token() {
   try { return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; }
 }
@@ -79,6 +119,11 @@ async function push() {
         body: JSON.stringify({ chat })
       });
       if (antwort.status === 503) { serverSagtNein = true; break; }
+      // 4xx betrifft GENAU DIESEN Chat und wird sich von selbst nie aendern —
+      // also melden und mit dem naechsten weitermachen, nicht abbrechen.
+      if (antwort.status >= 400 && antwort.status < 500) {
+        await meldeAbweisung(chat.id, antwort.status, await grundAus(antwort));
+      }
     }
   } catch { /* still: naechster Anlauf beim naechsten Ereignis */ }
   laeuft = false;
@@ -146,6 +191,11 @@ async function pushProjekte() {
       });
       if (antwort.status === 404) break; // Backend noch nicht da: aufhoeren, nicht merken
       if (antwort.status === 503) { serverSagtNeinProjekte = true; break; }
+      // Dieselbe Luecke wie beim Chat-Push: eine 4xx-Ablehnung war unsichtbar.
+      // 404 ist oben schon abgefangen — das ist "noch nicht ausgerollt", kein Verlust.
+      if (antwort.status >= 400 && antwort.status < 500) {
+        await meldeAbweisung(`projekt:${projekt?.id || "?"}`, antwort.status, await grundAus(antwort));
+      }
     }
   } catch { /* still: naechster Anlauf beim naechsten Ereignis */ }
   projekteLaufen = false;
