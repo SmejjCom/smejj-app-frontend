@@ -4520,6 +4520,18 @@ body.search-overlay-open {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Werkzeugleiste gruppieren (Betreiber-Befund 2026-08-13: "smejj 1.0" schwebte
+   allein in der Mitte, die Luecke wirkte unfertig). Links steht, WAS ich
+   schicke (Anhang + Modell), rechts, WIE es rausgeht (Diktat, Sprache,
+   Senden) — dieselbe Aufteilung wie bei ChatGPT.
+   Bewusst nur per `order`: das Markup in index.html bleibt unangetastet, die
+   Reihenfolge fuer Tastatur und Screenreader also auch. */
+.prompt-actions .plus-picker { order: 1; }
+.prompt-actions .model-picker { order: 2; }
+.prompt-actions .prompt-spacer { order: 3; }
+.prompt-actions [data-start-tool] { order: 4; }
+.prompt-actions .send-button { order: 5; }
+
 /* Vorlesen wohnt jetzt nur noch im Antwort-Menue („speak" in
    chat-actions-menu.js) — der dritte Audio-Knopf verwirrte nur. */
 .prompt-glass [data-start-tool="speaker"] {
