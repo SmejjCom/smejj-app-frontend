@@ -245,7 +245,33 @@ function titleFrom(messages) {
   return raw.slice(0, MAX_TITLE) + (raw.length > MAX_TITLE ? "…" : "");
 }
 
+// Medien auslagern, BEVOR der Schnappschuss gezogen wird (Befund 2026-08-14).
+//
+// readEntries() speichert `node.innerHTML`. Ein erzeugtes Bild steht dort als
+// ~585-KB-data:-URL — damit sprengt JEDER Chat mit Bild den Server-Deckel von
+// 512 KB, und der ganze Chat wird abgewiesen (chat-sync.js prueft nur auf 503,
+// der 400 fiel still durch). Ein Video steht dort sogar nur noch als
+// blob:-Zeiger, der mit dem Tab stirbt — vier solcher Leichen lagen im Konto.
+//
+// chat-medien.js legt das Medium einmal serverseitig ab und ersetzt die Quelle
+// durch eine kurze Adresse. Danach ist der Schnappschuss klein und das Medium
+// ueberlebt Neuladen und Geraetewechsel.
+//
+// Dynamischer Import und stiller Fehlschlag mit Absicht: ist das Modul nicht
+// ladbar oder die Ablage aus, wird gespeichert wie bisher — nie schlechter.
+async function medienAuslagern() {
+  try {
+    const log = startLog();
+    if (!log) return;
+    const { lagereMedienAus } = await import("./chat-medien.js?v=1");
+    for (const eintrag of log.querySelectorAll(":scope > .entry.assistant")) {
+      await lagereMedienAus(eintrag);
+    }
+  } catch { /* fail-safe: lieber ein grosser Chat als gar keiner */ }
+}
+
 async function persistActive() {
+  await medienAuslagern();
   const messages = readEntries();
   if (!messages.length) return null;
   let id = activeChatId();

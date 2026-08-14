@@ -338,6 +338,12 @@ function videoAbspielen(video, puffer, mime) {
 function videoQuellenUmwandeln(wurzel) {
   for (const video of wurzel.querySelectorAll?.('video[src^="data:video/"]') || []) {
     const daten = video.getAttribute("src");
+    // Die Originaldaten retten, BEVOR der src auf blob: umgestellt wird
+    // (Befund 2026-08-14): chat-store.js speichert `innerHTML`, und dort stand
+    // danach nur noch ein blob-Zeiger, der mit dem Tab stirbt. Vier Videos im
+    // Konto waren so unwiederbringlich weg. chat-medien.js liest dieses
+    // Attribut, lagert das Video aus und ersetzt es durch eine kurze Adresse.
+    video.setAttribute("data-smejj-quelle", daten);
     video.removeAttribute("src");
     const mime = (daten.match(/^data:(video\/[a-z0-9]+)/) || [])[1] || "video/mp4";
     fetch(daten)
