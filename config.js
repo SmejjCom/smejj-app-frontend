@@ -1,7 +1,6 @@
-// smejj.com — API-Origin: Standard ist Same-Origin (GitHub Pages). Fuer das
-// Salad-Container-Gateway (Backend auf *.salad.cloud) wird die Origin hier als
-// Konstante gesetzt oder per localStorage "smejj.apiOrigin.v1" uebersteuert
-// (nur https; lokales HTTP nur fuer localhost/Loopback-Testserver).
+// smejj.com — API-Origin: Standard ist der Zeabur-Control-Server. Die Origin
+// steht hier als Konstante und kann per localStorage "smejj.apiOrigin.v1"
+// uebersteuert werden (nur https; lokales HTTP nur fuer Loopback-Testserver).
 const DEFAULT_API_ORIGIN = "https://smejj-control.zeabur.app";
 
 function resolveApiOrigin() {
