@@ -175,7 +175,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v358";
+const CACHE_NAME = "smejj-shell-v359";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -329,8 +329,43 @@ const SHELL = [
   "/en/privacy.html"
 ];
 
+// VORABSPEICHERN MIT ECHTEM URSPRUNGSABRUF (Befund 2026-08-14).
+//
+// Vorher stand hier `cache.addAll(SHELL.map(url => new Request(url, { cache:
+// "reload" })))`. `cache: "reload"` umgeht aber nur den BROWSER-Cache, nicht
+// den Rand-Cache von GitHub Pages (max-age 600). Beim Deploy ist die neue
+// sw.js am Rand oft schon da, waehrend die Asset-Dateien noch die alten sind —
+// der frisch angelegte Speicher wurde also mit ALTEM Inhalt gefuellt und
+// lieferte ihn danach cache-first aus, bis irgendwann der NAECHSTE Deploy kam.
+// Der Versions-Bump, der die Auslieferung sichern soll, hat sie so gerade
+// verhindert.
+//
+// GEMESSEN am 2026-08-13: Nach dem Deploy von v340 lag der Speicher
+// "smejj-shell-v340" an, sein Inhalt war der von v339 — die neue Datei war am
+// selben Rand per curl bereits abrufbar. Erst Loeschen des Eintrags plus
+// Neuabruf brachte den richtigen Stand.
+//
+// Der Anhang `?sw=<CACHE_NAME>` ist je Version eindeutig und zwingt den Rand
+// damit zu einem echten Ursprungsabruf. Gespeichert wird unter dem SAUBEREN
+// Pfad, damit der cache-first-Abgleich (caches.match mit ignoreSearch) den
+// Eintrag unveraendert findet.
+//
+// Alles-oder-nichts bleibt wie bei addAll: faellt eine Datei aus, schlaegt die
+// Installation fehl und der ALTE Service Worker bleibt aktiv. Ein halb
+// gefuellter Speicher waere schlimmer als ein verschobener Deploy.
+async function fuelleVorabSpeicher(cache) {
+  await Promise.all(SHELL.map(async (pfad) => {
+    const trenner = pfad.includes("?") ? "&" : "?";
+    const antwort = await fetch(new Request(`${pfad}${trenner}sw=${CACHE_NAME}`, { cache: "reload" }));
+    if (!antwort || !antwort.ok) {
+      throw new Error(`precache_fehlgeschlagen:${pfad}:${antwort ? antwort.status : "keine Antwort"}`);
+    }
+    await cache.put(pfad, antwort);
+  }));
+}
+
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL.map((url) => new Request(url, { cache: "reload" })))));
+  event.waitUntil(caches.open(CACHE_NAME).then(fuelleVorabSpeicher));
   self.skipWaiting();
 });
 
