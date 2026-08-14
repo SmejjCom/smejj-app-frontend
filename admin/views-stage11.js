@@ -33,11 +33,8 @@
     return V.tabelleBlock(spalten, reihen.map(zeile));
   }
 
-  /** Eine Kennzahl, die als {wert, grund} kommt: Zahl ODER ehrliche Lücke.
-   *  Seit die Aufgaben-Ablage lebt, ist `wert` meist eine echte Zahl — die
-   *  Lücken-Anzeige bleibt für den Fall, dass die Ablage stumm ist. */
+  /** Eine Kennzahl, die als {wert, grund} kommt: Zahl ODER ehrliche Lücke. */
   function ungemessenZeile(name, feld) {
-    if (feld && feld.wert !== null && feld.wert !== undefined) return [e(name), e(String(feld.wert))];
     return [e(name), '<span class="dim">nicht gemessen — ' + e(feld && feld.grund ? feld.grund : "ohne Grund") + "</span>"];
   }
 
@@ -99,25 +96,16 @@
       ];
     });
     const lebenslauf = tabelle(["Zustand", "Zahl"], [
-      ungemessenZeile("neu erkannt", v.neu),
-      ungemessenZeile("in Arbeit", v.laufend),
+      ["neu erkannt", String(v.neuAusKonkurrenz || 0)],
+      ungemessenZeile("laufend", v.laufend),
       ungemessenZeile("erfolgreich abgeschlossen", v.erledigt),
-      ungemessenZeile("gescheitert (beim Betreiber)", v.gescheitert),
-      ["gesamt in der Ablage", v.gesamt === null || v.gesamt === undefined ? '<span class="dim">—</span>' : e(String(v.gesamt))]
+      ungemessenZeile("fehlgeschlagen", v.gescheitert)
     ]);
-    // Ein Befund, der immer wiederkommt, ist wichtiger als zehn einmalige.
-    const hartnaeckig = v.hartnaeckigste
-      ? '<div class="note glass"><div class="nx">◆</div><div><div class="nt">Hartnäckigster Befund: '
-        + e(v.hartnaeckigste.titel) + "</div>"
-        + '<div class="ns">' + v.hartnaeckigste.gesehen + " mal gesehen seit " + e(A.zeit(v.hartnaeckigste.seit))
-        + " — er verschwindet nicht von selbst.</div></div></div>"
-      : "";
     return V.panelBlock("Die wichtigsten Verbesserungen", "nach Score sortiert",
       zeilen.length
         ? tabelle(["Verbesserung", "Score", "Priorität", "Zuständig", "Freigabe"], zeilen)
         : '<div class="pb"><p class="dim">Keine offenen Verbesserungen erkannt.</p></div>')
-      + V.panelBlock("Lebenslauf der Aufgaben", "aus der Ablage — überlebt jeden Deploy", lebenslauf)
-      + hartnaeckig;
+      + V.panelBlock("Lebenslauf der Aufgaben", "was noch keine Ablage hat, steht als Lücke da", lebenslauf);
   }
 
   function konkurrenzBlock(d) {

@@ -17,8 +17,8 @@
   --sm-border:rgba(255,255,255,.11);
   --sm-border-strong:rgba(255,255,255,.2);
   --sm-ink:#f6f3ee;
-  --sm-ink-dim:rgba(246,243,238,.62);
-  --sm-ink-faint:rgba(246,243,238,.38);
+  --sm-ink-dim:rgba(246,243,238,.80);
+  --sm-ink-faint:rgba(246,243,238,.60);
   --sm-field:rgba(5,6,8,.45);
   --sm-danger:#ff9a9c;
   --sm-danger-bg:rgba(255,77,79,.12);
@@ -29,7 +29,7 @@
   --sm-warn:#ffd68a;
   --sm-warn-bg:rgba(255,214,138,.12);
   --sm-warn-border:rgba(255,214,138,.36);
-  --sm-shadow:0 0 24px rgba(45,212,191,.14),0 18px 50px rgba(0,0,0,.35);
+  --sm-shadow:0 18px 50px rgba(0,0,0,.45);
   --rail:284px;
   --radius:0px;              /* viereckig, ausdrueckliche Vorgabe */
   --glass-blur:blur(34px) saturate(170%);
@@ -41,10 +41,11 @@ body{
   min-height:100vh;
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   color:var(--sm-ink);
-  background:
-    radial-gradient(780px 500px at 84% 4%,rgba(45,212,191,.16),transparent 62%),
-    radial-gradient(660px 500px at -8% 72%,rgba(13,185,210,.10),transparent 64%),
-    linear-gradient(180deg,#0c1119 0%,#070b11 68%,#04070b 100%);
+  /* Ein Ton statt zweier Farbwolken (2026-08-14, Betreiber-Freigabe). Vorher
+     lagen hier ein tuerkiser und ein blauer Fleck ueber dem Grund und faerbten
+     jede Seite mit. Der Verlauf bleibt, damit die Flaeche nicht tot wirkt —
+     aber neutral. */
+  background:linear-gradient(180deg,#121417 0%,#0d0f12 62%,#0a0c0e 100%);
   background-attachment:fixed;
   -webkit-font-smoothing:antialiased;
 }
@@ -82,7 +83,7 @@ body{
 .rail-brand{padding:18px 16px 14px;border-bottom:1px solid var(--sm-border);}
 .rail-brand .mark{display:flex;align-items:center;gap:9px;}
 .rail-brand .dot{width:16px;height:16px;border:1.5px solid var(--sm-accent);
-  box-shadow:0 0 14px rgba(45,212,191,.55);position:relative;}
+  position:relative;}
 .rail-brand .dot::after{content:"";position:absolute;inset:4px;background:var(--sm-accent);}
 .rail-brand b{font-size:17.5px;font-weight:600;letter-spacing:.01em;}
 .rail-brand .sub{margin-top:8px;font-size:12px;font-weight:700;letter-spacing:.16em;
@@ -90,7 +91,7 @@ body{
 
 .rail-env{padding:10px 16px;border-bottom:1px solid var(--sm-border);
   display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--sm-ink-dim);}
-.rail-env .live{width:6px;height:6px;background:var(--sm-ok);box-shadow:0 0 8px var(--sm-ok);}
+.rail-env .live{width:6px;height:6px;background:var(--sm-ok);}
 
 .rail-nav{overflow-y:auto;padding:8px 8px 14px;}
 .rail-nav::-webkit-scrollbar{width:6px;}
@@ -108,10 +109,10 @@ body{
 }
 .rail-item:hover{background:rgba(255,255,255,.05);color:var(--sm-ink);}
 .rail-item.on{
-  background:var(--sm-accent-soft);border-color:var(--sm-accent-border);color:var(--sm-ink);
+  background:var(--sm-card-strong);border-color:var(--sm-border-strong);color:var(--sm-ink);
   box-shadow:inset 2px 0 0 var(--sm-accent);
 }
-.rail-item.on .ltr{background:var(--sm-accent);border-color:var(--sm-accent);color:#04302d;}
+.rail-item.on .ltr{background:transparent;border-color:var(--sm-accent);color:var(--sm-ink);}
 .rail-foot{padding:12px 16px;border-top:1px solid var(--sm-border);display:grid;gap:8px;}
 .rail-user{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:center;}
 .rail-user .av{width:32px;height:32px;display:grid;place-items:center;font-size:12.5px;font-weight:700;
@@ -243,7 +244,7 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
   position:relative;flex:none;}
 .sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;background:var(--sm-ink-faint);}
 .sw.on{background:var(--sm-accent-soft);border-color:var(--sm-accent-border);}
-.sw.on::after{left:auto;right:2px;background:var(--sm-accent);box-shadow:0 0 10px rgba(45,212,191,.6);}
+.sw.on::after{left:auto;right:2px;background:var(--sm-accent);}
 
 /* Hinweisstreifen */
 .note{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:13px 15px;align-items:start;
@@ -353,9 +354,9 @@ select.dlg-feld{cursor:pointer;}
 .ap-reg.warn{border-color:var(--sm-danger-border);background:var(--sm-danger-bg);
   color:var(--sm-danger);}
 .ap-reg.warn .n{color:var(--sm-danger);}
-.ap-reg.on{border-color:var(--sm-accent-border);background:var(--sm-accent-soft);
-  color:var(--sm-accent-text);}
-.ap-reg.on .n{color:var(--sm-accent-text);}
+.ap-reg.on{border-color:var(--sm-border-strong);background:var(--sm-card-strong);
+  color:var(--sm-ink);box-shadow:inset 2px 0 0 var(--sm-accent);}
+.ap-reg.on .n{color:var(--sm-ink);}
 .ap-reg.warn.on{border-color:var(--sm-danger);background:var(--sm-danger-bg);
   color:var(--sm-danger);}
 .ap-register-leer{grid-column:1/-1;padding:26px 18px;font-size:16px;line-height:1.55;
@@ -375,7 +376,8 @@ select.dlg-feld{cursor:pointer;}
 .ap-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;
   border:1px solid var(--sm-border);background:var(--sm-card);color:var(--sm-ink);}
 .ap-item:hover{border-color:var(--sm-border-strong);}
-.ap-item.on{border-color:var(--sm-accent-border);background:var(--sm-accent-soft);}
+.ap-item.on{border-color:var(--sm-border-strong);background:var(--sm-card-strong);
+  box-shadow:inset 2px 0 0 var(--sm-accent);}
 .ap-item .t{min-width:0;}
 .ap-item .t b{display:block;font-size:15.5px;}
 .ap-item .t > span{display:block;font-size:13.5px;color:var(--sm-ink-faint);}
@@ -387,9 +389,9 @@ select.dlg-feld{cursor:pointer;}
 .ap-nr{display:inline;color:var(--sm-ink-dim);font-weight:500;margin-right:8px;
   font-variant-numeric:tabular-nums;}
 .ap-dot{width:12px;height:12px;flex:none;}
-.ap-dot.gruen{background:var(--sm-ok);box-shadow:0 0 10px var(--sm-ok);}
-.ap-dot.gelb{background:var(--sm-warn);box-shadow:0 0 10px var(--sm-warn);}
-.ap-dot.rot{background:var(--sm-danger);box-shadow:0 0 10px var(--sm-danger);}
+.ap-dot.gruen{background:var(--sm-ok);}
+.ap-dot.gelb{background:var(--sm-warn);}
+.ap-dot.rot{background:var(--sm-danger);}
 .ap-dot.grau{background:var(--sm-ink-faint);}
 .ap-detail{display:flex;flex-direction:column;gap:12px;min-width:0;}
 /* Technische Kennung im Steckbrief: sichtbar, aber leise. Sie ist eine
@@ -409,7 +411,7 @@ select.dlg-feld{cursor:pointer;}
 
 /* Wartung: eigener Ampelzustand (Stufe 2b). Akzentfarbe statt Rot/Grün —
    stummgeschaltet ist weder gesund noch kaputt, sondern eine Entscheidung. */
-.ap-dot.wartung{background:var(--sm-accent);box-shadow:0 0 10px var(--sm-accent);opacity:.75;}
+.ap-dot.wartung{background:var(--sm-accent);opacity:.75;}
 .ap-knoepfe{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:4px;}
 .ap-knoepfe .btn{padding:9px 16px;font-size:15px;cursor:pointer;font-family:inherit;
   background:var(--sm-accent-soft);border:1px solid var(--sm-accent-border);color:var(--sm-accent-text);}

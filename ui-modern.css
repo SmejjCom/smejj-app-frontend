@@ -17,7 +17,7 @@
   --sm-border: rgba(255, 255, 255, 0.11);
   --sm-border-strong: rgba(255, 255, 255, 0.2);
   --sm-ink: #f6f3ee;
-  --sm-ink-dim: rgba(246, 243, 238, 0.62);
+  --sm-ink-dim: rgba(246, 243, 238, 0.80);
   --sm-field: rgba(5, 6, 8, 0.45);
   --sm-danger: #ff9a9c;
   --sm-danger-bg: rgba(255, 77, 79, 0.12);
@@ -121,9 +121,9 @@
 #storagePanelCheck:hover,
 #capabilities:hover,
 #costGuardDetails:hover {
-  background: rgba(0, 255, 239, 0.2) !important;
-  border-color: rgba(0, 255, 239, 0.65) !important;
-  color: #d9fffb !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(0, 255, 239, 0.5) !important;
+  color: #f2f0ec !important;
 }
 
 /* Toolbar: flexibel, kompakt */
@@ -161,7 +161,7 @@
 .view:not(#start) :is(input, select, textarea):focus,
 .modal :is(input, select, textarea):focus {
   border-color: var(--sm-accent-border);
-  box-shadow: 0 0 0 3px rgba(0, 255, 239, 0.14);
+  box-shadow: 0 0 0 2px rgba(0, 255, 239, 0.22);
 }
 
 .view:not(#start) label {
@@ -364,10 +364,10 @@ button.danger:hover {
 /* ---------- Toast ---------- */
 
 .toast {
-  border: 1px solid var(--sm-accent-border);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 12px;
-  background: rgba(10, 28, 26, 0.92);
-  color: #d9fffb;
+  background: rgba(18, 20, 23, 0.94);
+  color: #f2f0ec;
   font-weight: 600;
   box-shadow: var(--sm-shadow);
   backdrop-filter: blur(18px);

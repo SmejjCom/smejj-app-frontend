@@ -680,10 +680,10 @@ textarea {
 }
 
 body {
-  background:
-    radial-gradient(circle at 22% 12%, rgba(95, 176, 154, 0.16), transparent 28%),
-    radial-gradient(circle at 78% 20%, rgba(79, 143, 236, 0.14), transparent 26%),
-    linear-gradient(180deg, #151617 0%, #101113 58%, #0d0e10 100%);
+  /* Ein Ton statt zweier Farbwolken (2026-08-14, Betreiber-Freigabe). Hier
+     lagen ein gruen-tuerkiser und ein blauer Fleck ueber dem Grund und
+     faerbten den ganzen Aussenbereich mit. */
+  background: linear-gradient(180deg, #141517 0%, #101113 58%, #0d0e10 100%);
   color: #f6f3ee;
 }
 
