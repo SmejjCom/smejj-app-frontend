@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "এই লেখাটি উন্নত করুন:",
   "Recherchieren": "গবেষণা",
   "Recherchiere für mich:": "আমার জন্য এটি নিয়ে গবেষণা করুন:",
-  "Bild erstellen": "ছবি তৈরি",
-  "Erstelle ein Bild von:": "এর একটি ছবি তৈরি করুন:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "আমি কীভাবে সাহায্য করতে পারি?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "একটি কাজ বর্ণনা করুন বা একটি প্রশ্ন করুন।",
+  "Bilder generieren": "ছবি তৈরি করো",
+  "Generiere ein Bild von:": "এর ছবি তৈরি করো:",
+  "Video generieren": "ভিডিও তৈরি করো",
+  "Generiere ein Video von:": "এর ভিডিও তৈরি করো:",
 };

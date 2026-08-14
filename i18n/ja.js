@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "この文章を改善して：",
   "Recherchieren": "調べる",
   "Recherchiere für mich:": "これについて調べて：",
-  "Bild erstellen": "画像を作る",
-  "Erstelle ein Bild von:": "次の画像を作って：",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "何をお手伝いしましょうか？",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "タスクを説明するか、質問してください。",
+  "Bilder generieren": "画像を生成",
+  "Generiere ein Bild von:": "次の画像を生成：",
+  "Video generieren": "動画を生成",
+  "Generiere ein Video von:": "次の動画を生成：",
 };

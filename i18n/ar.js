@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "حسّن هذا النص:",
   "Recherchieren": "بحث",
   "Recherchiere für mich:": "ابحث لي عن:",
-  "Bild erstellen": "إنشاء صورة",
-  "Erstelle ein Bild von:": "أنشئ صورة لـ:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "كيف يمكنني المساعدة؟",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "صف مهمة أو اطرح سؤالاً.",
+  "Bilder generieren": "توليد صور",
+  "Generiere ein Bild von:": "ولّد صورة لـ:",
+  "Video generieren": "توليد فيديو",
+  "Generiere ein Video von:": "ولّد فيديو لـ:",
 };

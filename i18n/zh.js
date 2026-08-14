@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "帮我润色这段文字：",
   "Recherchieren": "做调研",
   "Recherchiere für mich:": "帮我调研：",
-  "Bild erstellen": "生成图片",
-  "Erstelle ein Bild von:": "帮我生成一张图片：",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "有什么可以帮您？",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "描述一个任务或提出一个问题。",
+  "Bilder generieren": "生成图片",
+  "Generiere ein Bild von:": "生成这个的图片：",
+  "Video generieren": "生成视频",
+  "Generiere ein Video von:": "生成这个的视频：",
 };

@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "Улучши этот текст:",
   "Recherchieren": "Найти информацию",
   "Recherchiere für mich:": "Найди информацию о:",
-  "Bild erstellen": "Создать изображение",
-  "Erstelle ein Bild von:": "Создай изображение:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "Чем я могу помочь?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "Опишите задачу или задайте вопрос.",
+  "Bilder generieren": "Создать изображения",
+  "Generiere ein Bild von:": "Создай изображение:",
+  "Video generieren": "Создать видео",
+  "Generiere ein Video von:": "Создай видео:",
 };

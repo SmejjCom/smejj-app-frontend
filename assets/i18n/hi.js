@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "इस टेक्स्ट को सुधारें:",
   "Recherchieren": "शोध करना",
   "Recherchiere für mich:": "मेरे लिए इस पर शोध करें:",
-  "Bild erstellen": "छवि बनाना",
-  "Erstelle ein Bild von:": "इसकी एक छवि बनाएँ:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "मैं कैसे मदद कर सकता हूँ?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "कोई कार्य बताइए या कोई प्रश्न पूछिए।",
+  "Bilder generieren": "चित्र बनाओ",
+  "Generiere ein Bild von:": "इसका चित्र बनाओ:",
+  "Video generieren": "वीडियो बनाओ",
+  "Generiere ein Video von:": "इसका वीडियो बनाओ:",
 };

@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "Perbaiki teks ini:",
   "Recherchieren": "Meneliti",
   "Recherchiere für mich:": "Telusuri ini untuk saya:",
-  "Bild erstellen": "Membuat gambar",
-  "Erstelle ein Bild von:": "Buat gambar tentang:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "Ada yang bisa saya bantu?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "Jelaskan tugas atau ajukan pertanyaan.",
+  "Bilder generieren": "Hasilkan gambar",
+  "Generiere ein Bild von:": "Hasilkan gambar tentang:",
+  "Video generieren": "Hasilkan video",
+  "Generiere ein Video von:": "Hasilkan video tentang:",
 };

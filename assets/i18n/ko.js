@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "이 문장을 다듬어 줘:",
   "Recherchieren": "조사하기",
   "Recherchiere für mich:": "이것에 대해 조사해 줘:",
-  "Bild erstellen": "이미지 만들기",
-  "Erstelle ein Bild von:": "다음 이미지를 만들어 줘:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "무엇을 도와드릴까요?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "작업을 설명하거나 질문해 주세요.",
+  "Bilder generieren": "이미지 생성",
+  "Generiere ein Bild von:": "다음 이미지를 생성:",
+  "Video generieren": "비디오 생성",
+  "Generiere ein Video von:": "다음 비디오를 생성:",
 };

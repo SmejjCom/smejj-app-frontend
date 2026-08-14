@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "Improve this text:",
   "Recherchieren": "Research",
   "Recherchiere für mich:": "Research this for me:",
-  "Bild erstellen": "Create an image",
-  "Erstelle ein Bild von:": "Create an image of:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "How can I help?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "Describe a task or ask a question.",
+  "Bilder generieren": "Generate images",
+  "Generiere ein Bild von:": "Generate an image of:",
+  "Video generieren": "Generate video",
+  "Generiere ein Video von:": "Generate a video of:",
 };

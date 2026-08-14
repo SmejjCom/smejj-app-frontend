@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "Bu metni iyileştir:",
   "Recherchieren": "Araştırmak",
   "Recherchiere für mich:": "Bunu benim için araştır:",
-  "Bild erstellen": "Görsel oluşturmak",
-  "Erstelle ein Bild von:": "Şunun görselini oluştur:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "Nasıl yardımcı olabilirim?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "Bir görev tanımlayın veya bir soru sorun.",
+  "Bilder generieren": "Görsel üret",
+  "Generiere ein Bild von:": "Şunun görselini üret:",
+  "Video generieren": "Video üret",
+  "Generiere ein Video von:": "Şunun videosunu üret:",
 };

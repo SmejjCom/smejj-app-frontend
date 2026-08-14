@@ -330,9 +330,11 @@ export default {
   "Verbessere diesen Text:": "Melhore este texto:",
   "Recherchieren": "Pesquisar",
   "Recherchiere für mich:": "Pesquise isto para mim:",
-  "Bild erstellen": "Criar uma imagem",
-  "Erstelle ein Bild von:": "Crie uma imagem de:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
   "Womit kann ich helfen?": "Como posso ajudar?",
   "Beschreibe eine Aufgabe oder stelle eine Frage.": "Descreva uma tarefa ou faça uma pergunta.",
+  "Bilder generieren": "Gerar imagens",
+  "Generiere ein Bild von:": "Gere uma imagem de:",
+  "Video generieren": "Gerar vídeo",
+  "Generiere ein Video von:": "Gere um vídeo de:",
 };
