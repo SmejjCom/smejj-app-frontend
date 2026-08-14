@@ -158,8 +158,15 @@
         + '<div class="ns">Der Zähler beginnt nach jedem Deploy neu. Die Prüfer selbst laufen trotzdem alle 30 Minuten '
         + "gegen ihre Selbsttest-Proben — grün heisst hier: die Prüfer funktionieren.</div></div></div>"
       : '<div class="note glass"><div class="nx">✓</div><div><div class="nt">' + s.abdeckung + " % der KI-Aktionen werden geprüft</div>"
-        + '<div class="ns">Der Rest läuft ungemessen durch. Ungemessen heisst nicht schlecht — es heisst, '
-        + "dass niemand hinsieht.</div></div></div>";
+        // Bei 100 % gibt es keinen Rest — der Satz "der Rest läuft ungemessen
+        // durch" stand dort trotzdem und widersprach der Zahl direkt darüber
+        // (live gesehen 2026-08-14). Ein Text, der seiner eigenen Kennzahl
+        // widerspricht, macht die ganze Seite unglaubwürdig.
+        + '<div class="ns">' + (s.abdeckung >= 100
+          ? "Jede gemeldete KI-Aktion bekommt eine Note. Was hier NICHT auftaucht, meldet sich gar nicht erst — "
+            + "die Abdeckung misst das Gemeldete, nicht die Welt."
+          : "Der Rest läuft ungemessen durch. Ungemessen heisst nicht schlecht — es heisst, dass niemand hinsieht.")
+        + "</div></div></div>";
 
     return V.kopfBlock("AE", "AI Evolution", "AI Evolution Engine",
       "Der Selbstverbesserungs-Kreislauf über allen KI-Funktionen. Jede Zahl hier ist gemessen — oder sie steht als Lücke da.")
