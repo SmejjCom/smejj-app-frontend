@@ -141,6 +141,7 @@
     const zeilen = (k.kandidaten || []).map(function (kandidat) {
       return [
         e(kandidat.anbieter),
+        e(kandidat.bereich || "allgemein"),
         '<a href="' + e(kandidat.url) + '" target="_blank" rel="noopener noreferrer">' + e(kandidat.titel) + "</a>",
         e(A.zeit(kandidat.gesehenAm))
       ];
@@ -153,7 +154,7 @@
     return V.panelBlock("Frische Suchtreffer des Radars",
       k.radarLetzterLauf ? "zuletzt gescannt: " + A.zeit(k.radarLetzterLauf) : "noch kein Scan gelaufen",
       (zeilen.length
-        ? tabelle(["Anbieter", "Schlagzeile (Quelle)", "gesehen"], zeilen)
+        ? tabelle(["Anbieter", "Bereich", "Schlagzeile (Quelle)", "gesehen"], zeilen)
         : '<div class="pb"><p class="dim">Keine Kandidaten aus dem letzten Scan.</p></div>')
       + '<div class="pb"><p>Das sind <b>Suchtreffer</b>, keine bestätigten Funktionen. '
       + "Ob daraus eine Lücke wird, entscheidest du — die Maschine belegt nur, was sie gefunden hat.</p></div>"
