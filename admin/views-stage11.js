@@ -76,6 +76,14 @@
       : '<div class="pb"><p class="dim">Seit dem letzten Neustart wurde noch keine KI-Aktion gemeldet. '
         + "Der Zähler beginnt bei jedem Deploy neu — das ist kein Ausfall.</p></div>";
 
+    // Zwei verschiedene Lücken, und die zweite ist die ehrlichere.
+    const stumm = (q.ohneMeldung || []).length
+      ? '<div class="note glass"><div class="nx">◆</div><div><div class="nt">'
+        + (q.ohneMeldung || []).length + " Medientyp(en) haben einen Prüfer, aber noch nie gemeldet</div>"
+        + '<div class="ns">' + e((q.ohneMeldung || []).join(", "))
+        + " — die Abdeckung oben misst nur, was gemeldet wird. Was sich nie meldet, taucht in ihr gar nicht auf.</div></div></div>"
+      : "";
+
     const luecke = (q.ohnePruefer || []).length
       ? '<div class="note glass"><div class="nx">◆</div><div><div class="nt">'
         + (q.ohnePruefer || []).length + " Aktionsart(en) noch ohne Prüfer</div>"
@@ -84,7 +92,7 @@
       : "";
 
     return V.panelBlock("Qualität je Medientyp", (q.pruefer || 0) + " Prüfer angemeldet: " + e((q.medientypen || []).join(", ")), artenTabelle)
-      + luecke;
+      + luecke + stumm;
   }
 
   function verbesserungenBlock(d) {
@@ -120,6 +128,38 @@
       + hartnaeckig;
   }
 
+  /**
+   * Die frischen Suchtreffer des Radars — bewusst als EIGENER Block unter den
+   * Lücken und ausdrücklich als unbestätigt beschriftet. Ein Zeitungstitel
+   * neben einer gemessenen Funktionslücke sähe sonst gleich verlässlich aus.
+   */
+  function radarBlock(k) {
+    if (k.radarStumm) {
+      return '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Radar-Ablage nicht lesbar</div>'
+        + '<div class="ns">' + e(k.radarStumm) + " — was hier fehlt, ist ungeprüft, nicht »keine Neuigkeiten«.</div></div></div>";
+    }
+    const zeilen = (k.kandidaten || []).map(function (kandidat) {
+      return [
+        e(kandidat.anbieter),
+        '<a href="' + e(kandidat.url) + '" target="_blank" rel="noopener noreferrer">' + e(kandidat.titel) + "</a>",
+        e(A.zeit(kandidat.gesehenAm))
+      ];
+    });
+    const stumm = (k.radarStummeQuellen || []).length
+      ? '<div class="pb"><p class="dim">Stumme Quellen beim letzten Scan: '
+        + e((k.radarStummeQuellen || []).map(function (s) { return s.anbieter; }).join(", "))
+        + " — dort wurde NICHT nachgesehen.</p></div>"
+      : "";
+    return V.panelBlock("Frische Suchtreffer des Radars",
+      k.radarLetzterLauf ? "zuletzt gescannt: " + A.zeit(k.radarLetzterLauf) : "noch kein Scan gelaufen",
+      (zeilen.length
+        ? tabelle(["Anbieter", "Schlagzeile (Quelle)", "gesehen"], zeilen)
+        : '<div class="pb"><p class="dim">Keine Kandidaten aus dem letzten Scan.</p></div>')
+      + '<div class="pb"><p>Das sind <b>Suchtreffer</b>, keine bestätigten Funktionen. '
+      + "Ob daraus eine Lücke wird, entscheidest du — die Maschine belegt nur, was sie gefunden hat.</p></div>"
+      + stumm);
+  }
+
   function konkurrenzBlock(d) {
     const k = d.konkurrenz || {};
     const luecken = (k.luecken || []).map(function (l) {
@@ -130,6 +170,7 @@
       luecken.length ? tabelle(["Funktion", "Wer hat sie"], luecken) : '<div class="pb"><p class="dim">Keine Lücke bekannt.</p></div>')
       + V.panelBlock("Wo smejj vorne liegt", "das hier nicht kaputtmachen",
         vorteile.length ? tabelle(["Funktion", "Beleg im Quelltext"], vorteile) : '<div class="pb"><p class="dim">Kein eigener Vorteil erfasst.</p></div>')
+      + radarBlock(k)
       + '<div class="note glass"><div class="nx">◆</div><div><div class="nt">Woher der Konkurrenz-Stand kommt</div>'
       + '<div class="ns">Stand ' + e(k.stand || "?") + " · " + e(k.herkunft || "")
       + ". Das ist eine gepflegte Liste, keine Live-Messung — sie wird als solche ausgewiesen, damit niemand sie für gemessen hält.</div></div></div>";
