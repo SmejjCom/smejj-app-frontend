@@ -175,7 +175,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v366";
+const CACHE_NAME = "smejj-shell-v367";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -385,6 +385,35 @@ const LIVE_DATEN_PFADE = new Set(["/verlauf-messwerte.json"]);
 
 // HTML bleibt network-first: Navigationen und .html-Seiten sollen Aenderungen
 // sofort sehen; nur fuer sie ist der Netz-Rundweg den Preis wert.
+/**
+ * Holt eine vorab gespeicherte Datei im Hintergrund neu und ersetzt den
+ * Eintrag, wenn sich der Inhalt geaendert hat.
+ *
+ * Der Abruf traegt denselben Cache-Buster wie beim Vorabspeichern: `reload`
+ * allein umgeht nur den Browser-Cache, nicht den Rand-Cache von GitHub Pages.
+ * Gespeichert wird unter dem SAUBEREN Pfad, damit der cache-first-Abgleich
+ * (ignoreSearch) den Eintrag unveraendert findet.
+ *
+ * Still bei jedem Fehler: das ist reine Nachbesserung, sie darf eine
+ * ausgelieferte Seite nie stoeren.
+ */
+async function erneuereImHintergrund(request, url) {
+  try {
+    const trenner = url.pathname.includes("?") ? "&" : "?";
+    const frisch = await fetch(new Request(`${url.pathname}${trenner}sw=${CACHE_NAME}-r`, { cache: "reload" }));
+    if (!frisch || !frisch.ok) return;
+    const cache = await caches.open(CACHE_NAME);
+    const alt = await cache.match(url.pathname, { ignoreSearch: true });
+    // Nur schreiben, wenn es wirklich etwas Neues gibt — sonst wandert bei
+    // JEDEM Seitenaufruf jede Datei durch den Speicher.
+    if (alt) {
+      const [a, b] = await Promise.all([alt.clone().text(), frisch.clone().text()]);
+      if (a === b) return;
+    }
+    await cache.put(url.pathname, frisch);
+  } catch { /* still: Nachbesserung darf nie stoeren */ }
+}
+
 function isHtmlRequest(request, url) {
   if (request.mode === "navigate" || request.destination === "document") return true;
   return url.pathname === "/" || url.pathname.endsWith(".html") || url.pathname.endsWith("/");
@@ -432,7 +461,28 @@ self.addEventListener("fetch", (event) => {
   // MUSS die Version oben hochzaehlen, sonst sehen Bestandsnutzer den alten Stand.
   if (url.origin === self.location.origin && !isHtmlRequest(request, url) && PRECACHE_PATHS.has(url.pathname)) {
     event.respondWith(
-      caches.match(request, { ignoreSearch: true }).then((cached) => cached || fetch(request))
+      caches.match(request, { ignoreSearch: true }).then((cached) => {
+        if (!cached) return fetch(request);
+        // SELBSTHEILUNG (Befund 2026-08-14): aus dem Speicher ausliefern UND
+        // im Hintergrund nachsehen, ob es inzwischen etwas Neueres gibt.
+        //
+        // Warum das noetig ist, obwohl der Vorabspeicher seit v359 mit einem
+        // Cache-Buster gefuellt wird: Der Service Worker installiert, sobald er
+        // die neue sw.js sieht. Liegt die Programmdatei an genau DIESEM
+        // Rand-Knoten noch nicht, wird der frische Speicher wieder mit dem
+        // alten Stand gefuellt — und cache-first lieferte ihn dann bis zum
+        // NAECHSTEN Deploy aus. Gemessen unmittelbar nach dem v366-Push:
+        // das Netz hatte chat-sync.js mit 9660 Bytes (neu), der Speicher
+        // "smejj-shell-v367" die alte Fassung. Der Nutzer bekam den Fix also
+        // einen ganzen Deploy zu spaet.
+        //
+        // Die Antwort selbst bleibt der Speicher-Treffer: die laufende Seite
+        // soll nicht mitten im Betrieb Fassungen mischen. Erneuert wird nur der
+        // EINTRAG — beim naechsten Laden ist er richtig. Genau so arbeiten die
+        // grossen Anbieter (stale-while-revalidate).
+        event.waitUntil(erneuereImHintergrund(request, url));
+        return cached;
+      })
     );
     return;
   }
