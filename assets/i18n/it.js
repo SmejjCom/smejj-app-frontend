@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Abbonamento attivo tramite Stripe. Disdetta mensile.",
   "Gekündigt — läuft zum Periodenende aus.": "Disdetto: termina alla fine del periodo.",
   "Plan wechseln": "Cambia piano",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "Il tuo abbonamento è attivo. Grazie! Puoi cambiare piano o disdire in qualsiasi momento in Account → Abbonamento e pagamenti.",
   "Läuft aus": "Termina presto",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "Disdetto — il tuo abbonamento resta attivo fino al {datum}.",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Pagamento in sospeso — controlla il metodo di pagamento nel portale abbonamenti.",

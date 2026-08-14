@@ -37,11 +37,21 @@ export function markOnboardingDone(storage = globalThis.localStorage) {
 // App ueber den GitHub-Pages-404-Fallback zuerst unter "/" — der Login-Marker
 // steht erst nach der Routen-Wiederherstellung wieder in der Adresse, und die
 // Marker-Bereinigung in account-privacy.js raeumt ihn ab 800 ms weg.
-// Input: planLinks { plus, pro, max } (Stripe-Zahlungslinks). Output: void.
-export function initOnboardingWelcome(planLinks = {}, doc = globalThis.document) {
+// Input: planLinks { plus, pro, max } (Stripe-Zahlungslinks), optional
+// leseAbo() -> Promise<{plan}|null> fuer den echten Abo-Stand. Output: void.
+export function initOnboardingWelcome(planLinks = {}, doc = globalThis.document, leseAbo = null) {
   tryShowOnboarding(planLinks, doc);
   setTimeout(() => tryShowOnboarding(planLinks, doc), 300);
   setTimeout(() => tryShowOnboarding(planLinks, doc), 600);
+  // Zahlende Nutzer duerfen hier nie "Free — Aktiv" lesen (Befund 2026-08-13:
+  // die Karte war fest verdrahtet). Der Serverstand kommt asynchron nach und
+  // korrigiert die Karte, sobald er da ist; ohne Antwort bleibt Free stehen.
+  if (leseAbo) {
+    Promise.resolve(leseAbo()).then((abo) => {
+      bestaetigtesAbo = abo || null;
+      zeigeEchtenPlan(bestaetigtesAbo, doc); // Overlay steht schon
+    }).catch(() => {});
+  }
   // Express-Gefuehl nach dem Login (2026-08-12): Cursor blinkt direkt im
   // Eingabefeld — wie bei Claude/ChatGPT. Nur wenn KEIN Overlay offen ist;
   // sonst uebernimmt der Schliessen-Klick des Overlays den Fokus.
@@ -63,6 +73,40 @@ export function initOnboardingWelcome(planLinks = {}, doc = globalThis.document)
       setTimeout(() => { if (!doc?.querySelector(".onboarding-overlay")) focusComposer(doc); }, verzoegerung);
     }
   }
+}
+
+const PLAN_TITEL = { plus: "Plus — 9 €", pro: "Pro — 19 €", max: "Max — 39 €" };
+// Der Abo-Stand und der Overlay-Aufbau laufen unabhaengig voneinander: wer
+// zuerst fertig ist, ruft zeigeEchtenPlan() — der jeweils andere Weg findet
+// hier das Ergebnis vor. Ohne das bliebe "Free — Aktiv" stehen, wenn die
+// Serverantwort vor dem Overlay eintrifft.
+let bestaetigtesAbo = null;
+
+// Karte auf den bestaetigten Serverstand umschreiben: der bezahlte Plan traegt
+// das "Aktiv"-Abzeichen, Free verliert es, und der eigene Plan bietet keinen
+// Kaufknopf mehr an (ein zweiter Kauf legte ein zweites Abo an).
+function zeigeEchtenPlan(abo, doc = globalThis.document) {
+  const plan = abo && PLAN_TITEL[abo.plan] ? abo.plan : null;
+  if (!plan) return;
+  const karten = doc?.querySelectorAll(".onboarding-plan");
+  if (!karten?.length) return;
+  const abzeichen = `<span class="onboarding-badge">${t("Aktiv")}</span>`;
+  for (const karte of karten) {
+    const titel = karte.querySelector("strong")?.textContent || "";
+    const eigener = titel.startsWith(PLAN_TITEL[plan].split(" —")[0]);
+    karte.classList.toggle("is-current", eigener);
+    if (eigener) karte.querySelector("button")?.replaceWith(knotenAus(doc, abzeichen));
+    else if (titel.startsWith("Free")) karte.querySelector(".onboarding-badge")?.remove();
+  }
+  const unterzeile = doc.querySelector(".onboarding-sub");
+  if (unterzeile) unterzeile.textContent = t("Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.");
+}
+
+// Kleiner Helfer: HTML-Schnipsel zu einem Knoten (kein innerHTML am Ziel).
+function knotenAus(doc, html) {
+  const huelle = doc.createElement("div");
+  huelle.innerHTML = html;
+  return huelle.firstElementChild;
 }
 
 // Fokus ins Chat-Eingabefeld — still scheitern, wenn es (z. B. auf /profile)
@@ -109,6 +153,7 @@ function tryShowOnboarding(planLinks, doc) {
         </div>
       </div>`;
     doc.body.append(overlay);
+    zeigeEchtenPlan(bestaetigtesAbo, doc); // Abo-Stand war schon da
     overlay.addEventListener("click", (event) => {
       if (event.target.closest("#onboardingPlus") && planLinks.plus) window.open(planLinks.plus, "_blank", "noopener");
       if (event.target.closest("#onboardingPro") && planLinks.pro) window.open(planLinks.pro, "_blank", "noopener");

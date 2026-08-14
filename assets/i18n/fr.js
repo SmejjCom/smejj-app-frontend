@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Abonnement actif via Stripe. Résiliable chaque mois.",
   "Gekündigt — läuft zum Periodenende aus.": "Résilié — prend fin à la fin de la période.",
   "Plan wechseln": "Changer de forfait",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "Votre abonnement est actif. Merci ! Vous pouvez changer de forfait ou résilier à tout moment dans Compte → Abonnement et paiements.",
   "Läuft aus": "Se termine bientôt",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "Résilié — votre abonnement reste actif jusqu’au {datum}.",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Paiement en attente — vérifiez votre moyen de paiement dans le portail d’abonnement.",

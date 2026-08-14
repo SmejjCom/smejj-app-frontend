@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "订阅已通过 Stripe 生效。可按月取消。",
   "Gekündigt — läuft zum Periodenende aus.": "已取消——将在当前周期结束时到期。",
   "Plan wechseln": "更换套餐",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "你的订阅已生效。谢谢！你可以随时在「账户 → 订阅与付款」中更换套餐或取消。",
   "Läuft aus": "即将到期",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "已取消 — 你的订阅仍有效至{datum}。",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "待付款 — 请在订阅门户中检查支付方式。",

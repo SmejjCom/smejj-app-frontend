@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Stripe-এর মাধ্যমে সাবস্ক্রিপশন সক্রিয়। মাসিক বাতিলযোগ্য।",
   "Gekündigt — läuft zum Periodenende aus.": "বাতিল — মেয়াদ শেষে বন্ধ হবে।",
   "Plan wechseln": "প্ল্যান বদলান",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "আপনার সাবস্ক্রিপশন সক্রিয়। ধন্যবাদ! অ্যাকাউন্ট → সাবস্ক্রিপশন ও পেমেন্ট থেকে যেকোনো সময় প্ল্যান বদলাতে বা বাতিল করতে পারেন।",
   "Läuft aus": "শীঘ্রই শেষ",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "বাতিল হয়েছে — আপনার সাবস্ক্রিপশন {datum} পর্যন্ত চালু থাকবে।",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "পেমেন্ট বাকি — অনুগ্রহ করে সাবস্ক্রিপশন পোর্টালে পেমেন্টের মাধ্যম যাচাই করুন।",

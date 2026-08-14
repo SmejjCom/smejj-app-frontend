@@ -63,7 +63,7 @@ export function initAccountPrivacySurface() {
   } catch { /* Speicher gesperrt: der Standard greift ohnehin */ }
   // Onboarding ZUERST: es liest den Login-Marker aus der Adresse, BEVOR die
   // Bereinigung unten ihn entfernt (erscheint nur einmal, smejj.onboarding.v1).
-  initOnboardingWelcome(STRIPE_PLAN_LINKS);
+  initOnboardingWelcome(STRIPE_PLAN_LINKS, document, fetchBillingStatus);
   // Mehrfach zeitversetzt: der app.js-Router (Start-Lock, nicht anfassbar)
   // haengt beim Ansichtswechsel location.search wieder an — je nach Ladetempo
   // gewinnt er das Rennen. Die spaeteren Durchlaeufe raeumen dann endgueltig auf.

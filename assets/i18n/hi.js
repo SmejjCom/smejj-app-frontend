@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Stripe के ज़रिए सदस्यता सक्रिय। हर माह रद्द की जा सकती है।",
   "Gekündigt — läuft zum Periodenende aus.": "रद्द — अवधि के अंत में समाप्त होगी।",
   "Plan wechseln": "प्लान बदलें",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "आपकी सदस्यता सक्रिय है। धन्यवाद! आप कभी भी खाता → सदस्यता और भुगतान में प्लान बदल सकते हैं या रद्द कर सकते हैं।",
   "Läuft aus": "जल्द समाप्त",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "रद्द किया गया — आपकी सदस्यता {datum} तक चालू रहेगी।",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "भुगतान बाकी — कृपया सदस्यता पोर्टल में भुगतान का तरीका जाँचें।",

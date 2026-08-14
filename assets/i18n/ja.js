@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Stripe 経由でサブスクリプションが有効です。毎月解約できます。",
   "Gekündigt — läuft zum Periodenende aus.": "解約済み — 期間の終わりに終了します。",
   "Plan wechseln": "プランを変更",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "サブスクリプションが有効です。ありがとうございます！プラン変更や解約は、アカウント → サブスクリプションとお支払い からいつでも行えます。",
   "Läuft aus": "まもなく終了",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "解約済み — サブスクリプションは{datum}まで有効です。",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "支払いが未完了です — サブスクリプションポータルで支払い方法をご確認ください。",

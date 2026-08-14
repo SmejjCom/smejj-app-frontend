@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Assinatura ativa via Stripe. Cancelável mensalmente.",
   "Gekündigt — läuft zum Periodenende aus.": "Cancelada — termina no fim do período.",
   "Plan wechseln": "Mudar de plano",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "Sua assinatura está ativa. Obrigado! Você pode mudar de plano ou cancelar quando quiser em Conta → Assinatura e pagamentos.",
   "Läuft aus": "Termina em breve",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "Cancelada — sua assinatura continua ativa até {datum}.",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Pagamento pendente — verifique o meio de pagamento no portal da assinatura.",

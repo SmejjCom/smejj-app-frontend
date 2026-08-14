@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Abonelik Stripe üzerinden etkin. Aylık iptal edilebilir.",
   "Gekündigt — läuft zum Periodenende aus.": "İptal edildi — dönem sonunda sona erer.",
   "Plan wechseln": "Planı değiştir",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "Aboneliğin etkin. Teşekkürler! Planı istediğin zaman Hesap → Abonelik ve ödemeler bölümünden değiştirebilir veya iptal edebilirsin.",
   "Läuft aus": "Yakında bitiyor",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "İptal edildi — aboneliğin {datum} tarihine kadar geçerli.",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Ödeme bekleniyor — lütfen abonelik portalında ödeme yöntemini kontrol et.",

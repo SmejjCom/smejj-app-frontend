@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Подписка активна через Stripe. Отмена ежемесячно.",
   "Gekündigt — läuft zum Periodenende aus.": "Отменена — действует до конца периода.",
   "Plan wechseln": "Сменить план",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "Ваша подписка активна. Спасибо! Сменить план или отменить подписку можно в любой момент в разделе Аккаунт → Подписка и платежи.",
   "Läuft aus": "Скоро закончится",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "Отменена — подписка действует до {datum}.",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Ожидается оплата — проверьте способ оплаты в портале подписки.",

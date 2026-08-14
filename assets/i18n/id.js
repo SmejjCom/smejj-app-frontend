@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Langganan aktif via Stripe. Bisa dibatalkan tiap bulan.",
   "Gekündigt — läuft zum Periodenende aus.": "Dibatalkan — berakhir pada akhir periode.",
   "Plan wechseln": "Ganti paket",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "Langgananmu aktif. Terima kasih! Kamu bisa ganti paket atau membatalkan kapan saja di Akun → Langganan & pembayaran.",
   "Läuft aus": "Segera berakhir",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "Dibatalkan — langgananmu tetap aktif sampai {datum}.",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Pembayaran tertunda — periksa metode pembayaran di portal langganan.",

@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Subscription active via Stripe. Cancel monthly.",
   "Gekündigt — läuft zum Periodenende aus.": "Cancelled — runs out at the end of the period.",
   "Plan wechseln": "Switch plan",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "Your subscription is active. Thank you! You can switch plans or cancel any time under Account → Subscription & payments.",
   "Läuft aus": "Ends soon",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "Cancelled — your subscription still runs until {datum}.",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Payment due — please check your payment method in the subscription portal.",

@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "الاشتراك مُفعَّل عبر Stripe. يمكن الإلغاء شهريًا.",
   "Gekündigt — läuft zum Periodenende aus.": "تم الإلغاء — ينتهي مع نهاية الفترة.",
   "Plan wechseln": "تغيير الخطة",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "اشتراكك فعّال. شكرًا لك! يمكنك تغيير الخطة أو الإلغاء في أي وقت من الحساب ← الاشتراك والمدفوعات.",
   "Läuft aus": "ينتهي قريبًا",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "أُلغي — يبقى اشتراكك فعّالًا حتى {datum}.",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "دفعة مستحقة — يُرجى التحقق من وسيلة الدفع في بوابة الاشتراك.",

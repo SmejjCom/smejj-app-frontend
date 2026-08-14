@@ -300,6 +300,7 @@ export default {
   "Abo aktiv über Stripe. Monatlich kündbar.": "Stripe를 통해 구독이 활성화되었습니다. 매월 해지할 수 있습니다.",
   "Gekündigt — läuft zum Periodenende aus.": "해지됨 — 기간이 끝나면 종료됩니다.",
   "Plan wechseln": "플랜 변경",
+  "Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.": "구독이 활성화되었습니다. 감사합니다! 계정 → 구독 및 결제에서 언제든 플랜을 변경하거나 해지할 수 있습니다.",
   "Läuft aus": "곧 종료",
   "Gekündigt — dein Abo läuft noch bis {datum}.": "해지됨 — 구독은 {datum}까지 유지됩니다.",
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "결제 대기 중 — 구독 포털에서 결제 수단을 확인해 주세요.",
