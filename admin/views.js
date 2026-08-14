@@ -197,7 +197,53 @@
       + panel("Stammdaten", u.userId || "", stamm)
       + panel("Sitzungen", (u.sessions || []).length + " insgesamt",
         tabelle(["Gerät", "Sitzung", "Zuletzt", "Läuft ab", "Stand"], sitzungen))
+      + akteAktionen(u)
       + '</div>';
+  }
+
+  /**
+   * Die Aktionsleiste der Nutzerakte.
+   *
+   * WARUM SIE HIER STEHT: console.js bindet seit dem 28.07.2026 Handler an
+   * `#akteAktionen` und `[data-aktion]` — nur hat diese Leiste NIE jemand
+   * gezeichnet. `getElementById` gab null, `bindeAkteAktionen()` kehrte still
+   * zurueck, und damit war der komplette schreibende Teil des Adminbereichs
+   * (sperren, entsperren, bestaetigen, entriegeln, abmelden, Rolle vergeben,
+   * loeschen, Support-Vorgang) fuer den Betreiber unerreichbar — waehrend
+   * Server, Vier-Augen-Freigabe, Step-up und Audit-Log vollstaendig da waren
+   * und gruen getestet wurden. Gefunden bei der A-bis-Z-Pruefung am 14.08.2026.
+   *
+   * GEZEIGT WIRD NUR, WAS AUCH ETWAS TUT. Ein "E-Mail bestätigen" an einer
+   * laengst bestaetigten Adresse waere ein Knopf, der nichts bewirkt — genau
+   * die Sorte Attrappe, die diese Konsole nicht haben will. Die Rechte prueft
+   * weiterhin der Server; die Leiste rät sie nicht nach.
+   */
+  function akteAktionen(u) {
+    // Eine geloeschte Huelle hat nichts mehr, was man an ihr tun koennte.
+    if (u.status === "deleted") {
+      return panel("Aktionen", "gelöscht",
+        '<div class="pb"><div class="leer">Dieses Konto ist gelöscht. Es gibt nichts mehr zu ändern.</div></div>');
+    }
+
+    const knopf = (aktion, text, ton) =>
+      '<button type="button" class="btn' + (ton ? " " + ton : "") + '" data-aktion="' + e(aktion) + '">'
+      + e(text) + "</button>";
+
+    const knoepfe = [];
+    knoepfe.push(u.status === "blocked"
+      ? knopf("unblock", "Entsperren")
+      : knopf("block", "Sperren", "danger"));
+    if (!u.emailVerifiedAt) knoepfe.push(knopf("verify", "E-Mail bestätigen"));
+    if ((u.loginGuard || {}).lockedUntil) knoepfe.push(knopf("unlock", "Login-Sperre aufheben"));
+    if ((u.sessions || []).some((s) => s.active)) knoepfe.push(knopf("sessions.revoke", "Sitzungen widerrufen"));
+    knoepfe.push(knopf("impersonation", "Support-Vorgang beantragen"));
+    knoepfe.push(knopf("role.grant", "Rolle vergeben"));
+    knoepfe.push(knopf("delete", "Konto löschen", "danger"));
+
+    return panel("Aktionen", "jede Änderung braucht Grund, Step-up und Audit-Eintrag",
+      '<div class="pb"><div class="bar" id="akteAktionen">' + knoepfe.join("") + '</div>'
+      + '<div class="leer">Rolle vergeben und Konto löschen brauchen zusätzlich die '
+      + 'Freigabe einer zweiten Person — du selbst darfst deinen eigenen Antrag nicht durchwinken.</div></div>');
   }
 
   // ---- O · Audit --------------------------------------------------------------
