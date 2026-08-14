@@ -115,7 +115,13 @@
   // unter /radar/berichte.json, der Control-Server liefert sie hinter der
   // Admin-Anmeldung unter /admin/radar-berichte.json aus. Ein einzelner Pfad
   // waere auf genau einem der beiden Wege tot — deshalb der Reihe nach beide.
-  const QUELLEN = ["/radar/berichte.json", "/admin/radar-berichte.json"];
+  // Reihenfolge mit Absicht: der Admin-Pfad zuerst. Er ist die bessere erste
+  // Wahl — hinter der Anmeldung, mit richtigem Inhaltstyp, aus der einen
+  // Quelle im Repo ausgeliefert. Auf GitHub Pages gibt es ihn nicht (404),
+  // dann greift der zweite. Beide Wege funktionieren, nur die Reihenfolge
+  // aendert sich; und der Pruefstand sieht jetzt eine Adresse, die wirklich
+  // bei einem Handler ankommt.
+  const QUELLEN = ["/admin/radar-berichte.json", "/radar/berichte.json"];
 
   async function holeBerichte() {
     let letzterStatus = 0;
