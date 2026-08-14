@@ -61,7 +61,7 @@ textarea {
 
 .brand h1 {
   margin: 0;
-  font-size: 28px;
+  font-size:32px;
   line-height: 1;
   letter-spacing: 0;
 }
@@ -70,7 +70,7 @@ textarea {
 .eyebrow {
   margin: 8px 0 0;
   color: #71716b;
-  font-size: 12px;
+  font-size:14.5px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -144,7 +144,7 @@ button:hover {
   background: #ffffff;
   padding: 8px 10px;
   color: #4a4a43;
-  font-size: 12px;
+  font-size:14.5px;
   font-weight: 700;
 }
 
@@ -207,7 +207,7 @@ button:hover {
   max-width: 620px;
   margin: 16px 0 0;
   color: #62625b;
-  font-size: 16px;
+  font-size:18.5px;
   line-height: 1.5;
 }
 
@@ -268,7 +268,7 @@ button:hover {
 
 .search-box span {
   color: rgba(246, 243, 238, 0.58);
-  font-size: 12px;
+  font-size:14.5px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -279,7 +279,7 @@ button:hover {
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(5, 6, 8, 0.38);
   color: #f6f3ee;
-  font-size: 18px;
+  font-size:21px;
 }
 
 .search-box input::placeholder {
@@ -376,19 +376,19 @@ button:hover {
 
 .status-grid strong {
   color: #20201d;
-  font-size: 13px;
+  font-size:15.5px;
 }
 
 .status-grid span {
   color: #62625b;
-  font-size: 12px;
+  font-size:14.5px;
   font-weight: 700;
 }
 
 label {
   display: grid;
   gap: 8px;
-  font-size: 13px;
+  font-size:15.5px;
   font-weight: 700;
   color: #42423c;
 }
@@ -448,7 +448,7 @@ textarea {
 #editor {
   min-height: 360px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 13px;
+  font-size:15.5px;
   line-height: 1.5;
 }
 
@@ -475,7 +475,7 @@ textarea {
 }
 
 #tools .output {
-  font-size: 12px;
+  font-size:14.5px;
   color: #4a4a43;
 }
 
@@ -521,11 +521,11 @@ textarea {
   }
 
   .brand h1 {
-    font-size: 26px;
+    font-size:29px;
   }
 
   .view-header h2 {
-    font-size: 36px;
+    font-size:40px;
   }
 
   .nav,
@@ -536,7 +536,7 @@ textarea {
 }
 
 .button-icon { display: inline-grid; place-items: center; width: 26px; min-width: 26px; color: #00ffef; font-weight: 800; }
-.nav-label { min-width: 0; overflow: hidden; font-size: 14px; line-height: 1.16; text-overflow: ellipsis; white-space: nowrap; }
+.nav-label { min-width: 0; overflow: hidden; font-size:16.5px; line-height: 1.16; text-overflow: ellipsis; white-space: nowrap; }
 
 .button-icon svg,
 .browser-panel-nav button svg {
@@ -566,14 +566,14 @@ textarea {
 .surface strong,
 .empty-state strong {
   color: #172033;
-  font-size: 13px;
+  font-size:15.5px;
 }
 
 .surface span,
 .empty-state span {
   overflow-wrap: anywhere;
   color: #5d6675;
-  font-size: 13px;
+  font-size:15.5px;
 }
 
 .toast-root {
@@ -853,7 +853,7 @@ body.task-indicator-done .split-icon span:last-child {
 .sidebar.is-compact .button-icon {
   width: 100%;
   min-width: 0;
-  font-size: 12px;
+  font-size:14.5px;
 }
 
 .sidebar.is-compact .button-icon svg,
@@ -983,7 +983,7 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel.is-compact .browser-panel-nav button span {
   width: 100%;
   min-width: 0;
-  font-size: 12px;
+  font-size:14.5px;
 }
 
 .browser-panel.is-compact .browser-panel-nav {
@@ -1001,7 +1001,7 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel-header h2 {
   margin: 0;
   color: #f6f3ee;
-  font-size: 24px;
+  font-size:27px;
   line-height: 1;
   letter-spacing: 0;
 }
@@ -1009,7 +1009,7 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel-header p {
   margin: 8px 0 0;
   color: rgba(246, 243, 238, 0.58);
-  font-size: 12px;
+  font-size:14.5px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -1061,7 +1061,7 @@ body.is-resizing-panel .panel-resizer::before {
   background: rgba(255, 255, 255, 0.08);
   color: rgba(246, 243, 238, 0.72);
   padding: 8px 10px;
-  font-size: 12px;
+  font-size:14.5px;
   font-weight: 700;
 }
 
@@ -1155,7 +1155,7 @@ body.is-resizing-panel .panel-resizer::before {
 .sidebar.is-compact .profile-avatar {
   width: 16px;
   height: 16px;
-  font-size: 10px;
+  font-size:12.5px;
 }
 
 .sidebar.is-compact .profile-avatar.is-empty {
@@ -1340,7 +1340,7 @@ body.is-resizing-panel .panel-resizer::before {
   padding: 0 10px;
   border-radius: 8px;
   color: rgba(246, 243, 238, 0.74);
-  font-size: 15px;
+  font-size:17.5px;
   font-weight: 500;
 }
 
@@ -1401,7 +1401,7 @@ body.is-resizing-panel .panel-resizer::before {
   border-color: transparent;
   background: transparent;
   color: rgba(246, 243, 238, 0.78);
-  font-size: 13px;
+  font-size:15.5px;
   font-weight: 500;
   text-align: left;
 }
@@ -1538,7 +1538,7 @@ button:hover {
   }
 
   .home-hero h2 {
-    font-size: 34px;
+    font-size:38px;
   }
 
   .prompt-actions {
@@ -1554,7 +1554,7 @@ button:hover {
   }
 
   .text-chip {
-    font-size: 16px;
+    font-size:18.5px;
   }
 
   .send-button {
@@ -1610,7 +1610,7 @@ button:hover {
 
 .model-submenu-arrow {
   color: rgba(246, 243, 238, 0.5);
-  font-size: 12px;
+  font-size:14.5px;
 }
 
 .model-submenu {
@@ -1634,7 +1634,7 @@ button:hover {
 
 .model-submenu-group {
   padding: 6px 8px 2px;
-  font-size: 11px;
+  font-size:13.5px;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -1671,7 +1671,7 @@ button:hover {
 .model-submenu-note,
 .model-submenu-hint {
   padding: 8px;
-  font-size: 12px;
+  font-size:14.5px;
   color: rgba(246, 243, 238, 0.62);
   margin: 0;
 }
@@ -1882,7 +1882,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      border-color: transparent;
      background: transparent;
      color: rgba(246, 243, 238, 0.78);
-     font-size: 13px;
+     font-size:15.5px;
      font-weight: 500;
      text-align: left;
      cursor: pointer;
@@ -1989,7 +1989,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 .voice-mode-status {
-     font-size: 17px;
+     font-size:20px;
      font-weight: 500;
      margin: 0;
 }
@@ -1998,7 +1998,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      max-width: 640px;
      min-height: 24px;
      margin: 0;
-     font-size: 14px;
+     font-size:16.5px;
      color: rgba(246, 243, 238, 0.6);
      line-height: 1.5;
 }
@@ -2009,7 +2009,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      max-height: 38vh;
      overflow-y: auto;
      margin: 0;
-     font-size: 15px;
+     font-size:17.5px;
      color: rgba(246, 243, 238, 0.85);
      line-height: 1.55;
      white-space: pre-wrap;
@@ -2053,7 +2053,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      left: 0;
      right: 0;
      margin: 0;
-     font-size: 12px;
+     font-size:14.5px;
      color: rgba(246, 243, 238, 0.45);
 }
 
@@ -2271,7 +2271,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      border: none;
      background: transparent;
      color: rgba(246, 243, 238, 0.92);
-     font-size: 14px;
+     font-size:16.5px;
      outline: none;
 }
 
@@ -2386,7 +2386,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      border-radius: 8px;
      background: rgba(255, 255, 255, 0.04);
      color: rgba(246, 243, 238, 0.85);
-     font-size: 12px;
+     font-size:14.5px;
      font-weight: 500;
      cursor: pointer;
 }
@@ -2488,7 +2488,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-radius: 5px;
   background: transparent;
   color: #f6f3ee;
-  font-size: 11px;
+  font-size:13.5px;
   cursor: pointer;
 }
 
@@ -2534,7 +2534,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   height: 16px;
   border-radius: 5px;
   color: rgba(246, 243, 238, 0.5);
-  font-size: 13px;
+  font-size:15.5px;
   line-height: 1;
 }
 
@@ -2556,7 +2556,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-radius: 6px;
   background: transparent;
   color: rgba(246, 243, 238, 0.62);
-  font-size: 15px;
+  font-size:17.5px;
   line-height: 1;
   cursor: pointer;
 }
@@ -2567,7 +2567,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border: 1px solid rgba(159, 231, 212, 0.36);
   background: rgba(159, 231, 212, 0.11);
   color: rgba(159, 231, 212, 0.95);
-  font-size: 11px;
+  font-size:13.5px;
   font-weight: 700;
 }
 
@@ -2651,7 +2651,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.28);
   color: #f6f3ee;
-  font-size: 11.5px;
+  font-size:14px;
 }
 
 .bp-address:focus {
@@ -2691,7 +2691,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(159, 231, 212, 0.08);
   color: rgba(246, 243, 238, 0.82);
-  font-size: 12px;
+  font-size:14.5px;
 }
 
 /* Inhalt */
@@ -2745,12 +2745,12 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 .bp-empty strong {
-  font-size: 15px;
+  font-size:17.5px;
 }
 
 .bp-empty span {
   color: rgba(246, 243, 238, 0.5);
-  font-size: 12.5px;
+  font-size:15px;
 }
 
 .bp-fallback {
@@ -2766,13 +2766,13 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 .bp-fallback strong {
-  font-size: 18px;
+  font-size:21px;
 }
 
 .bp-fallback span {
   max-width: 420px;
   color: rgba(246, 243, 238, 0.6);
-  font-size: 13px;
+  font-size:15.5px;
   line-height: 1.45;
 }
 
@@ -2786,7 +2786,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-radius: 8px;
   background: rgba(159, 231, 212, 0.12);
   color: #f6f3ee;
-  font-size: 13px;
+  font-size:15.5px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -3146,7 +3146,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 .profile-dock-name {
   min-width: 0;
   overflow: hidden;
-  font-size: 14px;
+  font-size:16.5px;
   line-height: 1.16;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3205,7 +3205,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 .sidebar.is-compact .profile-dock .profile-avatar {
   width: 20px;
   height: 20px;
-  font-size: 11px;
+  font-size:13.5px;
 }
 
 .sidebar.is-compact .profile-dock-name {
@@ -3270,7 +3270,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 
 .profile-dock-menu-head strong {
   overflow: hidden;
-  font-size: 13px;
+  font-size:15.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3278,7 +3278,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 .profile-dock-menu-head span {
   overflow: hidden;
   color: rgba(246, 243, 238, 0.6);
-  font-size: 12px;
+  font-size:14.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3291,7 +3291,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   color: rgba(246, 243, 238, 0.86);
   cursor: pointer;
   font: inherit;
-  font-size: 13px;
+  font-size:15.5px;
   text-align: left;
 }
 
@@ -3524,7 +3524,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: rgba(20, 20, 20, 0.55);
   color: rgba(246, 243, 238, 0.62);
   font: inherit;
-  font-size: 12px;
+  font-size:14.5px;
   line-height: 1.4;
   cursor: pointer;
   transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
@@ -3539,7 +3539,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     min-width: 0;
     min-height: 26px;
     padding: 0 8px;
-    font-size: 11px;
+    font-size:13.5px;
   }
 }
 
@@ -3887,7 +3887,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 .msg-version-label {
-  font-size: 12px;
+  font-size:14.5px;
   line-height: 1;
   white-space: nowrap;
   color: rgba(246, 243, 238, 0.62);
@@ -3914,7 +3914,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 .msg-menu-head {
   margin: 0;
   padding: 6px 10px 8px;
-  font-size: 12px;
+  font-size:14.5px;
   line-height: 1.3;
   color: rgba(246, 243, 238, 0.52);
 }
@@ -3930,7 +3930,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: transparent;
   color: rgba(246, 243, 238, 0.92);
   font: inherit;
-  font-size: 13px;
+  font-size:15.5px;
   text-align: left;
   cursor: pointer;
 }
@@ -4020,7 +4020,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 .msg-editor-note {
-  font-size: 12px;
+  font-size:14.5px;
   color: rgba(246, 243, 238, 0.64);
 }
 
@@ -4036,7 +4036,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: transparent;
   color: rgba(246, 243, 238, 0.86);
   font: inherit;
-  font-size: 13px;
+  font-size:15.5px;
   cursor: pointer;
 }
 
@@ -4071,7 +4071,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 6px;
-  font-size: 12px;
+  font-size:14.5px;
   color: rgba(246, 243, 238, 0.62);
 }
 
@@ -4082,7 +4082,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: transparent;
   color: rgba(246, 243, 238, 0.78);
   font: inherit;
-  font-size: 12px;
+  font-size:14.5px;
   min-height: 0;
   cursor: pointer;
 }
@@ -4109,7 +4109,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 
 .msg-source-url {
   color: #9ecbf0;
-  font-size: 13px;
+  font-size:15.5px;
   text-decoration: none;
   overflow-wrap: anywhere;
 }
@@ -4124,7 +4124,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 .msg-source-meta {
-  font-size: 12px;
+  font-size:14.5px;
   color: rgba(246, 243, 238, 0.56);
   overflow-wrap: anywhere;
 }
@@ -4140,7 +4140,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
-  font-size: 13px;
+  font-size:15.5px;
   color: rgba(246, 243, 238, 0.86);
 }
 
@@ -4151,7 +4151,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: transparent;
   color: #f6f3ee;
   font: inherit;
-  font-size: 13px;
+  font-size:15.5px;
   cursor: pointer;
 }
 
@@ -4194,7 +4194,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   color: rgba(246, 243, 238, 0.82);
-  font-size: 14px;
+  font-size:16.5px;
   line-height: 1.2;
 }
 
@@ -4220,7 +4220,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 .paste-attach-remove {
-  font-size: 18px;
+  font-size:21px;
   line-height: 1;
 }
 
@@ -4230,417 +4230,4 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   .msg-menu .msg-menu-item {
     min-height: 44px;
   }
-}
-
-/* ---- search-overlay.css ---- */
-/* Such-Overlay (Cmd+K) — eigene Datei, weil public/styles.css am
-   Ratchet-Limit (1589 Zeilen) eingefroren ist (scripts/check-guidelines.mjs).
-   Farben folgen dem Cyan-Cockpit (design-cyan.css), aber mit eigenen Werten:
-   die --design-*-Variablen leben dort im Scope .premium-view und sind hier
-   nicht verfuegbar. */
-
-.search-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 80; /* ueber Sidebar (70) und Modellmenue (60) */
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: min(12vh, 96px) 16px 16px;
-}
-
-.search-overlay[hidden] {
-  display: none;
-}
-
-body.search-overlay-open {
-  overflow: hidden;
-}
-
-.search-overlay-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(2, 6, 10, 0.62);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-.search-overlay-panel {
-  position: relative;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  width: min(680px, 100%);
-  max-height: min(72vh, 640px);
-  overflow: hidden;
-  border: 1px solid rgba(45, 212, 191, 0.58);
-  border-radius: 14px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.065), rgba(45, 212, 191, 0.025) 42%, transparent 70%),
-    rgba(19, 24, 33, 0.97);
-  box-shadow:
-    0 0 24px rgba(45, 212, 191, 0.28),
-    0 24px 64px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(126, 232, 218, 0.22);
-}
-
-.search-overlay-form {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 8px 10px;
-  border-bottom: 1px solid rgba(45, 212, 191, 0.26);
-}
-
-.search-overlay-form input {
-  flex: 1;
-  min-width: 0;
-  min-height: 44px;
-  border: 0;
-  outline: none;
-  background: transparent;
-  color: #f6f3ee;
-  font-size: 17px;
-}
-
-.search-overlay-form input::placeholder {
-  color: rgba(151, 158, 171, 0.78);
-}
-
-.search-overlay-close {
-  min-width: 44px;
-  min-height: 44px;
-  border: 1px solid rgba(45, 212, 191, 0.32);
-  border-radius: 10px;
-  background: rgba(6, 10, 16, 0.82);
-  color: rgba(126, 232, 218, 0.9);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.search-overlay-log {
-  overflow-y: auto;
-  display: grid;
-  align-content: start;
-  gap: 10px;
-  padding: 8px;
-}
-
-.search-overlay-group {
-  display: grid;
-  gap: 2px;
-}
-
-.search-overlay-group h3 {
-  margin: 0;
-  padding: 6px 10px 4px;
-  color: rgba(126, 232, 218, 0.78);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.search-overlay-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 2px 10px;
-  width: 100%;
-  min-height: 44px;
-  padding: 8px 10px;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  background: transparent;
-  color: #f6f3ee;
-  text-align: left;
-  font: inherit;
-  cursor: pointer;
-}
-
-.search-overlay-row .row-title {
-  overflow: hidden;
-  font-weight: 600;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.search-overlay-row .row-meta {
-  align-self: center;
-  color: rgba(151, 158, 171, 0.85);
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.search-overlay-row .row-detail {
-  grid-column: 1 / -1;
-  overflow: hidden;
-  color: rgba(246, 243, 238, 0.62);
-  font-size: 13px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-/* Maus-Hover und Tastatur-Auswahl sehen gleich aus — es gibt EINE Markierung. */
-.search-overlay-row.is-active {
-  border-color: rgba(45, 212, 191, 0.4);
-  background: rgba(45, 212, 191, 0.14);
-}
-
-.search-overlay-log mark {
-  border-radius: 3px;
-  padding: 0 1px;
-  background: rgba(50, 246, 234, 0.3);
-  color: #eafffb;
-}
-
-.search-overlay-empty {
-  padding: 14px;
-  color: rgba(246, 243, 238, 0.72);
-}
-
-.search-overlay-hints {
-  display: flex;
-  gap: 16px;
-  margin: 0;
-  padding: 8px 12px;
-  border-top: 1px solid rgba(45, 212, 191, 0.2);
-  color: rgba(151, 158, 171, 0.85);
-  font-size: 12px;
-}
-
-.search-overlay-hints kbd {
-  display: inline-block;
-  min-width: 18px;
-  margin-right: 4px;
-  padding: 1px 5px;
-  border: 1px solid rgba(126, 232, 218, 0.3);
-  border-radius: 5px;
-  background: rgba(6, 10, 16, 0.82);
-  color: rgba(126, 232, 218, 0.9);
-  font-family: inherit;
-  font-size: 11px;
-  text-align: center;
-}
-
-@media (max-width: 560px) {
-  .search-overlay {
-    padding: 8px;
-  }
-
-  .search-overlay-panel {
-    max-height: calc(100dvh - 16px);
-  }
-
-  .search-overlay-hints {
-    display: none; /* Tastatur-Hinweise nuetzen auf dem Handy nichts */
-  }
-}
-
-/* ---- start-glass.css ---- */
-/* smejj.com — Glas-Startseite (Screen 1), Freigabe:
-   docs/approvals/2026-08-13-startseite-glas-design-freigabe.md
-   Laedt NACH dem start-styles-Buendel und ueberschreibt nur Screen 1.
-   styles.css bleibt unangetastet (Ratchet 1589). */
-
-/* ── Leerer Zustand: Begruessung + Kapsel mittig ─────────────────── */
-
-#start:not(.has-start-chat) .home-feed {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: clamp(18px, 3vh, 26px);
-  padding: 24px 16px;
-  background:
-    radial-gradient(820px 520px at 18% -12%, rgba(45, 212, 191, 0.13), transparent 62%),
-    radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
-    linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%);
-}
-
-#start:not(.has-start-chat) .home-hero {
-  display: block;
-  min-height: 0;
-  padding: 0 16px;
-}
-
-#start:not(.has-start-chat) .home-hero h2 {
-  font-size: clamp(22px, 2.6vw, 30px);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.home-hero .start-markenwort {
-  color: #35e0d0;
-  text-shadow: 0 0 18px rgba(45, 212, 191, 0.35);
-}
-
-/* ── Eingabe-Kapsel: Glas statt Kante — gilt in beiden Zustaenden ── */
-
-.prompt-glass {
-  width: min(760px, calc(100% - 24px));
-  margin: 0 auto;
-  border: 1px solid rgba(126, 232, 218, 0.32);
-  /* Betreiber-Regel 2026-08-13: das gesamte Design ist viereckig. */
-  border-radius: 0;
-  padding: 6px 10px 6px;
-  background:
-    linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(45, 212, 191, 0.03) 46%, transparent 72%),
-    rgba(17, 23, 30, 0.62);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 0 26px rgba(45, 212, 191, 0.14),
-    0 14px 40px rgba(0, 0, 0, 0.42);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
-  backdrop-filter: blur(22px) saturate(150%);
-}
-
-.prompt-glass:focus-within {
-  border-color: rgba(50, 246, 234, 0.62);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 0 34px rgba(45, 212, 191, 0.26),
-    0 14px 40px rgba(0, 0, 0, 0.42);
-}
-
-/* Laufender Chat: Kapsel bleibt Kapsel, nur breiter und unten angedockt. */
-#start.has-start-chat .prompt-glass {
-  width: min(980px, calc(100% - 20px));
-  margin: 0 auto 10px;
-}
-
-.prompt-glass textarea {
-  height: auto;
-  min-height: 44px;
-  padding: 10px 12px 6px;
-  font-size: 16.5px;
-  line-height: 1.5;
-}
-
-.prompt-actions {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Werkzeugleiste gruppieren (Betreiber-Befund 2026-08-13: "smejj 1.0" schwebte
-   allein in der Mitte, die Luecke wirkte unfertig). Links steht, WAS ich
-   schicke (Anhang + Modell), rechts, WIE es rausgeht (Diktat, Sprache,
-   Senden) — dieselbe Aufteilung wie bei ChatGPT.
-   Bewusst nur per `order`: das Markup in index.html bleibt unangetastet, die
-   Reihenfolge fuer Tastatur und Screenreader also auch. */
-.prompt-actions .plus-picker { order: 1; }
-.prompt-actions .model-picker { order: 2; }
-.prompt-actions .prompt-spacer { order: 3; }
-.prompt-actions [data-start-tool] { order: 4; }
-.prompt-actions .send-button { order: 5; }
-
-/* Vorlesen wohnt jetzt nur noch im Antwort-Menue („speak" in
-   chat-actions-menu.js) — der dritte Audio-Knopf verwirrte nur. */
-.prompt-glass [data-start-tool="speaker"] {
-  display: none;
-}
-
-/* ── Beispiel-Chips: die Leerflaeche arbeitet ─────────────────────── */
-
-.start-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  max-width: 760px;
-  padding: 0 16px;
-}
-
-#start.has-start-chat .start-chips {
-  display: none;
-}
-
-.start-chips button {
-  min-height: 44px;
-  padding: 10px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  /* Betreiber-Regel 2026-08-13: das gesamte Design ist viereckig. */
-  border-radius: 0;
-  background: rgba(17, 23, 30, 0.5);
-  color: rgba(200, 209, 218, 0.92);
-  font-size: 13.5px;
-  cursor: pointer;
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  transition: border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
-}
-
-.start-chips button:hover,
-.start-chips button:focus-visible {
-  border-color: rgba(50, 246, 234, 0.5);
-  color: #f0f6f5;
-  box-shadow: 0 0 16px rgba(45, 212, 191, 0.18);
-}
-
-/* ── Rand-Icons: 44-px-Touchziele auch auf dem Desktop (2026-08-13) ──
-   Mobil (<600px) stehen die 44er schon im start-styles-Buendel; hier ziehen
-   Menue-, Browser- und Maus-Knopf auf allen Breiten nach. Doppelklasse gibt
-   Gewicht 0,2,0 wie beim Buendel-Vorbild. */
-
-.glass-icon.glass-icon {
-  width: 44px;
-  height: 44px;
-  min-height: 44px;
-}
-
-/* Der Maus-Knopf traegt right:36px als Inline-Stil (CSP-Hash, index.html ist
-   Start-Lock) — mit 44-px-Knoepfen ueberlappt das den Browser-Knopf, darum
-   hier per !important daneben gesetzt: 48px = 44px Knopf + Luft. */
-#mausButton {
-  right: calc(env(safe-area-inset-right) + 48px) !important;
-}
-
-/* Das Logo sass bei left:36px neben dem 28er-Menue-Knopf; der endet jetzt
-   bei 44. Gleicher Zug wie die Mobil-Regel im Buendel (left: +48px), und als
-   Klickziel waechst es selbst auf 44. */
-.app-brand-logo {
-  left: calc(env(safe-area-inset-left) + 48px);
-  width: 44px;
-  height: 44px;
-}
-
-body[data-left-menu-state="expanded"] .app-brand-logo {
-  height: 44px;
-}
-
-/* ── Mobil ────────────────────────────────────────────────────────── */
-
-@media (max-width: 600px) {
-  #start:not(.has-start-chat) .home-hero h2 {
-    font-size: 22px;
-  }
-
-  .prompt-glass {
-    width: calc(100% - 16px);
-  }
-
-  /* Auf kleinen Schirmen reichen zwei Chips. */
-  .start-chips button:nth-child(n + 3) {
-    display: none;
-  }
-}
-
-/* ---- eckig.css ---- */
-/* smejj.com — Betreiber-Regel 2026-08-13: das GESAMTE Design ist viereckig.
-   (Eckig-Kontrolle ueber alle 17 Ansichten, Betreiber-Wahl
-   "Alles ausser Avatar".) EINE Regel statt ~200 Einzelkorrekturen in 20
-   Dateien; laedt als letztes Stylesheet und gewinnt per !important auch
-   gegen Inline-Stile. Wer kuenftig bewusst rundet, braucht hier eine
-   dokumentierte Ausnahme — genau so ist es gedacht. */
-
-*,
-*::before,
-*::after {
-  border-radius: 0 !important;
-}
-
-/* Einzige freigegebene Ausnahme: Avatare bleiben Kreise (Betreiber-Wahl,
-   Branchenstandard). Profil-Knopf unten links + Anbieter-Kreise im
-   API-Schluessel-Bereich. */
-.profile-avatar,
-#settings .ak-avatar {
-  border-radius: 999px !important;
 }

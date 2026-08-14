@@ -83,7 +83,7 @@
   border-radius: 5px;
   background: transparent;
   color: #f6f3ee;
-  font-size: 11px;
+  font-size:13.5px;
   cursor: pointer;
 }
 
@@ -129,7 +129,7 @@
   height: 16px;
   border-radius: 5px;
   color: rgba(246, 243, 238, 0.5);
-  font-size: 13px;
+  font-size:15.5px;
   line-height: 1;
 }
 
@@ -151,7 +151,7 @@
   border-radius: 6px;
   background: transparent;
   color: rgba(246, 243, 238, 0.62);
-  font-size: 15px;
+  font-size:17.5px;
   line-height: 1;
   cursor: pointer;
 }
@@ -162,7 +162,7 @@
   border: 1px solid rgba(159, 231, 212, 0.36);
   background: rgba(159, 231, 212, 0.11);
   color: rgba(159, 231, 212, 0.95);
-  font-size: 11px;
+  font-size:13.5px;
   font-weight: 700;
 }
 
@@ -246,7 +246,7 @@
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.28);
   color: #f6f3ee;
-  font-size: 11.5px;
+  font-size:14px;
 }
 
 .bp-address:focus {
@@ -286,7 +286,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(159, 231, 212, 0.08);
   color: rgba(246, 243, 238, 0.82);
-  font-size: 12px;
+  font-size:14.5px;
 }
 
 /* Inhalt */
@@ -340,12 +340,12 @@
 }
 
 .bp-empty strong {
-  font-size: 15px;
+  font-size:17.5px;
 }
 
 .bp-empty span {
   color: rgba(246, 243, 238, 0.5);
-  font-size: 12.5px;
+  font-size:15px;
 }
 
 .bp-fallback {
@@ -361,13 +361,13 @@
 }
 
 .bp-fallback strong {
-  font-size: 18px;
+  font-size:21px;
 }
 
 .bp-fallback span {
   max-width: 420px;
   color: rgba(246, 243, 238, 0.6);
-  font-size: 13px;
+  font-size:15.5px;
   line-height: 1.45;
 }
 
@@ -381,7 +381,7 @@
   border-radius: 8px;
   background: rgba(159, 231, 212, 0.12);
   color: #f6f3ee;
-  font-size: 13px;
+  font-size:15.5px;
   font-weight: 700;
   text-decoration: none;
 }

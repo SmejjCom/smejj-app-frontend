@@ -54,7 +54,7 @@
 .onboarding-eyebrow {
   margin: 0 0 6px;
   color: #7ee8da;
-  font-size: 12px;
+  font-size:14.5px;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -62,7 +62,7 @@
 
 .onboarding-card h2 {
   margin: 0 0 8px;
-  font-size: 24px;
+  font-size:27px;
   font-weight: 700;
   color: #eef1f2;
 }
@@ -70,7 +70,7 @@
 .onboarding-sub {
   margin: 0 0 18px;
   color: #9fa8ad;
-  font-size: 14px;
+  font-size:16.5px;
   line-height: 1.55;
 }
 
@@ -103,13 +103,13 @@
 
 .onboarding-plan strong {
   color: #eef1f2;
-  font-size: 14.5px;
+  font-size:17px;
   font-weight: 650;
 }
 
 .onboarding-plan small {
   color: #9fa8ad;
-  font-size: 12.5px;
+  font-size:15px;
 }
 
 .onboarding-badge {
@@ -118,7 +118,7 @@
   border: 1px solid rgba(45, 212, 191, 0.4);
   background: rgba(45, 212, 191, 0.15);
   color: #7ee8da;
-  font-size: 11px;
+  font-size:13.5px;
   font-weight: 750;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -132,7 +132,7 @@
   border-radius: 0;
   background: rgba(255, 255, 255, 0.09);
   color: #eef1f2;
-  font-size: 13px;
+  font-size:15.5px;
   font-weight: 650;
   cursor: pointer;
 }
@@ -151,7 +151,7 @@
 
 .onboarding-note {
   color: #9fa8ad;
-  font-size: 12.5px;
+  font-size:15px;
 }
 
 .onboarding-primary {
@@ -160,7 +160,7 @@
   border-radius: 0;
   background: #eceeee;
   color: #101314;
-  font-size: 14px;
+  font-size:16.5px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;

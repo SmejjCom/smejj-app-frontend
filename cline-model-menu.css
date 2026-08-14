@@ -10,7 +10,7 @@
 
 .model-submenu-arrow {
   color: rgba(246, 243, 238, 0.5);
-  font-size: 12px;
+  font-size:14.5px;
 }
 
 .model-submenu {
@@ -34,7 +34,7 @@
 
 .model-submenu-group {
   padding: 6px 8px 2px;
-  font-size: 11px;
+  font-size:13.5px;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -71,7 +71,7 @@
 .model-submenu-note,
 .model-submenu-hint {
   padding: 8px;
-  font-size: 12px;
+  font-size:14.5px;
   color: rgba(246, 243, 238, 0.62);
   margin: 0;
 }

@@ -125,7 +125,7 @@
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   color: var(--premium-muted, #9fa8ad);
-  font-size: 12px;
+  font-size:14.5px;
   white-space: nowrap;
 }
 
@@ -154,7 +154,7 @@
   border-radius: 0;
   background: transparent;
   color: var(--premium-muted, #9fa8ad);
-  font-size: 14px;
+  font-size:16.5px;
   font-weight: 600;
   text-align: start;
   cursor: pointer;
@@ -187,14 +187,14 @@
 #profile .account-panel h3 {
   margin: 0 0 14px;
   color: var(--premium-text, #eef1f2);
-  font-size: 20px;
+  font-size:23px;
   font-weight: 650;
 }
 
 #profile .account-subhead {
   margin: 26px 0 10px;
   color: var(--premium-muted, #9fa8ad);
-  font-size: 12px;
+  font-size:14.5px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -231,13 +231,13 @@
 
 #profile .account-row strong {
   color: var(--premium-text, #eef1f2);
-  font-size: 14.5px;
+  font-size:17px;
   font-weight: 650;
 }
 
 #profile .account-row small {
   color: var(--premium-muted, #9fa8ad);
-  font-size: 13px;
+  font-size:15.5px;
   line-height: 1.45;
 }
 
@@ -286,7 +286,7 @@
   border-radius: 0;
   background: var(--konto-glass-strong);
   color: var(--premium-muted, #c6cdd1);
-  font-size: 11px;
+  font-size:13.5px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -317,13 +317,13 @@
   display: block;
   margin: 4px 0 3px;
   color: var(--premium-text, #eef1f2);
-  font-size: 19px;
+  font-size:22px;
   font-weight: 700;
 }
 
 #profile .account-plan small {
   color: var(--premium-muted, #9fa8ad);
-  font-size: 13px;
+  font-size:15.5px;
 }
 
 /* Eigene Anweisungen (Personalisierung). */
@@ -335,7 +335,7 @@
 
 #profile .account-textarea strong {
   color: var(--premium-muted, #9fa8ad);
-  font-size: 12px;
+  font-size:14.5px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -351,7 +351,7 @@
   background: var(--konto-field-bg);
   color: var(--premium-text, #eef1f2);
   font-family: inherit;
-  font-size: 15px;
+  font-size:17.5px;
   line-height: 1.5;
 }
 
@@ -366,7 +366,7 @@
   display: grid;
   gap: 8px;
   color: var(--premium-muted, #9fa8ad);
-  font-size: 12px;
+  font-size:14.5px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -380,7 +380,7 @@
   border-radius: 0;
   background: var(--konto-field-bg);
   color: var(--premium-text, #eef1f2);
-  font-size: 15px;
+  font-size:17.5px;
   font-weight: 500;
   letter-spacing: normal;
   text-transform: none;
@@ -401,7 +401,7 @@
   border-radius: 0;
   background: var(--konto-glass-strong);
   color: var(--premium-text, #eef1f2);
-  font-size: 13.5px;
+  font-size:16px;
   font-weight: 650;
   cursor: pointer;
   white-space: nowrap;
@@ -461,7 +461,7 @@
 
 #profile .account-status strong {
   color: var(--premium-muted, #9fa8ad);
-  font-size: 11px;
+  font-size:13.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -469,13 +469,13 @@
 
 #profile .account-status span {
   color: var(--premium-text, #eef1f2);
-  font-size: 14px;
+  font-size:16.5px;
 }
 
 #profile .account-note {
   margin: 14px 0 0;
   color: var(--premium-muted, #9fa8ad);
-  font-size: 13px;
+  font-size:15.5px;
   line-height: 1.55;
 }
 
@@ -504,7 +504,7 @@
 
 #profile .account-picture-body small {
   color: var(--premium-muted, #9fa8ad);
-  font-size: 13px;
+  font-size:15.5px;
   line-height: 1.45;
 }
 
@@ -522,7 +522,7 @@
   border-radius: 0;
   background: var(--konto-glass-strong);
   color: var(--premium-text, #eef1f2);
-  font-size: 13.5px;
+  font-size:16px;
   font-weight: 650;
   cursor: pointer;
   white-space: nowrap;
@@ -564,7 +564,7 @@
   min-height: 46px;
   padding: 13px 16px;
   color: var(--premium-muted, #9fa8ad);
-  font-size: 13.5px;
+  font-size:16px;
 }
 
 /* Mobil: Navigation wird zur umbrechenden Chip-Leiste — kein Scroll-Verlust. */
@@ -590,7 +590,7 @@
     border: 1px solid var(--konto-line);
     border-radius: 0;
     background: var(--konto-glass);
-    font-size: 13px;
+    font-size:15.5px;
   }
 
   #profile .account-nav button.is-active {
@@ -661,7 +661,7 @@
 }
 
 #profile .usage-count strong {
-  font-size: 22px;
+  font-size:25px;
   font-weight: 750;
   color: #7ee8da;
   line-height: 1.1;
@@ -669,7 +669,7 @@
 
 #profile .usage-count small {
   color: var(--premium-muted, #9fa8ad);
-  font-size: 11px;
+  font-size:13.5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -697,7 +697,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 13px;
+  font-size:15.5px;
 }
 
 /* Exakt die Optik der vorhandenen Konto-Felder (.account-grid input, Zeile 370):
@@ -710,7 +710,7 @@
   border-radius: 0;
   background: var(--konto-field-bg);
   color: var(--premium-text, #eef1f2);
-  font-size: 15px;
+  font-size:17.5px;
   font-weight: 500;
   letter-spacing: normal;
   text-transform: none;

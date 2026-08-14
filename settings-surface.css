@@ -38,7 +38,7 @@
 #settings .settings-status {
   flex: none;
   color: var(--premium-muted, #9fa8ad);
-  font-size: 12px;
+  font-size:14.5px;
   padding: 8px 16px;
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-top-color: rgba(255, 255, 255, 0.28);
@@ -79,7 +79,7 @@
   border-radius: 0;
   background: transparent;
   color: var(--premium-muted, #9fa8ad);
-  font-size: 14px;
+  font-size:16.5px;
   font-weight: 600;
   text-align: start;
   cursor: pointer;
@@ -126,14 +126,14 @@
 #settings .settings-panel h3 {
   margin: 0 0 4px;
   color: var(--premium-text, #eef1f2);
-  font-size: 20px;
+  font-size:23px;
   font-weight: 650;
 }
 
 #settings .settings-panel > header p {
   margin: 0;
   color: var(--premium-muted, #9fa8ad);
-  font-size: 13.5px;
+  font-size:16px;
   line-height: 1.5;
 }
 
@@ -170,13 +170,13 @@
 
 #settings .settings-row-copy strong {
   color: var(--premium-text, #eef1f2);
-  font-size: 14.5px;
+  font-size:17px;
   font-weight: 650;
 }
 
 #settings .settings-row-copy span {
   color: var(--premium-muted, #9fa8ad);
-  font-size: 13px;
+  font-size:15.5px;
   line-height: 1.45;
 }
 
@@ -188,7 +188,7 @@
   border-radius: 0;
   background: rgba(0, 0, 0, 0.25);
   color: var(--premium-text, #eef1f2);
-  font-size: 14.5px;
+  font-size:17px;
   font-family: inherit;
 }
 
@@ -258,7 +258,7 @@
   border-radius: 0;
   background: rgba(255, 255, 255, 0.085);
   color: var(--premium-text, #eef1f2);
-  font-size: 13.5px;
+  font-size:16px;
   font-weight: 650;
   cursor: pointer;
   white-space: nowrap;
@@ -278,7 +278,7 @@
   color: #2dd4bf;
   text-decoration: none;
   font-weight: 650;
-  font-size: 13.5px;
+  font-size:16px;
 }
 
 /* Hell-Modus: gleiche Formen, helle Flaechen, dunkle Haarlinien. */
@@ -367,7 +367,7 @@
     border: 1px solid rgba(255, 255, 255, 0.13);
     border-radius: 0;
     background: rgba(255, 255, 255, 0.045);
-    font-size: 13px;
+    font-size:15.5px;
   }
 
   #settings .settings-nav-button.is-active {

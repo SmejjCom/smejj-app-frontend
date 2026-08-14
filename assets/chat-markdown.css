@@ -196,7 +196,7 @@
   background: rgba(20, 20, 20, 0.55);
   color: rgba(246, 243, 238, 0.62);
   font: inherit;
-  font-size: 12px;
+  font-size:14.5px;
   line-height: 1.4;
   cursor: pointer;
   transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
@@ -211,7 +211,7 @@
     min-width: 0;
     min-height: 26px;
     padding: 0 8px;
-    font-size: 11px;
+    font-size:13.5px;
   }
 }
 
@@ -336,3 +336,46 @@
 @media (prefers-reduced-motion: reduce) {
   .chat-schritt[data-zustand="laeuft"] .chat-schritt-stand { animation: none; }
 }
+
+/* Zitate und Hinweiskaesten (Befund 2026-08-13).
+   Der Renderer kannte "> Text" nicht — im Chat stand woertlich "&gt; Text",
+   bei JEDER Modellantwort mit Zitat und in der Video-Statusmeldung. Farben
+   kommen aus currentColor, damit heller und dunkler Modus ohne zweite Regel
+   funktionieren (Lehre: ::before-Unterbau traegt nie). */
+.entry.assistant .chat-zitat {
+  margin: 10px 0;
+  padding: 2px 0 2px 14px;
+  border-left: 3px solid rgba(127, 127, 127, 0.45);
+  opacity: 0.85;
+  font-style: italic;
+}
+
+.entry.assistant .chat-hinweis {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  border-left-width: 3px;
+  background: rgba(127, 127, 127, 0.08);
+}
+
+.entry.assistant .chat-hinweis-titel {
+  font-weight: 600;
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+
+/* Die Art faerbt nur den linken Rand und den Titel — der Textkoerper bleibt
+   in der Vorlesefarbe, damit er auf beiden Hintergruenden lesbar ist. */
+.entry.assistant .chat-hinweis[data-art="note"] { border-left-color: #4a90d9; }
+.entry.assistant .chat-hinweis[data-art="note"] .chat-hinweis-titel { color: #4a90d9; }
+.entry.assistant .chat-hinweis[data-art="tip"] { border-left-color: #3fa66a; }
+.entry.assistant .chat-hinweis[data-art="tip"] .chat-hinweis-titel { color: #3fa66a; }
+.entry.assistant .chat-hinweis[data-art="important"] { border-left-color: #8b6bd9; }
+.entry.assistant .chat-hinweis[data-art="important"] .chat-hinweis-titel { color: #8b6bd9; }
+.entry.assistant .chat-hinweis[data-art="warning"] { border-left-color: #d99b3f; }
+.entry.assistant .chat-hinweis[data-art="warning"] .chat-hinweis-titel { color: #d99b3f; }
+.entry.assistant .chat-hinweis[data-art="caution"] { border-left-color: #d9614a; }
+.entry.assistant .chat-hinweis[data-art="caution"] .chat-hinweis-titel { color: #d9614a; }
