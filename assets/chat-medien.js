@@ -23,7 +23,15 @@
 // FAIL-SAFE UEBERALL: Scheitert die Ablage (kein Netz, Sync aus, zu gross),
 // bleibt der Knoten unveraendert. Dann ist das Verhalten exakt wie vorher —
 // nie schlechter.
-import { CLIENT_ROUTES } from "./config.js";
+// API_ORIGIN, NICHT CLIENT_ROUTES: `CLIENT_ROUTES.api` hat gar keinen Eintrag
+// `chats` (gemessen live 2026-08-14 — die Schluesselliste geht von `agent` bis
+// `terminalRun`, ein `chats` ist nicht darunter). Der erste Bau leitete die
+// Adresse davon ab, bekam "" und stieg deshalb bei JEDEM Aufruf sofort wieder
+// aus: die Auslagerung war vom Tag des Ausrollens an wirkungslos, ohne eine
+// einzige Fehlermeldung — der fail-safe Rueckweg sieht genauso aus wie
+// "nichts zu tun". chat-sync.js baut seine Adresse aus demselben Grund direkt
+// aus API_ORIGIN; das ist die eine Quelle, der beide folgen.
+import { API_ORIGIN } from "./config.js";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 
@@ -41,8 +49,8 @@ function token() {
 }
 
 function medienUrl() {
-  const chats = CLIENT_ROUTES?.api?.chats || "";
-  return chats ? chats.replace(/\/api\/chats$/, "/api/chat-medien") : "";
+  const wurzel = String(API_ORIGIN || "").replace(/\/+$/, "");
+  return wurzel ? `${wurzel}/api/chat-medien` : "";
 }
 
 /**

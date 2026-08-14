@@ -175,7 +175,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v367";
+const CACHE_NAME = "smejj-shell-v368";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -473,7 +473,7 @@ self.addEventListener("fetch", (event) => {
         // alten Stand gefuellt — und cache-first lieferte ihn dann bis zum
         // NAECHSTEN Deploy aus. Gemessen unmittelbar nach dem v366-Push:
         // das Netz hatte chat-sync.js mit 9660 Bytes (neu), der Speicher
-        // "smejj-shell-v367" die alte Fassung. Der Nutzer bekam den Fix also
+        // "smejj-shell-v368" die alte Fassung. Der Nutzer bekam den Fix also
         // einen ganzen Deploy zu spaet.
         //
         // Die Antwort selbst bleibt der Speicher-Treffer: die laufende Seite
