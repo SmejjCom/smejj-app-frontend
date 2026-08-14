@@ -47,7 +47,7 @@
   margin: 0;
   color: var(--premium-muted);
   font-size: clamp(15px, 1.8vw, 20px);
-  line-height: 1.45;
+  line-height: 1.6;
 }
 
 .premium-view .toolbar,
@@ -215,7 +215,7 @@
 .premium-view .entry {
   border-radius: 20px;
   color: rgba(248, 246, 242, 0.78);
-  line-height: 1.5;
+  line-height: 1.62;
 }
 
 .premium-view .output:empty::before {

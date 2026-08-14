@@ -5,7 +5,7 @@
 #settings .cline-grid select { width:100%; min-height:42px; text-transform:none; }
 #settings .cline-actions { display:flex; flex-wrap:wrap; gap:8px; }
 #settings .cline-actions button { min-height:38px; padding:0 13px; font-size:15.5px; }
-#settings .cline-status { margin:0; color:var(--premium-muted); font-size:15.5px; line-height:1.5; }
+#settings .cline-status { margin:0; color:var(--premium-muted); font-size:15.5px; line-height: 1.62; }
 #settings .cline-status[data-error="true"] { color:#ffb9b9; }
 @media (max-width:680px) {
   #settings .cline-grid { grid-template-columns:1fr; }

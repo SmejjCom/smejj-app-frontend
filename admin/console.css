@@ -158,7 +158,7 @@ body{
 .head .eyebrow .kbd{display:grid;place-items:center;width:24px;height:24px;font-size:12.5px;
   background:var(--sm-accent);color:#04302d;}
 .head h1{margin:0;font-size:34px;font-weight:600;line-height:1.06;letter-spacing:-.01em;}
-.head p{margin:9px 0 0;font-size:16px;color:var(--sm-ink-dim);max-width:76ch;line-height:1.5;}
+.head p{margin:9px 0 0;font-size:16px;color:var(--sm-ink-dim);max-width:76ch;line-height:1.62;}
 
 .bar{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;margin:16px 0 18px;}
 .btn{padding:7px 13px;font-size:14.5px;font-weight:500;border:1px solid var(--sm-border);
@@ -174,7 +174,7 @@ body{
 
 /* Kacheln */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;}
-.kpi{padding:15px 16px;}
+.kpi{padding:18px 18px;}
 .kpi .k{font-size:12.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--sm-ink-faint);}
 .kpi .v{margin-top:9px;font-size:30px;font-weight:600;line-height:1;letter-spacing:-.02em;}
 .kpi .d{margin-top:8px;font-size:13.5px;color:var(--sm-ink-dim);}
@@ -184,20 +184,20 @@ body{
 
 /* Panel */
 .panel{padding:0;overflow:hidden;}
-.panel>.ph{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--sm-border);
+.panel>.ph{display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid var(--sm-border);
   background:rgba(255,255,255,.03);}
 .panel>.ph h3{margin:0;font-size:15.5px;font-weight:600;letter-spacing:.01em;}
 .panel>.ph .sub{font-size:13.5px;color:var(--sm-ink-faint);}
 .panel>.ph .spacer{flex:1;}
-.panel>.pb{padding:15px 16px;}
+.panel>.pb{padding:18px 18px;}
 .panel>.pb.flush{padding:0;}
 
 /* Tabelle */
 table{width:100%;border-collapse:collapse;font-size:15px;}
-th{text-align:left;padding:10px 16px;font-size:13.5px;font-weight:700;letter-spacing:.10em;
+th{text-align:left;padding:12px 18px;font-size:13.5px;font-weight:700;letter-spacing:.10em;
   text-transform:uppercase;color:var(--sm-ink-faint);border-bottom:1px solid var(--sm-border);
   background:rgba(255,255,255,.025);white-space:nowrap;}
-td{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.06);color:var(--sm-ink-dim);vertical-align:middle;}
+td{padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.06);color:var(--sm-ink-dim);vertical-align:middle;}
 tr:last-child td{border-bottom:0;}
 td b{color:var(--sm-ink);font-weight:500;}
 td .mono,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;letter-spacing:-.01em;}
@@ -214,7 +214,7 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
 .row .ic{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--sm-border);
   background:rgba(255,255,255,.05);font-size:13.5px;color:var(--sm-ink-dim);}
 .row .t{font-size:15.5px;color:var(--sm-ink);}
-.row .s{font-size:13.5px;color:var(--sm-ink-faint);margin-top:3px;line-height:1.4;}
+.row .s{font-size:13.5px;color:var(--sm-ink-faint);margin-top:3px;line-height:1.55;}
 
 /* Balken */
 .bars{display:grid;gap:12px;}
@@ -233,7 +233,7 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
 .field .in{padding:9px 12px;background:var(--sm-field);border:1px solid var(--sm-border);
   font-size:15px;color:var(--sm-ink);}
 .field .in.ph{color:var(--sm-ink-faint);}
-.field .hint{font-size:13.5px;color:var(--sm-ink-faint);line-height:1.45;}
+.field .hint{font-size:13.5px;color:var(--sm-ink-faint);line-height:1.6;}
 .field .sel{display:flex;align-items:center;justify-content:space-between;}
 .field .sel::after{content:"▾";color:var(--sm-ink-faint);font-size:12.5px;}
 .tgl{display:flex;align-items:center;justify-content:space-between;padding:11px 0;
@@ -247,12 +247,12 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
 .sw.on::after{left:auto;right:2px;background:var(--sm-accent);}
 
 /* Hinweisstreifen */
-.note{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:13px 15px;align-items:start;
+.note{display:grid;grid-template-columns:auto 1fr;gap:14px;padding:16px 18px;align-items:start;
   border-left:3px solid var(--sm-accent);}
 .note.warn{border-left-color:var(--sm-warn);}
 .note.bad{border-left-color:var(--sm-danger);}
 .note .nt{font-size:15px;font-weight:600;}
-.note .ns{font-size:14px;color:var(--sm-ink-dim);margin-top:5px;line-height:1.5;}
+.note .ns{font-size:14px;color:var(--sm-ink-dim);margin-top:5px;line-height:1.62;}
 .note .nx{font-size:17.5px;line-height:1;}
 
 /* Zeitstrahl / Protokoll */
@@ -261,7 +261,7 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
   border-bottom:1px solid rgba(255,255,255,.06);font-size:14.5px;}
 .tl .e:last-child{border-bottom:0;}
 .tl .tm{color:var(--sm-ink-faint);font-family:ui-monospace,Menlo,monospace;font-size:13.5px;}
-.tl .tx{color:var(--sm-ink-dim);line-height:1.5;}
+.tl .tx{color:var(--sm-ink-dim);line-height:1.62;}
 .tl .tx b{color:var(--sm-ink);font-weight:500;}
 
 /* Vier-Augen-Karte */
@@ -274,7 +274,7 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
 .dual .link::after{content:"⇄";position:absolute;top:-9px;left:50%;transform:translateX(-50%);
   font-size:14.5px;color:var(--sm-ink-faint);background:#141517;padding:0 5px;}
 
-.foot-note{margin-top:26px;padding:13px 16px;font-size:13.5px;color:var(--sm-ink-faint);line-height:1.6;}
+.foot-note{margin-top:26px;padding:13px 16px;font-size:13.5px;color:var(--sm-ink-faint);line-height:1.7;}
 .foot-note b{color:var(--sm-ink-dim);}
 
 /* ---------- Zustaende der echten Konsole (Stufe 2) ---------- */
@@ -283,13 +283,13 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
 .hinweis-marke{margin:0 0 14px;font-size:12.5px;font-weight:700;letter-spacing:.16em;
   text-transform:uppercase;color:var(--sm-accent);}
 .hinweis h1{margin:0 0 12px;font-size:29px;font-weight:600;}
-.hinweis p{margin:0;font-size:16px;color:var(--sm-ink-dim);line-height:1.6;}
+.hinweis p{margin:0;font-size:16px;color:var(--sm-ink-dim);line-height:1.7;}
 .hinweis-code{margin-top:18px!important;font-size:13.5px!important;color:var(--sm-ink-faint)!important;
   font-family:ui-monospace,Menlo,monospace;}
 
 .laedt{padding:26px;font-size:15px;color:var(--sm-ink-faint);}
 .fehler{border-left:3px solid var(--sm-danger);}
-.leer{padding:22px 16px;font-size:15px;color:var(--sm-ink-faint);}
+.leer{padding:26px 18px;font-size:15px;color:var(--sm-ink-faint);}
 .track i{transition:width .25s ease;}
 .btn[disabled]{opacity:.45;cursor:default;}
 .zeitraum{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
@@ -313,7 +313,7 @@ tbody tr.klickbar{cursor:pointer;}
 .stepup-marke{margin:0 0 12px;font-size:12.5px;font-weight:700;letter-spacing:.16em;
   text-transform:uppercase;color:var(--sm-accent);}
 .stepup h2{margin:0 0 10px;font-size:22px;font-weight:600;color:var(--sm-ink);}
-.stepup p{margin:0 0 6px;font-size:15px;color:var(--sm-ink-dim);line-height:1.65;}
+.stepup p{margin:0 0 6px;font-size:15px;color:var(--sm-ink-dim);line-height:1.7;}
 .stepup .stepup-ziel{color:var(--sm-ink);font-family:ui-monospace,Menlo,monospace;font-size:14.5px;}
 .stepup-eingabe{width:100%;margin:16px 0 4px;padding:13px 14px;background:var(--sm-field);
   border:1px solid var(--sm-accent-border);color:var(--sm-ink);font-size:27px;
@@ -331,7 +331,7 @@ tbody tr.klickbar{cursor:pointer;}
    Rahmen mit der Sicherheitsbestaetigung oben. */
 .dlg-feld{width:100%;margin:14px 0 2px;padding:11px 13px;background:var(--sm-field);
   border:1px solid var(--sm-border-strong);color:var(--sm-ink);font-size:15.5px;
-  font-family:inherit;line-height:1.5;}
+  font-family:inherit;line-height:1.62;}
 .dlg-feld:focus{outline:2px solid var(--sm-accent);outline-offset:1px;
   border-color:var(--sm-accent-border);}
 .dlg-feld-gross{min-height:92px;resize:vertical;}
@@ -346,7 +346,7 @@ select.dlg-feld{cursor:pointer;}
    groesser null, faerbt sich das Register rot und zieht den Blick — steht dort
    eine Null, ist die Seite in einer Sekunde abgearbeitet. */
 .ap-register{display:flex;flex-wrap:wrap;gap:6px;}
-.ap-reg{display:flex;align-items:center;gap:9px;padding:9px 15px;cursor:pointer;
+.ap-reg{display:flex;align-items:center;gap:9px;padding:11px 16px;cursor:pointer;
   font-size:15px;border:1px solid var(--sm-border);background:var(--sm-card);
   color:var(--sm-ink-dim);user-select:none;}
 .ap-reg:hover{border-color:var(--sm-border-strong);color:var(--sm-ink);}
@@ -359,13 +359,13 @@ select.dlg-feld{cursor:pointer;}
 .ap-reg.on .n{color:var(--sm-ink);}
 .ap-reg.warn.on{border-color:var(--sm-danger);background:var(--sm-danger-bg);
   color:var(--sm-danger);}
-.ap-register-leer{grid-column:1/-1;padding:26px 18px;font-size:16px;line-height:1.55;
+.ap-register-leer{grid-column:1/-1;padding:26px 18px;font-size:16px;line-height:1.65;
   color:var(--sm-ink-dim);border:1px solid var(--sm-border);background:var(--sm-card);}
 
 
 /* Cockpit (Modul CK, 2026-08-14). Bewusst karg: die Seite soll in drei
    Sekunden gelesen sein. */
-.ck-fuss{font-size:14px;line-height:1.6;color:var(--sm-ink-faint);}
+.ck-fuss{font-size:14px;line-height:1.7;color:var(--sm-ink-faint);}
 .ck-link{color:var(--sm-accent-text);text-decoration:none;border-bottom:1px solid var(--sm-accent-border);}
 .ck-link:hover{border-bottom-color:var(--sm-accent);}
 .ck-stand{font-size:13.5px;color:var(--sm-ink-faint);}
@@ -373,7 +373,7 @@ select.dlg-feld{cursor:pointer;}
 .ap-wrap{display:grid;grid-template-columns:340px minmax(0,1fr);gap:14px;align-items:start;}
 @media (max-width:960px){.ap-wrap{grid-template-columns:1fr;}}
 .ap-liste{display:flex;flex-direction:column;gap:6px;}
-.ap-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;
+.ap-item{display:flex;align-items:center;gap:11px;padding:13px 14px;cursor:pointer;
   border:1px solid var(--sm-border);background:var(--sm-card);color:var(--sm-ink);}
 .ap-item:hover{border-color:var(--sm-border-strong);}
 .ap-item.on{border-color:var(--sm-border-strong);background:var(--sm-card-strong);
@@ -401,13 +401,13 @@ select.dlg-feld{cursor:pointer;}
 
 .ap-detail-kopf{display:flex;align-items:center;gap:12px;}
 .ap-detail-kopf h2{margin:0;font-size:23px;}
-.ap-kurz{margin:0;color:var(--sm-ink-dim);font-size:16px;line-height:1.55;}
+.ap-kurz{margin:0;color:var(--sm-ink-dim);font-size:16px;line-height:1.65;}
 .ap-funktionen{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;
-  font-size:15.5px;line-height:1.55;}
+  font-size:15.5px;line-height:1.65;}
 .ap-bedienung{display:flex;flex-direction:column;gap:14px;font-size:15.5px;}
 .ap-anleitung{margin-top:6px;padding:10px 12px;background:var(--sm-field);
   border:1px solid var(--sm-border);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:14.5px;line-height:1.6;word-break:break-word;color:var(--sm-ink);}
+  font-size:14.5px;line-height:1.7;word-break:break-word;color:var(--sm-ink);}
 
 /* Wartung: eigener Ampelzustand (Stufe 2b). Akzentfarbe statt Rot/Grün —
    stummgeschaltet ist weder gesund noch kaputt, sondern eine Entscheidung. */
@@ -433,17 +433,17 @@ select.dlg-feld{cursor:pointer;}
    Grosse Zahl links, ganzer Satz rechts, darunter die Uhrzeiten von heute.
    Die Zahl ist bewusst gross: sie ist die einzige Angabe, die man auch
    erfasst, wenn man am Handy nur kurz drueberschaut. */
-.ap-heute{display:flex;align-items:center;gap:16px;padding:14px;
+.ap-heute{display:flex;align-items:center;gap:18px;padding:17px;
   background:var(--sm-ok-bg);border:1px solid var(--sm-ok-border);}
 .ap-heute.fehler{background:var(--sm-danger-bg);border-color:var(--sm-danger-border);}
 .ap-heute-zahl{font-size:38px;line-height:1;font-weight:600;flex:none;min-width:52px;
   text-align:center;color:var(--sm-ok);}
 .ap-heute.fehler .ap-heute-zahl{color:var(--sm-danger);}
-.ap-heute-text{font-size:17.5px;line-height:1.45;min-width:0;}
+.ap-heute-text{font-size:17.5px;line-height:1.6;min-width:0;}
 .ap-heute-text .s{display:block;margin-top:4px;font-size:14.5px;color:var(--sm-ink-dim);}
 .ap-heute-liste{margin:12px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:5px;
-  font-size:15px;line-height:1.5;color:var(--sm-ink-dim);}
+  font-size:15px;line-height:1.62;color:var(--sm-ink-dim);}
 .ap-heute-liste b{color:var(--sm-ink);font-weight:500;}
-.ap-heute-leer{display:block;margin-top:12px;font-size:15px;line-height:1.5;}
+.ap-heute-leer{display:block;margin-top:12px;font-size:15px;line-height:1.62;}
 .ap-heute-utc{margin-top:12px;padding-top:10px;border-top:1px solid var(--sm-border);
-  font-size:14px;line-height:1.5;color:var(--sm-ink-faint);}
+  font-size:14px;line-height:1.62;color:var(--sm-ink-faint);}

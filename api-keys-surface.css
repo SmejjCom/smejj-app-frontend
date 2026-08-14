@@ -174,7 +174,7 @@
 #settings .ak-pop-loading, #settings .ak-pop-empty, #settings .ak-pop-more { padding: 10px; font-size:15px; color: var(--premium-muted, #9aa4b2); }
 
 /* Status */
-#settings .ak-status { margin: 2px; font-size:15px; color: var(--premium-muted, #9aa4b2); line-height: 1.5; }
+#settings .ak-status { margin: 2px; font-size:15px; color: var(--premium-muted, #9aa4b2); line-height: 1.62; }
 #settings .ak-status[data-error="true"] { color: #ffb9b9; }
 
 /* --- Tablet --- */

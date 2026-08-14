@@ -238,7 +238,7 @@
 #profile .account-row small {
   color: var(--premium-muted, #9fa8ad);
   font-size:15.5px;
-  line-height: 1.45;
+  line-height: 1.6;
 }
 
 /* Viereckige Schalter statt nackter Checkboxen. */
@@ -352,7 +352,7 @@
   color: var(--premium-text, #eef1f2);
   font-family: inherit;
   font-size:17.5px;
-  line-height: 1.5;
+  line-height: 1.62;
 }
 
 #profile .account-grid {
@@ -476,7 +476,7 @@
   margin: 14px 0 0;
   color: var(--premium-muted, #9fa8ad);
   font-size:15.5px;
-  line-height: 1.55;
+  line-height: 1.65;
 }
 
 /* Profilbild-Zeile (Markup aus profile-picture-control.js). */
@@ -505,7 +505,7 @@
 #profile .account-picture-body small {
   color: var(--premium-muted, #9fa8ad);
   font-size:15.5px;
-  line-height: 1.45;
+  line-height: 1.6;
 }
 
 #profile .account-picture-actions {

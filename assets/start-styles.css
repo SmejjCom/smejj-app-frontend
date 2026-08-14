@@ -208,7 +208,7 @@ button:hover {
   margin: 16px 0 0;
   color: #62625b;
   font-size:18.5px;
-  line-height: 1.5;
+  line-height: 1.62;
 }
 
 .log {
@@ -224,15 +224,15 @@ button:hover {
   border: 1px solid #deded8;
   border-radius: 8px;
   background: #ffffff;
-  padding: 16px;
+  padding: 18px 20px;
   white-space: pre-wrap;
 }
 
 .entry {
   max-width: 820px;
-  margin: 0 0 12px;
+  margin: 0 0 20px;
   color: #252520;
-  line-height: 1.55;
+  line-height: 1.65;
 }
 
 .entry.assistant {
@@ -449,7 +449,7 @@ textarea {
   min-height: 360px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size:15.5px;
-  line-height: 1.5;
+  line-height: 1.62;
 }
 
 .toolbar {
@@ -2000,7 +2000,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      margin: 0;
      font-size:16.5px;
      color: rgba(246, 243, 238, 0.6);
-     line-height: 1.5;
+     line-height: 1.62;
 }
 
 /* Live-Mitschrift der Antwort im Sprachmodus (Konkurrenz-Radar V2) */
@@ -2011,7 +2011,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      margin: 0;
      font-size:17.5px;
      color: rgba(246, 243, 238, 0.85);
-     line-height: 1.55;
+     line-height: 1.65;
      white-space: pre-wrap;
      overflow-wrap: anywhere;
 }
@@ -2773,7 +2773,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   max-width: 420px;
   color: rgba(246, 243, 238, 0.6);
   font-size:15.5px;
-  line-height: 1.45;
+  line-height: 1.6;
 }
 
 .bp-fallback a {
@@ -3525,7 +3525,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   color: rgba(246, 243, 238, 0.62);
   font: inherit;
   font-size:14.5px;
-  line-height: 1.4;
+  line-height: 1.55;
   cursor: pointer;
   transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
 }
@@ -3635,7 +3635,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  line-height: 1.45;
+  line-height: 1.6;
   /* Lange Suchbegriffe duerfen die Zeile nicht sprengen. */
   overflow-wrap: anywhere;
 }
@@ -4001,7 +4001,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: rgba(0, 0, 0, 0.22);
   color: #f6f3ee;
   font: inherit;
-  line-height: 1.55;
+  line-height: 1.65;
   resize: vertical;
 }
 

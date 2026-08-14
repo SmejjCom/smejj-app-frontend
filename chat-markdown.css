@@ -197,7 +197,7 @@
   color: rgba(246, 243, 238, 0.62);
   font: inherit;
   font-size:14.5px;
-  line-height: 1.4;
+  line-height: 1.55;
   cursor: pointer;
   transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
 }
@@ -307,7 +307,7 @@
   display: flex;
   align-items: baseline;
   gap: 6px;
-  line-height: 1.45;
+  line-height: 1.6;
   /* Lange Suchbegriffe duerfen die Zeile nicht sprengen. */
   overflow-wrap: anywhere;
 }

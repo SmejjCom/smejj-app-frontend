@@ -34,7 +34,7 @@ html.p-recht body {
     radial-gradient(circle at 78% 20%, rgba(79, 143, 236, 0.14), transparent 26%),
     linear-gradient(180deg, #151617 0%, #101113 58%, #0d0e10 100%);
   color: #f6f3ee;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 html.p-recht main {
   max-width: 720px;
@@ -91,7 +91,7 @@ html.p-404 a { color: #8ab4f8; text-decoration: none; border: 1px solid #3c4043;
 /* ===== Sprach-Startseiten (html.p-sprachstart) ===== */
 html.p-sprachstart { color-scheme: light; }
 html.p-sprachstart * { box-sizing: border-box; }
-html.p-sprachstart body { margin: 0; background: #f7f7f4; color: #1c1c1a; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; line-height: 1.6; }
+html.p-sprachstart body { margin: 0; background: #f7f7f4; color: #1c1c1a; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; line-height: 1.7; }
 html.p-sprachstart .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 56px; }
 html.p-sprachstart header.top { display: flex; align-items: center; margin-bottom: 40px; }
 html.p-sprachstart header.top a { display: inline-flex; max-width: 100%; }

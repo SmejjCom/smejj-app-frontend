@@ -134,7 +134,7 @@
   margin: 0;
   color: var(--premium-muted, #9fa8ad);
   font-size:16px;
-  line-height: 1.5;
+  line-height: 1.62;
 }
 
 /* Zeilen-Listen: Felder nur durch hauchduenne Linien getrennt. */
@@ -177,7 +177,7 @@
 #settings .settings-row-copy span {
   color: var(--premium-muted, #9fa8ad);
   font-size:15.5px;
-  line-height: 1.45;
+  line-height: 1.6;
 }
 
 #settings .settings-row select,
@@ -196,7 +196,7 @@
   width: 100%;
   min-height: 88px;
   resize: vertical;
-  line-height: 1.5;
+  line-height: 1.62;
 }
 
 /* Viereckiger Schalter (Markup: input + span). */
