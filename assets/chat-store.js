@@ -282,6 +282,17 @@ async function medienHolen(log) {
 async function persistActive() {
   await medienAuslagern();
   const messages = readEntries();
+  // ERST der Schnappschuss, DANN die Anzeige. Genau in dieser Reihenfolge:
+  // readEntries() speichert innerHTML, also muss dort die kurze Adresse stehen.
+  // Wuerde hier schon auf blob: umgeschaltet, landete der blob im Gespeicherten —
+  // und daran sind die vier Videos im Konto gestorben.
+  //
+  // Ohne diesen Aufruf sieht der Nutzer ein frisch erzeugtes Bild oder Video
+  // erst nach einem Neuladen: die Sicherheitsrichtlinie der Seite laesst kein
+  // Medium vom Control-Server zu (live gemessen — "MEDIA_ELEMENT_ERROR: Media
+  // load rejected" direkt nach dem Auslagern). Ohne await, das Speichern soll
+  // nicht auf das Netz warten.
+  medienHolen(startLog());
   if (!messages.length) return null;
   let id = activeChatId();
   if (!id) {
