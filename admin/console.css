@@ -5,10 +5,13 @@
    Optik: iPhone-17-Glas (backdrop-filter, Schichtung, Specular)
    ============================================================ */
 :root{
-  --sm-accent:#00ffef;
-  --sm-accent-soft:rgba(0,255,239,.12);
-  --sm-accent-border:rgba(0,255,239,.42);
-  --sm-accent-text:#9ffff8;
+  /* Cockpit-Palette der 15-Screen-Vorlage (2026-08-13) — dieselben Toene wie
+     Login-Karte, statische Seiten und die inneren App-Ansichten. Nur Farben;
+     die ausdrueckliche Vorgabe "alles viereckig" (--radius:0) bleibt. */
+  --sm-accent:#32f6ea;
+  --sm-accent-soft:rgba(45,212,191,.13);
+  --sm-accent-border:rgba(45,212,191,.55);
+  --sm-accent-text:#7ee8da;
   --sm-card:rgba(255,255,255,.055);
   --sm-card-strong:rgba(255,255,255,.09);
   --sm-border:rgba(255,255,255,.11);
@@ -26,7 +29,7 @@
   --sm-warn:#ffd68a;
   --sm-warn-bg:rgba(255,214,138,.12);
   --sm-warn-border:rgba(255,214,138,.36);
-  --sm-shadow:0 18px 50px rgba(0,0,0,.35);
+  --sm-shadow:0 0 24px rgba(45,212,191,.14),0 18px 50px rgba(0,0,0,.35);
   --rail:236px;
   --radius:0px;              /* viereckig, ausdrueckliche Vorgabe */
   --glass-blur:blur(34px) saturate(170%);
@@ -39,10 +42,9 @@ body{
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   color:var(--sm-ink);
   background:
-    radial-gradient(circle at 18% 8%,rgba(95,176,154,.20),transparent 30%),
-    radial-gradient(circle at 82% 14%,rgba(79,143,236,.17),transparent 28%),
-    radial-gradient(circle at 60% 92%,rgba(0,255,239,.07),transparent 34%),
-    linear-gradient(180deg,#151617 0%,#101113 58%,#0d0e10 100%);
+    radial-gradient(780px 500px at 84% 4%,rgba(45,212,191,.16),transparent 62%),
+    radial-gradient(660px 500px at -8% 72%,rgba(13,185,210,.10),transparent 64%),
+    linear-gradient(180deg,#0c1119 0%,#070b11 68%,#04070b 100%);
   background-attachment:fixed;
   -webkit-font-smoothing:antialiased;
 }
@@ -80,7 +82,7 @@ body{
 .rail-brand{padding:18px 16px 14px;border-bottom:1px solid var(--sm-border);}
 .rail-brand .mark{display:flex;align-items:center;gap:9px;}
 .rail-brand .dot{width:16px;height:16px;border:1.5px solid var(--sm-accent);
-  box-shadow:0 0 14px rgba(0,255,239,.55);position:relative;}
+  box-shadow:0 0 14px rgba(45,212,191,.55);position:relative;}
 .rail-brand .dot::after{content:"";position:absolute;inset:4px;background:var(--sm-accent);}
 .rail-brand b{font-size:15px;font-weight:600;letter-spacing:.01em;}
 .rail-brand .sub{margin-top:8px;font-size:9.5px;font-weight:700;letter-spacing:.16em;
@@ -177,7 +179,7 @@ body{
 .kpi .d{margin-top:8px;font-size:11px;color:var(--sm-ink-dim);}
 .kpi .d.up{color:var(--sm-ok);} .kpi .d.dn{color:var(--sm-danger);} .kpi .d.wr{color:var(--sm-warn);}
 .kpi .spark{margin-top:11px;display:flex;align-items:flex-end;gap:2px;height:26px;}
-.kpi .spark i{flex:1;background:linear-gradient(180deg,var(--sm-accent),rgba(0,255,239,.18));opacity:.8;}
+.kpi .spark i{flex:1;background:linear-gradient(180deg,var(--sm-accent),rgba(45,212,191,.18));opacity:.8;}
 
 /* Panel */
 .panel{padding:0;overflow:hidden;}
@@ -219,7 +221,7 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
 .bar-row .bl span:first-child{color:var(--sm-ink);}
 .bar-row .bl span:last-child{color:var(--sm-ink-faint);}
 .track{height:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.06);}
-.track i{display:block;height:100%;background:linear-gradient(90deg,var(--sm-accent),rgba(0,255,239,.35));}
+.track i{display:block;height:100%;background:linear-gradient(90deg,var(--sm-accent),rgba(45,212,191,.35));}
 .track i.wr{background:linear-gradient(90deg,var(--sm-warn),rgba(255,214,138,.3));}
 .track i.dg{background:linear-gradient(90deg,var(--sm-danger),rgba(255,77,79,.3));}
 
@@ -241,7 +243,7 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
   position:relative;flex:none;}
 .sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;background:var(--sm-ink-faint);}
 .sw.on{background:var(--sm-accent-soft);border-color:var(--sm-accent-border);}
-.sw.on::after{left:auto;right:2px;background:var(--sm-accent);box-shadow:0 0 10px rgba(0,255,239,.6);}
+.sw.on::after{left:auto;right:2px;background:var(--sm-accent);box-shadow:0 0 10px rgba(45,212,191,.6);}
 
 /* Hinweisstreifen */
 .note{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:13px 15px;align-items:start;
@@ -380,6 +382,10 @@ select.dlg-feld{cursor:pointer;}
 /* Die Heute-Zeile ist die erste Frage, die man stellt — also heller als der
    Steckbrief darunter (Ort/Zeitplan), aber leiser als der Name. */
 .ap-item .t span.h{color:var(--sm-ink-dim);margin:3px 0 1px;}
+/* Laufende Nummer vor dem Namen: da, aber leise. Tabellenziffern, damit
+   die Namen in der Liste trotz zweistelliger Nummern buendig starten. */
+.ap-nr{color:var(--sm-ink-faint);font-weight:400;margin-right:7px;
+  font-variant-numeric:tabular-nums;}
 .ap-dot{width:12px;height:12px;flex:none;}
 .ap-dot.gruen{background:var(--sm-ok);box-shadow:0 0 10px var(--sm-ok);}
 .ap-dot.gelb{background:var(--sm-warn);box-shadow:0 0 10px var(--sm-warn);}

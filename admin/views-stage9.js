@@ -28,6 +28,20 @@
     return pille(a.text, a.ton);
   }
 
+  /**
+   * Die laufende Nummer vor dem Namen — klein und leise.
+   *
+   * Sie stand bis 2026-08-14 IM Namen ("24. Autonomous Multi-File
+   * Repo-Architect Autopilot") und schob damit das Wort, das etwas sagt, aus
+   * der schmalen Spalte heraus. Sie ganz wegzunehmen war zu viel des Guten:
+   * der Betreiber verstaendigt sich ueber sie ("schau dir mal Autopilot 06
+   * an"). Also beides — Nummer als eigenes, ruhiges Element, Name als
+   * Hauptsache.
+   */
+  function nummer(a) {
+    return a.nummer ? '<span class="ap-nr">' + e(a.nummer) + "</span>" : "";
+  }
+
   function punkt(farbe) {
     return '<span class="ap-dot ' + e(farbe) + '"></span>';
   }
@@ -260,7 +274,7 @@
     return '<div class="ap-liste">' + autopiloten.map(function (a) {
       return '<a class="ap-item' + (a.id === auswahlId ? " on" : "") + '" data-ap="' + e(a.id) + '">'
         + punkt(a.ampel)
-        + '<span class="t"><b>' + e(a.name) + "</b>"
+        + '<span class="t"><b>' + nummer(a) + e(a.name) + "</b>"
         + '<span class="h">' + e(heuteSatz(a)) + "</span>"
         + "<span>" + e(a.ort) + " · " + e(a.zeitplan) + "</span></span></a>";
     }).join("") + "</div>";
@@ -319,7 +333,7 @@
     });
 
     return '<div class="ap-detail">'
-      + '<div class="ap-detail-kopf">' + punkt(a.ampel) + "<h2>" + e(a.name) + "</h2>" + ampelPille(a.ampel) + "</div>"
+      + '<div class="ap-detail-kopf">' + punkt(a.ampel) + "<h2>" + nummer(a) + e(a.name) + "</h2>" + ampelPille(a.ampel) + "</div>"
       + '<p class="ap-kurz">' + e(a.kurz) + "</p>"
       + grund
       + heuteBlock(a)
