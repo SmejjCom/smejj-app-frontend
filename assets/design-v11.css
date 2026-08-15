@@ -448,6 +448,11 @@ body.spur-start-aktiv .nav-vier { display: none; }
 .fpille-nachdenken {
   font-size: 14px;
   padding: 0 11px;
+  /* start-glass.css ordnet die Zeile per order (Plus 1, Modell 2, Platz 3,
+     Werkzeuge 4, Senden 5). Ohne eigenen Wert (0) rutschte die Pille an den
+     Zeilenanfang — im Mockup steht sie RECHTS vom Feld, vor dem Mikrofon.
+     Gleicher Wert wie die Werkzeuge; die DOM-Reihenfolge stellt sie davor. */
+  order: 4;
 }
 .fpille-nachdenken.an {
   background: var(--v11-cy-fill);
