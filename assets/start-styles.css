@@ -5519,3 +5519,52 @@ body.spur-start-aktiv .nav-kosten { display: none; }
 #papierkorb .papierkorb-text strong { font-size: 15.5px; }
 #papierkorb .papierkorb-text span { font-size: 13.5px; color: rgba(242, 245, 244, 0.62); }
 #papierkorb .papierkorb-leer { color: rgba(242, 245, 244, 0.62); font-size: 15.5px; }
+
+
+/* =======================================================================
+ * Bildschirm 29 — der Sprachmodus im neuen Kleid (gleiche Funktion)
+ * ======================================================================= */
+.voice-mode-overlay, #voiceOverlay, .voice-overlay {
+  background: rgba(7, 11, 17, 0.92) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  backdrop-filter: blur(40px) saturate(160%);
+}
+.voice-mode-logo svg, .voice-mode-logo { color: var(--v11-marke); }
+.voice-mode-status, .voice-mode-hint {
+  color: rgba(242, 245, 244, 0.74);
+  font-size: 16.5px;
+}
+.voice-mode-transcript, .voice-mitschrift {
+  background: var(--v11-glas);
+  border: 0;
+  border-radius: var(--v11-r);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+  color: #f2f5f4;
+  font-size: 17px;
+  line-height: 1.6;
+}
+.voice-mode-bar {
+  background: rgba(255, 255, 255, 0.06);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+}
+.voice-mode-bar input, .voice-mode-input {
+  background: transparent;
+  border: 0;
+  color: #f2f5f4;
+  font-size: 16.5px;
+}
+.voice-mode-bar button {
+  border-radius: 999px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.055);
+  color: #f2f5f4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+#voiceModeClose { color: rgba(242, 245, 244, 0.74); }
+#voiceModeMic[aria-pressed="true"] {
+  background: rgba(255, 122, 124, 0.18);
+  color: #ffb4b6;
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 124, 0.55);
+}

@@ -801,3 +801,29 @@
   font-size: 14px;
   color: #ffd68a;
 }
+
+
+/* Bildschirm 46: der groesste Knopf der Seite */
+#profile .sicherheit-panik {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 0 0 18px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(255, 214, 138, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(255, 214, 138, 0.35);
+}
+#profile .sicherheit-panik > div { flex: 1; min-width: 220px; display: grid; gap: 4px; }
+#profile .sicherheit-panik strong { font-size: 17px; }
+#profile .sicherheit-panik span { font-size: 14.5px; color: rgba(242, 245, 244, 0.78); line-height: 1.5; }
+#profile .sicherheit-panik-knopf {
+  padding: 14px 22px !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  background: #ffd68a !important;
+  color: #241a04 !important;
+  border: 0 !important;
+}

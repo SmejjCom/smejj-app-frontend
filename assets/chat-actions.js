@@ -155,7 +155,11 @@ function syncVersions(bar, meta) {
       + `<button type="button" class="msg-act msg-version-step" data-act="version-next" aria-label="Nächste Version"><span class="msg-act-icon" aria-hidden="true">${iconMarkup("right")}</span></button>`;
     bar.append(picker);
   }
-  setText(picker.querySelector(".msg-version-label"), versionLabel(meta.active, total));
+  // Mockup-Bildschirm 26, der Zusatz: es steht dabei, WANN geaendert wurde —
+  // sonst weiss man beim Zurueckblaettern nicht, welche Fassung die neuere ist.
+  const aktiveFassung = meta.versions[meta.active];
+  const zusatz = aktiveFassung?.editedAt ? ` · geändert ${vorText(aktiveFassung.editedAt)}` : "";
+  setText(picker.querySelector(".msg-version-label"), versionLabel(meta.active, total) + zusatz);
   setDisabled(picker.querySelector('[data-act="version-prev"]'), meta.active <= 0);
   setDisabled(picker.querySelector('[data-act="version-next"]'), meta.active >= total - 1);
 }
@@ -651,7 +655,7 @@ function onSettled() {
   if (!plan.ok) return;
   metaOf(plan.ziel).versions = pendingVersions.slice();
   pendingVersions = null;
-  addVersion(plan.ziel, { raw: plan.raw, html: plan.ziel.innerHTML });
+  addVersion(plan.ziel, { raw: plan.raw, html: plan.ziel.innerHTML, editedAt: new Date().toISOString() });
   ensureBar(plan.ziel);
 }
 
@@ -683,4 +687,13 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", init, { once: true });
 } else {
   init();
+}
+
+
+// "vor 8 Sekunden" / "vor 3 Minuten" / Uhrzeit — kurz und deutsch.
+function vorText(iso) {
+  const s = Math.round((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return `vor ${Math.max(1, s)} Sekunden`;
+  if (s < 3600) return `vor ${Math.round(s / 60)} Minuten`;
+  return `um ${new Date(iso).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}`;
 }
