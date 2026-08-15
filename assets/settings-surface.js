@@ -69,14 +69,19 @@ export function initSettingsSurface() {
   // und Unterzeile; Enter oeffnet den ersten Treffer. Bewusst nur die Liste,
   // nicht die einzelnen Schalter — die Unterzeilen nennen den Inhalt, damit
   // "Schrift" den Bereich "Aussehen & Schriftgröße" findet.
-  view.querySelector("#settingsSuche")?.addEventListener("input", (event) => {
+  // DELEGIERT wie der Klick daruber, nicht direkt am Feld: render() zeichnet
+  // die Oberflaeche neu (z. B. nach einem Sprachwechsel), und eine direkte
+  // Bindung stuerbe mit dem alten Feld — live gemessen am 2026-08-15: das
+  // Feld war da, aber der Filter tat nichts.
+  view.addEventListener("input", (event) => {
+    if (event.target.id !== "settingsSuche") return;
     const frage = event.target.value.trim().toLowerCase();
     view.querySelectorAll("[data-settings-tab]").forEach((knopf) => {
       knopf.hidden = Boolean(frage) && !knopf.textContent.toLowerCase().includes(frage);
     });
   });
-  view.querySelector("#settingsSuche")?.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter") return;
+  view.addEventListener("keydown", (event) => {
+    if (event.target.id !== "settingsSuche" || event.key !== "Enter") return;
     const erster = view.querySelector("[data-settings-tab]:not([hidden])");
     if (erster) activate(view, erster.dataset.settingsTab);
   });
