@@ -158,7 +158,14 @@ if (typeof document !== "undefined" && document.querySelector("#statusListe")) {
   document.querySelector("#statusErneut")?.addEventListener("click", () => statusAktualisieren());
   // Alle 60 Sekunden von selbst nachsehen, aber nur solange der Reiter sichtbar
   // ist — im Hintergrund fragt niemand ins Leere.
-  setInterval(() => {
+  const takt = setInterval(() => {
     if (document.visibilityState === "visible") statusAktualisieren();
   }, 60000);
+  // Beim Verlassen der Seite abraeumen. Ohne das laeuft der Takt im
+  // Zurueck-Vorwaerts-Zwischenspeicher (bfcache) weiter: Safari und Chrome
+  // frieren eine verlassene Seite ein, statt sie zu verwerfen — sie kann
+  // Minuten spaeter reaktiviert werden und haette dann zwei Takte. "pagehide"
+  // ist der Ereignisname, der dabei zuverlaessig feuert; "unload" verhindert
+  // die Zwischenspeicherung sogar.
+  window.addEventListener("pagehide", () => clearInterval(takt));
 }
