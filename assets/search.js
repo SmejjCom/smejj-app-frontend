@@ -5,7 +5,7 @@ import { CLIENT_ROUTES } from "./config.js";
 import { listChats, openChat } from "/assets/chat-store.js?v=pin-20260806";
 // Overlay-Logik (Cmd+K, Rendern, Tastatur) wohnt in search-overlay.js — diese
 // Datei bleibt klein und die Such-Seite hier ist nur noch die Rueckfallebene.
-import { initSearchOverlay, toggleSearchOverlay } from "./search-overlay.js";
+import { initSearchOverlay, toggleSearchOverlay } from "./search-overlay.js?v=b47";
 
 const STATIC_RESULTS = Object.freeze([
   ["Arbeitsbereiche", "Neu", "Neuer Chat oder neue Aufgabe starten", "start", "neu chat aufgabe start"],

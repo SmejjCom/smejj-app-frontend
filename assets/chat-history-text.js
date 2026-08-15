@@ -253,6 +253,28 @@ function gruppeVon(iso) {
   return "Älter";
 }
 
+
+/* ------------------------------------------------------------------ *
+ *  Merkmale (Mockup V11, Bildschirm 47)
+ * ------------------------------------------------------------------ */
+
+// "Werkzeug-Kennzeichen" statt geratener Themen: das Mockup filtert den
+// Verlauf nach dem, was NACHWEISBAR in der Unterhaltung steckt — Datei,
+// Bild, Code. Die Muster sind bewusst eng: lieber ein Kennzeichen zu wenig
+// als ein Filter, der luegt.
+const MERKMAL_DATEI = /\[anhang:|\.pdf\b|\.docx?\b|\.xlsx?\b|\.csv\b|\.zip\b/i;
+const MERKMAL_BILD = /\.jpe?g\b|\.png\b|\.heic\b|\.webp\b|screenshot|generiere ein bild/i;
+const MERKMAL_CODE = /```|\bfunction\b|\bconst \w+ =|\bimport \w+ from\b|<\/?[a-z]+>|\bdef \w+\(/;
+
+function merkmaleVon(chat) {
+  const text = volltext(chat).slice(0, 20000);
+  return {
+    datei: MERKMAL_DATEI.test(text),
+    bild: MERKMAL_BILD.test(text),
+    code: MERKMAL_CODE.test(text)
+  };
+}
+
 /* ------------------------------------------------------------------ *
  *  Suche
  * ------------------------------------------------------------------ */
@@ -384,6 +406,7 @@ export {
   anzeigeTitel,
   anzeigeVorschau,
   themaVon,
+  merkmaleVon,
   zeitText,
   gruppeVon,
   projektGruppen,
