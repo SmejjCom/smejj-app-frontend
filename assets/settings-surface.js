@@ -156,7 +156,7 @@ function markup() {
   // wird ueber Name UND Unterzeile; Enter springt in den ersten Treffer.
   const suche = `<input type="search" id="settingsSuche" class="settings-suche" placeholder="${t("Einstellung suchen…")}" aria-label="${t("Einstellung suchen…")}">`;
   return `<header class="settings-header"><div><p class="eyebrow">${t("Einstellungen")}</p><h2>${t("Einstellungen")}</h2><p class="subhead">${t("Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.")}</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">${t("Lokal gespeichert")}</div></header>
-    <div class="settings-shell">${suche}<nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${nav}</nav><div class="settings-content">
+    <div class="settings-shell"><nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${suche}${nav}</nav><div class="settings-content">
       ${panel("general", "Allgemein", "Grundlegendes Verhalten der App.", [
         select("Sprache", "settingsLanguage", LANGUAGE_OPTIONS, false),
         select("Beim Öffnen anzeigen", "settingsStartView", [["last", "Letzte Ansicht"], ["start", "Startseite"], ["projects", "Arbeitsbereich"]]),

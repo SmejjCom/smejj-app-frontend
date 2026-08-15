@@ -9,7 +9,7 @@ import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v
 import { initGlobalSearch } from "./search.js";
 import { openSearchOverlay } from "./search-overlay.js";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
-import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=mockup55b";
+import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=mockup55c";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
