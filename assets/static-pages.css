@@ -34,7 +34,7 @@ html.p-recht body {
     radial-gradient(circle at 78% 20%, rgba(79, 143, 236, 0.14), transparent 26%),
     linear-gradient(180deg, #151617 0%, #101113 58%, #0d0e10 100%);
   color: #f6f3ee;
-  line-height: 1.7;
+  line-height: 1.6;
 }
 html.p-recht main {
   max-width: 720px;
@@ -81,37 +81,48 @@ html.p-recht footer a { margin-right: 16px; display: inline-flex; align-items: c
 
 /* ===== Fehlerseite (html.p-404) ===== */
 html.p-404 body { font-family: system-ui, -apple-system, sans-serif; background: #0b0d10; color: #e8eaed; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+/* 404 im selben Cyan-Cockpit wie die uebrigen statischen Seiten. */
+html.p-404 body {
+  background:
+    radial-gradient(700px 460px at 50% -10%, rgba(45, 212, 191, 0.14), transparent 62%),
+    linear-gradient(180deg, #0c1119 0%, #070b11 68%, #04070b 100%);
+}
+html.p-404 h1 { color: #f6fffe; text-shadow: 0 0 22px rgba(45, 212, 191, 0.2); }
+html.p-404 a { color: #7ee8da; }
 html.p-404 main { text-align: center; padding: 2rem; }
 html.p-404 .error-brand { display: inline-flex; width: 30px; margin-bottom: 2rem; padding: 0; background: transparent; }
 html.p-404 .error-brand img { display: block; width: 100%; height: auto; aspect-ratio: 2000 / 1532.335; object-fit: contain; background: transparent; }
 html.p-404 h1 { font-size: 3rem; margin: 0 0 0.5rem; }
 html.p-404 p { color: #9aa0a6; margin: 0 0 1.5rem; }
-html.p-404 a { color: #8ab4f8; text-decoration: none; border: 1px solid #3c4043; border-radius: 999px; padding: 0.6rem 1.4rem; display: inline-block; }
+/* Knopf-Regel steht NACH dem Cockpit-Block und gewann per Reihenfolge —
+ * darum hier direkt in Cyan (2026-08-13, mit dem Cockpit-Umbau). */
+html.p-404 a { color: #7ee8da; text-decoration: none; border: 1px solid rgba(45, 212, 191, 0.45); border-radius: 999px; padding: 0.6rem 1.4rem; display: inline-block; }
+html.p-404 a:hover { border-color: #32f6ea; box-shadow: 0 0 14px rgba(45, 212, 191, 0.22); }
 
 /* ===== Sprach-Startseiten (html.p-sprachstart) ===== */
 html.p-sprachstart { color-scheme: light; }
 html.p-sprachstart * { box-sizing: border-box; }
-html.p-sprachstart body { margin: 0; background: #f7f7f4; color: #1c1c1a; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; line-height: 1.7; }
+html.p-sprachstart body { margin: 0; background: #f7f7f4; color: #1c1c1a; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; line-height: 1.6; }
 html.p-sprachstart .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 56px; }
 html.p-sprachstart header.top { display: flex; align-items: center; margin-bottom: 40px; }
 html.p-sprachstart header.top a { display: inline-flex; max-width: 100%; }
 html.p-sprachstart header.top img { width: clamp(26px, 4.5vw, 30px); height: auto; aspect-ratio: 2000 / 1532.335; object-fit: contain; background: transparent; }
 html.p-sprachstart h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.2; margin: 0 0 12px; }
-html.p-sprachstart p.tagline { font-size:21px; color: #44443f; margin: 0 0 24px; }
+html.p-sprachstart p.tagline { font-size: 18px; color: #44443f; margin: 0 0 24px; }
 html.p-sprachstart a.cta { display: inline-block; background: #1c1c1a; color: #f7f7f4; text-decoration: none; padding: 12px 26px; border-radius: 999px; font-weight: 600; }
 html.p-sprachstart a.cta:hover { background: #333330; }
-html.p-sprachstart h2 { font-size:25px; margin: 48px 0 16px; }
+html.p-sprachstart h2 { font-size: 22px; margin: 48px 0 16px; }
 html.p-sprachstart .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
 html.p-sprachstart .card { background: #ffffff; border: 1px solid #e6e6e0; border-radius: 14px; padding: 18px; }
-html.p-sprachstart .card h3 { margin: 0 0 8px; font-size:18.5px; }
-html.p-sprachstart .card p { margin: 0; font-size:17px; color: #44443f; }
+html.p-sprachstart .card h3 { margin: 0 0 8px; font-size: 16px; }
+html.p-sprachstart .card p { margin: 0; font-size: 14.5px; color: #44443f; }
 html.p-sprachstart details { background: #ffffff; border: 1px solid #e6e6e0; border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
 html.p-sprachstart summary { cursor: pointer; font-weight: 600; }
 html.p-sprachstart details p { margin: 10px 0 4px; color: #44443f; }
 html.p-sprachstart nav.langs { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 12px; }
-html.p-sprachstart nav.langs a { color: #1c1c1a; text-decoration: none; border-bottom: 1px solid #c9c9c2; padding-bottom: 1px; font-size:17px; }
+html.p-sprachstart nav.langs a { color: #1c1c1a; text-decoration: none; border-bottom: 1px solid #c9c9c2; padding-bottom: 1px; font-size: 14.5px; }
 html.p-sprachstart nav.langs a:hover { border-color: #1c1c1a; }
-html.p-sprachstart footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid #e6e6e0; font-size:16px; color: #6b6b64; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+html.p-sprachstart footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid #e6e6e0; font-size: 13.5px; color: #6b6b64; display: flex; flex-wrap: wrap; gap: 8px 18px; }
 html.p-sprachstart footer a { color: #6b6b64; }
 
 /* ===== Betriebsstatus (html.p-status, zusaetzlich zu p-recht) =====
@@ -153,6 +164,76 @@ html.p-status .status-knopf {
 }
 html.p-status .status-knopf:hover { background: rgba(255, 255, 255, 0.12); }
 html.p-status .status-stand { font-size: 0.85rem; color: rgba(246, 243, 238, 0.55); }
+
+/* Betriebsstatus im Cyan-Cockpit der 15-Screen-Vorlage. */
+html.p-status body {
+  background:
+    radial-gradient(780px 500px at 84% 4%, rgba(45, 212, 191, 0.16), transparent 62%),
+    radial-gradient(660px 500px at -8% 72%, rgba(13, 185, 210, 0.1), transparent 64%),
+    linear-gradient(180deg, #0c1119 0%, #070b11 68%, #04070b 100%);
+}
+
+html.p-status main {
+  max-width: 1180px;
+}
+
+html.p-status h1 {
+  color: #f6fffe;
+  text-shadow: 0 0 20px rgba(45, 212, 191, 0.18);
+}
+
+html.p-status .card,
+html.p-status .status-gesamt {
+  border-color: rgba(45, 212, 191, 0.48);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(45, 212, 191, 0.02)),
+    rgba(17, 23, 32, 0.86);
+  box-shadow:
+    0 0 24px rgba(45, 212, 191, 0.22),
+    inset 0 1px 0 rgba(126, 232, 218, 0.2);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
+html.p-status .status-knopf {
+  border-color: rgba(45, 212, 191, 0.56);
+  background: rgba(45, 212, 191, 0.1);
+}
+
+html.p-status .status-knopf:hover {
+  border-color: #32f6ea;
+  background: rgba(45, 212, 191, 0.18);
+  box-shadow: 0 0 16px rgba(45, 212, 191, 0.22);
+}
+
+/* ===== Rechts- und Hilfeseiten im Cyan-Cockpit der 15-Screen-Vorlage =====
+ * Fortsetzung der begonnenen Status-Umstellung (Block oben): dieselbe
+ * Bildsprache — kuehler Verlauf, Cyan-Schimmer oben, Glas-Karten, Cyan-Links.
+ * Bewusst zurueckhaltender als die Status-Seite: hier wird viel GELESEN,
+ * darum kein Blur auf den Karten (Rechtstexte muessen gestochen bleiben)
+ * und der Schimmer traegt nur den Kopf, nicht den Fliesstext.
+ * Die Sprach-Startseiten (p-sprachstart) bleiben unberuehrt — ihr Hintergrund
+ * ist fail-closed an themeColor aus locales.json gekoppelt. */
+html.p-recht body {
+  background:
+    radial-gradient(760px 480px at 82% -6%, rgba(45, 212, 191, 0.14), transparent 62%),
+    radial-gradient(620px 460px at -10% 30%, rgba(13, 185, 210, 0.08), transparent 64%),
+    linear-gradient(180deg, #0c1119 0%, #070b11 68%, #04070b 100%);
+}
+html.p-recht h1 {
+  color: #f6fffe;
+  text-shadow: 0 0 20px rgba(45, 212, 191, 0.18);
+}
+html.p-recht a { color: #7ee8da; }
+html.p-recht .card {
+  border-color: rgba(45, 212, 191, 0.34);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(45, 212, 191, 0.02)),
+    rgba(17, 23, 32, 0.82);
+  box-shadow: 0 0 18px rgba(45, 212, 191, 0.12);
+}
+html.p-recht .note { border-left-color: rgba(45, 212, 191, 0.55); }
+html.p-recht footer { border-top-color: rgba(45, 212, 191, 0.22); }
 
 /* ===== Hilfeseite (html.p-hilfe, zusaetzlich zu p-recht) ===== */
 html.p-hilfe .hilfe-vorspann { color: rgba(246, 243, 238, 0.78); margin: 0 0 1.4em; }

@@ -136,6 +136,7 @@
           <button class="nav-button" type="button" data-view="code" data-icon="code" title="Programmieren">Programmieren</button>
           <button class="nav-button" type="button" data-view="websites" data-icon="websites" title="Browser bedienen">Browser bedienen</button>
           <button class="nav-button" type="button" data-view="automation" data-icon="automation" title="Aufträge">Aufträge</button>
+          <button class="nav-button" type="button" data-view="arbeitsbereiche" data-icon="projects" title="Arbeitsbereiche">Arbeitsbereiche</button>
           <div class="nav-gruppe" aria-hidden="true">Meine Sachen</div>
           <button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Verlauf">Verlauf</button>
           <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="Meine Dateien">Meine Dateien</button>
@@ -232,6 +233,16 @@
                       <b>Bild hinzufügen</b>
                       <span class="werk-was">Foto oder Bildschirmfoto. smejj sagt dir, was darauf zu sehen ist.</span>
                       <span class="werk-bsp">„Was bedeutet diese Fehlermeldung?"</span>
+                    </button>
+                    <button type="button" role="menuitem" data-kamera-start="kamera">
+                      <b>Kamera</b>
+                      <span class="werk-was">smejj sieht, was deine Kamera sieht — ein Bild je Aufnahme, keine Daueraufnahme.</span>
+                      <span class="werk-bsp">„Was ist das für ein Bauteil?"</span>
+                    </button>
+                    <button type="button" role="menuitem" data-kamera-start="bildschirm">
+                      <b>Bildschirm teilen</b>
+                      <span class="werk-was">smejj sieht die Fehlermeldung, statt sie sich beschreiben zu lassen.</span>
+                      <span class="werk-bsp">„Warum geht dieser Knopf nicht?"</span>
                     </button>
                     <button type="button" role="menuitem" data-composer-action="diktat">
                       <b>Sprechen statt tippen</b>
@@ -758,6 +769,19 @@
           <div id="profileOutput" class="output"></div>
         </section>
 
+        <section id="arbeitsbereiche" class="view" aria-label="Arbeitsbereiche">
+          <header class="view-header">
+            <p class="eyebrow">Arbeiten</p>
+            <h2>Meine Arbeitsbereiche</h2>
+            <!-- Bildschirm 36: ein Ordner mit eigenem Wissen und eigener
+                 Anweisung. Die Dauer-Anweisung WIRKT: chat-store legt sie beim
+                 Oeffnen eines Bereichs-Gespraechs in den Sitzungsspeicher,
+                 settings-runtime nimmt sie in den Systemprompt. -->
+            <p class="subhead">Alle Gespräche eines Bereichs haben denselben Hintergrund — und eine Dauer-Anweisung, die dort in jedem Gespräch gilt.</p>
+          </header>
+          <div id="bereicheListe" class="output"></div>
+        </section>
+
         <section id="papierkorb" class="view" aria-label="Papierkorb">
           <header class="view-header">
             <p class="eyebrow">Meine Sachen</p>
@@ -823,8 +847,11 @@
     <script src="/assets/composer-sendetaste.js?v=v11-20260815" type="module"></script>
     <script src="/assets/nav-absichten.js?v=b32" type="module"></script>
     <script src="/assets/topbar-krume.js?v=b33" type="module"></script>
+    <script src="/assets/papierkorb.js?v=1" type="module"></script>
+    <script src="/assets/arbeitsbereiche.js?v=1" type="module"></script>
+    <script src="/assets/kamera.js?v=1" type="module"></script>
     <script src="/assets/spur-start.js?v=b34" type="module"></script>
-    <script src="/assets/app.js?v=b46r" type="module"></script>
+    <script src="/assets/app.js?v=b36" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>
     <script src="/assets/browser-pane-backdrop.js?v=2" type="module"></script>
@@ -832,7 +859,7 @@
     <script src="/assets/auth/passkey-ui.js" type="module"></script>
     <script src="/assets/view-chrome.js?v=view-chrome-20260716-2" type="module"></script>
     <script src="/assets/profile-dock.js?v=b46" type="module"></script>
-    <script src="/assets/chat-store.js?v=b48" type="module"></script>
+    <script src="/assets/chat-store.js?v=b49" type="module"></script>
     <script src="/assets/chat-history-view.js?v=b47" type="module"></script>
     <script src="/assets/chat-actions.js?v=b26" type="module"></script>
     <script src="/assets/chat-code-copy.js?v=code-copy-20260729" type="module"></script>

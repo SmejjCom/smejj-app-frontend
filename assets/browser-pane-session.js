@@ -6,6 +6,24 @@
 
 const ACT_QUEUE_MAX = 6;
 
+// Eine Live-Browser-Sitzung startet einen echten Browser auf unserer Maschine
+// und laesst ihn fremde Seiten ansteuern. Bis 2026-08-14 ging das ohne jede
+// Anmeldung: /api/browser/session stand auf keiner Schutzliste, und dieser
+// Client schickte nie einen Token mit. Beides ist jetzt geschlossen — die
+// Route ist anmeldepflichtig, und hier kommt die Anmeldung mit.
+// Gleicher Schluessel wie in account-sessions.js und shared/http-json.js.
+const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
+
+function mitAnmeldung(extra) {
+  try {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (token) return { ...extra, Authorization: `Bearer ${token}` };
+  } catch {
+    // Storage gesperrt: ohne Kopf weiter, der Server weist dann ab.
+  }
+  return { ...extra };
+}
+
 function endpointReady(value) {
   return typeof value === "string" && value.startsWith("https://");
 }
@@ -33,7 +51,7 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch } = 
     try {
       const response = await fetchImpl(endpoint, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: mitAnmeldung({ "content-type": "application/json" }),
         body: JSON.stringify(body)
       });
       const data = await response.json().catch(() => null);
@@ -60,7 +78,7 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch } = 
     try {
       fetchImpl(api.browserSessionClose, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: mitAnmeldung({ "content-type": "application/json" }),
         body: JSON.stringify({ sessionId }),
         keepalive: true
       }).catch(() => {});

@@ -13,9 +13,23 @@
 // Alles andere faellt weg. Genau daran sind die Arbeitsschritte am 2026-08-04
 // zuerst gescheitert: der Control Server sendete sie, dieser Filter warf sie fort.
 
+// Wieviel der sichtbaren Antwort wird zum Nachmessen aufgehoben? 20 000
+// Zeichen reichen fuer jede echte Antwort und deckeln den Speicher, falls ein
+// Modell einmal endlos laeuft. Die Sammlung dient NUR der Qualitaetspruefung
+// in der Bruecke; sie verlaesst den Prozess nicht (chat-bridge-evolution.js
+// schickt am Ende ausschliesslich das Urteil an den Control-Server).
+const SAMMEL_GRENZE = 20_000;
+
+/**
+ * Streamt die sichtbare Antwort an den Nutzer — und gibt sie ZURUECK.
+ *
+ * Der Rueckgabewert ist neu (2026-08-14) und der einzige Grund, warum die
+ * Bruecke ihre eigenen Antworten pruefen kann: vorher war der Text nach dem
+ * Streamen weg. Aufrufer, die ihn nicht brauchen, ignorieren ihn einfach.
+ */
 export async function pipeVisibleStream(body, res) {
   const decoder = new TextDecoder();
-  const state = { buffer: "", pending: "", insideThink: false };
+  const state = { buffer: "", pending: "", insideThink: false, sichtbar: "" };
   for await (const chunk of body) {
     state.buffer += decoder.decode(chunk, { stream: true });
     drainEvents(state, res, false);
@@ -23,6 +37,7 @@ export async function pipeVisibleStream(body, res) {
   state.buffer += decoder.decode();
   drainEvents(state, res, true);
   res.write("data: [DONE]\n\n");
+  return state.sichtbar;
 }
 
 function drainEvents(state, res, flush) {
@@ -93,7 +108,11 @@ function handleSseEvent(event, state, res) {
     return;
   }
   const visible = filterSsePayload(data, state);
-  if (visible) writeDelta(res, visible);
+  if (visible) {
+    writeDelta(res, visible);
+    // Erst senden, dann sammeln: die Messung darf den Nutzer nie aufhalten.
+    if (state.sichtbar !== undefined && state.sichtbar.length < SAMMEL_GRENZE) state.sichtbar += visible;
+  }
 }
 
 function writeDelta(res, content) {

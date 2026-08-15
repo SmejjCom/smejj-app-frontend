@@ -100,6 +100,14 @@ export function buildPreferenceBlock() {
   if (settings.personalization) lines.push(`Persoenliche Anweisung: ${settings.personalization}`);
   const accountInstructions = readAccountInstructions();
   if (accountInstructions) lines.push(`Eigene Anweisungen des Nutzers (Konto): ${accountInstructions}`);
+  // Bildschirm 36: die Dauer-Anweisung des aktiven Arbeitsbereichs. chat-store
+  // legt sie beim Oeffnen eines Bereichs-Gespraechs in den Sitzungsspeicher —
+  // damit wirkt sie in JEDEM Gespraech des Bereichs, ohne dass man sie je
+  // wieder eintippen muss.
+  try {
+    const bereich = JSON.parse(sessionStorage.getItem("smejj.bereichAnweisung.v1") || "null");
+    if (bereich?.anweisung) lines.push(`Dauer-Anweisung des Arbeitsbereichs "${bereich.name}": ${bereich.anweisung}`);
+  } catch { /* Beiwerk */ }
   return lines.join("\n");
 }
 

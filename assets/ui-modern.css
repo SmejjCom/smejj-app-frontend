@@ -17,7 +17,7 @@
   --sm-border: rgba(255, 255, 255, 0.11);
   --sm-border-strong: rgba(255, 255, 255, 0.2);
   --sm-ink: #f6f3ee;
-  --sm-ink-dim: rgba(246, 243, 238, 0.80);
+  --sm-ink-dim: rgba(246, 243, 238, 0.62);
   --sm-field: rgba(5, 6, 8, 0.45);
   --sm-danger: #ff9a9c;
   --sm-danger-bg: rgba(255, 77, 79, 0.12);
@@ -48,7 +48,7 @@
 
 .view:not(#start) .eyebrow {
   color: var(--sm-accent);
-  font-size:14px;
+  font-size: 11.5px;
   letter-spacing: 0.14em;
 }
 
@@ -61,7 +61,7 @@
 
 .view:not(#start) .subhead {
   margin-top: 10px;
-  font-size:17px;
+  font-size: 14.5px;
   color: var(--sm-ink-dim);
 }
 
@@ -76,7 +76,7 @@
   border-radius: var(--sm-radius-sm);
   background: rgba(255, 255, 255, 0.07);
   color: rgba(246, 243, 238, 0.88);
-  font-size:16.5px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.2;
   transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
@@ -121,9 +121,9 @@
 #storagePanelCheck:hover,
 #capabilities:hover,
 #costGuardDetails:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: rgba(0, 255, 239, 0.5) !important;
-  color: #f2f0ec !important;
+  background: rgba(0, 255, 239, 0.2) !important;
+  border-color: rgba(0, 255, 239, 0.65) !important;
+  color: #d9fffb !important;
 }
 
 /* Toolbar: flexibel, kompakt */
@@ -161,13 +161,13 @@
 .view:not(#start) :is(input, select, textarea):focus,
 .modal :is(input, select, textarea):focus {
   border-color: var(--sm-accent-border);
-  box-shadow: 0 0 0 2px rgba(0, 255, 239, 0.22);
+  box-shadow: 0 0 0 3px rgba(0, 255, 239, 0.14);
 }
 
 .view:not(#start) label {
   gap: 6px;
   color: var(--sm-ink-dim);
-  font-size:15px;
+  font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -199,14 +199,14 @@
 .view:not(#start) .empty-state strong,
 .view:not(#start) .surface strong {
   color: var(--sm-ink);
-  font-size:15.5px;
+  font-size: 13px;
 }
 
 .view:not(#start) .status-grid span,
 .view:not(#start) .empty-state span,
 .view:not(#start) .surface span {
   color: var(--sm-ink-dim);
-  font-size:15px;
+  font-size: 12.5px;
   font-weight: 500;
 }
 
@@ -223,8 +223,8 @@
   background: rgba(5, 6, 8, 0.5);
   color: rgba(246, 243, 238, 0.8);
   padding: 14px 16px;
-  font-size:16px;
-  line-height: 1.65;
+  font-size: 13.5px;
+  line-height: 1.55;
 }
 
 /* Leere Ausgabefelder nicht als graue Kaesten anzeigen */
@@ -235,7 +235,7 @@
 #codeOutput,
 #toolOutput {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size:15px;
+  font-size: 12.5px;
 }
 
 /* ---------- Suche ---------- */
@@ -266,7 +266,7 @@
   border-radius: var(--sm-radius-sm);
   background: transparent;
   color: var(--sm-ink-dim);
-  font-size:16.5px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 38px;
   list-style: none;
@@ -345,29 +345,29 @@ button.danger:hover {
 
 .modal h3 {
   color: var(--sm-ink);
-  font-size:20px;
+  font-size: 17px;
   font-weight: 600;
 }
 
 .modal header button {
   min-height: 34px;
   padding: 0 12px;
-  font-size:15.5px;
+  font-size: 13px;
 }
 
 .modal-body {
   color: rgba(246, 243, 238, 0.82);
-  font-size:16.5px;
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 /* ---------- Toast ---------- */
 
 .toast {
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--sm-accent-border);
   border-radius: 12px;
-  background: rgba(18, 20, 23, 0.94);
-  color: #f2f0ec;
+  background: rgba(10, 28, 26, 0.92);
+  color: #d9fffb;
   font-weight: 600;
   box-shadow: var(--sm-shadow);
   backdrop-filter: blur(18px);
@@ -397,7 +397,7 @@ button.danger:hover {
   }
 
   .view:not(#start) .view-header h2 {
-    font-size:29px;
+    font-size: 26px;
   }
 
   .view:not(#start) .toolbar {

@@ -68,7 +68,7 @@ export const CLIENT_ROUTES = {
 
 export const UI_COPY = {
   startup: "Hallo. Frag mich etwas, starte ein Projekt oder lass uns Code bauen.",
-  chatOffline: "smejj konnte gerade nicht antworten — die Verbindung steht nicht. Deine Frage steht noch im Feld, du musst nichts neu tippen. Probier es gleich noch einmal. (Es wurde nichts gestartet, das Geld kostet.)",
+  chatOffline: "smejj konnte gerade nicht antworten \u2014 die Verbindung steht nicht. Deine Frage steht noch im Feld, du musst nichts neu tippen. Probier es gleich noch einmal. (Es wurde nichts gestartet, das Geld kostet.)",
   testCommand: "pnpm run check",
   localOnly: "Diese Funktion ist in der Online-Version bewusst geschuetzt oder lokal gespeichert, damit keine versteckten Kosten und keine unsicheren Schreibzugriffe entstehen."
 };

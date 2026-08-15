@@ -175,7 +175,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v302";
+const CACHE_NAME = "smejj-shell-v328";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -206,6 +206,7 @@ const SHELL = [
   "/assets/icon-nutzung.js",
   "/assets/quellen-panel.js",
   "/assets/app-surfaces.css",
+  "/assets/design-v11-views.css",
   "/assets/settings-surface.css",
   "/assets/account-privacy.css",
   "/assets/panel-backdrop.css",
@@ -241,6 +242,7 @@ const SHELL = [
   "/assets/autonomous-thread-run.js",
   "/assets/browser-context.js",
   "/assets/search.js",
+  "/assets/search-overlay.js",
   "/assets/view-chrome.js",
   "/assets/composer-tools.js",
   "/assets/composer-plus-menu.js",
@@ -268,6 +270,21 @@ const SHELL = [
   "/assets/chat-title-auto.js",
   "/assets/chat-messages.js",
   "/assets/chat-actions.js",
+  // Beispiel-Chips der Startseite (2026-08-13). index.html laedt sie per
+  // <script>; ohne Eintrag hier fehlen sie offline — check:precache-imports
+  // hat genau das gemeldet.
+  "/assets/start-chips.js",
+  // Ein Knopf fuer zwei Zwecke (Design V11, Betreiber-Freigabe 2026-08-15):
+  // leer = Sprachwelle, getippt = senden. Muss in den Vorrat, sonst faellt
+  // die Startseite offline auf den alten Senden-Knopf zurueck.
+  "/assets/composer-sendetaste.js",
+  "/assets/nav-absichten.js",
+  "/assets/topbar-krume.js",
+  "/assets/spur-start.js",
+  "/assets/code-flaeche.js",
+  "/assets/kamera.js",
+  "/assets/arbeitsbereiche.js",
+  "/assets/papierkorb.js",
   "/assets/chat-actions-menu.js",
   "/assets/chat-code-copy.js",
   "/assets/workspace-bridge.js",

@@ -333,7 +333,7 @@ async function persistActive() {
     // Projekt-Zugehoerigkeit uebernehmen — dieselbe Falle wie bei pinned und
     // titleAuto (siehe oben): fehlt die Zeile, wirft jeder Tastendruck den
     // Chat lautlos aus seinem Projekt.
-    projectId: String(existing?.projectId || ""),
+    projectId: existing?.projectId || verbraucheBereichVormerkung(),
     createdAt: existing && existing.createdAt ? existing.createdAt : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     model: safeModelName(),
@@ -603,9 +603,11 @@ export async function openChat(id) {
   renderEntriesInto(log, chat.messages || []);
   goToStart();
   return true;
+  aktualisiereBereichsAnweisung((await getChat(id))?.projectId).catch(() => {});
 }
 
 export function newChat() {
+  try { if (!sessionStorage.getItem(BEREICH_NEU_KEY)) sessionStorage.removeItem(BEREICH_ANWEISUNG_KEY); } catch { /* still */ }
   const log = startLog();
   if (log && readEntries().length) {
     // aktueller Stand ist durch den Observer bereits gespeichert
@@ -826,6 +828,40 @@ export async function benenneProjektUm(id, name) {
   await tx(PROJEKT_STORE, "readwrite", (store) => store.put(projekt));
   notifyProjekteChanged();
   return true;
+}
+
+// Bildschirm 36: die Dauer-Anweisung des Arbeitsbereichs. Sie wird beim
+// Oeffnen eines Gespraechs dieses Bereichs in den Sitzungsspeicher gelegt
+// und von settings-runtime.buildPreferenceBlock() in den Systemprompt
+// uebernommen — sie WIRKT also wirklich, in jedem Gespraech des Bereichs.
+export async function setzeProjektAnweisung(id, text) {
+  const projekt = await getProjekt(id);
+  if (!projekt) return false;
+  projekt.anweisung = String(text || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, 2000);
+  projekt.updatedAt = new Date().toISOString();
+  await tx(PROJEKT_STORE, "readwrite", (store) => store.put(projekt));
+  notifyProjekteChanged();
+  await aktualisiereBereichsAnweisung((await getChat(activeChatId()))?.projectId);
+  return true;
+}
+
+const BEREICH_ANWEISUNG_KEY = "smejj.bereichAnweisung.v1";
+const BEREICH_NEU_KEY = "smejj.bereichNeu.v1";
+
+async function aktualisiereBereichsAnweisung(projectId) {
+  try {
+    const projekt = projectId ? await getProjekt(projectId) : null;
+    if (projekt?.anweisung) {
+      sessionStorage.setItem(BEREICH_ANWEISUNG_KEY, JSON.stringify({ name: projekt.name, anweisung: projekt.anweisung }));
+    } else {
+      sessionStorage.removeItem(BEREICH_ANWEISUNG_KEY);
+    }
+  } catch { /* Anweisung ist Beiwerk — nie das Oeffnen stoeren */ }
+}
+
+/** Merkt vor: das NAECHSTE neue Gespraech gehoert in diesen Bereich. */
+export function neuesGespraechImBereich(projektId) {
+  try { sessionStorage.setItem(BEREICH_NEU_KEY, String(projektId || "")); } catch { /* still */ }
 }
 
 export async function loescheProjekt(id) {

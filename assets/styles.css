@@ -52,7 +52,7 @@ textarea {
 
 .brand h1 {
   margin: 0;
-  font-size:32px;
+  font-size: 32px;
   line-height: 1;
   letter-spacing: 0;
 }
@@ -61,7 +61,7 @@ textarea {
 .eyebrow {
   margin: 8px 0 0;
   color: #71716b;
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -135,7 +135,7 @@ button:hover {
   background: #ffffff;
   padding: 8px 10px;
   color: #4a4a43;
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
 }
 
@@ -198,7 +198,7 @@ button:hover {
   max-width: 620px;
   margin: 16px 0 0;
   color: #62625b;
-  font-size:18.5px;
+  font-size: 18.5px;
   line-height: 1.62;
 }
 
@@ -259,7 +259,7 @@ button:hover {
 
 .search-box span {
   color: rgba(246, 243, 238, 0.58);
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -270,7 +270,7 @@ button:hover {
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(5, 6, 8, 0.38);
   color: #f6f3ee;
-  font-size:21px;
+  font-size: 21px;
 }
 
 .search-box input::placeholder {
@@ -367,19 +367,19 @@ button:hover {
 
 .status-grid strong {
   color: #20201d;
-  font-size:15.5px;
+  font-size: 15.5px;
 }
 
 .status-grid span {
   color: #62625b;
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
 }
 
 label {
   display: grid;
   gap: 8px;
-  font-size:15.5px;
+  font-size: 15.5px;
   font-weight: 700;
   color: #42423c;
 }
@@ -439,7 +439,7 @@ textarea {
 #editor {
   min-height: 360px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size:15.5px;
+  font-size: 15.5px;
   line-height: 1.62;
 }
 
@@ -466,7 +466,7 @@ textarea {
 }
 
 #tools .output {
-  font-size:14.5px;
+  font-size: 14.5px;
   color: #4a4a43;
 }
 
@@ -512,11 +512,11 @@ textarea {
   }
 
   .brand h1 {
-    font-size:29px;
+    font-size: 29px;
   }
 
   .view-header h2 {
-    font-size:40px;
+    font-size: 40px;
   }
 
   .nav,
@@ -527,7 +527,7 @@ textarea {
 }
 
 .button-icon { display: inline-grid; place-items: center; width: 26px; min-width: 26px; color: #00ffef; font-weight: 800; }
-.nav-label { min-width: 0; overflow: hidden; font-size:16.5px; line-height: 1.16; text-overflow: ellipsis; white-space: nowrap; }
+.nav-label { min-width: 0; overflow: hidden; font-size: 16.5px; line-height: 1.16; text-overflow: ellipsis; white-space: nowrap; }
 
 .button-icon svg,
 .browser-panel-nav button svg {
@@ -557,14 +557,14 @@ textarea {
 .surface strong,
 .empty-state strong {
   color: #172033;
-  font-size:15.5px;
+  font-size: 15.5px;
 }
 
 .surface span,
 .empty-state span {
   overflow-wrap: anywhere;
   color: #5d6675;
-  font-size:15.5px;
+  font-size: 15.5px;
 }
 
 .toast-root {
@@ -671,10 +671,8 @@ textarea {
 }
 
 body {
-  /* Ein Ton statt zweier Farbwolken (2026-08-14, Betreiber-Freigabe). Hier
-     lagen ein gruen-tuerkiser und ein blauer Fleck ueber dem Grund und
-     faerbten den ganzen Aussenbereich mit. */
-  background: linear-gradient(180deg, #141517 0%, #101113 58%, #0d0e10 100%);
+  background:
+    linear-gradient(180deg, #141517 0%, #101113 58%, #0d0e10 100%);
   color: #f6f3ee;
 }
 
@@ -844,7 +842,7 @@ body.task-indicator-done .split-icon span:last-child {
 .sidebar.is-compact .button-icon {
   width: 100%;
   min-width: 0;
-  font-size:14.5px;
+  font-size: 14.5px;
 }
 
 .sidebar.is-compact .button-icon svg,
@@ -974,7 +972,7 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel.is-compact .browser-panel-nav button span {
   width: 100%;
   min-width: 0;
-  font-size:14.5px;
+  font-size: 14.5px;
 }
 
 .browser-panel.is-compact .browser-panel-nav {
@@ -992,7 +990,7 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel-header h2 {
   margin: 0;
   color: #f6f3ee;
-  font-size:27px;
+  font-size: 27px;
   line-height: 1;
   letter-spacing: 0;
 }
@@ -1000,7 +998,7 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel-header p {
   margin: 8px 0 0;
   color: rgba(246, 243, 238, 0.58);
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -1052,7 +1050,7 @@ body.is-resizing-panel .panel-resizer::before {
   background: rgba(255, 255, 255, 0.08);
   color: rgba(246, 243, 238, 0.72);
   padding: 8px 10px;
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
 }
 
@@ -1146,7 +1144,7 @@ body.is-resizing-panel .panel-resizer::before {
 .sidebar.is-compact .profile-avatar {
   width: 16px;
   height: 16px;
-  font-size:12.5px;
+  font-size: 12.5px;
 }
 
 .sidebar.is-compact .profile-avatar.is-empty {
@@ -1331,7 +1329,7 @@ body.is-resizing-panel .panel-resizer::before {
   padding: 0 10px;
   border-radius: 8px;
   color: rgba(246, 243, 238, 0.74);
-  font-size:17.5px;
+  font-size: 17.5px;
   font-weight: 500;
 }
 
@@ -1392,7 +1390,7 @@ body.is-resizing-panel .panel-resizer::before {
   border-color: transparent;
   background: transparent;
   color: rgba(246, 243, 238, 0.78);
-  font-size:15.5px;
+  font-size: 15.5px;
   font-weight: 500;
   text-align: left;
 }
@@ -1529,7 +1527,7 @@ button:hover {
   }
 
   .home-hero h2 {
-    font-size:38px;
+    font-size: 38px;
   }
 
   .prompt-actions {
@@ -1545,7 +1543,7 @@ button:hover {
   }
 
   .text-chip {
-    font-size:18.5px;
+    font-size: 18.5px;
   }
 
   .send-button {

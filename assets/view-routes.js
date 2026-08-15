@@ -35,6 +35,7 @@ export const VIEW_PATHS = Object.freeze({
   storageView: "/storage",
   memory: "/memory",
   papierkorb: "/papierkorb",
+  arbeitsbereiche: "/bereiche",
   ai: "/ai",
   cost: "/cost",
   tools: "/status",

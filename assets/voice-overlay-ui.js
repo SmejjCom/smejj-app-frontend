@@ -32,6 +32,11 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
     + '<button id="voiceModeAttach" type="button" aria-label="Datei anhängen" title="Datei anhängen">'
     + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
     + '</button>'
+    // Bildschirm 35: das Auge — smejj sieht mit. Ein Bild je Aufnahme
+    // (kamera.js), durch den vorhandenen Bild-Verstehen-Weg.
+    + '<button type="button" data-kamera-start="kamera" aria-label="Kamera — smejj sieht mit" title="Kamera — smejj sieht mit">'
+    + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>'
+    + '</button>'
     + '<input id="voiceModeInput" type="text" placeholder="Frage schreiben ..." autocomplete="off">'
     + `<button id="voiceModeSend" type="button" aria-label="Senden" title="Senden" disabled>${sendIcon}</button>`
     + '</div>'
@@ -52,7 +57,7 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
     try {
       const [{ bildDateienAusClipboard }, { uebernehmeBildDatei }] = await Promise.all([
         import("./composer-paste-attach.js?v=1"),
-        import("./composer-bild-anhang.js?v=1")
+        import("./composer-bild-anhang.js")
       ]);
       const bilder = bildDateienAusClipboard(event.clipboardData);
       if (!bilder.length) return;
