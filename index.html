@@ -120,8 +120,8 @@
         <nav class="nav" aria-label="Arbeitsbereiche">
           <button class="nav-button is-active" type="button" data-view="start" data-icon="plus" title="Neu">Neu</button>
           <button class="nav-button icon-only-nav" type="button" data-view="search" data-icon="search" title="Suche" aria-label="Suche">Suche</button>
-          <button class="nav-button" type="button" data-view="code" data-icon="code" title="Coding">Coding</button>
-          <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="Arbeitsbereich">Arbeitsbereich</button>
+          <button class="nav-button" type="button" data-view="code" data-icon="code" title="Programmieren">Programmieren</button>
+          <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="Meine Sachen">Meine Sachen</button>
           <button class="nav-button" type="button" data-view="files" data-icon="files" title="Dateien">Dateien</button>
           <button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Verlauf">Verlauf</button>
         </nav>
@@ -280,7 +280,7 @@
 
         <section id="smejjClaw" class="view" aria-label="Coding">
           <header class="view-header">
-            <h2>Coding</h2>
+            <h2>Agenten-Arbeitsbereich</h2>
           </header>
           <div class="toolbar">
             <button type="button" data-jump="automation">Automatisierung</button>
@@ -307,7 +307,7 @@
           <header class="view-header">
             <p class="eyebrow">Browser</p>
             <h2>Lokaler Browser</h2>
-            <p class="subhead">Schneller Einstieg für lokale Dateien, Uploads und Browser-Speicher.</p>
+            <p class="subhead">Schneller Einstieg für Dateien auf diesem Gerät und zum Hochladen.</p>
           </header>
           <div class="status-grid">
             <div><strong>Browser-Speicher</strong><span>IndexedDB / OPFS</span></div>
@@ -356,9 +356,9 @@
 
         <section id="projects" class="view" aria-label="Arbeitsbereich">
           <header class="view-header">
-            <p class="eyebrow">Arbeitsbereich</p>
-            <h2>Lokale Dateien und Snapshots</h2>
-            <p class="subhead">Projektmanifeste und Snapshots entstehen lokal. IDrive-e2-Sync kommt später über signierte URLs.</p>
+            <p class="eyebrow">Meine Sachen</p>
+            <h2>Meine Dateien</h2>
+            <p class="subhead">Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.</p>
           </header>
           <div class="toolbar">
             <button id="projectCreate" type="button">Projekt erstellen</button>
@@ -388,7 +388,7 @@
         <section id="files" class="view" aria-label="Dateien und Uploads">
           <header class="view-header">
             <p class="eyebrow">Dateien</p>
-            <h2>Uploads und Downloads</h2>
+            <h2>Hochladen und Herunterladen</h2>
           </header>
           <div class="panel-grid">
             <label>
@@ -407,11 +407,11 @@
           <div id="fileOutput" class="output"></div>
         </section>
 
-        <section id="storageView" class="view" aria-label="Speicher und IDrive e2 Status">
+        <section id="storageView" class="view" aria-label="Wo deine Sachen liegen">
           <header class="view-header">
             <p class="eyebrow">Speicher</p>
-            <h2>IDrive e2 Status</h2>
-            <p class="subhead">IDrive e2 ist Hauptspeicher/Vault. Der Browser bekommt keine IDrive-Secrets.</p>
+            <h2>Wo deine Sachen liegen</h2>
+            <p class="subhead">Deine Dateien liegen in Europa in deinem eigenen Bereich. Die Zugangsschlüssel bekommt dein Browser nie zu sehen.</p>
           </header>
           <div class="status-grid" aria-label="Speicherstatus">
             <div><strong>Primaerspeicher</strong><span>IDrive e2</span></div>
@@ -433,8 +433,8 @@
 
         <section id="memory" class="view" aria-label="Memory und RAG">
           <header class="view-header">
-            <p class="eyebrow">Memory</p>
-            <h2>Merken und Suchen</h2>
+            <p class="eyebrow">Gedächtnis</p>
+            <h2>Was smejj sich merkt</h2>
           </header>
           <div class="panel-grid">
             <label>
@@ -458,8 +458,8 @@
         <section id="ai" class="view" aria-label="KI-Modus">
           <header class="view-header">
             <p class="eyebrow">KI</p>
-            <h2>Modus und Kosten</h2>
-            <p class="subhead">Standard ist sicher deaktiviert. Premium-KI wird nie automatisch oder versteckt kostenpflichtig genutzt.</p>
+            <h2>Wie smejj antwortet</h2>
+            <p class="subhead">Standardmäßig ist alles aus. Es wird nie automatisch und nie versteckt etwas benutzt, das Geld kostet.</p>
           </header>
           <div class="panel-grid">
             <label>
@@ -494,11 +494,11 @@
           <div class="output" id="aiOutput">KI ist deaktiviert. Kimi K2.7 ist Vault/BYOK/Partner/Self-host später, nicht kostenloser Standardmotor.</div>
         </section>
 
-        <section id="cost" class="view" aria-label="Kostenstatus und Free-Schutz">
+        <section id="cost" class="view" aria-label="Kostenschutz">
           <header class="view-header">
             <p class="eyebrow">Kosten</p>
-            <h2>Free-Schutz</h2>
-            <p class="subhead">GitHub und GitHub Pages bleiben dauerhaft Free. Paid-Fallbacks, Trials und Auto-Billing sind blockiert.</p>
+            <h2>Kostenschutz</h2>
+            <p class="subhead">Die Auslieferung bleibt dauerhaft kostenlos. Bezahl-Rückfälle, Testphasen und automatische Abbuchung sind gesperrt.</p>
           </header>
           <div class="status-grid">
             <div><strong>GitHub</strong><span>Free only</span></div>
@@ -541,8 +541,8 @@
         <section id="settings" class="view" aria-label="Einstellungen">
           <header class="view-header">
             <p class="eyebrow">Einstellungen</p>
-            <h2>App-Modus</h2>
-            <p class="subhead">Einstellungen bleiben lokal, bis Auth, Limits und IDrive-e2-Sync sicher sind.</p>
+            <h2>Wo deine Einstellungen liegen</h2>
+            <p class="subhead">Deine Einstellungen bleiben auf diesem Gerät, bis Anmeldung, Grenzen und Sicherung sicher stehen.</p>
           </header>
           <div class="panel-grid">
             <label>
@@ -576,8 +576,8 @@
 
         <section id="profile" class="view" aria-label="Nutzer und Login">
           <header class="view-header">
-            <h2>Nutzer</h2>
-            <p class="subhead">Login ist vorbereitet. Serverseitige Nutzer-Daten duerfen erst nach sicherer Auth- und Storage-Policy aktiv werden.</p>
+            <h2>Mein Konto</h2>
+            <p class="subhead">Die Anmeldung steht bereit. Daten auf dem Server werden erst freigeschaltet, wenn Anmeldung und Speicher sicher sind.</p>
           </header>
           <div class="panel-grid">
             <label>
@@ -626,7 +626,7 @@
           <header class="view-header">
             <p class="eyebrow">Offline</p>
             <h2>Offline weiterarbeiten</h2>
-            <p class="subhead">Lokale Projekte, Notizen und Snapshots bleiben nutzbar. Online-Sync wartet auf eine sichere Verbindung.</p>
+            <p class="subhead">Deine Projekte, Notizen und Sicherungen bleiben nutzbar. Der Abgleich wartet auf eine sichere Verbindung. Nichts geht verloren.</p>
           </header>
           <div class="empty-state"><strong>Offline-Modus</strong><span>Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.</span></div>
         </section>
@@ -634,8 +634,8 @@
         <section id="error" class="view" aria-label="Fehlerseite">
           <header class="view-header">
             <p class="eyebrow">Fehler</p>
-            <h2>Aktion blockiert</h2>
-            <p class="subhead">Wenn Konfiguration, Kostenstatus oder Provider unklar ist, stoppt smejj.com sicher.</p>
+            <h2>Das geht gerade nicht</h2>
+            <p class="subhead">Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.</p>
           </header>
           <div class="empty-state"><strong>Fail-closed</strong><span>Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.</span></div>
         </section>
