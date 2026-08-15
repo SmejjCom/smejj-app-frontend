@@ -38,7 +38,7 @@
 #settings .settings-status {
   flex: none;
   color: var(--premium-muted, #9fa8ad);
-  font-size:14.5px;
+  font-size: 12px;
   padding: 8px 16px;
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-top-color: rgba(255, 255, 255, 0.28);
@@ -79,7 +79,7 @@
   border-radius: 0;
   background: transparent;
   color: var(--premium-muted, #9fa8ad);
-  font-size:16.5px;
+  font-size: 14px;
   font-weight: 600;
   text-align: start;
   cursor: pointer;
@@ -126,15 +126,15 @@
 #settings .settings-panel h3 {
   margin: 0 0 4px;
   color: var(--premium-text, #eef1f2);
-  font-size:23px;
+  font-size: 20px;
   font-weight: 650;
 }
 
 #settings .settings-panel > header p {
   margin: 0;
   color: var(--premium-muted, #9fa8ad);
-  font-size:16px;
-  line-height: 1.62;
+  font-size: 13.5px;
+  line-height: 1.5;
 }
 
 /* Zeilen-Listen: Felder nur durch hauchduenne Linien getrennt. */
@@ -170,14 +170,14 @@
 
 #settings .settings-row-copy strong {
   color: var(--premium-text, #eef1f2);
-  font-size:17px;
+  font-size: 14.5px;
   font-weight: 650;
 }
 
 #settings .settings-row-copy span {
   color: var(--premium-muted, #9fa8ad);
-  font-size:15.5px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 #settings .settings-row select,
@@ -188,7 +188,7 @@
   border-radius: 0;
   background: rgba(0, 0, 0, 0.25);
   color: var(--premium-text, #eef1f2);
-  font-size:17px;
+  font-size: 14.5px;
   font-family: inherit;
 }
 
@@ -196,7 +196,7 @@
   width: 100%;
   min-height: 88px;
   resize: vertical;
-  line-height: 1.62;
+  line-height: 1.5;
 }
 
 /* Viereckiger Schalter (Markup: input + span). */
@@ -258,7 +258,7 @@
   border-radius: 0;
   background: rgba(255, 255, 255, 0.085);
   color: var(--premium-text, #eef1f2);
-  font-size:16px;
+  font-size: 13.5px;
   font-weight: 650;
   cursor: pointer;
   white-space: nowrap;
@@ -278,7 +278,7 @@
   color: #2dd4bf;
   text-decoration: none;
   font-weight: 650;
-  font-size:16px;
+  font-size: 13.5px;
 }
 
 /* Hell-Modus: gleiche Formen, helle Flaechen, dunkle Haarlinien. */
@@ -367,7 +367,7 @@
     border: 1px solid rgba(255, 255, 255, 0.13);
     border-radius: 0;
     background: rgba(255, 255, 255, 0.045);
-    font-size:15.5px;
+    font-size: 13px;
   }
 
   #settings .settings-nav-button.is-active {
@@ -393,4 +393,39 @@
     min-width: 0;
     width: 100%;
   }
+}
+
+
+/* --- Mockup V11, Bildschirm 55: Untertitel je Bereich + Suchfeld -------- */
+#settings .settings-nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+#settings .settings-nav-name {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+#settings .settings-nav-sub {
+  font-size: 13.5px;
+  color: rgba(242, 245, 244, 0.62);
+  font-weight: 400;
+}
+#settings .settings-nav-button.is-active .settings-nav-name { color: #ffffff; }
+#settings .settings-suche {
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 10px 13px;
+  font-size: 15px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.24);
+  color: #f2f5f4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+#settings .settings-suche:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px #32f6ea, 0 0 0 3px rgba(50, 246, 234, 0.22);
 }
