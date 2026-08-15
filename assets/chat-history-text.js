@@ -31,11 +31,24 @@ function ersteFrage(chat) {
 // Vorschau auf Karten, obwohl darunter eine richtige Antwort lag.
 const PLATZHALTER = /^(smejj denkt nach|authentication_required|autonomer auftrag wird als|wird geladen|…|\.\.\.)/i;
 
+// Markdown-Bilder und -Links duerfen in der Vorschau nie roh stehen —
+// gemessen 2026-08-15: ein Video-Chat zeigte "![Erzähltes Video](data:video/
+// mp4;base64,AAAA…" als Vorschauzeile. Das Bild wird durch seinen Alt-Text
+// ersetzt, der Link durch seinen Linktext, uebrige data:-Ungetueme fallen weg.
+function ohneMarkdownRohbau(text) {
+  return text
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/data:[a-z/+.-]+;base64,[A-Za-z0-9+/=…]+/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function letzteAntwort(chat) {
   const messages = Array.isArray(chat.messages) ? chat.messages : [];
   let notnagel = "";
   for (let i = messages.length - 1; i >= 0; i -= 1) {
-    const text = String(messages[i]?.text || "").replace(/\s+/g, " ").trim();
+    const text = ohneMarkdownRohbau(String(messages[i]?.text || "").replace(/\s+/g, " ").trim());
     if (messages[i]?.role === "user" || !text) continue;
     if (PLATZHALTER.test(text)) {
       if (!notnagel) notnagel = text;

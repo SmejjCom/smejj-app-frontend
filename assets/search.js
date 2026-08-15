@@ -5,7 +5,7 @@ import { CLIENT_ROUTES } from "./config.js";
 import { listChats, openChat } from "/assets/chat-store.js?v=b49";
 // Overlay-Logik (Cmd+K, Rendern, Tastatur) wohnt in search-overlay.js — diese
 // Datei bleibt klein und die Such-Seite hier ist nur noch die Rueckfallebene.
-import { initSearchOverlay, toggleSearchOverlay } from "./search-overlay.js?v=b47";
+import { initSearchOverlay, toggleSearchOverlay } from "./search-overlay.js?v=b47a";
 
 // Bildschirm 38: das eine Feld findet auch Einstellungen und Hilfe.
 // Die Bereichsliste spiegelt GROUPS aus settings-surface.js — dort ist die

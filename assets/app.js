@@ -6,10 +6,10 @@ import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js"
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { initComposerTools } from "./composer-tools.js?v=werkzeuge-1";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=1";
-import { initGlobalSearch } from "./search.js?v=b38";
-import { openSearchOverlay } from "./search-overlay.js?v=b47";
+import { initGlobalSearch } from "./search.js?v=b38a";
+import { openSearchOverlay } from "./search-overlay.js?v=b47a";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
-import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=b36";
+import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=b36a";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
 import { routeAutonomousRequest } from "./autonomous-intent.js";

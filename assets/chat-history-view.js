@@ -44,8 +44,8 @@ import {
   anzeigeTitel, anzeigeVorschau, ersteFrage, gruppeVon, mitHervorhebung,
   ohneBallast, trefferAusschnitt, volltext, zeitText, themaVon, merkmaleVon, sichereAlsMarkdown,
   projektGruppen
-} from "/assets/chat-history-text.js?v=b47";
-import { createCardBuilders, createProjektAktionen } from "/assets/chat-history-cards.js?v=b47";
+} from "/assets/chat-history-text.js?v=b47a";
+import { createCardBuilders, createProjektAktionen } from "/assets/chat-history-cards.js?v=b47a";
 
 const STYLE_ID = "chatHistoryStyles";
 
