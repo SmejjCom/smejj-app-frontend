@@ -19,7 +19,7 @@
 // und oeffnen per openChat — keine Attrappen.
 
 import { listChats, openChat, newChat } from "/assets/chat-store.js?v=b49";
-import { merkmaleVon } from "/assets/chat-history-text.js?v=b47a";
+import { merkmaleVon } from "/assets/chat-history-text.js?v=b47b";
 import { Icons } from "/assets/components.js?v=b48";
 
 const START_ANSICHTEN = new Set(["start", "code"]);

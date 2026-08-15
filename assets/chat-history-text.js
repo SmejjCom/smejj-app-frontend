@@ -39,7 +39,13 @@ function ohneMarkdownRohbau(text) {
   return text
     .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
-    .replace(/data:[a-z/+.-]+;base64,[A-Za-z0-9+/=…]+/gi, "")
+    // Abgeschnittene Anhaenge: MAX_CHAT_BYTES kappt riesige data:-URIs mitten
+    // im base64 — die Klammer schliesst dann NIE (gemessen: 655-KB-Video-
+    // Nachricht ohne einziges ")"). Darum auch das offene Ende aufraeumen.
+    .replace(/!?\[([^\]]*)\]\([^)]*$/, "$1")
+    // "mp4" enthaelt eine Ziffer — die Zeichenklasse braucht 0-9, sonst
+    // matcht schon "data:video/mp4" nicht.
+    .replace(/data:[a-z0-9/+.;=-]+,[A-Za-z0-9+/=…]*/gi, "")
     .replace(/\s+/g, " ")
     .trim();
 }
