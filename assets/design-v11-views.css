@@ -1,0 +1,208 @@
+/* smejj.com — Design V11 fuer ALLE Ansichten ausser der Startseite.
+ * Betreiber-Ansage 2026-08-15: "Muss 1 zu 1 wie in Mockup steht sein."
+ *
+ * Der Befund, der diese Datei ausgeloest hat (live gemessen am 2026-08-15
+ * in "Meine Dateien"): EINUNDZWANZIG Rahmen in einer einzigen Ansicht, zwei
+ * cyan GEFUELLTE Knoepfe, und der alte Cyanton rgba(45,212,191) an jedem
+ * Knopfrand. Genau das, was V11 verbietet — und genau der Befund des
+ * Betreibers vom 2026-08-14: "So viele Rahmen stoehnen mich auch."
+ *
+ * Die Ursache ist keine schlechte Regel, sondern VIER Generationen
+ * uebereinander: styles.css legt Kaesten an, app-surfaces.css legt
+ * Premium-Kaesten darueber, design-cyan-views.css faerbt deren Raender cyan,
+ * ui-modern.css bringt noch einmal eigene. Jede Generation hat nur
+ * hinzugefuegt, keine hat aufgeraeumt.
+ *
+ * Diese Datei raeumt auf. Sie traegt die eine Regel aus V11:
+ *
+ *   Glas ist die FLAECHE. Die Linie ist der TRENNER. Der Abstand ist die
+ *   GRUPPE. Nie zwei davon am selben Element.
+ *
+ * und die zweite:
+ *
+ *   Farbe nur da, wo sie etwas BEDEUTET. Aktiv heisst Kante, nicht Fuellung.
+ *
+ * LADEREIHENFOLGE — der Grund, warum das hier ueberhaupt wirkt:
+ * premium-surfaces.js haengt app-surfaces.css und design-cyan-views.css zur
+ * Laufzeit in den Kopf, also NACH dem Buendel. design-v11.css sitzt im
+ * Buendel und verliert deshalb gegen sie. Diese Datei wird von derselben
+ * Stelle geladen und steht dort als LETZTE — sie gewinnt bei gleicher
+ * Spezifitaet durch Reihenfolge. Wer hier eine Datei dahinterhaengt, dreht
+ * die Wirkung wieder zurueck.
+ *
+ * Bewusst OHNE !important: die Selektoren tragen eine Klasse mehr
+ * (.view.premium-view statt .premium-view), damit spaetere, ansichts-eigene
+ * Dateien wie account-privacy.css ihre Sonderfaelle weiter durchsetzen
+ * koennen. !important wuerde ihnen genau das nehmen.
+ *
+ * Farben kommen aus design-v11.css (:root im Buendel) — hier steht kein
+ * einziger Farbwert doppelt.
+ */
+
+/* ===================================================================
+ * 1. Behaelter: Flaeche statt Kasten
+ * ===================================================================
+ * Vorher hatte jeder Behaelter Rahmen UND Hintergrund UND Radius — drei
+ * Signale fuer dieselbe Aussage "das gehoert zusammen". Ab hier traegt die
+ * Flaeche allein, plus ein Lichtstrich an der Oberkante (das ist es, was
+ * Glas zu Glas macht — nicht ein Rahmen ringsum).
+ */
+.view.premium-view .toolbar,
+.view.premium-view .panel-grid,
+.view.premium-view .status-grid,
+.view.premium-view .output,
+.view.premium-view .surface,
+.view.premium-view .feed-item {
+  border: 0;
+  border-radius: var(--v11-r);
+  background: var(--v11-glas);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+}
+
+/* Der leere Zustand ist kein Gegenstand, sondern eine Abwesenheit. Er
+   bekommt darum gar keine Flaeche — nur Abstand und Text. */
+.view.premium-view .empty-state,
+.view.premium-view .search-empty {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Die Zellen INNERHALB eines Rasters bekamen bisher noch einmal je einen
+   eigenen Rahmen — Kasten im Kasten im Kasten. Sie trennt jetzt der
+   Abstand, den das Raster ohnehin schon setzt. */
+.view.premium-view .panel-grid > *,
+.view.premium-view .status-grid > * {
+  border: 0;
+  border-radius: var(--v11-r-sm);
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow: none;
+}
+
+/* ===================================================================
+ * 2. Knoepfe: der cyane Rand war Deko, keine Aussage
+ * ===================================================================
+ * design-cyan-views.css gab JEDEM Knopf einen cyanen Rand. Wenn alles
+ * hervorgehoben ist, ist nichts hervorgehoben — und der Nutzer sieht nicht
+ * mehr, welcher Knopf der wichtige ist.
+ */
+.view.premium-view button,
+.view.premium-view .more-actions summary,
+.view.premium-view .more-menu summary {
+  border: 0;
+  border-radius: var(--v11-r);
+  background: rgba(255, 255, 255, 0.055);
+  color: #f2efea;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  /* Zwei Schriftstaerken, nie 500 oder 600 — das ist der halbe Grund,
+     warum ChatGPT sauber wirkt. */
+  font-weight: 400;
+  /* Betreiber-Regel: nie unter 14 px. */
+  font-size: 15px;
+}
+
+.view.premium-view button:hover,
+.view.premium-view .more-actions summary:hover,
+.view.premium-view .more-menu summary:hover,
+.view.premium-view .more-menu[open] summary {
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Die EINE Hauptaktion je Werkzeugleiste. Kante und Schrift in Cyan, aber
+   keine Fuellung — gefuellt liest sich wie "hier musst du klicken", und das
+   stimmt bei einer Werkzeugleiste mit neun Knoepfen nie. */
+.view.premium-view .toolbar > button:first-child {
+  background: var(--v11-cy-fill);
+  color: var(--v11-cy);
+  box-shadow: inset 0 0 0 1px var(--v11-cy-line-on);
+}
+.view.premium-view .toolbar > button:first-child:hover {
+  background: rgba(50, 246, 234, 0.17);
+  color: var(--v11-cy);
+  box-shadow: inset 0 0 0 1px var(--v11-cy), 0 0 18px var(--v11-cy-glow);
+}
+
+/* Gefahr bleibt sichtbar — aber als Schriftfarbe, nicht als roter Kasten.
+   Der Kasten kommt erst bei :hover, wenn der Zeiger schon darauf steht. */
+.view.premium-view .danger-action,
+.view.premium-view button.danger {
+  background: rgba(255, 255, 255, 0.055);
+  color: var(--v11-bad);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.view.premium-view .danger-action:hover,
+.view.premium-view button.danger:hover {
+  background: rgba(255, 122, 124, 0.14);
+  color: #ffb4b6;
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 124, 0.55);
+}
+
+/* ===================================================================
+ * 3. Felder duerfen eine Linie haben
+ * ===================================================================
+ * Hier ist die Ausnahme zur Regel oben, und sie hat einen Grund: ein
+ * Eingabefeld muss man als Eingabefeld ERKENNEN, bevor man hineinklickt.
+ * Eine reine Flaeche ohne Kante sieht aus wie Text.
+ */
+.view.premium-view input,
+.view.premium-view select,
+.view.premium-view textarea {
+  border: 0;
+  border-radius: var(--v11-r-sm);
+  background: rgba(0, 0, 0, 0.3);
+  color: #f2efea;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.11);
+  font-size: 15px;
+}
+.view.premium-view input:focus,
+.view.premium-view select:focus,
+.view.premium-view textarea:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--v11-cy), 0 0 0 3px var(--v11-cy-glow);
+}
+
+/* ===================================================================
+ * 4. Kopf der Ansicht: ein Haarstrich trennt, kein Rahmen
+ * =================================================================== */
+.view.premium-view .view-header {
+  border-bottom: 1px solid var(--v11-hair);
+}
+
+/* Die Augenbraue schrie bisher in vollem Cyan. Sie ist eine Einordnung,
+   keine Aktion — gedaempft, aber nie unter 14 px und nie blasser als das,
+   was der Betreiber ohne Brille liest. */
+.view.premium-view .eyebrow {
+  color: var(--v11-cy-ink);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.view.premium-view .subhead {
+  color: rgba(246, 243, 238, 0.72);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* ===================================================================
+ * 5. Schwebende Menues
+ * ===================================================================
+ * Sie liegen ueber Text und brauchen darum eine dichtere Flaeche als der
+ * Rest — sonst liest man den Hintergrund mit. Gleiche Anmutung wie die
+ * Menues am Schreibfeld (design-v11.css), damit es EIN Menue-Aussehen gibt.
+ */
+.view.premium-view .more-menu .menu-panel,
+.view.premium-view .more-menu > div[role="menu"] {
+  border: 0;
+  border-radius: var(--v11-r);
+  background: rgba(14, 20, 28, 0.82);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px var(--v11-cy-line);
+}
