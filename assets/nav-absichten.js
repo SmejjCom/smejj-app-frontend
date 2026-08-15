@@ -21,15 +21,20 @@ function loeseAus(absicht) {
     return;
   }
   if (absicht === "bilder") {
-    // Der Chip traegt seine Beschriftung uebersetzt (i18n) — gesucht wird
-    // darum ueber das data-Attribut, nicht ueber den Text.
-    const chip =
-      document.querySelector('.start-chips [data-chip="bilder"]') ||
-      [...document.querySelectorAll(".start-chips button")].find((knopf) =>
-        /bilder|image/i.test(knopf.textContent)
-      );
-    chip?.click();
-    document.querySelector("#startMessage")?.focus();
+    // Nicht den Chip klicken, sondern seine Vorlage direkt einsetzen: der
+    // Chip-Klick ging im Getriebe des Ansichtswechsels verloren (live
+    // gemessen 2026-08-15 — Feld blieb leer). Die Vorlage kommt trotzdem
+    // vom Chip selbst (data-chip), damit Uebersetzungen weiter greifen.
+    const feld = document.querySelector("#startMessage");
+    if (!feld) return;
+    const chip = [...document.querySelectorAll(".start-chips button")].find((knopf) =>
+      /bilder|image/i.test(knopf.textContent)
+    );
+    const vorlage = chip?.dataset.chip || "Generiere ein Bild von: ";
+    feld.value = vorlage.endsWith(" ") ? vorlage : vorlage + " ";
+    feld.dispatchEvent(new Event("input", { bubbles: true }));
+    feld.focus();
+    feld.setSelectionRange(feld.value.length, feld.value.length);
   }
 }
 
@@ -38,9 +43,10 @@ export function initNavAbsichten({ dokument = document } = {}) {
     const knopf = ereignis.target.closest("[data-nav-absicht]");
     if (!knopf) return;
     const absicht = knopf.dataset.navAbsicht;
-    // Nach dem Ansichtswechsel von app.js: ein Tick reicht, requestAnimationFrame
-    // stellt sicher, dass die Zielansicht schon gezeichnet ist.
-    requestAnimationFrame(() => loeseAus(absicht));
+    // Nach dem Ansichtswechsel von app.js. Fester kurzer Abstand statt
+    // requestAnimationFrame: waehrend des Menue-Uebergangs kann ein Frame
+    // ausbleiben, ein Timer nicht.
+    setTimeout(() => loeseAus(absicht), 220);
   });
   return true;
 }
