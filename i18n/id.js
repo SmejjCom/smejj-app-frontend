@@ -122,7 +122,7 @@ export default {
   "Mit Apple fortfahren": "Lanjutkan dengan Apple",
   "Anmelden oder registrieren": "Masuk atau daftar",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "Kamu mendapatkan penyimpanan sendiri dan riwayat di semua perangkat — gratis.",
-  "Neu oder schon dabei? Jeder Weg funktioniert für beide.": "Baru atau sudah bergabung? Setiap cara berlaku untuk keduanya.",
+  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "Dari alamatmu kami tahu apakah kamu sudah punya akun.",
   "Du musst dich nicht entscheiden.": "Kamu tidak perlu memilih.",
   "Nutzungsbedingungen": "Ketentuan Penggunaan",
   "Passkey einrichten": "Siapkan passkey",

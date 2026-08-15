@@ -122,7 +122,7 @@ export default {
   "Mit Apple fortfahren": "Apple で続行",
   "Anmelden oder registrieren": "ログインまたは登録",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "自分専用の保存領域と、全デバイスでの履歴を無料で利用できます。",
-  "Neu oder schon dabei? Jeder Weg funktioniert für beide.": "初めてでも、既存ユーザーでも、どの方法でも使えます。",
+  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "メールアドレスから、既にアカウントがあるかどうかを判別します。",
   "Du musst dich nicht entscheiden.": "選ぶ必要はありません。",
   "Nutzungsbedingungen": "利用規約",
   "Passkey einrichten": "パスキーを設定",

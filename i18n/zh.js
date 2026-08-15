@@ -122,7 +122,7 @@ export default {
   "Mit Apple fortfahren": "使用 Apple 继续",
   "Anmelden oder registrieren": "登录或注册",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "你将获得自己的存储空间，并在所有设备上同步历史记录——免费。",
-  "Neu oder schon dabei? Jeder Weg funktioniert für beide.": "新用户还是老用户？每种方式都适用。",
+  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "我们会根据你的邮箱判断你是否已有账户。",
   "Du musst dich nicht entscheiden.": "无需做出选择。",
   "Nutzungsbedingungen": "使用条款",
   "Passkey einrichten": "设置通行密钥",

@@ -122,7 +122,7 @@ export default {
   "Mit Apple fortfahren": "Apple ile devam et",
   "Anmelden oder registrieren": "Giriş yap veya kaydol",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "Kendi depolama alanını ve tüm cihazlarda geçmişini ücretsiz alırsın.",
-  "Neu oder schon dabei? Jeder Weg funktioniert für beide.": "Yeni misin, zaten üye misin? Her yol ikisi için de çalışır.",
+  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "Adresinden zaten bir hesabın olup olmadığını anlarız.",
   "Du musst dich nicht entscheiden.": "Seçim yapmak zorunda değilsin.",
   "Nutzungsbedingungen": "Kullanım Koşulları",
   "Passkey einrichten": "Geçiş anahtarı kur",

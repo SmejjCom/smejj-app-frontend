@@ -122,7 +122,7 @@ export default {
   "Mit Apple fortfahren": "Apple দিয়ে চালিয়ে যান",
   "Anmelden oder registrieren": "লগইন বা নিবন্ধন",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "আপনি পাবেন নিজের স্টোরেজ এবং সব ডিভাইসে ইতিহাস — বিনামূল্যে।",
-  "Neu oder schon dabei? Jeder Weg funktioniert für beide.": "নতুন বা পুরনো? প্রতিটি উপায় দুজনের জন্যই কাজ করে।",
+  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "আপনার ঠিকানা থেকে আমরা বুঝি আপনার অ্যাকাউন্ট আছে কি না।",
   "Du musst dich nicht entscheiden.": "বেছে নিতে হবে না।",
   "Nutzungsbedingungen": "ব্যবহারের শর্তাবলী",
   "Passkey einrichten": "পাসকি সেট আপ করুন",

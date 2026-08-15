@@ -1,27 +1,30 @@
 // smejj.com — die vierte Zeile der Anmeldeseite (Mockup V11, Bildschirm 4,
-// Betreiber-Freigabe 2026-08-15). "Mit E-Mail fortfahren" klappt den
-// E-Mail-Block auf; die eigentliche Anmelde-Logik bleibt unveraendert in
-// auth-page.js (gesperrte Datei, hier nur Sichtbarkeit).
+// Betreiber-Freigabe 2026-08-15). Die cyan umrandete Zeile IST das
+// E-Mail-Feld; der Pfeil stoesst denselben Weg an wie der "Weiter"-Knopf
+// aus auth-page.js (gesperrte Datei — hier nur Sichtbarkeit und Weitergabe).
 //
-// Zwei Wege oeffnen den Block von selbst, damit kein bestehender Ablauf
-// bricht: (1) ?reset=/?email=-Parameter (Passwort-Reset fuellt und zeigt das
-// Formular — der Block darueber muss dann offen sein), (2) auth-page.js zeigt
-// #emailFormGroup selbst (revealEmailForm) — ein Beobachter zieht den Block
-// nach, falls das vor dem Klick passiert.
+// Der Block darunter (Passwort, Login-Link) oeffnet sich in drei Faellen:
+// (1) Pfeil-Klick oder Enter im Feld, (2) ?reset=/?email=-Parameter
+// (Passwort-Reset fuellt und zeigt das Formular), (3) auth-page.js zeigt
+// #emailFormGroup selbst — ein Beobachter zieht den Block dann nach.
 
 const block = document.getElementById("emailWegBlock");
-const knopf = document.getElementById("emailWeg");
+const pfeil = document.getElementById("emailPfeil");
+const feld = document.getElementById("profileEmail");
 
 function oeffne() {
-  if (!block) return;
-  block.hidden = false;
-  knopf?.setAttribute("aria-expanded", "true");
-  document.getElementById("profileEmail")?.focus();
+  if (block) block.hidden = false;
 }
 
-knopf?.addEventListener("click", oeffne);
-knopf?.setAttribute("aria-expanded", "false");
-knopf?.setAttribute("aria-controls", "emailWegBlock");
+function weiter() {
+  oeffne();
+  document.getElementById("emailLogin")?.click();
+}
+
+pfeil?.addEventListener("click", weiter);
+feld?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") { event.preventDefault(); weiter(); }
+});
 
 const params = new URLSearchParams(window.location.search);
 if (params.get("reset") || params.get("email")) oeffne();

@@ -122,7 +122,7 @@ export default {
   "Mit Apple fortfahren": "Apple로 계속하기",
   "Anmelden oder registrieren": "로그인 또는 가입",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "나만의 저장 공간과 모든 기기에서의 기록을 무료로 이용할 수 있습니다.",
-  "Neu oder schon dabei? Jeder Weg funktioniert für beide.": "처음이든 기존 사용자든 모든 방법이 통합니다.",
+  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "이메일 주소로 이미 계정이 있는지 확인합니다.",
   "Du musst dich nicht entscheiden.": "선택할 필요가 없습니다.",
   "Nutzungsbedingungen": "이용약관",
   "Passkey einrichten": "패스키 설정",

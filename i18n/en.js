@@ -122,7 +122,7 @@ export default {
   "Mit Apple fortfahren": "Continue with Apple",
   "Anmelden oder registrieren": "Sign in or sign up",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "You get your own storage and your history on all devices — free.",
-  "Neu oder schon dabei? Jeder Weg funktioniert für beide.": "New or already with us? Every option works for both.",
+  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "We can tell from your address whether you already have an account.",
   "Du musst dich nicht entscheiden.": "You don't have to choose.",
   "Nutzungsbedingungen": "Terms of Use",
   "Passkey einrichten": "Set up passkey",
