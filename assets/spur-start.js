@@ -1,0 +1,153 @@
+// smejj.com — die Start-Spur (Mockup V11, Bildschirme 24/25/32).
+//
+// Das Mockup zeigt die Spur in ZWEI Fassungen, und beide sind gewollt
+// (Betreiber-Entscheid 2026-08-15, "Wie im Mockup: beide"):
+//
+//   START und CODE  -> die kompakte Spur: Start/Code-Reiter, fuenf Punkte
+//                      ("Neuer Chat ⌘K, Suchen, Meine Dateien, Auftraege"),
+//                      darunter die letzten Gespraeche nach Tag, zum Schluss
+//                      "Alle N Gespraeche" (Bildschirm 32).
+//   ALLE ANDEREN    -> die Vier-Gruppen-Spur aus Bildschirm 19, die schon
+//                      im Markup steht (Reden/Arbeiten/Meine Sachen/Betrieb).
+//
+// Dieses Modul baut die Start-Spur zur LAUFZEIT als zweiten <nav>-Block und
+// schaltet per Koerperklasse um — das Markup der Vier-Gruppen-Spur bleibt
+// unangetastet (sie ist die Rueckfallebene: faellt dieses Modul aus, ist
+// alles weiter erreichbar, nur eben immer in vier Gruppen).
+//
+// Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
+// und oeffnen per openChat — keine Attrappen.
+
+import { listChats, openChat, newChat } from "/assets/chat-store.js?v=pin-20260806";
+import { Icons } from "/assets/components.js?v=chat-markdown-20260717";
+
+const START_ANSICHTEN = new Set(["start", "code"]);
+const MAX_LETZTE = 5;
+
+function tageHer(iso) {
+  const zeit = new Date(iso).getTime();
+  if (!Number.isFinite(zeit)) return Number.POSITIVE_INFINITY;
+  const heute = new Date(); heute.setHours(0, 0, 0, 0);
+  const tag = new Date(zeit); tag.setHours(0, 0, 0, 0);
+  return Math.round((heute - tag) / 86400000);
+}
+
+function punkt({ icon, text, kuerzel, aktion, aktiv }) {
+  const knopf = document.createElement("button");
+  knopf.type = "button";
+  knopf.className = `nav-button${aktiv ? " is-active" : ""}`;
+  knopf.title = text;
+  const zeichen = document.createElement("span");
+  zeichen.className = "button-icon";
+  zeichen.setAttribute("aria-hidden", "true");
+  zeichen.innerHTML = Icons[icon] || "";
+  const label = document.createElement("span");
+  label.className = "nav-label";
+  label.textContent = text;
+  knopf.append(zeichen, label);
+  if (kuerzel) {
+    const k = document.createElement("span");
+    k.className = "nav-kuerzel";
+    k.textContent = kuerzel;
+    knopf.append(k);
+  }
+  knopf.addEventListener("click", aktion);
+  return knopf;
+}
+
+function geheZu(view) {
+  // Denselben Weg nehmen wie jeder andere Spur-Knopf: app.js bindet
+  // .nav-button[data-view] generisch — hier wird der vorhandene Knopf der
+  // Vier-Gruppen-Spur stellvertretend geklickt, damit Verlauf, Adresse und
+  // Aktiv-Zustand ueberall gleich laufen.
+  document.querySelector(`.nav-vier .nav-button[data-view="${view}"]`)?.click();
+}
+
+async function zeichneStartSpur(halter) {
+  halter.replaceChildren();
+
+  // Start/Code-Reiter (Bildschirm 24: "beim Umschalten aendert sich alles").
+  const reiter = document.createElement("div");
+  reiter.className = "spur-reiter";
+  for (const [view, name] of [["start", "Start"], ["code", "Code"]]) {
+    const r = document.createElement("button");
+    r.type = "button";
+    r.textContent = name;
+    r.className = document.querySelector(`#${view}`)?.classList.contains("is-active") ? "an" : "";
+    r.addEventListener("click", () => geheZu(view));
+    reiter.append(r);
+  }
+  halter.append(reiter);
+
+  halter.append(punkt({ icon: "plus", text: "Neuer Chat", kuerzel: "⌘K", aktion: () => { newChat(); geheZu("start"); } }));
+  halter.append(punkt({ icon: "search", text: "Suchen", aktion: () => geheZu("search") }));
+  halter.append(punkt({ icon: "projects", text: "Meine Dateien", aktion: () => geheZu("projects") }));
+  halter.append(punkt({ icon: "automation", text: "Aufträge", aktion: () => geheZu("automation") }));
+
+  // Letzte Gespraeche — echt, aus dem Verlauf. Kein Eintrag, keine Gruppe.
+  let chats = [];
+  try { chats = await listChats(); } catch { /* Spur bleibt ohne Verlauf nutzbar */ }
+  const sortiert = [...chats]
+    .filter((chat) => chat && chat.updatedAt)
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+    .slice(0, MAX_LETZTE);
+  let letzteGruppe = "";
+  for (const chat of sortiert) {
+    const tage = tageHer(chat.updatedAt);
+    const gruppe = tage <= 0 ? "Heute" : tage === 1 ? "Gestern" : "Früher";
+    if (gruppe !== letzteGruppe) {
+      const kopf = document.createElement("div");
+      kopf.className = "nav-gruppe";
+      kopf.setAttribute("aria-hidden", "true");
+      kopf.textContent = gruppe;
+      halter.append(kopf);
+      letzteGruppe = gruppe;
+    }
+    const eintrag = document.createElement("button");
+    eintrag.type = "button";
+    eintrag.className = "nav-button spur-chat";
+    eintrag.title = chat.title || "Unterhaltung";
+    eintrag.textContent = chat.title || "Unterhaltung";
+    eintrag.addEventListener("click", () => { openChat(chat.id); geheZu("start"); });
+    halter.append(eintrag);
+  }
+  if (chats.length) {
+    const alle = document.createElement("button");
+    alle.type = "button";
+    alle.className = "nav-button spur-alle";
+    alle.textContent = `Alle ${chats.length} Gespräche`;
+    alle.addEventListener("click", () => geheZu("chatHistory"));
+    halter.append(alle);
+  }
+}
+
+function schalte() {
+  const aktiv = document.querySelector(".view.is-active")?.id || "start";
+  const startModus = START_ANSICHTEN.has(aktiv);
+  document.body.classList.toggle("spur-start-aktiv", startModus);
+  const halter = document.querySelector(".nav-start");
+  if (startModus && halter) void zeichneStartSpur(halter);
+}
+
+export function initSpurStart() {
+  const vier = document.querySelector('.nav[aria-label="Arbeitsbereiche"]');
+  if (!vier || document.querySelector(".nav-start")) return false;
+  vier.classList.add("nav-vier");
+  const halter = document.createElement("nav");
+  halter.className = "nav nav-start";
+  halter.setAttribute("aria-label", "Start und letzte Gespräche");
+  vier.before(halter);
+  // Ansichtswechsel laufen ueber Klicks und den Verlauf (gleiches Muster wie
+  // topbar-krume.js) — plus ein Lauscher auf Chat-Aenderungen, damit ein
+  // frisch gefuehrtes Gespraech sofort in der Spur erscheint.
+  document.addEventListener("click", () => setTimeout(schalte, 150));
+  window.addEventListener("popstate", () => setTimeout(schalte, 150));
+  window.addEventListener("smejj:chats-changed", () => setTimeout(schalte, 150));
+  schalte();
+  return true;
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => initSpurStart(), { once: true });
+  else initSpurStart();
+}
