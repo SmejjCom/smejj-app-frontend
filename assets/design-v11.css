@@ -464,3 +464,180 @@ body.spur-start-aktiv .nav-vier { display: none; }
      die Gruendlich-Stufe bleibt ueber das Modellmenue erreichbar. */
   .fpille-nachdenken { display: none; }
 }
+
+
+/* =======================================================================
+ * Bildschirm 32, exakt — der Start-Composer als EINE Pille
+ * =======================================================================
+ * Der Mockup-Composer (.feldzeile) ist eine 999px-Pille in EINER Zeile:
+ * [+] [Feld] [Nachdenken] [Mikro] [Hauptknopf]. Die Ein-Zeilen-Technik ist
+ * dieselbe wie am Telefon (display:contents) — hier gilt sie fuer den Start
+ * auf JEDER Breite. */
+#start .prompt-glass {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 9px 9px 16px;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(34px) saturate(170%);
+  backdrop-filter: blur(34px) saturate(170%);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+}
+#start .prompt-actions {
+  display: contents;
+}
+#start .prompt-glass textarea {
+  order: 2;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 40px;
+  height: 40px;
+  padding: 9px 4px;
+  font-size: 17px;
+}
+#start .prompt-actions .plus-picker { order: 1; }
+#start .prompt-actions .fpille-nachdenken { order: 3; }
+#start .prompt-actions [data-start-tool="voice"] { order: 4; }
+#start .prompt-actions .send-button { order: 5; }
+#start .prompt-actions .prompt-spacer { display: none; }
+/* Der Sprachmodus liegt im Hauptknopf (leeres Feld) — der doppelte
+   Audio-Knopf entfaellt wie am Telefon. Der Modellchip steht im Mockup
+   nicht im Feld; Modellwahl bleibt unter Einstellungen -> KI-Modelle &
+   Anbieter und in der KI-Modelle-Ansicht erreichbar. */
+#start .prompt-glass [data-start-tool="audio"],
+#start .prompt-glass .model-picker { display: none; }
+#start .prompt-glass .plus-picker,
+#start .prompt-glass [data-start-tool],
+#start .prompt-glass .send-button,
+#start .prompt-glass .fpille-nachdenken { flex: 0 0 auto; }
+
+/* Die runden Knoepfe rechts (Mockup .fknopf: 38px, rund) */
+#start .prompt-glass .ghost-button.icon-button,
+#start .prompt-glass .send-button {
+  width: 38px;
+  height: 38px;
+  min-height: 38px;
+  border-radius: 999px !important;
+}
+
+/* Hauptknopf: WEISS mit schwarzer Welle (Mockup .fknopf.haupt); beim
+   Tippen CYAN mit dunklem Pfeil (Mockup .fknopf.haupt.aktiv). */
+.send-button.ist-sprache {
+  background: #ffffff;
+  color: #0a0f16;
+  box-shadow: none;
+}
+#start .send-button:not(.ist-sprache) {
+  background: var(--v11-cy);
+  color: #04211f;
+  box-shadow: 0 0 22px var(--v11-cy-glow);
+}
+
+/* Die Pille "Nachdenken" (Mockup .fpille): leise, rund, mit Icon */
+.fpille-nachdenken {
+  border-radius: 999px !important;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(242, 245, 244, 0.74);
+  gap: 7px;
+  display: inline-flex;
+  align-items: center;
+}
+.fpille-nachdenken svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fpille-nachdenken:hover { background: rgba(255, 255, 255, 0.07); }
+.fpille-nachdenken.an { background: var(--v11-cy-fill); color: var(--v11-cy-ink); box-shadow: none; }
+
+/* Vorschlagzeilen (Mockup .vorschlagzeile): KEINE Linien, Icon + 16.5px */
+.start-vorschlaege button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 6px;
+  border: 0;
+  border-bottom: 0;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(242, 245, 244, 0.58);
+  font-size: 16.5px;
+  border-radius: var(--v11-r-sm) !important;
+}
+.start-vorschlaege button svg,
+.start-chipreihe button svg {
+  width: 19px;
+  height: 19px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: rgba(242, 245, 244, 0.58);
+}
+.start-vorschlaege button:hover { background: rgba(255, 255, 255, 0.05); color: #f2f5f4; }
+
+/* Werkzeug-Chips (Mockup .wchip): runde Pillen, Icon, "an" in Cyan */
+.start-chipreihe {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  justify-content: flex-start;
+  padding-bottom: 6px;
+  max-width: 720px;
+}
+.start-chipreihe button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 15px;
+  border-radius: 999px !important;
+  font-size: 15px;
+  color: rgba(242, 245, 244, 0.74);
+  white-space: nowrap;
+  flex: none;
+}
+.start-chipreihe button.an {
+  background: var(--v11-cy-fill);
+  color: var(--v11-cy-ink);
+  box-shadow: inset 0 0 0 1px var(--v11-cy-line);
+}
+.start-chipreihe button.an svg { color: var(--v11-cy); }
+
+/* Reiter mit Icons (Mockup .reiter): aktiv = weisse Flaeche, Icon cyan */
+.spur-reiter button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.spur-reiter button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.spur-reiter button.an {
+  background: rgba(255, 255, 255, 0.085);
+  color: #f2f5f4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.spur-reiter button.an svg { color: var(--v11-cy); }
+
+/* Fusszeile im Start-Modus: der Plan steht unter dem Namen (Mockup
+   .railfuss); die Kostenzeile gehoert zur Vier-Gruppen-Spur. */
+.profile-dock-plan {
+  display: block;
+  font-size: 13px;
+  color: rgba(242, 245, 244, 0.58);
+}
+body.spur-start-aktiv .nav-kosten { display: none; }

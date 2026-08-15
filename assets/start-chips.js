@@ -15,8 +15,12 @@ if (feld) {
   document.querySelectorAll(".start-chips button").forEach((knopf) => {
     // Der Knopf traegt zwei Texte: die kurze Taetigkeit als Aufschrift und in
     // data-chip den Satzanfang, der ins Feld wandert. Beide werden uebersetzt.
-    const vorlage = knopf.dataset.chip || knopf.textContent.trim();
-    knopf.textContent = t(knopf.textContent.trim());
+    // Seit Bildschirm 32 traegt der Chip ein Icon plus <span class="chip-label">;
+    // textContent wuerde das Icon loeschen — darum nur das Label uebersetzen.
+    const label = knopf.querySelector(".chip-label");
+    const vorlage = knopf.dataset.chip || (label || knopf).textContent.trim();
+    if (label) label.textContent = t(label.textContent.trim());
+    else knopf.textContent = t(knopf.textContent.trim());
     // Sprung-Chips (Bildschirm 32: "Browser") uebernimmt app.js ueber
     // [data-jump] — hier nur uebersetzen, keine Vorlage anhaengen.
     if (knopf.dataset.jump) return;

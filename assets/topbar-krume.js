@@ -9,7 +9,10 @@
 
 function name() {
   const ansicht = document.querySelector(".view.is-active");
-  if (!ansicht || ansicht.id === "start") return "";
+  if (!ansicht) return "";
+  // Bildschirm 32: auch der Start hat eine Brotkrume — sie heisst dort
+  // schlicht "Neuer Chat".
+  if (ansicht.id === "start") return "Neuer Chat";
   return ansicht.querySelector(".view-header h2, h2")?.textContent.trim() || "";
 }
 

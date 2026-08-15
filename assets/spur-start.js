@@ -69,17 +69,22 @@ async function zeichneStartSpur(halter) {
   // Start/Code-Reiter (Bildschirm 24: "beim Umschalten aendert sich alles").
   const reiter = document.createElement("div");
   reiter.className = "spur-reiter";
+  const REITER_ICON = {
+    start: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 11 8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>',
+    code: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg>'
+  };
   for (const [view, name] of [["start", "Start"], ["code", "Code"]]) {
     const r = document.createElement("button");
     r.type = "button";
-    r.textContent = name;
+    r.innerHTML = `${REITER_ICON[view]}<span>${name}</span>`;
     r.className = document.querySelector(`#${view}`)?.classList.contains("is-active") ? "an" : "";
     r.addEventListener("click", () => geheZu(view));
     reiter.append(r);
   }
   halter.append(reiter);
 
-  halter.append(punkt({ icon: "plus", text: "Neuer Chat", kuerzel: "⌘K", aktion: () => { newChat(); geheZu("start"); } }));
+  const startAktiv = document.querySelector("#start")?.classList.contains("is-active");
+  halter.append(punkt({ icon: "plus", text: "Neuer Chat", kuerzel: "⌘K", aktiv: startAktiv, aktion: () => { newChat(); geheZu("start"); } }));
   halter.append(punkt({ icon: "search", text: "Suchen", aktion: () => geheZu("search") }));
   halter.append(punkt({ icon: "projects", text: "Meine Dateien", aktion: () => geheZu("projects") }));
   halter.append(punkt({ icon: "automation", text: "Aufträge", aktion: () => geheZu("automation") }));
@@ -150,4 +155,33 @@ export function initSpurStart() {
 if (typeof document !== "undefined") {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => initSpurStart(), { once: true });
   else initSpurStart();
+}
+
+
+// "Plan unter dem Namen" (Bildschirm 32, Karte 4: "immer sichtbar, nie im
+// Weg"). Der Plan ist ECHT (/api/billing/status, Session-gebunden); ohne
+// Anmeldung oder bei Stoerung steht "Frei" — fail-closed, nie eine Attrappe
+// mit erfundenen Punkten.
+const PLAN_NAMEN = { plus: "smejj Plus", pro: "smejj Pro", max: "smejj Max" };
+
+async function zeichnePlanzeile() {
+  const dock = document.getElementById("profileDockName");
+  if (!dock || document.getElementById("profileDockPlan")) return;
+  const zeile = document.createElement("span");
+  zeile.id = "profileDockPlan";
+  zeile.className = "profile-dock-plan";
+  zeile.textContent = "Frei";
+  dock.after(zeile);
+  try {
+    const antwort = await fetch("/api/billing/status", { credentials: "include" });
+    if (antwort.ok) {
+      const daten = await antwort.json();
+      if (daten?.plan && daten.plan !== "free") zeile.textContent = PLAN_NAMEN[daten.plan] || daten.plan;
+    }
+  } catch { /* "Frei" bleibt stehen */ }
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => zeichnePlanzeile(), { once: true });
+  else void zeichnePlanzeile();
 }
