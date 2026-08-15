@@ -151,7 +151,7 @@ async function selectModel(submenu, modelId) {
     if (error?.status === 401 || error?.code === "authentication_required" || error?.code === "provider_not_configured") {
       renderKeyHint(submenu);
     } else {
-      renderNote(submenu, "Modellwechsel fehlgeschlagen. Bitte erneut versuchen.");
+      renderNote(submenu, "Das Modell liess sich gerade nicht wechseln. Dein bisheriges bleibt aktiv — es geht also weiter. Probier es gleich noch einmal.");
       appendSettingsEntry(submenu);
     }
   }

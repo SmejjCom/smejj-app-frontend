@@ -107,7 +107,7 @@ async function copyFrom(button) {
     await navigator.clipboard.writeText(text);
     flashCopied(button);
   } catch {
-    showToast("Kopieren wurde vom Browser abgelehnt.", "warn");
+    showToast("Dein Browser laesst das Kopieren nicht zu. Markier den Code und nimm Strg+C — oder Cmd+C am Mac.", "warn");
   }
 }
 

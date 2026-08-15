@@ -375,7 +375,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
       ? UI_COPY.chatOffline
       : /network error/i.test(error?.message || "")
         ? "Die Verbindung ist während der Antwort abgerissen — bitte sende die Frage noch einmal."
-        : error.message || "Aufgabe konnte nicht abgeschlossen werden.";
+        : error.message || "Das hat gerade nicht geklappt. Deine Frage steht noch im Feld — probier es noch einmal.";
     output.textContent = output.textContent ? `${output.textContent.trim()}\n\n${message}` : message;
     hideTaskIndicator();
   }

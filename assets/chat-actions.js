@@ -254,7 +254,7 @@ async function copyText(text, button, html = "") {
       await navigator.clipboard.writeText(kompakt);
       flashCopied(button);
     } catch {
-      showToast("Kopieren wurde vom Browser abgelehnt.", "warn");
+      showToast("Dein Browser laesst das Kopieren nicht zu. Markier den Text und nimm Strg+C — oder Cmd+C am Mac.", "warn");
     }
   }
 }
