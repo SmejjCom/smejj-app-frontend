@@ -42,8 +42,8 @@ import { groundingFor } from "/assets/browser-context.js";
 // Warteschlange aus demselben Modul haette es zerrissen. Gleiche Falle wie bei
 // settings-runtime.js in sw v184/v185.
 import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=blitz-20260726";
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=pin-20260806";
-import { showToast } from "/assets/components.js?v=chat-markdown-20260717";
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=b48";
+import { showToast } from "/assets/components.js?v=b48";
 
 const SETTLE_MS = 900;
 const COPY_FEEDBACK_MS = 2000;
@@ -254,7 +254,7 @@ async function copyText(text, button, html = "") {
       await navigator.clipboard.writeText(kompakt);
       flashCopied(button);
     } catch {
-      showToast("Dein Browser laesst das Kopieren nicht zu. Markier den Text und nimm Strg+C — oder Cmd+C am Mac.", "warn");
+      showToast("Dein Browser laesst das Kopieren nicht zu. Markier den Text und nimm Strg+C \u2014 oder Cmd+C am Mac.", "warn");
     }
   }
 }

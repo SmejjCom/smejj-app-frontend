@@ -61,7 +61,7 @@ textarea {
 
 .brand h1 {
   margin: 0;
-  font-size:32px;
+  font-size: 32px;
   line-height: 1;
   letter-spacing: 0;
 }
@@ -70,7 +70,7 @@ textarea {
 .eyebrow {
   margin: 8px 0 0;
   color: #71716b;
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -144,7 +144,7 @@ button:hover {
   background: #ffffff;
   padding: 8px 10px;
   color: #4a4a43;
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
 }
 
@@ -207,7 +207,7 @@ button:hover {
   max-width: 620px;
   margin: 16px 0 0;
   color: #62625b;
-  font-size:18.5px;
+  font-size: 18.5px;
   line-height: 1.62;
 }
 
@@ -268,7 +268,7 @@ button:hover {
 
 .search-box span {
   color: rgba(246, 243, 238, 0.58);
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -279,7 +279,7 @@ button:hover {
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(5, 6, 8, 0.38);
   color: #f6f3ee;
-  font-size:21px;
+  font-size: 21px;
 }
 
 .search-box input::placeholder {
@@ -376,19 +376,19 @@ button:hover {
 
 .status-grid strong {
   color: #20201d;
-  font-size:15.5px;
+  font-size: 15.5px;
 }
 
 .status-grid span {
   color: #62625b;
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
 }
 
 label {
   display: grid;
   gap: 8px;
-  font-size:15.5px;
+  font-size: 15.5px;
   font-weight: 700;
   color: #42423c;
 }
@@ -448,7 +448,7 @@ textarea {
 #editor {
   min-height: 360px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size:15.5px;
+  font-size: 15.5px;
   line-height: 1.62;
 }
 
@@ -475,7 +475,7 @@ textarea {
 }
 
 #tools .output {
-  font-size:14.5px;
+  font-size: 14.5px;
   color: #4a4a43;
 }
 
@@ -521,11 +521,11 @@ textarea {
   }
 
   .brand h1 {
-    font-size:29px;
+    font-size: 29px;
   }
 
   .view-header h2 {
-    font-size:40px;
+    font-size: 40px;
   }
 
   .nav,
@@ -536,7 +536,7 @@ textarea {
 }
 
 .button-icon { display: inline-grid; place-items: center; width: 26px; min-width: 26px; color: #00ffef; font-weight: 800; }
-.nav-label { min-width: 0; overflow: hidden; font-size:16.5px; line-height: 1.16; text-overflow: ellipsis; white-space: nowrap; }
+.nav-label { min-width: 0; overflow: hidden; font-size: 16.5px; line-height: 1.16; text-overflow: ellipsis; white-space: nowrap; }
 
 .button-icon svg,
 .browser-panel-nav button svg {
@@ -566,14 +566,14 @@ textarea {
 .surface strong,
 .empty-state strong {
   color: #172033;
-  font-size:15.5px;
+  font-size: 15.5px;
 }
 
 .surface span,
 .empty-state span {
   overflow-wrap: anywhere;
   color: #5d6675;
-  font-size:15.5px;
+  font-size: 15.5px;
 }
 
 .toast-root {
@@ -680,10 +680,8 @@ textarea {
 }
 
 body {
-  /* Ein Ton statt zweier Farbwolken (2026-08-14, Betreiber-Freigabe). Hier
-     lagen ein gruen-tuerkiser und ein blauer Fleck ueber dem Grund und
-     faerbten den ganzen Aussenbereich mit. */
-  background: linear-gradient(180deg, #141517 0%, #101113 58%, #0d0e10 100%);
+  background:
+    linear-gradient(180deg, #141517 0%, #101113 58%, #0d0e10 100%);
   color: #f6f3ee;
 }
 
@@ -853,7 +851,7 @@ body.task-indicator-done .split-icon span:last-child {
 .sidebar.is-compact .button-icon {
   width: 100%;
   min-width: 0;
-  font-size:14.5px;
+  font-size: 14.5px;
 }
 
 .sidebar.is-compact .button-icon svg,
@@ -983,7 +981,7 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel.is-compact .browser-panel-nav button span {
   width: 100%;
   min-width: 0;
-  font-size:14.5px;
+  font-size: 14.5px;
 }
 
 .browser-panel.is-compact .browser-panel-nav {
@@ -1001,7 +999,7 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel-header h2 {
   margin: 0;
   color: #f6f3ee;
-  font-size:27px;
+  font-size: 27px;
   line-height: 1;
   letter-spacing: 0;
 }
@@ -1009,7 +1007,7 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel-header p {
   margin: 8px 0 0;
   color: rgba(246, 243, 238, 0.58);
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -1061,7 +1059,7 @@ body.is-resizing-panel .panel-resizer::before {
   background: rgba(255, 255, 255, 0.08);
   color: rgba(246, 243, 238, 0.72);
   padding: 8px 10px;
-  font-size:14.5px;
+  font-size: 14.5px;
   font-weight: 700;
 }
 
@@ -1155,7 +1153,7 @@ body.is-resizing-panel .panel-resizer::before {
 .sidebar.is-compact .profile-avatar {
   width: 16px;
   height: 16px;
-  font-size:12.5px;
+  font-size: 12.5px;
 }
 
 .sidebar.is-compact .profile-avatar.is-empty {
@@ -1340,7 +1338,7 @@ body.is-resizing-panel .panel-resizer::before {
   padding: 0 10px;
   border-radius: 8px;
   color: rgba(246, 243, 238, 0.74);
-  font-size:17.5px;
+  font-size: 17.5px;
   font-weight: 500;
 }
 
@@ -1401,7 +1399,7 @@ body.is-resizing-panel .panel-resizer::before {
   border-color: transparent;
   background: transparent;
   color: rgba(246, 243, 238, 0.78);
-  font-size:15.5px;
+  font-size: 15.5px;
   font-weight: 500;
   text-align: left;
 }
@@ -1538,7 +1536,7 @@ button:hover {
   }
 
   .home-hero h2 {
-    font-size:38px;
+    font-size: 38px;
   }
 
   .prompt-actions {
@@ -1554,7 +1552,7 @@ button:hover {
   }
 
   .text-chip {
-    font-size:18.5px;
+    font-size: 18.5px;
   }
 
   .send-button {
@@ -1610,7 +1608,7 @@ button:hover {
 
 .model-submenu-arrow {
   color: rgba(246, 243, 238, 0.5);
-  font-size:14.5px;
+  font-size: 14.5px;
 }
 
 .model-submenu {
@@ -1634,7 +1632,7 @@ button:hover {
 
 .model-submenu-group {
   padding: 6px 8px 2px;
-  font-size:13.5px;
+  font-size: 13.5px;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -1671,7 +1669,7 @@ button:hover {
 .model-submenu-note,
 .model-submenu-hint {
   padding: 8px;
-  font-size:14.5px;
+  font-size: 14.5px;
   color: rgba(246, 243, 238, 0.62);
   margin: 0;
 }
@@ -1882,7 +1880,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      border-color: transparent;
      background: transparent;
      color: rgba(246, 243, 238, 0.78);
-     font-size:15.5px;
+     font-size: 15.5px;
      font-weight: 500;
      text-align: left;
      cursor: pointer;
@@ -1989,7 +1987,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 .voice-mode-status {
-     font-size:20px;
+     font-size: 20px;
      font-weight: 500;
      margin: 0;
 }
@@ -1998,7 +1996,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      max-width: 640px;
      min-height: 24px;
      margin: 0;
-     font-size:16.5px;
+     font-size: 16.5px;
      color: rgba(246, 243, 238, 0.6);
      line-height: 1.62;
 }
@@ -2009,7 +2007,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      max-height: 38vh;
      overflow-y: auto;
      margin: 0;
-     font-size:17.5px;
+     font-size: 17.5px;
      color: rgba(246, 243, 238, 0.85);
      line-height: 1.65;
      white-space: pre-wrap;
@@ -2053,7 +2051,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      left: 0;
      right: 0;
      margin: 0;
-     font-size:14.5px;
+     font-size: 14.5px;
      color: rgba(246, 243, 238, 0.45);
 }
 
@@ -2271,7 +2269,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      border: none;
      background: transparent;
      color: rgba(246, 243, 238, 0.92);
-     font-size:16.5px;
+     font-size: 16.5px;
      outline: none;
 }
 
@@ -2386,7 +2384,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      border-radius: 8px;
      background: rgba(255, 255, 255, 0.04);
      color: rgba(246, 243, 238, 0.85);
-     font-size:14.5px;
+     font-size: 14.5px;
      font-weight: 500;
      cursor: pointer;
 }
@@ -2488,7 +2486,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-radius: 5px;
   background: transparent;
   color: #f6f3ee;
-  font-size:13.5px;
+  font-size: 13.5px;
   cursor: pointer;
 }
 
@@ -2534,7 +2532,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   height: 16px;
   border-radius: 5px;
   color: rgba(246, 243, 238, 0.5);
-  font-size:15.5px;
+  font-size: 15.5px;
   line-height: 1;
 }
 
@@ -2556,7 +2554,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-radius: 6px;
   background: transparent;
   color: rgba(246, 243, 238, 0.62);
-  font-size:17.5px;
+  font-size: 17.5px;
   line-height: 1;
   cursor: pointer;
 }
@@ -2567,7 +2565,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border: 1px solid rgba(159, 231, 212, 0.36);
   background: rgba(159, 231, 212, 0.11);
   color: rgba(159, 231, 212, 0.95);
-  font-size:13.5px;
+  font-size: 13.5px;
   font-weight: 700;
 }
 
@@ -2651,7 +2649,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.28);
   color: #f6f3ee;
-  font-size:14px;
+  font-size: 14px;
 }
 
 .bp-address:focus {
@@ -2691,7 +2689,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(159, 231, 212, 0.08);
   color: rgba(246, 243, 238, 0.82);
-  font-size:14.5px;
+  font-size: 14.5px;
 }
 
 /* Inhalt */
@@ -2745,12 +2743,12 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 .bp-empty strong {
-  font-size:17.5px;
+  font-size: 17.5px;
 }
 
 .bp-empty span {
   color: rgba(246, 243, 238, 0.5);
-  font-size:15px;
+  font-size: 15px;
 }
 
 .bp-fallback {
@@ -2766,13 +2764,13 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 .bp-fallback strong {
-  font-size:21px;
+  font-size: 21px;
 }
 
 .bp-fallback span {
   max-width: 420px;
   color: rgba(246, 243, 238, 0.6);
-  font-size:15.5px;
+  font-size: 15.5px;
   line-height: 1.6;
 }
 
@@ -2786,7 +2784,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-radius: 8px;
   background: rgba(159, 231, 212, 0.12);
   color: #f6f3ee;
-  font-size:15.5px;
+  font-size: 15.5px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -3146,7 +3144,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 .profile-dock-name {
   min-width: 0;
   overflow: hidden;
-  font-size:16.5px;
+  font-size: 16.5px;
   line-height: 1.16;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3205,7 +3203,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 .sidebar.is-compact .profile-dock .profile-avatar {
   width: 20px;
   height: 20px;
-  font-size:13.5px;
+  font-size: 13.5px;
 }
 
 .sidebar.is-compact .profile-dock-name {
@@ -3270,7 +3268,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 
 .profile-dock-menu-head strong {
   overflow: hidden;
-  font-size:15.5px;
+  font-size: 15.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3278,7 +3276,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 .profile-dock-menu-head span {
   overflow: hidden;
   color: rgba(246, 243, 238, 0.6);
-  font-size:14.5px;
+  font-size: 14.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3291,7 +3289,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   color: rgba(246, 243, 238, 0.86);
   cursor: pointer;
   font: inherit;
-  font-size:15.5px;
+  font-size: 15.5px;
   text-align: left;
 }
 
@@ -3524,7 +3522,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: rgba(20, 20, 20, 0.55);
   color: rgba(246, 243, 238, 0.62);
   font: inherit;
-  font-size:14.5px;
+  font-size: 14.5px;
   line-height: 1.55;
   cursor: pointer;
   transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
@@ -3539,7 +3537,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     min-width: 0;
     min-height: 26px;
     padding: 0 8px;
-    font-size:13.5px;
+    font-size: 13.5px;
   }
 }
 
@@ -3887,7 +3885,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 .msg-version-label {
-  font-size:14.5px;
+  font-size: 14.5px;
   line-height: 1;
   white-space: nowrap;
   color: rgba(246, 243, 238, 0.62);
@@ -3914,7 +3912,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 .msg-menu-head {
   margin: 0;
   padding: 6px 10px 8px;
-  font-size:14.5px;
+  font-size: 14.5px;
   line-height: 1.3;
   color: rgba(246, 243, 238, 0.52);
 }
@@ -3930,7 +3928,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: transparent;
   color: rgba(246, 243, 238, 0.92);
   font: inherit;
-  font-size:15.5px;
+  font-size: 15.5px;
   text-align: left;
   cursor: pointer;
 }
@@ -4020,7 +4018,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 .msg-editor-note {
-  font-size:14.5px;
+  font-size: 14.5px;
   color: rgba(246, 243, 238, 0.64);
 }
 
@@ -4036,7 +4034,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: transparent;
   color: rgba(246, 243, 238, 0.86);
   font: inherit;
-  font-size:15.5px;
+  font-size: 15.5px;
   cursor: pointer;
 }
 
@@ -4071,7 +4069,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 6px;
-  font-size:14.5px;
+  font-size: 14.5px;
   color: rgba(246, 243, 238, 0.62);
 }
 
@@ -4082,7 +4080,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: transparent;
   color: rgba(246, 243, 238, 0.78);
   font: inherit;
-  font-size:14.5px;
+  font-size: 14.5px;
   min-height: 0;
   cursor: pointer;
 }
@@ -4109,7 +4107,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 
 .msg-source-url {
   color: #9ecbf0;
-  font-size:15.5px;
+  font-size: 15.5px;
   text-decoration: none;
   overflow-wrap: anywhere;
 }
@@ -4124,7 +4122,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 .msg-source-meta {
-  font-size:14.5px;
+  font-size: 14.5px;
   color: rgba(246, 243, 238, 0.56);
   overflow-wrap: anywhere;
 }
@@ -4140,7 +4138,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
-  font-size:15.5px;
+  font-size: 15.5px;
   color: rgba(246, 243, 238, 0.86);
 }
 
@@ -4151,7 +4149,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: transparent;
   color: #f6f3ee;
   font: inherit;
-  font-size:15.5px;
+  font-size: 15.5px;
   cursor: pointer;
 }
 
@@ -4194,7 +4192,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   color: rgba(246, 243, 238, 0.82);
-  font-size:16.5px;
+  font-size: 16.5px;
   line-height: 1.2;
 }
 
@@ -4220,7 +4218,7 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 .paste-attach-remove {
-  font-size:21px;
+  font-size: 21px;
   line-height: 1;
 }
 
@@ -4654,6 +4652,178 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 .profile-avatar,
 #settings .ak-avatar {
   border-radius: 999px !important;
+}
+
+/* ---- design-v11.css ---- */
+/* smejj.com — Design V11: eine Quelle fuer Farbe, Kante und Bewegung.
+ * Freigabe des Betreibers vom 2026-08-15: "Du kannst V11 umsetzen ...
+ * Ich gebe dir alle Rechte".
+ *
+ * Befund, der zu dieser Datei fuehrte (gemessen am 2026-08-14):
+ * Cyan lag in SECHS Dateien verstreut und in DREI verschiedenen Toenen —
+ * #2dd4bf, #32f6ea, #2fd4c9. Jede Farbaenderung zog sechs Nacharbeiten nach
+ * sich, und irgendeine wurde vergessen. Ab hier gibt es genau einen Ton.
+ *
+ * Die eine Regel, die alles traegt:
+ *   Glas ist die FLAECHE. Die Linie ist der TRENNER. Der Abstand ist die
+ *   GRUPPE. Nie zwei davon am selben Element.
+ *
+ * Laedt als LETZTES im Buendel (nach eckig.css) und gewinnt darum bei
+ * gleicher Spezifitaet. Bewusst nur Tokens und wenige Grundregeln — kein
+ * Umbau einzelner Ansichten. Wer eine Ansicht anfasst, nimmt die Tokens.
+ *
+ * ACHTUNG Rundung: eckig.css setzt app-weit border-radius 0. Der Betreiber
+ * hat am 2026-08-14 ausdruecklich "leichte Knick, aber sehr leicht"
+ * verlangt — deshalb steht hier 8 px als bewusste, dokumentierte Ausnahme.
+ */
+
+:root {
+  /* --- Farbe: EIN Cyanton --------------------------------------------- */
+  --v11-cy: #32f6ea;
+  --v11-cy-ink: #7ee8da;
+  --v11-cy-line: rgba(50, 246, 234, 0.30);
+  --v11-cy-line-on: rgba(50, 246, 234, 0.85);
+  --v11-cy-glow: rgba(50, 246, 234, 0.22);
+  --v11-cy-fill: rgba(50, 246, 234, 0.12);
+  /* Die Logofarbe aus public/icons/smejj_favicon.svg. Nur fuer das Zeichen
+     selbst — nie fuer Flaechen, sonst kippt der Kontrast. */
+  --v11-marke: #02fdfd;
+
+  /* --- Kante und Flaeche ---------------------------------------------- */
+  --v11-hair: rgba(255, 255, 255, 0.075);
+  --v11-glas: rgba(255, 255, 255, 0.045);
+  --v11-glas-2: rgba(255, 255, 255, 0.075);
+  /* iOS-Specular: der helle Strich NUR an der Oberkante. Das ist es, was
+     Glas zu Glas macht — nicht ein Rahmen ringsum. */
+  --v11-lichtkante: rgba(255, 255, 255, 0.13);
+
+  /* --- Zustand: immer Farbe UND Wort im Markup ------------------------- */
+  --v11-ok: #7ef0c2;
+  --v11-warn: #ffd68a;
+  --v11-bad: #ff9a9c;
+
+  /* --- Kante, Abstand, Bewegung ---------------------------------------- */
+  --v11-r: 8px;      /* der "leichte Knick" */
+  --v11-r-sm: 6px;
+  --v11-takt: 160ms; /* EINE Dauer fuer alles */
+}
+
+/* --- Eine Bewegungsdauer ---------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .ghost-button,
+  .send-button,
+  .text-chip,
+  .start-chips button,
+  .nav-button {
+    transition:
+      background var(--v11-takt) ease,
+      box-shadow var(--v11-takt) ease,
+      color var(--v11-takt) ease;
+  }
+}
+
+/* --- Der leichte Knick -------------------------------------------------
+ * Bewusste Ausnahme zu eckig.css (Betreiber-Ansage 2026-08-14). Bewusst
+ * eng gefasst: nur Bedienelemente und Flaechen, nicht "alles". */
+.prompt-glass,
+.plus-menu,
+.model-menu,
+.start-chips button,
+.ghost-button,
+.send-button,
+.text-chip {
+  border-radius: var(--v11-r) !important;
+}
+
+/* Rund bleibt nur der eine Hauptknopf — und Avatare (Regel aus eckig.css). */
+.send-button {
+  border-radius: 999px !important;
+}
+
+/* --- Der Hauptknopf: leer = Sprache, getippt = senden -------------------
+ * Die Zustaende setzt composer-sendetaste.js. Hier steht nur, wie sie
+ * aussehen. Weiss fuer "senden" (wie ChatGPT), Cyan-Fuellung fuer
+ * "Sprachmodus" — zwei Rollen, zwei Farben, nie dieselbe. */
+.send-button {
+  background: #ffffff;
+  color: #0a0f16;
+}
+.send-button svg {
+  stroke: currentColor;
+}
+.send-button.ist-sprache {
+  background: var(--v11-cy-fill);
+  color: var(--v11-cy);
+  box-shadow: inset 0 0 0 1px var(--v11-cy-line-on), 0 0 18px var(--v11-cy-glow);
+}
+/* Die Miniatur-Welle ist gefuellt, nicht gestrichelt — duenne Striche
+   verschluckt der Browser bei 18 px. */
+.send-button .sendetaste-welle rect {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* --- Glas: Flaeche plus Lichtkante oben, KEIN Rahmen ringsum ----------- */
+.prompt-glass {
+  background: var(--v11-glas);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
+  backdrop-filter: blur(30px) saturate(160%);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+  border: 0;
+}
+.prompt-glass:focus-within {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 0 1px var(--v11-cy),
+    0 0 30px var(--v11-cy-glow);
+}
+
+/* Menues schweben: staerkeres Glas, damit der Text darunter nicht stoert. */
+.plus-menu,
+.model-menu {
+  background: rgba(14, 20, 28, 0.78);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px var(--v11-cy-line);
+  border: 0;
+}
+
+/* --- Rahmen raus, Haarstrich rein --------------------------------------
+ * Befund des Betreibers: "so viele Rahmen stoehnen mich auch". Ein Rahmen
+ * trennt; wenn alles getrennt ist, gehoert nichts zusammen. */
+.start-chips button,
+.ghost-button,
+.text-chip {
+  border: 0;
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.start-chips button:hover,
+.ghost-button:hover,
+.text-chip:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+/* --- Zwei Schriftstaerken, nie 500 oder 600 ----------------------------
+ * Das ist der halbe Grund, warum ChatGPT sauber wirkt: es gibt nur normal
+ * und fett, nichts dazwischen. */
+.home-hero h2 {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.start-chips button,
+.text-chip {
+  font-weight: 400;
+}
+
+/* --- Lesbarkeit: nichts unter 15 px, nichts blasser als 58 % -----------
+ * Der Betreiber liest --sm-ink-faint nicht. Das ist gemessen, nicht
+ * vermutet — deshalb hier als harte Untergrenze. */
+.start-chips button {
+  font-size: 15px;
 }
 
 /* --- Das Schreibfeld am Telefon: EINE Zeile ----------------------------
@@ -5333,3 +5503,19 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   background: var(--v11-hair);
 }
 .profile-dock-menu .profile-dock-menu-logout { color: var(--v11-bad); }
+
+
+/* Bildschirm 48: der Papierkorb */
+#papierkorb .papierkorb-zeile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--v11-hair);
+  flex-wrap: wrap;
+}
+#papierkorb .papierkorb-zeile:last-child { border-bottom: 0; }
+#papierkorb .papierkorb-text { flex: 1; min-width: 200px; display: grid; gap: 3px; }
+#papierkorb .papierkorb-text strong { font-size: 15.5px; }
+#papierkorb .papierkorb-text span { font-size: 13.5px; color: rgba(242, 245, 244, 0.62); }
+#papierkorb .papierkorb-leer { color: rgba(242, 245, 244, 0.62); font-size: 15.5px; }

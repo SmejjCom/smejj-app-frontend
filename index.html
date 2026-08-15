@@ -140,6 +140,7 @@
           <button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Verlauf">Verlauf</button>
           <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="Meine Dateien">Meine Dateien</button>
           <button class="nav-button" type="button" data-view="files" data-icon="files" title="Dateien">Dateien</button>
+          <button class="nav-button" type="button" data-view="papierkorb" data-icon="trash" title="Papierkorb">Papierkorb</button>
           <div class="nav-gruppe" aria-hidden="true">Betrieb</div>
           <button class="nav-button" type="button" data-view="tools" data-icon="system" title="Systemzustand">Systemzustand</button>
           <button class="nav-button" type="button" data-view="ai" data-icon="model" title="KI-Modelle">KI-Modelle</button>
@@ -176,6 +177,7 @@
               <div class="dock-strich" role="separator" aria-hidden="true"></div>
               <button type="button" role="menuitem" data-dock-action="account">Mein Plan<span class="dock-wert" id="dockWertPlan"></span></button>
               <button type="button" role="menuitem" data-jump="cost">Verbrauch</button>
+              <button type="button" role="menuitem" data-jump="papierkorb">Papierkorb<span class="dock-wert" id="dockWertPapierkorb"></span></button>
               <div class="dock-strich" role="separator" aria-hidden="true"></div>
               <button type="button" role="menuitem" data-jump="tools">Systemzustand</button>
               <button type="button" role="menuitem" data-dock-action="hilfe">Hilfe &amp; Rückmeldung</button>
@@ -337,25 +339,6 @@
               </article>
             </section>
             <div id="homeOutput" class="output" hidden>Bereit. Lokale Arbeit startet sofort; Online-Sync und KI bleiben fail-closed, bis sie sicher konfiguriert sind.</div>
-          
-            <section class="feed-list" aria-label="Feed" hidden>
-              <article class="feed-item">
-                <strong>Willkommen zurück</strong>
-                <span id="homeWorkspaceSummary">lokal bereit</span>
-              </article>
-              <article class="feed-item">
-                <strong>KI-Modus</strong>
-                <span id="homeAiSummary">disabled</span>
-              </article>
-              <article class="feed-item">
-                <strong>Kosten</strong>
-                <span id="homeCostSummary">0 EUR Risiko / blockiert</span>
-              </article>
-              <article class="feed-item">
-                <strong>Speicher</strong>
-                <span id="homeStorageSummary">Hauptspeicher vorbereitet</span>
-              </article>
-            </section>
             <div id="homeOutput" class="output" hidden>Bereit. Lokale Arbeit startet sofort; Online-Sync und KI bleiben fail-closed, bis sie sicher konfiguriert sind.</div>
           </div>
         </section>
@@ -599,6 +582,10 @@
           <header class="view-header">
             <p class="eyebrow">Betrieb</p>
             <h2>KI-Modelle &amp; Anbieter</h2>
+            <!-- Bildschirm 56: diese Ansicht ist fuers Betreibercockpit —
+                 hier stehen die echten Modellnamen und Zahlen. Die
+                 Nutzersicht auf dieselbe Sache heisst "smejj schnell/
+                 gruendlich" (Stufen-Chip und Einstellungen). -->
             <p class="subhead">Standardmäßig ist alles aus. Es wird nie automatisch und nie versteckt etwas benutzt, das Geld kostet.</p>
           </header>
           <div class="panel-grid">
@@ -771,6 +758,18 @@
           <div id="profileOutput" class="output"></div>
         </section>
 
+        <section id="papierkorb" class="view" aria-label="Papierkorb">
+          <header class="view-header">
+            <p class="eyebrow">Meine Sachen</p>
+            <h2>Papierkorb</h2>
+            <!-- Bildschirm 48: "30 Tage lang ist nichts verloren." Geloeschte
+                 Gespraeche liegen hier, wiederherstellbar; nach 30 Tagen
+                 raeumt die App von selbst. Logik in papierkorb.js. -->
+            <p class="subhead">Gelöschte Gespräche bleiben hier 30 Tage. Du kannst sie jederzeit zurückholen — erst danach sind sie wirklich weg.</p>
+          </header>
+          <div id="papierkorbListe" class="output"></div>
+        </section>
+
         <section id="offline" class="view" aria-label="Offline-Seite">
           <header class="view-header">
             <p class="eyebrow">Offline</p>
@@ -825,8 +824,7 @@
     <script src="/assets/nav-absichten.js?v=b32" type="module"></script>
     <script src="/assets/topbar-krume.js?v=b33" type="module"></script>
     <script src="/assets/spur-start.js?v=b34" type="module"></script>
-    <script src="/assets/code-flaeche.js?v=b33" type="module"></script>
-    <script src="/assets/app.js?v=b38" type="module"></script>
+    <script src="/assets/app.js?v=b48" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>
     <script src="/assets/browser-pane-backdrop.js?v=2" type="module"></script>
@@ -834,7 +832,7 @@
     <script src="/assets/auth/passkey-ui.js" type="module"></script>
     <script src="/assets/view-chrome.js?v=view-chrome-20260716-2" type="module"></script>
     <script src="/assets/profile-dock.js?v=b40" type="module"></script>
-    <script src="/assets/chat-store.js?v=pin-20260806" type="module"></script>
+    <script src="/assets/chat-store.js?v=b48" type="module"></script>
     <script src="/assets/chat-history-view.js?v=b47" type="module"></script>
     <script src="/assets/chat-actions.js?v=msg-actions-20260728-2" type="module"></script>
     <script src="/assets/chat-code-copy.js?v=code-copy-20260729" type="module"></script>

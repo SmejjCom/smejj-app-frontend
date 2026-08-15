@@ -45,7 +45,7 @@ async function meldeAbweisung(kennung, status, grund) {
   if (abgewiesen.has(kennung)) return;
   abgewiesen.add(kennung);
   try {
-    const { showToast } = await import("/assets/components.js?v=chat-markdown-20260717");
+    const { showToast } = await import("/assets/components.js?v=b48");
     const text = grund === "chat_zu_gross"
       ? "Ein Chat ist zu gross und wurde NICHT gesichert — er bleibt nur auf diesem Geraet."
       : `Ein Chat konnte nicht gesichert werden (${status}${grund ? `: ${grund}` : ""}) — er bleibt nur auf diesem Geraet.`;

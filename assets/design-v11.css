@@ -846,3 +846,19 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   background: var(--v11-hair);
 }
 .profile-dock-menu .profile-dock-menu-logout { color: var(--v11-bad); }
+
+
+/* Bildschirm 48: der Papierkorb */
+#papierkorb .papierkorb-zeile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--v11-hair);
+  flex-wrap: wrap;
+}
+#papierkorb .papierkorb-zeile:last-child { border-bottom: 0; }
+#papierkorb .papierkorb-text { flex: 1; min-width: 200px; display: grid; gap: 3px; }
+#papierkorb .papierkorb-text strong { font-size: 15.5px; }
+#papierkorb .papierkorb-text span { font-size: 13.5px; color: rgba(242, 245, 244, 0.62); }
+#papierkorb .papierkorb-leer { color: rgba(242, 245, 244, 0.62); font-size: 15.5px; }

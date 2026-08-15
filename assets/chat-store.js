@@ -327,6 +327,9 @@ async function persistActive() {
     titleEdited: Boolean(existing && existing.titleEdited),
     titleAuto: Boolean(existing && existing.titleAuto),
     pinned: existing?.pinned === true,
+    // Papierkorb (Bildschirm 48): das Loeschdatum uebersteht das Speichern —
+    // dieselbe Feldlisten-Falle wie bei pinned und titleAuto.
+    deletedAt: existing?.deletedAt || "",
     // Projekt-Zugehoerigkeit uebernehmen — dieselbe Falle wie bei pinned und
     // titleAuto (siehe oben): fehlt die Zeile, wirft jeder Tastendruck den
     // Chat lautlos aus seinem Projekt.
@@ -377,8 +380,11 @@ export async function listChats() {
   const userId = aktuellerNutzer();
   const alt = geraeteBesitzer();
   const eigene = chats.filter((chat) => gehoertNutzer(chat, userId, alt));
+  // Papierkorb: Geloeschte tauchen in keiner normalen Liste auf —
+  // sie leben in listGeloeschteChats(), 30 Tage lang.
+  const sichtbar = eigene.filter((chat) => !chat.deletedAt);
   // Angepinnte zuerst (Konkurrenz-Radar V4), innerhalb der Gruppen neueste oben.
-  return eigene.sort((a, b) => ((b.pinned === true) - (a.pinned === true)) || String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  return sichtbar.sort((a, b) => ((b.pinned === true) - (a.pinned === true)) || String(b.updatedAt).localeCompare(String(a.updatedAt)));
 }
 
 // Anpinnen/Loesen (Konkurrenz-Radar V4, 2026-08-06). updatedAt bleibt bewusst
@@ -444,13 +450,20 @@ export async function renameChat(id, title) {
   return true;
 }
 
+// Papierkorb (Bildschirm 48: "30 Tage lang ist nichts verloren").
+// "Loeschen" ist ab jetzt WEICH: der Chat bekommt ein Loeschdatum und
+// verschwindet aus allen Listen, bleibt aber 30 Tage wiederherstellbar.
+// Erst das endgueltige Loeschen (aus dem Papierkorb oder durch die
+// 30-Tage-Raeumung) entfernt den Datensatz und meldet es dem Konto.
+const PAPIERKORB_TAGE = 30;
+
 export async function deleteChat(id) {
-  // Nur eigene Chats loeschen (Stufe 2). getChat liefert fuer fremde null.
-  if (!(await getChat(id))) return false;
-  await tx(STORE, "readwrite", (store) => store.delete(String(id || "")));
-  // Stufe 3: das Loeschen dem Konto melden (chat-sync.js reicht es zum Server
-  // weiter). Eigenes Ereignis statt Import — der Store kennt den Sync nicht.
-  try { window.dispatchEvent(new CustomEvent("smejj:chat-geloescht", { detail: { id: String(id || "") } })); } catch { /* still */ }
+  // Nur eigene Chats (Stufe 2). getChat liefert fuer fremde null — aber auch
+  // fuer schon weich geloeschte, darum roh nachfassen.
+  const chat = await getChat(id) || await rohEigenerChat(id);
+  if (!chat) return false;
+  chat.deletedAt = new Date().toISOString();
+  await tx(STORE, "readwrite", (store) => store.put(chat));
   if (activeChatId() === id) {
     try {
       sessionStorage.removeItem(ACTIVE_KEY_SESSION);
@@ -459,6 +472,51 @@ export async function deleteChat(id) {
   }
   notifyChanged();
   return true;
+}
+
+export async function restoreChat(id) {
+  const chat = await rohEigenerChat(id);
+  if (!chat || !chat.deletedAt) return false;
+  delete chat.deletedAt;
+  await tx(STORE, "readwrite", (store) => store.put(chat));
+  notifyChanged();
+  return true;
+}
+
+export async function endgueltigLoeschen(id) {
+  if (!(await rohEigenerChat(id))) return false;
+  await tx(STORE, "readwrite", (store) => store.delete(String(id || "")));
+  // Stufe 3: das Loeschen dem Konto melden (chat-sync.js reicht es zum Server
+  // weiter). Eigenes Ereignis statt Import — der Store kennt den Sync nicht.
+  try { window.dispatchEvent(new CustomEvent("smejj:chat-geloescht", { detail: { id: String(id || "") } })); } catch { /* still */ }
+  notifyChanged();
+  return true;
+}
+
+// Alle weich geloeschten eigenen Chats — und die 30-Tage-Raeumung in einem:
+// was zu alt ist, wird beim Lesen endgueltig entfernt.
+export async function listGeloeschteChats() {
+  const alle = await tx(STORE, "readonly", (store) => new Promise((resolve, reject) => {
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  })).catch(() => []);
+  const userId = aktuellerNutzer();
+  const alt = geraeteBesitzer();
+  const eigene = alle.filter((chat) => gehoertNutzer(chat, userId, alt) && chat.deletedAt);
+  const grenze = Date.now() - PAPIERKORB_TAGE * 86400000;
+  const frisch = [];
+  for (const chat of eigene) {
+    if (new Date(chat.deletedAt).getTime() < grenze) await endgueltigLoeschen(chat.id).catch(() => {});
+    else frisch.push(chat);
+  }
+  return frisch.sort((a, b) => String(b.deletedAt).localeCompare(String(a.deletedAt)));
+}
+
+async function rohEigenerChat(id) {
+  const roh = await tx(STORE, "readonly", (store) => store.get(String(id || ""))).catch(() => null);
+  if (!roh) return null;
+  return gehoertNutzer(roh, aktuellerNutzer(), geraeteBesitzer()) ? roh : null;
 }
 
 /**

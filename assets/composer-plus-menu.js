@@ -3,7 +3,7 @@
 // unveraendert: Menue oeffnen/schliessen, Anhaenge als Text-Referenz einfuegen.
 // Versionierter Pfad wie in app.js (QA-Welle 1, Befund F-07) — ein Schutztest
 // verlangt die Cache-Version dort ausdruecklich, also zieht dieser Import nach.
-import { showToast } from "./components.js?v=chat-markdown-20260717";
+import { showToast } from "./components.js?v=b48";
 import { bindBildAnhang } from "./composer-bild-anhang.js";
 
 const $ = (selector) => document.querySelector(selector);

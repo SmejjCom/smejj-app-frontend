@@ -4,7 +4,7 @@
 // Chip-Inhalte wieder an die Aufgabe an; "Als Text einfuegen" holt einen
 // Chip in die Eingabezeile zurueck. Versionierter Import wie in app.js —
 // der Schutztest aus QA-Welle 1 (F-07) verlangt die Cache-Version dort.
-import { showToast } from "./components.js?v=chat-markdown-20260717";
+import { showToast } from "./components.js?v=b48";
 // Bild-Einfuegen (2026-08-14): der Betreiber fuegte einen Screenshot per
 // Cmd+V ein und nichts passierte — dieser Handler kannte nur Text. Bilder
 // laufen jetzt ueber DENSELBEN Weg wie der Datei-Waehler (eine Quelle).

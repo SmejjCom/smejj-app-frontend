@@ -40,7 +40,7 @@
 
 // Absoluter /assets/-Pfad mit derselben Kennung wie in chat-actions.js: ein
 // anderer Spezifizierer erzeugt eine ZWEITE Modulinstanz von components.js.
-import { showToast } from "/assets/components.js?v=chat-markdown-20260717";
+import { showToast } from "/assets/components.js?v=b48";
 
 const FEEDBACK_MS = 2000;
 
@@ -107,7 +107,7 @@ async function copyFrom(button) {
     await navigator.clipboard.writeText(text);
     flashCopied(button);
   } catch {
-    showToast("Dein Browser laesst das Kopieren nicht zu. Markier den Code und nimm Strg+C — oder Cmd+C am Mac.", "warn");
+    showToast("Dein Browser laesst das Kopieren nicht zu. Markier den Code und nimm Strg+C \u2014 oder Cmd+C am Mac.", "warn");
   }
 }
 

@@ -18,9 +18,9 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat } from "/assets/chat-store.js?v=pin-20260806";
+import { listChats, openChat, newChat } from "/assets/chat-store.js?v=b48";
 import { merkmaleVon } from "/assets/chat-history-text.js?v=b47";
-import { Icons } from "/assets/components.js?v=chat-markdown-20260717";
+import { Icons } from "/assets/components.js?v=b48";
 
 const START_ANSICHTEN = new Set(["start", "code"]);
 const MAX_LETZTE = 5;

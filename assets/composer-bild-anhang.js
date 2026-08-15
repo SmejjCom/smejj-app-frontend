@@ -8,7 +8,7 @@
 // Bild wird deshalb stufenweise kleiner gerechnet, bis die data:-URL unter
 // MAX_DATA_URL_ZEICHEN liegt; gelingt das nicht, bleibt alles beim alten
 // Verhalten (nur Text-Referenz, kein Anhang) — fail-safe.
-import { showToast } from "./components.js?v=chat-markdown-20260717";
+import { showToast } from "./components.js?v=b48";
 
 const MAX_DATA_URL_ZEICHEN = 600 * 1024;
 // Kante/Qualitaet je Versuch: erst gute Qualitaet, dann kleiner.
