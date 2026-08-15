@@ -323,17 +323,12 @@ export default {
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "उदाहरण: संक्षेप में और हिन्दी में उत्तर दें। तकनीकी शब्द सरलता से समझाएँ।",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "आपका सत्र समाप्त हो गया है। कृपया दोबारा साइन इन करें।",
   // Beispiel-Chips der Glas-Startseite (2026-08-13).
-  "Code schreiben": "कोड लिखना",
   "Schreibe Code für:": "इसके लिए कोड लिखें:",
-  "Text verbessern": "टेक्स्ट सुधारना",
   "Verbessere diesen Text:": "इस टेक्स्ट को सुधारें:",
-  "Recherchieren": "शोध करना",
   "Recherchiere für mich:": "मेरे लिए इस पर शोध करें:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
-  "Womit kann ich helfen?": "मैं कैसे मदद कर सकता हूँ?",
-  "Beschreibe eine Aufgabe oder stelle eine Frage.": "कोई कार्य बताइए या कोई प्रश्न पूछिए।",
-  "Bilder generieren": "चित्र बनाओ",
+  "Womit kann ich dir helfen?": "मैं कैसे मदद कर सकता हूँ?",
+  "Frag mich alles": "कोई कार्य बताइए या कोई प्रश्न पूछिए।",
   "Generiere ein Bild von:": "इसका चित्र बनाओ:",
-  "Video generieren": "वीडियो बनाओ",
   "Generiere ein Video von:": "इसका वीडियो बनाओ:",
 };

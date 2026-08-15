@@ -191,11 +191,11 @@
           <h1 class="visually-hidden">smejj.com — KI- und Code-Assistent</h1>
           <div class="home-feed">
             <header class="home-hero">
-              <h2>Womit kann ich helfen?</h2>
+              <h2>Womit kann ich dir helfen?</h2>
             </header>
             <div id="startLog" class="start-log" aria-label="Start Chat" hidden></div>
             <section class="prompt-glass" aria-label="Start Eingabe">
-              <textarea id="startMessage" rows="1" aria-label="Startprompt" placeholder="Beschreibe eine Aufgabe oder stelle eine Frage."></textarea>
+              <textarea id="startMessage" rows="1" aria-label="Startprompt" placeholder="Frag mich alles"></textarea>
               <div class="prompt-actions">
                 <div class="plus-picker">
                   <button id="composerPlusButton" class="ghost-button icon-button" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Aktionen" title="Aktionen">
@@ -268,6 +268,10 @@
                     <button type="button" role="menuitem" data-model="Kimi K2.7">Coding-Profi (Kimi K2.7)</button>
                   </div>
                 </div>
+                <!-- Bildschirm 32: die Pille "Nachdenken" — sie schaltet die ECHTE
+                     Gruendlich-Stufe (dieselbe, die im Modellmenue liegt), keine
+                     Attrappe. Verdrahtung in nav-absichten.js. -->
+                <button id="stufeNachdenken" class="ghost-button text-chip fpille-nachdenken" type="button" aria-pressed="false" title="Gründlich nachdenken">Nachdenken</button>
                 <button class="ghost-button icon-button" type="button" data-start-tool="voice" aria-label="Mikrofon" title="Mikrofon">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0V7a4 4 0 0 0-4-4Z"/><path d="M5 11v1a7 7 0 0 0 14 0v-1"/><path d="M12 19v3"/></svg>
                 </button>
@@ -282,13 +286,45 @@
                 </button>
               </div>
             </section>
-            <div class="start-chips" aria-label="Beispiele zum Losklicken">
-              <button type="button" data-chip="Schreibe Code für:">Code schreiben</button>
-              <button type="button" data-chip="Verbessere diesen Text:">Text verbessern</button>
-              <button type="button" data-chip="Recherchiere für mich:">Recherchieren</button>
-              <button type="button" data-chip="Generiere ein Bild von:">Bilder generieren</button>
-              <button type="button" data-chip="Generiere ein Video von:">Video generieren</button>
+            <!-- Bildschirm 32, exakt: drei Vorschlagzeilen, darunter die sieben
+                 Werkzeug-Chips. Die Vorlagen (data-chip) sind dieselben wie
+                 bisher — nur die Aufschriften folgen dem Mockup. "Bild
+                 verstehen" und "Datei" oeffnen zusaetzlich die Dateiwahl,
+                 "Browser" springt in die Browser-Ansicht (data-jump). -->
+            <div class="start-chips start-vorschlaege" aria-label="Vorschläge">
+              <button type="button" data-chip="Generiere ein Bild von:">Erstelle ein Bild</button>
+              <button type="button" data-chip="Verbessere diesen Text:">Schreiben oder überarbeiten</button>
+              <button type="button" data-chip="Recherchiere für mich:">Im Internet suchen</button>
             </div>
+            <div class="start-chips start-chipreihe" aria-label="Werkzeuge">
+              <button type="button" data-chip="Recherchiere für mich:">Im Netz</button>
+              <button type="button" data-chip="Generiere ein Bild von:">Bild</button>
+              <button type="button" data-chip="Generiere ein Video von:">Video</button>
+              <button type="button" data-chip="Was ist auf diesem Bild zu sehen?" data-composer-action="attach-photo">Bild verstehen</button>
+              <button type="button" data-chip="Schreibe Code für:">Programmieren</button>
+              <button type="button" data-jump="websites">Browser</button>
+              <button type="button" data-composer-action="attach-file">Datei</button>
+            </div>
+            <section class="feed-list" aria-label="Feed" hidden>
+              <article class="feed-item">
+                <strong>Willkommen zurück</strong>
+                <span id="homeWorkspaceSummary">lokal bereit</span>
+              </article>
+              <article class="feed-item">
+                <strong>KI-Modus</strong>
+                <span id="homeAiSummary">disabled</span>
+              </article>
+              <article class="feed-item">
+                <strong>Kosten</strong>
+                <span id="homeCostSummary">0 EUR Risiko / blockiert</span>
+              </article>
+              <article class="feed-item">
+                <strong>Speicher</strong>
+                <span id="homeStorageSummary">Hauptspeicher vorbereitet</span>
+              </article>
+            </section>
+            <div id="homeOutput" class="output" hidden>Bereit. Lokale Arbeit startet sofort; Online-Sync und KI bleiben fail-closed, bis sie sicher konfiguriert sind.</div>
+          
             <section class="feed-list" aria-label="Feed" hidden>
               <article class="feed-item">
                 <strong>Willkommen zurück</strong>
@@ -732,9 +768,9 @@
       <p class="voice-mode-hint">Sprich einfach — zum Beenden X druecken oder Escape.</p>
     </div>
     <script src="/assets/frame-guard.js?v=1" type="module"></script>
-    <script src="/assets/start-chips.js?v=chips-i18n-20260813" type="module"></script>
+    <script src="/assets/start-chips.js?v=b32" type="module"></script>
     <script src="/assets/composer-sendetaste.js?v=v11-20260815" type="module"></script>
-    <script src="/assets/nav-absichten.js?v=feld-direkt-2" type="module"></script>
+    <script src="/assets/nav-absichten.js?v=b32" type="module"></script>
     <script src="/assets/topbar-krume.js?v=1" type="module"></script>
     <script src="/assets/spur-start.js?v=1" type="module"></script>
     <script src="/assets/app.js?v=werkzeuge-1" type="module"></script>

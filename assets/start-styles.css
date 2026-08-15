@@ -5075,3 +5075,46 @@ body.spur-start-aktiv .nav-vier { display: none; }
   color: var(--v11-cy-ink);
   font-size: 14px;
 }
+
+
+/* --- Bildschirm 32: Vorschlagzeilen, Chipreihe, Nachdenken-Pille -------- */
+.start-vorschlaege {
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 720px;
+  margin: 0 auto 14px;
+  gap: 0;
+}
+.start-vorschlaege button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  box-shadow: none;
+  border-bottom: 1px solid var(--v11-hair);
+  border-radius: 0 !important;
+  padding: 10px 6px;
+  font-size: 15.5px;
+}
+.start-vorschlaege button:hover { background: rgba(255, 255, 255, 0.05); }
+.start-vorschlaege button:last-child { border-bottom: 0; }
+
+.start-chipreihe button {
+  font-size: 14.5px;
+  padding: 7px 13px;
+}
+
+.fpille-nachdenken {
+  font-size: 14px;
+  padding: 0 11px;
+}
+.fpille-nachdenken.an {
+  background: var(--v11-cy-fill);
+  color: var(--v11-cy);
+  box-shadow: inset 0 0 0 1px var(--v11-cy-line-on);
+}
+@media (max-width: 560px) {
+  /* In der Ein-Zeilen-Fassung am Telefon ist kein Platz fuer die Pille —
+     die Gruendlich-Stufe bleibt ueber das Modellmenue erreichbar. */
+  .fpille-nachdenken { display: none; }
+}

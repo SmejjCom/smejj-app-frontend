@@ -323,17 +323,12 @@ export default {
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "예: 한국어로 간결하게 답해 주세요. 전문 용어는 쉽게 설명해 주세요.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "세션이 만료되었습니다. 다시 로그인해 주세요.",
   // Beispiel-Chips der Glas-Startseite (2026-08-13).
-  "Code schreiben": "코드 작성",
   "Schreibe Code für:": "다음을 위한 코드를 작성해 줘:",
-  "Text verbessern": "문장 다듬기",
   "Verbessere diesen Text:": "이 문장을 다듬어 줘:",
-  "Recherchieren": "조사하기",
   "Recherchiere für mich:": "이것에 대해 조사해 줘:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
-  "Womit kann ich helfen?": "무엇을 도와드릴까요?",
-  "Beschreibe eine Aufgabe oder stelle eine Frage.": "작업을 설명하거나 질문해 주세요.",
-  "Bilder generieren": "이미지 생성",
+  "Womit kann ich dir helfen?": "무엇을 도와드릴까요?",
+  "Frag mich alles": "작업을 설명하거나 질문해 주세요.",
   "Generiere ein Bild von:": "다음 이미지를 생성:",
-  "Video generieren": "비디오 생성",
   "Generiere ein Video von:": "다음 비디오를 생성:",
 };

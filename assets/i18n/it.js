@@ -323,17 +323,12 @@ export default {
   "z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.": "Ad esempio: Rispondi in modo breve e in italiano. Spiega i termini tecnici in modo semplice.",
   "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.": "La tua sessione è scaduta. Accedi di nuovo.",
   // Beispiel-Chips der Glas-Startseite (2026-08-13).
-  "Code schreiben": "Scrivere codice",
   "Schreibe Code für:": "Scrivi codice per:",
-  "Text verbessern": "Migliorare un testo",
   "Verbessere diesen Text:": "Migliora questo testo:",
-  "Recherchieren": "Fare ricerche",
   "Recherchiere für mich:": "Fai una ricerca su:",
   // Startseiten-Hero + Eingabe-Platzhalter (2026-08-13).
-  "Womit kann ich helfen?": "Come posso aiutarti?",
-  "Beschreibe eine Aufgabe oder stelle eine Frage.": "Descrivi un compito o fai una domanda.",
-  "Bilder generieren": "Genera immagini",
+  "Womit kann ich dir helfen?": "Come posso aiutarti?",
+  "Frag mich alles": "Descrivi un compito o fai una domanda.",
   "Generiere ein Bild von:": "Genera un'immagine di:",
-  "Video generieren": "Genera video",
   "Generiere ein Video von:": "Genera un video di:",
 };

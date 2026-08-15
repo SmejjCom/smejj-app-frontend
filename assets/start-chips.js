@@ -13,12 +13,25 @@ if (hero) hero.textContent = t(hero.textContent.trim());
 if (feld && feld.placeholder) feld.placeholder = t(feld.placeholder.trim());
 if (feld) {
   document.querySelectorAll(".start-chips button").forEach((knopf) => {
+    // Der Knopf traegt zwei Texte: die kurze Taetigkeit als Aufschrift und in
+    // data-chip den Satzanfang, der ins Feld wandert. Beide werden uebersetzt.
+    const vorlage = knopf.dataset.chip || knopf.textContent.trim();
     knopf.textContent = t(knopf.textContent.trim());
+    // Sprung-Chips (Bildschirm 32: "Browser") uebernimmt app.js ueber
+    // [data-jump] — hier nur uebersetzen, keine Vorlage anhaengen.
+    if (knopf.dataset.jump) return;
     knopf.addEventListener("click", () => {
-      feld.value = knopf.textContent.trim();
+      const satz = t(vorlage);
+      // Nach dem vollbreiten Doppelpunkt (CJK) kein Leerzeichen — dort waere es
+      // ein Satzzeichenfehler; sonst trennt es die Vorlage vom Weitergetippten.
+      feld.value = satz.endsWith("：") ? satz : `${satz} `;
       // input-Ereignis, damit die vorhandene Autogroesse des Feldes mitzieht.
       feld.dispatchEvent(new Event("input", { bubbles: true }));
       feld.focus();
+      // "Bild verstehen" und "Datei" (Bildschirm 32) oeffnen zusaetzlich die
+      // Dateiwahl — die Vorlage steht dann schon im Feld.
+      if (knopf.dataset.composerAction === "attach-photo") document.getElementById("composerPhotoInput")?.click();
+      if (knopf.dataset.composerAction === "attach-file") document.getElementById("composerFileInput")?.click();
     });
   });
 }

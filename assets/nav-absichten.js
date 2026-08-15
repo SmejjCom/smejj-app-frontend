@@ -54,3 +54,30 @@ export function initNavAbsichten({ dokument = document } = {}) {
 if (typeof document !== "undefined") {
   initNavAbsichten();
 }
+
+
+// Die Pille "Nachdenken" (Mockup Bildschirm 32): schaltet die echte
+// Gruendlich-Stufe um — denselben Weg, den das Modellmenue nimmt
+// ([data-stufe]), damit Chip-Beschriftung und Bruecken-Parameter ueberall
+// gleich laufen. Zustand kommt aus dem Speicher der Stufe selbst.
+const STUFE_SPEICHER = "smejj.stufe.v1";
+
+function zeichneNachdenken() {
+  const pille = document.getElementById("stufeNachdenken");
+  if (!pille) return;
+  const an = localStorage.getItem(STUFE_SPEICHER) === "gruendlich";
+  pille.setAttribute("aria-pressed", String(an));
+  pille.classList.toggle("an", an);
+}
+
+if (typeof document !== "undefined") {
+  document.addEventListener("click", (ereignis) => {
+    const pille = ereignis.target.closest("#stufeNachdenken");
+    if (!pille) return;
+    const an = localStorage.getItem(STUFE_SPEICHER) === "gruendlich";
+    document.querySelector(`[data-stufe="${an ? "auto" : "gruendlich"}"]`)?.click();
+    setTimeout(zeichneNachdenken, 80);
+  });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", zeichneNachdenken, { once: true });
+  else zeichneNachdenken();
+}
