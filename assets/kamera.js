@@ -25,6 +25,7 @@ function ansage(text) {
 }
 
 function schliesse() {
+  liveAn = false;
   if (strom) {
     for (const spur of strom.getTracks()) spur.stop();
     strom = null;
@@ -55,6 +56,7 @@ async function oeffne(art) {
       <video autoplay playsinline muted></video>
       <div class="kamera-leiste">
         <button type="button" data-kamera="aufnehmen">Aufnehmen &amp; fragen</button>
+        <button type="button" data-kamera="live">Live mitschauen</button>
         <button type="button" data-kamera="zu">Beenden</button>
       </div>
       <p class="kamera-hinweis">Ein Klick nimmt genau EIN Bild auf und hängt es der Frage an — es läuft keine Daueraufnahme.</p>
@@ -65,6 +67,10 @@ async function oeffne(art) {
   overlay.addEventListener("click", async (ereignis) => {
     const aktion = ereignis.target.closest("[data-kamera]")?.dataset.kamera;
     if (aktion === "zu" || ereignis.target === overlay) { schliesse(); return; }
+    // Stufe 2 (Bildschirm 35): "Live mitschauen" — die Vorschau dockt klein
+    // an, und bei JEDEM Senden geht automatisch ein frisches Bild mit. Kein
+    // Dauer-Upload: ein Bild je Frage, aufgenommen im Moment des Sendens.
+    if (aktion === "live") { starteLive(overlay); return; }
     if (aktion !== "aufnehmen") return;
     const video = overlay.querySelector("video");
     const leinwand = document.createElement("canvas");

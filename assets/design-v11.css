@@ -1049,3 +1049,61 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   color: #04211f;
   font-weight: 700;
 }
+
+
+/* Bildschirm 35 Stufe 2: die angedockte Live-Vorschau */
+#kameraOverlay.ist-live {
+  inset: auto 18px 18px auto;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  place-items: end;
+}
+#kameraOverlay.ist-live .kamera-kasten { width: 260px; padding: 8px; gap: 6px; }
+#kameraOverlay.ist-live .kamera-hinweis { display: none; }
+#kameraOverlay.ist-live [data-kamera="aufnehmen"],
+#kameraOverlay.ist-live [data-kamera="live"] { display: none; }
+
+/* Bildschirm 27: die Arbeitsflaeche rechts */
+#arbeitsflaeche {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  margin: 10px;
+  border-radius: var(--v11-r);
+  background: var(--v11-glas-2);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+  max-height: 70vh;
+  overflow: auto;
+}
+#arbeitsflaeche .af-kopf { display: flex; align-items: center; gap: 10px; }
+#arbeitsflaeche .af-kopf strong { flex: 1; font-size: 15.5px; }
+#arbeitsflaeche .af-kopf button { border: 0; background: transparent; color: rgba(242,245,244,.6); cursor: pointer; font-size: 16px; }
+#arbeitsflaeche .af-inhalt { font-size: 15px; line-height: 1.6; color: #f2f5f4; }
+#arbeitsflaeche .af-inhalt table { border-collapse: collapse; }
+#arbeitsflaeche .af-inhalt td, #arbeitsflaeche .af-inhalt th { border: 1px solid var(--v11-hair); padding: 6px 9px; }
+#arbeitsflaeche .af-leiste { display: flex; gap: 7px; flex-wrap: wrap; }
+#arbeitsflaeche .af-leiste .af-luft { flex: 1; }
+#arbeitsflaeche .af-leiste button {
+  border: 0; border-radius: 999px; padding: 7px 13px; font-size: 14px; cursor: pointer;
+  background: rgba(255,255,255,.055); color: #f2f5f4;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* Die Karte unter der Antwort (Mockup: "Anschreiben · Text · 1 Seite") */
+.af-karte {
+  display: flex; align-items: center; gap: 10px;
+  margin: 6px 0 12px; padding: 10px 14px;
+  border: 0; border-radius: var(--v11-r); cursor: pointer;
+  background: var(--v11-glas); color: #f2f5f4;
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+  font-size: 14.5px; text-align: left;
+}
+.af-karte strong { font-size: 15px; }
+.af-karte span { color: rgba(242,245,244,.62); }
+.af-karte em { margin-left: auto; font-style: normal; color: var(--v11-cy-ink); }
+
+/* Bildschirm 39: die Datei-Tabelle */
+#files .datei-tabelle { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+#files .datei-tabelle th { text-align: left; color: rgba(242,245,244,.58); font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; padding: 8px 10px; border-bottom: 1px solid var(--v11-hair); }
+#files .datei-tabelle td { padding: 9px 10px; border-bottom: 1px solid var(--v11-hair); }

@@ -21,7 +21,17 @@
   <link rel="icon" href="/icons/smejj_favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>smejj.com — Frag alles. Kostenlos.</title>
+  <script src="/assets/willkommen-fokus.js" defer></script>
   <style>
+    .schwerpunkte { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .schwerpunkte button {
+      padding: 9px 15px; border: 0; border-radius: 999px; cursor: pointer;
+      font-size: 15px; background: rgba(255,255,255,.055); color: var(--ink-dim);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .schwerpunkte button.an { background: var(--cy-fill); color: var(--cy-ink); box-shadow: inset 0 0 0 1px var(--cy-line); }
+    .fokus-satz { color: var(--ink-dim); font-size: 15px; margin-bottom: 16px; min-height: 24px; }
+    .plan.fokus { background: var(--glas-2); box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 0 0 1px var(--cy-line), 0 0 26px rgba(50,246,234,.22); }
     :root {
       --cy: #32f6ea; --cy-ink: #7ee8da; --cy-fill: rgba(50,246,234,.12);
       --cy-line: rgba(50,246,234,.30); --cy-line-on: rgba(50,246,234,.85);
@@ -138,6 +148,19 @@
 
   <section id="preise">
     <h2>Preise</h2>
+    <!-- Bildschirm 3, ehrliche Fassung: der Schwerpunkt-Umschalter des
+         Mockups halbiert Punktpreise — ein Punktesystem gibt es nicht.
+         Was BLEIBT: die Orientierung. Der Umschalter beantwortet "worum
+         geht es dir hauptsaechlich?" mit einer ehrlichen Empfehlung und
+         hebt den passenden echten Plan hervor. Gesperrt ist nie etwas. -->
+    <p style="color:var(--ink-dim);margin-bottom:14px">Worum geht es dir hauptsächlich? <span style="opacity:.75">Alles bleibt in jedem Plan möglich.</span></p>
+    <div class="schwerpunkte" id="schwerpunkte">
+      <button type="button" data-fokus="alles" class="an">Von allem etwas</button>
+      <button type="button" data-fokus="bilder">Bilder</button>
+      <button type="button" data-fokus="video">Videos</button>
+      <button type="button" data-fokus="code">Programmieren</button>
+    </div>
+    <p class="fokus-satz" id="fokusSatz">Chat, Websuche, Dateien und Sprache sind in jedem Plan unbegrenzt.</p>
     <div class="plaene">
       <div class="plan">
         <span class="stufe">Frei</span>

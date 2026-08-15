@@ -521,9 +521,15 @@
 
         <section id="files" class="view" aria-label="Dateien und Uploads">
           <header class="view-header">
-            <p class="eyebrow">Dateien</p>
-            <h2>Hochladen und Herunterladen</h2>
+            <p class="eyebrow">Meine Sachen</p>
+            <h2>Dateien</h2>
+            <!-- Bildschirm 39: die Spalte "Von smejj gelesen" beantwortet
+                 vorab, warum eine Frage zu einer frisch hochgeladenen Datei
+                 manchmal noch nicht funktioniert. Tabelle in
+                 uploads-surface.js, nur echte Werte. -->
+            <p class="subhead">Was du hochgeladen hast — und ob smejj es schon lesen konnte.</p>
           </header>
+          <div id="dateiTabelle" class="output" hidden></div>
           <div class="panel-grid">
             <label>
               Upload-Staging
@@ -849,10 +855,11 @@
     <script src="/assets/topbar-krume.js?v=b33" type="module"></script>
     <script src="/assets/papierkorb.js?v=1" type="module"></script>
     <script src="/assets/arbeitsbereiche.js?v=1" type="module"></script>
-    <script src="/assets/kamera.js?v=1" type="module"></script>
+    <script src="/assets/kamera.js?v=b35live" type="module"></script>
     <script src="/assets/fuehrung.js?v=1" type="module"></script>
+    <script src="/assets/arbeitsflaeche.js?v=1" type="module"></script>
     <script src="/assets/spur-start.js?v=b34" type="module"></script>
-    <script src="/assets/app.js?v=b36" type="module"></script>
+    <script src="/assets/app.js?v=b39" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>
     <script src="/assets/browser-pane-backdrop.js?v=2" type="module"></script>

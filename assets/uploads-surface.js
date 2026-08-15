@@ -45,6 +45,7 @@ export function bindUploads({ $, state, writeOutput }) {
     $("#uploadList").value = state.uploads
       .map((file) => `${file.name} | ${file.bytes} bytes | ${file.type}`)
       .join("\n");
+    zeichneDateiTabelle(state, $);
     writeOutput("#fileOutput", "Uploads sind lokal gestaged. Dauerhafte Speicherung gehoert in IDrive e2 und bleibt serverseitig geschuetzt.");
   });
   $("#storageAgain").addEventListener("click", () => showJson("#fileOutput", CLIENT_ROUTES.api.storageStatus));
