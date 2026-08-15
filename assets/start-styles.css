@@ -4655,3 +4655,175 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 #settings .ak-avatar {
   border-radius: 999px !important;
 }
+
+/* ==== design-v11.css (Design V11, Freigabe 2026-08-15) ==== */
+/* smejj.com — Design V11: eine Quelle fuer Farbe, Kante und Bewegung.
+ * Freigabe des Betreibers vom 2026-08-15: "Du kannst V11 umsetzen ...
+ * Ich gebe dir alle Rechte".
+ *
+ * Befund, der zu dieser Datei fuehrte (gemessen am 2026-08-14):
+ * Cyan lag in SECHS Dateien verstreut und in DREI verschiedenen Toenen —
+ * #2dd4bf, #32f6ea, #2fd4c9. Jede Farbaenderung zog sechs Nacharbeiten nach
+ * sich, und irgendeine wurde vergessen. Ab hier gibt es genau einen Ton.
+ *
+ * Die eine Regel, die alles traegt:
+ *   Glas ist die FLAECHE. Die Linie ist der TRENNER. Der Abstand ist die
+ *   GRUPPE. Nie zwei davon am selben Element.
+ *
+ * Laedt als LETZTES im Buendel (nach eckig.css) und gewinnt darum bei
+ * gleicher Spezifitaet. Bewusst nur Tokens und wenige Grundregeln — kein
+ * Umbau einzelner Ansichten. Wer eine Ansicht anfasst, nimmt die Tokens.
+ *
+ * ACHTUNG Rundung: eckig.css setzt app-weit border-radius 0. Der Betreiber
+ * hat am 2026-08-14 ausdruecklich "leichte Knick, aber sehr leicht"
+ * verlangt — deshalb steht hier 8 px als bewusste, dokumentierte Ausnahme.
+ */
+
+:root {
+  /* --- Farbe: EIN Cyanton --------------------------------------------- */
+  --v11-cy: #32f6ea;
+  --v11-cy-ink: #7ee8da;
+  --v11-cy-line: rgba(50, 246, 234, 0.30);
+  --v11-cy-line-on: rgba(50, 246, 234, 0.85);
+  --v11-cy-glow: rgba(50, 246, 234, 0.22);
+  --v11-cy-fill: rgba(50, 246, 234, 0.12);
+  /* Die Logofarbe aus public/icons/smejj_favicon.svg. Nur fuer das Zeichen
+     selbst — nie fuer Flaechen, sonst kippt der Kontrast. */
+  --v11-marke: #02fdfd;
+
+  /* --- Kante und Flaeche ---------------------------------------------- */
+  --v11-hair: rgba(255, 255, 255, 0.075);
+  --v11-glas: rgba(255, 255, 255, 0.045);
+  --v11-glas-2: rgba(255, 255, 255, 0.075);
+  /* iOS-Specular: der helle Strich NUR an der Oberkante. Das ist es, was
+     Glas zu Glas macht — nicht ein Rahmen ringsum. */
+  --v11-lichtkante: rgba(255, 255, 255, 0.13);
+
+  /* --- Zustand: immer Farbe UND Wort im Markup ------------------------- */
+  --v11-ok: #7ef0c2;
+  --v11-warn: #ffd68a;
+  --v11-bad: #ff9a9c;
+
+  /* --- Kante, Abstand, Bewegung ---------------------------------------- */
+  --v11-r: 8px;      /* der "leichte Knick" */
+  --v11-r-sm: 6px;
+  --v11-takt: 160ms; /* EINE Dauer fuer alles */
+}
+
+/* --- Eine Bewegungsdauer ---------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .ghost-button,
+  .send-button,
+  .text-chip,
+  .start-chips button,
+  .nav-button {
+    transition:
+      background var(--v11-takt) ease,
+      box-shadow var(--v11-takt) ease,
+      color var(--v11-takt) ease;
+  }
+}
+
+/* --- Der leichte Knick -------------------------------------------------
+ * Bewusste Ausnahme zu eckig.css (Betreiber-Ansage 2026-08-14). Bewusst
+ * eng gefasst: nur Bedienelemente und Flaechen, nicht "alles". */
+.prompt-glass,
+.plus-menu,
+.model-menu,
+.start-chips button,
+.ghost-button,
+.send-button,
+.text-chip {
+  border-radius: var(--v11-r) !important;
+}
+
+/* Rund bleibt nur der eine Hauptknopf — und Avatare (Regel aus eckig.css). */
+.send-button {
+  border-radius: 999px !important;
+}
+
+/* --- Der Hauptknopf: leer = Sprache, getippt = senden -------------------
+ * Die Zustaende setzt composer-sendetaste.js. Hier steht nur, wie sie
+ * aussehen. Weiss fuer "senden" (wie ChatGPT), Cyan-Fuellung fuer
+ * "Sprachmodus" — zwei Rollen, zwei Farben, nie dieselbe. */
+.send-button {
+  background: #ffffff;
+  color: #0a0f16;
+}
+.send-button svg {
+  stroke: currentColor;
+}
+.send-button.ist-sprache {
+  background: var(--v11-cy-fill);
+  color: var(--v11-cy);
+  box-shadow: inset 0 0 0 1px var(--v11-cy-line-on), 0 0 18px var(--v11-cy-glow);
+}
+/* Die Miniatur-Welle ist gefuellt, nicht gestrichelt — duenne Striche
+   verschluckt der Browser bei 18 px. */
+.send-button .sendetaste-welle rect {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* --- Glas: Flaeche plus Lichtkante oben, KEIN Rahmen ringsum ----------- */
+.prompt-glass {
+  background: var(--v11-glas);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
+  backdrop-filter: blur(30px) saturate(160%);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+  border: 0;
+}
+.prompt-glass:focus-within {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 0 1px var(--v11-cy),
+    0 0 30px var(--v11-cy-glow);
+}
+
+/* Menues schweben: staerkeres Glas, damit der Text darunter nicht stoert. */
+.plus-menu,
+.model-menu {
+  background: rgba(14, 20, 28, 0.78);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px var(--v11-cy-line);
+  border: 0;
+}
+
+/* --- Rahmen raus, Haarstrich rein --------------------------------------
+ * Befund des Betreibers: "so viele Rahmen stoehnen mich auch". Ein Rahmen
+ * trennt; wenn alles getrennt ist, gehoert nichts zusammen. */
+.start-chips button,
+.ghost-button,
+.text-chip {
+  border: 0;
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.start-chips button:hover,
+.ghost-button:hover,
+.text-chip:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+/* --- Zwei Schriftstaerken, nie 500 oder 600 ----------------------------
+ * Das ist der halbe Grund, warum ChatGPT sauber wirkt: es gibt nur normal
+ * und fett, nichts dazwischen. */
+.home-hero h2 {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.start-chips button,
+.text-chip {
+  font-weight: 400;
+}
+
+/* --- Lesbarkeit: nichts unter 15 px, nichts blasser als 58 % -----------
+ * Der Betreiber liest --sm-ink-faint nicht. Das ist gemessen, nicht
+ * vermutet — deshalb hier als harte Untergrenze. */
+.start-chips button {
+  font-size: 15px;
+}
