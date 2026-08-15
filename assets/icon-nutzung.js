@@ -61,7 +61,10 @@ const ELEMENTE = Object.freeze([
 
   { id: "plus:datei", wo: "Plus-Menü", name: "Datei anhängen", selektor: '[data-composer-action="attach-file"]' },
   { id: "plus:foto", wo: "Plus-Menü", name: "Foto oder Bild", selektor: '[data-composer-action="attach-photo"]' },
-  { id: "plus:workspace", wo: "Plus-Menü", name: "Workspace-Datei", selektor: '[data-composer-action="attach-workspace"]' },
+  // Werkzeuge-Menue (Mockup-Umbau 2026-08-15): workspace-Eintrag entfiel,
+  // die neuen Menue-Wege werden stattdessen gezaehlt.
+  { id: "plus:diktat", wo: "Plus-Menü", name: "Sprechen statt tippen", selektor: '[data-composer-action="diktat"]' },
+  { id: "plus:vorlage", wo: "Plus-Menü", name: "Vorlagen-Eintrag", selektor: '[data-composer-action="vorlage"]' },
 
   { id: "voice:beenden", wo: "Sprachmodus", name: "Beenden (X)", selektor: "#voiceModeClose" },
   { id: "voice:stumm", wo: "Sprachmodus", name: "Stummschalten", selektor: "#voiceModeMic" }

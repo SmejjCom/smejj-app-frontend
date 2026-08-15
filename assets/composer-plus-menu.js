@@ -63,6 +63,20 @@ export function bindPlusMenu({ getInput, notifyInputChanged }) {
     const action = item.dataset.composerAction;
     if (action === "attach-file") $("#composerFileInput")?.click();
     if (action === "attach-photo") $("#composerPhotoInput")?.click();
+    // Werkzeuge-Menue nach Mockup-Bildschirm "Alle Werkzeuge auf einmal":
+    // "Sprechen statt tippen" drueckt den vorhandenen Diktat-Knopf; die
+    // Vorlagen-Eintraege setzen ihre Chip-Vorlage ins Feld — dieselbe
+    // Mechanik wie die Beispiel-Chips, nur aus dem Menue heraus.
+    if (action === "diktat") $('[data-start-tool="voice"]')?.click();
+    if (action === "vorlage") {
+      const feld = $("#startMessage");
+      if (feld) {
+        feld.value = item.dataset.vorlage || "";
+        feld.dispatchEvent(new Event("input", { bubbles: true }));
+        feld.focus();
+        feld.setSelectionRange(feld.value.length, feld.value.length);
+      }
+    }
     closePlusMenu();
   });
   bindAttachInput("#composerFileInput", "Anhang", getInput, notifyInputChanged);

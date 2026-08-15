@@ -201,26 +201,54 @@
                   <button id="composerPlusButton" class="ghost-button icon-button" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Aktionen" title="Aktionen">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
                   </button>
-                  <div id="composerPlusMenu" class="plus-menu" role="menu" hidden>
+                  <div id="composerPlusMenu" class="plus-menu plus-menu-werkzeuge" role="menu" hidden>
+                    <!-- Mockup V11, Bildschirm "Alle Werkzeuge auf einmal — in
+                         drei Gruppen": nichts unter "Weitere", alle acht
+                         sichtbar, jede Zeile mit Namen, Erklaersatz und
+                         Beispiel. Man liest die Ueberschrift und weiss, wo man
+                         suchen muss. -->
+                    <p class="plus-gruppe" role="separator" aria-hidden="true">Sachen hinzufügen</p>
                     <button type="button" role="menuitem" data-composer-action="attach-file">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.5 12.6 21a5.4 5.4 0 0 1-7.6-7.6l8.8-8.8a3.6 3.6 0 0 1 5.1 5.1l-8.8 8.8a1.8 1.8 0 0 1-2.5-2.5l8.1-8.1"/></svg>
-                      Datei anhaengen
+                      <b>Datei hinzufügen</b>
+                      <span class="werk-was">PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.</span>
+                      <span class="werk-bsp">„Was steht in diesem Vertrag zum Kündigen?"</span>
                     </button>
                     <button type="button" role="menuitem" data-composer-action="attach-photo">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></svg>
-                      Foto oder Bild
+                      <b>Bild hinzufügen</b>
+                      <span class="werk-was">Foto oder Bildschirmfoto. smejj sagt dir, was darauf zu sehen ist.</span>
+                      <span class="werk-bsp">„Was bedeutet diese Fehlermeldung?"</span>
                     </button>
-                    <button type="button" role="menuitem" data-composer-action="attach-workspace">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6a2 2 0 0 1 2-2h8l6 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z"/><path d="M14 4v6h6"/></svg>
-                      Workspace-Datei anhaengen
+                    <button type="button" role="menuitem" data-composer-action="diktat">
+                      <b>Sprechen statt tippen</b>
+                      <span class="werk-was">Du diktierst, smejj schreibt mit — und liest die Antwort vor, wenn du willst.</span>
+                      <span class="werk-bsp">Einfach draufdrücken und losreden.</span>
                     </button>
-                    <button type="button" role="menuitem" data-jump="files">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
-                      Projekt-Dateien
+                    <p class="plus-gruppe" role="separator" aria-hidden="true">Nachschauen</p>
+                    <button type="button" role="menuitem" data-composer-action="vorlage" data-vorlage="Recherchiere für mich: ">
+                      <b>Im Netz nachsehen</b>
+                      <span class="werk-was">Für alles, was aktuell ist. Die Antwort bekommt Quellen, die du anklicken kannst.</span>
+                      <span class="werk-bsp">„Wie ist das Wetter am Wochenende in München?"</span>
                     </button>
-                    <button type="button" role="menuitem" data-jump="search">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                      Suche oeffnen
+                    <button type="button" role="menuitem" data-composer-action="vorlage" data-vorlage="Generiere ein Bild von: ">
+                      <b>Bild erstellen</b>
+                      <span class="werk-was">Beschreib, was du sehen willst. Dauert etwa 12 Sekunden.</span>
+                      <span class="werk-bsp">„Ein schlichtes Logo für eine Bäckerei, schwarz-weiß."</span>
+                    </button>
+                    <p class="plus-gruppe" role="separator" aria-hidden="true">Für mich arbeiten</p>
+                    <button type="button" role="menuitem" data-composer-action="vorlage" data-vorlage="Schreibe Code für: ">
+                      <b>Programmieren</b>
+                      <span class="werk-was">Code schreiben, erklären oder Fehler suchen. Du siehst jede Änderung vorher.</span>
+                      <span class="werk-bsp">„Warum stürzt dieses Skript ab?"</span>
+                    </button>
+                    <button type="button" role="menuitem" data-jump="websites">
+                      <b>Im Browser für mich klicken</b>
+                      <span class="werk-was">smejj bedient eine Webseite, du siehst live zu und kannst jederzeit stoppen.</span>
+                      <span class="werk-bsp">„Such mir den günstigsten Flug nach Rom."</span>
+                    </button>
+                    <button type="button" role="menuitem" data-jump="automation">
+                      <b>Auftrag laufen lassen</b>
+                      <span class="werk-was">Für größere Arbeiten. Läuft weiter, auch wenn du das Fenster schließt.</span>
+                      <span class="werk-bsp">„Beobachte diesen Preis und sag mir, wenn er fällt."</span>
                     </button>
                     <input id="composerFileInput" class="visually-hidden-input" type="file" multiple aria-hidden="true" tabindex="-1">
                     <input id="composerPhotoInput" class="visually-hidden-input" type="file" accept="image/*" multiple aria-hidden="true" tabindex="-1">
@@ -708,7 +736,7 @@
     <script src="/assets/composer-sendetaste.js?v=v11-20260815" type="module"></script>
     <script src="/assets/nav-absichten.js?v=feld-direkt-2" type="module"></script>
     <script src="/assets/topbar-krume.js?v=1" type="module"></script>
-    <script src="/assets/app.js?v=b47" type="module"></script>
+    <script src="/assets/app.js?v=werkzeuge-1" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>
     <script src="/assets/browser-pane-backdrop.js?v=2" type="module"></script>
