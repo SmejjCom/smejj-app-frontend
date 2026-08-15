@@ -53,7 +53,7 @@ const LANGUAGE_LANDING = new RegExp(`^/(?:${LANGUAGE_CODES})/(?:index\\.html)?$`
 
 // /danke-abo.html ist der Ruecksprung aus dem Stripe-Checkout: Wer gerade
 // bezahlt hat, darf die Bestaetigung nie an einer Login-Umleitung verlieren.
-const PUBLIC_PATHS = [/^\/auth\//, /^\/datenschutz/, /^\/impressum/, /^\/maus-replay/, /^\/status\.html$/, /^\/hilfe\.html$/, /^\/danke-abo\.html$/, LANGUAGE_LANDING];
+const PUBLIC_PATHS = [/^\/auth\//, /^\/datenschutz/, /^\/impressum/, /^\/maus-replay/, /^\/status\.html$/, /^\/hilfe\.html$/, /^\/danke-abo\.html$/, /^\/willkommen\.html$/, LANGUAGE_LANDING];
 
 // Oeffentlicher Pfad? Input: pathname (String). Output: boolean.
 export function isPublicPath(pathname) {
@@ -90,6 +90,17 @@ export function loginUrlFuer(win, extraQuery = "") {
 export function enforceAuthGate(win) {
   if (isPublicPath(win.location.pathname)) return false;
   if (hasSession(win.localStorage)) return false;
+  // Landeseite zuerst (Mockup V11, Bildschirm 1): "smejj.com leitet jeden
+  // sofort auf die Anmeldung. Wer nicht weiss, was es ist, meldet sich auch
+  // nicht an." Ein anonymer Besucher der WURZEL sieht darum die Landeseite
+  // mit Anmelden/Kostenlos-starten. Deep-Links in die App (z. B. ein
+  // geteilter /verlauf-Link) gehen weiter direkt zum Login samt
+  // Rueckkehr-Ziel — dort weiss der Besucher schon, wohin er will.
+  const pfad = String(win.location.pathname || "/");
+  if (pfad === "/" || pfad === "/index.html") {
+    win.location.replace("/willkommen.html");
+    return true;
+  }
   win.location.replace(loginUrlFuer(win));
   return true;
 }

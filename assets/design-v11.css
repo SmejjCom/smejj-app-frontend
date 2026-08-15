@@ -1005,3 +1005,47 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   font-weight: 700 !important;
   margin-bottom: 14px;
 }
+
+
+/* Bildschirm 16: die Fuehrungs-Blase (Mockup .coach) */
+#fuehrungBlase {
+  position: fixed;
+  z-index: 300;
+  width: 300px;
+  padding: 16px;
+  border-radius: var(--v11-r);
+  background: rgba(14, 20, 28, 0.96);
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 0 1px var(--v11-cy-line-on);
+  color: #f2f5f4;
+}
+#fuehrungBlase b { font-size: 15.5px; }
+#fuehrungBlase p { margin: 8px 0 0; font-size: 14.5px; line-height: 1.5; color: rgba(242, 245, 244, 0.82); }
+#fuehrungBlase .fuehrung-beispiel { color: var(--v11-cy-ink); font-style: italic; }
+#fuehrungBlase .fuehrung-pfeil {
+  position: absolute;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  transform: rotate(45deg);
+  background: rgba(14, 20, 28, 0.96);
+  border-left: 1px solid var(--v11-cy-line-on);
+  border-top: 1px solid var(--v11-cy-line-on);
+}
+#fuehrungBlase .fuehrung-knoepfe { display: flex; gap: 8px; margin-top: 14px; }
+#fuehrungBlase button {
+  padding: 9px 16px;
+  border: 0;
+  border-radius: var(--v11-r);
+  font-size: 14.5px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.055);
+  color: #f2f5f4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+#fuehrungBlase [data-fuehrung="weiter"] {
+  background: var(--v11-cy);
+  color: #04211f;
+  font-weight: 700;
+}
