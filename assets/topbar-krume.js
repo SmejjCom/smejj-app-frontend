@@ -26,6 +26,15 @@ function zeichne() {
     krume.className = "top-krume";
     krume.setAttribute("aria-hidden", "true");
     anker.after(krume);
+    // Der Hilfe-Knopf der Mockup-Topbar — ein Link, kein Skript.
+    if (!document.getElementById("topHilfe")) {
+      const hilfe = document.createElement("a");
+      hilfe.id = "topHilfe";
+      hilfe.className = "top-hilfe";
+      hilfe.href = "/hilfe.html";
+      hilfe.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.8.3-.9 1-.9 1.7"/><path d="M12 17h.01"/></svg>Hilfe';
+      document.body.append(hilfe);
+    }
   }
   const text = name();
   krume.textContent = text;

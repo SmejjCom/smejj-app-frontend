@@ -5415,3 +5415,54 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   color: rgba(242, 245, 244, 0.58);
   padding: 8px 0;
 }
+
+
+/* =======================================================================
+ * Bildschirm 24: "Spalten beruehren sich" — die Spur ist am Desktop OFFEN
+ * =======================================================================
+ * Im Mockup gibt es am Desktop keinen Menue-Knopf: die Spur steht immer
+ * links, die Mitte schliesst mit einem Haarstrich an. Der Klapp-Mechanismus
+ * bleibt fuer schmale Schirme vollstaendig erhalten — diese Regeln greifen
+ * erst ab 1024 px. */
+@media (min-width: 1024px) {
+  .sidebar {
+    transform: none !important;
+    visibility: visible !important;
+  }
+  main.shell {
+    margin-left: var(--left-panel-width, 196px);
+  }
+  .app-menu-button { display: none; }
+  .sidebar-backdrop { display: none !important; }
+  /* Die Brotkrume beginnt rechts der Spur, nicht unter dem Logo. */
+  .top-krume { left: calc(var(--left-panel-width, 196px) + 26px); }
+  /* Spur und Mitte trennt EIN Haarstrich — kein Abstand, kein Schatten. */
+  .sidebar {
+    border-right: 1px solid var(--v11-hair);
+    box-shadow: none;
+  }
+}
+
+/* Der Hilfe-Knopf oben rechts (Mockup-Topbar). Bewusst mit Abstand zu den
+   fixen Ecken-Knoepfen (Befund b0fb345: dort kollidierte schon einmal
+   etwas). */
+.top-hilfe {
+  position: fixed;
+  top: 14px;
+  right: 132px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: #f2f5f4;
+  font-size: 14px;
+  text-decoration: none;
+}
+.top-hilfe:hover { background: rgba(255, 255, 255, 0.09); }
+@media (max-width: 1023px) {
+  .top-hilfe { display: none; }
+}
