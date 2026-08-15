@@ -6,7 +6,7 @@ export const SETTINGS_VERSION = 2;
 
 const SAFE_VALUES = {
   theme: new Set(["system", "dark", "light"]),
-  startView: new Set(["last", "start", "projects"]),
+  startView: new Set(["last", "start"]),
   density: new Set(["comfortable", "compact"]),
   fontSize: new Set(["small", "medium", "large"]),
   responseStyle: new Set(["concise", "balanced", "detailed"]),
@@ -171,7 +171,11 @@ function taskStateLabel(state) {
 }
 
 function applyPreferredStartView() {
-  const settings = readRuntimeSettings();
-  if (location.pathname !== "/" || settings.startView !== "projects") return;
-  document.querySelector('[data-view="projects"]')?.click();
+  // STILLGELEGT (Betreiber-Befund 2026-08-15): Wer smejj.com oeffnet, stand
+  // ploetzlich in "Meine Dateien" — die gespeicherte Wahl "projects" leitete
+  // JEDE Oeffnung der Wurzel dorthin um. Betreiber-Ansage: Oeffnen heisst
+  // Startseite (dorthin fuehrt auch der Login, Regel "Login-Ziel ist der
+  // Chat"). Die Umleitung entfaellt; wer in "Meine Dateien" will, hat den
+  // Spur-Punkt. Die Funktion bleibt als Stumpf stehen, damit ihr Aufrufer
+  // keine Weiche braucht.
 }

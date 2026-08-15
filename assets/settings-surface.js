@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from "./config.js";
-import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=4";
+import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=5-startseite";
 // api-keys-surface.js und provider-settings.js werden BEWUSST nicht statisch
 // importiert (Seitengewicht, Freigabe Wof Kadavanich 2026-08-04). Beide rendern
 // ausschliesslich in das Panel "models", und der Startreiter ist "general" —
@@ -159,7 +159,7 @@ function markup() {
     <div class="settings-shell"><nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${suche}${nav}</nav><div class="settings-content">
       ${panel("general", "Allgemein", "Grundlegendes Verhalten der App.", [
         select("Sprache", "settingsLanguage", LANGUAGE_OPTIONS, false),
-        select("Beim Öffnen anzeigen", "settingsStartView", [["last", "Letzte Ansicht"], ["start", "Startseite"], ["projects", "Arbeitsbereich"]]),
+        select("Beim Öffnen anzeigen", "settingsStartView", [["start", "Startseite"], ["last", "Letzte Ansicht"]]),
         select("Sicherheitsmodus", "settingsMode", [["safe", "Free-safe"], ["byok", "BYOK vorbereitet"], ["local", "Lokal"]])])}
       ${panel("appearance", "Aussehen & Schriftgröße", "Gilt nur außerhalb der geschützten Startseite.", [
         select("Farbschema", "settingsTheme", [["system", "System"], ["dark", "Dunkel"], ["light", "Hell"]]),
