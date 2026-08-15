@@ -528,6 +528,7 @@
     // Konsole ueberhaupt sichtbar werden.
     GATE.freigeben();
     zustand.akteur = antwort.data.actor || {};
+    // (zeigeUmgebung() steht weiter unten, nach den Kopfzeilen-Feldern.)
     // Damit der Sicherheitsdialog sagen kann, WOHIN der Code ging, statt nur
     // "deine Admin-E-Mail-Adresse". Beim allerersten Aufruf einer noch nicht
     // bestaetigten Adresse steht das hier noch nicht — dort greift der
@@ -542,10 +543,38 @@
     const stufe = document.getElementById("stufe");
     stufe.textContent = "Stufe " + (antwort.data.stage || 2)
       + (antwort.data.writable ? " · schreibend" : " · nur lesend");
+    zeigeUmgebung();
     // Im Pfad-Modus ist jeder Seitenwechsel eine echte Navigation — es gibt
     // nichts zu beobachten. Der Hash-Horcher bleibt dem Rueckfallweg vorbehalten.
     if (!PFAD_MODUS) window.addEventListener("hashchange", route);
     route();
+  }
+
+  /**
+   * Sagt, WO diese Konsole gerade arbeitet.
+   *
+   * Befund 2026-08-15 (A-bis-Z-Pruefung): in index.html stand fest
+   * "Produktion" — kein Skript hat das je gesetzt. Eine Konsole auf einem
+   * Testserver haette genauso ausgesehen, und wer zwei Fenster offen hat,
+   * konnte sie nicht unterscheiden. Ein Etikett, das immer dasselbe sagt,
+   * sagt nichts.
+   *
+   * Jetzt steht dort der Host, von dem diese Konsole ausgeliefert wird. Das
+   * ist genau die Frage, die das Etikett beantworten soll: "Ist das hier die
+   * echte?" Nur smejj.com und der Rueckfallweg heissen weiter "Produktion",
+   * jeder andere Host wird beim Namen genannt.
+   *
+   * Bewusst aus `location` und nicht aus api.js: dessen Auswahl der API-Basis
+   * ist privat, und api.js liegt unter dem Admin-Lock. Eine zweite Kopie
+   * dieser Logik wuerde frueher oder spaeter auseinanderlaufen.
+   */
+  function zeigeUmgebung() {
+    const feld = document.getElementById("umgebung");
+    if (!feld) return;
+    const host = String(location.hostname || "").toLowerCase();
+    const echt = host === "smejj.com" || host === "www.smejj.com" || host === "smejj-control.zeabur.app";
+    feld.textContent = echt ? "Produktion" : (host || "unbekannt");
+    feld.title = "Diese Konsole wird von " + (host || "unbekannt") + " ausgeliefert";
   }
 
   start();
