@@ -32,7 +32,15 @@ const ELEMENTE = Object.freeze([
 
   { id: "nav:start", wo: "Seitenleiste", name: "Neu", selektor: '.nav-button[data-view="start"]' },
   { id: "nav:search", wo: "Seitenleiste", name: "Suche", selektor: '.nav-button[data-view="search"]' },
-  { id: "nav:smejjClaw", wo: "Seitenleiste", name: "Coding", selektor: '.nav-button[data-view="smejjClaw"]' },
+  // Zeigte bis 2026-08-15 auf [data-view="smejjClaw"] — einen Knopf, den es in
+  // der Seitenleiste nie gab. Der Zaehler stand damit dauerhaft auf 0, und
+  // genau das haette der Radar-Bericht als "diesen Bereich findet niemand"
+  // gemeldet: ein Fehlsignal in dem Bericht, der unbenutzte Bedienelemente
+  // aufspueren soll. Der echte Knopf heisst [data-view="code"] und traegt seit
+  // der Klartext-Runde die Beschriftung "Programmieren".
+  // Die Kennung wandert von "nav:smejjClaw" auf "nav:code" mit — es geht kein
+  // Zaehlerstand verloren, weil nie etwas gezaehlt wurde.
+  { id: "nav:code", wo: "Seitenleiste", name: "Programmieren", selektor: '.nav-button[data-view="code"]' },
   { id: "nav:projects", wo: "Seitenleiste", name: "Arbeitsbereich", selektor: '.nav-button[data-view="projects"]' },
   { id: "nav:files", wo: "Seitenleiste", name: "Dateien", selektor: '.nav-button[data-view="files"]' },
   { id: "nav:chatHistory", wo: "Seitenleiste", name: "Verlauf", selektor: '.nav-button[data-view="chatHistory"]' },
