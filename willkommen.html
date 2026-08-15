@@ -21,7 +21,7 @@
   <link rel="icon" href="/icons/smejj_favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>smejj.com — Frag alles. Kostenlos.</title>
-  <script src="/assets/willkommen-fokus.js" defer></script>
+  <script src="/assets/willkommen-fokus.js?v=w2" defer></script>
   <style>
     .schwerpunkte { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
     .schwerpunkte button {
@@ -62,7 +62,30 @@
       background: rgba(255,255,255,.055); box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
     }
     .knopf.gross { padding: 14px 26px; font-size: 17px; }
+    /* Mockup 1: der Haupt-Knopf ist WEISS, nicht cyan — "Farbe nur wo sie
+       etwas sagt". Cyan bleibt fuer die Beliebteste-Wahl-Karte. */
+    .knopf.weiss { background: #f2f5f4; color: #0b1418; box-shadow: 0 0 18px rgba(255,255,255,.12); }
     .knopf.cyan { background: var(--cy); color: #04211f; box-shadow: 0 0 22px rgba(50,246,234,.22); }
+    /* Mockup 1: das Probier-Feld unter den Knoepfen. */
+    .probier {
+      margin: 30px auto 0; max-width: 640px; display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 999px; background: var(--glas-2);
+      box-shadow: inset 0 1px 0 var(--licht);
+    }
+    .probier input {
+      flex: 1; min-width: 0; background: none; border: 0; outline: none;
+      color: var(--ink); font: inherit; font-size: 16.5px;
+    }
+    .probier .chip {
+      white-space: nowrap; font-size: 14px; color: var(--ink-dim);
+      padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.05);
+      border: 0; cursor: default;
+    }
+    .probier .los {
+      border: 0; cursor: pointer; width: 38px; height: 38px; border-radius: 999px;
+      background: #f2f5f4; color: #0b1418; font-size: 17px; font-weight: 700;
+    }
+    .probier-zeile { font-size: 14px; color: var(--ink-dim); margin-top: 10px; }
     .held { max-width: 860px; margin: 0 auto; padding: 72px 22px 40px; text-align: center; }
     .held .vertrauen {
       display: inline-block; padding: 6px 14px; border-radius: 999px;
@@ -107,42 +130,60 @@
     <a href="/willkommen.html" aria-label="smejj.com"><img src="/icons/smejj_full_logo_on_dark.svg" alt="smejj.com"></a>
     <nav aria-label="Bereiche">
       <a href="#funktionen">Funktionen</a>
+      <a href="/programmieren.html">Für Programmierer</a>
       <a href="#preise">Preise</a>
       <a href="#herunterladen">Herunterladen</a>
       <a href="/hilfe.html">Hilfe</a>
     </nav>
     <div class="rechts">
       <a class="knopf" href="/auth/login/">Anmelden</a>
-      <a class="knopf cyan" href="/auth/register/">Kostenlos starten</a>
+      <a class="knopf weiss" href="/auth/register/">Kostenlos starten</a>
     </div>
   </header>
 
   <div class="held">
     <span class="vertrauen">Deine Daten bleiben bei dir</span>
-    <h1>Frag alles. <em>Kostenlos.</em></h1>
+    <h1>Frag alles.<br>Kostenlos.</h1>
     <p>Schreiben, recherchieren, Bilder und Videos erstellen, programmieren — in einem Fenster. Ohne Kreditkarte, ohne Testphase.</p>
     <div class="knoepfe">
-      <a class="knopf cyan gross" href="/auth/register/">Kostenlos starten</a>
+      <a class="knopf weiss gross" href="/auth/register/">Kostenlos starten</a>
       <a class="knopf gross" href="#preise">Preise ansehen</a>
     </div>
+    <!-- Mockup 1: das Probier-Feld. EHRLICH: "die ersten drei Fragen gehen
+         ohne Konto" gibt es serverseitig nicht (Login-Pflicht, Kostenschutz) —
+         darum nimmt das Feld die Frage MIT zur kostenlosen Anmeldung, und die
+         Zeile darunter sagt genau das. Keine Attrappe: der Weg funktioniert. -->
+    <!-- Das Feld hat bewusst KEIN name-Attribut: die Frage darf nie in der
+         Adresszeile landen. willkommen-fokus.js legt sie in sessionStorage,
+         die App holt sie nach der Anmeldung ins Schreibfeld. -->
+    <form class="probier" id="probierForm" action="/auth/register/" method="get">
+      <input id="probierFeld" placeholder="Frag mich alles" autocomplete="off">
+      <span class="chip">Nachdenken</span>
+      <button class="los" type="submit" aria-label="Frage stellen">↑</button>
+    </form>
+    <p class="probier-zeile">Probier es hier — nach der kostenlosen Anmeldung geht deine Frage sofort los.</p>
   </div>
 
   <section id="funktionen">
     <h2>Was smejj kann</h2>
     <div class="karten">
-      <div class="karte"><h3>Fragen &amp; Schreiben</h3><p>Antworten in ganzen Sätzen, Texte, Zusammenfassungen — auf Deutsch und in 14 weiteren Sprachen.</p></div>
-      <div class="karte"><h3>Bilder &amp; Videos</h3><p>Aus einer Beschreibung entsteht ein Bild in rund 12 Sekunden — oder ein kurzes Video.</p></div>
-      <div class="karte"><h3>Programmieren</h3><p>Code schreiben, Fehler suchen, erklären. Du siehst jede Änderung, bevor sie passiert.</p></div>
-      <div class="karte"><h3>Sprechen statt tippen</h3><p>Du redest, smejj hört zu und antwortet mit Stimme — und die Kamera zeigt ihm, was du siehst.</p></div>
+      <!-- Wortlaut = Mockup 1. Die vierte Karte ist die Maus ("Für dich
+           klicken") — sie existiert wirklich (Maus-Panel in der App). -->
+      <div class="karte"><h3>Fragen &amp; Schreiben</h3><p>Antworten in ganzen Sätzen, Texte, Zusammenfassungen.</p></div>
+      <div class="karte"><h3>Bilder &amp; Videos</h3><p>Aus einer Beschreibung — Video mit Erzählstimme.</p></div>
+      <div class="karte"><h3>Programmieren</h3><p>Code schreiben, Fehler suchen, Tests laufen lassen.</p></div>
+      <div class="karte"><h3>Für dich klicken</h3><p>smejj bedient eine Webseite, du siehst zu.</p></div>
     </div>
   </section>
 
   <section id="warum">
     <h2>Warum smejj</h2>
+    <!-- Wortlaut = Mockup 1 — bis auf "In Europa": der Speicherort ist nicht
+         belegt, also steht er hier nicht. Keine Behauptung ohne Beweis. -->
     <div class="karten">
-      <div class="karte"><h3>Deine Daten bleiben bei dir</h3><p>Verschlüsselt, in deinem eigenen Bereich — nicht in einem gemeinsamen Topf. Kein Training mit deinen Texten ohne dein ausdrückliches Ja.</p></div>
-      <div class="karte"><h3>Kostenlos heißt kostenlos</h3><p>Keine Funktion gesperrt, keine Kreditkarte, keine Testphase, die ausläuft.</p></div>
-      <div class="karte"><h3>Fragt nach statt zu raten</h3><p>Wenn smejj dich nicht versteht, fragt es — statt eine erfundene Frage zu beantworten.</p></div>
+      <div class="karte"><h3>Deine Daten bleiben bei dir</h3><p>Verschlüsselt, in deinem eigenen Bereich. Kein Training mit deinen Texten.</p></div>
+      <div class="karte"><h3>Kostenlos heißt kostenlos</h3><p>Keine Funktion gesperrt. Nur die Menge ist begrenzt.</p></div>
+      <div class="karte"><h3>Fragt nach statt zu raten</h3><p>Wenn smejj dich akustisch nicht versteht, fragt es — statt eine erfundene Frage zu beantworten.</p></div>
     </div>
   </section>
 
@@ -205,11 +246,24 @@
   </section>
 
   <section id="herunterladen">
-    <h2>Herunterladen</h2>
+    <!-- Mockup 6: "smejj auf deinem Gerät" + die drei Anwendungen von iMild.
+         con.ax und smyst.com sind echte, erreichbare Seiten (geprueft) —
+         die Karten verlinken dorthin, kein erfundenes Produkt. -->
+    <h2>smejj auf deinem Gerät</h2>
+    <p style="color:var(--ink-dim);max-width:640px;margin-bottom:18px">Ohne App-Store, ohne Installation im klassischen Sinn. Ein Klick im Browser und smejj liegt auf dem Startbildschirm wie jede andere App — mit eigenem Fenster, eigenem Symbol und offline nutzbarem Verlauf.</p>
+    <h2 style="font-size:20px">Die drei Anwendungen von iMild</h2>
     <div class="karten">
-      <div class="karte"><h3>Als App installieren</h3><p>smejj.com ist eine Web-App: im Browser öffnen, dann „Zum Home-Bildschirm hinzufügen" (Handy) oder „App installieren" (Chrome/Edge am Rechner). Kein App-Store nötig.</p></div>
-      <div class="karte"><h3>Funktioniert offline</h3><p>Einmal geladen, startet smejj auch ohne Netz — deine Gespräche sind da, sobald du wieder online bist.</p></div>
+      <div class="karte"><h3>smejj.com — Denken &amp; Bauen</h3><p>Fragen, schreiben, Bilder und Videos erstellen, programmieren. Das KI-Betriebssystem, das Software selbst baut.</p><p style="margin-top:8px;color:var(--cy-ink)">Du bist hier</p></div>
+      <div class="karte"><h3>con.ax — Verbinden</h3><p>Das soziale Netzwerk mit interaktiven Karten — Menschen, Orte und Momente geografisch verbunden.</p><p style="margin-top:8px"><a href="https://con.ax" rel="noopener">Ansehen</a> · Eigenes Konto nötig</p></div>
+      <div class="karte"><h3>smyst.com — Bewahren</h3><p>Dein digitaler KI-Zwilling — mit deinem Wissen und deinen Erinnerungen, für Familie und kommende Generationen.</p><p style="margin-top:8px"><a href="https://smyst.com" rel="noopener">Ansehen</a> · Eigenes Konto nötig</p></div>
     </div>
+    <h2 style="font-size:20px;margin-top:26px">So geht das Installieren — je Gerät</h2>
+    <div class="karten">
+      <div class="karte"><h3>iPhone &amp; iPad</h3><p>Safari öffnen → Teilen-Symbol unten → „Zum Home-Bildschirm".</p></div>
+      <div class="karte"><h3>Android</h3><p>Chrome öffnen → Menü oben rechts → „App installieren".</p></div>
+      <div class="karte"><h3>Mac &amp; Windows</h3><p>Chrome oder Edge → Symbol rechts in der Adresszeile → „Installieren".</p></div>
+    </div>
+    <p class="hinweis">Funktioniert offline: einmal geladen, startet smejj auch ohne Netz — deine Gespräche sind da, sobald du wieder online bist.</p>
   </section>
 
   <footer>

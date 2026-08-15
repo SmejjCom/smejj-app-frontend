@@ -302,6 +302,16 @@ function bindStartComposer() {
   const input = $("#startMessage");
   const send = $("#startSend");
   if (!input || !send) return;
+  // Landeseite (Mockup 1): das Probier-Feld nimmt die Frage mit zur
+  // Anmeldung — hier kommt sie an. sessionStorage statt Adresszeile,
+  // damit die Frage nie in einer URL steht.
+  try {
+    const probierFrage = sessionStorage.getItem("smejj.probierFrage.v1");
+    if (probierFrage && !input.value.trim()) {
+      input.value = probierFrage;
+      sessionStorage.removeItem("smejj.probierFrage.v1");
+    }
+  } catch { /* ohne Speicher einfach leer starten */ }
   const resizeInput = () => {
     input.style.height = "auto";
     input.style.height = input.value ? `${Math.min(input.scrollHeight, 324)}px` : "48px";

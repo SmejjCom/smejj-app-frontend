@@ -9,6 +9,19 @@
     code: "Programmieren hat eine eigene Tür: smejj.com/code. In jedem Plan enthalten — für tägliche Code-Arbeit passt Pro."
   };
   var FOKUS_PLAN = { alles: 1, bilder: 1, video: 2, code: 2 }; // Index in .plaene
+  // Mockup 1: das Probier-Feld. Die Frage geht NIE in die Adresszeile —
+  // sie wandert per sessionStorage mit, die App legt sie nach der Anmeldung
+  // ins Schreibfeld (app.js liest smejj.probierFrage.v1).
+  var probier = document.getElementById("probierForm");
+  if (probier) {
+    probier.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var frage = (document.getElementById("probierFeld") || {}).value || "";
+      try { if (frage.trim()) sessionStorage.setItem("smejj.probierFrage.v1", frage.trim()); } catch (fehler) { /* ohne Speicher geht es trotzdem zur Anmeldung */ }
+      location.href = "/auth/register/";
+    });
+  }
+
   var leiste = document.getElementById("schwerpunkte");
   if (!leiste) return;
   leiste.addEventListener("click", function (e) {
