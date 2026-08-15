@@ -1,8 +1,8 @@
 import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js";
 import { applyServerAiStatus } from "/assets/storage/index.js";
 import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=5";
-import { initSettingsSurface } from "./settings-surface.js?v=8-startseite";
-import { initAccountPrivacySurface } from "./account-privacy.js?v=b41";
+import { initSettingsSurface } from "./settings-surface.js?v=9-b45";
+import { initAccountPrivacySurface } from "./account-privacy.js?v=b47k";
 import { afterFirstPaint } from "./deferred-start.js";
 
 export function enhancePremiumSurfaces() {

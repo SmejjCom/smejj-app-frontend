@@ -162,12 +162,13 @@ function markup() {
         select("Beim Öffnen anzeigen", "settingsStartView", [["start", "Startseite"], ["last", "Letzte Ansicht"]]),
         select("Sicherheitsmodus", "settingsMode", [["safe", "Free-safe"], ["byok", "BYOK vorbereitet"], ["local", "Lokal"]])])}
       ${panel("appearance", "Aussehen & Schriftgröße", "Gilt nur außerhalb der geschützten Startseite.", [
-        select("Farbschema", "settingsTheme", [["system", "System"], ["dark", "Dunkel"], ["light", "Hell"]]),
-        select("Oberflächendichte", "settingsDensity", [["comfortable", "Komfortabel"], ["compact", "Kompakt"]]),
-        select("Schriftgröße", "settingsFontSize", [["small", "Klein"], ["medium", "Mittel"], ["large", "Groß"]])])}
+        select("Schriftgröße", "settingsFontSize", [["small", "Normal · 16 px"], ["medium", "Groß · 19 px"], ["large", "Sehr groß · 23 px"]]),
+        `<p class="settings-schriftprobe" aria-live="polite">${t("So sieht dein Text dann überall aus. Auch Knöpfe und Menüs wachsen mit — nicht nur der Fließtext.")}</p>`,
+        select("Helligkeit", "settingsTheme", [["dark", "Dunkel"], ["light", "Hell"], ["system", "So wie mein Gerät"]]),
+        select("Oberflächendichte", "settingsDensity", [["comfortable", "Komfortabel"], ["compact", "Kompakt"]])])}
       ${panel("behavior", "Wie smejj antwortet", "Lege fest, wie selbstständig smejj.com arbeiten darf.", [
         select("Bestätigungen", "settingsConfirmations", [["strict", "Immer bestätigen"], ["balanced", "Bei wichtigen Aktionen"], ["trusted", "Nur externe Auswirkungen"]]),
-        select("Antwortstil", "settingsResponseStyle", [["concise", "Kompakt"], ["balanced", "Ausgewogen"], ["detailed", "Ausführlich"]]),
+        select("Wie ausführlich?", "settingsResponseStyle", [["concise", "Kurz"], ["balanced", "Ausgewogen"], ["detailed", "Ausführlich"]]),
         toggle("Projektkontext automatisch berücksichtigen", "settingsAutoContext", "Relevante Projektdateien und Anweisungen einbeziehen.")])}
       ${panel("models", "KI-Modelle & Anbieter", "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.", [
         select("Reasoning-Aufwand", "settingsReasoningEffort", [["medium", "Mittel"], ["high", "Hoch"], ["max", "Maximal"]]),
@@ -326,7 +327,7 @@ function applyValues(view, settings) {
 function loadStyles() {
   // Versionsmarke wie in account-privacy.js: GitHub Pages liefert Assets mit
   // max-age; ohne ?v= saehe ein offener Browser die neue Datei erst spaeter.
-  const href = "/assets/settings-surface.css?v=mockup55";
+  const href = "/assets/settings-surface.css?v=b45";
   if (document.querySelector('link[href^="/assets/settings-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
