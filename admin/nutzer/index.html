@@ -11,13 +11,19 @@
      connect-src listet den Control-Server, weil die Konsole von smejj.com aus
      fremde Herkunft anspricht. WER DIE API-ADRESSE AENDERT, MUSS SIE HIER
      EINTRAGEN — sonst blockiert der Browser jede Abfrage. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud https://smejj-control.zeabur.app; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://smejj-control.zeabur.app; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <title>smejj.com — Operations Console</title>
 <link rel="stylesheet" href="/admin/console.css">
 <!-- Tuersteher: verbirgt die Huelle und leitet Abgemeldete zur Anmeldung.
      MUSS im <head> stehen und ohne defer laden, sonst blitzt der Adminbereich
      kurz auf, bevor umgeleitet wird. Siehe gate.js fuer den Befund. -->
 <script src="/admin/gate.js"></script>
+<!-- Klickjacking-Schutz. MUSS mit, weil GitHub Pages keine eigenen Kopfzeilen
+     setzen kann und frame-ancestors in einer meta-CSP wirkungslos ist. Auf dem
+     Control-Server faengt stattdessen dessen Kopfzeile x-frame-options: DENY.
+     Befund 2026-08-14: das Modul gab es laengst, hing aber nur an 3 von 12
+     Seiten — der Adminbereich war NICHT dabei. -->
+<script type="module" src="/frame-guard.js?v=1"></script>
 </head>
 <body>
 <div class="shell">
@@ -63,6 +69,10 @@
 <script src="/admin/console-stage8.js"></script>
 <script src="/admin/views-stage9.js"></script>
 <script src="/admin/console-stage9.js"></script>
+    <script src="/admin/views-cockpit.js"></script>
+    <script src="/admin/console-cockpit.js"></script>
+    <script src="/admin/views-stage10.js"></script>
+    <script src="/admin/console-stage10.js"></script>
 <script src="/admin/views-stage11.js"></script>
 <script src="/admin/console-stage11.js"></script>
 <script src="/admin/console.js"></script>

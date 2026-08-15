@@ -18,6 +18,12 @@
      MUSS im <head> stehen und ohne defer laden, sonst blitzt der Adminbereich
      kurz auf, bevor umgeleitet wird. Siehe gate.js fuer den Befund. -->
 <script src="/admin/gate.js"></script>
+<!-- Klickjacking-Schutz. MUSS mit, weil GitHub Pages keine eigenen Kopfzeilen
+     setzen kann und frame-ancestors in einer meta-CSP wirkungslos ist. Auf dem
+     Control-Server faengt stattdessen dessen Kopfzeile x-frame-options: DENY.
+     Befund 2026-08-14: das Modul gab es laengst, hing aber nur an 3 von 12
+     Seiten — der Adminbereich war NICHT dabei. -->
+<script type="module" src="/frame-guard.js?v=1"></script>
 </head>
 <body>
 <div class="shell">

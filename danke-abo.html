@@ -12,9 +12,17 @@
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/favicon.ico?v=112" sizes="any">
     <link rel="icon" href="/icons/smejj_favicon.svg?v=112" type="image/svg+xml">
+    <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
+    <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
     <link rel="stylesheet" href="/assets/static-pages.css">
-  </head>
+  <!-- Klickjacking-Schutz. MUSS mit, weil GitHub Pages keine eigenen Kopfzeilen
+     setzen kann und frame-ancestors in einer meta-CSP wirkungslos ist. Auf dem
+     Control-Server faengt stattdessen dessen Kopfzeile x-frame-options: DENY.
+     Befund 2026-08-14: das Modul gab es laengst, hing aber nur an 3 von 12
+     Seiten — der Adminbereich war NICHT dabei. -->
+<script type="module" src="/frame-guard.js?v=1"></script>
+</head>
   <body>
     <main>
       <a class="legal-brand" href="/" aria-label="smejj.com Startseite">
