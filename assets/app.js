@@ -6,7 +6,7 @@ import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js"
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=chat-markdown-20260717";
 import { initComposerTools } from "./composer-tools.js?v=werkzeuge-1";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=1";
-import { initGlobalSearch } from "./search.js?v=b47";
+import { initGlobalSearch } from "./search.js?v=b38";
 import { openSearchOverlay } from "./search-overlay.js?v=b47";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=b45";
