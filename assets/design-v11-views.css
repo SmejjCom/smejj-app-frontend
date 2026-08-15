@@ -112,13 +112,32 @@
 
 /* Die EINE Hauptaktion je Werkzeugleiste. Kante und Schrift in Cyan, aber
    keine Fuellung — gefuellt liest sich wie "hier musst du klicken", und das
-   stimmt bei einer Werkzeugleiste mit neun Knoepfen nie. */
-.view.premium-view .toolbar > button:first-child {
+   stimmt bei einer Werkzeugleiste mit neun Knoepfen nie.
+   Betreiber-Regel dahinter (2026-08-14): "Farbe nur wo sie BEDEUTET;
+   aktiv = Kante statt Fuellung."
+   Die ID-Liste unten spiegelt design-cyan-views.css: dort stehen dieselben
+   sechs Knoepfe mit Doppel-ID-Selektor (1,2,0) und voller Cyan-FUELLUNG.
+   Eine Klassenregel verliert dagegen immer — live gemessen am 2026-08-15:
+   trotz Fundament blieben "Projekt erstellen" und "Projekt speichern"
+   gefuellt. Darum hier dieselben Selektoren, eine Position spaeter. */
+.view.premium-view .toolbar > button:first-child,
+#projects #projectCreate,
+#projects #projectSave,
+#search #searchSubmit,
+#settings #saveSettings,
+#profile #saveProfile,
+#files #storageAgain {
   background: var(--v11-cy-fill);
   color: var(--v11-cy);
   box-shadow: inset 0 0 0 1px var(--v11-cy-line-on);
 }
-.view.premium-view .toolbar > button:first-child:hover {
+.view.premium-view .toolbar > button:first-child:hover,
+#projects #projectCreate:hover,
+#projects #projectSave:hover,
+#search #searchSubmit:hover,
+#settings #saveSettings:hover,
+#profile #saveProfile:hover,
+#files #storageAgain:hover {
   background: rgba(50, 246, 234, 0.17);
   color: var(--v11-cy);
   box-shadow: inset 0 0 0 1px var(--v11-cy), 0 0 18px var(--v11-cy-glow);
