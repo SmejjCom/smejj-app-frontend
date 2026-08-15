@@ -85,6 +85,13 @@ export function initCodeFlaeche() {
       senden();
     }
   });
+  // Anhang und Diktat (Bildschirm 18): dieselben echten Wege wie am Start.
+  document.getElementById("codeAnhang")?.addEventListener("click", () => {
+    document.getElementById("composerFileInput")?.click();
+  });
+  document.getElementById("codeDiktat")?.addEventListener("click", () => {
+    document.querySelector('[data-start-tool="voice"]')?.click();
+  });
   document.getElementById("codeStufeChip")?.addEventListener("click", () => {
     const naechste = STUFEN[(STUFEN.indexOf(stufe()) + 1) % STUFEN.length];
     document.querySelector(`[data-stufe="${naechste}"]`)?.click();

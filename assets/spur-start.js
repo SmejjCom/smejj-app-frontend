@@ -19,6 +19,7 @@
 // und oeffnen per openChat — keine Attrappen.
 
 import { listChats, openChat, newChat } from "/assets/chat-store.js?v=pin-20260806";
+import { merkmaleVon } from "/assets/chat-history-text.js?v=b47";
 import { Icons } from "/assets/components.js?v=chat-markdown-20260717";
 
 const START_ANSICHTEN = new Set(["start", "code"]);
@@ -82,6 +83,44 @@ async function zeichneStartSpur(halter) {
     reiter.append(r);
   }
   halter.append(reiter);
+
+  const codeAktiv = document.querySelector("#code")?.classList.contains("is-active");
+  if (codeAktiv) {
+    // Bildschirm 18: die Code-Spur hat EIGENE Punkte. "Neuer Auftrag"
+    // fokussiert das Auftragsfeld; "Nach Zeitplan" ist der echte Nachtbau —
+    // er wohnt unter Auftraege. Ohne erfundene Abzeichen und Uhrzeiten.
+    halter.append(punkt({ icon: "plus", text: "Neuer Auftrag", kuerzel: "⌘K", aktiv: true, aktion: () => {
+      const feld = document.getElementById("codeAufgabe");
+      if (feld) { feld.value = ""; feld.focus(); }
+    } }));
+    halter.append(punkt({ icon: "projects", text: "Meine Projekte", aktion: () => geheZu("projects") }));
+    halter.append(punkt({ icon: "automation", text: "Nach Zeitplan", aktion: () => geheZu("automation") }));
+    halter.append(punkt({ icon: "settings", text: "Regeln", aktion: () => geheZu("settings") }));
+    halter.append(punkt({ icon: "system", text: "Mehr", aktion: () => geheZu("settings") }));
+    let chats = [];
+    try { chats = await listChats(); } catch { /* Spur bleibt nutzbar */ }
+    const code = chats
+      .filter((chat) => chat?.updatedAt && merkmaleVon(chat).code)
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      .slice(0, 3);
+    if (code.length) {
+      const kopf = document.createElement("div");
+      kopf.className = "nav-gruppe";
+      kopf.setAttribute("aria-hidden", "true");
+      kopf.textContent = "Zuletzt verwendet";
+      halter.append(kopf);
+      for (const chat of code) {
+        const eintrag = document.createElement("button");
+        eintrag.type = "button";
+        eintrag.className = "nav-button spur-chat";
+        eintrag.title = chat.title || "Unterhaltung";
+        eintrag.textContent = chat.title || "Unterhaltung";
+        eintrag.addEventListener("click", () => { openChat(chat.id); geheZu("start"); });
+        halter.append(eintrag);
+      }
+    }
+    return;
+  }
 
   const startAktiv = document.querySelector("#start")?.classList.contains("is-active");
   halter.append(punkt({ icon: "plus", text: "Neuer Chat", kuerzel: "⌘K", aktiv: startAktiv, aktion: () => { newChat(); geheZu("start"); } }));

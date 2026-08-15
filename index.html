@@ -422,7 +422,7 @@
                Liste: keine verifizierte Funktion entfernen). Verdrahtung in
                code-flaeche.js; ohne das Modul bleibt alles bedienbar. -->
           <div class="codeflaeche">
-            <div class="codegruss" id="codeGruss">Was steht als Nächstes an?</div>
+            <div class="codegruss"><svg class="codegruss-zeichen" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg><span id="codeGruss">Was steht als Nächstes an?</span></div>
             <div class="codeleer" aria-hidden="true"></div>
             <div class="codeunten">
               <div class="repozeile">
@@ -432,6 +432,8 @@
                 <textarea id="codeAufgabe" rows="2" placeholder="Beschreibe eine Aufgabe oder stelle eine Frage" aria-label="Code-Auftrag"></textarea>
                 <div class="codeleiste">
                   <button type="button" class="repochip" id="codeStufeChip" title="Antwortstufe wechseln">Automatisch</button>
+                  <button type="button" class="ghost-button icon-button code-mini" id="codeAnhang" aria-label="Datei anhängen" title="Datei anhängen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+                  <button type="button" class="ghost-button icon-button code-mini" id="codeDiktat" aria-label="Diktieren" title="Diktieren"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></button>
                   <div class="code-rechts">
                     <span id="codeModellAnzeige"><b>smejj 1.0</b></span>
                     <span id="codeTiefeAnzeige">Mittel</span>
@@ -805,8 +807,8 @@
     <script src="/assets/composer-sendetaste.js?v=v11-20260815" type="module"></script>
     <script src="/assets/nav-absichten.js?v=b32" type="module"></script>
     <script src="/assets/topbar-krume.js?v=b33" type="module"></script>
-    <script src="/assets/spur-start.js?v=b32" type="module"></script>
-    <script src="/assets/code-flaeche.js?v=1" type="module"></script>
+    <script src="/assets/spur-start.js?v=b33" type="module"></script>
+    <script src="/assets/code-flaeche.js?v=b33" type="module"></script>
     <script src="/assets/app.js?v=startseite-1" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>

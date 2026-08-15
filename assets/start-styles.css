@@ -5466,3 +5466,17 @@ body.spur-start-aktiv .nav-kosten { display: none; }
 @media (max-width: 1023px) {
   .top-hilfe { display: none; }
 }
+
+
+/* Bildschirm 18, Feinschliff: Gruss mit Zeichen, Mini-Knoepfe der Leiste */
+#code .codegruss { display: flex; align-items: center; gap: 11px; }
+#code .codegruss-zeichen {
+  width: 24px; height: 24px; flex: none;
+  fill: none; stroke: var(--v11-cy); stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+#code .code-mini {
+  width: 30px; height: 30px; min-height: 30px;
+  border-radius: 999px !important;
+}
+#code .code-mini svg { width: 16px; height: 16px; }
