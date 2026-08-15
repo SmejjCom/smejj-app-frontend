@@ -20,7 +20,7 @@ import "./quellen-panel.js?v=1";
 import { STORAGE_KEYS } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
 import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=1";
-import { initProfileDockMenu, renderProfileDockMenu } from "./profile-dock-menu.js?v=2";
+import { initProfileDockMenu, renderProfileDockMenu } from "./profile-dock-menu.js?v=b40";
 import { initUsageCapture } from "./usage-meter.js?v=1";
 
 // Buttons, nach deren Klick sich Name/Session aendern koennen (app.js schreibt

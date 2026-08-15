@@ -124,6 +124,12 @@ async function hydrateBillingStatus(view) {
 function renderBillingState(view, billing) {
   const panel = view.querySelector('[data-account-panel="billing"]');
   if (!panel) return;
+  // Bildschirm 41, die wichtigste Zeile der Kontoseite: "Bezahlt wurde mit".
+  // Genau daran ist das erste echte Abo unsichtbar geworden — bezahlt unter
+  // einer anderen Adresse als angemeldet. paidEmail kommt seit 2026-08-15 aus
+  // /api/billing/status (nur fuer den Kontoinhaber). Bestandsabos von vor dem
+  // Feld haben es nicht — dann erscheint die Zeile nicht.
+  renderZugang(panel, billing);
   const label = PLAN_LABELS[billing.plan];
   const aktiv = Boolean(label);
   const planName = panel.querySelector(".plan-name");
@@ -511,5 +517,5 @@ function dataAction(label, hint, id, text, danger = false) { return `<div class=
 // Versionsmarke: GitHub Pages liefert Assets mit max-age, ohne ?v= sieht der
 // Browser eine Aenderung erst nach Ablauf der Frist. Gleiche Konvention wie die
 // Stylesheet-Links in index.html. Bei jeder Aenderung an der CSS-Datei erhoehen.
-const STYLE_VERSION = "konto-glas-hell-20260726e";
+const STYLE_VERSION = "konto-zugang-b41";
 function loadStyles() { const href = `/assets/account-privacy.css?v=${STYLE_VERSION}`; if (document.querySelector(`link[href^="/assets/account-privacy.css"]`)) return; const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href; document.head.append(link); }

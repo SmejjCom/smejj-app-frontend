@@ -5484,3 +5484,24 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   fill: none; stroke: currentColor; stroke-width: 2.2;
   stroke-linecap: round; stroke-linejoin: round;
 }
+
+
+/* Bildschirm 40: Profilmenue — Wert rechts, Trennlinien statt Ueberschriften */
+.profile-dock-menu [role="menuitem"] {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+.profile-dock-menu .dock-wert {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: rgba(242, 245, 244, 0.55);
+  white-space: nowrap;
+}
+.profile-dock-menu .dock-strich {
+  height: 1px;
+  margin: 5px 10px;
+  background: var(--v11-hair);
+}
+.profile-dock-menu .profile-dock-menu-logout { color: var(--v11-bad); }
