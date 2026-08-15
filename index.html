@@ -146,6 +146,14 @@
           <button class="nav-button" type="button" data-view="storageView" data-icon="storage" title="Speicher">Speicher</button>
         </nav>
         <nav class="nav bottom-nav" aria-label="Nutzer und Einstellungen">
+          <!-- Mockup V11, Bildschirm 19, Fusszeile: "Unten steht, was es
+               kostet — zwei Aengste beantwortet, bevor sie entstehen."
+               Bewusste Abweichung vom Mockup-Beispiel "0,00 € · 13 Bilder
+               uebrig": ein Bilder-Kontingent gibt es nicht, und eine
+               erfundene Zahl waere eine Luege. Die Zeile sagt, was wahr ist
+               (der Kostenschutz startet nichts Kostenpflichtiges), und
+               fuehrt zur Kostenansicht mit den echten Zahlen. -->
+          <button class="nav-button nav-kosten" type="button" data-jump="cost" data-icon="cost" title="Kosten">Kostenschutz an</button>
           <div id="profileDock" class="profile-dock">
             <button id="profileDockButton" class="profile-dock-button" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="profileDockMenu" title="Profil" aria-label="Profil">
               <span id="profileDockFace" class="profile-avatar is-empty" aria-hidden="true"></span>
@@ -699,6 +707,7 @@
     <script src="/assets/start-chips.js?v=chips-i18n-20260813" type="module"></script>
     <script src="/assets/composer-sendetaste.js?v=v11-20260815" type="module"></script>
     <script src="/assets/nav-absichten.js?v=feld-direkt-2" type="module"></script>
+    <script src="/assets/topbar-krume.js?v=1" type="module"></script>
     <script src="/assets/app.js?v=stufen-chip-20260809" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>

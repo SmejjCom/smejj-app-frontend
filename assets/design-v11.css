@@ -287,3 +287,34 @@
 .nav .nav-gruppe:first-child {
   padding-top: 8px;
 }
+
+
+/* --- Fusszeile der Spur: Kosten immer sichtbar (Mockup Bildschirm 19) --- */
+.nav-kosten {
+  font-size: 13.5px;
+}
+.nav-kosten .button-icon {
+  color: var(--v11-ok);
+}
+
+/* --- Die Brotkrume oben (Mockup .crumb: 14.5px, gedaempft) -------------- */
+.top-krume {
+  position: fixed;
+  top: 18px;
+  /* rechts neben dem Wortzeichen; das Logo ist ~150 px breit plus Rand */
+  left: 210px;
+  z-index: 30;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #f2f5f4;
+  pointer-events: none;
+}
+.top-krume::before {
+  content: "/";
+  margin-right: 10px;
+  font-weight: 400;
+  color: rgba(242, 245, 244, 0.45);
+}
+@media (max-width: 720px) {
+  .top-krume { display: none; }
+}
