@@ -15,6 +15,7 @@
 // solange die Vorschau laeuft.
 
 let strom = null;
+let liveAn = false;
 
 function ansage(text) {
   try {
@@ -31,6 +32,28 @@ function schliesse() {
     strom = null;
   }
   document.getElementById("kameraOverlay")?.remove();
+}
+
+// Stufe 2 (Bildschirm 35): die Vorschau dockt klein unten rechts an, und bei
+// JEDEM Senden geht automatisch ein frisches Bild mit — aufgenommen genau im
+// Moment des Sendens. Kein Dauer-Upload, ein Bild je Frage.
+function starteLive(overlay) {
+  liveAn = true;
+  overlay.classList.add("ist-live");
+  ansage("smejj schaut jetzt live mit. Bei jeder Frage geht ein frisches Bild mit.");
+  const hinweis = overlay.querySelector(".kamera-hinweis");
+  if (hinweis) hinweis.textContent = "Live: bei jedem Senden geht automatisch ein frisches Bild mit — aufgenommen genau in dem Moment. Beenden stoppt alles.";
+}
+
+// Ein Bild aus der laufenden Vorschau — genau jetzt.
+function bildJetzt() {
+  const video = document.querySelector("#kameraOverlay video");
+  if (!video) return Promise.resolve(null);
+  const leinwand = document.createElement("canvas");
+  leinwand.width = video.videoWidth || 1280;
+  leinwand.height = video.videoHeight || 720;
+  leinwand.getContext("2d").drawImage(video, 0, 0);
+  return new Promise((r) => leinwand.toBlob(r, "image/jpeg", 0.9));
 }
 
 async function oeffne(art) {
@@ -107,6 +130,34 @@ export function initKamera() {
     if (!knopf) return;
     void oeffne(knopf.dataset.kameraStart);
   });
+
+  // Stufe 2: laeuft "Live mitschauen", faengt dieser Lauscher das Senden ab
+  // (capture-Phase, VOR dem App-Handler), haengt ein frisches Bild an und
+  // loest das Senden dann selbst wieder aus. Der Durchlauf-Merker verhindert
+  // die Endlosschleife beim zweiten Klick.
+  document.addEventListener("click", async (ereignis) => {
+    const knopf = ereignis.target.closest("#startSend");
+    if (!knopf || !liveAn || !strom) return;
+    if (knopf.dataset.kameraDurchlauf === "an") { delete knopf.dataset.kameraDurchlauf; return; }
+    const feld = document.getElementById("startMessage");
+    if (!feld || !feld.value.trim()) return;
+    ereignis.preventDefault();
+    ereignis.stopImmediatePropagation();
+    const blob = await bildJetzt();
+    if (blob) {
+      const eingabe = document.getElementById("composerPhotoInput");
+      if (eingabe) {
+        const ablage = new DataTransfer();
+        ablage.items.add(new File([blob], "kamera-live.jpg", { type: "image/jpeg" }));
+        eingabe.files = ablage.files;
+        eingabe.dispatchEvent(new Event("change", { bubbles: true }));
+        // Der Anhang-Weg braucht einen Moment, bis das Bild am Entwurf haengt.
+        await new Promise((r) => setTimeout(r, 700));
+      }
+    }
+    knopf.dataset.kameraDurchlauf = "an";
+    knopf.click();
+  }, true);
   return true;
 }
 
