@@ -118,12 +118,32 @@
     <main class="shell">
       <aside class="sidebar">
         <nav class="nav" aria-label="Arbeitsbereiche">
-          <button class="nav-button is-active" type="button" data-view="start" data-icon="plus" title="Neu">Neu</button>
-          <button class="nav-button icon-only-nav" type="button" data-view="search" data-icon="search" title="Suche" aria-label="Suche">Suche</button>
+          <!-- Seitenleiste 1:1 nach Mockup V11, Bildschirm 19 ("Alle Bereiche
+               in der Spur — in vier beschrifteten Gruppen"). Der Trick heisst
+               Gruppieren, nicht Verstecken: vier Ueberschriften machen 15
+               Punkte uebersichtlicher als 5 Punkte plus Raetselmenue. Jede
+               Zeile hat Symbol UND Wort. Abweichungen vom Mockup, ehrlich:
+               "Papierkorb" fehlt (die Ansicht existiert noch nicht) — dafuer
+               bleibt "Dateien" erreichbar; "Bilder erstellen" und "Sprechen"
+               springen zum Chat und loesen dort die vorhandene Funktion aus
+               (nav-absichten.js), weil es keine eigenen Ansichten dafuer gibt. -->
+          <div class="nav-gruppe" aria-hidden="true">Reden</div>
+          <button class="nav-button is-active" type="button" data-view="start" data-icon="chat" title="Chat">Chat</button>
+          <button class="nav-button" type="button" data-view="start" data-icon="mic" data-nav-absicht="sprechen" title="Sprechen">Sprechen</button>
+          <div class="nav-gruppe" aria-hidden="true">Arbeiten</div>
+          <button class="nav-button" type="button" data-view="search" data-icon="search" title="Im Netz suchen">Im Netz suchen</button>
+          <button class="nav-button" type="button" data-view="start" data-icon="image" data-nav-absicht="bilder" title="Bilder erstellen">Bilder erstellen</button>
           <button class="nav-button" type="button" data-view="code" data-icon="code" title="Programmieren">Programmieren</button>
-          <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="Meine Sachen">Meine Sachen</button>
-          <button class="nav-button" type="button" data-view="files" data-icon="files" title="Dateien">Dateien</button>
+          <button class="nav-button" type="button" data-view="websites" data-icon="websites" title="Browser bedienen">Browser bedienen</button>
+          <button class="nav-button" type="button" data-view="automation" data-icon="automation" title="Aufträge">Aufträge</button>
+          <div class="nav-gruppe" aria-hidden="true">Meine Sachen</div>
           <button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Verlauf">Verlauf</button>
+          <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="Meine Dateien">Meine Dateien</button>
+          <button class="nav-button" type="button" data-view="files" data-icon="files" title="Dateien">Dateien</button>
+          <div class="nav-gruppe" aria-hidden="true">Betrieb</div>
+          <button class="nav-button" type="button" data-view="tools" data-icon="system" title="Systemzustand">Systemzustand</button>
+          <button class="nav-button" type="button" data-view="ai" data-icon="model" title="KI-Modelle">KI-Modelle</button>
+          <button class="nav-button" type="button" data-view="storageView" data-icon="storage" title="Speicher">Speicher</button>
         </nav>
         <nav class="nav bottom-nav" aria-label="Nutzer und Einstellungen">
           <div id="profileDock" class="profile-dock">

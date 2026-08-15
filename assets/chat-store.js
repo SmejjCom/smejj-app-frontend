@@ -592,7 +592,10 @@ async function restoreOnBoot() {
 
 function bindNewChatButton() {
   document.addEventListener("click", (event) => {
-    const button = event.target.closest('.nav-button[data-view="start"][data-icon="plus"]');
+    // Seit der Vier-Gruppen-Spur (Mockup V11, Bildschirm 19) heisst der Knopf
+    // "Chat" und traegt das Chat-Symbol; das Plus-Icon bleibt als Altform
+    // erkannt, falls eine zwischengespeicherte Huelle noch die alte Leiste hat.
+    const button = event.target.closest('.nav-button[data-view="start"][data-icon="chat"], .nav-button[data-view="start"][data-icon="plus"]');
     if (button) newChat();
   }, true);
 }

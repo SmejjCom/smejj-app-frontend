@@ -4927,3 +4927,22 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
     font-size: 14px;
   }
 }
+
+
+/* --- Die Vier-Gruppen-Spur (Mockup V11, Bildschirm 19) ------------------
+ * Werte 1:1 aus dem Mockup-Endstand (.gruppe): 11 px Versalien mit weitem
+ * Abstand. Das ist eine BEWUSSTE Ausnahme von der 15-px-Untergrenze oben:
+ * die Beschriftung ist eine Gruppen-Ueberschrift, kein Inhalt — im Mockup
+ * hat der Betreiber genau diese Anmutung abgenommen. */
+.nav-gruppe {
+  padding: 16px 14px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(242, 245, 244, 0.58);
+  user-select: none;
+}
+.nav .nav-gruppe:first-child {
+  padding-top: 8px;
+}
