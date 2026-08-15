@@ -303,16 +303,44 @@
       + '<div class="nt">Serverseitig durchgesetzt, nicht im Browser</div>'
       + '<div class="ns">Diese Liste zeigt nur, was der Server ohnehin erzwingt. Die Rolle wird bei '
       + 'jeder Anfrage frisch aus dem Nutzer-Store gelesen — nie aus dem Sitzungs-Token.'
-      + (d.actor && d.actor.roleSource === "bootstrap"
-        ? ' Diese Rolle stammt aus <span class="mono">SMEJJ_ADMIN_OWNER_EMAILS</span>, nicht aus dem Konto.'
-        : "")
       + '</div></div></div>';
 
     return kopf("C", "Rollen", "Deine Rechte",
       "Was dein Konto in dieser Konsole darf — und was zusätzlich eine zweite Freigabe oder eine Einwilligung braucht.")
-      + '<div class="stack">' + hinweis
+      + '<div class="stack">' + hinweis + herkunftDerRolle(d.actor || {})
       + panel("Berechtigungen", "Rolle: " + ((d.actor || {}).role || "—"),
         tabelle(["Berechtigung", "Stufe"], zeilen)) + '</div>';
+  }
+
+  /**
+   * Woher die eigenen Rechte kommen — und was passiert, wenn diese Quelle wegfällt.
+   *
+   * BEFUND 2026-08-14: Am selben Tag hat ein einziger fehlerhafter Aufruf die
+   * Zeabur-Umgebung von smejj-control ersetzt. `SMEJJ_ADMIN_OWNER_EMAILS` war
+   * weg — und mit ihr der gesamte Adminzugang, denn im Konto des Betreibers
+   * steht als Rolle nur `user`. Der alte Hinweis erwähnte die Variable zwar,
+   * aber in einem Nebensatz und ohne die Folge zu nennen.
+   *
+   * Hier steht jetzt beides: die Herkunft UND was ihr Verlust bedeutet.
+   * Bewusst kein Knopf daneben: eine Rollenvergabe ist eine Rechteausweitung
+   * und braucht nach `adminRoles.js` für JEDE Rolle eine zweite Person —
+   * auch für den Owner. Wer sich hier selbst eintragen könnte, hätte das
+   * Vier-Augen-Prinzip mit einem Klick ausgehebelt.
+   */
+  function herkunftDerRolle(actor) {
+    if (actor.roleSource !== "bootstrap") return "";
+    const gespeichert = actor.storedRole || "user";
+    return '<div class="note glass"><div class="nx">!</div><div>'
+      + '<div class="nt">Deine Rechte hängen an einer einzelnen Umgebungsvariablen</div>'
+      + '<div class="ns">Du bist <b>' + e(actor.role || "owner") + '</b>, weil deine Adresse in '
+      + '<span class="mono">SMEJJ_ADMIN_OWNER_EMAILS</span> steht. In deinem Konto ist als Rolle '
+      + 'nur <span class="mono">' + e(gespeichert) + '</span> hinterlegt. Geht die Variable verloren, '
+      + 'ist die Konsole für alle zu — genau das ist am 14.08.2026 passiert. '
+      + 'Wiederherstellen: <span class="mono">control_umgebung_wiederherstellen.mjs</span>; '
+      + 'der Wert liegt dafür in <span class="mono">env.local</span> bereit. '
+      + 'Eine dauerhafte Rolle im Konto kann dir nur eine zweite Person geben — '
+      + 'Rollenvergabe ist Vier-Augen, auch für dich.'
+      + '</div></div></div>';
   }
 
   // ---- N · EU AI Act ----------------------------------------------------------
