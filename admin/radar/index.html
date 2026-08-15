@@ -14,6 +14,10 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://smejj-control.zeabur.app; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <title>smejj.com — Operations Console</title>
 <link rel="stylesheet" href="/admin/console.css">
+<!-- Tuersteher: verbirgt die Huelle und leitet Abgemeldete zur Anmeldung.
+     MUSS im <head> stehen und ohne defer laden, sonst blitzt der Adminbereich
+     kurz auf, bevor umgeleitet wird. Siehe gate.js fuer den Befund. -->
+<script src="/admin/gate.js"></script>
 </head>
 <body>
 <div class="shell">

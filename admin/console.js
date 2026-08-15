@@ -481,14 +481,63 @@
     return zeigeUebersicht();
   }
 
+  // Spiegel zu public/admin/console.js. Hier liegt gate.js NICHT daneben:
+  // adminUiRoutes.js prueft schon vor dem Ausliefern und gibt ohne Adminrolle
+  // keine Datei heraus. Der Fallback macht die Zeilen damit wirkungslos — sie
+  // stehen trotzdem hier, damit die beiden Kopien nicht auseinanderlaufen.
+  const GATE = window.smejjAdminGate || { freigeben: function () {}, abweisen: function () {} };
+  const KEIN_ADMIN = ["admin_role_required", "admin_account_not_active"];
+
   async function start() {
     schreibeNav(STARTSEITE);
     laedt("Anmeldung wird geprüft …");
     const antwort = await A.ich();
     if (!antwort.ok) {
-      seite.innerHTML = V.fehlerblock(antwort.fehler);
+      // Der Server hat nicht JA gesagt — also bleibt die Huelle weg. Sie
+      // verraet sonst jedem, der die Adresse kennt, welche Module es gibt und
+      // wie sie heissen (Befund 2026-08-14).
+      //
+      // WICHTIG, zweiter Befund desselben Tages: der erste Entwurf gab die
+      // Huelle bei jeder unklaren Antwort frei (Netz, CORS, 5xx) — damit war
+      // die Luecke sofort wieder offen, denn "der Server antwortet nicht" ist
+      // der Zustand, den ein Angreifer am leichtesten herstellt. Im Browser
+      // gemessen und behoben: sichtbar wird die Konsole AUSSCHLIESSLICH nach
+      // einem bestaetigten Akteur.
+      if (antwort.status === 401) {
+        location.replace(GATE.anmeldeAdresse ? GATE.anmeldeAdresse("abgelaufen=1") : "/auth/login/");
+        return;
+      }
+      // Nur diese beiden 403 heissen "du bist kein Admin" — sie sind die
+      // einzigen, die adminAuth.js VOR der Rollenpruefung vergeben kann.
+      // Alle anderen 403 (Adresse noch nicht bestaetigt, Step-up noetig)
+      // treffen jemanden, der SEHR WOHL Admin ist und die Konsole braucht,
+      // um genau das zu erledigen.
+      if (antwort.status === 403) {
+        if (KEIN_ADMIN.indexOf((antwort.data || {}).error) >= 0) {
+          GATE.abweisen(antwort.fehler || "Dieser Bereich ist der Betreiberverwaltung vorbehalten.");
+          return;
+        }
+        // Ein anderer 403 heisst: Adminrolle JA, aber ein Schritt fehlt noch
+        // (Adresse bestaetigen, zweiter Faktor). Genau dafuer braucht dieser
+        // Mensch die Konsole — adminUiRoutes.js laesst ihn deshalb ausdruecklich
+        // herein ("erlaubeUnbestaetigt"). Huelle zeigen, Grund darin nennen.
+        GATE.freigeben();
+        seite.innerHTML = V.fehlerblock(antwort.fehler);
+        return;
+      }
+      // Alles Uebrige: der Grund im Klartext und ein Knopf zum Wiederholen.
+      // Der Betreiber verliert dabei nichts — ohne Serverantwort stuende in
+      // der Huelle ohnehin keine einzige Zeile Inhalt.
+      GATE.abweisen({
+        titel: "Konsole nicht erreichbar",
+        text: antwort.fehler || "Der Control-Server hat nicht geantwortet.",
+        neuLaden: true
+      });
       return;
     }
+    // Ab hier ist der Akteur vom SERVER bestaetigt — erst jetzt darf die
+    // Konsole ueberhaupt sichtbar werden.
+    GATE.freigeben();
     zustand.akteur = antwort.data.actor || {};
     // Damit der Sicherheitsdialog sagen kann, WOHIN der Code ging, statt nur
     // "deine Admin-E-Mail-Adresse". Beim allerersten Aufruf einer noch nicht
