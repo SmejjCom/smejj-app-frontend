@@ -12,11 +12,6 @@
 
   let daten = null;
   let auswahl = null;
-  // Welches Register offen ist. null heisst "noch nichts gewaehlt" — dann
-  // entscheidet die Ansicht selbst und schlaegt bei einem Ausfall das Register
-  // "Braucht dich" auf. Ab dem ersten Klick gilt die Wahl des Betreibers, auch
-  // wenn zwischendurch neu geladen wird.
-  let register = null;
 
   async function laden(ctx) {
     const antwort = await A.hole("/api/admin/ops/autopiloten");
@@ -30,20 +25,10 @@
   }
 
   function zeichne(ctx) {
-    ctx.zeichne(S.autopiloten(daten, auswahl, register));
+    ctx.zeichne(S.autopiloten(daten, auswahl));
     document.querySelectorAll("[data-ap]").forEach(function (el) {
       el.addEventListener("click", function () {
         auswahl = el.getAttribute("data-ap");
-        zeichne(ctx);
-      });
-    });
-    // Register wechseln. Die Auswahl wird bewusst NICHT zurueckgesetzt: wer im
-    // Register "Braucht dich" einen Autopiloten offen hat und auf "Alle"
-    // wechselt, soll denselben weiter vor sich haben. Faellt er aus dem neuen
-    // Register heraus, springt die Ansicht von allein auf den ersten sichtbaren.
-    document.querySelectorAll("[data-apReg]").forEach(function (el) {
-      el.addEventListener("click", function () {
-        register = el.getAttribute("data-apReg");
         zeichne(ctx);
       });
     });

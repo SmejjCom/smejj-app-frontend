@@ -19,7 +19,14 @@
     }
 
     const zeilen = (d.abos || []).map(function (a) {
-      return "<tr><td>" + (a.konto ? "<b>" + e(a.konto) + "</b>" : '<span class="s">nicht zugeordnet</span>')
+      // "nicht zugeordnet" allein ist eine Sackgasse: der Kunde hat bezahlt und
+      // sieht in der App "Free", und die Betreiberin weiss nicht, wen sie
+      // anschreiben soll. Steht die zahlende Adresse daneben, ist der naechste
+      // Schritt sofort klar (Befund 2026-08-14, erstes echtes Abo).
+      return "<tr><td>" + (a.konto
+        ? "<b>" + e(a.konto) + "</b>"
+        : '<span class="s">nicht zugeordnet</span>'
+          + (a.zahlendeAdresse ? '<br><b>zahlt als ' + e(a.zahlendeAdresse) + "</b>" : ""))
         + '<br><span class="s mono">' + e(a.kundenId) + "</span></td>"
         + "<td>" + (a.plan ? pille(a.plan, "dim") : "—") + "</td>"
         + "<td>" + zustandPille(a) + "</td>"

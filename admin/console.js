@@ -32,8 +32,6 @@
     (window.adminStage7 || {}).seiten || {},
     (window.adminStage8 || {}).seiten || {},
     (window.adminStage9 || {}).seiten || {},
-    (window.adminStageCockpit || {}).seiten || {},
-    (window.adminStage10 || {}).seiten || {},
     (window.adminStage11 || {}).seiten || {}
   );
   Object.keys(ANGEMELDET).forEach(function (pfad) {
@@ -72,16 +70,9 @@
   // Notfall weiter bedienbar ist, ohne die (gesperrte) Auslieferung anzufassen.
   const PFAD_MODUS = /(^|\.)smejj\.com$/.test(location.hostname);
 
-  // Welche Seite unter der nackten Adresse /admin/ liegt. Seit 2026-08-14 das
-  // Cockpit: es beantwortet in einem Satz, ob gerade etwas zu tun ist. Vorher
-  // lag dort die Uebersicht — die zeigt Zahlen, aber sie sagt einem nicht, ob
-  // man sie lesen muss. Die Uebersicht bleibt erreichbar unter
-  // /admin/uebersicht/ (der Ordner existiert im Frontend-Repo).
-  const STARTSEITE = "cockpit";
-
   function seitenLink(pfad) {
     if (!PFAD_MODUS) return "#" + pfad;
-    return pfad === STARTSEITE ? "/admin/" : "/admin/" + pfad + "/";
+    return pfad === "uebersicht" ? "/admin/" : "/admin/" + pfad + "/";
   }
 
   /** Wohin navigieren — im Pfad-Modus als echte Navigation, sonst per Hash. */
@@ -99,12 +90,12 @@
 
   /** Das Ziel aus der Adresse lesen — Pfad zuerst, alte #-Links bleiben gueltig. */
   function aktuellerPfad() {
-    if (!PFAD_MODUS) return (location.hash || ("#" + STARTSEITE)).replace(/^#/, "");
+    if (!PFAD_MODUS) return (location.hash || "#uebersicht").replace(/^#/, "");
     const akte = new URLSearchParams(location.search).get("akte");
     if (akte) return "akte/" + akte;
     const teil = location.pathname.replace(/^\/admin\/?/, "").replace(/\/$/, "");
     if (teil) return teil;
-    return (location.hash || ("#" + STARTSEITE)).replace(/^#/, "");
+    return (location.hash || "#uebersicht").replace(/^#/, "");
   }
 
   function schreibeNav(aktiv) {
@@ -463,9 +454,7 @@
       setzeKopf("Nutzerakte");
       return zeigeAkte(decodeURIComponent(ziel.slice("akte/".length)));
     }
-    const treffer = SEITEN.filter(function (s) { return s.pfad === ziel; })[0]
-      || SEITEN.filter(function (s) { return s.pfad === STARTSEITE; })[0]
-      || SEITEN[0];
+    const treffer = SEITEN.filter(function (s) { return s.pfad === ziel; })[0] || SEITEN[0];
     schreibeNav(treffer.pfad);
     setzeKopf(treffer.name);
     if (treffer.pfad === "nutzer") return zeigeNutzer();
@@ -489,7 +478,7 @@
   const KEIN_ADMIN = ["admin_role_required", "admin_account_not_active"];
 
   async function start() {
-    schreibeNav(STARTSEITE);
+    schreibeNav("uebersicht");
     laedt("Anmeldung wird geprüft …");
     const antwort = await A.ich();
     if (!antwort.ok) {

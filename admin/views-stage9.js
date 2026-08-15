@@ -28,20 +28,6 @@
     return pille(a.text, a.ton);
   }
 
-  /**
-   * Die laufende Nummer vor dem Namen — klein und leise.
-   *
-   * Sie stand bis 2026-08-14 IM Namen ("24. Autonomous Multi-File
-   * Repo-Architect Autopilot") und schob damit das Wort, das etwas sagt, aus
-   * der schmalen Spalte heraus. Sie ganz wegzunehmen war zu viel des Guten:
-   * der Betreiber verstaendigt sich ueber sie ("schau dir mal Autopilot 06
-   * an"). Also beides — Nummer als eigenes, ruhiges Element, Name als
-   * Hauptsache.
-   */
-  function nummer(a) {
-    return a.nummer ? '<span class="ap-nr">' + e(a.nummer) + "</span>" : "";
-  }
-
   function punkt(farbe) {
     return '<span class="ap-dot ' + e(farbe) + '"></span>';
   }
@@ -198,83 +184,11 @@
       V.tabelleBlock(["Autopilot", "Art", "Von", "Bis", "Dauer", "Grund"], zeilen));
   }
 
-  // ---------- Register: welche Automatiken sehe ich gerade? (2026-08-14) ----------
-  //
-  // Dreissig Zeilen untereinander sind eine Liste, keine Uebersicht. Wer die
-  // Seite oeffnet, will EINE Sache wissen: muss ich jetzt etwas tun? Die
-  // Register beantworten genau das, bevor man ueberhaupt liest.
-  //
-  // Wortwahl mit Absicht: das dritte Register heisst "Still", NICHT "Schläft".
-  // Grau bedeutet in diesem Haus "keine Messung" — bei einer Montags-Automatik
-  // ist das normal, bei einer stuendlichen waere es ein Befund. "Schläft" wuerde
-  // beides zu "alles gut" verklaeren, und das ist genau die Sorte Beschoenigung,
-  // die die Ampel hier nirgends macht.
-  const REGISTER = [
-    {
-      id: "achtung", name: "Braucht dich",
-      passt: function (a) { return a.ampel === "rot" || a.ampel === "gelb"; },
-      leer: "Niemand braucht dich gerade. Kein Ausfall, keine Verspätung."
-    },
-    {
-      id: "arbeit", name: "Arbeitet",
-      passt: function (a) { return a.ampel === "gruen"; },
-      leer: "Gerade arbeitet keine Automatik nachweislich — es liegt für keine ein frischer Herzschlag vor."
-    },
-    {
-      id: "still", name: "Still",
-      passt: function (a) { return a.ampel === "grau"; },
-      leer: "Von jeder Automatik liegt eine Messung vor. Keine ist stumm."
-    },
-    {
-      // Erscheint nur, wenn wirklich jemand stummgeschaltet ist — ein Register
-      // mit dauerhafter Null waere ein Knopf, der nie etwas tut.
-      id: "wartung", name: "In Wartung", nurWennVorhanden: true,
-      passt: function (a) { return a.ampel === "wartung"; },
-      leer: "Keine Automatik ist stummgeschaltet."
-    },
-    {
-      id: "alle", name: "Alle",
-      passt: function () { return true; },
-      leer: "Es ist keine einzige Automatik eingetragen."
-    }
-  ];
-
-  function registerFuer(id) {
-    return REGISTER.filter(function (r) { return r.id === id; })[0] || null;
-  }
-
-  /** Die Register, die gerade gezeigt werden — ohne die dauerhaft leeren. */
-  function registerListe(alle) {
-    return REGISTER.filter(function (r) {
-      return !r.nurWennVorhanden || alle.some(r.passt);
-    });
-  }
-
-  /**
-   * Welches Register ist offen, wenn noch keins gewaehlt wurde?
-   * Antwort: das mit dem Problem. Wer die Seite aufschlaegt und einen Ausfall
-   * hat, soll ihn sehen und nicht erst danach suchen muessen.
-   */
-  function standardRegister(alle) {
-    return alle.some(registerFuer("achtung").passt) ? "achtung" : "alle";
-  }
-
-  function registerLeiste(alle, aktivId) {
-    return '<div class="ap-register">' + registerListe(alle).map(function (r) {
-      const anzahl = alle.filter(r.passt).length;
-      const dringend = r.id === "achtung" && anzahl > 0;
-      return '<span class="ap-reg' + (r.id === aktivId ? " on" : "") + (dringend ? " warn" : "")
-        + '" data-apReg="' + e(r.id) + '">' + e(r.name)
-        + '<b class="n">' + anzahl + "</b></span>";
-    }).join("") + "</div>";
-  }
-
   function liste(autopiloten, auswahlId) {
-    if (!autopiloten.length) return "";
     return '<div class="ap-liste">' + autopiloten.map(function (a) {
       return '<a class="ap-item' + (a.id === auswahlId ? " on" : "") + '" data-ap="' + e(a.id) + '">'
         + punkt(a.ampel)
-        + '<span class="t"><b>' + nummer(a) + e(a.name) + "</b>"
+        + '<span class="t"><b>' + e(a.name) + "</b>"
         + '<span class="h">' + e(heuteSatz(a)) + "</span>"
         + "<span>" + e(a.ort) + " · " + e(a.zeitplan) + "</span></span></a>";
     }).join("") + "</div>";
@@ -288,16 +202,10 @@
       + '<div class="nt">Warum diese Ampel?</div>'
       + '<div class="ns">' + e(a.ampelGrund || "") + "</div></div></div>";
 
-    // Nummer und technischer Name stehen hier unten, nicht in der Ueberschrift:
-    // oben soll stehen, was das Ding TUT. Wer sie braucht — fuer eine Notiz,
-    // ein Zettel-Verweis, eine Fehlersuche im Log — findet sie hier.
     const steckbrief = V.tabelleBlock(["", ""], [
       "<tr><td><b>Wo läuft er?</b></td><td>" + e(a.ort) + "</td></tr>",
       "<tr><td><b>Wann läuft er?</b></td><td>" + e(a.zeitplan) + "</td></tr>",
-      "<tr><td><b>Letzter Lauf</b></td><td>" + e(letzterLaufText(a)) + "</td></tr>",
-      "<tr><td><b>Nummer und Kennung</b></td><td><span class=\"s\">"
-        + (a.nummer ? "Autopilot " + e(a.nummer) + " · " : "")
-        + "<code>" + e(a.id) + "</code></span></td></tr>"
+      "<tr><td><b>Letzter Lauf</b></td><td>" + e(letzterLaufText(a)) + "</td></tr>"
     ]);
 
     const funktionen = "<ul class=\"ap-funktionen\">"
@@ -333,7 +241,7 @@
     });
 
     return '<div class="ap-detail">'
-      + '<div class="ap-detail-kopf">' + punkt(a.ampel) + "<h2>" + nummer(a) + e(a.name) + "</h2>" + ampelPille(a.ampel) + "</div>"
+      + '<div class="ap-detail-kopf">' + punkt(a.ampel) + "<h2>" + e(a.name) + "</h2>" + ampelPille(a.ampel) + "</div>"
       + '<p class="ap-kurz">' + e(a.kurz) + "</p>"
       + grund
       + heuteBlock(a)
@@ -348,20 +256,9 @@
       + "</div>";
   }
 
-  function autopiloten(d, auswahlId, registerId) {
+  function autopiloten(d, auswahlId) {
     const alle = d.autopiloten || [];
-    // Das Register entscheidet, WAS in der Liste steht; die Auswahl wird
-    // danach INNERHALB des Registers aufgeloest. Sonst zeigte die Liste das
-    // eine und die Akte daneben ein anderes — der haeufigste Weg, wie eine
-    // Master-Detail-Ansicht luegt.
-    // Nur ein Register waehlen, das gerade auch als Reiter dasteht: wird der
-    // letzte Wartungsfall beendet, waehrend das Register offen ist, stuende
-    // sonst eine leere Liste ohne hervorgehobenen Reiter da.
-    const gezeigt = registerListe(alle);
-    const gewaehlt = gezeigt.filter(function (r) { return r.id === registerId; })[0];
-    const reg = gewaehlt || registerFuer(standardRegister(alle));
-    const sichtbar = alle.filter(reg.passt);
-    const auswahl = sichtbar.filter(function (a) { return a.id === auswahlId; })[0] || sichtbar[0] || null;
+    const auswahl = alle.filter(function (a) { return a.id === auswahlId; })[0] || alle[0] || null;
 
     let lage;
     if ((d.rot || 0) > 0) {
@@ -379,25 +276,19 @@
         + '<div class="ns">Alles Gemessene ist pünktlich und erfolgreich gelaufen. ' + e(d.hinweis || "") + "</div></div></div>";
     }
 
-    // Die Zahlenkacheln standen frueher hier (Grün/Gelb/Rot/Wartung). Sie sind
-    // ab 2026-08-14 weg: die Register darunter zeigen dieselben Zahlen, nur
-    // anklickbar — dieselbe Zahl an zwei Stellen ist das Gegenteil von
-    // uebersichtlich. Die Aufteilung gelb/rot, die den Registern fehlt, steht
-    // im Lage-Satz direkt darueber ("N auf Rot", "N verspätet").
-    //
-    // Mit weg ist die Kachel "DPO Self-Training / 24/7 Aktiv": sie war ein
-    // fest verdrahteter Text, der nie etwas anderes sagen konnte, also auch
-    // keinen Ausfall. Genau so eine Behauptung ohne Messung ist auf dieser
-    // Seite verboten (docs/approvals/2026-08-12-ampel-ehrlich-messen.md).
     return V.kopfBlock("AP", "Autopiloten", "Autopiloten",
       "Alle Automatiken auf einen Blick. Grün ist gemessen, nie behauptet: ohne Herzschlag gibt es kein Grün.")
-      + '<div class="stack">' + lage
-      + registerLeiste(alle, reg.id)
-      + '<div class="ap-wrap">'
-      + (sichtbar.length
-        ? liste(sichtbar, auswahl ? auswahl.id : null) + detail(auswahl)
-        : '<div class="ap-register-leer">' + e(reg.leer) + "</div>")
+      + '<div class="kpis">'
+      + V.kachelBlock("Grün", String(d.gruen || 0), "läuft nachweislich", (d.gruen || 0) > 0 ? "up" : "")
+      + V.kachelBlock("Gelb", String(d.gelb || 0), "verspätet, Schonfrist läuft")
+      + V.kachelBlock("Rot", String(d.rot || 0), (d.rot || 0) > 0 ? "sofort ansehen" : "keiner", (d.rot || 0) > 0 ? "dn" : "up")
+      + V.kachelBlock("DPO Self-Training", "24/7 Aktiv", "Ground-Truth Self-Play & Benchmarks", "up")
+      + ((d.wartung || 0) > 0
+        ? V.kachelBlock("Wartung", String(d.wartung), "stummgeschaltet, kein Alarm")
+        : "")
       + "</div>"
+      + '<div class="stack">' + lage
+      + '<div class="ap-wrap">' + liste(alle, auswahl ? auswahl.id : null) + detail(auswahl) + "</div>"
       + vorfallBlock(d.vorfaelle)
       + "</div>";
   }
