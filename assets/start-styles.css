@@ -4827,3 +4827,103 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 .start-chips button {
   font-size: 15px;
 }
+
+/* --- Das Schreibfeld am Telefon: EINE Zeile ----------------------------
+ * Betreiber-Ansage 2026-08-14: "Am Handy: Soll auch Schreibfeld eine
+ * Zeile sein."
+ *
+ * Vorher standen zwei Kaesten uebereinander — das Textfeld (44 px) und
+ * darunter die Werkzeugleiste (min-height 64 px). Zusammen ueber 110 px
+ * Hoehe, auf einem 812-px-Telefon ein Siebtel des Bildschirms fuer eine
+ * Leiste, die man erst beim Tippen braucht.
+ *
+ * Der Trick ist `display: contents` auf .prompt-actions: die Leiste
+ * verliert ihren eigenen Kasten (Rahmen, Polster, Mindesthoehe), ihre
+ * Knoepfe werden direkte Flex-Kinder des Glases und stehen damit in
+ * derselben Zeile wie das Textfeld. Kein Markup wird angefasst und kein
+ * Knopf umgehaengt — die Menues von Plus und Modell haengen weiter an
+ * ihren eigenen position:relative-Huellen und oeffnen an der richtigen
+ * Stelle.
+ *
+ * Was in der Zeile steht:  [+] [Modell] [Textfeld] [Mikro] [Hauptknopf]
+ *
+ * Der Audio-Knopf verschwindet dabei NICHT als Funktion. Er ist am
+ * Telefon nur nicht mehr doppelt: der Hauptknopf ist bei leerem Feld
+ * selbst der Sprachknopf (composer-sendetaste.js klickt genau dieses
+ * Element weiter, und ein programmatischer Klick geht auch auf ein
+ * ausgeblendetes Element). Der Lautsprecher-Knopf war hier schon vorher
+ * ausgeblendet (start-glass.css) — das ist kein neuer Verlust.
+ *
+ * 560 px als Grenze, weil styles.css und start-glass.css dieselbe Kante
+ * benutzen. Eine zweite Kante daneben waere eine zweite Wahrheit. */
+@media (max-width: 560px) {
+  .prompt-glass {
+    display: flex;
+    /* flex-end, damit die Knoepfe unten bleiben, wenn das Textfeld bei
+       langem Text mehrzeilig wird. */
+    align-items: flex-end;
+    gap: 6px;
+    padding: 6px 8px;
+  }
+
+  /* Der Kasten der Leiste faellt weg, die Knoepfe bleiben. */
+  .prompt-actions {
+    display: contents;
+  }
+
+  .prompt-glass textarea {
+    order: 3;
+    /* min-width:0 ist der Teil, den man vergisst: ohne ihn weigert sich
+       ein Flex-Kind zu schrumpfen und drueckt den Hauptknopf hinaus. */
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 40px;
+    height: 40px;
+    padding: 9px 4px;
+  }
+
+  .prompt-actions .plus-picker { order: 1; }
+  .prompt-actions .model-picker { order: 2; }
+  .prompt-actions [data-start-tool="voice"] { order: 4; }
+  .prompt-actions .send-button { order: 5; }
+
+  /* Der Platzhalter schob die Knoepfe auseinander — in einer Zeile mit
+     dehnbarem Textfeld hat er keine Aufgabe mehr. */
+  .prompt-actions .prompt-spacer { display: none; }
+  .prompt-glass [data-start-tool="audio"] { display: none; }
+
+  /* Knoepfe duerfen nicht schrumpfen, sonst wird aus einem 34-px-Ziel
+     ein 12-px-Ziel, sobald der Text laenger wird. */
+  .prompt-glass .plus-picker,
+  .prompt-glass .model-picker,
+  .prompt-glass [data-start-tool],
+  .prompt-glass .send-button {
+    flex: 0 0 auto;
+  }
+
+  /* Der Modellname darf die Zeile nicht sprengen: bei 375 px bleiben dem
+     Textfeld sonst unter 100 px. 76 px reichen fuer "smejj 1.0". */
+  .model-picker .text-chip {
+    max-width: 76px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    padding: 0 8px;
+  }
+
+  /* Am 2026-08-15 im echten Chrome nachgemessen: ohne diese Regel bricht
+     der Platzhalter "Beschreibe eine Aufgabe oder stelle eine Frage." in
+     dem 139 px schmalen Feld auf zwei Zeilen um, und die zweite Zeile
+     wird auf halber Hoehe abgeschnitten — das sieht kaputt aus. Mit
+     nowrap steht eine saubere Zeile, die am Rand endet.
+     Wichtig: das gilt NUR fuer den Platzhalter. Getippter Text bricht
+     weiter normal um, weil ::placeholder ein eigenes Pseudo-Element ist.
+     (text-overflow: ellipsis nimmt Chrome hier nicht an — gemessen,
+     nicht vermutet. Es bleibt bei einem harten Schnitt.) */
+  .prompt-glass textarea::placeholder {
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 14px;
+  }
+}
