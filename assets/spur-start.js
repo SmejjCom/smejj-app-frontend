@@ -64,8 +64,15 @@ function geheZu(view) {
   document.querySelector(`.nav-vier .nav-button[data-view="${view}"]`)?.click();
 }
 
+let zeichenLauf = 0;
+
 async function zeichneStartSpur(halter) {
+  const lauf = ++zeichenLauf;
   halter.replaceChildren();
+  // Nach jedem await pruefen, ob inzwischen ein neuer Lauf begonnen hat —
+  // sonst haengen zwei Laeufe ihre Listen nacheinander an (live gesehen:
+  // "Zuletzt verwendet" doppelt).
+  const veraltet = () => lauf !== zeichenLauf;
 
   // Start/Code-Reiter (Bildschirm 24: "beim Umschalten aendert sich alles").
   const reiter = document.createElement("div");
@@ -99,6 +106,7 @@ async function zeichneStartSpur(halter) {
     halter.append(punkt({ icon: "system", text: "Mehr", aktion: () => geheZu("settings") }));
     let chats = [];
     try { chats = await listChats(); } catch { /* Spur bleibt nutzbar */ }
+    if (veraltet()) return;
     const code = chats
       .filter((chat) => chat?.updatedAt && merkmaleVon(chat).code)
       .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
@@ -131,6 +139,7 @@ async function zeichneStartSpur(halter) {
   // Letzte Gespraeche — echt, aus dem Verlauf. Kein Eintrag, keine Gruppe.
   let chats = [];
   try { chats = await listChats(); } catch { /* Spur bleibt ohne Verlauf nutzbar */ }
+  if (veraltet()) return;
   const sortiert = [...chats]
     .filter((chat) => chat && chat.updatedAt)
     .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))

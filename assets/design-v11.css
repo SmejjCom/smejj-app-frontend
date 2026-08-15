@@ -820,4 +820,8 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   width: 30px; height: 30px; min-height: 30px;
   border-radius: 999px !important;
 }
-#code .code-mini svg { width: 16px; height: 16px; }
+#code .code-mini svg {
+  width: 16px; height: 16px;
+  fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
