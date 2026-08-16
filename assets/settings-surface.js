@@ -161,7 +161,7 @@ function markup() {
     <div class="settings-shell"><nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${suche}${nav}</nav><div class="settings-content">
       ${panel("general", "Allgemein", "Grundlegendes Verhalten der App.", [
         select("Sprache", "settingsLanguage", LANGUAGE_OPTIONS, false),
-        select("Beim Öffnen anzeigen", "settingsStartView", [["start", "Startseite"], ["last", "Letzte Ansicht"]]),
+        select("Beim Öffnen anzeigen", "settingsStartView", [["start", "Startseite"], ["last", "Letzte Ansicht"], ["projects", "smejjCloud"]]),
         select("Sicherheitsmodus", "settingsMode", [["safe", "Free-safe"], ["byok", "BYOK vorbereitet"], ["local", "Lokal"]])])}
       ${panel("appearance", "Aussehen & Schriftgröße", "Gilt nur außerhalb der geschützten Startseite.", [
         select("Schriftgröße", "settingsFontSize", [["small", "Normal · 16 px"], ["medium", "Groß · 19 px"], ["large", "Sehr groß · 23 px"]]),
