@@ -5123,16 +5123,29 @@ body.spur-start-aktiv .nav-vier { display: none; }
    Mockup-Texte unangetastet), nur die Anzeige ist kompakt. */
 .plus-menu-werkzeuge .werk-was,
 .plus-menu-werkzeuge .werk-bsp,
-.plus-menu-werkzeuge .plus-gruppe { display: none; }
+.plus-menu-werkzeuge .plus-gruppe { display: none !important; }
+/* !important durchgehend: die Runtime-CSS (design-v11-views laedt NACH dem
+   Buendel) stellte die Eintraege sonst wieder untereinander und zentriert —
+   Betreiber 2026-08-16: "Icon und dann Beschreibung, EINE Zeile, buendig". */
 .plus-menu-werkzeuge button[role="menuitem"] {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 10px 14px;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  gap: 11px !important;
+  padding: 10px 14px !important;
+  width: 100% !important;
 }
 .plus-menu-werkzeuge button[role="menuitem"] b {
-  font-weight: 400;
-  font-size: 15px;
+  font-weight: 400 !important;
+  font-size: 15px !important;
+  white-space: nowrap;
+}
+.plus-menu.plus-menu-werkzeuge {
+  width: max-content !important;
+  min-width: 260px !important;
+  max-width: 330px !important;
 }
 .plus-menu-werkzeuge .werk-ic {
   flex: none;
