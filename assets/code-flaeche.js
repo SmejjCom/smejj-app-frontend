@@ -55,6 +55,25 @@ function tiefe() {
 // Chat-Projects; ihn zu ueberschreiben wuerde die Dateiflaeche verstellen.
 const CODE_PROJEKT = "smejj.codeProjekt.v1";
 
+// Berechtigungs-Modus wie Claude Code (Betreiber 2026-08-16). Er WIRKT echt:
+// settings-runtime.buildPreferenceBlock speist die Verhaltensregel des Modus
+// in den Systemprompt JEDES Gespraechs — derselbe bewiesene Weg wie die
+// Dauer-Anweisung eines Projects. Eine haertere technische Sperre (Klick-
+// Freigabe je Dateizugriff) braucht den Anschluss von shouldConfirm an einen
+// echten Schreibpfad — bewusst NICHT als Attrappe vorgezogen.
+const CODE_MODUS = "smejj.codeModus.v1";
+const MODI = [
+  ["auto", "Auto", "smejj entscheidet — fragt nur bei riskanten Schritten nach."],
+  ["manuell", "Manuell", "Immer fragen, bevor etwas geändert wird."],
+  ["akzeptieren", "Auto-akzeptieren", "Änderungen ohne Rückfrage ausführen, am Ende zusammenfassen."],
+  ["plan", "Plan", "Erst ein Plan — Umsetzung erst nach deiner Freigabe."]
+];
+
+function modus() {
+  const wert = localStorage.getItem(CODE_MODUS);
+  return MODI.some(([id]) => id === wert) ? wert : "auto";
+}
+
 async function zeichneProjektChip() {
   const chipKnopf = document.getElementById("codeProjektChip");
   if (!chipKnopf) return;
@@ -81,8 +100,42 @@ function zeichne() {
   if (modell) modell.innerHTML = `<b>${MODELL_TEXT[s]}</b>`;
   const t = document.getElementById("codeTiefeAnzeige");
   if (t) t.textContent = tiefe();
+  const modusChip = document.getElementById("codeModusChip");
+  if (modusChip) modusChip.textContent = MODI.find(([id]) => id === modus())[1];
   void zeichneProjektChip();
   logVerwalten();
+}
+
+// ---- Modus-Menue (wie Claude Code: Auto / Manuell / Akzeptieren / Plan) --
+function schliesseModusMenue() {
+  document.getElementById("codeModusMenue")?.remove();
+}
+
+function oeffneModusMenue() {
+  if (document.getElementById("codeModusMenue")) { schliesseModusMenue(); return; }
+  const chip = document.getElementById("codeModusChip");
+  const feld = chip?.closest(".codefeld");
+  if (!chip || !feld) return;
+  const menue = document.createElement("div");
+  menue.id = "codeModusMenue";
+  menue.className = "code-projekt-menue code-modus-menue";
+  menue.setAttribute("role", "menu");
+  const aktiv = modus();
+  for (const [id, name, hinweis] of MODI) {
+    const k = document.createElement("button");
+    k.type = "button";
+    k.setAttribute("role", "menuitemradio");
+    k.setAttribute("aria-checked", String(id === aktiv));
+    k.innerHTML = `<b>${name}</b>${id === aktiv ? " ✓" : ""}<small>${hinweis}</small>`;
+    k.addEventListener("click", (e) => {
+      e.stopPropagation();
+      localStorage.setItem(CODE_MODUS, id);
+      schliesseModusMenue();
+      zeichne();
+    });
+    menue.append(k);
+  }
+  feld.append(menue);
 }
 
 // ---- Der Chat-Stream IN der Code-Flaeche -------------------------------
@@ -190,6 +243,11 @@ export function initCodeFlaeche() {
   });
   document.addEventListener("click", (e) => {
     if (!e.target.closest?.("#codeProjektMenue")) schliesseProjektMenue();
+    if (!e.target.closest?.("#codeModusMenue")) schliesseModusMenue();
+  });
+  document.getElementById("codeModusChip")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    oeffneModusMenue();
   });
   document.getElementById("codeAufgabe")?.addEventListener("keydown", (ereignis) => {
     if (ereignis.key === "Enter" && !ereignis.shiftKey) {

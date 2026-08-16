@@ -5539,6 +5539,17 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   cursor: pointer;
 }
 .code-projekt-menue button:hover { background: rgba(94, 234, 212, 0.12); }
+
+/* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
+#code .codefeld { position: relative; }
+.code-modus-menue { min-width: 300px; }
+.code-modus-menue button b { display: inline; font-weight: 650; }
+.code-modus-menue button small {
+  display: block;
+  margin-top: 2px;
+  opacity: 0.72;
+  font-size: 0.86em;
+}
 #code .codeunten { padding: 14px 0 8px; }
 #code .repozeile {
   display: flex;

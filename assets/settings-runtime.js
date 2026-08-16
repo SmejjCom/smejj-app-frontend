@@ -108,6 +108,18 @@ export function buildPreferenceBlock() {
     const bereich = JSON.parse(sessionStorage.getItem("smejj.bereichAnweisung.v1") || "null");
     if (bereich?.anweisung) lines.push(`Dauer-Anweisung des Arbeitsbereichs "${bereich.name}": ${bereich.anweisung}`);
   } catch { /* Beiwerk */ }
+  // Berechtigungs-Modus der Code-Seite (Betreiber 2026-08-16, wie Claude
+  // Code). Er wirkt ueber DENSELBEN bewiesenen Weg wie die Bereichs-
+  // Anweisung: als Verhaltensregel im Systemprompt. "auto" ist der
+  // Normalzustand und braucht keine Zeile.
+  try {
+    const modusText = {
+      manuell: "Berechtigungs-Modus MANUELL: Frage IMMER zuerst nach und warte auf ein Ja des Nutzers, bevor du Code schreibst, Dateien aenderst oder etwas erzeugst. Zeige vorher knapp, WAS du tun willst.",
+      akzeptieren: "Berechtigungs-Modus AUTOMATISCH AKZEPTIEREN: Fuehre Code- und Datei-Arbeit ohne Rueckfragen aus und fasse am Ende zusammen, was du getan hast.",
+      plan: "Berechtigungs-Modus PLAN: Erstelle ZUERST einen kurzen nummerierten Plan und warte auf die Freigabe des Nutzers, bevor du mit der Umsetzung beginnst."
+    }[localStorage.getItem("smejj.codeModus.v1")];
+    if (modusText) lines.push(modusText);
+  } catch { /* Beiwerk */ }
   return lines.join("\n");
 }
 
