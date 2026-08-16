@@ -5605,6 +5605,18 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 #code .codefeld textarea { min-height: 26px; }
 
+/* Betreiber 2026-08-16: die drei Punkte stehen in DERSELBEN Zeile, in der
+   die Antwort endet — keine eigene Zeile darunter. Antworten sind
+   linksbuendig, also sitzen die Punkte rechts in der letzten Zeilenhoehe;
+   bei eigenen (rechtsbuendigen) Nachrichten links daneben. */
+#startLog .msg-actions {
+  margin-top: -28px;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+#startLog .msg-actions .msg-act { pointer-events: auto; }
+#startLog .msg-actions.is-user { justify-content: flex-start; }
+
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
 .code-modus-menue { min-width: 300px; }

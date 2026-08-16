@@ -114,6 +114,7 @@ function ensureBar(entry) {
 }
 
 function syncRating(bar, meta) {
+  if (!bar) return;
   for (const act of ["rate-up", "rate-down"]) {
     const button = bar.querySelector(`[data-act="${act}"]`);
     if (!button) continue;
@@ -567,14 +568,19 @@ const HANDLERS = {
   speak: (entry) => speakEntry(entry),
   fork: (entry) => forkFrom(entry),
   remove: (entry) => removeFrom(entry),
-  "rate-up": (entry, button) => {
+  "rate-up": (entry) => {
+    // Seit dem Drei-Punkte-Umbau (2026-08-16) kommt der Klick aus dem Menue am
+    // BODY — button.closest(".msg-actions") war dort null, syncRating warf und
+    // riss das Daumen-Signal an den Antwort-TUEV mit ab. Die Leiste des
+    // Eintrags liefert ensureBar; ihr Klassen-Toggle stoesst zugleich den
+    // Verlauf-Save an (MutationObserver im Log).
     setRating(entry, "up");
-    syncRating(button.closest(".msg-actions"), metaOf(entry));
+    syncRating(ensureBar(entry), metaOf(entry));
     sendeDaumenSignal(entry, "up");
   },
-  "rate-down": (entry, button) => {
+  "rate-down": (entry) => {
     setRating(entry, "down");
-    syncRating(button.closest(".msg-actions"), metaOf(entry));
+    syncRating(ensureBar(entry), metaOf(entry));
     sendeDaumenSignal(entry, "down");
   },
   "version-prev": (entry) => showVersion(entry, metaOf(entry).active - 1),
