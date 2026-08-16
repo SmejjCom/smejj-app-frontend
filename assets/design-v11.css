@@ -795,7 +795,18 @@ body.spur-start-aktiv .nav-kosten { display: none; }
     border-right: 1px solid var(--v11-hair);
     box-shadow: none;
   }
+  /* Der Zieh-Griff sitzt IMMER an der rechten Spur-Kante (Betreiber-Befund
+     2026-08-15: er hing durch eine Alt-Regel bei x=-24 und war unziehbar). */
+  .sidebar .left-panel-resizer {
+    left: auto !important;
+    right: -6px !important;
+  }
 }
+
+/* Profilzeile unten wie ChatGPT (Betreiber 2026-08-15): runder Avatar,
+   Name, Plan — KEIN separates Zahnrad; Einstellungen wohnen im Menue. */
+.profile-dock-gear { display: none !important; }
+.profile-avatar { border-radius: 999px; overflow: hidden; }
 
 /* Der Hilfe-Knopf oben rechts (Mockup-Topbar). Bewusst mit Abstand zu den
    fixen Ecken-Knoepfen (Befund b0fb345: dort kollidierte schon einmal

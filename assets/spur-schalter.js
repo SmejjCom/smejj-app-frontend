@@ -28,6 +28,26 @@ export function initSpurSchalter() {
     try { localStorage.setItem(SPUR_ZU_KEY, zu ? "zu" : "offen"); } catch { /* nicht kritisch */ }
     knopf.setAttribute("aria-expanded", String(!zu));
   }, true);
+
+  // Wie ChatGPT: wer die Spur ganz klein zieht, klappt sie zu. Nach dem
+  // Loslassen des Griffs (is-resizing-panel faellt weg) wird gemessen —
+  // unter 120 px geht die Spur zu und die Breite auf den Standard zurueck,
+  // damit der naechste Klick auf das Menue-Icon wieder eine volle Spur zeigt.
+  window.addEventListener("pointerup", () => {
+    if (!desktop() || !document.body.classList.contains("is-resizing-panel")) return;
+    setTimeout(() => {
+      const breite = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--left-panel-width"), 10);
+      if (breite && breite < 120) {
+        document.body.classList.add("spur-zu");
+        try {
+          localStorage.setItem(SPUR_ZU_KEY, "zu");
+          localStorage.setItem("smejj.ui.leftPanelWidth.v9", "196");
+        } catch { /* nicht kritisch */ }
+        document.documentElement.style.setProperty("--left-panel-width", "196px");
+        knopf.setAttribute("aria-expanded", "false");
+      }
+    }, 50);
+  });
   return true;
 }
 

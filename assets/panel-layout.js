@@ -158,7 +158,9 @@ export function bindPanelResize(selector, side, { $ }) {
   handle.addEventListener("pointerdown", (event) => {
     event.preventDefault();
     document.body.classList.add("is-resizing-panel");
-    handle.setPointerCapture?.(event.pointerId);
+    // Ein ungueltiger pointerId (z. B. aus Tests) warf hier und riss den
+    // ganzen Handler ab — das Ziehen war dann tot, ohne Fehlermeldung.
+    try { handle.setPointerCapture?.(event.pointerId); } catch { /* ohne Capture zieht es trotzdem */ }
     const move = (moveEvent) => {
       const width = side === "left" ? moveEvent.clientX : window.innerWidth - moveEvent.clientX;
       setPanelWidth(side, width);
