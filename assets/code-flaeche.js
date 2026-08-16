@@ -82,7 +82,10 @@ async function zeichneProjektChip() {
   const projekte = await listProjekte().catch(() => []);
   const eintrag = projekte.find((p) => p.id === kennung);
   if (!eintrag) { localStorage.removeItem(CODE_PROJEKT); chipKnopf.textContent = "Projekt wählen …"; return; }
-  chipKnopf.textContent = `Projekt: ${eintrag.name}`;
+  // Der verbundene Ordner steht mit im Chip — wie "Repo auswaehlen" bei
+  // Claude Code sieht man sofort, WORIN das Project arbeitet.
+  const ordner = await window.smejjProjektOrdner?.ordnerName?.(kennung).catch(() => "") || "";
+  chipKnopf.textContent = ordner ? `Projekt: ${eintrag.name} · 📁 ${ordner}` : `Projekt: ${eintrag.name}`;
 }
 
 function zeichne() {
@@ -174,16 +177,30 @@ function logVerwalten() {
   }
 }
 
-function senden() {
+async function senden() {
   const feld = document.getElementById("codeAufgabe");
   const start = document.getElementById("startMessage");
   const text = feld?.value.trim();
   if (!text || !start) return;
   feld.value = "";
   holeLog();
+  // Fester Ordner je Project (wie Claude Code): ist am gewaehlten Project
+  // ein Ordner verbunden, reisen dessen Textdateien als Kontext mit —
+  // das Modell arbeitet mit den ECHTEN Dateien. Der Klick auf Senden ist
+  // die Nutzergeste, die Chrome fuer die Ordner-Erlaubnis verlangt.
+  let auftrag = text;
+  const projektId = localStorage.getItem(CODE_PROJEKT) || "";
+  if (projektId && window.smejjProjektOrdner) {
+    try {
+      const kontext = await window.smejjProjektOrdner.leseKontext(projektId);
+      if (kontext?.dateien?.length) {
+        auftrag = text + window.smejjProjektOrdner.baueKontextBlock(kontext.name, kontext.dateien);
+      }
+    } catch { /* ohne Ordnerkontext laeuft der Auftrag unveraendert */ }
+  }
   // Derselbe echte Sende-Weg wie am Start — nur ohne Ansichtswechsel:
   // die Antwort streamt in den adoptierten #startLog direkt hier.
-  start.value = text;
+  start.value = auftrag;
   start.dispatchEvent(new Event("input", { bubbles: true }));
   document.getElementById("startSend")?.click();
 }

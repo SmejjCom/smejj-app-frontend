@@ -76,7 +76,37 @@ function upgrade(pre) {
   // Reihenfolge bleibt die Position im Text erhalten.
   pre.replaceWith(wrap);
   wrap.append(button, pre);
+  // "In den Project-Ordner speichern" (Betreiber 2026-08-16, wie Claude
+  // Code): erscheint nur, wenn am Code-Project ein Ordner verbunden ist.
+  // Gleiche Textknoten-Regel wie beim Kopieren-Knopf: KEIN Text im Knopf.
+  const projektId = (() => { try { return localStorage.getItem("smejj.codeProjekt.v1") || ""; } catch { return ""; } })();
+  if (projektId && window.smejjProjektOrdner) {
+    window.smejjProjektOrdner.ordnerName(projektId).then((name) => {
+      if (!name || wrap.querySelector("[data-code-save]")) return;
+      const speichern = document.createElement("button");
+      speichern.type = "button";
+      speichern.className = "chat-code-copy chat-code-save";
+      speichern.dataset.codeSave = "";
+      speichern.setAttribute("aria-label", `In Ordner ${name} speichern`);
+      speichern.title = `In Ordner ${name} speichern`;
+      speichern.innerHTML = '<span class="chat-code-copy-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg></span>';
+      wrap.append(speichern);
+    }).catch(() => {});
+  }
   return true;
+}
+
+let speicherLauf = 1;
+async function saveFrom(button) {
+  const code = button.parentElement?.querySelector("pre.chat-code code");
+  const text = String(code?.textContent || "");
+  const projektId = localStorage.getItem("smejj.codeProjekt.v1") || "";
+  if (!text || !projektId || !window.smejjProjektOrdner) return;
+  const info = code?.className?.replace("language-", "") || "";
+  const name = window.smejjProjektOrdner.rateDateiname(info, text, speicherLauf);
+  const ergebnis = await window.smejjProjektOrdner.schreibeDatei(projektId, name, text);
+  if (ergebnis.ok) { speicherLauf += 1; showToast(`Gespeichert: ${ergebnis.pfad}`, "ok"); flashCopied(button); }
+  else showToast(ergebnis.fehler || "Speichern fehlgeschlagen.", "warn");
 }
 
 function sweep(root) {
@@ -112,6 +142,8 @@ async function copyFrom(button) {
 }
 
 function onClick(event) {
+  const speichern = event.target.closest?.("[data-code-save]");
+  if (speichern) { saveFrom(speichern); return; }
   const button = event.target.closest?.("[data-code-copy]");
   if (button) copyFrom(button);
 }

@@ -5694,6 +5694,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
    oben — wie Claude Code. Die Escape-Logik von view-chrome bleibt. */
 #code .view-chrome { display: none; }
 
+/* Ordner je Project: Speichern-Knopf sitzt neben dem Kopieren-Knopf am
+   Codeblock; der Verbinden-Knopf auf der Projects-Karte wie die anderen. */
+.chat-code-save { right: 46px; }
+
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
 .code-modus-menue { min-width: 300px; }

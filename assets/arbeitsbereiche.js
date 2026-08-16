@@ -152,7 +152,22 @@ async function zeichne() {
       newChat();
       geheZu("start");
     });
-    aktionen.append(hier, speichern);
+    // Fester ORDNER je Project (Betreiber 2026-08-16, wie Claude Code):
+    // einmal verbinden, dann liest jeder Code-Auftrag des Projects die
+    // Dateien mit, und Codebloecke lassen sich hineinschreiben.
+    const ordner = document.createElement("button");
+    ordner.type = "button";
+    ordner.className = "bereich-ordner";
+    ordner.textContent = "📁 Ordner verbinden";
+    window.smejjProjektOrdner?.ordnerName(projekt.id).then((name) => {
+      if (name) ordner.textContent = `📁 ${name} (wechseln)`;
+    });
+    ordner.addEventListener("click", async () => {
+      const ergebnis = await window.smejjProjektOrdner?.verbindeOrdner(projekt.id);
+      if (ergebnis?.ok) ordner.textContent = `📁 ${ergebnis.name} (wechseln)`;
+      else if (ergebnis?.fehler) { ordner.textContent = ergebnis.fehler; setTimeout(() => zeichne(), 4000); }
+    });
+    aktionen.append(hier, speichern, ordner);
     karte.append(anweisung, aktionen);
 
     // Die letzten Gespraeche des Bereichs — echt, klickbar.
