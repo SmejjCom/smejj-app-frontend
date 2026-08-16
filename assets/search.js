@@ -45,7 +45,7 @@ const STATIC_RESULTS = Object.freeze([
   ["Werkzeuge", "GitHub", "Repository, Branch und Commit-Status", "settings", "github repo branch commit pr"],
   ["Werkzeuge", "Vorschau", "App oder Website Preview", "browser", "vorschau preview app website"],
   ["Werkzeuge", "Status", "Tests, Build, Deploy und Fehler", "tools", "status tests build deploy fehler"],
-  ["Werkzeuge", "Automatisierung", "Wiederholbare Ablaufe und Agenten", "automation", "automatisierung automation agenten"]
+  ["Werkzeuge", "smejjBot", "Wiederholbare Ablaufe und Agenten", "automation", "smejjbot automatisierung automation auftraege agenten"]
 ]);
 
 export function initGlobalSearch({ $, goToView, showTaskIndicator, showToast, state, workspace }) {

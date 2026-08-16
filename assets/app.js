@@ -6,7 +6,7 @@ import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js"
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { initComposerTools } from "./composer-tools.js?v=werkzeuge-1";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=1";
-import { initGlobalSearch } from "./search.js?v=b38c";
+import { initGlobalSearch } from "./search.js?v=b38d";
 import { openSearchOverlay } from "./search-overlay.js?v=b47c";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=b37a";
@@ -23,7 +23,7 @@ import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39t"
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
 import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
-import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b48";
+import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b49";
 import { applyViewTitle } from "./view-title.js";
 import { getJson, postJson } from "./shared/http-json.js";
 const $ = (selector) => document.querySelector(selector);

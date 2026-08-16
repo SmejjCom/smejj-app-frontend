@@ -134,7 +134,7 @@ async function zeichneStartSpur(halter) {
   halter.append(punkt({ icon: "plus", text: "Neuer Chat", kuerzel: "⌘K", aktiv: startAktiv, aktion: () => { newChat(); geheZu("start"); } }));
   halter.append(punkt({ icon: "search", text: "Suchen", aktion: () => geheZu("search") }));
   halter.append(punkt({ icon: "projects", text: "Meine Dateien", aktion: () => geheZu("projects") }));
-  halter.append(punkt({ icon: "automation", text: "Aufträge", aktion: () => geheZu("automation") }));
+  halter.append(punkt({ icon: "automation", text: "smejjBot", aktion: () => geheZu("automation") }));
 
   // Letzte Gespraeche — echt, aus dem Verlauf. Kein Eintrag, keine Gruppe.
   let chats = [];
