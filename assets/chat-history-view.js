@@ -29,7 +29,7 @@
 import {
   listChats, openChat, renameChat, deleteChat, activeChatId, togglePinChat, newChat,
   listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
-} from "/assets/chat-store.js?v=b51";
+} from "/assets/chat-store.js?v=b52";
 // Holt fuer Chats ohne eigenen Titel einen aus der Bruecke. Von HIER importiert
 // und nicht aus index.html, damit die Startseite unter dem Start-Lock bleibt
 // (gleiches Muster wie icon-nutzung.js in profile-dock.js). Das Modul meldet

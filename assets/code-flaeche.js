@@ -28,7 +28,7 @@
 // index.html — das <script>-Tag fehlte, ALLE Knoepfe der Code-Seite waren
 // tot. Der module-queries-Test prueft jetzt auch dieses Glied.
 
-import { listProjekte, neuesGespraechImBereich, newChat } from "/assets/chat-store.js?v=b51";
+import { listProjekte, neuesGespraechImBereich, newChat } from "/assets/chat-store.js?v=b52";
 
 const STUFEN = ["auto", "gruendlich", "schnell"];
 const STUFEN_TEXT = { auto: "Automatisch", gruendlich: "Gründlich", schnell: "Schnell" };

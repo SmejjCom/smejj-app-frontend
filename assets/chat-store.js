@@ -666,7 +666,14 @@ function bindNewChatButton() {
     // "Chat" und traegt das Chat-Symbol; das Plus-Icon bleibt als Altform
     // erkannt, falls eine zwischengespeicherte Huelle noch die alte Leiste hat.
     const button = event.target.closest('.nav-button[data-view="start"][data-icon="chat"], .nav-button[data-view="start"][data-icon="plus"]');
-    if (button) newChat();
+    if (!button) return;
+    // Betreiber-Befund 2026-08-16 ("mein Chat verschwindet"): der Knopf
+    // warf das LAUFENDE Gespraech weg. Jetzt wechselt er ZUM Gespraech;
+    // ein neues startet er nur, wenn gerade keines sichtbar ist. Der
+    // ausdrueckliche Weg bleibt "Neuer Chat" (Start-Spur, Cmd+K).
+    const log = startLog();
+    if (log && log.children.length > 0) return; // bindNav wechselt nur die Ansicht
+    newChat();
   }, true);
 }
 
