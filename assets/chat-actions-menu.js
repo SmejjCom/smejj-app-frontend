@@ -35,25 +35,35 @@ const ITEMS = Object.freeze({
  * @returns {Array<{act: string, label: string, icon: string, danger?: boolean}>}
  */
 export function menuItemsFor(role, hatQuellen = false) {
-  if (role === "user") return [ITEMS.fork, ITEMS.remove];
-  const punkte = [ITEMS.plain, ITEMS.speak, ITEMS.fork, ITEMS.remove];
+  if (role === "user") return [...MENU_KOPF.user, ITEMS.fork, ITEMS.remove];
+  const punkte = [...MENU_KOPF.assistant, ITEMS.plain, ITEMS.speak, ITEMS.fork, ITEMS.remove];
   return hatQuellen ? [ITEMS.sources, ...punkte] : punkte;
 }
 
-// Belegung der sichtbaren Leiste. Icon-only wie bei ChatGPT: mit Textlabels
-// platzt die Zeile auf schmalen Geraeten. Reihenfolge nach Haeufigkeit.
+// Belegung der sichtbaren Leiste. Betreiber-Entscheid 2026-08-16: NUR noch
+// die drei Punkte — ALLE Aktionen (auch Kopieren und die Daumen) liegen im
+// Menue darunter. Eine ruhige Zeile, nichts geht verloren.
 const BAR_SPECS = Object.freeze({
   user: Object.freeze([
-    { act: "copy", icon: "copy", label: "Kopieren" },
-    { act: "edit", icon: "edit", label: "Bearbeiten" },
-    { act: "menu", icon: "more", label: "Weitere Aktionen" }
+    { act: "menu", icon: "more", label: "Aktionen" }
   ]),
   assistant: Object.freeze([
-    { act: "copy", icon: "copy", label: "Kopieren" },
-    { act: "rate-up", icon: "up", label: "Hilfreich" },
-    { act: "rate-down", icon: "down", label: "Nicht hilfreich" },
-    { act: "regen", icon: "regen", label: "Neu generieren" },
-    { act: "menu", icon: "more", label: "Weitere Aktionen" }
+    { act: "menu", icon: "more", label: "Aktionen" }
+  ])
+});
+
+// Die frueher sichtbaren Knoepfe wandern an den ANFANG des Menues —
+// Reihenfolge nach Haeufigkeit, wie sie vorher in der Leiste stand.
+const MENU_KOPF = Object.freeze({
+  user: Object.freeze([
+    { act: "copy", label: "Kopieren", icon: "copy" },
+    { act: "edit", label: "Bearbeiten", icon: "edit" }
+  ]),
+  assistant: Object.freeze([
+    { act: "copy", label: "Kopieren", icon: "copy" },
+    { act: "rate-up", label: "Hilfreich", icon: "up" },
+    { act: "rate-down", label: "Nicht hilfreich", icon: "down" },
+    { act: "regen", label: "Neu generieren", icon: "regen" }
   ])
 });
 

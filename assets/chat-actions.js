@@ -26,7 +26,7 @@
 // fail-safe: scheitert der Versand, bleibt die Bewertung lokal sichtbar.
 
 import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=1";
-import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=1";
+import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=2";
 // OHNE ?v=-Kennung — app.js importiert "./browser-context.js" (also
 // /assets/browser-context.js). Ein anderer Spezifizierer erzeugt eine ZWEITE
 // Modulinstanz mit eigenem Quellen-Gedaechtnis; der Menuepunkt "Quellen
