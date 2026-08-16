@@ -874,6 +874,24 @@ export function neuesGespraechImBereich(projektId) {
   try { sessionStorage.setItem(BEREICH_NEU_KEY, String(projektId || "")); } catch { /* still */ }
 }
 
+// Gegenstueck: persistActive holt die Vormerkung beim ERSTEN Speichern eines
+// neuen Gespraechs ab und loescht sie — einmal vormerken, einmal wirken.
+//
+// DIESE Funktion wurde beim Bereichs-Bau (2026-08-15) aufgerufen, aber NIE
+// definiert (Halb-Commit, drittes Vorkommen). Folge: JEDER persistActive-Lauf
+// starb still am ReferenceError — der Fehlerfaenger in scheduleSave schluckte
+// ihn, und seit dem Abend wurde KEIN Chat mehr gespeichert. node --check und
+// die Suite sehen so etwas nicht; nur der Live-Lauf tat es.
+function verbraucheBereichVormerkung() {
+  try {
+    const id = sessionStorage.getItem(BEREICH_NEU_KEY) || "";
+    if (id) sessionStorage.removeItem(BEREICH_NEU_KEY);
+    return id;
+  } catch {
+    return "";
+  }
+}
+
 export async function loescheProjekt(id) {
   if (!(await getProjekt(id))) return false;
   await tx(PROJEKT_STORE, "readwrite", (store) => store.delete(String(id || "")));
