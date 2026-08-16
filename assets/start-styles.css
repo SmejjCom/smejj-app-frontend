@@ -6255,3 +6255,35 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 .chat-stopp:hover { background: #dfe5e3; }
 .chat-stopp svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
+
+/* Betreiber 2026-08-16 ("Codierung wie Claude machen"): Codebloecke mit
+   Kopfleiste wie Claude — Sprachname links im Kopfstreifen, der
+   Kopieren-Knopf (chat-code-copy.js) sitzt rechts darin. Nur Bloecke, die
+   eine Sprache tragen (data-language aus chat-markdown.js); alle anderen
+   behalten den bisherigen schwebenden Knopf. ::before steht nicht in
+   textContent — Verlauf und Modellkontext bleiben sauber. */
+#startLog .entry.assistant .chat-code[data-language] {
+  padding-top: 0;
+}
+#startLog .entry.assistant .chat-code[data-language]::before {
+  content: attr(data-language);
+  display: block;
+  position: sticky;
+  left: 0;
+  margin: 0 -12px 10px;
+  padding: 9px 12px;
+  background: rgba(255, 255, 255, 0.045);
+  border-bottom: 1px solid var(--v11-hair);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  color: rgba(242, 245, 244, 0.6);
+}
+
+/* Syntax-Farben der Codebloecke (chat-code-farben.js) — dezent, dunkelruhig */
+.chat-code .cf-kom { color: rgba(242, 245, 244, 0.42); font-style: italic; }
+.chat-code .cf-str { color: #8fd9a8; }
+.chat-code .cf-zahl { color: #e5b567; }
+.chat-code .cf-schl { color: #7cc7e8; }
+.chat-code .cf-fn { color: #c3b1e1; }
