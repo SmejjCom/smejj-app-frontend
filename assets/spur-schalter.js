@@ -22,9 +22,19 @@ export function initSpurSchalter() {
   // Der Zieh-Griff lag als Spur-Kind unter overflow:hidden und im eigenen
   // Stacking-Kontext (backdrop-filter) — kein Mausklick kam je an
   // (elementFromPoint traf den Body). Am document.body wirkt position:fixed
-  // global; die pointerdown-Listener reisen beim Umhaengen mit.
+  // global; die pointerdown-Listener reisen beim Umhaengen mit. Die Position
+  // kommt als INLINE-Style — hoechste Prioritaet, kein Kaskaden-Wettrennen.
   const griff = document.getElementById("leftPanelResize");
-  if (griff && desktop()) document.body.append(griff);
+  if (griff && desktop()) {
+    document.body.append(griff);
+    const setzeGriff = () => {
+      griff.style.cssText = document.body.classList.contains("spur-zu")
+        ? "display:none"
+        : "position:fixed;top:0;bottom:0;width:12px;left:calc(var(--left-panel-width, 196px) - 6px);right:auto;z-index:200;cursor:col-resize;pointer-events:auto";
+    };
+    setzeGriff();
+    new MutationObserver(setzeGriff).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  }
   try {
     if (localStorage.getItem(SPUR_ZU_KEY) === "zu") document.body.classList.add("spur-zu");
   } catch { /* offen ist der Standard */ }
@@ -43,7 +53,9 @@ export function initSpurSchalter() {
   window.addEventListener("pointerup", () => {
     if (!desktop() || !document.body.classList.contains("is-resizing-panel")) return;
     setTimeout(() => {
-      const breite = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--left-panel-width"), 10);
+      // Die ECHTE Spurbreite messen, nicht die Variable — die kann beim
+      // fruehen Laden noch fehlen und macht die Schwelle unberechenbar.
+      const breite = Math.round(document.querySelector(".sidebar")?.getBoundingClientRect().width || 0);
       if (breite && breite < 120) {
         document.body.classList.add("spur-zu");
         try {
