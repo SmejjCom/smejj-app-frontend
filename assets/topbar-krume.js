@@ -10,9 +10,10 @@
 function name() {
   const ansicht = document.querySelector(".view.is-active");
   if (!ansicht) return "";
-  // Bildschirm 32: auch der Start hat eine Brotkrume — sie heisst dort
-  // schlicht "Neuer Chat".
-  if (ansicht.id === "start") return "Neuer Chat";
+  // Betreiber-Entscheid 2026-08-15 (Chat): auf der Startseite KEINE Krume —
+  // "wer braucht diese Information Neuer Chat". In allen anderen Ansichten
+  // bleibt sie, dort sagt sie wirklich, wo man ist.
+  if (ansicht.id === "start") return "";
   return ansicht.querySelector(".view-header h2, h2")?.textContent.trim() || "";
 }
 

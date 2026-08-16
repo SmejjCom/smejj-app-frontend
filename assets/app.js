@@ -137,7 +137,7 @@ function bindNavigation() {
   };
   // Abdunkeln, Wegklicken und Escape leben in panel-backdrop.js (SRP).
   const syncBackdrop = initPanelBackdrop({ backdrop, sidebar, browserPanel, menuButton, browserButton, setMenuOpen, setBrowserPanelOpen });
-  menuButton?.addEventListener("click", () => setMenuOpen(!sidebar?.classList.contains("is-open")));
+  menuButton?.addEventListener("click", () => setMenuOpen(!sidebar?.classList.contains("is-open"))); // Desktop-Auf/Zu: spur-schalter.js (capture)
   browserButton?.addEventListener("click", () => setBrowserPanelOpen(!browserPanel?.classList.contains("is-open")));
   bindPanelResize("#leftPanelResize", "left", { $ });
   bindPanelResize("#rightPanelResize", "right", { $ });
