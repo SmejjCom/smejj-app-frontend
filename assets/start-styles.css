@@ -5344,8 +5344,11 @@ body.is-resizing-panel #rightPanelResize {
    Audio-Knopf entfaellt wie am Telefon. Der Modellchip steht im Mockup
    nicht im Feld; Modellwahl bleibt unter Einstellungen -> KI-Modelle &
    Anbieter und in der KI-Modelle-Ansicht erreichbar. */
-#start .prompt-glass [data-start-tool="audio"],
-/* Betreiber 2026-08-16: Modell-Waehler ist wieder sichtbar (Claude-Stil, Regel weiter unten). */
+#start .prompt-glass [data-start-tool="audio"] { display: none; }
+/* Betreiber 2026-08-16: Modell-Waehler ist wieder sichtbar (Claude-Stil,
+   Regel weiter unten). ACHTUNG: der sed-Umbau hatte die Sammelregel
+   zerrissen — der Audio-Knopf verlor sein display:none und die doppelte
+   Sprachwelle stand wieder im Feld (Betreiber-Befund v458-v463). */
 #start .prompt-glass .plus-picker,
 #start .prompt-glass [data-start-tool],
 #start .prompt-glass .send-button,
