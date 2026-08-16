@@ -243,7 +243,33 @@ async function oeffneProjektMenue() {
   };
   menue.append(eintragKnopf("Ohne Projekt", () => waehle("")));
   const projekte = await listProjekte().catch(() => []);
-  for (const p of projekte) menue.append(eintragKnopf(p.name || "Projekt", () => waehle(p.id)));
+  // Betreiber 2026-08-16 ("zu kompliziert, wie Claude auf derselben Seite"):
+  // Der Ordner wird DIREKT HIER gewaehlt — jede Projekt-Zeile traegt rechts
+  // ihren 📁-Knopf. Ein Klick, Chrome-Dialog, fertig; kein Seitenwechsel.
+  for (const p of projekte) {
+    const zeile = document.createElement("div");
+    zeile.className = "code-projekt-zeile";
+    zeile.append(eintragKnopf(p.name || "Projekt", () => waehle(p.id)));
+    const ordner = document.createElement("button");
+    ordner.type = "button";
+    ordner.className = "code-projekt-ordner";
+    ordner.textContent = "📁";
+    ordner.title = "Ordner für dieses Project wählen";
+    window.smejjProjektOrdner?.ordnerName(p.id).then((n) => {
+      if (n) { ordner.textContent = `📁 ${n}`; ordner.title = `Ordner: ${n} — klicken zum Wechseln`; }
+    }).catch(() => {});
+    ordner.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const ergebnis = await window.smejjProjektOrdner?.verbindeOrdner(p.id);
+      if (ergebnis?.ok) {
+        localStorage.setItem(CODE_PROJEKT, p.id);
+        schliesseProjektMenue();
+        zeichne();
+      }
+    });
+    zeile.append(ordner);
+    menue.append(zeile);
+  }
   menue.append(eintragKnopf("Neues Project anlegen …", () => {
     schliesseProjektMenue();
     document.querySelector('.nav-button[data-view="arbeitsbereiche"]')?.click();

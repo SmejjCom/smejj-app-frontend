@@ -5698,6 +5698,19 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
    Codeblock; der Verbinden-Knopf auf der Projects-Karte wie die anderen. */
 .chat-code-save { right: 46px; }
 
+/* Projekt-Zeile im Code-Menue: links Name (waehlt Project), rechts der
+   📁-Knopf (waehlt den Ordner — direkt hier, kein Seitenwechsel). */
+.code-projekt-zeile { display: flex; align-items: stretch; }
+.code-projekt-zeile button:first-child { flex: 1 1 auto; }
+.code-projekt-zeile .code-projekt-ordner {
+  flex: 0 0 auto;
+  max-width: 46%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(242, 245, 244, 0.72);
+}
+
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
 .code-modus-menue { min-width: 300px; }
