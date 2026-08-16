@@ -42,18 +42,52 @@ async function zeichne() {
 
   const stueck = document.createDocumentFragment();
 
+  // Betreiber 2026-08-16: "Project erstellen soll auf der gleichen Seite
+  // bleiben, wie bei chatgpt.com/projects" — kein prompt()-Browserdialog
+  // mehr. Der Knopf klappt ein Eingabefeld direkt in der Seite auf; Enter
+  // oder "Anlegen" erstellt, Escape klappt zu. Fehler stehen als Zeile
+  // daneben, nicht als alert().
   const neu = document.createElement("button");
   neu.type = "button";
   neu.id = "bereichNeu";
-  neu.textContent = "Neuen Bereich anlegen";
-  neu.addEventListener("click", async () => {
-    const name = prompt("Wie soll das Project heißen?");
-    if (!name) return;
+  neu.textContent = "Neues Project anlegen";
+  const formular = document.createElement("form");
+  formular.id = "bereichNeuFormular";
+  formular.className = "bereich-neu-formular";
+  formular.hidden = true;
+  const eingabe = document.createElement("input");
+  eingabe.type = "text";
+  eingabe.placeholder = "Wie soll das Project heißen?";
+  eingabe.maxLength = 60;
+  const anlegen = document.createElement("button");
+  anlegen.type = "submit";
+  anlegen.textContent = "Anlegen";
+  const meldung = document.createElement("span");
+  meldung.className = "bereich-neu-meldung";
+  meldung.setAttribute("role", "status");
+  formular.append(eingabe, anlegen, meldung);
+  neu.addEventListener("click", () => {
+    formular.hidden = !formular.hidden;
+    if (!formular.hidden) eingabe.focus();
+  });
+  eingabe.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { formular.hidden = true; neu.focus(); }
+  });
+  formular.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = eingabe.value.trim();
+    if (!name) { eingabe.focus(); return; }
+    anlegen.disabled = true;
     const id = await erstelleProjekt(name);
-    if (!id) alert("Der Bereich konnte nicht angelegt werden (Name schon vergeben oder Höchstzahl erreicht).");
+    anlegen.disabled = false;
+    if (!id) {
+      meldung.textContent = "Name schon vergeben oder Höchstzahl erreicht — probier einen anderen Namen.";
+      eingabe.focus();
+      return;
+    }
     zeichne();
   });
-  stueck.append(neu);
+  stueck.append(neu, formular);
 
   if (!projekte.length) {
     const leer = document.createElement("p");

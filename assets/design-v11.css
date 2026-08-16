@@ -558,6 +558,38 @@ body.spur-start-aktiv .nav-vier { display: none; }
   top: calc(100% + 10px);
 }
 
+/* Project-Anlegen bleibt AUF der Seite (Betreiber 2026-08-16, wie
+   chatgpt.com/projects): aufklappendes Eingabefeld statt Browser-Dialog. */
+.bereich-neu-formular {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0 4px;
+}
+.bereich-neu-formular input {
+  flex: 1;
+  min-width: 220px;
+  max-width: 420px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: var(--v11-r);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px var(--v11-cy-line);
+  color: inherit;
+  font: inherit;
+}
+.bereich-neu-formular button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: var(--v11-r);
+  background: #f2f5f4;
+  color: #0b1418;
+  font-weight: 700;
+  cursor: pointer;
+}
+.bereich-neu-meldung { flex-basis: 100%; font-size: 14px; color: var(--v11-warn); }
+
 /* Die Zieh-Griffe SICHTBAR machen (Betreiber 2026-08-16: "warum kann ich
    nicht ziehen" — man sah schlicht nicht, WO). Dezenter Streifen in der
    Mitte, beim Draufzeigen cyan. Die Position setzt spur-schalter.js als
