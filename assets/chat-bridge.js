@@ -272,7 +272,8 @@ async function handleAgent(req, res) {
   }
   if (await streamViaControl(res, "/api/agent", body)) return;
   const webContext = !coding && shouldSearchWeb(task) ? await buildWebContext(task, CONTROL_ORIGIN) : "";
-  const messages = buildAgentMessages({ task, coding, webContext, wissen, rechnung, history: body.history });
+  const modus = ["plan", "manuell", "akzeptieren"].includes(String(body?.preferences?.modus || "")) ? body.preferences.modus : "auto";
+  const messages = buildAgentMessages({ task, coding, webContext, wissen, rechnung, history: body.history, modus });
   return streamModel(res, messages, coding ? "coding" : webContext ? "web" : "fast", body.model);
 }
 
@@ -300,12 +301,20 @@ function nutzerfragenRueckwaerts(history, grenze = 6) {
     .map((n) => n.content);
 }
 
-function buildAgentMessages({ task, coding, webContext, wissen = "", rechnung = "", history }) {
+function buildAgentMessages({ task, coding, webContext, wissen = "", rechnung = "", history, modus = "auto" }) {
+  // Berechtigungs-Modus der Code-Seite (Betreiber 2026-08-16, wie Claude
+  // Code). Der Halt MUSS hier im Server-Prompt stehen: eine Client-Zeile
+  // verlor zweimal gemessen gegen die Diff-Anweisung dieses Prompts.
+  const codingAnweisung = {
+    plan: "Antworte AUSSCHLIESSLICH mit einem kurzen nummerierten Plan und der Schlussfrage \"Soll ich so umsetzen?\". Schreibe in dieser Antwort KEINEN Code, keine Diffs und keine Dateien — die Umsetzung folgt erst nach der Freigabe des Nutzers in seiner naechsten Nachricht.",
+    manuell: "Antworte zuerst NUR mit 1-3 Saetzen, WAS du tun wuerdest, und der Frage \"Soll ich das so machen?\". Schreibe in dieser Antwort KEINEN Code und keine Diffs — erst nach einem Ja des Nutzers.",
+    akzeptieren: "Liefere einen kompakten Plan und konkrete Code-/Diff-Vorschlaege in EINEM Zug und fasse am Ende kurz zusammen, was du getan hast. Behaupte nicht, dass Dateien geaendert wurden."
+  }[modus] || "Liefere einen kompakten Plan und konkrete Code-/Diff-Vorschlaege. Behaupte nicht, dass Dateien geaendert wurden.";
   const system = [
     coding ? "You are smejj.com Code Agent." : "Du bist der Assistent von smejj.com.",
     "Antworte sofort sichtbar und direkt. Gib keine Denk-Tags, kein <think>, keine internen Notizen und keine Rohdaten aus.",
     coding
-      ? "Liefere einen kompakten Plan und konkrete Code-/Diff-Vorschlaege. Behaupte nicht, dass Dateien geaendert wurden."
+      ? codingAnweisung
       : "Beantworte in der Sprache des Nutzers korrekt, knapp und hilfreich.",
     webContext
       ? "Nutze nur die Live-Internet-Ergebnisse. Antworte in maximal 5 kurzen Saetzen. Schreibe am Ende genau eine Zeile: Quellen: URL1, URL2 (Stand: ISO-Zeit)."
