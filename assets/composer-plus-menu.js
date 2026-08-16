@@ -63,6 +63,10 @@ export function bindPlusMenu({ getInput, notifyInputChanged }) {
     const action = item.dataset.composerAction;
     if (action === "attach-file") $("#composerFileInput")?.click();
     if (action === "attach-photo") $("#composerPhotoInput")?.click();
+    // "Foto oder Video aufnehmen" (Betreiber 2026-08-16): der capture-Input
+    // oeffnet am Handy/Tablet direkt die Kamera, am Rechner die Dateiwahl —
+    // derselbe Weg wie bei ChatGPT und Gemini.
+    if (action === "aufnahme") $("#composerCaptureInput")?.click();
     // Werkzeuge-Menue nach Mockup-Bildschirm "Alle Werkzeuge auf einmal":
     // "Sprechen statt tippen" drueckt den vorhandenen Diktat-Knopf; die
     // Vorlagen-Eintraege setzen ihre Chip-Vorlage ins Feld — dieselbe
@@ -78,6 +82,27 @@ export function bindPlusMenu({ getInput, notifyInputChanged }) {
       }
     }
     closePlusMenu();
+  });
+  // Die frische Aufnahme laeuft durch den VORHANDENEN Bild-Anhang-Weg
+  // (composerPhotoInput -> composer-bild-anhang -> Bild-Verstehen). Videos
+  // kann smejj noch nicht ansehen — das sagt die App ehrlich, mit Ausweg,
+  // statt das Video still zu verschlucken (Video-VERSTEHEN existiert nicht;
+  // eine stumme Annahme waere eine Attrappe).
+  const capture = $("#composerCaptureInput");
+  capture?.addEventListener("change", () => {
+    const datei = capture.files?.[0];
+    capture.value = "";
+    if (!datei) return;
+    if (datei.type.startsWith("image/")) {
+      const foto = $("#composerPhotoInput");
+      if (!foto) return;
+      const ablage = new DataTransfer();
+      ablage.items.add(datei);
+      foto.files = ablage.files;
+      foto.dispatchEvent(new Event("change", { bubbles: true }));
+      return;
+    }
+    alert("Dein Video ist aufgenommen — aber smejj kann Videos noch nicht ansehen. Ein Foto geht sofort: nochmal auf Aufnehmen tippen und ein Bild machen.");
   });
   bindAttachInput("#composerFileInput", "Anhang", getInput, notifyInputChanged);
   // Fotos tragen seit Stufe 1 (Bild-Verstehen) echten Bildinhalt statt nur

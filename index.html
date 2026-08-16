@@ -237,6 +237,17 @@
                       <span class="werk-was">Foto oder Bildschirmfoto. smejj sagt dir, was darauf zu sehen ist.</span>
                       <span class="werk-bsp">„Was bedeutet diese Fehlermeldung?"</span>
                     </button>
+                    <!-- Betreiber 2026-08-16: "Foto oder Video machen und direkt
+                         hochladen, wie ChatGPT/Gemini" — der capture-Input
+                         oeffnet am Handy/Tablet direkt die Kamera-App, am
+                         Rechner die Aufnahme-/Dateiwahl. Fotos gehen durch den
+                         vorhandenen Bild-Verstehen-Weg; bei Videos sagt die
+                         App EHRLICH, dass Video-Verstehen noch fehlt. -->
+                    <button type="button" role="menuitem" data-composer-action="aufnahme">
+                      <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h2l2-2h6l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/><path d="M18 3l1 2"/></svg><b>Foto oder Video aufnehmen</b>
+                      <span class="werk-was">Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.</span>
+                      <span class="werk-bsp">Aufnehmen, fertig — smejj schaut es sich an.</span>
+                    </button>
                     <button type="button" role="menuitem" data-kamera-start="kamera">
                       <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h2l2-2h6l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/></svg><b>Kamera</b>
                       <span class="werk-was">smejj sieht, was deine Kamera sieht — ein Bild je Aufnahme, keine Daueraufnahme.</span>
@@ -281,6 +292,7 @@
                     </button>
                     <input id="composerFileInput" class="visually-hidden-input" type="file" multiple aria-hidden="true" tabindex="-1">
                     <input id="composerPhotoInput" class="visually-hidden-input" type="file" accept="image/*" multiple aria-hidden="true" tabindex="-1">
+                    <input id="composerCaptureInput" class="visually-hidden-input" type="file" accept="image/*,video/*" capture="environment" aria-hidden="true" tabindex="-1">
                   </div>
                 </div>
                 <span class="prompt-spacer"></span>
