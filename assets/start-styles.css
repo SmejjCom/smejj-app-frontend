@@ -5478,6 +5478,10 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   flex-direction: column;
   flex: 1;
   min-height: 62vh;
+  /* Betreiber 2026-08-16: das Schreibfeld bleibt wie bei Claude UNTEN FEST —
+     die Flaeche waechst nie ueber den Bildschirm hinaus, der Chat scrollt
+     in seinem Halter (overflow: auto dort). */
+  max-height: calc(100vh - 130px);
 }
 #code .codegruss {
   padding: 26px 4px 0;
@@ -5491,6 +5495,20 @@ body.spur-start-aktiv .nav-kosten { display: none; }
    der Auftrag streamt auf der Code-Seite selbst, wie bei Codex/Claude. */
 #code .code-log-halter { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; }
 #code .code-log-halter .start-log { flex: 1; }
+
+/* Betreiber 2026-08-16: der Chat ist RAHMENLOS wie bei Claude — Texte
+   fliessen hintereinander. Die Nutzer-Zeile bleibt eine dezente Flaeche
+   (ohne Kante), die Antwort steht nackt auf dem Grund. */
+.start-log .entry,
+.start-log .entry.assistant {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.start-log .entry.user {
+  border: 0;
+  background: rgba(255, 255, 255, 0.07);
+}
 
 /* Projekt-Menue am Chip: gleiche Glas-Ruhe wie das Profilmenue, viereckig. */
 #code .repozeile { position: relative; }

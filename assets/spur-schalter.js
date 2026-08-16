@@ -40,11 +40,11 @@ function bindeGriffe() {
     if (links) {
       links.style.cssText = document.body.classList.contains("spur-zu")
         ? "display:none"
-        : "position:fixed;top:0;bottom:0;width:12px;left:calc(var(--left-panel-width, 196px) - 6px);right:auto;z-index:200;cursor:col-resize;pointer-events:auto";
+        : "position:fixed;top:0;bottom:0;width:12px;left:calc(var(--left-panel-width, 196px) - 6px);right:auto;z-index:75;cursor:col-resize;pointer-events:auto";
     }
     if (rechts) {
       rechts.style.cssText = document.body.classList.contains("right-panel-open")
-        ? "position:fixed;top:0;bottom:0;width:12px;right:calc(var(--right-panel-width, 320px) - 6px);left:auto;z-index:200;cursor:col-resize;pointer-events:auto"
+        ? "position:fixed;top:0;bottom:0;width:12px;right:calc(var(--right-panel-width, 320px) - 6px);left:auto;z-index:75;cursor:col-resize;pointer-events:auto"
         : "display:none";
     }
   };
