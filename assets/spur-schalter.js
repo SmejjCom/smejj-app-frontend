@@ -15,6 +15,15 @@ function desktop() {
   return window.matchMedia("(min-width: 768px)").matches;
 }
 
+// Nach dem Zuklappen (oder Wieder-Oeffnen) auf die normale Breite zurueck —
+// sonst klebt die is-compact-Schmalspur aus dem Kleinziehen an der Spur
+// (gemessen: 283 px breit, aber nur Icons ohne Beschriftung).
+function volleBreite() {
+  document.documentElement.style.setProperty("--left-panel-width", "196px");
+  document.querySelector(".sidebar")?.classList.remove("is-compact");
+  try { localStorage.setItem("smejj.ui.leftPanelWidth.v9", "196"); } catch { /* nicht kritisch */ }
+}
+
 export function initSpurSchalter() {
   const knopf = document.getElementById("appMenuButton");
   if (!knopf || knopf.dataset.spurSchalter) return false;
@@ -44,6 +53,7 @@ export function initSpurSchalter() {
     const zu = document.body.classList.toggle("spur-zu");
     try { localStorage.setItem(SPUR_ZU_KEY, zu ? "zu" : "offen"); } catch { /* nicht kritisch */ }
     knopf.setAttribute("aria-expanded", String(!zu));
+    if (!zu) volleBreite();
   }, true);
 
   // Wie ChatGPT: wer die Spur ganz klein zieht, klappt sie zu. Nach dem
@@ -58,11 +68,8 @@ export function initSpurSchalter() {
       const breite = Math.round(document.querySelector(".sidebar")?.getBoundingClientRect().width || 0);
       if (breite && breite < 120) {
         document.body.classList.add("spur-zu");
-        try {
-          localStorage.setItem(SPUR_ZU_KEY, "zu");
-          localStorage.setItem("smejj.ui.leftPanelWidth.v9", "196");
-        } catch { /* nicht kritisch */ }
-        document.documentElement.style.setProperty("--left-panel-width", "196px");
+        try { localStorage.setItem(SPUR_ZU_KEY, "zu"); } catch { /* nicht kritisch */ }
+        volleBreite();
         knopf.setAttribute("aria-expanded", "false");
       }
     }, 50);
