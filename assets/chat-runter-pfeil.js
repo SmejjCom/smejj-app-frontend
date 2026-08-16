@@ -27,7 +27,10 @@ function baueKnopf() {
   knopf.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16"/><path d="m5 13 7 7 7-7"/></svg>';
   knopf.addEventListener("click", () => {
     const el = document.scrollingElement;
-    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    // smooth braucht rAF — im versteckten Tab laeuft die Animation nie an
+    // (gemessen 2026-08-16 in der Fixture): dann direkt springen.
+    el.scrollTo({ top: el.scrollHeight, behavior: document.hidden ? "auto" : "smooth" });
+    knopf.hidden = true;
   });
   knopf.hidden = true;
   document.body.append(knopf);
