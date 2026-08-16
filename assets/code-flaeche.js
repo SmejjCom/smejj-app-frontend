@@ -156,6 +156,9 @@ function holeLog() {
   log.hidden = false;
   const leer = document.querySelector("#code .codeleer");
   if (leer) leer.hidden = true;
+  // Wie bei Claude: beim Andocken ans Gespraechs-ENDE springen — der Chat
+  // scrollt intern, das Feld bleibt unten fest (Betreiber 2026-08-16).
+  requestAnimationFrame(() => { halter.scrollTop = halter.scrollHeight; });
 }
 
 function logVerwalten() {

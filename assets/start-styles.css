@@ -5674,8 +5674,21 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #code .codeflaeche {
   height: calc(100vh - 96px);
   max-height: none;
+  overflow: hidden;
 }
-#code .codeunten { padding-bottom: 14px; }
+/* Betreiber 2026-08-16 (Screenshots): KEINE Leerflaechen — der Chat dockt
+   GANZ OBEN an (der Gruss weicht, sobald ein Gespraech laeuft, wie bei
+   Claude), scrollt INTERN, und das Schreibfeld klebt IMMER am Boden. */
+#code .codeflaeche:has(#codeLogHalter #startLog:not([hidden])) .codegruss { display: none; }
+#code .codeflaeche:has(#codeLogHalter #startLog:not([hidden])) .codeleer { display: none; }
+#code .code-log-halter { flex: 1 1 auto; }
+#code .codeunten { margin-top: auto; padding-bottom: 14px; }
+
+/* Betreiber 2026-08-16: das Mikrofon (und der Anhang) bleiben in der
+   unteren Leiste sichtbar wie bei Claude — ihre Icons wurden ohne feste
+   Groesse als winzige Punkte gerendert. */
+#code .code-mini { width: 34px; height: 34px; flex: 0 0 auto; }
+#code .code-mini svg { width: 18px; height: 18px; stroke: currentColor; }
 
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
