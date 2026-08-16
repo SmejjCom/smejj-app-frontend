@@ -5649,6 +5649,19 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 .search-overlay-row { padding-top: 4px; padding-bottom: 4px; }
 .search-overlay-row + .search-overlay-row { border-top: 1px solid var(--v11-hair); }
 
+/* Voll-Audit 2026-08-16: Bei schmalen Fenstern (Betreiber-Zoom) schob sich
+   in den Einstellungen das Auswahlfeld UEBER den Zeilennamen
+   ("SicherheitsmoduFree-safe", per Zoom-Screenshot belegt). Die Zeile darf
+   jetzt umbrechen; der Name behaelt seine Mindestbreite. */
+#settings .settings-row {
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  align-items: center;
+}
+#settings .settings-row-copy { flex: 1 1 160px; min-width: 0; }
+#settings .settings-row select,
+#settings .settings-row input[type="text"] { max-width: 100%; }
+
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
 .code-modus-menue { min-width: 300px; }
