@@ -47,7 +47,7 @@ async function zeichne() {
   neu.id = "bereichNeu";
   neu.textContent = "Neuen Bereich anlegen";
   neu.addEventListener("click", async () => {
-    const name = prompt("Wie soll der Arbeitsbereich heißen?");
+    const name = prompt("Wie soll das Project heißen?");
     if (!name) return;
     const id = await erstelleProjekt(name);
     if (!id) alert("Der Bereich konnte nicht angelegt werden (Name schon vergeben oder Höchstzahl erreicht).");
@@ -58,7 +58,7 @@ async function zeichne() {
   if (!projekte.length) {
     const leer = document.createElement("p");
     leer.className = "bereiche-leer";
-    leer.textContent = "Noch kein Arbeitsbereich. Ein Bereich bündelt Gespräche zu einem Thema — mit einer Dauer-Anweisung, die in jedem Gespräch des Bereichs gilt.";
+    leer.textContent = "Noch kein Project. Ein Project bündelt Gespräche zu einem Thema — mit einer Dauer-Anweisung, die in jedem Gespräch des Bereichs gilt.";
     stueck.append(leer);
   }
 

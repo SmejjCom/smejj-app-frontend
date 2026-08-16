@@ -34,7 +34,7 @@ const STATIC_RESULTS = Object.freeze([
   // "Arbeitsbereich" statt "Projekte" (2026-08-13): "Projekte" heisst seit dem
   // Verlauf-Ausbau die Chat-Sammlung. Die alten Suchwoerter bleiben stehen —
   // wer "projekt" tippt, soll diese Flaeche weiterhin finden.
-  ["Arbeitsbereiche", "Arbeitsbereich", "Lokale Dateien und Snapshots öffnen", "projects", "arbeitsbereich workspace projekt projekte dateien"],
+  ["Arbeitsbereiche", "Arbeitsbereich", "Lokale Dateien und Snapshots öffnen", "projects", "arbeitsbereich workspace projekt projekte projects dateien"],
   ["Arbeitsbereiche", "Dateien", "Projektdateien und Uploads finden", "files", "dateien files uploads quellen"],
   ["Arbeitsbereiche", "Verlauf", "Alte Chats und Aufgaben finden", "chatHistory", "verlauf history chat task"],
   ["Einstellungen", "Einstellungen", "Konto, Modelle, API-Keys und Sprache", "settings", "settings einstellungen konto modell api key"],
