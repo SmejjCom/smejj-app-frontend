@@ -5552,6 +5552,21 @@ body.spur-start-aktiv .nav-kosten { display: none; }
 }
 .code-projekt-menue button:hover { background: rgba(94, 234, 212, 0.12); }
 
+/* Rechtes Panel OHNE transform-Animation am Desktop (Nachtlauf 2026-08-16):
+   Die translateX-Transition liess die HIT-Flaeche um Panelbreite+18 neben dem
+   gemalten Panel haengen — sichtbar offen, echte Klicks gingen ins Leere
+   (drittes Vorkommen der Familie "sichtbar != klickbar"; sogar !important
+   auf transform verlor gegen die haengende Transition). Animation laeuft
+   darum ueber `right`; transform ist hart aus. */
+@media (min-width: 768px) {
+  #browserPanel {
+    transform: none !important;
+    transition: right 180ms ease;
+    right: calc(-1 * var(--right-panel-width, 320px) - 24px);
+  }
+  #browserPanel.is-open { right: 0; }
+}
+
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
 .code-modus-menue { min-width: 300px; }
