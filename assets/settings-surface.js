@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from "./config.js";
-import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=b38";
+import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=b39";
 // api-keys-surface.js und provider-settings.js werden BEWUSST nicht statisch
 // importiert (Seitengewicht, Freigabe Wof Kadavanich 2026-08-04). Beide rendern
 // ausschliesslich in das Panel "models", und der Startreiter ist "general" —

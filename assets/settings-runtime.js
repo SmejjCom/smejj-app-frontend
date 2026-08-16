@@ -70,7 +70,12 @@ export function taskPreferences() {
     verificationRequired: settings.runChecks,
     browserVerificationRequired: settings.browserPreview,
     autonomousNetworkAllowed: settings.networkAccess,
-    confirmationMode: settings.confirmations
+    confirmationMode: settings.confirmations,
+    // Berechtigungs-Modus der Code-Seite: reist zum Server (Chat-Bruecke),
+    // damit der Halt DORT durchgesetzt wird — die reine Systemprompt-Zeile
+    // im Client verlor gegen den Coding-Prompt der Bruecke (live gemessen
+    // 2026-08-16, zweimal).
+    modus: (() => { try { return localStorage.getItem("smejj.codeModus.v1") || "auto"; } catch { return "auto"; } })()
   };
 }
 
