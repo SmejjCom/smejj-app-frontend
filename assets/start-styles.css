@@ -4960,6 +4960,18 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 }
 
 
+/* Live-Befund 2026-08-16 (Nachtlauf): Bei 760 px Fensterhoehe war die
+   Vier-Gruppen-Spur 61 px laenger als ihre Scroll-Flaeche — "KI-Modelle"
+   und "Speicher" lagen unsichtbar unter der Kante, der Kostenschutz-Fuss
+   darueber. Niedrige Fenster bekommen darum kompaktere Eintraege (alle
+   passen ohne Scrollen), und die Spur zeigt eine duenne Scroll-Leiste,
+   falls es doch einmal ueberlaeuft. */
+.sidebar .nav { scrollbar-width: thin; }
+@media (max-height: 840px) {
+  .sidebar .nav-vier .nav-button { min-height: 30px; padding-top: 4px; padding-bottom: 4px; }
+  .sidebar .nav-vier .nav-gruppe { padding-top: 6px; padding-bottom: 2px; }
+}
+
 /* --- Fusszeile der Spur: Kosten immer sichtbar (Mockup Bildschirm 19) --- */
 .nav-kosten {
   font-size: 13.5px;
