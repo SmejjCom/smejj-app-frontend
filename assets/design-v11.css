@@ -525,7 +525,9 @@ body.spur-start-aktiv .nav-vier { display: none; }
   justify-content: center;
   width: 26px;
   height: 26px;
-  border-radius: 999px;
+  /* !important gegen eckig.css (app-weit border-radius 0); Avatare sind
+     dort die dokumentierte Ausnahme. */
+  border-radius: 999px !important;
   background: var(--v11-cy-fill);
   color: var(--v11-cy-ink);
   font-size: 12px;
