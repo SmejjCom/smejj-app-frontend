@@ -442,10 +442,23 @@ body.spur-start-aktiv .nav-vier { display: none; }
 .start-vorschlaege button:hover { background: transparent; color: #f2f5f4; }
 .start-vorschlaege button:last-child { border-bottom: 0; }
 
-.start-chipreihe button {
-  font-size: 14.5px;
-  padding: 7px 13px;
+/* Betreiber 2026-08-16: die Werkzeuge "nur als Icons, alle eine Zeile"
+   direkt unter dem Schreibfeld. Der Name bleibt als title/aria-label und
+   als Tooltip — das Wort daneben faellt weg. 44 px = Touch-Regel. */
+.start-chipreihe {
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 10px;
+  overflow: visible;
 }
+.start-chipreihe button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  justify-content: center;
+}
+.start-chipreihe .chip-label { display: none; }
+.start-chipreihe button svg { width: 20px; height: 20px; }
 
 .fpille-nachdenken {
   font-size: 14px;
