@@ -66,7 +66,7 @@
          1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
-    <link rel="stylesheet" href="/assets/start-styles.css?v=griff-body-20260816">
+    <link rel="stylesheet" href="/assets/start-styles.css?v=logo-schalter-20260816">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -94,8 +94,11 @@
     </script>
   </head>
   <body data-left-menu-state="closed">
-    <button id="appMenuButton" class="glass-icon app-menu-button" type="button" aria-label="Menue oeffnen" aria-expanded="false">
-      <span class="split-icon" aria-hidden="true"><span></span><span></span></span>
+    <!-- Betreiber 2026-08-16: das LOGO ist der Spur-Schalter, wie bei
+         ChatGPT — Klick oeffnet und schliesst die linke Spur. Das alte
+         Doppel-Logo daneben blendet design-v11.css aus. -->
+    <button id="appMenuButton" class="glass-icon app-menu-button" type="button" aria-label="Spur öffnen oder schließen" aria-expanded="false">
+      <img class="menu-logo" src="/icons/smejj_favicon.svg" alt="" aria-hidden="true" width="24" height="24">
     </button>
     <a class="app-brand-logo" href="/" aria-label="smejj.com Startseite">
       <img class="app-brand-icon" src="/icons/smejj_icon.svg" alt="" aria-hidden="true" width="2000" height="1532">
