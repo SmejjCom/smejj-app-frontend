@@ -5345,7 +5345,7 @@ body.is-resizing-panel #rightPanelResize {
    nicht im Feld; Modellwahl bleibt unter Einstellungen -> KI-Modelle &
    Anbieter und in der KI-Modelle-Ansicht erreichbar. */
 #start .prompt-glass [data-start-tool="audio"],
-#start .prompt-glass .model-picker { display: none; }
+/* Betreiber 2026-08-16: Modell-Waehler ist wieder sichtbar (Claude-Stil, Regel weiter unten). */
 #start .prompt-glass .plus-picker,
 #start .prompt-glass [data-start-tool],
 #start .prompt-glass .send-button,
@@ -5565,6 +5565,30 @@ body.spur-start-aktiv .nav-kosten { display: none; }
     right: calc(-1 * var(--right-panel-width, 320px) - 24px);
   }
   #browserPanel.is-open { right: 0; }
+}
+
+/* Betreiber 2026-08-16 (Screenshot Claude-App als Vorbild):
+   1) Der Modell-Waehler steht wie bei Claude ("Fable 5 · Hoch") dezent
+      RECHTS in der Schreibleiste — er war seit dem Icon-Umbau versteckt,
+      obwohl Menue und Verdrahtung laengst leben. Echte Werte, echter Wechsel.
+   2) Sind BEIDE Fenster zu, ist die Mitte rahmenlos wie bei Claude:
+      keine Linie ueber dem Chat, keine Lichtkante ueber dem Feld. */
+#start .prompt-glass .model-picker { display: block; }
+#start .prompt-glass .model-picker .text-chip,
+#start .prompt-glass #modelPickerButton {
+  font-size: 13.5px;
+  color: rgba(242, 245, 244, 0.62);
+  background: none;
+  border: 0;
+  padding: 6px 8px;
+}
+#start .prompt-glass #modelPickerButton:hover { color: rgba(242, 245, 244, 0.92); }
+.prompt-actions .model-picker { order: 4; }
+
+body.spur-zu:not(.right-panel-open) .start-log { border-top: 0; }
+body.spur-zu:not(.right-panel-open) .prompt-glass {
+  box-shadow: none;
+  border-top: 0;
 }
 
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
