@@ -155,7 +155,9 @@ function markup() {
   // tippt, landet in Sicherheit, ohne den Bereichsnamen zu kennen". Gefiltert
   // wird ueber Name UND Unterzeile; Enter springt in den ersten Treffer.
   const suche = `<input type="search" id="settingsSuche" class="settings-suche" placeholder="${t("Einstellung suchen…")}" aria-label="${t("Einstellung suchen…")}">`;
-  return `<header class="settings-header"><div><p class="eyebrow">${t("Einstellungen")}</p><h2>${t("Einstellungen")}</h2><p class="subhead">${t("Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.")}</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">${t("Lokal gespeichert")}</div></header>
+  // Betreiber 2026-08-16: keine doppelten Ueberschriften — die kleine Zeile
+  // "Einstellungen" stand direkt ueber der grossen "Einstellungen".
+  return `<header class="settings-header"><div><h2>${t("Einstellungen")}</h2><p class="subhead">${t("Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.")}</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">${t("Lokal gespeichert")}</div></header>
     <div class="settings-shell"><nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${suche}${nav}</nav><div class="settings-content">
       ${panel("general", "Allgemein", "Grundlegendes Verhalten der App.", [
         select("Sprache", "settingsLanguage", LANGUAGE_OPTIONS, false),
