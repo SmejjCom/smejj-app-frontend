@@ -97,6 +97,10 @@ async function zeichneStartSpur(halter) {
     // fokussiert das Auftragsfeld; "Nach Zeitplan" ist der echte Nachtbau —
     // er wohnt unter Auftraege. Ohne erfundene Abzeichen und Uhrzeiten.
     halter.append(punkt({ icon: "plus", text: "Neuer Auftrag", kuerzel: "⌘K", aktiv: true, aktion: () => {
+      // Betreiber-Befund 2026-08-16 ("Warum schreibst du unter alte Chat?"):
+      // nur das Feld zu leeren liess den offenen Chat WEITERLAUFEN — die
+      // naechste Aufgabe landete im alten Gespraech. Erst newChat() trennt.
+      newChat();
       const feld = document.getElementById("codeAufgabe");
       if (feld) { feld.value = ""; feld.focus(); }
     } }));

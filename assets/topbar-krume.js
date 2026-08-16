@@ -25,15 +25,10 @@ function zeichne() {
     krume.className = "top-krume";
     krume.setAttribute("aria-hidden", "true");
     anker.after(krume);
-    // Der Hilfe-Knopf der Mockup-Topbar — ein Link, kein Skript.
-    if (!document.getElementById("topHilfe")) {
-      const hilfe = document.createElement("a");
-      hilfe.id = "topHilfe";
-      hilfe.className = "top-hilfe";
-      hilfe.href = "/hilfe.html";
-      hilfe.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.8.3-.9 1-.9 1.7"/><path d="M12 17h.01"/></svg>Hilfe';
-      document.body.append(hilfe);
-    }
+    // Betreiber 2026-08-16 ("wir brauchen Platz von oben nach unten"): der
+    // fixe Hilfe-Knopf oben ist RAUS — Hilfe wohnt im Dock-Menue und unter
+    // Einstellungen, die obere Kante bleibt frei fuer den Inhalt.
+    document.getElementById("topHilfe")?.remove();
     // Rechts oben sitzt seit 2026-08-16 (zweite Betreiber-Ansage) wieder das
     // Browser-Icon — das Profil wohnt unten links in der Spur.
   }
