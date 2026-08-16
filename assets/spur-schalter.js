@@ -50,6 +50,24 @@ function bindeGriffe() {
   };
   setze();
   new MutationObserver(setze).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+  // DER Klick-Killer (Befund 2026-08-16, Betreiber: "wenn ich klicke,
+  // passiert nichts"): panel-layout haelt die Spur fuer zugeklappt (Handy-
+  // Automat) und setzt inert + aria-hidden — am Desktop zeigt das CSS sie
+  // aber IMMER. Ergebnis: sichtbare Spur, komplett tot fuer echte Maus-
+  // klicks (elementFromPoint traf den BODY). Diese Wache entfernt inert,
+  // solange die Spur am Desktop sichtbar ist; bei spur-zu darf es bleiben.
+  const spur = document.querySelector(".sidebar");
+  if (spur) {
+    const wache = () => {
+      if (!desktop() || document.body.classList.contains("spur-zu")) return;
+      if (spur.hasAttribute("inert")) spur.removeAttribute("inert");
+      if (spur.hasAttribute("aria-hidden")) spur.removeAttribute("aria-hidden");
+    };
+    wache();
+    new MutationObserver(wache).observe(spur, { attributes: true, attributeFilter: ["inert", "aria-hidden"] });
+    new MutationObserver(wache).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  }
 }
 
 export function initSpurSchalter() {
