@@ -5690,6 +5690,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #code .code-mini { width: 34px; height: 34px; flex: 0 0 auto; }
 #code .code-mini svg { width: 18px; height: 18px; stroke: currentColor; }
 
+/* Betreiber 2026-08-16: Auf der Code-Seite KEIN Zurueck-Pfeil und KEIN X
+   oben — wie Claude Code. Die Escape-Logik von view-chrome bleibt. */
+#code .view-chrome { display: none; }
+
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
 .code-modus-menue { min-width: 300px; }

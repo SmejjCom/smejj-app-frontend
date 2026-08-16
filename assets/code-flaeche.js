@@ -234,6 +234,10 @@ async function oeffneProjektMenue() {
   zeile.append(menue);
 }
 
+// Von der Code-Spur genutzt (spur-start.js): ein Verlaufs-Klick oeffnet das
+// Gespraech IM Code-Bereich — dieser Haken adoptiert den Log dorthin.
+if (typeof window !== "undefined") window.smejjCodeZeig = holeLog;
+
 export function initCodeFlaeche() {
   const flaeche = document.querySelector("#code .codeflaeche");
   if (!flaeche || flaeche.dataset.bereit) return false;

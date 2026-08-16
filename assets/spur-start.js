@@ -107,25 +107,40 @@ async function zeichneStartSpur(halter) {
     let chats = [];
     try { chats = await listChats(); } catch { /* Spur bleibt nutzbar */ }
     if (veraltet()) return;
-    const code = chats
-      .filter((chat) => chat?.updatedAt && merkmaleVon(chat).code)
+    // Betreiber 2026-08-16 ("Ich sehe meinen Verlauf auch nicht"): die
+    // Code-Spur zeigt jetzt den ECHTEN Verlauf wie Claude Code — die
+    // letzten acht Gespraeche (nicht nur Code-markierte, nicht nur drei),
+    // und ein Klick oeffnet das Gespraech IM Code-Bereich statt am Start.
+    const letzte = chats
+      .filter((chat) => chat?.updatedAt)
       .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-      .slice(0, 3);
-    if (code.length) {
+      .slice(0, 8);
+    if (letzte.length) {
       const kopf = document.createElement("div");
       kopf.className = "nav-gruppe";
       kopf.setAttribute("aria-hidden", "true");
       kopf.textContent = "Zuletzt verwendet";
       halter.append(kopf);
-      for (const chat of code) {
+      for (const chat of letzte) {
         const eintrag = document.createElement("button");
         eintrag.type = "button";
         eintrag.className = "nav-button spur-chat";
         eintrag.title = chat.title || "Unterhaltung";
         eintrag.textContent = chat.title || "Unterhaltung";
-        eintrag.addEventListener("click", () => { openChat(chat.id); geheZu("start"); });
+        eintrag.addEventListener("click", async () => {
+          await openChat(chat.id);
+          geheZu("code");
+          // code-flaeche adoptiert den Log in die Code-Flaeche.
+          setTimeout(() => window.smejjCodeZeig?.(), 200);
+        });
         halter.append(eintrag);
       }
+      const alle = document.createElement("button");
+      alle.type = "button";
+      alle.className = "nav-button spur-alle";
+      alle.textContent = `Alle ${chats.length} Gespräche`;
+      alle.addEventListener("click", () => geheZu("chatHistory"));
+      halter.append(alle);
     }
     return;
   }
