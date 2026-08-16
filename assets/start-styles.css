@@ -5662,6 +5662,18 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #settings .settings-row select,
 #settings .settings-row input[type="text"] { max-width: 100%; }
 
+/* Betreiber 2026-08-16 (schriftlich im Chat): Das Code-Schreibfeld sitzt
+   wie bei Claude GANZ UNTEN, und darunter ist NICHTS — die Vorlagen-Chips
+   ("Fehler suchen", "Funktion einbauen", ...) sind weg, die Flaeche bleibt
+   leer. Die Chips existieren im Markup weiter (Rote Liste), sind aber
+   unsichtbar. */
+#code .code-wchips { display: none; }
+#code .codeflaeche {
+  height: calc(100vh - 130px);
+  max-height: none;
+}
+#code .codeunten { padding-bottom: 14px; }
+
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
 .code-modus-menue { min-width: 300px; }
