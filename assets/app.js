@@ -6,8 +6,8 @@ import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js"
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { initComposerTools } from "./composer-tools.js?v=werkzeuge-1";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=1";
-import { initGlobalSearch } from "./search.js?v=b38b";
-import { openSearchOverlay } from "./search-overlay.js?v=b47b";
+import { initGlobalSearch } from "./search.js?v=b38c";
+import { openSearchOverlay } from "./search-overlay.js?v=b47c";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=b36a";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";

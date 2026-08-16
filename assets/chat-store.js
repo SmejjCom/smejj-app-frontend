@@ -601,13 +601,23 @@ export async function openChat(id) {
   if (!chat || !log) return false;
   setActiveChatId(chat.id);
   renderEntriesInto(log, chat.messages || []);
+  // Bereichs-Anweisung in den Sitzungsspeicher — diese Zeile stand bis
+  // 2026-08-16 NACH dem return und lief darum nie (toter Code): die
+  // Dauer-Anweisung eines Projects fehlte beim Oeffnen seiner Gespraeche.
+  aktualisiereBereichsAnweisung(chat.projectId).catch(() => {});
   goToStart();
   return true;
-  aktualisiereBereichsAnweisung((await getChat(id))?.projectId).catch(() => {});
 }
 
 export function newChat() {
-  try { if (!sessionStorage.getItem(BEREICH_NEU_KEY)) sessionStorage.removeItem(BEREICH_ANWEISUNG_KEY); } catch { /* still */ }
+  // Vorgemerkter Bereich ("Neues Gespraech hier"): die Dauer-Anweisung
+  // SOFORT in den Sitzungsspeicher — sie muss schon fuer die erste
+  // Nachricht im Systemprompt stehen, nicht erst nach dem Speichern.
+  try {
+    const vormerkung = sessionStorage.getItem(BEREICH_NEU_KEY);
+    if (vormerkung) aktualisiereBereichsAnweisung(vormerkung).catch(() => {});
+    else sessionStorage.removeItem(BEREICH_ANWEISUNG_KEY);
+  } catch { /* still */ }
   const log = startLog();
   if (log && readEntries().length) {
     // aktueller Stand ist durch den Observer bereits gespeichert
