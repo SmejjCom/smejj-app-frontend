@@ -96,7 +96,9 @@ async function zeichneStartSpur(halter) {
     // Bildschirm 18: die Code-Spur hat EIGENE Punkte. "Neuer Auftrag"
     // fokussiert das Auftragsfeld; "Nach Zeitplan" ist der echte Nachtbau —
     // er wohnt unter Auftraege. Ohne erfundene Abzeichen und Uhrzeiten.
-    halter.append(punkt({ icon: "plus", text: "Neuer Auftrag", kuerzel: "⌘K", aktiv: true, aktion: () => {
+    // Claude nennt den Punkt kurz "Neu" — unser "Neuer Auftrag" wurde in der
+    // schmalen Spur abgeschnitten ("Neuer Auf…", Betreiber-Chrome 2026-08-16).
+    halter.append(punkt({ icon: "plus", text: "Neu", kuerzel: "⌘K", aktiv: true, aktion: () => {
       // Betreiber-Befund 2026-08-16 ("Warum schreibst du unter alte Chat?"):
       // nur das Feld zu leeren liess den offenen Chat WEITERLAUFEN — die
       // naechste Aufgabe landete im alten Gespraech. Erst newChat() trennt.
