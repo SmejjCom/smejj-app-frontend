@@ -5617,6 +5617,19 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #startLog .msg-actions .msg-act { pointer-events: auto; }
 #startLog .msg-actions.is-user { justify-content: flex-start; }
 
+/* Betreiber 2026-08-16: "gesamten Chat-Kontakt sehen" — der Chat wird DICHT.
+   Zwischen Frage und Antwort kaum Luft, getrennt nur durch einen leichten
+   Haarstrich; die Drei-Punkte sitzen in der letzten Zeile (Regel oben).
+   Dazu die App insgesamt kompakter: engere Koepfe und Raster. */
+#startLog { gap: 0; }
+#startLog .entry { margin: 0; padding-top: 7px; padding-bottom: 7px; }
+#startLog .entry.user { padding: 7px 11px; }
+#startLog .entry:not(:first-child) { border-top: 1px solid var(--v11-hair); }
+
+.view-header { margin-bottom: 10px; }
+.view-header .subhead { margin-top: 2px; }
+.panel-grid { gap: 8px; }
+
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
 .code-modus-menue { min-width: 300px; }
