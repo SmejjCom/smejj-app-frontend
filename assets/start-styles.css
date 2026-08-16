@@ -5668,8 +5668,11 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
    leer. Die Chips existieren im Markup weiter (Rote Liste), sind aber
    unsichtbar. */
 #code .code-wchips { display: none; }
+/* Auch die zugeklappte "Editor & Dateien"-Zeile unter dem Feld: weg —
+   der Betreiber will unter dem Schreibfeld NICHTS. Markup bleibt. */
+#code .code-werkzeuge { display: none; }
 #code .codeflaeche {
-  height: calc(100vh - 130px);
+  height: calc(100vh - 96px);
   max-height: none;
 }
 #code .codeunten { padding-bottom: 14px; }
