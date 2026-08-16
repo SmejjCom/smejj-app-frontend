@@ -460,22 +460,6 @@ export function clearThinkingState(output) {
 }
 
 /**
- * Ein abgerissener Bild-/Video-Strom hinterlaesst ein `![...](data:...`-Markdown
- * ohne schliessende Klammer — dann steht 100+ KB base64 als Rohtext im Chat.
- * Das Fragment wird abgeschnitten und durch einen verstaendlichen Satz ersetzt.
- */
-export function entferneAbgerisseneMedien(text) {
-  const roh = String(text || "");
-  const start = roh.lastIndexOf("![");
-  if (start === -1) return roh;
-  const rest = roh.slice(start);
-  const klammer = rest.indexOf("](data:");
-  if (klammer === -1 || rest.indexOf(")", klammer) !== -1) return roh;
-  const art = rest.slice(klammer).startsWith("](data:video") ? "Video" : "Bild";
-  return `${roh.slice(0, start).trimEnd()}\n\nDie ${art}-Übertragung ist abgerissen — bitte fordere es einfach noch einmal an.`;
-}
-
-/**
  * Fehlertext einer nicht angenommenen Antwort, so lesbar wie moeglich.
  * Eine HTML-Seite (typisch fuer ein Gateway) ist fuer Nutzer wertlos — dann
  * lieber der eigene Offline-Hinweis.
@@ -506,6 +490,26 @@ export async function readableError(response, offlineNotice = "") {
  * @param {HTMLElement} output Antwort-Knoten
  * @param {{renderMarkdown?: Function, offlineNotice?: string}} deps
  */
+// Betreiber 2026-08-16 ("Chat-Funktion wie ChatGPT"): laufende Stroeme sind
+// abbrechbar. Die Registry haelt jeden aktiven Leser; stoppeChatStrom()
+// cancelt sie alle — die Leseschleife endet dann SAUBER ueber done, der
+// normale Abschluss (Wartesignal weg, Markdown, Notiz-Fallback) laeuft wie
+// bei einem regulaeren Stromende. Das Fensterereignis "smejj:chat-strom"
+// meldet die Zahl laufender Stroeme an die Oberflaeche (Stopp-Knopf).
+const aktiveLeser = new Set();
+
+function meldeStromstand() {
+  try {
+    window.dispatchEvent(new CustomEvent("smejj:chat-strom", { detail: { laufen: aktiveLeser.size } }));
+  } catch { /* ohne Fenster (Tests) einfach still */ }
+}
+
+export function stoppeChatStrom() {
+  for (const leser of aktiveLeser) {
+    try { leser.cancel(); } catch { /* Strom war schon zu */ }
+  }
+}
+
 export async function streamChatAnswer(url, body, output, { renderMarkdown, offlineNotice = "" } = {}) {
   // Ab dem Absenden sichtbar arbeiten — der Server meldet sich erst nach
   // gemessenen 5,75 s (siehe starteWartesignal).
@@ -531,6 +535,8 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   }
 
   const reader = response.body.getReader();
+  aktiveLeser.add(reader);
+  meldeStromstand();
   const decoder = new TextDecoder();
   let buffer = "";
   // Ausgang der Werkzeugarbeit — gebraucht wird er erst ganz am Ende, fuer die
@@ -541,24 +547,9 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // nichts stehen (abgebrochener Lauf), kommt sie zurueck.
   let letzteNotiz = "";
 
-  // Stille-Waechter: Nach einem Container-Ersatz haelt der Load-Balancer die
-  // tote SSE-Verbindung offen (live gesehen 2026-08-13: Schrittzeile fror
-  // minutenlang bei "laeuft ... 60 s" ein, reader.read() wartete endlos). Die
-  // Bruecke tickt bei echter Arbeit alle ~10 s — 45 s Stille heisst: tot.
-  // Hinweis: Hintergrund-Tabs drosseln Timer, dort feuert die Uhr spaeter —
-  // unkritisch, weil dort auch niemand auf die eingefrorene Zeile schaut.
-  const STILLE_LIMIT_MS = 45_000;
-  const liesMitStilleUhr = () => {
-    let uhr;
-    return Promise.race([
-      reader.read(),
-      new Promise((_, ablehnen) => { uhr = setTimeout(() => ablehnen(new Error("stille-limit")), STILLE_LIMIT_MS); })
-    ]).finally(() => clearTimeout(uhr));
-  };
-
   try {
   while (true) {
-    const { value, done } = await liesMitStilleUhr();
+    const { value, done } = await reader.read();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
     const events = buffer.split("\n\n");
@@ -596,27 +587,15 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
     }
     output.scrollIntoView({ block: "end" });
   }
-  } catch (abriss) {
-    // Live gesehen 2026-08-13: Bruecken-Neustart mitten im Bild-Streamen —
-    // ohne Saeuberung stehen 131.072 Zeichen base64-Rohtext in der Blase.
-    stoppeWartesignal();
-    clearThinkingState(output);
-    output.textContent = entferneAbgerisseneMedien(output.textContent);
-    if (abriss?.message === "stille-limit") {
-      reader.cancel().catch(() => {});
-      const bisher = output.textContent.trim();
-      const hinweis = "Die Verbindung ist eingeschlafen — bitte sende die Frage einfach noch einmal.";
-      output.textContent = bisher ? `${bisher}\n\n${hinweis}` : hinweis;
-      renderMarkdown?.(output);
-      falteSchritte(output, schritteOhneFundZahl);
-      return;
-    }
-    throw abriss;
+  } finally {
+    // Immer deregistrieren — auch wenn read() wirft (Netzabbruch): sonst
+    // bliebe der Stopp-Knopf fuer immer stehen.
+    aktiveLeser.delete(reader);
+    meldeStromstand();
   }
   // Auch wenn der Strom ohne ein einziges Ereignis endet: das Signal muss weg.
   stoppeWartesignal();
   clearThinkingState(output);
-  output.textContent = entferneAbgerisseneMedien(output.textContent);
   // Der Lauf endete ohne Schlussantwort (alle Runden gingen in Werkzeuge).
   // Dann ist die letzte Arbeitsnotiz besser als eine leere Blase.
   if (!output.textContent.trim() && letzteNotiz.trim()) output.textContent = letzteNotiz;

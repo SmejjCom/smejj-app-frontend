@@ -6241,3 +6241,17 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 .chat-runter:hover { background: rgba(40, 48, 58, 0.95); }
 .chat-runter svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Stopp-Knopf waehrend der Antwort (Overlay ueber dem Senden-Pfeil) */
+.chat-stopp {
+  position: fixed;
+  z-index: 70;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; border: 0;
+  border-radius: 999px;
+  background: #f2f5f4;
+  color: #0a0f16;
+  cursor: pointer;
+}
+.chat-stopp:hover { background: #dfe5e3; }
+.chat-stopp svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
