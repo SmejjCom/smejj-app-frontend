@@ -2,7 +2,8 @@
 // 2026-08-15 im Chat: "Wenn man klickt, soll man oeffnen und wieder
 // zumachen koennen"). Am Handy bleibt der bisherige Weg aus app.js
 // (is-open + Abdunkeln); dieser Lauscher greift NUR ab 1024px und faengt
-// den Klick in der capture-Phase ab, bevor app.js ihn sieht.
+// den Klick in der capture-Phase ab, bevor app.js ihn sieht. Schwelle
+// 768 statt 1024: der Betreiber arbeitet mit Zoom (~778 CSS-px Fenster).
 //
 // Das Groesser-/Kleiner-Ziehen uebernehmen die vorhandenen Griffe
 // (#leftPanelResize/#rightPanelResize, app.js bindPanelResize) — hier
@@ -11,7 +12,7 @@
 const SPUR_ZU_KEY = "smejj.spurZu.v1";
 
 function desktop() {
-  return window.matchMedia("(min-width: 1024px)").matches;
+  return window.matchMedia("(min-width: 768px)").matches;
 }
 
 export function initSpurSchalter() {

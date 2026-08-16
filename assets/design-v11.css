@@ -767,8 +767,10 @@ body.spur-start-aktiv .nav-kosten { display: none; }
  * links, die Mitte schliesst mit einem Haarstrich an. Der Klapp-Mechanismus
  * bleibt fuer schmale Schirme vollstaendig erhalten — diese Regeln greifen
  * erst ab 1024 px. */
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   /* Betreiber-Entscheid 2026-08-15 (Chat): die Spur muss auch am Desktop
+     ZUGEHEN — und zwar schon ab 768 px: der Betreiber arbeitet mit Zoom,
+     sein Fenster hat effektiv ~778 CSS-px, die 1024er-Schwelle griff NIE.
      ZUGEHEN. Standard bleibt offen; der Menue-Knopf links oben schaltet
      body.spur-zu (app.js merkt sich den Zustand). Groesser/kleiner ziehen
      uebernehmen die vorhandenen Griffe (#leftPanelResize/#rightPanelResize). */
