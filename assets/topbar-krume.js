@@ -36,30 +36,17 @@ function zeichne() {
       hilfe.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.8.3-.9 1-.9 1.7"/><path d="M12 17h.01"/></svg>Hilfe';
       document.body.append(hilfe);
     }
-    // Der Avatar oben rechts (Mockup 24, wie ChatGPT): echte Initialen aus
-    // dem Profil, oeffnet das VORHANDENE Profilmenue der Spur — ein zweiter
-    // Weg zum selben Menue, keine zweite Logik. Sitzt links vom Hilfe-Link,
-    // damit die Ecke des Browser-Knopfs frei bleibt (Befund b0fb345).
-    if (!document.getElementById("topAvatar")) {
-      const avatar = document.createElement("button");
-      avatar.id = "topAvatar";
-      avatar.type = "button";
-      avatar.className = "top-hilfe top-avatar";
-      avatar.title = "Profil";
-      avatar.setAttribute("aria-label", "Profil");
-      let initialen = "•";
+    // Betreiber 2026-08-16: das Profil-Zeichen sitzt IM rechten Ecken-Knopf
+    // (browserButton) — wie links das Logo. Hier werden nur die echten
+    // Initialen aus dem Profilnamen eingesetzt; der Knopf selbst behaelt
+    // seine Funktion (rechtes Fenster auf/zu).
+    const initialenZiel = document.querySelector("#browserButton .profil-initialen");
+    if (initialenZiel) {
       try {
         const profil = JSON.parse(localStorage.getItem("smejj.profile.v1") || "{}");
         const n = String(profil.name || "").trim();
-        if (n) initialen = n.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+        if (n) initialenZiel.textContent = n.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
       } catch { /* ohne Profil bleibt der Punkt */ }
-      avatar.textContent = initialen;
-      avatar.style.cssText = "right:214px;width:34px;height:34px;justify-content:center;padding:0;border-radius:999px;font-weight:700;font-size:13px;border:0;cursor:pointer;color:inherit;";
-      avatar.addEventListener("click", (e) => {
-        e.stopPropagation();
-        document.getElementById("profileDockButton")?.click();
-      });
-      document.body.append(avatar);
     }
   }
   const text = name();

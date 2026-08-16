@@ -66,7 +66,7 @@
          1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
-    <link rel="stylesheet" href="/assets/start-styles.css?v=griffe-sichtbar-20260816">
+    <link rel="stylesheet" href="/assets/start-styles.css?v=profil-rechts-20260816">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -104,8 +104,12 @@
       <img class="app-brand-icon" src="/icons/smejj_icon.svg" alt="" aria-hidden="true" width="2000" height="1532">
       <img class="app-brand-wordmark" src="/icons/smejj_full_logo_on_dark.svg" alt="" aria-hidden="true" width="2920" height="660">
     </a>
-    <button id="browserButton" class="glass-icon browser-button" type="button" aria-label="Browser oeffnen" aria-expanded="false" title="Browser">
-      <span class="split-icon" aria-hidden="true"><span></span><span></span></span>
+    <!-- Betreiber 2026-08-16: rechts oben sitzt das PROFIL-Zeichen (Initialen)
+         statt des Menue-Icons — wie links das Logo. Die Funktion bleibt: der
+         Knopf oeffnet und schliesst das rechte Fenster. Die Initialen fuellt
+         topbar-krume.js aus dem Profilnamen. -->
+    <button id="browserButton" class="glass-icon browser-button" type="button" aria-label="Rechtes Fenster öffnen oder schließen" aria-expanded="false" title="Rechtes Fenster">
+      <span class="profil-initialen" aria-hidden="true">•</span>
     </button>
     <!-- Freigabe "Maus-Sichtbarkeit" (Wof Kadavanich, 2026-07-28): oeffnet die
          Maus-Engine-Wiedergabe direkt im rechten Browser-Panel (dieselben
@@ -876,7 +880,7 @@
     <script src="/assets/start-chips.js?v=b32b" type="module"></script>
     <script src="/assets/composer-sendetaste.js?v=v11-20260815" type="module"></script>
     <script src="/assets/nav-absichten.js?v=b32" type="module"></script>
-    <script src="/assets/topbar-krume.js?v=b33b" type="module"></script>
+    <script src="/assets/topbar-krume.js?v=b33c" type="module"></script>
     <script src="/assets/papierkorb.js?v=1" type="module"></script>
     <script src="/assets/arbeitsbereiche.js?v=2" type="module"></script>
     <script src="/assets/kamera.js?v=b35live2" type="module"></script>

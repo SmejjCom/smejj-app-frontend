@@ -517,6 +517,22 @@ body.spur-start-aktiv .nav-vier { display: none; }
 .app-menu-button .menu-logo { width: 24px; height: 24px; display: block; }
 .app-brand-logo { display: none !important; }
 
+/* Rechts oben das Profil-Zeichen im Ecken-Knopf (Betreiber 2026-08-16):
+   runder Kreis mit den echten Initialen, wie bei ChatGPT. */
+.browser-button .profil-initialen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--v11-cy-fill);
+  color: var(--v11-cy-ink);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 /* Betreiber 2026-08-16: das Plus-Menue oeffnet nach UNTEN (wie ChatGPT auf
    der leeren Startseite). Sobald der Chat laeuft (Feld unten, startLog
    sichtbar), klappt es automatisch wieder nach oben — sonst raus aus dem
