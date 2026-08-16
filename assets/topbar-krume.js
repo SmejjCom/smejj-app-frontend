@@ -36,18 +36,8 @@ function zeichne() {
       hilfe.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.8.3-.9 1-.9 1.7"/><path d="M12 17h.01"/></svg>Hilfe';
       document.body.append(hilfe);
     }
-    // Betreiber 2026-08-16: das Profil-Zeichen sitzt IM rechten Ecken-Knopf
-    // (browserButton) — wie links das Logo. Hier werden nur die echten
-    // Initialen aus dem Profilnamen eingesetzt; der Knopf selbst behaelt
-    // seine Funktion (rechtes Fenster auf/zu).
-    const initialenZiel = document.querySelector("#browserButton .profil-initialen");
-    if (initialenZiel) {
-      try {
-        const profil = JSON.parse(localStorage.getItem("smejj.profile.v1") || "{}");
-        const n = String(profil.name || "").trim();
-        if (n) initialenZiel.textContent = n.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
-      } catch { /* ohne Profil bleibt der Punkt */ }
-    }
+    // Rechts oben sitzt seit 2026-08-16 (zweite Betreiber-Ansage) wieder das
+    // Browser-Icon — das Profil wohnt unten links in der Spur.
   }
   const text = name();
   krume.textContent = text;
