@@ -113,10 +113,14 @@ export function buildPreferenceBlock() {
   // Anweisung: als Verhaltensregel im Systemprompt. "auto" ist der
   // Normalzustand und braucht keine Zeile.
   try {
+    // Live gemessen 2026-08-16: eine weiche Formulierung ("warte auf
+    // Freigabe") verliert gegen den Coding-Systemprompt — das Modell haengte
+    // den Diff direkt an den Plan. Darum ausdruecklich: KEIN Code in dieser
+    // Antwort.
     const modusText = {
-      manuell: "Berechtigungs-Modus MANUELL: Frage IMMER zuerst nach und warte auf ein Ja des Nutzers, bevor du Code schreibst, Dateien aenderst oder etwas erzeugst. Zeige vorher knapp, WAS du tun willst.",
-      akzeptieren: "Berechtigungs-Modus AUTOMATISCH AKZEPTIEREN: Fuehre Code- und Datei-Arbeit ohne Rueckfragen aus und fasse am Ende zusammen, was du getan hast.",
-      plan: "Berechtigungs-Modus PLAN: Erstelle ZUERST einen kurzen nummerierten Plan und warte auf die Freigabe des Nutzers, bevor du mit der Umsetzung beginnst."
+      manuell: "WICHTIGSTE REGEL (Berechtigungs-Modus MANUELL): Antworte zuerst NUR mit 1-3 Saetzen, WAS du tun wuerdest, und der Frage \"Soll ich das so machen?\". Schreibe in dieser Antwort KEINEN Code, keine Diffs und keine fertigen Dateien — erst nach einem Ja des Nutzers.",
+      akzeptieren: "Berechtigungs-Modus AUTOMATISCH AKZEPTIEREN: Fuehre Code- und Datei-Arbeit ohne Rueckfragen in einem Zug aus und fasse am Ende kurz zusammen, was du getan hast.",
+      plan: "WICHTIGSTE REGEL (Berechtigungs-Modus PLAN): Antworte NUR mit einem kurzen nummerierten Plan und der Schlussfrage \"Soll ich so umsetzen?\". Schreibe in dieser Antwort KEINEN Code, keine Diffs und keine fertigen Dateien — die Umsetzung kommt erst nach der Freigabe des Nutzers."
     }[localStorage.getItem("smejj.codeModus.v1")];
     if (modusText) lines.push(modusText);
   } catch { /* Beiwerk */ }
