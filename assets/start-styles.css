@@ -5630,6 +5630,22 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 .view-header .subhead { margin-top: 2px; }
 .panel-grid { gap: 8px; }
 
+/* Betreiber 2026-08-16: Verlauf und Suche kompakt wie der Chat — flache
+   Zeilen statt Karten, getrennt nur durch den Haarstrich. Die aktive
+   Zeile behaelt ihre leichte Cyan-Flaeche (Orientierung). */
+#chatHistory .ch-karte {
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 7px 10px;
+  margin-bottom: 0;
+}
+#chatHistory .ch-karte + .ch-karte { border-top: 1px solid var(--v11-hair); }
+#chatHistory .ch-karte.is-active { background: rgba(120, 220, 232, 0.10); }
+
+.search-overlay-row { padding-top: 4px; padding-bottom: 4px; }
+.search-overlay-row + .search-overlay-row { border-top: 1px solid var(--v11-hair); }
+
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
 .code-modus-menue { min-width: 300px; }
