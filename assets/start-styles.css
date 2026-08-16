@@ -5486,6 +5486,41 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   letter-spacing: -0.03em;
 }
 #code .codeleer { flex: 1; min-height: 80px; }
+
+/* Der adoptierte Chat-Stream (echter #startLog) fuellt die freie Flaeche —
+   der Auftrag streamt auf der Code-Seite selbst, wie bei Codex/Claude. */
+#code .code-log-halter { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; }
+#code .code-log-halter .start-log { flex: 1; }
+
+/* Projekt-Menue am Chip: gleiche Glas-Ruhe wie das Profilmenue, viereckig. */
+#code .repozeile { position: relative; }
+.code-projekt-menue {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background: rgba(13, 18, 25, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.code-projekt-menue button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  min-height: 44px;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.code-projekt-menue button:hover { background: rgba(94, 234, 212, 0.12); }
 #code .codeunten { padding: 14px 0 8px; }
 #code .repozeile {
   display: flex;

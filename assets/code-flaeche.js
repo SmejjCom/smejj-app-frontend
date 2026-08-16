@@ -17,6 +17,19 @@
 // - "Ein Auftrag kostet 3 Punkte" — es gibt kein Punktesystem; eine
 //   erfundene Zahl waere eine Luege.
 
+// Betreiber 2026-08-16: "genau wie Codex/Claude — in gleicher Seite bleiben
+// und anfangen zu programmieren". Der Auftrag laeuft darum durch den ECHTEN
+// Chat-Weg (startMessage + startSend), aber OHNE Ansichtswechsel: der echte
+// #startLog-Knoten (derselbe, kein Klon) wird in die Code-Flaeche geholt und
+// beim Verlassen der Ansicht zurueckgegeben. Antwort, Kopier-Knoepfe und
+// Verlauf sind damit dieselben wie im Chat — keine tote Kopie.
+//
+// WICHTIG (Falle vom 2026-08-16): dieses Modul stand nur als Kommentar in
+// index.html — das <script>-Tag fehlte, ALLE Knoepfe der Code-Seite waren
+// tot. Der module-queries-Test prueft jetzt auch dieses Glied.
+
+import { listProjekte, neuesGespraechImBereich, newChat } from "/assets/chat-store.js?v=b50";
+
 const STUFEN = ["auto", "gruendlich", "schnell"];
 const STUFEN_TEXT = { auto: "Automatisch", gruendlich: "Gründlich", schnell: "Schnell" };
 const MODELL_TEXT = { auto: "smejj 1.0", gruendlich: "smejj gründlich", schnell: "smejj schnell" };
@@ -37,6 +50,22 @@ function tiefe() {
   }
 }
 
+// Das gewaehlte Chat-Project der Code-Seite — BEWUSST ein eigener Schluessel:
+// smejj.currentProject gehoert dem lokalen Datei-Workspace, nicht den
+// Chat-Projects; ihn zu ueberschreiben wuerde die Dateiflaeche verstellen.
+const CODE_PROJEKT = "smejj.codeProjekt.v1";
+
+async function zeichneProjektChip() {
+  const chipKnopf = document.getElementById("codeProjektChip");
+  if (!chipKnopf) return;
+  const kennung = localStorage.getItem(CODE_PROJEKT) || "";
+  if (!kennung) { chipKnopf.textContent = "Projekt wählen …"; return; }
+  const projekte = await listProjekte().catch(() => []);
+  const eintrag = projekte.find((p) => p.id === kennung);
+  if (!eintrag) { localStorage.removeItem(CODE_PROJEKT); chipKnopf.textContent = "Projekt wählen …"; return; }
+  chipKnopf.textContent = `Projekt: ${eintrag.name}`;
+}
+
 function zeichne() {
   const gruss = document.getElementById("codeGruss");
   if (gruss) {
@@ -52,10 +81,40 @@ function zeichne() {
   if (modell) modell.innerHTML = `<b>${MODELL_TEXT[s]}</b>`;
   const t = document.getElementById("codeTiefeAnzeige");
   if (t) t.textContent = tiefe();
-  const projekt = document.getElementById("codeProjektChip");
-  if (projekt) {
-    const kennung = localStorage.getItem("smejj.currentProject") || localStorage.getItem("smejj-current-project") || "";
-    projekt.textContent = kennung ? "Projekt: gewählt" : "Projekt wählen …";
+  void zeichneProjektChip();
+  logVerwalten();
+}
+
+// ---- Der Chat-Stream IN der Code-Flaeche -------------------------------
+// Der echte #startLog wird adoptiert (derselbe Knoten wandert hierher);
+// ein unsichtbarer Anker merkt sich seinen Platz auf der Startseite.
+let logAnker = null;
+
+function holeLog() {
+  const log = document.getElementById("startLog");
+  const halter = document.getElementById("codeLogHalter");
+  if (!log || !halter) return;
+  if (log.parentElement !== halter) {
+    logAnker = document.createElement("div");
+    logAnker.hidden = true;
+    log.before(logAnker);
+    halter.append(log);
+  }
+  log.hidden = false;
+  const leer = document.querySelector("#code .codeleer");
+  if (leer) leer.hidden = true;
+}
+
+function logVerwalten() {
+  // Beim Verlassen der Code-Ansicht gehoert der Log zurueck auf die
+  // Startseite — sonst fehlt dort der Chat.
+  const codeAktiv = document.querySelector("#code")?.classList.contains("is-active");
+  const log = document.getElementById("startLog");
+  if (!codeAktiv && log && logAnker?.parentElement) {
+    logAnker.replaceWith(log);
+    logAnker = null;
+    const leer = document.querySelector("#code .codeleer");
+    if (leer) leer.hidden = false;
   }
 }
 
@@ -65,12 +124,58 @@ function senden() {
   const text = feld?.value.trim();
   if (!text || !start) return;
   feld.value = "";
+  holeLog();
+  // Derselbe echte Sende-Weg wie am Start — nur ohne Ansichtswechsel:
+  // die Antwort streamt in den adoptierten #startLog direkt hier.
   start.value = text;
   start.dispatchEvent(new Event("input", { bubbles: true }));
-  // In den Chat wechseln, wo die Antwort streamt — derselbe Weg, den jeder
-  // Spur-Knopf nimmt.
-  document.querySelector('.nav-vier .nav-button[data-view="start"], .nav-button[data-view="start"]')?.click();
-  setTimeout(() => document.getElementById("startSend")?.click(), 200);
+  document.getElementById("startSend")?.click();
+}
+
+// ---- Projekt-Menue (Betreiber: kein Rauswurf zur Projektseite) ---------
+function schliesseProjektMenue() {
+  document.getElementById("codeProjektMenue")?.remove();
+}
+
+async function oeffneProjektMenue() {
+  if (document.getElementById("codeProjektMenue")) { schliesseProjektMenue(); return; }
+  const chipKnopf = document.getElementById("codeProjektChip");
+  const zeile = chipKnopf?.closest(".repozeile");
+  if (!chipKnopf || !zeile) return;
+  const menue = document.createElement("div");
+  menue.id = "codeProjektMenue";
+  menue.className = "code-projekt-menue";
+  menue.setAttribute("role", "menu");
+  const eintragKnopf = (text, aktion) => {
+    const k = document.createElement("button");
+    k.type = "button";
+    k.setAttribute("role", "menuitem");
+    k.textContent = text;
+    k.addEventListener("click", (e) => { e.stopPropagation(); aktion(); });
+    return k;
+  };
+  const waehle = (id) => {
+    if (id) {
+      localStorage.setItem(CODE_PROJEKT, id);
+      // Frisches Gespraech IM Project (wie ChatGPT-Projects): die
+      // Dauer-Anweisung des Projects gilt ab dem ersten Wort.
+      neuesGespraechImBereich(id);
+      newChat();
+    } else {
+      localStorage.removeItem(CODE_PROJEKT);
+      newChat();
+    }
+    schliesseProjektMenue();
+    void zeichneProjektChip();
+  };
+  menue.append(eintragKnopf("Ohne Projekt", () => waehle("")));
+  const projekte = await listProjekte().catch(() => []);
+  for (const p of projekte) menue.append(eintragKnopf(p.name || "Projekt", () => waehle(p.id)));
+  menue.append(eintragKnopf("Neues Project anlegen …", () => {
+    schliesseProjektMenue();
+    document.querySelector('.nav-button[data-view="arbeitsbereiche"]')?.click();
+  }));
+  zeile.append(menue);
 }
 
 export function initCodeFlaeche() {
@@ -79,6 +184,13 @@ export function initCodeFlaeche() {
   flaeche.dataset.bereit = "an";
 
   document.getElementById("codeSenden")?.addEventListener("click", senden);
+  document.getElementById("codeProjektChip")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    void oeffneProjektMenue();
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest?.("#codeProjektMenue")) schliesseProjektMenue();
+  });
   document.getElementById("codeAufgabe")?.addEventListener("keydown", (ereignis) => {
     if (ereignis.key === "Enter" && !ereignis.shiftKey) {
       ereignis.preventDefault();

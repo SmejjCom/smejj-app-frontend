@@ -66,7 +66,7 @@
          1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
-    <link rel="stylesheet" href="/assets/start-styles.css?v=project-inline-20260816">
+    <link rel="stylesheet" href="/assets/start-styles.css?v=codeflaeche-20260816">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -145,7 +145,7 @@
           <button class="nav-button" type="button" data-view="arbeitsbereiche" data-icon="projects" title="Projects">Projects</button>
           <div class="nav-gruppe" aria-hidden="true">Meine Sachen</div>
           <button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Verlauf">Verlauf</button>
-          <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="Meine Dateien">Meine Dateien</button>
+          <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="smejjCloud">smejjCloud</button>
           <button class="nav-button" type="button" data-view="files" data-icon="files" title="Dateien">Dateien</button>
           <button class="nav-button" type="button" data-view="papierkorb" data-icon="trash" title="Papierkorb">Papierkorb</button>
           <div class="nav-gruppe" aria-hidden="true">Betrieb</div>
@@ -458,9 +458,12 @@
           <div class="codeflaeche">
             <div class="codegruss"><svg class="codegruss-zeichen" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg><span id="codeGruss">Was steht als Nächstes an?</span></div>
             <div class="codeleer" aria-hidden="true"></div>
+            <!-- Hierher wandert der ECHTE #startLog beim Senden (kein Klon):
+                 der Auftrag streamt auf dieser Seite, wie bei Codex/Claude. -->
+            <div id="codeLogHalter" class="code-log-halter"></div>
             <div class="codeunten">
               <div class="repozeile">
-                <button type="button" class="repochip an" id="codeProjektChip" data-jump="projects">Projekt wählen …</button>
+                <button type="button" class="repochip an" id="codeProjektChip">Projekt wählen …</button>
               </div>
               <div class="codefeld">
                 <textarea id="codeAufgabe" rows="2" placeholder="Beschreibe eine Aufgabe oder stelle eine Frage" aria-label="Code-Auftrag"></textarea>
@@ -515,10 +518,10 @@
         </details>
         </section>
 
-        <section id="projects" class="view" aria-label="Arbeitsbereich">
+        <section id="projects" class="view" aria-label="smejjCloud">
           <header class="view-header">
             <p class="eyebrow">Meine Sachen</p>
-            <h2>Meine Dateien</h2>
+            <h2>smejjCloud</h2>
             <p class="subhead">Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.</p>
           </header>
           <div class="toolbar">
@@ -886,7 +889,8 @@
     <script src="/assets/fuehrung.js?v=1" type="module"></script>
     <script src="/assets/arbeitsflaeche.js?v=1" type="module"></script>
     <script src="/assets/spur-schalter.js?v=8" type="module"></script>
-    <script src="/assets/spur-start.js?v=b34d" type="module"></script>
+    <script src="/assets/spur-start.js?v=b34e" type="module"></script>
+    <script src="/assets/code-flaeche.js?v=2" type="module"></script>
     <script src="/assets/app.js?v=b45" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>
