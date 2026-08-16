@@ -5591,6 +5591,20 @@ body.spur-zu:not(.right-panel-open) .prompt-glass {
   border-top: 0;
 }
 
+/* Betreiber 2026-08-16 ("Ich meine bei smejj Code"): die CODE-Seite wird
+   bei zugeklappten Fenstern flach wie Claude Code — das Schreibfeld ohne
+   Lichtkante auf ruhigem Grund, die Vorlagen-Chips ohne Karten-Look.
+   Das Feld selbst ist einzeilig (rows=1 im Markup). */
+body.spur-zu:not(.right-panel-open) #code .codefeld {
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.035);
+}
+body.spur-zu:not(.right-panel-open) #code .code-wchips button {
+  background: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.10);
+}
+#code .codefeld textarea { min-height: 26px; }
+
 /* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
 .code-modus-menue { min-width: 300px; }
