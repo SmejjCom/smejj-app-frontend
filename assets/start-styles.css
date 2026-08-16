@@ -5701,7 +5701,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 
 /* Ordner je Project: Speichern-Knopf sitzt neben dem Kopieren-Knopf am
    Codeblock; der Verbinden-Knopf auf der Projects-Karte wie die anderen. */
-.chat-code-save { right: 46px; }
+.chat-code-download { right: 46px; }
+.chat-code-save { right: 86px; }
 
 /* Projekt-Zeile im Code-Menue: links Name (waehlt Project), rechts der
    📁-Knopf (waehlt den Ordner — direkt hier, kein Seitenwechsel). */
