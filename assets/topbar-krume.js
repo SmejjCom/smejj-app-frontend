@@ -8,13 +8,11 @@
 // dort war schon einmal eine Kollisionsquelle (Betreiber-Befund b0fb345).
 
 function name() {
-  const ansicht = document.querySelector(".view.is-active");
-  if (!ansicht) return "";
-  // Betreiber-Entscheid 2026-08-15 (Chat): auf der Startseite KEINE Krume —
-  // "wer braucht diese Information Neuer Chat". In allen anderen Ansichten
-  // bleibt sie, dort sagt sie wirklich, wo man ist.
-  if (ansicht.id === "start") return "";
-  return ansicht.querySelector(".view-header h2, h2")?.textContent.trim() || "";
+  // Betreiber-Entscheid 2026-08-16 (Chat): die Krume verwirrt — jede
+  // Ansicht traegt ihre grosse Ueberschrift selbst, die kleine Zeile oben
+  // doppelte sie nur ("/ Meine Dateien" ueber "Meine Dateien"). Sie ist
+  // darum UEBERALL leer; das Modul bleibt fuer den Hilfe-Link bestehen.
+  return "";
 }
 
 function zeichne() {
