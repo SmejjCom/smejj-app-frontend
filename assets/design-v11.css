@@ -797,12 +797,21 @@ body.spur-start-aktiv .nav-kosten { display: none; }
     border-right: 1px solid var(--v11-hair);
     box-shadow: none;
   }
-  /* Der Zieh-Griff sitzt IMMER an der rechten Spur-Kante (Betreiber-Befund
-     2026-08-15: er hing durch eine Alt-Regel bei x=-24 und war unziehbar). */
-  .sidebar .left-panel-resizer {
-    left: auto !important;
-    right: -6px !important;
+  /* Der Zieh-Griff als FIXES Overlay an der Spur-Kante (Betreiber-Befund
+     2026-08-15: als Sidebar-Kind verschluckte der Hit-Test jeden Klick —
+     elementFromPoint traf BODY statt Griff). position:fixed loest ihn aus
+     Clip und Stapel der Spur; die Breiten-Variable haelt ihn an der Kante. */
+  body:not(.spur-zu) .sidebar .left-panel-resizer {
+    position: fixed !important;
+    left: calc(var(--left-panel-width, 196px) - 6px) !important;
+    right: auto !important;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    z-index: 80;
+    pointer-events: auto !important;
   }
+  body.spur-zu .sidebar .left-panel-resizer { display: none; }
 }
 
 /* Profilzeile unten wie ChatGPT (Betreiber 2026-08-15): runder Avatar,
