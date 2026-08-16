@@ -194,7 +194,12 @@ export function setPanelWidth(side, rawWidth, { persist = true } = {}) {
   const width = Math.round(Math.min(Math.max(rawWidth, PANEL_WIDTHS.compact), maxWidth));
   const prop = side === "left" ? "--left-panel-width" : "--right-panel-width";
   document.documentElement.style.setProperty(prop, `${width}px`);
-  applyPanelCompact(side, width, side === "left" ? PANEL_WIDTHS.min - 1 : PANEL_WIDTHS.compact);
+  // Rechts galt bis 2026-08-16 die 28px-Schwelle: zwischen 28 und 188 zeigte
+  // das schmale Panel sein VOLLES Menue — der Kopfzeilen-Knopf lag ueber dem
+  // ersten Eintrag ("Browser" war fuer echte Klicks tot, live gemessen bei
+  // 176 px). Beide Seiten schalten jetzt unter 188 px auf Nur-Icons um;
+  // das Kleinziehen selbst bleibt wie vom Betreiber entschieden.
+  applyPanelCompact(side, width, PANEL_WIDTHS.min - 1);
   if (persist) localStorage.setItem(PANEL_WIDTH_KEYS[side], String(width));
 }
 
