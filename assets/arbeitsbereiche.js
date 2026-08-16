@@ -20,6 +20,8 @@ function geheZu(view) {
   document.querySelector(`.nav-vier .nav-button[data-view="${view}"], .nav-button[data-view="${view}"]`)?.click();
 }
 
+let formularOffen = false;
+let formularWert = "";
 let zeichenLauf = 0;
 
 async function zeichne() {
@@ -47,6 +49,11 @@ async function zeichne() {
   // mehr. Der Knopf klappt ein Eingabefeld direkt in der Seite auf; Enter
   // oder "Anlegen" erstellt, Escape klappt zu. Fehler stehen als Zeile
   // daneben, nicht als alert().
+  //
+  // Offen-Zustand und Eingabe leben in Modul-Variablen: der globale
+  // Klick-Lauscher zeichnet die Ansicht 150 ms nach JEDEM Klick neu — ohne
+  // die Merker wuerde genau der oeffnende Klick das frische Formular sofort
+  // wieder zuklappen (live gemessen).
   const neu = document.createElement("button");
   neu.type = "button";
   neu.id = "bereichNeu";
@@ -54,11 +61,13 @@ async function zeichne() {
   const formular = document.createElement("form");
   formular.id = "bereichNeuFormular";
   formular.className = "bereich-neu-formular";
-  formular.hidden = true;
+  formular.hidden = !formularOffen;
   const eingabe = document.createElement("input");
   eingabe.type = "text";
   eingabe.placeholder = "Wie soll das Project heißen?";
   eingabe.maxLength = 60;
+  eingabe.value = formularWert;
+  eingabe.addEventListener("input", () => { formularWert = eingabe.value; });
   const anlegen = document.createElement("button");
   anlegen.type = "submit";
   anlegen.textContent = "Anlegen";
@@ -67,11 +76,12 @@ async function zeichne() {
   meldung.setAttribute("role", "status");
   formular.append(eingabe, anlegen, meldung);
   neu.addEventListener("click", () => {
-    formular.hidden = !formular.hidden;
-    if (!formular.hidden) eingabe.focus();
+    formularOffen = !formularOffen;
+    formular.hidden = !formularOffen;
+    if (formularOffen) eingabe.focus();
   });
   eingabe.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") { formular.hidden = true; neu.focus(); }
+    if (e.key === "Escape") { formularOffen = false; formular.hidden = true; neu.focus(); }
   });
   formular.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -85,9 +95,12 @@ async function zeichne() {
       eingabe.focus();
       return;
     }
+    formularOffen = false;
+    formularWert = "";
     zeichne();
   });
   stueck.append(neu, formular);
+  if (formularOffen) queueMicrotask(() => eingabe.focus());
 
   if (!projekte.length) {
     const leer = document.createElement("p");
