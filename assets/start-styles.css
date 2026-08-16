@@ -5520,7 +5520,7 @@ body.spur-start-aktiv .nav-kosten { display: none; }
      2026-08-15: als Sidebar-Kind verschluckte der Hit-Test jeden Klick —
      elementFromPoint traf BODY statt Griff). position:fixed loest ihn aus
      Clip und Stapel der Spur; die Breiten-Variable haelt ihn an der Kante. */
-  body:not(.spur-zu) .sidebar .left-panel-resizer {
+  body:not(.spur-zu) .left-panel-resizer {
     position: fixed !important;
     left: calc(var(--left-panel-width, 196px) - 6px) !important;
     right: auto !important;
@@ -5530,7 +5530,7 @@ body.spur-start-aktiv .nav-kosten { display: none; }
     z-index: 80;
     pointer-events: auto !important;
   }
-  body.spur-zu .sidebar .left-panel-resizer { display: none; }
+  body.spur-zu .left-panel-resizer { display: none; }
 }
 
 /* Profilzeile unten wie ChatGPT (Betreiber 2026-08-15): runder Avatar,

@@ -19,6 +19,12 @@ export function initSpurSchalter() {
   const knopf = document.getElementById("appMenuButton");
   if (!knopf || knopf.dataset.spurSchalter) return false;
   knopf.dataset.spurSchalter = "an";
+  // Der Zieh-Griff lag als Spur-Kind unter overflow:hidden und im eigenen
+  // Stacking-Kontext (backdrop-filter) — kein Mausklick kam je an
+  // (elementFromPoint traf den Body). Am document.body wirkt position:fixed
+  // global; die pointerdown-Listener reisen beim Umhaengen mit.
+  const griff = document.getElementById("leftPanelResize");
+  if (griff && desktop()) document.body.append(griff);
   try {
     if (localStorage.getItem(SPUR_ZU_KEY) === "zu") document.body.classList.add("spur-zu");
   } catch { /* offen ist der Standard */ }
