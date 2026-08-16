@@ -37,15 +37,10 @@ function baueKnopf() {
 export function initChatRunterPfeil() {
   if (document.getElementById("chatRunter")) return false;
   const knopf = baueKnopf();
-  let angefragt = false;
-  const zeige = () => {
-    angefragt = false;
-    knopf.hidden = !(startAktivMitChat() && !amEnde());
-  };
+  // Bewusst OHNE requestAnimationFrame: im versteckten Tab feuert rAF nie
+  // (gemessen 2026-08-09) — und die Arbeit ist nur ein hidden-Toggle.
   const plane = () => {
-    if (angefragt) return;
-    angefragt = true;
-    requestAnimationFrame(zeige);
+    knopf.hidden = !(startAktivMitChat() && !amEnde());
   };
   window.addEventListener("scroll", plane, { passive: true });
   window.addEventListener("resize", plane, { passive: true });
