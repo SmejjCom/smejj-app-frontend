@@ -103,12 +103,26 @@ function kurzName(id) {
     .trim();
 }
 
+// Reihenfolge = Betreiber-Freigabe 2026-08-17 ("smejj 1.0 zuerst, dann
+// nach Staerke/Beliebtheit"). Deepseek Flash zeigt BEWUSST die
+// Cline-Pass-Variante — die Gratis-ID ist per API gesperrt (403).
 const CLINE_KURZ = [
-  ["GLM 5.3", "cline-pass/glm-5.3"],
   ["Opus 5", "anthropic/claude-opus-5"],
   ["GPT 5.6", "openai/gpt-5.6-sol"],
+  ["GLM 5.3", "cline-pass/glm-5.3"],
   ["Grok 4.5", "x-ai/grok-4.5"],
-  ["Kimi K3", "moonshotai/kimi-k3"]
+  ["Kimi K3", "moonshotai/kimi-k3"],
+  ["Deepseek V4 Pro", "cline-pass/deepseek-v4-pro"],
+  ["Qwen 3.8 Max", "cline-pass/qwen3.8-max"],
+  ["Kimi K2.7 Code", "cline-pass/kimi-k2.7-code"],
+  ["Minimax M3", "cline-pass/minimax-m3"],
+  ["Deepseek V4 Flash", "cline-pass/deepseek-v4-flash"],
+  ["Qwen 3.7 Max", "cline-pass/qwen3.7-max"],
+  ["GLM 5.2", "cline-pass/glm-5.2"],
+  ["Mimo V2.5 Pro", "cline-pass/mimo-v2.5-pro"],
+  ["Qwen 3.7 Plus", "cline-pass/qwen3.7-plus"],
+  ["Kimi K2.6", "cline-pass/kimi-k2.6"],
+  ["Mimo V2.5", "cline-pass/mimo-v2.5"]
 ];
 
 function modellAnzeige() {
@@ -298,6 +312,9 @@ async function oeffneModellMenue() {
     }
     for (const m of katalog?.models || []) {
       if (gezeigt.has(m.id)) continue;
+      // Gratis-Gruppe NICHT anbieten: per API gesperrt ("only available
+      // via Cline product surfaces", 403 live gemessen) — tote Knoepfe.
+      if (m.category === "free") continue;
       const kurz = kurzName(m.id);
       if (gezeigt.has(kurz.toLowerCase())) continue;
       baueZeile(kurz, m.id);
