@@ -81,17 +81,24 @@ async function zeichneStartSpur(halter) {
     start: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 11 8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>',
     code: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg>'
   };
+  // Beim DIREKTEN Seitenaufruf von /code zeichnet die Spur, BEVOR der
+  // Router die is-active-Klasse setzt (#start traegt sie STATISCH im
+  // Markup) — dann zeigte sie die Start-Punkte und markierte "Start"
+  // (Betreiber-Screenshot 2026-08-16). Die Adresse kennt die Ansicht
+  // schon; sobald der Router #code umschaltet, zeichnet der Beobachter in
+  // initSpurStart ohnehin nach.
+  const codeAktiv = document.querySelector("#code")?.classList.contains("is-active")
+    || location.pathname === "/code";
   for (const [view, name] of [["start", "Start"], ["code", "Code"]]) {
     const r = document.createElement("button");
     r.type = "button";
     r.innerHTML = `${REITER_ICON[view]}<span>${name}</span>`;
-    r.className = document.querySelector(`#${view}`)?.classList.contains("is-active") ? "an" : "";
+    r.className = (view === "code" ? codeAktiv : !codeAktiv) ? "an" : "";
     r.addEventListener("click", () => geheZu(view));
     reiter.append(r);
   }
   halter.append(reiter);
 
-  const codeAktiv = document.querySelector("#code")?.classList.contains("is-active");
   if (codeAktiv) {
     // Bildschirm 18: die Code-Spur hat EIGENE Punkte. "Neuer Auftrag"
     // fokussiert das Auftragsfeld; "Nach Zeitplan" ist der echte Nachtbau —
@@ -217,6 +224,12 @@ export function initSpurStart() {
   document.addEventListener("click", () => setTimeout(schalte, 150));
   window.addEventListener("popstate", () => setTimeout(schalte, 150));
   window.addEventListener("smejj:chats-changed", () => setTimeout(schalte, 150));
+  // Beim direkten /code-Aufruf schaltet der Router die is-active-Klasse
+  // ERST NACH dem ersten Zeichnen um — ohne Klick und ohne popstate. Der
+  // Beobachter zeichnet dann nach (Betreiber-Screenshot 2026-08-16:
+  // Start-Spur auf der Code-Seite).
+  const codeView = document.querySelector("#code");
+  if (codeView) new MutationObserver(() => setTimeout(schalte, 30)).observe(codeView, { attributes: true, attributeFilter: ["class"] });
   schalte();
   return true;
 }

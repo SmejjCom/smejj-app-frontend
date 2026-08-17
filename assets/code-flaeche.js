@@ -328,6 +328,12 @@ export function initCodeFlaeche() {
     });
   }
   document.addEventListener("click", () => setTimeout(zeichne, 150));
+  // Der Gruss-Name kommt aus dem Profil-Dock — das laedt sein Konto NACH
+  // dem ersten Zeichnen (direkter /code-Aufruf zeigte "Was steht als
+  // Naechstes an?" OHNE Namen, Betreiber-Screenshot 2026-08-16; Claude
+  // gruesst mit Namen). Sobald der Dock-Name eintrifft, Gruss nachziehen.
+  const dockName = document.getElementById("profileDockName");
+  if (dockName) new MutationObserver(() => zeichne()).observe(dockName, { childList: true, characterData: true, subtree: true });
   zeichne();
   return true;
 }
