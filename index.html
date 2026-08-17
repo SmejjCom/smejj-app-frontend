@@ -66,7 +66,7 @@
          1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
-    <link rel="stylesheet" href="/assets/start-styles.css?v=zcode-leiste-20260816">
+    <link rel="stylesheet" href="/assets/start-styles.css?v=codeplus-20260816">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -467,6 +467,33 @@
               </div>
               <div class="codefeld">
                 <textarea id="codeAufgabe" rows="1" placeholder="Beschreibe eine Aufgabe oder stelle eine Frage" aria-label="Code-Auftrag"></textarea>
+                <!-- Betreiber 2026-08-16: das Plus im CODE-Feld oeffnet ein
+                     Menue wie bei Claude (1:1-Optik: Gruppen, Trennlinie,
+                     Kuerzel rechts, Untermenue-Pfeil). Dahinter liegen NUR
+                     echte smejj-Funktionen — Claudes Skills/Konnektoren/
+                     Plugins gibt es hier nicht und stehen darum nicht drin
+                     (Blindgaenger-Verbot). Verdrahtung: code-flaeche.js. -->
+                <div id="codePlusMenue" class="code-plus-menu" role="menu" aria-label="Hinzufügen" hidden>
+                  <button type="button" role="menuitem" data-code-plus="dateien">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.44 11.05 12 20.5a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.74 9.1L9.17 17.67a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    <span>Dateien oder Fotos hinzufügen</span>
+                    <kbd aria-hidden="true">⌘U</kbd>
+                  </button>
+                  <button type="button" role="menuitem" data-code-plus="foto">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg>
+                    <span>Foto aufnehmen</span>
+                  </button>
+                  <button type="button" role="menuitem" data-code-plus="projekt">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                    <span>Zum Projekt hinzufügen</span>
+                    <svg class="plus-pfeil" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 7 5 5-5 5"/></svg>
+                  </button>
+                  <div class="code-plus-line" role="separator" aria-hidden="true"></div>
+                  <button type="button" role="menuitem" data-code-plus="recherche">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+                    <span>Recherche</span>
+                  </button>
+                </div>
                 <div class="codeleiste">
                   <button type="button" class="repochip" id="codeModusChip" title="Berechtigungs-Modus — wann smejj vor Änderungen fragt">Auto</button>
                   <button type="button" class="repochip" id="codeStufeChip" title="Antwortstufe wechseln">Automatisch</button>
@@ -892,7 +919,7 @@
     <script src="/assets/spur-schalter.js?v=9" type="module"></script>
     <script src="/assets/spur-start.js?v=b34k" type="module"></script>
     <script src="/assets/projekt-ordner.js?v=1" type="module"></script>
-    <script src="/assets/code-flaeche.js?v=9" type="module"></script>
+    <script src="/assets/code-flaeche.js?v=10" type="module"></script>
     <script src="/assets/app.js?v=b50" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>

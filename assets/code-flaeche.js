@@ -296,6 +296,9 @@ export function initCodeFlaeche() {
   document.addEventListener("click", (e) => {
     if (!e.target.closest?.("#codeProjektMenue")) schliesseProjektMenue();
     if (!e.target.closest?.("#codeModusMenue")) schliesseModusMenue();
+    // Plus-Menue: Klick ausserhalb schliesst (schliessePlus ist zur
+    // Klickzeit laengst gebunden — Handler feuern erst nach init).
+    if (!e.target.closest?.("#codePlusMenue") && !e.target.closest?.("#codeAnhang")) schliessePlus();
   });
   document.getElementById("codeModusChip")?.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -307,9 +310,62 @@ export function initCodeFlaeche() {
       senden();
     }
   });
-  // Anhang und Diktat (Bildschirm 18): dieselben echten Wege wie am Start.
-  document.getElementById("codeAnhang")?.addEventListener("click", () => {
-    document.getElementById("composerFileInput")?.click();
+  // Plus-Menue wie bei Claude (Betreiber 2026-08-16): das Plus oeffnet ein
+  // Menue in Claudes Anordnung; jeder Punkt ruft einen ECHTEN smejj-Weg.
+  // Fail-safe: fehlt das Menue im DOM, bleibt der alte Direktweg (Dateiwahl).
+  const plusMenue = document.getElementById("codePlusMenue");
+  const plusKnopf = document.getElementById("codeAnhang");
+  const schliessePlus = () => {
+    if (plusMenue) plusMenue.hidden = true;
+    plusKnopf?.setAttribute("aria-expanded", "false");
+  };
+  plusKnopf?.addEventListener("click", (e) => {
+    if (!plusMenue) { document.getElementById("composerFileInput")?.click(); return; }
+    e.stopPropagation();
+    const oeffnen = plusMenue.hidden;
+    plusMenue.hidden = !oeffnen;
+    plusKnopf.setAttribute("aria-expanded", oeffnen ? "true" : "false");
+  });
+  plusMenue?.addEventListener("click", (e) => {
+    const knopf = e.target.closest?.("[data-code-plus]");
+    if (!knopf) return;
+    const was = knopf.dataset.codePlus;
+    schliessePlus();
+    if (was === "dateien") document.getElementById("composerFileInput")?.click();
+    else if (was === "foto") document.getElementById("composerCaptureInput")?.click();
+    else if (was === "projekt") document.getElementById("codeProjektChip")?.click();
+    else if (was === "recherche") {
+      const feld = document.getElementById("codeAufgabe");
+      if (feld) {
+        feld.value = "Recherchiere für mich: ";
+        feld.focus();
+        feld.setSelectionRange(feld.value.length, feld.value.length);
+        feld.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") schliessePlus();
+    // Cmd/Strg+U wie bei Claude: Dateien hinzufuegen, nur in der CODE-Ansicht.
+    if ((e.metaKey || e.ctrlKey) && (e.key === "u" || e.key === "U")
+      && document.querySelector("#code.view.is-active")) {
+      e.preventDefault();
+      document.getElementById("composerFileInput")?.click();
+    }
+  });
+  // Arbeits-Punkt (Betreiber 2026-08-16: "viereckiger Punkt im Schreibfeld,
+  // man soll erkennen: arbeitet gerade"): haengt am echten Strom-Signal
+  // smejj:chat-strom aus chat-stream.js — kein geratener Zustand.
+  const arbeitsPunkt = document.createElement("span");
+  arbeitsPunkt.id = "codeArbeitsPunkt";
+  arbeitsPunkt.className = "code-arbeit";
+  arbeitsPunkt.title = "smejj arbeitet gerade";
+  arbeitsPunkt.setAttribute("role", "status");
+  arbeitsPunkt.setAttribute("aria-label", "smejj arbeitet gerade");
+  arbeitsPunkt.hidden = true;
+  document.querySelector("#code .codeleiste")?.prepend(arbeitsPunkt);
+  window.addEventListener("smejj:chat-strom", (e) => {
+    arbeitsPunkt.hidden = !(Number(e.detail?.laufen) > 0);
   });
   document.getElementById("codeDiktat")?.addEventListener("click", () => {
     document.querySelector('[data-start-tool="voice"]')?.click();
