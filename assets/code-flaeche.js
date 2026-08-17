@@ -788,6 +788,21 @@ export function initCodeFlaeche() {
       document.querySelector('.nav-button[data-view="tools"]')?.click();
     }
   });
+  // Start-Schreibfeld waechst mit dem Text (Betreiber 2026-08-17: "man
+  // soll ganze Schreiben sehen"). Fallback fuer Browser ohne
+  // field-sizing: Hoehe nach jedem Tippen neu messen, Deckel 40vh.
+  const startFeld = document.getElementById("startMessage");
+  if (startFeld && !startFeld.dataset.autoHoehe) {
+    startFeld.dataset.autoHoehe = "an";
+    const wachsen = () => {
+      startFeld.style.height = "auto";
+      const deckel = Math.round(window.innerHeight * 0.4);
+      startFeld.style.height = `${Math.min(startFeld.scrollHeight, deckel)}px`;
+    };
+    startFeld.addEventListener("input", wachsen);
+    window.addEventListener("smejj:chat-strom", () => setTimeout(wachsen, 0));
+    wachsen();
+  }
   // Arbeits-Viereck wie bei Claude (Betreiber 2026-08-16): dasselbe
   // Strom-Signal wie der Stopp-Knopf — laeuft mindestens ein Strom,
   // pulsiert das Viereck in Logo-Cyan.

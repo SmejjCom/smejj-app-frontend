@@ -6874,8 +6874,13 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   order: 0;
   flex: 1 1 100%;
   width: 100%;
-  height: auto;
-  min-height: 40px;
+  /* !important, weil die Ein-Pillen-Regel weiter oben height:40px setzt
+     und sogar den Inline-Stil des Autogrow schlaegt (live gemessen:
+     scrollHeight 120, sichtbar 44). field-sizing waechst nativ, das JS
+     unten ist der Fallback fuer Browser ohne Unterstuetzung. */
+  height: auto !important;
+  field-sizing: content;
+  min-height: 40px !important;
   max-height: 40vh;
   overflow-y: auto;
 }
