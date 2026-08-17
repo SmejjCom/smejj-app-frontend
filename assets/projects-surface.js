@@ -25,7 +25,10 @@ export function bindProjects(deps) {
     showToast("Projekt angelegt.");
   });
 
-  $("#projectRefresh").addEventListener("click", refreshProjectList);
+  // Nutzertest 2026-08-17: refreshProjectList stand DIREKT als Handler —
+  // damit kam das Klick-EREIGNIS als deps an (workspace undefined), jeder
+  // Klick auf "Liste aktualisieren" crashte und die Liste blieb leer.
+  $("#projectRefresh").addEventListener("click", () => { refreshProjectList(deps).catch(() => {}); });
 
   $("#projectOpen").addEventListener("click", async () => {
     try {
