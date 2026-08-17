@@ -175,23 +175,10 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v492";
+const CACHE_NAME = "smejj-shell-v333";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
-  "/assets/start-chips.js",
-  "/assets/composer-sendetaste.js",
-  "/assets/nav-absichten.js",
-  "/assets/topbar-krume.js",
-  "/assets/spur-start.js",
-  "/assets/code-flaeche.js",
-  "/assets/kamera.js",
-  "/assets/fuehrung.js",
-  "/assets/willkommen-fokus.js",
-  "/assets/arbeitsflaeche.js",
-  "/assets/spur-schalter.js",
-  "/assets/arbeitsbereiche.js",
-  "/assets/papierkorb.js",
   "/assets/composer-paste-attach.js",
   "/assets/static-pages.css",
   "/assets/deferred-start.js",
@@ -220,7 +207,6 @@ const SHELL = [
   "/assets/quellen-panel.js",
   "/assets/app-surfaces.css",
   "/assets/design-v11-views.css",
-  "/assets/design-cyan-views.css",
   "/assets/settings-surface.css",
   "/assets/account-privacy.css",
   "/assets/panel-backdrop.css",
@@ -233,7 +219,6 @@ const SHELL = [
   "/assets/config.js",
   "/assets/components.js",
   "/assets/chat-markdown.js",
-  "/assets/chat-medien.js",
   "/assets/frame-guard.js",
   "/assets/app.js",
   "/assets/view-title.js",
@@ -279,20 +264,33 @@ const SHELL = [
   "/assets/ai/fetch-retry.js",
   "/assets/composer-dictation.js",
   "/assets/chat-store.js",
-  "/assets/chat-owner.js",
-  "/assets/chat-sync.js",
   "/assets/chat-history-view.js",
   "/assets/chat-history-text.js",
   "/assets/chat-history-cards.js",
   "/assets/chat-title-auto.js",
   "/assets/chat-messages.js",
   "/assets/chat-actions.js",
+  // Beispiel-Chips der Startseite (2026-08-13). index.html laedt sie per
+  // <script>; ohne Eintrag hier fehlen sie offline — check:precache-imports
+  // hat genau das gemeldet.
+  "/assets/start-chips.js",
+  // Ein Knopf fuer zwei Zwecke (Design V11, Betreiber-Freigabe 2026-08-15):
+  // leer = Sprachwelle, getippt = senden. Muss in den Vorrat, sonst faellt
+  // die Startseite offline auf den alten Senden-Knopf zurueck.
+  "/assets/composer-sendetaste.js",
+  "/assets/nav-absichten.js",
+  "/assets/topbar-krume.js",
+  "/assets/spur-start.js",
+  "/assets/code-flaeche.js",
+  "/assets/kamera.js",
+  "/assets/fuehrung.js",
+  "/assets/willkommen-fokus.js",
+  "/assets/arbeitsflaeche.js",
+  "/assets/spur-schalter.js",
+  "/assets/arbeitsbereiche.js",
+  "/assets/papierkorb.js",
   "/assets/chat-actions-menu.js",
   "/assets/chat-code-copy.js",
-  "/assets/chat-runter-pfeil.js",
-  "/assets/chat-stopp.js",
-  "/assets/chat-code-farben.js",
-  "/assets/chat-code-download.js",
   "/assets/workspace-bridge.js",
   "/assets/storage/index.js",
   "/assets/storage/localWorkspace.js",
@@ -344,43 +342,8 @@ const SHELL = [
   "/en/privacy.html"
 ];
 
-// VORABSPEICHERN MIT ECHTEM URSPRUNGSABRUF (Befund 2026-08-14).
-//
-// Vorher stand hier `cache.addAll(SHELL.map(url => new Request(url, { cache:
-// "reload" })))`. `cache: "reload"` umgeht aber nur den BROWSER-Cache, nicht
-// den Rand-Cache von GitHub Pages (max-age 600). Beim Deploy ist die neue
-// sw.js am Rand oft schon da, waehrend die Asset-Dateien noch die alten sind —
-// der frisch angelegte Speicher wurde also mit ALTEM Inhalt gefuellt und
-// lieferte ihn danach cache-first aus, bis irgendwann der NAECHSTE Deploy kam.
-// Der Versions-Bump, der die Auslieferung sichern soll, hat sie so gerade
-// verhindert.
-//
-// GEMESSEN am 2026-08-13: Nach dem Deploy von v340 lag der Speicher
-// "smejj-shell-v343" an, sein Inhalt war der von v339 — die neue Datei war am
-// selben Rand per curl bereits abrufbar. Erst Loeschen des Eintrags plus
-// Neuabruf brachte den richtigen Stand.
-//
-// Der Anhang `?sw=<CACHE_NAME>` ist je Version eindeutig und zwingt den Rand
-// damit zu einem echten Ursprungsabruf. Gespeichert wird unter dem SAUBEREN
-// Pfad, damit der cache-first-Abgleich (caches.match mit ignoreSearch) den
-// Eintrag unveraendert findet.
-//
-// Alles-oder-nichts bleibt wie bei addAll: faellt eine Datei aus, schlaegt die
-// Installation fehl und der ALTE Service Worker bleibt aktiv. Ein halb
-// gefuellter Speicher waere schlimmer als ein verschobener Deploy.
-async function fuelleVorabSpeicher(cache) {
-  await Promise.all(SHELL.map(async (pfad) => {
-    const trenner = pfad.includes("?") ? "&" : "?";
-    const antwort = await fetch(new Request(`${pfad}${trenner}sw=${CACHE_NAME}`, { cache: "reload" }));
-    if (!antwort || !antwort.ok) {
-      throw new Error(`precache_fehlgeschlagen:${pfad}:${antwort ? antwort.status : "keine Antwort"}`);
-    }
-    await cache.put(pfad, antwort);
-  }));
-}
-
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then(fuelleVorabSpeicher));
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL.map((url) => new Request(url, { cache: "reload" })))));
   self.skipWaiting();
 });
 
@@ -402,35 +365,6 @@ const LIVE_DATEN_PFADE = new Set(["/verlauf-messwerte.json"]);
 
 // HTML bleibt network-first: Navigationen und .html-Seiten sollen Aenderungen
 // sofort sehen; nur fuer sie ist der Netz-Rundweg den Preis wert.
-/**
- * Holt eine vorab gespeicherte Datei im Hintergrund neu und ersetzt den
- * Eintrag, wenn sich der Inhalt geaendert hat.
- *
- * Der Abruf traegt denselben Cache-Buster wie beim Vorabspeichern: `reload`
- * allein umgeht nur den Browser-Cache, nicht den Rand-Cache von GitHub Pages.
- * Gespeichert wird unter dem SAUBEREN Pfad, damit der cache-first-Abgleich
- * (ignoreSearch) den Eintrag unveraendert findet.
- *
- * Still bei jedem Fehler: das ist reine Nachbesserung, sie darf eine
- * ausgelieferte Seite nie stoeren.
- */
-async function erneuereImHintergrund(request, url) {
-  try {
-    const trenner = url.pathname.includes("?") ? "&" : "?";
-    const frisch = await fetch(new Request(`${url.pathname}${trenner}sw=${CACHE_NAME}-r`, { cache: "reload" }));
-    if (!frisch || !frisch.ok) return;
-    const cache = await caches.open(CACHE_NAME);
-    const alt = await cache.match(url.pathname, { ignoreSearch: true });
-    // Nur schreiben, wenn es wirklich etwas Neues gibt — sonst wandert bei
-    // JEDEM Seitenaufruf jede Datei durch den Speicher.
-    if (alt) {
-      const [a, b] = await Promise.all([alt.clone().text(), frisch.clone().text()]);
-      if (a === b) return;
-    }
-    await cache.put(url.pathname, frisch);
-  } catch { /* still: Nachbesserung darf nie stoeren */ }
-}
-
 function isHtmlRequest(request, url) {
   if (request.mode === "navigate" || request.destination === "document") return true;
   return url.pathname === "/" || url.pathname.endsWith(".html") || url.pathname.endsWith("/");
@@ -478,28 +412,7 @@ self.addEventListener("fetch", (event) => {
   // MUSS die Version oben hochzaehlen, sonst sehen Bestandsnutzer den alten Stand.
   if (url.origin === self.location.origin && !isHtmlRequest(request, url) && PRECACHE_PATHS.has(url.pathname)) {
     event.respondWith(
-      caches.match(request, { ignoreSearch: true }).then((cached) => {
-        if (!cached) return fetch(request);
-        // SELBSTHEILUNG (Befund 2026-08-14): aus dem Speicher ausliefern UND
-        // im Hintergrund nachsehen, ob es inzwischen etwas Neueres gibt.
-        //
-        // Warum das noetig ist, obwohl der Vorabspeicher seit v359 mit einem
-        // Cache-Buster gefuellt wird: Der Service Worker installiert, sobald er
-        // die neue sw.js sieht. Liegt die Programmdatei an genau DIESEM
-        // Rand-Knoten noch nicht, wird der frische Speicher wieder mit dem
-        // alten Stand gefuellt — und cache-first lieferte ihn dann bis zum
-        // NAECHSTEN Deploy aus. Gemessen unmittelbar nach dem v366-Push:
-        // das Netz hatte chat-sync.js mit 9660 Bytes (neu), der Speicher
-        // "smejj-shell-v371" die alte Fassung. Der Nutzer bekam den Fix also
-        // einen ganzen Deploy zu spaet.
-        //
-        // Die Antwort selbst bleibt der Speicher-Treffer: die laufende Seite
-        // soll nicht mitten im Betrieb Fassungen mischen. Erneuert wird nur der
-        // EINTRAG — beim naechsten Laden ist er richtig. Genau so arbeiten die
-        // grossen Anbieter (stale-while-revalidate).
-        event.waitUntil(erneuereImHintergrund(request, url));
-        return cached;
-      })
+      caches.match(request, { ignoreSearch: true }).then((cached) => cached || fetch(request))
     );
     return;
   }

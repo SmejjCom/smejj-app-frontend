@@ -1095,7 +1095,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: rgb(32, 32, 31);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
-.code-plus-menu [role="menuitem"] {
+.code-plus-menu [role="menuitem"],
+.code-plus-menu [role="menuitemcheckbox"] {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1111,13 +1112,17 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   cursor: pointer;
 }
 @media (pointer: fine) {
-  .code-plus-menu [role="menuitem"] { min-height: 32px; }
+  .code-plus-menu [role="menuitem"],
+  .code-plus-menu [role="menuitemcheckbox"] { min-height: 32px; }
 }
 .code-plus-menu [role="menuitem"]:hover,
-.code-plus-menu [role="menuitem"]:focus-visible {
+.code-plus-menu [role="menuitem"]:focus-visible,
+.code-plus-menu [role="menuitemcheckbox"]:hover,
+.code-plus-menu [role="menuitemcheckbox"]:focus-visible {
   background: rgba(255, 255, 255, 0.08);
 }
-.code-plus-menu [role="menuitem"] svg {
+.code-plus-menu [role="menuitem"] svg,
+.code-plus-menu [role="menuitemcheckbox"] svg {
   width: 16px;
   height: 16px;
   flex: none;
@@ -1128,7 +1133,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   stroke-linejoin: round;
   color: rgba(240, 239, 236, 0.75);
 }
-.code-plus-menu [role="menuitem"] span { flex: 1; }
+.code-plus-menu [role="menuitem"] span,
+.code-plus-menu [role="menuitemcheckbox"] span { flex: 1; }
 .code-plus-menu [role="menuitem"] kbd {
   font-family: inherit;
   font-size: 12.5px;
@@ -1140,6 +1146,43 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   margin: 6px 4px;
   background: rgba(255, 255, 255, 0.08);
 }
+
+/* Konnektoren-Flyout (Betreiber-Screenshot 2026-08-16): oeffnet wie bei
+   Claude RECHTS neben dem Menuepunkt; auf schmalen Geraeten darueber. */
+.code-plus-unter {
+  position: absolute;
+  left: calc(100% + 6px);
+  bottom: 0;
+  min-width: 250px;
+}
+@media (max-width: 720px) {
+  .code-plus-unter { left: auto; right: 0; bottom: calc(100% + 6px); }
+}
+/* Schalter wie Claudes Toggle, aber VIERECKIG (Betreiber-Designgesetz).
+   Aus-Zustand grau, Ein-Zustand cyan; der Knubbel faehrt herueber. */
+.code-schalter {
+  position: relative;
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: 34px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.16);
+  transition: background-color 120ms ease;
+}
+.code-schalter::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  background: #f2f5f4;
+  transition: transform 120ms ease;
+}
+/* Staerker als die span-flex-Regel des Menues: der Schalter bleibt 34px. */
+.code-plus-menu [role="menuitemcheckbox"] .code-schalter { flex: 0 0 34px; width: 34px; }
+[aria-checked="true"] .code-schalter { background: var(--v11-cy); }
+[aria-checked="true"] .code-schalter::after { transform: translateX(14px); }
 
 /* Slash-Palette (code-flaeche.js): gleicher Kasten wie das Plus-Menue,
    Befehl in Mono links, die Vorlage gedaempft rechts. */

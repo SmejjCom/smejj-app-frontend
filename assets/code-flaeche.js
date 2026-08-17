@@ -323,6 +323,11 @@ export function initCodeFlaeche() {
   const schliessePlus = () => {
     if (plusMenue) plusMenue.hidden = true;
     plusKnopf?.setAttribute("aria-expanded", "false");
+    // Das Konnektoren-Flyout haengt IM Menue — beim Schliessen mit zuruecksetzen,
+    // sonst stuende es beim naechsten Oeffnen sofort wieder offen.
+    const unter = document.getElementById("codeKonnektorenMenue");
+    if (unter) unter.hidden = true;
+    plusMenue?.querySelector('[data-code-plus="konnektoren"]')?.setAttribute("aria-expanded", "false");
   };
   plusKnopf?.addEventListener("click", (e) => {
     if (!plusMenue) { document.getElementById("composerFileInput")?.click(); return; }
@@ -331,10 +336,60 @@ export function initCodeFlaeche() {
     plusMenue.hidden = !oeffnen;
     plusKnopf.setAttribute("aria-expanded", oeffnen ? "true" : "false");
   });
+  // Konnektoren-Untermenue (Betreiber-Screenshot 2026-08-16): oeffnet als
+  // Flyout IM Plus-Menue. Der Projekt-Ordner-Schalter zeigt den echten
+  // Zustand (verbunden/nicht) und schaltet wirklich (verbinden/trennen).
+  const konnektorenMenue = document.getElementById("codeKonnektorenMenue");
+  const konnektorenKnopf = plusMenue?.querySelector('[data-code-plus="konnektoren"]');
+  const schliesseKonnektoren = () => {
+    if (konnektorenMenue) konnektorenMenue.hidden = true;
+    konnektorenKnopf?.setAttribute("aria-expanded", "false");
+  };
+  async function zeigeKonnektoren() {
+    if (!konnektorenMenue) return;
+    const schalter = konnektorenMenue.querySelector('[data-code-konnektor="ordner"]');
+    const projektId = localStorage.getItem(CODE_PROJEKT) || "";
+    let name = "";
+    try { name = projektId ? await window.smejjProjektOrdner?.ordnerName(projektId) || "" : ""; } catch { /* still */ }
+    schalter?.setAttribute("aria-checked", name ? "true" : "false");
+    if (schalter) schalter.title = name ? `Verbunden: ${name} — klicken zum Trennen` : "Ordner mit dem Code-Project verbinden";
+    konnektorenMenue.hidden = false;
+    konnektorenKnopf?.setAttribute("aria-expanded", "true");
+  }
+  konnektorenMenue?.addEventListener("click", async (e) => {
+    const knopf = e.target.closest?.("[data-code-konnektor]");
+    if (!knopf) return;
+    const was = knopf.dataset.codeKonnektor;
+    if (was === "ordner") {
+      const projektId = localStorage.getItem(CODE_PROJEKT) || "";
+      if (!projektId) { schliesseKonnektoren(); schliessePlus(); document.getElementById("codeProjektChip")?.click(); return; }
+      const verbunden = knopf.getAttribute("aria-checked") === "true";
+      if (verbunden) {
+        window.smejjProjektOrdner?.trenneOrdner(projektId);
+        knopf.setAttribute("aria-checked", "false");
+      } else {
+        const ergebnis = await window.smejjProjektOrdner?.verbindeOrdner(projektId);
+        if (ergebnis?.ok) knopf.setAttribute("aria-checked", "true");
+      }
+      zeichne();
+      return; // Untermenue bleibt offen — wie bei Claude schaltet man mehrere
+    }
+    schliesseKonnektoren();
+    schliessePlus();
+    if (was === "verwalten") document.querySelector('.nav-button[data-view="settings"]')?.click();
+    else if (was === "durchsuchen") document.querySelector('.nav-button[data-view="tools"]')?.click();
+  });
   plusMenue?.addEventListener("click", async (e) => {
+    if (e.target.closest?.("#codeKonnektorenMenue")) return; // eigenes Menue, eigener Handler
     const knopf = e.target.closest?.("[data-code-plus]");
     if (!knopf) return;
     const was = knopf.dataset.codePlus;
+    if (was === "konnektoren") {
+      // Flyout auf/zu statt Seitenwechsel — wie Claudes Pfeil-Untermenue.
+      if (konnektorenMenue?.hidden) void zeigeKonnektoren(); else schliesseKonnektoren();
+      return;
+    }
+    schliesseKonnektoren();
     schliessePlus();
     if (was === "dateien") document.getElementById("composerFileInput")?.click();
     else if (was === "ordner") {
@@ -355,10 +410,18 @@ export function initCodeFlaeche() {
         feld.dispatchEvent(new Event("input", { bubbles: true }));
       }
     }
-    else if (was === "konnektoren") {
-      // smejjs Verbindungen nach draussen sind die Anbieter/API-Schluessel —
-      // sie liegen in den Einstellungen.
-      document.querySelector('.nav-button[data-view="settings"]')?.click();
+    else if (was === "plugins") {
+      // smejjs Plugin-Katalog sind die Werkzeuge — echtes Ziel statt Attrappe.
+      document.querySelector('.nav-button[data-view="tools"]')?.click();
+    }
+  });
+  // ⌘U / Strg+U wie bei Claude: oeffnet die Dateiauswahl — nur solange die
+  // CODE-Ansicht aktiv ist, damit die Kombination sonst niemandem gehoert.
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && String(e.key).toLowerCase() === "u"
+      && document.querySelector("#code.view.is-active")) {
+      e.preventDefault();
+      document.getElementById("composerFileInput")?.click();
     }
   });
   // Slash-Befehle wie bei Claude: "/" am Feldanfang oeffnet die Palette mit
