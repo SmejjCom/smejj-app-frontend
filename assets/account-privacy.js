@@ -119,6 +119,24 @@ async function hydrateBillingStatus(view) {
   renderBillingState(view, billing);
 }
 
+// "Bezahlt wurde mit"-Zeile. Halb-Commit repariert (Nutzertest 2026-08-17):
+// der Aufruf stand im Repo, die Funktion fehlte — renderBillingState crashte
+// mit ReferenceError und die ganze Abo-Anzeige blieb leer. Fail-safe: ohne
+// paidEmail verschwindet die Zeile, es wird nie etwas erfunden.
+function renderZugang(panel, billing) {
+  const bisher = panel.querySelector(".zahl-adresse");
+  const mail = String(billing?.paidEmail || "").trim();
+  if (!mail) { bisher?.remove(); return; }
+  let zeile = bisher;
+  if (!zeile) {
+    zeile = document.createElement("p");
+    zeile.className = "zahl-adresse";
+    const anker = panel.querySelector(".account-plan");
+    if (anker) anker.after(zeile); else panel.append(zeile);
+  }
+  zeile.textContent = `Bezahlt wurde mit: ${mail}`;
+}
+
 // Serverstand -> Panel: aktueller Plan gross und klar, Verlaengerungs- bzw.
 // Auslaufdatum, "Abo verwalten"-Knopf, aktueller Plan in der Liste markiert.
 function renderBillingState(view, billing) {

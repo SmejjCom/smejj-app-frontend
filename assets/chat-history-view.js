@@ -50,6 +50,10 @@ import { createCardBuilders, createProjektAktionen } from "/assets/chat-history-
 const STYLE_ID = "chatHistoryStyles";
 
 let confirmingId = "";
+// Halb-Commit repariert (Nutzertest 2026-08-17): menuSchliessen setzte diese
+// Variable, deklariert war sie NIE — jeder ⋯-Klick warf einen ReferenceError,
+// bevor das Menue erschien. Umbenennen/Anheften/Loeschen waren unerreichbar.
+let confirmingProjektId = "";
 let confirmTimer = null;
 let suchbegriff = "";
 let themenFilter = "";
