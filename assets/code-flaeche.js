@@ -265,6 +265,12 @@ async function oeffneModellMenue(kontext = {}) {
     menue.style.left = "auto";
     menue.style.right = `${Math.max(0, Math.round(feldR.right - chipR.right))}px`;
     menue.style.bottom = `${Math.round(feldR.bottom - chipR.top + 6)}px`;
+    // Nie oben aus dem Fenster ragen (auf der Startseite gemessen):
+    // notfalls tiefer setzen, das Menue scrollt innen.
+    const oben = menue.getBoundingClientRect().top;
+    if (oben < 8) {
+      menue.style.bottom = `${Math.round(parseFloat(menue.style.bottom) - (8 - oben))}px`;
+    }
   } catch { /* Standardposition bleibt */ }
   // Cline-Katalog LIVE nachladen — erst Status (Key da?), dann Modelle.
   // Fail-safe: ohne Token/Key eine ehrliche Hinweis-Zeile statt Attrappe.
@@ -639,6 +645,15 @@ export function initCodeFlaeche() {
       halter: startKnopf.offsetParent || startKnopf.parentElement
     });
   }, { capture: true });
+  // Anzeige im Start-Knopf: kurzer Modellname statt "Cline · <rohe id>".
+  // app.js schreibt seinen Text bei model-selected — wir setzen NACH ihm.
+  const startAnzeige = () => {
+    if (!startKnopf) return;
+    setTimeout(() => { startKnopf.textContent = modellAnzeige(); }, 0);
+  };
+  window.addEventListener("smejj:model-selected", startAnzeige);
+  document.addEventListener("smejj:cline-selected", startAnzeige);
+  startAnzeige();
   document.getElementById("codeAufgabe")?.addEventListener("keydown", (ereignis) => {
     if (ereignis.key === "Enter" && !ereignis.shiftKey) {
       ereignis.preventDefault();
