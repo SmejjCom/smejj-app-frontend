@@ -8,6 +8,7 @@
 // Alle anderen Modi geben false zurueck — der bestehende fail-closed Server-Pfad
 // in app.js bleibt unveraendert zustaendig.
 import { validateByokConfig } from "./byok.js";
+import { autoAktiv, sorgeFuerModell } from "./modellRouter.js";
 import { API_ORIGIN, STORAGE_KEYS } from "../config.js";
 
 const MAX_HISTORY_MESSAGES = 12;
@@ -179,6 +180,17 @@ async function runClineChat({ task, output, offlineNotice }) {
   }
   try {
     const contextFiles = await resolveWorkspaceReferences(task);
+    // "Auto": vor dem Senden das guenstigste passende Modell setzen. Nur wenn
+    // der Betreiber Auto gewaehlt hat — eine feste Modellwahl bleibt unberuehrt.
+    // Das /select MUSS abgewartet werden (Datensatz auf IDrive e2), sonst
+    // laeuft der Auftrag noch mit dem vorherigen Modell.
+    if (autoAktiv()) {
+      const wahl = await sorgeFuerModell(task, { dateien: contextFiles?.length || 0 });
+      if (!wahl.ok) {
+        output.textContent = "Automatische Modellwahl hat nicht geklappt — bitte ein Modell von Hand waehlen.";
+        return true;
+      }
+    }
     const response = await fetch(`${API_ORIGIN}/api/providers/cline/chat`, {
       method: "POST",
       credentials: "include",

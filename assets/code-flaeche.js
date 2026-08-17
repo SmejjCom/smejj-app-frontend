@@ -110,14 +110,12 @@ const CLINE_KURZ = [
   ["Opus 5", "anthropic/claude-opus-5"],
   ["GPT 5.6", "openai/gpt-5.6-sol"],
   ["GLM 5.3", "cline-pass/glm-5.3"],
-  ["Grok 4.5", "x-ai/grok-4.5"],
   ["Kimi K3", "moonshotai/kimi-k3"],
   ["Deepseek V4 Pro", "cline-pass/deepseek-v4-pro"],
   ["Qwen 3.8 Max", "cline-pass/qwen3.8-max"],
   ["Kimi K2.7 Code", "cline-pass/kimi-k2.7-code"],
   ["Minimax M3", "cline-pass/minimax-m3"],
   ["Deepseek V4 Flash", "cline-pass/deepseek-v4-flash"],
-  ["Qwen 3.7 Max", "cline-pass/qwen3.7-max"],
   ["GLM 5.2", "cline-pass/glm-5.2"],
   ["Mimo V2.5 Pro", "cline-pass/mimo-v2.5-pro"],
   ["Qwen 3.7 Plus", "cline-pass/qwen3.7-plus"],
@@ -125,9 +123,21 @@ const CLINE_KURZ = [
   ["Mimo V2.5", "cline-pass/mimo-v2.5"]
 ];
 
+// Blindgaenger-Verbot (Betreiber-Regel: keine toten Knoepfe). Live gemessen
+// 2026-08-17: beide antworten mit HTTP 200, aber 0 Zeichen Inhalt — nach 90 s
+// (Qwen 3.7 Max) bzw. 72-123 s (Grok 4.5). Sie stehen darum weder in der
+// Wunschliste oben noch werden sie aus dem Katalog nachgezogen.
+const CLINE_BLINDGAENGER = new Set(["cline-pass/qwen3.7-max", "x-ai/grok-4.5"]);
+
+// "Auto" ist keine Katalog-ID, sondern der Merkwert des Routers
+// (ai/modellRouter.js): Alltag guenstig ueber das Abo, harte Faelle ueber
+// Guthaben. Steht bewusst ganz oben — das ist die sparsame Voreinstellung.
+const AUTO_MARKE = "auto";
+
 function modellAnzeige() {
   if (localStorage.getItem(MODELL_KEY) === "Cline") {
     const m = localStorage.getItem(CLINE_MODEL_KEY) || "";
+    if (m === AUTO_MARKE) return "Auto";
     const kurz = CLINE_KURZ.find(([, id]) => id === m)?.[0];
     if (kurz) return kurz;
     if (m) return kurzName(m); // auch unten huebsch: "Qwen 3.8 Max" statt roher ID
@@ -256,6 +266,22 @@ async function oeffneModellMenue(kontext = {}) {
       zeichne();
     }
   });
+  // Auto: der sparsame Weg. Hier wird NICHT /select gerufen — das Modell
+  // steht erst fest, wenn der Auftrag da ist (ai/modellRouter.js waehlt dann
+  // und wartet das /select ab). Darum ist diese Zeile sofort fertig.
+  zeile({
+    titel: "Auto",
+    klein: "guenstig: Alltag ueber das Abo, harte Faelle ueber Guthaben",
+    aktiv: istCline && aktivesClineModell === AUTO_MARKE,
+    aktion: () => {
+      localStorage.setItem(CLINE_MODEL_KEY, AUTO_MARKE);
+      localStorage.setItem(MODELL_KEY, "Cline");
+      document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: AUTO_MARKE } }));
+      window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
+      zu();
+      zeichne();
+    }
+  });
   feld.append(menue);
   // Das Menue KLEBT am Modellnamen (Betreiber 2026-08-17, wie Claude):
   // Unterkante 6px ueber der Knopf-Oberkante, rechtsbuendig zum Knopf —
@@ -365,6 +391,8 @@ async function oeffneModellMenue(kontext = {}) {
       // Gratis-Gruppe NICHT anbieten: per API gesperrt ("only available
       // via Cline product surfaces", 403 live gemessen) — tote Knoepfe.
       if (m.category === "free") continue;
+      // Ebenso die zwei Blindgaenger: HTTP 200, aber leere Antwort.
+      if (CLINE_BLINDGAENGER.has(m.id)) continue;
       const kurz = kurzName(m.id);
       if (gezeigt.has(kurz.toLowerCase())) continue;
       baueZeile(kurz, m.id);
