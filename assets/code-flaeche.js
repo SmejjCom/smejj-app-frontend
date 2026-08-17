@@ -293,6 +293,14 @@ async function senden() {
   feld.value = "";
   // Elastische Hoehe zuruecksetzen — sonst bleibt das geleerte Feld hoch.
   feld.dispatchEvent(new Event("input", { bubbles: true }));
+  // Betreiber-Urfehler in zweiter Form (Nutzertest 2026-08-16): Die Flaeche
+  // zeigt den GRUSS (nichts adoptiert), aber am Zeiger haengt noch das
+  // zuletzt offene Gespraech — die Aufgabe waere unsichtbar im ALTEN Chat
+  // gelandet und alle alten Eintraege waeren mit aufgetaucht. Zeigt die
+  // Code-Seite leer, beginnt Senden ein NEUES Gespraech; ein sichtbar
+  // geoeffnetes (adoptierter Log) laeuft normal weiter.
+  const schonAdoptiert = document.querySelector("#codeLogHalter #startLog");
+  if (!schonAdoptiert && document.querySelector("#startLog")?.children.length) newChat();
   holeLog();
   // Fester Ordner je Project (wie Claude Code): ist am gewaehlten Project
   // ein Ordner verbunden, reisen dessen Textdateien als Kontext mit —
@@ -526,6 +534,12 @@ export function initCodeFlaeche() {
       // smejjs Plugin-Katalog sind die Werkzeuge — echtes Ziel statt Attrappe.
       document.querySelector('.nav-button[data-view="tools"]')?.click();
     }
+  });
+  // Arbeits-Viereck wie bei Claude (Betreiber 2026-08-16): dasselbe
+  // Strom-Signal wie der Stopp-Knopf — laeuft mindestens ein Strom,
+  // pulsiert das Viereck in Logo-Cyan.
+  window.addEventListener("smejj:chat-strom", (event) => {
+    document.getElementById("codeArbeit")?.classList.toggle("an", (Number(event.detail?.laufen) || 0) > 0);
   });
   // ⌘U / Strg+U wie bei Claude: oeffnet die Dateiauswahl — nur solange die
   // CODE-Ansicht aktiv ist, damit die Kombination sonst niemandem gehoert.

@@ -66,7 +66,7 @@
          1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
-    <link rel="stylesheet" href="/assets/start-styles.css?v=spuricons-20260816">
+    <link rel="stylesheet" href="/assets/start-styles.css?v=leiste4-20260816">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -462,14 +462,84 @@
                  der Auftrag streamt auf dieser Seite, wie bei Codex/Claude. -->
             <div id="codeLogHalter" class="code-log-halter"></div>
             <div class="codeunten">
-              <div class="repozeile">
-                <button type="button" class="repochip an" id="codeProjektChip">Projekt wählen …</button>
-              </div>
+              <!-- Betreiber 2026-08-16: KEINE Projekt-Zeile mehr ueber dem
+                   Feld — der Platz gehoert dem Text. Der Projekt-Chip sitzt
+                   jetzt schlank unten in der Leiste (siehe codeleiste). -->
               <div class="codefeld">
+                <!-- Anhaenge erscheinen als Chips statt als Text im Feld
+                     (Betreiber: "[Bild angehaengt: …] im Feld ist nicht
+                     professionell"). code-flaeche.js zieht Verweis-Zeilen
+                     hierher; beim Senden reisen sie unsichtbar mit. -->
+                <!-- Ordner-Chip wie Claude: nur sichtbar, wenn ein Ordner
+                     verbunden ist (code-flaeche.js zeichneOrdnerChip). -->
+                <div id="codeOrdnerZeile" class="code-anhaenge" hidden></div>
+                <div id="codeAnhaenge" class="code-anhaenge" hidden></div>
+                <!-- Arbeits-Viereck wie bei Claude (Betreiber 2026-08-16):
+                     ruhig wenn frei, cyan pulsierend solange smejj arbeitet.
+                     Signal: smejj:chat-strom (code-flaeche.js). -->
+                <span id="codeArbeit" class="code-arbeit" aria-hidden="true"></span>
                 <textarea id="codeAufgabe" rows="1" placeholder="Beschreibe eine Aufgabe oder stelle eine Frage" aria-label="Code-Auftrag"></textarea>
+                <!-- Betreiber 2026-08-16: das Plus im CODE-Feld oeffnet ein
+                     Menue wie bei Claude (1:1-Optik: Gruppen, Trennlinie,
+                     Kuerzel rechts, Untermenue-Pfeil). Dahinter liegen NUR
+                     echte smejj-Funktionen — Claudes Skills/Konnektoren/
+                     Plugins gibt es hier nicht und stehen darum nicht drin
+                     (Blindgaenger-Verbot). Verdrahtung: code-flaeche.js. -->
+                <!-- Betreiber-Nachtrag (Screenshot des Claude-CODE-Menues):
+                     GENAU diese Punkte — Dateien/Fotos, Ordner hinzufuegen,
+                     Slash-Befehle, Konnektoren. Claudes fuenfter Punkt
+                     "Plugins hinzufuegen…" fehlt BEWUSST: smejj hat kein
+                     Plugin-System, der Knopf wuerde ins Leere fuehren. -->
+                <div id="codePlusMenue" class="code-plus-menu" role="menu" aria-label="Hinzufügen" hidden>
+                  <button type="button" role="menuitem" data-code-plus="dateien">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.44 11.05 12 20.5a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.74 9.1L9.17 17.67a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    <span>Dateien oder Fotos hinzufügen</span>
+                    <kbd aria-hidden="true">⌘U</kbd>
+                  </button>
+                  <button type="button" role="menuitem" data-code-plus="ordner">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                    <span>Ordner hinzufügen</span>
+                  </button>
+                  <button type="button" role="menuitem" data-code-plus="slash">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m14 8-4 8"/></svg>
+                    <span>Slash-Befehle</span>
+                  </button>
+                  <button type="button" role="menuitem" data-code-plus="konnektoren" aria-haspopup="menu" aria-expanded="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/><path d="M11 7h4v4"/></svg>
+                    <span>Konnektoren</span>
+                    <svg class="plus-pfeil" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 7 5 5-5 5"/></svg>
+                  </button>
+                  <button type="button" role="menuitem" data-code-plus="plugins">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22v-3"/><path d="M9 8V5"/><path d="M15 8V5"/><path d="M6 8h12v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4Z"/></svg>
+                    <span>Plugins hinzufügen …</span>
+                  </button>
+                  <!-- Konnektoren-Untermenue wie Claude (Betreiber-Screenshot
+                       2026-08-16): Zeilen mit Schalter, darunter Verwalten und
+                       Durchsuchen. Unser echter schaltbarer Konnektor ist der
+                       Projekt-Ordner (verbinden/trennen, projekt-ordner.js);
+                       der Schalter zeichnet VIERECKIG (Betreiber-Designgesetz
+                       schlaegt Claudes Pille). -->
+                  <div id="codeKonnektorenMenue" class="code-plus-menu code-plus-unter" role="menu" aria-label="Konnektoren" hidden>
+                    <button type="button" role="menuitemcheckbox" aria-checked="false" data-code-konnektor="ordner">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                      <span>Projekt-Ordner</span>
+                      <span class="code-schalter" aria-hidden="true"></span>
+                    </button>
+                    <div class="code-plus-line" role="separator" aria-hidden="true"></div>
+                    <button type="button" role="menuitem" data-code-konnektor="verwalten">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+                      <span>Konnektoren verwalten</span>
+                    </button>
+                    <button type="button" role="menuitem" data-code-konnektor="durchsuchen">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                      <span>Konnektoren durchsuchen</span>
+                    </button>
+                  </div>
+                </div>
                 <div class="codeleiste">
                   <button type="button" class="repochip" id="codeModusChip" title="Berechtigungs-Modus — wann smejj vor Änderungen fragt">Auto</button>
                   <button type="button" class="repochip" id="codeStufeChip" title="Antwortstufe wechseln">Automatisch</button>
+                  <button type="button" class="repochip an" id="codeProjektChip" title="Project und Ordner wählen">Projekt wählen …</button>
                   <button type="button" class="ghost-button icon-button code-mini" id="codeAnhang" aria-label="Datei anhängen" title="Datei anhängen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
                   <button type="button" class="ghost-button icon-button code-mini" id="codeDiktat" aria-label="Diktieren" title="Diktieren"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></button>
                   <div class="code-rechts">
@@ -892,8 +962,8 @@
     <script src="/assets/spur-schalter.js?v=9" type="module"></script>
     <script src="/assets/spur-start.js?v=b34k" type="module"></script>
     <script src="/assets/projekt-ordner.js?v=1" type="module"></script>
-    <script src="/assets/code-flaeche.js?v=9" type="module"></script>
-    <script src="/assets/app.js?v=b50" type="module"></script>
+    <script src="/assets/code-flaeche.js?v=16" type="module"></script>
+    <script src="/assets/app.js?v=b51" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>
     <script src="/assets/browser-pane-backdrop.js?v=2" type="module"></script>
@@ -903,11 +973,11 @@
     <script src="/assets/profile-dock.js?v=b46" type="module"></script>
     <script src="/assets/chat-store.js?v=b52" type="module"></script>
     <script src="/assets/chat-history-view.js?v=b47c" type="module"></script>
-    <script src="/assets/chat-actions.js?v=b26e" type="module"></script>
-    <script src="/assets/chat-code-copy.js?v=code-copy-20260816" type="module"></script>
+    <script src="/assets/chat-actions.js?v=b26l" type="module"></script>
+    <script src="/assets/chat-code-copy.js?v=zcode2-20260816" type="module"></script>
     <script src="/assets/chat-runter-pfeil.js?v=3" type="module"></script>
     <script src="/assets/chat-stopp.js?v=1" type="module"></script>
     <script src="/assets/chat-code-farben.js?v=1" type="module"></script>
-    <script src="/assets/chat-code-download.js?v=1" type="module"></script>
+    <script src="/assets/chat-code-download.js?v=2" type="module"></script>
   </body>
 </html>
