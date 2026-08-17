@@ -5836,6 +5836,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* Modell-Menue oeffnet DIREKT UEBER dem Modellnamen (rechts in der
+   Leiste), nicht links am Feld — wie bei Claude (Betreiber 2026-08-17). */
+#codeModellMenue { left: auto; right: 10px; }
+
 /* Konnektoren-Flyout (Betreiber-Screenshot 2026-08-16): oeffnet wie bei
    Claude RECHTS neben dem Menuepunkt; auf schmalen Geraeten darueber. */
 .code-plus-unter {
@@ -5952,7 +5956,9 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   display: block;
   text-align: left;
 }
-.code-modus-menue button b { display: block; font-weight: 450; font-size: 13px; line-height: 1.45; letter-spacing: 0.01em; color: rgba(242, 245, 244, 0.88); }
+/* Wie Claudes Modell-Menue (Betreiber-Screenshot 2026-08-17):
+   normale Schrift, nicht fett, Claude-Groesse. */
+.code-modus-menue button b { display: block; font-weight: 400; font-size: 14.5px; line-height: 1.5; color: rgba(242, 245, 244, 0.92); }
 .code-modus-menue button small {
   display: block;
   margin-top: 1px;
