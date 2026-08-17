@@ -33,6 +33,14 @@ function tageHer(iso) {
   return Math.round((heute - tag) / 86400000);
 }
 
+// Claude-Abgleich 2026-08-16 (Betreiber: "jedes Icon exakt anpassen"):
+// eigene Zeichen NUR fuer die Spur — die geteilte Icons-Bibliothek bleibt
+// unangetastet (das Haekchen dort ist anderswo ein echtes Haekchen).
+const SPUR_ICONS = {
+  chevron: '<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
+  sliders: '<svg viewBox="0 0 24 24"><path d="M4 7h8"/><path d="M18 7h2"/><circle cx="15" cy="7" r="2.2"/><path d="M4 17h2"/><path d="M11 17h9"/><circle cx="8" cy="17" r="2.2"/></svg>'
+};
+
 function punkt({ icon, text, kuerzel, aktion, aktiv }) {
   const knopf = document.createElement("button");
   knopf.type = "button";
@@ -41,7 +49,7 @@ function punkt({ icon, text, kuerzel, aktion, aktiv }) {
   const zeichen = document.createElement("span");
   zeichen.className = "button-icon";
   zeichen.setAttribute("aria-hidden", "true");
-  zeichen.innerHTML = Icons[icon] || "";
+  zeichen.innerHTML = Icons[icon] || SPUR_ICONS[icon] || "";
   const label = document.createElement("span");
   label.className = "nav-label";
   label.textContent = text;
@@ -115,8 +123,8 @@ async function zeichneStartSpur(halter) {
     } }));
     halter.append(punkt({ icon: "projects", text: "Meine Projekte", aktion: () => geheZu("projects") }));
     halter.append(punkt({ icon: "automation", text: "Nach Zeitplan", aktion: () => geheZu("automation") }));
-    halter.append(punkt({ icon: "settings", text: "Regeln", aktion: () => geheZu("settings") }));
-    halter.append(punkt({ icon: "system", text: "Mehr", aktion: () => geheZu("settings") }));
+    halter.append(punkt({ icon: "sliders", text: "Regeln", aktion: () => geheZu("settings") }));
+    halter.append(punkt({ icon: "chevron", text: "Mehr", aktion: () => geheZu("settings") }));
     let chats = [];
     try { chats = await listChats(); } catch { /* Spur bleibt nutzbar */ }
     if (veraltet()) return;

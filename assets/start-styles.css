@@ -6319,3 +6319,20 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 /* Das Schreibfeld waechst beim Tippen nach OBEN mit (code-flaeche.js) —
    ab 40% Bildhoehe scrollt es innen statt weiterzuwachsen. */
 #code .codefeld textarea { max-height: 40vh; overflow-y: auto; }
+
+/* Claude-Abgleich 2026-08-16: "Zuletzt verwendet"-Eintraege tragen wie bei
+   Claude einen kleinen Kreis; das offene Gespraech fuellt ihn (cyan). */
+.nav-start .spur-chat::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  margin-right: 9px;
+  border: 1.5px solid rgba(242, 245, 244, 0.4);
+  border-radius: 50%;
+}
+.nav-start .spur-chat.is-active::before {
+  border-color: var(--v11-cy);
+  background: var(--v11-cy);
+}
+.nav-start .spur-chat { display: flex; align-items: center; }
