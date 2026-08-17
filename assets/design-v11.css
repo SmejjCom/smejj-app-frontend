@@ -1259,8 +1259,11 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
    Kopf "Modus", Zeilen linksbuendig OHNE Trennstriche, Beschreibung
    gedaempft darunter (eine Zeile, Punkte), rechts Haken + Ziffer. */
 .code-modus-menue {
-  min-width: 250px;
-  max-width: 92vw;
+  /* Betreiber 2026-08-17 ("Freiflaeche rausnehmen, Fenster klein"):
+     Breite = Inhalt, keine Leerflaeche rechts — wie Claudes Menue. */
+  min-width: 0;
+  width: max-content;
+  max-width: min(320px, 92vw);
   /* Der Modell-Katalog ist lang — deckeln und innen scrollen (2026-08-17). */
   max-height: 60vh;
   overflow-y: auto;
