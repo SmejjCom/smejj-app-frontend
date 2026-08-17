@@ -95,7 +95,7 @@ function kurzName(id) {
   const roh = String(id).split("/").pop().replace(/:free$/, "");
   return roh
     .replace(/-/g, " ")
-    .replace(/([a-z])(\d)/gi, "$1 $2")
+    .replace(/([a-z]{2,})(\d)/gi, "$1 $2")
     .split(" ")
     .map((w) => /^(glm|gpt)$/i.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ")
