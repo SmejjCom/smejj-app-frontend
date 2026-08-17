@@ -1255,15 +1255,15 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
    Kopf "Modus", Zeilen linksbuendig OHNE Trennstriche, Beschreibung
    gedaempft darunter (eine Zeile, Punkte), rechts Haken + Ziffer. */
 .code-modus-menue {
-  min-width: 320px;
+  min-width: 250px;
   max-width: 92vw;
   /* Der Modell-Katalog ist lang — deckeln und innen scrollen (2026-08-17). */
   max-height: 60vh;
   overflow-y: auto;
 }
 .code-menue-titel {
-  padding: 6px 12px 2px;
-  font-size: 12.5px;
+  padding: 5px 12px 1px;
+  font-size: 11.5px;
   color: rgba(240, 239, 236, 0.5);
 }
 .code-modus-menue button {
@@ -1272,8 +1272,9 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   gap: 10px;
   border: 0;
   min-height: 0;
-  /* Betreiber 2026-08-17: Modelle KOMPAKT untereinander, wenig Luft. */
-  padding: 2px 12px;
+  /* Betreiber 2026-08-17: Modelle KOMPAKT, Schrift wie die Leisten-Chips
+     (Auto/Schnell, 13px), leicht statt fett — edel und eng gepackt. */
+  padding: 1px 12px;
   text-align: left;
 }
 .code-modus-menue .modus-links {
@@ -1282,7 +1283,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   display: block;
   text-align: left;
 }
-.code-modus-menue button b { display: block; font-weight: 550; font-size: 14px; line-height: 1.35; }
+.code-modus-menue button b { display: block; font-weight: 450; font-size: 13px; line-height: 1.45; letter-spacing: 0.01em; color: rgba(242, 245, 244, 0.88); }
 .code-modus-menue button small {
   display: block;
   margin-top: 1px;
