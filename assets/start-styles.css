@@ -4693,7 +4693,7 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   --v11-cy-ink: #7ee8da;
   --v11-cy-line: rgba(50, 246, 234, 0.30);
   --v11-cy-line-on: rgba(50, 246, 234, 0.85);
-  --v11-cy-glow: rgba(50, 246, 234, 0.22);
+  --v11-cy-glow: rgba(50, 246, 234, 0.10);
   --v11-cy-fill: rgba(50, 246, 234, 0.12);
   /* Die Logofarbe aus public/icons/smejj_favicon.svg. Nur fuer das Zeichen
      selbst — nie fuer Flaechen, sonst kippt der Kontrast. */
@@ -4705,7 +4705,7 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   --v11-glas-2: rgba(255, 255, 255, 0.075);
   /* iOS-Specular: der helle Strich NUR an der Oberkante. Das ist es, was
      Glas zu Glas macht — nicht ein Rahmen ringsum. */
-  --v11-lichtkante: rgba(255, 255, 255, 0.13);
+  --v11-lichtkante: rgba(255, 255, 255, 0.07);
 
   /* --- Zustand: immer Farbe UND Wort im Markup ------------------------- */
   --v11-ok: #7ef0c2;
@@ -4782,10 +4782,11 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   border: 0;
 }
 .prompt-glass:focus-within {
+  /* Betreiber 2026-08-16: Raender leuchten nur noch leise — Augen schonen. */
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 0 0 1px var(--v11-cy),
-    0 0 30px var(--v11-cy-glow);
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px var(--v11-cy-line),
+    0 0 12px var(--v11-cy-glow);
 }
 
 /* Menues schweben: staerkeres Glas, damit der Text darunter nicht stoert.
@@ -5098,7 +5099,7 @@ body.spur-start-aktiv .nav-vier { display: none; }
 }
 
 .nav-start .spur-chat {
-  font-size: 14.5px;
+  font-size: 13.5px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -5204,6 +5205,15 @@ body.spur-start-aktiv .nav-vier { display: none; }
 }
 .nav-start .nav-button,
 .nav-vier .nav-button { letter-spacing: 0.01em; }
+/* Betreiber 2026-08-16 ("jede Platz brauchen wir"): die Spur-Liste ist
+   KOMPAKT — flache Zeilen, wenig Abstand, wie Claudes Verlaufsliste. */
+.nav-start .nav-button {
+  min-height: 28px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+.nav-start { gap: 1px; }
+.nav-start .side-block { margin-top: 2px; }
 
 /* Betreiber 2026-08-16: das LOGO oben links ist der Spur-Schalter (wie
    ChatGPT). Das alte grosse Doppel-Logo daneben faellt weg. */
@@ -6030,7 +6040,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 #code .code-anhang-weg:hover { color: #f2f5f4; }
 #code .codefeld:focus-within {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 0 0 1px var(--v11-cy), 0 0 30px var(--v11-cy-glow);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 0 1px var(--v11-cy-line), 0 0 12px var(--v11-cy-glow);
 }
 #code .codefeld textarea {
   width: 100%;
@@ -6755,14 +6765,15 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 .nav-start .spur-chat::before {
   content: "";
   flex: 0 0 auto;
-  width: 7px;
-  height: 7px;
-  margin-right: 9px;
-  border: 1.5px solid rgba(242, 245, 244, 0.4);
+  width: 5px;
+  height: 5px;
+  margin-right: 8px;
+  border: 1px solid rgba(242, 245, 244, 0.32);
   border-radius: 50%;
 }
 .nav-start .spur-chat.is-active::before {
-  border-color: var(--v11-cy);
-  background: var(--v11-cy);
+  /* dezent statt Leuchtpunkt (Betreiber 2026-08-16) */
+  border-color: rgba(50, 246, 234, 0.55);
+  background: rgba(50, 246, 234, 0.55);
 }
 .nav-start .spur-chat { display: flex; align-items: center; }

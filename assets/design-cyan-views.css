@@ -129,10 +129,13 @@ body:has(.premium-view.is-active) .browser-panel {
 
 body:has(.premium-view.is-active) .nav-button.is-active,
 body:has(.premium-view.is-active) .browser-panel-nav button:hover {
-  border-color: rgba(50, 246, 234, 0.58);
-  background: rgba(45, 212, 191, 0.14);
+  /* Betreiber 2026-08-16 ("leuchtet zu viel, Augen schonen"): aktive
+     Zeile wie bei Claude — ruhige helle Toenung, KEIN Rahmen, KEIN
+     Schein, kein Seitenbalken. */
+  border-color: transparent;
+  background: rgba(255, 255, 255, 0.07);
   color: #effffd;
-  box-shadow: inset 3px 0 0 var(--design-cyan-bright), 0 0 14px rgba(45, 212, 191, 0.13);
+  box-shadow: none;
 }
 
 #chatHistory.premium-view,
