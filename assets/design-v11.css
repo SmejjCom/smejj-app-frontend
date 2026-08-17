@@ -897,6 +897,10 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   min-height: 44px;
   background: none;
   border: 0;
+  /* KEINE Trennstriche (Betreiber 2026-08-16, wie Claude): styles.css gibt
+     jedem Knopf eine Lichtkante + Grundton — hier gemessen als "Striche"
+     zwischen den Zeilen. Beides aus. */
+  box-shadow: none;
   color: inherit;
   font: inherit;
   cursor: pointer;
@@ -1258,6 +1262,17 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   align-items: center;
   gap: 9px;
   flex: 0 0 auto;
+}
+/* Mit ID-Gewicht gegen jede generische Knopf-Regel (gemessen: bg 0.055 und
+   Lichtkante blieben trotz background:none der Basisklasse). */
+#code .code-projekt-menue button,
+#code .code-modus-menue button {
+  background: transparent;
+  box-shadow: none;
+}
+#code .code-projekt-menue button:hover,
+#code .code-modus-menue button:hover {
+  background: rgba(94, 234, 212, 0.12);
 }
 .code-modus-menue .modus-haken { color: var(--v11-cy); }
 .code-modus-menue .modus-ziffer {
