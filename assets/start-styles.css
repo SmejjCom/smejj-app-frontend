@@ -5663,9 +5663,12 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
    Haarstrich; die Drei-Punkte sitzen in der letzten Zeile (Regel oben).
    Dazu die App insgesamt kompakter: engere Koepfe und Raster. */
 #startLog { gap: 0; }
-#startLog .entry { margin: 0; padding-top: 7px; padding-bottom: 7px; }
-#startLog .entry.user { padding: 7px 11px; }
-#startLog .entry:not(:first-child) { border-top: 1px solid var(--v11-hair); }
+#startLog .entry { margin: 0; padding-top: 6px; padding-bottom: 6px; }
+#startLog .entry.user { padding: 6px 11px; }
+/* Betreiber-Nachtrag 2026-08-16 ("keine Trennlinie zwischen Texten,
+   kompakt"): der Haarstrich zwischen den Eintraegen ist WEG — die Blase
+   der eigenen Nachricht trennt optisch genug. */
+#startLog .entry:not(:first-child) { border-top: 0; }
 
 .view-header { margin-bottom: 10px; }
 .view-header .subhead { margin-top: 2px; }
