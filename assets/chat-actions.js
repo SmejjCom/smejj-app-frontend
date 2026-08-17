@@ -135,7 +135,11 @@ function ensureBar(entry) {
   syncZeit(bar, meta);
   syncRating(bar, meta);
   syncVersions(bar, meta);
-  positioniereInline(bar, entry);
+  // Einen Tick verzoegert: beim Wiederherstellen ist das Layout (Schrift,
+  // Zeilenumbruch) oft noch nicht fertig — sofort gemessen war das
+  // Textende 0x0 und die Leiste blieb unten (live beobachtet). Kein rAF:
+  // das feuert im versteckten Tab nie.
+  setTimeout(() => positioniereInline(bar, entry), 60);
   return bar;
 }
 
@@ -747,13 +751,18 @@ function init() {
     // Das Menue liegt am Viewport, nicht in der Nachricht. Scrollt das Log oder
     // aendert sich die Fenstergroesse, wuerde es von seinem Ausloeser abdriften.
     container.addEventListener("scroll", () => closeMenu(), { passive: true });
-    window.addEventListener("resize", () => {
-      closeMenu();
-      // Zeilenumbrueche verschieben das Textende — Inline-Position nachziehen.
+    const alleNeuPositionieren = () => {
       for (const bar of document.querySelectorAll(".msg-actions.is-assistant")) {
         positioniereInline(bar, bar.previousElementSibling);
       }
+    };
+    window.addEventListener("resize", () => {
+      closeMenu();
+      // Zeilenumbrueche verschieben das Textende — Inline-Position nachziehen.
+      alleNeuPositionieren();
     });
+    // Nach dem Schrift-Laden verschieben sich Zeilenenden — nachziehen.
+    document.fonts?.ready?.then(() => setTimeout(alleNeuPositionieren, 50)).catch(() => {});
     refreshBars();
   } catch {
     /* fail-safe: ohne Aktionsleiste laeuft der Chat unveraendert weiter */
