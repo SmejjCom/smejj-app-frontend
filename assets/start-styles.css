@@ -5883,14 +5883,13 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   width: 11px;
   height: 11px;
   pointer-events: none;
-  /* Betreiber-Nachtrag: im Ruhezustand UNSICHTBAR — das Viereck existiert
-     nur, solange smejj arbeitet. */
-  opacity: 0;
-  visibility: hidden;
+  /* Betreiber-Klarstellung 2026-08-17: SICHTBAR als ruhiger Umriss wie
+     bei Claude — aber ohne jedes Leuchten. Nur beim Arbeiten leuchtet
+     es cyan (Regel darunter). */
+  border: 1.5px solid rgba(242, 245, 244, 0.3);
 }
 #code .code-arbeit.an {
-  opacity: 1;
-  visibility: visible;
+  border-color: var(--v11-cy);
   background: var(--v11-cy);
   animation: code-arbeit-puls 1.6s ease-in-out infinite;
 }
