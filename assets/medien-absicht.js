@@ -30,9 +30,21 @@ export async function chatOhneMedienauftrag(auftrag) {
   return runClientChat(auftrag);
 }
 
+// Ein Auftrag faengt "eindeutig" an, wenn schon die ersten Worte ein
+// Mal-/Erzeuge-Verb mit Bild- oder Video-Motiv tragen. Bei so einem Anfang
+// ist die Absicht klar, egal wie lang die Beschreibung danach wird.
+const EINDEUTIGER_ANFANG = /^\s*(?:bitte\s+)?(?:zeichne|male|malen|skizziere|erstelle|erstell|generiere|generier|erzeuge|erzeug|mach|mache|draw|paint|sketch|generate|create|make)\b[^.!?]{0,80}?\b(?:bild|bilder|foto|fotos|grafik|illustration|zeichnung|logo|skizze|gem(?:ae|ä)lde|image|picture|photo|drawing|video|film|animation|clip|mp4|movie)\b/i;
+
 export function istMedienAuftrag(task) {
   const text = String(task || "").trim();
-  if (!text || text.length > 600) return false;
+  if (!text) return false;
+  // Betreiber-Befund 2026-08-17 ("Bilder sollen mit allen Modellen gehen"):
+  // die harte 600-Zeichen-Grenze warf AUSFUEHRLICHE Bildauftraege auf den
+  // Textweg — der Nutzer bekam dann eine Beschreibung statt eines Bildes.
+  // Lange Texte bleiben vorsichtig behandelt (in Fliesstext stehen "Bild"
+  // und "erstelle" schnell zufaellig beieinander), aber ein Auftrag, der
+  // MIT dem Malauftrag beginnt, zaehlt in jeder Laenge.
+  if (text.length > 600) return EINDEUTIGER_ANFANG.test(text);
   if (WISSENSFRAGE.test(text)) return false;
   if ((BILD_MOTIV.test(text) || VIDEO_MOTIV.test(text)) && MEDIEN_VERB.test(text)) return true;
   if (MALVERB_ALLEIN.test(text)) return true;
