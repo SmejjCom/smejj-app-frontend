@@ -316,6 +316,19 @@ async function oeffneModellMenue(kontext = {}) {
         aktion: () => {
           localStorage.setItem(CLINE_MODEL_KEY, id);
           localStorage.setItem(MODELL_KEY, "Cline");
+          // PFLICHT (live gemessen 2026-08-17): der Chat-Request traegt KEIN
+          // model-Feld — der Server nimmt sein gespeichertes selectedModel.
+          // Ohne dieses /select wirkte die Menue-Wahl beim Senden NIE.
+          try {
+            const token = sessionStorage.getItem(TOKEN_KEY)
+              || localStorage.getItem("smejj.auth.accessToken.v1") || "";
+            void fetch(`${API_ORIGIN}/api/providers/cline/select`, {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+              body: JSON.stringify({ model: id })
+            });
+          } catch { /* fail-safe: lokale Wahl bleibt */ }
           document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: id } }));
           window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
           zu();
