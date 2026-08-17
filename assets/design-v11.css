@@ -1319,11 +1319,14 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 /* Live gemessen 2026-08-17: app-surfaces gibt jedem premium-view-Knopf
    min-height 40px + padding 0 14px und gewann bei gleicher Spezifitaet —
    darum hier MIT ID-Gewicht die engen Claude-Zeilen erzwingen. */
-#code .code-modus-menue button {
+.code-modus-menue.code-modus-menue button {
   min-height: 0;
   height: auto;
   padding: 2px 12px;
+  background: transparent;
+  box-shadow: none;
 }
+.code-modus-menue.code-modus-menue button:hover { background: rgba(94, 234, 212, 0.12); }
 #code .code-projekt-menue button:hover,
 #code .code-modus-menue button:hover {
   background: rgba(94, 234, 212, 0.12);

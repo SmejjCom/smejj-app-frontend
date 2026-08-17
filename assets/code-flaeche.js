@@ -205,13 +205,18 @@ function schliesseModellMenue() {
   document.getElementById("codeModellMenue")?.remove();
 }
 
-async function oeffneModellMenue() {
-  if (document.getElementById("codeModellMenue")) { schliesseModellMenue(); return; }
-  const chip = document.getElementById("codeModellAnzeige");
-  const feld = chip?.closest(".codefeld");
+// Betreiber 2026-08-17 ("bei Startseite auch gleiche Modelle-Menue"):
+// derselbe Bauweg fuer BEIDE Seiten — kontext bestimmt Knopf, Halter und
+// Menue-ID. Der Code-Bereich nutzt die Standardwerte.
+async function oeffneModellMenue(kontext = {}) {
+  const menueId = kontext.menueId || "codeModellMenue";
+  if (document.getElementById(menueId)) { document.getElementById(menueId).remove(); return; }
+  const chip = kontext.chip || document.getElementById("codeModellAnzeige");
+  const feld = kontext.halter || chip?.closest(".codefeld") || chip?.offsetParent;
   if (!chip || !feld) return;
+  const zu = () => document.getElementById(menueId)?.remove();
   const menue = document.createElement("div");
-  menue.id = "codeModellMenue";
+  menue.id = menueId;
   menue.className = "code-projekt-menue code-modus-menue";
   menue.setAttribute("role", "menu");
   const kopf = document.createElement("div");
@@ -246,7 +251,7 @@ async function oeffneModellMenue() {
     aktion: () => {
       localStorage.setItem(MODELL_KEY, "smejj 1.0");
       window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "smejj 1.0" } }));
-      schliesseModellMenue();
+      zu();
       zeichne();
     }
   });
@@ -277,12 +282,12 @@ async function oeffneModellMenue() {
     ]);
     const status = statusAntwort.ok ? await statusAntwort.json() : null;
     const katalog = katalogAntwort.ok ? await katalogAntwort.json() : null;
-    if (!document.getElementById("codeModellMenue")) return; // inzwischen zu
+    if (!document.getElementById(menueId)) return; // inzwischen zu
     if (!(status?.hasKey ?? status?.configured)) {
       zeile({
         titel: "Cline-Key verbinden …",
         aktiv: false,
-        aktion: () => { schliesseModellMenue(); document.querySelector('.nav-button[data-view="settings"]')?.click(); }
+        aktion: () => { zu(); document.querySelector('.nav-button[data-view="settings"]')?.click(); }
       });
       return;
     }
@@ -300,7 +305,7 @@ async function oeffneModellMenue() {
           localStorage.setItem(MODELL_KEY, "Cline");
           document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: id } }));
           window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
-          schliesseModellMenue();
+          zu();
           zeichne();
         }
       });
@@ -600,6 +605,7 @@ export function initCodeFlaeche() {
     if (!e.target.closest?.("#codeProjektMenue")) schliesseProjektMenue();
     if (!e.target.closest?.("#codeModusMenue")) schliesseModusMenue();
     if (!e.target.closest?.("#codeModellMenue") && !e.target.closest?.("#codeModellAnzeige")) schliesseModellMenue();
+    if (!e.target.closest?.("#startModellMenue") && !e.target.closest?.("#modelPickerButton")) document.getElementById("startModellMenue")?.remove();
     // Plus-Menue: Klick ausserhalb schliesst (schliessePlus ist zur
     // Klickzeit laengst gebunden — Handler feuern erst nach init).
     if (!e.target.closest?.("#codePlusMenue") && !e.target.closest?.("#codeAnhang")) schliessePlus();
@@ -617,6 +623,22 @@ export function initCodeFlaeche() {
     e.stopPropagation();
     void oeffneModellMenue();
   });
+  // Startseite (Betreiber 2026-08-17): derselbe Modell-Picker am
+  // #modelPickerButton. Capture + stopImmediatePropagation, damit das ALTE
+  // Menue (app.js) nicht zusaetzlich aufgeht — es bleibt unangetastet im
+  // DOM (Rote Liste), wird nur nicht mehr geoeffnet.
+  const startKnopf = document.getElementById("modelPickerButton");
+  startKnopf?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const alt = document.getElementById("modelPickerMenu");
+    if (alt) alt.hidden = true;
+    void oeffneModellMenue({
+      menueId: "startModellMenue",
+      chip: startKnopf,
+      halter: startKnopf.offsetParent || startKnopf.parentElement
+    });
+  }, { capture: true });
   document.getElementById("codeAufgabe")?.addEventListener("keydown", (ereignis) => {
     if (ereignis.key === "Enter" && !ereignis.shiftKey) {
       ereignis.preventDefault();
