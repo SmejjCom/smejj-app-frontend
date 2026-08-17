@@ -123,6 +123,51 @@ const CLINE_KURZ = [
   ["Mimo V2.5", "cline-pass/mimo-v2.5"]
 ];
 
+// ---- Gedaechtnis fuer Status und Katalog (Betreiber-Befund 2026-08-17:
+// "manchmal kommen komplette Modelle und manchmal nur 2, 3").
+//
+// Ursache, live reproduziert: der Server bremst bei 12 Anfragen pro Minute
+// je Nutzer (rateLimiter capacity 12, refill 0,2/s) — und /status und
+// /models teilen sich diese Bremse mit /chat. Wer ein paar Nachrichten
+// schickt und dann das Menue oeffnet, bekommt 429. Der alte Code machte
+// daraus `null` und zeigte deshalb KEINE Modellzeile (bzw. "Key verbinden",
+// obwohl der Key verbunden ist).
+//
+// Zwei Gegenmittel: die Antwort wird gemerkt (der Katalog aendert sich fast
+// nie), und ein 429 liefert das Gemerkte statt Leere. Nur wenn es nichts zu
+// merken gibt, sagt das Menue ehrlich, dass gebremst wird.
+const GEDAECHTNIS_MS = 10 * 60 * 1000;
+function baueGedaechtnis(pfad, speicherName) {
+  let gemerkt = null;
+  try {
+    const roh = sessionStorage.getItem(speicherName);
+    if (roh) gemerkt = JSON.parse(roh);
+  } catch { /* kaputter Eintrag ist wie keiner */ }
+  return {
+    async holen(kopfzeilen) {
+      const frisch = gemerkt && (Date.now() - gemerkt.zeit) < GEDAECHTNIS_MS;
+      if (frisch) return { wert: gemerkt.wert, gebremst: false };
+      try {
+        const antwort = await fetch(`${API_ORIGIN}/api/providers/cline/${pfad}`, { credentials: "include", headers: kopfzeilen });
+        if (antwort.status === 429) {
+          const nutzlast = await antwort.json().catch(() => ({}));
+          // Gemerktes schlaegt Leere — auch wenn es aelter als 10 Minuten ist.
+          return { wert: gemerkt?.wert || null, gebremst: true, wartenSek: Number(nutzlast.retryAfterSec) || 5 };
+        }
+        if (!antwort.ok) return { wert: gemerkt?.wert || null, gebremst: false };
+        const wert = await antwort.json();
+        gemerkt = { wert, zeit: Date.now() };
+        try { sessionStorage.setItem(speicherName, JSON.stringify(gemerkt)); } catch { /* voller Speicher: dann eben nur im Arbeitsspeicher */ }
+        return { wert, gebremst: false };
+      } catch {
+        return { wert: gemerkt?.wert || null, gebremst: false };
+      }
+    }
+  };
+}
+const merkeStatus = baueGedaechtnis("status", "smejj.cline.status.v1");
+const merkeKatalog = baueGedaechtnis("models", "smejj.cline.katalog.v1");
+
 // Blindgaenger-Verbot (Betreiber-Regel: keine toten Knoepfe). Live gemessen
 // 2026-08-17: beide antworten mit HTTP 200, aber 0 Zeichen Inhalt — nach 90 s
 // (Qwen 3.7 Max) bzw. 72-123 s (Grok 4.5). Sie stehen darum weder in der
@@ -320,12 +365,33 @@ async function oeffneModellMenue(kontext = {}) {
       || localStorage.getItem("smejj.auth.accessToken.v1") || "";
     const kopfzeilen = token ? { Authorization: `Bearer ${token}` } : {};
     const [statusAntwort, katalogAntwort] = await Promise.all([
-      fetch(`${API_ORIGIN}/api/providers/cline/status`, { credentials: "include", headers: kopfzeilen }),
-      fetch(`${API_ORIGIN}/api/providers/cline/models`, { credentials: "include", headers: kopfzeilen })
+      merkeStatus.holen(kopfzeilen),
+      merkeKatalog.holen(kopfzeilen)
     ]);
-    const status = statusAntwort.ok ? await statusAntwort.json() : null;
-    const katalog = katalogAntwort.ok ? await katalogAntwort.json() : null;
+    const status = statusAntwort.wert;
+    const katalog = katalogAntwort.wert;
     if (!document.getElementById(menueId)) return; // inzwischen zu
+    // Gebremst (429) UND nichts gemerkt: ehrlich sagen, warum die Liste fehlt,
+    // statt still nur zwei Zeilen zu zeigen oder "Key verbinden" zu luegen.
+    // Betreiber-Befund 2026-08-17: "manchmal kommen komplette Modelle und
+    // manchmal nur 2, 3" — genau dieser Fall.
+    if (!katalog && katalogAntwort.gebremst) {
+      const sek = katalogAntwort.wartenSek || 5;
+      zeile({
+        titel: `Liste lädt gleich … (${sek} s)`,
+        hinweis: "Der Server bremst gerade zu viele Anfragen ab. Das Menü holt die Liste automatisch nach.",
+        aktiv: false,
+        aktion: () => { zu(); }
+      });
+      imFensterHalten();
+      // Automatisch nachladen, sobald die Bremse wieder auf ist.
+      setTimeout(() => {
+        if (!document.getElementById(menueId)) return;
+        zu();
+        oeffneModellMenue();
+      }, (sek + 1) * 1000);
+      return;
+    }
     if (!(status?.hasKey ?? status?.configured)) {
       zeile({
         titel: "Cline-Key verbinden …",

@@ -62,14 +62,26 @@ function init() {
   restoreClineLabel();
 }
 
-function openSubmenu(trigger, submenu) {
-  if (!submenu.hidden) return;
+function openSubmenu(trigger, submenu, erzwingen = false) {
+  if (!submenu.hidden && !erzwingen) return;
   submenu.hidden = false;
   trigger.setAttribute("aria-expanded", "true");
   renderNote(submenu, "Cline-Modelle werden geladen…");
   loadCatalog()
     .then((catalog) => renderCatalog(submenu, catalog))
-    .catch(() => renderKeyHint(submenu));
+    .catch((fehler) => {
+      // Gebremst ist NICHT dasselbe wie "kein Key" (Betreiber-Befund
+      // 2026-08-17: mal die ganze Liste, mal nur zwei Zeilen). Der Server
+      // bremst bei 12 Anfragen pro Minute; dann ehrlich sagen und selbst
+      // nachladen, statt "Key verbinden" zu behaupten.
+      if (fehler?.status === 429) {
+        const sek = Number(fehler.retryAfterSec) || 5;
+        renderNote(submenu, `Liste lädt gleich … (${sek} s — der Server bremst gerade zu viele Anfragen ab)`);
+        setTimeout(() => { if (!submenu.hidden) openSubmenu(trigger, submenu, true); }, (sek + 1) * 1000);
+        return;
+      }
+      renderKeyHint(submenu);
+    });
 }
 
 function closeSubmenu(trigger, submenu) {
