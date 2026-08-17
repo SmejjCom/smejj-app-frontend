@@ -66,7 +66,7 @@
          1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
-    <link rel="stylesheet" href="/assets/start-styles.css?v=konnektoren-20260816">
+    <link rel="stylesheet" href="/assets/start-styles.css?v=schlank-20260816">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -462,10 +462,15 @@
                  der Auftrag streamt auf dieser Seite, wie bei Codex/Claude. -->
             <div id="codeLogHalter" class="code-log-halter"></div>
             <div class="codeunten">
-              <div class="repozeile">
-                <button type="button" class="repochip an" id="codeProjektChip">Projekt wählen …</button>
-              </div>
+              <!-- Betreiber 2026-08-16: KEINE Projekt-Zeile mehr ueber dem
+                   Feld — der Platz gehoert dem Text. Der Projekt-Chip sitzt
+                   jetzt schlank unten in der Leiste (siehe codeleiste). -->
               <div class="codefeld">
+                <!-- Anhaenge erscheinen als Chips statt als Text im Feld
+                     (Betreiber: "[Bild angehaengt: …] im Feld ist nicht
+                     professionell"). code-flaeche.js zieht Verweis-Zeilen
+                     hierher; beim Senden reisen sie unsichtbar mit. -->
+                <div id="codeAnhaenge" class="code-anhaenge" hidden></div>
                 <textarea id="codeAufgabe" rows="1" placeholder="Beschreibe eine Aufgabe oder stelle eine Frage" aria-label="Code-Auftrag"></textarea>
                 <!-- Betreiber 2026-08-16: das Plus im CODE-Feld oeffnet ein
                      Menue wie bei Claude (1:1-Optik: Gruppen, Trennlinie,
@@ -527,6 +532,7 @@
                 <div class="codeleiste">
                   <button type="button" class="repochip" id="codeModusChip" title="Berechtigungs-Modus — wann smejj vor Änderungen fragt">Auto</button>
                   <button type="button" class="repochip" id="codeStufeChip" title="Antwortstufe wechseln">Automatisch</button>
+                  <button type="button" class="repochip an" id="codeProjektChip" title="Project und Ordner wählen">Projekt wählen …</button>
                   <button type="button" class="ghost-button icon-button code-mini" id="codeAnhang" aria-label="Datei anhängen" title="Datei anhängen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
                   <button type="button" class="ghost-button icon-button code-mini" id="codeDiktat" aria-label="Diktieren" title="Diktieren"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></button>
                   <div class="code-rechts">
@@ -949,7 +955,7 @@
     <script src="/assets/spur-schalter.js?v=9" type="module"></script>
     <script src="/assets/spur-start.js?v=b34k" type="module"></script>
     <script src="/assets/projekt-ordner.js?v=1" type="module"></script>
-    <script src="/assets/code-flaeche.js?v=12" type="module"></script>
+    <script src="/assets/code-flaeche.js?v=13" type="module"></script>
     <script src="/assets/app.js?v=b51" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260714-3" type="module"></script>
     <script src="/assets/browser-pane.js?v=browser-pane-20260728-3" type="module"></script>

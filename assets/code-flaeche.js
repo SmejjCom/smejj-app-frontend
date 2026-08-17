@@ -177,11 +177,62 @@ function logVerwalten() {
   }
 }
 
+// --- Anhang-Chips (Betreiber 2026-08-16: "[Bild angehaengt: …] als Text im
+// Schreibfeld ist nicht professionell"). Verweis-Zeilen der Anhang-Module
+// wandern aus dem Feld in Chips ueber dem Text; beim Senden reisen sie
+// unsichtbar mit. Das Feld bleibt frei fuer die eigentliche Aufgabe.
+const ANHANG_ZEILE = /^\[(?:Anhang|Bild angehaengt|Bild|Foto)[^\n\]]*:\s*[^\n\]]+\]$/;
+let anhaenge = [];
+
+function zeichneAnhaenge() {
+  const halter = document.getElementById("codeAnhaenge");
+  if (!halter) return;
+  halter.innerHTML = "";
+  halter.hidden = anhaenge.length === 0;
+  anhaenge.forEach((ref, i) => {
+    const chip = document.createElement("span");
+    chip.className = "code-anhang-chip";
+    const name = ref.replace(/^\[[^:]*:\s*/, "").replace(/\]$/, "");
+    const wort = document.createElement("span");
+    wort.textContent = name;
+    const weg = document.createElement("button");
+    weg.type = "button";
+    weg.className = "code-anhang-weg";
+    weg.setAttribute("aria-label", `${name} entfernen`);
+    weg.textContent = "×";
+    weg.addEventListener("click", () => {
+      const [entfernt] = anhaenge.splice(i, 1);
+      // Ein Bild-Anhang traegt echten Inhalt im Zwischenspeicher — beim
+      // Entfernen mit verwerfen, sonst haengt er an der naechsten Frage.
+      if (/^\[Bild angehaengt/.test(entfernt || "")) window.smejjBildAnhang?.take?.();
+      zeichneAnhaenge();
+    });
+    chip.append(wort, weg);
+    halter.append(chip);
+  });
+}
+
+function zieheAnhaengeAusFeld(feld) {
+  if (!feld.value.includes("[")) return;
+  const zeilen = String(feld.value).split("\n");
+  const rest = [];
+  let gefunden = false;
+  for (const zeile of zeilen) {
+    if (ANHANG_ZEILE.test(zeile.trim())) { anhaenge.push(zeile.trim()); gefunden = true; }
+    else rest.push(zeile);
+  }
+  if (gefunden) {
+    feld.value = rest.join("\n").replace(/^\n+/, "").replace(/\n+$/, "");
+    zeichneAnhaenge();
+  }
+}
+
 async function senden() {
   const feld = document.getElementById("codeAufgabe");
   const start = document.getElementById("startMessage");
   const text = feld?.value.trim();
-  if (!text || !start) return;
+  // Ein Anhang allein ist sendbar — wie bei Claude.
+  if ((!text && !anhaenge.length) || !start || !feld) return;
   feld.value = "";
   // Elastische Hoehe zuruecksetzen — sonst bleibt das geleerte Feld hoch.
   feld.dispatchEvent(new Event("input", { bubbles: true }));
@@ -190,13 +241,15 @@ async function senden() {
   // ein Ordner verbunden, reisen dessen Textdateien als Kontext mit —
   // das Modell arbeitet mit den ECHTEN Dateien. Der Klick auf Senden ist
   // die Nutzergeste, die Chrome fuer die Ordner-Erlaubnis verlangt.
-  let auftrag = text;
+  let auftrag = [text, ...anhaenge].filter(Boolean).join("\n");
+  anhaenge = [];
+  zeichneAnhaenge();
   const projektId = localStorage.getItem(CODE_PROJEKT) || "";
   if (projektId && window.smejjProjektOrdner) {
     try {
       const kontext = await window.smejjProjektOrdner.leseKontext(projektId);
       if (kontext?.dateien?.length) {
-        auftrag = text + window.smejjProjektOrdner.baueKontextBlock(kontext.name, kontext.dateien);
+        auftrag = auftrag + window.smejjProjektOrdner.baueKontextBlock(kontext.name, kontext.dateien);
       }
     } catch { /* ohne Ordnerkontext laeuft der Auftrag unveraendert */ }
   }
@@ -215,7 +268,9 @@ function schliesseProjektMenue() {
 async function oeffneProjektMenue() {
   if (document.getElementById("codeProjektMenue")) { schliesseProjektMenue(); return; }
   const chipKnopf = document.getElementById("codeProjektChip");
-  const zeile = chipKnopf?.closest(".repozeile");
+  // Seit dem Leisten-Umbau (Betreiber 2026-08-16) sitzt der Chip unten in
+  // der Leiste — das Menue ankert wie das Modus-Menue am .codefeld.
+  const zeile = chipKnopf?.closest(".codefeld");
   if (!chipKnopf || !zeile) return;
   const menue = document.createElement("div");
   menue.id = "codeProjektMenue";
@@ -482,6 +537,9 @@ export function initCodeFlaeche() {
     slashMenue.hidden = false;
   }
   document.getElementById("codeAufgabe")?.addEventListener("input", (e) => {
+    // Anhang-Verweise sofort in Chips ueberfuehren — sie stehen nie als
+    // Text im Feld (Betreiber 2026-08-16).
+    zieheAnhaengeAusFeld(e.target);
     const wert = String(e.target.value || "");
     if (wert.startsWith("/") && !wert.includes(" ")) zeigeSlash(wert);
     else schliesseSlash();

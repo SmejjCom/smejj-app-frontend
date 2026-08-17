@@ -1235,25 +1235,34 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   flex-wrap: wrap;
   align-items: center;
 }
+/* Betreiber 2026-08-16 ("ohne Hintergrund, ganz schmal, modern"): die
+   Leisten-Chips sind Geister — kein Pillen-Grund, gedaempfte Schrift,
+   Hover hellt nur auf. Der aktive Projekt-Chip zeigt Cyan als FARBE,
+   nicht als Fuellung; lange Projektnamen kappen mit Punkten. */
 #code .repochip {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 12px;
+  gap: 6px;
+  padding: 3px 7px;
   min-height: 0;
   width: auto;
-  font-size: 14px;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
   font-weight: 400;
-  color: rgba(242, 245, 244, 0.74);
+  color: rgba(242, 245, 244, 0.55);
   border: 0;
-  border-radius: var(--v11-r) !important;
-  background: rgba(255, 255, 255, 0.055);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  background: transparent;
+  box-shadow: none;
+  transition: color 120ms ease;
 }
+#code .repochip:hover { color: #f2f5f4; background: transparent; }
 #code .repochip.an {
-  background: var(--v11-cy-fill);
-  color: var(--v11-cy-ink);
-  box-shadow: inset 0 0 0 1px var(--v11-cy-line);
+  background: transparent;
+  color: var(--v11-cy);
+  box-shadow: none;
 }
 #code .codefeld {
   background: rgba(255, 255, 255, 0.05);
@@ -1262,8 +1271,39 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
   border: 0;
   border-radius: var(--v11-r);
-  padding: 13px 14px;
+  /* schmaler von oben nach unten (Betreiber 2026-08-16) */
+  padding: 8px 12px;
 }
+
+/* Anhang-Chips im Schreibfeld (code-flaeche.js zeichneAnhaenge): kleine
+   Zeile UEBER dem Text — der Verweis steht nie als Text im Feld. */
+#code .code-anhaenge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+#code .code-anhang-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px 2px 8px;
+  font-size: 12.5px;
+  color: rgba(242, 245, 244, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+#code .code-anhang-weg {
+  min-height: 0;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: rgba(242, 245, 244, 0.5);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+#code .code-anhang-weg:hover { color: #f2f5f4; }
 #code .codefeld:focus-within {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 0 0 1px var(--v11-cy), 0 0 30px var(--v11-cy-glow);
 }
@@ -1281,9 +1321,21 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #code .codeleiste {
   display: flex;
   align-items: center;
-  gap: 9px;
-  margin-top: 14px;
+  gap: 4px;
+  margin-top: 6px;
   flex-wrap: wrap;
+}
+/* Icon-Knoepfe der Leiste als Geister: kein runder Grund (Betreiber
+   2026-08-16, "modern professionell wie Claude"). */
+#code .codeleiste .icon-button.code-mini {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: rgba(242, 245, 244, 0.55);
+}
+#code .codeleiste .icon-button.code-mini:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #f2f5f4;
 }
 #code .code-rechts {
   margin-left: auto;
