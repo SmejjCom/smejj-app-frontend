@@ -186,7 +186,6 @@ const SHELL = [
   "/assets/google-login.js",
   "/assets/free-coding-fallback.js",
   "/assets/uploads-surface.js",
-  "/assets/medien-absicht.js",
   "/assets/projects-surface.js",
   "/assets/panel-layout.js",
   "/assets/local-workspace-surface.js",

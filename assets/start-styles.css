@@ -6861,3 +6861,27 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding-bottom: 6px;
 }
 .panel-status .status-grid span { text-align: right; opacity: 0.8; }
+
+/* =======================================================================
+ * Betreiber 2026-08-17: Start-Composer wie der CODE-Bereich —
+ * das Schreibfeld ist ZEILE 1 (volle Breite, waechst, der GANZE Text
+ * bleibt sichtbar), die Werkzeuge sind eine FESTE ZWEITE ZEILE unten.
+ * Steht bewusst am DATEIENDE: schlaegt die Ein-Pillen-Regeln (Desktop
+ * Bildschirm 32 und Telefon-Block) bei gleicher Spezifitaet.
+ * ===================================================================== */
+#start .prompt-glass { flex-wrap: wrap; align-items: center; }
+#start .prompt-glass textarea {
+  order: 0;
+  flex: 1 1 100%;
+  width: 100%;
+  height: auto;
+  min-height: 40px;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+#start .prompt-actions .plus-picker { order: 1; }
+#start .prompt-actions .prompt-spacer { display: block; flex: 1 1 auto; order: 2; }
+#start .prompt-actions .fpille-nachdenken { order: 3; }
+#start .prompt-actions .model-picker { order: 4; display: block; }
+#start .prompt-actions [data-start-tool="voice"] { order: 5; }
+#start .prompt-actions .send-button { order: 6; }
