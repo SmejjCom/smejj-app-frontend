@@ -85,15 +85,23 @@ function modus() {
 const MODELL_KEY = "smejj.model.selected.v2";
 const CLINE_MODEL_KEY = "smejj.cline.model.v1";
 const TOKEN_KEY = "smejj.apiToken.v1";
-const CLINE_GRUPPEN = [
-  ["recommended", "Empfohlen"],
-  ["cline-pass", "Cline Pass"],
-  ["free", "Kostenlos"]
+// Betreiber 2026-08-17: NUR kurze Modellnamen, keine zweite Zeile, keine
+// Gruppen — uebersichtlich wie seine Beispiel-Liste. Gezeigt wird ein
+// Eintrag nur, wenn seine ID wirklich im Cline-Katalog steht (ehrlich);
+// Fable 5 und Gemini gibt es dort nicht und stehen darum nicht hier.
+const CLINE_KURZ = [
+  ["GLM 5.3", "cline-pass/glm-5.3"],
+  ["Opus 5", "anthropic/claude-opus-5"],
+  ["GPT 5.6", "openai/gpt-5.6-sol"],
+  ["Grok 4.5", "x-ai/grok-4.5"],
+  ["Kimi K3", "moonshotai/kimi-k3"]
 ];
 
 function modellAnzeige() {
   if (localStorage.getItem(MODELL_KEY) === "Cline") {
     const m = localStorage.getItem(CLINE_MODEL_KEY) || "";
+    const kurz = CLINE_KURZ.find(([, id]) => id === m)?.[0];
+    if (kurz) return kurz;
     if (m) return m.split("/").pop();
   }
   return MODELL_TEXT[stufe()];
@@ -206,7 +214,6 @@ async function oeffneModellMenue() {
   // Hausmodell: nutzt den bestehenden Stufen-Weg (Auto/Gruendlich/Schnell).
   zeile({
     titel: "smejj 1.0",
-    klein: "Hausmodell — folgt der Stufe (Auto · Gründlich · Schnell)",
     aktiv: !istCline,
     aktion: () => {
       localStorage.setItem(MODELL_KEY, "smejj 1.0");
@@ -235,35 +242,27 @@ async function oeffneModellMenue() {
     if (!document.getElementById("codeModellMenue")) return; // inzwischen zu
     if (!(status?.hasKey ?? status?.configured)) {
       zeile({
-        titel: "Cline-Modelle",
-        klein: "Cline-Key in den Einstellungen verbinden — dann erscheinen sie hier.",
+        titel: "Cline-Key verbinden …",
         aktiv: false,
         aktion: () => { schliesseModellMenue(); document.querySelector('.nav-button[data-view="settings"]')?.click(); }
       });
       return;
     }
-    for (const [gruppe, beschriftung] of CLINE_GRUPPEN) {
-      const eintraege = (katalog?.models || []).filter((m) => m.category === gruppe);
-      if (!eintraege.length) continue;
-      const titelZeile = document.createElement("div");
-      titelZeile.className = "code-menue-titel";
-      titelZeile.textContent = beschriftung;
-      menue.append(titelZeile);
-      for (const m of eintraege) {
-        zeile({
-          titel: m.name || m.id.split("/").pop(),
-          klein: m.description || "",
-          aktiv: istCline && aktivesClineModell === m.id,
-          aktion: () => {
-            localStorage.setItem(CLINE_MODEL_KEY, m.id);
-            localStorage.setItem(MODELL_KEY, "Cline");
-            document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: m.id } }));
-            window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
-            schliesseModellMenue();
-            zeichne();
-          }
-        });
-      }
+    const vorhanden = new Set((katalog?.models || []).map((m) => m.id));
+    for (const [kurz, id] of CLINE_KURZ) {
+      if (!vorhanden.has(id)) continue;
+      zeile({
+        titel: kurz,
+        aktiv: istCline && aktivesClineModell === id,
+        aktion: () => {
+          localStorage.setItem(CLINE_MODEL_KEY, id);
+          localStorage.setItem(MODELL_KEY, "Cline");
+          document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: id } }));
+          window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
+          schliesseModellMenue();
+          zeichne();
+        }
+      });
     }
   } catch { /* fail-safe: Menue zeigt dann nur das Hausmodell */ }
 }
