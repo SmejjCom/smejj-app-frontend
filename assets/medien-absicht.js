@@ -20,6 +20,16 @@ const VIDEO_MOTIV = /\b(video(s)?|film(e|s)?|animation(en)?|clip(s)?|mp4|movie(s
 const MALVERB_ALLEIN = /(^|\s)(zeichne|zeichnest|zeichnen|male|malst|malen|skizziere|skizzier|draw|paint|sketch)\b/i;
 const WISSENSFRAGE = /\b(unterschied|was ist|wie geht|bedeutung|erkläre|erklare|definition)\b/i;
 
+// Die WEICHE selbst wohnt hier, nicht in app.js: dort riss der Einbau die
+// 800-Zeilen-Grenze (Hinweis der Parallelsitzung 2026-08-17). app.js ruft
+// nur noch chatOhneMedienauftrag() — ein Aufruf statt Bedingung plus
+// Kommentarblock, und die Regel bleibt an EINER Stelle.
+export async function chatOhneMedienauftrag(auftrag) {
+  if (istMedienAuftrag(auftrag?.task)) return false;
+  const { runClientChat } = await import("/assets/ai/chatClient.js?v=3");
+  return runClientChat(auftrag);
+}
+
 export function istMedienAuftrag(task) {
   const text = String(task || "").trim();
   if (!text || text.length > 600) return false;

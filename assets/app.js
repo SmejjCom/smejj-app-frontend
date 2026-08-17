@@ -1,7 +1,6 @@
 import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js";
 import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
-import { runClientChat } from "/assets/ai/chatClient.js?v=3";
 import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { initComposerTools } from "./composer-tools.js?v=werkzeuge-3";
@@ -20,7 +19,7 @@ import { afterFirstPaint } from "./deferred-start.js";
 import { initGoogleLogin } from "./google-login.js";
 import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
 import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39u";
-import { istMedienAuftrag } from "./medien-absicht.js?v=1";
+import { chatOhneMedienauftrag } from "./medien-absicht.js?v=2";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
 import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
@@ -349,11 +348,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   const output = addEntry("", "assistant", target);
   try {
     if (routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
-    // Bild- und Video-Auftraege nehmen IMMER den Bruecken-Weg — die
-    // Medien-Spur (Maler, Video-Worker) lebt dort. Ueber den Cline-Weg kam
-    // sonst ein ausformulierter "Bildprompt" statt eines Bildes
-    // (Nutzertest 2026-08-17, medien-absicht.js).
-    if (!istMedienAuftrag(task) && await runClientChat({ task: await groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
+    if (await chatOhneMedienauftrag({ task: await groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
     try {
       const anfrage = {
         task: await groundTask(task),
