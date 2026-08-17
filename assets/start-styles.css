@@ -6288,3 +6288,31 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 .chat-code .cf-zahl { color: #e5b567; }
 .chat-code .cf-schl { color: #7cc7e8; }
 .chat-code .cf-fn { color: #c3b1e1; }
+
+/* Betreiber 2026-08-16 ("gesamte Flaeche nutzen, kompakt, keine
+   Freiflaeche"): die CODE-Seite randlos wie Claude. Die Ansicht selbst ist
+   eine Bildschirm-hohe Flex-Spalte — oben nur Platz fuer die fixe
+   Logo-Zeile, links/rechts 12px, unten schliesst das Schreibfeld buendig
+   ab. Der Text im Gespraech deckt die volle Breite (die 980px-Mitte der
+   Startseite gilt hier nicht). */
+#code.view.is-active {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  padding: 42px 12px 8px;
+}
+#code .codeflaeche {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+}
+#code .codegruss { padding: 2px 2px 0; }
+#code .codeunten { margin-top: auto; padding: 8px 0 0; }
+#code .code-log-halter .start-log .entry { max-width: none; }
+#code .code-log-halter .msg-actions { max-width: none; }
+/* Das Schreibfeld waechst beim Tippen nach OBEN mit (code-flaeche.js) —
+   ab 40% Bildhoehe scrollt es innen statt weiterzuwachsen. */
+#code .codefeld textarea { max-height: 40vh; overflow-y: auto; }

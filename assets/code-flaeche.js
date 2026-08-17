@@ -183,6 +183,8 @@ async function senden() {
   const text = feld?.value.trim();
   if (!text || !start) return;
   feld.value = "";
+  // Elastische Hoehe zuruecksetzen — sonst bleibt das geleerte Feld hoch.
+  feld.dispatchEvent(new Event("input", { bubbles: true }));
   holeLog();
   // Fester Ordner je Project (wie Claude Code): ist am gewaehlten Project
   // ein Ordner verbunden, reisen dessen Textdateien als Kontext mit —
@@ -326,6 +328,19 @@ export function initCodeFlaeche() {
       feld.focus();
       feld.setSelectionRange(feld.value.length, feld.value.length);
     });
+  }
+  // Betreiber 2026-08-16 ("ich kann meinen Text nicht sehen"): das Feld
+  // waechst beim Tippen elastisch nach oben, wie bei Claude — gleiche
+  // Mechanik wie das Start-Feld (bindStartComposer in app.js). Die
+  // Obergrenze setzt design-v11.css (max-height 40vh, dann innen scrollen).
+  const aufgabe = document.getElementById("codeAufgabe");
+  if (aufgabe) {
+    const wachse = () => {
+      aufgabe.style.height = "auto";
+      aufgabe.style.height = aufgabe.value ? `${aufgabe.scrollHeight}px` : "";
+    };
+    aufgabe.addEventListener("input", wachse);
+    wachse();
   }
   document.addEventListener("click", () => setTimeout(zeichne, 150));
   // Der Gruss-Name kommt aus dem Profil-Dock — das laedt sein Konto NACH
