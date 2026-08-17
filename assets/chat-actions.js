@@ -135,7 +135,36 @@ function ensureBar(entry) {
   syncZeit(bar, meta);
   syncRating(bar, meta);
   syncVersions(bar, meta);
+  positioniereInline(bar, entry);
   return bar;
+}
+
+// Betreiber 2026-08-16 ("einfügen ist das letzte Wort der Zeile — die
+// Icons sollen NACH ihm in derselben Zeile stehen"): das Zeilenende wird
+// per Range gemessen und die Leiste dorthin geschoben. Reicht der Platz
+// in der Zeile nicht, bleibt sie wie bisher darunter. Nur Antworten —
+// eigene Nachrichten behalten ihre Blasen-Überlagerung.
+function positioniereInline(bar, entry) {
+  if (!bar || !entry || !bar.classList.contains("is-assistant")) return;
+  try {
+    bar.style.marginTop = "";
+    bar.style.marginLeft = "";
+    const range = document.createRange();
+    range.selectNodeContents(entry);
+    range.collapse(false);
+    const ende = range.getBoundingClientRect();
+    if (!ende || (!ende.width && !ende.height)) return;
+    const eRekt = entry.getBoundingClientRect();
+    const barBreite = bar.offsetWidth || 0;
+    const frei = eRekt.right - ende.right;
+    if (!barBreite || frei < barBreite + 12) return; // Zeile zu voll
+    const barRekt = bar.getBoundingClientRect();
+    const barHoehe = barRekt.height || 26;
+    const ziel = ende.top + (ende.height - barHoehe) / 2;
+    const computedTop = parseFloat(getComputedStyle(bar).marginTop) || 0;
+    bar.style.marginTop = `${Math.round(computedTop - (barRekt.top - ziel))}px`;
+    bar.style.marginLeft = `${Math.round(ende.right - eRekt.left + 8)}px`;
+  } catch { /* fail-safe: Leiste bleibt unter dem Text */ }
 }
 
 function syncRating(bar, meta) {
@@ -707,7 +736,13 @@ function init() {
     // Das Menue liegt am Viewport, nicht in der Nachricht. Scrollt das Log oder
     // aendert sich die Fenstergroesse, wuerde es von seinem Ausloeser abdriften.
     container.addEventListener("scroll", () => closeMenu(), { passive: true });
-    window.addEventListener("resize", () => closeMenu());
+    window.addEventListener("resize", () => {
+      closeMenu();
+      // Zeilenumbrueche verschieben das Textende — Inline-Position nachziehen.
+      for (const bar of document.querySelectorAll(".msg-actions.is-assistant")) {
+        positioniereInline(bar, bar.previousElementSibling);
+      }
+    });
     refreshBars();
   } catch {
     /* fail-safe: ohne Aktionsleiste laeuft der Chat unveraendert weiter */
