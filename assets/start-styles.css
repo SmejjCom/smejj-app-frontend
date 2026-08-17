@@ -5700,9 +5700,20 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #code .view-chrome { display: none; }
 
 /* Ordner je Project: Speichern-Knopf sitzt neben dem Kopieren-Knopf am
-   Codeblock; der Verbinden-Knopf auf der Projects-Karte wie die anderen. */
-.chat-code-download { right: 46px; }
-.chat-code-save { right: 86px; }
+   Codeblock; der Verbinden-Knopf auf der Projects-Karte wie die anderen.
+   Anordnung (ZCode-Abgleich 2026-08-16, rechts nach links): Chevron,
+   Download, Kopieren, Speichern — alle Knoepfe sind wie bei ZCode reine
+   Icon-Knoepfe mit fester Breite, die Abstaende bleiben darum stabil. */
+.chat-code-klapp { right: 4px; }
+.chat-code-download { right: 48px; }
+.chat-code-copy[data-code-copy] { right: 92px; }
+.chat-code-save { right: 136px; }
+@media (pointer: fine) {
+  .chat-code-klapp { right: 6px; }
+  .chat-code-download { right: 34px; }
+  .chat-code-copy[data-code-copy] { right: 62px; }
+  .chat-code-save { right: 90px; }
+}
 
 /* Projekt-Zeile im Code-Menue: links Name (waehlt Project), rechts der
    📁-Knopf (waehlt den Ordner — direkt hier, kein Seitenwechsel). */
@@ -6257,12 +6268,12 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 .chat-stopp:hover { background: #dfe5e3; }
 .chat-stopp svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
 
-/* Betreiber 2026-08-16 ("Codierung wie Claude machen"): Codebloecke mit
-   Kopfleiste wie Claude — Sprachname links im Kopfstreifen, der
-   Kopieren-Knopf (chat-code-copy.js) sitzt rechts darin. Nur Bloecke, die
-   eine Sprache tragen (data-language aus chat-markdown.js); alle anderen
-   behalten den bisherigen schwebenden Knopf. ::before steht nicht in
-   textContent — Verlauf und Modellkontext bleiben sauber. */
+/* Betreiber 2026-08-16 ("Code-Bereich wie die ZCode-App"): Codebloecke
+   mit Kopfzeile — Sprachname links, die Icon-Knoepfe (chat-code-copy.js,
+   chat-code-download.js) sitzen rechts darin. JEDER Block traegt eine
+   Sprache (chat-markdown.js liefert sie, chat-code-copy.js setzt sonst
+   "text" nach). ::before steht nicht in textContent — Verlauf und
+   Modellkontext bleiben sauber. */
 #startLog .entry.assistant .chat-code[data-language] {
   padding-top: 0;
 }
@@ -6271,23 +6282,77 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   display: block;
   position: sticky;
   left: 0;
-  margin: 0 -12px 10px;
-  padding: 9px 12px;
-  background: rgba(255, 255, 255, 0.045);
-  border-bottom: 1px solid var(--v11-hair);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 12.5px;
-  letter-spacing: 0.04em;
+  /* ZCode-Abgleich 2026-08-16: die Sprachzeile ist bei ZCode KEIN eigener
+     Streifen — kleine Mono-Schrift, gedaempft, ohne Grund und ohne
+     Trennlinie, im selben Kasten wie der Code. Hoch genug fuer die
+     42px-Touch-Knoepfe; bei praezisem Zeigegeraet kompakt (h-8 wie ZCode). */
+  margin: 0 -12px 6px;
+  padding: 15px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.02em;
   text-transform: lowercase;
-  color: rgba(242, 245, 244, 0.6);
+  color: rgba(242, 245, 244, 0.55);
+}
+@media (pointer: fine) {
+  #startLog .entry.assistant .chat-code[data-language]::before {
+    padding: 8px 12px;
+  }
 }
 
-/* Syntax-Farben der Codebloecke (chat-code-farben.js) — dezent, dunkelruhig */
-.chat-code .cf-kom { color: rgba(242, 245, 244, 0.42); font-style: italic; }
-.chat-code .cf-str { color: #8fd9a8; }
-.chat-code .cf-zahl { color: #e5b567; }
-.chat-code .cf-schl { color: #7cc7e8; }
-.chat-code .cf-fn { color: #c3b1e1; }
+/* ZCode-Abgleich Runde 2 (Betreiber 2026-08-16, "Code-Bereich wie die
+   ZCode-App"): die Knoepfe in der Kopfzeile sind wie bei ZCode reine
+   Icon-Knoepfe — randlos, gedaempft, Hover/Fokus hellt NUR die Farbe auf
+   (ZCode: text-muted-foreground -> text-foreground, kein Grundwechsel).
+   Die Grundregeln (Groesse, Fokusring, immer sichtbar) bleiben in
+   chat-markdown.css und gelten weiter. */
+#startLog .chat-code-wrap .chat-code-copy {
+  top: 3px;
+  border-color: transparent;
+  background: transparent;
+  color: rgba(242, 245, 244, 0.55);
+  transition: color 120ms ease;
+}
+#startLog .chat-code-wrap .chat-code-copy:hover,
+#startLog .chat-code-wrap .chat-code-copy:focus-visible {
+  border-color: transparent;
+  background: transparent;
+  color: #f2f5f4;
+}
+@media (pointer: fine) {
+  #startLog .chat-code-wrap .chat-code-copy { top: 4px; }
+}
+/* Wie ZCode: kein geschriebenes "Kopieren" am Codeblock — nur das Icon,
+   der Name bleibt im aria-label/title. Die ::after-Beschriftung aus
+   chat-markdown.css gilt weiter fuer alle Kopierknoepfe ausserhalb. */
+#startLog .chat-code-wrap .chat-code-copy::after { content: none; }
+#startLog .chat-code-wrap .chat-code-copy svg { width: 14px; height: 14px; }
+
+/* Ein-/Ausklappen wie ZCodes einklappbare Zeilen ("1 file changed"-Muster;
+   chat-code-copy.js setzt data-zu am
+   Wrapper): zu sehen bleibt nur der Kopfstreifen, der Chevron dreht zur
+   Seite. Die Hoehen entsprechen dem Kopfstreifen samt Rahmen. */
+#startLog .chat-code-wrap[data-zu] .chat-code[data-language] {
+  max-height: 50px;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+@media (pointer: fine) {
+  #startLog .chat-code-wrap[data-zu] .chat-code[data-language] { max-height: 36px; }
+}
+.chat-code-klapp svg { transition: transform 150ms ease; }
+.chat-code-wrap[data-zu] .chat-code-klapp svg { transform: rotate(-90deg); }
+
+/* Syntax-Farben der Codebloecke (chat-code-farben.js) — ZCode-Abgleich
+   2026-08-16: die GitHub-Dark-Farbwelt, in der auch ZCode zeichnet
+   (Kommentar grau, String hellblau, Zahl blau, Schluesselwort koralle,
+   Funktion violett). */
+.chat-code .cf-kom { color: #8b949e; font-style: italic; }
+.chat-code .cf-str { color: #a5d6ff; }
+.chat-code .cf-zahl { color: #79c0ff; }
+.chat-code .cf-schl { color: #ff7b72; }
+.chat-code .cf-fn { color: #d2a8ff; }
 
 /* Betreiber 2026-08-16 ("gesamte Flaeche nutzen, kompakt, keine
    Freiflaeche"): die CODE-Seite randlos wie Claude. Die Ansicht selbst ist

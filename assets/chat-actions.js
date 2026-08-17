@@ -50,7 +50,7 @@ const COPY_FEEDBACK_MS = 2000;
 const UNDO_MS = 5000;
 
 const ICONS = Object.freeze({
-  copy: '<svg viewBox="0 0 24 24"><path d="M9 9h10v10H9Z"/><path d="M15 9V5H5v10h4"/></svg>',
+  copy: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M4 16c-1.1 0-2-.9-2-2V5c0-1.65 1.35-3 3-3h9c1.1 0 2 .9 2 2"/></svg>',
   check: '<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>',
   edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16Z"/><path d="m14 6 4 4"/></svg>',
   up: '<svg viewBox="0 0 24 24"><path d="M7 20V10l4-6 1 1v5h5.5a2 2 0 0 1 2 2.3l-1 6a2 2 0 0 1-2 1.7Z"/><path d="M7 10H4v10h3"/></svg>',

@@ -46,9 +46,14 @@ const FEEDBACK_MS = 2000;
 
 // Gleiche Zeichnung wie in chat-actions.js — ein Kopieren-Symbol, das im Chat
 // zweierlei aussieht, liest sich als zwei verschiedene Funktionen.
+// ZCode-Abgleich 2026-08-16: die zwei Blaetter tragen wie bei ZCode
+// abgerundete Ecken — erlaubt, weil die Rundung INNERHALB einer Zeichnung
+// liegt, nicht am Bauteil (eckiges Designgesetz bleibt unberuehrt).
 const ICONS = Object.freeze({
-  copy: '<svg viewBox="0 0 24 24"><path d="M9 9h10v10H9Z"/><path d="M15 9V5H5v10h4"/></svg>',
-  check: '<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>'
+  copy: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M4 16c-1.1 0-2-.9-2-2V5c0-1.65 1.35-3 3-3h9c1.1 0 2 .9 2 2"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>',
+  // Chevron zeigt nach unten (offen); eingeklappt dreht CSS ihn zur Seite.
+  klapp: '<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>'
 });
 
 function log() {
@@ -76,6 +81,20 @@ function upgrade(pre) {
   // Reihenfolge bleibt die Position im Text erhalten.
   pre.replaceWith(wrap);
   wrap.append(button, pre);
+  // ZCode-Abgleich 2026-08-16: JEDER Block traegt die Kopfzeile. Bloecke
+  // ohne Sprachangabe bekommen die Kennung "text" — das data-Attribut
+  // speist NUR die CSS-Kopfzeile (attr()), nie textContent.
+  if (!pre.dataset.language) pre.dataset.language = "text";
+  // Ein-/Ausklappen wie ZCodes einklappbare Zeilen: Chevron ganz rechts.
+  // Gleiche Textknoten-Regel: KEIN Text im Knopf, Name nur im aria-label.
+  const klapp = document.createElement("button");
+  klapp.type = "button";
+  klapp.className = "chat-code-copy chat-code-klapp";
+  klapp.dataset.codeKlapp = "";
+  klapp.setAttribute("aria-label", "Code einklappen");
+  klapp.setAttribute("aria-expanded", "true");
+  klapp.innerHTML = `<span class="chat-code-copy-icon" aria-hidden="true">${ICONS.klapp}</span>`;
+  wrap.append(klapp);
   // "In den Project-Ordner speichern" (Betreiber 2026-08-16, wie Claude
   // Code): erscheint nur, wenn am Code-Project ein Ordner verbunden ist.
   // Gleiche Textknoten-Regel wie beim Kopieren-Knopf: KEIN Text im Knopf.
@@ -141,7 +160,22 @@ async function copyFrom(button) {
   }
 }
 
+// Zusammenklappen wie bei Claude: der Zustand haengt als data-zu am Wrapper,
+// CSS blendet alles unterhalb des Kopfstreifens aus. Kein Speichern des
+// Zustands — beim Wiederherstellen des Verlaufs ist jeder Block offen.
+function toggleKlapp(button) {
+  const wrap = button.closest(".chat-code-wrap");
+  if (!wrap) return;
+  const jetztZu = wrap.dataset.zu !== "an";
+  if (jetztZu) wrap.dataset.zu = "an";
+  else delete wrap.dataset.zu;
+  button.setAttribute("aria-expanded", jetztZu ? "false" : "true");
+  button.setAttribute("aria-label", jetztZu ? "Code ausklappen" : "Code einklappen");
+}
+
 function onClick(event) {
+  const zuklappen = event.target.closest?.("[data-code-klapp]");
+  if (zuklappen) { toggleKlapp(zuklappen); return; }
   const speichern = event.target.closest?.("[data-code-save]");
   if (speichern) { saveFrom(speichern); return; }
   const button = event.target.closest?.("[data-code-copy]");

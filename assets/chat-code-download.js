@@ -42,7 +42,9 @@ function ruesteNach(wrap) {
   button.dataset.codeDownload = "";
   button.setAttribute("aria-label", "Code als Datei herunterladen");
   button.title = "Als Datei herunterladen";
-  button.innerHTML = '<span class="chat-code-copy-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg></span>';
+  // ZCode-Abgleich 2026-08-16: Download wie bei ZCode — Pfeil in die
+  // Ablageschale statt Pfeil auf Grundlinie.
+  button.innerHTML = '<span class="chat-code-copy-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg></span>';
   wrap.append(button);
 }
 
