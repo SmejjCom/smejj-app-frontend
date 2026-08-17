@@ -1243,7 +1243,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 7px;
+  padding: 2px 6px;
   min-height: 0;
   width: auto;
   max-width: 240px;
@@ -1277,8 +1277,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
   border: 0;
   border-radius: var(--v11-r);
-  /* schmaler von oben nach unten (Betreiber 2026-08-16) */
-  padding: 8px 12px;
+  /* ultra-schmal (Betreiber 2026-08-16, Variante A): wirkt wie EINE Zeile */
+  padding: 5px 10px 4px;
 }
 
 /* Anhang-Chips im Schreibfeld (code-flaeche.js zeichneAnhaenge): kleine
@@ -1286,15 +1286,15 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #code .code-anhaenge {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 6px;
+  gap: 5px;
+  margin-bottom: 3px;
 }
 #code .code-anhang-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 2px 4px 2px 8px;
-  font-size: 12.5px;
+  padding: 1px 3px 1px 7px;
+  font-size: 12px;
   color: rgba(242, 245, 244, 0.8);
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1327,8 +1327,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #code .codeleiste {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-top: 6px;
+  gap: 3px;
+  margin-top: 2px;
   flex-wrap: wrap;
 }
 /* Icon-Knoepfe der Leiste als Geister: kein runder Grund (Betreiber
@@ -1338,6 +1338,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   border: 0;
   box-shadow: none;
   color: rgba(242, 245, 244, 0.55);
+}
+@media (pointer: fine) {
+  #code .codeleiste .icon-button.code-mini { width: 28px; height: 28px; min-height: 28px; }
+  #code #codeSenden { width: 28px; height: 28px; min-height: 28px; }
 }
 #code .codeleiste .icon-button.code-mini:hover {
   background: rgba(255, 255, 255, 0.07);
@@ -2011,7 +2015,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   /* Betreiber-Nachtrag ("Text ganz oben, ueber Browser-Icon"): kein
      reservierter Kopfstreifen — der Text beginnt an der Oberkante, das
      fixe Browser-Icon schwebt rechts darueber. */
-  padding: 4px 12px 8px;
+  padding: 4px 12px 0;
 }
 #code .codeflaeche {
   flex: 1;
@@ -2020,7 +2024,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   max-height: none;
 }
 #code .codegruss { padding: 2px 2px 0; }
-#code .codeunten { margin-top: auto; padding: 8px 0 0; }
+#code .codeunten { margin-top: auto; padding: 4px 0 0; }
 #code .code-log-halter .start-log .entry { max-width: none; }
 #code .code-log-halter .msg-actions { max-width: none; }
 /* Das Schreibfeld waechst beim Tippen nach OBEN mit (code-flaeche.js) —
