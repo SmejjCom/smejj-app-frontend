@@ -86,6 +86,36 @@ async function zeichneProjektChip() {
   // Claude Code sieht man sofort, WORIN das Project arbeitet.
   const ordner = await window.smejjProjektOrdner?.ordnerName?.(kennung).catch(() => "") || "";
   chipKnopf.textContent = ordner ? `Projekt: ${eintrag.name} · 📁 ${ordner}` : `Projekt: ${eintrag.name}`;
+  zeichneOrdnerChip(kennung, ordner);
+}
+
+// Ordner-Chip wie Claude (Betreiber 2026-08-16, "woher soll ich wissen,
+// welcher Ordner hinzugefuegt ist?"): NUR wenn ein Ordner verbunden ist,
+// erscheint ueber dem Feld ein kleiner Chip "📁 Name ×"; das × trennt.
+// Ohne Ordner bleibt der Platz komplett frei.
+function zeichneOrdnerChip(projektId, ordnerName) {
+  const zeile = document.getElementById("codeOrdnerZeile");
+  if (!zeile) return;
+  zeile.innerHTML = "";
+  zeile.hidden = !ordnerName;
+  if (!ordnerName) return;
+  const chip = document.createElement("span");
+  chip.className = "code-anhang-chip code-ordner-chip";
+  const wort = document.createElement("span");
+  wort.textContent = `📁 ${ordnerName}`;
+  const weg = document.createElement("button");
+  weg.type = "button";
+  weg.className = "code-anhang-weg";
+  weg.setAttribute("aria-label", `Ordner ${ordnerName} trennen`);
+  weg.title = "Ordner trennen";
+  weg.textContent = "×";
+  weg.addEventListener("click", () => {
+    try { window.smejjProjektOrdner?.trenneOrdner?.(projektId); } catch { /* still */ }
+    zeichneOrdnerChip(projektId, "");
+    void zeichneProjektChip();
+  });
+  chip.append(wort, weg);
+  zeile.append(chip);
 }
 
 function zeichne() {
