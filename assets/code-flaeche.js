@@ -233,7 +233,7 @@ async function oeffneModellMenue() {
     const status = statusAntwort.ok ? await statusAntwort.json() : null;
     const katalog = katalogAntwort.ok ? await katalogAntwort.json() : null;
     if (!document.getElementById("codeModellMenue")) return; // inzwischen zu
-    if (!status?.hasKey) {
+    if (!(status?.hasKey ?? status?.configured)) {
       zeile({
         titel: "Cline-Modelle",
         klein: "Cline-Key in den Einstellungen verbinden — dann erscheinen sie hier.",
