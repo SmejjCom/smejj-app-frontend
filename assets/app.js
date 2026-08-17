@@ -4,7 +4,7 @@ import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { runClientChat } from "/assets/ai/chatClient.js?v=3";
 import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
-import { initComposerTools } from "./composer-tools.js?v=werkzeuge-1";
+import { initComposerTools } from "./composer-tools.js?v=werkzeuge-2";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=1";
 import { initGlobalSearch } from "./search.js?v=b38d";
 import { openSearchOverlay } from "./search-overlay.js?v=b47c";

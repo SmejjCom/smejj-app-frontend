@@ -4,7 +4,7 @@
 // Versionierter Pfad wie in app.js (QA-Welle 1, Befund F-07) — ein Schutztest
 // verlangt die Cache-Version dort ausdruecklich, also zieht dieser Import nach.
 import { showToast } from "./components.js?v=b48";
-import { bindBildAnhang } from "./composer-bild-anhang.js";
+import { bindBildAnhang, uebernehmeBildDatei } from "./composer-bild-anhang.js";
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -17,17 +17,38 @@ function closePlusMenu() {
 
 function bindAttachInput(selector, label, getInput, notifyInputChanged) {
   const fileInput = $(selector);
-  const input = getInput();
-  if (!fileInput || !input) return;
-  fileInput.addEventListener("change", () => {
+  if (!fileInput) return;
+  fileInput.addEventListener("change", async () => {
     const files = Array.from(fileInput.files || []);
+    fileInput.value = "";
     if (files.length === 0) return;
-    const references = files.map((file) => `[${label}: ${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)]`);
-    input.value = input.value ? `${input.value}\n${references.join("\n")}` : references.join("\n");
+    // Das Ziel-Feld ZUR AENDERUNGSZEIT holen, nicht beim Laden (Betreiber-
+    // Befund 2026-08-16, live gemessen): in der CODE-Ansicht ist das Ziel
+    // das Code-Feld — vorher landete der Verweis unsichtbar im Start-Feld
+    // und "Foto hinzufuegen hat nicht geklappt".
+    const input = getInput();
+    if (!input) return;
+    // Fotos gehen den Bild-Verstehen-Weg wie beim Bild-Menuepunkt — ein
+    // Foto ueber "Dateien oder Fotos hinzufuegen" war vorher nur toter
+    // Text ohne Bildinhalt. Wie bei bindBildAnhang traegt nur das ERSTE
+    // Bild echten Inhalt (die Bruecke nimmt ein Bild pro Frage).
+    const bilder = files.filter((file) => String(file.type || "").startsWith("image/"));
+    const andere = files.filter((file) => !String(file.type || "").startsWith("image/"));
+    if (bilder.length) {
+      const [erstes, ...rest] = bilder;
+      await uebernehmeBildDatei(erstes, input, notifyInputChanged);
+      if (rest.length) {
+        const referenzen = rest.map((file) => `[Bild: ${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)]`);
+        input.value = `${input.value}\n${referenzen.join("\n")}`;
+      }
+    }
+    if (andere.length) {
+      const references = andere.map((file) => `[${label}: ${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)]`);
+      input.value = input.value ? `${input.value}\n${references.join("\n")}` : references.join("\n");
+      showToast(andere.length === 1 ? `${label} hinzugefuegt: ${andere[0].name}` : `${andere.length} Dateien hinzugefuegt`);
+    }
     notifyInputChanged(input);
     input.focus();
-    showToast(files.length === 1 ? `${label} hinzugefuegt: ${files[0].name}` : `${files.length} Dateien hinzugefuegt`);
-    fileInput.value = "";
   });
 }
 

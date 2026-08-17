@@ -95,9 +95,12 @@ export async function uebernehmeBildDatei(file, input, notifyInputChanged, { her
  */
 export function bindBildAnhang(selector, getInput, notifyInputChanged) {
   const fileInput = document.querySelector(selector);
-  const input = getInput();
-  if (!fileInput || !input) return;
+  if (!fileInput) return;
   fileInput.addEventListener("change", async () => {
+    // Ziel-Feld zur AENDERUNGSZEIT holen — in der CODE-Ansicht ist es das
+    // Code-Feld (gleicher Betreiber-Befund wie in composer-plus-menu.js).
+    const input = getInput();
+    if (!input) return;
     const files = Array.from(fileInput.files || []);
     fileInput.value = "";
     if (files.length === 0) return;

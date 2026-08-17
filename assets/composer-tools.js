@@ -32,7 +32,7 @@ import { createThinkingCue } from "./voice-thinking-cue.js";
 import { createPremiumVoice } from "./voice-premium-tts.js";
 import { CLIENT_ROUTES } from "./config.js";
 // Plus-Menue (Anhaenge) — ausgelagert, Verhalten unveraendert.
-import { bindPlusMenu } from "./composer-plus-menu.js?v=werkzeuge-1";
+import { bindPlusMenu } from "./composer-plus-menu.js?v=werkzeuge-2";
 // Mikrofon-Diktat — ausgelagert (800-Zeilen-Regel), Verhalten unveraendert.
 import { createDictation } from "./composer-dictation.js";
 
@@ -127,6 +127,13 @@ function stopSpeaking() {
 }
 
 function composerInput() {
+      // In der CODE-Ansicht gehoeren Anhaenge und Diktat ins Code-Feld:
+      // Betreiber-Befund 2026-08-16 ("Foto hinzufuegen hat nicht geklappt")
+      // — der Verweis landete unsichtbar im Start-Feld, live gemessen.
+      if (document.querySelector("#code.view.is-active")) {
+            const feld = document.getElementById("codeAufgabe");
+            if (feld) return feld;
+      }
       return $("#startMessage");
 }
 
