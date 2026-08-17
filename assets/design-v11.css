@@ -978,7 +978,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #startLog .msg-actions {
   justify-content: flex-start;
   align-items: center;
-  margin-top: 0;
+  /* Betreiber 2026-08-16 ("Icons sollen die letzte Textzeile treffen"):
+     die gemessene Luecke (7px Eintrag-Polster + ~6px Icon-Kopfraum) wird
+     exakt aufgehoben — die Icons haengen an der Textunterkante. */
+  margin-top: -13px;
   pointer-events: none;
 }
 #startLog .msg-actions .msg-act { pointer-events: auto; }
