@@ -154,12 +154,39 @@ function oeffneModusMenue() {
   menue.className = "code-projekt-menue code-modus-menue";
   menue.setAttribute("role", "menu");
   const aktiv = modus();
-  for (const [id, name, hinweis] of MODI) {
+  // 1:1 wie Claudes Modus-Menue (Betreiber-Screenshot 2026-08-16):
+  // Kopfzeile "Modus", jede Zeile linksbuendig mit Beschreibung darunter,
+  // rechts Haken (aktiv) und Ziffer 1-4 — die Ziffern FUNKTIONIEREN als
+  // Tasten, solange das Menue offen ist. Keine Trennstriche, kompakt.
+  const kopf = document.createElement("div");
+  kopf.className = "code-menue-titel";
+  kopf.textContent = "Modus";
+  menue.append(kopf);
+  MODI.forEach(([id, name, hinweis], i) => {
     const k = document.createElement("button");
     k.type = "button";
     k.setAttribute("role", "menuitemradio");
     k.setAttribute("aria-checked", String(id === aktiv));
-    k.innerHTML = `<b>${name}</b>${id === aktiv ? " ✓" : ""}<small>${hinweis}</small>`;
+    const links = document.createElement("span");
+    links.className = "modus-links";
+    const titel = document.createElement("b");
+    titel.textContent = name;
+    const klein = document.createElement("small");
+    klein.textContent = hinweis;
+    links.append(titel, klein);
+    const rechts = document.createElement("span");
+    rechts.className = "modus-rechts";
+    if (id === aktiv) {
+      const haken = document.createElement("span");
+      haken.className = "modus-haken";
+      haken.textContent = "✓";
+      rechts.append(haken);
+    }
+    const ziffer = document.createElement("span");
+    ziffer.className = "modus-ziffer";
+    ziffer.textContent = String(i + 1);
+    rechts.append(ziffer);
+    k.append(links, rechts);
     k.addEventListener("click", (e) => {
       e.stopPropagation();
       localStorage.setItem(CODE_MODUS, id);
@@ -167,7 +194,7 @@ function oeffneModusMenue() {
       zeichne();
     });
     menue.append(k);
-  }
+  });
   feld.append(menue);
 }
 
@@ -575,6 +602,14 @@ export function initCodeFlaeche() {
     else schliesseSlash();
   });
   document.addEventListener("keydown", (e) => {
+    // Ziffern 1-4 waehlen den Modus, solange das Menue offen ist (wie
+    // Claudes Kurztasten im Modus-Menue).
+    const modusMenue = document.getElementById("codeModusMenue");
+    if (modusMenue && /^[1-4]$/.test(e.key)) {
+      e.preventDefault();
+      modusMenue.querySelectorAll('[role="menuitemradio"]')[Number(e.key) - 1]?.click();
+      return;
+    }
     if (e.key === "Escape") { schliessePlus(); schliesseSlash(); }
     // Cmd/Strg+U wie bei Claude: Dateien hinzufuegen, nur in der CODE-Ansicht.
     if ((e.metaKey || e.ctrlKey) && (e.key === "u" || e.key === "U")

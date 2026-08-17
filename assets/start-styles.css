@@ -5886,13 +5886,50 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (prefers-reduced-motion: reduce) {
   .code-arbeit { animation: none; }
 }
-.code-modus-menue { min-width: 300px; }
-.code-modus-menue button b { display: inline; font-weight: 650; }
+/* Modus-Menue 1:1 wie Claude (Betreiber-Screenshot 2026-08-16):
+   Kopf "Modus", Zeilen linksbuendig OHNE Trennstriche, Beschreibung
+   gedaempft darunter (eine Zeile, Punkte), rechts Haken + Ziffer. */
+.code-modus-menue { min-width: 320px; max-width: 92vw; }
+.code-menue-titel {
+  padding: 6px 12px 2px;
+  font-size: 12.5px;
+  color: rgba(240, 239, 236, 0.5);
+}
+.code-modus-menue button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  min-height: 0;
+  padding: 7px 12px;
+  text-align: left;
+}
+.code-modus-menue .modus-links {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  text-align: left;
+}
+.code-modus-menue button b { display: block; font-weight: 550; font-size: 14.5px; }
 .code-modus-menue button small {
   display: block;
-  margin-top: 2px;
-  opacity: 0.72;
+  margin-top: 1px;
+  opacity: 0.6;
   font-size: 0.86em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.code-modus-menue .modus-rechts {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 0 auto;
+}
+.code-modus-menue .modus-haken { color: var(--v11-cy); }
+.code-modus-menue .modus-ziffer {
+  color: rgba(240, 239, 236, 0.45);
+  font-size: 13px;
 }
 #code .codeunten { padding: 14px 0 8px; }
 #code .repozeile {
