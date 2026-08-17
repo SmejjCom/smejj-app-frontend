@@ -20,6 +20,7 @@ import { afterFirstPaint } from "./deferred-start.js";
 import { initGoogleLogin } from "./google-login.js";
 import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
 import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39u";
+import { istMedienAuftrag } from "./medien-absicht.js?v=1";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
 import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
@@ -348,7 +349,11 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   const output = addEntry("", "assistant", target);
   try {
     if (routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
-    if (await runClientChat({ task: await groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
+    // Bild- und Video-Auftraege nehmen IMMER den Bruecken-Weg — die
+    // Medien-Spur (Maler, Video-Worker) lebt dort. Ueber den Cline-Weg kam
+    // sonst ein ausformulierter "Bildprompt" statt eines Bildes
+    // (Nutzertest 2026-08-17, medien-absicht.js).
+    if (!istMedienAuftrag(task) && await runClientChat({ task: await groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
     try {
       const anfrage = {
         task: await groundTask(task),
