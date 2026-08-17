@@ -5916,26 +5916,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   color: rgba(240, 239, 236, 0.5);
 }
 
-/* Arbeits-Punkt (Betreiber 2026-08-16: "viereckiger Punkt im Schreibfeld —
-   man soll erkennen, es arbeitet gerade", wie Claudes Arbeitszeichen, aber
-   VIERECKIG nach Designgesetz). Sichtbar nur solange smejj:chat-strom
-   laeuft (code-flaeche.js). */
-.code-arbeit {
-  flex: 0 0 auto;
-  width: 9px;
-  height: 9px;
-  align-self: center;
-  margin-right: 2px;
-  background: var(--v11-cy);
-  animation: codeArbeitPuls 1.2s ease-in-out infinite;
-}
-@keyframes codeArbeitPuls {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .code-arbeit { animation: none; }
-}
+/* Der alte Arbeits-Punkt links in der Leiste (v491) ist ERSETZT durch
+   das Claude-Viereck rechts oben im Feld (#codeArbeit, Regeln oben) —
+   seine Dauer-Cyan-Regel faerbte das neue Viereck mit (2026-08-17
+   live gemessen). */
 /* Modus-Menue 1:1 wie Claude (Betreiber-Screenshot 2026-08-16):
    Kopf "Modus", Zeilen linksbuendig OHNE Trennstriche, Beschreibung
    gedaempft darunter (eine Zeile, Punkte), rechts Haken + Ziffer. */

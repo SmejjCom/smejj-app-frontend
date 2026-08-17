@@ -632,20 +632,8 @@ export function initCodeFlaeche() {
       document.getElementById("composerFileInput")?.click();
     }
   });
-  // Arbeits-Punkt (Betreiber 2026-08-16: "viereckiger Punkt im Schreibfeld,
-  // man soll erkennen: arbeitet gerade"): haengt am echten Strom-Signal
-  // smejj:chat-strom aus chat-stream.js — kein geratener Zustand.
-  const arbeitsPunkt = document.createElement("span");
-  arbeitsPunkt.id = "codeArbeitsPunkt";
-  arbeitsPunkt.className = "code-arbeit";
-  arbeitsPunkt.title = "smejj arbeitet gerade";
-  arbeitsPunkt.setAttribute("role", "status");
-  arbeitsPunkt.setAttribute("aria-label", "smejj arbeitet gerade");
-  arbeitsPunkt.hidden = true;
-  document.querySelector("#code .codeleiste")?.prepend(arbeitsPunkt);
-  window.addEventListener("smejj:chat-strom", (e) => {
-    arbeitsPunkt.hidden = !(Number(e.detail?.laufen) > 0);
-  });
+  // Der alte Arbeits-Punkt links in der Leiste (v491) ist ersetzt durch
+  // das Claude-Viereck rechts oben im Feld (#codeArbeit, siehe oben).
   document.getElementById("codeDiktat")?.addEventListener("click", () => {
     document.querySelector('[data-start-tool="voice"]')?.click();
   });
