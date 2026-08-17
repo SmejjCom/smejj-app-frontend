@@ -36,7 +36,7 @@ const ITEMS = Object.freeze({
  */
 export function menuItemsFor(role, hatQuellen = false) {
   if (role === "user") return [...MENU_KOPF.user, ITEMS.fork, ITEMS.remove];
-  const punkte = [...MENU_KOPF.assistant, ITEMS.plain, ITEMS.speak, ITEMS.fork, ITEMS.remove];
+  const punkte = [...MENU_KOPF.assistant, ITEMS.plain, ITEMS.fork, ITEMS.remove];
   return hatQuellen ? [ITEMS.sources, ...punkte] : punkte;
 }
 
@@ -51,6 +51,8 @@ const BAR_SPECS = Object.freeze({
   ]),
   assistant: Object.freeze([
     { act: "copy", label: "Kopieren", icon: "copy" },
+    // Betreiber 2026-08-16: Vorlesen direkt nach Kopieren — oft gebraucht.
+    { act: "speak", label: "Vorlesen", icon: "volume" },
     { act: "rate-up", label: "Hilfreich", icon: "up" },
     { act: "rate-down", label: "Nicht hilfreich", icon: "down" },
     { act: "menu", icon: "more", label: "Aktionen" }
