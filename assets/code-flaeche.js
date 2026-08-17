@@ -240,7 +240,8 @@ async function oeffneModellMenue(kontext = {}) {
     rechts.className = "modus-rechts";
     if (aktiv) { const h = document.createElement("span"); h.className = "modus-haken"; h.textContent = "✓"; rechts.append(h); }
     k.append(links, rechts);
-    k.addEventListener("click", (e) => { e.stopPropagation(); aktion(); });
+    // Der Knopf geht an die aktion — sie schreibt waehrend des Wartens "…" hinein.
+    k.addEventListener("click", (e) => { e.stopPropagation(); aktion(k); });
     menue.append(k);
     return k;
   };
@@ -313,22 +314,40 @@ async function oeffneModellMenue(kontext = {}) {
       zeile({
         titel: kurz,
         aktiv: istCline && aktivesClineModell === id,
-        aktion: () => {
+        aktion: async (k) => {
           localStorage.setItem(CLINE_MODEL_KEY, id);
           localStorage.setItem(MODELL_KEY, "Cline");
           // PFLICHT (live gemessen 2026-08-17): der Chat-Request traegt KEIN
           // model-Feld — der Server nimmt sein gespeichertes selectedModel.
-          // Ohne dieses /select wirkte die Menue-Wahl beim Senden NIE.
+          //
+          // Und es muss ABGEWARTET werden, nicht nur abgeschickt: der
+          // Datensatz liegt auf IDrive e2, das Schreiben dauert. Ein
+          // fire-and-forget /select liess den naechsten Auftrag noch mit
+          // dem ALTEN Modell laufen — gemessen 2026-08-17: Grok gewaehlt,
+          // Antwort kam von Qwen, das Modell hinkte jedes Mal genau eine
+          // Wahl hinterher. Der Knopf zeigt solange "…".
+          const knopfText = k.querySelector("b");
+          const vorher = knopfText?.textContent;
+          if (knopfText) knopfText.textContent = `${kurz} …`;
           try {
             const token = sessionStorage.getItem(TOKEN_KEY)
               || localStorage.getItem("smejj.auth.accessToken.v1") || "";
-            void fetch(`${API_ORIGIN}/api/providers/cline/select`, {
+            const antwort = await fetch(`${API_ORIGIN}/api/providers/cline/select`, {
               method: "POST",
               credentials: "include",
               headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
               body: JSON.stringify({ model: id })
             });
-          } catch { /* fail-safe: lokale Wahl bleibt */ }
+            if (!antwort.ok) throw new Error(`select_${antwort.status}`);
+          } catch (fehler) {
+            // Ehrlich scheitern statt still das falsche Modell benutzen.
+            if (knopfText && vorher) knopfText.textContent = vorher;
+            try {
+              const { showToast } = await import("/assets/components.js?v=b48");
+              showToast("Modellwechsel hat nicht geklappt — bitte erneut versuchen.", "warn");
+            } catch { /* still */ }
+            return;
+          }
           document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: id } }));
           window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
           zu();
@@ -561,7 +580,8 @@ async function oeffneProjektMenue() {
     k.type = "button";
     k.setAttribute("role", "menuitem");
     k.textContent = text;
-    k.addEventListener("click", (e) => { e.stopPropagation(); aktion(); });
+    // Der Knopf geht an die aktion — sie schreibt waehrend des Wartens "…" hinein.
+    k.addEventListener("click", (e) => { e.stopPropagation(); aktion(k); });
     return k;
   };
   const waehle = (id) => {
