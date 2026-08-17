@@ -265,13 +265,19 @@ async function oeffneModellMenue(kontext = {}) {
     menue.style.left = "auto";
     menue.style.right = `${Math.max(0, Math.round(feldR.right - chipR.right))}px`;
     menue.style.bottom = `${Math.round(feldR.bottom - chipR.top + 6)}px`;
-    // Nie oben aus dem Fenster ragen (auf der Startseite gemessen):
-    // notfalls tiefer setzen, das Menue scrollt innen.
-    const oben = menue.getBoundingClientRect().top;
-    if (oben < 8) {
-      menue.style.bottom = `${Math.round(parseFloat(menue.style.bottom) - (8 - oben))}px`;
-    }
   } catch { /* Standardposition bleibt */ }
+  // Nie oben aus dem Fenster ragen: die Zeilen kommen ASYNCHRON aus dem
+  // Katalog nach und das bottom-verankerte Menue waechst nach OBEN — die
+  // Kappe muss darum nach JEDEM Fuellen laufen (live gemessen: top -112).
+  const imFensterHalten = () => {
+    try {
+      const oben = menue.getBoundingClientRect().top;
+      if (oben < 8) {
+        menue.style.bottom = `${Math.round(parseFloat(menue.style.bottom || "0") - (8 - oben))}px`;
+      }
+    } catch { /* still */ }
+  };
+  imFensterHalten();
   // Cline-Katalog LIVE nachladen — erst Status (Key da?), dann Modelle.
   // Fail-safe: ohne Token/Key eine ehrliche Hinweis-Zeile statt Attrappe.
   try {
@@ -295,6 +301,7 @@ async function oeffneModellMenue(kontext = {}) {
         aktiv: false,
         aktion: () => { zu(); document.querySelector('.nav-button[data-view="settings"]')?.click(); }
       });
+      imFensterHalten();
       return;
     }
     // Betreiber-Nachtrag: ALLE Katalog-Modelle, aber im selben Stil —
@@ -330,6 +337,7 @@ async function oeffneModellMenue(kontext = {}) {
       if (gezeigt.has(kurz.toLowerCase())) continue;
       baueZeile(kurz, m.id);
     }
+    imFensterHalten();
   } catch { /* fail-safe: Menue zeigt dann nur das Hausmodell */ }
 }
 
@@ -647,13 +655,20 @@ export function initCodeFlaeche() {
   }, { capture: true });
   // Anzeige im Start-Knopf: kurzer Modellname statt "Cline · <rohe id>".
   // app.js schreibt seinen Text bei model-selected — wir setzen NACH ihm.
-  const startAnzeige = () => {
-    if (!startKnopf) return;
-    setTimeout(() => { startKnopf.textContent = modellAnzeige(); }, 0);
-  };
-  window.addEventListener("smejj:model-selected", startAnzeige);
-  document.addEventListener("smejj:cline-selected", startAnzeige);
-  startAnzeige();
+  // app.js schreibt "Cline · <id>" auch SPAETER (async) in den Knopf —
+  // ein Waechter haelt bei Cline-Wahl den kurzen Namen dagegen.
+  if (startKnopf && !startKnopf.dataset.kurzWacht) {
+    startKnopf.dataset.kurzWacht = "an";
+    const kurzHalten = () => {
+      if (localStorage.getItem(MODELL_KEY) !== "Cline") return;
+      const soll = modellAnzeige();
+      if (startKnopf.textContent !== soll) startKnopf.textContent = soll;
+    };
+    new MutationObserver(kurzHalten).observe(startKnopf, { childList: true, characterData: true, subtree: true });
+    window.addEventListener("smejj:model-selected", () => setTimeout(kurzHalten, 0));
+    document.addEventListener("smejj:cline-selected", () => setTimeout(kurzHalten, 0));
+    kurzHalten();
+  }
   document.getElementById("codeAufgabe")?.addEventListener("keydown", (ereignis) => {
     if (ereignis.key === "Enter" && !ereignis.shiftKey) {
       ereignis.preventDefault();
