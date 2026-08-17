@@ -1213,11 +1213,15 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   right: 12px;
   width: 11px;
   height: 11px;
-  border: 1.5px solid rgba(242, 245, 244, 0.3);
   pointer-events: none;
+  /* Betreiber-Nachtrag: im Ruhezustand UNSICHTBAR — das Viereck existiert
+     nur, solange smejj arbeitet. */
+  opacity: 0;
+  visibility: hidden;
 }
 #code .code-arbeit.an {
-  border-color: var(--v11-cy);
+  opacity: 1;
+  visibility: visible;
   background: var(--v11-cy);
   animation: code-arbeit-puls 1.6s ease-in-out infinite;
 }
