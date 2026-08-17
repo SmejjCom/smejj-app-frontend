@@ -1259,6 +1259,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   transition: color 120ms ease;
 }
 #code .repochip:hover { color: #f2f5f4; background: transparent; }
+/* text-overflow greift nicht in inline-flex (live gemessen: "ojekt:" —
+   vorn abgeschnitten). Der Projekt-Chip ist deshalb inline-block und
+   kappt hinten mit Punkten. */
+#code #codeProjektChip { display: inline-block; text-align: left; }
 #code .repochip.an {
   background: transparent;
   color: var(--v11-cy);
