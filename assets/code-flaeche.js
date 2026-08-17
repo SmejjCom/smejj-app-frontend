@@ -219,11 +219,16 @@ async function oeffneModellMenue() {
   // Cline-Katalog LIVE nachladen — erst Status (Key da?), dann Modelle.
   // Fail-safe: ohne Token/Key eine ehrliche Hinweis-Zeile statt Attrappe.
   try {
-    const token = localStorage.getItem(TOKEN_KEY) || "";
+    // Gleiche Anmeldung wie provider-settings.js (live gemessen 2026-08-17:
+    // nur localStorage-apiToken gab 401 und das Menue log "Key verbinden",
+    // obwohl er verbunden war): Sitzungs-Token, dann Zugangs-Token, plus
+    // Cookies.
+    const token = sessionStorage.getItem(TOKEN_KEY)
+      || localStorage.getItem("smejj.auth.accessToken.v1") || "";
     const kopfzeilen = token ? { Authorization: `Bearer ${token}` } : {};
     const [statusAntwort, katalogAntwort] = await Promise.all([
-      fetch(`${API_ORIGIN}/api/providers/cline/status`, { headers: kopfzeilen }),
-      fetch(`${API_ORIGIN}/api/providers/cline/models`, { headers: kopfzeilen })
+      fetch(`${API_ORIGIN}/api/providers/cline/status`, { credentials: "include", headers: kopfzeilen }),
+      fetch(`${API_ORIGIN}/api/providers/cline/models`, { credentials: "include", headers: kopfzeilen })
     ]);
     const status = statusAntwort.ok ? await statusAntwort.json() : null;
     const katalog = katalogAntwort.ok ? await katalogAntwort.json() : null;
