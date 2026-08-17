@@ -6890,3 +6890,16 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #start .prompt-actions .model-picker { order: 4; display: block; }
 #start .prompt-actions [data-start-tool="voice"] { order: 5; }
 #start .prompt-actions .send-button { order: 6; }
+
+/* Betreiber 2026-08-17: die Antwort im Sprachmodus liest sich wie Text —
+   linksbuendig, normale Groesse, ruhige Zeilen. Zentriert und riesig war
+   sie unlesbar, sobald sie laenger als ein Satz wurde. */
+.voice-mode-reply {
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.55;
+  max-width: 620px;
+  width: 100%;
+  padding: 0 4px;
+}
+.voice-mode-transcript { text-align: left; }

@@ -136,10 +136,30 @@ export function setVoiceModeTranscript(text) {
 // Live-Mitschrift der Antwort (Konkurrenz-Radar V2, 2026-08-06): Die Antwort
 // streamt sichtbar unter der Welle mit statt nur als "Ich spreche ...".
 // Bewusst NUR Text (textContent) — kein HTML aus dem Log uebernehmen.
+// Betreiber 2026-08-17 ("Keiner braucht diese komische Schriftarten — User
+// wollen nur die Information"): im Sprachmodus stand die Antwort ROH da —
+// "```js", "**fett**", "### Ueberschrift" als Zeichen, riesig und zentriert.
+// Hier fallen die Auszeichnungs-Zeichen weg; der Text bleibt Text
+// (textContent, kein HTML aus dem Log). Der Vorlese-Offset bleibt
+// unberuehrt — die Sprachausgabe liest weiter aus ihrer eigenen Quelle.
+export function lesbarerSprechtext(roh) {
+  return String(roh || "")
+    .replace(/```[a-z0-9+-]*\n?/gi, "")   // Codezaun-Zeilen
+    .replace(/`([^`\n]+)`/g, "$1")        // Inline-Code
+    .replace(/^\s{0,3}#{1,6}\s+/gm, "")   // Ueberschriften
+    .replace(/\*\*([^*\n]+)\*\*/g, "$1")  // fett
+    .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,;:!?]|$)/g, "$1$2") // kursiv
+    .replace(/^\s{0,3}>\s?/gm, "")        // Zitatzeichen
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 export function setVoiceModeReply(text) {
   const reply = document.querySelector("#voiceModeReply");
-  if (!reply || reply.textContent === text) return;
-  reply.textContent = text;
+  if (!reply) return;
+  const sauber = lesbarerSprechtext(text);
+  if (reply.textContent === sauber) return;
+  reply.textContent = sauber;
   reply.scrollTop = reply.scrollHeight;
 }
 
