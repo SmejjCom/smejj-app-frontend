@@ -89,6 +89,20 @@ const TOKEN_KEY = "smejj.apiToken.v1";
 // Gruppen — uebersichtlich wie seine Beispiel-Liste. Gezeigt wird ein
 // Eintrag nur, wenn seine ID wirklich im Cline-Katalog steht (ehrlich);
 // Fable 5 und Gemini gibt es dort nicht und stehen darum nicht hier.
+// Katalog-IDs ohne Kurznamen werden lesbar gemacht: "cline-pass/qwen3.8-max"
+// -> "Qwen 3.8 Max". Bekannte Kuerzel bleiben gross.
+function kurzName(id) {
+  const roh = String(id).split("/").pop().replace(/:free$/, "");
+  return roh
+    .replace(/-/g, " ")
+    .replace(/([a-z])(\d)/gi, "$1 $2")
+    .split(" ")
+    .map((w) => /^(glm|gpt)$/i.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 const CLINE_KURZ = [
   ["GLM 5.3", "cline-pass/glm-5.3"],
   ["Opus 5", "anthropic/claude-opus-5"],
@@ -248,9 +262,12 @@ async function oeffneModellMenue() {
       });
       return;
     }
+    // Betreiber-Nachtrag: ALLE Katalog-Modelle, aber im selben Stil —
+    // erst seine Wunschliste, dann der Rest; gleiche Namen nur einmal
+    // (kimi-k3 steht z. B. doppelt im Katalog).
     const vorhanden = new Set((katalog?.models || []).map((m) => m.id));
-    for (const [kurz, id] of CLINE_KURZ) {
-      if (!vorhanden.has(id)) continue;
+    const gezeigt = new Set();
+    const baueZeile = (kurz, id) => {
       zeile({
         titel: kurz,
         aktiv: istCline && aktivesClineModell === id,
@@ -263,6 +280,17 @@ async function oeffneModellMenue() {
           zeichne();
         }
       });
+      gezeigt.add(kurz.toLowerCase());
+      gezeigt.add(id);
+    };
+    for (const [kurz, id] of CLINE_KURZ) {
+      if (vorhanden.has(id)) baueZeile(kurz, id);
+    }
+    for (const m of katalog?.models || []) {
+      if (gezeigt.has(m.id)) continue;
+      const kurz = kurzName(m.id);
+      if (gezeigt.has(kurz.toLowerCase())) continue;
+      baueZeile(kurz, m.id);
     }
   } catch { /* fail-safe: Menue zeigt dann nur das Hausmodell */ }
 }

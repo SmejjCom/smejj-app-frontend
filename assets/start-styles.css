@@ -5941,7 +5941,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   gap: 10px;
   border: 0;
   min-height: 0;
-  padding: 7px 12px;
+  /* Betreiber 2026-08-17: Modelle KOMPAKT untereinander, wenig Luft. */
+  padding: 3px 12px;
   text-align: left;
 }
 .code-modus-menue .modus-links {
@@ -5950,7 +5951,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   display: block;
   text-align: left;
 }
-.code-modus-menue button b { display: block; font-weight: 550; font-size: 14.5px; }
+.code-modus-menue button b { display: block; font-weight: 550; font-size: 14px; line-height: 1.5; }
 .code-modus-menue button small {
   display: block;
   margin-top: 1px;
