@@ -29,6 +29,9 @@
 // tot. Der module-queries-Test prueft jetzt auch dieses Glied.
 
 import { listProjekte, neuesGespraechImBereich, newChat } from "/assets/chat-store.js?v=b52";
+// OHNE ?v — dieselbe Kennung wie app.js/cline-model-menu.js ("./config.js"),
+// sonst entsteht eine zweite Modulinstanz (module-queries-Waechter).
+import { API_ORIGIN } from "./config.js";
 
 const STUFEN = ["auto", "gruendlich", "schnell"];
 const STUFEN_TEXT = { auto: "Automatisch", gruendlich: "Gründlich", schnell: "Schnell" };
@@ -72,6 +75,28 @@ const MODI = [
 function modus() {
   const wert = localStorage.getItem(CODE_MODUS);
   return MODI.some(([id]) => id === wert) ? wert : "auto";
+}
+
+// ---- Modellwahl (Betreiber 2026-08-17: "warum kann ich bei Code nicht
+// Modelle waehlen?"). Dieselben Speicher wie der Start-Picker: die Wahl
+// eines Cline-Modells setzt smejj.model.selected.v2 auf "Cline" und den
+// Katalog-Namen in smejj.cline.model.v1 — der bestehende Chat-Weg
+// (runClineChat-Weiche) greift dann von selbst. Kein eigener Pfad.
+const MODELL_KEY = "smejj.model.selected.v2";
+const CLINE_MODEL_KEY = "smejj.cline.model.v1";
+const TOKEN_KEY = "smejj.apiToken.v1";
+const CLINE_GRUPPEN = [
+  ["recommended", "Empfohlen"],
+  ["cline-pass", "Cline Pass"],
+  ["free", "Kostenlos"]
+];
+
+function modellAnzeige() {
+  if (localStorage.getItem(MODELL_KEY) === "Cline") {
+    const m = localStorage.getItem(CLINE_MODEL_KEY) || "";
+    if (m) return m.split("/").pop();
+  }
+  return MODELL_TEXT[stufe()];
 }
 
 async function zeichneProjektChip() {
@@ -130,13 +155,112 @@ function zeichne() {
   const chip = document.getElementById("codeStufeChip");
   if (chip) chip.textContent = STUFEN_TEXT[s];
   const modell = document.getElementById("codeModellAnzeige");
-  if (modell) modell.innerHTML = `<b>${MODELL_TEXT[s]}</b>`;
+  if (modell) modell.innerHTML = `<b>${modellAnzeige()}</b>`;
   const t = document.getElementById("codeTiefeAnzeige");
   if (t) t.textContent = tiefe();
   const modusChip = document.getElementById("codeModusChip");
   if (modusChip) modusChip.textContent = MODI.find(([id]) => id === modus())[1];
   void zeichneProjektChip();
   logVerwalten();
+}
+
+// ---- Modell-Menue (wie Claudes "Fable 5"-Menue, Betreiber 2026-08-17) ---
+function schliesseModellMenue() {
+  document.getElementById("codeModellMenue")?.remove();
+}
+
+async function oeffneModellMenue() {
+  if (document.getElementById("codeModellMenue")) { schliesseModellMenue(); return; }
+  const chip = document.getElementById("codeModellAnzeige");
+  const feld = chip?.closest(".codefeld");
+  if (!chip || !feld) return;
+  const menue = document.createElement("div");
+  menue.id = "codeModellMenue";
+  menue.className = "code-projekt-menue code-modus-menue";
+  menue.setAttribute("role", "menu");
+  const kopf = document.createElement("div");
+  kopf.className = "code-menue-titel";
+  kopf.textContent = "Modell";
+  menue.append(kopf);
+  const istCline = localStorage.getItem(MODELL_KEY) === "Cline";
+  const aktivesClineModell = localStorage.getItem(CLINE_MODEL_KEY) || "";
+  const zeile = ({ titel, klein, aktiv, aktion }) => {
+    const k = document.createElement("button");
+    k.type = "button";
+    k.setAttribute("role", "menuitemradio");
+    k.setAttribute("aria-checked", String(Boolean(aktiv)));
+    const links = document.createElement("span");
+    links.className = "modus-links";
+    const b = document.createElement("b");
+    b.textContent = titel;
+    links.append(b);
+    if (klein) { const s = document.createElement("small"); s.textContent = klein; links.append(s); }
+    const rechts = document.createElement("span");
+    rechts.className = "modus-rechts";
+    if (aktiv) { const h = document.createElement("span"); h.className = "modus-haken"; h.textContent = "✓"; rechts.append(h); }
+    k.append(links, rechts);
+    k.addEventListener("click", (e) => { e.stopPropagation(); aktion(); });
+    menue.append(k);
+    return k;
+  };
+  // Hausmodell: nutzt den bestehenden Stufen-Weg (Auto/Gruendlich/Schnell).
+  zeile({
+    titel: "smejj 1.0",
+    klein: "Hausmodell — folgt der Stufe (Auto · Gründlich · Schnell)",
+    aktiv: !istCline,
+    aktion: () => {
+      localStorage.setItem(MODELL_KEY, "smejj 1.0");
+      window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "smejj 1.0" } }));
+      schliesseModellMenue();
+      zeichne();
+    }
+  });
+  feld.append(menue);
+  // Cline-Katalog LIVE nachladen — erst Status (Key da?), dann Modelle.
+  // Fail-safe: ohne Token/Key eine ehrliche Hinweis-Zeile statt Attrappe.
+  try {
+    const token = localStorage.getItem(TOKEN_KEY) || "";
+    const kopfzeilen = token ? { Authorization: `Bearer ${token}` } : {};
+    const [statusAntwort, katalogAntwort] = await Promise.all([
+      fetch(`${API_ORIGIN}/api/providers/cline/status`, { headers: kopfzeilen }),
+      fetch(`${API_ORIGIN}/api/providers/cline/models`, { headers: kopfzeilen })
+    ]);
+    const status = statusAntwort.ok ? await statusAntwort.json() : null;
+    const katalog = katalogAntwort.ok ? await katalogAntwort.json() : null;
+    if (!document.getElementById("codeModellMenue")) return; // inzwischen zu
+    if (!status?.hasKey) {
+      zeile({
+        titel: "Cline-Modelle",
+        klein: "Cline-Key in den Einstellungen verbinden — dann erscheinen sie hier.",
+        aktiv: false,
+        aktion: () => { schliesseModellMenue(); document.querySelector('.nav-button[data-view="settings"]')?.click(); }
+      });
+      return;
+    }
+    for (const [gruppe, beschriftung] of CLINE_GRUPPEN) {
+      const eintraege = (katalog?.models || []).filter((m) => m.category === gruppe);
+      if (!eintraege.length) continue;
+      const titelZeile = document.createElement("div");
+      titelZeile.className = "code-menue-titel";
+      titelZeile.textContent = beschriftung;
+      menue.append(titelZeile);
+      for (const m of eintraege) {
+        zeile({
+          titel: m.name || m.id.split("/").pop(),
+          klein: m.description || "",
+          aktiv: istCline && aktivesClineModell === m.id,
+          aktion: () => {
+            localStorage.setItem(CLINE_MODEL_KEY, m.id);
+            localStorage.setItem(MODELL_KEY, "Cline");
+            document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: m.id } }));
+            window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
+            schliesseModellMenue();
+            zeichne();
+          }
+        });
+      }
+    }
+  } catch { /* fail-safe: Menue zeigt dann nur das Hausmodell */ }
 }
 
 // ---- Modus-Menue (wie Claude Code: Auto / Manuell / Akzeptieren / Plan) --
@@ -416,6 +540,7 @@ export function initCodeFlaeche() {
   document.addEventListener("click", (e) => {
     if (!e.target.closest?.("#codeProjektMenue")) schliesseProjektMenue();
     if (!e.target.closest?.("#codeModusMenue")) schliesseModusMenue();
+    if (!e.target.closest?.("#codeModellMenue") && !e.target.closest?.("#codeModellAnzeige")) schliesseModellMenue();
     // Plus-Menue: Klick ausserhalb schliesst (schliessePlus ist zur
     // Klickzeit laengst gebunden — Handler feuern erst nach init).
     if (!e.target.closest?.("#codePlusMenue") && !e.target.closest?.("#codeAnhang")) schliessePlus();
@@ -428,6 +553,10 @@ export function initCodeFlaeche() {
   document.getElementById("codeModusChip")?.addEventListener("click", (e) => {
     e.stopPropagation();
     oeffneModusMenue();
+  });
+  document.getElementById("codeModellAnzeige")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    void oeffneModellMenue();
   });
   document.getElementById("codeAufgabe")?.addEventListener("keydown", (ereignis) => {
     if (ereignis.key === "Enter" && !ereignis.shiftKey) {
