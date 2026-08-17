@@ -1254,7 +1254,13 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 /* Modus-Menue 1:1 wie Claude (Betreiber-Screenshot 2026-08-16):
    Kopf "Modus", Zeilen linksbuendig OHNE Trennstriche, Beschreibung
    gedaempft darunter (eine Zeile, Punkte), rechts Haken + Ziffer. */
-.code-modus-menue { min-width: 320px; max-width: 92vw; }
+.code-modus-menue {
+  min-width: 320px;
+  max-width: 92vw;
+  /* Der Modell-Katalog ist lang — deckeln und innen scrollen (2026-08-17). */
+  max-height: 60vh;
+  overflow-y: auto;
+}
 .code-menue-titel {
   padding: 6px 12px 2px;
   font-size: 12.5px;
@@ -2142,3 +2148,21 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: rgba(50, 246, 234, 0.55);
 }
 .nav-start .spur-chat { display: flex; align-items: center; }
+
+/* Status IM rechten Panel (panel-status.js): die echte status-grid der
+   Systemzustand-Ansicht, im schmalen Panel einspaltig und kompakt. */
+.panel-status { padding: 10px 12px; overflow: auto; }
+.panel-status .status-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13.5px;
+}
+.panel-status .status-grid > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--v11-hair);
+  padding-bottom: 6px;
+}
+.panel-status .status-grid span { text-align: right; opacity: 0.8; }

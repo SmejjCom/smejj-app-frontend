@@ -5923,7 +5923,13 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 /* Modus-Menue 1:1 wie Claude (Betreiber-Screenshot 2026-08-16):
    Kopf "Modus", Zeilen linksbuendig OHNE Trennstriche, Beschreibung
    gedaempft darunter (eine Zeile, Punkte), rechts Haken + Ziffer. */
-.code-modus-menue { min-width: 320px; max-width: 92vw; }
+.code-modus-menue {
+  min-width: 320px;
+  max-width: 92vw;
+  /* Der Modell-Katalog ist lang — deckeln und innen scrollen (2026-08-17). */
+  max-height: 60vh;
+  overflow-y: auto;
+}
 .code-menue-titel {
   padding: 6px 12px 2px;
   font-size: 12.5px;
