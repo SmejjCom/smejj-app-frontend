@@ -5750,7 +5750,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
    Radius 12 (nimmt eckig.css app-weit zurueck), Zeilen 32px hoch,
    14px Schrift, 8px Icon-Abstand, Kuerzel/Untermenue-Pfeil rechts
    gedaempft, Trennlinie als Haarstrich. Oeffnet sich NACH OBEN. */
-#codePlusMenue {
+.code-plus-menu {
   position: absolute;
   left: 8px;
   bottom: calc(100% + 8px);
@@ -5762,7 +5762,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: rgb(32, 32, 31);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
-#codePlusMenue [role="menuitem"] {
+.code-plus-menu [role="menuitem"] {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -5778,13 +5778,13 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   cursor: pointer;
 }
 @media (pointer: fine) {
-  #codePlusMenue [role="menuitem"] { min-height: 32px; }
+  .code-plus-menu [role="menuitem"] { min-height: 32px; }
 }
-#codePlusMenue [role="menuitem"]:hover,
-#codePlusMenue [role="menuitem"]:focus-visible {
+.code-plus-menu [role="menuitem"]:hover,
+.code-plus-menu [role="menuitem"]:focus-visible {
   background: rgba(255, 255, 255, 0.08);
 }
-#codePlusMenue [role="menuitem"] svg {
+.code-plus-menu [role="menuitem"] svg {
   width: 16px;
   height: 16px;
   flex: none;
@@ -5795,17 +5795,32 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   stroke-linejoin: round;
   color: rgba(240, 239, 236, 0.75);
 }
-#codePlusMenue [role="menuitem"] span { flex: 1; }
-#codePlusMenue [role="menuitem"] kbd {
+.code-plus-menu [role="menuitem"] span { flex: 1; }
+.code-plus-menu [role="menuitem"] kbd {
   font-family: inherit;
   font-size: 12.5px;
   color: rgba(240, 239, 236, 0.45);
 }
-#codePlusMenue .plus-pfeil { color: rgba(240, 239, 236, 0.45); }
-#codePlusMenue .code-plus-line {
+.code-plus-menu .plus-pfeil { color: rgba(240, 239, 236, 0.45); }
+.code-plus-menu .code-plus-line {
   height: 1px;
   margin: 6px 4px;
   background: rgba(255, 255, 255, 0.08);
+}
+
+/* Slash-Palette (code-flaeche.js): gleicher Kasten wie das Plus-Menue,
+   Befehl in Mono links, die Vorlage gedaempft rechts. */
+#codeSlashMenue { max-height: 300px; overflow-y: auto; }
+#codeSlashMenue [role="menuitem"] b {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  font-weight: 600;
+}
+#codeSlashMenue [role="menuitem"] span {
+  flex: 1;
+  text-align: right;
+  font-size: 12.5px;
+  color: rgba(240, 239, 236, 0.5);
 }
 
 /* Arbeits-Punkt (Betreiber 2026-08-16: "viereckiger Punkt im Schreibfeld —
@@ -6427,6 +6442,82 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #startLog .chat-code-wrap .chat-code-copy::after { content: none; }
 #startLog .chat-code-wrap .chat-code-copy svg { width: 14px; height: 14px; }
 
+/* Werkzeug-Karte wie ZCodes Datei-Karte (chat-code-copy.js zeigeDateiKarte,
+   Betreiber 2026-08-16): sichtbare Spur nach "In den Project-Ordner
+   speichern". Name und Unterzeile kommen aus data-Attributen (attr()) —
+   nichts davon steht in textContent. */
+.chat-code-wrap .code-datei-karte {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+.code-datei-zeichen {
+  grid-row: 1 / span 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(242, 245, 244, 0.75);
+}
+.code-datei-zeichen svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.code-datei-karte::before {
+  content: attr(data-datei);
+  grid-column: 2;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13.5px;
+  color: #f0efec;
+}
+.code-datei-karte::after {
+  content: attr(data-info);
+  grid-column: 2;
+  font-size: 12px;
+  color: rgba(242, 245, 244, 0.5);
+}
+
+/* Arbeitsschritte-Falte im ZCode-Look ("Worked for … >"): gedaempfte
+   Zeile mit drehendem Chevron statt des Aufklapp-Dreiecks; die Schritte
+   darunter ruecken mit Haarstrich ein wie bei ZCode. */
+#startLog .chat-schritte-titel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  cursor: pointer;
+  color: rgba(242, 245, 244, 0.5);
+  font-size: 13px;
+}
+#startLog .chat-schritte-titel::-webkit-details-marker { display: none; }
+#startLog .chat-schritte-titel::after {
+  content: "›";
+  font-size: 15px;
+  line-height: 1;
+  transition: transform 150ms ease;
+}
+#startLog .chat-schritte-falte[open] .chat-schritte-titel::after {
+  transform: rotate(90deg);
+}
+#startLog .chat-schritte-falte[open] .chat-schritt {
+  margin-left: 4px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 /* Ein-/Ausklappen wie ZCodes einklappbare Zeilen ("1 file changed"-Muster;
    chat-code-copy.js setzt data-zu am
    Wrapper): zu sehen bleibt nur der Kopfstreifen, der Chevron dreht zur
@@ -6451,6 +6542,14 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding: 2px 6px;
   background: rgba(255, 255, 255, 0.09);
   font-size: 0.875em;
+}
+/* Codebloecke sind KEINE Chips: der Reset aus chat-markdown.css verliert
+   gegen die ID-Regel oben — hier mit gleicher Staerke wiederholen (im
+   Fixture gemessen: sonst traegt jede Blockzeile einen Chip-Grund). */
+#startLog .entry.assistant .chat-code code {
+  padding: 0;
+  background: none;
+  font-size: 0.92em;
 }
 
 /* Syntax-Farben der Codebloecke (chat-code-farben.js) — ZCode-Abgleich

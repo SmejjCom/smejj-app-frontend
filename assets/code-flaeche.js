@@ -299,6 +299,11 @@ export function initCodeFlaeche() {
     // Plus-Menue: Klick ausserhalb schliesst (schliessePlus ist zur
     // Klickzeit laengst gebunden — Handler feuern erst nach init).
     if (!e.target.closest?.("#codePlusMenue") && !e.target.closest?.("#codeAnhang")) schliessePlus();
+    // NICHT bei Klicks aus dem Plus-Menue schliessen: der Punkt
+    // "Slash-Befehle" oeffnet die Palette ja gerade (im Fixture gemessen:
+    // sie ging sofort wieder zu).
+    if (!e.target.closest?.("#codeSlashMenue") && !e.target.closest?.("#codeAufgabe")
+      && !e.target.closest?.("#codePlusMenue")) schliesseSlash();
   });
   document.getElementById("codeModusChip")?.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -326,26 +331,100 @@ export function initCodeFlaeche() {
     plusMenue.hidden = !oeffnen;
     plusKnopf.setAttribute("aria-expanded", oeffnen ? "true" : "false");
   });
-  plusMenue?.addEventListener("click", (e) => {
+  plusMenue?.addEventListener("click", async (e) => {
     const knopf = e.target.closest?.("[data-code-plus]");
     if (!knopf) return;
     const was = knopf.dataset.codePlus;
     schliessePlus();
     if (was === "dateien") document.getElementById("composerFileInput")?.click();
-    else if (was === "foto") document.getElementById("composerCaptureInput")?.click();
-    else if (was === "projekt") document.getElementById("codeProjektChip")?.click();
-    else if (was === "recherche") {
+    else if (was === "ordner") {
+      // Wie Claudes "Ordner hinzufuegen": verbindet einen echten Ordner mit
+      // dem aktiven Code-Project (File-System-Access, projekt-ordner.js).
+      // Ohne gewaehltes Project zuerst die Projektwahl oeffnen.
+      const projektId = localStorage.getItem(CODE_PROJEKT) || "";
+      if (!projektId) { document.getElementById("codeProjektChip")?.click(); return; }
+      const ergebnis = await window.smejjProjektOrdner?.verbindeOrdner(projektId);
+      if (ergebnis?.ok) zeichne();
+    }
+    else if (was === "slash") {
       const feld = document.getElementById("codeAufgabe");
       if (feld) {
-        feld.value = "Recherchiere für mich: ";
+        feld.value = "/";
         feld.focus();
-        feld.setSelectionRange(feld.value.length, feld.value.length);
+        feld.setSelectionRange(1, 1);
         feld.dispatchEvent(new Event("input", { bubbles: true }));
       }
     }
+    else if (was === "konnektoren") {
+      // smejjs Verbindungen nach draussen sind die Anbieter/API-Schluessel —
+      // sie liegen in den Einstellungen.
+      document.querySelector('.nav-button[data-view="settings"]')?.click();
+    }
+  });
+  // Slash-Befehle wie bei Claude: "/" am Feldanfang oeffnet die Palette mit
+  // den ECHTEN Vorlagen der Code-Seite; Tippen filtert, Klick fuellt das
+  // Feld. Keine erfundenen Befehle — jede Zeile ist eine bestehende Vorlage.
+  const SLASH_BEFEHLE = Object.freeze([
+    { befehl: "/recherche", vorlage: "Recherchiere für mich:" },
+    { befehl: "/code", vorlage: "Schreibe Code für:" },
+    { befehl: "/tests", vorlage: "Schreibe Tests für:" },
+    { befehl: "/fehler", vorlage: "Suche den Fehler in:" },
+    { befehl: "/erklaere", vorlage: "Erkläre mir diesen Code:" },
+    { befehl: "/funktion", vorlage: "Baue folgende Funktion ein:" },
+    { befehl: "/bild", vorlage: "Generiere ein Bild von:" },
+    { befehl: "/video", vorlage: "Generiere ein Video von:" },
+    { befehl: "/text", vorlage: "Verbessere diesen Text:" }
+  ]);
+  let slashMenue = null;
+  const schliesseSlash = () => { if (slashMenue) slashMenue.hidden = true; };
+  function zeigeSlash(filter) {
+    const feldHalter = document.querySelector("#code .codefeld");
+    if (!feldHalter) return;
+    if (!slashMenue) {
+      slashMenue = document.createElement("div");
+      slashMenue.id = "codeSlashMenue";
+      slashMenue.className = "code-plus-menu";
+      slashMenue.setAttribute("role", "menu");
+      slashMenue.setAttribute("aria-label", "Slash-Befehle");
+      feldHalter.append(slashMenue);
+      slashMenue.addEventListener("click", (e) => {
+        const zeile = e.target.closest?.("[data-slash]");
+        if (!zeile) return;
+        const feld = document.getElementById("codeAufgabe");
+        if (feld) {
+          feld.value = `${zeile.dataset.slash} `;
+          feld.focus();
+          feld.setSelectionRange(feld.value.length, feld.value.length);
+          feld.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+        schliesseSlash();
+      });
+    }
+    const suche = String(filter || "").toLowerCase();
+    const treffer = SLASH_BEFEHLE.filter((s) => s.befehl.startsWith(suche) || suche === "/");
+    if (!treffer.length) { schliesseSlash(); return; }
+    slashMenue.innerHTML = "";
+    for (const s of treffer) {
+      const zeile = document.createElement("button");
+      zeile.type = "button";
+      zeile.setAttribute("role", "menuitem");
+      zeile.dataset.slash = s.vorlage;
+      const b = document.createElement("b");
+      b.textContent = s.befehl;
+      const was = document.createElement("span");
+      was.textContent = s.vorlage;
+      zeile.append(b, was);
+      slashMenue.append(zeile);
+    }
+    slashMenue.hidden = false;
+  }
+  document.getElementById("codeAufgabe")?.addEventListener("input", (e) => {
+    const wert = String(e.target.value || "");
+    if (wert.startsWith("/") && !wert.includes(" ")) zeigeSlash(wert);
+    else schliesseSlash();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") schliessePlus();
+    if (e.key === "Escape") { schliessePlus(); schliesseSlash(); }
     // Cmd/Strg+U wie bei Claude: Dateien hinzufuegen, nur in der CODE-Ansicht.
     if ((e.metaKey || e.ctrlKey) && (e.key === "u" || e.key === "U")
       && document.querySelector("#code.view.is-active")) {

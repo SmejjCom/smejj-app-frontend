@@ -124,8 +124,39 @@ async function saveFrom(button) {
   const info = code?.className?.replace("language-", "") || "";
   const name = window.smejjProjektOrdner.rateDateiname(info, text, speicherLauf);
   const ergebnis = await window.smejjProjektOrdner.schreibeDatei(projektId, name, text);
-  if (ergebnis.ok) { speicherLauf += 1; showToast(`Gespeichert: ${ergebnis.pfad}`, "ok"); flashCopied(button); }
+  if (ergebnis.ok) {
+    speicherLauf += 1;
+    showToast(`Gespeichert: ${ergebnis.pfad}`, "ok");
+    flashCopied(button);
+    zeigeDateiKarte(button.parentElement, ergebnis.pfad, text);
+  }
   else showToast(ergebnis.fehler || "Speichern fehlgeschlagen.", "warn");
+}
+
+// Werkzeug-Karte wie ZCodes Datei-Karte (Betreiber 2026-08-16): nach dem
+// Speichern in den Project-Ordner bleibt eine sichtbare Spur am Codeblock.
+// ALLER Text kommt aus data-Attributen und wird per CSS attr() gezeichnet —
+// textContent des Eintrags bleibt sauber (Verlauf + Modellkontext), dieselbe
+// Regel wie bei den Knoepfen. chat-store speichert innerHTML: die Karte
+// uebersteht ein Neuladen.
+function zeigeDateiKarte(wrap, pfad, text) {
+  if (!wrap) return;
+  let karte = wrap.querySelector(".code-datei-karte");
+  if (!karte) {
+    karte = document.createElement("div");
+    karte.className = "code-datei-karte";
+    const zeichen = document.createElement("span");
+    zeichen.className = "code-datei-zeichen";
+    zeichen.setAttribute("aria-hidden", "true");
+    zeichen.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v5h5"/></svg>';
+    karte.append(zeichen);
+    wrap.append(karte);
+  }
+  const zeilen = String(text).split("\n").length;
+  karte.dataset.datei = String(pfad);
+  karte.dataset.info = `Im Project-Ordner gespeichert · ${zeilen} Zeilen`;
+  karte.setAttribute("role", "note");
+  karte.setAttribute("aria-label", `${pfad} — im Project-Ordner gespeichert, ${zeilen} Zeilen`);
 }
 
 function sweep(root) {
