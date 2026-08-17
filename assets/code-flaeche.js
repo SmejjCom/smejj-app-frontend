@@ -235,11 +235,12 @@ async function oeffneModellMenue(kontext = {}) {
   menue.append(kopf);
   const istCline = localStorage.getItem(MODELL_KEY) === "Cline";
   const aktivesClineModell = localStorage.getItem(CLINE_MODEL_KEY) || "";
-  const zeile = ({ titel, klein, aktiv, aktion }) => {
+  const zeile = ({ titel, klein, hinweis, aktiv, aktion }) => {
     const k = document.createElement("button");
     k.type = "button";
     k.setAttribute("role", "menuitemradio");
     k.setAttribute("aria-checked", String(Boolean(aktiv)));
+    if (hinweis) k.title = hinweis;
     const links = document.createElement("span");
     links.className = "modus-links";
     const b = document.createElement("b");
@@ -269,9 +270,12 @@ async function oeffneModellMenue(kontext = {}) {
   // Auto: der sparsame Weg. Hier wird NICHT /select gerufen — das Modell
   // steht erst fest, wenn der Auftrag da ist (ai/modellRouter.js waehlt dann
   // und wartet das /select ab). Darum ist diese Zeile sofort fertig.
+  // Kein Untertitel: das Menue traegt NUR nackte Kurznamen (Betreiber-Regel
+  // 2026-08-17). Eine zweite Zeile wurde live auf halbem Weg abgeschnitten —
+  // die Erklaerung gehoert darum in den Tooltip, nicht in die Zeile.
   zeile({
     titel: "Auto",
-    klein: "guenstig: Alltag ueber das Abo, harte Faelle ueber Guthaben",
+    hinweis: "Guenstig: Alltag ueber das Abo, harte Faelle ueber Guthaben",
     aktiv: istCline && aktivesClineModell === AUTO_MARKE,
     aktion: () => {
       localStorage.setItem(CLINE_MODEL_KEY, AUTO_MARKE);
