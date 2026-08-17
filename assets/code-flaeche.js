@@ -237,6 +237,16 @@ async function oeffneModellMenue() {
     }
   });
   feld.append(menue);
+  // Das Menue KLEBT am Modellnamen (Betreiber 2026-08-17, wie Claude):
+  // Unterkante 6px ueber der Knopf-Oberkante, rechtsbuendig zum Knopf —
+  // nicht irgendwo links am Feld.
+  try {
+    const chipR = chip.getBoundingClientRect();
+    const feldR = feld.getBoundingClientRect();
+    menue.style.left = "auto";
+    menue.style.right = `${Math.max(0, Math.round(feldR.right - chipR.right))}px`;
+    menue.style.bottom = `${Math.round(feldR.bottom - chipR.top + 6)}px`;
+  } catch { /* Standardposition bleibt */ }
   // Cline-Katalog LIVE nachladen — erst Status (Key da?), dann Modelle.
   // Fail-safe: ohne Token/Key eine ehrliche Hinweis-Zeile statt Attrappe.
   try {
