@@ -18,7 +18,7 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat } from "/assets/chat-store.js?v=b52";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=b52";
 import { merkmaleVon } from "/assets/chat-history-text.js?v=b47b";
 import { Icons } from "/assets/components.js?v=b48";
 
@@ -134,10 +134,14 @@ async function zeichneStartSpur(halter) {
       kopf.setAttribute("aria-hidden", "true");
       kopf.textContent = "Zuletzt verwendet";
       halter.append(kopf);
+      // Betreiber 2026-08-16 ("warum sehe ich aktuellen Chat links nicht?"):
+      // das LAUFENDE Gespraech wird wie bei Claude markiert — sonst sieht
+      // jeder Eintrag gleich aus und der eigene ist nicht zu finden.
+      const aktivId = activeChatId();
       for (const chat of letzte) {
         const eintrag = document.createElement("button");
         eintrag.type = "button";
-        eintrag.className = "nav-button spur-chat";
+        eintrag.className = `nav-button spur-chat${chat.id === aktivId ? " is-active" : ""}`;
         eintrag.title = chat.title || "Unterhaltung";
         eintrag.textContent = chat.title || "Unterhaltung";
         eintrag.addEventListener("click", async () => {
@@ -186,7 +190,9 @@ async function zeichneStartSpur(halter) {
     }
     const eintrag = document.createElement("button");
     eintrag.type = "button";
-    eintrag.className = "nav-button spur-chat";
+    // Gleiche Markierung wie in der Code-Spur: das offene Gespraech ist
+    // hervorgehoben (Betreiber 2026-08-16).
+    eintrag.className = `nav-button spur-chat${chat.id === activeChatId() ? " is-active" : ""}`;
     eintrag.title = chat.title || "Unterhaltung";
     eintrag.textContent = chat.title || "Unterhaltung";
     eintrag.addEventListener("click", () => { openChat(chat.id); geheZu("start"); });
