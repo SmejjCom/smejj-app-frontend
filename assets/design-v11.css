@@ -956,16 +956,20 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 #code .codefeld textarea { min-height: 26px; }
 
-/* Betreiber 2026-08-16: die drei Punkte stehen in DERSELBEN Zeile, in der
-   die Antwort endet — keine eigene Zeile darunter. Antworten sind
-   linksbuendig, also sitzen die Punkte rechts in der letzten Zeilenhoehe;
-   bei eigenen (rechtsbuendigen) Nachrichten links daneben. */
+/* Betreiber 2026-08-16, Runde 2 (ZCode-Abgleich, ersetzt die "dieselbe
+   Zeile"-Regel vom selben Tag — die war fuer NUR drei Punkte gebaut):
+   Antworten tragen wie ZCode eine eigene Zeile darunter, linksbuendig:
+   Kopieren, Daumen, Menue, Uhrzeit. Nur bei eigenen (rechtsbuendigen)
+   Nachrichten bleiben die drei Punkte in der letzten Blasenzeile. */
 #startLog .msg-actions {
-  margin-top: -28px;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 0;
   pointer-events: none;
 }
 #startLog .msg-actions .msg-act { pointer-events: auto; }
+/* Blasen-Ueberlagerung der eigenen Nachricht: margin-top -34px weiter
+   unten (Betreiber-Regel "in der letzten Zeile der Blase"). */
 #startLog .msg-actions.is-user { justify-content: flex-start; }
 
 /* Betreiber 2026-08-16: "gesamten Chat-Kontakt sehen" — der Chat wird DICHT.

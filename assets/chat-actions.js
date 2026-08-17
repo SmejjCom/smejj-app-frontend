@@ -26,7 +26,7 @@
 // fail-safe: scheitert der Versand, bleibt die Bewertung lokal sichtbar.
 
 import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=1";
-import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=2";
+import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=3";
 // OHNE ?v=-Kennung — app.js importiert "./browser-context.js" (also
 // /assets/browser-context.js). Ein anderer Spezifizierer erzeugt eine ZWEITE
 // Modulinstanz mit eigenem Quellen-Gedaechtnis; der Menuepunkt "Quellen
@@ -53,8 +53,9 @@ const ICONS = Object.freeze({
   copy: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M4 16c-1.1 0-2-.9-2-2V5c0-1.65 1.35-3 3-3h9c1.1 0 2 .9 2 2"/></svg>',
   check: '<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>',
   edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16Z"/><path d="m14 6 4 4"/></svg>',
-  up: '<svg viewBox="0 0 24 24"><path d="M7 20V10l4-6 1 1v5h5.5a2 2 0 0 1 2 2.3l-1 6a2 2 0 0 1-2 1.7Z"/><path d="M7 10H4v10h3"/></svg>',
-  down: '<svg viewBox="0 0 24 24"><path d="M7 4v10l4 6 1-1v-5h5.5a2 2 0 0 0 2-2.3l-1-6A2 2 0 0 0 16.5 4Z"/><path d="M7 14H4V4h3"/></svg>',
+  // ZCode-Abgleich 2026-08-16: exakt ZCodes Daumen-Zeichnungen (Lucide).
+  up: '<svg viewBox="0 0 24 24"><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/><path d="M7 10v12"/></svg>',
+  down: '<svg viewBox="0 0 24 24"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>',
   regen: '<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v6h-6"/></svg>',
   more: '<svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></svg>',
   left: '<svg viewBox="0 0 24 24"><path d="m14 7-5 5 5 5"/></svg>',
@@ -90,6 +91,28 @@ function barOf(entry) {
   return next && next.classList?.contains("msg-actions") ? next : null;
 }
 
+// Uhrzeit wie ZCode am Ende der Antwort-Zeile. Unbedenklich als Textknoten:
+// die Leiste ist GESCHWISTER des Eintrags, chat-store speichert nur dessen
+// textContent (das Versions-Label hier drin ist seit je Text). Wird bei jedem
+// ensureBar aufgefrischt — falls die Wiederherstellung meta.createdAt erst
+// nach dem ersten Leistenbau setzt (seedMeta), heilt der naechste Tick.
+function syncZeit(bar, meta) {
+  if (!bar || meta.role !== "assistant") return;
+  const d = new Date(meta.createdAt || "");
+  if (Number.isNaN(d.getTime())) return;
+  let zeit = bar.querySelector(".msg-zeit");
+  if (!zeit) {
+    zeit = document.createElement("span");
+    zeit.className = "msg-zeit";
+    bar.append(zeit);
+  }
+  const text = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (zeit.textContent !== text) {
+    zeit.textContent = text;
+    zeit.title = d.toLocaleString();
+  }
+}
+
 // Leiste anlegen oder auffrischen. Idempotent — der Beobachter ruft das oft.
 function ensureBar(entry) {
   const meta = metaOf(entry);
@@ -108,6 +131,7 @@ function ensureBar(entry) {
     entry.after(bar);
   }
   bar.dataset.for = meta.id;
+  syncZeit(bar, meta);
   syncRating(bar, meta);
   syncVersions(bar, meta);
   return bar;

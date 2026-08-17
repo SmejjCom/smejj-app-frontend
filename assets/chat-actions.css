@@ -99,6 +99,16 @@
   color: rgba(246, 243, 238, 0.24);
 }
 
+/* Uhrzeit am Zeilenende wie ZCode (chat-actions.js syncZeit) — reine
+   Anzeige, kein Knopf. */
+.msg-zeit {
+  margin-left: 6px;
+  font-size: 12px;
+  color: rgba(246, 243, 238, 0.4);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 /* Versionswaehler: lesbares Label statt zwei namenloser Pfeile. */
 .msg-versions {
   display: inline-flex;

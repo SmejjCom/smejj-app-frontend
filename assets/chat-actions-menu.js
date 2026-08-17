@@ -40,29 +40,32 @@ export function menuItemsFor(role, hatQuellen = false) {
   return hatQuellen ? [ITEMS.sources, ...punkte] : punkte;
 }
 
-// Belegung der sichtbaren Leiste. Betreiber-Entscheid 2026-08-16: NUR noch
-// die drei Punkte — ALLE Aktionen (auch Kopieren und die Daumen) liegen im
-// Menue darunter. Eine ruhige Zeile, nichts geht verloren.
+// Belegung der sichtbaren Leiste. Betreiber-Entscheid 2026-08-16 (Runde 2,
+// ZCode-Abgleich, ersetzt den Drei-Punkte-Entscheid vom selben Tag):
+// Antworten zeigen wie ZCode Kopieren + Daumen hoch/runter direkt in der
+// Zeile, danach die Uhrzeit (chat-actions.js) — alles Weitere liegt im
+// Drei-Punkte-Menue am Ende. Eigene Nachrichten behalten die ruhige Zeile.
 const BAR_SPECS = Object.freeze({
   user: Object.freeze([
     { act: "menu", icon: "more", label: "Aktionen" }
   ]),
   assistant: Object.freeze([
+    { act: "copy", label: "Kopieren", icon: "copy" },
+    { act: "rate-up", label: "Hilfreich", icon: "up" },
+    { act: "rate-down", label: "Nicht hilfreich", icon: "down" },
     { act: "menu", icon: "more", label: "Aktionen" }
   ])
 });
 
-// Die frueher sichtbaren Knoepfe wandern an den ANFANG des Menues —
-// Reihenfolge nach Haeufigkeit, wie sie vorher in der Leiste stand.
+// Menuekopf: nur, was NICHT schon sichtbar in der Leiste steht —
+// doppelte Wege verwirren (Kopieren/Daumen sitzen seit dem ZCode-Abgleich
+// wieder in der Leiste der Antwort).
 const MENU_KOPF = Object.freeze({
   user: Object.freeze([
     { act: "copy", label: "Kopieren", icon: "copy" },
     { act: "edit", label: "Bearbeiten", icon: "edit" }
   ]),
   assistant: Object.freeze([
-    { act: "copy", label: "Kopieren", icon: "copy" },
-    { act: "rate-up", label: "Hilfreich", icon: "up" },
-    { act: "rate-down", label: "Nicht hilfreich", icon: "down" },
     { act: "regen", label: "Neu generieren", icon: "regen" }
   ])
 });
