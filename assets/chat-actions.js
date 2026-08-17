@@ -149,15 +149,26 @@ function positioniereInline(bar, entry) {
   try {
     bar.style.marginTop = "";
     bar.style.marginLeft = "";
+    // Das Ende des LETZTEN TEXTKNOTENS messen — ein aufs Element
+    // kollabierter Range liefert 0x0 (live gemessen).
+    const walker = document.createTreeWalker(entry, NodeFilter.SHOW_TEXT, null);
+    let letzter = null;
+    let knoten;
+    while ((knoten = walker.nextNode())) { if (knoten.textContent.trim()) letzter = knoten; }
+    if (!letzter) return;
     const range = document.createRange();
-    range.selectNodeContents(entry);
-    range.collapse(false);
+    range.setStart(letzter, letzter.textContent.length);
+    range.setEnd(letzter, letzter.textContent.length);
     const ende = range.getBoundingClientRect();
-    if (!ende || (!ende.width && !ende.height)) return;
+    if (!ende || !ende.height) return;
     const eRekt = entry.getBoundingClientRect();
-    const barBreite = bar.offsetWidth || 0;
+    // Die Leiste ist ein Block voller Breite — zaehlen muss der INHALT
+    // (erstes bis letztes Kind), nicht offsetWidth (613px gemessen).
+    const erst = bar.firstElementChild?.getBoundingClientRect();
+    const letzt = bar.lastElementChild?.getBoundingClientRect();
+    const benoetigt = erst && letzt ? letzt.right - erst.left : 0;
     const frei = eRekt.right - ende.right;
-    if (!barBreite || frei < barBreite + 12) return; // Zeile zu voll
+    if (!benoetigt || frei < benoetigt + 12) return; // Zeile zu voll
     const barRekt = bar.getBoundingClientRect();
     const barHoehe = barRekt.height || 26;
     const ziel = ende.top + (ende.height - barHoehe) / 2;
