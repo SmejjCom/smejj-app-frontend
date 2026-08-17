@@ -1204,6 +1204,31 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 [aria-checked="true"] .code-schalter { background: var(--v11-cy); }
 [aria-checked="true"] .code-schalter::after { transform: translateX(14px); }
 
+/* Arbeits-Viereck wie bei Claude (Betreiber 2026-08-16): sitzt rechts
+   oben im Schreibfeld. Frei = gedaempfter Umriss; arbeitet = in
+   Logo-Cyan gefuellt mit leisem Puls (Augen-Regel: kein Leuchten). */
+#code .code-arbeit {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid rgba(242, 245, 244, 0.3);
+  pointer-events: none;
+}
+#code .code-arbeit.an {
+  border-color: var(--v11-cy);
+  background: var(--v11-cy);
+  animation: code-arbeit-puls 1.6s ease-in-out infinite;
+}
+@keyframes code-arbeit-puls {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #code .code-arbeit.an { animation: none; }
+}
+
 /* Slash-Palette (code-flaeche.js): gleicher Kasten wie das Plus-Menue,
    Befehl in Mono links, die Vorlage gedaempft rechts. */
 #codeSlashMenue { max-height: 300px; overflow-y: auto; }
