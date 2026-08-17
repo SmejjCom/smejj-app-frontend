@@ -1221,7 +1221,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   /* Betreiber-Klarstellung 2026-08-17: SICHTBAR als ruhiger Umriss wie
      bei Claude — aber ohne jedes Leuchten. Nur beim Arbeiten leuchtet
      es cyan (Regel darunter). */
-  border: 1.5px solid rgba(242, 245, 244, 0.3);
+  /* Betreiber 2026-08-17 ("Rahmen scharf stellen"): deutlicher Umriss. */
+  border: 1.5px solid rgba(242, 245, 244, 0.55);
 }
 #code .code-arbeit.an {
   border-color: var(--v11-cy);
@@ -1460,7 +1461,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-size: 14.5px;
   color: rgba(242, 245, 244, 0.74);
 }
-#code .code-rechts b { color: #f2f5f4; font-weight: 700; }
+/* Betreiber 2026-08-17: Modellname NICHT fett, gleiche Groesse wie die
+   Chips links (Auto/Schnell, 13px). */
+#code .code-rechts b { color: rgba(242, 245, 244, 0.8); font-weight: 400; font-size: 13px; }
+#code .code-rechts { font-size: 13px; }
 #code #codeSenden {
   width: 32px;
   height: 32px;

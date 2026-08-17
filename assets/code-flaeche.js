@@ -116,7 +116,7 @@ function modellAnzeige() {
     const m = localStorage.getItem(CLINE_MODEL_KEY) || "";
     const kurz = CLINE_KURZ.find(([, id]) => id === m)?.[0];
     if (kurz) return kurz;
-    if (m) return m.split("/").pop();
+    if (m) return kurzName(m); // auch unten huebsch: "Qwen 3.8 Max" statt roher ID
   }
   return MODELL_TEXT[stufe()];
 }
