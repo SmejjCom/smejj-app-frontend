@@ -6301,7 +6301,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   height: 100dvh;
   max-height: 100dvh;
   overflow: hidden;
-  padding: 42px 12px 8px;
+  /* Betreiber-Nachtrag ("Text ganz oben, ueber Browser-Icon"): kein
+     reservierter Kopfstreifen — der Text beginnt an der Oberkante, das
+     fixe Browser-Icon schwebt rechts darueber. */
+  padding: 4px 12px 8px;
 }
 #code .codeflaeche {
   flex: 1;
