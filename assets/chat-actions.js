@@ -734,10 +734,20 @@ function onSettled() {
   ensureBar(plan.ziel);
 }
 
+let inlineTimer = null;
 function onLogChanged(entries) {
   refreshBars(entries);
   clearTimeout(settleTimer);
   settleTimer = setTimeout(onSettled, SETTLE_MS);
+  // Nach jeder Log-Aenderung die Inline-Position nachziehen — der
+  // 60ms-Tick in ensureBar kam beim Wiederherstellen VOR dem fertigen
+  // Layout (live gemessen: Styles blieben leer, resize heilte es).
+  clearTimeout(inlineTimer);
+  inlineTimer = setTimeout(() => {
+    for (const bar of document.querySelectorAll(".msg-actions.is-assistant")) {
+      positioniereInline(bar, bar.previousElementSibling);
+    }
+  }, 250);
 }
 
 function init() {
