@@ -6506,6 +6506,20 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #files .datei-tabelle th { text-align: left; color: rgba(242,245,244,.58); font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; padding: 8px 10px; border-bottom: 1px solid var(--v11-hair); }
 #files .datei-tabelle td { padding: 9px 10px; border-bottom: 1px solid var(--v11-hair); }
 
+/* Betreiber 2026-08-16 ("ohne Rahmen, transparent, ohne Hintergrund"):
+   die Aktions-Icons unter Nachrichten tragen KEINEN Kasten — die
+   generische Knopf-Regel (Grundton 0.055 + Lichtkante, live gemessen)
+   wird hier mit Doppelklassen-Gewicht abgeschaltet; nur Hover toent. */
+.msg-actions .msg-act.msg-act {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.msg-actions .msg-act.msg-act:hover,
+.msg-actions .msg-act.msg-act:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 /* Betreiber 2026-08-16 ("Warum hast du ... mit Rahmen gemacht — soll mit
    Text gleiche Zeile sein"): die drei Punkte liegen NIE auf einem Rahmen.
    Nach einer Werkzeug-Karte sitzen sie knapp UNTER der Karte statt auf
