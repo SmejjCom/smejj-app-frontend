@@ -103,7 +103,19 @@ export function bindUploads({ $, state, writeOutput }) {
     zeichneDateiTabelle(state, $);
     writeOutput("#fileOutput", "Uploads sind lokal gestaged. Dauerhafte Speicherung gehoert in IDrive e2 und bleibt serverseitig geschuetzt.");
   });
-  $("#storageAgain").addEventListener("click", () => showJson("#fileOutput", CLIENT_ROUTES.api.storageStatus));
+  // Nutzertest 2026-08-17: showJson und CLIENT_ROUTES existieren in DIESEM
+  // Modul nicht (sie leben in app.js) — der Knopf crashte seit der
+  // Auslagerung bei jedem Klick still mit einem ReferenceError. Jetzt
+  // lokal und fail-safe: Fehler landen lesbar in der Ausgabe.
+  $("#storageAgain").addEventListener("click", async () => {
+    try {
+      const { CLIENT_ROUTES } = await import("./config.js");
+      const antwort = await fetch(CLIENT_ROUTES.api.storageStatus);
+      writeOutput("#fileOutput", JSON.stringify(await antwort.json(), null, 2));
+    } catch (fehler) {
+      writeOutput("#fileOutput", `IDrive-Pruefung fehlgeschlagen: ${fehler.message}`);
+    }
+  });
   $("#downloadUploadManifest").addEventListener("click", () => {
     downloadText("smejj-upload-manifest.json", JSON.stringify({
       generatedAt: new Date().toISOString(),
