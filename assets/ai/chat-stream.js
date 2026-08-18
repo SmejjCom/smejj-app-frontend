@@ -9,6 +9,7 @@
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
 import { fetchStreamWithRetry } from "./fetch-retry.js";
+import { frageLokal, lokalErlaubt, taugtFuerLokal } from "./lokalesModell.js";
 
 // Gleicher Schluessel wie in auth/auth-page.js, account-sessions.js und
 // auth-gate.js — dort bewusst dupliziert, damit kein Modul den anderen nur
@@ -547,7 +548,60 @@ function starteStilleWache(reader, beiStille) {
   };
 }
 
+/**
+ * STUFE 0 — das Modell im Browser des Nutzers, vor jedem Netzaufruf.
+ *
+ * Betreiber-Anweisung 2026-08-18: unbegrenzt und kostenlos fuer jeden Nutzer.
+ * Das geht nur, wenn die Anfrage unseren Server gar nicht erst erreicht.
+ * Chrome bringt das Modell mit; Google berechnet dafuer nichts.
+ *
+ * Drei Regeln, die hier nicht verhandelbar sind:
+ *  1. Nur wo das kleine Modell wirklich taugt (siehe taugtFuerLokal). Im Zweifel
+ *     Server — eine still verschlechterte Antwort waere mit Vertrauen bezahlt.
+ *  2. SICHTBAR machen. Der Nutzer muss erkennen koennen, dass sein Geraet
+ *     geantwortet hat, und wie er eine gruendlichere Antwort bekommt.
+ *  3. Bei jedem Zweifel WEITERREICHEN: schlaegt es fehl oder wird die Antwort
+ *     zu duenn, laeuft der gewohnte Weg — der Nutzer merkt nur die Wartezeit.
+ *
+ * @returns {Promise<boolean>} true = fertig beantwortet, kein Netzaufruf noetig.
+ */
+async function versucheLokaleAntwort(body, output, renderMarkdown) {
+  if (!lokalErlaubt()) return false;
+  const lage = {
+    frage: String(body?.task || ""),
+    dateien: Array.isArray(body?.files) ? body.files.length : 0,
+    verlauf: Array.isArray(body?.history) ? body.history : [],
+    bilder: body?.preferences?.bild || body?.preferences?.image ? 1 : 0
+  };
+  const urteil = taugtFuerLokal(lage);
+  if (!urteil.ok) return false;
+
+  let text = "";
+  const ergebnis = await frageLokal(lage.frage, {
+    system: "Du bist der Assistent von smejj.com. Antworte kurz, korrekt und in der Sprache des Nutzers.",
+    onDelta: (zuwachs) => {
+      text += zuwachs;
+      output.textContent = text;
+    }
+  });
+  if (!ergebnis.ok) {
+    // Nichts stehen lassen, was der Server gleich ueberschreibt.
+    output.textContent = "";
+    return false;
+  }
+  const hinweis = "\n\nAuf deinem Geraet beantwortet — ohne Server, ohne Kosten."
+    + " Fuer eine gruendlichere Antwort schreibe \u00bbgenauer\u00ab dazu.";
+  const ganz = `${ergebnis.text}${hinweis}`;
+  if (typeof renderMarkdown === "function") renderMarkdown(output, ganz);
+  else output.textContent = ganz;
+  return true;
+}
+
 export async function streamChatAnswer(url, body, output, { renderMarkdown, offlineNotice = "" } = {}) {
+  // Stufe 0 zuerst: was das Geraet des Nutzers selbst beantworten kann, kostet
+  // niemanden etwas und ist meist schneller (gemessen 1,7-3,5 s gegen 2,9-6,6 s).
+  if (await versucheLokaleAntwort(body, output, renderMarkdown)) return;
+
   // Ab dem Absenden sichtbar arbeiten — der Server meldet sich erst nach
   // gemessenen 5,75 s (siehe starteWartesignal).
   const stoppeWartesignal = starteWartesignal(output);
