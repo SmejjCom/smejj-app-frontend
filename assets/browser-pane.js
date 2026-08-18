@@ -416,6 +416,10 @@ async function navigate(tab, url, { push = true } = {}) {
   const finalUrl = data?.finalUrl || url;
   tab.url = finalUrl;
   tab.title = data?.title || shortHost(finalUrl);
+  // Echtes Favicon, wenn der Server eines mitgeschickt hat. Nur data: wird
+  // uebernommen — eine fremde Adresse waere durch img-src ohnehin gesperrt,
+  // und was der Browser nicht zeigen kann, gehoert nicht in den Zustand.
+  if (typeof data?.favicon === "string" && data.favicon.startsWith("data:image/")) tab.favicon = data.favicon;
 
   if (data?.ok && data.html && shouldOpenInRealBrowser(data.html, finalUrl)) {
     if (await tryRemoteBrowser(tab, finalUrl, { reason: "external-required", push })) return;
@@ -687,6 +691,10 @@ export function persistTabs() {
       tabs: state.tabs.map((tab) => {
         const history = tab.history.slice(-MAX_PERSISTED_HISTORY);
         const dropped = tab.history.length - history.length;
+        // ABSICHTLICH OHNE favicon: ein Icon ist bis zu 64 KB, mal sieben
+        // Tabs waeren das ein halbes Megabyte im lokalen Speicher — fuer ein
+        // Bildchen, das beim naechsten Laden ohnehin neu mitkommt. Bis dahin
+        // zeigt der Tab seinen Anfangsbuchstaben. Kein Versehen.
         return {
           id: tab.id,
           url: tab.url,
