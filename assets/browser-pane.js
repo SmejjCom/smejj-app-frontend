@@ -23,6 +23,7 @@ import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
 import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260709-2";
 import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-2";
+import { zeigeSicherheit } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
 import { buildErrorPageHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 
 const MAX_TABS = 7;
@@ -702,8 +703,7 @@ export function render() {
       render();
     }
   });
-  refs.prevTab.disabled = state.tabs.length <= 1;
-  refs.nextTab.disabled = state.tabs.length <= 1;
+  refs.prevTab.disabled = refs.nextTab.disabled = state.tabs.length <= 1;
   refs.addTab.disabled = state.tabs.length >= MAX_TABS;
   refs.addTab.title = refs.addTab.disabled ? `Tab-Limit erreicht (${MAX_TABS})` : "Neuer Tab";
   refs.tabCount.textContent = String(state.tabs.length || 1);
@@ -711,6 +711,7 @@ export function render() {
   refs.tabCount.setAttribute("aria-label", `${state.tabs.length || 1} von ${MAX_TABS} Tabs`);
 
   if (document.activeElement !== refs.address) refs.address.value = anzeigeAdresse(active?.url || "");
+  zeigeSicherheit(refs.addressForm, active?.url || "");
   refs.back.disabled = !active || active.historyIndex <= 0;
   refs.forward.disabled = !active || active.historyIndex >= (active.history.length - 1);
   refs.external.disabled = !active?.url;

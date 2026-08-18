@@ -2943,6 +2943,64 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   height: var(--bp-control-size);
 }
 
+/* Sicherheitsanzeige links in der Adressleiste (Chromes Schloss).
+   Seit die Adresse ohne "https://" angezeigt wird, ist dieses Zeichen die
+   EINZIGE Auskunft ueber die Verschluesselung — ohne es waere das Kuerzen
+   ein Rueckschritt. */
+.bp-sicherheit {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.6);
+  cursor: default;
+}
+
+.bp-sicherheit[hidden] { display: none; }
+
+.bp-sicherheit svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Unsicher wird betont, sicher nicht. Ein Schloss, das immer da ist, sieht
+   niemand mehr; eine Warnung, die selten kommt, liest man. Die WARNUNG hat
+   ausserdem eine andere FORM (Dreieck statt Schloss) — Farbe allein reicht
+   nicht, rund 8 % der Maenner unterscheiden Rot und Gruen nicht. */
+.bp-sicherheit[data-zustand="unsicher"] {
+  background: rgba(240, 173, 78, 0.16);
+  color: #f0ad4e;
+}
+
+.bp-sicherheit-text {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Platz fuer das Zeichen — sonst laeuft die Adresse darunter. */
+.bp-address {
+  padding-left: 28px;
+}
+
+.bp-sicherheit[data-zustand="unsicher"] ~ .bp-address {
+  padding-left: 92px;
+}
+
 /* ---- view-chrome.css ---- */
 /* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
    und Schliessen-X (ganz oben rechts). Ohne Hintergrund, transparent, schmal,
