@@ -510,6 +510,43 @@ export function stoppeChatStrom() {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Stille-Wache
+//
+// GEMESSEN 2026-08-17: Ein Video-Auftrag stand 15 Minuten auf "Erzeuge dein
+// Video läuft … (ca. 1-2 Minuten)" — und blieb dort stehen. Der Platz beim
+// Video-Maler war blockiert; die Leitung starb nach der ERSTEN Meldung. Der
+// Chat hat das nie gemerkt und haette bis zum Schliessen des Tabs gewartet.
+//
+// Serverseitig gilt eine 3-Minuten-Grenze, aber sie hilft nichts, wenn der
+// Strom danach still verendet. Diese Wache misst darum die STILLE: kommt
+// laenger als STILLE_GRENZE_MS kein einziges Byte, gilt der Weg als tot.
+//
+// 90 Sekunden mit Absicht: die Bruecke taktet lange Arbeiten alle 10 s
+// ("läuft … 40 s"), ein Modell streamt ohnehin laufend. Wer 90 Sekunden lang
+// gar nichts sagt, sagt nichts mehr. Kurzer gewaehlt wuerde ein langsames
+// Modell abgewuergt.
+const STILLE_GRENZE_MS = 90_000;
+
+function starteStilleWache(reader, beiStille) {
+  let uhr = null;
+  let ausgeloest = false;
+  const neuStellen = () => {
+    clearTimeout(uhr);
+    uhr = setTimeout(() => {
+      ausgeloest = true;
+      beiStille();
+      try { reader.cancel(); } catch { /* Strom war schon zu */ }
+    }, STILLE_GRENZE_MS);
+  };
+  neuStellen();
+  return {
+    lebenszeichen: neuStellen,
+    beenden: () => clearTimeout(uhr),
+    get hatZugeschlagen() { return ausgeloest; }
+  };
+}
+
 export async function streamChatAnswer(url, body, output, { renderMarkdown, offlineNotice = "" } = {}) {
   // Ab dem Absenden sichtbar arbeiten — der Server meldet sich erst nach
   // gemessenen 5,75 s (siehe starteWartesignal).
@@ -547,10 +584,15 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // nichts stehen (abgebrochener Lauf), kommt sie zurueck.
   let letzteNotiz = "";
 
+  // Stille-Wache: schlaegt der Strom laenger als 90 s nicht mehr an, gilt er
+  // als tot und wird abgebrochen. Ohne sie wartet der Chat endlos.
+  let stilleGemeldet = false;
+  const wache = starteStilleWache(reader, () => { stilleGemeldet = true; });
   try {
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
+    wache.lebenszeichen();
     buffer += decoder.decode(value, { stream: true });
     const events = buffer.split("\n\n");
     buffer = events.pop() || "";
@@ -590,12 +632,25 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   } finally {
     // Immer deregistrieren — auch wenn read() wirft (Netzabbruch): sonst
     // bliebe der Stopp-Knopf fuer immer stehen.
+    wache.beenden();
     aktiveLeser.delete(reader);
     meldeStromstand();
   }
   // Auch wenn der Strom ohne ein einziges Ereignis endet: das Signal muss weg.
   stoppeWartesignal();
   clearThinkingState(output);
+  // Der Weg ist mitten in der Arbeit verstummt (gemessen 2026-08-17 an einem
+  // haengenden Video-Auftrag). Ehrlich sagen statt endlos "läuft" zeigen —
+  // und die bisherige Teilantwort behalten, sie ist nicht falsch.
+  if (stilleGemeldet) {
+    const bisher = output.textContent.trim();
+    output.textContent = bisher
+      ? `${bisher}\n\n_Abgebrochen: der Server hat sich 90 Sekunden lang nicht mehr gemeldet. Bitte erneut versuchen._`
+      : "Abgebrochen: der Server hat sich 90 Sekunden lang nicht mehr gemeldet. Bitte erneut versuchen.";
+    renderMarkdown?.(output);
+    falteSchritte(output, schritteOhneFundZahl);
+    return;
+  }
   // Der Lauf endete ohne Schlussantwort (alle Runden gingen in Werkzeuge).
   // Dann ist die letzte Arbeitsnotiz besser als eine leere Blase.
   if (!output.textContent.trim() && letzteNotiz.trim()) output.textContent = letzteNotiz;
