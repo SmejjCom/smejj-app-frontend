@@ -25,6 +25,7 @@ import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-202
 import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-2";
 import { zeigeSicherheit } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
+import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260709-2";
 import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 
 const MAX_TABS = 7;
@@ -57,7 +58,10 @@ export const state = {
   mounted: false,
   persistTimer: 0,
   remoteRefitTimer: 0,
-  lastRemoteRefitAt: 0
+  lastRemoteRefitAt: 0,
+  // Zuletzt geschlossene Tabs fuer Cmd+Shift+T. Bewusst nur im Arbeits-
+  // speicher: was man nach einem Neustart zurueckholen will, steht im Verlauf.
+  geschlossen: []
 };
 
 export const refs = {};
@@ -182,7 +186,16 @@ function mountOnce() {
   refs.forward.addEventListener("click", () => stepHistory(1));
   refs.reload.addEventListener("click", () => {
     const tab = activeTab();
-    if (tab?.url) navigate(tab, tab.url, { push: false });
+    if (!tab) return;
+    // Waehrend des Ladens ist derselbe Knopf ein Stopp-Knopf — wie in Chrome.
+    if (tab.status === "loading") {
+      tab.abbruch?.abort();
+      tab.status = "ready";
+      showHint("Laden abgebrochen.");
+      render();
+      return;
+    }
+    if (tab.url) navigate(tab, tab.url, { push: false });
   });
   refs.addressForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -205,6 +218,7 @@ function mountOnce() {
 
   // Zoom wie in Chrome: Strg/Cmd mit +, - oder 0 (50–200 %).
   document.addEventListener("keydown", onZoomShortcut);
+  verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, refs, state });
 
   // Resize: Der Remote-Viewport folgt der sichtbaren Flaeche — debounced und
   // gedrosselt, damit der Remote-Worker nicht mit Anfragen geflutet wird.
@@ -327,6 +341,7 @@ export function addTab({ url = "", focusAddress = false } = {}) {
 function closeTab(tabId) {
   const index = state.tabs.findIndex((tab) => tab.id === tabId);
   if (index === -1) return;
+  state.geschlossen = merkeGeschlossen(state.geschlossen, state.tabs[index]);
   if (state.tabs[index].sessionId) sessionClient.close(state.tabs[index].sessionId);
   state.tabs[index].frame?.remove();
   state.tabs.splice(index, 1);
@@ -391,13 +406,21 @@ async function navigate(tab, url, { push = true } = {}) {
   let data = null;
   const endpoint = CLIENT_ROUTES.api.browserFetch;
   if (endpoint && endpoint.startsWith("https://")) {
+    // Abbrechbar: der Stopp-Knopf soll den Ladevorgang wirklich beenden,
+    // nicht nur so aussehen. Der Abbruch landet unten im selben catch wie
+    // ein Netzfehler — fuer den Nutzer ist beides "kam nicht an".
+    tab.abbruch?.abort();
+    const abbruch = new AbortController();
+    tab.abbruch = abbruch;
     try {
-      const response = await fetch(`${endpoint}?url=${encodeURIComponent(url)}`);
+      const response = await fetch(`${endpoint}?url=${encodeURIComponent(url)}`, { signal: abbruch.signal });
       data = response.ok || response.status === 400 || response.status === 502
         ? await response.json()
         : null;
     } catch {
       data = null;
+    } finally {
+      if (tab.abbruch === abbruch) tab.abbruch = null;
     }
   }
 
@@ -664,6 +687,7 @@ export function render() {
 
   if (document.activeElement !== refs.address) refs.address.value = anzeigeAdresse(active?.url || "");
   zeigeSicherheit(refs.addressForm, active?.url || "");
+  malenStoppOderNeuladen(active?.status === "loading");
   zeigeLesezeichen(refs.addressForm, active?.url || "", active?.title || "");
   refs.back.disabled = !active || active.historyIndex <= 0;
   refs.forward.disabled = !active || active.historyIndex >= (active.history.length - 1);
@@ -683,6 +707,20 @@ function showHint(text) {
 }
 
 // --- Persistenz ---------------------------------------------------------------
+
+// Derselbe Knopf, zwei Bedeutungen — wie in Chrome. Waehrend des Ladens ein
+// Kreuz zum Abbrechen, sonst der Kreispfeil zum Neuladen. Ein Knopf, dessen
+// Beschriftung nicht mitwandert, ist eine Falle: man klickt "neu laden" und
+// bricht ab.
+function malenStoppOderNeuladen(laedt) {
+  if (!refs.reload) return;
+  const text = laedt ? "Laden abbrechen" : "Neu laden";
+  refs.reload.title = text;
+  refs.reload.setAttribute("aria-label", text);
+  refs.reload.innerHTML = laedt
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>';
+}
 
 export function persistTabs() {
   try {
