@@ -29,6 +29,18 @@
 /** Aus-Schalter fuer den Nutzer; Standard ist an, sobald das Modell da ist. */
 const SCHALTER = "smejj.lokalesModell.v1";
 
+// ZAEHLER fuer die Messwoche. Ohne ihn ist die Gratis-Spur UNSICHTBAR: was auf
+// dem Geraet beantwortet wird, erzeugt keine Server-Logzeile. Der Tagesbericht
+// saehe nur weniger Anfragen und koennte nicht sagen, warum — "es greift" waere
+// dann eine Behauptung, keine Messung.
+//
+// Gezaehlt wird LOKAL, nach demselben Muster wie field-vitals.js (smejj.vitals.v1).
+// Kein Beacon an den Server: eine Gratis-Spur, die jede Antwort meldet, waere
+// keine mehr. Gespeichert wird nur, WIE OFT welcher Grund auftrat — kein
+// Fragetext, keine Kennung, nichts Persoenliches.
+const ZAEHLER = "smejj.lokalquote.v1";
+const ZAEHLER_TAGE = 14;
+
 /** Fragen unter dieser Laenge tragen zu wenig Signal fuer eine gute Antwort. */
 const MIN_ZEICHEN = 12;
 
@@ -65,6 +77,58 @@ const BRAUCHT_WERKZEUG = /\b(such|google|link|url|http|seite|website|oeffne|brow
 // eine bessere JETZT — nicht erst nach einem Ausflug in die Einstellungen.
 // Diese Woerter schicken die Frage garantiert auf die starke Spur.
 export const STARKE_SPUR_WOERTER = /\b(genau|genauer|gruendlich|ausfuehrlich|richtig nachdenken|denk nach)\b/i;
+
+/** Heutiges Datum als Schluessel, ohne Uhrzeit. */
+function heute(jetzt = new Date()) {
+  return jetzt.toISOString().slice(0, 10);
+}
+
+/**
+ * Zaehlt eine Entscheidung mit — je Tag und Grund.
+ *
+ * Bewusst ohne Fragetext: fuer die Frage "wie oft greift die Gratis-Spur?"
+ * genuegt die Zahl, und alles darueber hinaus waere gespeicherte Neugier.
+ */
+export function merkeEntscheidung(grund, speicher = globalThis.localStorage, jetzt = new Date()) {
+  // Ohne Speicher wurde NICHT gezaehlt — dann sagt die Antwort das auch. Ein
+  // freundliches `true` waere hier dieselbe Sorte Luege wie eine geschaetzte
+  // Zahl, die als gemessen ausgegeben wird (der Test hat es gefunden).
+  if (!speicher || typeof speicher.setItem !== "function") return false;
+  try {
+    const rohdaten = speicher?.getItem(ZAEHLER);
+    const daten = rohdaten ? JSON.parse(rohdaten) : {};
+    const tag = heute(jetzt);
+    daten[tag] = daten[tag] || {};
+    daten[tag][grund] = (daten[tag][grund] || 0) + 1;
+    // Alte Tage fallen weg — der Speicher des Browsers ist knapp und niemand
+    // wertet drei Wochen alte Quoten aus.
+    for (const alterTag of Object.keys(daten).sort().slice(0, -ZAEHLER_TAGE)) delete daten[alterTag];
+    speicher?.setItem(ZAEHLER, JSON.stringify(daten));
+    return true;
+  } catch {
+    return false; // Privater Modus oder voller Speicher: nie die Antwort kosten.
+  }
+}
+
+/**
+ * Der Stand fuer die Messwoche: je Tag die Gruende und die lokale Quote.
+ * @returns {{tage: Array<{tag: string, gesamt: number, lokal: number, quote: number, gruende: object}>}}
+ */
+export function lokalStatistik(speicher = globalThis.localStorage) {
+  try {
+    const rohdaten = speicher?.getItem(ZAEHLER);
+    const daten = rohdaten ? JSON.parse(rohdaten) : {};
+    const tage = Object.keys(daten).sort().map((tag) => {
+      const gruende = daten[tag] || {};
+      const gesamt = Object.values(gruende).reduce((summe, wert) => summe + Number(wert || 0), 0);
+      const lokal = Number(gruende.geeignet || 0);
+      return { tag, gesamt, lokal, quote: gesamt > 0 ? Number((lokal / gesamt).toFixed(3)) : 0, gruende };
+    });
+    return { tage };
+  } catch {
+    return { tage: [] };
+  }
+}
 
 /**
  * Ist das eingebaute Modell da UND bereit?

@@ -9,7 +9,7 @@
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
 import { fetchStreamWithRetry } from "./fetch-retry.js";
-import { frageLokal, lokalErlaubt, taugtFuerLokal } from "./lokalesModell.js";
+import { frageLokal, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js";
 
 // Gleicher Schluessel wie in auth/auth-page.js, account-sessions.js und
 // auth-gate.js — dort bewusst dupliziert, damit kein Modul den anderen nur
@@ -579,6 +579,9 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
   // beim ersten Live-Test im Raum, als 19 Gespraechsblasen die Spur still
   // blockierten.
   console.info(`[lokal] ${JSON.stringify({ lokal: urteil.ok, grund: urteil.grund })}`);
+  // Mitzaehlen, sonst ist die Gratis-Spur fuer den Tagesbericht unsichtbar:
+  // eine lokal beantwortete Frage erzeugt KEINE Server-Logzeile.
+  merkeEntscheidung(urteil.grund);
   if (!urteil.ok) return false;
 
   let text = "";
