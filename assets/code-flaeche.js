@@ -425,6 +425,12 @@ async function oeffneModellMenue(kontext = {}) {
           const knopfText = k.querySelector("b");
           const vorher = knopfText?.textContent;
           if (knopfText) knopfText.textContent = `${kurz} …`;
+          // Betreiber-Befund 2026-08-17 ("Knopf zeigte kurz Mimo V2.5"):
+          // der Modell-Knopf behielt waehrend des Wartens den ALTEN Namen
+          // und sah dadurch falsch aus. Er zeigt jetzt denselben
+          // Wartezustand wie die Menuezeile.
+          const chipVorher = chip.textContent;
+          chip.textContent = `${kurz} …`;
           try {
             const token = sessionStorage.getItem(TOKEN_KEY)
               || localStorage.getItem("smejj.auth.accessToken.v1") || "";
@@ -438,6 +444,7 @@ async function oeffneModellMenue(kontext = {}) {
           } catch (fehler) {
             // Ehrlich scheitern statt still das falsche Modell benutzen.
             if (knopfText && vorher) knopfText.textContent = vorher;
+            chip.textContent = chipVorher;
             try {
               const { showToast } = await import("/assets/components.js?v=b48");
               showToast("Modellwechsel hat nicht geklappt — bitte erneut versuchen.", "warn");
