@@ -931,13 +931,62 @@ export function initCodeFlaeche() {
   // Arbeits-Viereck wie bei Claude (Betreiber 2026-08-16): dasselbe
   // Strom-Signal wie der Stopp-Knopf — laeuft mindestens ein Strom,
   // pulsiert das Viereck in Logo-Cyan.
+  // ---- Arbeits-Anzeige: AB DEM ABSENDEN, nicht erst ab dem ersten Zeichen
+  //
+  // Betreiber 2026-08-18: "sobald was angefragt, Denkzeit und Arbeitszeit
+  // immer so blenden". Der Strom (smejj:chat-strom) meldet sich erst, wenn
+  // der Server zu senden beginnt — die Sekunden davor (Absenden, Verbindung,
+  // Denkzeit, Werkzeugrunden) blieben dunkel, obwohl laengst gearbeitet wird.
+  //
+  // Darum zwei Quellen, ODER-verknuepft:
+  //   vorlauf = der Nutzer hat gesendet, der Strom laeuft aber noch nicht
+  //   strom   = der echte Strom laeuft (bisheriges Signal)
+  // Die Anzeige leuchtet, solange EINE von beiden wahr ist — so entsteht
+  // keine dunkle Luecke zwischen Klick und erstem Zeichen.
+  //
+  // Notbremse: meldet sich binnen 90 s gar kein Strom, geht der Vorlauf von
+  // selbst aus. Sonst blinkt es ewig, wenn der Server verstummt (dieselbe
+  // Grenze wie die Stille-Wache in chat-stream.js).
+  const VORLAUF_GRENZE_MS = 90_000;
+  let vorlauf = false;
+  let stromLaeuft = false;
+  let vorlaufUhr = 0;
+  function zeigeArbeit() {
+    const an = vorlauf || stromLaeuft;
+    document.getElementById("codeArbeit")?.classList.toggle("an", an);
+    document.getElementById("startArbeit")?.classList.toggle("an", an);
+  }
+  function arbeitBeginnt() {
+    vorlauf = true;
+    clearTimeout(vorlaufUhr);
+    vorlaufUhr = setTimeout(() => { vorlauf = false; zeigeArbeit(); }, VORLAUF_GRENZE_MS);
+    zeigeArbeit();
+  }
   window.addEventListener("smejj:chat-strom", (event) => {
-    const laeuft = (Number(event.detail?.laufen) || 0) > 0;
-    document.getElementById("codeArbeit")?.classList.toggle("an", laeuft);
-    // Betreiber 2026-08-18: dasselbe Signal treibt das Viereck im
-    // CHAT-Bereich (Startseite) — ein Strom, zwei Anzeigen.
-    document.getElementById("startArbeit")?.classList.toggle("an", laeuft);
+    stromLaeuft = (Number(event.detail?.laufen) || 0) > 0;
+    // Endet der Strom, ist die Antwort fertig — dann faellt auch der
+    // Vorlauf, selbst wenn seine Uhr noch laeuft.
+    if (!stromLaeuft) { vorlauf = false; clearTimeout(vorlaufUhr); }
+    zeigeArbeit();
   });
+  // Beide Sendewege melden den Beginn: Code-Knopf, Start-Knopf und die
+  // Eingabetaste im Code-Feld (senden() laeuft ueber denselben Weg).
+  // capture:true — andere Handler an denselben Knoepfen (z. B. die
+  // Sendetaste, die bei leerem Feld in den Sprachmodus wechselt) rufen
+  // stopImmediatePropagation; in der Capture-Phase laeuft die Meldung
+  // trotzdem und kann nicht verschluckt werden.
+  //
+  // Nur melden, wenn wirklich etwas abgeschickt wird: bei LEEREM Feld ist
+  // der Hauptknopf der Sprachknopf — dann arbeitet niemand.
+  const meldeWennText = (feldId) => (e) => {
+    if (e.type === "keydown" && (e.key !== "Enter" || e.shiftKey)) return;
+    const feld = document.getElementById(feldId);
+    if (feld && String(feld.value || "").trim()) arbeitBeginnt();
+  };
+  document.getElementById("codeSenden")?.addEventListener("click", meldeWennText("codeAufgabe"), true);
+  document.getElementById("startSend")?.addEventListener("click", meldeWennText("startMessage"), true);
+  document.getElementById("codeAufgabe")?.addEventListener("keydown", meldeWennText("codeAufgabe"), true);
+  document.getElementById("startMessage")?.addEventListener("keydown", meldeWennText("startMessage"), true);
   // Das Viereck steht bei Claude NEBEN der ersten Textzeile. Ein fester
   // CSS-Wert reichte nicht (375-px-Messung 2026-08-18: am Telefon steht
   // der Text weiter oben, das Viereck rutschte 23 px darunter) — die
