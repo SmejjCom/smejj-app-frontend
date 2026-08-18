@@ -40,10 +40,21 @@ const CODE_ABO = "cline-pass/kimi-k2.7-code";
 export const BLINDGAENGER = ["cline-pass/qwen3.7-max", "x-ai/grok-4.5"];
 
 const CODE_WORTE = /\b(code|coden|programm|funktion|function|klasse|class|bug|fehler|refactor|typescript|javascript|python|react|sql|api|regex|test|compile|stacktrace|exception)\b/i;
-const SCHWER_WORTE = /\b(architektur|entwirf|entwurf|migration|refactor|sicherheitsl(ue|ü)cke|security|race condition|deadlock|performance|optimier|beweise|analysiere|warum funktioniert)\b/i;
-
 /**
  * Waehlt das Modell fuer einen Auftrag. Reine Funktion — testbar ohne Netz.
+ *
+ * NACHGEMESSEN 2026-08-17 (Betreiber-Karte "Regel verschaerfen"): Die erste
+ * Fassung schickte auch Denk-Woerter (architektur, migration, security …)
+ * an Opus 5. Der Ausfuehrungs-Test mit 19 echten Testfaellen widerlegt das:
+ * minimax-m3 loeste ALLE — genauso fehlerfrei wie Opus 5 (je 19/19) und
+ * schneller (8 s gegen 12 s), bei 0 EUR ueber das Abo. 13 der 14 nutzbaren
+ * Modelle schafften 19/19; nur mimo-v2.5 fiel beim Intervall-Merge durch.
+ * Ein Wort wie "Architektur" macht eine Aufgabe also NICHT teuer.
+ *
+ * Guthaben zieht darum nur noch, was NICHT gemessen ist: angehaengte
+ * Dateien und sehr lange Auftraege. Dort ist ein grosses Kontextfenster
+ * plausibel im Vorteil — bewiesen ist es nicht, und das steht hier so.
+ *
  * @param {string} auftrag Der Text, den der Nutzer abschickt.
  * @param {{dateien?: number}} [lage] Angehaengte Dateien/Kontext.
  */
@@ -51,11 +62,10 @@ export function waehleModell(auftrag = "", lage = {}) {
   const text = String(auftrag || "");
   const dateien = Number(lage.dateien || 0);
   const codeArtig = CODE_WORTE.test(text) || /```/.test(text);
-  // Schwer heisst: viel Kontext, angehaengte Dateien oder ein Wort, das nach
-  // Nachdenken statt Tippen klingt.
-  const schwer = dateien > 0 || text.length > 1200 || SCHWER_WORTE.test(text);
+  // Nur echter Kontext-Umfang rechtfertigt noch die teure Spur.
+  const vielKontext = dateien > 0 || text.length > 4000;
 
-  if (schwer) return { modell: SCHWER, grund: "schwer", spur: "Guthaben" };
+  if (vielKontext) return { modell: SCHWER, grund: "viel-kontext", spur: "Guthaben" };
   if (codeArtig) return { modell: CODE_ABO, grund: "code", spur: "Abo" };
   return { modell: ALLTAG, grund: "alltag", spur: "Abo" };
 }
