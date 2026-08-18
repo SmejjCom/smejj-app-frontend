@@ -2300,3 +2300,32 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: var(--v11-cy);
   animation: code-arbeit-puls 1.6s ease-in-out infinite;
 }
+
+/* =======================================================================
+ * Betreiber-Freigabe 2026-08-18: das CHAT-Schreibfeld klebt unten fest —
+ * wie im CODE-Bereich und wie bei Claude/ChatGPT.
+ *
+ * Befund, live gemessen: bei langem Verlauf stand das Glas-Feld 10938 px
+ * tief; man scrollte es aus dem Bild und erreichte weder Eingabe noch
+ * Arbeits-Viereck. Der Verlauf scrollt jetzt INNEN, das Feld bleibt
+ * stehen.
+ *
+ * Bewusst nur im Chat-Zustand (.has-start-chat): der leere
+ * Willkommens-Bildschirm behaelt seine mittige Kapsel unveraendert.
+ * ===================================================================== */
+#start.has-start-chat .home-feed {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+#start.has-start-chat #startLog {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+#start.has-start-chat .prompt-glass {
+  flex: 0 0 auto;
+  margin-top: auto;
+}
