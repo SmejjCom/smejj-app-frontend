@@ -64,10 +64,19 @@
 }
 
 .bp-tabs {
-  display: grid;
+  display: flex;
+  align-items: center;
+  gap: 2px;
   min-width: 0;
-  overflow: hidden;
+  /* Chrome schiebt Tabs nebeneinander und laesst sie schrumpfen; erst unter
+     der Mindestbreite wird gescrollt. `grid` zeigte hier vorher genau EINEN
+     Tab — daher die Blaetter-Pfeile, die Chrome nicht hat. */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
 }
+
+.bp-tabs::-webkit-scrollbar { display: none; }
 
 .bp-tab {
   display: grid;
@@ -75,7 +84,8 @@
   align-items: center;
   gap: 7px;
   min-width: 0;
-  width: 100%;
+  /* Breite setzt browser-pane-tableiste.js je nach Tab-Anzahl. */
+  flex: none;
   height: var(--bp-control-size);
   min-height: 0;
   padding: 0 7px;
@@ -88,8 +98,122 @@
 }
 
 .bp-tab.is-active {
-  border-color: transparent;
+  border-color: rgba(246, 243, 238, 0.14);
+  background: rgba(246, 243, 238, 0.1);
+  color: #f6f3ee;
+}
+
+.bp-tab:hover:not(.is-active) {
+  background: rgba(246, 243, 238, 0.05);
+}
+
+.bp-tab:focus-visible {
+  outline: 2px solid rgba(159, 231, 212, 0.9);
+  outline-offset: -2px;
+}
+
+/* Nur-Icon-Zustand: Titel und Kreuz sind weg, das Icon steht mittig. */
+.bp-tab.is-schmal {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  padding: 0 4px;
+}
+
+.bp-tab.is-ziehend {
+  opacity: 0.45;
+}
+
+/* Marke links im Tab: echtes Favicon, sonst Anfangsbuchstabe. Fremde
+   Icon-Adressen sind durch img-src 'self' data: blob: ausgeschlossen —
+   der Buchstabe ist deshalb der Normalfall, nicht der Notbehelf. */
+.bp-tab-marke {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+}
+
+.bp-tab-favicon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.bp-tab-marke-buchstabe {
+  border-radius: 3px;
+  background: hsl(var(--bp-tab-farbton, 210) 45% 42%);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Kreuz erscheint erst beim Hover oder am aktiven Tab — wie in Chrome, sonst
+   flimmert die Leiste bei vielen Tabs. */
+.bp-tab-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  color: rgba(246, 243, 238, 0.55);
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0;
+}
+
+.bp-tab.is-active .bp-tab-close,
+.bp-tab:hover .bp-tab-close {
+  opacity: 1;
+}
+
+.bp-tab-close:hover {
+  background: rgba(246, 243, 238, 0.16);
+  color: #f6f3ee;
+}
+
+/* Adressvorschlaege (Chromes Omnibox-Liste) */
+.bp-address-form {
+  position: relative;
+}
+
+.bp-vorschlaege {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid rgba(246, 243, 238, 0.14);
+  border-radius: 6px;
+  background: #16181b;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+}
+
+.bp-vorschlaege[hidden] { display: none; }
+
+.bp-vorschlag {
+  padding: 8px 11px;
+  border: 0;
   background: transparent;
+  color: rgba(246, 243, 238, 0.86);
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.bp-vorschlag:hover,
+.bp-vorschlag.is-markiert {
+  background: rgba(246, 243, 238, 0.1);
   color: #f6f3ee;
 }
 

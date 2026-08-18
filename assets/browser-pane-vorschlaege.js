@@ -1,0 +1,163 @@
+// smejj.com — Adressvorschlaege wie Chromes Omnibox.
+//
+// Chrome schlaegt beim Tippen aus dem Verlauf vor und hebt die erste Zeile
+// hervor; Enter nimmt sie, Pfeiltasten wechseln, Escape schliesst. Unser
+// Panel hatte davon nichts: getippt wurde blind, jede Adresse jedes Mal ganz.
+//
+// Bewusst NICHT uebernommen: Chrome fragt beim Tippen eine Suchmaschine nach
+// Vorschlaegen. Das hiesse, jeden Tastendruck an einen Dritten zu senden —
+// dafuer gibt es hier keinen Anlass und keine Einwilligung. Vorgeschlagen
+// wird nur, was der Nutzer selbst schon besucht hat.
+//
+// SRP: reine Datenlogik plus eine schlanke Liste. Kein Netzwerk, kein
+// Speicher — der Verlauf wird hineingereicht.
+
+export const MAX_VORSCHLAEGE = 6;
+
+/**
+ * Passt ein Verlaufseintrag zur Eingabe?
+ * Chrome gewichtet Treffer am Hostanfang hoeher als irgendwo im Pfad — das
+ * ist der Unterschied zwischen "amazon.com als erstes" und "irgendein Link,
+ * in dem amazon vorkommt".
+ */
+export function bewerte(eintrag, eingabe) {
+  const text = String(eintrag || "").toLowerCase();
+  const suche = String(eingabe || "").trim().toLowerCase();
+  if (!suche || !text) return 0;
+  const ohneSchema = text.replace(/^https?:\/\//, "").replace(/^www\./, "");
+  if (ohneSchema.startsWith(suche)) return 3;   // Host beginnt so
+  if (ohneSchema.includes(`/${suche}`)) return 2; // Pfadabschnitt
+  if (text.includes(suche)) return 1;            // irgendwo
+  return 0;
+}
+
+/**
+ * Waehlt und sortiert die Vorschlaege.
+ * Doppelte Adressen fliegen raus — im Verlauf steht dieselbe Seite oft
+ * mehrfach, und sechs Zeilen derselben Adresse sind keine Hilfe.
+ */
+export function vorschlaege(verlauf, eingabe, grenze = MAX_VORSCHLAEGE) {
+  const suche = String(eingabe || "").trim();
+  if (!suche) return [];
+  const gesehen = new Set();
+  return (Array.isArray(verlauf) ? verlauf : [])
+    .map((url) => ({ url: String(url || ""), punkte: bewerte(url, suche) }))
+    .filter((e) => {
+      if (e.punkte === 0) return false;
+      const schluessel = e.url.replace(/\/$/, "").toLowerCase();
+      if (gesehen.has(schluessel)) return false;
+      gesehen.add(schluessel);
+      return true;
+    })
+    .sort((a, b) => b.punkte - a.punkte || a.url.length - b.url.length)
+    .slice(0, grenze)
+    .map((e) => e.url);
+}
+
+/**
+ * Haengt die Vorschlagsliste an ein Adressfeld.
+ *
+ * @returns {{zerstoere: Function}} zum Abmelden der Ereignisse
+ */
+export function verdrahteVorschlaege({
+  feld,
+  liste,
+  verlauf = () => [],
+  uebernehmen = () => {}
+} = {}) {
+  if (!feld || !liste) return { zerstoere: () => {} };
+  let aktuell = [];
+  let markiert = -1;
+
+  function schliesse() {
+    aktuell = [];
+    markiert = -1;
+    liste.hidden = true;
+    liste.innerHTML = "";
+    feld.setAttribute("aria-expanded", "false");
+  }
+
+  function zeichne() {
+    liste.innerHTML = "";
+    aktuell.forEach((url, index) => {
+      const zeile = document.createElement("button");
+      zeile.type = "button";
+      zeile.className = `bp-vorschlag${index === markiert ? " is-markiert" : ""}`;
+      zeile.setAttribute("role", "option");
+      zeile.setAttribute("aria-selected", String(index === markiert));
+      zeile.textContent = url;
+      // mousedown statt click: das Feld verliert sonst vorher den Fokus und
+      // "blur" schliesst die Liste, bevor der Klick ankommt. Ein Klassiker.
+      zeile.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+        schliesse();
+        uebernehmen(url);
+      });
+      liste.appendChild(zeile);
+    });
+    liste.hidden = aktuell.length === 0;
+    feld.setAttribute("aria-expanded", String(aktuell.length > 0));
+  }
+
+  function beiEingabe() {
+    aktuell = vorschlaege(verlauf(), feld.value);
+    markiert = -1;
+    zeichne();
+  }
+
+  function beiTaste(event) {
+    if (liste.hidden) return;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const richtung = event.key === "ArrowDown" ? 1 : -1;
+      markiert = (markiert + richtung + aktuell.length + 1) % (aktuell.length + 1);
+      // Position aktuell.length bedeutet "nichts markiert" — so kommt man
+      // per Pfeil auch wieder zur eigenen Eingabe zurueck, wie in Chrome.
+      if (markiert === aktuell.length) markiert = -1;
+      zeichne();
+      return;
+    }
+    if (event.key === "Enter" && markiert >= 0) {
+      event.preventDefault();
+      const url = aktuell[markiert];
+      schliesse();
+      uebernehmen(url);
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      schliesse();
+    }
+  }
+
+  feld.addEventListener("input", beiEingabe);
+  feld.addEventListener("keydown", beiTaste);
+  feld.addEventListener("blur", () => setTimeout(schliesse, 120));
+  feld.setAttribute("role", "combobox");
+  feld.setAttribute("aria-autocomplete", "list");
+  feld.setAttribute("aria-expanded", "false");
+  liste.setAttribute("role", "listbox");
+  liste.hidden = true;
+
+  return {
+    zerstoere() {
+      feld.removeEventListener("input", beiEingabe);
+      feld.removeEventListener("keydown", beiTaste);
+      schliesse();
+    }
+  };
+}
+
+/**
+ * Bequemer Einstieg fuer das Panel: nimmt Feld, Liste, den Panel-Zustand und
+ * die Navigationsfunktion — und weiss selbst, dass der Verlauf aller Tabs die
+ * Quelle ist. So bleibt in browser-pane.js ein einziger Aufruf stehen.
+ */
+export function verdrahtePanelVorschlaege(feld, liste, zustand, oeffne) {
+  return verdrahteVorschlaege({
+    feld,
+    liste,
+    verlauf: () => (zustand?.tabs || []).flatMap((t) => t.history || []),
+    uebernehmen: (url) => { feld.value = url; oeffne(url); }
+  });
+}

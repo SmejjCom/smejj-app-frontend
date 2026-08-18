@@ -19,6 +19,11 @@ import {
 } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260709-2";
+// Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
+// liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
+import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260709-2";
+import { verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-2";
+import { buildErrorPageHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
@@ -171,6 +176,7 @@ function mountOnce() {
       <form class="bp-address-form">
         <input class="bp-address" type="text" inputmode="url" autocomplete="off" spellcheck="false"
           placeholder="Suchen oder URL eingeben" aria-label="Adresse oder Suche">
+        <div class="bp-vorschlaege" hidden></div>
       </form>
       <div class="bp-toolbar-right">
         <button class="bp-open-external" type="button" title="In neuem Tab oeffnen" aria-label="In neuem Tab oeffnen">
@@ -207,6 +213,10 @@ function mountOnce() {
   refs.reload = root.querySelector(".bp-nav-reload");
   refs.addressForm = root.querySelector(".bp-address-form");
   refs.address = root.querySelector(".bp-address");
+  refs.vorschlaege = root.querySelector(".bp-vorschlaege");
+  // Vorgeschlagen wird NUR, was der Nutzer selbst besucht hat — anders als
+  // Chrome fragen wir dafuer keine Suchmaschine.
+  verdrahtePanelVorschlaege(refs.address, refs.vorschlaege, state, openBrowserRequest);
   refs.external = root.querySelector(".bp-open-external");
   refs.menu = root.querySelector(".bp-menu");
   refs.close = root.querySelector(".bp-close");
@@ -447,7 +457,9 @@ async function navigate(tab, url, { push = true } = {}) {
   if (data?.ok === false) {
     if (await tryRemoteBrowser(tab, url, { reason: "fetch-error", push })) return;
     tab.status = "error";
-    showHint(`Seite konnte nicht geladen werden: ${String(data.error || "unbekannt")}`);
+    // Ganze Fehlerseite statt schmaler Hinweiszeile ueber leerem Grund —
+    // mit Grund in Alltagssprache und "Erneut laden", wie Chrome es zeigt.
+    setFrame(tab, { srcdoc: buildErrorPageHtml({ url, grund: String(data.error || "") }), mode: "error" });
     render();
     return;
   }
@@ -644,6 +656,10 @@ function onFrameMessage(event) {
     sessionClient.handleAct(tab, message.action, sessionHooks);
     return;
   }
+  if (message.type === "smejj.browser.reload" && tab.url) {
+    navigate(tab, tab.url, { push: false }); // "Erneut laden" der Fehlerseite
+    return;
+  }
   if (message.type === "smejj.browser.navigate" && typeof message.url === "string") {
     const target = normalizeAddress(message.url);
     if (target) navigate(tab, target);
@@ -670,34 +686,22 @@ export function render() {
   if (!state.mounted) return;
   const active = activeTab();
 
-  refs.tabs.innerHTML = "";
-  const visibleTabs = active ? [active] : [];
-  for (const tab of visibleTabs) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = `bp-tab${tab.id === state.activeId ? " is-active" : ""}${tab.status === "loading" ? " is-loading" : ""}`;
-    button.setAttribute("role", "tab");
-    button.setAttribute("aria-selected", String(tab.id === state.activeId));
-    button.title = tab.url || tab.title;
-
-    const dot = document.createElement("span");
-    dot.className = "bp-tab-dot";
-    const label = document.createElement("span");
-    label.className = "bp-tab-title";
-    label.textContent = tab.title || NEW_TAB_TITLE;
-    const close = document.createElement("span");
-    close.className = "bp-tab-close";
-    close.setAttribute("role", "button");
-    close.setAttribute("aria-label", "Tab schliessen");
-    close.textContent = "×";
-    close.addEventListener("click", (event) => {
-      event.stopPropagation();
-      closeTab(tab.id);
-    });
-    button.append(dot, label, close);
-    button.addEventListener("click", () => selectTab(tab.id));
-    refs.tabs.appendChild(button);
-  }
+  // ALLE Tabs zeichnen, nicht nur den aktiven. Vorher stand hier
+  // `const visibleTabs = active ? [active] : []` — daher die Blaetter-Pfeile,
+  // die Chrome gar nicht hat: sie waren der Ersatz dafuer, dass man seine
+  // Tabs nicht sieht.
+  zeichneTableiste(refs.tabs, {
+    tabs: state.tabs,
+    aktiveId: state.activeId,
+    neuerTabTitel: NEW_TAB_TITLE,
+    waehlen: selectTab,
+    schliessen: closeTab,
+    sortieren: (neueReihenfolge) => {
+      state.tabs = neueReihenfolge;
+      persistTabs();
+      render();
+    }
+  });
   refs.prevTab.disabled = state.tabs.length <= 1;
   refs.nextTab.disabled = state.tabs.length <= 1;
   refs.addTab.disabled = state.tabs.length >= MAX_TABS;

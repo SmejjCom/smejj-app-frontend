@@ -30,6 +30,96 @@ export function buildExternalFallbackHtml({ url, title, message }) {
 </html>`;
 }
 
+// Fehlerseite wie in Chrome.
+//
+// Vorher gab es bei einem Ladefehler nur eine schmale Hinweiszeile ueber
+// leerem Grund ("Seite konnte nicht geladen werden: ..."). Chrome zeigt
+// stattdessen eine ganze Seite: ein Symbol, einen Satz in Alltagssprache,
+// darunter den technischen Grund fuer alle, die ihn brauchen — und einen
+// Knopf "Erneut laden". Genau daran haelt sich das hier.
+//
+// Der Knopf meldet sich beim Panel per postMessage: die Shell laeuft
+// sandboxed ohne allow-same-origin, kann also nichts direkt aufrufen.
+const FEHLER_TEXTE = Object.freeze({
+  dns: {
+    titel: "Diese Website ist nicht erreichbar",
+    hinweis: "Die Adresse konnte nicht gefunden werden. Pruefe, ob sie richtig geschrieben ist."
+  },
+  netz: {
+    titel: "Keine Verbindung",
+    hinweis: "Die Seite hat nicht geantwortet. Pruefe deine Internetverbindung und versuch es noch einmal."
+  },
+  zeit: {
+    titel: "Die Seite braucht zu lange",
+    hinweis: "Der Server hat nicht rechtzeitig geantwortet."
+  },
+  allgemein: {
+    titel: "Die Seite konnte nicht geladen werden",
+    hinweis: "Etwas ist dazwischengekommen. Ein erneuter Versuch hilft oft."
+  }
+});
+
+/** Ordnet eine technische Meldung einer verstaendlichen Erklaerung zu. */
+export function fehlerArt(grund = "") {
+  const text = String(grund).toLowerCase();
+  if (/enotfound|dns|getaddrinfo|nicht gefunden/.test(text)) return "dns";
+  if (/timeout|zeit|timed out|abort/.test(text)) return "zeit";
+  if (/econnrefused|econnreset|network|fetch failed|verbindung/.test(text)) return "netz";
+  return "allgemein";
+}
+
+export function buildErrorPageHtml({ url = "", grund = "" } = {}) {
+  const art = fehlerArt(grund);
+  const { titel, hinweis } = FEHLER_TEXTE[art] || FEHLER_TEXTE.allgemein;
+  const safeUrl = escapeHtml(url);
+  const safeHost = escapeHtml(hostAus(url));
+  const safeGrund = escapeHtml(String(grund || "").slice(0, 200));
+  return `<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html,body{height:100%;margin:0;background:#101113;color:#f6f3ee;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{min-height:100%;display:grid;place-content:center;justify-items:start;gap:14px;padding:32px;max-width:520px;box-sizing:border-box}
+    .zeichen{font-size:44px;line-height:1;opacity:.55}
+    h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
+    p{margin:0;color:rgba(246,243,238,.66);font-size:14px;line-height:1.5}
+    .adresse{color:rgba(246,243,238,.5);font-size:13px;word-break:break-all}
+    button{min-height:36px;padding:0 16px;border:1px solid rgba(159,231,212,.42);border-radius:8px;background:rgba(159,231,212,.12);color:#f6f3ee;font-size:13px;font-weight:700;cursor:pointer}
+    button:hover{background:rgba(159,231,212,.2)}
+    button:focus-visible{outline:2px solid #9fe7d4;outline-offset:2px}
+    details{color:rgba(246,243,238,.42);font-size:12px}
+    summary{cursor:pointer}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="zeichen" aria-hidden="true">⚠</div>
+    <h1>${escapeHtml(titel)}</h1>
+    <p>${escapeHtml(hinweis)}</p>
+    <p class="adresse">${safeHost || safeUrl}</p>
+    <button type="button" id="nochmal">Erneut laden</button>
+    ${safeGrund ? `<details><summary>Technischer Grund</summary><code>${safeGrund}</code></details>` : ""}
+  </main>
+  <script>
+    document.getElementById("nochmal").addEventListener("click", function () {
+      parent.postMessage({ type: "smejj.browser.reload" }, "*");
+    });
+  </script>
+</body>
+</html>`;
+}
+
+function hostAus(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
 export function isRemoteScreenshot(value) {
   const text = String(value || "");
   return text.startsWith("data:image/png;base64,") || text.startsWith("data:image/jpeg;base64,");

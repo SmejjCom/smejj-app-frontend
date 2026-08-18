@@ -2467,10 +2467,19 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 .bp-tabs {
-  display: grid;
+  display: flex;
+  align-items: center;
+  gap: 2px;
   min-width: 0;
-  overflow: hidden;
+  /* Chrome schiebt Tabs nebeneinander und laesst sie schrumpfen; erst unter
+     der Mindestbreite wird gescrollt. `grid` zeigte hier vorher genau EINEN
+     Tab — daher die Blaetter-Pfeile, die Chrome nicht hat. */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
 }
+
+.bp-tabs::-webkit-scrollbar { display: none; }
 
 .bp-tab {
   display: grid;
@@ -2478,7 +2487,8 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   align-items: center;
   gap: 7px;
   min-width: 0;
-  width: 100%;
+  /* Breite setzt browser-pane-tableiste.js je nach Tab-Anzahl. */
+  flex: none;
   height: var(--bp-control-size);
   min-height: 0;
   padding: 0 7px;
@@ -2491,8 +2501,122 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 .bp-tab.is-active {
-  border-color: transparent;
+  border-color: rgba(246, 243, 238, 0.14);
+  background: rgba(246, 243, 238, 0.1);
+  color: #f6f3ee;
+}
+
+.bp-tab:hover:not(.is-active) {
+  background: rgba(246, 243, 238, 0.05);
+}
+
+.bp-tab:focus-visible {
+  outline: 2px solid rgba(159, 231, 212, 0.9);
+  outline-offset: -2px;
+}
+
+/* Nur-Icon-Zustand: Titel und Kreuz sind weg, das Icon steht mittig. */
+.bp-tab.is-schmal {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  padding: 0 4px;
+}
+
+.bp-tab.is-ziehend {
+  opacity: 0.45;
+}
+
+/* Marke links im Tab: echtes Favicon, sonst Anfangsbuchstabe. Fremde
+   Icon-Adressen sind durch img-src 'self' data: blob: ausgeschlossen —
+   der Buchstabe ist deshalb der Normalfall, nicht der Notbehelf. */
+.bp-tab-marke {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+}
+
+.bp-tab-favicon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.bp-tab-marke-buchstabe {
+  border-radius: 3px;
+  background: hsl(var(--bp-tab-farbton, 210) 45% 42%);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Kreuz erscheint erst beim Hover oder am aktiven Tab — wie in Chrome, sonst
+   flimmert die Leiste bei vielen Tabs. */
+.bp-tab-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  color: rgba(246, 243, 238, 0.55);
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0;
+}
+
+.bp-tab.is-active .bp-tab-close,
+.bp-tab:hover .bp-tab-close {
+  opacity: 1;
+}
+
+.bp-tab-close:hover {
+  background: rgba(246, 243, 238, 0.16);
+  color: #f6f3ee;
+}
+
+/* Adressvorschlaege (Chromes Omnibox-Liste) */
+.bp-address-form {
+  position: relative;
+}
+
+.bp-vorschlaege {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid rgba(246, 243, 238, 0.14);
+  border-radius: 6px;
+  background: #16181b;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+}
+
+.bp-vorschlaege[hidden] { display: none; }
+
+.bp-vorschlag {
+  padding: 8px 11px;
+  border: 0;
   background: transparent;
+  color: rgba(246, 243, 238, 0.86);
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.bp-vorschlag:hover,
+.bp-vorschlag.is-markiert {
+  background: rgba(246, 243, 238, 0.1);
   color: #f6f3ee;
 }
 
@@ -3731,8 +3855,10 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
      Touch-Ziel des Projekts. Jetzt wandert der Versionswaehler in eine zweite
      Zeile und die Knoepfe behalten ihre Groesse. */
   flex-wrap: wrap;
-  gap: 2px;
-  margin: -3px 0 2px;
+  gap: 0;
+  /* dicht unter der Textunterkante (Betreiber 2026-08-16: "fast mit
+     oberer Kante treffen"), klein und edel */
+  margin: -7px 0 2px;
   max-width: min(980px, 100%);
 }
 
@@ -3781,8 +3907,8 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 .msg-act svg {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
@@ -3808,6 +3934,16 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   color: rgba(246, 243, 238, 0.24);
 }
 
+/* Uhrzeit am Zeilenende wie ZCode (chat-actions.js syncZeit) — reine
+   Anzeige, kein Knopf. */
+.msg-zeit {
+  margin-left: 6px;
+  font-size: 11.5px;
+  color: rgba(246, 243, 238, 0.4);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 /* Versionswaehler: lesbares Label statt zwei namenloser Pfeile. */
 .msg-versions {
   display: inline-flex;
@@ -3829,9 +3965,9 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 
 @media (pointer: fine) {
   .msg-act {
-    width: 28px;
-    height: 28px;
-    min-height: 28px;
+    width: 26px;
+    height: 26px;
+    min-height: 26px;
   }
 
   .msg-version-step {
@@ -4683,7 +4819,7 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   --v11-cy-ink: #7ee8da;
   --v11-cy-line: rgba(50, 246, 234, 0.30);
   --v11-cy-line-on: rgba(50, 246, 234, 0.85);
-  --v11-cy-glow: rgba(50, 246, 234, 0.22);
+  --v11-cy-glow: rgba(50, 246, 234, 0.10);
   --v11-cy-fill: rgba(50, 246, 234, 0.12);
   /* Die Logofarbe aus public/icons/smejj_favicon.svg. Nur fuer das Zeichen
      selbst — nie fuer Flaechen, sonst kippt der Kontrast. */
@@ -4695,7 +4831,7 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   --v11-glas-2: rgba(255, 255, 255, 0.075);
   /* iOS-Specular: der helle Strich NUR an der Oberkante. Das ist es, was
      Glas zu Glas macht — nicht ein Rahmen ringsum. */
-  --v11-lichtkante: rgba(255, 255, 255, 0.13);
+  --v11-lichtkante: rgba(255, 255, 255, 0.07);
 
   /* --- Zustand: immer Farbe UND Wort im Markup ------------------------- */
   --v11-ok: #7ef0c2;
@@ -4772,13 +4908,28 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   border: 0;
 }
 .prompt-glass:focus-within {
+  /* Betreiber 2026-08-16: Raender leuchten nur noch leise — Augen schonen. */
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 0 0 1px var(--v11-cy),
-    0 0 30px var(--v11-cy-glow);
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px var(--v11-cy-line),
+    0 0 12px var(--v11-cy-glow);
 }
 
-/* Menues schweben: staerkeres Glas, damit der Text darunter nicht stoert. */
+/* Menues schweben: staerkeres Glas, damit der Text darunter nicht stoert.
+   #profileDockMenu dabei (Betreiber 2026-08-16: "Profil-Menue soll auch
+   Glas Edel aussehen") — mit !important, weil die Runtime-CSS der
+   Premium-Flaechen nach dem Buendel laedt und sonst gewinnt. */
+#profileDockMenu {
+  background: rgba(14, 20, 28, 0.78) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+  backdrop-filter: blur(40px) saturate(180%) !important;
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px var(--v11-cy-line) !important;
+  border: 0 !important;
+  border-radius: var(--v11-r) !important;
+}
 .plus-menu,
 .model-menu {
   background: rgba(14, 20, 28, 0.78);
@@ -4946,6 +5097,18 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 }
 
 
+/* Live-Befund 2026-08-16 (Nachtlauf): Bei 760 px Fensterhoehe war die
+   Vier-Gruppen-Spur 61 px laenger als ihre Scroll-Flaeche — "KI-Modelle"
+   und "Speicher" lagen unsichtbar unter der Kante, der Kostenschutz-Fuss
+   darueber. Niedrige Fenster bekommen darum kompaktere Eintraege (alle
+   passen ohne Scrollen), und die Spur zeigt eine duenne Scroll-Leiste,
+   falls es doch einmal ueberlaeuft. */
+.sidebar .nav { scrollbar-width: thin; }
+@media (max-height: 840px) {
+  .sidebar .nav-vier .nav-button { min-height: 30px; padding-top: 4px; padding-bottom: 4px; }
+  .sidebar .nav-vier .nav-gruppe { padding-top: 6px; padding-bottom: 2px; }
+}
+
 /* --- Fusszeile der Spur: Kosten immer sichtbar (Mockup Bildschirm 19) --- */
 .nav-kosten {
   font-size: 13.5px;
@@ -5062,7 +5225,7 @@ body.spur-start-aktiv .nav-vier { display: none; }
 }
 
 .nav-start .spur-chat {
-  font-size: 14.5px;
+  font-size: 13.5px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -5094,12 +5257,177 @@ body.spur-start-aktiv .nav-vier { display: none; }
   padding: 10px 6px;
   font-size: 15.5px;
 }
-.start-vorschlaege button:hover { background: rgba(255, 255, 255, 0.05); }
+/* Betreiber 2026-08-15: "als Text mit Link, ohne Hintergrund, ohne Rahmen" —
+   beim Zeigen wird nur die Schrift heller, keine Flaeche. */
+.start-vorschlaege button:hover { background: transparent; color: #f2f5f4; }
 .start-vorschlaege button:last-child { border-bottom: 0; }
 
+/* Betreiber 2026-08-16: die Werkzeuge "nur als Icons, alle eine Zeile"
+   direkt unter dem Schreibfeld. Der Name bleibt als title/aria-label und
+   als Tooltip — das Wort daneben faellt weg. 44 px = Touch-Regel. */
+.start-chipreihe {
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 10px;
+  overflow: visible;
+}
 .start-chipreihe button {
-  font-size: 14.5px;
-  padding: 7px 13px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  justify-content: center;
+}
+.start-chipreihe .chip-label { display: none; }
+.start-chipreihe button svg { width: 20px; height: 20px; }
+
+/* Betreiber 2026-08-16: das Plus-Menue kompakt wie bei ChatGPT — Icon und
+   Name in EINER Zeile, keine Erklaertexte, keine Beispielsaetze, keine
+   Gruppen-Ueberschriften. Alles bleibt im Markup (Screenreader-Weg und
+   Mockup-Texte unangetastet), nur die Anzeige ist kompakt. */
+.plus-menu-werkzeuge .werk-was,
+.plus-menu-werkzeuge .werk-bsp,
+.plus-menu-werkzeuge .plus-gruppe { display: none !important; }
+/* !important durchgehend: die Runtime-CSS (design-v11-views laedt NACH dem
+   Buendel) stellte die Eintraege sonst wieder untereinander und zentriert —
+   Betreiber 2026-08-16: "Icon und dann Beschreibung, EINE Zeile, buendig". */
+.plus-menu-werkzeuge button[role="menuitem"] {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  gap: 11px !important;
+  padding: 10px 14px !important;
+  width: 100% !important;
+}
+.plus-menu-werkzeuge button[role="menuitem"] b {
+  font-weight: 400 !important;
+  font-size: 15px !important;
+  white-space: nowrap;
+}
+.plus-menu.plus-menu-werkzeuge {
+  width: max-content !important;
+  min-width: 260px !important;
+  max-width: 330px !important;
+}
+.plus-menu-werkzeuge .werk-ic {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+
+/* Spur-Icons ruhiger und einheitlich (Betreiber: "modern wie ChatGPT"). */
+.nav-start .button-icon svg,
+.nav-vier .button-icon svg {
+  width: 18px;
+  height: 18px;
+  opacity: 0.85;
+}
+.nav-start .nav-button,
+.nav-vier .nav-button { letter-spacing: 0.01em; }
+/* Betreiber 2026-08-16 ("jede Platz brauchen wir"): die Spur-Liste ist
+   KOMPAKT — flache Zeilen, wenig Abstand, wie Claudes Verlaufsliste. */
+.nav-start .nav-button {
+  min-height: 28px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+.nav-start { gap: 1px; }
+.nav-start .side-block { margin-top: 2px; }
+
+/* Betreiber 2026-08-16: das LOGO oben links ist der Spur-Schalter (wie
+   ChatGPT). Das alte grosse Doppel-Logo daneben faellt weg. */
+.app-menu-button .menu-logo { width: 24px; height: 24px; display: block; }
+.app-brand-logo { display: none !important; }
+
+/* Rechts oben das Profil-Zeichen im Ecken-Knopf (Betreiber 2026-08-16):
+   runder Kreis mit den echten Initialen, wie bei ChatGPT. */
+.browser-button .profil-initialen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  /* !important gegen eckig.css (app-weit border-radius 0); Avatare sind
+     dort die dokumentierte Ausnahme. */
+  border-radius: 999px !important;
+  background: var(--v11-cy-fill);
+  color: var(--v11-cy-ink);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Betreiber 2026-08-16: das Plus-Menue oeffnet nach UNTEN (wie ChatGPT auf
+   der leeren Startseite). Sobald der Chat laeuft (Feld unten, startLog
+   sichtbar), klappt es automatisch wieder nach oben — sonst raus aus dem
+   Bild. */
+#start:has(#startLog[hidden]) .plus-menu {
+  bottom: auto;
+  top: calc(100% + 10px);
+}
+
+/* Project-Anlegen bleibt AUF der Seite (Betreiber 2026-08-16, wie
+   chatgpt.com/projects): aufklappendes Eingabefeld statt Browser-Dialog. */
+.bereich-neu-formular {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0 4px;
+}
+.bereich-neu-formular input {
+  flex: 1;
+  min-width: 220px;
+  max-width: 420px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: var(--v11-r);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px var(--v11-cy-line);
+  color: inherit;
+  font: inherit;
+}
+.bereich-neu-formular button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: var(--v11-r);
+  background: #f2f5f4;
+  color: #0b1418;
+  font-weight: 700;
+  cursor: pointer;
+}
+.bereich-neu-meldung { flex-basis: 100%; font-size: 14px; color: var(--v11-warn); }
+
+/* Die Zieh-Griffe SICHTBAR machen (Betreiber 2026-08-16: "warum kann ich
+   nicht ziehen" — man sah schlicht nicht, WO). Dezenter Streifen in der
+   Mitte, beim Draufzeigen cyan. Die Position setzt spur-schalter.js als
+   Inline-Style; background bleibt bewusst dem CSS. */
+#leftPanelResize,
+#rightPanelResize {
+  background: linear-gradient(to right, transparent 5px, rgba(255, 255, 255, 0.16) 5px, rgba(255, 255, 255, 0.16) 7px, transparent 7px) !important;
+}
+#leftPanelResize:hover,
+#rightPanelResize:hover,
+body.is-resizing-panel #leftPanelResize,
+body.is-resizing-panel #rightPanelResize {
+  background: linear-gradient(to right, transparent 4px, rgba(50, 246, 234, 0.6) 4px, rgba(50, 246, 234, 0.6) 8px, transparent 8px) !important;
+}
+
+/* Panels als Glas (Betreiber: "glaenzen, edel wie die Startseite"):
+   dieselbe Optik wie die schwebenden Menues — Glas, Blur, Lichtkante. */
+.sidebar,
+#browserPanel {
+  background: rgba(13, 18, 25, 0.62);
+  -webkit-backdrop-filter: blur(34px) saturate(170%);
+  backdrop-filter: blur(34px) saturate(170%);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
 }
 
 .fpille-nachdenken {
@@ -5135,12 +5463,17 @@ body.spur-start-aktiv .nav-vier { display: none; }
   align-items: center;
   gap: 10px;
   padding: 9px 9px 9px 16px;
-  border-radius: 999px !important;
+  /* Betreiber 2026-08-16 (Screenshot): die 999px-Pille wurde bei
+     mehrzeiligem Text zum haesslichen Oval. Wie Claude: fast viereckig,
+     nur der leichte Knick. */
+  border-radius: 14px !important;
   background: rgba(255, 255, 255, 0.06);
   -webkit-backdrop-filter: blur(34px) saturate(170%);
   backdrop-filter: blur(34px) saturate(170%);
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
 }
+/* Im laufenden Chat klebt das Feld GANZ unten — kaum Rand, wie Claude. */
+#start.has-start-chat .prompt-glass { margin-bottom: 6px; }
 #start .prompt-actions {
   display: contents;
 }
@@ -5162,8 +5495,11 @@ body.spur-start-aktiv .nav-vier { display: none; }
    Audio-Knopf entfaellt wie am Telefon. Der Modellchip steht im Mockup
    nicht im Feld; Modellwahl bleibt unter Einstellungen -> KI-Modelle &
    Anbieter und in der KI-Modelle-Ansicht erreichbar. */
-#start .prompt-glass [data-start-tool="audio"],
-#start .prompt-glass .model-picker { display: none; }
+#start .prompt-glass [data-start-tool="audio"] { display: none; }
+/* Betreiber 2026-08-16: Modell-Waehler ist wieder sichtbar (Claude-Stil,
+   Regel weiter unten). ACHTUNG: der sed-Umbau hatte die Sammelregel
+   zerrissen — der Audio-Knopf verlor sein display:none und die doppelte
+   Sprachwelle stand wieder im Feld (Betreiber-Befund v458-v463). */
 #start .prompt-glass .plus-picker,
 #start .prompt-glass [data-start-tool],
 #start .prompt-glass .send-button,
@@ -5308,6 +5644,10 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   flex-direction: column;
   flex: 1;
   min-height: 62vh;
+  /* Betreiber 2026-08-16: das Schreibfeld bleibt wie bei Claude UNTEN FEST —
+     die Flaeche waechst nie ueber den Bildschirm hinaus, der Chat scrollt
+     in seinem Halter (overflow: auto dort). */
+  max-height: calc(100vh - 130px);
 }
 #code .codegruss {
   padding: 26px 4px 0;
@@ -5316,6 +5656,479 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   letter-spacing: -0.03em;
 }
 #code .codeleer { flex: 1; min-height: 80px; }
+
+/* Der adoptierte Chat-Stream (echter #startLog) fuellt die freie Flaeche —
+   der Auftrag streamt auf der Code-Seite selbst, wie bei Codex/Claude. */
+#code .code-log-halter { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; }
+#code .code-log-halter .start-log { flex: 1; }
+
+/* Betreiber 2026-08-16: der Chat ist RAHMENLOS wie bei Claude — Texte
+   fliessen hintereinander. Die Nutzer-Zeile bleibt eine dezente Flaeche
+   (ohne Kante), die Antwort steht nackt auf dem Grund. */
+.start-log .entry,
+.start-log .entry.assistant {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.start-log .entry.user {
+  border: 0;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* Projekt-Menue am Chip: gleiche Glas-Ruhe wie das Profilmenue, viereckig. */
+#code .repozeile { position: relative; }
+.code-projekt-menue {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background: rgba(13, 18, 25, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.code-projekt-menue button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  min-height: 44px;
+  background: none;
+  border: 0;
+  /* KEINE Trennstriche (Betreiber 2026-08-16, wie Claude): styles.css gibt
+     jedem Knopf eine Lichtkante + Grundton — hier gemessen als "Striche"
+     zwischen den Zeilen. Beides aus. */
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.code-projekt-menue button:hover { background: rgba(94, 234, 212, 0.12); }
+
+/* Rechtes Panel OHNE transform-Animation am Desktop (Nachtlauf 2026-08-16):
+   Die translateX-Transition liess die HIT-Flaeche um Panelbreite+18 neben dem
+   gemalten Panel haengen — sichtbar offen, echte Klicks gingen ins Leere
+   (drittes Vorkommen der Familie "sichtbar != klickbar"; sogar !important
+   auf transform verlor gegen die haengende Transition). Animation laeuft
+   darum ueber `right`; transform ist hart aus. */
+@media (min-width: 768px) {
+  #browserPanel {
+    transform: none !important;
+    transition: right 180ms ease;
+    right: calc(-1 * var(--right-panel-width, 320px) - 24px);
+  }
+  #browserPanel.is-open { right: 0; }
+}
+
+/* Betreiber 2026-08-16 (Screenshot Claude-App als Vorbild):
+   1) Der Modell-Waehler steht wie bei Claude ("Fable 5 · Hoch") dezent
+      RECHTS in der Schreibleiste — er war seit dem Icon-Umbau versteckt,
+      obwohl Menue und Verdrahtung laengst leben. Echte Werte, echter Wechsel.
+   2) Sind BEIDE Fenster zu, ist die Mitte rahmenlos wie bei Claude:
+      keine Linie ueber dem Chat, keine Lichtkante ueber dem Feld. */
+#start .prompt-glass .model-picker { display: block; }
+#start .prompt-glass .model-picker .text-chip,
+#start .prompt-glass #modelPickerButton {
+  font-size: 13.5px;
+  color: rgba(242, 245, 244, 0.62);
+  background: none;
+  border: 0;
+  padding: 6px 8px;
+}
+#start .prompt-glass #modelPickerButton:hover { color: rgba(242, 245, 244, 0.92); }
+.prompt-actions .model-picker { order: 4; }
+
+body.spur-zu:not(.right-panel-open) .start-log { border-top: 0; }
+body.spur-zu:not(.right-panel-open) .prompt-glass {
+  box-shadow: none;
+  border-top: 0;
+}
+
+/* Betreiber 2026-08-16 ("Ich meine bei smejj Code"): die CODE-Seite wird
+   bei zugeklappten Fenstern flach wie Claude Code — das Schreibfeld ohne
+   Lichtkante auf ruhigem Grund, die Vorlagen-Chips ohne Karten-Look.
+   Das Feld selbst ist einzeilig (rows=1 im Markup). */
+body.spur-zu:not(.right-panel-open) #code .codefeld {
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.035);
+}
+body.spur-zu:not(.right-panel-open) #code .code-wchips button {
+  background: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.10);
+}
+#code .codefeld textarea { min-height: 26px; }
+
+/* Betreiber 2026-08-16, Runde 2 (ZCode-Abgleich, ersetzt die "dieselbe
+   Zeile"-Regel vom selben Tag — die war fuer NUR drei Punkte gebaut):
+   Antworten tragen wie ZCode eine eigene Zeile darunter, linksbuendig:
+   Kopieren, Daumen, Menue, Uhrzeit. Nur bei eigenen (rechtsbuendigen)
+   Nachrichten bleiben die drei Punkte in der letzten Blasenzeile. */
+#startLog .msg-actions {
+  justify-content: flex-start;
+  align-items: center;
+  /* Betreiber 2026-08-16 ("Icons sollen die letzte Textzeile treffen"):
+     die gemessene Luecke (7px Eintrag-Polster + ~6px Icon-Kopfraum) wird
+     exakt aufgehoben — die Icons haengen an der Textunterkante. */
+  margin-top: -13px;
+  pointer-events: none;
+}
+#startLog .msg-actions .msg-act { pointer-events: auto; }
+/* Blasen-Ueberlagerung der eigenen Nachricht: margin-top -34px weiter
+   unten (Betreiber-Regel "in der letzten Zeile der Blase"). */
+#startLog .msg-actions.is-user { justify-content: flex-start; }
+
+/* Betreiber 2026-08-16: "gesamten Chat-Kontakt sehen" — der Chat wird DICHT.
+   Zwischen Frage und Antwort kaum Luft, getrennt nur durch einen leichten
+   Haarstrich; die Drei-Punkte sitzen in der letzten Zeile (Regel oben).
+   Dazu die App insgesamt kompakter: engere Koepfe und Raster. */
+#startLog { gap: 0; }
+#startLog .entry { margin: 0; padding-top: 6px; padding-bottom: 6px; }
+#startLog .entry.user { padding: 6px 11px; }
+/* Betreiber-Nachtrag 2026-08-16 ("keine Trennlinie zwischen Texten,
+   kompakt"): der Haarstrich zwischen den Eintraegen ist WEG — die Blase
+   der eigenen Nachricht trennt optisch genug. */
+#startLog .entry:not(:first-child) { border-top: 0; }
+
+.view-header { margin-bottom: 10px; }
+.view-header .subhead { margin-top: 2px; }
+.panel-grid { gap: 8px; }
+
+/* Betreiber 2026-08-16: Verlauf und Suche kompakt wie der Chat — flache
+   Zeilen statt Karten, getrennt nur durch den Haarstrich. Die aktive
+   Zeile behaelt ihre leichte Cyan-Flaeche (Orientierung). */
+#chatHistory .ch-karte {
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 7px 10px;
+  margin-bottom: 0;
+}
+#chatHistory .ch-karte + .ch-karte { border-top: 1px solid var(--v11-hair); }
+#chatHistory .ch-karte.is-active { background: rgba(120, 220, 232, 0.10); }
+
+.search-overlay-row { padding-top: 4px; padding-bottom: 4px; }
+.search-overlay-row + .search-overlay-row { border-top: 1px solid var(--v11-hair); }
+
+/* Voll-Audit 2026-08-16: Bei schmalen Fenstern (Betreiber-Zoom) schob sich
+   in den Einstellungen das Auswahlfeld UEBER den Zeilennamen
+   ("SicherheitsmoduFree-safe", per Zoom-Screenshot belegt). Die Zeile darf
+   jetzt umbrechen; der Name behaelt seine Mindestbreite. */
+#settings .settings-row {
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  align-items: center;
+}
+#settings .settings-row-copy { flex: 1 1 160px; min-width: 0; }
+#settings .settings-row select,
+#settings .settings-row input[type="text"] { max-width: 100%; }
+
+/* Betreiber 2026-08-16 (schriftlich im Chat): Das Code-Schreibfeld sitzt
+   wie bei Claude GANZ UNTEN, und darunter ist NICHTS — die Vorlagen-Chips
+   ("Fehler suchen", "Funktion einbauen", ...) sind weg, die Flaeche bleibt
+   leer. Die Chips existieren im Markup weiter (Rote Liste), sind aber
+   unsichtbar. */
+#code .code-wchips { display: none; }
+/* Auch die zugeklappte "Editor & Dateien"-Zeile unter dem Feld: weg —
+   der Betreiber will unter dem Schreibfeld NICHTS. Markup bleibt. */
+#code .code-werkzeuge { display: none; }
+#code .codeflaeche {
+  height: calc(100vh - 96px);
+  max-height: none;
+  overflow: hidden;
+}
+/* Betreiber 2026-08-16 (Screenshots): KEINE Leerflaechen — der Chat dockt
+   GANZ OBEN an (der Gruss weicht, sobald ein Gespraech laeuft, wie bei
+   Claude), scrollt INTERN, und das Schreibfeld klebt IMMER am Boden. */
+#code .codeflaeche:has(#codeLogHalter #startLog:not([hidden])) .codegruss { display: none; }
+#code .codeflaeche:has(#codeLogHalter #startLog:not([hidden])) .codeleer { display: none; }
+#code .code-log-halter { flex: 1 1 auto; }
+#code .codeunten { margin-top: auto; padding-bottom: 14px; }
+
+/* Betreiber 2026-08-16: das Mikrofon (und der Anhang) bleiben in der
+   unteren Leiste sichtbar wie bei Claude — ihre Icons wurden ohne feste
+   Groesse als winzige Punkte gerendert. */
+#code .code-mini { width: 34px; height: 34px; flex: 0 0 auto; }
+#code .code-mini svg { width: 18px; height: 18px; stroke: currentColor; }
+
+/* Betreiber 2026-08-16: Auf der Code-Seite KEIN Zurueck-Pfeil und KEIN X
+   oben — wie Claude Code. Die Escape-Logik von view-chrome bleibt. */
+#code .view-chrome { display: none; }
+
+/* Ordner je Project: Speichern-Knopf sitzt neben dem Kopieren-Knopf am
+   Codeblock; der Verbinden-Knopf auf der Projects-Karte wie die anderen.
+   Anordnung (ZCode-Abgleich 2026-08-16, rechts nach links): Chevron,
+   Download, Kopieren, Speichern — alle Knoepfe sind wie bei ZCode reine
+   Icon-Knoepfe mit fester Breite, die Abstaende bleiben darum stabil. */
+.chat-code-klapp { right: 4px; }
+.chat-code-download { right: 48px; }
+.chat-code-copy[data-code-copy] { right: 92px; }
+.chat-code-save { right: 136px; }
+@media (pointer: fine) {
+  .chat-code-klapp { right: 6px; }
+  .chat-code-download { right: 34px; }
+  .chat-code-copy[data-code-copy] { right: 62px; }
+  .chat-code-save { right: 90px; }
+}
+
+/* Projekt-Zeile im Code-Menue: links Name (waehlt Project), rechts der
+   📁-Knopf (waehlt den Ordner — direkt hier, kein Seitenwechsel). */
+.code-projekt-zeile { display: flex; align-items: stretch; }
+.code-projekt-zeile button:first-child { flex: 1 1 auto; }
+.code-projekt-zeile .code-projekt-ordner {
+  flex: 0 0 auto;
+  max-width: 46%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(242, 245, 244, 0.72);
+}
+
+/* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
+#code .codefeld { position: relative; }
+
+/* Plus-Menue der CODE-Ansicht (Betreiber 2026-08-16, "wie bei Claude,
+   1 zu 1"): Masse an claude.ai gemessen — Kasten rgb(32,32,31), 302px,
+   Radius 12 (nimmt eckig.css app-weit zurueck), Zeilen 32px hoch,
+   14px Schrift, 8px Icon-Abstand, Kuerzel/Untermenue-Pfeil rechts
+   gedaempft, Trennlinie als Haarstrich. Oeffnet sich NACH OBEN. */
+.code-plus-menu {
+  position: absolute;
+  left: 8px;
+  bottom: calc(100% + 8px);
+  z-index: 30;
+  min-width: 302px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgb(32, 32, 31);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+.code-plus-menu [role="menuitem"],
+.code-plus-menu [role="menuitemcheckbox"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #f0efec;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+@media (pointer: fine) {
+  .code-plus-menu [role="menuitem"],
+  .code-plus-menu [role="menuitemcheckbox"] { min-height: 32px; }
+}
+.code-plus-menu [role="menuitem"]:hover,
+.code-plus-menu [role="menuitem"]:focus-visible,
+.code-plus-menu [role="menuitemcheckbox"]:hover,
+.code-plus-menu [role="menuitemcheckbox"]:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+.code-plus-menu [role="menuitem"] svg,
+.code-plus-menu [role="menuitemcheckbox"] svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: rgba(240, 239, 236, 0.75);
+}
+.code-plus-menu [role="menuitem"] span,
+.code-plus-menu [role="menuitemcheckbox"] span { flex: 1; }
+.code-plus-menu [role="menuitem"] kbd {
+  font-family: inherit;
+  font-size: 12.5px;
+  color: rgba(240, 239, 236, 0.45);
+}
+.code-plus-menu .plus-pfeil { color: rgba(240, 239, 236, 0.45); }
+.code-plus-menu .code-plus-line {
+  height: 1px;
+  margin: 6px 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Modell-Menue oeffnet DIREKT UEBER dem Modellnamen (rechts in der
+   Leiste), nicht links am Feld — wie bei Claude (Betreiber 2026-08-17). */
+#codeModellMenue { left: auto; right: 10px; }
+
+/* Konnektoren-Flyout (Betreiber-Screenshot 2026-08-16): oeffnet wie bei
+   Claude RECHTS neben dem Menuepunkt; auf schmalen Geraeten darueber. */
+.code-plus-unter {
+  position: absolute;
+  left: calc(100% + 6px);
+  bottom: 0;
+  min-width: 250px;
+}
+@media (max-width: 720px) {
+  .code-plus-unter { left: auto; right: 0; bottom: calc(100% + 6px); }
+}
+/* Schalter wie Claudes Toggle, aber VIERECKIG (Betreiber-Designgesetz).
+   Aus-Zustand grau, Ein-Zustand cyan; der Knubbel faehrt herueber. */
+.code-schalter {
+  position: relative;
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: 34px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.16);
+  transition: background-color 120ms ease;
+}
+.code-schalter::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  background: #f2f5f4;
+  transition: transform 120ms ease;
+}
+/* Staerker als die span-flex-Regel des Menues: der Schalter bleibt 34px. */
+.code-plus-menu [role="menuitemcheckbox"] .code-schalter { flex: 0 0 34px; width: 34px; }
+[aria-checked="true"] .code-schalter { background: var(--v11-cy); }
+[aria-checked="true"] .code-schalter::after { transform: translateX(14px); }
+
+/* Arbeits-Viereck wie bei Claude (Betreiber 2026-08-16): sitzt rechts
+   oben im Schreibfeld. Frei = gedaempfter Umriss; arbeitet = in
+   Logo-Cyan gefuellt mit leisem Puls (Augen-Regel: kein Leuchten). */
+#code .code-arbeit {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  /* Betreiber-Klarstellung 2026-08-17: SICHTBAR als ruhiger Umriss wie
+     bei Claude — aber ohne jedes Leuchten. Nur beim Arbeiten leuchtet
+     es cyan (Regel darunter). */
+  /* Betreiber 2026-08-17 ("Rahmen scharf stellen"): deutlicher Umriss. */
+  border: 1.5px solid rgba(242, 245, 244, 0.55);
+}
+#code .code-arbeit.an {
+  border-color: var(--v11-cy);
+  background: var(--v11-cy);
+  animation: code-arbeit-puls 1.6s ease-in-out infinite;
+}
+@keyframes code-arbeit-puls {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #code .code-arbeit.an { animation: none; }
+}
+
+/* Slash-Palette (code-flaeche.js): gleicher Kasten wie das Plus-Menue,
+   Befehl in Mono links, die Vorlage gedaempft rechts. */
+#codeSlashMenue { max-height: 300px; overflow-y: auto; }
+#codeSlashMenue [role="menuitem"] b {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  font-weight: 600;
+}
+#codeSlashMenue [role="menuitem"] span {
+  flex: 1;
+  text-align: right;
+  font-size: 12.5px;
+  color: rgba(240, 239, 236, 0.5);
+}
+
+/* Der alte Arbeits-Punkt links in der Leiste (v491) ist ERSETZT durch
+   das Claude-Viereck rechts oben im Feld (#codeArbeit, Regeln oben) —
+   seine Dauer-Cyan-Regel faerbte das neue Viereck mit (2026-08-17
+   live gemessen). */
+/* Modus-Menue 1:1 wie Claude (Betreiber-Screenshot 2026-08-16):
+   Kopf "Modus", Zeilen linksbuendig OHNE Trennstriche, Beschreibung
+   gedaempft darunter (eine Zeile, Punkte), rechts Haken + Ziffer. */
+.code-modus-menue {
+  /* Betreiber 2026-08-17 ("Freiflaeche rausnehmen, Fenster klein"):
+     Breite = Inhalt, keine Leerflaeche rechts — wie Claudes Menue. */
+  min-width: 0;
+  width: max-content;
+  max-width: min(320px, 92vw);
+  /* Der Modell-Katalog ist lang — deckeln und innen scrollen (2026-08-17). */
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.code-menue-titel {
+  padding: 5px 12px 1px;
+  font-size: 11.5px;
+  color: rgba(240, 239, 236, 0.5);
+}
+.code-modus-menue button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  min-height: 0;
+  /* Betreiber 2026-08-17: Modelle KOMPAKT, Schrift wie die Leisten-Chips
+     (Auto/Schnell, 13px), leicht statt fett — edel und eng gepackt. */
+  padding: 1px 12px;
+  text-align: left;
+}
+.code-modus-menue .modus-links {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  text-align: left;
+}
+/* Wie Claudes Modell-Menue (Betreiber-Screenshot 2026-08-17):
+   normale Schrift, nicht fett, Claude-Groesse. */
+.code-modus-menue button b { display: block; font-weight: 400; font-size: 14.5px; line-height: 1.5; color: rgba(242, 245, 244, 0.92); }
+.code-modus-menue button small {
+  display: block;
+  margin-top: 1px;
+  opacity: 0.6;
+  font-size: 0.86em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.code-modus-menue .modus-rechts {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 0 auto;
+}
+/* Mit ID-Gewicht gegen jede generische Knopf-Regel (gemessen: bg 0.055 und
+   Lichtkante blieben trotz background:none der Basisklasse). */
+#code .code-projekt-menue button,
+#code .code-modus-menue button {
+  background: transparent;
+  box-shadow: none;
+}
+/* Live gemessen 2026-08-17: app-surfaces gibt jedem premium-view-Knopf
+   min-height 40px + padding 0 14px und gewann bei gleicher Spezifitaet —
+   darum hier MIT ID-Gewicht die engen Claude-Zeilen erzwingen. */
+.code-modus-menue.code-modus-menue button {
+  min-height: 0;
+  height: auto;
+  padding: 2px 12px;
+  background: transparent;
+  box-shadow: none;
+}
+.code-modus-menue.code-modus-menue button:hover { background: rgba(94, 234, 212, 0.12); }
+#code .code-projekt-menue button:hover,
+#code .code-modus-menue button:hover {
+  background: rgba(94, 234, 212, 0.12);
+}
+.code-modus-menue .modus-haken { color: var(--v11-cy); }
+.code-modus-menue .modus-ziffer {
+  color: rgba(240, 239, 236, 0.45);
+  font-size: 13px;
+}
 #code .codeunten { padding: 14px 0 8px; }
 #code .repozeile {
   display: flex;
@@ -5324,25 +6137,40 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   flex-wrap: wrap;
   align-items: center;
 }
+/* Betreiber 2026-08-16 ("ohne Hintergrund, ganz schmal, modern"): die
+   Leisten-Chips sind Geister — kein Pillen-Grund, gedaempfte Schrift,
+   Hover hellt nur auf. Der aktive Projekt-Chip zeigt Cyan als FARBE,
+   nicht als Fuellung; lange Projektnamen kappen mit Punkten. */
 #code .repochip {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 12px;
+  gap: 6px;
+  padding: 2px 6px;
   min-height: 0;
   width: auto;
-  font-size: 14px;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
   font-weight: 400;
-  color: rgba(242, 245, 244, 0.74);
+  color: rgba(242, 245, 244, 0.55);
   border: 0;
-  border-radius: var(--v11-r) !important;
-  background: rgba(255, 255, 255, 0.055);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  background: transparent;
+  box-shadow: none;
+  transition: color 120ms ease;
 }
+#code .repochip:hover { color: #f2f5f4; background: transparent; }
+/* Betreiber 2026-08-16 ("bei Claude sieht man das nicht"): der
+   Projekt-Chip ist UNSICHTBAR — die Leiste zeigt wie Claude nur
+   Auto/Gruendlich/+/Mikro. Der Knopf bleibt im DOM: das Plus-Menue
+   ("Ordner hinzufuegen" ohne gewaehltes Project) und code-flaeche.js
+   klicken ihn programmatisch, um die Projektwahl zu oeffnen. */
+#code #codeProjektChip { display: none; }
 #code .repochip.an {
-  background: var(--v11-cy-fill);
-  color: var(--v11-cy-ink);
-  box-shadow: inset 0 0 0 1px var(--v11-cy-line);
+  background: transparent;
+  color: var(--v11-cy);
+  box-shadow: none;
 }
 #code .codefeld {
   background: rgba(255, 255, 255, 0.05);
@@ -5351,10 +6179,41 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
   border: 0;
   border-radius: var(--v11-r);
-  padding: 13px 14px;
+  /* ultra-schmal (Betreiber 2026-08-16, Variante A): wirkt wie EINE Zeile */
+  padding: 5px 10px 4px;
 }
+
+/* Anhang-Chips im Schreibfeld (code-flaeche.js zeichneAnhaenge): kleine
+   Zeile UEBER dem Text — der Verweis steht nie als Text im Feld. */
+#code .code-anhaenge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 3px;
+}
+#code .code-anhang-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 3px 1px 7px;
+  font-size: 12px;
+  color: rgba(242, 245, 244, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+#code .code-anhang-weg {
+  min-height: 0;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: rgba(242, 245, 244, 0.5);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+#code .code-anhang-weg:hover { color: #f2f5f4; }
 #code .codefeld:focus-within {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 0 0 1px var(--v11-cy), 0 0 30px var(--v11-cy-glow);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 0 1px var(--v11-cy-line), 0 0 12px var(--v11-cy-glow);
 }
 #code .codefeld textarea {
   width: 100%;
@@ -5370,9 +6229,25 @@ body.spur-start-aktiv .nav-kosten { display: none; }
 #code .codeleiste {
   display: flex;
   align-items: center;
-  gap: 9px;
-  margin-top: 14px;
+  gap: 3px;
+  margin-top: 2px;
   flex-wrap: wrap;
+}
+/* Icon-Knoepfe der Leiste als Geister: kein runder Grund (Betreiber
+   2026-08-16, "modern professionell wie Claude"). */
+#code .codeleiste .icon-button.code-mini {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: rgba(242, 245, 244, 0.55);
+}
+@media (pointer: fine) {
+  #code .codeleiste .icon-button.code-mini { width: 28px; height: 28px; min-height: 28px; }
+  #code #codeSenden { width: 28px; height: 28px; min-height: 28px; }
+}
+#code .codeleiste .icon-button.code-mini:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #f2f5f4;
 }
 #code .code-rechts {
   margin-left: auto;
@@ -5382,7 +6257,10 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   font-size: 14.5px;
   color: rgba(242, 245, 244, 0.74);
 }
-#code .code-rechts b { color: #f2f5f4; font-weight: 700; }
+/* Betreiber 2026-08-17: Modellname NICHT fett, gleiche Groesse wie die
+   Chips links (Auto/Schnell, 13px). */
+#code .code-rechts b { color: rgba(242, 245, 244, 0.8); font-weight: 400; font-size: 13px; }
+#code .code-rechts { font-size: 13px; }
 #code #codeSenden {
   width: 32px;
   height: 32px;
@@ -5422,24 +6300,57 @@ body.spur-start-aktiv .nav-kosten { display: none; }
  * links, die Mitte schliesst mit einem Haarstrich an. Der Klapp-Mechanismus
  * bleibt fuer schmale Schirme vollstaendig erhalten — diese Regeln greifen
  * erst ab 1024 px. */
-@media (min-width: 1024px) {
-  .sidebar {
+@media (min-width: 768px) {
+  /* Betreiber-Entscheid 2026-08-15 (Chat): die Spur muss auch am Desktop
+     ZUGEHEN — und zwar schon ab 768 px: der Betreiber arbeitet mit Zoom,
+     sein Fenster hat effektiv ~778 CSS-px, die 1024er-Schwelle griff NIE.
+     ZUGEHEN. Standard bleibt offen; der Menue-Knopf links oben schaltet
+     body.spur-zu (app.js merkt sich den Zustand). Groesser/kleiner ziehen
+     uebernehmen die vorhandenen Griffe (#leftPanelResize/#rightPanelResize). */
+  body:not(.spur-zu) .sidebar {
     transform: none !important;
     visibility: visible !important;
   }
-  main.shell {
+  body:not(.spur-zu) main.shell {
     margin-left: var(--left-panel-width, 196px);
   }
-  .app-menu-button { display: none; }
+  body.spur-zu .sidebar {
+    transform: translateX(-102%) !important;
+    visibility: hidden !important;
+  }
+  body.spur-zu main.shell { margin-left: 0; }
+  /* Der Menue-Knopf bleibt sichtbar — er ist jetzt der Schalter. */
+  .app-menu-button { display: inline-flex; }
   .sidebar-backdrop { display: none !important; }
   /* Die Brotkrume beginnt rechts der Spur, nicht unter dem Logo. */
-  .top-krume { left: calc(var(--left-panel-width, 196px) + 26px); }
+  body:not(.spur-zu) .top-krume { left: calc(var(--left-panel-width, 196px) + 26px); }
+  body.spur-zu .top-krume { left: 96px; }
   /* Spur und Mitte trennt EIN Haarstrich — kein Abstand, kein Schatten. */
   .sidebar {
     border-right: 1px solid var(--v11-hair);
     box-shadow: none;
   }
+  /* Der Zieh-Griff als FIXES Overlay an der Spur-Kante (Betreiber-Befund
+     2026-08-15: als Sidebar-Kind verschluckte der Hit-Test jeden Klick —
+     elementFromPoint traf BODY statt Griff). position:fixed loest ihn aus
+     Clip und Stapel der Spur; die Breiten-Variable haelt ihn an der Kante. */
+  body:not(.spur-zu) .left-panel-resizer {
+    position: fixed !important;
+    left: calc(var(--left-panel-width, 196px) - 6px) !important;
+    right: auto !important;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    z-index: 80;
+    pointer-events: auto !important;
+  }
+  body.spur-zu .left-panel-resizer { display: none; }
 }
+
+/* Profilzeile unten wie ChatGPT (Betreiber 2026-08-15): runder Avatar,
+   Name, Plan — KEIN separates Zahnrad; Einstellungen wohnen im Menue. */
+.profile-dock-gear { display: none !important; }
+.profile-avatar { border-radius: 999px; overflow: hidden; }
 
 /* Der Hilfe-Knopf oben rechts (Mockup-Topbar). Bewusst mit Abstand zu den
    fixen Ecken-Knoepfen (Befund b0fb345: dort kollidierte schon einmal
@@ -5475,10 +6386,14 @@ body.spur-start-aktiv .nav-kosten { display: none; }
 }
 #code .code-mini {
   width: 30px; height: 30px; min-height: 30px;
+  /* ghost-button bringt padding 0 14px mit — im 30px-Knopf blieben dem SVG
+     nur 2px Innenbreite, Anhang- und Diktat-Icon waren unsichtbare Striche
+     (Betreiber-Testlauf 2026-08-16). */
+  padding: 0;
   border-radius: 999px !important;
 }
 #code .code-mini svg {
-  width: 16px; height: 16px;
+  width: 16px; height: 16px; flex: none;
   fill: none; stroke: currentColor; stroke-width: 2.2;
   stroke-linecap: round; stroke-linejoin: round;
 }
@@ -5764,3 +6679,351 @@ body.spur-start-aktiv .nav-kosten { display: none; }
 #files .datei-tabelle { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 #files .datei-tabelle th { text-align: left; color: rgba(242,245,244,.58); font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; padding: 8px 10px; border-bottom: 1px solid var(--v11-hair); }
 #files .datei-tabelle td { padding: 9px 10px; border-bottom: 1px solid var(--v11-hair); }
+
+/* Betreiber 2026-08-16 ("ohne Rahmen, transparent, ohne Hintergrund"):
+   die Aktions-Icons unter Nachrichten tragen KEINEN Kasten — die
+   generische Knopf-Regel (Grundton 0.055 + Lichtkante, live gemessen)
+   wird hier mit Doppelklassen-Gewicht abgeschaltet; nur Hover toent. */
+.msg-actions .msg-act.msg-act {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.msg-actions .msg-act.msg-act:hover,
+.msg-actions .msg-act.msg-act:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Betreiber 2026-08-16 ("Warum hast du ... mit Rahmen gemacht — soll mit
+   Text gleiche Zeile sein"): die drei Punkte liegen NIE auf einem Rahmen.
+   Nach einer Werkzeug-Karte sitzen sie knapp UNTER der Karte statt auf
+   ihrem Rand; bei eigenen Nachrichten sitzen sie IN der letzten Zeile der
+   Blase — der Text bekommt dafuer rechts Platz. */
+#startLog .af-karte + .msg-actions { margin-top: -10px; }
+#startLog .entry.user { padding-right: 40px; }
+#startLog .msg-actions.is-user { margin-top: -34px; padding-right: 6px; }
+
+/* Betreiber 2026-08-16 ("Chat-Funktion wie ChatGPT"): der Runter-Pfeil.
+   Sitzt mittig ueber dem Schreibfeld, nur sichtbar wenn hochgescrollt. */
+.chat-runter {
+  position: fixed;
+  left: 50%;
+  bottom: 128px;
+  transform: translateX(-50%);
+  z-index: 60;
+  width: 34px; height: 34px; min-height: 34px;
+  padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--v11-hair);
+  border-radius: 999px;
+  background: rgba(20, 26, 33, 0.92);
+  color: #f2f5f4;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+.chat-runter:hover { background: rgba(40, 48, 58, 0.95); }
+.chat-runter svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Stopp-Knopf waehrend der Antwort (Overlay ueber dem Senden-Pfeil) */
+.chat-stopp {
+  position: fixed;
+  z-index: 70;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; border: 0;
+  border-radius: 999px;
+  background: #f2f5f4;
+  color: #0a0f16;
+  cursor: pointer;
+}
+.chat-stopp:hover { background: #dfe5e3; }
+.chat-stopp svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
+
+/* Betreiber 2026-08-16 ("Code-Bereich wie die ZCode-App"): Codebloecke
+   mit Kopfzeile — Sprachname links, die Icon-Knoepfe (chat-code-copy.js,
+   chat-code-download.js) sitzen rechts darin. JEDER Block traegt eine
+   Sprache (chat-markdown.js liefert sie, chat-code-copy.js setzt sonst
+   "text" nach). ::before steht nicht in textContent — Verlauf und
+   Modellkontext bleiben sauber. */
+#startLog .entry.assistant .chat-code[data-language] {
+  padding-top: 0;
+}
+#startLog .entry.assistant .chat-code[data-language]::before {
+  content: attr(data-language);
+  display: block;
+  position: sticky;
+  left: 0;
+  /* ZCode-Abgleich 2026-08-16: die Sprachzeile ist bei ZCode KEIN eigener
+     Streifen — kleine Mono-Schrift, gedaempft, ohne Grund und ohne
+     Trennlinie, im selben Kasten wie der Code. Hoch genug fuer die
+     42px-Touch-Knoepfe; bei praezisem Zeigegeraet kompakt (h-8 wie ZCode). */
+  margin: 0 -12px 6px;
+  padding: 15px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  color: rgba(242, 245, 244, 0.55);
+}
+@media (pointer: fine) {
+  #startLog .entry.assistant .chat-code[data-language]::before {
+    padding: 8px 12px;
+  }
+}
+
+/* ZCode-Abgleich Runde 2 (Betreiber 2026-08-16, "Code-Bereich wie die
+   ZCode-App"): die Knoepfe in der Kopfzeile sind wie bei ZCode reine
+   Icon-Knoepfe — randlos, gedaempft, Hover/Fokus hellt NUR die Farbe auf
+   (ZCode: text-muted-foreground -> text-foreground, kein Grundwechsel).
+   Die Grundregeln (Groesse, Fokusring, immer sichtbar) bleiben in
+   chat-markdown.css und gelten weiter. */
+#startLog .chat-code-wrap .chat-code-copy {
+  top: 3px;
+  border-color: transparent;
+  background: transparent;
+  color: rgba(242, 245, 244, 0.55);
+  transition: color 120ms ease;
+}
+#startLog .chat-code-wrap .chat-code-copy:hover,
+#startLog .chat-code-wrap .chat-code-copy:focus-visible {
+  border-color: transparent;
+  background: transparent;
+  color: #f2f5f4;
+}
+@media (pointer: fine) {
+  #startLog .chat-code-wrap .chat-code-copy { top: 4px; }
+}
+/* Wie ZCode: kein geschriebenes "Kopieren" am Codeblock — nur das Icon,
+   der Name bleibt im aria-label/title. Die ::after-Beschriftung aus
+   chat-markdown.css gilt weiter fuer alle Kopierknoepfe ausserhalb. */
+#startLog .chat-code-wrap .chat-code-copy::after { content: none; }
+#startLog .chat-code-wrap .chat-code-copy svg { width: 14px; height: 14px; }
+
+/* Werkzeug-Karte wie ZCodes Datei-Karte (chat-code-copy.js zeigeDateiKarte,
+   Betreiber 2026-08-16): sichtbare Spur nach "In den Project-Ordner
+   speichern". Name und Unterzeile kommen aus data-Attributen (attr()) —
+   nichts davon steht in textContent. */
+.chat-code-wrap .code-datei-karte {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+.code-datei-zeichen {
+  grid-row: 1 / span 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(242, 245, 244, 0.75);
+}
+.code-datei-zeichen svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.code-datei-karte::before {
+  content: attr(data-datei);
+  grid-column: 2;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13.5px;
+  color: #f0efec;
+}
+.code-datei-karte::after {
+  content: attr(data-info);
+  grid-column: 2;
+  font-size: 12px;
+  color: rgba(242, 245, 244, 0.5);
+}
+
+/* Arbeitsschritte-Falte im ZCode-Look ("Worked for … >"): gedaempfte
+   Zeile mit drehendem Chevron statt des Aufklapp-Dreiecks; die Schritte
+   darunter ruecken mit Haarstrich ein wie bei ZCode. */
+#startLog .chat-schritte-titel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  cursor: pointer;
+  color: rgba(242, 245, 244, 0.5);
+  font-size: 13px;
+}
+#startLog .chat-schritte-titel::-webkit-details-marker { display: none; }
+#startLog .chat-schritte-titel::after {
+  content: "›";
+  font-size: 15px;
+  line-height: 1;
+  transition: transform 150ms ease;
+}
+#startLog .chat-schritte-falte[open] .chat-schritte-titel::after {
+  transform: rotate(90deg);
+}
+#startLog .chat-schritte-falte[open] .chat-schritt {
+  margin-left: 4px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Ein-/Ausklappen wie ZCodes einklappbare Zeilen ("1 file changed"-Muster;
+   chat-code-copy.js setzt data-zu am
+   Wrapper): zu sehen bleibt nur der Kopfstreifen, der Chevron dreht zur
+   Seite. Die Hoehen entsprechen dem Kopfstreifen samt Rahmen. */
+#startLog .chat-code-wrap[data-zu] .chat-code[data-language] {
+  max-height: 50px;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+@media (pointer: fine) {
+  #startLog .chat-code-wrap[data-zu] .chat-code[data-language] { max-height: 36px; }
+}
+.chat-code-klapp svg { transition: transform 150ms ease; }
+.chat-code-wrap[data-zu] .chat-code-klapp svg { transform: rotate(-90deg); }
+
+/* ZCode-Abgleich Runde 3 (2026-08-16): Inline-Code als Chip exakt wie
+   ZCodes streamdown-inline-code (rounded bg-muted px-1.5 py-0.5 font-mono
+   text-sm) — gefuellter Grund, KEIN Rahmen, 0.875em. Die Rundung nimmt
+   eckig.css app-weit zurueck (Betreiber-Designgesetz). Codebloecke sind
+   ausgenommen (chat-markdown.css setzt padding/bg dort zurueck). */
+#startLog .entry.assistant code {
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.09);
+  font-size: 0.875em;
+}
+/* Codebloecke sind KEINE Chips: der Reset aus chat-markdown.css verliert
+   gegen die ID-Regel oben — hier mit gleicher Staerke wiederholen (im
+   Fixture gemessen: sonst traegt jede Blockzeile einen Chip-Grund). */
+#startLog .entry.assistant .chat-code code {
+  padding: 0;
+  background: none;
+  font-size: 0.92em;
+}
+
+/* Syntax-Farben der Codebloecke (chat-code-farben.js) — ZCode-Abgleich
+   2026-08-16: die GitHub-Dark-Farbwelt, in der auch ZCode zeichnet
+   (Kommentar grau, String hellblau, Zahl blau, Schluesselwort koralle,
+   Funktion violett). */
+.chat-code .cf-kom { color: #8b949e; font-style: italic; }
+.chat-code .cf-str { color: #a5d6ff; }
+.chat-code .cf-zahl { color: #79c0ff; }
+.chat-code .cf-schl { color: #ff7b72; }
+.chat-code .cf-fn { color: #d2a8ff; }
+
+/* Betreiber 2026-08-16 ("gesamte Flaeche nutzen, kompakt, keine
+   Freiflaeche"): die CODE-Seite randlos wie Claude. Die Ansicht selbst ist
+   eine Bildschirm-hohe Flex-Spalte — oben nur Platz fuer die fixe
+   Logo-Zeile, links/rechts 12px, unten schliesst das Schreibfeld buendig
+   ab. Der Text im Gespraech deckt die volle Breite (die 980px-Mitte der
+   Startseite gilt hier nicht). */
+#code.view.is-active {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  /* Betreiber-Nachtrag ("Text ganz oben, ueber Browser-Icon"): kein
+     reservierter Kopfstreifen — der Text beginnt an der Oberkante, das
+     fixe Browser-Icon schwebt rechts darueber. */
+  padding: 4px 12px 0;
+}
+#code .codeflaeche {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+}
+#code .codegruss { padding: 2px 2px 0; }
+#code .codeunten { margin-top: auto; padding: 4px 0 0; }
+#code .code-log-halter .start-log .entry { max-width: none; }
+#code .code-log-halter .msg-actions { max-width: none; }
+/* Das Schreibfeld waechst beim Tippen nach OBEN mit (code-flaeche.js) —
+   ab 40% Bildhoehe scrollt es innen statt weiterzuwachsen. */
+#code .codefeld textarea { max-height: 40vh; overflow-y: auto; }
+
+/* Claude-Abgleich 2026-08-16: "Zuletzt verwendet"-Eintraege tragen wie bei
+   Claude einen kleinen Kreis; das offene Gespraech fuellt ihn (cyan). */
+.nav-start .spur-chat::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  margin-right: 8px;
+  border: 1px solid rgba(242, 245, 244, 0.32);
+  border-radius: 50%;
+}
+.nav-start .spur-chat.is-active::before {
+  /* dezent statt Leuchtpunkt (Betreiber 2026-08-16) */
+  border-color: rgba(50, 246, 234, 0.55);
+  background: rgba(50, 246, 234, 0.55);
+}
+.nav-start .spur-chat { display: flex; align-items: center; }
+
+/* Status IM rechten Panel (panel-status.js): die echte status-grid der
+   Systemzustand-Ansicht, im schmalen Panel einspaltig und kompakt. */
+.panel-status { padding: 10px 12px; overflow: auto; }
+.panel-status .status-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13.5px;
+}
+.panel-status .status-grid > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--v11-hair);
+  padding-bottom: 6px;
+}
+.panel-status .status-grid span { text-align: right; opacity: 0.8; }
+
+/* =======================================================================
+ * Betreiber 2026-08-17: Start-Composer wie der CODE-Bereich —
+ * das Schreibfeld ist ZEILE 1 (volle Breite, waechst, der GANZE Text
+ * bleibt sichtbar), die Werkzeuge sind eine FESTE ZWEITE ZEILE unten.
+ * Steht bewusst am DATEIENDE: schlaegt die Ein-Pillen-Regeln (Desktop
+ * Bildschirm 32 und Telefon-Block) bei gleicher Spezifitaet.
+ * ===================================================================== */
+#start .prompt-glass { flex-wrap: wrap; align-items: center; }
+#start .prompt-glass textarea {
+  order: 0;
+  flex: 1 1 100%;
+  width: 100%;
+  /* !important, weil die Ein-Pillen-Regel weiter oben height:40px setzt
+     und sogar den Inline-Stil des Autogrow schlaegt (live gemessen:
+     scrollHeight 120, sichtbar 44). field-sizing waechst nativ, das JS
+     unten ist der Fallback fuer Browser ohne Unterstuetzung. */
+  height: auto !important;
+  field-sizing: content;
+  min-height: 40px !important;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+#start .prompt-actions .plus-picker { order: 1; }
+#start .prompt-actions .prompt-spacer { display: block; flex: 1 1 auto; order: 2; }
+#start .prompt-actions .fpille-nachdenken { order: 3; }
+#start .prompt-actions .model-picker { order: 4; display: block; }
+#start .prompt-actions [data-start-tool="voice"] { order: 5; }
+#start .prompt-actions .send-button { order: 6; }
+
+/* Betreiber 2026-08-17: die Antwort im Sprachmodus liest sich wie Text —
+   linksbuendig, normale Groesse, ruhige Zeilen. Zentriert und riesig war
+   sie unlesbar, sobald sie laenger als ein Satz wurde. */
+.voice-mode-reply {
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.55;
+  max-width: 620px;
+  width: 100%;
+  padding: 0 4px;
+}
+.voice-mode-transcript { text-align: left; }
