@@ -33,22 +33,43 @@ const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
 // im Aufrufer, dass er stattgefunden hat.
 let gemerktesToken = "";
 
-function tokenAusSpeicher() {
-  for (const speicher of [globalThis.sessionStorage, globalThis.localStorage]) {
+/**
+ * ALLE in Frage kommenden Nachweise, in der Reihenfolge ihrer Verlaesslichkeit.
+ *
+ * KORREKTUR 2026-08-17, noch am selben Abend: Meine erste Fassung nahm den
+ * ERSTEN gefundenen Wert und sah dabei sessionStorage zuerst an. Genau das
+ * hat den Live-Browser kaputtgemacht, der vorher lief: lag in sessionStorage
+ * ein abgelaufener Nachweis, gewann der falsche — und der gute in
+ * localStorage, mit dem es bis dahin funktioniert hatte, kam nie zum Zug.
+ *
+ * Lehre: Wer eine funktionierende Quelle um eine zweite ERGAENZT, darf sie
+ * nicht gleichzeitig VERDRAENGEN. Jetzt werden beide probiert, localStorage
+ * zuerst — das ist die Quelle, die nachweislich getragen hat.
+ */
+function tokenKandidaten() {
+  const gefunden = [];
+  if (gemerktesToken) gefunden.push(gemerktesToken);
+  for (const speicher of [globalThis.localStorage, globalThis.sessionStorage]) {
     try {
       const wert = speicher?.getItem(AUTH_TOKEN_KEY);
-      if (wert) return wert;
+      if (wert && !gefunden.includes(wert)) gefunden.push(wert);
     } catch {
       // Speicher gesperrt: naechsten versuchen.
     }
   }
-  return "";
+  return gefunden;
 }
 
-// Holt einen frischen Nachweis aus dem Anmelde-Cookie. `credentials:"include"`
-// ist hier Pflicht: Seite (smejj.com) und Server (smejj-control.zeabur.app)
-// sind verschiedene Herkuenfte, und ohne diese Angabe schickt der Browser das
-// Cookie NICHT mit.
+/**
+ * Letzter Ausweg: Nachweis aus dem Anmelde-Cookie holen.
+ *
+ * WICHTIG, damit niemand sich darauf verlaesst: Seite (smejj.com) und Server
+ * (…zeabur.app) sind verschiedene Registrierungs-Domains. Das Cookie gilt
+ * dort als FREMD, und aktuelle Browser blockieren fremde Cookies. Dieser Weg
+ * schlaegt im Normalfall also fehl — er kostet nichts und hilft in den Faellen
+ * mit gleicher Domain, aber der tragende Weg sind die Nachweise aus dem
+ * Speicher oben.
+ */
 async function frischesToken(apiOrigin, fetchImpl) {
   if (!apiOrigin) return "";
   try {
@@ -114,11 +135,22 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
   // — dann waere jede Wiederholung nur Last ohne Aussicht.
   async function post(endpoint, body) {
     try {
-      let token = gemerktesToken || tokenAusSpeicher();
-      let response = await sende(endpoint, body, token);
+      // Jeden bekannten Nachweis probieren, bevor aufgegeben wird. Vorher
+      // wurde nur EINER versucht — und wenn das der abgelaufene war, fiel das
+      // Panel wortlos auf das Standbild zurueck.
+      let response = null;
+      for (const token of tokenKandidaten()) {
+        response = await sende(endpoint, body, token);
+        if (response.status !== 401 && response.status !== 403) {
+          gemerktesToken = token;
+          break;
+        }
+      }
+      // Kein Kandidat da oder alle abgewiesen: ohne Nachweis bzw. per Cookie.
+      if (!response) response = await sende(endpoint, body, "");
       if (response.status === 401 || response.status === 403) {
         const frisch = await frischesToken(herkunft, fetchImpl);
-        if (frisch && frisch !== token) response = await sende(endpoint, body, frisch);
+        if (frisch) response = await sende(endpoint, body, frisch);
       }
       const data = await response.json().catch(() => null);
       return data && typeof data === "object" ? data : null;
