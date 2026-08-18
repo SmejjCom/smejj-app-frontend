@@ -3210,6 +3210,40 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 
 .bp-tab.ist-angepinnt .bp-tab-close { display: none; }
 
+/* Maus-Knopf in der Kopfleiste. Er sitzt auf einem der beiden Platzhalter,
+   die rechts ohnehin reserviert waren — die Kopfgeometrie bleibt unberuehrt. */
+.bp-tabstrip .bp-maus {
+  display: grid;
+  place-items: center;
+  width: var(--bp-control-size);
+  height: var(--bp-control-size);
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.6);
+  cursor: pointer;
+}
+
+.bp-tabstrip .bp-maus svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.bp-tabstrip .bp-maus:hover { background: rgba(246, 243, 238, 0.12); color: #f6f3ee; }
+.bp-tabstrip .bp-maus:focus-visible { outline: 2px solid rgba(159, 231, 212, 0.9); outline-offset: -2px; }
+
+/* Waehrend die Maus laeuft: der Knopf ist der Not-Aus und sagt das auch.
+   Ein Lauf, den man nicht stoppen kann, ist keiner, dem man zusehen moechte. */
+.bp-tabstrip .bp-maus.laeuft {
+  background: rgba(159, 231, 212, 0.18);
+  color: #9fe7d4;
+  animation: bp-pulse 1.4s ease-in-out infinite;
+}
+
 /* ---- view-chrome.css ---- */
 /* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
    und Schliessen-X (ganz oben rechts). Ohne Hintergrund, transparent, schmal,
@@ -6274,7 +6308,18 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
    Logo-Cyan gefuellt mit leisem Puls (Augen-Regel: kein Leuchten). */
 #code .code-arbeit {
   position: absolute;
-  top: 10px;
+  /* Betreiber-Abgleich mit Claude 2026-08-18: das Viereck steht dort auf
+     HOEHE DER TEXTZEILE, nicht am oberen Feldrand. Gemessen: bei uns lag
+     die Mitte auf 16 px, die Textzeile auf 37 px — sobald der Ordner-Chip
+     darueber liegt, driftete es 21 px nach oben weg. Der Anker ist darum
+     die Textzeile selbst. NACHTRAG 2026-08-18 (375-px-Messung): ein
+     FESTER Wert war falsch — am Telefon steht der Text weiter oben, das
+     Viereck rutschte 23 px darunter. code-flaeche.js richtet es darum
+     zur Laufzeit an der Textzeile aus (--code-arbeit-top); der Wert hier
+     ist nur der Startwert, bis die Messung greift.
+     Groesse und Form bleiben unveraendert (Betreiber: "das Viereck war
+     gut, es soll NUR beleuchtet werden"). */
+  top: var(--code-arbeit-top, 31px);
   right: 12px;
   width: 11px;
   height: 11px;
@@ -6285,6 +6330,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   /* Betreiber 2026-08-17 ("Rahmen scharf stellen"): deutlicher Umriss. */
   border: 1.5px solid rgba(242, 245, 244, 0.55);
 }
+/* Betreiber 2026-08-18, RUECKGAENGIG: "das Viereck war gut, es soll NUR
+   beleuchtet werden". Groesse, Platz und Form bleiben also exakt wie
+   vorher (11 px, top 10 / right 12 aus der Grundregel) — im
+   Arbeitszustand aendert sich AUSSCHLIESSLICH die Beleuchtung. */
 #code .code-arbeit.an {
   border-color: var(--v11-cy);
   background: var(--v11-cy);
@@ -7295,3 +7344,54 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding: 0 4px;
 }
 .voice-mode-transcript { text-align: left; }
+
+/* =======================================================================
+ * Betreiber-Freigabe 2026-08-18 ("nur am Handy vergroessern"): unter
+ * 600 px erfuellen die Bedienknoepfe der CODE-Leiste das Touch-Ziel des
+ * Projekts (44 px). Am Desktop bleibt alles schmal und edel wie bestellt
+ * — die Regel greift AUSSCHLIESSLICH hier.
+ * Gemessen im integrierten Browser bei 375 px: Anhang/Diktat 30x30,
+ * Senden 32x32, Chips 19 px hoch.
+ * 600 px ist die im Projekt schon benutzte Kante (styles.css,
+ * start-glass.css) — keine zweite Wahrheit daneben.
+ * ===================================================================== */
+@media (max-width: 600px) {
+  #code .codeleiste .icon-button.code-mini,
+  #code .codeleiste #codeSenden {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+  #code .repochip {
+    min-height: 44px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  /* Die Zeile darf dabei nicht enger werden als die Knoepfe hoch sind. */
+  #code .codeleiste { gap: 4px; }
+}
+
+/* =======================================================================
+ * Arbeits-Viereck im CHAT-Bereich (Betreiber 2026-08-18: "kannst du das
+ * fuer den Chat-Bereich auch machen — sieht gut aus").
+ * Erbt Groesse, Form und Beleuchtung von .code-arbeit; hier steht nur,
+ * WO es sitzt: im Glas-Schreibfeld der Startseite, rechts neben der
+ * Textzeile. Die Hoehe misst code-flaeche.js zur Laufzeit
+ * (--start-arbeit-top) — ein fester Wert versagte am Telefon.
+ * ===================================================================== */
+#start .prompt-glass { position: relative; }
+#start .start-arbeit {
+  position: absolute;
+  top: var(--start-arbeit-top, 18px);
+  right: 12px;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  border: 1.5px solid rgba(242, 245, 244, 0.55);
+  z-index: 2;
+}
+#start .start-arbeit.an {
+  border-color: var(--v11-cy);
+  background: var(--v11-cy);
+  animation: code-arbeit-puls 1.6s ease-in-out infinite;
+}

@@ -30,6 +30,8 @@ const API_PATHS = {
   authConfig: "/api/auth/config",
   browserFetch: "/api/browser/fetch",
   browserRemote: "/api/browser/remote",
+  // Nur-Plan-Route der Maus: der Server plant und prueft, das Panel faehrt.
+  mausRun: "/api/maus/run",
   browserSession: "/api/browser/session",
   browserSessionAct: "/api/browser/session/act",
   browserSessionClose: "/api/browser/session/close",

@@ -399,7 +399,9 @@ export function buildPaneShellHtml({ neuerTabTitel = "Neuer Tab", maxTabs = 7 } 
       <div class="bp-tabs"></div>
       <div class="bp-tab-right">
         <button class="bp-tab-count" type="button" title="Tab-Uebersicht" aria-label="Tab-Uebersicht">0</button>
-        <span class="bp-tab-spacer" aria-hidden="true"></span>
+        <button class="bp-maus" type="button" title="Maus beauftragen — sie bedient diesen Browser" aria-label="Maus beauftragen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l6.5 17 2.5-7 7-2.5z"/></svg>
+        </button>
         <span class="bp-tab-spacer" aria-hidden="true"></span>
       </div>
     </div>

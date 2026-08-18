@@ -214,7 +214,7 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
         tab.title = data.title || shortHostName(finalUrl);
         hooks?.onNavigated?.(tab);
       }
-      return;
+      return data;
     }
     const error = String(data?.error || "");
     if (error === "session_busy") return; // Aktion verworfen — naechste kommt durch.
@@ -251,5 +251,17 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
     window.addEventListener("pagehide", closeAll);
   }
 
-  return { ready, open, close, closeAll, handleAct };
+  /**
+   * Wie handleAct, aber es WARTET und gibt die Antwort zurueck.
+   *
+   * Das Bindeglied der Maus braucht das: es muss nach jedem Schritt wissen,
+   * ob er gelungen ist — sonst laeuft ein Plan blind weiter. handleAct ist
+   * fuer den Nutzer gedacht (feuern und vergessen) und taugt dafuer nicht.
+   */
+  async function actUndWarte(tab, action, hooks) {
+    if (!tab?.sessionId) return null;
+    return runAct(tab, action, hooks);
+  }
+
+  return { ready, open, close, closeAll, handleAct, actUndWarte };
 }

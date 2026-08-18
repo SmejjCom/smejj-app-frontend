@@ -27,6 +27,7 @@ import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicher
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
 import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260709-2";
 import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
+import { verdrahteMausKnopf } from "./browser-pane-maus.js?v=browser-pane-20260709-2";
 let suche = null;
 import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 
@@ -181,6 +182,7 @@ function mountOnce() {
   verdrahtePanelVorschlaege(refs.address, refs.vorschlaege, state, openBrowserRequest);
   refs.external = root.querySelector(".bp-open-external");
   refs.menu = root.querySelector(".bp-menu");
+  refs.maus = root.querySelector(".bp-maus");
   refs.close = root.querySelector(".bp-close");
   refs.progress = root.querySelector(".bp-progress");
   refs.hint = root.querySelector(".bp-hint");
@@ -233,6 +235,12 @@ function mountOnce() {
   refs.external.addEventListener("click", () => {
     const url = activeTab()?.url;
     if (url) window.open(url, "_blank", "noopener");
+  });
+  verdrahteMausKnopf({
+    knopf: refs.maus, activeTab, render, zeige: showHint,
+    planeUrl: CLIENT_ROUTES.api.mausRun,
+    holeToken: () => { try { return localStorage.getItem("smejj.auth.accessToken.v1") || sessionStorage.getItem("smejj.auth.accessToken.v1") || ""; } catch { return ""; } },
+    sende: (aktion) => sessionClient.actUndWarte(activeTab(), aktion, sessionHooks)
   });
   refs.menu.addEventListener("click", backToMenu);
   refs.close.addEventListener("click", closePane);

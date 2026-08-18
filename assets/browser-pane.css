@@ -806,3 +806,37 @@
 }
 
 .bp-tab.ist-angepinnt .bp-tab-close { display: none; }
+
+/* Maus-Knopf in der Kopfleiste. Er sitzt auf einem der beiden Platzhalter,
+   die rechts ohnehin reserviert waren — die Kopfgeometrie bleibt unberuehrt. */
+.bp-tabstrip .bp-maus {
+  display: grid;
+  place-items: center;
+  width: var(--bp-control-size);
+  height: var(--bp-control-size);
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.6);
+  cursor: pointer;
+}
+
+.bp-tabstrip .bp-maus svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.bp-tabstrip .bp-maus:hover { background: rgba(246, 243, 238, 0.12); color: #f6f3ee; }
+.bp-tabstrip .bp-maus:focus-visible { outline: 2px solid rgba(159, 231, 212, 0.9); outline-offset: -2px; }
+
+/* Waehrend die Maus laeuft: der Knopf ist der Not-Aus und sagt das auch.
+   Ein Lauf, den man nicht stoppen kann, ist keiner, dem man zusehen moechte. */
+.bp-tabstrip .bp-maus.laeuft {
+  background: rgba(159, 231, 212, 0.18);
+  color: #9fe7d4;
+  animation: bp-pulse 1.4s ease-in-out infinite;
+}
