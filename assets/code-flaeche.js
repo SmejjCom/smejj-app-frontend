@@ -934,6 +934,36 @@ export function initCodeFlaeche() {
   window.addEventListener("smejj:chat-strom", (event) => {
     document.getElementById("codeArbeit")?.classList.toggle("an", (Number(event.detail?.laufen) || 0) > 0);
   });
+  // Das Viereck steht bei Claude NEBEN der ersten Textzeile. Ein fester
+  // CSS-Wert reichte nicht (375-px-Messung 2026-08-18: am Telefon steht
+  // der Text weiter oben, das Viereck rutschte 23 px darunter) — die
+  // Hoehe wird darum an der Textzeile GEMESSEN. Aufruf bei jedem Anlass,
+  // der die Zeile verschiebt: Chips, Tippen, Fensterbreite, Ansicht.
+  function richteArbeitAus() {
+    const viereck = document.getElementById("codeArbeit");
+    const feld = document.querySelector("#code .codefeld");
+    const eingabe = document.getElementById("codeAufgabe");
+    if (!viereck || !feld || !eingabe) return;
+    try {
+      // line-height steht auf "normal" (gemessen 2026-08-18) — parseFloat
+      // gibt dann NaN und ein fester Fallback liegt daneben. Ersatzmass:
+      // Schriftgroesse x 1,2, plus das obere Polster der Eingabe.
+      const stil = getComputedStyle(eingabe);
+      const roh = parseFloat(stil.lineHeight);
+      const zeilenhoehe = Number.isFinite(roh) ? roh : (parseFloat(stil.fontSize) || 16.5) * 1.2;
+      const polster = parseFloat(stil.paddingTop) || 0;
+      const oben = eingabe.offsetTop + polster + (zeilenhoehe - viereck.offsetHeight) / 2;
+      feld.style.setProperty("--code-arbeit-top", `${Math.max(4, Math.round(oben))}px`);
+    } catch { /* fail-safe: der CSS-Startwert bleibt stehen */ }
+  }
+  richteArbeitAus();
+  window.addEventListener("resize", richteArbeitAus);
+  document.getElementById("codeAufgabe")?.addEventListener("input", () => setTimeout(richteArbeitAus, 0));
+  // Chips (Ordner/Anhaenge) schieben die Zeile — ihre Aenderung beobachten.
+  for (const id of ["codeOrdnerZeile", "codeAnhaenge"]) {
+    const halter = document.getElementById(id);
+    if (halter) new MutationObserver(() => setTimeout(richteArbeitAus, 0)).observe(halter, { childList: true, attributes: true });
+  }
   // ⌘U / Strg+U wie bei Claude: oeffnet die Dateiauswahl — nur solange die
   // CODE-Ansicht aktiv ist, damit die Kombination sonst niemandem gehoert.
   document.addEventListener("keydown", (e) => {

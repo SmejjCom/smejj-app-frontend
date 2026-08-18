@@ -1217,10 +1217,14 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
      HOEHE DER TEXTZEILE, nicht am oberen Feldrand. Gemessen: bei uns lag
      die Mitte auf 16 px, die Textzeile auf 37 px — sobald der Ordner-Chip
      darueber liegt, driftete es 21 px nach oben weg. Der Anker ist darum
-     die Textzeile selbst (erste Zeile: 28 px Oberkante + halbe Zeile).
+     die Textzeile selbst. NACHTRAG 2026-08-18 (375-px-Messung): ein
+     FESTER Wert war falsch — am Telefon steht der Text weiter oben, das
+     Viereck rutschte 23 px darunter. code-flaeche.js richtet es darum
+     zur Laufzeit an der Textzeile aus (--code-arbeit-top); der Wert hier
+     ist nur der Startwert, bis die Messung greift.
      Groesse und Form bleiben unveraendert (Betreiber: "das Viereck war
      gut, es soll NUR beleuchtet werden"). */
-  top: 31px;
+  top: var(--code-arbeit-top, 31px);
   right: 12px;
   width: 11px;
   height: 11px;
