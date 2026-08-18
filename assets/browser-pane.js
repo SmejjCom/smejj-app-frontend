@@ -164,10 +164,10 @@ function mountOnce() {
     <div class="bp-toolbar">
       <div class="bp-toolbar-left">
         <button class="bp-nav-back" type="button" title="Zurueck" aria-label="Zurueck" disabled>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
         </button>
         <button class="bp-nav-forward" type="button" title="Vor" aria-label="Vor" disabled>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
         </button>
         <button class="bp-nav-reload" type="button" title="Neu laden" aria-label="Neu laden">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>

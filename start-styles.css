@@ -2415,9 +2415,12 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 
 .browser-pane {
   display: grid;
-  --bp-row-height: 26px;
-  --bp-control-size: 22px;
-  --bp-control-gap: 3px;
+  /* An Chrome gemessen (Bildschirmfoto 2026-08-17): Leistenhoehe ~32 px,
+     Knoepfe ~28 px, Abstand ~6 px. Der enge Satz 26/22/3 gilt weiter fuer
+     schmale Fenster (Medienabfrage unten) — dort zaehlt jeder Pixel. */
+  --bp-row-height: 32px;
+  --bp-control-size: 28px;
+  --bp-control-gap: 6px;
   --bp-side-width: calc((var(--bp-control-size) * 3) + (var(--bp-control-gap) * 2));
   /* Inhalt darf nie hoeher als das Panel werden: minmax(0, 1fr) statt fester
      Mindesthoehe — sonst werden Seiten auf kleinen Fenstern abgeschnitten. */
