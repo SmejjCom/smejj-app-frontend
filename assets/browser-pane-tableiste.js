@@ -87,6 +87,24 @@ export function umsortiert(liste, von, nach) {
 }
 
 /**
+ * Welche Eintraege gehoeren ins Rechtsklick-Menue eines Tabs?
+ * Reine Funktion — was ausgegraut ist, haengt allein von der Lage ab.
+ * Chrome zeigt unbenutzbare Eintraege ebenfalls an (statt sie zu verstecken):
+ * ein Menue, dessen Eintraege springen, kann man sich nicht merken.
+ */
+export function menueEintraege(tabs, tabId) {
+  const andere = (tabs || []).filter((t) => t.id !== tabId).length;
+  const index = (tabs || []).findIndex((t) => t.id === tabId);
+  const rechts = index >= 0 ? (tabs || []).length - index - 1 : 0;
+  return [
+    { id: "duplizieren", text: "Tab duplizieren", aktiv: true },
+    { id: "schliessen", text: "Tab schliessen", aktiv: true },
+    { id: "andereSchliessen", text: "Andere Tabs schliessen", aktiv: andere > 0 },
+    { id: "rechteSchliessen", text: "Tabs rechts schliessen", aktiv: rechts > 0 }
+  ];
+}
+
+/**
  * Zeichnet die Leiste neu.
  *
  * @param {HTMLElement} behaelter  das .bp-tabs-Element
@@ -104,6 +122,7 @@ export function zeichneTableiste(behaelter, {
   waehlen = () => {},
   schliessen = () => {},
   sortieren = null,
+  oeffnen = null,
   neuerTabTitel = "Neuer Tab"
 } = {}) {
   if (!behaelter) return;
@@ -139,6 +158,10 @@ export function zeichneTableiste(behaelter, {
       if (event.button !== 1) return;
       event.preventDefault();
       schliessen(tab.id);
+    });
+    knopf.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      oeffneMenue(event, tab, tabs, { schliessen, oeffnen });
     });
     behaelter.appendChild(knopf);
   });
@@ -219,4 +242,53 @@ function verdrahteZiehen(behaelter, tabs, sortieren) {
     vonIndex = -1;
     for (const k of behaelter.querySelectorAll(".is-ziehend")) k.classList.remove("is-ziehend");
   });
+}
+
+// Rechtsklick-Menue. Bewusst ohne Bibliothek: ein <div> mit Knoepfen, das beim
+// naechsten Klick irgendwo wieder verschwindet.
+function oeffneMenue(event, tab, tabs, { schliessen, oeffnen }) {
+  document.querySelector(".bp-tabmenue")?.remove();
+  const menue = document.createElement("div");
+  menue.className = "bp-tabmenue";
+  menue.setAttribute("role", "menu");
+  menue.style.left = `${event.clientX}px`;
+  menue.style.top = `${event.clientY}px`;
+
+  for (const eintrag of menueEintraege(tabs, tab.id)) {
+    const knopf = document.createElement("button");
+    knopf.type = "button";
+    knopf.className = "bp-tabmenue-eintrag";
+    knopf.setAttribute("role", "menuitem");
+    knopf.textContent = eintrag.text;
+    knopf.disabled = !eintrag.aktiv;
+    knopf.addEventListener("click", () => {
+      menue.remove();
+      fuehreAus(eintrag.id, tab, tabs, { schliessen, oeffnen });
+    });
+    menue.appendChild(knopf);
+  }
+  document.body.appendChild(menue);
+  // Beim naechsten Klick oder Escape wieder weg — ein Menue, das haengen
+  // bleibt, verdeckt genau das, was man als Naechstes anklicken will.
+  const zu = () => menue.remove();
+  setTimeout(() => {
+    document.addEventListener("click", zu, { once: true });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") zu(); }, { once: true });
+  }, 0);
+}
+
+function fuehreAus(id, tab, tabs, { schliessen, oeffnen }) {
+  if (id === "schliessen") return schliessen(tab.id);
+  if (id === "duplizieren") return oeffnen?.(tab.url);
+  if (id === "andereSchliessen") {
+    // Von hinten schliessen: sonst verschieben sich die Positionen unter der
+    // laufenden Schleife weg und es bleibt einer stehen.
+    for (const t of [...tabs].reverse()) if (t.id !== tab.id) schliessen(t.id);
+    return undefined;
+  }
+  if (id === "rechteSchliessen") {
+    const index = tabs.findIndex((t) => t.id === tab.id);
+    for (const t of tabs.slice(index + 1).reverse()) schliessen(t.id);
+  }
+  return undefined;
 }

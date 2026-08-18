@@ -3069,6 +3069,70 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   padding-right: 30px;
 }
 
+/* Zoom-Anzeige in der Adressleiste (Chrome zeigt sie dauerhaft, nicht als
+   verschwindenden Hinweis). Sichtbar nur bei Abweichung von 100 %. */
+.bp-toolbar .bp-zoom {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 30px;
+  transform: translateY(-50%);
+  width: auto;
+  min-width: 0;
+  height: 18px;
+  padding: 0 6px;
+  border: 1px solid rgba(246, 243, 238, 0.18);
+  border-radius: 3px;
+  background: rgba(246, 243, 238, 0.08);
+  color: rgba(246, 243, 238, 0.78);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.bp-toolbar .bp-zoom[hidden] { display: none; }
+.bp-toolbar .bp-zoom:hover { background: rgba(246, 243, 238, 0.16); color: #f6f3ee; }
+
+/* Rechtsklick-Menue der Tabs */
+.bp-tabmenue {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  min-width: 210px;
+  padding: 4px;
+  border: 1px solid rgba(246, 243, 238, 0.14);
+  border-radius: 6px;
+  background: #16181b;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+}
+
+.bp-tabmenue-eintrag {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.88);
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.bp-tabmenue-eintrag:hover:not(:disabled) { background: rgba(246, 243, 238, 0.1); color: #f6f3ee; }
+
+/* Unbenutzbare Eintraege bleiben SICHTBAR (wie in Chrome) — ein Menue, dessen
+   Eintraege springen, kann man sich nicht merken. */
+.bp-tabmenue-eintrag:disabled { color: rgba(246, 243, 238, 0.3); cursor: default; }
+
+/* Platz fuer die Zoom-Anzeige. Muss ueber das Formular laufen: das Zeichen
+   steht im DOM nach dem Eingabefeld, eine Geschwister-Regel kaeme nicht hin. */
+.bp-address-form.hat-zoom .bp-address {
+  padding-right: 76px;
+}
+
 /* ---- view-chrome.css ---- */
 /* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
    und Schliessen-X (ganz oben rechts). Ohne Hintergrund, transparent, schmal,

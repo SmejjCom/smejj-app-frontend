@@ -107,3 +107,46 @@ export function zeigeSicherheit(form, url) {
   }
   return zustand;
 }
+
+// --- Zoom-Anzeige -------------------------------------------------------------
+//
+// Chrome zeigt eine abweichende Zoomstufe DAUERHAFT in der Adressleiste an,
+// und ein Klick stellt 100 % wieder her. Bei uns stand sie nur kurz in der
+// Hinweiszeile und verschwand dann — wer eine Seite auf 150 % gestellt hat
+// und spaeter zurueckkommt, sieht keinen Grund mehr fuer die grosse Schrift
+// und haelt es fuer einen Fehler der Seite.
+//
+// Sichtbar nur bei Abweichung: eine Anzeige, die immer "100 %" sagt, ist
+// Rauschen.
+
+export function zeigeZoom(form, zoom, aufKlick = null) {
+  if (!form) return null;
+  let knopf = form.querySelector(".bp-zoom");
+  if (!knopf) {
+    knopf = document.createElement("button");
+    knopf.type = "button";
+    knopf.className = "bp-zoom";
+    // Vor den Stern haengen, damit die Reihenfolge stabil bleibt.
+    const stern = form.querySelector(".bp-stern");
+    if (stern) form.insertBefore(knopf, stern); else form.appendChild(knopf);
+    knopf.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (typeof aufKlick === "function") aufKlick();
+    });
+  }
+  const prozent = Math.round((Number(zoom) || 1) * 100);
+  // Die Klasse sitzt am FORMULAR, nicht am Feld: Das Zeichen steht im DOM
+  // NACH dem Eingabefeld, deshalb kann eine Geschwister-Regel (~) es nicht
+  // erreichen. Gemessen — der Text lief sonst unter die Anzeige.
+  form.classList.toggle("hat-zoom", prozent !== 100);
+  if (prozent === 100) {
+    knopf.hidden = true;
+    return null;
+  }
+  knopf.hidden = false;
+  knopf.textContent = `${prozent} %`;
+  const text = `Zoom ${prozent} % — klicken fuer 100 %`;
+  knopf.title = text;
+  knopf.setAttribute("aria-label", text);
+  return prozent;
+}

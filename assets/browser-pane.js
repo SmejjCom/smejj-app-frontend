@@ -23,7 +23,7 @@ import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
 import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260709-2";
 import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-2";
-import { zeigeSicherheit } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
+import { zeigeSicherheit, zeigeZoom } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
 import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260709-2";
 import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
@@ -672,6 +672,7 @@ export function render() {
     neuerTabTitel: NEW_TAB_TITLE,
     waehlen: selectTab,
     schliessen: closeTab,
+    oeffnen: (url) => addTab({ url }),
     sortieren: (neueReihenfolge) => {
       state.tabs = neueReihenfolge;
       persistTabs();
@@ -688,6 +689,7 @@ export function render() {
   if (document.activeElement !== refs.address) refs.address.value = anzeigeAdresse(active?.url || "");
   zeigeSicherheit(refs.addressForm, active?.url || "");
   malenStoppOderNeuladen(active?.status === "loading");
+  zeigeZoom(refs.addressForm, active?.zoom || 1, () => { const t = activeTab(); if (t) { t.zoom = 1; applyZoom(t); render(); schedulePersist(); } });
   zeigeLesezeichen(refs.addressForm, active?.url || "", active?.title || "");
   refs.back.disabled = !active || active.historyIndex <= 0;
   refs.forward.disabled = !active || active.historyIndex >= (active.history.length - 1);
