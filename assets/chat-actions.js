@@ -143,43 +143,18 @@ function ensureBar(entry) {
   return bar;
 }
 
-// Betreiber 2026-08-16 ("einfügen ist das letzte Wort der Zeile — die
-// Icons sollen NACH ihm in derselben Zeile stehen"): das Zeilenende wird
-// per Range gemessen und die Leiste dorthin geschoben. Reicht der Platz
-// in der Zeile nicht, bleibt sie wie bisher darunter. Nur Antworten —
-// eigene Nachrichten behalten ihre Blasen-Überlagerung.
-function positioniereInline(bar, entry) {
-  if (!bar || !entry || !bar.classList.contains("is-assistant")) return;
-  try {
-    bar.style.marginTop = "";
-    bar.style.marginLeft = "";
-    // Das Ende des LETZTEN TEXTKNOTENS messen — ein aufs Element
-    // kollabierter Range liefert 0x0 (live gemessen).
-    const walker = document.createTreeWalker(entry, NodeFilter.SHOW_TEXT, null);
-    let letzter = null;
-    let knoten;
-    while ((knoten = walker.nextNode())) { if (knoten.textContent.trim()) letzter = knoten; }
-    if (!letzter) return;
-    const range = document.createRange();
-    range.setStart(letzter, letzter.textContent.length);
-    range.setEnd(letzter, letzter.textContent.length);
-    const ende = range.getBoundingClientRect();
-    if (!ende || !ende.height) return;
-    const eRekt = entry.getBoundingClientRect();
-    // Die Leiste ist ein Block voller Breite — zaehlen muss der INHALT
-    // (erstes bis letztes Kind), nicht offsetWidth (613px gemessen).
-    const erst = bar.firstElementChild?.getBoundingClientRect();
-    const letzt = bar.lastElementChild?.getBoundingClientRect();
-    const benoetigt = erst && letzt ? letzt.right - erst.left : 0;
-    const frei = eRekt.right - ende.right;
-    if (!benoetigt || frei < benoetigt + 12) return; // Zeile zu voll
-    const barRekt = bar.getBoundingClientRect();
-    const barHoehe = barRekt.height || 26;
-    const ziel = ende.top + (ende.height - barHoehe) / 2;
-    const computedTop = parseFloat(getComputedStyle(bar).marginTop) || 0;
-    bar.style.marginTop = `${Math.round(computedTop - (barRekt.top - ziel))}px`;
-    bar.style.marginLeft = `${Math.round(ende.right - eRekt.left + 8)}px`;
-  } catch { /* fail-safe: Leiste bleibt unter dem Text */ }
+// Betreiber 2026-08-18, RUECKBAU auf den Stand von gestern (vor 22:42):
+// die Leiste steht wieder in einer EIGENEN ZEILE unter der Antwort,
+// linksbuendig — nicht mehr hinter dem letzten Wort. Der Betreiber hat
+// den Inline-Auftrag vom 16.08. ausdruecklich zurueckgenommen.
+//
+// Die Funktion bleibt als Aufraeumer bestehen: sie loescht die von der
+// alten Fassung gesetzten Inline-Abstaende, damit wiederhergestellte
+// Leisten aus dem Verlauf nicht in ihrer alten Position haengen bleiben.
+function positioniereInline(bar) {
+  if (!bar) return;
+  bar.style.marginTop = "";
+  bar.style.marginLeft = "";
 }
 
 function syncRating(bar, meta) {
