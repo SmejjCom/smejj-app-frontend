@@ -31,6 +31,21 @@ const SCHALTER = "smejj.lokalesModell.v1";
 
 /** Fragen unter dieser Laenge tragen zu wenig Signal fuer eine gute Antwort. */
 const MIN_ZEICHEN = 12;
+
+// VERLAUF: erst verboten, dann GEMESSEN und korrigiert (2026-08-18).
+// Der erste Entwurf lehnte JEDE Anfrage mit Verlauf ab — aus Sorge, dass
+// "und dann?" ohne Zusammenhang falsch beantwortet wird. Der Live-Test an der
+// echten Oberflaeche zeigte den Preis dieser Vorsicht: die Seite hatte 19
+// Gespraechsblasen, die Regel griff, und die Frage ging an den Server. Fast
+// jeder echte Chat hat Verlauf — die Gratis-Spur haette also so gut wie nie
+// gegriffen. Ein Hebel, der nie zieht, ist kein Hebel.
+//
+// Richtig ist: der Verlauf wird MITGEGEBEN, nicht als Ausschlussgrund benutzt.
+// Das eingebaute Modell nimmt Vorgeschichte ueber `initialPrompts` entgegen.
+// Begrenzt bleibt es trotzdem — es ist klein, und ein langer Verlauf sprengt
+// sein Fenster. Dann gehoert die Anfrage ohnehin auf die starke Spur.
+const MAX_VERLAUF_NACHRICHTEN = 8;
+const MAX_VERLAUF_ZEICHEN = 4_000;
 /** Darueber ist es ein grosser Auftrag — der gehoert auf die starke Spur. */
 const MAX_ZEICHEN = 1_500;
 
@@ -102,7 +117,10 @@ export function taugtFuerLokal({ frage = "", dateien = 0, verlauf = [], bilder =
   const text = String(frage || "").trim();
   if (Number(dateien) > 0) return { ok: false, grund: "dateien" };
   if (Number(bilder) > 0) return { ok: false, grund: "bilder" };
-  if (Array.isArray(verlauf) && verlauf.length > 0) return { ok: false, grund: "anschlussfrage" };
+  const nachrichten = Array.isArray(verlauf) ? verlauf : [];
+  if (nachrichten.length > MAX_VERLAUF_NACHRICHTEN) return { ok: false, grund: "verlauf-zu-lang" };
+  const verlaufZeichen = nachrichten.reduce((summe, n) => summe + String(n?.content || "").length, 0);
+  if (verlaufZeichen > MAX_VERLAUF_ZEICHEN) return { ok: false, grund: "verlauf-zu-gross" };
   if (text.length < MIN_ZEICHEN) return { ok: false, grund: "zu-kurz" };
   if (text.length > MAX_ZEICHEN) return { ok: false, grund: "zu-gross" };
   if (AKTUALITAET.test(text)) return { ok: false, grund: "tagesaktuell" };
@@ -119,16 +137,25 @@ export function taugtFuerLokal({ frage = "", dateien = 0, verlauf = [], bilder =
  * @param {{onDelta?: (text: string) => void, system?: string}} optionen
  * @returns {Promise<{ok: boolean, text: string, ms: number, grund: string}>}
  */
-export async function frageLokal(frage, { onDelta, system = "", umgebung = globalThis, jetzt = () => Date.now() } = {}) {
+export async function frageLokal(frage, { onDelta, system = "", verlauf = [], umgebung = globalThis, jetzt = () => Date.now() } = {}) {
   const start = jetzt();
   const pruefung = await lokalVerfuegbar(umgebung);
   if (!pruefung.da) return { ok: false, text: "", ms: 0, grund: pruefung.grund };
 
   let sitzung = null;
   try {
-    sitzung = await pruefung.api.create(
-      system ? { initialPrompts: [{ role: "system", content: system }] } : {}
-    );
+    // Vorgeschichte mitgeben, damit eine Anschlussfrage im Zusammenhang steht.
+    // Nur die Rollen, die das Modell kennt; alles andere still verwerfen statt
+    // zu raten (dieselbe Regel wie serverseitig in conversationHistory.js).
+    const vorgeschichte = (Array.isArray(verlauf) ? verlauf : [])
+      .filter((n) => n && (n.role === "user" || n.role === "assistant") && typeof n.content === "string" && n.content.trim())
+      .slice(-MAX_VERLAUF_NACHRICHTEN)
+      .map((n) => ({ role: n.role, content: n.content.slice(0, 1_000) }));
+    const anfang = [
+      ...(system ? [{ role: "system", content: system }] : []),
+      ...vorgeschichte
+    ];
+    sitzung = await pruefung.api.create(anfang.length ? { initialPrompts: anfang } : {});
     let text = "";
     if (typeof sitzung.promptStreaming === "function") {
       for await (const stueck of sitzung.promptStreaming(frage)) {

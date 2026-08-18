@@ -574,11 +574,17 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
     bilder: body?.preferences?.bild || body?.preferences?.image ? 1 : 0
   };
   const urteil = taugtFuerLokal(lage);
+  // Der Grund gehoert IMMER ins Protokoll. Ohne ihn laesst sich "greift nie"
+  // nicht von "ist abgeschaltet" unterscheiden — und genau diese Frage stand
+  // beim ersten Live-Test im Raum, als 19 Gespraechsblasen die Spur still
+  // blockierten.
+  console.info(`[lokal] ${JSON.stringify({ lokal: urteil.ok, grund: urteil.grund })}`);
   if (!urteil.ok) return false;
 
   let text = "";
   const ergebnis = await frageLokal(lage.frage, {
     system: "Du bist der Assistent von smejj.com. Antworte kurz, korrekt und in der Sprache des Nutzers.",
+    verlauf: lage.verlauf,
     onDelta: (zuwachs) => {
       text += zuwachs;
       output.textContent = text;
