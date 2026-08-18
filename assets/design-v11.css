@@ -2275,3 +2275,28 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   /* Die Zeile darf dabei nicht enger werden als die Knoepfe hoch sind. */
   #code .codeleiste { gap: 4px; }
 }
+
+/* =======================================================================
+ * Arbeits-Viereck im CHAT-Bereich (Betreiber 2026-08-18: "kannst du das
+ * fuer den Chat-Bereich auch machen — sieht gut aus").
+ * Erbt Groesse, Form und Beleuchtung von .code-arbeit; hier steht nur,
+ * WO es sitzt: im Glas-Schreibfeld der Startseite, rechts neben der
+ * Textzeile. Die Hoehe misst code-flaeche.js zur Laufzeit
+ * (--start-arbeit-top) — ein fester Wert versagte am Telefon.
+ * ===================================================================== */
+#start .prompt-glass { position: relative; }
+#start .start-arbeit {
+  position: absolute;
+  top: var(--start-arbeit-top, 18px);
+  right: 12px;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  border: 1.5px solid rgba(242, 245, 244, 0.55);
+  z-index: 2;
+}
+#start .start-arbeit.an {
+  border-color: var(--v11-cy);
+  background: var(--v11-cy);
+  animation: code-arbeit-puls 1.6s ease-in-out infinite;
+}

@@ -932,7 +932,11 @@ export function initCodeFlaeche() {
   // Strom-Signal wie der Stopp-Knopf — laeuft mindestens ein Strom,
   // pulsiert das Viereck in Logo-Cyan.
   window.addEventListener("smejj:chat-strom", (event) => {
-    document.getElementById("codeArbeit")?.classList.toggle("an", (Number(event.detail?.laufen) || 0) > 0);
+    const laeuft = (Number(event.detail?.laufen) || 0) > 0;
+    document.getElementById("codeArbeit")?.classList.toggle("an", laeuft);
+    // Betreiber 2026-08-18: dasselbe Signal treibt das Viereck im
+    // CHAT-Bereich (Startseite) — ein Strom, zwei Anzeigen.
+    document.getElementById("startArbeit")?.classList.toggle("an", laeuft);
   });
   // Das Viereck steht bei Claude NEBEN der ersten Textzeile. Ein fester
   // CSS-Wert reichte nicht (375-px-Messung 2026-08-18: am Telefon steht
@@ -956,6 +960,27 @@ export function initCodeFlaeche() {
       feld.style.setProperty("--code-arbeit-top", `${Math.max(4, Math.round(oben))}px`);
     } catch { /* fail-safe: der CSS-Startwert bleibt stehen */ }
   }
+  // Dasselbe fuer den Chat-Bereich: das Viereck sitzt neben der ersten
+  // Textzeile des Glas-Schreibfelds. Eigene Messung, weil dort andere
+  // Polster und Schriftgroessen gelten.
+  function richteStartArbeitAus() {
+    const viereck = document.getElementById("startArbeit");
+    const glas = document.querySelector("#start .prompt-glass");
+    const eingabe = document.getElementById("startMessage");
+    if (!viereck || !glas || !eingabe) return;
+    try {
+      const stil = getComputedStyle(eingabe);
+      const roh = parseFloat(stil.lineHeight);
+      const zeilenhoehe = Number.isFinite(roh) ? roh : (parseFloat(stil.fontSize) || 17) * 1.2;
+      const polster = parseFloat(stil.paddingTop) || 0;
+      const oben = eingabe.offsetTop + polster + (zeilenhoehe - viereck.offsetHeight) / 2;
+      glas.style.setProperty("--start-arbeit-top", `${Math.max(4, Math.round(oben))}px`);
+    } catch { /* fail-safe: der CSS-Startwert bleibt stehen */ }
+  }
+  const richteBeideAus = () => { richteArbeitAus(); richteStartArbeitAus(); };
+  richteBeideAus();
+  window.addEventListener("resize", richteBeideAus);
+  document.getElementById("startMessage")?.addEventListener("input", () => setTimeout(richteStartArbeitAus, 0));
   richteArbeitAus();
   window.addEventListener("resize", richteArbeitAus);
   document.getElementById("codeAufgabe")?.addEventListener("input", () => setTimeout(richteArbeitAus, 0));
