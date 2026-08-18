@@ -22,7 +22,7 @@ import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-
 // Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
 import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260709-2";
-import { verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-2";
+import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-2";
 import { buildErrorPageHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 
 const MAX_TABS = 7;
@@ -710,7 +710,7 @@ export function render() {
   refs.tabCount.title = `${state.tabs.length || 1} von ${MAX_TABS} Tabs`;
   refs.tabCount.setAttribute("aria-label", `${state.tabs.length || 1} von ${MAX_TABS} Tabs`);
 
-  if (document.activeElement !== refs.address) refs.address.value = active?.url || "";
+  if (document.activeElement !== refs.address) refs.address.value = anzeigeAdresse(active?.url || "");
   refs.back.disabled = !active || active.historyIndex <= 0;
   refs.forward.disabled = !active || active.historyIndex >= (active.history.length - 1);
   refs.external.disabled = !active?.url;

@@ -149,11 +149,41 @@ export function verdrahteVorschlaege({
 }
 
 /**
+ * Adresse so anzeigen wie Chrome: ohne "https://", ohne "www.", ohne
+ * abschliessenden Schraegstrich. Chrome zeigt "smejj.com", nicht
+ * "https://www.smejj.com/" — das ist der auffaelligste Unterschied, den ein
+ * Nebeneinander der beiden Leisten zeigt.
+ *
+ * "http://" bleibt SICHTBAR. Chrome ersetzt es durch eine Warnung; solange
+ * wir die nicht haben, ist das sichtbare Schema das ehrlichere Signal —
+ * eine unverschluesselte Verbindung darf nicht aussehen wie eine sichere.
+ */
+export function anzeigeAdresse(url) {
+  const text = String(url || "");
+  if (!/^https:\/\//i.test(text)) return text;
+  const kurz = text.replace(/^https:\/\//i, "").replace(/^www\./i, "");
+  // Nur den Schraegstrich der blossen Startseite weglassen, nie einen Pfad.
+  return kurz.replace(/\/$/, "");
+}
+
+/**
  * Bequemer Einstieg fuer das Panel: nimmt Feld, Liste, den Panel-Zustand und
  * die Navigationsfunktion — und weiss selbst, dass der Verlauf aller Tabs die
  * Quelle ist. So bleibt in browser-pane.js ein einziger Aufruf stehen.
  */
 export function verdrahtePanelVorschlaege(feld, liste, zustand, oeffne) {
+  // Beim Bearbeiten die VOLLE Adresse zeigen und alles auswaehlen — sonst
+  // koennte man eine gekuerzte Adresse nicht sinnvoll aendern. Genau so
+  // verhaelt sich Chrome beim Klick in die Leiste.
+  feld.addEventListener("focus", () => {
+    const voll = zustand?.tabs?.find((t) => t.id === zustand.activeId)?.url || "";
+    if (voll) feld.value = voll;
+    feld.select();
+  });
+  feld.addEventListener("blur", () => {
+    const voll = zustand?.tabs?.find((t) => t.id === zustand.activeId)?.url || "";
+    feld.value = anzeigeAdresse(voll);
+  });
   return verdrahteVorschlaege({
     feld,
     liste,
