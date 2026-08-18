@@ -19,7 +19,8 @@ import { behandleRechtsklick } from "./browser-pane-menue.js?v=browser-pane-2026
 export function baueNachrichtenEmpfang(bausteine) {
   const {
     state, sessionClient, sessionHooks, stepHistory, navigate, showHint,
-    commitHistory, persistTabs, render, schedulePersist, applyZoom, normalizeAddress, holeSuche
+    commitHistory, persistTabs, render, schedulePersist, applyZoom, normalizeAddress,
+    neuerTabImHintergrund, holeSuche
   } = bausteine;
   const suche = { get melde() { return holeSuche()?.melde; } };
   return function onFrameMessage(event) {
@@ -41,7 +42,12 @@ export function baueNachrichtenEmpfang(bausteine) {
     }
     if (message.type === "smejj.browser.navigate" && typeof message.url === "string") {
       const target = normalizeAddress(message.url);
-      if (target) navigate(tab, target);
+      if (!target) return;
+      // Cmd/Strg-Klick, Mausradklick und target="_blank" oeffnen einen neuen
+      // Tab — und zwar im HINTERGRUND, wie in Chrome: wer nebenbei oeffnet,
+      // will weiterlesen, nicht wegspringen.
+      if (message.neuerTab) neuerTabImHintergrund(target);
+      else navigate(tab, target);
       return;
     }
     if (message.type === "smejj.browser.scrollState") {

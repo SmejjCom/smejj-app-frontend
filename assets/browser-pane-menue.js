@@ -135,3 +135,52 @@ export function behandleRechtsklick(message, tab, { stepHistory, navigate, showH
     }
   });
 }
+
+// --- Verlaufsliste am Zurueck-/Vor-Knopf --------------------------------------
+//
+// Chrome zeigt beim langen Druck (bzw. Rechtsklick) auf Zurueck die letzten
+// Stationen und laesst einen direkt dorthin springen. Ohne das muss man
+// mehrfach klicken und raet dabei, wie oft — bei jedem Klick laedt eine Seite,
+// die man gar nicht sehen wollte.
+
+export const MAX_VERLAUF_EINTRAEGE = 10;
+
+/**
+ * Die Stationen in EINER Richtung, neueste zuerst.
+ * Reine Funktion; `richtung` ist -1 (zurueck) oder 1 (vor).
+ */
+export function verlaufEintraege(history, historyIndex, richtung) {
+  const liste = Array.isArray(history) ? history : [];
+  const i = Number(historyIndex);
+  if (!Number.isFinite(i)) return [];
+  const roh = richtung < 0
+    ? liste.slice(0, Math.max(0, i)).reverse()
+    : liste.slice(i + 1);
+  return roh.slice(0, MAX_VERLAUF_EINTRAEGE).map((url, n) => ({
+    // Der Sprung ist relativ: der n-te Eintrag liegt n+1 Schritte entfernt.
+    id: String(richtung * (n + 1)),
+    text: kurzeAdresse(url),
+    aktiv: true
+  }));
+}
+
+function kurzeAdresse(url) {
+  try {
+    const u = new URL(url);
+    const pfad = u.pathname === "/" ? "" : u.pathname;
+    return (u.hostname.replace(/^www\./, "") + pfad).slice(0, 60);
+  } catch {
+    return String(url || "").slice(0, 60);
+  }
+}
+
+/**
+ * Zeigt die Verlaufsliste an einem Knopf. Ohne Stationen erscheint gar nichts —
+ * ein leeres Menue ist eine Antwort, die keine ist.
+ */
+export function zeigeVerlaufMenue(knopf, tab, richtung, springe) {
+  const eintraege = verlaufEintraege(tab?.history, tab?.historyIndex, richtung);
+  if (!eintraege.length) return null;
+  const k = knopf.getBoundingClientRect();
+  return zeigeMenue(k.left, k.bottom + 4, eintraege, (id) => springe(Number(id)));
+}

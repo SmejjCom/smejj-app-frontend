@@ -97,7 +97,10 @@ function init() {
   window.addEventListener("smejj:browser-request", onBrowserRequest);
   window.addEventListener("message", baueNachrichtenEmpfang({
     state, sessionClient, sessionHooks, stepHistory, navigate, showHint,
-    commitHistory, persistTabs, render, schedulePersist, applyZoom, normalizeAddress, holeSuche: () => suche
+    commitHistory, persistTabs, render, schedulePersist, applyZoom, normalizeAddress,
+    // Neuer Tab im HINTERGRUND: der aktive bleibt aktiv.
+    neuerTabImHintergrund: (url) => { const vorher = state.activeId; addTab({ url }); state.activeId = vorher; render(); },
+    holeSuche: () => suche
   }));
 }
 
@@ -186,10 +189,22 @@ function mountOnce() {
 
   refs.prevTab.addEventListener("click", () => switchTab(-1));
   refs.nextTab.addEventListener("click", () => switchTab(1));
+  // Doppelklick auf die freie Flaeche der Tableiste oeffnet einen Tab — in
+  // Chrome seit jeher, und mit der Maus der kuerzeste Weg.
+  refs.tabs.addEventListener("dblclick", (event) => { if (event.target === refs.tabs) addTab({ focusAddress: true }); });
   refs.addTab.addEventListener("click", () => addTab({ focusAddress: true }));
   refs.tabCount.addEventListener("click", () => switchTab(1));
   refs.back.addEventListener("click", () => stepHistory(-1));
   refs.forward.addEventListener("click", () => stepHistory(1));
+  // Rechtsklick zeigt die Stationen — sonst klickt man mehrfach und laedt
+  // dabei jedes Mal eine Seite, die man gar nicht sehen wollte.
+  for (const [knopf, richtung] of [[refs.back, -1], [refs.forward, 1]]) {
+    knopf.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      const tab = activeTab();
+      if (tab) zeigeVerlaufMenue(knopf, tab, richtung, (schritte) => stepHistory(schritte));
+    });
+  }
   refs.reload.addEventListener("click", () => {
     const tab = activeTab();
     if (!tab) return;
