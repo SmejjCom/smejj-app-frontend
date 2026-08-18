@@ -23,9 +23,11 @@ import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
 import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260709-2";
 import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-2";
-import { zeigeSicherheit, zeigeZoom } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
+import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
 import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260709-2";
+import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
+let suche = null;
 import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 
 const MAX_TABS = 7;
@@ -218,7 +220,13 @@ function mountOnce() {
 
   // Zoom wie in Chrome: Strg/Cmd mit +, - oder 0 (50–200 %).
   document.addEventListener("keydown", onZoomShortcut);
-  verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, refs, state });
+  suche = verdrahtePanelSuche({
+    wurzel: refs.root,
+    activeTab,
+    sendeAnRahmen: (nachricht) => activeTab()?.frame?.contentWindow?.postMessage(nachricht, "*")
+  });
+  verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, refs, state,
+    oeffneSuche: () => { const r = suche.oeffne(); if (r && !r.ok) showHint(r.grund); } });
 
   // Resize: Der Remote-Viewport folgt der sichtbaren Flaeche — debounced und
   // gedrosselt, damit der Remote-Worker nicht mit Anfragen geflutet wird.
@@ -632,6 +640,10 @@ function onFrameMessage(event) {
     sessionClient.handleAct(tab, message.action, sessionHooks);
     return;
   }
+  if (message.type === "smejj.browser.suchErgebnis") {
+    suche?.melde(message.anzahl, message.index);
+    return;
+  }
   if (message.type === "smejj.browser.reload" && tab.url) {
     navigate(tab, tab.url, { push: false }); // "Erneut laden" der Fehlerseite
     return;
@@ -688,7 +700,7 @@ export function render() {
 
   if (document.activeElement !== refs.address) refs.address.value = anzeigeAdresse(active?.url || "");
   zeigeSicherheit(refs.addressForm, active?.url || "");
-  malenStoppOderNeuladen(active?.status === "loading");
+  zeigeNeuladen(refs.reload, active?.status === "loading");
   zeigeZoom(refs.addressForm, active?.zoom || 1, () => { const t = activeTab(); if (t) { t.zoom = 1; applyZoom(t); render(); schedulePersist(); } });
   zeigeLesezeichen(refs.addressForm, active?.url || "", active?.title || "");
   refs.back.disabled = !active || active.historyIndex <= 0;
@@ -709,20 +721,6 @@ function showHint(text) {
 }
 
 // --- Persistenz ---------------------------------------------------------------
-
-// Derselbe Knopf, zwei Bedeutungen — wie in Chrome. Waehrend des Ladens ein
-// Kreuz zum Abbrechen, sonst der Kreispfeil zum Neuladen. Ein Knopf, dessen
-// Beschriftung nicht mitwandert, ist eine Falle: man klickt "neu laden" und
-// bricht ab.
-function malenStoppOderNeuladen(laedt) {
-  if (!refs.reload) return;
-  const text = laedt ? "Laden abbrechen" : "Neu laden";
-  refs.reload.title = text;
-  refs.reload.setAttribute("aria-label", text);
-  refs.reload.innerHTML = laedt
-    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>'
-    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>';
-}
 
 export function persistTabs() {
   try {

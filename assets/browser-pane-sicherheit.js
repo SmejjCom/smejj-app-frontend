@@ -150,3 +150,21 @@ export function zeigeZoom(form, zoom, aufKlick = null) {
   knopf.setAttribute("aria-label", text);
   return prozent;
 }
+
+// --- Neu laden / Stopp --------------------------------------------------------
+//
+// Derselbe Knopf, zwei Bedeutungen — wie in Chrome. Waehrend des Ladens ein
+// Kreuz zum Abbrechen, sonst der Kreispfeil. Ein Knopf, dessen Beschriftung
+// NICHT mitwandert, ist eine Falle: man klickt "neu laden" und bricht ab.
+//
+// Liegt bei den anderen Leisten-Anzeigen, weil es dasselbe Muster ist:
+// ein Zeichen, das den Zustand spiegelt.
+export function zeigeNeuladen(knopf, laedt) {
+  if (!knopf) return;
+  const text = laedt ? "Laden abbrechen" : "Neu laden";
+  knopf.title = text;
+  knopf.setAttribute("aria-label", text);
+  knopf.innerHTML = laedt
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>';
+}

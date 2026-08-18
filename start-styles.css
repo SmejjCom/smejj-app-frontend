@@ -3133,6 +3133,71 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   padding-right: 76px;
 }
 
+/* Suchleiste (Cmd+F). Schwebt oben rechts ueber dem Inhalt, wie in Chrome —
+   sie soll den Text nicht verschieben, sonst springt beim Oeffnen die ganze
+   Seite und man verliert die Stelle, die man gerade gelesen hat. */
+.bp-suche {
+  position: absolute;
+  z-index: 40;
+  top: 6px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 6px;
+  border: 1px solid rgba(246, 243, 238, 0.16);
+  border-radius: 6px;
+  background: #16181b;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+}
+
+.bp-suche[hidden] { display: none; }
+
+.bp-suche-feld {
+  width: 190px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid rgba(246, 243, 238, 0.14);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #f6f3ee;
+  font-size: 13px;
+}
+
+.bp-suche-feld:focus { outline: 2px solid rgba(159, 231, 212, 0.8); outline-offset: -1px; }
+
+/* Kein Treffer: das FELD faerbt sich, nicht nur die Zahl — man schaut beim
+   Tippen aufs Feld, nicht auf den Zaehler daneben. */
+.bp-suche.ist-leer .bp-suche-feld { border-color: rgba(240, 173, 78, 0.7); }
+
+.bp-suche-zahl {
+  min-width: 42px;
+  color: rgba(246, 243, 238, 0.6);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.bp-suche button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.7);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.bp-suche button:hover { background: rgba(246, 243, 238, 0.12); color: #f6f3ee; }
+.bp-suche button:focus-visible { outline: 2px solid rgba(159, 231, 212, 0.9); outline-offset: 1px; }
+
+/* Der Inhaltsbereich braucht einen Bezugspunkt, sonst schwebt die Leiste
+   relativ zur ganzen Seite. */
+.bp-content { position: relative; }
+
 /* ---- view-chrome.css ---- */
 /* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
    und Schliessen-X (ganz oben rechts). Ohne Hintergrund, transparent, schmal,

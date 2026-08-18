@@ -32,6 +32,7 @@ export function tastenBefehl(event) {
     case "w": return { befehl: "tabSchliessen" };
     case "l": return { befehl: "adresseFokus" };
     case "r": return { befehl: "neuLaden" };
+    case "f": return { befehl: "suchen" };
     default: break;
   }
   // Cmd+1..8 springt zum n-ten Tab, Cmd+9 zum LETZTEN — nicht zum neunten.
@@ -91,12 +92,13 @@ export function holeZurueck(stapel) {
  * alle Kuerzel. So bleibt in browser-pane.js ein einziger Aufruf stehen —
  * und WAS ein Kuerzel bedeutet, steht an einer Stelle statt verstreut.
  */
-export function verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, refs, state }) {
+export function verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, refs, state, oeffneSuche }) {
   return verdrahteTasten({
     neuerTab: () => addTab({ focusAddress: true }),
     tabSchliessen: () => { const t = activeTab(); if (t) closeTab(t.id); },
     adresseFokus: () => { refs.address?.focus(); refs.address?.select(); },
     neuLaden: () => { const t = activeTab(); if (t?.url) navigate(t, t.url, { push: false }); },
+    suchen: () => oeffneSuche?.(),
     tabZurueckholen: () => {
       const { eintrag, stapel } = holeZurueck(state.geschlossen);
       state.geschlossen = stapel;
