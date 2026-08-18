@@ -72,6 +72,7 @@ export const refs = {};
 const sessionClient = createBrowserSessionClient({ routes: CLIENT_ROUTES });
 const sessionHooks = {
   onNavigated: (tab) => { commitHistory(tab, tab.url, true); persistTabs(); render(); },
+  onSuchErgebnis: (anzahl, index) => suche?.melde(anzahl, index),
   onLost: (tab) => {
     showHint("Live-Browser-Session beendet — verbinde neu ...");
     if (tab.url) navigate(tab, tab.url, { push: false });
@@ -223,7 +224,8 @@ function mountOnce() {
   suche = verdrahtePanelSuche({
     wurzel: refs.root,
     activeTab,
-    sendeAnRahmen: (nachricht) => activeTab()?.frame?.contentWindow?.postMessage(nachricht, "*")
+    sendeAnRahmen: (nachricht) => activeTab()?.frame?.contentWindow?.postMessage(nachricht, "*"),
+    sendeAnSitzung: (aktion) => { const t = activeTab(); if (t) sessionClient.handleAct(t, aktion, sessionHooks); }
   });
   verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, refs, state,
     oeffneSuche: () => { const r = suche.oeffne(); if (r && !r.ok) showHint(r.grund); } });

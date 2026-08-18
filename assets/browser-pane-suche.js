@@ -33,7 +33,23 @@ export function trefferText(aktuell, gesamt) {
 
 /** In welchen Ansichten ist eine Suche ueberhaupt moeglich? */
 export function sucheMoeglich(mode) {
-  return mode === "proxy" || mode === "live-browser";
+  return sucheWeg(mode) !== null;
+}
+
+/**
+ * WELCHEN Weg nimmt die Suche in dieser Ansicht?
+ *   "rahmen"  — das Skript im Proxy-Rahmen sucht (das Dokument liegt dort)
+ *   "sitzung" — der echte Browser sucht (wir sehen nur ein Bild)
+ *   null      — nicht moeglich (fremder Rahmen, Fehlerseite, leer)
+ *
+ * Als reine Funktion, damit die Zuordnung pruefbar ist, ohne ein DOM zu
+ * bauen — und damit eine kuenftige Ansicht hier eingetragen wird statt
+ * mitten in der Leiste.
+ */
+export function sucheWeg(mode) {
+  if (mode === "proxy") return "rahmen";
+  if (mode === "live-browser") return "sitzung";
+  return null;
 }
 
 export function baueSuchleiste(wurzel) {
@@ -126,11 +142,22 @@ export function verdrahteSuche({ wurzel, suchen = () => {}, beenden = () => {}, 
  * Einstieg fuer das Panel: verdrahtet die Leiste gegen den aktiven Tab.
  * Sendet in den Rahmen (Proxy-Ansicht) bzw. an die Live-Sitzung.
  */
-export function verdrahtePanelSuche({ wurzel, activeTab, sendeAnRahmen }) {
+export function verdrahtePanelSuche({ wurzel, activeTab, sendeAnRahmen, sendeAnSitzung }) {
+  // ZWEI WEGE, EINE LEISTE. In der Proxy-Ansicht sucht das Skript im Rahmen;
+  // im Live-Browser sucht der echte Browser ueber eine Sitzungs-Aktion. Die
+  // Leiste selbst weiss davon nichts — sonst muesste jede kuenftige Ansicht
+  // sie wieder anfassen.
+  const senden = (text, index) => {
+    if (sucheWeg(activeTab()?.mode) === "sitzung") return sendeAnSitzung?.({ type: "find", text, index });
+    return sendeAnRahmen({ type: "smejj.browser.suche", text, index });
+  };
   return verdrahteSuche({
     wurzel,
     moeglich: () => sucheMoeglich(activeTab()?.mode),
-    suchen: (text, _richtung, index) => sendeAnRahmen({ type: "smejj.browser.suche", text, index }),
-    beenden: () => sendeAnRahmen({ type: "smejj.browser.sucheAus" })
+    suchen: (text, _richtung, index) => senden(text, index),
+    beenden: () => {
+      if (sucheWeg(activeTab()?.mode) === "sitzung") return sendeAnSitzung?.({ type: "find", text: "", index: 0 });
+      return sendeAnRahmen({ type: "smejj.browser.sucheAus" });
+    }
   });
 }

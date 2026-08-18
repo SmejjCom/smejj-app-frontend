@@ -202,6 +202,12 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
     if (tab.sessionId !== sessionId) return; // Tab hat inzwischen neu verbunden.
     if (data?.ok && data.screenshot) {
       postToFrame(tab, { type: "smejj.browser.sessionFrame", screenshot: data.screenshot, title: data.title || "" });
+      // Die Suche liefert ihre Trefferzahl als Beifang der Aktion mit. Sie
+      // geht denselben Weg wie im Proxy-Rahmen, damit die Suchleiste nicht
+      // wissen muss, in welcher Ansicht sie gerade steht.
+      if (typeof data.treffer === "number") {
+        hooks?.onSuchErgebnis?.(data.treffer, action?.index || 0);
+      }
       const finalUrl = typeof data.finalUrl === "string" ? data.finalUrl : "";
       if (finalUrl && finalUrl !== tab.url) {
         tab.url = finalUrl;
