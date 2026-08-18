@@ -172,12 +172,26 @@ async function runByokChat({ task, output, offlineNotice }) {
   return true;
 }
 
+// Arbeits-Signal fuer die Oberflaeche (Betreiber-Befund 2026-08-18:
+// "laeuft gerade, aber das Viereck leuchtet nicht"). Der normale Weg meldet
+// sich ueber chat-stream.js; die Anbieter-Wege hier taten es NIE — darum
+// blieben Arbeits-Viereck und Stopp-Knopf bei Cline/BYOK stumm. Gleicher
+// Ereignisname, gleiche Nutzlast: { laufen: <Anzahl> }.
+let anbieterLaeufe = 0;
+function meldeStrom(delta) {
+  anbieterLaeufe = Math.max(0, anbieterLaeufe + delta);
+  try {
+    window.dispatchEvent(new CustomEvent("smejj:chat-strom", { detail: { laufen: anbieterLaeufe } }));
+  } catch { /* fail-safe: die Antwort laeuft auch ohne Signal */ }
+}
+
 async function runClineChat({ task, output, offlineNotice }) {
   const token = sessionStorage.getItem(API_TOKEN_KEY) || "";
   if (!token) {
     output.textContent = "Bitte zuerst anmelden und Cline unter Einstellungen → Modelle verbinden.";
     return true;
   }
+  meldeStrom(+1);
   try {
     const contextFiles = await resolveWorkspaceReferences(task);
     // "Auto": vor dem Senden das guenstigste passende Modell setzen. Nur wenn
@@ -232,6 +246,8 @@ async function runClineChat({ task, output, offlineNotice }) {
     if (!answer) output.textContent = "(leere Antwort)";
   } catch (error) {
     output.textContent = `Cline-Fehler: ${String(error?.message || error).slice(0, 400)}`;
+  } finally {
+    meldeStrom(-1);
   }
   return true;
 }
@@ -246,6 +262,7 @@ async function runProviderChat({ providerId, task, output, offlineNotice }) {
     output.textContent = "Bitte zuerst anmelden und den Anbieter unter Einstellungen → Modelle verbinden.";
     return true;
   }
+  meldeStrom(+1);
   try {
     const contextFiles = await resolveWorkspaceReferences(task);
     const response = await fetch(`${API_ORIGIN}/api/keys/${providerId}/chat`, {
@@ -282,6 +299,8 @@ async function runProviderChat({ providerId, task, output, offlineNotice }) {
     if (!answer) output.textContent = "(leere Antwort)";
   } catch (error) {
     output.textContent = `Anbieter-Fehler: ${String(error?.message || error).slice(0, 400)}`;
+  } finally {
+    meldeStrom(-1);
   }
   return true;
 }
