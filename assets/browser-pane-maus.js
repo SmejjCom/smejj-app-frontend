@@ -101,7 +101,15 @@ export function planAlsAuftraege(plan) {
 /** Ein Satz, den ein Mensch lesen kann — er steht waehrend des Laufs im Panel. */
 export function beschreibe(step) {
   const s = step || {};
-  const wo = s.target?.name || s.target?.value || s.selector?.value || "";
+  // Dieselbe Verschachtelung wie beim Selektor — hier stand sie noch nicht,
+  // und der Nutzer las waehrend des Laufs "Klicken:" ohne Ziel. Ein Satz, der
+  // die Haelfte verschweigt, ist schlimmer als eine Kennung.
+  // Fuer die ANZEIGE darf nicht dieselbe Strenge gelten wie fuers Ausfuehren:
+  // selektorAus verlangt Strategie UND Wert (zu Recht — sonst klickt man ins
+  // Leere). Hier genuegt irgendein Text, der dem Nutzer sagt, worum es geht.
+  const sel = selektorAus(s);
+  const roh = s.target?.selector || s.target || s.selector || {};
+  const wo = sel?.name || sel?.value || roh.name || roh.value || "";
   switch (s.action) {
     case "navigate": return `Seite oeffnen: ${kurz(s.url)}`;
     case "click": case "openLink": return `Klicken: ${kurz(wo)}`;
