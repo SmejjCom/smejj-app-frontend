@@ -24,7 +24,8 @@ import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-
 import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260709-2";
 import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-2";
 import { zeigeSicherheit } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
-import { buildErrorPageHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
+import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
+import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
@@ -148,60 +149,7 @@ function mountOnce() {
   state.mounted = true;
   const root = document.getElementById("browserPaneRoot");
   root.hidden = false;
-  root.innerHTML = `
-    <div class="bp-tabstrip" role="tablist" aria-label="Browser Tabs">
-      <div class="bp-tab-left">
-        <button class="bp-tab-prev" type="button" title="Vorheriger Tab" aria-label="Vorheriger Tab">‹</button>
-        <button class="bp-tab-next" type="button" title="Naechster Tab" aria-label="Naechster Tab">›</button>
-        <button class="bp-tab-add" type="button" title="Neuer Tab" aria-label="Neuer Tab">+</button>
-      </div>
-      <div class="bp-tabs"></div>
-      <div class="bp-tab-right">
-        <button class="bp-tab-count" type="button" title="Tab-Uebersicht" aria-label="Tab-Uebersicht">0</button>
-        <span class="bp-tab-spacer" aria-hidden="true"></span>
-        <span class="bp-tab-spacer" aria-hidden="true"></span>
-      </div>
-    </div>
-    <div class="bp-toolbar">
-      <div class="bp-toolbar-left">
-        <button class="bp-nav-back" type="button" title="Zurueck" aria-label="Zurueck" disabled>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-        </button>
-        <button class="bp-nav-forward" type="button" title="Vor" aria-label="Vor" disabled>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-        </button>
-        <button class="bp-nav-reload" type="button" title="Neu laden" aria-label="Neu laden">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>
-        </button>
-      </div>
-      <form class="bp-address-form">
-        <input class="bp-address" type="text" inputmode="url" autocomplete="off" spellcheck="false"
-          placeholder="Suchen oder URL eingeben" aria-label="Adresse oder Suche">
-        <div class="bp-vorschlaege" hidden></div>
-      </form>
-      <div class="bp-toolbar-right">
-        <button class="bp-open-external" type="button" title="In neuem Tab oeffnen" aria-label="In neuem Tab oeffnen">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 13v6H5V6h6"/></svg>
-        </button>
-        <button class="bp-menu" type="button" title="Panel-Menue" aria-label="Panel-Menue">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-        </button>
-        <button class="bp-close" type="button" title="Browser schliessen" aria-label="Browser schliessen">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-        </button>
-      </div>
-    </div>
-    <div class="bp-progress" hidden><span></span></div>
-    <div class="bp-hint" hidden></div>
-    <div class="bp-content">
-      <div class="bp-empty">
-        <div class="bp-empty-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>
-        </div>
-        <strong>${NEW_TAB_TITLE}</strong>
-        <span>Suchen oder URL eingeben — bis zu ${MAX_TABS} Tabs.</span>
-      </div>
-    </div>`;
+  root.innerHTML = buildPaneShellHtml({ neuerTabTitel: NEW_TAB_TITLE, maxTabs: MAX_TABS });
 
   refs.root = root;
   refs.tabs = root.querySelector(".bp-tabs");
@@ -712,6 +660,7 @@ export function render() {
 
   if (document.activeElement !== refs.address) refs.address.value = anzeigeAdresse(active?.url || "");
   zeigeSicherheit(refs.addressForm, active?.url || "");
+  zeigeLesezeichen(refs.addressForm, active?.url || "", active?.title || "");
   refs.back.disabled = !active || active.historyIndex <= 0;
   refs.forward.disabled = !active || active.historyIndex >= (active.history.length - 1);
   refs.external.disabled = !active?.url;

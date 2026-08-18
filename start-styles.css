@@ -3001,6 +3001,57 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   padding-left: 92px;
 }
 
+/* Lesezeichen-Stern rechts IN der Adressleiste (wie Chrome). */
+.bp-stern {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.5);
+  cursor: pointer;
+}
+
+.bp-stern[hidden] { display: none; }
+
+.bp-stern:hover {
+  background: rgba(246, 243, 238, 0.12);
+  color: #f6f3ee;
+}
+
+.bp-stern:focus-visible {
+  outline: 2px solid rgba(159, 231, 212, 0.9);
+  outline-offset: 1px;
+}
+
+.bp-stern svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+/* Gemerkt: gefuellt UND farbig. Die Fuellung allein traegt die Auskunft,
+   die Farbe verstaerkt sie nur — Farbe allein waere fuer einen Teil der
+   Nutzer keine Auskunft. */
+.bp-stern[data-gemerkt="ja"] {
+  color: #f0c14b;
+}
+
+/* Platz rechts, damit die Adresse nicht unter den Stern laeuft. */
+.bp-address {
+  padding-right: 30px;
+}
+
 /* ---- view-chrome.css ---- */
 /* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
    und Schliessen-X (ganz oben rechts). Ohne Hintergrund, transparent, schmal,
