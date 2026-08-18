@@ -2249,3 +2249,29 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding: 0 4px;
 }
 .voice-mode-transcript { text-align: left; }
+
+/* =======================================================================
+ * Betreiber-Freigabe 2026-08-18 ("nur am Handy vergroessern"): unter
+ * 600 px erfuellen die Bedienknoepfe der CODE-Leiste das Touch-Ziel des
+ * Projekts (44 px). Am Desktop bleibt alles schmal und edel wie bestellt
+ * — die Regel greift AUSSCHLIESSLICH hier.
+ * Gemessen im integrierten Browser bei 375 px: Anhang/Diktat 30x30,
+ * Senden 32x32, Chips 19 px hoch.
+ * 600 px ist die im Projekt schon benutzte Kante (styles.css,
+ * start-glass.css) — keine zweite Wahrheit daneben.
+ * ===================================================================== */
+@media (max-width: 600px) {
+  #code .codeleiste .icon-button.code-mini,
+  #code .codeleiste #codeSenden {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+  #code .repochip {
+    min-height: 44px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  /* Die Zeile darf dabei nicht enger werden als die Knoepfe hoch sind. */
+  #code .codeleiste { gap: 4px; }
+}
