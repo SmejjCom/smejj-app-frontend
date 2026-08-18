@@ -1224,24 +1224,18 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   /* Betreiber 2026-08-17 ("Rahmen scharf stellen"): deutlicher Umriss. */
   border: 1.5px solid rgba(242, 245, 244, 0.55);
 }
-/* Betreiber-Befund 2026-08-18 ("ich sehe es im Browser nicht"): technisch
-   leuchtete es, praktisch war es mit 11 px in der Ecke unsichtbar. Im
-   ARBEITSZUSTAND (und NUR dort) darum groesser, mit Schein und
-   Groessenpuls — ein Arbeitssignal darf auffallen; die Augen-Regel gilt
-   fuer Dauerzustaende, nicht fuer die Zeit der Arbeit. */
+/* Betreiber 2026-08-18, RUECKGAENGIG: "das Viereck war gut, es soll NUR
+   beleuchtet werden". Groesse, Platz und Form bleiben also exakt wie
+   vorher (11 px, top 10 / right 12 aus der Grundregel) — im
+   Arbeitszustand aendert sich AUSSCHLIESSLICH die Beleuchtung. */
 #code .code-arbeit.an {
-  width: 15px;
-  height: 15px;
-  top: 8px;
-  right: 10px;
   border-color: var(--v11-cy);
   background: var(--v11-cy);
-  box-shadow: 0 0 12px var(--v11-cy), 0 0 22px rgba(50, 246, 234, 0.45);
-  animation: code-arbeit-puls 1.15s ease-in-out infinite;
+  animation: code-arbeit-puls 1.6s ease-in-out infinite;
 }
 @keyframes code-arbeit-puls {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.45; transform: scale(0.72); }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 @media (prefers-reduced-motion: reduce) {
   #code .code-arbeit.an { animation: none; }
