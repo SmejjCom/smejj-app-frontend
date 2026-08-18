@@ -86,6 +86,14 @@ export function umsortiert(liste, von, nach) {
   if (von === nach || von < 0 || nach < 0 || von >= liste.length || nach >= liste.length) {
     return liste.slice();
   }
+  // Ueber die Gruppengrenze wird NICHT gezogen. Sonst zieht man einen
+  // gewoehnlichen Tab nach vorn, und beim naechsten Zeichnen schnappt er
+  // zurueck — weil die Angepinnten immer vorn stehen. Das sieht nach einem
+  // Fehler aus, obwohl beide Regeln fuer sich richtig sind. Chrome loest es
+  // genauso: die Gruppe ist eine Wand.
+  if (Boolean(liste[von]?.angepinnt) !== Boolean(liste[nach]?.angepinnt)) {
+    return liste.slice();
+  }
   const kopie = liste.slice();
   const [element] = kopie.splice(von, 1);
   kopie.splice(nach, 0, element);

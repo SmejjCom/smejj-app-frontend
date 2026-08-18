@@ -63,7 +63,9 @@ export function verdrahteVorschlaege({
   feld,
   liste,
   verlauf = () => [],
-  uebernehmen = () => {}
+  uebernehmen = () => {},
+  // Escape: was "abbrechen" bedeutet, weiss nur der Aufrufer.
+  zuruecksetzen = () => {}
 } = {}) {
   if (!feld || !liste) return { zerstoere: () => {} };
   let aktuell = [];
@@ -106,6 +108,17 @@ export function verdrahteVorschlaege({
   }
 
   function beiTaste(event) {
+    // Escape MUSS auch greifen, wenn keine Vorschlaege stehen. Vorher stieg
+    // die Behandlung hier aus, und wer eine falsche Adresse getippt hatte,
+    // blieb auf seinem halben Text sitzen — Chrome holt die alte Adresse
+    // zurueck und gibt den Fokus an die Seite. Der Ausstieg oben war fuer die
+    // Pfeiltasten gedacht und hat Escape mit verschluckt.
+    if (event.key === "Escape") {
+      event.preventDefault();
+      schliesse();
+      zuruecksetzen();
+      return;
+    }
     if (liste.hidden) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
@@ -123,10 +136,6 @@ export function verdrahteVorschlaege({
       schliesse();
       uebernehmen(url);
       return;
-    }
-    if (event.key === "Escape") {
-      event.preventDefault();
-      schliesse();
     }
   }
 
@@ -184,10 +193,14 @@ export function verdrahtePanelVorschlaege(feld, liste, zustand, oeffne) {
     const voll = zustand?.tabs?.find((t) => t.id === zustand.activeId)?.url || "";
     feld.value = anzeigeAdresse(voll);
   });
+  const aktuelleUrl = () => zustand?.tabs?.find((t) => t.id === zustand.activeId)?.url || "";
   return verdrahteVorschlaege({
     feld,
     liste,
     verlauf: () => (zustand?.tabs || []).flatMap((t) => t.history || []),
-    uebernehmen: (url) => { feld.value = url; oeffne(url); }
+    uebernehmen: (url) => { feld.value = url; oeffne(url); },
+    // Escape: zurueck zur gekuerzten Adresse der Seite und Fokus abgeben —
+    // wie in Chrome.
+    zuruecksetzen: () => { feld.value = anzeigeAdresse(aktuelleUrl()); feld.blur(); }
   });
 }

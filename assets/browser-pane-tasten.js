@@ -12,6 +12,7 @@
 //
 // SRP: Die Zuordnung Taste -> Befehl ist eine REINE FUNKTION und dadurch
 // ohne Browser testbar. Was ein Befehl tut, weiss nur der Aufrufer.
+import { sortiertNachPinnung } from "./browser-pane-tableiste.js?v=browser-pane-20260709-2";
 
 /**
  * Welcher Befehl gehoert zu diesem Tastendruck?
@@ -107,7 +108,12 @@ export function verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, se
       if (eintrag) addTab({ url: eintrag.url });
     },
     tabWaehlen: (i) => {
-      const ziel = i === -1 ? state.tabs[state.tabs.length - 1] : state.tabs[i];
+      // NACH DER ANZEIGE waehlen, nicht nach der internen Liste. Mit
+      // angepinnten Tabs weichen beide voneinander ab — Cmd+1 traf dann einen
+      // anderen Tab als den, den man ganz links SIEHT. In Chrome meint Cmd+1
+      // immer den linkesten.
+      const sichtbar = sortiertNachPinnung(state.tabs);
+      const ziel = i === -1 ? sichtbar[sichtbar.length - 1] : sichtbar[i];
       if (ziel) selectTab(ziel.id);
     }
   }, () => document.body.classList.contains("browser-pane-open"));
