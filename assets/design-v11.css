@@ -1213,7 +1213,14 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
    Logo-Cyan gefuellt mit leisem Puls (Augen-Regel: kein Leuchten). */
 #code .code-arbeit {
   position: absolute;
-  top: 10px;
+  /* Betreiber-Abgleich mit Claude 2026-08-18: das Viereck steht dort auf
+     HOEHE DER TEXTZEILE, nicht am oberen Feldrand. Gemessen: bei uns lag
+     die Mitte auf 16 px, die Textzeile auf 37 px — sobald der Ordner-Chip
+     darueber liegt, driftete es 21 px nach oben weg. Der Anker ist darum
+     die Textzeile selbst (erste Zeile: 28 px Oberkante + halbe Zeile).
+     Groesse und Form bleiben unveraendert (Betreiber: "das Viereck war
+     gut, es soll NUR beleuchtet werden"). */
+  top: 31px;
   right: 12px;
   width: 11px;
   height: 11px;
