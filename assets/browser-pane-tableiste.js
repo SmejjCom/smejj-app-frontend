@@ -26,6 +26,10 @@ export const TAB_MIN_BREITE = 52;
 // Unter dieser Breite passt kein Titel mehr sinnvoll neben Icon und Kreuz;
 // dann zeigt Chrome nur noch das Favicon.
 export const TAB_NUR_ICON_BREITE = 88;
+// Angepinnte Tabs sind in Chrome fest schmal — nur das Zeichen, kein Titel,
+// kein Kreuz. Sie sollen Platz sparen UND unauffaellig sein: was man anpinnt,
+// will man behalten, nicht andauernd lesen.
+export const PIN_BREITE = 40;
 
 /**
  * Wie breit wird ein einzelner Tab bei gegebener Leistenbreite?
@@ -89,6 +93,16 @@ export function umsortiert(liste, von, nach) {
 }
 
 /**
+ * Angepinnte Tabs nach vorn — wie in Chrome. Die Reihenfolge innerhalb der
+ * beiden Gruppen bleibt erhalten, sonst springen Tabs beim Anpinnen wild
+ * durcheinander und man findet sie nicht wieder.
+ */
+export function sortiertNachPinnung(tabs) {
+  const liste = Array.isArray(tabs) ? tabs : [];
+  return [...liste.filter((t) => t?.angepinnt), ...liste.filter((t) => !t?.angepinnt)];
+}
+
+/**
  * Welche Eintraege gehoeren ins Rechtsklick-Menue eines Tabs?
  * Reine Funktion — was ausgegraut ist, haengt allein von der Lage ab.
  * Chrome zeigt unbenutzbare Eintraege ebenfalls an (statt sie zu verstecken):
@@ -98,9 +112,14 @@ export function menueEintraege(tabs, tabId) {
   const andere = (tabs || []).filter((t) => t.id !== tabId).length;
   const index = (tabs || []).findIndex((t) => t.id === tabId);
   const rechts = index >= 0 ? (tabs || []).length - index - 1 : 0;
+  const tab = (tabs || []).find((t) => t.id === tabId);
+  const angepinnt = Boolean(tab?.angepinnt);
   return [
+    { id: "pinnen", text: angepinnt ? "Tab loesen" : "Tab anpinnen", aktiv: true },
     { id: "duplizieren", text: "Tab duplizieren", aktiv: true },
-    { id: "schliessen", text: "Tab schliessen", aktiv: true },
+    // Ein angepinnter Tab laesst sich nicht schliessen, ohne ihn vorher zu
+    // loesen — das ist der ganze Sinn des Anpinnens. Chrome macht es genauso.
+    { id: "schliessen", text: "Tab schliessen", aktiv: !angepinnt },
     { id: "andereSchliessen", text: "Andere Tabs schliessen", aktiv: andere > 0 },
     { id: "rechteSchliessen", text: "Tabs rechts schliessen", aktiv: rechts > 0 }
   ];
@@ -125,22 +144,28 @@ export function zeichneTableiste(behaelter, {
   schliessen = () => {},
   sortieren = null,
   oeffnen = null,
+  pinnen = null,
   neuerTabTitel = "Neuer Tab"
 } = {}) {
   if (!behaelter) return;
   behaelter.innerHTML = "";
-  const verfuegbar = behaelter.clientWidth || TAB_MAX_BREITE * Math.max(tabs.length, 1);
-  const breite = tabBreite(tabs.length, verfuegbar);
+  // Angepinnte belegen feste Breite; der Rest teilt sich, was uebrig bleibt.
+  const geordnet = sortiertNachPinnung(tabs);
+  const angepinnte = geordnet.filter((t) => t.angepinnt).length;
+  const verfuegbar = behaelter.clientWidth || TAB_MAX_BREITE * Math.max(geordnet.length, 1);
+  const restBreite = Math.max(0, verfuegbar - angepinnte * PIN_BREITE);
+  const breite = tabBreite(geordnet.length - angepinnte, restBreite);
   const mitTitel = zeigtTitel(breite);
 
-  tabs.forEach((tab, index) => {
+  geordnet.forEach((tab, index) => {
     const istAktiv = tab.id === aktiveId;
+    const istPin = Boolean(tab.angepinnt);
     const knopf = document.createElement("button");
     knopf.type = "button";
-    knopf.className = `bp-tab${istAktiv ? " is-active" : ""}${tab.status === "loading" ? " is-loading" : ""}${mitTitel ? "" : " is-schmal"}`;
+    knopf.className = `bp-tab${istAktiv ? " is-active" : ""}${tab.status === "loading" ? " is-loading" : ""}${istPin || !mitTitel ? " is-schmal" : ""}${istPin ? " ist-angepinnt" : ""}`;
     knopf.setAttribute("role", "tab");
     knopf.setAttribute("aria-selected", String(istAktiv));
-    knopf.style.width = `${breite}px`;
+    knopf.style.width = `${istPin ? PIN_BREITE : breite}px`;
     // Chrome zeigt im Tooltip Titel UND Adresse — bei schmalen Tabs ist das
     // oft die einzige Moeglichkeit, die Seite zu erkennen.
     knopf.title = [tab.title, tab.url].filter(Boolean).join("\n") || neuerTabTitel;
@@ -150,8 +175,9 @@ export function zeichneTableiste(behaelter, {
 
     knopf.append(
       markenElement(tab),
-      ...(mitTitel ? [titelElement(tab, neuerTabTitel)] : []),
-      ...(mitTitel || istAktiv ? [kreuzElement(tab, schliessen)] : [])
+      ...(istPin || !mitTitel ? [] : [titelElement(tab, neuerTabTitel)]),
+      // Kein Kreuz an angepinnten Tabs: erst loesen, dann schliessen.
+      ...(!istPin && (mitTitel || istAktiv) ? [kreuzElement(tab, schliessen)] : [])
     );
     knopf.addEventListener("click", () => waehlen(tab.id));
     // Mittlere Maustaste schliesst den Tab — in Chrome seit jeher, und wer es
@@ -159,16 +185,16 @@ export function zeichneTableiste(behaelter, {
     knopf.addEventListener("auxclick", (event) => {
       if (event.button !== 1) return;
       event.preventDefault();
-      schliessen(tab.id);
+      if (!istPin) schliessen(tab.id); // angepinnt: auch die Mausradtaste nicht
     });
     knopf.addEventListener("contextmenu", (event) => {
       event.preventDefault();
-      oeffneMenue(event, tab, tabs, { schliessen, oeffnen });
+      oeffneMenue(event, tab, geordnet, { schliessen, oeffnen, pinnen });
     });
     behaelter.appendChild(knopf);
   });
 
-  if (sortieren) verdrahteZiehen(behaelter, tabs, sortieren);
+  if (sortieren) verdrahteZiehen(behaelter, geordnet, sortieren);
 }
 
 function markenElement(tab) {
@@ -250,12 +276,13 @@ function verdrahteZiehen(behaelter, tabs, sortieren) {
 // Aussehen) liegt in browser-pane-menue.js — sie wird auch fuer den
 // Rechtsklick auf die SEITE gebraucht, und zwei Menues, die sich
 // unterschiedlich schliessen, faellt niemandem als Absicht auf.
-function oeffneMenue(event, tab, tabs, { schliessen, oeffnen }) {
+function oeffneMenue(event, tab, tabs, befehle) {
   zeigeMenue(event.clientX, event.clientY, menueEintraege(tabs, tab.id),
-    (id) => fuehreAus(id, tab, tabs, { schliessen, oeffnen }));
+    (id) => fuehreAus(id, tab, tabs, befehle));
 }
 
-function fuehreAus(id, tab, tabs, { schliessen, oeffnen }) {
+function fuehreAus(id, tab, tabs, { schliessen, oeffnen, pinnen }) {
+  if (id === "pinnen") return pinnen?.(tab.id);
   if (id === "schliessen") return schliessen(tab.id);
   if (id === "duplizieren") return oeffnen?.(tab.url);
   if (id === "andereSchliessen") {

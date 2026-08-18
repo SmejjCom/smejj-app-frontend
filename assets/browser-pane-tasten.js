@@ -95,7 +95,9 @@ export function holeZurueck(stapel) {
 export function verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, refs, state, oeffneSuche }) {
   return verdrahteTasten({
     neuerTab: () => addTab({ focusAddress: true }),
-    tabSchliessen: () => { const t = activeTab(); if (t) closeTab(t.id); },
+    // Cmd+W schliesst KEINEN angepinnten Tab — genau davor soll das Anpinnen
+    // schuetzen. Sonst waere es ein Versprechen, das die Tastatur bricht.
+    tabSchliessen: () => { const t = activeTab(); if (t && !t.angepinnt) closeTab(t.id); },
     adresseFokus: () => { refs.address?.focus(); refs.address?.select(); },
     neuLaden: () => { const t = activeTab(); if (t?.url) navigate(t, t.url, { push: false }); },
     suchen: () => oeffneSuche?.(),

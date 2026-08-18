@@ -3198,6 +3198,16 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
    relativ zur ganzen Seite. */
 .bp-content { position: relative; }
 
+/* Angepinnte Tabs: schmal, ohne Titel, ohne Kreuz. Ein feiner Strich links
+   zeigt, dass sie eine eigene Gruppe sind — ohne ihn sehen sie nur aus wie
+   Tabs, die zufaellig kein Wort tragen. */
+.bp-tab.ist-angepinnt {
+  padding: 0;
+  border-left: 2px solid rgba(159, 231, 212, 0.55);
+}
+
+.bp-tab.ist-angepinnt .bp-tab-close { display: none; }
+
 /* ---- view-chrome.css ---- */
 /* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
    und Schliessen-X (ganz oben rechts). Ohne Hintergrund, transparent, schmal,

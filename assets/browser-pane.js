@@ -660,6 +660,7 @@ export function render() {
     waehlen: selectTab,
     schliessen: closeTab,
     oeffnen: (url) => addTab({ url }),
+    pinnen: (id) => { const t = state.tabs.find((x) => x.id === id); if (t) { t.angepinnt = !t.angepinnt; persistTabs(); render(); } },
     sortieren: (neueReihenfolge) => {
       state.tabs = neueReihenfolge;
       persistTabs();
@@ -712,6 +713,11 @@ export function persistTabs() {
           id: tab.id,
           url: tab.url,
           title: tab.title,
+          // Angepinnt gehoert hierher: was man anpinnt, will man nach einem
+          // Neustart WIEDERFINDEN — sonst ist das Anpinnen wertlos. Diese
+          // Feldliste ist die bekannte Falle: was hier fehlt, existiert nach
+          // dem naechsten Laden nicht mehr.
+          angepinnt: Boolean(tab.angepinnt),
           scrollRatio: Math.round((tab.scrollRatio || 0) * 1000) / 1000,
           zoom: tab.zoom || 1,
           history,
