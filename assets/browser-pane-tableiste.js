@@ -13,6 +13,8 @@
 //   * das Kreuz erscheint bei schmalen Tabs nur am aktiven und beim Hover
 //   * Tabs lassen sich mit der Maus umsortieren
 //
+import { zeigeMenue } from "./browser-pane-menue.js?v=browser-pane-20260709-2";
+
 // SRP: browser-pane.js steht bei 795 von 800 Zeilen und darf nicht wachsen.
 // Dieses Modul bekommt alles hineingereicht (Zustand, Aktionen) und kennt
 // weder Netzwerk noch Speicher — dadurch ist es ohne Browser testbar.
@@ -244,37 +246,13 @@ function verdrahteZiehen(behaelter, tabs, sortieren) {
   });
 }
 
-// Rechtsklick-Menue. Bewusst ohne Bibliothek: ein <div> mit Knoepfen, das beim
-// naechsten Klick irgendwo wieder verschwindet.
+// Rechtsklick-Menue eines Tabs. Die Mechanik (Positionieren, Schliessen,
+// Aussehen) liegt in browser-pane-menue.js — sie wird auch fuer den
+// Rechtsklick auf die SEITE gebraucht, und zwei Menues, die sich
+// unterschiedlich schliessen, faellt niemandem als Absicht auf.
 function oeffneMenue(event, tab, tabs, { schliessen, oeffnen }) {
-  document.querySelector(".bp-tabmenue")?.remove();
-  const menue = document.createElement("div");
-  menue.className = "bp-tabmenue";
-  menue.setAttribute("role", "menu");
-  menue.style.left = `${event.clientX}px`;
-  menue.style.top = `${event.clientY}px`;
-
-  for (const eintrag of menueEintraege(tabs, tab.id)) {
-    const knopf = document.createElement("button");
-    knopf.type = "button";
-    knopf.className = "bp-tabmenue-eintrag";
-    knopf.setAttribute("role", "menuitem");
-    knopf.textContent = eintrag.text;
-    knopf.disabled = !eintrag.aktiv;
-    knopf.addEventListener("click", () => {
-      menue.remove();
-      fuehreAus(eintrag.id, tab, tabs, { schliessen, oeffnen });
-    });
-    menue.appendChild(knopf);
-  }
-  document.body.appendChild(menue);
-  // Beim naechsten Klick oder Escape wieder weg — ein Menue, das haengen
-  // bleibt, verdeckt genau das, was man als Naechstes anklicken will.
-  const zu = () => menue.remove();
-  setTimeout(() => {
-    document.addEventListener("click", zu, { once: true });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") zu(); }, { once: true });
-  }, 0);
+  zeigeMenue(event.clientX, event.clientY, menueEintraege(tabs, tab.id),
+    (id) => fuehreAus(id, tab, tabs, { schliessen, oeffnen }));
 }
 
 function fuehreAus(id, tab, tabs, { schliessen, oeffnen }) {

@@ -95,7 +95,10 @@ function init() {
     openPane();
   }, true);
   window.addEventListener("smejj:browser-request", onBrowserRequest);
-  window.addEventListener("message", onFrameMessage);
+  window.addEventListener("message", baueNachrichtenEmpfang({
+    state, sessionClient, sessionHooks, stepHistory, navigate, showHint,
+    commitHistory, persistTabs, render, schedulePersist, applyZoom, normalizeAddress, holeSuche: () => suche
+  }));
 }
 
 // --- Pane oeffnen/schliessen -------------------------------------------------
@@ -633,36 +636,6 @@ function isAmazonHost(host) {
   return /^amazon\./i.test(String(host || ""));
 }
 
-function onFrameMessage(event) {
-  const message = event.data;
-  if (!message || typeof message.type !== "string") return;
-  const tab = state.tabs.find((entry) => entry.frame?.contentWindow === event.source);
-  if (!tab) return;
-  if (message.type === "smejj.browser.sessionAct" && message.action) {
-    sessionClient.handleAct(tab, message.action, sessionHooks);
-    return;
-  }
-  if (message.type === "smejj.browser.suchErgebnis") {
-    suche?.melde(message.anzahl, message.index);
-    return;
-  }
-  if (message.type === "smejj.browser.reload" && tab.url) {
-    navigate(tab, tab.url, { push: false }); // "Erneut laden" der Fehlerseite
-    return;
-  }
-  if (message.type === "smejj.browser.navigate" && typeof message.url === "string") {
-    const target = normalizeAddress(message.url);
-    if (target) navigate(tab, target);
-    return;
-  }
-  if (message.type === "smejj.browser.scrollState") {
-    const top = Number(message.top);
-    const max = Number(message.max);
-    if (!Number.isFinite(top) || !Number.isFinite(max) || max <= 0) return;
-    tab.scrollRatio = Math.min(1, Math.max(0, top / max));
-    schedulePersist();
-  }
-}
 
 // Persistenz fuer hochfrequente Updates (Scroll) buendeln.
 function schedulePersist() {

@@ -270,6 +270,12 @@ export function buildLiveBrowserHtml({ url, title, screenshot, viewport = {} } =
     function sendAction(action) {
       parent.postMessage({ type: "smejj.browser.sessionAct", action: action }, "*");
     }
+    // Rechtsklick gehoert dem Panel, nicht der Seite darunter: auf einem
+    // Standbild ist das Browser-Menue ohnehin sinnlos ("Bild speichern").
+    document.addEventListener("contextmenu", function (event) {
+      event.preventDefault();
+      parent.postMessage({ type: "smejj.browser.rechtsklick", x: event.clientX, y: event.clientY }, "*");
+    });
     function flushText() {
       clearTimeout(textTimer);
       textTimer = 0;
