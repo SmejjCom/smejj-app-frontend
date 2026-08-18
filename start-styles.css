@@ -2947,7 +2947,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
    Seit die Adresse ohne "https://" angezeigt wird, ist dieses Zeichen die
    EINZIGE Auskunft ueber die Verschluesselung — ohne es waere das Kuerzen
    ein Rueckschritt. */
-.bp-sicherheit {
+.bp-toolbar .bp-sicherheit {
   position: absolute;
   z-index: 2;
   top: 50%;
@@ -2965,9 +2965,24 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   cursor: default;
 }
 
-.bp-sicherheit[hidden] { display: none; }
+/* Breite MUSS sich nach dem Inhalt richten: bei "Nicht sicher" stehen
+   Symbol und Text nebeneinander. `.bp-toolbar button` gibt allen Knoepfen
+   eine feste Quadratgroesse — hier ist das falsch. */
+.bp-toolbar .bp-sicherheit {
+  width: auto;
+  min-width: 0;
+  height: 20px;
+  display: flex;
+  /* `place-items: unset` allein nahm die Zentrierung weg, die
+     `.bp-toolbar button` per `place-items: center` gesetzt hatte — Symbol und
+     Text standen dann auf verschiedenen Hoehen. Gemessen, nicht geraten. */
+  align-items: center;
+  justify-content: flex-start;
+}
 
-.bp-sicherheit svg {
+.bp-toolbar .bp-sicherheit[hidden] { display: none; }
+
+.bp-toolbar .bp-sicherheit svg {
   width: 14px;
   height: 14px;
   fill: none;
@@ -2981,7 +2996,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
    niemand mehr; eine Warnung, die selten kommt, liest man. Die WARNUNG hat
    ausserdem eine andere FORM (Dreieck statt Schloss) — Farbe allein reicht
    nicht, rund 8 % der Maenner unterscheiden Rot und Gruen nicht. */
-.bp-sicherheit[data-zustand="unsicher"] {
+.bp-toolbar .bp-sicherheit[data-zustand="unsicher"] {
   background: rgba(240, 173, 78, 0.16);
   color: #f0ad4e;
 }
@@ -2997,12 +3012,14 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   padding-left: 28px;
 }
 
-.bp-sicherheit[data-zustand="unsicher"] ~ .bp-address {
-  padding-left: 92px;
+.bp-toolbar .bp-sicherheit[data-zustand="unsicher"] ~ .bp-address {
+  /* Gemessen (Testseite 2026-08-17): das Zeichen endet bei 95 px.
+     100 px lassen ihm Platz UND einen sichtbaren Abstand zum Text. */
+  padding-left: 100px;
 }
 
 /* Lesezeichen-Stern rechts IN der Adressleiste (wie Chrome). */
-.bp-stern {
+.bp-toolbar .bp-stern {
   position: absolute;
   z-index: 2;
   top: 50%;
@@ -3019,19 +3036,19 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   cursor: pointer;
 }
 
-.bp-stern[hidden] { display: none; }
+.bp-toolbar .bp-stern[hidden] { display: none; }
 
-.bp-stern:hover {
+.bp-toolbar .bp-stern:hover {
   background: rgba(246, 243, 238, 0.12);
   color: #f6f3ee;
 }
 
-.bp-stern:focus-visible {
+.bp-toolbar .bp-stern:focus-visible {
   outline: 2px solid rgba(159, 231, 212, 0.9);
   outline-offset: 1px;
 }
 
-.bp-stern svg {
+.bp-toolbar .bp-stern svg {
   width: 15px;
   height: 15px;
   fill: none;
@@ -3043,7 +3060,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 /* Gemerkt: gefuellt UND farbig. Die Fuellung allein traegt die Auskunft,
    die Farbe verstaerkt sie nur — Farbe allein waere fuer einen Teil der
    Nutzer keine Auskunft. */
-.bp-stern[data-gemerkt="ja"] {
+.bp-toolbar .bp-stern[data-gemerkt="ja"] {
   color: #f0c14b;
 }
 
