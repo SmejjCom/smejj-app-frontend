@@ -209,12 +209,30 @@ function markenElement(tab) {
   const marke = document.createElement("span");
   marke.className = "bp-tab-marke";
   marke.setAttribute("aria-hidden", "true");
+  // Auch der Rahmen der Marke haelt seine Groesse ohne Stylesheet — siehe
+  // die Begruendung beim Bild weiter unten.
+  marke.style.flex = "none";
+  marke.style.width = "16px";
+  marke.style.height = "16px";
+  marke.style.overflow = "hidden";
   // Echtes Icon, wenn der Server eines als data: mitgeliefert hat.
   if (typeof tab.favicon === "string" && tab.favicon.startsWith("data:image/")) {
     const bild = document.createElement("img");
     bild.src = tab.favicon;
     bild.alt = "";
     bild.className = "bp-tab-favicon";
+    // Groesse AUCH ohne CSS festnageln. Ein Favicon ist oft 64x64 oder
+    // groesser; haengt seine Groesse nur am Stylesheet, genuegt EIN Moment
+    // mit alter CSS und neuem Skript — und ein riesiges Bild sprengt die
+    // Kopfleiste. Genau dieser Zustand ist am 2026-08-18 beim Betreiber
+    // aufgetreten (ein oranger Block statt eines Tabs). Der Dienstarbeiter
+    // liefert Dateien einzeln aus dem Zwischenspeicher; dass CSS und Skript
+    // aus derselben Fassung stammen, ist NICHT garantiert.
+    bild.width = 16;
+    bild.height = 16;
+    bild.style.width = "16px";
+    bild.style.height = "16px";
+    bild.style.objectFit = "contain";
     marke.appendChild(bild);
     return marke;
   }

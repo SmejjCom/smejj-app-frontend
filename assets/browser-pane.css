@@ -12,12 +12,14 @@
 
 .browser-pane {
   display: grid;
-  /* An Chrome gemessen (Bildschirmfoto 2026-08-17): Leistenhoehe ~32 px,
-     Knoepfe ~28 px, Abstand ~6 px. Der enge Satz 26/22/3 gilt weiter fuer
-     schmale Fenster (Medienabfrage unten) — dort zaehlt jeder Pixel. */
-  --bp-row-height: 32px;
-  --bp-control-size: 28px;
-  --bp-control-gap: 6px;
+  /* ZURUECKGENOMMEN 2026-08-18 auf Ansage des Betreibers: Ich hatte die
+     Leiste an Chromes Masse angeglichen (32/28/6). Gewuenscht war aber die
+     FUNKTION von Chrome, nicht sein Aussehen — die Kopfleiste von smejj soll
+     bleiben, wie sie war. Das ist keine Geschmacksfrage: das Panel teilt sich
+     den Bildschirm mit dem Chat, und jede Zeile Kopf fehlt der Seite. */
+  --bp-row-height: 26px;
+  --bp-control-size: 22px;
+  --bp-control-gap: 3px;
   --bp-side-width: calc((var(--bp-control-size) * 3) + (var(--bp-control-gap) * 2));
   /* Inhalt darf nie hoeher als das Panel werden: minmax(0, 1fr) statt fester
      Mindesthoehe — sonst werden Seiten auf kleinen Fenstern abgeschnitten. */
