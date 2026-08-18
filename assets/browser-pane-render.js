@@ -244,7 +244,14 @@ export function buildLiveBrowserHtml({ url, title, screenshot, viewport = {} } =
 </head>
 <body>
   <main class="bp-live-browser">
-    <header><strong id="bpTitle">${safeTitle}</strong><span class="bp-live-state" id="bpState">Live</span><a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a></header>
+    <!-- KEINE Titelzeile mehr (Chrome-Abgleich 2026-08-17).
+         Hier stand Titel + "Live" + "Extern oeffnen" — alle drei stehen
+         bereits in unserer eigenen Leiste darueber: der Titel im Tab, der
+         Zustand in der Hinweiszeile, "Extern oeffnen" als Knopf. Chrome hat
+         zwischen Adressleiste und Seite gar nichts. Die Zeile kostete rund
+         30 px Seitenhoehe fuer dreifach dieselbe Auskunft.
+         Die Skript-Zugriffe auf bpTitle/bpState sind gegen Fehlen
+         abgesichert (if (titleEl …)) und laufen unveraendert weiter. -->
     <div class="bp-live-stage" id="bpStage" tabindex="0">
       <img id="bpFrame" src="${safeScreenshot}" alt="Live-Browser-Ansicht von ${safeTitle}">
     </div>
