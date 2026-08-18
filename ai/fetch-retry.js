@@ -48,6 +48,29 @@ const DEEP_LANE_MODEL = /"model"\s*:\s*"[^"]*(glm|kimi|cline)/i;
 const DEEP_LANE_ROUTE = /\/api\/agent(?:[/?#]|$)/;
 
 /**
+ * Grosse Auftraege brauchen mehr Zeit bis zum ersten Byte — unabhaengig von
+ * Route und Modell.
+ *
+ * GEMESSEN am 2026-08-18 im angemeldeten Browser: ein Coding-Auftrag mit 21.000
+ * Zeichen meldete "Verbindung zum Server unterbrochen", waehrend der Server
+ * sauber weiterarbeitete und laut Messschrieb nach 19,4 s bzw. 69,3 s fertig
+ * antwortete. Der Nutzer sah einen Fehler, wo gar keiner war — und die Arbeit
+ * lief bezahlt im Hintergrund weiter.
+ *
+ * DER WIDERSPRUCH, der das ausloest: dieselbe Schwelle von 4.000 Zeichen, die
+ * einem Auftrag die volle DENKTIEFE zugesteht (src/ai/chatThinkingPolicy.js),
+ * gestand ihm bisher keine zusaetzliche ZEIT zu. Wer tief nachdenken darf, muss
+ * auch laenger brauchen duerfen — sonst bricht genau der Fall ab, fuer den die
+ * Tiefe gedacht ist.
+ *
+ * Die Zahl ist nicht gegriffen: die Bruecke gibt sich selbst 60 s bis zu den
+ * Antwortkopfzeilen (SMEJJ_CHAT_BRIDGE_TIMEOUT_MS). Der Client darf nicht
+ * frueher aufgeben als der Server ueberhaupt zugesteht.
+ */
+const GROSSER_AUFTRAG_ZEICHEN = 4000;
+const GROSSER_AUFTRAG_TIMEOUT_MS = 60000;
+
+/**
  * Wieviel Zeit bis zum ersten Byte? Ohne ausdrueckliche Vorgabe entscheidet die
  * angefragte Spur — erkennbar an der Route ODER am Modellnamen im Anfragekoerper.
  * @param {{body?: unknown}} init
@@ -56,8 +79,10 @@ const DEEP_LANE_ROUTE = /\/api\/agent(?:[/?#]|$)/;
  * @returns {number}
  */
 export function firstByteBudgetFor(init, tiefspurMs = DEEP_LANE_FIRST_BYTE_TIMEOUT_MS, url = "") {
-  if (DEEP_LANE_ROUTE.test(String(url || ""))) return tiefspurMs;
   const body = typeof init?.body === "string" ? init.body : "";
+  // Groesse zuerst: sie schlaegt Route und Modellname, weil sie beide ueberholt.
+  if (body.length >= GROSSER_AUFTRAG_ZEICHEN) return GROSSER_AUFTRAG_TIMEOUT_MS;
+  if (DEEP_LANE_ROUTE.test(String(url || ""))) return tiefspurMs;
   return DEEP_LANE_MODEL.test(body) ? tiefspurMs : DEFAULT_FIRST_BYTE_TIMEOUT_MS;
 }
 
