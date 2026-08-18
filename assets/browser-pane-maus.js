@@ -22,8 +22,7 @@ const UEBERSPRUNGEN = new Set(["openBrowser", "closeBrowser", "screenshot", "htt
  */
 export function alsSitzungsAktion(step) {
   const s = step || {};
-  const ziel = s.target || s.selector || null;
-  const sel = ziel ? { strategy: ziel.strategy, value: ziel.value, ...(ziel.name !== undefined ? { name: ziel.name } : {}) } : null;
+  const sel = selektorAus(s);
 
   if (UEBERSPRUNGEN.has(s.action)) return { ueberspringen: s.action };
 
@@ -57,16 +56,45 @@ export function alsSitzungsAktion(step) {
 }
 
 /**
+ * Holt den Selektor aus einem Schritt — egal, wie tief er liegt.
+ *
+ * ECHTE PLAENE NUTZEN ZWEI FORMEN, und das ist kein Zufall:
+ *   extract: { target: { strategy, value } }
+ *   click:   { target: { selector: { strategy, value } } }
+ * Mein erster Uebersetzer kannte nur die flache Form. Folge: der Klick-Schritt
+ * fand kein Ziel — und wurde still verworfen. Der Auftrag "Klicke auf den Link
+ * zum Impressum" fuehrte dazu, dass die Maus nur die Seite oeffnete und
+ * "1 Schritt erledigt" meldete. Ein Erfolg, der keiner war.
+ */
+export function selektorAus(step) {
+  const ziel = step?.target?.selector || step?.target || step?.selector || null;
+  if (!ziel?.strategy || !ziel?.value) return null;
+  return {
+    strategy: ziel.strategy,
+    value: ziel.value,
+    ...(ziel.name !== undefined ? { name: ziel.name } : {})
+  };
+}
+
+/**
  * Uebersetzt einen ganzen Plan. Gibt eine Liste von Auftraegen zurueck,
  * jeweils mit dem Ursprungsschritt fuer die Anzeige.
  */
 export function planAlsAuftraege(plan) {
   const steps = Array.isArray(plan?.steps) ? plan.steps : [];
   const auftraege = [];
+  const fehler = [];
   for (const step of steps) {
     const u = alsSitzungsAktion(step);
     if (u.aktion) auftraege.push({ id: step.id, beschreibung: beschreibe(step), aktion: u.aktion, liestAls: u.liestAls || null });
+    // Ein Schritt, den wir NICHT uebersetzen konnten, darf nicht still
+    // verschwinden. Sonst meldet die Maus "erledigt" fuer einen Auftrag, den
+    // sie nur zur Haelfte verstanden hat — genau das ist am 2026-08-18 beim
+    // Klick-Auftrag passiert. Uebersprungene Schritte (openBrowser & Co.)
+    // sind etwas anderes: die sind hier absichtlich ohne Bedeutung.
+    else if (u.fehler) fehler.push(`${step.id || "?"}: ${u.fehler}`);
   }
+  auftraege.fehler = fehler;
   return auftraege;
 }
 
@@ -186,6 +214,10 @@ export async function fuehreMausAuftragAus({
   }
 
   const auftraege = planAlsAuftraege(plan);
+  // Fail-closed: lieber gar nicht laufen als einen halb verstandenen Plan.
+  if (auftraege.fehler?.length) {
+    return { ok: false, grund: `Maus hat den Plan nicht ganz verstanden (${auftraege.fehler.join("; ")}) — nichts ausgefuehrt.` };
+  }
   if (!auftraege.length) return { ok: false, grund: "Aus dem Plan ergab sich kein Schritt fuer diese Ansicht." };
 
   const ergebnis = await fahreAuftraege({
