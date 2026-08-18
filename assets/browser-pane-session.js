@@ -14,14 +14,60 @@ const ACT_QUEUE_MAX = 6;
 // Gleicher Schluessel wie in account-sessions.js und shared/http-json.js.
 const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
 
-function mitAnmeldung(extra) {
-  try {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (token) return { ...extra, Authorization: `Bearer ${token}` };
-  } catch {
-    // Storage gesperrt: ohne Kopf weiter, der Server weist dann ab.
+// WARUM DER LIVE-BROWSER STILL ZUM STANDBILD WURDE (Befund 2026-08-17):
+//
+// Der Betreiber sah Amazon als Bild — kein Scrollen, kein Weiterklicken. Die
+// Ursache lag nicht im Fern-Browser, sondern hier: /api/browser/session ist
+// anmeldepflichtig, dieser Client las den Nachweis aber NUR aus localStorage.
+// Zwei Wege fuehrten dort ins Leere:
+//
+//   1. Der Auffrischer in account-sessions.js legt frische Nachweise in
+//      sessionStorage ab — gelesen wurde localStorage. Aneinander vorbei.
+//   2. War gar keiner da, wurde auch keiner geholt. Andere Flaechen holen
+//      sich ueber /api/auth/session-token (mit Cookie) Nachschub; hier nicht.
+//
+// Folge: HTTP 401, `open()` gab null zurueck, und der Aufrufer fiel wortlos
+// auf das Standbild zurueck. Ein stiller Rueckfall auf die schlechtere
+// Ansicht sieht aus wie "die Funktion kann das nicht" — dabei fehlte nur der
+// Nachweis. Deshalb wird hier jetzt aktiv nachgeholt, und der Rueckfall sagt
+// im Aufrufer, dass er stattgefunden hat.
+let gemerktesToken = "";
+
+function tokenAusSpeicher() {
+  for (const speicher of [globalThis.sessionStorage, globalThis.localStorage]) {
+    try {
+      const wert = speicher?.getItem(AUTH_TOKEN_KEY);
+      if (wert) return wert;
+    } catch {
+      // Speicher gesperrt: naechsten versuchen.
+    }
   }
-  return { ...extra };
+  return "";
+}
+
+// Holt einen frischen Nachweis aus dem Anmelde-Cookie. `credentials:"include"`
+// ist hier Pflicht: Seite (smejj.com) und Server (smejj-control.zeabur.app)
+// sind verschiedene Herkuenfte, und ohne diese Angabe schickt der Browser das
+// Cookie NICHT mit.
+async function frischesToken(apiOrigin, fetchImpl) {
+  if (!apiOrigin) return "";
+  try {
+    const response = await fetchImpl(`${apiOrigin}/api/auth/session-token`, { credentials: "include" });
+    if (!response.ok) return "";
+    const data = await response.json().catch(() => null);
+    const token = String(data?.accessToken || "");
+    if (token) {
+      gemerktesToken = token;
+      try { globalThis.sessionStorage?.setItem(AUTH_TOKEN_KEY, token); } catch { /* gesperrt */ }
+    }
+    return token;
+  } catch {
+    return "";
+  }
+}
+
+function mitAnmeldung(extra, token) {
+  return token ? { ...extra, Authorization: `Bearer ${token}` } : { ...extra };
 }
 
 function endpointReady(value) {
@@ -36,10 +82,15 @@ function shortHostName(url) {
   }
 }
 
-export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch } = {}) {
+export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, apiOrigin = "" } = {}) {
   const api = routes.api || {};
   const openIds = new Set();
   const queues = new Map();
+  // Herkunft des Servers: entweder hineingereicht oder aus einer der Routen
+  // abgeleitet — der Nachschub-Endpunkt liegt auf demselben Server.
+  const herkunft = apiOrigin || (() => {
+    try { return new URL(api.browserSession).origin; } catch { return ""; }
+  })();
 
   function ready() {
     return endpointReady(api.browserSession)
@@ -47,13 +98,28 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch } = 
       && endpointReady(api.browserSessionClose);
   }
 
+  async function sende(endpoint, body, token) {
+    return fetchImpl(endpoint, {
+      method: "POST",
+      headers: mitAnmeldung({ "content-type": "application/json" }, token),
+      // Das Cookie mitschicken: dann geht es auch, wenn gar kein Token
+      // vorliegt, der Nutzer aber angemeldet ist.
+      credentials: "include",
+      body: JSON.stringify(body)
+    });
+  }
+
+  // Einmal nachfassen, nie oefter: Ist der Nachweis abgelaufen, hilft ein
+  // frischer. Hilft der auch nicht, ist der Nutzer wirklich nicht angemeldet
+  // — dann waere jede Wiederholung nur Last ohne Aussicht.
   async function post(endpoint, body) {
     try {
-      const response = await fetchImpl(endpoint, {
-        method: "POST",
-        headers: mitAnmeldung({ "content-type": "application/json" }),
-        body: JSON.stringify(body)
-      });
+      let token = gemerktesToken || tokenAusSpeicher();
+      let response = await sende(endpoint, body, token);
+      if (response.status === 401 || response.status === 403) {
+        const frisch = await frischesToken(herkunft, fetchImpl);
+        if (frisch && frisch !== token) response = await sende(endpoint, body, frisch);
+      }
       const data = await response.json().catch(() => null);
       return data && typeof data === "object" ? data : null;
     } catch {
