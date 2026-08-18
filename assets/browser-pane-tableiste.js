@@ -157,6 +157,24 @@ export function zeichneTableiste(behaelter, {
 } = {}) {
   if (!behaelter) return;
   behaelter.innerHTML = "";
+  // DIE TRAGENDEN LAYOUT-WERTE STEHEN HIER, NICHT NUR IM STYLESHEET.
+  //
+  // Warum: Bis zum 2026-08-18 zeichnete diese Leiste genau EINEN Tab, und die
+  // passende CSS lag seit jeher vor. Mit der neuen Leiste sieht sie nur mit
+  // der NEUEN CSS richtig aus — und der Dienstarbeiter liefert Dateien
+  // einzeln aus dem Zwischenspeicher. Ein Browser kann also neues Skript mit
+  // alter CSS mischen. Genau das ist passiert: die Tabs erschienen als nackte
+  // Buchstaben, senkrecht gestapelt, ueber den Rand hinaus.
+  //
+  // Eine Kopfleiste darf nicht davon abhaengen, welche Fassung des
+  // Stylesheets gerade im Zwischenspeicher liegt. Das Stylesheet bleibt
+  // zustaendig fuer Farben und Feinheiten; was das Layout TRAEGT, steht hier.
+  behaelter.style.display = "flex";
+  behaelter.style.alignItems = "center";
+  behaelter.style.gap = "2px";
+  behaelter.style.minWidth = "0";
+  behaelter.style.overflowX = "auto";
+  behaelter.style.overflowY = "hidden";
   // Angepinnte belegen feste Breite; der Rest teilt sich, was uebrig bleibt.
   const geordnet = sortiertNachPinnung(tabs);
   const angepinnte = geordnet.filter((t) => t.angepinnt).length;
@@ -174,6 +192,24 @@ export function zeichneTableiste(behaelter, {
     knopf.setAttribute("role", "tab");
     knopf.setAttribute("aria-selected", String(istAktiv));
     knopf.style.width = `${istPin ? PIN_BREITE : breite}px`;
+    // Dasselbe hier: das Grundgeruest eines Tabs haengt nicht am Stylesheet.
+    knopf.style.flex = "none";
+    knopf.style.display = "grid";
+    knopf.style.gridTemplateColumns = istPin || !mitTitel ? "minmax(0, 1fr)" : "auto minmax(0, 1fr) auto";
+    knopf.style.alignItems = "center";
+    knopf.style.justifyItems = istPin || !mitTitel ? "center" : "stretch";
+    knopf.style.gap = "7px";
+    knopf.style.height = "var(--bp-control-size, 22px)";
+    knopf.style.minHeight = "0";
+    knopf.style.padding = istPin ? "0" : "0 7px";
+    knopf.style.boxSizing = "border-box";
+    knopf.style.border = "1px solid transparent";
+    knopf.style.borderRadius = "5px";
+    knopf.style.background = istAktiv ? "rgba(246, 243, 238, 0.1)" : "transparent";
+    knopf.style.color = "#f6f3ee";
+    knopf.style.fontSize = "13.5px";
+    knopf.style.cursor = "pointer";
+    knopf.style.overflow = "hidden";
     // Chrome zeigt im Tooltip Titel UND Adresse — bei schmalen Tabs ist das
     // oft die einzige Moeglichkeit, die Seite zu erkennen.
     knopf.title = [tab.title, tab.url].filter(Boolean).join("\n") || neuerTabTitel;
@@ -238,6 +274,14 @@ function markenElement(tab) {
   }
   const { buchstabe, farbton } = tabMarke(tab.url);
   marke.textContent = buchstabe;
+  marke.style.display = "grid";
+  marke.style.placeItems = "center";
+  marke.style.borderRadius = "3px";
+  marke.style.background = `hsl(${farbton} 45% 42%)`;
+  marke.style.color = "#fff";
+  marke.style.fontSize = "10px";
+  marke.style.fontWeight = "700";
+  marke.style.lineHeight = "1";
   marke.style.setProperty("--bp-tab-farbton", String(farbton));
   marke.classList.add("bp-tab-marke-buchstabe");
   return marke;
@@ -246,6 +290,10 @@ function markenElement(tab) {
 function titelElement(tab, neuerTabTitel) {
   const label = document.createElement("span");
   label.className = "bp-tab-title";
+  label.style.overflow = "hidden";
+  label.style.textOverflow = "ellipsis";
+  label.style.whiteSpace = "nowrap";
+  label.style.textAlign = "left";
   label.textContent = tab.title || hostVon(tab.url) || neuerTabTitel;
   return label;
 }
@@ -257,6 +305,15 @@ function kreuzElement(tab, schliessen) {
   kreuz.setAttribute("aria-label", `Tab schliessen: ${tab.title || hostVon(tab.url) || "Neuer Tab"}`);
   kreuz.title = "Schliessen";
   kreuz.textContent = "×";
+  kreuz.style.flex = "none";
+  kreuz.style.display = "grid";
+  kreuz.style.placeItems = "center";
+  kreuz.style.width = "16px";
+  kreuz.style.height = "16px";
+  kreuz.style.borderRadius = "3px";
+  kreuz.style.color = "rgba(246, 243, 238, 0.55)";
+  kreuz.style.fontSize = "14px";
+  kreuz.style.lineHeight = "1";
   kreuz.addEventListener("click", (event) => {
     event.stopPropagation();
     schliessen(tab.id);
