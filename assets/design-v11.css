@@ -2402,3 +2402,23 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: #dfe5e3;
   color: #0a0f16;
 }
+/* =====================================================================
+ * Betreiber 2026-08-18: "im Chat kommt beim Senden-Icon immer noch ein
+ * viereckiger Rahmen — soll aussehen wie im Code."
+ *
+ * Der Uebeltaeter war NICHT der Senden-Knopf, sondern das Stopp-Quadrat,
+ * das waehrend der Antwort darueber liegt (.chat-stopp). Zwei fremde
+ * Regeln haben es verformt:
+ *   *, ::before, ::after { border-radius: 0 !important }  -> eckig
+ *   button { min-height: 42px }                           -> 4 px zu hoch
+ * Beide schlugen die eigenen Werte des Overlays, weil die ohne
+ * !important standen. Es sass darum als kantiger Klotz ueber dem runden
+ * Knopf. Jetzt deckt es den Senden-Knopf exakt und traegt dieselbe Form.
+ * ===================================================================== */
+#chatStopp.chat-stopp {
+  border-radius: 999px !important;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+}
