@@ -16,8 +16,8 @@ import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
   buildRemoteBrowserHtml
-} from "./browser-pane-render.js?v=browser-pane-20260709-2";
-export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260709-2";
+} from "./browser-pane-render.js?v=browser-pane-20260818-4";
+export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260818-4";
 import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260709-2";
 // Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
@@ -25,8 +25,8 @@ import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-202
 import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-2";
 import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
-import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260709-2";
-import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
+import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260818-4";
+import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260818-4";
 import { verdrahteMausKnopf } from "./browser-pane-maus.js?v=browser-pane-20260818-1";
 // Gefunden 2026-08-18 beim Livetest: dieser Import FEHLTE, obwohl init() die
 // Funktion benutzt. Folge war kein kleiner Schoenheitsfehler — browser-pane.js
@@ -35,7 +35,7 @@ import { verdrahteMausKnopf } from "./browser-pane-maus.js?v=browser-pane-202608
 // gemeldet: alle pruefen den QUELLTEXT, keiner laesst das Modul laufen.
 import { baueNachrichtenEmpfang } from "./browser-pane-nachrichten.js?v=browser-pane-20260709-2";
 let suche = null;
-import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
+import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260818-4";
 // Reine Helfer (2026-08-19 ausgelagert, 800-Zeilen-Regel). Sie werden hier
 // zugleich WEITER EXPORTIERT, damit tests/browser-pane.test.mjs und jeder
 // bisherige Aufrufer sie unveraendert von browser-pane.js bekommt.

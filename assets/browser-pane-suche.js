@@ -63,7 +63,7 @@ export function baueSuchleiste(wurzel) {
     <input class="bp-suche-feld" type="text" placeholder="Auf der Seite suchen" aria-label="Auf der Seite suchen">
     <span class="bp-suche-zahl" aria-live="polite">0/0</span>
     <button class="bp-suche-hoch" type="button" title="Vorheriger Treffer" aria-label="Vorheriger Treffer">‹</button>
-    <button class="bp-suche-runter" type="button" title="Naechster Treffer" aria-label="Naechster Treffer">›</button>
+    <button class="bp-suche-runter" type="button" title="Nächster Treffer" aria-label="Nächster Treffer">›</button>
     <button class="bp-suche-zu" type="button" title="Suche schliessen" aria-label="Suche schliessen">×</button>`;
   wurzel.appendChild(leiste);
   return leiste;

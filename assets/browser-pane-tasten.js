@@ -22,6 +22,14 @@ export function tastenBefehl(event) {
   if (!event || (!event.metaKey && !event.ctrlKey)) return null;
   const taste = String(event.key || "").toLowerCase();
 
+  // Strg+Tab / Strg+Umschalt+Tab wechselt den Tab — Chromes eigener Weg.
+  // Er ist der ERSATZ fuer die beiden Blaetterpfeile, die frueher in der
+  // Leiste sassen: Chrome hat sie nicht, und sie kosteten 44 px, die den
+  // Tabs fehlten. Die Faehigkeit bleibt, nur der Platzverbrauch faellt weg.
+  // Steht bewusst VOR der Umschalt-Sperre weiter unten, sonst kaeme die
+  // Rueckwaerts-Richtung nie an.
+  if (taste === "tab") return { befehl: "tabWechseln", wert: event.shiftKey ? -1 : 1 };
+
   // Cmd+Shift+T holt den zuletzt geschlossenen Tab zurueck. MUSS vor der
   // Pruefung auf "t" stehen — sonst gewinnt "neuer Tab" und der
   // geschlossene bleibt weg.
@@ -93,9 +101,10 @@ export function holeZurueck(stapel) {
  * alle Kuerzel. So bleibt in browser-pane.js ein einziger Aufruf stehen —
  * und WAS ein Kuerzel bedeutet, steht an einer Stelle statt verstreut.
  */
-export function verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, refs, state, oeffneSuche }) {
+export function verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, switchTab, refs, state, oeffneSuche }) {
   return verdrahteTasten({
     neuerTab: () => addTab({ focusAddress: true }),
+    tabWechseln: (richtung) => switchTab?.(richtung),
     // Cmd+W schliesst KEINEN angepinnten Tab — genau davor soll das Anpinnen
     // schuetzen. Sonst waere es ein Versprechen, das die Tastatur bricht.
     tabSchliessen: () => { const t = activeTab(); if (t && !t.angepinnt) closeTab(t.id); },

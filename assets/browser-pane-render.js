@@ -392,13 +392,10 @@ export function buildPaneShellHtml({ neuerTabTitel = "Neuer Tab", maxTabs = 7 } 
   return `
     <div class="bp-tabstrip" role="tablist" aria-label="Browser Tabs">
       <div class="bp-tab-left">
-        <button class="bp-tab-prev" type="button" title="Vorheriger Tab" aria-label="Vorheriger Tab">‹</button>
-        <button class="bp-tab-next" type="button" title="Naechster Tab" aria-label="Naechster Tab">›</button>
-        <button class="bp-tab-add" type="button" title="Neuer Tab" aria-label="Neuer Tab">+</button>
+        <button class="bp-tab-add" type="button" title="Neuer Tab (⌘T)" aria-label="Neuer Tab">+</button>
       </div>
       <div class="bp-tabs"></div>
       <div class="bp-tab-right">
-        <button class="bp-tab-count" type="button" title="Tab-Uebersicht" aria-label="Tab-Uebersicht">0</button>
         <button class="bp-maus" type="button" title="Maus beauftragen — sie bedient diesen Browser" aria-label="Maus beauftragen">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l6.5 17 2.5-7 7-2.5z"/></svg>
         </button>
@@ -407,29 +404,29 @@ export function buildPaneShellHtml({ neuerTabTitel = "Neuer Tab", maxTabs = 7 } 
     </div>
     <div class="bp-toolbar">
       <div class="bp-toolbar-left">
-        <button class="bp-nav-back" type="button" title="Zurueck" aria-label="Zurueck" disabled>
+        <button class="bp-nav-back" type="button" title="Zurück" aria-label="Zurück" disabled>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
         </button>
-        <button class="bp-nav-forward" type="button" title="Vor" aria-label="Vor" disabled>
+        <button class="bp-nav-forward" type="button" title="Vorwärts" aria-label="Vorwärts" disabled>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
         </button>
-        <button class="bp-nav-reload" type="button" title="Neu laden" aria-label="Neu laden">
+        <button class="bp-nav-reload" type="button" title="Diese Seite neu laden (⌘R)" aria-label="Diese Seite neu laden">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>
         </button>
       </div>
       <form class="bp-address-form">
         <input class="bp-address" type="text" inputmode="url" autocomplete="off" spellcheck="false"
-          placeholder="Suchen oder URL eingeben" aria-label="Adresse oder Suche">
+          placeholder="Suchen oder URL eingeben" aria-label="Adressleiste und Suchleiste">
         <div class="bp-vorschlaege" hidden></div>
       </form>
       <div class="bp-toolbar-right">
-        <button class="bp-open-external" type="button" title="In neuem Tab oeffnen" aria-label="In neuem Tab oeffnen">
+        <button class="bp-open-external" type="button" title="In neuem Tab öffnen" aria-label="In neuem Tab öffnen">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 13v6H5V6h6"/></svg>
         </button>
-        <button class="bp-menu" type="button" title="Panel-Menue" aria-label="Panel-Menue">
+        <button class="bp-menu" type="button" title="Browser anpassen und einstellen" aria-label="Browser anpassen und einstellen">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
-        <button class="bp-close" type="button" title="Browser schliessen" aria-label="Browser schliessen">
+        <button class="bp-close" type="button" title="Browser schließen" aria-label="Browser schließen">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
         </button>
       </div>
