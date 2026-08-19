@@ -538,6 +538,53 @@ async function tryLiveBrowser(tab, url, { push = true } = {}) {
   return true;
 }
 
+/**
+ * Oeffnet eine Adresse AUSDRUECKLICH im Live-Browser — der einzige Modus, in
+ * dem die Maus etwas sehen und klicken kann.
+ *
+ * WARUM ES DAS BRAUCHT (live gemessen 2026-08-18, mehrfach im Kreis gelaufen):
+ * navigate() waehlt den Modus nach der SEITE, nicht nach dem Zweck. Ist eine
+ * Seite einbettbar — und das sind die meisten —, landet sie als gewoehnlicher
+ * iframe im Panel. Das ist fuer einen Menschen genau richtig: volles
+ * JavaScript, schnell, kein Serverumweg. Fuer die Maus ist es wertlos: ein
+ * fremder iframe laesst sich nicht auslesen, es entsteht keine sessionId, und
+ * der freie Lauf wartet auf eine Sitzung, die nie kommt.
+ *
+ * Solange /api/browser/fetch ausgefallen war (404), fiel alles auf den
+ * Live-Browser zurueck und es sah aus, als funktioniere die Kette. Als der
+ * Endpunkt zurueckkam, verschwand die Sitzung wieder — derselbe Fehler, neues
+ * Gesicht. Deshalb fragt die Maus jetzt selbst danach, statt zu hoffen.
+ *
+ * @returns {Promise<{ok: true}|{ok: false, grund: string}>}
+ */
+export async function oeffneImLiveBrowser(url) {
+  const ziel = normalizeAgentBrowserUrl(url);
+  if (!ziel) return { ok: false, grund: `Diese Adresse kann der Browser nicht oeffnen: ${url} — es geht nur https.` };
+  openPane();
+
+  // Ist das Panel voll (MAX_TABS), wird der AKTIVE Tab weiterbenutzt statt
+  // aufzugeben. Sieben offene Taebe sind kein Grund, einen Auftrag zu
+  // verweigern — der Nutzer erfaehrt es im Chat.
+  const aktiv = activeTab();
+  const tab = (!aktiv?.url || aktiv.url === ziel) ? aktiv : (addTab() || aktiv);
+  if (!tab) return { ok: false, grund: "Der Browser konnte keinen Tab bereitstellen." };
+
+  if (tab.sessionId) { sessionClient.close(tab.sessionId); tab.sessionId = ""; }
+  tab.status = "loading";
+  tab.url = ziel;
+  refs.address.value = ziel;
+  refs.address.blur();
+  render();
+
+  const gelungen = await tryLiveBrowser(tab, ziel, { push: true });
+  if (gelungen) return { ok: true };
+
+  // Fail-closed mit Grund: lieber ehrlich abbrechen als die Seite als
+  // gewoehnlichen iframe zeigen und die Maus danach ins Leere greifen lassen.
+  tab.status = "ready";
+  return { ok: false, grund: "Der Live-Browser hat die Seite nicht uebernommen. Ohne ihn kann die Maus nichts sehen oder klicken." };
+}
+
 async function tryRemoteBrowser(tab, url, { reason = "", push = true } = {}) {
   if (await tryLiveBrowser(tab, url, { push })) return true;
   const endpoint = CLIENT_ROUTES.api.browserRemote;

@@ -42,7 +42,7 @@
 // Dann zeigte activeTab() auf ein leeres Panel und starteMausLauf() meldete
 // ewig "Der Browser ist noch nicht bereit". Nichts waere kaputt zu sehen,
 // alles waere kaputt.
-const PANEL = "./browser-pane.js?v=browser-pane-20260818-4";
+const PANEL = "./browser-pane.js?v=browser-pane-20260818-5";
 const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260818-1";
 
 async function holePanel() {
@@ -50,6 +50,7 @@ async function holePanel() {
   return {
     activeTab: pane.activeTab,
     openBrowserRequest: pane.openBrowserRequest,
+    oeffneImLiveBrowser: pane.oeffneImLiveBrowser,
     normalizeAgentBrowserUrl: pane.normalizeAgentBrowserUrl,
     openPane: pane.openPane,
     refs: pane.refs,
@@ -302,10 +303,16 @@ export async function mausAuftragErledigt({ task, output, deps = {} } = {}) {
   // Erst der eigene Chrome (wie bei Claude), dann der ferne Browser.
   if (!deps.oeffne && await ueberChrome({ aufgabe, ziel, schreibe })) return true;
 
-  schreibe(`Ich oeffne ${kurzeAdresse(ziel)} im Browser rechts.`);
+  // AUSDRUECKLICH im Live-Browser oeffnen, nicht "irgendwie". navigate()
+  // waehlt den Modus nach der Seite: einbettbare Seiten landen als
+  // gewoehnlicher iframe, und darin sieht die Maus nichts. Genau daran ist der
+  // Auftrag am 2026-08-18 immer wieder gescheitert — mal weil der Proxy tot
+  // war, mal weil er wieder lebte. Jetzt wird der richtige Modus verlangt,
+  // statt auf ihn zu hoffen.
+  schreibe(`Ich oeffne ${kurzeAdresse(ziel)} im Live-Browser rechts.`);
   const geoeffnet = deps.oeffne
     ? (oeffne(ziel) ? { ok: true } : { ok: false, grund: `Diese Adresse kann der eingebaute Browser nicht oeffnen: ${ziel}` })
-    : oeffneZiel(ziel, panel, schreibe);
+    : await panel.oeffneImLiveBrowser(ziel);
   if (!geoeffnet.ok) {
     schreibe(geoeffnet.grund);
     return true;
