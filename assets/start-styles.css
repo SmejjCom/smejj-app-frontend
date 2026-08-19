@@ -7460,13 +7460,15 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #start .prompt-glass .send-button,
 #start .prompt-glass .send-button.ist-sprache,
 #start .prompt-glass .send-button:not(.ist-sprache),
-#code .codeleiste .send-button {
+#code .codeleiste .send-button,
+#code .codeleiste #codeSenden {
   background: transparent;
   box-shadow: none;
   color: rgba(242, 245, 244, 0.74);
 }
 #start .prompt-glass .send-button:hover,
-#code .codeleiste .send-button:hover {
+#code .codeleiste .send-button:hover,
+#code .codeleiste #codeSenden:hover {
   background: transparent;
   color: #f2f5f4;
 }
