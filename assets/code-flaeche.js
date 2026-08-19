@@ -301,17 +301,10 @@ async function oeffneModellMenue(kontext = {}) {
     menue.append(k);
     return k;
   };
-  // Hausmodell: nutzt den bestehenden Stufen-Weg (Auto/Gruendlich/Schnell).
-  zeile({
-    titel: "smejj 1.0",
-    aktiv: !istCline,
-    aktion: () => {
-      localStorage.setItem(MODELL_KEY, "smejj 1.0");
-      window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "smejj 1.0" } }));
-      zu();
-      zeichne();
-    }
-  });
+  // REIHENFOLGE: Auto steht ganz oben (Betreiber-Auftrag 2026-08-18:
+  // "Auto soll ganz oben 1. sein, smejj 1.0 2. sein"). Der sparsame Weg
+  // ist die Voreinstellung, die der Betreiber sehen soll — nicht das
+  // Hausmodell.
   // Auto: der sparsame Weg. Hier wird NICHT /select gerufen — das Modell
   // steht erst fest, wenn der Auftrag da ist (ai/modellRouter.js waehlt dann
   // und wartet das /select ab). Darum ist diese Zeile sofort fertig.
@@ -327,6 +320,17 @@ async function oeffneModellMenue(kontext = {}) {
       localStorage.setItem(MODELL_KEY, "Cline");
       document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: AUTO_MARKE } }));
       window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
+      zu();
+      zeichne();
+    }
+  });
+  // Hausmodell: nutzt den bestehenden Stufen-Weg (Auto/Gruendlich/Schnell).
+  zeile({
+    titel: "smejj 1.0",
+    aktiv: !istCline,
+    aktion: () => {
+      localStorage.setItem(MODELL_KEY, "smejj 1.0");
+      window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "smejj 1.0" } }));
       zu();
       zeichne();
     }
