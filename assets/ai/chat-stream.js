@@ -499,6 +499,23 @@ export async function readableError(response, offlineNotice = "") {
 // meldet die Zahl laufender Stroeme an die Oberflaeche (Stopp-Knopf).
 const aktiveLeser = new Set();
 
+/**
+ * Ein abgerissener Bild-/Video-Strom hinterlaesst ein `![...](data:...`-Markdown
+ * ohne schliessende Klammer — dann steht 100+ KB base64 als Rohtext im Chat
+ * (live gesehen 2026-08-13 bei einem Bruecken-Neustart mitten im Malen).
+ * Das Fragment wird abgeschnitten und durch einen verstaendlichen Satz ersetzt.
+ */
+export function entferneAbgerisseneMedien(text) {
+  const roh = String(text || "");
+  const start = roh.lastIndexOf("![");
+  if (start === -1) return roh;
+  const rest = roh.slice(start);
+  const klammer = rest.indexOf("](data:");
+  if (klammer === -1 || rest.indexOf(")", klammer) !== -1) return roh;
+  const art = rest.slice(klammer).startsWith("](data:video") ? "Video" : "Bild";
+  return `${roh.slice(0, start).trimEnd()}\n\nDie ${art}-Übertragung ist abgerissen — bitte fordere es einfach noch einmal an.`;
+}
+
 function meldeStromstand() {
   try {
     window.dispatchEvent(new CustomEvent("smejj:chat-strom", { detail: { laufen: aktiveLeser.size } }));
@@ -692,6 +709,11 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
     }
     output.scrollIntoView({ block: "end" });
   }
+  } catch (abriss) {
+    // Netzabbruch mitten im Bild-/Video-Strom: ohne Saeuberung stuenden hier
+    // 100+ KB base64-Rohtext in der Blase.
+    output.textContent = entferneAbgerisseneMedien(output.textContent);
+    throw abriss;
   } finally {
     // Immer deregistrieren — auch wenn read() wirft (Netzabbruch): sonst
     // bliebe der Stopp-Knopf fuer immer stehen.
@@ -706,7 +728,7 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // haengenden Video-Auftrag). Ehrlich sagen statt endlos "läuft" zeigen —
   // und die bisherige Teilantwort behalten, sie ist nicht falsch.
   if (stilleGemeldet) {
-    const bisher = output.textContent.trim();
+    const bisher = entferneAbgerisseneMedien(output.textContent).trim();
     output.textContent = bisher
       ? `${bisher}\n\n_Abgebrochen: der Server hat sich 90 Sekunden lang nicht mehr gemeldet. Bitte erneut versuchen._`
       : "Abgebrochen: der Server hat sich 90 Sekunden lang nicht mehr gemeldet. Bitte erneut versuchen.";
@@ -717,6 +739,7 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // Der Lauf endete ohne Schlussantwort (alle Runden gingen in Werkzeuge).
   // Dann ist die letzte Arbeitsnotiz besser als eine leere Blase.
   if (!output.textContent.trim() && letzteNotiz.trim()) output.textContent = letzteNotiz;
+  output.textContent = entferneAbgerisseneMedien(output.textContent);
   // VOR renderMarkdown: der Renderer liest textContent und ersetzt innerHTML —
   // danach angehaengter Text bliebe roher Stern-Text.
   output.textContent += quellenHinweis({
