@@ -36,25 +36,24 @@ import { verdrahteMausKnopf } from "./browser-pane-maus.js?v=browser-pane-202608
 import { baueNachrichtenEmpfang } from "./browser-pane-nachrichten.js?v=browser-pane-20260709-2";
 let suche = null;
 import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260709-2";
+// Reine Helfer (2026-08-19 ausgelagert, 800-Zeilen-Regel). Sie werden hier
+// zugleich WEITER EXPORTIERT, damit tests/browser-pane.test.mjs und jeder
+// bisherige Aufrufer sie unveraendert von browser-pane.js bekommt.
+import {
+  clampZoom, clampViewport, normalizeAddress, normalizeAgentBrowserUrl,
+  shouldOpenInRealBrowser, shouldPreferRealBrowserUrl, shortHost
+} from "./browser-pane-adressen.js?v=browser-pane-20260819-1";
+export {
+  clampZoom, normalizeAddress, normalizeAgentBrowserUrl,
+  shouldOpenInRealBrowser, shouldPreferRealBrowserUrl
+};
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
 const PANE_WIDTH = "50vw";
 const NEW_TAB_TITLE = "Neuer Tab";
-const BLOCKED_PAGE_PATTERNS = [
-  /max challenge attempts exceeded/i,
-  /robot check/i,
-  /captcha/i,
-  /verify (that )?you are human/i,
-  /unusual traffic/i,
-  /automated access/i,
-  /enable cookies/i,
-  /api-services-support@amazon\.com/i
-];
 
 const MAX_PERSISTED_HISTORY = 50;
-const ZOOM_MIN = 0.5;
-const ZOOM_MAX = 2;
 const ZOOM_STEP = 0.1;
 const REMOTE_REFIT_DEBOUNCE_MS = 600;
 const REMOTE_REFIT_MIN_DELTA_PX = 64;
@@ -173,10 +172,7 @@ function mountOnce() {
 
   refs.root = root;
   refs.tabs = root.querySelector(".bp-tabs");
-  refs.prevTab = root.querySelector(".bp-tab-prev");
-  refs.nextTab = root.querySelector(".bp-tab-next");
   refs.addTab = root.querySelector(".bp-tab-add");
-  refs.tabCount = root.querySelector(".bp-tab-count");
   refs.back = root.querySelector(".bp-nav-back");
   refs.forward = root.querySelector(".bp-nav-forward");
   refs.reload = root.querySelector(".bp-nav-reload");
@@ -195,13 +191,10 @@ function mountOnce() {
   refs.content = root.querySelector(".bp-content");
   refs.empty = root.querySelector(".bp-empty");
 
-  refs.prevTab.addEventListener("click", () => switchTab(-1));
-  refs.nextTab.addEventListener("click", () => switchTab(1));
   // Doppelklick auf die freie Flaeche der Tableiste oeffnet einen Tab — in
   // Chrome seit jeher, und mit der Maus der kuerzeste Weg.
   refs.tabs.addEventListener("dblclick", (event) => { if (event.target === refs.tabs) addTab({ focusAddress: true }); });
   refs.addTab.addEventListener("click", () => addTab({ focusAddress: true }));
-  refs.tabCount.addEventListener("click", () => switchTab(1));
   refs.back.addEventListener("click", () => stepHistory(-1));
   refs.forward.addEventListener("click", () => stepHistory(1));
   // Rechtsklick zeigt die Stationen — sonst klickt man mehrfach und laedt
@@ -259,7 +252,7 @@ function mountOnce() {
     sendeAnRahmen: (nachricht) => activeTab()?.frame?.contentWindow?.postMessage(nachricht, "*"),
     sendeAnSitzung: (aktion) => { const t = activeTab(); if (t) sessionClient.handleAct(t, aktion, sessionHooks); }
   });
-  verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, refs, state,
+  verdrahtePanelTasten({ addTab, activeTab, closeTab, navigate, selectTab, switchTab, refs, state,
     oeffneSuche: () => { const r = suche.oeffne(); if (r && !r.ok) showHint(r.grund); } });
 
   // Resize: Der Remote-Viewport folgt der sichtbaren Flaeche — debounced und
@@ -301,11 +294,6 @@ function onZoomShortcut(event) {
   schedulePersist();
 }
 
-export function clampZoom(value) {
-  const zoom = Math.round(Number(value) * 10) / 10;
-  if (!Number.isFinite(zoom)) return 1;
-  return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
-}
 
 function applyZoom(tab) {
   const frame = tab?.frame;
@@ -411,23 +399,7 @@ function switchTab(delta) {
 
 // --- Navigation --------------------------------------------------------------
 
-export function normalizeAddress(input) {
-  const text = String(input || "").trim();
-  if (!text) return "";
-  if (/^https?:\/\//i.test(text)) return text;
-  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(\/|\?|#|$)/i.test(text)) return `https://${text}`;
-  return `https://duckduckgo.com/html/?q=${encodeURIComponent(text)}`;
-}
 
-export function normalizeAgentBrowserUrl(input) {
-  const target = normalizeAddress(input);
-  try {
-    const url = new URL(target);
-    return url.protocol === "https:" && !url.username && !url.password ? url.toString() : "";
-  } catch {
-    return "";
-  }
-}
 
 export function commitHistory(tab, url, push) {
   if (!push) return;
@@ -505,7 +477,23 @@ async function navigate(tab, url, { push = true } = {}) {
     });
     showHint("Diese Webseite braucht einen echten Browser-Kontext. Bitte extern oeffnen.");
   } else {
-    // Direkt einbetten: erlaubt volles JS; ohne Server-Antwort als Fallback.
+    // OHNE Server-Antwort zuerst den Live-Browser fragen, statt sofort direkt
+    // einzubetten.
+    //
+    // Live gemessen 2026-08-18: /api/browser/fetch liefert auf dem laufenden
+    // Control-Server 404. `data` ist damit IMMER null, und weil dieser Zweig
+    // der letzte ist, landete danach JEDE Seite hier — direkt eingebettet,
+    // ohne Sitzung. Der Live-Browser wurde nie gefragt, obwohl er einwandfrei
+    // laeuft (/api/browser/session antwortet 200 mit interactive:true,
+    // sessionId und Bild). Folge: tab.sessionId blieb leer, und die Maus
+    // konnte grundsaetzlich nichts sehen und nichts klicken — auf KEINER
+    // Seite. Der eingebaute Browser war damit eine Attrappe: Bild ja,
+    // Bedienung nein.
+    //
+    // tryLiveBrowser() gibt sauber false zurueck, wenn der Dienst nicht
+    // bereit ist oder der Aufruf scheitert. Das direkte Einbetten bleibt
+    // also der Rueckfall, es ist nur nicht mehr der erste Griff.
+    if (!data && await tryLiveBrowser(tab, finalUrl, { push })) return;
     setFrame(tab, { src: finalUrl, mode: data ? "direct" : "direct-fallback" });
     if (!data) showHint('Server-Proxy nicht erreichbar. Falls die Seite leer bleibt: "In neuem Tab oeffnen".');
   }
@@ -584,10 +572,6 @@ function remoteBrowserViewport() {
   return { width, height };
 }
 
-function clampViewport(value, min, max, fallback) {
-  const parsed = Math.round(Number(value));
-  return Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : fallback;
-}
 
 function stepHistory(delta) {
   const tab = activeTab();
@@ -640,30 +624,8 @@ function setFallbackFrame(tab, { url, title, message }) {
   });
 }
 
-export function shouldOpenInRealBrowser(html, url = "") {
-  const text = String(html || "").slice(0, 120000);
-  if (!text) return false;
-  if (BLOCKED_PAGE_PATTERNS.some((pattern) => pattern.test(text))) return true;
-  try {
-    const host = new URL(url).hostname.replace(/^www\./, "");
-    return isAmazonHost(host) && /challenge|captcha|robot|automated/i.test(text);
-  } catch {
-    return false;
-  }
-}
 
-export function shouldPreferRealBrowserUrl(url = "") {
-  try {
-    const host = new URL(url).hostname.replace(/^www\./, "");
-    return isAmazonHost(host);
-  } catch {
-    return false;
-  }
-}
 
-function isAmazonHost(host) {
-  return /^amazon\./i.test(String(host || ""));
-}
 
 
 // Persistenz fuer hochfrequente Updates (Scroll) buendeln.
@@ -696,12 +658,8 @@ export function render() {
       render();
     }
   });
-  refs.prevTab.disabled = refs.nextTab.disabled = state.tabs.length <= 1;
   refs.addTab.disabled = state.tabs.length >= MAX_TABS;
-  refs.addTab.title = refs.addTab.disabled ? `Tab-Limit erreicht (${MAX_TABS})` : "Neuer Tab";
-  refs.tabCount.textContent = String(state.tabs.length || 1);
-  refs.tabCount.title = `${state.tabs.length || 1} von ${MAX_TABS} Tabs`;
-  refs.tabCount.setAttribute("aria-label", `${state.tabs.length || 1} von ${MAX_TABS} Tabs`);
+  refs.addTab.title = refs.addTab.disabled ? `Tab-Limit erreicht (${MAX_TABS})` : "Neuer Tab (⌘T)";
 
   if (document.activeElement !== refs.address) refs.address.value = anzeigeAdresse(active?.url || "");
   zeigeSicherheit(refs.addressForm, active?.url || "");
@@ -796,10 +754,3 @@ function restoreTabs() {
   if (!state.activeId) state.activeId = state.tabs[0]?.id || "";
 }
 
-function shortHost(url) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return url;
-  }
-}
