@@ -127,71 +127,6 @@ export function modellAnzeige(hausText) {
   return hausText;
 }
 
-async function zeichneProjektChip() {
-  const chipKnopf = document.getElementById("codeProjektChip");
-  if (!chipKnopf) return;
-  const kennung = localStorage.getItem(CODE_PROJEKT) || "";
-  if (!kennung) { chipKnopf.textContent = "Projekt wählen …"; return; }
-  const projekte = await listProjekte().catch(() => []);
-  const eintrag = projekte.find((p) => p.id === kennung);
-  if (!eintrag) { localStorage.removeItem(CODE_PROJEKT); chipKnopf.textContent = "Projekt wählen …"; return; }
-  // Der verbundene Ordner steht mit im Chip — wie "Repo auswaehlen" bei
-  // Claude Code sieht man sofort, WORIN das Project arbeitet.
-  const ordner = await window.smejjProjektOrdner?.ordnerName?.(kennung).catch(() => "") || "";
-  chipKnopf.textContent = ordner ? `Projekt: ${eintrag.name} · 📁 ${ordner}` : `Projekt: ${eintrag.name}`;
-  zeichneOrdnerChip(kennung, ordner);
-}
-
-// Ordner-Chip wie Claude (Betreiber 2026-08-16, "woher soll ich wissen,
-// welcher Ordner hinzugefuegt ist?"): NUR wenn ein Ordner verbunden ist,
-// erscheint ueber dem Feld ein kleiner Chip "📁 Name ×"; das × trennt.
-// Ohne Ordner bleibt der Platz komplett frei.
-function zeichneOrdnerChip(projektId, ordnerName) {
-  const zeile = document.getElementById("codeOrdnerZeile");
-  if (!zeile) return;
-  zeile.innerHTML = "";
-  zeile.hidden = !ordnerName;
-  if (!ordnerName) return;
-  const chip = document.createElement("span");
-  chip.className = "code-anhang-chip code-ordner-chip";
-  const wort = document.createElement("span");
-  wort.textContent = `📁 ${ordnerName}`;
-  const weg = document.createElement("button");
-  weg.type = "button";
-  weg.className = "code-anhang-weg";
-  weg.setAttribute("aria-label", `Ordner ${ordnerName} trennen`);
-  weg.title = "Ordner trennen";
-  weg.textContent = "×";
-  weg.addEventListener("click", () => {
-    try { window.smejjProjektOrdner?.trenneOrdner?.(projektId); } catch { /* still */ }
-    zeichneOrdnerChip(projektId, "");
-    void zeichneProjektChip();
-  });
-  chip.append(wort, weg);
-  zeile.append(chip);
-}
-
-function zeichne() {
-  const gruss = document.getElementById("codeGruss");
-  if (gruss) {
-    const name = document.getElementById("profileDockName")?.textContent.trim();
-    gruss.textContent = name && name !== "Nutzer"
-      ? `Was steht als Nächstes an, ${name.split(" ")[0]}?`
-      : "Was steht als Nächstes an?";
-  }
-  const s = stufe();
-  const chip = document.getElementById("codeStufeChip");
-  if (chip) chip.textContent = STUFEN_TEXT[s];
-  const modell = document.getElementById("codeModellAnzeige");
-  if (modell) modell.innerHTML = `<b>${modellAnzeige()}</b>`;
-  const t = document.getElementById("codeTiefeAnzeige");
-  if (t) t.textContent = tiefe();
-  const modusChip = document.getElementById("codeModusChip");
-  if (modusChip) modusChip.textContent = MODI.find(([id]) => id === modus())[1];
-  void zeichneProjektChip();
-  logVerwalten();
-}
-
 // ---- Modell-Menue (wie Claudes "Fable 5"-Menue, Betreiber 2026-08-17) ---
 export function schliesseModellMenue() {
   document.getElementById("codeModellMenue")?.remove();
@@ -269,7 +204,7 @@ export async function oeffneModellMenue(kontext = {}) {
       localStorage.setItem(MODELL_KEY, "smejj 1.0");
       window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "smejj 1.0" } }));
       zu();
-      zeichne();
+      kontext.beiWahl?.();
     }
   });
   feld.append(menue);
@@ -419,3 +354,110 @@ export async function oeffneModellMenue(kontext = {}) {
   } catch { /* fail-safe: Menue zeigt dann nur das Hausmodell */ }
 }
 
+
+// ---------------------------------------------------------------------------
+// Kopfzeile der Code-Flaeche: Gruss, Chips, Projekt- und Ordner-Chip
+//
+// BEFUND 2026-08-18 (live gemessen): Beim Auslagern dieses Moduls sind
+// `zeichne`, `zeichneProjektChip` und `zeichneOrdnerChip` aus
+// code-flaeche.js GELOESCHT worden, ihre 9 Aufrufe blieben stehen. Live
+// warf jeder Aufbau der Code-Flaeche und JEDER Klick in der App
+// "ReferenceError: zeichne is not defined" — initCodeFlaeche brach ab,
+// der Gruss blieb unpersoenlich, der Projekt-Chip erschien nie und die
+// Modellanzeige aktualisierte sich nach einer Wahl nicht mehr.
+//
+// Sie liegen jetzt hier, weil dort kein Platz mehr ist (800-Zeilen-Regel).
+// Damit kein Ringschluss entsteht, kommen die Zustandsfragen der
+// Code-Flaeche als Rueckrufe herein — genau wie oben `hausText`/`beiWahl`.
+
+/**
+ * Baut die drei Zeichen-Funktionen der Code-Kopfzeile.
+ * @param {{stufenText: () => string, modellAnzeige: () => string,
+ *   tiefe: () => string, modusText: () => string,
+ *   holeLogAnker: () => (Element|null), loescheLogAnker: () => void,
+ *   projektKey: string, listProjekte: () => Promise<Array<{id: string, name: string}>>}} deps
+ *   Alles, was nur die Code-Flaeche weiss — als Rueckruf, nie als Import.
+ * @returns {{zeichne: () => void, zeichneProjektChip: () => Promise<void>,
+ *   zeichneOrdnerChip: (projektId: string, ordnerName: string) => void}}
+ */
+export function baueKopfzeile(deps) {
+  // Ordner-Chip wie Claude (Betreiber 2026-08-16, "woher soll ich wissen,
+  // welcher Ordner hinzugefuegt ist?"): NUR wenn ein Ordner verbunden ist,
+  // erscheint ueber dem Feld ein kleiner Chip "Name x"; das x trennt.
+  function zeichneOrdnerChip(projektId, ordnerName) {
+    const zeile = document.getElementById("codeOrdnerZeile");
+    if (!zeile) return;
+    zeile.innerHTML = "";
+    zeile.hidden = !ordnerName;
+    if (!ordnerName) return;
+    const chip = document.createElement("span");
+    chip.className = "code-anhang-chip code-ordner-chip";
+    const wort = document.createElement("span");
+    wort.textContent = `📁 ${ordnerName}`;
+    const weg = document.createElement("button");
+    weg.type = "button";
+    weg.className = "code-anhang-weg";
+    weg.setAttribute("aria-label", `Ordner ${ordnerName} trennen`);
+    weg.title = "Ordner trennen";
+    weg.textContent = "×";
+    weg.addEventListener("click", () => {
+      try { window.smejjProjektOrdner?.trenneOrdner?.(projektId); } catch { /* still */ }
+      zeichneOrdnerChip(projektId, "");
+      void zeichneProjektChip();
+    });
+    chip.append(wort, weg);
+    zeile.append(chip);
+  }
+
+  async function zeichneProjektChip() {
+    const chipKnopf = document.getElementById("codeProjektChip");
+    if (!chipKnopf) return;
+    const kennung = localStorage.getItem(deps.projektKey) || "";
+    if (!kennung) { chipKnopf.textContent = "Projekt wählen …"; return; }
+    const projekte = await deps.listProjekte().catch(() => []);
+    const eintrag = projekte.find((p) => p.id === kennung);
+    if (!eintrag) { localStorage.removeItem(deps.projektKey); chipKnopf.textContent = "Projekt wählen …"; return; }
+    // Der verbundene Ordner steht mit im Chip — wie "Repo auswaehlen" bei
+    // Claude Code sieht man sofort, WORIN das Project arbeitet.
+    const ordner = await window.smejjProjektOrdner?.ordnerName?.(kennung).catch(() => "") || "";
+    chipKnopf.textContent = ordner ? `Projekt: ${eintrag.name} · 📁 ${ordner}` : `Projekt: ${eintrag.name}`;
+    zeichneOrdnerChip(kennung, ordner);
+  }
+
+  function zeichne() {
+    const gruss = document.getElementById("codeGruss");
+    if (gruss) {
+      const name = document.getElementById("profileDockName")?.textContent.trim();
+      gruss.textContent = name && name !== "Nutzer"
+        ? `Was steht als Nächstes an, ${name.split(" ")[0]}?`
+        : "Was steht als Nächstes an?";
+    }
+    const chip = document.getElementById("codeStufeChip");
+    if (chip) chip.textContent = deps.stufenText();
+    const modell = document.getElementById("codeModellAnzeige");
+    if (modell) modell.innerHTML = `<b>${deps.modellAnzeige()}</b>`;
+    const t = document.getElementById("codeTiefeAnzeige");
+    if (t) t.textContent = deps.tiefe();
+    const modusChip = document.getElementById("codeModusChip");
+    if (modusChip) modusChip.textContent = deps.modusText();
+    void zeichneProjektChip();
+    logVerwalten();
+  }
+
+  // Beim Verlassen der Code-Ansicht gehoert der Log zurueck auf die
+  // Startseite — sonst fehlt dort der Chat. Der Anker gehoert der
+  // Code-Flaeche, darum kommt er als Rueckruf herein.
+  function logVerwalten() {
+    const codeAktiv = document.querySelector("#code")?.classList.contains("is-active");
+    const log = document.getElementById("startLog");
+    const anker = deps.holeLogAnker();
+    if (!codeAktiv && log && anker?.parentElement) {
+      anker.replaceWith(log);
+      deps.loescheLogAnker();
+      const leer = document.querySelector("#code .codeleer");
+      if (leer) leer.hidden = false;
+    }
+  }
+
+  return { zeichne, zeichneProjektChip, zeichneOrdnerChip };
+}

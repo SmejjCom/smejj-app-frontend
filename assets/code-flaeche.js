@@ -40,10 +40,23 @@ import {
   CLINE_MODEL_KEY,
   AUTO_MARKE,
   kurzName,
+  baueKopfzeile,
   modellAnzeige as modellAnzeigeRoh,
   oeffneModellMenue as oeffneModellMenueRoh,
   schliesseModellMenue
 } from "./code-modell-menue.js";
+
+// Gruss, Chips und Projekt-Chip liegen im selben Modul (dort war Platz);
+// alles Dateieigene geht als Rueckruf hinein, gelesen erst beim Zeichnen.
+const { zeichne, zeichneProjektChip } = baueKopfzeile({
+  stufenText: () => STUFEN_TEXT[stufe()],
+  modellAnzeige: () => modellAnzeige(),
+  tiefe: () => tiefe(),
+  modusText: () => MODI.find(([id]) => id === modus())[1],
+  holeLogAnker: () => logAnker, loescheLogAnker: () => { logAnker = null; },
+  projektKey: CODE_PROJEKT,
+  listProjekte
+});
 
 // Die Hausanzeige (Auto/Gruendlich/Schnell) kennt nur diese Datei —
 // darum wird sie dem Modul hereingereicht statt dort nachgebaut.
@@ -179,19 +192,6 @@ function holeLog() {
   // Wie bei Claude: beim Andocken ans Gespraechs-ENDE springen — der Chat
   // scrollt intern, das Feld bleibt unten fest (Betreiber 2026-08-16).
   requestAnimationFrame(() => { halter.scrollTop = halter.scrollHeight; });
-}
-
-function logVerwalten() {
-  // Beim Verlassen der Code-Ansicht gehoert der Log zurueck auf die
-  // Startseite — sonst fehlt dort der Chat.
-  const codeAktiv = document.querySelector("#code")?.classList.contains("is-active");
-  const log = document.getElementById("startLog");
-  if (!codeAktiv && log && logAnker?.parentElement) {
-    logAnker.replaceWith(log);
-    logAnker = null;
-    const leer = document.querySelector("#code .codeleer");
-    if (leer) leer.hidden = false;
-  }
 }
 
 // --- Anhang-Chips (Betreiber 2026-08-16: "[Bild angehaengt: …] als Text im
