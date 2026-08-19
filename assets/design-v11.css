@@ -2329,3 +2329,23 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   flex: 0 0 auto;
   margin-top: auto;
 }
+
+/* =====================================================================
+ * Betreiber 2026-08-18: "unten sollen nicht zwei viereckige Rahmen
+ * stehen — nur der leuchtende bleibt, der andere raus, bei Code UND
+ * Chat." Also: die Icon-Knoepfe der Eingabeleiste verlieren ihre
+ * Flaeche und ihren Innenstrich; sichtbar bleibt nur das Zeichen.
+ * Der Senden-Knopf (.send-button) behaelt seinen Block — er ist der
+ * leuchtende.
+ * ===================================================================== */
+#start .prompt-glass .ghost-button.icon-button,
+#code .codeleiste .ghost-button.icon-button {
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+}
+#start .prompt-glass .ghost-button.icon-button:hover,
+#code .codeleiste .ghost-button.icon-button:hover {
+  background: transparent;
+  color: #f2f5f4;
+}
