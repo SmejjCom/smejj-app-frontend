@@ -462,7 +462,16 @@ export async function fuehreFreienLaufAus({
       });
       antwort = await r.json().catch(() => null);
       if (!r.ok || !antwort?.ok) {
-        return { ok: false, grund: `Maus konnte nicht entscheiden: ${antwort?.error || r.status}`, gelesen };
+        // DIE GRUENDE MITNEHMEN. Der Server schickt bei einer abgelehnten
+        // Entscheidung `gruende` mit — genau das, was man zum Verstehen
+        // braucht. Vorher stand hier nur "entscheidung_abgelehnt", und
+        // damit war jede Fehlersuche blind: dieselbe Kennung fuer eine
+        // gesperrte Domain, einen unbekannten Schritt und ein Feld, das
+        // das Modell falsch benannt hat. Live erlebt am 2026-08-18.
+        const gruende = Array.isArray(antwort?.gruende) && antwort.gruende.length
+          ? ` (${antwort.gruende.map((g) => (typeof g === "string" ? g : JSON.stringify(g))).join("; ").slice(0, 300)})`
+          : "";
+        return { ok: false, grund: `Maus konnte nicht entscheiden: ${antwort?.error || r.status}${gruende}`, gelesen };
       }
     } catch {
       return { ok: false, grund: "Maus nicht erreichbar.", gelesen };
