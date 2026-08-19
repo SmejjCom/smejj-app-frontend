@@ -399,6 +399,7 @@ export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, send
 // und dieser hier ist fuer das, was vorher gar nicht ging.
 
 export const FREI_MAX_SCHRITTE = 10;
+export const VERWURF_GRENZE = 2;
 
 /** Eine Entscheidung der Maus in eine Panel-Aktion uebersetzen. */
 export function entscheidungAlsAktion(entscheidung) {
@@ -433,6 +434,10 @@ export async function fuehreFreienLaufAus({
 
   const verlauf = [];
   const gelesen = {};
+  // Wie oft darf eine Entscheidung abgelehnt werden, bevor der Lauf endet?
+  // Zwei Versuche reichen fuer einen Formfehler; wer dreimal danebenliegt,
+  // hat ein anderes Problem als die Formulierung.
+  let verworfen = 0;
   for (let n = 1; n <= maxSchritte; n += 1) {
     if (abbruch()) return { ok: false, grund: `Maus angehalten nach ${n - 1} Schritten.`, gelesen };
 
@@ -469,9 +474,30 @@ export async function fuehreFreienLaufAus({
         // gesperrte Domain, einen unbekannten Schritt und ein Feld, das
         // das Modell falsch benannt hat. Live erlebt am 2026-08-18.
         const gruende = Array.isArray(antwort?.gruende) && antwort.gruende.length
-          ? ` (${antwort.gruende.map((g) => (typeof g === "string" ? g : JSON.stringify(g))).join("; ").slice(0, 300)})`
+          ? antwort.gruende.map((g) => (typeof g === "string" ? g : JSON.stringify(g))).join("; ").slice(0, 300)
           : "";
-        return { ok: false, grund: `Maus konnte nicht entscheiden: ${antwort?.error || r.status}${gruende}`, gelesen };
+
+        // AUS DER ABLEHNUNG LERNEN, STATT AUFZUGEBEN.
+        //
+        // Eine abgelehnte Entscheidung ist fast nie eine Sackgasse, sondern ein
+        // Formfehler: das Modell nennt einen Schritt richtig, haengt aber das
+        // falsche Feld daran (live gemessen 2026-08-18: openLink mit "url"
+        // statt "target" — openLink verlangt laut Schema ein Ziel, keine
+        // Adresse). Das Modell KANN das korrigieren, wenn es den Grund
+        // erfaehrt. Vorher endete der ganze Auftrag an dieser Stelle, und der
+        // Nutzer sah nur "entscheidung_abgelehnt".
+        //
+        // Der Grund wandert deshalb in den Verlauf — denselben Weg, auf dem
+        // das Modell auch seine eigenen Schritte wiedersieht — und der Lauf
+        // geht weiter. Begrenzt, damit aus dem Lernen keine Endlosschleife
+        // wird: nach VERWURF_GRENZE Fehlversuchen ist Schluss.
+        if (r.status === 422 && verworfen < VERWURF_GRENZE) {
+          verworfen += 1;
+          verlauf.push(`VERWORFEN (bitte anders formulieren): ${gruende || antwort?.error || "ohne Grund"}`);
+          zeige(`Maus ${n}/${maxSchritte}: Vorschlag abgelehnt, sie versucht es anders ...`);
+          continue;
+        }
+        return { ok: false, grund: `Maus konnte nicht entscheiden: ${antwort?.error || r.status}${gruende ? ` (${gruende})` : ""}`, gelesen };
       }
     } catch {
       return { ok: false, grund: "Maus nicht erreichbar.", gelesen };
