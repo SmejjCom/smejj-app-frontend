@@ -14,6 +14,17 @@
 
 const MIN_ZEILEN = 20;
 
+// Welche Antwort zeigt die Flaeche gerade? Gebraucht, damit sie ihrem
+// Original FOLGT: der Markdown-Renderer laeuft erst am STROM-ENDE
+// (public/ai/chat-stream.js), die Flaeche oeffnete aber schon nach 1,2 s
+// Ruhe — jede Denkpause des Modells genuegte, und sie fror den ROHEN
+// Zwischenstand ein ("#" und "##" als Text, live gesehen 2026-08-19 an
+// zwei Antworten). Statt ein Fertig-Signal zu erraten, zieht der
+// Beobachter unten die offene Flaeche bei jeder Aenderung nach — die
+// letzte Aenderung ist immer die gerenderte Endfassung.
+let quellEntry = null;
+let quellInhalt = null;
+
 function verdient(entry) {
   if (entry.querySelector("table, pre")) return true;
   return (entry.innerText.match(/\n/g) || []).length >= MIN_ZEILEN;
@@ -56,6 +67,8 @@ function oeffneRechts(entry) {
   inhalt.className = "af-inhalt";
   // Klon der Antwort — Original bleibt unangetastet im Chat.
   inhalt.innerHTML = entry.innerHTML;
+  quellEntry = entry;
+  quellInhalt = inhalt;
   const leiste = document.createElement("div");
   leiste.className = "af-leiste";
   leiste.innerHTML = `
@@ -80,7 +93,7 @@ function oeffneRechts(entry) {
       return;
     }
     const aktion = e.target.closest("[data-af]")?.dataset.af;
-    if (aktion === "zu") { f.hidden = true; return; }
+    if (aktion === "zu") { f.hidden = true; quellEntry = null; quellInhalt = null; return; }
     if (aktion === "kopieren") {
       try {
         await navigator.clipboard.writeText(inhalt.innerText);
@@ -124,6 +137,11 @@ export function initArbeitsflaeche() {
     // Erst wenn die Antwort fertig ist — waehrend des Stroms waechst sie noch.
     clearTimeout(initArbeitsflaeche._t);
     initArbeitsflaeche._t = setTimeout(() => {
+      // Offene Flaeche dem Original nachziehen — billig (innerHTML-Vergleich
+      // entfaellt bewusst: die Zuweisung ist selten, der Timer entprellt).
+      if (quellEntry && quellInhalt && document.contains(quellEntry)) {
+        quellInhalt.innerHTML = quellEntry.innerHTML;
+      }
       for (const entry of log.querySelectorAll(":scope > .entry.assistant, :scope > .entry:not(.user)")) {
         if (entry.dataset.afGeprueft) continue;
         // Noch im Strom? Dann beim naechsten Tick wieder.
