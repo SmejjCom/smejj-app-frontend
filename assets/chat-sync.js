@@ -80,13 +80,36 @@ function store() {
   return window.smejjChatStore || null;
 }
 
+/**
+ * Holt einen einzelnen Chat vollstaendig nach — erst wenn feststeht, dass er
+ * wirklich neuer ist als der lokale Stand.
+ */
+async function holeVollstaendig(id, kopf) {
+  try {
+    const antwort = await fetch(`${API_ORIGIN}/api/chats?id=${encodeURIComponent(id)}`, { headers: kopf });
+    if (!antwort.ok) return null;
+    const daten = await antwort.json();
+    return daten?.chat || null;
+  } catch { return null; }
+}
+
+/**
+ * Gleicht den Verlauf ab.
+ *
+ * GEMESSEN 2026-08-19: die volle Liste war 2,50 MB bei 88 Chats und ging bei
+ * JEDEM Seitenaufruf ueber die Leitung — 65 % des Seitengewichts, und der
+ * Control Server stand damit im Pfad jedes normalen Aufrufs (Static-First
+ * gebrochen). Dabei braucht der Abgleich die Nachrichten gar nicht, um zu
+ * ENTSCHEIDEN: dafuer genuegen `id` und `updatedAt`. Geholt wird jetzt nur noch,
+ * was wirklich neuer ist — meistens nichts.
+ */
 async function pull() {
   const kopf = kopfzeilen();
   const s = store();
   if (!kopf || !s || serverSagtNein) return;
   let antwort;
   try {
-    antwort = await fetch(`${API_ORIGIN}/api/chats`, { headers: kopf });
+    antwort = await fetch(`${API_ORIGIN}/api/chats?nurListe=1`, { headers: kopf });
   } catch { return; }
   if (antwort.status === 503) { serverSagtNein = true; return; }
   if (!antwort.ok) return;
@@ -97,8 +120,16 @@ async function pull() {
       const lokal = await s.getChat(fern.id);
       const lokalStand = Date.parse(String(lokal?.updatedAt || "")) || 0;
       const fernStand = Date.parse(String(fern.updatedAt || "")) || 0;
-      if (!lokal && fernStand) await s.importChat?.(fern);
-      else if (lokal && fernStand > lokalStand) await s.importChat?.(fern);
+      if (!fernStand) continue;
+      if (lokal && fernStand <= lokalStand) continue;
+
+      const voll = Array.isArray(fern.messages) ? fern : await holeVollstaendig(fern.id, kopf);
+      // OHNE Nachrichten wird NICHTS importiert. Ein Eintrag ohne `messages`
+      // wuerde einen vorhandenen Verlauf leer ueberschreiben — ein Datenverlust,
+      // ausgeloest von einem Performance-Fix. Lieber diesen einen Chat
+      // ueberspringen und es beim naechsten Abgleich erneut versuchen.
+      if (!voll || !Array.isArray(voll.messages)) continue;
+      await s.importChat?.(voll);
     } catch { /* einzelner Chat darf den Rest nicht stoppen */ }
   }
 }
