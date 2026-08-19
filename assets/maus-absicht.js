@@ -42,7 +42,7 @@
 // Dann zeigte activeTab() auf ein leeres Panel und starteMausLauf() meldete
 // ewig "Der Browser ist noch nicht bereit". Nichts waere kaputt zu sehen,
 // alles waere kaputt.
-const PANEL = "./browser-pane.js?v=browser-pane-20260818-2";
+const PANEL = "./browser-pane.js?v=browser-pane-20260818-3";
 const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260818-1";
 
 async function holePanel() {
@@ -54,8 +54,67 @@ async function holePanel() {
     openPane: pane.openPane,
     refs: pane.refs,
     state: pane.state,
-    starteMausLauf: maus.starteMausLauf
+    starteMausLauf: maus.starteMausLauf,
+    starteMausLaufMitSender: maus.starteMausLaufMitSender
   };
+}
+
+// --- DER WEG WIE BEI CLAUDE: der eigene Chrome des Nutzers --------------------
+//
+// Betreiber-Auftrag 2026-08-18: "Mach genau 1 zu 1 wie Claude."
+//
+// Der Unterschied ist nicht die Schleife — die hat smejj laengst — sondern WO
+// gearbeitet wird. Der ferne Browser auf Zeabur ist die zerbrechlichste Stelle
+// der ganzen Kette: er muss laufen, erreichbar sein, eine Sitzung aufbauen und
+// Bilder schicken. Faellt irgendetwas davon aus, sieht die Maus nichts. Genau
+// das war am 2026-08-18 der Fall, und zwar den ganzen Tag.
+//
+// Im eigenen Chrome faellt all das weg: die Seite ist schon offen, das
+// Dokument liegt vor, geklickt wird echt. Dafuer braucht es die Erweiterung
+// extensions/smejj-maus-bruecke — ohne sie kann KEINE Webseite auf den Inhalt
+// einer fremden Seite zugreifen. Das ist keine Bequemlichkeit, sondern eine
+// harte Browsergrenze; ein iframe hilft nicht, weil fremde Seiten sich nicht
+// auslesen lassen.
+//
+// Ist die Bruecke nicht da, bleibt der ferne Weg unveraendert bestehen.
+async function ueberChrome({ aufgabe, ziel, schreibe }) {
+  const { brueckeDa, sendeAnChrome } = await import("./maus-chrome.js?v=1");
+  if (!brueckeDa()) return false;
+
+  const panel = await holePanel();
+  const { CLIENT_ROUTES } = await import("./config.js");
+
+  schreibe(`Ich arbeite in deinem eigenen Chrome — du siehst der Maus direkt zu. Ich oeffne ${kurzeAdresse(ziel)}.`);
+  const auf = await sendeAnChrome({ type: "navigate", url: ziel });
+  if (!auf?.ok) {
+    schreibe(deuteChromeFehler(auf?.error, ziel));
+    return true;
+  }
+
+  const ergebnis = await panel.starteMausLaufMitSender({
+    auftrag: aufgabe,
+    sende: sendeAnChrome,
+    seitenUrl: ziel,
+    schrittUrl: CLIENT_ROUTES.api.mausRun,
+    holeToken: () => { try { return localStorage.getItem("smejj.auth.accessToken.v1") || sessionStorage.getItem("smejj.auth.accessToken.v1") || ""; } catch { return ""; } },
+    zeige: schreibe
+  });
+  schreibe(ergebnis?.grund || (ergebnis?.ok ? "Maus fertig." : "Maus gestoppt."));
+  return true;
+}
+
+// Die Bruecke antwortet mit Kennungen, nicht mit Saetzen. Hier werden sie
+// uebersetzt — und zwar so, dass daraus ein HANDGRIFF folgt. Eine Meldung, aus
+// der nicht hervorgeht, was zu tun ist, kostet nur Zeit.
+export function deuteChromeFehler(kennung, ziel) {
+  const text = String(kennung || "");
+  if (text.startsWith("herkunft_nicht_freigegeben")) {
+    return `Fuer ${kurzeAdresse(ziel)} fehlt noch deine Freigabe. Klick in Chrome oben rechts auf das smejj-Symbol und dann auf „Fuer 30 Minuten erlauben“ — danach den Auftrag noch einmal senden.`;
+  }
+  if (text === "nur_https") return `${kurzeAdresse(ziel)} laeuft nicht ueber https. In deinem angemeldeten Chrome arbeitet die Maus nur auf verschluesselten Seiten.`;
+  if (text === "bruecke_antwortet_nicht") return "Die Maus-Bruecke in Chrome antwortet nicht. Oeffne chrome://extensions und pruefe, ob sie aktiv ist.";
+  if (text === "kein_maus_tab") return "Chrome hat den Arbeits-Tab nicht geoeffnet. Bitte den Auftrag noch einmal senden.";
+  return `Die Maus-Bruecke in Chrome meldet: ${text || "unbekannter Grund"}.`;
 }
 
 /**
@@ -240,6 +299,9 @@ export async function mausAuftragErledigt({ task, output, deps = {} } = {}) {
 
   // Zusehen ist der halbe Zweck: erst wird der Browser sichtbar geoeffnet,
   // dann faengt die Maus an — nie umgekehrt.
+  // Erst der eigene Chrome (wie bei Claude), dann der ferne Browser.
+  if (!deps.oeffne && await ueberChrome({ aufgabe, ziel, schreibe })) return true;
+
   schreibe(`Ich oeffne ${kurzeAdresse(ziel)} im Browser rechts.`);
   const geoeffnet = deps.oeffne
     ? (oeffne(ziel) ? { ok: true } : { ok: false, grund: `Diese Adresse kann der eingebaute Browser nicht oeffnen: ${ziel}` })

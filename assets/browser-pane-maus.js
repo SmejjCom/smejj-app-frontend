@@ -318,6 +318,45 @@ export async function starteMausLauf({ auftrag, zeige } = {}) {
 }
 
 /**
+ * Ein Lauf mit einem FREMDEN Sender — heute: der eigene Chrome des Nutzers.
+ *
+ * Warum hier und nicht als eigene Datei: Zustand (`laeuft`, `anhalten`) muss
+ * geteilt werden. Haette der Chrome-Weg seinen eigenen, koennten zwei Maeuse
+ * gleichzeitig klicken, und der Not-Aus des Panel-Knopfes wuerde den einen
+ * nicht erreichen. Ein Lauf, den man nicht stoppen kann, ist keiner, dem man
+ * zusehen moechte — das gilt fuer jeden Weg gleichermassen.
+ *
+ * @param {{auftrag:string, sende:Function, seitenUrl:string, schrittUrl:string,
+ *          holeToken?:Function, zeige?:Function}} o
+ */
+export async function starteMausLaufMitSender({ auftrag, sende, seitenUrl, schrittUrl, holeToken, zeige } = {}) {
+  const text = String(auftrag || "").trim();
+  if (!text) return { ok: false, grund: "Es fehlt die Aufgabe." };
+  if (laeuft) return { ok: false, grund: "Die Maus arbeitet schon an einem Auftrag." };
+
+  laeuft = true;
+  anhalten = false;
+  const knopf = bausteine?.knopf;
+  knopf?.classList.add("laeuft");
+  try {
+    return await fuehreFreienLaufAus({
+      auftrag: text,
+      tab: { url: seitenUrl },
+      braucheSitzung: false,
+      schrittUrl,
+      holeToken,
+      sende,
+      zeige,
+      abbruch: () => anhalten
+    });
+  } finally {
+    laeuft = false;
+    knopf?.classList.remove("laeuft");
+    bausteine?.render?.();
+  }
+}
+
+/**
  * Verdrahtet den Maus-Knopf der Kopfleiste.
  * Nimmt die Panel-Bausteine — so bleibt in browser-pane.js eine Zeile stehen.
  * Dieselben Bausteine bedienen ab jetzt auch den Chat-Einstieg (starteMausLauf).
@@ -382,11 +421,15 @@ export function entscheidungAlsAktion(entscheidung) {
  */
 export async function fuehreFreienLaufAus({
   auftrag, tab, schrittUrl, holeToken = () => "", sende, zeige = () => {},
-  abbruch = () => false, maxSchritte = FREI_MAX_SCHRITTE
+  abbruch = () => false, maxSchritte = FREI_MAX_SCHRITTE, braucheSitzung = true
 } = {}) {
   const hosts = erlaubteHosts(tab?.url);
   if (!hosts.length) return { ok: false, grund: "Erst eine Seite oeffnen — die Maus arbeitet nur dort." };
-  if (!tab?.sessionId) return { ok: false, grund: "Die Maus braucht den Live-Browser. Diese Ansicht hat keinen." };
+  // Die Sitzungspflicht gilt nur fuer den FERNEN Browser. Arbeitet die Maus im
+  // eigenen Chrome des Nutzers (Bruecken-Erweiterung), gibt es keine Sitzung,
+  // die hochkommen muesste — die Seite ist ja schon offen. Genau daran ist der
+  // ferne Weg regelmaessig gescheitert.
+  if (braucheSitzung && !tab?.sessionId) return { ok: false, grund: "Die Maus braucht den Live-Browser. Diese Ansicht hat keinen." };
 
   const verlauf = [];
   const gelesen = {};
