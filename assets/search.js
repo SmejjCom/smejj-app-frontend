@@ -40,7 +40,7 @@ const STATIC_RESULTS = Object.freeze([
   ["Einstellungen", "Einstellungen", "Konto, Modelle, API-Keys und Sprache", "settings", "settings einstellungen konto modell api key"],
   ["Einstellungen", "Kosten & Limits", "Kostenstatus und Limits prüfen", "cost", "kosten limits budget"],
   ["Einstellungen", "Nutzer", "Lokalen Nutzer und Login prüfen", "profile", "nutzer login konto profil"],
-  ["Werkzeuge", "Browser", "Websites öffnen und prüfen", "websites", "browser websites web"],
+  ["Werkzeuge", "Browser", "Seiten öffnen und bedienen", "browser", "browser websites web"],
   ["Werkzeuge", "Quellen", "Referenzen und Projektdateien", "files", "quellen referenzen links dokumente"],
   ["Werkzeuge", "GitHub", "Repository, Branch und Commit-Status", "settings", "github repo branch commit pr"],
   ["Werkzeuge", "Vorschau", "App oder Website Preview", "browser", "vorschau preview app website"],

@@ -90,10 +90,22 @@ if (typeof document !== "undefined") init();
 
 function init() {
   if (!document.getElementById("browserPaneRoot")) return;
-  // Der "Browser"-Eintrag im rechten Panel oeffnet den integrierten Browser.
-  // Capture-Phase, damit der generische data-jump-Handler nicht mehr feuert.
+  // JEDER Browser-Knopf oeffnet den eingebauten Browser — Panel, Seitenspur
+  // und Menue.
+  //
+  // Betreiber-Entscheid 2026-08-18: "Nehm Websites raus, wir haben browser."
+  // Bis dahin trugen diese Knoepfe data-jump/data-view="websites" und fielen,
+  // wenn dieses Modul nicht rechtzeitig geladen war, auf eine LEERE Ansicht
+  // unter /websites zurueck ("Website-Bereich bereit."). Genau das ist am
+  // 2026-08-18 passiert, als browser-pane.js wegen einer fehlenden Datei gar
+  // nicht hochkam: der Klick auf "Browser" landete auf /websites, und es sah
+  // aus wie eine geaenderte Navigation. Es war ein toter Rueckfall.
+  //
+  // Die Attrappe ist jetzt weg, samt Route. Diese Knoepfe tragen ein eigenes
+  // Merkmal und koennen deshalb NIRGENDWO mehr hinfuehren ausser hierher —
+  // faellt dieses Modul aus, passiert gar nichts, statt etwas Falsches.
   document.addEventListener("click", (event) => {
-    const trigger = event.target?.closest?.('#browserPanel [data-jump="websites"]');
+    const trigger = event.target?.closest?.("[data-browser-oeffnen]");
     if (!trigger) return;
     event.preventDefault();
     event.stopPropagation();

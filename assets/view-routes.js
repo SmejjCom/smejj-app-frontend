@@ -24,7 +24,6 @@ export const ALIAS_PATHS = Object.freeze({
 export const VIEW_PATHS = Object.freeze({
   start: "/",
   search: "/search",
-  websites: "/websites",
   smejjClaw: "/smejj-claw",
   automation: "/smejjBot",
   chatHistory: "/chat-history",

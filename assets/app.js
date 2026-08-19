@@ -3,11 +3,12 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
+import { initComposerTools } from "./composer-tools.js?v=werkzeuge-3";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=1";
-import { initGlobalSearch } from "./search.js?v=b38d";
+import { initGlobalSearch } from "./search.js?v=b39";
 import { openSearchOverlay } from "./search-overlay.js?v=b47c";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
-import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
+import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=b41b";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
@@ -23,7 +24,7 @@ import { mausAuftragErledigt } from "./maus-absicht.js?v=3";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
 import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
-import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b49";
+import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b50";
 import { applyViewTitle } from "./view-title.js";
 import { getJson, postJson } from "./shared/http-json.js";
 const $ = (selector) => document.querySelector(selector);
@@ -72,13 +73,12 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
-const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=b41b").then((m) => (m.enhancePremiumSurfaces(), m)));
 boot();
 
 // Buendelt, was projects-surface.js aus der App braucht — eine Stelle statt neun.
 function projektAbhaengigkeiten() {
   const basis = { $, state, workspace, showToast, writeOutput, setText, renderEmptyState, refreshSessionStatus };
-  return { ...basis, renderProjectCards: (p) => holeFlaechen().then((m) => m.renderProjectCards(p)), renderEmptyState, ensureProject: () => ensureProject(basis), refreshLocalWorkspaceStatus: () => refreshLocalWorkspaceStatus(basis) };
+  return { ...basis, renderProjectCards, renderEmptyState, ensureProject: () => ensureProject(basis), refreshLocalWorkspaceStatus: () => refreshLocalWorkspaceStatus(basis) };
 }
 
 function boot() {
@@ -94,6 +94,7 @@ function boot() {
   bindMemory();
   bindAi();
   bindProjects(projektAbhaengigkeiten());
+  enhancePremiumSurfaces();
   bindStoragePanel();
   bindCost();
   bindSettings();
@@ -273,7 +274,6 @@ function goToView(viewId, { replace = false } = {}) {
     const method = replace ? "replaceState" : "pushState";
     history[method]({ viewId: resolvedViewId }, "", nextUrl);
   }
-  holeFlaechen(resolvedViewId);
   updateCanonical();
   applyViewTitle(target, resolvedViewId); // Seitentitel je Ansicht (W2-05)
   if (resolvedViewId === "tools") refreshLiveSystemStatus();
@@ -328,7 +328,7 @@ function bindStartComposer() {
   };
   send.addEventListener("click", submit);
   bindPasteAttach({ getInput: () => input });
-  ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=werkzeuge-3").then((m) => m.initComposerTools()));
+  initComposerTools();
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {

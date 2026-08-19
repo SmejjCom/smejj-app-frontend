@@ -46,7 +46,7 @@ const ELEMENTE = Object.freeze([
   { id: "nav:chatHistory", wo: "Seitenleiste", name: "Verlauf", selektor: '.nav-button[data-view="chatHistory"]' },
   { id: "nav:settings", wo: "Seitenleiste", name: "Einstellungen", selektor: '.nav-button[data-view="settings"]' },
 
-  { id: "jump:websites", wo: "Rechtes Panel", name: "Browser", selektor: '[data-jump="websites"]' },
+  { id: "browser-oeffnen", wo: "Rechtes Panel", name: "Browser", selektor: "[data-browser-oeffnen]" },
   { id: "jump:files", wo: "Rechtes Panel", name: "Quellen", selektor: '[data-jump="files"]' },
   { id: "jump:automation", wo: "Rechtes Panel", name: "GitHub", selektor: '[data-jump="automation"]' },
   { id: "jump:browser", wo: "Rechtes Panel", name: "Vorschau", selektor: '[data-jump="browser"]' },
