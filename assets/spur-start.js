@@ -21,6 +21,8 @@
 import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=b52";
 import { merkmaleVon } from "/assets/chat-history-text.js?v=b47b";
 import { Icons } from "/assets/components.js?v=b48";
+// OHNE ?v — dieselbe Kennung wie app.js/code-flaeche.js, sonst zweite Instanz.
+import { API_ORIGIN } from "./config.js";
 
 const START_ANSICHTEN = new Set(["start", "code"]);
 const MAX_LETZTE = 5;
@@ -269,7 +271,11 @@ async function zeichnePlanzeile() {
   zeile.textContent = "Frei";
   dock.after(zeile);
   try {
-    const antwort = await fetch("/api/billing/status", { credentials: "include" });
+    // GEMESSEN 2026-08-19: der Abruf ging an smejj.com selbst — dort liegt
+    // nur die statische Seite, also 404 bei JEDEM Seitenaufruf, und die
+    // Planzeile blieb auch fuer zahlende Kunden auf "Frei". Der Endpunkt
+    // gehoert dem Control-Server (dort: 401 ohne Sitzung, also da).
+    const antwort = await fetch(`${API_ORIGIN}/api/billing/status`, { credentials: "include" });
     if (antwort.ok) {
       const daten = await antwort.json();
       if (daten?.plan && daten.plan !== "free") zeile.textContent = PLAN_NAMEN[daten.plan] || daten.plan;
