@@ -34,7 +34,25 @@ const letzterAuftrag = new Map();
 function merke(bereich) {
   const feld = document.getElementById(bereich.feld);
   const text = String(feld?.value || "").trim();
-  if (text) letzterAuftrag.set(bereich.viereck, text);
+  if (!text) return;
+  letzterAuftrag.set(bereich.viereck, text);
+  // Wer selbst abschickt, will arbeiten: ein frueherer Abbruch ist damit
+  // erledigt, sonst wuerde die Nachzuegler-Bremse unten den neuen Lauf
+  // gleich wieder abwuergen.
+  loescheAbbruch();
+}
+
+/** Beendet den Abbruch-Zustand in BEIDEN Bereichen. */
+function loescheAbbruch() {
+  for (const b of BEREICHE) {
+    const viereck = document.getElementById(b.viereck);
+    if (viereck?.classList.contains("gestoppt")) zeigeGestoppt(viereck, false);
+  }
+}
+
+/** true, solange irgendein Viereck auf "gestoppt" steht. */
+function istAbgebrochen() {
+  return BEREICHE.some((b) => document.getElementById(b.viereck)?.classList.contains("gestoppt"));
 }
 
 function zeigeGestoppt(viereck, an) {
@@ -74,7 +92,7 @@ export function ruesteViereck(bereich) {
       const feld = document.getElementById(bereich.feld);
       const senden = document.getElementById(bereich.senden);
       if (!text || !feld || !senden) return;
-      zeigeGestoppt(viereck, false);
+      loescheAbbruch();
       feld.value = text;
       feld.dispatchEvent(new Event("input", { bubbles: true }));
       senden.click();
@@ -97,14 +115,16 @@ export function ruesteViereck(bereich) {
 export function initChatStopp() {
   let gesetzt = 0;
   for (const bereich of BEREICHE) if (ruesteViereck(bereich)) gesetzt += 1;
-  // Faengt ein Lauf regulaer an, ist ein frueherer Abbruch erledigt —
-  // sonst haengt das Play-Dreieck ueber einer laufenden Antwort.
+  // NACHZUEGLER-BREMSE. Gemessen am 2026-08-18 im Code-Bereich: ein
+  // stoppeChatStrom() beendet nur den LAUFENDEN Leser — vier Sekunden
+  // spaeter startete chatClient.js den naechsten Anbieter (Rueckfall) und
+  // der Text lief weiter, obwohl der Nutzer gestoppt hatte (+530 Zeichen
+  // gemessen). Solange also ein Viereck auf "gestoppt" steht, wird jeder
+  // neu anlaufende Strom sofort wieder beendet. Aufgehoben wird das nur
+  // durch eine echte Nutzergeste: Play oder ein neues Absenden (merke()).
   window.addEventListener("smejj:chat-strom", (event) => {
     if ((Number(event.detail?.laufen) || 0) <= 0) return;
-    for (const bereich of BEREICHE) {
-      const viereck = document.getElementById(bereich.viereck);
-      if (viereck?.classList.contains("gestoppt")) zeigeGestoppt(viereck, false);
-    }
+    if (istAbgebrochen()) stoppeChatStrom();
   });
   return gesetzt > 0;
 }
