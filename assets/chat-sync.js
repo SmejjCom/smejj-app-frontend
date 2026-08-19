@@ -14,6 +14,7 @@
 //   hochgereicht. Massstab ist updatedAt — dieselbe Regel wie serverseitig.
 // - Jeder Fehler ist still: Sync ist Komfort, der Chat laeuft immer weiter.
 import { API_ORIGIN } from "/assets/config.js";
+import { OWNER_KEY, gehoertNutzer, sessionUserId } from "/assets/chat-owner.js?v=2";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
@@ -115,6 +116,10 @@ async function pull() {
   if (!antwort.ok) return;
   let daten;
   try { daten = await antwort.json(); } catch { return; }
+  const nutzer = sessionUserId(localStorage);
+  let besitzer = "";
+  try { besitzer = localStorage.getItem(OWNER_KEY) || ""; } catch { besitzer = ""; }
+  let fremd = 0;
   for (const fern of daten.chats || []) {
     try {
       const lokal = await s.getChat(fern.id);
@@ -122,6 +127,17 @@ async function pull() {
       const fernStand = Date.parse(String(fern.updatedAt || "")) || 0;
       if (!fernStand) continue;
       if (lokal && fernStand <= lokalStand) continue;
+
+      // NICHT HOLEN, WAS DER IMPORT OHNEHIN ABWEIST (gemessen 2026-08-19).
+      // `importChat` prueft mit gehoertNutzer, ob der Chat dem angemeldeten
+      // Konto gehoert. Passt die Kennung nicht, gibt es ein `false` — und der
+      // 3-Sekunden-Abruf davor war umsonst. Am echten Konto waren das 14 Chats
+      // JE Seitenaufruf: 590 KB und 45 s Leerlauf, jedes Mal aufs Neue, weil
+      // ein abgewiesener Chat nie lokal ankommt und beim naechsten Abgleich
+      // wieder als "fehlt" gilt.
+      // Geprueft wird mit DERSELBEN Funktion, die auch importiert — deshalb
+      // kann hier nichts uebersprungen werden, was sonst angekommen waere.
+      if (!gehoertNutzer(fern, nutzer, besitzer)) { fremd += 1; continue; }
 
       const voll = Array.isArray(fern.messages) ? fern : await holeVollstaendig(fern.id, kopf);
       // OHNE Nachrichten wird NICHTS importiert. Ein Eintrag ohne `messages`
@@ -131,6 +147,12 @@ async function pull() {
       if (!voll || !Array.isArray(voll.messages)) continue;
       await s.importChat?.(voll);
     } catch { /* einzelner Chat darf den Rest nicht stoppen */ }
+  }
+  // Nicht still: wer Chats auf dem Server hat, die er lokal nie sieht, soll den
+  // Grund im Protokoll finden koennen. Eine Zeile je Abgleich, keine Meldung an
+  // den Nutzer — es ist kein Fehler, den er beheben kann.
+  if (fremd > 0) {
+    console.warn(`smejj Verlauf-Sync: ${fremd} Chat(s) auf dem Server tragen eine andere Kontokennung als dieses Geraet und bleiben ausgeblendet.`);
   }
 }
 
