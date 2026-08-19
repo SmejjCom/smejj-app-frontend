@@ -22,11 +22,11 @@ export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot }
 import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260709-2";
 // Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
-import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260709-2";
+import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260819-3";
 import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-2";
 import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
-import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260709-2";
+import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260819-3";
 import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
 import { verdrahteMausKnopf } from "./browser-pane-maus.js?v=browser-pane-20260819-1";
 // Gefunden 2026-08-18 beim Livetest: dieser Import FEHLTE, obwohl init() die

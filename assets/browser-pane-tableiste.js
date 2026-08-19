@@ -48,6 +48,35 @@ export function zeigtTitel(breite) {
 }
 
 /**
+ * Breiten fuer aktiven und uebrige Tabs — der aktive schrumpft ZULETZT.
+ *
+ * Chrome haelt den aktiven Tab lesbar, solange es irgend geht: werden die
+ * Tabs so schmal, dass kein Titel mehr passt (< TAB_NUR_ICON_BREITE),
+ * bekommt bei uns der AKTIVE die Titel-Mindestbreite und die uebrigen
+ * teilen sich den Rest (nie unter TAB_MIN_BREITE). Vorher zeigten bei
+ * 7 Tabs im schmalen Panel ALLE nur ihren Anfangsbuchstaben — auch der,
+ * auf dem man gerade IST (live gemessen 2026-08-19: 55 px pro Tab).
+ * Reine Rechnung, direkt testbar.
+ */
+export function tabBreiten(anzahl, verfuegbar, hatAktiven = true) {
+  const gleich = tabBreite(anzahl, verfuegbar);
+  if (!hatAktiven || anzahl <= 1 || gleich >= TAB_NUR_ICON_BREITE) {
+    return { aktiv: gleich, rest: gleich };
+  }
+  // Der Aktive bekommt die Titel-Mindestbreite FEST — auch wenn dadurch die
+  // Summe den Platz sprengt: die Leiste steht auf overflow-x: auto und
+  // scrollt dann, statt weiter zu quetschen. Ein aktiver Tab mit 75 px
+  // zeigte weiter nur den Anfangsbuchstaben und niemandem waere geholfen.
+  const aktiv = TAB_NUR_ICON_BREITE;
+  // Absichern: bleibt nach dem Aktiven nichts uebrig (z. B. Leiste beim
+  // allerersten Zeichnen noch 0 px breit), faellt tabBreite() auf die
+  // MAXIMAL-Breite zurueck — die falsche Richtung. Dann gilt das Minimum.
+  const fuerRest = verfuegbar - aktiv;
+  const rest = fuerRest > 0 ? tabBreite(anzahl - 1, fuerRest) : TAB_MIN_BREITE;
+  return { aktiv, rest };
+}
+
+/**
  * Anfangsbuchstabe und Farbe fuer Seiten ohne geladenes Favicon.
  *
  * Warum nicht einfach Googles Favicon-Dienst wie viele Anleitungen zeigen:
@@ -180,18 +209,20 @@ export function zeichneTableiste(behaelter, {
   const angepinnte = geordnet.filter((t) => t.angepinnt).length;
   const verfuegbar = behaelter.clientWidth || TAB_MAX_BREITE * Math.max(geordnet.length, 1);
   const restBreite = Math.max(0, verfuegbar - angepinnte * PIN_BREITE);
-  const breite = tabBreite(geordnet.length - angepinnte, restBreite);
-  const mitTitel = zeigtTitel(breite);
+  const hatAktiven = geordnet.some((t) => t.id === aktiveId && !t.angepinnt);
+  const { aktiv: aktivBreite, rest: breite } = tabBreiten(geordnet.length - angepinnte, restBreite, hatAktiven);
 
   geordnet.forEach((tab, index) => {
     const istAktiv = tab.id === aktiveId;
     const istPin = Boolean(tab.angepinnt);
+    const tabBreiteHier = istPin ? PIN_BREITE : (istAktiv ? aktivBreite : breite);
+    const mitTitel = zeigtTitel(tabBreiteHier);
     const knopf = document.createElement("button");
     knopf.type = "button";
     knopf.className = `bp-tab${istAktiv ? " is-active" : ""}${tab.status === "loading" ? " is-loading" : ""}${istPin || !mitTitel ? " is-schmal" : ""}${istPin ? " ist-angepinnt" : ""}`;
     knopf.setAttribute("role", "tab");
     knopf.setAttribute("aria-selected", String(istAktiv));
-    knopf.style.width = `${istPin ? PIN_BREITE : breite}px`;
+    knopf.style.width = `${tabBreiteHier}px`;
     // Dasselbe hier: das Grundgeruest eines Tabs haengt nicht am Stylesheet.
     knopf.style.flex = "none";
     knopf.style.display = "grid";
