@@ -400,6 +400,7 @@ export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, send
 
 export const FREI_MAX_SCHRITTE = 10;
 export const VERWURF_GRENZE = 2;
+export const AUSSETZER_GRENZE = 3;
 
 /** Eine Entscheidung der Maus in eine Panel-Aktion uebersetzen. */
 export function entscheidungAlsAktion(entscheidung) {
@@ -438,6 +439,9 @@ export async function fuehreFreienLaufAus({
   // Zwei Versuche reichen fuer einen Formfehler; wer dreimal danebenliegt,
   // hat ein anderes Problem als die Formulierung.
   let verworfen = 0;
+  // Aussetzer sind etwas anderes als Ablehnungen: sie werden nicht gezaehlt
+  // wie ein Schritt, weil nichts geschehen ist.
+  let aussetzer = 0;
   for (let n = 1; n <= maxSchritte; n += 1) {
     if (abbruch()) return { ok: false, grund: `Maus angehalten nach ${n - 1} Schritten.`, gelesen };
 
@@ -495,6 +499,26 @@ export async function fuehreFreienLaufAus({
           verworfen += 1;
           verlauf.push(`VERWORFEN (bitte anders formulieren): ${gruende || antwort?.error || "ohne Grund"}`);
           zeige(`Maus ${n}/${maxSchritte}: Vorschlag abgelehnt, sie versucht es anders ...`);
+          continue;
+        }
+
+        // AUSSETZER DES PLANERS: einfach noch einmal fragen.
+        //
+        // Gemessen 2026-08-19, dieselbe Anfrage dreimal hintereinander an den
+        // Live-Server: 200 (fertige Entscheidung), dann 502 planer_leere_antwort,
+        // dann noch einmal 502. Das Modell liefert bei gleicher Eingabe mal eine
+        // Antwort und mal gar keine — ein Aussetzer, kein Denkfehler.
+        //
+        // Hier gehoert AUSDRUECKLICH nichts in den Verlauf: dem Modell
+        // vorzuhalten, es habe geschwiegen, wuerde seine naechste Antwort nur
+        // verwirren. Wiederholt wird stillschweigend, aber sichtbar — der
+        // Nutzer soll sehen, dass gewartet wird, statt eine stumme Pause zu
+        // erleben. Zwei Fehlschlaege hintereinander waren im Test bereits die
+        // Ausnahme; wer dreimal schweigt, hat ein anderes Problem.
+        if (r.status >= 500 && aussetzer < AUSSETZER_GRENZE) {
+          aussetzer += 1;
+          zeige(`Maus ${n}/${maxSchritte}: keine Antwort erhalten, sie fragt noch einmal ...`);
+          n -= 1; // dieser Schritt zaehlt nicht — es wurde ja nichts getan
           continue;
         }
         return { ok: false, grund: `Maus konnte nicht entscheiden: ${antwort?.error || r.status}${gruende ? ` (${gruende})` : ""}`, gelesen };
