@@ -287,6 +287,9 @@ const SHELL = [
   // leer = Sprachwelle, getippt = senden. Muss in den Vorrat, sonst faellt
   // die Startseite offline auf den alten Senden-Knopf zurueck.
   "/assets/composer-sendetaste.js",
+  // Die Maus aus dem Chat beauftragen (2026-08-18). Ohne Eintrag hier faende
+  // der Import von app.js offline nichts — und app.js braeche komplett ab.
+  "/assets/maus-absicht.js",
   "/assets/nav-absichten.js",
   "/assets/topbar-krume.js",
   "/assets/spur-start.js",

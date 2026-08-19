@@ -352,7 +352,7 @@
               <button type="button" data-chip="Was ist auf diesem Bild zu sehen?" data-composer-action="attach-photo" title="Bild verstehen" aria-label="Bild verstehen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span class="chip-label">Bild verstehen</span></button>
               <button type="button" data-chip="Verbessere diesen Text:" title="Schreiben oder bearbeiten" aria-label="Schreiben oder bearbeiten"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/><path d="m14 7 3 3"/></svg><span class="chip-label">Schreiben oder bearbeiten</span></button>
               <button type="button" data-chip="Schreibe Code für:" title="Programmieren" aria-label="Programmieren"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg><span class="chip-label">Programmieren</span></button>
-              <button type="button" data-jump="websites" title="Maus — arbeitet für dich" aria-label="Maus — arbeitet für dich"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 3 15 7-7 2-2 7z"/></svg><span class="chip-label">Browser</span></button>
+              <button type="button" data-chip="Erledige mit der Maus im Browser:" title="Maus — arbeitet für dich" aria-label="Maus — arbeitet für dich"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 3 15 7-7 2-2 7z"/></svg><span class="chip-label">Browser</span></button>
               <button type="button" data-composer-action="attach-file" title="Datei" aria-label="Datei"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v5h5"/></svg><span class="chip-label">Datei</span></button>
             </div>
             <!-- Betreiber 2026-08-16: die drei Textzeilen sind raus — die
@@ -461,7 +461,9 @@
                Liste: keine verifizierte Funktion entfernen). Verdrahtung in
                code-flaeche.js; ohne das Modul bleibt alles bedienbar. -->
           <div class="codeflaeche">
-            <div class="codegruss"><svg class="codegruss-zeichen" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg><span id="codeGruss">Was steht als Nächstes an?</span></div>
+            <!-- Betreiber 2026-08-18: das Code-Zeichen vor dem Gruss ist RAUS —
+                 es deckte das Logo oben links zu. -->
+            <div class="codegruss"><span id="codeGruss">Was steht als Nächstes an?</span></div>
             <div class="codeleer" aria-hidden="true"></div>
             <!-- Hierher wandert der ECHTE #startLog beim Senden (kein Klon):
                  der Auftrag streamt auf dieser Seite, wie bei Codex/Claude. -->
