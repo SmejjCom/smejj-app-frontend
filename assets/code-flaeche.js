@@ -46,6 +46,11 @@ import {
   schliesseModellMenue
 } from "./code-modell-menue.js";
 
+// Eigener Schluessel (smejj.currentProject gehoert der Dateiflaeche). MUSS vor
+// baueKopfzeile() stehen — der Aufruf wertet sein Objekt SOFORT aus; weiter
+// unten brach das Modul ab, der Code-Bereich war kopflos (live 2026-08-18).
+const CODE_PROJEKT = "smejj.codeProjekt.v1";
+
 // Gruss, Chips und Projekt-Chip liegen im selben Modul (dort war Platz);
 // alles Dateieigene geht als Rueckruf hinein, gelesen erst beim Zeichnen.
 const { zeichne, zeichneProjektChip } = baueKopfzeile({
@@ -54,7 +59,7 @@ const { zeichne, zeichneProjektChip } = baueKopfzeile({
   tiefe: () => tiefe(),
   modusText: () => MODI.find(([id]) => id === modus())[1],
   holeLogAnker: () => logAnker, loescheLogAnker: () => { logAnker = null; },
-  projektKey: CODE_PROJEKT,
+  projektKey: () => CODE_PROJEKT,
   listProjekte
 });
 
@@ -87,11 +92,6 @@ function tiefe() {
     return "Mittel";
   }
 }
-
-// Das gewaehlte Chat-Project der Code-Seite — BEWUSST ein eigener Schluessel:
-// smejj.currentProject gehoert dem lokalen Datei-Workspace, nicht den
-// Chat-Projects; ihn zu ueberschreiben wuerde die Dateiflaeche verstellen.
-const CODE_PROJEKT = "smejj.codeProjekt.v1";
 
 // Berechtigungs-Modus wie Claude Code (Betreiber 2026-08-16). Er WIRKT echt:
 // settings-runtime.buildPreferenceBlock speist die Verhaltensregel des Modus

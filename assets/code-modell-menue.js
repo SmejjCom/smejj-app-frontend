@@ -375,7 +375,7 @@ export async function oeffneModellMenue(kontext = {}) {
  * @param {{stufenText: () => string, modellAnzeige: () => string,
  *   tiefe: () => string, modusText: () => string,
  *   holeLogAnker: () => (Element|null), loescheLogAnker: () => void,
- *   projektKey: string, listProjekte: () => Promise<Array<{id: string, name: string}>>}} deps
+ *   projektKey: () => string, listProjekte: () => Promise<Array<{id: string, name: string}>>}} deps
  *   Alles, was nur die Code-Flaeche weiss — als Rueckruf, nie als Import.
  * @returns {{zeichne: () => void, zeichneProjektChip: () => Promise<void>,
  *   zeichneOrdnerChip: (projektId: string, ordnerName: string) => void}}
@@ -412,11 +412,11 @@ export function baueKopfzeile(deps) {
   async function zeichneProjektChip() {
     const chipKnopf = document.getElementById("codeProjektChip");
     if (!chipKnopf) return;
-    const kennung = localStorage.getItem(deps.projektKey) || "";
+    const kennung = localStorage.getItem(deps.projektKey()) || "";
     if (!kennung) { chipKnopf.textContent = "Projekt wählen …"; return; }
     const projekte = await deps.listProjekte().catch(() => []);
     const eintrag = projekte.find((p) => p.id === kennung);
-    if (!eintrag) { localStorage.removeItem(deps.projektKey); chipKnopf.textContent = "Projekt wählen …"; return; }
+    if (!eintrag) { localStorage.removeItem(deps.projektKey()); chipKnopf.textContent = "Projekt wählen …"; return; }
     // Der verbundene Ordner steht mit im Chip — wie "Repo auswaehlen" bei
     // Claude Code sieht man sofort, WORIN das Project arbeitet.
     const ordner = await window.smejjProjektOrdner?.ordnerName?.(kennung).catch(() => "") || "";
