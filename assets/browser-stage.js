@@ -188,5 +188,9 @@
     function grabFocus() { try { stage.focus({ preventScroll: true }); } catch (error) {} }
     window.addEventListener("load", grabFocus);
     grabFocus();
+    // Stufe 2 des Lebenszeichens: ALLE Handler sind gebunden. Trennt beim
+    // Diagnostizieren "Skript startete, starb aber unterwegs" von "Buehne
+    // komplett — das Problem liegt beim Eingabeweg davor".
+    try { parent.postMessage({ type: "smejj.browser.stageBereit", stufe: "handler" }, "*"); } catch (fehler) { /* kein parent */ }
   })();
 })();
