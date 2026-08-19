@@ -2422,3 +2422,50 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding: 0;
   border: 0;
 }
+/* =====================================================================
+ * Betreiber 2026-08-18: das leuchtende Viereck IST jetzt der Knopf; der
+ * runde Stopp-Knopf darunter faellt weg. Drei Zustaende, siehe
+ * chat-stopp.js:
+ *   frei      -> gedaempfter Umriss (Regeln weiter oben, unveraendert)
+ *   arbeitet  -> gefuellt und pulsend, Klick stoppt
+ *   gestoppt  -> bleibt hell, wird zum Play-Dreieck, Klick schickt neu
+ *
+ * Das Dreieck entsteht aus derselben Flaeche (clip-path) — kein zweites
+ * Zeichen, das nachgeladen werden koennte.
+ *
+ * Klickflaeche: sichtbar bleiben es 11 px (Betreiber: "das Viereck war
+ * gut"), fassbar sind 30 px. Das leistet ein unsichtbares ::before —
+ * die Flaeche liegt UEBER dem Feldrand rechts oben, nicht ueber dem Text.
+ * ===================================================================== */
+#chatStopp, .chat-stopp { display: none !important; }
+
+#start .start-arbeit[role="button"],
+#code .code-arbeit[role="button"] {
+  pointer-events: auto;
+  cursor: pointer;
+}
+#start .start-arbeit[role="button"]::before,
+#code .code-arbeit[role="button"]::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 0;
+}
+/* Das Dreieck sitzt bewusst auf einem ::after und NICHT als clip-path auf
+   dem Viereck selbst: ein clip-path haette die unsichtbare Klickflaeche
+   gleich mitgeschnitten, der Knopf waere im Play-Zustand 11 px klein
+   geworden. */
+#start .start-arbeit.gestoppt,
+#code .code-arbeit.gestoppt {
+  border-color: transparent;
+  background: transparent;
+  animation: none;
+}
+#start .start-arbeit.gestoppt::after,
+#code .code-arbeit.gestoppt::after {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  background: var(--v11-cy);
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
