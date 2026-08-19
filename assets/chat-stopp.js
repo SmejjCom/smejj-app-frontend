@@ -127,6 +127,22 @@ async function setzeFort(bereich) {
     const meldung = output.textContent.trim();
     output.textContent = meldung ? `${vorher}\n\n${meldung}` : vorher;
     renderChatMarkdown?.(output);
+    return true;
+  }
+  // Naht glaetten: Modelle wiederholen trotz Auftrag gern die letzten Worte
+  // vor der Abbruchstelle ("…Schilf oder" + "Schilf oder Baumstaemmen…",
+  // live gemessen 2026-08-19). Die laengste Ueberlappung zwischen Ende der
+  // Teilantwort und Anfang der Fortsetzung wird herausgeschnitten —
+  // mindestens 8 Zeichen, sonst schneiden zufaellige Treffer echte Worte.
+  const roh = output.textContent.slice(vorher.length);
+  const fort = roh.replace(/^\s+/, "");
+  const deckel = Math.min(vorher.length, fort.length, 300);
+  for (let n = deckel; n >= 8; n--) {
+    if (vorher.endsWith(fort.slice(0, n))) {
+      output.textContent = vorher + fort.slice(n);
+      renderChatMarkdown?.(output);
+      break;
+    }
   }
   return true;
 }
