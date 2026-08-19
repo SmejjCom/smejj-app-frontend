@@ -42,7 +42,7 @@
 // Dann zeigte activeTab() auf ein leeres Panel und starteMausLauf() meldete
 // ewig "Der Browser ist noch nicht bereit". Nichts waere kaputt zu sehen,
 // alles waere kaputt.
-const PANEL = "./browser-pane.js?v=browser-pane-20260819-3";
+const PANEL = "./browser-pane.js?v=browser-pane-20260819-4";
 const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260819-1";
 
 async function holePanel() {

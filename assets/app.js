@@ -19,7 +19,7 @@ import { initGoogleLogin } from "./google-login.js";
 import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
 import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39u";
 import { chatOhneMedienauftrag } from "./medien-absicht.js?v=4";
-import { mausAuftragErledigt } from "./maus-absicht.js?v=11";
+import { mausAuftragErledigt } from "./maus-absicht.js?v=12";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
 import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
@@ -139,6 +139,9 @@ function bindNavigation() {
   const syncBackdrop = initPanelBackdrop({ backdrop, sidebar, browserPanel, menuButton, browserButton, setMenuOpen, setBrowserPanelOpen });
   menuButton?.addEventListener("click", () => setMenuOpen(!sidebar?.classList.contains("is-open"))); // Desktop-Auf/Zu: spur-schalter.js (capture)
   browserButton?.addEventListener("click", () => setBrowserPanelOpen(!browserPanel?.classList.contains("is-open")));
+  // Meldung an knopf-puffer.js: ab jetzt kommen Klicks wirklich an. Ein Klick,
+  // der in die Ladezeit fiel, wird dort nachgefeuert (Knopf-Totzeit, 2026-08-19).
+  document.dispatchEvent(new CustomEvent("smejj:panel-bereit"));
   bindPanelResize("#leftPanelResize", "left", { $ });
   bindPanelResize("#rightPanelResize", "right", { $ });
   for (const button of $$(".nav-button")) {
