@@ -7444,3 +7444,29 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: transparent;
   color: #f2f5f4;
 }
+
+/* =====================================================================
+ * Betreiber 2026-08-18, zweiter Durchgang: "bei Chat auch raus nehmen —
+ * nur Denkzeit, Arbeitszeit und so weiter sollen beleuchten; wenn
+ * beendet, soll nicht beleuchten."
+ *
+ * Also ruht auch der Hauptknopf als blosses Zeichen: keine gefuellte
+ * Flaeche, kein Schein — weder leer (weisse Welle) noch getippt (Cyan).
+ * Hell bleibt in der Leiste nur, was WIRKLICH gerade arbeitet:
+ *   - das Arbeits-Viereck (#startArbeit / #codeArbeit, Klasse .an)
+ *   - das Stopp-Quadrat waehrend der laufenden Antwort (.chat-stopp)
+ * Beide sind unveraendert und bleiben die einzigen hellen Flaechen.
+ * ===================================================================== */
+#start .prompt-glass .send-button,
+#start .prompt-glass .send-button.ist-sprache,
+#start .prompt-glass .send-button:not(.ist-sprache),
+#code .codeleiste .send-button {
+  background: transparent;
+  box-shadow: none;
+  color: rgba(242, 245, 244, 0.74);
+}
+#start .prompt-glass .send-button:hover,
+#code .codeleiste .send-button:hover {
+  background: transparent;
+  color: #f2f5f4;
+}
