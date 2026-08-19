@@ -20,6 +20,7 @@ import { initGoogleLogin } from "./google-login.js";
 import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
 import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39u";
 import { chatOhneMedienauftrag } from "./medien-absicht.js?v=4";
+import { mausAuftragErledigt } from "./maus-absicht.js?v=1";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
 import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
@@ -348,6 +349,11 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   const output = addEntry("", "assistant", target);
   try {
     if (routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
+    // Maus-Auftrag ("Erledige mit der Maus im Browser: ...") VOR jedem
+    // Modellweg: er wird nicht beantwortet, sondern ausgefuehrt — Browser auf,
+    // Schritt fuer Schritt, sichtbar. Erkennt die Weiche nichts, laeuft alles
+    // unveraendert weiter (maus-absicht.js).
+    if (await mausAuftragErledigt({ task, output })) return showTaskIndicator("done");
     if (await chatOhneMedienauftrag({ task: await groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
     try {
       const anfrage = {

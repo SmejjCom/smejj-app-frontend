@@ -240,45 +240,205 @@ export async function fuehreMausAuftragAus({
   return { ok: true, grund: `Maus fertig — ${ergebnis.getan} Schritte${gelesen ? `. ${gelesen}` : ""}`, ...ergebnis };
 }
 
+// --- EIN LAUF, ZWEI EINSTIEGE ------------------------------------------------
+//
+// Seit 2026-08-18 laesst sich die Maus auf ZWEI Wegen beauftragen: ueber den
+// Knopf in der Panel-Kopfleiste und ueber den Chat ("Erledige mit der Maus im
+// Browser: ..."). Beide MUESSEN sich denselben Lauf teilen. Haette jeder
+// Einstieg sein eigenes `laeuft`, koennten zwei Maeuse gleichzeitig in
+// derselben Sitzung klicken — und der Not-Aus des Knopfes wuerde einen aus dem
+// Chat gestarteten Lauf gar nicht erreichen. Ein Lauf, den man nicht stoppen
+// kann, ist keiner, dem man zusehen moechte.
+//
+// Darum liegen Zustand und Bausteine hier auf Modulebene. Eingetragen werden
+// sie von verdrahteMausKnopf(): so bleibt browser-pane.js unberuehrt (dort
+// waere sonst ein zweiter Aufruf noetig — die Datei steht unter dem Start-Lock).
+let laeuft = false;
+let anhalten = false;
+let bausteine = null;
+
+/** Laeuft gerade ein Auftrag? */
+export function mausLaeuft() {
+  return laeuft;
+}
+
+/** Not-Aus. Meldet zurueck, ob ueberhaupt etwas anzuhalten war. */
+export function haltMausAn() {
+  if (!laeuft) return false;
+  anhalten = true;
+  return true;
+}
+
+/**
+ * Startet einen Auftrag mit den eingetragenen Panel-Bausteinen.
+ * Derselbe Weg fuer Knopf und Chat — der Unterschied ist nur, WOHIN die
+ * Fortschrittszeilen gehen (zeige).
+ *
+ * @param {{auftrag: string, zeige?: Function}} o
+ * @returns {Promise<{ok: boolean, grund: string}>}
+ */
+export async function starteMausLauf({ auftrag, zeige } = {}) {
+  const text = String(auftrag || "").trim();
+  if (!text) return { ok: false, grund: "Es fehlt die Aufgabe." };
+  if (!bausteine) return { ok: false, grund: "Der Browser ist noch nicht bereit — bitte kurz warten." };
+  if (laeuft) return { ok: false, grund: "Die Maus arbeitet schon an einem Auftrag." };
+
+  const melde = zeige || bausteine.zeige || (() => {});
+  const { knopf, activeTab, planeUrl, holeToken, sende, render } = bausteine;
+
+  laeuft = true;
+  anhalten = false;
+  knopf?.classList.add("laeuft");
+  if (knopf) knopf.title = "Maus anhalten";
+  try {
+    // FREIER MODUS IST DER STANDARD. Er kommt mit Ueberraschungen zurecht
+    // — Cookie-Fenster, anderer Seitenaufbau, verschobene Links —, und
+    // genau daran ist der Plan-Modus regelmaessig gescheitert. Er kostet
+    // eine Modellfrage je Schritt; das ist der Preis dafuer, dass die Maus
+    // hinsieht statt zu raten.
+    //
+    // Der Plan-Modus bleibt erreichbar (Auftrag mit "plan:" beginnen): bei
+    // einfachen, bekannten Ablaeufen ist er schneller und billiger.
+    const planModus = /^plan:/i.test(text);
+    const tab = activeTab();
+    return planModus
+      ? await fuehreMausAuftragAus({
+        auftrag: text.replace(/^plan:/i, "").trim(),
+        tab, planeUrl, holeToken, sende, zeige: melde, abbruch: () => anhalten
+      })
+      : await fuehreFreienLaufAus({
+        auftrag: text, tab, schrittUrl: planeUrl, holeToken, sende, zeige: melde, abbruch: () => anhalten
+      });
+  } finally {
+    laeuft = false;
+    knopf?.classList.remove("laeuft");
+    if (knopf) knopf.title = "Maus beauftragen — sie bedient diesen Browser";
+    render?.();
+  }
+}
+
 /**
  * Verdrahtet den Maus-Knopf der Kopfleiste.
  * Nimmt die Panel-Bausteine — so bleibt in browser-pane.js eine Zeile stehen.
+ * Dieselben Bausteine bedienen ab jetzt auch den Chat-Einstieg (starteMausLauf).
  */
 export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, sende, zeige, render }) {
-  if (!knopf) return { laeuft: () => false };
-  let laeuft = false;
-  let anhalten = false;
+  // Die Bausteine werden AUCH ohne Knopf eingetragen: der Chat-Einstieg
+  // braucht sie, der Knopf ist nur eine von zwei Tueren.
+  bausteine = { knopf: knopf || null, activeTab, planeUrl, holeToken, sende, zeige, render };
+  if (!knopf) return { laeuft: mausLaeuft };
 
   knopf.addEventListener("click", async () => {
     // Zweiter Klick waehrend eines Laufs haelt an — der Knopf ist dann der
-    // Not-Aus. Ein Lauf, den man nicht stoppen kann, ist keiner, dem man
-    // zusehen moechte.
-    if (laeuft) { anhalten = true; zeige("Maus wird angehalten ..."); return; }
+    // Not-Aus, egal ob der Lauf hier oder im Chat begonnen hat.
+    if (haltMausAn()) { zeige("Maus wird angehalten ..."); return; }
 
-    const tab = activeTab();
     const auftrag = globalThis.prompt?.(
-      "Was soll die Maus auf dieser Seite tun?\n\nSie arbeitet NUR auf " +
-      (erlaubteHosts(tab?.url)[0] || "dieser Seite") + " und klickt selbstaendig."
+      "Was soll die Maus auf dieser Seite tun?\n\n" +
+      "Sie arbeitet NUR auf " + (erlaubteHosts(activeTab()?.url)[0] || "dieser Seite") +
+      " und klickt selbstaendig. Sie sieht nach jedem Schritt neu hin.\n\n" +
+      "Tipp: mit \"plan:\" beginnen macht es schneller, aber starr."
     );
     if (!auftrag || !auftrag.trim()) return;
 
-    laeuft = true;
-    anhalten = false;
-    knopf.classList.add("laeuft");
-    knopf.title = "Maus anhalten";
-    try {
-      const ergebnis = await fuehreMausAuftragAus({
-        auftrag, tab, planeUrl, holeToken, sende, zeige,
-        abbruch: () => anhalten
-      });
-      zeige(ergebnis.grund);
-    } finally {
-      laeuft = false;
-      knopf.classList.remove("laeuft");
-      knopf.title = "Maus beauftragen — sie bedient diesen Browser";
-      render?.();
-    }
+    const ergebnis = await starteMausLauf({ auftrag: auftrag.trim(), zeige });
+    zeige(ergebnis.grund);
   });
 
-  return { laeuft: () => laeuft };
+  return { laeuft: mausLaeuft };
+}
+
+// --- FREIER MODUS: hinsehen, entscheiden, handeln -----------------------------
+//
+// Der Unterschied zum Plan-Modus ist kein technischer, sondern ein
+// praktischer: Ein Plan wird EINMAL gemacht und scheitert an allem, was
+// dazwischenkommt — ein Cookie-Fenster, ein anderer Seitenaufbau, ein Link,
+// der woanders steht. Hier schaut die Maus nach JEDEM Schritt neu hin.
+//
+// Der Preis ist ehrlich zu nennen: jeder Schritt kostet eine Modellfrage.
+// Deshalb bleibt der Plan-Modus fuer einfache Auftraege die bessere Wahl,
+// und dieser hier ist fuer das, was vorher gar nicht ging.
+
+export const FREI_MAX_SCHRITTE = 10;
+
+/** Eine Entscheidung der Maus in eine Panel-Aktion uebersetzen. */
+export function entscheidungAlsAktion(entscheidung) {
+  if (!entscheidung || typeof entscheidung !== "object") return { fehler: "keine_entscheidung" };
+  if (entscheidung.decision === "done") return { fertig: true, grund: entscheidung.reason || "fertig" };
+  if (entscheidung.decision === "fail") return { fehler: entscheidung.reason || "maus_gibt_auf" };
+  if (entscheidung.decision !== "act") return { fehler: `unbekannte_entscheidung:${entscheidung.decision}` };
+  const u = alsSitzungsAktion(entscheidung.step);
+  if (u.aktion) return { aktion: u.aktion, beschreibung: beschreibe(entscheidung.step), liestAls: u.liestAls || null };
+  // Auch hier: nichts still verschlucken.
+  return { fehler: u.fehler || `nicht_uebersetzbar:${entscheidung.step?.action || "?"}` };
+}
+
+/**
+ * Der freie Lauf. Fragt den Server nach JEDEM Schritt erneut.
+ *
+ * @param {object} o
+ *   auftrag, tab, schrittUrl, holeToken, sende(aktion), zeige(text), abbruch()
+ *   maxSchritte  Obergrenze — ohne sie koennte die Maus ewig weitermachen
+ */
+export async function fuehreFreienLaufAus({
+  auftrag, tab, schrittUrl, holeToken = () => "", sende, zeige = () => {},
+  abbruch = () => false, maxSchritte = FREI_MAX_SCHRITTE
+} = {}) {
+  const hosts = erlaubteHosts(tab?.url);
+  if (!hosts.length) return { ok: false, grund: "Erst eine Seite oeffnen — die Maus arbeitet nur dort." };
+  if (!tab?.sessionId) return { ok: false, grund: "Die Maus braucht den Live-Browser. Diese Ansicht hat keinen." };
+
+  const verlauf = [];
+  const gelesen = {};
+  for (let n = 1; n <= maxSchritte; n += 1) {
+    if (abbruch()) return { ok: false, grund: `Maus angehalten nach ${n - 1} Schritten.`, gelesen };
+
+    // 1. HINSEHEN
+    zeige(`Maus ${n}/${maxSchritte}: sieht sich die Seite an ...`);
+    const blick = await sende({ type: "observe" });
+    if (!blick?.beobachtung) return { ok: false, grund: "Die Maus konnte die Seite nicht ansehen.", gelesen };
+
+    // 2. ENTSCHEIDEN (auf dem Server: Modell + Pruefung)
+    zeige(`Maus ${n}/${maxSchritte}: ueberlegt ...`);
+    let antwort;
+    try {
+      const token = await holeToken();
+      const r = await fetch(schrittUrl, {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({
+          naechsterSchritt: true,
+          task: String(auftrag || "").slice(0, 4000),
+          capsuleRef: `panel-frei-${Date.now().toString(36)}`,
+          domainAllowlist: hosts,
+          beobachtung: blick.beobachtung,
+          verlauf,
+          restSchritte: maxSchritte - n + 1
+        })
+      });
+      antwort = await r.json().catch(() => null);
+      if (!r.ok || !antwort?.ok) {
+        return { ok: false, grund: `Maus konnte nicht entscheiden: ${antwort?.error || r.status}`, gelesen };
+      }
+    } catch {
+      return { ok: false, grund: "Maus nicht erreichbar.", gelesen };
+    }
+
+    // 3. HANDELN
+    const naechste = entscheidungAlsAktion(antwort.entscheidung);
+    if (naechste.fertig) return { ok: true, grund: `Maus fertig nach ${n - 1} Schritten: ${naechste.grund}`, gelesen };
+    if (naechste.fehler) return { ok: false, grund: `Maus gestoppt: ${naechste.fehler}`, gelesen };
+
+    zeige(`Maus ${n}/${maxSchritte}: ${naechste.beschreibung}`);
+    const ergebnis = await sende(naechste.aktion);
+    if (!ergebnis || ergebnis.ok === false) {
+      return { ok: false, grund: `Maus gestoppt bei: ${naechste.beschreibung}`, gelesen };
+    }
+    if (naechste.liestAls && typeof ergebnis.gelesen === "string") gelesen[naechste.liestAls] = ergebnis.gelesen;
+    // Der Verlauf haelt sie davon ab, im Kreis zu laufen: ohne ihn entscheidet
+    // sie bei gleichem Seitenzustand jedes Mal dasselbe.
+    verlauf.push(naechste.beschreibung);
+  }
+  return { ok: false, grund: `Maus hat nach ${maxSchritte} Schritten aufgehoert (Obergrenze).`, gelesen };
 }
