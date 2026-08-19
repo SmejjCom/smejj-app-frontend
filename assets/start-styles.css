@@ -7472,3 +7472,28 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: transparent;
   color: #f2f5f4;
 }
+/* =====================================================================
+ * Betreiber 2026-08-18: "genau 1 zu 1 wie bei Claude, fuer Chat UND Code,
+ * mit der Beleuchtung."
+ *
+ * Claudes Hauptknopf kennt drei Zustaende:
+ *   leer      -> aus (nur das Zeichen, keine Flaeche)
+ *   Text da   -> HELL gefuellt, dunkles Zeichen (bereit zum Senden)
+ *   Antwort   -> Stopp-Quadrat (bei uns .chat-stopp bzw. das pulsende
+ *                Arbeits-Viereck im Code-Feld)
+ *
+ * "Text da" wird ohne neues JavaScript erkannt: ein Textfeld mit Inhalt
+ * verliert :placeholder-shown. Der Knopf haengt also am Feld selbst —
+ * es gibt keinen zweiten Zustand, der auseinanderlaufen koennte.
+ * ===================================================================== */
+#start .prompt-glass:has(#startMessage:not(:placeholder-shown)) .send-button,
+#code .codefeld:has(#codeAufgabe:not(:placeholder-shown)) #codeSenden {
+  background: #f2f5f4;
+  color: #0a0f16;
+  box-shadow: none;
+}
+#start .prompt-glass:has(#startMessage:not(:placeholder-shown)) .send-button:hover,
+#code .codefeld:has(#codeAufgabe:not(:placeholder-shown)) #codeSenden:hover {
+  background: #dfe5e3;
+  color: #0a0f16;
+}
