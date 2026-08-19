@@ -1,3 +1,11 @@
+// smejj.com — Maus-Auftraege erkennen und ausfuehren.
+//
+// WARUM DIESE WEICHE VOR JEDEM MODELLWEG STEHT (aus app.js hierher verschoben,
+// 2026-08-17, 800-Zeilen-Regel): Ein Maus-Auftrag ("Erledige mit der Maus im
+// Browser: ...") wird nicht BEANTWORTET, sondern AUSGEFUEHRT — Browser auf,
+// Schritt fuer Schritt, sichtbar. Erkennt die Weiche nichts, laeuft alles
+// unveraendert weiter (fail-safe).
+
 // smejj.com — "Erledige mit der Maus im Browser: ..." direkt aus dem Chat.
 //
 // WARUM ES DIESE DATEI GIBT (Betreiber-Befund 2026-08-18):
@@ -39,7 +47,60 @@ const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260818-1";
 
 async function holePanel() {
   const [pane, maus] = await Promise.all([import(PANEL), import(PANEL_MAUS)]);
-  return { activeTab: pane.activeTab, openBrowserRequest: pane.openBrowserRequest, starteMausLauf: maus.starteMausLauf };
+  return {
+    activeTab: pane.activeTab,
+    openBrowserRequest: pane.openBrowserRequest,
+    normalizeAgentBrowserUrl: pane.normalizeAgentBrowserUrl,
+    openPane: pane.openPane,
+    refs: pane.refs,
+    state: pane.state,
+    starteMausLauf: maus.starteMausLauf
+  };
+}
+
+/**
+ * Oeffnet das Ziel — auch wenn das Panel seine sieben Taebe schon voll hat.
+ *
+ * WARUM ES DAS BRAUCHT (live gemessen 2026-08-18 im Browser des Betreibers):
+ * openBrowserRequest() gibt false zurueck, wenn addTab() wegen MAX_TABS nichts
+ * mehr liefert. Meine erste Fassung deutete jedes false als "Adresse taugt
+ * nicht" und schrieb "es geht nur https" — fuer die astreine https-Adresse
+ * https://smejj.com. Eine Meldung, die den falschen Grund nennt, ist schlimmer
+ * als gar keine: sie schickt die Fehlersuche in die falsche Richtung.
+ *
+ * Die zwei Faelle sind jetzt getrennt. Ist das Panel voll, wird der AKTIVE Tab
+ * weiterbenutzt — ueber genau den Weg, den auch ein Mensch nimmt (Adresszeile,
+ * Enter). Das kostet den Inhalt dieses einen Tabs, deshalb wird es im Chat
+ * gesagt, nicht stillschweigend getan.
+ *
+ * @returns {{ok: true}|{ok: false, grund: string}}
+ */
+export function oeffneZiel(ziel, panel, schreibe) {
+  if (panel.openBrowserRequest(ziel)) return { ok: true };
+
+  const brauchbar = panel.normalizeAgentBrowserUrl ? panel.normalizeAgentBrowserUrl(ziel) : ziel;
+  if (!brauchbar) {
+    return { ok: false, grund: `Diese Adresse kann der eingebaute Browser nicht oeffnen: ${ziel} — es geht nur https.` };
+  }
+
+  const adresszeile = panel.refs?.address;
+  if (!adresszeile) {
+    return { ok: false, grund: "Der Browser rechts ist noch nicht aufgebaut. Bitte einmal den Browser oeffnen und den Auftrag noch einmal senden." };
+  }
+
+  const anzahl = panel.state?.tabs?.length;
+  schreibe(`Der Browser hat schon ${anzahl || "zu viele"} Tabs — mehr gehen nicht. Ich benutze den aktiven Tab weiter.`);
+  panel.openPane?.();
+  adresszeile.value = ziel;
+  // Ohne Fenster (Test) gibt es KeyboardEvent nicht. Im Browser bleibt es
+  // exakt dasselbe Ereignis wie beim Tippen — nur die Herkunft unterscheidet
+  // sich, und darauf hoert die Adresszeile nicht.
+  adresszeile.dispatchEvent(
+    typeof KeyboardEvent === "function"
+      ? new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
+      : { type: "keydown", key: "Enter", bubbles: true }
+  );
+  return { ok: true };
 }
 
 /** Die Vorlage, die der Startseiten-Chip ins Feld setzt (Quellsprache Deutsch). */
@@ -180,8 +241,11 @@ export async function mausAuftragErledigt({ task, output, deps = {} } = {}) {
   // Zusehen ist der halbe Zweck: erst wird der Browser sichtbar geoeffnet,
   // dann faengt die Maus an — nie umgekehrt.
   schreibe(`Ich oeffne ${kurzeAdresse(ziel)} im Browser rechts.`);
-  if (!oeffne(ziel)) {
-    schreibe(`Diese Adresse kann der eingebaute Browser nicht oeffnen: ${ziel} (es geht nur https).`);
+  const geoeffnet = deps.oeffne
+    ? (oeffne(ziel) ? { ok: true } : { ok: false, grund: `Diese Adresse kann der eingebaute Browser nicht oeffnen: ${ziel}` })
+    : oeffneZiel(ziel, panel, schreibe);
+  if (!geoeffnet.ok) {
+    schreibe(geoeffnet.grund);
     return true;
   }
 
@@ -208,9 +272,15 @@ export async function warteAufSitzung({ tab, warte, versuche = WARTE_VERSUCHE })
     if (tab()?.sessionId) return { ok: true };
     await warte(WARTE_MS);
   }
+  // Der Rat "einmal neu laden" stand hier zuerst und war falsch: wenn der
+  // Live-Browser gar nicht erst anspringt, aendert Neuladen nichts — der
+  // Nutzer dreht sich im Kreis. Gemessen 2026-08-18: die Seite wird dann
+  // direkt eingebettet (mode "direct"), es entsteht nie eine Sitzung, weil
+  // der Server-Endpunkt fehlt. Das ist nichts, was im Browser zu heilen ist,
+  // also wird es auch nicht so dargestellt.
   return {
     ok: false,
-    grund: "Der Live-Browser ist nicht hochgekommen — ohne ihn kann die Maus die Seite nicht ansehen. Bitte die Seite im Browser rechts einmal neu laden und den Auftrag noch einmal senden."
+    grund: "Der Live-Browser ist nicht angesprungen — die Seite rechts ist nur eingebettet, und darin kann die Maus nichts sehen oder klicken. Das liegt am Server, nicht an deinem Browser: Neuladen hilft hier nicht."
   };
 }
 
