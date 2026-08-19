@@ -34,13 +34,13 @@ export function sicherheitsZustand(url) {
 const TEXTE = Object.freeze({
   [ZUSTAende.SICHER]: {
     kurz: "",
-    titel: "Verbindung ist verschluesselt",
+    titel: "Verbindung ist verschlüsselt",
     hinweis: "Was du hier eingibst, kann unterwegs niemand mitlesen."
   },
   [ZUSTAende.UNSICHER]: {
     kurz: "Nicht sicher",
-    titel: "Verbindung ist NICHT verschluesselt",
-    hinweis: "Gib hier keine Passwoerter oder Zahlungsdaten ein — sie waeren unterwegs lesbar."
+    titel: "Verbindung ist NICHT verschlüsselt",
+    hinweis: "Gib hier keine Passwörter oder Zahlungsdaten ein — sie wären unterwegs lesbar."
   },
   [ZUSTAende.INTERN]: {
     kurz: "",

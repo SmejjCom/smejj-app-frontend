@@ -24,7 +24,7 @@ export function buildExternalFallbackHtml({ url, title, message }) {
   <main class="bp-fallback">
     <strong>${safeTitle}</strong>
     <span>${safeMessage}</span>
-    <a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a>
+    <a href="${safeUrl}" target="_blank" rel="noopener">Extern öffnen</a>
   </main>
 </body>
 </html>`;
@@ -43,11 +43,11 @@ export function buildExternalFallbackHtml({ url, title, message }) {
 const FEHLER_TEXTE = Object.freeze({
   dns: {
     titel: "Diese Website ist nicht erreichbar",
-    hinweis: "Die Adresse konnte nicht gefunden werden. Pruefe, ob sie richtig geschrieben ist."
+    hinweis: "Die Adresse konnte nicht gefunden werden. Prüfe, ob sie richtig geschrieben ist."
   },
   netz: {
     titel: "Keine Verbindung",
-    hinweis: "Die Seite hat nicht geantwortet. Pruefe deine Internetverbindung und versuch es noch einmal."
+    hinweis: "Die Seite hat nicht geantwortet. Prüfe deine Internetverbindung und versuch es noch einmal."
   },
   zeit: {
     titel: "Die Seite braucht zu lange",
@@ -167,7 +167,7 @@ export function buildRemoteBrowserHtml({ url, title, screenshot, reason = "", ca
 </head>
 <body>
   <main class="bp-remote-browser" data-reason="${safeReason}">
-    <header><strong>${safeTitle}</strong><span>Remote-Browser</span><a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a></header>
+    <header><strong>${safeTitle}</strong><span>Remote-Browser</span><a href="${safeUrl}" target="_blank" rel="noopener">Extern öffnen</a></header>
     <div class="bp-remote-scroll" id="bpScroll" tabindex="0">
       <div class="bp-remote-page">
         <img src="${safeScreenshot}" alt="Remote-Browser-Ansicht von ${safeTitle}">
