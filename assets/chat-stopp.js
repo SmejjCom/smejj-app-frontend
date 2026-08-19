@@ -36,6 +36,14 @@ const BEREICHE = [
 /** Merkt den zuletzt abgeschickten Text je Bereich. */
 const letzterAuftrag = new Map();
 
+/** Wann zuletzt irgendein Strom Aktivitaet gemeldet hat (Gnadenfenster). */
+let letzteAktivitaet = 0;
+if (typeof window !== "undefined") {
+  window.addEventListener("smejj:chat-strom", (event) => {
+    if ((Number(event.detail?.laufen) || 0) > 0) letzteAktivitaet = Date.now();
+  });
+}
+
 function merke(bereich) {
   const feld = document.getElementById(bereich.feld);
   const text = String(feld?.value || "").trim();
@@ -198,7 +206,16 @@ export function ruesteViereck(bereich) {
       void setzeFort(bereich);
       return;
     }
-    if (!viereck.classList.contains("an")) return; // frei: nichts zu tun
+    // "Laeuft gerade etwas?" nicht NUR an der an-Klasse festmachen: die
+    // speist sich aus smejj:chat-strom, und ZWEI Zaehler senden dieses
+    // Ereignis (chat-stream.js zaehlt seine Leser, chatClient.js seine
+    // Anbieter-Laeufe). Faellt einer kurz auf 0, ist die Klasse fuer
+    // einen Moment weg — ein Klick genau dann verpuffte (Betreiber
+    // 2026-08-19: "stoppen funktioniert nicht"). Das Gnadenfenster
+    // zaehlt jede Aktivitaet der letzten 3 s als "laeuft".
+    const aktiv = viereck.classList.contains("an")
+      || (Date.now() - letzteAktivitaet) < 3000;
+    if (!aktiv) return; // wirklich frei: nichts zu tun
     stoppeAlleStroeme();
     zeigeGestoppt(viereck, true);
   };

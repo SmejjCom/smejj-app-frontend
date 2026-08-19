@@ -7530,11 +7530,14 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   pointer-events: auto;
   cursor: pointer;
 }
+/* Betreiber 2026-08-19 ("stoppen funktioniert nicht"): 29 px Trefferfeld
+   war zu klein — wer das 11-px-Viereck knapp verfehlte, stoppte nichts.
+   Jetzt 45 px (Touch-Regel: mindestens 44 px, siehe Charta). */
 #start .start-arbeit[role="button"]::before,
 #code .code-arbeit[role="button"]::before {
   content: "";
   position: absolute;
-  inset: -9px;
+  inset: -17px;
   border-radius: 0;
 }
 /* Das Dreieck sitzt bewusst auf einem ::after und NICHT als clip-path auf
