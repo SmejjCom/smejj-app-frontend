@@ -2455,17 +2455,21 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
    dem Viereck selbst: ein clip-path haette die unsichtbare Klickflaeche
    gleich mitgeschnitten, der Knopf waere im Play-Zustand 11 px klein
    geworden. */
+/* Betreiber 2026-08-19 ("bei zwei Zustaenden nicht mehr beleuchtet"):
+   gestoppt bleibt das VIERECK selbst hell — cyan gefuellt, ohne Puls —
+   und das Play-Dreieck sitzt DUNKEL DARIN. Vorher stand nur ein winziges
+   cyanes Dreieck auf leerem Grund, das als "aus" gelesen wurde. */
 #start .start-arbeit.gestoppt,
 #code .code-arbeit.gestoppt {
-  border-color: transparent;
-  background: transparent;
+  border-color: var(--v11-cy);
+  background: var(--v11-cy);
   animation: none;
 }
 #start .start-arbeit.gestoppt::after,
 #code .code-arbeit.gestoppt::after {
   content: "";
   position: absolute;
-  inset: -1.5px;
-  background: var(--v11-cy);
+  inset: 2px 1px 2px 3px;
+  background: #04211f;
   clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
 }

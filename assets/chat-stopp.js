@@ -116,10 +116,25 @@ async function setzeFort(bereich) {
     preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}) },
     history: buildRequestHistory(FORTSETZUNGS_AUFTRAG)
   };
-  await streamChatAnswer(
-    buildChatTargets({ primary: CLIENT_ROUTES.api.agent, reserve: CLIENT_ROUTES.api.chatFallback }, anfrage),
-    anfrage, output, { renderMarkdown: renderChatMarkdown, offlineNotice: UI_COPY.chatOffline }
-  );
+  // Denkzeit sichtbar machen (Betreiber 2026-08-19: nach Play blieb das
+  // Viereck dunkel, bis das erste Byte kam — gemessen 5+ s). Der normale
+  // Sendeweg hat dafuer den Vorlauf in code-flaeche.js; der haengt aber am
+  // Klick auf den Senden-Knopf, den es beim Fortsetzen nicht gibt. Darum
+  // meldet die Fortsetzung ihren Lauf selbst — ehrlich: an beim Start,
+  // aus nach dem Ende (streamChatAnswer loest sich IMMER auf, auch im
+  // Fehlerfall; dazwischen uebernehmen die echten Strom-Ereignisse).
+  const melde = (laufen) => {
+    try { window.dispatchEvent(new CustomEvent("smejj:chat-strom", { detail: { laufen } })); } catch { /* still */ }
+  };
+  melde(1);
+  try {
+    await streamChatAnswer(
+      buildChatTargets({ primary: CLIENT_ROUTES.api.agent, reserve: CLIENT_ROUTES.api.chatFallback }, anfrage),
+      anfrage, output, { renderMarkdown: renderChatMarkdown, offlineNotice: UI_COPY.chatOffline }
+    );
+  } finally {
+    melde(0);
+  }
   // Fehlerwege in streamChatAnswer ERSETZEN den Blaseninhalt (kurze
   // Meldung). Die Teilantwort ist dann weg — zurueckholen und die Meldung
   // dahinter setzen; Fortsetzungen machen den Text nie kuerzer.
