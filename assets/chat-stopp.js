@@ -10,16 +10,21 @@
 //   gestoppt  -> bleibt hell, zeigt aber ein Play-Dreieck; ein Klick
 //                schickt denselben Auftrag erneut los
 //
-// Wichtig zur Erwartung: "wieder starten" heisst NEU SCHICKEN. Ein
-// abgebrochener Strom laesst sich nicht an der Abbruchstelle fortsetzen —
-// darum merkt sich dieses Modul den zuletzt abgeschickten Text und legt
-// ihn beim Play zurueck ins Feld, bevor es den Senden-Knopf ausloest.
-// Freigabe des Betreibers dafuer liegt vor ("Ja").
+// FORTSETZEN statt neu schicken (Betreiber 2026-08-19: "wo hat gestoppt
+// soll da wieder starten"): Play schickt eine Fortsetzungs-Anfrage mit dem
+// vollen Verlauf INKLUSIVE der Teilantwort und streamt in DIESELBE Blase
+// weiter — so machen es ChatGPT ("Continue generating") und Claude. Der
+// alte Weg (denselben Text neu schicken) bleibt nur als Rueckfall, wenn
+// es noch gar keine Teilantwort gibt.
 //
 // Rein additiv: der Sendeweg selbst wird nicht angefasst (wir klicken nur
 // denselben Knopf, den auch ein Mensch klickt), und das Stoppen laeuft
 // ueber die vorhandene stoppeChatStrom() aus chat-stream.js.
-import { stoppeChatStrom } from "/assets/ai/chat-stream.js";
+import { stoppeChatStrom, streamChatAnswer } from "/assets/ai/chat-stream.js";
+// Dieselben Kennungen wie app.js — sonst zweite Modulinstanz (module-queries).
+import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js";
+import { renderChatMarkdown } from "./components.js?v=b48";
+import { CLIENT_ROUTES, UI_COPY } from "./config.js";
 
 // Die beiden Bereiche unterscheiden sich nur in drei Kennungen — alles
 // andere ist identisch, darum eine Tabelle statt zweier Kopien.
@@ -55,10 +60,70 @@ function istAbgebrochen() {
   return BEREICHE.some((b) => document.getElementById(b.viereck)?.classList.contains("gestoppt"));
 }
 
+// Der Auftrag an das Modell. Er enthaelt mit Absicht das Wort "genau":
+// lokalesModell.js (STARKE_SPUR_WOERTER) laesst solche Anfragen NIE lokal
+// beantworten — der lokale Weg wuerde die Teilantwort in der Blase sonst
+// ueberschreiben statt anhaengen.
+// Dieselbe Wahl, die das Modell-Menue schreibt (code-modell-menue.js).
+const MODELL_SCHLUESSEL = "smejj.model.selected.v2";
+
+const FORTSETZUNGS_AUFTRAG = "Deine letzte Antwort wurde gestoppt. Setze sie"
+  + " genau an der Abbruchstelle fort: nichts wiederholen, keine Einleitung,"
+  + " keine Zusammenfassung — direkt weiterschreiben, notfalls mitten im Satz.";
+
+/**
+ * Setzt die gestoppte Antwort in DERSELBEN Blase fort.
+ *
+ * Der Verlauf traegt die Teilantwort als juengste Assistenten-Nachricht
+ * (buildRequestHistory liest sie aus dem Log); streamChatAnswer haengt die
+ * neuen Zeichen an textContent an — es entsteht kein zweiter Anfang.
+ *
+ * @param {{viereck: string, feld: string, senden: string}} bereich Kennungen.
+ * @returns {Promise<boolean>} true, wenn fortgesetzt wurde.
+ */
+async function setzeFort(bereich) {
+  const blasen = document.querySelectorAll("#startLog .entry.assistant");
+  const output = blasen[blasen.length - 1];
+  if (!output || !output.textContent.trim()) {
+    // Nichts zum Fortsetzen (gestoppt vor dem ersten Zeichen): der alte
+    // Weg — denselben Auftrag noch einmal ueber den normalen Sendepfad.
+    const text = letzterAuftrag.get(bereich.viereck);
+    const feld = document.getElementById(bereich.feld);
+    const senden = document.getElementById(bereich.senden);
+    if (!text || !feld || !senden) return false;
+    feld.value = text;
+    feld.dispatchEvent(new Event("input", { bubbles: true }));
+    senden.click();
+    return true;
+  }
+  const vorher = output.textContent;
+  const anfrage = {
+    task: FORTSETZUNGS_AUFTRAG,
+    model: localStorage.getItem(MODELL_SCHLUESSEL) || "smejj 1.0",
+    files: [],
+    preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}) },
+    history: buildRequestHistory(FORTSETZUNGS_AUFTRAG)
+  };
+  await streamChatAnswer(
+    buildChatTargets({ primary: CLIENT_ROUTES.api.agent, reserve: CLIENT_ROUTES.api.chatFallback }, anfrage),
+    anfrage, output, { renderMarkdown: renderChatMarkdown, offlineNotice: UI_COPY.chatOffline }
+  );
+  // Fehlerwege in streamChatAnswer ERSETZEN den Blaseninhalt (kurze
+  // Meldung). Die Teilantwort ist dann weg — zurueckholen und die Meldung
+  // dahinter setzen; Fortsetzungen machen den Text nie kuerzer.
+  if (output.textContent.length < vorher.length) {
+    const meldung = output.textContent.trim();
+    output.textContent = meldung ? `${vorher}\n\n${meldung}` : vorher;
+    renderChatMarkdown?.(output);
+  }
+  return true;
+}
+
+
 function zeigeGestoppt(viereck, an) {
   viereck.classList.toggle("gestoppt", an);
-  viereck.setAttribute("aria-label", an ? "Antwort erneut schicken" : "Antwort stoppen");
-  viereck.setAttribute("title", an ? "Erneut schicken" : "Stoppen");
+  viereck.setAttribute("aria-label", an ? "Antwort fortsetzen" : "Antwort stoppen");
+  viereck.setAttribute("title", an ? "Fortsetzen" : "Stoppen");
 }
 
 /**
@@ -86,16 +151,8 @@ export function ruesteViereck(bereich) {
 
   const handeln = () => {
     if (viereck.classList.contains("gestoppt")) {
-      // Play: denselben Auftrag erneut. Das Feld ist der einzige Weg, den
-      // der Sendepfad kennt — also legen wir den Text zurueck und klicken.
-      const text = letzterAuftrag.get(bereich.viereck);
-      const feld = document.getElementById(bereich.feld);
-      const senden = document.getElementById(bereich.senden);
-      if (!text || !feld || !senden) return;
       loescheAbbruch();
-      feld.value = text;
-      feld.dispatchEvent(new Event("input", { bubbles: true }));
-      senden.click();
+      void setzeFort(bereich);
       return;
     }
     if (!viereck.classList.contains("an")) return; // frei: nichts zu tun
