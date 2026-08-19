@@ -145,7 +145,7 @@ export function zeigeZoom(form, zoom, aufKlick = null) {
   }
   knopf.hidden = false;
   knopf.textContent = `${prozent} %`;
-  const text = `Zoom ${prozent} % — klicken fuer 100 %`;
+  const text = `Zoom ${prozent} % — klicken für 100 %`;
   knopf.title = text;
   knopf.setAttribute("aria-label", text);
   return prozent;
@@ -161,7 +161,9 @@ export function zeigeZoom(form, zoom, aufKlick = null) {
 // ein Zeichen, das den Zustand spiegelt.
 export function zeigeNeuladen(knopf, laedt) {
   if (!knopf) return;
-  const text = laedt ? "Laden abbrechen" : "Neu laden";
+  // Chrome nennt im Tooltip das Kuerzel. Genannt wird nur, was es hier
+  // wirklich gibt: Cmd+R ist verdrahtet, fuer den Abbruch gibt es keins.
+  const text = laedt ? "Laden abbrechen" : "Diese Seite neu laden (⌘R)";
   knopf.title = text;
   knopf.setAttribute("aria-label", text);
   knopf.innerHTML = laedt

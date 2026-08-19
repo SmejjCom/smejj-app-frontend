@@ -85,11 +85,11 @@ export function zeigeMenue(x, y, eintraege, aufWahl) {
  */
 export function seitenEintraege({ kannZurueck = false, kannVor = false, hatAdresse = false } = {}) {
   return [
-    { id: "zurueck", text: "Zurueck", aktiv: kannZurueck },
-    { id: "vor", text: "Vor", aktiv: kannVor },
+    { id: "zurueck", text: "Zurück", aktiv: kannZurueck },
+    { id: "vor", text: "Vorwärts", aktiv: kannVor },
     { id: "neuLaden", text: "Neu laden", aktiv: hatAdresse },
     { id: "adresseKopieren", text: "Adresse kopieren", aktiv: hatAdresse },
-    { id: "externOeffnen", text: "In neuem Tab oeffnen", aktiv: hatAdresse }
+    { id: "externOeffnen", text: "In neuem Tab öffnen", aktiv: hatAdresse }
   ];
 }
 
