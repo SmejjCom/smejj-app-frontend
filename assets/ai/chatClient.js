@@ -117,13 +117,14 @@ async function streamOpenAiCompatible({ baseUrl, apiKey, model, messages, output
     return;
   }
   const reader = response.body.getReader();
+  anbieterLeser.add(reader);
   const decoder = new TextDecoder();
   let buffer = "";
   let text = "";
   output.textContent = "";
   while (true) {
     const { value, done } = await reader.read();
-    if (done) break;
+    if (done || stoppVerlangt) break;
     buffer += decoder.decode(value, { stream: true });
     const lines = buffer.split("\n");
     buffer = lines.pop() || "";
@@ -142,6 +143,7 @@ async function streamOpenAiCompatible({ baseUrl, apiKey, model, messages, output
       }
     }
   }
+  anbieterLeser.delete(reader);
   if (!text) output.textContent = "(leere Antwort)";
 }
 
@@ -178,7 +180,35 @@ async function runByokChat({ task, output, offlineNotice }) {
 // blieben Arbeits-Viereck und Stopp-Knopf bei Cline/BYOK stumm. Gleicher
 // Ereignisname, gleiche Nutzlast: { laufen: <Anzahl> }.
 let anbieterLaeufe = 0;
+
+// Stopp-Weg (Betreiber 2026-08-19, live gemessen: "ich klicke Stop, aber
+// macht trotzdem weiter"). stoppeChatStrom() aus chat-stream.js kennt nur
+// die EIGENEN Leser — die Anbieter-Stroeme hier (Cline/BYOK/Provider)
+// liefen daran vorbei und waren nicht abbrechbar (562 -> 3.447 Zeichen
+// NACH dem Stopp-Klick gemessen). Darum meldet sich jeder Leser in dieser
+// Menge an, und chat-stopp.js beendet sie ueber das Ereignis
+// "smejj:chat-stoppen". Das Flag deckt die Luecke zwischen Absenden und
+// erstem Byte: wird in ihr gestoppt, bricht die Schleife beim ersten
+// Lesen ab, obwohl der Leser beim Klick noch gar nicht existierte.
+const anbieterLeser = new Set();
+let stoppVerlangt = false;
+if (typeof window !== "undefined") {
+  window.addEventListener("smejj:chat-stoppen", () => {
+    stoppVerlangt = true;
+    for (const leser of anbieterLeser) {
+      try { leser.cancel(); } catch { /* Strom war schon zu */ }
+    }
+    // Abgebrochene Leser sind tot — die Menge gleich leeren, damit ein
+    // per Fehler uebersprungenes Abmelden keinen Eintrag stehen laesst.
+    anbieterLeser.clear();
+  });
+}
+
 function meldeStrom(delta) {
+  // Ein NEU beginnender Lauf hebt den Stopp-Wunsch auf; laeuft er gegen
+  // einen stehenden Abbruch an, setzt die Nachzuegler-Bremse in
+  // chat-stopp.js das Flag sofort wieder (ihr Ereignis kommt NACH diesem).
+  if (delta > 0) stoppVerlangt = false;
   anbieterLaeufe = Math.max(0, anbieterLaeufe + delta);
   try {
     window.dispatchEvent(new CustomEvent("smejj:chat-strom", { detail: { laufen: anbieterLaeufe } }));
@@ -219,13 +249,14 @@ async function runClineChat({ task, output, offlineNotice }) {
       throw new Error(error.message || error.error || `HTTP ${response.status}`);
     }
     const reader = response.body.getReader();
+  anbieterLeser.add(reader);
     const decoder = new TextDecoder();
     let buffer = "";
     let answer = "";
     output.textContent = "";
     while (true) {
       const { value, done } = await reader.read();
-      if (done) break;
+      if (done || stoppVerlangt) break;
       buffer += decoder.decode(value, { stream: true });
       const events = buffer.split("\n\n");
       buffer = events.pop() || "";
@@ -243,6 +274,7 @@ async function runClineChat({ task, output, offlineNotice }) {
         }
       }
     }
+    anbieterLeser.delete(reader);
     if (!answer) output.textContent = "(leere Antwort)";
   } catch (error) {
     output.textContent = `Cline-Fehler: ${String(error?.message || error).slice(0, 400)}`;
@@ -276,13 +308,14 @@ async function runProviderChat({ providerId, task, output, offlineNotice }) {
       throw new Error(error.message || error.error || `HTTP ${response.status}`);
     }
     const reader = response.body.getReader();
+  anbieterLeser.add(reader);
     const decoder = new TextDecoder();
     let buffer = "";
     let answer = "";
     output.textContent = "";
     while (true) {
       const { value, done } = await reader.read();
-      if (done) break;
+      if (done || stoppVerlangt) break;
       buffer += decoder.decode(value, { stream: true });
       const events = buffer.split("\n\n");
       buffer = events.pop() || "";
@@ -296,6 +329,7 @@ async function runProviderChat({ providerId, task, output, offlineNotice }) {
         if (delta) { answer += delta; output.textContent = answer; }
       }
     }
+    anbieterLeser.delete(reader);
     if (!answer) output.textContent = "(leere Antwort)";
   } catch (error) {
     output.textContent = `Anbieter-Fehler: ${String(error?.message || error).slice(0, 400)}`;

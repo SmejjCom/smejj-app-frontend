@@ -67,6 +67,18 @@ function istAbgebrochen() {
 // Dieselbe Wahl, die das Modell-Menue schreibt (code-modell-menue.js).
 const MODELL_SCHLUESSEL = "smejj.model.selected.v2";
 
+/**
+ * Beendet ALLE laufenden Antworten. Es gibt zwei Stromfamilien: die
+ * Hausmodelle lesen in chat-stream.js (stoppeChatStrom), die Anbieter-Wege
+ * (Cline/BYOK/Provider) lesen in chatClient.js — sie hoeren auf das
+ * Ereignis "smejj:chat-stoppen". Genau diese Luecke war der Betreiber-
+ * Befund vom 2026-08-19: "ich klicke Stop, aber macht trotzdem weiter".
+ */
+function stoppeAlleStroeme() {
+  stoppeChatStrom();
+  try { window.dispatchEvent(new CustomEvent("smejj:chat-stoppen")); } catch { /* still */ }
+}
+
 const FORTSETZUNGS_AUFTRAG = "Deine letzte Antwort wurde gestoppt. Setze sie"
   + " genau an der Abbruchstelle fort: nichts wiederholen, keine Einleitung,"
   + " keine Zusammenfassung — direkt weiterschreiben, notfalls mitten im Satz.";
@@ -156,7 +168,7 @@ export function ruesteViereck(bereich) {
       return;
     }
     if (!viereck.classList.contains("an")) return; // frei: nichts zu tun
-    stoppeChatStrom();
+    stoppeAlleStroeme();
     zeigeGestoppt(viereck, true);
   };
 
@@ -181,7 +193,7 @@ export function initChatStopp() {
   // durch eine echte Nutzergeste: Play oder ein neues Absenden (merke()).
   window.addEventListener("smejj:chat-strom", (event) => {
     if ((Number(event.detail?.laufen) || 0) <= 0) return;
-    if (istAbgebrochen()) stoppeChatStrom();
+    if (istAbgebrochen()) stoppeAlleStroeme();
   });
   return gesetzt > 0;
 }
