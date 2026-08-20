@@ -1351,7 +1351,6 @@ button:hover {
 }
 
 /* ---- cline-model-menu.css ---- */
-
 .model-menu button[data-submenu-trigger] {
   display: inline-flex;
   align-items: center;
@@ -1530,7 +1529,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 /* ---- composer-tools.css ---- */
-
 .plus-picker {
      position: relative;
      z-index: 50;
@@ -1965,7 +1963,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 /* ---- browser-pane.css ---- */
-
 .browser-panel.is-browser-mode {
   grid-template-rows: 1fr;
   padding: 0;
@@ -2391,7 +2388,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 /* ---- browser-pane-chrome.css ---- */
-
 .bp-tab-spacer {
   flex: none;
   width: var(--bp-control-size);
@@ -2619,7 +2615,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 /* ---- view-chrome.css ---- */
-
 .view.has-view-chrome {
   position: relative;
   padding-top: 52px;
@@ -2774,7 +2769,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 /* ---- profile-dock.css ---- */
-
 .profile-dock {
   align-items: center;
 }
@@ -2945,7 +2939,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 /* ---- chat-markdown.css ---- */
-
 .entry.assistant p {
   margin: 0 0 10px;
 }
@@ -3215,7 +3208,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 .entry.assistant .chat-hinweis[data-art="caution"] .chat-hinweis-titel { color: #d9614a; }
 
 /* ---- chat-actions.css ---- */
-
 .msg-actions {
   position: relative;
   display: flex;
@@ -3627,7 +3619,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 /* ---- search-overlay.css ---- */
-
 .search-overlay {
   position: fixed;
   inset: 0;
@@ -3802,7 +3793,6 @@ body.search-overlay-open {
 }
 
 /* ---- start-glass.css ---- */
-
 #start:not(.has-start-chat) .home-feed {
   display: flex;
   flex-direction: column;
@@ -3933,7 +3923,6 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 }
 
 /* ---- eckig.css ---- */
-
 *,
 *::before,
 *::after {
@@ -3945,7 +3934,6 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 }
 
 /* ---- design-v11.css ---- */
-
 :root {
   --v11-cy: #32f6ea;
   --v11-cy-ink: #7ee8da;
