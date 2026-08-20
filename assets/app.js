@@ -139,9 +139,6 @@ function bindNavigation() {
   const syncBackdrop = initPanelBackdrop({ backdrop, sidebar, browserPanel, menuButton, browserButton, setMenuOpen, setBrowserPanelOpen });
   menuButton?.addEventListener("click", () => setMenuOpen(!sidebar?.classList.contains("is-open"))); // Desktop-Auf/Zu: spur-schalter.js (capture)
   browserButton?.addEventListener("click", () => setBrowserPanelOpen(!browserPanel?.classList.contains("is-open")));
-  // Meldung an knopf-puffer.js: ab jetzt kommen Klicks wirklich an. Ein Klick,
-  // der in die Ladezeit fiel, wird dort nachgefeuert (Knopf-Totzeit, 2026-08-19).
-  document.dispatchEvent(new CustomEvent("smejj:panel-bereit"));
   bindPanelResize("#leftPanelResize", "left", { $ });
   bindPanelResize("#rightPanelResize", "right", { $ });
   for (const button of $$(".nav-button")) {
