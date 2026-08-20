@@ -79,7 +79,14 @@ export function hatAnmeldeFeld(html) {
 export function shouldOpenInRealBrowser(html, url = "") {
   const text = String(html || "").slice(0, 120000);
   if (!text) return false;
-  if (hatAnmeldeFeld(text)) return true;
+  // Anmeldefelder werden im GANZEN Dokument gesucht, nicht nur in den ersten
+  // 120 000 Zeichen: die Google-Anmeldung ist 990 KB gross und traegt ihr
+  // Passwortfeld an Position 918 843 (live gemessen 2026-08-20). Mit dem
+  // gekuerzten Fenster fand die Weiche es nicht — die Seite landete weiter
+  // im Proxy und der Betreiber konnte sich nicht anmelden. Das Fenster
+  // schuetzt die MUSTERSUCHE unten vor grossen Seiten; eine einzelne
+  // Zeichenkettensuche ist billig genug fuer das ganze Dokument.
+  if (hatAnmeldeFeld(html)) return true;
   if (BLOCKED_PAGE_PATTERNS.some((pattern) => pattern.test(text))) return true;
   try {
     const host = new URL(url).hostname.replace(/^www\./, "");

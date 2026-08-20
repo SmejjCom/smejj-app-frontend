@@ -12,7 +12,7 @@
 // abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
 // instanzen mit getrennten CLIENT_ROUTES.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260820-1";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260820-2";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
@@ -43,7 +43,7 @@ import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js
 import {
   clampZoom, clampViewport, normalizeAddress, normalizeAgentBrowserUrl,
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl, shortHost
-} from "./browser-pane-adressen.js?v=browser-pane-20260820-1";
+} from "./browser-pane-adressen.js?v=browser-pane-20260820-2";
 export {
   clampZoom, normalizeAddress, normalizeAgentBrowserUrl,
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl
