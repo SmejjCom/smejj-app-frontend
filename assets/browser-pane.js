@@ -12,13 +12,13 @@
 // abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
 // instanzen mit getrennten CLIENT_ROUTES.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260819-6";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260820-1";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
   buildRemoteBrowserHtml
-} from "./browser-pane-render.js?v=browser-pane-20260819-6";
-export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260819-6";
+} from "./browser-pane-render.js?v=browser-pane-20260820-1";
+export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260820-1";
 import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260709-2";
 // Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
@@ -36,14 +36,14 @@ import { verdrahteMausKnopf } from "./browser-pane-maus.js?v=browser-pane-202608
 // gemeldet: alle pruefen den QUELLTEXT, keiner laesst das Modul laufen.
 import { baueNachrichtenEmpfang } from "./browser-pane-nachrichten.js?v=browser-pane-20260709-2";
 let suche = null;
-import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260819-6";
+import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260820-1";
 // Reine Helfer (2026-08-19 ausgelagert, 800-Zeilen-Regel). Sie werden hier
 // zugleich WEITER EXPORTIERT, damit tests/browser-pane.test.mjs und jeder
 // bisherige Aufrufer sie unveraendert von browser-pane.js bekommt.
 import {
   clampZoom, clampViewport, normalizeAddress, normalizeAgentBrowserUrl,
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl, shortHost
-} from "./browser-pane-adressen.js?v=browser-pane-20260819-1";
+} from "./browser-pane-adressen.js?v=browser-pane-20260820-1";
 export {
   clampZoom, normalizeAddress, normalizeAgentBrowserUrl,
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl

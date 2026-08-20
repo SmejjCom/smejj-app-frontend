@@ -55,9 +55,31 @@ export function clampViewport(value, min, max, fallback) {
   return Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : fallback;
 }
 
+/**
+ * Traegt die Seite ein Passwortfeld? Dann ist sie eine Anmeldeseite.
+ *
+ * BEFUND 2026-08-20 (Betreiber: "Google Mail kann ich nicht einloggen,
+ * Alibaba nicht"): Anmeldeseiten landeten im PROXY — einem toten Abbild.
+ * Man SIEHT das Formular, aber es ist ein Bild aus HTML: kein JavaScript,
+ * keine Cookies, keine Sitzung. Getippte Zeichen erscheinen nicht einmal,
+ * live nachgestellt an der Google-Anmeldung. Anmelden ist dort grundsaetz-
+ * lich unmoeglich, und nichts sagt es.
+ *
+ * Die Erkennung ist bewusst INHALTLICH statt einer Hostliste: jede
+ * Anmeldeseite der Welt hat ein Passwortfeld, und keine Liste bleibt
+ * vollstaendig. Preis der Regel: Seiten mit versteckter Anmeldung im Kopf
+ * (viele Shops) gehen ebenfalls in den Live-Browser — der ist langsamer,
+ * aber ein ECHTER Browser. Das ist der bessere Tausch: lieber etwas
+ * langsamer und bedienbar als schnell und nutzlos.
+ */
+export function hatAnmeldeFeld(html) {
+  return /<input[^>]+type\s*=\s*["']?password/i.test(String(html || ""));
+}
+
 export function shouldOpenInRealBrowser(html, url = "") {
   const text = String(html || "").slice(0, 120000);
   if (!text) return false;
+  if (hatAnmeldeFeld(text)) return true;
   if (BLOCKED_PAGE_PATTERNS.some((pattern) => pattern.test(text))) return true;
   try {
     const host = new URL(url).hostname.replace(/^www\./, "");

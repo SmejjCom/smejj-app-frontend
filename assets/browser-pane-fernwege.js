@@ -7,8 +7,8 @@
 // Zustand traegt (sessionClient, refs, Zeichnen, Speichern), kommt als
 // Baustein herein — dasselbe Muster wie browser-pane-tableiste.js. Dadurch
 // bleibt die Familie ohne DOM testbar.
-import { buildLiveBrowserHtml, buildRemoteBrowserHtml } from "./browser-pane-render.js?v=browser-pane-20260819-6";
-import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260819-1";
+import { buildLiveBrowserHtml, buildRemoteBrowserHtml } from "./browser-pane-render.js?v=browser-pane-20260820-1";
+import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260820-1";
 
 export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbackFrame, commitHistory, showHint, persistTabs, render }) {
   function remoteBrowserViewport() {

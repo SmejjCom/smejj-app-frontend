@@ -24,7 +24,7 @@
 // und auch nicht verstecken darf (fail-closed: echte Fehlermeldung, kein
 // erfundener Erfolg).
 
-import { openPane, activeTab, addTab, setFrame, commitHistory, persistTabs, render, refs, state } from "./browser-pane.js?v=browser-pane-20260819-6";
+import { openPane, activeTab, addTab, setFrame, commitHistory, persistTabs, render, refs, state } from "./browser-pane.js?v=browser-pane-20260820-1";
 
 const MAUS_MODE = "maus-replay";
 
