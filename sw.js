@@ -175,7 +175,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v625";
+const CACHE_NAME = "smejj-shell-v626";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -294,6 +294,9 @@ const SHELL = [
   // Die Maus aus dem Chat beauftragen (2026-08-18). Ohne Eintrag hier faende
   // der Import von app.js offline nichts — und app.js braeche komplett ab.
   "/assets/maus-absicht.js",
+  "/assets/maus-auftrag.js",
+  "/assets/chat-sync.js",
+  "/assets/chat-medien.js",
   // Die Maus im eigenen Chrome des Nutzers (2026-08-18).
   "/assets/maus-chrome.js",
   "/assets/nav-absichten.js",
