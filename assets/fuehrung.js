@@ -111,6 +111,17 @@ export function initFuehrung() {
     document.addEventListener("click", function weg(e) {
       if (!e.target.closest("#fuehrungBlase")) { beende(); document.removeEventListener("click", weg); }
     });
+    // Sobald wirklich gearbeitet wird, ist die Einfuehrung vorbei — wer eine
+    // Antwort bekommt, braucht keine Erklaerung mehr, sondern den Stopp-Knopf.
+    //
+    // BEFUND 2026-08-20 (Handy, 375 px, echte Fingertipps): die Blase deckte
+    // 27 von 81 Punkten des Stopp-Trefferfeldes ab. Ein Tipp dorthin landete
+    // auf der Blase — und weil ein Tipp AUF die Blase sie nicht schliesst,
+    // passierte gar nichts. Der Nutzer sah einen Stopp-Knopf, der nicht
+    // reagierte, und keinen Hinweis warum.
+    window.addEventListener("smejj:chat-strom", (e) => {
+      if ((Number(e.detail?.laufen) || 0) > 0) beende();
+    }, { once: true });
   };
   setTimeout(start, 1600);
   return true;
