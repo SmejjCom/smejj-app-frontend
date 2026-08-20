@@ -158,8 +158,25 @@
     }, { passive: false });
     var specialKeys = ["Enter", "Tab", "Escape", "Backspace", "Delete",
       "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End"];
+    // Bearbeiten-Kuerzel, die eine Anmeldung erst bequem machen: ohne
+    // Einfuegen muss man jedes Passwort aus dem Manager ABTIPPEN (Betreiber
+    // 2026-08-20). Bewusst nur diese fuenf — alles andere bleibt beim
+    // umgebenden Browser, damit ⌘T/⌘W/⌘Q dort weiter das Gewohnte tun.
+    var comboKeys = { v: 1, c: 1, x: 1, a: 1, z: 1 };
     window.addEventListener("keydown", function (event) {
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.metaKey || event.ctrlKey) {
+        var taste = String(event.key || "").toLowerCase();
+        if (!event.altKey && !event.shiftKey && comboKeys[taste] === 1) {
+          event.preventDefault();
+          flushText();
+          // "ControlOrMeta" laesst Playwright die richtige Taste des Systems
+          // waehlen: der Fern-Browser laeuft unter Linux, der Nutzer sitzt
+          // womoeglich am Mac.
+          sendAction({ type: "key", key: "ControlOrMeta+" + taste });
+        }
+        return;
+      }
+      if (event.altKey) return;
       if (specialKeys.indexOf(event.key) !== -1) {
         event.preventDefault();
         flushText();

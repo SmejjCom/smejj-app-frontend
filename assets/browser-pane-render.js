@@ -107,7 +107,7 @@ export function buildErrorPageHtml({ url = "", grund = "" } = {}) {
        Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
        hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
        unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
-  <script src="/assets/browser-stage.js?v=3"></script>
+  <script src="/assets/browser-stage.js?v=4"></script>
 </body>
 </html>`;
 }
@@ -179,7 +179,7 @@ export function buildRemoteBrowserHtml({ url, title, screenshot, reason = "", ca
        Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
        hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
        unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
-  <script src="/assets/browser-stage.js?v=3"></script>
+  <script src="/assets/browser-stage.js?v=4"></script>
 </body>
 </html>`;
 }
@@ -227,7 +227,7 @@ export function buildLiveBrowserHtml({ url, title, screenshot, viewport = {} } =
        Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
        hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
        unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
-  <script src="/assets/browser-stage.js?v=3"></script>
+  <script src="/assets/browser-stage.js?v=4"></script>
 </body>
 </html>`;
 }
