@@ -88,6 +88,20 @@ async function ueberChrome({ aufgabe, ziel, schreibe }) {
   schreibe(`Ich arbeite in deinem eigenen Chrome — du siehst der Maus direkt zu. Ich oeffne ${kurzeAdresse(ziel)}.`);
   const auf = await sendeAnChrome({ type: "navigate", url: ziel });
   if (!auf?.ok) {
+    // FEHLENDE FREIGABE IST KEIN ABBRUCH, SONDERN EIN UMWEG.
+    //
+    // Gemessen 2026-08-20: sobald die Bruecke installiert war, endete jeder
+    // Auftrag auf einer noch nicht freigegebenen Seite — obwohl der ferne
+    // Browser sie ohne Weiteres haette oeffnen koennen. Die Bruecke ist fuer
+    // Seiten da, auf denen der Nutzer ANGEMELDET ist; fuer alles Oeffentliche
+    // ist der ferne Browser genauso gut und braucht keine Freigabe.
+    //
+    // Also: Grund nennen, Weg wechseln, weiterarbeiten. Wer den angemeldeten
+    // Zugang braucht, erfaehrt im selben Satz, wie er ihn bekommt.
+    if (String(auf?.error || "").startsWith("herkunft_nicht_freigegeben")) {
+      schreibe(`Fuer ${kurzeAdresse(ziel)} hast du deinem Chrome noch nichts erlaubt — ich nehme den eingebauten Browser. (Wenn die Maus dort ANGEMELDET arbeiten soll: Puzzleteil oben rechts, „smejj.com Maus-Bruecke“, „Fuer 30 Minuten erlauben“.)`);
+      return false;
+    }
     schreibe(deuteChromeFehler(auf?.error, ziel));
     return true;
   }
