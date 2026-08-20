@@ -20,11 +20,21 @@
 // Rein additiv: der Sendeweg selbst wird nicht angefasst (wir klicken nur
 // denselben Knopf, den auch ein Mensch klickt), und das Stoppen laeuft
 // ueber die vorhandene stoppeChatStrom() aus chat-stream.js.
-import { stoppeChatStrom, streamChatAnswer } from "/assets/ai/chat-stream.js";
-// Dieselben Kennungen wie app.js — sonst zweite Modulinstanz (module-queries).
-import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js";
-import { renderChatMarkdown } from "./components.js?v=b48";
-import { CLIENT_ROUTES, UI_COPY } from "./config.js";
+// KEINE statischen Importe — und das ist der ganze Zweck dieser Zeilen.
+//
+// GEMESSEN am 2026-08-20 auf einem emulierten Handy (375 px): das Viereck war
+// nach 2.061 ms sichtbar, aber erst nach 4.087 ms bedienbar. Zwei Sekunden
+// lang sah man einen Stopp-Knopf, der nichts tat. Grund war MEIN eigener
+// Ausbau: fuer das Fortsetzen kamen drei Importe oben dazu
+// (chat-history-context, components -> chat-markdown, config), und ein Modul
+// fuehrt seinen Rumpf erst aus, wenn die GANZE Kette geladen ist. Das
+// Verdrahten braucht davon nichts.
+//
+// Darum wird jetzt zuerst verdrahtet und erst beim Tippen nachgeladen. Zum
+// Zeitpunkt eines Klicks liegen die Module ohnehin im Modul-Zwischenspeicher
+// (app.js laedt sie statisch), der Nachladeschritt kostet dann nichts mehr.
+// Die Kennungen sind absichtlich dieselben wie in app.js — eine abweichende
+// erzeugt eine ZWEITE Modulinstanz (module-queries-Waechter).
 
 // Die beiden Bereiche unterscheiden sich nur in drei Kennungen — alles
 // andere ist identisch, darum eine Tabelle statt zweier Kopien.
@@ -83,8 +93,13 @@ const MODELL_SCHLUESSEL = "smejj.model.selected.v2";
  * Befund vom 2026-08-19: "ich klicke Stop, aber macht trotzdem weiter".
  */
 function stoppeAlleStroeme() {
-  stoppeChatStrom();
+  // Das Ereignis zuerst und OHNE Nachladen: es erreicht die Anbieter-Leser in
+  // chatClient.js sofort. stoppeChatStrom() kommt einen Wimpernschlag spaeter
+  // aus dem Modul-Zwischenspeicher — so haengt kein Stopp an einer Ladezeit.
   try { window.dispatchEvent(new CustomEvent("smejj:chat-stoppen")); } catch { /* still */ }
+  import("/assets/ai/chat-stream.js")
+    .then((m) => m.stoppeChatStrom())
+    .catch(() => { /* fail-safe: das Ereignis oben hat schon gewirkt */ });
 }
 
 const FORTSETZUNGS_AUFTRAG = "Deine letzte Antwort wurde gestoppt. Setze sie"
@@ -116,6 +131,12 @@ async function setzeFort(bereich) {
     senden.click();
     return true;
   }
+  const [{ streamChatAnswer }, { buildChatTargets, buildRequestHistory }, { renderChatMarkdown }, { CLIENT_ROUTES, UI_COPY }] = await Promise.all([
+    import("/assets/ai/chat-stream.js"),
+    import("./chat-history-context.js"),
+    import("./components.js?v=b48"),
+    import("./config.js")
+  ]);
   const vorher = output.textContent;
   const anfrage = {
     task: FORTSETZUNGS_AUFTRAG,
