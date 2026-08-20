@@ -110,7 +110,12 @@ async function pull() {
   if (!kopf || !s || serverSagtNein) return;
   let antwort;
   try {
-    antwort = await fetch(`${API_ORIGIN}/api/chats?nurListe=1`, { headers: kopf });
+    // `nurAbgleich=1`: nur id/updatedAt/ownerId — genau die drei Felder, die
+    // die Schleife unten liest. GEMESSEN 2026-08-20: nurListe=1 brachte
+    // 42 KB bei 88 Chats, davon war der Loewenanteil Titel, Projekt und
+    // Marken, die hier nie angesehen werden. Der VOLLE Chat kommt ohnehin
+    // einzeln nach (holeVollstaendig), sobald einer wirklich neuer ist.
+    antwort = await fetch(`${API_ORIGIN}/api/chats?nurAbgleich=1`, { headers: kopf });
   } catch { return; }
   if (antwort.status === 503) { serverSagtNein = true; return; }
   if (!antwort.ok) return;

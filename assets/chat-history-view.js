@@ -29,7 +29,7 @@
 import {
   listChats, openChat, renameChat, deleteChat, activeChatId, togglePinChat, newChat,
   listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
-} from "/assets/chat-store.js?v=b52";
+} from "/assets/chat-store.js?v=b53";
 // Holt fuer Chats ohne eigenen Titel einen aus der Bruecke. Von HIER importiert
 // und nicht aus index.html, damit die Startseite unter dem Start-Lock bleibt
 // (gleiches Muster wie icon-nutzung.js in profile-dock.js). Das Modul meldet
@@ -45,7 +45,7 @@ import {
   ohneBallast, trefferAusschnitt, volltext, zeitText, themaVon, merkmaleVon, sichereAlsMarkdown,
   projektGruppen
 } from "/assets/chat-history-text.js?v=b47b";
-import { createCardBuilders, createProjektAktionen } from "/assets/chat-history-cards.js?v=b47c";
+import { createCardBuilders, createProjektAktionen } from "/assets/chat-history-cards.js?v=b47d";
 
 const STYLE_ID = "chatHistoryStyles";
 

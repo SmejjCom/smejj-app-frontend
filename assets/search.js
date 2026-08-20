@@ -2,10 +2,10 @@ import { CLIENT_ROUTES } from "./config.js";
 // Chats kommen aus dem Speicher, nicht aus dem DOM (QA-Welle 2, Befund W2-01).
 // WICHTIG: derselbe Pfad wie in chat-history-view.js — ein abweichender
 // Spezifizierer (z. B. "./chat-store.js") erzeugt eine ZWEITE Modulinstanz.
-import { listChats, openChat } from "/assets/chat-store.js?v=b52";
+import { listChats, openChat } from "/assets/chat-store.js?v=b53";
 // Overlay-Logik (Cmd+K, Rendern, Tastatur) wohnt in search-overlay.js — diese
 // Datei bleibt klein und die Such-Seite hier ist nur noch die Rueckfallebene.
-import { initSearchOverlay, toggleSearchOverlay } from "./search-overlay.js?v=b47c";
+import { initSearchOverlay, toggleSearchOverlay } from "./search-overlay.js?v=b47d";
 
 // Bildschirm 38: das eine Feld findet auch Einstellungen und Hilfe.
 // Die Bereichsliste spiegelt GROUPS aus settings-surface.js — dort ist die
