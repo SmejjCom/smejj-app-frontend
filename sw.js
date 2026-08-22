@@ -161,6 +161,11 @@
 // Datei stand noch auf v636. Genau die Kollision, vor der der Absatz
 // darueber warnt.
 //
+// v646 -> v647 (2026-08-22): der Chat-Fix. Ohne diesen Sprung behaelt
+// jeder wiederkehrende Nutzer die alte chatClient.js aus dem Vorrat — und
+// bekaeme weiter "Bitte zuerst anmelden", obwohl er angemeldet ist. Genau
+// die Falle vom Mittag (v637 hielt browser-stage.js fest).
+//
 // v257 -> v258 (2026-08-09): Die Liste zeichnet nicht mehr alle Chats auf
 // einmal. Erster Block 30 Karten, der Rest kommt beim Scrollen nachgeladen
 // (angehaengt, nie neu gezeichnet — sonst springt die Scrollposition).
@@ -185,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v646";
+const CACHE_NAME = "smejj-shell-v647";
 const SHELL = [
   "/",
   "/assets/start-styles.css",

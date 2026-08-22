@@ -15,6 +15,49 @@ const MAX_HISTORY_MESSAGES = 12;
 const MAX_MESSAGE_CHARS = 8000;
 const SYSTEM_PROMPT = "Du bist der Assistent von smejj.com, einem AI Coding OS. Antworte hilfreich, korrekt und kompakt auf Deutsch, ausser der Nutzer schreibt in einer anderen Sprache.";
 const API_TOKEN_KEY = "smejj.apiToken.v1";
+// Dasselbe Token liegt dauerhaft hier — auth-gate.js fuellt beide Faecher.
+const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
+
+/**
+ * Holt das Zugriffstoken — erst aus dem Fach dieser Seite, dann aus dem
+ * dauerhaften.
+ *
+ * BETREIBER-FREIGABE 2026-08-22 (Start-Lock). Vorher las der Chat NUR
+ * sessionStorage. Das Fach stirbt mit dem Browserfenster, und es wird erst
+ * wieder gefuellt, nachdem auth-gate.js den Server gefragt hat — ein
+ * Netzaufruf. Wer den Browser oeffnete und sofort tippte, bekam in diesem
+ * Fenster "Bitte zuerst anmelden", obwohl die Anmeldung voellig in Ordnung
+ * war. Genau das ist dem Betreiber passiert; er hat dreimal gefragt und
+ * dreimal dieselbe Abfuhr bekommen.
+ *
+ * Das dauerhafte Fach ist ohne Netzaufruf sofort da. Es zuerst zu befuellen
+ * waere der falsche Weg (der Chat soll das Gate nicht ersetzen), aber es zu
+ * LESEN, wenn das eigene Fach leer ist, kostet nichts und macht das
+ * Zeitfenster zu.
+ */
+function holeZugriffsToken() {
+  try {
+    const eigenes = sessionStorage.getItem(API_TOKEN_KEY);
+    if (eigenes) return eigenes;
+  } catch { /* Speicher gesperrt: unten weiterversuchen */ }
+  try {
+    return localStorage.getItem(AUTH_TOKEN_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Der Satz, den der Nutzer sieht, wenn kein Token da ist.
+ *
+ * Vorher stand hier "Bitte zuerst anmelden UND <Anbieter> verbinden" — zwei
+ * Ursachen, von denen nur EINE geprueft wurde. Der Betreiber hat daraufhin
+ * bei Cline gesucht, wo nichts kaputt war. Ohne Token wissen wir ueber den
+ * Anbieter nichts; also nennen wir nur, was wir wirklich wissen.
+ */
+function nichtAngemeldetText() {
+  return "Deine Anmeldung ist abgelaufen. Bitte melde dich neu an — dann antworte ich sofort wieder.";
+}
 
 const BYOK_HINT = [
   "BYOK ist noch nicht konfiguriert.",
@@ -216,9 +259,9 @@ function meldeStrom(delta) {
 }
 
 async function runClineChat({ task, output, offlineNotice }) {
-  const token = sessionStorage.getItem(API_TOKEN_KEY) || "";
+  const token = holeZugriffsToken();
   if (!token) {
-    output.textContent = "Bitte zuerst anmelden und Cline unter Einstellungen → Modelle verbinden.";
+    output.textContent = nichtAngemeldetText();
     return true;
   }
   meldeStrom(+1);
@@ -289,9 +332,9 @@ async function runClineChat({ task, output, offlineNotice }) {
 // Der Key bleibt serverseitig verschluesselt; hier laeuft nur der authentifizierte
 // Stream ueber die Control-Server-Route — kein Key im Browser.
 async function runProviderChat({ providerId, task, output, offlineNotice }) {
-  const token = sessionStorage.getItem(API_TOKEN_KEY) || "";
+  const token = holeZugriffsToken();
   if (!token) {
-    output.textContent = "Bitte zuerst anmelden und den Anbieter unter Einstellungen → Modelle verbinden.";
+    output.textContent = nichtAngemeldetText();
     return true;
   }
   meldeStrom(+1);
