@@ -125,6 +125,73 @@ export function enforceAuthGate(win) {
 //     auf einen Netzaufruf warten.
 const SESSION_CHECK_TIMEOUT_MS = 8000;
 
+// --- Der zweite Schluesselbund: smejj.apiToken.v1 ------------------------------
+//
+// Befund 2026-08-22, im angemeldeten Chrome des Betreibers live gemessen: der
+// Chat antwortete auf jede Frage mit "Bitte zuerst anmelden und Cline unter
+// Einstellungen -> Modelle verbinden" — und schickte dabei KEINE einzige
+// Anfrage an den Server. Die Anmeldung war dabei voellig in Ordnung: das
+// dauerhafte Token aus localStorage lieferte an /api/auth/me sauber
+// authenticated=true samt frischem accessToken.
+//
+// Die App fuehrt zwei Schluesselbunde, die nie miteinander gesprochen haben:
+//   localStorage["smejj.auth.accessToken.v1"]  Gate, Profil-Dock — dauerhaft.
+//   sessionStorage["smejj.apiToken.v1"]        Chat (ai/chatClient.js), Suche,
+//                                              eigene Anbieter-Keys, Maus-Wiedergabe.
+// Der zweite wird NUR beim Anmelden gefuellt und stirbt mit dem Browserfenster.
+// Wer den Browser schloss und wiederkam, war angemeldet — und sein Chat tot.
+// Der Hinweistext zeigte dabei auf die falsche Ursache ("Cline verbinden").
+//
+// Geheilt wird hier, weil ai/chatClient.js unter dem Start-Lock und
+// account-sessions.js unter dem Security-Lock steht — beide sind eingefroren.
+// Das Gate haelt das frische Token ohnehin schon in der Hand und legt es jetzt
+// in BEIDE Faecher. Kein zusaetzlicher Netzaufruf fuer den Regelfall.
+const API_TOKEN_KEY = "smejj.apiToken.v1";
+
+// Legt das Token im Fach der Chat-Seite ab. Output: true = abgelegt.
+function legeApiTokenAb(win, token) {
+  if (!token) return false;
+  try {
+    win.sessionStorage.setItem(API_TOKEN_KEY, String(token));
+    return true;
+  } catch {
+    return false; // Privatmodus/Storage gesperrt — der Chat meldet es selbst.
+  }
+}
+
+/**
+ * Nur-Cookie-Fall: kein dauerhaftes Token im Browser, aber eine gueltige
+ * Serversitzung. Dann holt der Cookie-Weg ein frisches Token — dieselbe Route,
+ * die account-sessions.js benutzt. Liegt das Token schon da, passiert nichts.
+ *
+ * Fail-safe wie das ganze Gate: eine Absage oder ein Netzfehler meldet NIEMAND
+ * ab, sie lassen den Zustand einfach, wie er ist.
+ *
+ * @param {object} win window-artiges Objekt
+ * @param {{fetchFn?: Function, apiOrigin?: string}} [deps]
+ * @returns {Promise<"vorhanden"|"geholt"|"keine-sitzung"|"kein-speicher"|"unklar">}
+ */
+export async function holeApiTokenUeberCookie(win, { fetchFn = globalThis.fetch, apiOrigin = API_ORIGIN } = {}) {
+  try {
+    if (win.sessionStorage.getItem(API_TOKEN_KEY)) return "vorhanden";
+  } catch {
+    return "kein-speicher";
+  }
+  if (!apiOrigin) return "unklar";
+  try {
+    const antwort = await fetchFn(`${apiOrigin}/api/auth/session-token`, {
+      credentials: "include",
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(SESSION_CHECK_TIMEOUT_MS)
+    });
+    if (!antwort.ok) return "keine-sitzung";
+    const payload = await antwort.json();
+    return legeApiTokenAb(win, String(payload?.accessToken || "")) ? "geholt" : "kein-speicher";
+  } catch {
+    return "unklar"; // offline oder Zeitueberschreitung: nichts tun.
+  }
+}
+
 /**
  * Fragt den Server, ob das gespeicherte Token noch gilt, und meldet ab, wenn es
  * eindeutig nicht mehr gilt.
@@ -155,6 +222,8 @@ export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, api
       try {
         win.localStorage.setItem(AUTH_TOKEN_KEY, payload.accessToken);
       } catch {}
+      // Dasselbe Token gehoert in das Fach, aus dem der Chat liest.
+      legeApiTokenAb(win, payload.accessToken);
     }
   } catch {
     return "unklar"; // offline oder Zeitueberschreitung: nichts tun.
@@ -186,5 +255,13 @@ export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, api
 if (typeof window !== "undefined") {
   const umgeleitet = enforceAuthGate(window);
   // Nur wenn die Seite bleibt: sonst pruefen wir eine Seite, die gerade geht.
-  if (!umgeleitet) verifyStoredSession(window).catch(() => {});
+  // Nach der Pruefung immer noch einmal nach dem Chat-Token sehen: hat
+  // verifyStoredSession eines mitgebracht, kehrt der Aufruf sofort um; sonst
+  // versucht er den Cookie-Weg. Beides blockiert das Rendern nicht.
+  if (!umgeleitet) {
+    verifyStoredSession(window)
+      .catch(() => {})
+      .then(() => holeApiTokenUeberCookie(window))
+      .catch(() => {});
+  }
 }
