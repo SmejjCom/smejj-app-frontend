@@ -185,7 +185,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v642";
+const CACHE_NAME = "smejj-shell-v643";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -326,6 +326,19 @@ const SHELL = [
   "/assets/papierkorb.js",
   "/assets/chat-actions-menu.js",
   "/assets/chat-code-copy.js",
+  // Sieben Module, die index.html per <script> laedt und die bis 2026-08-22
+  // hier fehlten. Offline lieferte der Fetch-Handler dafuer die index.html
+  // zurueck — der Browser bekam HTML statt JavaScript, brach das Modul ab, und
+  // mit ihm fielen Code-Farben, Herunterladen, der Runter-Pfeil, der
+  // Stopp-Knopf, die Warte-Anzeige, die Panel-Ampel und die Projektordner aus.
+  // Gefunden von check:precache-imports beim Marktstart-Check.
+  "/assets/chat-code-farben.js",
+  "/assets/chat-code-download.js",
+  "/assets/chat-runter-pfeil.js",
+  "/assets/chat-stopp.js",
+  "/assets/chat-warte-reste.js",
+  "/assets/panel-status.js",
+  "/assets/projekt-ordner.js",
   "/assets/workspace-bridge.js",
   "/assets/storage/index.js",
   "/assets/storage/localWorkspace.js",
@@ -346,6 +359,9 @@ const SHELL = [
   "/assets/ai/costGuard.js",
   "/assets/ai/promptContextBuilder.js",
   "/assets/ai/chatClient.js",
+  // chatClient.js importiert ihn fuer die Auto-Modellwahl — ohne Eintrag riss
+  // er offline den ganzen Chat-Client mit (check:precache-imports 2026-08-22).
+  "/assets/ai/modellRouter.js",
   "/assets/shared/securityPolicy.js",
   "/assets/shared/http-json.js",
   "/manifest.webmanifest",
