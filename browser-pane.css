@@ -12,10 +12,25 @@
 
 .browser-pane {
   display: grid;
+  /* ZURUECKGENOMMEN 2026-08-18 auf Ansage des Betreibers: Ich hatte die
+     Leiste an Chromes Masse angeglichen (32/28/6). Gewuenscht war aber die
+     FUNKTION von Chrome, nicht sein Aussehen — die Kopfleiste von smejj soll
+     bleiben, wie sie war. Das ist keine Geschmacksfrage: das Panel teilt sich
+     den Bildschirm mit dem Chat, und jede Zeile Kopf fehlt der Seite. */
   --bp-row-height: 26px;
   --bp-control-size: 22px;
   --bp-control-gap: 3px;
   --bp-side-width: calc((var(--bp-control-size) * 3) + (var(--bp-control-gap) * 2));
+  /* Die TABLEISTE hat schmalere Raender als die Werkzeugleiste: links sitzt
+     nur noch "+" (1 Knopf), rechts Maus und Platzhalter (2). Frueher galt
+     hier ebenfalls --bp-side-width (3 Knoepfe je Seite) — der Rest stand
+     leer, und die Tabs bekamen ihn NICHT. Bei 7 Tabs blieben so 79 px pro
+     Tab, unter der 88-px-Schwelle: selbst der aktive Tab zeigte keinen
+     Titel mehr, nur seinen Anfangsbuchstaben. Diese 75 px gehen jetzt an
+     die Tabs. Chrome macht es genauso — dort beginnen die Tabs am linken
+     Rand, waehrend die Adresszeile darunter ihre drei Knoepfe hat. */
+  --bp-tab-left-width: var(--bp-control-size);
+  --bp-tab-right-width: calc((var(--bp-control-size) * 2) + var(--bp-control-gap));
   /* Inhalt darf nie hoeher als das Panel werden: minmax(0, 1fr) statt fester
      Mindesthoehe — sonst werden Seiten auf kleinen Fenstern abgeschnitten. */
   grid-template-rows: var(--bp-row-height) var(--bp-row-height) auto auto minmax(0, 1fr);
@@ -37,7 +52,7 @@
 .bp-tabstrip {
   grid-row: 1;
   display: grid;
-  grid-template-columns: var(--bp-side-width) minmax(0, 1fr) var(--bp-side-width);
+  grid-template-columns: var(--bp-tab-left-width) minmax(0, 1fr) var(--bp-tab-right-width);
   align-items: center;
   gap: 6px;
   min-width: 0;
@@ -64,10 +79,19 @@
 }
 
 .bp-tabs {
-  display: grid;
+  display: flex;
+  align-items: center;
+  gap: 2px;
   min-width: 0;
-  overflow: hidden;
+  /* Chrome schiebt Tabs nebeneinander und laesst sie schrumpfen; erst unter
+     der Mindestbreite wird gescrollt. `grid` zeigte hier vorher genau EINEN
+     Tab — daher die Blaetter-Pfeile, die Chrome nicht hat. */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
 }
+
+.bp-tabs::-webkit-scrollbar { display: none; }
 
 .bp-tab {
   display: grid;
@@ -75,7 +99,8 @@
   align-items: center;
   gap: 7px;
   min-width: 0;
-  width: 100%;
+  /* Breite setzt browser-pane-tableiste.js je nach Tab-Anzahl. */
+  flex: none;
   height: var(--bp-control-size);
   min-height: 0;
   padding: 0 7px;
@@ -83,13 +108,123 @@
   border-radius: 5px;
   background: transparent;
   color: #f6f3ee;
-  font-size:13.5px;
+  font-size: 13.5px;
   cursor: pointer;
 }
 
 .bp-tab.is-active {
-  border-color: transparent;
+  border-color: rgba(246, 243, 238, 0.14);
+  background: rgba(246, 243, 238, 0.1);
+  color: #f6f3ee;
+}
+
+.bp-tab:hover:not(.is-active) {
+  background: rgba(246, 243, 238, 0.05);
+}
+
+.bp-tab:focus-visible {
+  outline: 2px solid rgba(159, 231, 212, 0.9);
+  outline-offset: -2px;
+}
+
+/* Nur-Icon-Zustand: Titel und Kreuz sind weg, das Icon steht mittig. */
+.bp-tab.is-schmal {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  padding: 0 4px;
+}
+
+.bp-tab.is-ziehend {
+  opacity: 0.45;
+}
+
+/* Marke links im Tab: echtes Favicon, sonst Anfangsbuchstabe. Fremde
+   Icon-Adressen sind durch img-src 'self' data: blob: ausgeschlossen —
+   der Buchstabe ist deshalb der Normalfall, nicht der Notbehelf. */
+.bp-tab-marke {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+}
+
+.bp-tab-favicon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.bp-tab-marke-buchstabe {
+  border-radius: 3px;
+  background: hsl(var(--bp-tab-farbton, 210) 45% 42%);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Kreuz erscheint erst beim Hover oder am aktiven Tab — wie in Chrome, sonst
+   flimmert die Leiste bei vielen Tabs. */
+.bp-tab-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  color: rgba(246, 243, 238, 0.55);
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0;
+}
+
+.bp-tab.is-active .bp-tab-close,
+.bp-tab:hover .bp-tab-close {
+  opacity: 1;
+}
+
+.bp-tab-close:hover {
+  background: rgba(246, 243, 238, 0.16);
+  color: #f6f3ee;
+}
+
+/* Adressvorschlaege (Chromes Omnibox-Liste) */
+.bp-vorschlaege {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid rgba(246, 243, 238, 0.14);
+  border-radius: 6px;
+  background: #16181b;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+}
+
+.bp-vorschlaege[hidden] { display: none; }
+
+.bp-vorschlag {
+  padding: 8px 11px;
+  border: 0;
   background: transparent;
+  color: rgba(246, 243, 238, 0.86);
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.bp-vorschlag:hover,
+.bp-vorschlag.is-markiert {
+  background: rgba(246, 243, 238, 0.1);
   color: #f6f3ee;
 }
 
@@ -129,7 +264,7 @@
   height: 16px;
   border-radius: 5px;
   color: rgba(246, 243, 238, 0.5);
-  font-size:15.5px;
+  font-size: 15.5px;
   line-height: 1;
 }
 
@@ -138,10 +273,7 @@
   color: #f6f3ee;
 }
 
-.bp-tab-add,
-.bp-tab-prev,
-.bp-tab-next,
-.bp-tab-count {
+.bp-tab-add {
   flex: none;
   width: var(--bp-control-size);
   height: var(--bp-control-size);
@@ -151,32 +283,17 @@
   border-radius: 6px;
   background: transparent;
   color: rgba(246, 243, 238, 0.62);
-  font-size:17.5px;
+  font-size: 17.5px;
   line-height: 1;
   cursor: pointer;
 }
 
-.bp-tab-count {
-  min-width: var(--bp-control-size);
-  padding: 0 5px;
-  border: 1px solid rgba(159, 231, 212, 0.36);
-  background: rgba(159, 231, 212, 0.11);
-  color: rgba(159, 231, 212, 0.95);
-  font-size:13.5px;
-  font-weight: 700;
-}
-
-.bp-tab-add:hover:not(:disabled),
-.bp-tab-prev:hover:not(:disabled),
-.bp-tab-next:hover:not(:disabled),
-.bp-tab-count:hover:not(:disabled) {
+.bp-tab-add:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.1);
   color: #f6f3ee;
 }
 
-.bp-tab-add:disabled,
-.bp-tab-prev:disabled,
-.bp-tab-next:disabled {
+.bp-tab-add:disabled {
   opacity: 0.35;
   cursor: default;
 }
@@ -236,6 +353,8 @@
 .bp-address-form {
   min-width: 0;
   margin: 0;
+  /* Bezugspunkt fuer die Vorschlagsliste darunter (position: absolute). */
+  position: relative;
 }
 
 .bp-address {
@@ -246,7 +365,7 @@
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.28);
   color: #f6f3ee;
-  font-size:14px;
+  font-size: 14px;
 }
 
 .bp-address:focus {
@@ -286,7 +405,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(159, 231, 212, 0.08);
   color: rgba(246, 243, 238, 0.82);
-  font-size:14.5px;
+  font-size: 14.5px;
 }
 
 /* Inhalt */
@@ -340,12 +459,12 @@
 }
 
 .bp-empty strong {
-  font-size:17.5px;
+  font-size: 17.5px;
 }
 
 .bp-empty span {
   color: rgba(246, 243, 238, 0.5);
-  font-size:15px;
+  font-size: 15px;
 }
 
 .bp-fallback {
@@ -361,13 +480,13 @@
 }
 
 .bp-fallback strong {
-  font-size:21px;
+  font-size: 21px;
 }
 
 .bp-fallback span {
   max-width: 420px;
   color: rgba(246, 243, 238, 0.6);
-  font-size:15.5px;
+  font-size: 15.5px;
   line-height: 1.6;
 }
 
@@ -381,7 +500,7 @@
   border-radius: 8px;
   background: rgba(159, 231, 212, 0.12);
   color: #f6f3ee;
-  font-size:15.5px;
+  font-size: 15.5px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -397,10 +516,6 @@
     padding: 0 5px;
   }
 
-  .bp-tab-count {
-    padding: 0 5px;
-  }
-
   .bp-toolbar {
     padding: 2px 5px;
   }
@@ -408,9 +523,4 @@
   body.browser-pane-open .browser-panel {
     width: calc(100vw - 12px);
   }
-}
-.bp-tab-spacer {
-  flex: none;
-  width: var(--bp-control-size);
-  height: var(--bp-control-size);
 }

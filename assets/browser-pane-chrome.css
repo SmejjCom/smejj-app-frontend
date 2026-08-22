@@ -1,0 +1,328 @@
+/* smejj.com — Browser-Panel: die Chrome-Angleichung.
+ *
+ * WARUM ES DIESE DATEI GIBT (2026-08-19): browser-pane.css war auf 842 Zeilen
+ * gewachsen und riss damit die 800-Zeilen-Regel aus AI_Guidelines.md. Gewachsen
+ * ist sie in Lagen — Sicherheitsanzeige, Lesezeichen-Stern, Zoom, Tabmenue,
+ * Seitensuche, angepinnte Tabs, Maus-Knopf kamen nacheinander hinten dran.
+ * Genau diese Lagen stehen jetzt hier: alles, was das Panel an Chrome angleicht.
+ * browser-pane.css behaelt das Grundgeruest (Rahmen, Werkzeugleiste, Adresse,
+ * Inhalt, Fehlerseiten).
+ *
+ * DIE REIHENFOLGE IST TEIL DER BEDEUTUNG. Mehrere Regeln hier ueberschreiben
+ * absichtlich frueheres aus browser-pane.css (z. B. .bp-address gleich dreimal).
+ * Darum steht diese Datei in bundle-start-styles.mjs DIREKT hinter
+ * browser-pane.css. Wer sie davorschiebt, dreht die Kaskade um und bekommt die
+ * Fehler zurueck, die hier schon einmal behoben wurden (Schloss unter fremder
+ * Regel, Zoom-Marke ueber dem Adresstext).
+ */
+
+.bp-tab-spacer {
+  flex: none;
+  width: var(--bp-control-size);
+  height: var(--bp-control-size);
+}
+
+/* Sicherheitsanzeige links in der Adressleiste (Chromes Schloss).
+   Seit die Adresse ohne "https://" angezeigt wird, ist dieses Zeichen die
+   EINZIGE Auskunft ueber die Verschluesselung — ohne es waere das Kuerzen
+   ein Rueckschritt. */
+.bp-toolbar .bp-sicherheit {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.6);
+  cursor: default;
+}
+
+/* Breite MUSS sich nach dem Inhalt richten: bei "Nicht sicher" stehen
+   Symbol und Text nebeneinander. `.bp-toolbar button` gibt allen Knoepfen
+   eine feste Quadratgroesse — hier ist das falsch. */
+.bp-toolbar .bp-sicherheit {
+  width: auto;
+  min-width: 0;
+  height: 20px;
+  display: flex;
+  /* `place-items: unset` allein nahm die Zentrierung weg, die
+     `.bp-toolbar button` per `place-items: center` gesetzt hatte — Symbol und
+     Text standen dann auf verschiedenen Hoehen. Gemessen, nicht geraten. */
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.bp-toolbar .bp-sicherheit[hidden] { display: none; }
+
+.bp-toolbar .bp-sicherheit svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Unsicher wird betont, sicher nicht. Ein Schloss, das immer da ist, sieht
+   niemand mehr; eine Warnung, die selten kommt, liest man. Die WARNUNG hat
+   ausserdem eine andere FORM (Dreieck statt Schloss) — Farbe allein reicht
+   nicht, rund 8 % der Maenner unterscheiden Rot und Gruen nicht. */
+.bp-toolbar .bp-sicherheit[data-zustand="unsicher"] {
+  background: rgba(240, 173, 78, 0.16);
+  color: #f0ad4e;
+}
+
+.bp-sicherheit-text {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Platz fuer das Zeichen — sonst laeuft die Adresse darunter. */
+.bp-address {
+  padding-left: 28px;
+}
+
+.bp-toolbar .bp-sicherheit[data-zustand="unsicher"] ~ .bp-address {
+  /* Gemessen (Testseite 2026-08-17): das Zeichen endet bei 95 px.
+     100 px lassen ihm Platz UND einen sichtbaren Abstand zum Text. */
+  padding-left: 100px;
+}
+
+/* Lesezeichen-Stern rechts IN der Adressleiste (wie Chrome). */
+.bp-toolbar .bp-stern {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.5);
+  cursor: pointer;
+}
+
+.bp-toolbar .bp-stern[hidden] { display: none; }
+
+.bp-toolbar .bp-stern:hover {
+  background: rgba(246, 243, 238, 0.12);
+  color: #f6f3ee;
+}
+
+.bp-toolbar .bp-stern:focus-visible {
+  outline: 2px solid rgba(159, 231, 212, 0.9);
+  outline-offset: 1px;
+}
+
+.bp-toolbar .bp-stern svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+/* Gemerkt: gefuellt UND farbig. Die Fuellung allein traegt die Auskunft,
+   die Farbe verstaerkt sie nur — Farbe allein waere fuer einen Teil der
+   Nutzer keine Auskunft. */
+.bp-toolbar .bp-stern[data-gemerkt="ja"] {
+  color: #f0c14b;
+}
+
+/* Platz rechts, damit die Adresse nicht unter den Stern laeuft. */
+.bp-address {
+  padding-right: 30px;
+}
+
+/* Zoom-Anzeige in der Adressleiste (Chrome zeigt sie dauerhaft, nicht als
+   verschwindenden Hinweis). Sichtbar nur bei Abweichung von 100 %. */
+.bp-toolbar .bp-zoom {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 30px;
+  transform: translateY(-50%);
+  width: auto;
+  min-width: 0;
+  height: 18px;
+  padding: 0 6px;
+  border: 1px solid rgba(246, 243, 238, 0.18);
+  border-radius: 3px;
+  background: rgba(246, 243, 238, 0.08);
+  color: rgba(246, 243, 238, 0.78);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.bp-toolbar .bp-zoom[hidden] { display: none; }
+.bp-toolbar .bp-zoom:hover { background: rgba(246, 243, 238, 0.16); color: #f6f3ee; }
+
+/* Rechtsklick-Menue der Tabs */
+.bp-tabmenue {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  min-width: 210px;
+  padding: 4px;
+  border: 1px solid rgba(246, 243, 238, 0.14);
+  border-radius: 6px;
+  background: #16181b;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+}
+
+.bp-tabmenue-eintrag {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.88);
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.bp-tabmenue-eintrag:hover:not(:disabled) { background: rgba(246, 243, 238, 0.1); color: #f6f3ee; }
+
+/* Unbenutzbare Eintraege bleiben SICHTBAR (wie in Chrome) — ein Menue, dessen
+   Eintraege springen, kann man sich nicht merken. */
+.bp-tabmenue-eintrag:disabled { color: rgba(246, 243, 238, 0.3); cursor: default; }
+
+/* Platz fuer die Zoom-Anzeige. Muss ueber das Formular laufen: das Zeichen
+   steht im DOM nach dem Eingabefeld, eine Geschwister-Regel kaeme nicht hin. */
+.bp-address-form.hat-zoom .bp-address {
+  padding-right: 76px;
+}
+
+/* Suchleiste (Cmd+F). Schwebt oben rechts ueber dem Inhalt, wie in Chrome —
+   sie soll den Text nicht verschieben, sonst springt beim Oeffnen die ganze
+   Seite und man verliert die Stelle, die man gerade gelesen hat. */
+.bp-suche {
+  position: absolute;
+  z-index: 40;
+  top: 6px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 6px;
+  border: 1px solid rgba(246, 243, 238, 0.16);
+  border-radius: 6px;
+  background: #16181b;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+}
+
+.bp-suche[hidden] { display: none; }
+
+.bp-suche-feld {
+  width: 190px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid rgba(246, 243, 238, 0.14);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #f6f3ee;
+  font-size: 13px;
+}
+
+.bp-suche-feld:focus { outline: 2px solid rgba(159, 231, 212, 0.8); outline-offset: -1px; }
+
+/* Kein Treffer: das FELD faerbt sich, nicht nur die Zahl — man schaut beim
+   Tippen aufs Feld, nicht auf den Zaehler daneben. */
+.bp-suche.ist-leer .bp-suche-feld { border-color: rgba(240, 173, 78, 0.7); }
+
+.bp-suche-zahl {
+  min-width: 42px;
+  color: rgba(246, 243, 238, 0.6);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.bp-suche button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.7);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.bp-suche button:hover { background: rgba(246, 243, 238, 0.12); color: #f6f3ee; }
+.bp-suche button:focus-visible { outline: 2px solid rgba(159, 231, 212, 0.9); outline-offset: 1px; }
+
+/* Der Inhaltsbereich braucht einen Bezugspunkt, sonst schwebt die Leiste
+   relativ zur ganzen Seite. */
+.bp-content { position: relative; }
+
+/* Angepinnte Tabs: schmal, ohne Titel, ohne Kreuz. Ein feiner Strich links
+   zeigt, dass sie eine eigene Gruppe sind — ohne ihn sehen sie nur aus wie
+   Tabs, die zufaellig kein Wort tragen. */
+.bp-tab.ist-angepinnt {
+  padding: 0;
+  border-left: 2px solid rgba(159, 231, 212, 0.55);
+}
+
+.bp-tab.ist-angepinnt .bp-tab-close { display: none; }
+
+/* Maus-Knopf in der Kopfleiste. Er sitzt auf einem der beiden Platzhalter,
+   die rechts ohnehin reserviert waren — die Kopfgeometrie bleibt unberuehrt. */
+.bp-tabstrip .bp-maus {
+  display: grid;
+  place-items: center;
+  width: var(--bp-control-size);
+  height: var(--bp-control-size);
+  /* Ohne dieses min-height gewinnt die globale Touch-Regel `button
+     { min-height: 42px }` — `min-height` schlaegt `height`. Der Knopf wurde
+     dann 42 px hoch und riss die 26-px-Kopfleiste 16 px in die Werkzeugleiste
+     hinein. Gemessen live am 2026-08-18. Jeder Panel-Knopf braucht diese
+     Zeile; beim Maus-Knopf fehlte sie, weil er spaeter dazukam. */
+  min-height: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: rgba(246, 243, 238, 0.6);
+  cursor: pointer;
+}
+
+.bp-tabstrip .bp-maus svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.bp-tabstrip .bp-maus:hover { background: rgba(246, 243, 238, 0.12); color: #f6f3ee; }
+.bp-tabstrip .bp-maus:focus-visible { outline: 2px solid rgba(159, 231, 212, 0.9); outline-offset: -2px; }
+
+/* Waehrend die Maus laeuft: der Knopf ist der Not-Aus und sagt das auch.
+   Ein Lauf, den man nicht stoppen kann, ist keiner, dem man zusehen moechte. */
+.bp-tabstrip .bp-maus.laeuft {
+  background: rgba(159, 231, 212, 0.18);
+  color: #9fe7d4;
+  animation: bp-pulse 1.4s ease-in-out infinite;
+}

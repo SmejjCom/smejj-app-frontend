@@ -24,7 +24,13 @@
          anfragen. Wer hier Verweise ergaenzt, muss vorher die Freigabe einholen
          und den Lock neu einfrieren — nicht einfach hinzufuegen. -->
     <link rel="stylesheet" href="/assets/static-pages.css">
-  </head>
+  <!-- Klickjacking-Schutz. MUSS mit, weil GitHub Pages keine eigenen Kopfzeilen
+     setzen kann und frame-ancestors in einer meta-CSP wirkungslos ist. Auf dem
+     Control-Server faengt stattdessen dessen Kopfzeile x-frame-options: DENY.
+     Befund 2026-08-14: das Modul gab es laengst, hing aber nur an 3 von 12
+     Seiten — der Adminbereich war NICHT dabei. -->
+<script type="module" src="/frame-guard.js?v=1"></script>
+</head>
   <body>
     <main>
       <a class="legal-brand" href="/" aria-label="smejj.com Startseite">

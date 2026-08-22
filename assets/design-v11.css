@@ -2377,6 +2377,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: transparent;
   color: #f2f5f4;
 }
+
 /* =====================================================================
  * Betreiber 2026-08-18: "genau 1 zu 1 wie bei Claude, fuer Chat UND Code,
  * mit der Beleuchtung."
@@ -2402,6 +2403,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: #dfe5e3;
   color: #0a0f16;
 }
+
 /* =====================================================================
  * Betreiber 2026-08-18: "im Chat kommt beim Senden-Icon immer noch ein
  * viereckiger Rahmen — soll aussehen wie im Code."
@@ -2422,6 +2424,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding: 0;
   border: 0;
 }
+
 /* =====================================================================
  * Betreiber 2026-08-18: das leuchtende Viereck IST jetzt der Knopf; der
  * runde Stopp-Knopf darunter faellt weg. Drei Zustaende, siehe
@@ -2475,4 +2478,62 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   inset: 2px 1px 2px 3px;
   background: #04211f;
   clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+/* =======================================================================
+ * Touch-Ziele am Handy — zweiter Teil (Betreiber-Freigabe 2026-08-22:
+ * "wie im Code-Bereich").
+ *
+ * Am 2026-08-18 wurde genau das schon einmal freigegeben, aber nur fuer die
+ * CODE-Leiste: "nur am Handy vergroessern", unter 600 px 44 px, am
+ * Schreibtisch bleibt alles schmal und edel. Die Chat-Leiste, das Startmenue,
+ * die Spur-Reiter und die Einfuehrung haben diesen Schritt nie mitgemacht —
+ * `npm run measure:touch:app` meldete dort am 2026-08-22 noch 32 Ziele unter
+ * 44 px. Der Grund war nicht Nachlaessigkeit, sondern die Kaskade: design-v11
+ * steht als LETZTE Quelle im Buendel (bundle-start-styles.mjs) und hat die
+ * alten 600-px-Regeln aus styles.css mit den Mockup-Massen ueberschrieben
+ * (".fknopf: 38px"). Deshalb steht dieser Block hier ganz am Ende — spaeter
+ * als jede Regel, die er heben soll. Eine Medienabfrage erhoeht die
+ * Spezifitaet NICHT; weiter oben haette er nichts bewirkt.
+ *
+ * 600 px ist die im Projekt schon benutzte Kante (styles.css,
+ * start-glass.css, der Code-Block oben) — keine zweite Wahrheit daneben.
+ * ===================================================================== */
+@media (max-width: 600px) {
+  /* Die runden Knoepfe der Chat-Eingabe (Plus, Mikrofon, Senden). Sichtbar
+     bleiben Form und Farbe aus dem Mockup, nur das Mass waechst von 38 auf
+     44 px — dieselbe Aenderung, die die Code-Leiste am 18.08. bekam. */
+  #start .prompt-glass .ghost-button.icon-button,
+  #start .prompt-glass .send-button {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+
+  /* Das Startmenue: 28 px hohe Zeilen sind mit dem Finger nicht sicher zu
+     treffen. Der Abstand waechst mit, damit die Schrift nicht am Rand klebt. */
+  .nav-start .nav-button,
+  .sidebar .nav-vier .nav-button {
+    min-height: 44px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  /* Spur-Reiter ("Start" / "Code") und die Knoepfe der Einfuehrung lagen bei
+     42 px — zwei Pixel unter dem Ziel, aber die Regel ist eine Grenze und
+     kein Richtwert. */
+  .spur-reiter button,
+  #fuehrungBlase button {
+    min-height: 44px;
+  }
+
+  /* Code-Ansicht: das Auftragsfeld war 26 px hoch, der Modus-Chip 40 px
+     breit (hoch war er schon 44). */
+  #code #codeAufgabe {
+    min-height: 44px;
+  }
+
+  #code .repochip {
+    min-width: 44px;
+  }
 }
