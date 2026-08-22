@@ -187,11 +187,36 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
   font-size: 15.5px;
 }
+/* --- Der Fokusring, EINE Wahrheit fuer alle Ansichten -------------------
+ * Nachgerechnet am 2026-08-22 (WCAG non-text, Schwelle 3.0). Die App hat
+ * ein helles Schema, und zwar fuer JEDE premium-view
+ * (app-surfaces.css:627), nicht nur fuer Einstellungen und Konto:
+ *   app-surfaces  rgba(255,255,255,0.09) auf #fdfdfb -> ~1.0 (weiss auf
+ *                 weiss, buchstaeblich unsichtbar)
+ *   --v11-cy      #32f6ea auf #fdfdfb                -> 1.33
+ *   --v11-cy      #32f6ea auf dunkel #101216         -> 13.84
+ * Auf Dunkel traegt der Akzentton also muehelos, auf Hell faellt er durch
+ * — und die aeltere Fassung darunter war noch schlechter.
+ *
+ * Gefunden, weil derselbe Fehler im Kontobereich auffiel: dort pinnte ein
+ * Test den Farbwert und behauptete dazu "traegt in hell und dunkel",
+ * ohne je zu rechnen. Der Rest der App hatte dieselbe Luecke, nur ohne
+ * Test, der sie behauptet haette.
+ */
+.view.premium-view {
+  --v11-fokus: var(--v11-cy);
+}
+.view.premium-view[data-settings-theme="light"] {
+  /* 6.29 gegen #fdfdfb — derselbe Ton, den das helle Schema schon fuer
+     "ok" benutzt (--konto-ok-text). */
+  --v11-fokus: #0c6b5e;
+}
+
 .view.premium-view input:focus,
 .view.premium-view select:focus,
 .view.premium-view textarea:focus {
   outline: none;
-  box-shadow: inset 0 0 0 1px var(--v11-cy), 0 0 0 3px var(--v11-cy-glow);
+  box-shadow: inset 0 0 0 1px var(--v11-fokus), 0 0 0 3px var(--v11-cy-glow);
 }
 
 /* ===================================================================
