@@ -2734,7 +2734,7 @@ body::after {
   box-shadow:
     inset 0 0 0 1px rgba(2, 253, 253, 0.3),
     inset 0 0 26px rgba(2, 253, 253, 0.22),
-    inset 0 0 72px rgba(45, 212, 191, 0.13);
+    inset 0 0 72px rgba(50, 246, 234, 0.13);
 }
 .sidebar.is-compact .button-icon svg,
 .browser-panel.is-compact .browser-panel-nav button svg {
@@ -3649,13 +3649,13 @@ body.search-overlay-open {
   width: min(680px, 100%);
   max-height: min(72vh, 640px);
   overflow: hidden;
-  border: 1px solid rgba(45, 212, 191, 0.58);
+  border: 1px solid rgba(50, 246, 234, 0.58);
   border-radius: 14px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.065), rgba(45, 212, 191, 0.025) 42%, transparent 70%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.065), rgba(50, 246, 234, 0.025) 42%, transparent 70%),
     rgba(19, 24, 33, 0.97);
   box-shadow:
-    0 0 24px rgba(45, 212, 191, 0.28),
+    0 0 24px rgba(50, 246, 234, 0.28),
     0 24px 64px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(126, 232, 218, 0.22);
 }
@@ -3664,7 +3664,7 @@ body.search-overlay-open {
   gap: 8px;
   align-items: center;
   padding: 8px 10px;
-  border-bottom: 1px solid rgba(45, 212, 191, 0.26);
+  border-bottom: 1px solid rgba(50, 246, 234, 0.26);
 }
 .search-overlay-form input {
   flex: 1;
@@ -3682,7 +3682,7 @@ body.search-overlay-open {
 .search-overlay-close {
   min-width: 44px;
   min-height: 44px;
-  border: 1px solid rgba(45, 212, 191, 0.32);
+  border: 1px solid rgba(50, 246, 234, 0.32);
   border-radius: 10px;
   background: rgba(6, 10, 16, 0.82);
   color: rgba(126, 232, 218, 0.9);
@@ -3746,8 +3746,8 @@ body.search-overlay-open {
   text-overflow: ellipsis;
 }
 .search-overlay-row.is-active {
-  border-color: rgba(45, 212, 191, 0.4);
-  background: rgba(45, 212, 191, 0.14);
+  border-color: rgba(50, 246, 234, 0.4);
+  background: rgba(50, 246, 234, 0.14);
 }
 .search-overlay-log mark {
   border-radius: 3px;
@@ -3764,7 +3764,7 @@ body.search-overlay-open {
   gap: 16px;
   margin: 0;
   padding: 8px 12px;
-  border-top: 1px solid rgba(45, 212, 191, 0.2);
+  border-top: 1px solid rgba(50, 246, 234, 0.2);
   color: rgba(151, 158, 171, 0.85);
   font-size: 12px;
 }
@@ -3802,7 +3802,7 @@ body.search-overlay-open {
   gap: clamp(18px, 3vh, 26px);
   padding: 24px 16px;
   background:
-    radial-gradient(820px 520px at 18% -12%, rgba(45, 212, 191, 0.13), transparent 62%),
+    radial-gradient(820px 520px at 18% -12%, rgba(50, 246, 234, 0.13), transparent 62%),
     radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
     linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%);
 }
@@ -3818,7 +3818,7 @@ body.search-overlay-open {
 }
 .home-hero .start-markenwort {
   color: #35e0d0;
-  text-shadow: 0 0 18px rgba(45, 212, 191, 0.35);
+  text-shadow: 0 0 18px rgba(50, 246, 234, 0.35);
 }
 .prompt-glass {
   width: min(760px, calc(100% - 24px));
@@ -3827,11 +3827,11 @@ body.search-overlay-open {
   border-radius: 0;
   padding: 6px 10px 6px;
   background:
-    linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(45, 212, 191, 0.03) 46%, transparent 72%),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(50, 246, 234, 0.03) 46%, transparent 72%),
     rgba(17, 23, 30, 0.62);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 0 26px rgba(45, 212, 191, 0.14),
+    0 0 26px rgba(50, 246, 234, 0.14),
     0 14px 40px rgba(0, 0, 0, 0.42);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
   backdrop-filter: blur(22px) saturate(150%);
@@ -3840,7 +3840,7 @@ body.search-overlay-open {
   border-color: rgba(50, 246, 234, 0.62);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 0 34px rgba(45, 212, 191, 0.26),
+    0 0 34px rgba(50, 246, 234, 0.26),
     0 14px 40px rgba(0, 0, 0, 0.42);
 }
 #start.has-start-chat .prompt-glass {
@@ -3893,7 +3893,7 @@ body.search-overlay-open {
 .start-chips button:focus-visible {
   border-color: rgba(50, 246, 234, 0.5);
   color: #f0f6f5;
-  box-shadow: 0 0 16px rgba(45, 212, 191, 0.18);
+  box-shadow: 0 0 16px rgba(50, 246, 234, 0.18);
 }
 .glass-icon.glass-icon {
   width: 44px;

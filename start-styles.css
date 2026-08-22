@@ -13,15 +13,12 @@
   background: #f7f7f4;
   color: #151515;
 }
-
 * {
   box-sizing: border-box;
 }
-
 [hidden] {
   display: none !important;
 }
-
 body {
   margin: 0;
   min-height: 100dvh;
@@ -30,21 +27,18 @@ body {
     linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(247, 247, 244, 0.96)),
     repeating-linear-gradient(90deg, rgba(22, 22, 22, 0.025) 0 1px, transparent 1px 96px);
 }
-
 button,
 input,
 select,
 textarea {
   font: inherit;
 }
-
 .shell {
   display: grid;
   grid-template-columns: 248px minmax(0, 1fr);
   min-height: 100dvh;
   background: #f7f7f4;
 }
-
 .sidebar {
   display: grid;
   align-content: start;
@@ -54,18 +48,15 @@ textarea {
   border-right: 1px solid #deded8;
   background: #f1f1ed;
 }
-
 .brand {
   padding: 2px 8px 12px;
 }
-
 .brand h1 {
   margin: 0;
   font-size: 32px;
   line-height: 1;
   letter-spacing: 0;
 }
-
 .note,
 .eyebrow {
   margin: 8px 0 0;
@@ -75,14 +66,12 @@ textarea {
   letter-spacing: 0;
   text-transform: uppercase;
 }
-
 .nav,
 .side-block,
 .toolbar {
   display: grid;
   gap: 8px;
 }
-
 button {
   min-height: 42px;
   border: 1px solid #262622;
@@ -93,11 +82,9 @@ button {
   cursor: pointer;
   touch-action: manipulation;
 }
-
 button:hover {
   background: #11110f;
 }
-
 .nav-button {
   display: flex;
   align-items: center;
@@ -111,24 +98,20 @@ button:hover {
   box-shadow: none;
   text-align: left;
 }
-
 .nav-button:hover {
   background: #e8e8e1;
   color: #151515;
 }
-
 .nav-button.is-active {
   border-color: #ddddd4;
   background: #ffffff;
   color: #151515;
 }
-
 .side-block {
   margin-top: 4px;
   padding-top: 16px;
   border-top: 1px solid #deded8;
 }
-
 .status-strip {
   display: grid;
   gap: 6px;
@@ -136,7 +119,6 @@ button:hover {
   border-top: 1px solid #deded8;
   border-bottom: 1px solid #deded8;
 }
-
 .status-strip span {
   overflow-wrap: anywhere;
   border: 1px solid #d4d4cc;
@@ -147,35 +129,29 @@ button:hover {
   font-size: 14.5px;
   font-weight: 700;
 }
-
 .side-block button {
   min-height: 38px;
   border-color: #d4d4cc;
   background: #ffffff;
   color: #4a4a43;
 }
-
 .side-block button:hover {
   background: #e8e8e1;
 }
-
 .workspace {
   min-width: 0;
   min-height: 100dvh;
 }
-
 .view {
   display: none;
   min-height: 100dvh;
   padding: 30px;
 }
-
 .view.is-active {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 22px;
 }
-
 #code.view.is-active,
 #projects.view.is-active,
 #files.view.is-active,
@@ -190,11 +166,9 @@ button:hover {
 #error.view.is-active {
   grid-template-rows: auto auto auto minmax(120px, 1fr);
 }
-
 .view-header {
   max-width: 920px;
 }
-
 .view-header h2 {
   max-width: 760px;
   margin: 6px 0 0;
@@ -202,7 +176,6 @@ button:hover {
   line-height: 0.98;
   letter-spacing: 0;
 }
-
 .subhead {
   max-width: 620px;
   margin: 16px 0 0;
@@ -210,7 +183,6 @@ button:hover {
   font-size: 18.5px;
   line-height: 1.62;
 }
-
 .log {
   display: flex;
   flex-direction: column;
@@ -218,7 +190,6 @@ button:hover {
   overflow: auto;
   padding: 8px 0;
 }
-
 .output,
 .entry {
   border: 1px solid #deded8;
@@ -227,25 +198,21 @@ button:hover {
   padding: 18px 20px;
   white-space: pre-wrap;
 }
-
 .entry {
   max-width: 820px;
   margin: 0 0 20px;
   color: #252520;
   line-height: 1.65;
 }
-
 .entry.assistant {
   border-color: transparent;
   background: transparent;
   padding-left: 0;
 }
-
 #search.view.is-active {
   grid-template-rows: auto auto minmax(0, 1fr);
   align-content: start;
 }
-
 .search-shell {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -259,13 +226,11 @@ button:hover {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
-
 .search-box {
   display: grid;
   gap: 5px;
   min-width: 0;
 }
-
 .search-box span {
   color: rgba(246, 243, 238, 0.58);
   font-size: 14.5px;
@@ -273,7 +238,6 @@ button:hover {
   letter-spacing: 0;
   text-transform: uppercase;
 }
-
 .search-box input {
   min-height: 48px;
   border-color: rgba(255, 255, 255, 0.12);
@@ -281,17 +245,14 @@ button:hover {
   color: #f6f3ee;
   font-size: 21px;
 }
-
 .search-box input::placeholder {
   color: rgba(151, 158, 171, 0.78);
 }
-
 .search-shell button {
   align-self: end;
   min-width: 112px;
   min-height: 48px;
 }
-
 .search-log {
   display: grid;
   align-content: start;
@@ -299,7 +260,6 @@ button:hover {
   width: min(820px, 100%);
   min-height: 220px;
 }
-
 .search-empty {
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
@@ -310,22 +270,18 @@ button:hover {
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
-
 .search-log .entry {
   max-width: min(760px, 100%);
   margin-bottom: 0;
 }
-
 @media (max-width: 560px) {
   .search-shell {
     grid-template-columns: 1fr;
   }
-
   .search-shell button {
     width: 100%;
   }
 }
-
 .entry.user {
   align-self: flex-end;
   margin-left: auto;
@@ -333,7 +289,6 @@ button:hover {
   background: #20201d;
   color: #ffffff;
 }
-
 .composer {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 112px;
@@ -346,19 +301,16 @@ button:hover {
   padding: 10px;
   box-shadow: 0 16px 44px rgba(32, 32, 29, 0.08);
 }
-
 .panel-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
-
 .status-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
-
 .status-grid div {
   display: grid;
   gap: 6px;
@@ -368,23 +320,19 @@ button:hover {
   background: #ffffff;
   padding: 14px;
 }
-
 .status-grid strong,
 .status-grid span {
   overflow-wrap: anywhere;
 }
-
 .status-grid strong {
   color: #20201d;
   font-size: 15.5px;
 }
-
 .status-grid span {
   color: #62625b;
   font-size: 14.5px;
   font-weight: 700;
 }
-
 label {
   display: grid;
   gap: 8px;
@@ -392,7 +340,6 @@ label {
   font-weight: 700;
   color: #42423c;
 }
-
 input,
 select,
 textarea {
@@ -404,35 +351,22 @@ textarea {
   padding: 13px 14px;
   outline: none;
 }
-
 input:focus,
 select:focus,
 textarea:focus {
   border-color: #20201d;
   box-shadow: 0 0 0 3px rgba(32, 32, 29, 0.08);
 }
-
-/* Eigener Fokusstil (QA-Welle 1, Befund F-17). Vorher gab es Fokusregeln NUR
-   fuer input/select/textarea; Knoepfe und Links verliessen sich auf den
-   Standardring des Browsers. Der ist in Chrome sichtbar (mit echter
-   Tastaturbedienung geprueft), faellt aber je nach Browser unterschiedlich aus
-   und geht auf dunklem Grund leicht unter. Zwei Ringe uebereinander — heller
-   Kern, dunkler Saum — bleiben auf hellem UND dunklem Hintergrund erkennbar
-   und erfuellen WCAG 2.4.7 unabhaengig vom Browser.
-   Nur :focus-visible: Mausklicks erzeugen weiterhin keinen Ring, das sichtbare
-   Verhalten aendert sich fuer Zeigergeraete also nicht. */
 :where(button, a[href], summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: 2px solid #f6f3ee;
   outline-offset: 2px;
   box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.85);
   border-radius: 6px;
 }
-
 textarea {
   min-height: 160px;
   resize: vertical;
 }
-
 #message {
   min-height: 58px;
   max-height: 180px;
@@ -440,104 +374,84 @@ textarea {
   background: transparent;
   resize: none;
 }
-
 #message:focus {
   box-shadow: none;
 }
-
 #editor {
   min-height: 360px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 15.5px;
   line-height: 1.62;
 }
-
 .toolbar {
   grid-template-columns: repeat(auto-fit, minmax(140px, max-content));
   align-items: center;
   max-width: 100%;
   min-width: 0;
 }
-
 .toolbar > * {
   min-width: 0;
   max-width: 100%;
 }
-
 .toolbar button {
   overflow-wrap: anywhere;
   white-space: normal;
 }
-
 .toolbar input,
 .toolbar select {
   min-width: min(360px, 100%);
 }
-
 #tools .output {
   font-size: 14.5px;
   color: #4a4a43;
 }
-
 @media (max-width: 920px) {
   .shell {
     grid-template-columns: 1fr;
   }
-
   .sidebar {
     min-height: auto;
     border-right: 0;
     border-bottom: 1px solid #deded8;
   }
-
   .nav,
   .side-block {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-
   .workspace,
   .view {
     min-height: auto;
   }
-
   .view {
     padding: 22px 16px;
   }
-
   .panel-grid,
   .composer,
   .status-grid {
     grid-template-columns: 1fr;
   }
 }
-
 @media (max-width: 560px) {
   .sidebar {
     padding: 16px 10px;
   }
-
   .view {
     padding: 18px 10px;
   }
-
   .brand h1 {
     font-size: 29px;
   }
-
   .view-header h2 {
     font-size: 40px;
   }
-
   .nav,
   .side-block,
   .toolbar {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-
 .button-icon { display: inline-grid; place-items: center; width: 26px; min-width: 26px; color: #00ffef; font-weight: 800; }
 .nav-label { min-width: 0; overflow: hidden; font-size: 16.5px; line-height: 1.16; text-overflow: ellipsis; white-space: nowrap; }
-
 .button-icon svg,
 .browser-panel-nav button svg {
   width: 18px; height: 18px; fill: none; stroke: currentColor;
@@ -545,13 +459,11 @@ textarea {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
-
 .surface,
 .empty-state {
   display: grid;
@@ -562,20 +474,17 @@ textarea {
   background: #ffffff;
   padding: 16px;
 }
-
 .surface strong,
 .empty-state strong {
   color: #172033;
   font-size: 15.5px;
 }
-
 .surface span,
 .empty-state span {
   overflow-wrap: anywhere;
   color: #5d6675;
   font-size: 15.5px;
 }
-
 .toast-root {
   position: fixed;
   right: 16px;
@@ -585,7 +494,6 @@ textarea {
   gap: 8px;
   width: min(360px, calc(100vw - 32px)); pointer-events: none;
 }
-
 .toast {
   border: 1px solid #bdd6cd;
   border-radius: 8px;
@@ -595,11 +503,9 @@ textarea {
   font-weight: 700;
   box-shadow: 0 12px 30px rgba(23, 32, 51, 0.12); pointer-events: auto;
 }
-
 .modal-root[hidden] {
   display: none;
 }
-
 .modal-root {
   position: fixed;
   inset: 0;
@@ -608,13 +514,11 @@ textarea {
   place-items: center;
   padding: 16px;
 }
-
 .modal-backdrop {
   position: absolute;
   inset: 0;
   background: rgba(23, 32, 51, 0.38);
 }
-
 .modal {
   position: relative;
   z-index: 1;
@@ -625,23 +529,19 @@ textarea {
   padding: 16px;
   box-shadow: 0 24px 80px rgba(23, 32, 51, 0.24);
 }
-
 .modal header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
-
 .modal h3 {
   margin: 0;
 }
-
 .modal-body {
   margin-top: 12px;
   white-space: pre-wrap;
 }
-
 .skeleton {
   min-height: 54px;
   border-radius: 8px;
@@ -649,26 +549,21 @@ textarea {
   background-size: 220% 100%;
   animation: shimmer 1.2s linear infinite;
 }
-
 @keyframes shimmer {
   to {
     background-position-x: -220%;
   }
 }
-
 @media (max-width: 920px) {
   .dashboard-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
 @media (max-width: 560px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
 }
-
-/* Codex-like start shell with glass controls. */
 :root {
   color-scheme: dark;
   --menu-icon-color: rgba(246, 243, 238, 0.78);
@@ -678,19 +573,16 @@ textarea {
   background: #101113;
   color: #f6f3ee;
 }
-
 body {
   background:
     linear-gradient(180deg, #141517 0%, #101113 58%, #0d0e10 100%);
   color: #f6f3ee;
 }
-
 .shell {
   display: block;
   min-height: 100dvh;
   background: transparent;
 }
-
 .workspace {
   min-height: 100dvh;
   background: transparent;
@@ -700,15 +592,12 @@ body {
   overflow: hidden;
   transition: margin 180ms ease;
 }
-
 body.left-panel-open .workspace {
   margin-left: 0;
 }
-
 body.right-panel-open .workspace {
   margin-right: min(var(--right-panel-width), calc(100vw - 120px));
 }
-
 @media (max-width: 680px) {
   body.left-panel-open .workspace,
   body.right-panel-open .workspace {
@@ -716,7 +605,6 @@ body.right-panel-open .workspace {
     margin-left: 0;
   }
 }
-
 .glass-icon {
   position: fixed;
   top: env(safe-area-inset-top);
@@ -734,19 +622,15 @@ body.right-panel-open .workspace {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-
 .glass-icon:hover {
   background: transparent;
 }
-
 .app-menu-button {
   left: env(safe-area-inset-left);
 }
-
 .browser-button {
   right: env(safe-area-inset-right);
 }
-
 .split-icon {
   position: relative;
   display: block;
@@ -755,7 +639,6 @@ body.right-panel-open .workspace {
   border: 1.5px solid rgba(232, 232, 232, 0.72);
   border-radius: 4px;
 }
-
 .split-icon span:first-child {
   position: absolute;
   inset: 2px auto 2px 5px;
@@ -763,11 +646,9 @@ body.right-panel-open .workspace {
   border-radius: 999px;
   background: rgba(232, 232, 232, 0.58);
 }
-
 .split-icon span:last-child {
   display: none;
 }
-
 body.task-indicator-active .split-icon span:last-child {
   position: absolute;
   top: -5px;
@@ -779,28 +660,23 @@ body.task-indicator-active .split-icon span:last-child {
   background: #2997ff;
   box-shadow: 0 0 0 2px rgba(16, 17, 19, 0.78), 0 0 14px rgba(41, 151, 255, 0.7);
 }
-
 body.task-indicator-done .split-icon span:last-child {
   animation: taskIndicatorDone 1400ms ease both;
 }
-
 @keyframes taskIndicatorDone {
   0%,
   78% {
     opacity: 1;
     transform: scale(1);
   }
-
   100% {
     opacity: 0;
     transform: scale(0.72);
   }
 }
-
 .sidebar-backdrop {
   display: none;
 }
-
 .sidebar {
   position: fixed;
   top: 0;
@@ -824,19 +700,16 @@ body.task-indicator-done .split-icon span:last-child {
   backdrop-filter: blur(30px) saturate(1.35);
   -webkit-backdrop-filter: blur(30px) saturate(1.35);
 }
-
 .sidebar.is-compact {
   padding-top: 84px;
   padding-right: 0;
   padding-bottom: 10px;
   padding-left: 0;
 }
-
 .sidebar.is-compact .nav-button span:not(.button-icon):not(.profile-avatar),
 .sidebar.is-compact #profileDockLabel {
   display: none;
 }
-
 .sidebar.is-compact .nav-button,
 .sidebar.is-compact .profile-dock {
   justify-content: center;
@@ -847,49 +720,42 @@ body.task-indicator-done .split-icon span:last-child {
   padding-right: 0;
   padding-left: 0;
 }
-
 .sidebar.is-compact .button-icon {
   width: 100%;
   min-width: 0;
   font-size: 14.5px;
 }
-
 .sidebar.is-compact .button-icon svg,
 .browser-panel.is-compact .browser-panel-nav button svg {
   width: 16px;
   height: 16px;
 }
-
 .sidebar.is-compact .nav {
   gap: 4px;
 }
-
 .sidebar.is-compact .bottom-nav {
   gap: 4px;
   padding-top: 8px;
 }
-
 .sidebar.is-compact .nav-button,
 .sidebar.is-compact .profile-dock,
 .browser-panel.is-compact .browser-panel-nav button {
   min-height: 44px;
   height: 44px;
 }
-
 .sidebar.is-compact .profile-dock {
   margin-top: 0;
   padding-top: 0;
   padding-bottom: 0;
 }
-
 .sidebar .nav {
   gap: 0;
   align-content: start;
   min-height: 0;
   overflow: auto;
   padding-right: 2px;
+  grid-template-columns: minmax(0, 1fr);
 }
-
 .sidebar .bottom-nav {
   gap: 0;
   align-self: end;
@@ -897,11 +763,9 @@ body.task-indicator-done .split-icon span:last-child {
   padding-top: 8px; margin-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-
 .sidebar.is-open {
   transform: translateX(0);
 }
-
 .panel-resizer {
   position: absolute;
   top: 0;
@@ -911,7 +775,6 @@ body.task-indicator-done .split-icon span:last-child {
   cursor: col-resize;
   touch-action: none;
 }
-
 .panel-resizer::before {
   content: "";
   position: absolute;
@@ -920,28 +783,22 @@ body.task-indicator-done .split-icon span:last-child {
   width: 1px;
   background: rgba(255, 255, 255, 0.14);
 }
-
 .panel-resizer:hover::before,
 body.is-resizing-panel .panel-resizer::before {
   background: rgba(159, 231, 212, 0.58);
 }
-
 .left-panel-resizer {
   right: -6px;
 }
-
 .left-panel-resizer::before {
   left: 5px;
 }
-
 .right-panel-resizer {
   left: -6px;
 }
-
 .right-panel-resizer::before {
   left: 6px;
 }
-
 .browser-panel {
   position: fixed;
   top: 0;
@@ -964,12 +821,10 @@ body.is-resizing-panel .panel-resizer::before {
   backdrop-filter: blur(30px) saturate(1.35);
   -webkit-backdrop-filter: blur(30px) saturate(1.35);
 }
-
 .browser-panel.is-compact {
   padding-top: 30px;
   padding-right: 0; padding-bottom: 10px; padding-left: 0;
 }
-
 .browser-panel.is-compact .browser-panel-nav button {
   justify-content: center;
   gap: 0;
@@ -977,25 +832,20 @@ body.is-resizing-panel .panel-resizer::before {
   padding-right: 0;
   padding-left: 0;
 }
-
 .browser-panel.is-compact .browser-panel-nav button span {
   width: 100%;
   min-width: 0;
   font-size: 14.5px;
 }
-
 .browser-panel.is-compact .browser-panel-nav {
   gap: 4px;
 }
-
 .browser-panel.is-open {
   transform: translateX(0);
 }
-
 .browser-panel-header {
   padding: 2px 8px 12px;
 }
-
 .browser-panel-header h2 {
   margin: 0;
   color: #f6f3ee;
@@ -1003,7 +853,6 @@ body.is-resizing-panel .panel-resizer::before {
   line-height: 1;
   letter-spacing: 0;
 }
-
 .browser-panel-header p {
   margin: 8px 0 0;
   color: rgba(246, 243, 238, 0.58);
@@ -1012,13 +861,11 @@ body.is-resizing-panel .panel-resizer::before {
   letter-spacing: 0;
   text-transform: uppercase;
 }
-
 .browser-panel-nav,
 .browser-panel-status {
   display: grid;
   gap: 0;
 }
-
 .browser-panel-nav button {
   display: flex;
   align-items: center;
@@ -1031,7 +878,6 @@ body.is-resizing-panel .panel-resizer::before {
   color: rgba(246, 243, 238, 0.76);
   text-align: left;
 }
-
 .browser-panel-nav button span {
   display: inline-grid;
   place-items: center;
@@ -1040,19 +886,16 @@ body.is-resizing-panel .panel-resizer::before {
   color: var(--menu-icon-color);
   font-weight: 800;
 }
-
 .browser-panel-nav button:hover {
   border-color: transparent;
   background: rgba(255, 255, 255, 0.035);
   color: #ffffff;
 }
-
 .browser-panel-status {
   align-content: end;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   padding: 12px 8px 0;
 }
-
 .browser-panel-status span {
   border: 1px solid rgba(255, 255, 255, 0.11);
   border-radius: 8px;
@@ -1062,20 +905,16 @@ body.is-resizing-panel .panel-resizer::before {
   font-size: 14.5px;
   font-weight: 700;
 }
-
 .brand {
   padding: 2px 8px 14px;
 }
-
 .brand h1 {
   color: #f6f3ee;
 }
-
 .note,
 .eyebrow {
   color: rgba(246, 243, 238, 0.58);
 }
-
 .nav-button {
   border: 1px solid transparent;
   border-radius: 10px;
@@ -1085,50 +924,40 @@ body.is-resizing-panel .panel-resizer::before {
   padding-top: 6px;
   padding-bottom: 6px;
 }
-
 .sidebar .nav-button,
 .browser-panel-nav button {
   font-weight: 500;
 }
-
 .nav-button:hover,
 .nav-button.is-active {
   border-color: transparent;
   background: transparent;
   color: #ffffff;
 }
-
 .button-icon {
   color: var(--menu-icon-color);
 }
-
 .sidebar .nav-button.is-active .button-icon,
 .browser-panel-nav button.is-active span { color: var(--menu-icon-active-color); }
-
 .sidebar .nav-button:hover,
 .browser-panel-nav button:hover {
   background: rgba(255, 255, 255, 0.035);
 }
-
 .sidebar .nav-button.is-active {
   background: transparent;
 }
-
 .status-strip {
   border-color: rgba(255, 255, 255, 0.12);
 }
-
 .status-strip span,
 .side-block button {
   border-color: rgba(255, 255, 255, 0.11);
   background: rgba(255, 255, 255, 0.08);
   color: rgba(246, 243, 238, 0.72);
 }
-
 .side-block {
   border-top-color: rgba(255, 255, 255, 0.12);
 }
-
 .profile-dock {
   align-self: end;
   display: flex;
@@ -1137,7 +966,6 @@ body.is-resizing-panel .panel-resizer::before {
   margin-top: 0;
   padding: 4px 0 0;
 }
-
 .profile-avatar {
   display: grid;
   place-items: center;
@@ -1149,19 +977,16 @@ body.is-resizing-panel .panel-resizer::before {
   font-weight: 900;
   text-transform: lowercase;
 }
-
 .sidebar.is-compact .profile-avatar {
   width: 16px;
   height: 16px;
   font-size: 12.5px;
 }
-
 .sidebar.is-compact .profile-avatar.is-empty {
   background:
     radial-gradient(circle at 50% 37%, transparent 0 2px, rgba(246, 243, 238, 0.78) 2.5px 4px, transparent 4.5px),
     radial-gradient(ellipse at 50% 82%, transparent 0 5px, rgba(246, 243, 238, 0.78) 5.5px 8px, transparent 8.5px);
 }
-
 .profile-avatar.is-empty {
   border: 1px solid rgba(246, 243, 238, 0.5);
   background:
@@ -1169,21 +994,14 @@ body.is-resizing-panel .panel-resizer::before {
     radial-gradient(ellipse at 50% 82%, transparent 0 8px, rgba(246, 243, 238, 0.78) 8.5px 12px, transparent 12.5px);
   color: transparent;
 }
-
 .view {
   min-height: 100dvh;
   padding: 72px clamp(14px, 4vw, 48px) 28px;
 }
-
 .view.is-active {
   display: grid;
   gap: 20px;
 }
-
-/* DESIGN LOCK: smejj start design lock v1.
-   Nicht aendern ohne schriftliche Bestaetigung des Nutzers.
-   Geschuetzt: Startseite, dunkler Mittelbereich, unteres Eingabefeld,
-   Modellname, Icon-Zeile, Trennlinie und kompakte Seitenleisten. */
 #start.view.is-active {
   display: grid;
   grid-template-rows: 1fr;
@@ -1191,7 +1009,6 @@ body.is-resizing-panel .panel-resizer::before {
   gap: 0;
   padding: 0;
 }
-
 .home-feed {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -1200,11 +1017,9 @@ body.is-resizing-panel .panel-resizer::before {
   min-height: 100dvh;
   background: linear-gradient(180deg, rgba(15, 17, 18, 0.86) 0%, #090a0c 72%, #050608 100%);
 }
-
 #start.has-start-chat .home-feed {
   grid-template-rows: minmax(0, 1fr) auto;
 }
-
 .home-hero {
   display: grid;
   align-items: end;
@@ -1213,7 +1028,6 @@ body.is-resizing-panel .panel-resizer::before {
   padding: 52px 16px 10px;
   text-align: center;
 }
-
 .home-hero h2 {
   margin: 0 auto;
   max-width: 960px;
@@ -1223,11 +1037,9 @@ body.is-resizing-panel .panel-resizer::before {
   line-height: 1.12;
   letter-spacing: 0;
 }
-
 #start.has-start-chat .home-hero {
   display: none;
 }
-
 .start-log {
   display: flex;
   flex-direction: column;
@@ -1240,31 +1052,25 @@ body.is-resizing-panel .panel-resizer::before {
   padding: 6px clamp(8px, 1.4vw, 18px) 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
-
 #start.has-start-chat .start-log {
   justify-content: flex-start;
 }
-
 #start.has-start-chat .start-log .entry:first-child {
   max-width: min(980px, calc(100% - 64px));
   margin-right: 32px;
   margin-left: 32px;
 }
-
 .start-log .entry {
   max-width: min(980px, 100%);
   margin-bottom: 0;
   border-radius: 8px;
 }
-
 .start-log .entry.user {
   padding: 8px 11px;
 }
-
 .start-log .entry.assistant {
   padding: 2px 0;
 }
-
 .prompt-glass {
   width: 100%;
   margin: 0;
@@ -1277,7 +1083,6 @@ body.is-resizing-panel .panel-resizer::before {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-
 .prompt-glass textarea {
   height: 48px;
   min-height: 48px;
@@ -1292,11 +1097,9 @@ body.is-resizing-panel .panel-resizer::before {
   overflow-y: auto;
   resize: none;
 }
-
 .prompt-glass textarea::placeholder {
   color: rgba(151, 158, 171, 0.78);
 }
-
 .prompt-actions {
   display: flex;
   align-items: center;
@@ -1305,11 +1108,9 @@ body.is-resizing-panel .panel-resizer::before {
   padding: 0 clamp(8px, 1.4vw, 16px);
   border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
-
 .prompt-spacer {
   flex: 1;
 }
-
 .ghost-button,
 .mode-pill,
 .text-chip,
@@ -1320,7 +1121,6 @@ body.is-resizing-panel .panel-resizer::before {
   color: rgba(246, 243, 238, 0.9);
   box-shadow: none;
 }
-
 .ghost-button {
   position: relative;
   display: grid;
@@ -1331,7 +1131,6 @@ body.is-resizing-panel .panel-resizer::before {
   padding: 0;
   font-weight: 300;
 }
-
 .text-chip {
   width: auto;
   min-width: 88px;
@@ -1341,7 +1140,6 @@ body.is-resizing-panel .panel-resizer::before {
   font-size: 17.5px;
   font-weight: 500;
 }
-
 .icon-button svg {
   width: 22px;
   height: 22px;
@@ -1352,7 +1150,6 @@ body.is-resizing-panel .panel-resizer::before {
   stroke-linejoin: round;
   pointer-events: none;
 }
-
 .send-button {
   display: grid;
   place-items: center;
@@ -1365,18 +1162,15 @@ body.is-resizing-panel .panel-resizer::before {
   color: rgba(246, 243, 238, 0.96);
   font-weight: 300;
 }
-
 .send-button svg {
   width: 25px;
   height: 25px;
   stroke-width: 2.2;
 }
-
 .model-picker {
   position: relative;
   z-index: 50;
 }
-
 .model-menu {
   position: absolute;
   right: 0;
@@ -1392,7 +1186,6 @@ body.is-resizing-panel .panel-resizer::before {
   backdrop-filter: blur(24px) saturate(1.2);
   -webkit-backdrop-filter: blur(24px) saturate(1.2);
 }
-
 .model-menu button {
   justify-content: flex-start;
   min-height: 34px;
@@ -1403,18 +1196,15 @@ body.is-resizing-panel .panel-resizer::before {
   font-weight: 500;
   text-align: left;
 }
-
 .model-menu button:hover {
   background: rgba(255, 255, 255, 0.06);
   color: #ffffff;
 }
-
 .feed-list {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
-
 .feed-item,
 .surface,
 .empty-state,
@@ -1428,7 +1218,6 @@ body.is-resizing-panel .panel-resizer::before {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
-
 .feed-item {
   display: grid;
   gap: 8px;
@@ -1437,14 +1226,12 @@ body.is-resizing-panel .panel-resizer::before {
   border-radius: 16px;
   padding: 14px;
 }
-
 .feed-item strong,
 .surface strong,
 .empty-state strong,
 .status-grid strong {
   color: #f6f3ee;
 }
-
 .feed-item span,
 .surface span,
 .empty-state span,
@@ -1452,11 +1239,9 @@ body.is-resizing-panel .panel-resizer::before {
 .subhead {
   color: rgba(246, 243, 238, 0.62);
 }
-
 .view-header h2 {
   color: #f9f6f1;
 }
-
 input,
 select,
 textarea,
@@ -1465,115 +1250,88 @@ textarea,
   background: rgba(255, 255, 255, 0.08);
   color: #f6f3ee;
 }
-
 button {
   border-color: rgba(255, 255, 255, 0.14);
   background: rgba(246, 243, 238, 0.9);
   color: #111214;
 }
-
 button:hover {
   background: #ffffff;
 }
-
 .entry.user {
   border-color: rgba(94, 173, 235, 0.38);
   background: rgba(94, 173, 235, 0.18);
 }
-
 .entry.assistant {
   color: rgba(246, 243, 238, 0.86);
 }
-
 @media (max-width: 920px) {
   .shell {
     grid-template-columns: 1fr;
   }
-
   .sidebar {
     min-height: 100dvh;
     border-bottom: 0;
   }
-
   .nav,
   .side-block {
     grid-template-columns: 1fr;
   }
-
   .feed-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
 @media (max-width: 560px) {
   .glass-icon {
     width: 28px;
     height: 28px;
     min-height: 28px;
   }
-
   .start-log {
     gap: 3px;
     padding: 4px 8px 8px;
   }
-
   .start-log .entry {
     max-width: 100%;
   }
-
   #start.has-start-chat .start-log .entry:first-child {
     max-width: calc(100% - 64px);
     margin-right: 32px;
     margin-left: 32px;
   }
-
   .start-log .entry.user {
     padding: 7px 10px;
   }
-
   .start-log .entry.assistant {
     padding: 1px 0;
   }
-
   .home-hero h2 {
     font-size: 38px;
   }
-
   .prompt-actions {
     gap: 9px;
     min-height: 64px;
     padding: 0 10px;
   }
-
   .ghost-button {
     width: 30px;
     height: 38px;
     min-height: 38px;
   }
-
   .text-chip {
     font-size: 18.5px;
   }
-
   .send-button {
     width: 34px;
     height: 38px;
     min-height: 38px;
   }
 }
-/* END DESIGN LOCK: smejj start design lock v1. */
-
 .legal-links {
   margin-top: 18px;
   font-size: 0.85rem;
   color: rgba(246, 243, 238, 0.6);
 }
-
-/* Klickflaeche mindestens 24x24 px (QA-Welle 1, Befund F-21; WCAG 2.2 AA
-   "Target Size (Minimum)"). Gemessen waren "Impressum" 74x16 und
-   "Datenschutz" 84x16 — zu klein zum sicheren Treffen auf Beruehrgeraeten.
-   inline-flex mit min-height vergroessert nur die Flaeche, nicht die Schrift;
-   das Schriftbild bleibt unveraendert. */
 .legal-links a {
   color: #8fc7ff;
   margin-left: 8px;
@@ -1581,8 +1339,6 @@ button:hover {
   align-items: center;
   min-height: 24px;
 }
-
-/* Nur fuer Screenreader/SEO sichtbar (H1 der Startseite) — pixel-identisches Rendering. */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -1596,21 +1352,16 @@ button:hover {
 }
 
 /* ---- cline-model-menu.css ---- */
-/* smejj.com — Cline-Untermenue im Modell-Picker (Codex-Stil).
-   Design-Sprache identisch zum bestehenden .model-menu (dunkel, Glas, dezente Linien). */
-
 .model-menu button[data-submenu-trigger] {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
-
 .model-submenu-arrow {
   color: rgba(246, 243, 238, 0.5);
   font-size: 14.5px;
 }
-
 .model-submenu {
   position: absolute;
   right: calc(100% + 6px);
@@ -1629,7 +1380,6 @@ button:hover {
   backdrop-filter: blur(24px) saturate(1.2);
   -webkit-backdrop-filter: blur(24px) saturate(1.2);
 }
-
 .model-submenu-group {
   padding: 6px 8px 2px;
   font-size: 13.5px;
@@ -1638,7 +1388,6 @@ button:hover {
   text-transform: uppercase;
   color: rgba(246, 243, 238, 0.45);
 }
-
 .model-submenu button {
   display: inline-flex;
   align-items: center;
@@ -1646,26 +1395,21 @@ button:hover {
   gap: 8px;
   white-space: nowrap;
 }
-
 .model-submenu .model-submenu-name {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .model-submenu .model-submenu-check {
   visibility: hidden;
   color: rgba(246, 243, 238, 0.92);
 }
-
 .model-submenu button.is-active .model-submenu-check {
   visibility: visible;
 }
-
 .model-submenu-divider {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin: 4px 0;
 }
-
 .model-submenu-note,
 .model-submenu-hint {
   padding: 8px;
@@ -1673,7 +1417,6 @@ button:hover {
   color: rgba(246, 243, 238, 0.62);
   margin: 0;
 }
-
 @media (max-width: 640px) {
   .model-submenu {
     right: 0;
@@ -1686,11 +1429,9 @@ button:hover {
 .app-menu-button {
   z-index: 75;
 }
-
 .sidebar {
   border-right: 0;
 }
-
 .app-brand-logo {
   --app-brand-expanded-width: 80px;
   --app-brand-expanded-height: 28px;
@@ -1713,13 +1454,11 @@ button:hover {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
-
 .app-brand-logo img {
   grid-area: 1 / 1;
   display: block;
   object-fit: contain;
 }
-
 .app-brand-icon {
   width: 16px;
   height: 16px;
@@ -1727,7 +1466,6 @@ button:hover {
   visibility: visible;
   opacity: 1;
 }
-
 .app-brand-wordmark {
   width: 100%;
   height: auto;
@@ -1736,7 +1474,6 @@ button:hover {
   opacity: 0;
   pointer-events: none;
 }
-
 body[data-left-menu-state="expanded"] .app-brand-logo {
   width: min(var(--app-brand-expanded-width), calc(var(--left-panel-width) - 52px));
   height: var(--app-brand-expanded-height);
@@ -1744,114 +1481,59 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   background: transparent;
   box-shadow: none;
 }
-
 body[data-left-menu-state="expanded"] .app-brand-icon {
   visibility: hidden;
   opacity: 0;
 }
-
 body[data-left-menu-state="expanded"] .app-brand-wordmark {
   visibility: visible;
   opacity: 1;
 }
-
-/* ===== Marken sind Absender, keine Schaltflaechen (2026-08-13) =====
-   In jeder Ecke soll genau EIN Bedienelement stehen: links der Menue-Knopf,
-   rechts der Panel-Knopf. Die Marke lebt im Panel und erscheint erst, wenn es
-   offen ist — dasselbe Muster wie bei ChatGPT. Vorher standen links und rechts
-   zwei fast gleiche Zeichen dauerhaft im Bild.
-
-   Bewusst ueber die vorhandenen Zustaende geloest (kein neues JS): der Body
-   traegt schon data-left-menu-state = closed | compact | opening | expanded.
-   Fehlt das Attribut, bleibt alles sichtbar wie bisher — die Regel kann die
-   Marke also nie versehentlich ganz verschlucken. */
 body[data-left-menu-state="closed"] .app-brand-logo,
 body[data-left-menu-state="opening"] .app-brand-logo {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
 }
-
-/* In der schmalen Spur ist das Zeichen der oberste Eintrag — so macht es das
-   Vorbild von ChatGPT, und ohne Marke waere die Spur eine anonyme Icon-Leiste.
-   Mittig statt links, weil in einer 96 px schmalen Spur sonst der Menue-Knopf
-   danebensteht; eine Zeile tiefer, damit sich beide nicht beruehren. Gerechnet
-   statt mit transform verschoben — transform ist in dieser Datei gesperrt. */
 body[data-left-menu-state="compact"] .app-brand-logo {
   top: calc(env(safe-area-inset-top) + 44px);
   left: calc(env(safe-area-inset-left) + (min(var(--left-panel-width), 100vw - 28px) - 28px) / 2);
 }
-
-/* Bewusst OHNE Ueberblendung: tests/branding-presentation.test.mjs verbietet
-   in dieser Datei filter, mask, transform und transition. Der Grund steht im
-   Testnamen — die Marke soll unabhaengig vom Layout und ohne Effekte
-   erscheinen. Ein Auf- und Abblenden waere huebsch, ist aber genau das, was
-   die Sperre draussen halten will. */
-
-/* Rechte Seite spiegelbildlich: das Maus-Zeichen zeigt sich erst, wenn das
-   rechte Panel offen ist. Umgekehrt formuliert (verstecken statt zeigen),
-   damit ein Browser ohne :has() den Knopf sichtbar laesst statt ihn
-   unerreichbar zu machen — fail-visible, nicht fail-closed. */
 body:has(#browserPanel:not(.is-open)) #mausButton {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
 }
-
-/* Das Maus-Zeichen war bis 2026-08-13 Strich fuer Strich unser Logo — links
-   und rechts stand dasselbe Bild, und niemand konnte die Maus als Maus lesen.
-   Jetzt ein Zeiger in derselben Farbe: die Familie stellt die Farbe her, die
-   Form stiftet den Unterschied. Der Austausch laeuft ueber den Hintergrund,
-   weil das <img> in der gesperrten index.html steht. Der Pfad ist absolut
-   (fuehrender Schraegstrich) und damit unabhaengig davon, ob diese Datei
-   einzeln oder im Buendel ausgeliefert wird. */
 #mausButton {
   background-image: url("/icons/maus-zeiger.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 20px 20px;
 }
-
 #mausButton img {
   display: none;
 }
-
 @media (max-width: 560px) {
   .app-brand-logo {
     --app-brand-expanded-width: 76px;
   }
 }
-
-/* Das Logo sitzt fest neben dem Menue-Knopf. Wachsen beide auf 44 px (siehe
-   styles.css, 2026-08-09), reichen die bisherigen 36 px Abstand nicht mehr —
-   der Menue-Knopf endet dann erst bei 44. */
 @media (max-width: 600px) {
   .app-brand-logo {
     width: 44px;
     height: 44px;
     left: calc(env(safe-area-inset-left) + 48px);
   }
-
-  /* Bei offenem linken Menue zeigt das Logo die Wortmarke und ist dann breiter,
-     aber nur so hoch wie --app-brand-expanded-height (28 px). Live nachgemessen
-     2026-08-09: in genau diesem Zustand war es 76x28 und damit als einziges
-     Kopf-Element wieder unter dem Touch-Ziel. Die Breite bleibt der Wortmarke
-     ueberlassen, die Hoehe nicht. */
   body[data-left-menu-state="expanded"] .app-brand-logo {
     height: 44px;
   }
 }
 
 /* ---- composer-tools.css ---- */
-/* smejj.com — Styles fuer Composer-Werkzeuge (Plus-Menue, Diktat, Sprachmodus, Vorlesen).
-   Eigene Datei, damit die design-gelockte styles.css (Ratchet-Baseline) nicht waechst.
-   Design-Sprache identisch zum bestehenden .model-menu (dunkel, Glas, dezente Linien). */
-
 .plus-picker {
      position: relative;
      z-index: 50;
 }
-
 .plus-menu {
      position: absolute;
      left: 0;
@@ -1867,7 +1549,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      backdrop-filter: blur(24px) saturate(1.2);
      -webkit-backdrop-filter: blur(24px) saturate(1.2);
 }
-
 .plus-menu button {
      display: flex;
      align-items: center;
@@ -1885,12 +1566,10 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      text-align: left;
      cursor: pointer;
 }
-
 .plus-menu button:hover {
      background: rgba(255, 255, 255, 0.06);
      color: #ffffff;
 }
-
 .plus-menu button svg {
      width: 17px;
      height: 17px;
@@ -1902,32 +1581,21 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      stroke-linejoin: round;
      pointer-events: none;
 }
-
 .plus-menu .visually-hidden-input {
      display: none;
 }
-
-/* Diktat aktiv: Mikrofon pulsiert rot. */
-
 [data-start-tool="voice"].is-recording {
      color: #ff5c5c;
      animation: composer-pulse 1.4s ease-in-out infinite;
 }
-
-/* Vorlesen aktiv: Lautsprecher hervorgehoben. */
-
 [data-start-tool="speaker"].is-speaking {
      color: #7fd4a8;
      animation: composer-pulse 1.8s ease-in-out infinite;
 }
-
 @keyframes composer-pulse {
      0%, 100% { opacity: 1; }
      50% { opacity: 0.45; }
 }
-
-/* Sprachmodus-Overlay (Gespraech). */
-
 .voice-mode-overlay {
      position: fixed;
      inset: 0;
@@ -1944,11 +1612,9 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      text-align: center;
      padding: 24px;
 }
-
 .voice-mode-overlay[hidden] {
      display: none;
 }
-
 .voice-mode-wave {
      display: flex;
      align-items: center;
@@ -1956,7 +1622,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      gap: 7px;
      height: 84px;
 }
-
 .voice-mode-wave span {
      width: 9px;
      height: 18px;
@@ -1964,34 +1629,26 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      background: rgba(246, 243, 238, 0.9);
      animation: voice-wave 1.15s ease-in-out infinite;
 }
-
 .voice-mode-wave span:nth-child(2) { animation-delay: 0.12s; }
 .voice-mode-wave span:nth-child(3) { animation-delay: 0.24s; }
 .voice-mode-wave span:nth-child(4) { animation-delay: 0.36s; }
 .voice-mode-wave span:nth-child(5) { animation-delay: 0.48s; }
-
 @keyframes voice-wave {
      0%, 100% { transform: scaleY(0.45); }
      50% { transform: scaleY(1); }
 }
-
-/* Zustaende: Zuhoeren (weiss), Denken (gedimmt, langsam), Sprechen (gruenlich). */
-
 .voice-mode-overlay[data-mode="thinking"] .voice-mode-wave span {
      animation-duration: 2.2s;
      background: rgba(246, 243, 238, 0.45);
 }
-
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-wave span {
      background: #7fd4a8;
 }
-
 .voice-mode-status {
      font-size: 20px;
      font-weight: 500;
      margin: 0;
 }
-
 .voice-mode-transcript {
      max-width: 640px;
      min-height: 24px;
@@ -2000,8 +1657,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      color: rgba(246, 243, 238, 0.6);
      line-height: 1.62;
 }
-
-/* Live-Mitschrift der Antwort im Sprachmodus (Konkurrenz-Radar V2) */
 .voice-mode-reply {
      max-width: 640px;
      max-height: 38vh;
@@ -2013,11 +1668,9 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      white-space: pre-wrap;
      overflow-wrap: anywhere;
 }
-
 .voice-mode-reply:empty {
      display: none;
 }
-
 .voice-mode-close {
      display: grid;
      place-items: center;
@@ -2030,11 +1683,9 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      color: #101114;
      cursor: pointer;
 }
-
 .voice-mode-close:hover {
      background: #ffffff;
 }
-
 .voice-mode-close svg {
      width: 18px;
      height: 18px;
@@ -2044,7 +1695,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      stroke-linecap: round;
      pointer-events: none;
 }
-
 .voice-mode-hint {
      position: absolute;
      bottom: 28px;
@@ -2054,17 +1704,12 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      font-size: 14.5px;
      color: rgba(246, 243, 238, 0.45);
 }
-
-/* Sprachmodus neu: animiertes smejj.com Zeichen — linke und rechte Klammer
-   sprechen im Wechsel, je ein Punkt gehoert zu einer Seite. */
-
 .voice-mode-logo {
      position: relative;
      display: flex;
      align-items: center;
      justify-content: center;
 }
-
 .voice-mode-logo::before {
      content: "";
      position: absolute;
@@ -2076,12 +1721,10 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      animation: voice-aura-pulse 3s ease-in-out infinite;
      z-index: -1;
 }
-
 .voice-mode-logo svg {
      width: 150px;
      height: 109px;
 }
-
 .voice-mode-logo path {
      fill: none;
      stroke: #14e0dc;
@@ -2090,104 +1733,70 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      stroke-linejoin: round;
      filter: drop-shadow(0 0 12px rgba(20, 224, 220, 0.4));
 }
-
 .voice-mode-logo circle {
      fill: #14e0dc;
      filter: drop-shadow(0 0 8px rgba(20, 224, 220, 0.6));
 }
-
 .voice-logo-left { animation: voice-talk-left 2.4s ease-in-out infinite; }
 .voice-logo-right { animation: voice-talk-right 2.4s ease-in-out infinite; }
 .voice-logo-dot-a { animation: voice-dot-a 2.4s ease-in-out infinite; }
 .voice-logo-dot-b { animation: voice-dot-b 2.4s ease-in-out infinite; }
-
 @keyframes voice-talk-left {
      0%, 40%, 100% { transform: translateX(0) scale(1); }
      15% { transform: translateX(-7px) scale(1.06); }
      28% { transform: translateX(0) scale(1); }
 }
-
 @keyframes voice-talk-right {
      0%, 50%, 100% { transform: translateX(0) scale(1); }
      65% { transform: translateX(7px) scale(1.06); }
      78% { transform: translateX(0) scale(1); }
 }
-
 @keyframes voice-dot-a {
      0%, 40%, 100% { opacity: 0.25; }
      15% { opacity: 1; }
 }
-
 @keyframes voice-dot-b {
      0%, 50%, 100% { opacity: 0.25; }
      65% { opacity: 1; }
 }
-
 @keyframes voice-aura-pulse {
      0%, 100% { transform: scale(0.92); opacity: 0.45; }
      50% { transform: scale(1.12); opacity: 0.9; }
 }
-
-/* Zustaende des Zeichens: Denken (langsam), Sprechen (gruen).
-   Stumm: Das Zeichen bleibt bewusst farbig und animiert — der Sprachmodus
-   laeuft weiter, nur das Mikrofon ist aus (Signal traegt der rote Mic-Button). */
-
-/* Denken = Dialog-Puls (Betreiber-Auftrag + Freigabe 2026-08-13).
-
-   Vorher wurde die Bewegung beim Denken LANGSAMER (2,4 s -> 3,6 s) — genau in
-   dem Moment, wo der Nutzer wissen will, ob gearbeitet wird, wirkte das
-   Zeichen am totesten ("dieser Moment, wo arbeitet ... soll rechts links
-   bewegen wie zwei Menschen reden"). Jetzt schwingen die Klammern abwechselnd
-   deutlich aufeinander zu (±15 px statt ±7) und die Punkte blinken versetzt
-   wie ein Wortwechsel — ein Herzschlag-Takt von 1,1 s. Hoeren bleibt ruhig,
-   Sprechen bleibt gruen: die drei Zustaende sind jetzt auf einen Blick
-   unterscheidbar. */
-
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-left {
      animation: voice-puls-left 1.1s ease-in-out infinite;
 }
-
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-right {
      animation: voice-puls-right 1.1s ease-in-out infinite;
 }
-
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a {
      animation: voice-puls-dot-a 1.1s ease-in-out infinite;
 }
-
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b {
      animation: voice-puls-dot-b 1.1s ease-in-out infinite;
 }
-
 @keyframes voice-puls-left {
      0%, 100% { transform: translateX(0) scale(1); }
      25% { transform: translateX(15px) scale(1.08); }
      50% { transform: translateX(0) scale(1); }
 }
-
 @keyframes voice-puls-right {
      0%, 50% { transform: translateX(0) scale(1); }
      75% { transform: translateX(-15px) scale(1.08); }
      100% { transform: translateX(0) scale(1); }
 }
-
 @keyframes voice-puls-dot-a {
      0%, 45%, 100% { opacity: 0.3; }
      20% { opacity: 1; }
 }
-
 @keyframes voice-puls-dot-b {
      0%, 55%, 100% { opacity: 0.3; }
      75% { opacity: 1; }
 }
-
 .voice-mode-overlay[data-mode="thinking"] .voice-mode-logo::before {
      background: radial-gradient(circle, rgba(20, 224, 220, 0.3) 0%, rgba(20, 224, 220, 0) 70%);
      animation-duration: 1.1s;
 }
-
-/* Bewegung nur, wenn der Nutzer sie nicht abbestellt hat — der Puls ist die
-   kraeftigste Animation der App und braucht diese Bremse zwingend. */
 @media (prefers-reduced-motion: reduce) {
      .voice-logo-left, .voice-logo-right, .voice-logo-dot-a, .voice-logo-dot-b,
      .voice-mode-overlay[data-mode="thinking"] .voice-logo-left,
@@ -2198,31 +1807,24 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
           animation: none;
      }
 }
-
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-logo path {
      stroke: #7fd4a8;
      filter: drop-shadow(0 0 14px rgba(127, 212, 168, 0.5));
 }
-
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-logo circle {
      fill: #7fd4a8;
      filter: drop-shadow(0 0 10px rgba(127, 212, 168, 0.7));
 }
-
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-logo::before {
      background: radial-gradient(circle, rgba(127, 212, 168, 0.32) 0%, rgba(127, 212, 168, 0) 70%);
      animation-duration: 2s;
 }
-
-/* Untere Leiste im Sprachmodus: Eingabefeld mit Plus, Mikrofon (stumm), Beenden. */
-
 .voice-mode-bar {
      display: flex;
      align-items: center;
      gap: 10px;
      width: min(560px, 100%);
 }
-
 .voice-mode-input-wrap {
      flex: 1 1 auto;
      display: flex;
@@ -2234,7 +1836,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      border-radius: 24px;
      background: rgba(255, 255, 255, 0.05);
 }
-
 .voice-mode-input-wrap button {
      display: grid;
      place-items: center;
@@ -2247,12 +1848,10 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      cursor: pointer;
      flex: 0 0 auto;
 }
-
 .voice-mode-input-wrap button:hover {
      background: rgba(255, 255, 255, 0.08);
      color: #ffffff;
 }
-
 .voice-mode-input-wrap svg {
      width: 18px;
      height: 18px;
@@ -2262,7 +1861,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      stroke-linecap: round;
      pointer-events: none;
 }
-
 #voiceModeInput {
      flex: 1 1 auto;
      min-width: 0;
@@ -2272,33 +1870,24 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      font-size: 16.5px;
      outline: none;
 }
-
 #voiceModeInput::placeholder {
      color: rgba(246, 243, 238, 0.4);
 }
-
-/* Sende-Button (Pfeil nach oben, wie ChatGPT): ohne Hintergrund, transparent —
-   nur mit Text aktiv (Freigabe-Wortlaut 2026-07-21: "ohne Hintergrund und Transparent"). */
-
 #voiceModeSend {
      background: transparent;
 }
-
 #voiceModeSend:hover {
      background: transparent;
      color: #ffffff;
 }
-
 #voiceModeSend:disabled {
      background: transparent;
      color: rgba(246, 243, 238, 0.35);
      cursor: default;
 }
-
 #voiceModeSend svg {
      stroke-width: 2.4;
 }
-
 .voice-mode-mic {
      display: grid;
      place-items: center;
@@ -2312,11 +1901,9 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      cursor: pointer;
      transition: color 0.15s ease;
 }
-
 .voice-mode-mic:hover {
      background: rgba(255, 255, 255, 0.1);
 }
-
 .voice-mode-mic svg {
      width: 20px;
      height: 20px;
@@ -2327,56 +1914,34 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      stroke-linejoin: round;
      pointer-events: none;
 }
-
 .voice-mode-mic .voice-mic-slash {
      display: none;
 }
-
-/* Stumm: Button-Optik bleibt identisch zu den anderen Buttons —
-   nur das Mikrofon-Icon wird rot (ruhiges "laeuft weiter"-Signal). */
-
 .voice-mode-mic.is-muted {
      color: #e24b4a;
 }
-
 .voice-mode-mic.is-muted:hover {
      background: rgba(255, 255, 255, 0.1);
 }
-
 .voice-mode-mic.is-muted .voice-mic-slash {
      display: block;
 }
-
-/* Nach dem Upgrade steht der Hinweis im Fluss (kein Overlap mit der Leiste).
-   Das Overlay zentriert per justify-content ALLES als einen Block — dadurch
-   hing die untere Leiste in der Bildmitte statt am unteren Rand. Zwei
-   auto-Margins teilen den Freiraum: das Zeichen bleibt mittig, Hinweis und
-   Leiste rutschen ganz nach unten. Bewusst EINE Regel pro Selektor — zwei
-   Regeln mit gleichem Selektor (margin:0 vs. margin-top:auto) waeren wieder
-   die Spezifitaetsfalle vom Konto-Tab-Fix. */
-
 .voice-mode-overlay[data-upgraded="true"] .voice-mode-logo {
      margin-top: auto;
 }
-
 .voice-mode-overlay[data-upgraded="true"] .voice-mode-hint {
      position: static;
      margin: auto 0 0;
 }
-
 .voice-mode-overlay[data-upgraded="true"] .voice-mode-bar {
      margin-bottom: 8px;
 }
-
-/* Code-Uebernahme aus Chat-Antworten in den Workspace. */
-
 .chat-code-actions {
      display: flex;
      flex-wrap: wrap;
      gap: 8px;
      margin: 6px 0 2px;
 }
-
 .chat-code-save {
      min-height: 30px;
      padding: 4px 12px;
@@ -2388,12 +1953,10 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      font-weight: 500;
      cursor: pointer;
 }
-
 .chat-code-save:hover:not(:disabled) {
      background: rgba(255, 255, 255, 0.09);
      color: #ffffff;
 }
-
 .chat-code-save:disabled {
      border-color: rgba(127, 212, 168, 0.4);
      color: #7fd4a8;
@@ -2401,51 +1964,37 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 /* ---- browser-pane.css ---- */
-/* smejj.com — Integrierter Browser (Codex-Stil) im rechten Panel. */
-
 .browser-panel.is-browser-mode {
   grid-template-rows: 1fr;
   padding: 0;
   gap: 0;
 }
-
 .browser-panel.is-browser-mode .browser-panel-nav {
   display: none;
 }
-
 .browser-pane {
   display: grid;
-  /* ZURUECKGENOMMEN 2026-08-18 auf Ansage des Betreibers: Ich hatte die
-     Leiste an Chromes Masse angeglichen (32/28/6). Gewuenscht war aber die
-     FUNKTION von Chrome, nicht sein Aussehen — die Kopfleiste von smejj soll
-     bleiben, wie sie war. Das ist keine Geschmacksfrage: das Panel teilt sich
-     den Bildschirm mit dem Chat, und jede Zeile Kopf fehlt der Seite. */
   --bp-row-height: 26px;
   --bp-control-size: 22px;
   --bp-control-gap: 3px;
   --bp-side-width: calc((var(--bp-control-size) * 3) + (var(--bp-control-gap) * 2));
-  /* Inhalt darf nie hoeher als das Panel werden: minmax(0, 1fr) statt fester
-     Mindesthoehe — sonst werden Seiten auf kleinen Fenstern abgeschnitten. */
+  --bp-tab-left-width: var(--bp-control-size);
+  --bp-tab-right-width: calc((var(--bp-control-size) * 2) + var(--bp-control-gap));
   grid-template-rows: var(--bp-row-height) var(--bp-row-height) auto auto minmax(0, 1fr);
   min-height: 0;
   height: 100%;
 }
-
 .browser-pane,
 .browser-pane * {
   box-sizing: border-box;
 }
-
 .browser-panel:not(.is-browser-mode) .browser-pane {
   display: none;
 }
-
-/* Tab-Leiste */
-
 .bp-tabstrip {
   grid-row: 1;
   display: grid;
-  grid-template-columns: var(--bp-side-width) minmax(0, 1fr) var(--bp-side-width);
+  grid-template-columns: var(--bp-tab-left-width) minmax(0, 1fr) var(--bp-tab-right-width);
   align-items: center;
   gap: 6px;
   min-width: 0;
@@ -2455,7 +2004,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   background: rgba(255, 255, 255, 0.04);
   overflow: hidden;
 }
-
 .bp-tab-left,
 .bp-tab-right,
 .bp-toolbar-left,
@@ -2465,34 +2013,26 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   gap: var(--bp-control-gap);
   min-width: 0;
 }
-
 .bp-tab-right,
 .bp-toolbar-right {
   justify-content: flex-end;
 }
-
 .bp-tabs {
   display: flex;
   align-items: center;
   gap: 2px;
   min-width: 0;
-  /* Chrome schiebt Tabs nebeneinander und laesst sie schrumpfen; erst unter
-     der Mindestbreite wird gescrollt. `grid` zeigte hier vorher genau EINEN
-     Tab — daher die Blaetter-Pfeile, die Chrome nicht hat. */
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
 }
-
 .bp-tabs::-webkit-scrollbar { display: none; }
-
 .bp-tab {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 7px;
   min-width: 0;
-  /* Breite setzt browser-pane-tableiste.js je nach Tab-Anzahl. */
   flex: none;
   height: var(--bp-control-size);
   min-height: 0;
@@ -2504,36 +2044,26 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   font-size: 13.5px;
   cursor: pointer;
 }
-
 .bp-tab.is-active {
   border-color: rgba(246, 243, 238, 0.14);
   background: rgba(246, 243, 238, 0.1);
   color: #f6f3ee;
 }
-
 .bp-tab:hover:not(.is-active) {
   background: rgba(246, 243, 238, 0.05);
 }
-
 .bp-tab:focus-visible {
   outline: 2px solid rgba(159, 231, 212, 0.9);
   outline-offset: -2px;
 }
-
-/* Nur-Icon-Zustand: Titel und Kreuz sind weg, das Icon steht mittig. */
 .bp-tab.is-schmal {
   grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   padding: 0 4px;
 }
-
 .bp-tab.is-ziehend {
   opacity: 0.45;
 }
-
-/* Marke links im Tab: echtes Favicon, sonst Anfangsbuchstabe. Fremde
-   Icon-Adressen sind durch img-src 'self' data: blob: ausgeschlossen —
-   der Buchstabe ist deshalb der Normalfall, nicht der Notbehelf. */
 .bp-tab-marke {
   flex: none;
   display: grid;
@@ -2542,13 +2072,11 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   height: 16px;
   overflow: hidden;
 }
-
 .bp-tab-favicon {
   width: 16px;
   height: 16px;
   object-fit: contain;
 }
-
 .bp-tab-marke-buchstabe {
   border-radius: 3px;
   background: hsl(var(--bp-tab-farbton, 210) 45% 42%);
@@ -2557,9 +2085,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   font-weight: 700;
   line-height: 1;
 }
-
-/* Kreuz erscheint erst beim Hover oder am aktiven Tab — wie in Chrome, sonst
-   flimmert die Leiste bei vielen Tabs. */
 .bp-tab-close {
   flex: none;
   display: grid;
@@ -2572,18 +2097,14 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   line-height: 1;
   opacity: 0;
 }
-
 .bp-tab.is-active .bp-tab-close,
 .bp-tab:hover .bp-tab-close {
   opacity: 1;
 }
-
 .bp-tab-close:hover {
   background: rgba(246, 243, 238, 0.16);
   color: #f6f3ee;
 }
-
-/* Adressvorschlaege (Chromes Omnibox-Liste) */
 .bp-vorschlaege {
   position: absolute;
   z-index: 30;
@@ -2599,9 +2120,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   background: #16181b;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
 }
-
 .bp-vorschlaege[hidden] { display: none; }
-
 .bp-vorschlag {
   padding: 8px 11px;
   border: 0;
@@ -2614,13 +2133,11 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   text-overflow: ellipsis;
   cursor: pointer;
 }
-
 .bp-vorschlag:hover,
 .bp-vorschlag.is-markiert {
   background: rgba(246, 243, 238, 0.1);
   color: #f6f3ee;
 }
-
 .bp-tab-dot {
   flex: none;
   width: 7px;
@@ -2628,27 +2145,22 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-radius: 999px;
   background: rgba(246, 243, 238, 0.35);
 }
-
 .bp-tab.is-active .bp-tab-dot {
   background: rgba(159, 231, 212, 0.9);
 }
-
 .bp-tab.is-loading .bp-tab-dot {
   animation: bp-pulse 900ms ease-in-out infinite;
 }
-
 @keyframes bp-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.25; }
 }
-
 .bp-tab-title {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .bp-tab-close {
   flex: none;
   display: grid;
@@ -2660,16 +2172,11 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   font-size: 15.5px;
   line-height: 1;
 }
-
 .bp-tab-close:hover {
   background: rgba(255, 255, 255, 0.14);
   color: #f6f3ee;
 }
-
-.bp-tab-add,
-.bp-tab-prev,
-.bp-tab-next,
-.bp-tab-count {
+.bp-tab-add {
   flex: none;
   width: var(--bp-control-size);
   height: var(--bp-control-size);
@@ -2683,34 +2190,14 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   line-height: 1;
   cursor: pointer;
 }
-
-.bp-tab-count {
-  min-width: var(--bp-control-size);
-  padding: 0 5px;
-  border: 1px solid rgba(159, 231, 212, 0.36);
-  background: rgba(159, 231, 212, 0.11);
-  color: rgba(159, 231, 212, 0.95);
-  font-size: 13.5px;
-  font-weight: 700;
-}
-
-.bp-tab-add:hover:not(:disabled),
-.bp-tab-prev:hover:not(:disabled),
-.bp-tab-next:hover:not(:disabled),
-.bp-tab-count:hover:not(:disabled) {
+.bp-tab-add:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.1);
   color: #f6f3ee;
 }
-
-.bp-tab-add:disabled,
-.bp-tab-prev:disabled,
-.bp-tab-next:disabled {
+.bp-tab-add:disabled {
   opacity: 0.35;
   cursor: default;
 }
-
-/* Toolbar */
-
 .bp-toolbar {
   grid-row: 2;
   display: grid;
@@ -2725,7 +2212,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
 }
-
 .bp-toolbar button {
   flex: none;
   display: grid;
@@ -2740,17 +2226,14 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   color: rgba(246, 243, 238, 0.72);
   cursor: pointer;
 }
-
 .bp-toolbar button:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.1);
   color: #f6f3ee;
 }
-
 .bp-toolbar button:disabled {
   opacity: 0.3;
   cursor: default;
 }
-
 .bp-toolbar svg {
   width: 13px;
   height: 13px;
@@ -2760,14 +2243,11 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-
 .bp-address-form {
   min-width: 0;
   margin: 0;
-  /* Bezugspunkt fuer die Vorschlagsliste darunter (position: absolute). */
   position: relative;
 }
-
 .bp-address {
   width: 100%;
   height: var(--bp-control-size);
@@ -2778,25 +2258,19 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   color: #f6f3ee;
   font-size: 14px;
 }
-
 .bp-address:focus {
   outline: none;
   border-color: rgba(159, 231, 212, 0.55);
   background: rgba(0, 0, 0, 0.4);
 }
-
 .bp-address::placeholder {
   color: rgba(246, 243, 238, 0.4);
 }
-
-/* Ladeindikator + Hinweise */
-
 .bp-progress {
   height: 2px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.06);
 }
-
 .bp-progress span {
   display: block;
   width: 38%;
@@ -2805,12 +2279,10 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   background: rgba(159, 231, 212, 0.85);
   animation: bp-progress 1100ms ease-in-out infinite;
 }
-
 @keyframes bp-progress {
   0% { transform: translateX(-110%); }
   100% { transform: translateX(320%); }
 }
-
 .bp-hint {
   padding: 7px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -2818,9 +2290,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   color: rgba(246, 243, 238, 0.82);
   font-size: 14.5px;
 }
-
-/* Inhalt */
-
 .bp-content {
   grid-row: 5;
   position: relative;
@@ -2828,7 +2297,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   overflow: hidden;
   background: #fff;
 }
-
 .bp-frame {
   position: absolute;
   inset: 0;
@@ -2836,19 +2304,14 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   height: 100%;
   border: none;
   background: #fff;
-  transform-origin: 0 0; /* Zoom 50–200 % skaliert von oben links. */
-  /* visibility statt display: display:none setzt in Chromium die Scroll-
-     position eingebetteter Seiten zurueck; visibility erhaelt sie und
-     verhindert Flackern beim Tab-Wechsel. */
+  transform-origin: 0 0;
   visibility: hidden;
   pointer-events: none;
 }
-
 .bp-frame.is-active {
   visibility: visible;
   pointer-events: auto;
 }
-
 .bp-empty {
   position: absolute;
   inset: 0;
@@ -2860,7 +2323,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   color: rgba(246, 243, 238, 0.82);
   text-align: center;
 }
-
 .bp-empty-mark svg {
   width: 44px;
   height: 44px;
@@ -2868,16 +2330,13 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   stroke: rgba(246, 243, 238, 0.45);
   stroke-width: 1.4;
 }
-
 .bp-empty strong {
   font-size: 17.5px;
 }
-
 .bp-empty span {
   color: rgba(246, 243, 238, 0.5);
   font-size: 15px;
 }
-
 .bp-fallback {
   position: absolute;
   inset: 0;
@@ -2889,18 +2348,15 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   color: rgba(246, 243, 238, 0.88);
   text-align: center;
 }
-
 .bp-fallback strong {
   font-size: 21px;
 }
-
 .bp-fallback span {
   max-width: 420px;
   color: rgba(246, 243, 238, 0.6);
   font-size: 15.5px;
   line-height: 1.6;
 }
-
 .bp-fallback a {
   justify-self: center;
   display: inline-grid;
@@ -2915,40 +2371,29 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   font-weight: 700;
   text-decoration: none;
 }
-
 @media (max-width: 680px) {
   .browser-pane {
     --bp-row-height: 26px;
     --bp-control-size: 22px;
     --bp-control-gap: 3px;
   }
-
   .bp-tabstrip {
     padding: 0 5px;
   }
-
-  .bp-tab-count {
-    padding: 0 5px;
-  }
-
   .bp-toolbar {
     padding: 2px 5px;
   }
-
   body.browser-pane-open .browser-panel {
     width: calc(100vw - 12px);
   }
 }
+
+/* ---- browser-pane-chrome.css ---- */
 .bp-tab-spacer {
   flex: none;
   width: var(--bp-control-size);
   height: var(--bp-control-size);
 }
-
-/* Sicherheitsanzeige links in der Adressleiste (Chromes Schloss).
-   Seit die Adresse ohne "https://" angezeigt wird, ist dieses Zeichen die
-   EINZIGE Auskunft ueber die Verschluesselung — ohne es waere das Kuerzen
-   ein Rueckschritt. */
 .bp-toolbar .bp-sicherheit {
   position: absolute;
   z-index: 2;
@@ -2966,24 +2411,15 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   color: rgba(246, 243, 238, 0.6);
   cursor: default;
 }
-
-/* Breite MUSS sich nach dem Inhalt richten: bei "Nicht sicher" stehen
-   Symbol und Text nebeneinander. `.bp-toolbar button` gibt allen Knoepfen
-   eine feste Quadratgroesse — hier ist das falsch. */
 .bp-toolbar .bp-sicherheit {
   width: auto;
   min-width: 0;
   height: 20px;
   display: flex;
-  /* `place-items: unset` allein nahm die Zentrierung weg, die
-     `.bp-toolbar button` per `place-items: center` gesetzt hatte — Symbol und
-     Text standen dann auf verschiedenen Hoehen. Gemessen, nicht geraten. */
   align-items: center;
   justify-content: flex-start;
 }
-
 .bp-toolbar .bp-sicherheit[hidden] { display: none; }
-
 .bp-toolbar .bp-sicherheit svg {
   width: 14px;
   height: 14px;
@@ -2993,34 +2429,21 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-
-/* Unsicher wird betont, sicher nicht. Ein Schloss, das immer da ist, sieht
-   niemand mehr; eine Warnung, die selten kommt, liest man. Die WARNUNG hat
-   ausserdem eine andere FORM (Dreieck statt Schloss) — Farbe allein reicht
-   nicht, rund 8 % der Maenner unterscheiden Rot und Gruen nicht. */
 .bp-toolbar .bp-sicherheit[data-zustand="unsicher"] {
   background: rgba(240, 173, 78, 0.16);
   color: #f0ad4e;
 }
-
 .bp-sicherheit-text {
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
 }
-
-/* Platz fuer das Zeichen — sonst laeuft die Adresse darunter. */
 .bp-address {
   padding-left: 28px;
 }
-
 .bp-toolbar .bp-sicherheit[data-zustand="unsicher"] ~ .bp-address {
-  /* Gemessen (Testseite 2026-08-17): das Zeichen endet bei 95 px.
-     100 px lassen ihm Platz UND einen sichtbaren Abstand zum Text. */
   padding-left: 100px;
 }
-
-/* Lesezeichen-Stern rechts IN der Adressleiste (wie Chrome). */
 .bp-toolbar .bp-stern {
   position: absolute;
   z-index: 2;
@@ -3037,19 +2460,15 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   color: rgba(246, 243, 238, 0.5);
   cursor: pointer;
 }
-
 .bp-toolbar .bp-stern[hidden] { display: none; }
-
 .bp-toolbar .bp-stern:hover {
   background: rgba(246, 243, 238, 0.12);
   color: #f6f3ee;
 }
-
 .bp-toolbar .bp-stern:focus-visible {
   outline: 2px solid rgba(159, 231, 212, 0.9);
   outline-offset: 1px;
 }
-
 .bp-toolbar .bp-stern svg {
   width: 15px;
   height: 15px;
@@ -3058,21 +2477,12 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   stroke-width: 1.8;
   stroke-linejoin: round;
 }
-
-/* Gemerkt: gefuellt UND farbig. Die Fuellung allein traegt die Auskunft,
-   die Farbe verstaerkt sie nur — Farbe allein waere fuer einen Teil der
-   Nutzer keine Auskunft. */
 .bp-toolbar .bp-stern[data-gemerkt="ja"] {
   color: #f0c14b;
 }
-
-/* Platz rechts, damit die Adresse nicht unter den Stern laeuft. */
 .bp-address {
   padding-right: 30px;
 }
-
-/* Zoom-Anzeige in der Adressleiste (Chrome zeigt sie dauerhaft, nicht als
-   verschwindenden Hinweis). Sichtbar nur bei Abweichung von 100 %. */
 .bp-toolbar .bp-zoom {
   position: absolute;
   z-index: 2;
@@ -3093,11 +2503,8 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   white-space: nowrap;
   cursor: pointer;
 }
-
 .bp-toolbar .bp-zoom[hidden] { display: none; }
 .bp-toolbar .bp-zoom:hover { background: rgba(246, 243, 238, 0.16); color: #f6f3ee; }
-
-/* Rechtsklick-Menue der Tabs */
 .bp-tabmenue {
   position: fixed;
   z-index: 60;
@@ -3110,7 +2517,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   background: #16181b;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
 }
-
 .bp-tabmenue-eintrag {
   padding: 8px 10px;
   border: 0;
@@ -3122,22 +2528,11 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   white-space: nowrap;
   cursor: pointer;
 }
-
 .bp-tabmenue-eintrag:hover:not(:disabled) { background: rgba(246, 243, 238, 0.1); color: #f6f3ee; }
-
-/* Unbenutzbare Eintraege bleiben SICHTBAR (wie in Chrome) — ein Menue, dessen
-   Eintraege springen, kann man sich nicht merken. */
 .bp-tabmenue-eintrag:disabled { color: rgba(246, 243, 238, 0.3); cursor: default; }
-
-/* Platz fuer die Zoom-Anzeige. Muss ueber das Formular laufen: das Zeichen
-   steht im DOM nach dem Eingabefeld, eine Geschwister-Regel kaeme nicht hin. */
 .bp-address-form.hat-zoom .bp-address {
   padding-right: 76px;
 }
-
-/* Suchleiste (Cmd+F). Schwebt oben rechts ueber dem Inhalt, wie in Chrome —
-   sie soll den Text nicht verschieben, sonst springt beim Oeffnen die ganze
-   Seite und man verliert die Stelle, die man gerade gelesen hat. */
 .bp-suche {
   position: absolute;
   z-index: 40;
@@ -3152,9 +2547,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   background: #16181b;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
 }
-
 .bp-suche[hidden] { display: none; }
-
 .bp-suche-feld {
   width: 190px;
   height: 24px;
@@ -3165,13 +2558,8 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   color: #f6f3ee;
   font-size: 13px;
 }
-
 .bp-suche-feld:focus { outline: 2px solid rgba(159, 231, 212, 0.8); outline-offset: -1px; }
-
-/* Kein Treffer: das FELD faerbt sich, nicht nur die Zahl — man schaut beim
-   Tippen aufs Feld, nicht auf den Zaehler daneben. */
 .bp-suche.ist-leer .bp-suche-feld { border-color: rgba(240, 173, 78, 0.7); }
-
 .bp-suche-zahl {
   min-width: 42px;
   color: rgba(246, 243, 238, 0.6);
@@ -3179,7 +2567,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
-
 .bp-suche button {
   display: grid;
   place-items: center;
@@ -3192,38 +2579,26 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   font-size: 15px;
   cursor: pointer;
 }
-
 .bp-suche button:hover { background: rgba(246, 243, 238, 0.12); color: #f6f3ee; }
 .bp-suche button:focus-visible { outline: 2px solid rgba(159, 231, 212, 0.9); outline-offset: 1px; }
-
-/* Der Inhaltsbereich braucht einen Bezugspunkt, sonst schwebt die Leiste
-   relativ zur ganzen Seite. */
 .bp-content { position: relative; }
-
-/* Angepinnte Tabs: schmal, ohne Titel, ohne Kreuz. Ein feiner Strich links
-   zeigt, dass sie eine eigene Gruppe sind — ohne ihn sehen sie nur aus wie
-   Tabs, die zufaellig kein Wort tragen. */
 .bp-tab.ist-angepinnt {
   padding: 0;
   border-left: 2px solid rgba(159, 231, 212, 0.55);
 }
-
 .bp-tab.ist-angepinnt .bp-tab-close { display: none; }
-
-/* Maus-Knopf in der Kopfleiste. Er sitzt auf einem der beiden Platzhalter,
-   die rechts ohnehin reserviert waren — die Kopfgeometrie bleibt unberuehrt. */
 .bp-tabstrip .bp-maus {
   display: grid;
   place-items: center;
   width: var(--bp-control-size);
   height: var(--bp-control-size);
+  min-height: 0;
   border: 0;
   border-radius: 5px;
   background: transparent;
   color: rgba(246, 243, 238, 0.6);
   cursor: pointer;
 }
-
 .bp-tabstrip .bp-maus svg {
   width: 14px;
   height: 14px;
@@ -3232,12 +2607,8 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   stroke-width: 2;
   stroke-linejoin: round;
 }
-
 .bp-tabstrip .bp-maus:hover { background: rgba(246, 243, 238, 0.12); color: #f6f3ee; }
 .bp-tabstrip .bp-maus:focus-visible { outline: 2px solid rgba(159, 231, 212, 0.9); outline-offset: -2px; }
-
-/* Waehrend die Maus laeuft: der Knopf ist der Not-Aus und sagt das auch.
-   Ein Lauf, den man nicht stoppen kann, ist keiner, dem man zusehen moechte. */
 .bp-tabstrip .bp-maus.laeuft {
   background: rgba(159, 231, 212, 0.18);
   color: #9fe7d4;
@@ -3245,27 +2616,13 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 
 /* ---- view-chrome.css ---- */
-/* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
-   und Schliessen-X (ganz oben rechts). Ohne Hintergrund, transparent, schmal,
-   leicht fett; besetzt keinen Platz. Nur auf Views ausser #start; die
-   Startseite bleibt unveraendert (Design-Lock).
-   Hinweis: !important ist hier bewusst gesetzt, weil generische Button-Regeln
-   der Premium-Flaechen (app-surfaces/settings-surface) sonst Hintergrund,
-   Rahmen, Hoehe und SVG-Groesse ueberschreiben. */
-
 .view.has-view-chrome {
   position: relative;
   padding-top: 52px;
 }
-
 .view-chrome {
   position: absolute;
   top: 8px;
-  /* In den Ecken sitzen die FIXEN Knoepfe der App (Menue links, Browser-Panel
-     rechts, styles.css .glass-icon). Die Leiste muss neben ihnen beginnen,
-     nicht unter ihnen: mit 14px lag das Schliessen-X exakt auf dem
-     Browser-Knopf (Betreiber-Befund 2026-08-13, gemessen 34px Ueberlappung
-     bei 375px). 48px = 28px Knopf + Luft; die Handy-Werte stehen unten. */
   left: calc(env(safe-area-inset-left) + 48px);
   right: calc(env(safe-area-inset-right) + 48px);
   z-index: 5;
@@ -3274,7 +2631,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   justify-content: space-between;
   pointer-events: none;
 }
-
 .view .view-chrome button,
 .premium-view .view-chrome button {
   pointer-events: auto;
@@ -3295,19 +2651,16 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   opacity: 0.85;
   transition: opacity 0.15s ease;
 }
-
 .view .view-chrome button:hover,
 .premium-view .view-chrome button:hover {
   opacity: 1;
   background: transparent !important;
 }
-
 .view .view-chrome button:focus-visible,
 .premium-view .view-chrome button:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
-
 .view .view-chrome button svg,
 .premium-view .view-chrome button svg {
   width: 20px !important;
@@ -3316,129 +2669,62 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   min-height: 20px !important;
   flex: none !important;
 }
-
-/* Dunkle Premium-Views: helle Icons ueber die vorhandenen Premium-Variablen. */
 .premium-view .view-chrome button {
   color: var(--premium-text, #f8f6f2);
 }
-
 @media (max-width: 640px) {
   .view.has-view-chrome {
     padding-top: 46px;
   }
-
   .view-chrome {
     top: 6px;
-    /* Auf schmalen Schirmen sind die Ecken-Knoepfe 44px (Touch-Regel unten):
-       52px = 44px Knopf + Luft. Gemessen bei 375px: X endet bei 323px, der
-       Browser-Knopf beginnt bei 331px — 8px frei statt 34px Ueberdeckung. */
     left: calc(env(safe-area-inset-left) + 52px);
     right: calc(env(safe-area-inset-right) + 52px);
   }
 }
-
-/* Touch-Ziel auf schmalen Schirmen (2026-08-09). Gemessen bei 375 px in ALLEN
-   15 Ansichten: Zurueck und Schliessen waren 32x32 — die kleinsten Ziele der
-   App. Das Symbol bleibt 20 px, nur die Flaeche waechst.
-
-   Das !important ist nicht Zierde: die Regel oben setzt width/height selbst mit
-   !important (um die Knopf-Grundregeln der Ansichten zu schlagen), und dagegen
-   kommt eine normale Deklaration nicht an. */
 @media (max-width: 600px) {
   .view .view-chrome button,
   .premium-view .view-chrome button {
     width: 44px !important;
     height: 44px !important;
   }
-
-  /* Die Leiste liegt absolut ueber dem Inhalt. Wird sie 12 px hoeher, muss der
-     Inhalt entsprechend tiefer anfangen, sonst deckt der Knopf die Ueberschrift. */
   .view.has-view-chrome,
   .premium-view.has-view-chrome {
     padding-top: 58px;
   }
 }
-
-/* Grundposition des Maus-Knopfs. Stand bis 2026-08-09 als style="right: 36px"
-   im HTML — inline schlaegt jede Media-Query, die Handy-Regel unten waere
-   wirkungslos geblieben. */
 #mausButton {
   right: calc(env(safe-area-inset-right) + 36px);
 }
-
-/* Die folgenden zwei Bloecke standen bis 2026-08-09 in styles.css und sind
-   hierher gezogen, als die Ratchet-Grenze dort riss. Sie gehoeren ohnehin
-   eher hierher: es ist die Groesse der App-Chrome, nicht des Grundgeruests.
-   Die Kaskade aendert sich dadurch nicht — view-chrome.css liegt im selben
-   Buendel NACH styles.css, und die Selektoren tragen ihr Gewicht selbst. */
-
-/* Touch-Ziele auf schmalen Schirmen (2026-08-09).
-   Live gemessen bei 375 px mit echter Geraete-Emulation: die vier Icons der
-   Kopfleiste waren 28x28, die fuenf Knoepfe der Eingabezeile 30x38 bzw. 34x38 —
-   deutlich unter den 44 px, die Apple und Google fuer Touch nennen. Auf dem
-   Desktop bleibt alles wie es war, die Regeln greifen nur unterhalb 600 px.
-
-   Die Doppelklasse gibt den Regeln Gewicht 0,2,0: app-surfaces.css bringt
-   `.premium-view button` (0,1,1) mit und setzt mobil width: 100%. Auf der
-   Startseite greift das zwar nicht, aber die Knoepfe wandern erfahrungsgemaess. */
 @media (max-width: 600px) {
   .glass-icon.glass-icon {
     width: 44px;
     height: 44px;
     min-height: 44px;
   }
-
-  /* Der Maus-Knopf steht links neben dem Browser-Knopf. Mit 28 px genuegten
-     36 px Abstand; bei 44 px wuerden sich beide ueberlappen. */
   #mausButton {
     right: calc(env(safe-area-inset-right) + 44px);
   }
-
-  /* Eingabezeile: Hoehe fuer alle Knoepfe der Reihe (auch den Modell-Chip,
-     der sonst als einziger 38 px hoch bliebe), Breite nur fuer die Symbole —
-     der Chip traegt Text und muss mitwachsen duerfen. */
   .prompt-actions .ghost-button.ghost-button,
   .prompt-actions .send-button.send-button {
     height: 44px;
     min-height: 44px;
   }
-
   .prompt-actions .ghost-button.icon-button,
   .prompt-actions .send-button.send-button {
     width: 44px;
   }
-
-  /* Gemessen 2026-08-09: mit 44er Knoepfen braucht die Reihe 382 px bei 375 px
-     Fenster. Sie wird dabei NICHT gequetscht, sondern zieht die ganze Spalte
-     hinaus — `.home-feed` ist ein Grid-Item und hat damit min-width: auto,
-     waechst also mit seinem breitesten Kind (dieselbe Ursache wie bei der
-     Chip-Leiste des Verlaufs, sw v252). Statt am Container zu drehen, wird
-     hier der Platz beschafft: engere Abstaende, schmaleres Polster. Gemessen
-     bleiben danach ueber 20 px Luft. */
   .prompt-actions {
     gap: 4px;
     padding: 0 6px;
   }
 }
-
-/* Linkes Menue und Browser-Panel: 44 px hohe Eintraege auf schmalen Schirmen
-   (2026-08-09). Gemessen waren 178x36 bzw. 179x36 — breit genug zum Treffen,
-   es fehlte nur Hoehe. Der Anker `.sidebar` gibt Gewicht 0,2,0 und schlaegt
-   damit sowohl `.nav-button` (0,1,0) als auch `.premium-view button` (0,1,1). */
 @media (max-width: 600px) {
   .sidebar .nav-button,
   .browser-panel-nav button {
     min-height: 44px;
   }
 }
-
-/* Aussenkante der App: ein zarter Lichtsaum in der Logo-Farbe #02fdfd —
-   dasselbe Cyan-Light-Leak wie die Anmeldekarte (public/auth/auth.css,
-   .auth-card), nur schwaecher: dort umrandet es eine kleine Karte, hier die
-   ganze Flaeche. Die erste Fassung (0.14/0.10/0.06) war dem Betreiber am
-   2026-08-13 live zu schwach — jetzt gut die Haelfte der Anmeldekarte.
-   Reine Deko, deshalb fixiert, ohne Mausfang
-   und ohne eigene Groesse — die Kante folgt immer dem Fenster. */
 body::after {
   content: "";
   position: fixed;
@@ -3448,78 +2734,35 @@ body::after {
   box-shadow:
     inset 0 0 0 1px rgba(2, 253, 253, 0.3),
     inset 0 0 26px rgba(2, 253, 253, 0.22),
-    inset 0 0 72px rgba(45, 212, 191, 0.13);
+    inset 0 0 72px rgba(50, 246, 234, 0.13);
 }
-
-/* ===== Schmale Spur: was styles.css nicht mehr aufnehmen darf =====
-   styles.css steht an seiner Ratchet-Baseline (1589 Zeilen, siehe
-   scripts/check-guidelines.mjs) — neue Regeln der App-Chrome gehoeren hierher.
-   Die Werte in styles.css sind nur geaendert, nicht vermehrt worden. */
-
-/* Kraeftigerer Strich in der Spur (Betreiber 2026-08-13, "Icons fetter"):
-   bei 16 px traegt die Strichstaerke die Lesbarkeit, nicht die Flaeche. */
 .sidebar.is-compact .button-icon svg,
 .browser-panel.is-compact .browser-panel-nav button svg {
   stroke-width: 2.4;
 }
-
 .sidebar.is-compact .nav-button,
 .sidebar.is-compact .profile-dock,
 .browser-panel.is-compact .browser-panel-nav button {
   border-radius: 12px;
 }
-
-/* Die Mitte weicht den Seiten aus (Betreiber 2026-08-13: "Mittlere Schrift
-   soll sich automatisch anpassen, nicht unter Feldern bleiben"). Bis dahin
-   galt margin-left: 0 — die Sidebar ist position:fixed und lag als Overlay
-   ueber dem Inhalt, sodass Text und Eingabezeile unter der Spur verschwanden.
-   Schwelle 681 px — dieselbe Grenze, an der styles.css schon die rechte Seite
-   schiebt. Der erste Versuch stand bei 921 px und griff auf dem Bildschirm des
-   Betreibers (915 px Fensterbreite) genau NICHT. Darunter bleibt die Sidebar
-   die Schublade mit Abdunkeln (siehe panel-backdrop.css). */
 @media (min-width: 681px) {
   body.left-panel-open .workspace {
     margin-left: min(var(--left-panel-width), calc(100vw - 120px));
   }
 }
-
-/* Das Maus-Zeichen gehoert IN die rechte Spur, nicht daneben (Betreiber
-   2026-08-13: "Maus bleibt draussen ... soll auch automatisch in rechte Seite
-   reingehen"). Grundstellung ist 36 px links vom Panel-Knopf; bei offenem
-   Panel rueckt es in dessen Spalte, eine Zeile darunter. */
 body:has(#browserPanel.is-open) #mausButton {
   top: calc(env(safe-area-inset-top) + 32px);
   right: env(safe-area-inset-right);
 }
-
-/* In der schmalen rechten Spur sitzt das Maus-Zeichen in der obersten Zeile.
-   Die Liste darunter muss tiefer beginnen, sonst liegt das erste Zeichen
-   (Browser) unter dem Zeiger — beim ersten Bau genau so passiert. */
 .browser-panel.is-compact {
   padding-top: 64px;
 }
-
-/* Eine SPUR ist Rahmen, eine SCHUBLADE ist Overlay (2026-08-13, Nacht-Modus).
-   Auf dem Handy blieb die Mitte auch bei schmaler Spur unter der Leiste: die
-   680-px-Regel in styles.css setzt beide Raender auf 0, weil sie fuer die
-   breite Schublade mit Abdunkeln gedacht ist. Eine 28-px-Spur ist aber keine
-   Schublade — sie steht dauerhaft und darf den Text nicht verdecken. Darum
-   weicht die Mitte IMMER aus, wenn die Seite im Spur-Zustand ist; die
-   Schublade bleibt Overlay wie bisher. */
 body.left-panel-open:has(.sidebar.is-compact) .workspace {
   margin-left: min(var(--left-panel-width), calc(100vw - 120px));
 }
-
 body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   margin-right: min(var(--right-panel-width), calc(100vw - 120px));
 }
-
-/* Auf dem Handy schiebt nur EINE Spur (2026-08-13, gemessen bei 375 px):
-   die Eingabereihe braucht dort 344 px. Mit einer Spur bleiben 347 px — es
-   passt. Mit beiden Spuren blieben 319 px, und die Reihe zog die Spalte 25 px
-   aus dem Bild (dieselbe Ursache wie 2026-08-09: `.home-feed` ist Grid-Item
-   mit min-width: auto). Die linke Spur ist die Hauptnavigation und schiebt;
-   die rechte bleibt auf schmalen Schirmen ein Overlay. */
 @media (max-width: 600px) {
   body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     margin-right: 0;
@@ -3527,19 +2770,9 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 /* ---- profile-dock.css ---- */
-/* smejj.com — Profil-Dock (linke Navigation unten): Profilbild + Name + Zahnrad.
-   Eigene Datei, weil public/styles.css per Ratchet-Baseline nicht wachsen darf.
-   Basisregeln (.profile-dock, .profile-avatar) stehen weiterhin in styles.css;
-   hier folgen nur die Ergaenzungen fuer Bild, Name und Zahnrad-Spalte. */
-
 .profile-dock {
   align-items: center;
 }
-
-/* flex 0 1 auto (nicht 1 1 auto): Der Button nimmt nur die Breite, die er
-   braucht — so steht das Zahnrad direkt neben dem Namen statt am rechten Rand
-   (Freigabe 2026-07-17: "soll bisschen naeher kommen"). Bei langen Namen
-   schrumpft der Button und der Name wird mit Ellipse gekuerzt. */
 .profile-dock-button {
   display: flex;
   flex: 0 1 auto;
@@ -3556,17 +2789,14 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   text-align: left;
   transition: background 140ms ease, color 140ms ease;
 }
-
 .profile-dock-button:hover {
   background: rgba(255, 255, 255, 0.06);
   color: #f6f3ee;
 }
-
 .profile-dock-button:focus-visible {
   outline: 2px solid #00ffef;
   outline-offset: 2px;
 }
-
 .profile-dock-name {
   min-width: 0;
   overflow: hidden;
@@ -3575,19 +2805,15 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .profile-dock .profile-avatar {
   flex: 0 0 auto;
 }
-
-/* Mit Bild: Verlauf und Initiale weichen dem Foto. */
 .profile-avatar.has-picture {
   overflow: hidden;
   padding: 0;
   border: 1px solid rgba(246, 243, 238, 0.22);
   background: none;
 }
-
 .profile-dock-image {
   display: block;
   width: 100%;
@@ -3595,8 +2821,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border-radius: 999px;
   object-fit: cover;
 }
-
-/* Zahnrad: nur Icon (Beschriftung bleibt fuer Screenreader im DOM). */
 .profile-dock-gear {
   flex: 0 0 auto;
   justify-content: center;
@@ -3604,7 +2828,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   min-width: 34px;
   padding: 0;
 }
-
 .profile-dock-gear .nav-label {
   position: absolute;
   width: 1px;
@@ -3613,11 +2836,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   clip-path: inset(50%);
   white-space: nowrap;
 }
-
-/* Kompakte Sidebar: Avatar ueber Zahnrad, keine Textspalten.
-   styles.css setzt .sidebar.is-compact .profile-dock auf height:28px + overflow:hidden
-   (Stand vor dem Dock: eine einzige Zeile). Mit zwei gestapelten Zeilen wuerde das
-   Zahnrad abgeschnitten — deshalb hier Hoehe freigeben. */
 .sidebar.is-compact .profile-dock {
   flex-direction: column;
   gap: 0;
@@ -3625,51 +2843,37 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   min-height: 0;
   overflow: visible;
 }
-
 .sidebar.is-compact .profile-dock .profile-avatar {
   width: 20px;
   height: 20px;
   font-size: 13.5px;
 }
-
 .sidebar.is-compact .profile-dock-name {
   display: none;
 }
-
 .sidebar.is-compact .profile-dock-button {
   justify-content: center;
   width: 100%;
   padding: 0;
 }
-
 .sidebar.is-compact .profile-dock-gear {
   width: 100%;
   min-width: 0;
 }
-
 @media (prefers-reduced-motion: reduce) {
   .profile-dock-button {
     transition: none;
   }
 }
-
-/* Avatar-Menue: Ausloggen einen Klick vom Avatar entfernt (Freigabe 2026-07-17).
-   Oeffnet nach OBEN, weil das Dock am unteren Rand der Sidebar sitzt. */
 .profile-dock {
   position: relative;
 }
-
-/* position: fixed + Anhaengen an <body> (siehe profile-dock-menu.js): Die Sidebar
-   hat overflow:hidden UND transform — beides wuerde das Menue abschneiden.
-   Die Koordinaten setzt das Modul beim Oeffnen. */
 .profile-dock-menu {
   position: fixed;
-  z-index: 80; /* ueber der Sidebar (z-index 70), sonst liegt das Menue dahinter */
+  z-index: 80;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  /* Feste Breite: Das Menue haengt am <body>, "100%" waere hier die Fensterbreite
-     (live gemessen: 885px statt 208px). */
   width: 232px;
   max-width: calc(100vw - 16px);
   padding: 6px;
@@ -3678,11 +2882,9 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: #1b1c1f;
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
 }
-
 .profile-dock-menu[hidden] {
   display: none;
 }
-
 .profile-dock-menu-head {
   display: flex;
   flex-direction: column;
@@ -3691,14 +2893,12 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 4px;
 }
-
 .profile-dock-menu-head strong {
   overflow: hidden;
   font-size: 15.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .profile-dock-menu-head span {
   overflow: hidden;
   color: rgba(246, 243, 238, 0.6);
@@ -3706,7 +2906,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .profile-dock-menu [role="menuitem"] {
   padding: 8px 10px;
   border: 0;
@@ -3718,31 +2917,22 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   font-size: 15.5px;
   text-align: left;
 }
-
 .profile-dock-menu [role="menuitem"]:hover,
 .profile-dock-menu [role="menuitem"]:focus-visible {
   background: rgba(255, 255, 255, 0.09);
   color: #f6f3ee;
   outline: none;
 }
-
-/* Ausloggen bleibt bewusst unauffaellig rot: erkennbar, aber kein Alarm. */
 .profile-dock-menu-logout {
   margin-top: 2px;
   border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 0 0 8px 8px !important;
   color: #ff9d9d !important;
 }
-
-
-/* Profil-Chip (93x42) und Zahnrad (34x36) waren die letzten beiden Ziele der
-   unteren Leiste unter 44 px. Beim Zahnrad fehlte auch Breite: es traegt nur
-   ein Symbol und wuchs deshalb nicht mit. Gemessen 2026-08-09 bei 375 px. */
 @media (max-width: 600px) {
   .profile-dock .profile-dock-button {
     min-height: 44px;
   }
-
   .profile-dock .profile-dock-gear {
     min-width: 44px;
     min-height: 44px;
@@ -3750,64 +2940,40 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 /* ---- chat-markdown.css ---- */
-/* smejj.com — Darstellung der gerenderten Chat-Antworten (public/chat-markdown.js).
-   Eigene Datei, weil public/styles.css per Ratchet-Baseline nicht wachsen darf.
-   Bewusst zurueckhaltend: Das Antwort-Design bleibt wie bisher, nur Auszeichnung
-   wird sichtbar (fett/kursiv/Code) statt als Sternchen. */
-
 .entry.assistant p {
   margin: 0 0 10px;
 }
-
 .entry.assistant p:last-child {
   margin-bottom: 0;
 }
-
 .entry.assistant strong {
   font-weight: 700;
 }
-
 .entry.assistant .chat-list {
   margin: 0 0 10px;
   padding-left: 20px;
 }
-
 .entry.assistant .chat-list li {
   margin: 2px 0;
 }
-
-/* Links aus chat-markdown.js (Betreiber-Auftrag 2026-08-03: klickbar).
-   currentColor + Unterstrich: bleibt in hell und dunkel lesbar, kein neuer Farbwert. */
 .entry.assistant .chat-link {
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-
 .entry.assistant .chat-link:hover {
   opacity: 0.8;
 }
-
-/* Tabellen aus chat-markdown.js (Befund 2026-08-13: sieben echte Angebote
-   standen als "| # | Lage | …" im Chat, weil der Renderer keine Tabellen
-   kannte). Ohne diese Regeln stehen die Spalten zwar richtig, kleben aber
-   aneinander — "225 sq ft700 $" war live lesbar.
-
-   Bewusst ohne neue Farbwerte: currentColor mit niedriger Deckkraft traegt in
-   hell UND dunkel, genau wie beim Link darueber. */
 .entry.assistant .chat-table-wrap {
-  /* Eine breite Tabelle darf nie den ganzen Chat seitlich verschieben. */
   overflow-x: auto;
   margin: 10px 0;
   -webkit-overflow-scrolling: touch;
 }
-
 .entry.assistant .chat-table {
   border-collapse: collapse;
   width: 100%;
   font-size: 0.95em;
 }
-
 .entry.assistant .chat-table th,
 .entry.assistant .chat-table td {
   padding: 7px 12px;
@@ -3815,26 +2981,17 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   vertical-align: top;
   border-bottom: 1px solid rgba(127, 127, 127, 0.25);
 }
-
 .entry.assistant .chat-table th {
   font-weight: 600;
   white-space: nowrap;
   border-bottom-width: 2px;
 }
-
-/* Zebra hilft beim Wandern entlang einer langen Zeile — sechs Spalten mit
-   Adresse, Flaeche und Preis sind sonst schwer zu verfolgen. */
 .entry.assistant .chat-table tbody tr:nth-child(even) {
   background: rgba(127, 127, 127, 0.06);
 }
-
 .entry.assistant .chat-table tbody tr:last-child td {
   border-bottom: none;
 }
-
-/* Schimmernder Bild-Platzhalter, waehrend der Bild-Maler arbeitet
-   (chat-stream.js legt ihn an und entfernt ihn bei "fertig"). Bewusst in
-   Bildgroesse: der Nutzer sieht, WO sein Bild entsteht — statt Stapel-Zeilen. */
 .entry.assistant .chat-bild-platzhalter {
   width: min(100%, 512px);
   aspect-ratio: 1 / 1;
@@ -3844,19 +3001,12 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background-size: 200% 100%;
   animation: chat-bild-schimmer 1.6s linear infinite;
 }
-
 @keyframes chat-bild-schimmer {
   to { background-position: -200% 0; }
 }
-
-/* Bewegung nur, wenn der Nutzer sie nicht abbestellt hat. */
 @media (prefers-reduced-motion: reduce) {
   .entry.assistant .chat-bild-platzhalter { animation: none; }
 }
-
-/* Erzeugte Bilder aus chat-markdown.js (Bilder-Zeichnen 2026-08-12).
-   Nur data:-URLs der eigenen Bruecke; volle Breite bis 512 px, damit ein
-   1024er-Bild die Chatspalte nicht sprengt. */
 .entry.assistant .chat-image {
   display: block;
   max-width: min(100%, 512px);
@@ -3864,9 +3014,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   margin: 4px 0 10px;
   border-radius: 12px;
 }
-
-/* Erzeugte Videos aus chat-markdown.js (Video-Erstellung 2026-08-12).
-   Ersetzt ![video](URL) durch einen interaktiven HTML5-Player. */
 .entry.assistant .chat-video {
   display: block;
   width: 100%;
@@ -3878,7 +3025,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
-
 .entry.assistant code {
   padding: 1px 5px;
   border-radius: 5px;
@@ -3886,7 +3032,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.92em;
 }
-
 .entry.assistant .chat-code {
   margin: 0 0 10px;
   padding: 10px 12px;
@@ -3895,42 +3040,19 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
 }
-
 .entry.assistant .chat-code code {
   padding: 0;
   background: none;
   white-space: pre;
 }
-
-/* Kopieren-Knopf am Codeblock (public/chat-code-copy.js).
-   Der Wrapper traegt die Positionierung, damit das <pre> seinen
-   horizontalen Ueberlauf behaelt und der Knopf beim Scrollen stehen bleibt. */
 .chat-code-wrap {
   position: relative;
   margin: 0 0 10px;
 }
-
-/* Spezifitaet mit `.entry.assistant` davor, sonst gewinnt die Grundregel
-   `.entry.assistant .chat-code { padding: 10px 12px }` weiter oben und der Knopf
-   legt sich ueber die erste Codezeile. Live gemessen 2026-07-29: 17 px
-   Ueberlappung, sichtbar erst bei langen Zeilen. */
 .entry.assistant .chat-code-wrap .chat-code {
   margin: 0;
-  /* Platz fuer den Knopf. Der Wert haengt an seiner Hoehe und wird bei
-     praezisem Zeigegeraet unten mitverkleinert. */
   padding-top: 52px;
 }
-
-/* Zwei Regeln aus dem Projektstandard, beide keine Kosmetik:
-
-   1. NICHT an :hover haengen. Eine reine Hover-Bedienung existiert fuer
-      Tastatur-, Touch- und Screenreader-Nutzer nicht (WCAG 2.1.1). Der Knopf
-      ist immer da, nur zurueckhaltend gefaerbt.
-   2. styles.css setzt projektweit `button { min-height: 42px }` als Touch-Ziel.
-      Das bleibt die Voreinstellung — nur wo ein praezises Zeigegeraet vorhanden
-      ist, wird der Knopf kompakt. Browser ohne pointer-Abfrage behalten das
-      groessere, sichere Ziel. Gemessen 2026-07-29 auf 375 px: ohne diese Regel
-      mass der Knopf 31x23 px. */
 .chat-code-copy {
   position: absolute;
   top: 5px;
@@ -3953,12 +3075,10 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   cursor: pointer;
   transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
 }
-
 @media (pointer: fine) {
   .entry.assistant .chat-code-wrap .chat-code {
     padding-top: 37px;
   }
-
   .chat-code-copy {
     min-width: 0;
     min-height: 26px;
@@ -3966,43 +3086,32 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     font-size: 13.5px;
   }
 }
-
-/* Beschriftung aus CSS, NICHT als Textknoten: chat-store.js speichert
-   entry.textContent und chat-history-context.js baut daraus den Modellkontext —
-   ein geschriebenes "Kopieren" waere mitten im Code gelandet. */
 .chat-code-copy::after {
   content: "Kopieren";
 }
-
 .chat-code-copy.is-done::after {
   content: "Kopiert";
 }
-
 .chat-code-wrap:hover .chat-code-copy,
 .chat-code-wrap:focus-within .chat-code-copy {
   color: rgba(246, 243, 238, 0.85);
 }
-
 .chat-code-copy:hover,
 .chat-code-copy:focus-visible {
   border-color: rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.1);
   color: #f6f3ee;
 }
-
 .chat-code-copy:focus-visible {
   outline: 2px solid var(--menu-icon-active-color, #00ffef);
   outline-offset: 1px;
 }
-
 .chat-code-copy.is-done {
   color: #7fe0a8;
 }
-
 .chat-code-copy-icon {
   display: inline-flex;
 }
-
 .chat-code-copy svg {
   width: 13px;
   height: 13px;
@@ -4012,40 +3121,28 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-
-/* Schmale Geraete: nur das Symbol. Mit Beschriftung frisst der Knopf sonst die
-   halbe Breite des Codeblocks. Der Name bleibt ueber aria-label erhalten. */
 @media (max-width: 430px) {
   .chat-code-copy::after {
     content: none;
   }
 }
-
 .entry.assistant[data-thinking="true"] {
   color: rgba(255, 255, 255, 0.65);
   font-style: italic;
   padding: 6px 10px;
 }
-
 .thinking-dots .dot {
   animation: thinkingDot 1.4s infinite ease-in-out both;
   display: inline-block;
   margin-left: 1px;
 }
-
 .thinking-dots .dot:nth-child(1) { animation-delay: 0s; }
 .thinking-dots .dot:nth-child(2) { animation-delay: 0.2s; }
 .thinking-dots .dot:nth-child(3) { animation-delay: 0.4s; }
-
 @keyframes thinkingDot {
   0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
   40% { opacity: 1; transform: scale(1.2); }
 }
-
-/* --- Arbeitsschritte waehrend der Antwort (Befund 2026-08-04) ------------
-   Der Nutzer sah sekundenlang nichts, waehrend im Hintergrund gesucht wurde,
-   und hielt die Antwort fuer beendet. Diese Liste macht die Arbeit sichtbar.
-   Bewusst zurueckhaltend: sie ist Beiwerk, nicht die Antwort. */
 .chat-schritte {
   display: flex;
   flex-direction: column;
@@ -4054,46 +3151,30 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   opacity: 0.78;
   padding-block: 2px;
 }
-
 .chat-schritt {
   display: flex;
   align-items: baseline;
   gap: 6px;
   line-height: 1.6;
-  /* Lange Suchbegriffe duerfen die Zeile nicht sprengen. */
   overflow-wrap: anywhere;
 }
-
 .chat-schritt-stand {
   white-space: nowrap;
   opacity: 0.72;
 }
-
-/* Ein laufender Schritt pulsiert leicht — der Unterschied zu "fertig" muss
-   auch ohne Farbe erkennbar sein (der Haken traegt die Aussage). */
 .chat-schritt[data-zustand="laeuft"] .chat-schritt-stand {
   animation: chat-schritt-puls 1.4s ease-in-out infinite;
 }
-
 .chat-schritt[data-zustand="fertig"] {
   opacity: 0.9;
 }
-
 @keyframes chat-schritt-puls {
   0%, 100% { opacity: 0.45; }
   50% { opacity: 0.95; }
 }
-
-/* Bewegung nur, wenn der Nutzer sie nicht abbestellt hat. */
 @media (prefers-reduced-motion: reduce) {
   .chat-schritt[data-zustand="laeuft"] .chat-schritt-stand { animation: none; }
 }
-
-/* Zitate und Hinweiskaesten (Befund 2026-08-13).
-   Der Renderer kannte "> Text" nicht — im Chat stand woertlich "&gt; Text",
-   bei JEDER Modellantwort mit Zitat und in der Video-Statusmeldung. Farben
-   kommen aus currentColor, damit heller und dunkler Modus ohne zweite Regel
-   funktionieren (Lehre: ::before-Unterbau traegt nie). */
 .entry.assistant .chat-zitat {
   margin: 10px 0;
   padding: 2px 0 2px 14px;
@@ -4101,7 +3182,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   opacity: 0.85;
   font-style: italic;
 }
-
 .entry.assistant .chat-hinweis {
   margin: 12px 0;
   padding: 10px 14px;
@@ -4110,7 +3190,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border-left-width: 3px;
   background: rgba(127, 127, 127, 0.08);
 }
-
 .entry.assistant .chat-hinweis-titel {
   font-weight: 600;
   font-size: 0.9em;
@@ -4118,9 +3197,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   margin-bottom: 4px;
   opacity: 0.9;
 }
-
-/* Die Art faerbt nur den linken Rand und den Titel — der Textkoerper bleibt
-   in der Vorlesefarbe, damit er auf beiden Hintergruenden lesbar ist. */
 .entry.assistant .chat-hinweis[data-art="note"] { border-left-color: #4a90d9; }
 .entry.assistant .chat-hinweis[data-art="note"] .chat-hinweis-titel { color: #4a90d9; }
 .entry.assistant .chat-hinweis[data-art="tip"] { border-left-color: #3fa66a; }
@@ -4133,52 +3209,24 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 .entry.assistant .chat-hinweis[data-art="caution"] .chat-hinweis-titel { color: #d9614a; }
 
 /* ---- chat-actions.css ---- */
-/* smejj.com — Aktionen pro Chat-Nachricht (2026-07-28).
- *
- * Wird ueber scripts/build/bundle-start-styles.mjs in start-styles.css
- * gebuendelt — kein zusaetzliches render-blockierendes Stylesheet
- * (Performance-Lock: die Startseite laedt genau EIN Stylesheet).
- *
- * Kernentscheidung gegenueber ChatGPT, Gemini und Claude: die Leiste haengt
- * NICHT an :hover. Sie ist immer da, nur zurueckhaltend gefaerbt, und wird bei
- * :hover UND :focus-within gleichermassen deutlich. Eine reine Hover-Leiste
- * existiert fuer Tastatur-, Touch- und Screenreader-Nutzer nicht (WCAG 2.1.1).
- * Gefaerbt wird ueber color, nie ueber opacity — opacity auf Text driftet je
- * Untergrund und trifft auch den Fokusring.
- */
-
 .msg-actions {
   position: relative;
   display: flex;
   align-items: center;
-  /* Umbrechen statt quetschen. Gemessen 2026-07-28 auf 375 px mit Touch-Maßen:
-     fuenf Aktionen, zwei Versionspfeile und das Label "Version 2 von 3" ergeben
-     rund 366 px und Flexbox schrumpfte die Knoepfe von 42 auf 37 px — unter das
-     Touch-Ziel des Projekts. Jetzt wandert der Versionswaehler in eine zweite
-     Zeile und die Knoepfe behalten ihre Groesse. */
   flex-wrap: wrap;
   gap: 0;
-  /* dicht unter der Textunterkante (Betreiber 2026-08-16: "fast mit
-     oberer Kante treffen"), klein und edel */
   margin: -7px 0 2px;
   max-width: min(980px, 100%);
 }
-
 .msg-actions.is-user {
   align-self: flex-end;
   margin-left: auto;
   justify-content: flex-end;
 }
-
-/* Groesse: styles.css setzt projektweit `button { min-height: 42px }` als
-   Touch-Ziel. Das bleibt die Voreinstellung — nur wo ein praezises Zeigegeraet
-   vorhanden ist, wird die Leiste kompakt (28 px, wie ChatGPT auf dem Desktop).
-   Browser ohne pointer-Abfrage behalten das groessere, sichere Ziel. */
 .msg-act {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* Nie schrumpfen: ein Touch-Ziel, das sich der Zeile anpasst, ist keins. */
   flex: 0 0 auto;
   width: 42px;
   height: 42px;
@@ -4191,23 +3239,19 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   cursor: pointer;
   transition: color 120ms ease, background-color 120ms ease;
 }
-
 .msg-actions:hover .msg-act,
 .msg-actions:focus-within .msg-act {
   color: rgba(246, 243, 238, 0.78);
 }
-
 .msg-act:hover,
 .msg-act:focus-visible {
   background: rgba(255, 255, 255, 0.08);
   color: #f6f3ee;
 }
-
 .msg-act:focus-visible {
   outline: 2px solid var(--menu-icon-active-color, #00ffef);
   outline-offset: 1px;
 }
-
 .msg-act svg {
   width: 15px;
   height: 15px;
@@ -4217,27 +3261,20 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-
 .msg-act.is-active {
   color: var(--menu-icon-active-color, #00ffef);
 }
-
 .msg-act.is-done {
   color: #7fe0a8;
 }
-
 .msg-act:disabled {
   color: rgba(246, 243, 238, 0.24);
   cursor: default;
 }
-
 .msg-actions:hover .msg-act:disabled,
 .msg-actions:focus-within .msg-act:disabled {
   color: rgba(246, 243, 238, 0.24);
 }
-
-/* Uhrzeit am Zeilenende wie ZCode (chat-actions.js syncZeit) — reine
-   Anzeige, kein Knopf. */
 .msg-zeit {
   margin-left: 6px;
   font-size: 11.5px;
@@ -4245,55 +3282,33 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-
-/* Versionswaehler: lesbares Label statt zwei namenloser Pfeile. */
 .msg-versions {
   display: inline-flex;
   align-items: center;
   gap: 1px;
   margin-left: 6px;
 }
-
 .msg-version-step {
   width: 34px;
   height: 34px;
   min-height: 34px;
 }
-
 .msg-version-step svg {
   width: 15px;
   height: 15px;
 }
-
 @media (pointer: fine) {
   .msg-act {
     width: 26px;
     height: 26px;
     min-height: 26px;
   }
-
   .msg-version-step {
     width: 22px;
     height: 22px;
     min-height: 22px;
   }
 }
-
-/* Schmale Schirme: 44x44 statt 42x42 (Apple HIG und Material nennen 44 bzw.
-   48 dp als Untergrund; 42 war knapp darunter). Gemessen 2026-08-09 live bei
-   375 px mit Geraete-Emulation: alle Aktionsknoepfe lagen bei 42x42.
-
-   Zwei Fallen, die den Selektor erklaeren:
-   1. app-surfaces.css setzt unterhalb 760 px `.premium-view button { width:
-      100% }` (Spezifitaet 0,1,1). Eine blosse `.msg-act`-Klassenregel (0,1,0)
-      verliert dagegen. Darum ein ID-Anker plus eine doppelt gewichtete
-      Klassenvariante fuer Leisten ausserhalb von #startLog.
-   2. Der Desktop soll unveraendert bleiben. Ein schmales Fenster AM RECHNER
-      hat aber pointer: fine — ohne die zweite Abfrage wuerde die neue, hoeher
-      gewichtete Regel die kompakten 28 px ueberschreiben. Deshalb wird der
-      Maus-Fall darunter ausdruecklich wiederhergestellt.
-   Die Versionspfeile gehen mit (waren 34 px): sie stehen in derselben Leiste
-   und werden mit demselben Daumen getroffen. */
 @media (max-width: 600px) {
   #startLog .msg-act,
   .msg-actions .msg-act.msg-act {
@@ -4302,7 +3317,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     min-height: 44px;
   }
 }
-
 @media (max-width: 600px) and (pointer: fine) {
   #startLog .msg-act,
   .msg-actions .msg-act.msg-act {
@@ -4310,10 +3324,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     height: 28px;
     min-height: 28px;
   }
-
-  /* Die Pfeile sind mit Maus kleiner als die Aktionen. Der ID-Anker muss hier
-     doppelt gewichtet sein: `#startLog .msg-act` (1,1,0) wuerde eine blosse
-     Klassenregel fuer die Pfeile sonst schlagen, obwohl sie spaeter steht. */
   #startLog .msg-version-step.msg-version-step,
   .msg-actions .msg-version-step.msg-version-step.msg-version-step {
     width: 22px;
@@ -4321,19 +3331,12 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     min-height: 22px;
   }
 }
-
 .msg-version-label {
   font-size: 14.5px;
   line-height: 1;
   white-space: nowrap;
   color: rgba(246, 243, 238, 0.62);
 }
-
-/* Ueberlaufmenue.
-   Liegt am BODY und ist am Viewport ausgerichtet, nicht in der Leiste:
-   #startLog hat overflow: auto und schnitt das Menue an seiner Kante ab (Live-
-   Befund 2026-07-28 — bei der ersten Antwort passte es weder darunter noch
-   darueber). Position setzt chat-actions.js beim Oeffnen. */
 .msg-menu {
   position: fixed;
   top: 0;
@@ -4346,7 +3349,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   background: #1b1c1f;
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.46);
 }
-
 .msg-menu-head {
   margin: 0;
   padding: 6px 10px 8px;
@@ -4354,7 +3356,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   line-height: 1.3;
   color: rgba(246, 243, 238, 0.52);
 }
-
 .msg-menu-item {
   display: flex;
   align-items: center;
@@ -4370,30 +3371,24 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   text-align: left;
   cursor: pointer;
 }
-
 .msg-menu-item:hover,
 .msg-menu-item:focus-visible {
   background: rgba(255, 255, 255, 0.09);
 }
-
 .msg-menu-item:focus-visible {
   outline: 2px solid var(--menu-icon-active-color, #00ffef);
   outline-offset: -2px;
 }
-
 .msg-menu-item.is-danger {
   color: #ff9c90;
 }
-
 .msg-menu-icon {
   display: inline-flex;
   color: rgba(246, 243, 238, 0.62);
 }
-
 .msg-menu-item.is-danger .msg-menu-icon {
   color: #ff9c90;
 }
-
 .msg-menu-icon svg {
   width: 17px;
   height: 17px;
@@ -4403,19 +3398,14 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-
 .msg-menu-line {
   height: 1px;
   margin: 5px 8px;
   background: rgba(255, 255, 255, 0.12);
 }
-
-/* Bearbeiten: der Editor liegt NEBEN der Nachricht, nicht darin — sonst
-   landete der Eingabe-Zustand im gespeicherten Verlauf. */
 .entry.is-editing {
   display: none;
 }
-
 .msg-editor {
   align-self: flex-end;
   width: min(980px, 100%);
@@ -4425,7 +3415,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border-radius: 10px;
   background: rgba(94, 173, 235, 0.12);
 }
-
 .msg-editor-field {
   display: block;
   width: 100%;
@@ -4440,12 +3429,10 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   line-height: 1.65;
   resize: vertical;
 }
-
 .msg-editor-field:focus-visible {
   outline: 2px solid var(--menu-icon-active-color, #00ffef);
   outline-offset: 1px;
 }
-
 .msg-editor-row {
   display: flex;
   align-items: center;
@@ -4454,17 +3441,14 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   gap: 10px;
   margin-top: 8px;
 }
-
 .msg-editor-note {
   font-size: 14.5px;
   color: rgba(246, 243, 238, 0.64);
 }
-
 .msg-editor-buttons {
   display: inline-flex;
   gap: 6px;
 }
-
 .msg-editor-button {
   padding: 5px 11px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -4475,23 +3459,17 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   font-size: 15.5px;
   cursor: pointer;
 }
-
 .msg-editor-button:hover {
   background: rgba(255, 255, 255, 0.08);
 }
-
 .msg-editor-button.is-primary {
   border-color: rgba(94, 173, 235, 0.7);
   color: #dcecfa;
 }
-
 .msg-editor-button:focus-visible {
   outline: 2px solid var(--menu-icon-active-color, #00ffef);
   outline-offset: 1px;
 }
-
-/* Quellen einer Antwort. Wie Leiste und Editor ein Geschwister der Nachricht,
-   damit die Adressen nicht im gespeicherten Verlauf und im Modellkontext landen. */
 .msg-sources {
   max-width: min(980px, 100%);
   margin: 0 0 6px;
@@ -4500,7 +3478,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.04);
 }
-
 .msg-sources-head {
   display: flex;
   align-items: center;
@@ -4510,7 +3487,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   font-size: 14.5px;
   color: rgba(246, 243, 238, 0.62);
 }
-
 .msg-sources-close {
   padding: 2px 8px;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -4522,50 +3498,40 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   min-height: 0;
   cursor: pointer;
 }
-
 .msg-sources-close:hover {
   background: rgba(255, 255, 255, 0.08);
 }
-
 .msg-sources-close:focus-visible {
   outline: 2px solid var(--menu-icon-active-color, #00ffef);
   outline-offset: 1px;
 }
-
 .msg-source {
   display: flex;
   flex-direction: column;
   gap: 1px;
   padding: 4px 0;
 }
-
 .msg-source + .msg-source {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
-
 .msg-source-url {
   color: #9ecbf0;
   font-size: 15.5px;
   text-decoration: none;
   overflow-wrap: anywhere;
 }
-
 .msg-source-url:hover {
   text-decoration: underline;
 }
-
 .msg-source-url:focus-visible {
   outline: 2px solid var(--menu-icon-active-color, #00ffef);
   outline-offset: 2px;
 }
-
 .msg-source-meta {
   font-size: 14.5px;
   color: rgba(246, 243, 238, 0.56);
   overflow-wrap: anywhere;
 }
-
-/* "Ab hier loeschen" ist umkehrbar — fuenf Sekunden lang. */
 .msg-undo {
   display: flex;
   align-items: center;
@@ -4579,7 +3545,6 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   font-size: 15.5px;
   color: rgba(246, 243, 238, 0.86);
 }
-
 .msg-undo-button {
   padding: 4px 10px;
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -4590,36 +3555,29 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   font-size: 15.5px;
   cursor: pointer;
 }
-
 .msg-undo-button:hover {
   background: rgba(255, 255, 255, 0.09);
 }
-
 .msg-undo-button:focus-visible {
   outline: 2px solid var(--menu-icon-active-color, #00ffef);
   outline-offset: 1px;
 }
-
 @media (max-width: 560px) {
   .msg-menu {
     min-width: 208px;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   .msg-act {
     transition: none;
   }
 }
-
-/* Riesen-Einfuegung als Anhang-Chip (Konkurrenz-Radar V1, 2026-08-06) */
 .paste-attach-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   padding: 10px 12px 0;
 }
-
 .paste-attach-chip {
   display: inline-flex;
   align-items: center;
@@ -4633,13 +3591,11 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   font-size: 16.5px;
   line-height: 1.2;
 }
-
 .paste-attach-label {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-
 .paste-attach-restore,
 .paste-attach-remove {
   border: 0;
@@ -4649,19 +3605,14 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   cursor: pointer;
   padding: 2px 4px;
 }
-
 .paste-attach-restore:hover,
 .paste-attach-remove:hover {
   color: rgba(246, 243, 238, 0.95);
 }
-
 .paste-attach-remove {
   font-size: 21px;
   line-height: 1;
 }
-
-/* Die Eintraege des Ueberlaufmenues waren 209x42 — zwei Pixel unter dem Ziel
-   (Polster 7 px plus 13-px-Zeile). Gemessen 2026-08-09 bei 375 px. */
 @media (max-width: 600px) {
   .msg-menu .msg-menu-item {
     min-height: 44px;
@@ -4669,30 +3620,21 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
 }
 
 /* ---- search-overlay.css ---- */
-/* Such-Overlay (Cmd+K) — eigene Datei, weil public/styles.css am
-   Ratchet-Limit (1589 Zeilen) eingefroren ist (scripts/check-guidelines.mjs).
-   Farben folgen dem Cyan-Cockpit (design-cyan.css), aber mit eigenen Werten:
-   die --design-*-Variablen leben dort im Scope .premium-view und sind hier
-   nicht verfuegbar. */
-
 .search-overlay {
   position: fixed;
   inset: 0;
-  z-index: 80; /* ueber Sidebar (70) und Modellmenue (60) */
+  z-index: 80;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding: min(12vh, 96px) 16px 16px;
 }
-
 .search-overlay[hidden] {
   display: none;
 }
-
 body.search-overlay-open {
   overflow: hidden;
 }
-
 .search-overlay-backdrop {
   position: absolute;
   inset: 0;
@@ -4700,7 +3642,6 @@ body.search-overlay-open {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
-
 .search-overlay-panel {
   position: relative;
   display: grid;
@@ -4708,25 +3649,23 @@ body.search-overlay-open {
   width: min(680px, 100%);
   max-height: min(72vh, 640px);
   overflow: hidden;
-  border: 1px solid rgba(45, 212, 191, 0.58);
+  border: 1px solid rgba(50, 246, 234, 0.58);
   border-radius: 14px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.065), rgba(45, 212, 191, 0.025) 42%, transparent 70%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.065), rgba(50, 246, 234, 0.025) 42%, transparent 70%),
     rgba(19, 24, 33, 0.97);
   box-shadow:
-    0 0 24px rgba(45, 212, 191, 0.28),
+    0 0 24px rgba(50, 246, 234, 0.28),
     0 24px 64px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(126, 232, 218, 0.22);
 }
-
 .search-overlay-form {
   display: flex;
   gap: 8px;
   align-items: center;
   padding: 8px 10px;
-  border-bottom: 1px solid rgba(45, 212, 191, 0.26);
+  border-bottom: 1px solid rgba(50, 246, 234, 0.26);
 }
-
 .search-overlay-form input {
   flex: 1;
   min-width: 0;
@@ -4737,15 +3676,13 @@ body.search-overlay-open {
   color: #f6f3ee;
   font-size: 17px;
 }
-
 .search-overlay-form input::placeholder {
   color: rgba(151, 158, 171, 0.78);
 }
-
 .search-overlay-close {
   min-width: 44px;
   min-height: 44px;
-  border: 1px solid rgba(45, 212, 191, 0.32);
+  border: 1px solid rgba(50, 246, 234, 0.32);
   border-radius: 10px;
   background: rgba(6, 10, 16, 0.82);
   color: rgba(126, 232, 218, 0.9);
@@ -4753,7 +3690,6 @@ body.search-overlay-open {
   font-weight: 700;
   cursor: pointer;
 }
-
 .search-overlay-log {
   overflow-y: auto;
   display: grid;
@@ -4761,12 +3697,10 @@ body.search-overlay-open {
   gap: 10px;
   padding: 8px;
 }
-
 .search-overlay-group {
   display: grid;
   gap: 2px;
 }
-
 .search-overlay-group h3 {
   margin: 0;
   padding: 6px 10px 4px;
@@ -4776,7 +3710,6 @@ body.search-overlay-open {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-
 .search-overlay-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -4792,21 +3725,18 @@ body.search-overlay-open {
   font: inherit;
   cursor: pointer;
 }
-
 .search-overlay-row .row-title {
   overflow: hidden;
   font-weight: 600;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-
 .search-overlay-row .row-meta {
   align-self: center;
   color: rgba(151, 158, 171, 0.85);
   font-size: 12px;
   white-space: nowrap;
 }
-
 .search-overlay-row .row-detail {
   grid-column: 1 / -1;
   overflow: hidden;
@@ -4815,35 +3745,29 @@ body.search-overlay-open {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-
-/* Maus-Hover und Tastatur-Auswahl sehen gleich aus — es gibt EINE Markierung. */
 .search-overlay-row.is-active {
-  border-color: rgba(45, 212, 191, 0.4);
-  background: rgba(45, 212, 191, 0.14);
+  border-color: rgba(50, 246, 234, 0.4);
+  background: rgba(50, 246, 234, 0.14);
 }
-
 .search-overlay-log mark {
   border-radius: 3px;
   padding: 0 1px;
   background: rgba(50, 246, 234, 0.3);
   color: #eafffb;
 }
-
 .search-overlay-empty {
   padding: 14px;
   color: rgba(246, 243, 238, 0.72);
 }
-
 .search-overlay-hints {
   display: flex;
   gap: 16px;
   margin: 0;
   padding: 8px 12px;
-  border-top: 1px solid rgba(45, 212, 191, 0.2);
+  border-top: 1px solid rgba(50, 246, 234, 0.2);
   color: rgba(151, 158, 171, 0.85);
   font-size: 12px;
 }
-
 .search-overlay-hints kbd {
   display: inline-block;
   min-width: 18px;
@@ -4857,29 +3781,19 @@ body.search-overlay-open {
   font-size: 11px;
   text-align: center;
 }
-
 @media (max-width: 560px) {
   .search-overlay {
     padding: 8px;
   }
-
   .search-overlay-panel {
     max-height: calc(100dvh - 16px);
   }
-
   .search-overlay-hints {
-    display: none; /* Tastatur-Hinweise nuetzen auf dem Handy nichts */
+    display: none;
   }
 }
 
 /* ---- start-glass.css ---- */
-/* smejj.com — Glas-Startseite (Screen 1), Freigabe:
-   docs/approvals/2026-08-13-startseite-glas-design-freigabe.md
-   Laedt NACH dem start-styles-Buendel und ueberschreibt nur Screen 1.
-   styles.css bleibt unangetastet (Ratchet 1589). */
-
-/* ── Leerer Zustand: Begruessung + Kapsel mittig ─────────────────── */
-
 #start:not(.has-start-chat) .home-feed {
   display: flex;
   flex-direction: column;
@@ -4888,62 +3802,51 @@ body.search-overlay-open {
   gap: clamp(18px, 3vh, 26px);
   padding: 24px 16px;
   background:
-    radial-gradient(820px 520px at 18% -12%, rgba(45, 212, 191, 0.13), transparent 62%),
+    radial-gradient(820px 520px at 18% -12%, rgba(50, 246, 234, 0.13), transparent 62%),
     radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
     linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%);
 }
-
 #start:not(.has-start-chat) .home-hero {
   display: block;
   min-height: 0;
   padding: 0 16px;
 }
-
 #start:not(.has-start-chat) .home-hero h2 {
   font-size: clamp(22px, 2.6vw, 30px);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
-
 .home-hero .start-markenwort {
   color: #35e0d0;
-  text-shadow: 0 0 18px rgba(45, 212, 191, 0.35);
+  text-shadow: 0 0 18px rgba(50, 246, 234, 0.35);
 }
-
-/* ── Eingabe-Kapsel: Glas statt Kante — gilt in beiden Zustaenden ── */
-
 .prompt-glass {
   width: min(760px, calc(100% - 24px));
   margin: 0 auto;
   border: 1px solid rgba(126, 232, 218, 0.32);
-  /* Betreiber-Regel 2026-08-13: das gesamte Design ist viereckig. */
   border-radius: 0;
   padding: 6px 10px 6px;
   background:
-    linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(45, 212, 191, 0.03) 46%, transparent 72%),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(50, 246, 234, 0.03) 46%, transparent 72%),
     rgba(17, 23, 30, 0.62);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 0 26px rgba(45, 212, 191, 0.14),
+    0 0 26px rgba(50, 246, 234, 0.14),
     0 14px 40px rgba(0, 0, 0, 0.42);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
   backdrop-filter: blur(22px) saturate(150%);
 }
-
 .prompt-glass:focus-within {
   border-color: rgba(50, 246, 234, 0.62);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 0 34px rgba(45, 212, 191, 0.26),
+    0 0 34px rgba(50, 246, 234, 0.26),
     0 14px 40px rgba(0, 0, 0, 0.42);
 }
-
-/* Laufender Chat: Kapsel bleibt Kapsel, nur breiter und unten angedockt. */
 #start.has-start-chat .prompt-glass {
   width: min(980px, calc(100% - 20px));
   margin: 0 auto 10px;
 }
-
 .prompt-glass textarea {
   height: auto;
   min-height: 44px;
@@ -4951,202 +3854,106 @@ body.search-overlay-open {
   font-size: 16.5px;
   line-height: 1.5;
 }
-
 .prompt-actions {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
-
-/* Werkzeugleiste gruppieren (Betreiber-Befund 2026-08-13: "smejj 1.0" schwebte
-   allein in der Mitte, die Luecke wirkte unfertig). Links steht, WAS ich
-   schicke (Anhang + Modell), rechts, WIE es rausgeht (Diktat, Sprache,
-   Senden) — dieselbe Aufteilung wie bei ChatGPT.
-   Bewusst nur per `order`: das Markup in index.html bleibt unangetastet, die
-   Reihenfolge fuer Tastatur und Screenreader also auch. */
 .prompt-actions .plus-picker { order: 1; }
 .prompt-actions .model-picker { order: 2; }
 .prompt-actions .prompt-spacer { order: 3; }
 .prompt-actions [data-start-tool] { order: 4; }
 .prompt-actions .send-button { order: 5; }
-
-/* Vorlesen wohnt jetzt nur noch im Antwort-Menue („speak" in
-   chat-actions-menu.js) — der dritte Audio-Knopf verwirrte nur. */
 .prompt-glass [data-start-tool="speaker"] {
   display: none;
 }
-
-/* ── Beispiel-Chips: die Leerflaeche arbeitet ─────────────────────── */
-
 .start-chips {
   display: flex;
-  /* Umbruch BLEIBT erlaubt: auf schmalen Schirmen ist eine zweite Zeile
-     richtig; nowrap wuerde die Chips dort zusammenquetschen. */
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-  /* 760 px reichten fuer vier Chips. Mit dem fuenften ("Video generieren",
-     2026-08-14) brauchen sie 743 px NETTO — die 32 px Innenabstand kippten
-     damit genau einen Chip in die zweite Zeile. 940 px geben Luft, bewusst
-     mehr als die ~775 px, die Deutsch braucht: die Beschriftungen sind
-     uebersetzt, und "Générer des images" oder "Создать изображения" tragen
-     breiter auf. Die Eingabe-Kapsel darueber bleibt bei 760 px — die Chips
-     duerfen breiter stehen, sie sind kein Eingabefeld. */
   max-width: 940px;
   padding: 0 16px;
 }
-
 #start.has-start-chat .start-chips {
   display: none;
 }
-
 .start-chips button {
   min-height: 44px;
   padding: 10px 18px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  /* Betreiber-Regel 2026-08-13: das gesamte Design ist viereckig. */
   border-radius: 0;
   background: rgba(17, 23, 30, 0.5);
   color: rgba(200, 209, 218, 0.92);
-  /* 14 px statt 13,5: Betreiber-Regel "nie unter 14 px" (er liest ohne
-     Brille). Die Chips waren die letzte Stelle der Startseite darunter. */
   font-size: 14px;
   cursor: pointer;
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   transition: border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
 }
-
 .start-chips button:hover,
 .start-chips button:focus-visible {
   border-color: rgba(50, 246, 234, 0.5);
   color: #f0f6f5;
-  box-shadow: 0 0 16px rgba(45, 212, 191, 0.18);
+  box-shadow: 0 0 16px rgba(50, 246, 234, 0.18);
 }
-
-/* ── Rand-Icons: 44-px-Touchziele auch auf dem Desktop (2026-08-13) ──
-   Mobil (<600px) stehen die 44er schon im start-styles-Buendel; hier ziehen
-   Menue-, Browser- und Maus-Knopf auf allen Breiten nach. Doppelklasse gibt
-   Gewicht 0,2,0 wie beim Buendel-Vorbild. */
-
 .glass-icon.glass-icon {
   width: 44px;
   height: 44px;
   min-height: 44px;
 }
-
-/* Der Maus-Knopf traegt right:36px als Inline-Stil (CSP-Hash, index.html ist
-   Start-Lock) — mit 44-px-Knoepfen ueberlappt das den Browser-Knopf, darum
-   hier per !important daneben gesetzt: 48px = 44px Knopf + Luft. */
 #mausButton {
   right: calc(env(safe-area-inset-right) + 48px) !important;
 }
-
-/* Das Logo sass bei left:36px neben dem 28er-Menue-Knopf; der endet jetzt
-   bei 44. Gleicher Zug wie die Mobil-Regel im Buendel (left: +48px), und als
-   Klickziel waechst es selbst auf 44. */
 .app-brand-logo {
   left: calc(env(safe-area-inset-left) + 48px);
   width: 44px;
   height: 44px;
 }
-
 body[data-left-menu-state="expanded"] .app-brand-logo {
   height: 44px;
 }
-
-/* ── Mobil ────────────────────────────────────────────────────────── */
-
 @media (max-width: 600px) {
   #start:not(.has-start-chat) .home-hero h2 {
     font-size: 22px;
   }
-
   .prompt-glass {
     width: calc(100% - 16px);
   }
-
-  /* Auf kleinen Schirmen reichen zwei Chips. */
   .start-chips button:nth-child(n + 3) {
     display: none;
   }
 }
 
 /* ---- eckig.css ---- */
-/* smejj.com — Betreiber-Regel 2026-08-13: das GESAMTE Design ist viereckig.
-   (Eckig-Kontrolle ueber alle 17 Ansichten, Betreiber-Wahl
-   "Alles ausser Avatar".) EINE Regel statt ~200 Einzelkorrekturen in 20
-   Dateien; laedt als letztes Stylesheet und gewinnt per !important auch
-   gegen Inline-Stile. Wer kuenftig bewusst rundet, braucht hier eine
-   dokumentierte Ausnahme — genau so ist es gedacht. */
-
 *,
 *::before,
 *::after {
   border-radius: 0 !important;
 }
-
-/* Einzige freigegebene Ausnahme: Avatare bleiben Kreise (Betreiber-Wahl,
-   Branchenstandard). Profil-Knopf unten links + Anbieter-Kreise im
-   API-Schluessel-Bereich. */
 .profile-avatar,
 #settings .ak-avatar {
   border-radius: 999px !important;
 }
 
 /* ---- design-v11.css ---- */
-/* smejj.com — Design V11: eine Quelle fuer Farbe, Kante und Bewegung.
- * Freigabe des Betreibers vom 2026-08-15: "Du kannst V11 umsetzen ...
- * Ich gebe dir alle Rechte".
- *
- * Befund, der zu dieser Datei fuehrte (gemessen am 2026-08-14):
- * Cyan lag in SECHS Dateien verstreut und in DREI verschiedenen Toenen —
- * #2dd4bf, #32f6ea, #2fd4c9. Jede Farbaenderung zog sechs Nacharbeiten nach
- * sich, und irgendeine wurde vergessen. Ab hier gibt es genau einen Ton.
- *
- * Die eine Regel, die alles traegt:
- *   Glas ist die FLAECHE. Die Linie ist der TRENNER. Der Abstand ist die
- *   GRUPPE. Nie zwei davon am selben Element.
- *
- * Laedt als LETZTES im Buendel (nach eckig.css) und gewinnt darum bei
- * gleicher Spezifitaet. Bewusst nur Tokens und wenige Grundregeln — kein
- * Umbau einzelner Ansichten. Wer eine Ansicht anfasst, nimmt die Tokens.
- *
- * ACHTUNG Rundung: eckig.css setzt app-weit border-radius 0. Der Betreiber
- * hat am 2026-08-14 ausdruecklich "leichte Knick, aber sehr leicht"
- * verlangt — deshalb steht hier 8 px als bewusste, dokumentierte Ausnahme.
- */
-
 :root {
-  /* --- Farbe: EIN Cyanton --------------------------------------------- */
   --v11-cy: #32f6ea;
   --v11-cy-ink: #7ee8da;
   --v11-cy-line: rgba(50, 246, 234, 0.30);
   --v11-cy-line-on: rgba(50, 246, 234, 0.85);
   --v11-cy-glow: rgba(50, 246, 234, 0.10);
   --v11-cy-fill: rgba(50, 246, 234, 0.12);
-  /* Die Logofarbe aus public/icons/smejj_favicon.svg. Nur fuer das Zeichen
-     selbst — nie fuer Flaechen, sonst kippt der Kontrast. */
   --v11-marke: #02fdfd;
-
-  /* --- Kante und Flaeche ---------------------------------------------- */
   --v11-hair: rgba(255, 255, 255, 0.075);
   --v11-glas: rgba(255, 255, 255, 0.045);
   --v11-glas-2: rgba(255, 255, 255, 0.075);
-  /* iOS-Specular: der helle Strich NUR an der Oberkante. Das ist es, was
-     Glas zu Glas macht — nicht ein Rahmen ringsum. */
   --v11-lichtkante: rgba(255, 255, 255, 0.07);
-
-  /* --- Zustand: immer Farbe UND Wort im Markup ------------------------- */
   --v11-ok: #7ef0c2;
   --v11-warn: #ffd68a;
   --v11-bad: #ff9a9c;
-
-  /* --- Kante, Abstand, Bewegung ---------------------------------------- */
-  --v11-r: 8px;      /* der "leichte Knick" */
+  --v11-r: 8px;
   --v11-r-sm: 6px;
-  --v11-takt: 160ms; /* EINE Dauer fuer alles */
+  --v11-takt: 160ms;
 }
-
-/* --- Eine Bewegungsdauer ---------------------------------------------- */
 @media (prefers-reduced-motion: no-preference) {
   .ghost-button,
   .send-button,
@@ -5159,10 +3966,6 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
       color var(--v11-takt) ease;
   }
 }
-
-/* --- Der leichte Knick -------------------------------------------------
- * Bewusste Ausnahme zu eckig.css (Betreiber-Ansage 2026-08-14). Bewusst
- * eng gefasst: nur Bedienelemente und Flaechen, nicht "alles". */
 .prompt-glass,
 .plus-menu,
 .model-menu,
@@ -5172,16 +3975,9 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 .text-chip {
   border-radius: var(--v11-r) !important;
 }
-
-/* Rund bleibt nur der eine Hauptknopf — und Avatare (Regel aus eckig.css). */
 .send-button {
   border-radius: 999px !important;
 }
-
-/* --- Der Hauptknopf: leer = Sprache, getippt = senden -------------------
- * Die Zustaende setzt composer-sendetaste.js. Hier steht nur, wie sie
- * aussehen. Weiss fuer "senden" (wie ChatGPT), Cyan-Fuellung fuer
- * "Sprachmodus" — zwei Rollen, zwei Farben, nie dieselbe. */
 .send-button {
   background: #ffffff;
   color: #0a0f16;
@@ -5194,14 +3990,10 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   color: var(--v11-cy);
   box-shadow: inset 0 0 0 1px var(--v11-cy-line-on), 0 0 18px var(--v11-cy-glow);
 }
-/* Die Miniatur-Welle ist gefuellt, nicht gestrichelt — duenne Striche
-   verschluckt der Browser bei 18 px. */
 .send-button .sendetaste-welle rect {
   fill: currentColor;
   stroke: none;
 }
-
-/* --- Glas: Flaeche plus Lichtkante oben, KEIN Rahmen ringsum ----------- */
 .prompt-glass {
   background: var(--v11-glas);
   -webkit-backdrop-filter: blur(30px) saturate(160%);
@@ -5210,17 +4002,11 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   border: 0;
 }
 .prompt-glass:focus-within {
-  /* Betreiber 2026-08-16: Raender leuchten nur noch leise — Augen schonen. */
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
     0 0 0 1px var(--v11-cy-line),
     0 0 12px var(--v11-cy-glow);
 }
-
-/* Menues schweben: staerkeres Glas, damit der Text darunter nicht stoert.
-   #profileDockMenu dabei (Betreiber 2026-08-16: "Profil-Menue soll auch
-   Glas Edel aussehen") — mit !important, weil die Runtime-CSS der
-   Premium-Flaechen nach dem Buendel laedt und sonst gewinnt. */
 #profileDockMenu {
   background: rgba(14, 20, 28, 0.78) !important;
   -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
@@ -5243,10 +4029,6 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
     0 0 0 1px var(--v11-cy-line);
   border: 0;
 }
-
-/* --- Rahmen raus, Haarstrich rein --------------------------------------
- * Befund des Betreibers: "so viele Rahmen stoehnen mich auch". Ein Rahmen
- * trennt; wenn alles getrennt ist, gehoert nichts zusammen. */
 .start-chips button,
 .ghost-button,
 .text-chip {
@@ -5259,10 +4041,6 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 .text-chip:hover {
   background: rgba(255, 255, 255, 0.09);
 }
-
-/* --- Zwei Schriftstaerken, nie 500 oder 600 ----------------------------
- * Das ist der halbe Grund, warum ChatGPT sauber wirkt: es gibt nur normal
- * und fett, nichts dazwischen. */
 .home-hero h2 {
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -5271,89 +4049,39 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 .text-chip {
   font-weight: 400;
 }
-
-/* --- Lesbarkeit: nichts unter 15 px, nichts blasser als 58 % -----------
- * Der Betreiber liest --sm-ink-faint nicht. Das ist gemessen, nicht
- * vermutet — deshalb hier als harte Untergrenze. */
 .start-chips button {
   font-size: 15px;
 }
-
-/* --- Das Schreibfeld am Telefon: EINE Zeile ----------------------------
- * Betreiber-Ansage 2026-08-14: "Am Handy: Soll auch Schreibfeld eine
- * Zeile sein."
- *
- * Vorher standen zwei Kaesten uebereinander — das Textfeld (44 px) und
- * darunter die Werkzeugleiste (min-height 64 px). Zusammen ueber 110 px
- * Hoehe, auf einem 812-px-Telefon ein Siebtel des Bildschirms fuer eine
- * Leiste, die man erst beim Tippen braucht.
- *
- * Der Trick ist `display: contents` auf .prompt-actions: die Leiste
- * verliert ihren eigenen Kasten (Rahmen, Polster, Mindesthoehe), ihre
- * Knoepfe werden direkte Flex-Kinder des Glases und stehen damit in
- * derselben Zeile wie das Textfeld. Kein Markup wird angefasst und kein
- * Knopf umgehaengt — die Menues von Plus und Modell haengen weiter an
- * ihren eigenen position:relative-Huellen und oeffnen an der richtigen
- * Stelle.
- *
- * Was in der Zeile steht:  [+] [Modell] [Textfeld] [Mikro] [Hauptknopf]
- *
- * Der Audio-Knopf verschwindet dabei NICHT als Funktion. Er ist am
- * Telefon nur nicht mehr doppelt: der Hauptknopf ist bei leerem Feld
- * selbst der Sprachknopf (composer-sendetaste.js klickt genau dieses
- * Element weiter, und ein programmatischer Klick geht auch auf ein
- * ausgeblendetes Element). Der Lautsprecher-Knopf war hier schon vorher
- * ausgeblendet (start-glass.css) — das ist kein neuer Verlust.
- *
- * 560 px als Grenze, weil styles.css und start-glass.css dieselbe Kante
- * benutzen. Eine zweite Kante daneben waere eine zweite Wahrheit. */
 @media (max-width: 560px) {
   .prompt-glass {
     display: flex;
-    /* flex-end, damit die Knoepfe unten bleiben, wenn das Textfeld bei
-       langem Text mehrzeilig wird. */
     align-items: flex-end;
     gap: 6px;
     padding: 6px 8px;
   }
-
-  /* Der Kasten der Leiste faellt weg, die Knoepfe bleiben. */
   .prompt-actions {
     display: contents;
   }
-
   .prompt-glass textarea {
     order: 3;
-    /* min-width:0 ist der Teil, den man vergisst: ohne ihn weigert sich
-       ein Flex-Kind zu schrumpfen und drueckt den Hauptknopf hinaus. */
     flex: 1 1 auto;
     min-width: 0;
     min-height: 40px;
     height: 40px;
     padding: 9px 4px;
   }
-
   .prompt-actions .plus-picker { order: 1; }
   .prompt-actions .model-picker { order: 2; }
   .prompt-actions [data-start-tool="voice"] { order: 4; }
   .prompt-actions .send-button { order: 5; }
-
-  /* Der Platzhalter schob die Knoepfe auseinander — in einer Zeile mit
-     dehnbarem Textfeld hat er keine Aufgabe mehr. */
   .prompt-actions .prompt-spacer { display: none; }
   .prompt-glass [data-start-tool="audio"] { display: none; }
-
-  /* Knoepfe duerfen nicht schrumpfen, sonst wird aus einem 34-px-Ziel
-     ein 12-px-Ziel, sobald der Text laenger wird. */
   .prompt-glass .plus-picker,
   .prompt-glass .model-picker,
   .prompt-glass [data-start-tool],
   .prompt-glass .send-button {
     flex: 0 0 auto;
   }
-
-  /* Der Modellname darf die Zeile nicht sprengen: bei 375 px bleiben dem
-     Textfeld sonst unter 100 px. 76 px reichen fuer "smejj 1.0". */
   .model-picker .text-chip {
     max-width: 76px;
     overflow: hidden;
@@ -5362,29 +4090,12 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
     font-size: 13px;
     padding: 0 8px;
   }
-
-  /* Am 2026-08-15 im echten Chrome nachgemessen: ohne diese Regel bricht
-     der Platzhalter "Beschreibe eine Aufgabe oder stelle eine Frage." in
-     dem 139 px schmalen Feld auf zwei Zeilen um, und die zweite Zeile
-     wird auf halber Hoehe abgeschnitten — das sieht kaputt aus. Mit
-     nowrap steht eine saubere Zeile, die am Rand endet.
-     Wichtig: das gilt NUR fuer den Platzhalter. Getippter Text bricht
-     weiter normal um, weil ::placeholder ein eigenes Pseudo-Element ist.
-     (text-overflow: ellipsis nimmt Chrome hier nicht an — gemessen,
-     nicht vermutet. Es bleibt bei einem harten Schnitt.) */
   .prompt-glass textarea::placeholder {
     white-space: nowrap;
     overflow: hidden;
     font-size: 14px;
   }
 }
-
-
-/* --- Die Vier-Gruppen-Spur (Mockup V11, Bildschirm 19) ------------------
- * Werte 1:1 aus dem Mockup-Endstand (.gruppe): 11 px Versalien mit weitem
- * Abstand. Das ist eine BEWUSSTE Ausnahme von der 15-px-Untergrenze oben:
- * die Beschriftung ist eine Gruppen-Ueberschrift, kein Inhalt — im Mockup
- * hat der Betreiber genau diese Anmutung abgenommen. */
 .nav-gruppe {
   padding: 16px 14px 4px;
   font-size: 11px;
@@ -5397,33 +4108,20 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 .nav .nav-gruppe:first-child {
   padding-top: 8px;
 }
-
-
-/* Live-Befund 2026-08-16 (Nachtlauf): Bei 760 px Fensterhoehe war die
-   Vier-Gruppen-Spur 61 px laenger als ihre Scroll-Flaeche — "KI-Modelle"
-   und "Speicher" lagen unsichtbar unter der Kante, der Kostenschutz-Fuss
-   darueber. Niedrige Fenster bekommen darum kompaktere Eintraege (alle
-   passen ohne Scrollen), und die Spur zeigt eine duenne Scroll-Leiste,
-   falls es doch einmal ueberlaeuft. */
 .sidebar .nav { scrollbar-width: thin; }
 @media (max-height: 840px) {
   .sidebar .nav-vier .nav-button { min-height: 30px; padding-top: 4px; padding-bottom: 4px; }
   .sidebar .nav-vier .nav-gruppe { padding-top: 6px; padding-bottom: 2px; }
 }
-
-/* --- Fusszeile der Spur: Kosten immer sichtbar (Mockup Bildschirm 19) --- */
 .nav-kosten {
   font-size: 13.5px;
 }
 .nav-kosten .button-icon {
   color: var(--v11-ok);
 }
-
-/* --- Die Brotkrume oben (Mockup .crumb: 14.5px, gedaempft) -------------- */
 .top-krume {
   position: fixed;
   top: 18px;
-  /* rechts neben dem Wortzeichen; das Logo ist ~150 px breit plus Rand */
   left: 210px;
   z-index: 30;
   font-size: 14.5px;
@@ -5440,9 +4138,6 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 @media (max-width: 720px) {
   .top-krume { display: none; }
 }
-
-
-/* --- Das Werkzeuge-Menue (Mockup "Alle Werkzeuge auf einmal") ----------- */
 .plus-menu-werkzeuge {
   min-width: 340px;
   max-width: 92vw;
@@ -5483,16 +4178,9 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   font-style: italic;
   color: var(--v11-cy-ink);
 }
-
-
-/* --- Die Start-Spur (Mockup Bildschirme 24/25/32) ----------------------
- * Zwei Spuren, eine sichtbar: .spur-start-aktiv (Koerperklasse aus
- * spur-start.js) blendet auf Start/Code die kompakte Spur ein und die
- * Vier-Gruppen-Spur aus — ueberall sonst umgekehrt. */
 .nav-start { display: none; }
 body.spur-start-aktiv .nav-start { display: flex; flex-direction: column; }
 body.spur-start-aktiv .nav-vier { display: none; }
-
 .spur-reiter {
   display: flex;
   gap: 4px;
@@ -5518,14 +4206,12 @@ body.spur-start-aktiv .nav-vier { display: none; }
   color: var(--v11-cy);
   box-shadow: inset 0 0 0 1px var(--v11-cy-line-on);
 }
-
 .nav-kuerzel {
   margin-left: auto;
   font-size: 11.5px;
   color: rgba(242, 245, 244, 0.45);
   letter-spacing: 0.06em;
 }
-
 .nav-start .spur-chat {
   font-size: 13.5px;
   overflow: hidden;
@@ -5538,9 +4224,6 @@ body.spur-start-aktiv .nav-vier { display: none; }
   color: var(--v11-cy-ink);
   font-size: 14px;
 }
-
-
-/* --- Bildschirm 32: Vorschlagzeilen, Chipreihe, Nachdenken-Pille -------- */
 .start-vorschlaege {
   flex-direction: column;
   align-items: stretch;
@@ -5559,14 +4242,8 @@ body.spur-start-aktiv .nav-vier { display: none; }
   padding: 10px 6px;
   font-size: 15.5px;
 }
-/* Betreiber 2026-08-15: "als Text mit Link, ohne Hintergrund, ohne Rahmen" —
-   beim Zeigen wird nur die Schrift heller, keine Flaeche. */
 .start-vorschlaege button:hover { background: transparent; color: #f2f5f4; }
 .start-vorschlaege button:last-child { border-bottom: 0; }
-
-/* Betreiber 2026-08-16: die Werkzeuge "nur als Icons, alle eine Zeile"
-   direkt unter dem Schreibfeld. Der Name bleibt als title/aria-label und
-   als Tooltip — das Wort daneben faellt weg. 44 px = Touch-Regel. */
 .start-chipreihe {
   flex-wrap: nowrap;
   justify-content: center;
@@ -5581,17 +4258,9 @@ body.spur-start-aktiv .nav-vier { display: none; }
 }
 .start-chipreihe .chip-label { display: none; }
 .start-chipreihe button svg { width: 20px; height: 20px; }
-
-/* Betreiber 2026-08-16: das Plus-Menue kompakt wie bei ChatGPT — Icon und
-   Name in EINER Zeile, keine Erklaertexte, keine Beispielsaetze, keine
-   Gruppen-Ueberschriften. Alles bleibt im Markup (Screenreader-Weg und
-   Mockup-Texte unangetastet), nur die Anzeige ist kompakt. */
 .plus-menu-werkzeuge .werk-was,
 .plus-menu-werkzeuge .werk-bsp,
 .plus-menu-werkzeuge .plus-gruppe { display: none !important; }
-/* !important durchgehend: die Runtime-CSS (design-v11-views laedt NACH dem
-   Buendel) stellte die Eintraege sonst wieder untereinander und zentriert —
-   Betreiber 2026-08-16: "Icon und dann Beschreibung, EINE Zeile, buendig". */
 .plus-menu-werkzeuge button[role="menuitem"] {
   display: flex !important;
   flex-direction: row !important;
@@ -5623,8 +4292,6 @@ body.spur-start-aktiv .nav-vier { display: none; }
   stroke-linejoin: round;
   opacity: 0.85;
 }
-
-/* Spur-Icons ruhiger und einheitlich (Betreiber: "modern wie ChatGPT"). */
 .nav-start .button-icon svg,
 .nav-vier .button-icon svg {
   width: 18px;
@@ -5633,8 +4300,6 @@ body.spur-start-aktiv .nav-vier { display: none; }
 }
 .nav-start .nav-button,
 .nav-vier .nav-button { letter-spacing: 0.01em; }
-/* Betreiber 2026-08-16 ("jede Platz brauchen wir"): die Spur-Liste ist
-   KOMPAKT — flache Zeilen, wenig Abstand, wie Claudes Verlaufsliste. */
 .nav-start .nav-button {
   min-height: 28px;
   padding-top: 3px;
@@ -5642,22 +4307,14 @@ body.spur-start-aktiv .nav-vier { display: none; }
 }
 .nav-start { gap: 1px; }
 .nav-start .side-block { margin-top: 2px; }
-
-/* Betreiber 2026-08-16: das LOGO oben links ist der Spur-Schalter (wie
-   ChatGPT). Das alte grosse Doppel-Logo daneben faellt weg. */
 .app-menu-button .menu-logo { width: 24px; height: 24px; display: block; }
 .app-brand-logo { display: none !important; }
-
-/* Rechts oben das Profil-Zeichen im Ecken-Knopf (Betreiber 2026-08-16):
-   runder Kreis mit den echten Initialen, wie bei ChatGPT. */
 .browser-button .profil-initialen {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 26px;
   height: 26px;
-  /* !important gegen eckig.css (app-weit border-radius 0); Avatare sind
-     dort die dokumentierte Ausnahme. */
   border-radius: 999px !important;
   background: var(--v11-cy-fill);
   color: var(--v11-cy-ink);
@@ -5665,18 +4322,10 @@ body.spur-start-aktiv .nav-vier { display: none; }
   font-weight: 700;
   letter-spacing: 0.02em;
 }
-
-/* Betreiber 2026-08-16: das Plus-Menue oeffnet nach UNTEN (wie ChatGPT auf
-   der leeren Startseite). Sobald der Chat laeuft (Feld unten, startLog
-   sichtbar), klappt es automatisch wieder nach oben — sonst raus aus dem
-   Bild. */
 #start:has(#startLog[hidden]) .plus-menu {
   bottom: auto;
   top: calc(100% + 10px);
 }
-
-/* Project-Anlegen bleibt AUF der Seite (Betreiber 2026-08-16, wie
-   chatgpt.com/projects): aufklappendes Eingabefeld statt Browser-Dialog. */
 .bereich-neu-formular {
   display: flex;
   align-items: center;
@@ -5706,11 +4355,6 @@ body.spur-start-aktiv .nav-vier { display: none; }
   cursor: pointer;
 }
 .bereich-neu-meldung { flex-basis: 100%; font-size: 14px; color: var(--v11-warn); }
-
-/* Die Zieh-Griffe SICHTBAR machen (Betreiber 2026-08-16: "warum kann ich
-   nicht ziehen" — man sah schlicht nicht, WO). Dezenter Streifen in der
-   Mitte, beim Draufzeigen cyan. Die Position setzt spur-schalter.js als
-   Inline-Style; background bleibt bewusst dem CSS. */
 #leftPanelResize,
 #rightPanelResize {
   background: linear-gradient(to right, transparent 5px, rgba(255, 255, 255, 0.16) 5px, rgba(255, 255, 255, 0.16) 7px, transparent 7px) !important;
@@ -5721,9 +4365,6 @@ body.is-resizing-panel #leftPanelResize,
 body.is-resizing-panel #rightPanelResize {
   background: linear-gradient(to right, transparent 4px, rgba(50, 246, 234, 0.6) 4px, rgba(50, 246, 234, 0.6) 8px, transparent 8px) !important;
 }
-
-/* Panels als Glas (Betreiber: "glaenzen, edel wie die Startseite"):
-   dieselbe Optik wie die schwebenden Menues — Glas, Blur, Lichtkante. */
 .sidebar,
 #browserPanel {
   background: rgba(13, 18, 25, 0.62);
@@ -5731,14 +4372,9 @@ body.is-resizing-panel #rightPanelResize {
   backdrop-filter: blur(34px) saturate(170%);
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
 }
-
 .fpille-nachdenken {
   font-size: 14px;
   padding: 0 11px;
-  /* start-glass.css ordnet die Zeile per order (Plus 1, Modell 2, Platz 3,
-     Werkzeuge 4, Senden 5). Ohne eigenen Wert (0) rutschte die Pille an den
-     Zeilenanfang — im Mockup steht sie RECHTS vom Feld, vor dem Mikrofon.
-     Gleicher Wert wie die Werkzeuge; die DOM-Reihenfolge stellt sie davor. */
   order: 4;
 }
 .fpille-nachdenken.an {
@@ -5747,34 +4383,19 @@ body.is-resizing-panel #rightPanelResize {
   box-shadow: inset 0 0 0 1px var(--v11-cy-line-on);
 }
 @media (max-width: 560px) {
-  /* In der Ein-Zeilen-Fassung am Telefon ist kein Platz fuer die Pille —
-     die Gruendlich-Stufe bleibt ueber das Modellmenue erreichbar. */
   .fpille-nachdenken { display: none; }
 }
-
-
-/* =======================================================================
- * Bildschirm 32, exakt — der Start-Composer als EINE Pille
- * =======================================================================
- * Der Mockup-Composer (.feldzeile) ist eine 999px-Pille in EINER Zeile:
- * [+] [Feld] [Nachdenken] [Mikro] [Hauptknopf]. Die Ein-Zeilen-Technik ist
- * dieselbe wie am Telefon (display:contents) — hier gilt sie fuer den Start
- * auf JEDER Breite. */
 #start .prompt-glass {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 9px 9px 9px 16px;
-  /* Betreiber 2026-08-16 (Screenshot): die 999px-Pille wurde bei
-     mehrzeiligem Text zum haesslichen Oval. Wie Claude: fast viereckig,
-     nur der leichte Knick. */
   border-radius: 14px !important;
   background: rgba(255, 255, 255, 0.06);
   -webkit-backdrop-filter: blur(34px) saturate(170%);
   backdrop-filter: blur(34px) saturate(170%);
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
 }
-/* Im laufenden Chat klebt das Feld GANZ unten — kaum Rand, wie Claude. */
 #start.has-start-chat .prompt-glass { margin-bottom: 6px; }
 #start .prompt-actions {
   display: contents;
@@ -5793,21 +4414,11 @@ body.is-resizing-panel #rightPanelResize {
 #start .prompt-actions [data-start-tool="voice"] { order: 4; }
 #start .prompt-actions .send-button { order: 5; }
 #start .prompt-actions .prompt-spacer { display: none; }
-/* Der Sprachmodus liegt im Hauptknopf (leeres Feld) — der doppelte
-   Audio-Knopf entfaellt wie am Telefon. Der Modellchip steht im Mockup
-   nicht im Feld; Modellwahl bleibt unter Einstellungen -> KI-Modelle &
-   Anbieter und in der KI-Modelle-Ansicht erreichbar. */
 #start .prompt-glass [data-start-tool="audio"] { display: none; }
-/* Betreiber 2026-08-16: Modell-Waehler ist wieder sichtbar (Claude-Stil,
-   Regel weiter unten). ACHTUNG: der sed-Umbau hatte die Sammelregel
-   zerrissen — der Audio-Knopf verlor sein display:none und die doppelte
-   Sprachwelle stand wieder im Feld (Betreiber-Befund v458-v463). */
 #start .prompt-glass .plus-picker,
 #start .prompt-glass [data-start-tool],
 #start .prompt-glass .send-button,
 #start .prompt-glass .fpille-nachdenken { flex: 0 0 auto; }
-
-/* Die runden Knoepfe rechts (Mockup .fknopf: 38px, rund) */
 #start .prompt-glass .ghost-button.icon-button,
 #start .prompt-glass .send-button {
   width: 38px;
@@ -5815,9 +4426,6 @@ body.is-resizing-panel #rightPanelResize {
   min-height: 38px;
   border-radius: 999px !important;
 }
-
-/* Hauptknopf: WEISS mit schwarzer Welle (Mockup .fknopf.haupt); beim
-   Tippen CYAN mit dunklem Pfeil (Mockup .fknopf.haupt.aktiv). */
 .send-button.ist-sprache {
   background: #ffffff;
   color: #0a0f16;
@@ -5828,8 +4436,6 @@ body.is-resizing-panel #rightPanelResize {
   color: #04211f;
   box-shadow: 0 0 22px var(--v11-cy-glow);
 }
-
-/* Die Pille "Nachdenken" (Mockup .fpille): leise, rund, mit Icon */
 .fpille-nachdenken {
   border-radius: 999px !important;
   background: transparent;
@@ -5850,8 +4456,6 @@ body.is-resizing-panel #rightPanelResize {
 }
 .fpille-nachdenken:hover { background: rgba(255, 255, 255, 0.07); }
 .fpille-nachdenken.an { background: var(--v11-cy-fill); color: var(--v11-cy-ink); box-shadow: none; }
-
-/* Vorschlagzeilen (Mockup .vorschlagzeile): KEINE Linien, Icon + 16.5px */
 .start-vorschlaege button {
   display: flex;
   align-items: center;
@@ -5878,8 +4482,6 @@ body.is-resizing-panel #rightPanelResize {
   color: rgba(242, 245, 244, 0.58);
 }
 .start-vorschlaege button:hover { background: rgba(255, 255, 255, 0.05); color: #f2f5f4; }
-
-/* Werkzeug-Chips (Mockup .wchip): runde Pillen, Icon, "an" in Cyan */
 .start-chipreihe {
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -5904,8 +4506,6 @@ body.is-resizing-panel #rightPanelResize {
   box-shadow: inset 0 0 0 1px var(--v11-cy-line);
 }
 .start-chipreihe button.an svg { color: var(--v11-cy); }
-
-/* Reiter mit Icons (Mockup .reiter): aktiv = weisse Flaeche, Icon cyan */
 .spur-reiter button {
   display: inline-flex;
   align-items: center;
@@ -5927,28 +4527,17 @@ body.is-resizing-panel #rightPanelResize {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 .spur-reiter button.an svg { color: var(--v11-cy); }
-
-/* Fusszeile im Start-Modus: der Plan steht unter dem Namen (Mockup
-   .railfuss); die Kostenzeile gehoert zur Vier-Gruppen-Spur. */
 .profile-dock-plan {
   display: block;
   font-size: 13px;
   color: rgba(242, 245, 244, 0.58);
 }
 body.spur-start-aktiv .nav-kosten { display: none; }
-
-
-/* =======================================================================
- * Bildschirm 26 — der Code-Bereich: Schreibfeld sitzt unten
- * ======================================================================= */
 #code .codeflaeche {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 62vh;
-  /* Betreiber 2026-08-16: das Schreibfeld bleibt wie bei Claude UNTEN FEST —
-     die Flaeche waechst nie ueber den Bildschirm hinaus, der Chat scrollt
-     in seinem Halter (overflow: auto dort). */
   max-height: calc(100vh - 130px);
 }
 #code .codegruss {
@@ -5958,15 +4547,8 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   letter-spacing: -0.03em;
 }
 #code .codeleer { flex: 1; min-height: 80px; }
-
-/* Der adoptierte Chat-Stream (echter #startLog) fuellt die freie Flaeche —
-   der Auftrag streamt auf der Code-Seite selbst, wie bei Codex/Claude. */
 #code .code-log-halter { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; }
 #code .code-log-halter .start-log { flex: 1; }
-
-/* Betreiber 2026-08-16: der Chat ist RAHMENLOS wie bei Claude — Texte
-   fliessen hintereinander. Die Nutzer-Zeile bleibt eine dezente Flaeche
-   (ohne Kante), die Antwort steht nackt auf dem Grund. */
 .start-log .entry,
 .start-log .entry.assistant {
   border: 0;
@@ -5977,8 +4559,6 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   border: 0;
   background: rgba(255, 255, 255, 0.07);
 }
-
-/* Projekt-Menue am Chip: gleiche Glas-Ruhe wie das Profilmenue, viereckig. */
 #code .repozeile { position: relative; }
 .code-projekt-menue {
   position: absolute;
@@ -6002,22 +4582,12 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   min-height: 44px;
   background: none;
   border: 0;
-  /* KEINE Trennstriche (Betreiber 2026-08-16, wie Claude): styles.css gibt
-     jedem Knopf eine Lichtkante + Grundton — hier gemessen als "Striche"
-     zwischen den Zeilen. Beides aus. */
   box-shadow: none;
   color: inherit;
   font: inherit;
   cursor: pointer;
 }
 .code-projekt-menue button:hover { background: rgba(94, 234, 212, 0.12); }
-
-/* Rechtes Panel OHNE transform-Animation am Desktop (Nachtlauf 2026-08-16):
-   Die translateX-Transition liess die HIT-Flaeche um Panelbreite+18 neben dem
-   gemalten Panel haengen — sichtbar offen, echte Klicks gingen ins Leere
-   (drittes Vorkommen der Familie "sichtbar != klickbar"; sogar !important
-   auf transform verlor gegen die haengende Transition). Animation laeuft
-   darum ueber `right`; transform ist hart aus. */
 @media (min-width: 768px) {
   #browserPanel {
     transform: none !important;
@@ -6026,13 +4596,6 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   }
   #browserPanel.is-open { right: 0; }
 }
-
-/* Betreiber 2026-08-16 (Screenshot Claude-App als Vorbild):
-   1) Der Modell-Waehler steht wie bei Claude ("Fable 5 · Hoch") dezent
-      RECHTS in der Schreibleiste — er war seit dem Icon-Umbau versteckt,
-      obwohl Menue und Verdrahtung laengst leben. Echte Werte, echter Wechsel.
-   2) Sind BEIDE Fenster zu, ist die Mitte rahmenlos wie bei Claude:
-      keine Linie ueber dem Chat, keine Lichtkante ueber dem Feld. */
 #start .prompt-glass .model-picker { display: block; }
 #start .prompt-glass .model-picker .text-chip,
 #start .prompt-glass #modelPickerButton {
@@ -6044,17 +4607,11 @@ body.spur-start-aktiv .nav-kosten { display: none; }
 }
 #start .prompt-glass #modelPickerButton:hover { color: rgba(242, 245, 244, 0.92); }
 .prompt-actions .model-picker { order: 4; }
-
 body.spur-zu:not(.right-panel-open) .start-log { border-top: 0; }
 body.spur-zu:not(.right-panel-open) .prompt-glass {
   box-shadow: none;
   border-top: 0;
 }
-
-/* Betreiber 2026-08-16 ("Ich meine bei smejj Code"): die CODE-Seite wird
-   bei zugeklappten Fenstern flach wie Claude Code — das Schreibfeld ohne
-   Lichtkante auf ruhigem Grund, die Vorlagen-Chips ohne Karten-Look.
-   Das Feld selbst ist einzeilig (rows=1 im Markup). */
 body.spur-zu:not(.right-panel-open) #code .codefeld {
   box-shadow: none;
   background: rgba(255, 255, 255, 0.035);
@@ -6064,45 +4621,21 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.10);
 }
 #code .codefeld textarea { min-height: 26px; }
-
-/* Betreiber 2026-08-16, Runde 2 (ZCode-Abgleich, ersetzt die "dieselbe
-   Zeile"-Regel vom selben Tag — die war fuer NUR drei Punkte gebaut):
-   Antworten tragen wie ZCode eine eigene Zeile darunter, linksbuendig:
-   Kopieren, Daumen, Menue, Uhrzeit. Nur bei eigenen (rechtsbuendigen)
-   Nachrichten bleiben die drei Punkte in der letzten Blasenzeile. */
 #startLog .msg-actions {
   justify-content: flex-start;
   align-items: center;
-  /* Betreiber 2026-08-16 ("Icons sollen die letzte Textzeile treffen"):
-     die gemessene Luecke (7px Eintrag-Polster + ~6px Icon-Kopfraum) wird
-     exakt aufgehoben — die Icons haengen an der Textunterkante. */
   margin-top: -13px;
   pointer-events: none;
 }
 #startLog .msg-actions .msg-act { pointer-events: auto; }
-/* Blasen-Ueberlagerung der eigenen Nachricht: margin-top -34px weiter
-   unten (Betreiber-Regel "in der letzten Zeile der Blase"). */
 #startLog .msg-actions.is-user { justify-content: flex-start; }
-
-/* Betreiber 2026-08-16: "gesamten Chat-Kontakt sehen" — der Chat wird DICHT.
-   Zwischen Frage und Antwort kaum Luft, getrennt nur durch einen leichten
-   Haarstrich; die Drei-Punkte sitzen in der letzten Zeile (Regel oben).
-   Dazu die App insgesamt kompakter: engere Koepfe und Raster. */
 #startLog { gap: 0; }
 #startLog .entry { margin: 0; padding-top: 6px; padding-bottom: 6px; }
 #startLog .entry.user { padding: 6px 11px; }
-/* Betreiber-Nachtrag 2026-08-16 ("keine Trennlinie zwischen Texten,
-   kompakt"): der Haarstrich zwischen den Eintraegen ist WEG — die Blase
-   der eigenen Nachricht trennt optisch genug. */
 #startLog .entry:not(:first-child) { border-top: 0; }
-
 .view-header { margin-bottom: 10px; }
 .view-header .subhead { margin-top: 2px; }
 .panel-grid { gap: 8px; }
-
-/* Betreiber 2026-08-16: Verlauf und Suche kompakt wie der Chat — flache
-   Zeilen statt Karten, getrennt nur durch den Haarstrich. Die aktive
-   Zeile behaelt ihre leichte Cyan-Flaeche (Orientierung). */
 #chatHistory .ch-karte {
   background: none;
   box-shadow: none;
@@ -6112,14 +4645,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 #chatHistory .ch-karte + .ch-karte { border-top: 1px solid var(--v11-hair); }
 #chatHistory .ch-karte.is-active { background: rgba(120, 220, 232, 0.10); }
-
 .search-overlay-row { padding-top: 4px; padding-bottom: 4px; }
 .search-overlay-row + .search-overlay-row { border-top: 1px solid var(--v11-hair); }
-
-/* Voll-Audit 2026-08-16: Bei schmalen Fenstern (Betreiber-Zoom) schob sich
-   in den Einstellungen das Auswahlfeld UEBER den Zeilennamen
-   ("SicherheitsmoduFree-safe", per Zoom-Screenshot belegt). Die Zeile darf
-   jetzt umbrechen; der Name behaelt seine Mindestbreite. */
 #settings .settings-row {
   flex-wrap: wrap;
   gap: 6px 12px;
@@ -6128,44 +4655,20 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #settings .settings-row-copy { flex: 1 1 160px; min-width: 0; }
 #settings .settings-row select,
 #settings .settings-row input[type="text"] { max-width: 100%; }
-
-/* Betreiber 2026-08-16 (schriftlich im Chat): Das Code-Schreibfeld sitzt
-   wie bei Claude GANZ UNTEN, und darunter ist NICHTS — die Vorlagen-Chips
-   ("Fehler suchen", "Funktion einbauen", ...) sind weg, die Flaeche bleibt
-   leer. Die Chips existieren im Markup weiter (Rote Liste), sind aber
-   unsichtbar. */
 #code .code-wchips { display: none; }
-/* Auch die zugeklappte "Editor & Dateien"-Zeile unter dem Feld: weg —
-   der Betreiber will unter dem Schreibfeld NICHTS. Markup bleibt. */
 #code .code-werkzeuge { display: none; }
 #code .codeflaeche {
   height: calc(100vh - 96px);
   max-height: none;
   overflow: hidden;
 }
-/* Betreiber 2026-08-16 (Screenshots): KEINE Leerflaechen — der Chat dockt
-   GANZ OBEN an (der Gruss weicht, sobald ein Gespraech laeuft, wie bei
-   Claude), scrollt INTERN, und das Schreibfeld klebt IMMER am Boden. */
 #code .codeflaeche:has(#codeLogHalter #startLog:not([hidden])) .codegruss { display: none; }
 #code .codeflaeche:has(#codeLogHalter #startLog:not([hidden])) .codeleer { display: none; }
 #code .code-log-halter { flex: 1 1 auto; }
 #code .codeunten { margin-top: auto; padding-bottom: 14px; }
-
-/* Betreiber 2026-08-16: das Mikrofon (und der Anhang) bleiben in der
-   unteren Leiste sichtbar wie bei Claude — ihre Icons wurden ohne feste
-   Groesse als winzige Punkte gerendert. */
 #code .code-mini { width: 34px; height: 34px; flex: 0 0 auto; }
 #code .code-mini svg { width: 18px; height: 18px; stroke: currentColor; }
-
-/* Betreiber 2026-08-16: Auf der Code-Seite KEIN Zurueck-Pfeil und KEIN X
-   oben — wie Claude Code. Die Escape-Logik von view-chrome bleibt. */
 #code .view-chrome { display: none; }
-
-/* Ordner je Project: Speichern-Knopf sitzt neben dem Kopieren-Knopf am
-   Codeblock; der Verbinden-Knopf auf der Projects-Karte wie die anderen.
-   Anordnung (ZCode-Abgleich 2026-08-16, rechts nach links): Chevron,
-   Download, Kopieren, Speichern — alle Knoepfe sind wie bei ZCode reine
-   Icon-Knoepfe mit fester Breite, die Abstaende bleiben darum stabil. */
 .chat-code-klapp { right: 4px; }
 .chat-code-download { right: 48px; }
 .chat-code-copy[data-code-copy] { right: 92px; }
@@ -6176,9 +4679,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   .chat-code-copy[data-code-copy] { right: 62px; }
   .chat-code-save { right: 90px; }
 }
-
-/* Projekt-Zeile im Code-Menue: links Name (waehlt Project), rechts der
-   📁-Knopf (waehlt den Ordner — direkt hier, kein Seitenwechsel). */
 .code-projekt-zeile { display: flex; align-items: stretch; }
 .code-projekt-zeile button:first-child { flex: 1 1 auto; }
 .code-projekt-zeile .code-projekt-ordner {
@@ -6189,15 +4689,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   white-space: nowrap;
   color: rgba(242, 245, 244, 0.72);
 }
-
-/* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
-
-/* Plus-Menue der CODE-Ansicht (Betreiber 2026-08-16, "wie bei Claude,
-   1 zu 1"): Masse an claude.ai gemessen — Kasten rgb(32,32,31), 302px,
-   Radius 12 (nimmt eckig.css app-weit zurueck), Zeilen 32px hoch,
-   14px Schrift, 8px Icon-Abstand, Kuerzel/Untermenue-Pfeil rechts
-   gedaempft, Trennlinie als Haarstrich. Oeffnet sich NACH OBEN. */
 .code-plus-menu {
   position: absolute;
   left: 8px;
@@ -6261,13 +4753,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   margin: 6px 4px;
   background: rgba(255, 255, 255, 0.08);
 }
-
-/* Modell-Menue oeffnet DIREKT UEBER dem Modellnamen (rechts in der
-   Leiste), nicht links am Feld — wie bei Claude (Betreiber 2026-08-17). */
 #codeModellMenue { left: auto; right: 10px; }
-
-/* Konnektoren-Flyout (Betreiber-Screenshot 2026-08-16): oeffnet wie bei
-   Claude RECHTS neben dem Menuepunkt; auf schmalen Geraeten darueber. */
 .code-plus-unter {
   position: absolute;
   left: calc(100% + 6px);
@@ -6277,8 +4763,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (max-width: 720px) {
   .code-plus-unter { left: auto; right: 0; bottom: calc(100% + 6px); }
 }
-/* Schalter wie Claudes Toggle, aber VIERECKIG (Betreiber-Designgesetz).
-   Aus-Zustand grau, Ein-Zustand cyan; der Knubbel faehrt herueber. */
 .code-schalter {
   position: relative;
   flex: 0 0 auto;
@@ -6298,42 +4782,18 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: #f2f5f4;
   transition: transform 120ms ease;
 }
-/* Staerker als die span-flex-Regel des Menues: der Schalter bleibt 34px. */
 .code-plus-menu [role="menuitemcheckbox"] .code-schalter { flex: 0 0 34px; width: 34px; }
 [aria-checked="true"] .code-schalter { background: var(--v11-cy); }
 [aria-checked="true"] .code-schalter::after { transform: translateX(14px); }
-
-/* Arbeits-Viereck wie bei Claude (Betreiber 2026-08-16): sitzt rechts
-   oben im Schreibfeld. Frei = gedaempfter Umriss; arbeitet = in
-   Logo-Cyan gefuellt mit leisem Puls (Augen-Regel: kein Leuchten). */
 #code .code-arbeit {
   position: absolute;
-  /* Betreiber-Abgleich mit Claude 2026-08-18: das Viereck steht dort auf
-     HOEHE DER TEXTZEILE, nicht am oberen Feldrand. Gemessen: bei uns lag
-     die Mitte auf 16 px, die Textzeile auf 37 px — sobald der Ordner-Chip
-     darueber liegt, driftete es 21 px nach oben weg. Der Anker ist darum
-     die Textzeile selbst. NACHTRAG 2026-08-18 (375-px-Messung): ein
-     FESTER Wert war falsch — am Telefon steht der Text weiter oben, das
-     Viereck rutschte 23 px darunter. code-flaeche.js richtet es darum
-     zur Laufzeit an der Textzeile aus (--code-arbeit-top); der Wert hier
-     ist nur der Startwert, bis die Messung greift.
-     Groesse und Form bleiben unveraendert (Betreiber: "das Viereck war
-     gut, es soll NUR beleuchtet werden"). */
   top: var(--code-arbeit-top, 31px);
   right: 12px;
   width: 11px;
   height: 11px;
   pointer-events: none;
-  /* Betreiber-Klarstellung 2026-08-17: SICHTBAR als ruhiger Umriss wie
-     bei Claude — aber ohne jedes Leuchten. Nur beim Arbeiten leuchtet
-     es cyan (Regel darunter). */
-  /* Betreiber 2026-08-17 ("Rahmen scharf stellen"): deutlicher Umriss. */
   border: 1.5px solid rgba(242, 245, 244, 0.55);
 }
-/* Betreiber 2026-08-18, RUECKGAENGIG: "das Viereck war gut, es soll NUR
-   beleuchtet werden". Groesse, Platz und Form bleiben also exakt wie
-   vorher (11 px, top 10 / right 12 aus der Grundregel) — im
-   Arbeitszustand aendert sich AUSSCHLIESSLICH die Beleuchtung. */
 #code .code-arbeit.an {
   border-color: var(--v11-cy);
   background: var(--v11-cy);
@@ -6346,9 +4806,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (prefers-reduced-motion: reduce) {
   #code .code-arbeit.an { animation: none; }
 }
-
-/* Slash-Palette (code-flaeche.js): gleicher Kasten wie das Plus-Menue,
-   Befehl in Mono links, die Vorlage gedaempft rechts. */
 #codeSlashMenue { max-height: 300px; overflow-y: auto; }
 #codeSlashMenue [role="menuitem"] b {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -6361,21 +4818,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-size: 12.5px;
   color: rgba(240, 239, 236, 0.5);
 }
-
-/* Der alte Arbeits-Punkt links in der Leiste (v491) ist ERSETZT durch
-   das Claude-Viereck rechts oben im Feld (#codeArbeit, Regeln oben) —
-   seine Dauer-Cyan-Regel faerbte das neue Viereck mit (2026-08-17
-   live gemessen). */
-/* Modus-Menue 1:1 wie Claude (Betreiber-Screenshot 2026-08-16):
-   Kopf "Modus", Zeilen linksbuendig OHNE Trennstriche, Beschreibung
-   gedaempft darunter (eine Zeile, Punkte), rechts Haken + Ziffer. */
 .code-modus-menue {
-  /* Betreiber 2026-08-17 ("Freiflaeche rausnehmen, Fenster klein"):
-     Breite = Inhalt, keine Leerflaeche rechts — wie Claudes Menue. */
   min-width: 0;
   width: max-content;
   max-width: min(320px, 92vw);
-  /* Der Modell-Katalog ist lang — deckeln und innen scrollen (2026-08-17). */
   max-height: 60vh;
   overflow-y: auto;
 }
@@ -6390,8 +4836,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   gap: 10px;
   border: 0;
   min-height: 0;
-  /* Betreiber 2026-08-17: Modelle KOMPAKT, Schrift wie die Leisten-Chips
-     (Auto/Schnell, 13px), leicht statt fett — edel und eng gepackt. */
   padding: 1px 12px;
   text-align: left;
 }
@@ -6401,8 +4845,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   display: block;
   text-align: left;
 }
-/* Wie Claudes Modell-Menue (Betreiber-Screenshot 2026-08-17):
-   normale Schrift, nicht fett, Claude-Groesse. */
 .code-modus-menue button b { display: block; font-weight: 400; font-size: 14.5px; line-height: 1.5; color: rgba(242, 245, 244, 0.92); }
 .code-modus-menue button small {
   display: block;
@@ -6419,16 +4861,11 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   gap: 9px;
   flex: 0 0 auto;
 }
-/* Mit ID-Gewicht gegen jede generische Knopf-Regel (gemessen: bg 0.055 und
-   Lichtkante blieben trotz background:none der Basisklasse). */
 #code .code-projekt-menue button,
 #code .code-modus-menue button {
   background: transparent;
   box-shadow: none;
 }
-/* Live gemessen 2026-08-17: app-surfaces gibt jedem premium-view-Knopf
-   min-height 40px + padding 0 14px und gewann bei gleicher Spezifitaet —
-   darum hier MIT ID-Gewicht die engen Claude-Zeilen erzwingen. */
 .code-modus-menue.code-modus-menue button {
   min-height: 0;
   height: auto;
@@ -6454,10 +4891,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   flex-wrap: wrap;
   align-items: center;
 }
-/* Betreiber 2026-08-16 ("ohne Hintergrund, ganz schmal, modern"): die
-   Leisten-Chips sind Geister — kein Pillen-Grund, gedaempfte Schrift,
-   Hover hellt nur auf. Der aktive Projekt-Chip zeigt Cyan als FARBE,
-   nicht als Fuellung; lange Projektnamen kappen mit Punkten. */
 #code .repochip {
   display: inline-flex;
   align-items: center;
@@ -6478,11 +4911,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   transition: color 120ms ease;
 }
 #code .repochip:hover { color: #f2f5f4; background: transparent; }
-/* Betreiber 2026-08-16 ("bei Claude sieht man das nicht"): der
-   Projekt-Chip ist UNSICHTBAR — die Leiste zeigt wie Claude nur
-   Auto/Gruendlich/+/Mikro. Der Knopf bleibt im DOM: das Plus-Menue
-   ("Ordner hinzufuegen" ohne gewaehltes Project) und code-flaeche.js
-   klicken ihn programmatisch, um die Projektwahl zu oeffnen. */
 #code #codeProjektChip { display: none; }
 #code .repochip.an {
   background: transparent;
@@ -6496,12 +4924,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
   border: 0;
   border-radius: var(--v11-r);
-  /* ultra-schmal (Betreiber 2026-08-16, Variante A): wirkt wie EINE Zeile */
   padding: 5px 10px 4px;
 }
-
-/* Anhang-Chips im Schreibfeld (code-flaeche.js zeichneAnhaenge): kleine
-   Zeile UEBER dem Text — der Verweis steht nie als Text im Feld. */
 #code .code-anhaenge {
   display: flex;
   flex-wrap: wrap;
@@ -6550,8 +4974,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   margin-top: 2px;
   flex-wrap: wrap;
 }
-/* Icon-Knoepfe der Leiste als Geister: kein runder Grund (Betreiber
-   2026-08-16, "modern professionell wie Claude"). */
 #code .codeleiste .icon-button.code-mini {
   background: transparent;
   border: 0;
@@ -6574,8 +4996,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-size: 14.5px;
   color: rgba(242, 245, 244, 0.74);
 }
-/* Betreiber 2026-08-17: Modellname NICHT fett, gleiche Groesse wie die
-   Chips links (Auto/Schnell, 13px). */
 #code .code-rechts b { color: rgba(242, 245, 244, 0.8); font-weight: 400; font-size: 13px; }
 #code .code-rechts { font-size: 13px; }
 #code #codeSenden {
@@ -6600,7 +5020,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding: 9px 15px;
   width: auto;
 }
-/* Die alten Editor-Werkzeuge: vollstaendig erhalten, eingeklappt darunter. */
 #code .code-werkzeuge { margin-top: 18px; }
 #code .code-werkzeuge summary {
   cursor: pointer;
@@ -6608,22 +5027,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   color: rgba(242, 245, 244, 0.58);
   padding: 8px 0;
 }
-
-
-/* =======================================================================
- * Bildschirm 24: "Spalten beruehren sich" — die Spur ist am Desktop OFFEN
- * =======================================================================
- * Im Mockup gibt es am Desktop keinen Menue-Knopf: die Spur steht immer
- * links, die Mitte schliesst mit einem Haarstrich an. Der Klapp-Mechanismus
- * bleibt fuer schmale Schirme vollstaendig erhalten — diese Regeln greifen
- * erst ab 1024 px. */
 @media (min-width: 768px) {
-  /* Betreiber-Entscheid 2026-08-15 (Chat): die Spur muss auch am Desktop
-     ZUGEHEN — und zwar schon ab 768 px: der Betreiber arbeitet mit Zoom,
-     sein Fenster hat effektiv ~778 CSS-px, die 1024er-Schwelle griff NIE.
-     ZUGEHEN. Standard bleibt offen; der Menue-Knopf links oben schaltet
-     body.spur-zu (app.js merkt sich den Zustand). Groesser/kleiner ziehen
-     uebernehmen die vorhandenen Griffe (#leftPanelResize/#rightPanelResize). */
   body:not(.spur-zu) .sidebar {
     transform: none !important;
     visibility: visible !important;
@@ -6636,21 +5040,14 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
     visibility: hidden !important;
   }
   body.spur-zu main.shell { margin-left: 0; }
-  /* Der Menue-Knopf bleibt sichtbar — er ist jetzt der Schalter. */
   .app-menu-button { display: inline-flex; }
   .sidebar-backdrop { display: none !important; }
-  /* Die Brotkrume beginnt rechts der Spur, nicht unter dem Logo. */
   body:not(.spur-zu) .top-krume { left: calc(var(--left-panel-width, 196px) + 26px); }
   body.spur-zu .top-krume { left: 96px; }
-  /* Spur und Mitte trennt EIN Haarstrich — kein Abstand, kein Schatten. */
   .sidebar {
     border-right: 1px solid var(--v11-hair);
     box-shadow: none;
   }
-  /* Der Zieh-Griff als FIXES Overlay an der Spur-Kante (Betreiber-Befund
-     2026-08-15: als Sidebar-Kind verschluckte der Hit-Test jeden Klick —
-     elementFromPoint traf BODY statt Griff). position:fixed loest ihn aus
-     Clip und Stapel der Spur; die Breiten-Variable haelt ihn an der Kante. */
   body:not(.spur-zu) .left-panel-resizer {
     position: fixed !important;
     left: calc(var(--left-panel-width, 196px) - 6px) !important;
@@ -6663,15 +5060,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   }
   body.spur-zu .left-panel-resizer { display: none; }
 }
-
-/* Profilzeile unten wie ChatGPT (Betreiber 2026-08-15): runder Avatar,
-   Name, Plan — KEIN separates Zahnrad; Einstellungen wohnen im Menue. */
 .profile-dock-gear { display: none !important; }
 .profile-avatar { border-radius: 999px; overflow: hidden; }
-
-/* Der Hilfe-Knopf oben rechts (Mockup-Topbar). Bewusst mit Abstand zu den
-   fixen Ecken-Knoepfen (Befund b0fb345: dort kollidierte schon einmal
-   etwas). */
 .top-hilfe {
   position: fixed;
   top: 14px;
@@ -6692,9 +5082,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (max-width: 1023px) {
   .top-hilfe { display: none; }
 }
-
-
-/* Bildschirm 18, Feinschliff: Gruss mit Zeichen, Mini-Knoepfe der Leiste */
 #code .codegruss { display: flex; align-items: center; gap: 11px; }
 #code .codegruss-zeichen {
   width: 24px; height: 24px; flex: none;
@@ -6703,9 +5090,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 #code .code-mini {
   width: 30px; height: 30px; min-height: 30px;
-  /* ghost-button bringt padding 0 14px mit — im 30px-Knopf blieben dem SVG
-     nur 2px Innenbreite, Anhang- und Diktat-Icon waren unsichtbare Striche
-     (Betreiber-Testlauf 2026-08-16). */
   padding: 0;
   border-radius: 999px !important;
 }
@@ -6714,9 +5098,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   fill: none; stroke: currentColor; stroke-width: 2.2;
   stroke-linecap: round; stroke-linejoin: round;
 }
-
-
-/* Bildschirm 40: Profilmenue — Wert rechts, Trennlinien statt Ueberschriften */
 .profile-dock-menu [role="menuitem"] {
   display: flex;
   align-items: center;
@@ -6735,9 +5116,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: var(--v11-hair);
 }
 .profile-dock-menu .profile-dock-menu-logout { color: var(--v11-bad); }
-
-
-/* Bildschirm 48: der Papierkorb */
 #papierkorb .papierkorb-zeile {
   display: flex;
   align-items: center;
@@ -6751,11 +5129,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #papierkorb .papierkorb-text strong { font-size: 15.5px; }
 #papierkorb .papierkorb-text span { font-size: 13.5px; color: rgba(242, 245, 244, 0.62); }
 #papierkorb .papierkorb-leer { color: rgba(242, 245, 244, 0.62); font-size: 15.5px; }
-
-
-/* =======================================================================
- * Bildschirm 29 — der Sprachmodus im neuen Kleid (gleiche Funktion)
- * ======================================================================= */
 .voice-mode-overlay, #voiceOverlay, .voice-overlay {
   background: rgba(7, 11, 17, 0.92) !important;
   -webkit-backdrop-filter: blur(40px) saturate(160%);
@@ -6800,11 +5173,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   color: #ffb4b6;
   box-shadow: inset 0 0 0 1px rgba(255, 122, 124, 0.55);
 }
-
-
-/* =======================================================================
- * Bildschirme 35+36 — Kamera-Overlay und Arbeitsbereiche
- * ======================================================================= */
 #kameraOverlay {
   position: fixed;
   inset: 0;
@@ -6853,7 +5221,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-weight: 700;
 }
 #kameraOverlay .kamera-hinweis { margin: 0; font-size: 13.5px; color: rgba(242, 245, 244, 0.62); }
-
 #arbeitsbereiche .bereich-karte {
   padding: 14px 4px 16px;
   border-bottom: 1px solid var(--v11-hair);
@@ -6894,9 +5261,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-weight: 700 !important;
   margin-bottom: 14px;
 }
-
-
-/* Bildschirm 16: die Fuehrungs-Blase (Mockup .coach) */
 #fuehrungBlase {
   position: fixed;
   z-index: 300;
@@ -6938,9 +5302,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   color: #04211f;
   font-weight: 700;
 }
-
-
-/* Bildschirm 35 Stufe 2: die angedockte Live-Vorschau */
 #kameraOverlay.ist-live {
   inset: auto 18px 18px auto;
   background: transparent;
@@ -6952,8 +5313,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #kameraOverlay.ist-live .kamera-hinweis { display: none; }
 #kameraOverlay.ist-live [data-kamera="aufnehmen"],
 #kameraOverlay.ist-live [data-kamera="live"] { display: none; }
-
-/* Bildschirm 27: die Arbeitsflaeche rechts */
 #arbeitsflaeche {
   display: grid;
   gap: 10px;
@@ -6978,8 +5337,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: rgba(255,255,255,.055); color: #f2f5f4;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
 }
-
-/* Die Karte unter der Antwort (Mockup: "Anschreiben · Text · 1 Seite") */
 .af-karte {
   display: flex; align-items: center; gap: 10px;
   margin: 6px 0 12px; padding: 10px 14px;
@@ -6991,16 +5348,9 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 .af-karte strong { font-size: 15px; }
 .af-karte span { color: rgba(242,245,244,.62); }
 .af-karte em { margin-left: auto; font-style: normal; color: var(--v11-cy-ink); }
-
-/* Bildschirm 39: die Datei-Tabelle */
 #files .datei-tabelle { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 #files .datei-tabelle th { text-align: left; color: rgba(242,245,244,.58); font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; padding: 8px 10px; border-bottom: 1px solid var(--v11-hair); }
 #files .datei-tabelle td { padding: 9px 10px; border-bottom: 1px solid var(--v11-hair); }
-
-/* Betreiber 2026-08-16 ("ohne Rahmen, transparent, ohne Hintergrund"):
-   die Aktions-Icons unter Nachrichten tragen KEINEN Kasten — die
-   generische Knopf-Regel (Grundton 0.055 + Lichtkante, live gemessen)
-   wird hier mit Doppelklassen-Gewicht abgeschaltet; nur Hover toent. */
 .msg-actions .msg-act.msg-act {
   background: transparent;
   border-color: transparent;
@@ -7010,18 +5360,9 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 .msg-actions .msg-act.msg-act:focus-visible {
   background: rgba(255, 255, 255, 0.08);
 }
-
-/* Betreiber 2026-08-16 ("Warum hast du ... mit Rahmen gemacht — soll mit
-   Text gleiche Zeile sein"): die drei Punkte liegen NIE auf einem Rahmen.
-   Nach einer Werkzeug-Karte sitzen sie knapp UNTER der Karte statt auf
-   ihrem Rand; bei eigenen Nachrichten sitzen sie IN der letzten Zeile der
-   Blase — der Text bekommt dafuer rechts Platz. */
 #startLog .af-karte + .msg-actions { margin-top: -10px; }
 #startLog .entry.user { padding-right: 40px; }
 #startLog .msg-actions.is-user { margin-top: -34px; padding-right: 6px; }
-
-/* Betreiber 2026-08-16 ("Chat-Funktion wie ChatGPT"): der Runter-Pfeil.
-   Sitzt mittig ueber dem Schreibfeld, nur sichtbar wenn hochgescrollt. */
 .chat-runter {
   position: fixed;
   left: 50%;
@@ -7040,8 +5381,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 .chat-runter:hover { background: rgba(40, 48, 58, 0.95); }
 .chat-runter svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-/* Stopp-Knopf waehrend der Antwort (Overlay ueber dem Senden-Pfeil) */
 .chat-stopp {
   position: fixed;
   z-index: 70;
@@ -7054,13 +5393,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 .chat-stopp:hover { background: #dfe5e3; }
 .chat-stopp svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
-
-/* Betreiber 2026-08-16 ("Code-Bereich wie die ZCode-App"): Codebloecke
-   mit Kopfzeile — Sprachname links, die Icon-Knoepfe (chat-code-copy.js,
-   chat-code-download.js) sitzen rechts darin. JEDER Block traegt eine
-   Sprache (chat-markdown.js liefert sie, chat-code-copy.js setzt sonst
-   "text" nach). ::before steht nicht in textContent — Verlauf und
-   Modellkontext bleiben sauber. */
 #startLog .entry.assistant .chat-code[data-language] {
   padding-top: 0;
 }
@@ -7069,10 +5401,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   display: block;
   position: sticky;
   left: 0;
-  /* ZCode-Abgleich 2026-08-16: die Sprachzeile ist bei ZCode KEIN eigener
-     Streifen — kleine Mono-Schrift, gedaempft, ohne Grund und ohne
-     Trennlinie, im selben Kasten wie der Code. Hoch genug fuer die
-     42px-Touch-Knoepfe; bei praezisem Zeigegeraet kompakt (h-8 wie ZCode). */
   margin: 0 -12px 6px;
   padding: 15px 12px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -7087,13 +5415,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
     padding: 8px 12px;
   }
 }
-
-/* ZCode-Abgleich Runde 2 (Betreiber 2026-08-16, "Code-Bereich wie die
-   ZCode-App"): die Knoepfe in der Kopfzeile sind wie bei ZCode reine
-   Icon-Knoepfe — randlos, gedaempft, Hover/Fokus hellt NUR die Farbe auf
-   (ZCode: text-muted-foreground -> text-foreground, kein Grundwechsel).
-   Die Grundregeln (Groesse, Fokusring, immer sichtbar) bleiben in
-   chat-markdown.css und gelten weiter. */
 #startLog .chat-code-wrap .chat-code-copy {
   top: 3px;
   border-color: transparent;
@@ -7110,16 +5431,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (pointer: fine) {
   #startLog .chat-code-wrap .chat-code-copy { top: 4px; }
 }
-/* Wie ZCode: kein geschriebenes "Kopieren" am Codeblock — nur das Icon,
-   der Name bleibt im aria-label/title. Die ::after-Beschriftung aus
-   chat-markdown.css gilt weiter fuer alle Kopierknoepfe ausserhalb. */
 #startLog .chat-code-wrap .chat-code-copy::after { content: none; }
 #startLog .chat-code-wrap .chat-code-copy svg { width: 14px; height: 14px; }
-
-/* Werkzeug-Karte wie ZCodes Datei-Karte (chat-code-copy.js zeigeDateiKarte,
-   Betreiber 2026-08-16): sichtbare Spur nach "In den Project-Ordner
-   speichern". Name und Unterzeile kommen aus data-Attributen (attr()) —
-   nichts davon steht in textContent. */
 .chat-code-wrap .code-datei-karte {
   display: grid;
   grid-template-columns: 36px 1fr;
@@ -7163,10 +5476,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-size: 12px;
   color: rgba(242, 245, 244, 0.5);
 }
-
-/* Arbeitsschritte-Falte im ZCode-Look ("Worked for … >"): gedaempfte
-   Zeile mit drehendem Chevron statt des Aufklapp-Dreiecks; die Schritte
-   darunter ruecken mit Haarstrich ein wie bei ZCode. */
 #startLog .chat-schritte-titel {
   display: inline-flex;
   align-items: center;
@@ -7191,11 +5500,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding-left: 10px;
   border-left: 1px solid rgba(255, 255, 255, 0.12);
 }
-
-/* Ein-/Ausklappen wie ZCodes einklappbare Zeilen ("1 file changed"-Muster;
-   chat-code-copy.js setzt data-zu am
-   Wrapper): zu sehen bleibt nur der Kopfstreifen, der Chevron dreht zur
-   Seite. Die Hoehen entsprechen dem Kopfstreifen samt Rahmen. */
 #startLog .chat-code-wrap[data-zu] .chat-code[data-language] {
   max-height: 50px;
   overflow: hidden;
@@ -7206,51 +5510,27 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 .chat-code-klapp svg { transition: transform 150ms ease; }
 .chat-code-wrap[data-zu] .chat-code-klapp svg { transform: rotate(-90deg); }
-
-/* ZCode-Abgleich Runde 3 (2026-08-16): Inline-Code als Chip exakt wie
-   ZCodes streamdown-inline-code (rounded bg-muted px-1.5 py-0.5 font-mono
-   text-sm) — gefuellter Grund, KEIN Rahmen, 0.875em. Die Rundung nimmt
-   eckig.css app-weit zurueck (Betreiber-Designgesetz). Codebloecke sind
-   ausgenommen (chat-markdown.css setzt padding/bg dort zurueck). */
 #startLog .entry.assistant code {
   padding: 2px 6px;
   background: rgba(255, 255, 255, 0.09);
   font-size: 0.875em;
 }
-/* Codebloecke sind KEINE Chips: der Reset aus chat-markdown.css verliert
-   gegen die ID-Regel oben — hier mit gleicher Staerke wiederholen (im
-   Fixture gemessen: sonst traegt jede Blockzeile einen Chip-Grund). */
 #startLog .entry.assistant .chat-code code {
   padding: 0;
   background: none;
   font-size: 0.92em;
 }
-
-/* Syntax-Farben der Codebloecke (chat-code-farben.js) — ZCode-Abgleich
-   2026-08-16: die GitHub-Dark-Farbwelt, in der auch ZCode zeichnet
-   (Kommentar grau, String hellblau, Zahl blau, Schluesselwort koralle,
-   Funktion violett). */
 .chat-code .cf-kom { color: #8b949e; font-style: italic; }
 .chat-code .cf-str { color: #a5d6ff; }
 .chat-code .cf-zahl { color: #79c0ff; }
 .chat-code .cf-schl { color: #ff7b72; }
 .chat-code .cf-fn { color: #d2a8ff; }
-
-/* Betreiber 2026-08-16 ("gesamte Flaeche nutzen, kompakt, keine
-   Freiflaeche"): die CODE-Seite randlos wie Claude. Die Ansicht selbst ist
-   eine Bildschirm-hohe Flex-Spalte — oben nur Platz fuer die fixe
-   Logo-Zeile, links/rechts 12px, unten schliesst das Schreibfeld buendig
-   ab. Der Text im Gespraech deckt die volle Breite (die 980px-Mitte der
-   Startseite gilt hier nicht). */
 #code.view.is-active {
   display: flex;
   flex-direction: column;
   height: 100dvh;
   max-height: 100dvh;
   overflow: hidden;
-  /* Betreiber-Nachtrag ("Text ganz oben, ueber Browser-Icon"): kein
-     reservierter Kopfstreifen — der Text beginnt an der Oberkante, das
-     fixe Browser-Icon schwebt rechts darueber. */
   padding: 4px 12px 0;
 }
 #code .codeflaeche {
@@ -7263,12 +5543,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #code .codeunten { margin-top: auto; padding: 4px 0 0; }
 #code .code-log-halter .start-log .entry { max-width: none; }
 #code .code-log-halter .msg-actions { max-width: none; }
-/* Das Schreibfeld waechst beim Tippen nach OBEN mit (code-flaeche.js) —
-   ab 40% Bildhoehe scrollt es innen statt weiterzuwachsen. */
 #code .codefeld textarea { max-height: 40vh; overflow-y: auto; }
-
-/* Claude-Abgleich 2026-08-16: "Zuletzt verwendet"-Eintraege tragen wie bei
-   Claude einen kleinen Kreis; das offene Gespraech fuellt ihn (cyan). */
 .nav-start .spur-chat::before {
   content: "";
   flex: 0 0 auto;
@@ -7279,14 +5554,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   border-radius: 50%;
 }
 .nav-start .spur-chat.is-active::before {
-  /* dezent statt Leuchtpunkt (Betreiber 2026-08-16) */
   border-color: rgba(50, 246, 234, 0.55);
   background: rgba(50, 246, 234, 0.55);
 }
 .nav-start .spur-chat { display: flex; align-items: center; }
-
-/* Status IM rechten Panel (panel-status.js): die echte status-grid der
-   Systemzustand-Ansicht, im schmalen Panel einspaltig und kompakt. */
 .panel-status { padding: 10px 12px; overflow: auto; }
 .panel-status .status-grid {
   display: flex;
@@ -7302,23 +5573,11 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding-bottom: 6px;
 }
 .panel-status .status-grid span { text-align: right; opacity: 0.8; }
-
-/* =======================================================================
- * Betreiber 2026-08-17: Start-Composer wie der CODE-Bereich —
- * das Schreibfeld ist ZEILE 1 (volle Breite, waechst, der GANZE Text
- * bleibt sichtbar), die Werkzeuge sind eine FESTE ZWEITE ZEILE unten.
- * Steht bewusst am DATEIENDE: schlaegt die Ein-Pillen-Regeln (Desktop
- * Bildschirm 32 und Telefon-Block) bei gleicher Spezifitaet.
- * ===================================================================== */
 #start .prompt-glass { flex-wrap: wrap; align-items: center; }
 #start .prompt-glass textarea {
   order: 0;
   flex: 1 1 100%;
   width: 100%;
-  /* !important, weil die Ein-Pillen-Regel weiter oben height:40px setzt
-     und sogar den Inline-Stil des Autogrow schlaegt (live gemessen:
-     scrollHeight 120, sichtbar 44). field-sizing waechst nativ, das JS
-     unten ist der Fallback fuer Browser ohne Unterstuetzung. */
   height: auto !important;
   field-sizing: content;
   min-height: 40px !important;
@@ -7331,10 +5590,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #start .prompt-actions .model-picker { order: 4; display: block; }
 #start .prompt-actions [data-start-tool="voice"] { order: 5; }
 #start .prompt-actions .send-button { order: 6; }
-
-/* Betreiber 2026-08-17: die Antwort im Sprachmodus liest sich wie Text —
-   linksbuendig, normale Groesse, ruhige Zeilen. Zentriert und riesig war
-   sie unlesbar, sobald sie laenger als ein Satz wurde. */
 .voice-mode-reply {
   text-align: left;
   font-size: 16px;
@@ -7344,17 +5599,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding: 0 4px;
 }
 .voice-mode-transcript { text-align: left; }
-
-/* =======================================================================
- * Betreiber-Freigabe 2026-08-18 ("nur am Handy vergroessern"): unter
- * 600 px erfuellen die Bedienknoepfe der CODE-Leiste das Touch-Ziel des
- * Projekts (44 px). Am Desktop bleibt alles schmal und edel wie bestellt
- * — die Regel greift AUSSCHLIESSLICH hier.
- * Gemessen im integrierten Browser bei 375 px: Anhang/Diktat 30x30,
- * Senden 32x32, Chips 19 px hoch.
- * 600 px ist die im Projekt schon benutzte Kante (styles.css,
- * start-glass.css) — keine zweite Wahrheit daneben.
- * ===================================================================== */
 @media (max-width: 600px) {
   #code .codeleiste .icon-button.code-mini,
   #code .codeleiste #codeSenden {
@@ -7367,18 +5611,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
     padding-top: 0;
     padding-bottom: 0;
   }
-  /* Die Zeile darf dabei nicht enger werden als die Knoepfe hoch sind. */
   #code .codeleiste { gap: 4px; }
 }
-
-/* =======================================================================
- * Arbeits-Viereck im CHAT-Bereich (Betreiber 2026-08-18: "kannst du das
- * fuer den Chat-Bereich auch machen — sieht gut aus").
- * Erbt Groesse, Form und Beleuchtung von .code-arbeit; hier steht nur,
- * WO es sitzt: im Glas-Schreibfeld der Startseite, rechts neben der
- * Textzeile. Die Hoehe misst code-flaeche.js zur Laufzeit
- * (--start-arbeit-top) — ein fester Wert versagte am Telefon.
- * ===================================================================== */
 #start .prompt-glass { position: relative; }
 #start .start-arbeit {
   position: absolute;
@@ -7394,4 +5628,115 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   border-color: var(--v11-cy);
   background: var(--v11-cy);
   animation: code-arbeit-puls 1.6s ease-in-out infinite;
+}
+#start.has-start-chat .home-feed {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+#start.has-start-chat #startLog {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+#start.has-start-chat .prompt-glass {
+  flex: 0 0 auto;
+  margin-top: auto;
+}
+#start .prompt-glass .ghost-button.icon-button,
+#code .codeleiste .ghost-button.icon-button {
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+}
+#start .prompt-glass .ghost-button.icon-button:hover,
+#code .codeleiste .ghost-button.icon-button:hover {
+  background: transparent;
+  color: #f2f5f4;
+}
+#start .prompt-glass .send-button,
+#start .prompt-glass .send-button.ist-sprache,
+#start .prompt-glass .send-button:not(.ist-sprache),
+#code .codeleiste .send-button,
+#code .codeleiste #codeSenden {
+  background: transparent;
+  box-shadow: none;
+  color: rgba(242, 245, 244, 0.74);
+}
+#start .prompt-glass .send-button:hover,
+#code .codeleiste .send-button:hover,
+#code .codeleiste #codeSenden:hover {
+  background: transparent;
+  color: #f2f5f4;
+}
+#start .prompt-glass:has(#startMessage:not(:placeholder-shown)) .send-button,
+#code .codefeld:has(#codeAufgabe:not(:placeholder-shown)) #codeSenden {
+  background: #f2f5f4;
+  color: #0a0f16;
+  box-shadow: none;
+}
+#start .prompt-glass:has(#startMessage:not(:placeholder-shown)) .send-button:hover,
+#code .codefeld:has(#codeAufgabe:not(:placeholder-shown)) #codeSenden:hover {
+  background: #dfe5e3;
+  color: #0a0f16;
+}
+#chatStopp.chat-stopp {
+  border-radius: 999px !important;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+}
+#chatStopp, .chat-stopp { display: none !important; }
+#start .start-arbeit[role="button"],
+#code .code-arbeit[role="button"] {
+  pointer-events: auto;
+  cursor: pointer;
+}
+#start .start-arbeit[role="button"]::before,
+#code .code-arbeit[role="button"]::before {
+  content: "";
+  position: absolute;
+  inset: -17px;
+  border-radius: 0;
+}
+#start .start-arbeit.gestoppt,
+#code .code-arbeit.gestoppt {
+  border-color: var(--v11-cy);
+  background: var(--v11-cy);
+  animation: none;
+}
+#start .start-arbeit.gestoppt::after,
+#code .code-arbeit.gestoppt::after {
+  content: "";
+  position: absolute;
+  inset: 2px 1px 2px 3px;
+  background: #04211f;
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+@media (max-width: 600px) {
+  #start .prompt-glass .ghost-button.icon-button,
+  #start .prompt-glass .send-button {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+  .nav-start .nav-button,
+  .sidebar .nav-vier .nav-button {
+    min-height: 44px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .spur-reiter button,
+  #fuehrungBlase button {
+    min-height: 44px;
+  }
+  #code #codeAufgabe {
+    min-height: 44px;
+  }
+  #code .repochip {
+    min-width: 44px;
+  }
 }
