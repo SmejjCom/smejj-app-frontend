@@ -151,6 +151,16 @@
 // `curl .../smejj-app-frontend/main/sw.js | grep CACHE_NAME` gegen diese
 // Datei halten, dann hochzaehlen (v259).
 //
+// v636 -> v638 (2026-08-21): JS-Dialoge im Panel. Der Sprung ist NOETIG,
+// nicht kosmetisch — live gemessen in Chrome: der Vorrat lieferte weiter
+// browser-stage.js?v=4 ohne Dialogfenster, obwohl der Server die neue
+// Fassung auslieferte. Selbst fetch(..., {cache:"reload"}) kam nicht daran
+// vorbei, weil der Service Worker die Anfrage abfaengt.
+// v637 wurde UEBERSPRUNGEN: eine Parallelsitzung hatte sie bereits live
+// vergeben (gemessen per curl gegen smejj-app-frontend/main/sw.js), diese
+// Datei stand noch auf v636. Genau die Kollision, vor der der Absatz
+// darueber warnt.
+//
 // v257 -> v258 (2026-08-09): Die Liste zeichnet nicht mehr alle Chats auf
 // einmal. Erster Block 30 Karten, der Rest kommt beim Scrollen nachgeladen
 // (angehaengt, nie neu gezeichnet — sonst springt die Scrollposition).
@@ -175,7 +185,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v637";
+const CACHE_NAME = "smejj-shell-v638";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
