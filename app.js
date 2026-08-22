@@ -1,15 +1,13 @@
 import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js";
 import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
-import { runClientChat } from "/assets/ai/chatClient.js?v=3";
 import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js";
-import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=chat-markdown-20260717";
-import { initComposerTools } from "./composer-tools.js?v=voice-mitschrift-20260806";
+import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=1";
-import { initGlobalSearch } from "./search.js";
-import { openSearchOverlay } from "./search-overlay.js";
+import { initGlobalSearch } from "./search.js?v=b40";
+import { openSearchOverlay } from "./search-overlay.js?v=b47d";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
-import { enhancePremiumSurfaces, renderProjectCards } from "./premium-surfaces.js?v=account-privacy-v3";
+import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
 import { routeAutonomousRequest } from "./autonomous-intent.js";
@@ -19,11 +17,13 @@ import { groundTask, modelForTask } from "./browser-context.js";
 import { afterFirstPaint } from "./deferred-start.js";
 import { initGoogleLogin } from "./google-login.js";
 import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
-import { bindUploads, validateBrowserUpload } from "./uploads-surface.js";
+import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39u";
+import { chatOhneMedienauftrag } from "./medien-absicht.js?v=4";
+import { mausAuftragErledigt } from "./maus-absicht.js?v=18";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
-import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js";
+import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
-import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js";
+import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b50";
 import { applyViewTitle } from "./view-title.js";
 import { getJson, postJson } from "./shared/http-json.js";
 const $ = (selector) => document.querySelector(selector);
@@ -72,12 +72,13 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
+const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=b41b").then((m) => (m.enhancePremiumSurfaces(), m)));
 boot();
 
 // Buendelt, was projects-surface.js aus der App braucht — eine Stelle statt neun.
 function projektAbhaengigkeiten() {
   const basis = { $, state, workspace, showToast, writeOutput, setText, renderEmptyState, refreshSessionStatus };
-  return { ...basis, renderProjectCards, renderEmptyState, ensureProject: () => ensureProject(basis), refreshLocalWorkspaceStatus: () => refreshLocalWorkspaceStatus(basis) };
+  return { ...basis, renderProjectCards: (p) => holeFlaechen().then((m) => m.renderProjectCards(p)), renderEmptyState, ensureProject: () => ensureProject(basis), refreshLocalWorkspaceStatus: () => refreshLocalWorkspaceStatus(basis) };
 }
 
 function boot() {
@@ -93,7 +94,6 @@ function boot() {
   bindMemory();
   bindAi();
   bindProjects(projektAbhaengigkeiten());
-  enhancePremiumSurfaces();
   bindStoragePanel();
   bindCost();
   bindSettings();
@@ -137,7 +137,7 @@ function bindNavigation() {
   };
   // Abdunkeln, Wegklicken und Escape leben in panel-backdrop.js (SRP).
   const syncBackdrop = initPanelBackdrop({ backdrop, sidebar, browserPanel, menuButton, browserButton, setMenuOpen, setBrowserPanelOpen });
-  menuButton?.addEventListener("click", () => setMenuOpen(!sidebar?.classList.contains("is-open")));
+  menuButton?.addEventListener("click", () => setMenuOpen(!sidebar?.classList.contains("is-open"))); // Desktop-Auf/Zu: spur-schalter.js (capture)
   browserButton?.addEventListener("click", () => setBrowserPanelOpen(!browserPanel?.classList.contains("is-open")));
   bindPanelResize("#leftPanelResize", "left", { $ });
   bindPanelResize("#rightPanelResize", "right", { $ });
@@ -273,6 +273,7 @@ function goToView(viewId, { replace = false } = {}) {
     const method = replace ? "replaceState" : "pushState";
     history[method]({ viewId: resolvedViewId }, "", nextUrl);
   }
+  holeFlaechen(resolvedViewId);
   updateCanonical();
   applyViewTitle(target, resolvedViewId); // Seitentitel je Ansicht (W2-05)
   if (resolvedViewId === "tools") refreshLiveSystemStatus();
@@ -302,6 +303,16 @@ function bindStartComposer() {
   const input = $("#startMessage");
   const send = $("#startSend");
   if (!input || !send) return;
+  // Landeseite (Mockup 1): das Probier-Feld nimmt die Frage mit zur
+  // Anmeldung — hier kommt sie an. sessionStorage statt Adresszeile,
+  // damit die Frage nie in einer URL steht.
+  try {
+    const probierFrage = sessionStorage.getItem("smejj.probierFrage.v1");
+    if (probierFrage && !input.value.trim()) {
+      input.value = probierFrage;
+      sessionStorage.removeItem("smejj.probierFrage.v1");
+    }
+  } catch { /* ohne Speicher einfach leer starten */ }
   const resizeInput = () => {
     input.style.height = "auto";
     input.style.height = input.value ? `${Math.min(input.scrollHeight, 324)}px` : "48px";
@@ -317,7 +328,7 @@ function bindStartComposer() {
   };
   send.addEventListener("click", submit);
   bindPasteAttach({ getInput: () => input });
-  initComposerTools();
+  ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=werkzeuge-3").then((m) => m.initComposerTools()));
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {
@@ -338,7 +349,8 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   const output = addEntry("", "assistant", target);
   try {
     if (routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
-    if (await runClientChat({ task: await groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
+    if (await mausAuftragErledigt({ task, output })) return showTaskIndicator("done");
+    if (await chatOhneMedienauftrag({ task: await groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
     try {
       const anfrage = {
         task: await groundTask(task),
@@ -375,7 +387,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
       ? UI_COPY.chatOffline
       : /network error/i.test(error?.message || "")
         ? "Die Verbindung ist während der Antwort abgerissen — bitte sende die Frage noch einmal."
-        : error.message || "Aufgabe konnte nicht abgeschlossen werden.";
+        : error.message || "Das hat gerade nicht geklappt. Deine Frage steht noch im Feld — probier es noch einmal.";
     output.textContent = output.textContent ? `${output.textContent.trim()}\n\n${message}` : message;
     hideTaskIndicator();
   }
@@ -414,7 +426,6 @@ function bindCodeTools() {
     downloadText(filename, $("#editor").value);
   });
 }
-
 
 
 function bindStoragePanel() {

@@ -51,7 +51,36 @@ export {
 
 const MAX_TABS = 7;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
-const PANE_WIDTH = "50vw";
+// Die Mitte darf nicht verhungern. Bis 2026-08-22 nahm das Panel stur die halbe
+// Fensterbreite ("50vw"). Es liegt aber per position:fixed UEBER dem Chat, und
+// die linke Spur zaehlt mit: live gemessen bei 962 px Fensterbreite blieben dem
+// Chat 962 - 196 (Spur) - 520 (Panel) = 246 px. Das Eingabefeld war oben
+// angeschnitten, Antworten brachen nach drei Woertern um, und das Modellmenue
+// rutschte unter die Seitenleiste.
+//
+// Gleiche Idee wie panel-layout.js (maxWidth = Fenster - centerMin), nur mit der
+// linken Spur im Abzug. Auf breiten Bildschirmen aendert sich nichts: bei
+// 1280 px bleibt es bei den vollen 50 %.
+const PANE_MIN_PX = 320;   // schmaler ist das Browser-Panel selbst unbrauchbar
+const CHAT_MIN_PX = 380;   // darunter bricht die Antwort woertlich um
+const PANE_VOLLBILD_BIS = 680; // darunter gilt die Medienregel in browser-pane.css
+
+// Reine Rechnung, ohne DOM — damit sie sich pruefen laesst.
+// Input: Fensterbreite und linker Rand der Mitte (rechts der Seitenleiste).
+// Output: CSS-Laenge als String.
+export function paneBreiteAus({ fenster, mitteLinks = 0 }) {
+  const breite = Math.round(fenster || 1200);
+  if (breite <= PANE_VOLLBILD_BIS) return "50vw";
+  const platz = breite - Math.max(0, Math.round(mitteLinks)) - CHAT_MIN_PX;
+  return `${Math.round(Math.max(PANE_MIN_PX, Math.min(breite * 0.5, platz)))}px`;
+}
+
+// Dieselbe Rechnung, aber mit gemessenen Werten aus der Seite.
+function paneBreite() {
+  let mitteLinks = 0;
+  try { mitteLinks = Math.round(document.querySelector("main")?.getBoundingClientRect().left || 0); } catch { mitteLinks = 0; }
+  return paneBreiteAus({ fenster: window.innerWidth, mitteLinks });
+}
 const NEW_TAB_TITLE = "Neuer Tab";
 
 const MAX_PERSISTED_HISTORY = 50;
@@ -140,13 +169,30 @@ function init() {
 
 // --- Pane oeffnen/schliessen -------------------------------------------------
 
+// Beim Groesserziehen des Fensters soll das Panel wieder wachsen duerfen, beim
+// Kleinerziehen dem Chat weichen. Einmalig registriert, laeuft nur bei offenem
+// Panel und schreibt nur, wenn sich der Wert wirklich aendert.
+let breiteBeobachtet = false;
+function breiteBeobachten() {
+  if (breiteBeobachtet || typeof window === "undefined") return;
+  breiteBeobachtet = true;
+  window.addEventListener("resize", () => {
+    if (!document.body.classList.contains("browser-pane-open")) return;
+    const neu = paneBreite();
+    if (document.body.style.getPropertyValue("--right-panel-width") !== neu) {
+      document.body.style.setProperty("--right-panel-width", neu);
+    }
+  });
+}
+
 export function openPane() {
   mountOnce();
   const panel = document.getElementById("browserPanel");
   panel?.classList.add("is-open", "is-browser-mode");
   panel?.classList.remove("is-compact");
   document.body.classList.add("right-panel-open", "browser-pane-open");
-  document.body.style.setProperty("--right-panel-width", PANE_WIDTH);
+  document.body.style.setProperty("--right-panel-width", paneBreite());
+  breiteBeobachten();
   document.getElementById("browserButton")?.setAttribute("aria-expanded", "true");
   if (state.tabs.length === 0) addTab();
   render();

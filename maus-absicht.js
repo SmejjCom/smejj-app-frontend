@@ -42,14 +42,15 @@
 // Dann zeigte activeTab() auf ein leeres Panel und starteMausLauf() meldete
 // ewig "Der Browser ist noch nicht bereit". Nichts waere kaputt zu sehen,
 // alles waere kaputt.
-const PANEL = "./browser-pane.js?v=browser-pane-20260818-3";
-const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260818-1";
+const PANEL = "./browser-pane.js?v=browser-pane-20260822-1";
+const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260819-1";
 
 async function holePanel() {
   const [pane, maus] = await Promise.all([import(PANEL), import(PANEL_MAUS)]);
   return {
     activeTab: pane.activeTab,
     openBrowserRequest: pane.openBrowserRequest,
+    oeffneImLiveBrowser: pane.oeffneImLiveBrowser,
     normalizeAgentBrowserUrl: pane.normalizeAgentBrowserUrl,
     openPane: pane.openPane,
     refs: pane.refs,
@@ -87,6 +88,20 @@ async function ueberChrome({ aufgabe, ziel, schreibe }) {
   schreibe(`Ich arbeite in deinem eigenen Chrome — du siehst der Maus direkt zu. Ich oeffne ${kurzeAdresse(ziel)}.`);
   const auf = await sendeAnChrome({ type: "navigate", url: ziel });
   if (!auf?.ok) {
+    // FEHLENDE FREIGABE IST KEIN ABBRUCH, SONDERN EIN UMWEG.
+    //
+    // Gemessen 2026-08-20: sobald die Bruecke installiert war, endete jeder
+    // Auftrag auf einer noch nicht freigegebenen Seite — obwohl der ferne
+    // Browser sie ohne Weiteres haette oeffnen koennen. Die Bruecke ist fuer
+    // Seiten da, auf denen der Nutzer ANGEMELDET ist; fuer alles Oeffentliche
+    // ist der ferne Browser genauso gut und braucht keine Freigabe.
+    //
+    // Also: Grund nennen, Weg wechseln, weiterarbeiten. Wer den angemeldeten
+    // Zugang braucht, erfaehrt im selben Satz, wie er ihn bekommt.
+    if (String(auf?.error || "").startsWith("herkunft_nicht_freigegeben")) {
+      schreibe(`Fuer ${kurzeAdresse(ziel)} hast du deinem Chrome noch nichts erlaubt — ich nehme den eingebauten Browser. (Wenn die Maus dort ANGEMELDET arbeiten soll: Puzzleteil oben rechts, „smejj.com Maus-Bruecke“, „Fuer 30 Minuten erlauben“.)`);
+      return false;
+    }
     schreibe(deuteChromeFehler(auf?.error, ziel));
     return true;
   }
@@ -302,10 +317,16 @@ export async function mausAuftragErledigt({ task, output, deps = {} } = {}) {
   // Erst der eigene Chrome (wie bei Claude), dann der ferne Browser.
   if (!deps.oeffne && await ueberChrome({ aufgabe, ziel, schreibe })) return true;
 
-  schreibe(`Ich oeffne ${kurzeAdresse(ziel)} im Browser rechts.`);
+  // AUSDRUECKLICH im Live-Browser oeffnen, nicht "irgendwie". navigate()
+  // waehlt den Modus nach der Seite: einbettbare Seiten landen als
+  // gewoehnlicher iframe, und darin sieht die Maus nichts. Genau daran ist der
+  // Auftrag am 2026-08-18 immer wieder gescheitert — mal weil der Proxy tot
+  // war, mal weil er wieder lebte. Jetzt wird der richtige Modus verlangt,
+  // statt auf ihn zu hoffen.
+  schreibe(`Ich oeffne ${kurzeAdresse(ziel)} im Live-Browser rechts.`);
   const geoeffnet = deps.oeffne
     ? (oeffne(ziel) ? { ok: true } : { ok: false, grund: `Diese Adresse kann der eingebaute Browser nicht oeffnen: ${ziel}` })
-    : oeffneZiel(ziel, panel, schreibe);
+    : await panel.oeffneImLiveBrowser(ziel);
   if (!geoeffnet.ok) {
     schreibe(geoeffnet.grund);
     return true;
