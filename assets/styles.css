@@ -879,6 +879,17 @@ body.task-indicator-done .split-icon span:last-child {
   min-height: 0;
   overflow: auto;
   padding-right: 2px;
+  /* Die Spalte darf nie breiter werden als die Schublade. Ohne diese Zeile
+     gilt fuer die Knoepfe die Vorgabe `min-width: auto` — sie wachsen dann mit
+     ihrem laengsten Wort. Gemessen am 2026-08-22: die Leiste ist 180 px breit,
+     der Knopf "Browser bedienen" wurde 192 px, und weil `overflow: auto`
+     darueber steht, entstand ein seitlicher Bildlauf IN der Schublade. Zu
+     sehen war davon nur, dass der Text 3 px hinter der Kante endete — ohne
+     Auslassungspunkte, denn aus Sicht der Beschriftung (140 px in 140 px)
+     gab es nichts zu kuerzen; geschnitten wurde eine Ebene hoeher. Mit
+     minmax(0, 1fr) wird der Knopf gestaucht, die Beschriftung laeuft ueber
+     und `text-overflow: ellipsis` greift wie gedacht. */
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .sidebar .bottom-nav {

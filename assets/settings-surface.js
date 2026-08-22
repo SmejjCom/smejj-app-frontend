@@ -329,7 +329,7 @@ function applyValues(view, settings) {
 function loadStyles() {
   // Versionsmarke wie in account-privacy.js: GitHub Pages liefert Assets mit
   // max-age; ohne ?v= saehe ein offener Browser die neue Datei erst spaeter.
-  const href = "/assets/settings-surface.css?v=b46";
+  const href = "/assets/settings-surface.css?v=b48";
   if (document.querySelector('link[href^="/assets/settings-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";

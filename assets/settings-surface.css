@@ -7,9 +7,12 @@
 
 #settings.premium-view {
   padding: 72px clamp(14px, 4vw, 48px) 28px;
-  background-image:
-    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.10), transparent 60%),
-    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.07), transparent 60%);
+  /* 2026-08-22: die zwei cyan/violetten Lichtflecken sind hier RAUS. Am
+     selben Tag wurde design-cyan-views.css abgeraeumt — seither tragen alle
+     anderen Ansichten den ruhigen Grundton der App. Diese Ansicht brachte
+     ihre eigene Faerbung mit und waere als einzige (mit /profile) bunt
+     stehengeblieben. Gemessen vorher: 10 von 12 Ansichten transparent,
+     settings und profile mit radial-gradient(rgba(45,212,191,…)). */
 }
 
 #settings .settings-header {
@@ -306,10 +309,10 @@
 
 /* Hell-Modus: gleiche Formen, helle Flaechen, dunkle Haarlinien. */
 #settings.premium-view[data-settings-theme="light"] {
+  /* Die deckende Flaeche bleibt (Fail-safe gegen dunklen Text auf dunklem
+     Glas, Befund iPhone-PWA 2026-07-26). Nur die zwei Lichtflecken sind
+     raus — wie im Dunkel-Block oben. */
   background: #f2f4f4;
-  background-image:
-    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.14), transparent 60%),
-    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.08), transparent 60%);
   color: #14181a;
 }
 
@@ -419,6 +422,26 @@
   #settings .settings-row select {
     min-width: 0;
     width: 100%;
+  }
+
+  /* Der Status-Chip ("Lokal gespeichert") steht mit white-space: nowrap in
+     einer Zeile und ist damit 134 px breit. Auf einem 320-px-Telefon passt er
+     neben der Ueberschrift nicht mehr: die Ansicht liess sich um 7 px seitlich
+     schieben. Wenig, aber es ist derselbe Fehler wie jeder grosse — die Seite
+     wackelt beim Wischen. Hier darf der Chip umbrechen; ab 480 px bleibt er
+     einzeilig wie entworfen. Gemessen mit npm run measure:responsive. */
+  #settings .settings-status {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  /* Umbrechen allein reichte nicht: die Kopfzeile ist eine Flex-Reihe mit
+     nowrap, und der Chip steht auf flex: 0 0 auto — er schrumpft also nicht,
+     und solange sein Kasten breit genug bleibt, bricht auch der Text nicht um.
+     Erst wenn die ZEILE umbricht, rutscht der Chip unter die Ueberschrift und
+     die Ansicht passt wieder ins Fenster. */
+  #settings .settings-header {
+    flex-wrap: wrap;
   }
 }
 

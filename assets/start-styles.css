@@ -754,6 +754,7 @@ body.task-indicator-done .split-icon span:last-child {
   min-height: 0;
   overflow: auto;
   padding-right: 2px;
+  grid-template-columns: minmax(0, 1fr);
 }
 .sidebar .bottom-nav {
   gap: 0;
