@@ -162,7 +162,12 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
   async function open(url, viewport) {
     if (!ready()) return null;
     const data = await post(api.browserSession, { url, viewport });
-    if (!data?.ok || !data.sessionId || !data.screenshot) return null;
+    // Ein Bild ist Pflicht — ausser die Seite hat schon beim Laden gefragt
+    // (alert/confirm direkt im onload). Dann gibt es kein Bild, und ohne
+    // diese Ausnahme gaelte die Sitzung als fehlgeschlagen, obwohl sie
+    // laeuft und nur auf eine Antwort wartet.
+    if (!data?.ok || !data.sessionId) return null;
+    if (!data.screenshot && !data.dialog) return null;
     openIds.add(data.sessionId);
     return data;
   }
@@ -200,6 +205,22 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
     const data = await post(api.browserSessionAct, { sessionId, action });
     postToFrame(tab, { type: "smejj.browser.sessionState", busy: false });
     if (tab.sessionId !== sessionId) return; // Tab hat inzwischen neu verbunden.
+    // JS-DIALOG (2026-08-21). Zwei Gruende, warum das VOR der Bildpruefung
+    // steht:
+    // 1. Bei offenem Dialog kann der Worker kein neues Bild machen — Chromium
+    //    blockiert die Seite. Die Antwort traegt dann das letzte Bild oder gar
+    //    keins. Stuende die Dialogpruefung unten, fiele genau der Fall in den
+    //    Fehlerzweig und die Sitzung gaelte als verloren.
+    // 2. Auch ein 409 "dialog_offen" (die Aktion wurde abgelehnt, weil eine
+    //    Frage offen steht) traegt den Dialog mit. Der Nutzer soll die Frage
+    //    sehen, statt einen Klick zu machen, der ins Leere geht.
+    postToFrame(tab, { type: "smejj.browser.sessionDialog", dialog: data?.dialog || null });
+    if (data?.dialog) {
+      if (data.screenshot) {
+        postToFrame(tab, { type: "smejj.browser.sessionFrame", screenshot: data.screenshot, title: data.title || "" });
+      }
+      return data;
+    }
     if (data?.ok && data.screenshot) {
       postToFrame(tab, { type: "smejj.browser.sessionFrame", screenshot: data.screenshot, title: data.title || "" });
       // Die Suche liefert ihre Trefferzahl als Beifang der Aktion mit. Sie

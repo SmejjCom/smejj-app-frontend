@@ -92,6 +92,62 @@
     function sendAction(action) {
       parent.postMessage({ type: "smejj.browser.sessionAct", action: action }, "*");
     }
+
+    // --- JS-Dialoge der Seite (alert/confirm/prompt) ----------------------
+    // Vorher verwarf der Fern-Browser jede Frage stillschweigend mit
+    // "Abbrechen". Wer hier sass, sah eine Seite, die auf seinen Klick nicht
+    // reagierte. Jetzt steht die Frage sichtbar da und wird beantwortet.
+    var dlg = document.getElementById("bpDialog");
+    var dlgKopf = document.getElementById("bpDialogKopf");
+    var dlgText = document.getElementById("bpDialogText");
+    var dlgEingabe = document.getElementById("bpDialogEingabe");
+    var dlgOk = document.getElementById("bpDialogOk");
+    var dlgAbbruch = document.getElementById("bpDialogAbbruch");
+    var dialogOffen = false;
+    var KOPFTEXT = { alert: "Hinweis der Seite", confirm: "Frage der Seite", prompt: "Eingabe erwartet", beforeunload: "Seite verlassen?" };
+
+    function zeigeDialog(dialog) {
+      if (!dlg) return;
+      if (!dialog) {
+        dialogOffen = false;
+        dlg.classList.remove("is-open");
+        return;
+      }
+      dialogOffen = true;
+      var art = String(dialog.art || "dialog");
+      if (dlgKopf) dlgKopf.textContent = KOPFTEXT[art] || "Meldung der Seite";
+      // textContent, nie innerHTML: der Text kommt aus einer fremden Seite.
+      if (dlgText) dlgText.textContent = String(dialog.nachricht || "");
+      if (dlgEingabe) {
+        var brauchtEingabe = art === "prompt";
+        dlgEingabe.classList.toggle("is-open", brauchtEingabe);
+        dlgEingabe.value = brauchtEingabe ? String(dialog.vorgabe || "") : "";
+      }
+      // Ein alert() hat nur EINEN Weg hinaus — ein zweiter Knopf waere
+      // gelogen, denn beide taeten dasselbe.
+      if (dlgAbbruch) dlgAbbruch.style.display = art === "alert" ? "none" : "";
+      dlg.classList.add("is-open");
+      try { (art === "prompt" ? dlgEingabe : dlgOk).focus(); } catch (fehler) { /* Fokus ist Komfort */ }
+    }
+
+    function beantworte(bestaetigen) {
+      if (!dialogOffen) return;
+      var art = dlgEingabe && dlgEingabe.classList.contains("is-open");
+      var aktion = bestaetigen ? { type: "dialogAccept" } : { type: "dialogDismiss" };
+      if (bestaetigen && art) aktion.text = dlgEingabe.value;
+      // ERST schliessen, DANN senden: sonst blinkt das Fenster noch, waehrend
+      // die Antwort schon unterwegs ist, und ein zweiter Klick kaeme durch.
+      zeigeDialog(null);
+      sendAction(aktion);
+    }
+
+    if (dlgOk) dlgOk.addEventListener("click", function () { beantworte(true); });
+    if (dlgAbbruch) dlgAbbruch.addEventListener("click", function () { beantworte(false); });
+    if (dlgEingabe) {
+      dlgEingabe.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") { event.preventDefault(); beantworte(true); }
+      });
+    }
     // Rechtsklick gehoert dem Panel, nicht der Seite darunter: auf einem
     // Standbild ist das Browser-Menue ohnehin sinnlos ("Bild speichern").
     document.addEventListener("contextmenu", function (event) {
@@ -138,7 +194,12 @@
       if (x < 0 || x > 100 || y < 0 || y > 100) return null;
       return { x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 };
     }
+    // Solange die Seite fragt, ist sie wirklich blockiert — und der Dialog
+    // liegt INNERHALB der Buehne. Ohne diesen Ausstieg wuerde ein Klick auf
+    // "OK" zusaetzlich als Klick an die Seite geschickt (und traefe dort
+    // irgendetwas). Gilt fuer jeden Eingabeweg, nicht nur die Maus.
     stage.addEventListener("click", function (event) {
+      if (dialogOffen) return;
       event.preventDefault();
       flushText();
       var pct = toPct(event);
@@ -146,12 +207,14 @@
       try { stage.focus({ preventScroll: true }); } catch (error) {}
     });
     stage.addEventListener("contextmenu", function (event) {
+      if (dialogOffen) return;
       event.preventDefault();
       flushText();
       var pct = toPct(event);
       if (pct) sendAction({ type: "click", xPct: pct.x, yPct: pct.y, button: "right" });
     });
     stage.addEventListener("wheel", function (event) {
+      if (dialogOffen) return;
       event.preventDefault();
       wheelDelta += event.deltaY;
       if (!wheelTimer) wheelTimer = setTimeout(flushWheel, 200);
@@ -164,6 +227,9 @@
     // umgebenden Browser, damit ⌘T/⌘W/⌘Q dort weiter das Gewohnte tun.
     var comboKeys = { v: 1, c: 1, x: 1, a: 1, z: 1 };
     window.addEventListener("keydown", function (event) {
+      // Bei offenem Dialog gehoert die Tastatur dem Eingabefeld, nicht der
+      // blockierten Seite darunter.
+      if (dialogOffen) return;
       if (event.metaKey || event.ctrlKey) {
         var taste = String(event.key || "").toLowerCase();
         if (!event.altKey && !event.shiftKey && comboKeys[taste] === 1) {
@@ -195,6 +261,10 @@
       if (data.type === "smejj.browser.sessionFrame") {
         if (typeof data.screenshot === "string" && data.screenshot.indexOf("data:image/") === 0) frame.src = data.screenshot;
         if (titleEl && typeof data.title === "string" && data.title) titleEl.textContent = data.title;
+        return;
+      }
+      if (data.type === "smejj.browser.sessionDialog") {
+        zeigeDialog(data.dialog || null);
         return;
       }
       if (data.type === "smejj.browser.sessionState" && stateEl) {

@@ -107,7 +107,7 @@ export function buildErrorPageHtml({ url = "", grund = "" } = {}) {
        Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
        hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
        unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
-  <script src="/assets/browser-stage.js?v=4"></script>
+  <script src="/assets/browser-stage.js?v=5"></script>
 </body>
 </html>`;
 }
@@ -179,7 +179,7 @@ export function buildRemoteBrowserHtml({ url, title, screenshot, reason = "", ca
        Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
        hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
        unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
-  <script src="/assets/browser-stage.js?v=4"></script>
+  <script src="/assets/browser-stage.js?v=5"></script>
 </body>
 </html>`;
 }
@@ -207,6 +207,20 @@ export function buildLiveBrowserHtml({ url, title, screenshot, viewport = {} } =
     .bp-live-stage{position:relative;overflow:hidden;background:#fff;outline:none;cursor:default}
     .bp-live-stage img{display:block;width:100%;height:100%;object-fit:contain;background:#fff;user-select:none;-webkit-user-drag:none}
     .bp-live-stage.is-busy img{opacity:.72;transition:opacity .15s ease}
+    /* JS-Dialog der Seite (alert/confirm/prompt). Er liegt UEBER dem Bild,
+       weil die Seite dahinter wirklich blockiert ist — ein halbdurchsichtiger
+       Schleier sagt das ehrlicher als jede Beschriftung. Viereckig nach
+       Betreiber-Regel, grosse Schrift (15px), Knoepfe 44px hoch. */
+    .bp-dialog{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(16,17,19,.62);padding:16px;box-sizing:border-box}
+    .bp-dialog.is-open{display:flex}
+    .bp-dialog-box{width:min(420px,100%);background:#18191c;border:1px solid rgba(246,243,238,.18);box-sizing:border-box}
+    .bp-dialog-kopf{padding:10px 14px;border-bottom:1px solid rgba(246,243,238,.12);font-size:12px;color:#9fe7d4;text-transform:uppercase;letter-spacing:.04em}
+    .bp-dialog-text{padding:14px;font-size:15px;line-height:1.45;white-space:pre-wrap;word-break:break-word;max-height:38vh;overflow:auto}
+    .bp-dialog-eingabe{display:none;width:calc(100% - 28px);margin:0 14px 14px;padding:10px;font-size:15px;font-family:inherit;color:#f6f3ee;background:#101113;border:1px solid rgba(246,243,238,.24);box-sizing:border-box}
+    .bp-dialog-eingabe.is-open{display:block}
+    .bp-dialog-knoepfe{display:flex;gap:8px;padding:0 14px 14px}
+    .bp-dialog-knoepfe button{flex:1;min-height:44px;font-size:15px;font-family:inherit;font-weight:700;color:#101113;background:#9fe7d4;border:0;cursor:pointer}
+    .bp-dialog-knoepfe button.ist-zweitrangig{color:#f6f3ee;background:transparent;border:1px solid rgba(246,243,238,.28)}
   </style>
 </head>
 <body>
@@ -221,13 +235,28 @@ export function buildLiveBrowserHtml({ url, title, screenshot, viewport = {} } =
          abgesichert (if (titleEl …)) und laufen unveraendert weiter. -->
     <div class="bp-live-stage" id="bpStage" tabindex="0">
       <img id="bpFrame" src="${safeScreenshot}" alt="Live-Browser-Ansicht von ${safeTitle}">
+      <!-- Das Dialogfenster der SEITE (alert/confirm/prompt). Leer und
+           versteckt, bis browser-stage.js eine Frage hereinreicht. Die
+           Beschriftungen kommen von dort — hier steht bewusst kein Text,
+           damit es nie kurz eine leere Frage zeigt. -->
+      <div class="bp-dialog" id="bpDialog" role="alertdialog" aria-modal="true" aria-labelledby="bpDialogText">
+        <div class="bp-dialog-box">
+          <div class="bp-dialog-kopf" id="bpDialogKopf"></div>
+          <div class="bp-dialog-text" id="bpDialogText"></div>
+          <input class="bp-dialog-eingabe" id="bpDialogEingabe" type="text" autocomplete="off">
+          <div class="bp-dialog-knoepfe">
+            <button type="button" id="bpDialogOk">OK</button>
+            <button type="button" class="ist-zweitrangig" id="bpDialogAbbruch">Abbrechen</button>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
   <!-- Bedienlogik EXTERN in browser-stage.js: srcdoc erbt die CSP des
        Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
        hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
        unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
-  <script src="/assets/browser-stage.js?v=4"></script>
+  <script src="/assets/browser-stage.js?v=5"></script>
 </body>
 </html>`;
 }
