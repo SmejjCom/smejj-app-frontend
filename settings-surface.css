@@ -1,15 +1,25 @@
 /* smejj.com — Einstellungen im viereckigen Glas-Design (Freigabe 2026-07-26,
    "komplett fertig machen"). Gleiche Formensprache wie der Kontobereich:
    rechteckige Glasflaechen (border-radius 0), Felder nur durch hauchduenne
-   Linien getrennt, feine helle Kante oben, Akzent fest tuerkis (#2dd4bf).
+   Linien getrennt, feine helle Kante oben. Der Akzent kommt seit dem
+   2026-08-22 aus var(--v11-cy) — vorher stand hier der ALTE Ton #2dd4bf
+   fest verdrahtet, und genau diese Ton-Vielfalt sollte V11 beenden.
    Markup, IDs und die Verhaltens-Hooks (data-settings-density/font-size/
    theme/diagnostics) bleiben unveraendert. Hell-Modus wird mitgezogen. */
 
 #settings.premium-view {
   padding: 72px clamp(14px, 4vw, 48px) 28px;
-  background-image:
-    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.10), transparent 60%),
-    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.07), transparent 60%);
+  /* Fokusring: eigene Variable, weil der Akzentton auf hellem Grund
+     durchfaellt. Nachgerechnet 2026-08-22 (WCAG non-text, Schwelle 3.0):
+     #32f6ea gegen #f2f4f4 = 1.36. Auf Dunkel traegt er mit 13.84.
+     Gleiche Loesung wie im Kontobereich (--konto-fokus). */
+  --set-fokus: var(--v11-cy);
+  /* 2026-08-22: die zwei cyan/violetten Lichtflecken sind hier RAUS. Am
+     selben Tag wurde design-cyan-views.css abgeraeumt — seither tragen alle
+     anderen Ansichten den ruhigen Grundton der App. Diese Ansicht brachte
+     ihre eigene Faerbung mit und waere als einzige (mit /profile) bunt
+     stehengeblieben. Gemessen vorher: 10 von 12 Ansichten transparent,
+     settings und profile mit radial-gradient(rgba(45,212,191,…)). */
 }
 
 #settings .settings-header {
@@ -38,7 +48,7 @@
 #settings .settings-status {
   flex: none;
   color: var(--premium-muted, #9fa8ad);
-  font-size:14.5px;
+  font-size: 12px;
   padding: 8px 16px;
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-top-color: rgba(255, 255, 255, 0.28);
@@ -49,12 +59,35 @@
   white-space: nowrap;
 }
 
+/* Zwei Spalten, die von selbst umbrechen — und zwar nach dem Platz, den die
+   FLAECHE hat, nicht nach der Fenstergroesse. Der Unterschied ist bei
+   smejj.com betraechtlich: bei 768 px stehen links 200 px Schublade und,
+   sobald die rechte Flaeche angedockt ist, rechts noch einmal 200 px. Von
+   768 px bleiben dann 368 px uebrig. Ein festes `250px <Inhalt>`-Raster
+   kannte diesen Unterschied nicht: die Medienabfrage sah 768 px und liess
+   beide Spalten stehen, der Inhalt bekam 168 px und lief 200 px ueber den
+   Rand (gemessen mit `npm run measure:responsive`). Als umbrechende
+   Flex-Zeile entscheidet der tatsaechliche Platz: reicht er fuer 250 px
+   Navigation UND rund 420 px Inhalt, stehen sie nebeneinander wie bisher,
+   sonst rutscht der Inhalt darunter. Auf dem Schreibtisch aendert sich
+   nichts. */
 #settings .settings-shell {
-  display: grid;
-  grid-template-columns: 250px minmax(0, 820px);
-  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: clamp(18px, 3vw, 40px);
   padding-top: 24px;
+}
+
+#settings .settings-shell > .settings-nav {
+  flex: 1 1 250px;
+  max-width: 250px;
+}
+
+#settings .settings-shell > .settings-content {
+  flex: 1 1 420px;
+  min-width: 0;
+  max-width: 820px;
 }
 
 /* Navigation: eine Glasleiste, Punkte durch hauchduenne Linien getrennt. */
@@ -79,7 +112,7 @@
   border-radius: 0;
   background: transparent;
   color: var(--premium-muted, #9fa8ad);
-  font-size:16.5px;
+  font-size: 14px;
   font-weight: 600;
   text-align: start;
   cursor: pointer;
@@ -97,7 +130,7 @@
 #settings .settings-nav-button.is-active {
   color: var(--premium-text, #eef1f2);
   background: rgba(255, 255, 255, 0.085);
-  box-shadow: inset 3px 0 0 #2dd4bf;
+  box-shadow: inset 3px 0 0 var(--v11-cy);
 }
 
 #settings .settings-content {
@@ -126,15 +159,15 @@
 #settings .settings-panel h3 {
   margin: 0 0 4px;
   color: var(--premium-text, #eef1f2);
-  font-size:23px;
+  font-size: 20px;
   font-weight: 650;
 }
 
 #settings .settings-panel > header p {
   margin: 0;
   color: var(--premium-muted, #9fa8ad);
-  font-size:16px;
-  line-height: 1.62;
+  font-size: 13.5px;
+  line-height: 1.5;
 }
 
 /* Zeilen-Listen: Felder nur durch hauchduenne Linien getrennt. */
@@ -170,14 +203,14 @@
 
 #settings .settings-row-copy strong {
   color: var(--premium-text, #eef1f2);
-  font-size:17px;
+  font-size: 14.5px;
   font-weight: 650;
 }
 
 #settings .settings-row-copy span {
   color: var(--premium-muted, #9fa8ad);
-  font-size:15.5px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 #settings .settings-row select,
@@ -188,7 +221,7 @@
   border-radius: 0;
   background: rgba(0, 0, 0, 0.25);
   color: var(--premium-text, #eef1f2);
-  font-size:17px;
+  font-size: 14.5px;
   font-family: inherit;
 }
 
@@ -196,7 +229,7 @@
   width: 100%;
   min-height: 88px;
   resize: vertical;
-  line-height: 1.62;
+  line-height: 1.5;
 }
 
 /* Viereckiger Schalter (Markup: input + span). */
@@ -237,8 +270,8 @@
 }
 
 #settings .settings-switch input:checked + span {
-  background: #2dd4bf;
-  border-color: #2dd4bf;
+  background: var(--v11-cy);
+  border-color: var(--v11-cy);
 }
 
 #settings .settings-switch input:checked + span::after {
@@ -247,7 +280,7 @@
 }
 
 #settings .settings-switch input:focus-visible + span {
-  outline: 2px solid #2dd4bf;
+  outline: 2px solid var(--set-fokus);
   outline-offset: 2px;
 }
 
@@ -258,7 +291,7 @@
   border-radius: 0;
   background: rgba(255, 255, 255, 0.085);
   color: var(--premium-text, #eef1f2);
-  font-size:16px;
+  font-size: 13.5px;
   font-weight: 650;
   cursor: pointer;
   white-space: nowrap;
@@ -275,18 +308,20 @@
 }
 
 #settings .settings-links a {
-  color: #2dd4bf;
+  color: var(--v11-cy);
   text-decoration: none;
   font-weight: 650;
-  font-size:16px;
+  font-size: 13.5px;
 }
 
 /* Hell-Modus: gleiche Formen, helle Flaechen, dunkle Haarlinien. */
 #settings.premium-view[data-settings-theme="light"] {
+  /* 6.20 gegen #f2f4f4 — derselbe dunkle Tuerkiston wie im Kontobereich. */
+  --set-fokus: #0c6b5e;
+  /* Die deckende Flaeche bleibt (Fail-safe gegen dunklen Text auf dunklem
+     Glas, Befund iPhone-PWA 2026-07-26). Nur die zwei Lichtflecken sind
+     raus — wie im Dunkel-Block oben. */
   background: #f2f4f4;
-  background-image:
-    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.14), transparent 60%),
-    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.08), transparent 60%);
   color: #14181a;
 }
 
@@ -345,9 +380,13 @@
 }
 
 /* Mobil: Navigation als umbrechende Chip-Leiste. */
-@media (max-width: 760px) {
-  #settings .settings-shell {
-    grid-template-columns: minmax(0, 1fr);
+@media (max-width: 900px) {
+  /* Die Navigation nimmt die volle Breite ein und wird zur Chip-Leiste.
+     Die Grenze lag bis 2026-08-22 bei 760 px — bei 768 px stand links noch
+     die 200-px-Schublade, sodass fuer den Inhalt nur 234 px blieben. */
+  #settings .settings-shell > .settings-nav {
+    flex-basis: 100%;
+    max-width: none;
   }
 
   #settings .settings-nav {
@@ -367,11 +406,11 @@
     border: 1px solid rgba(255, 255, 255, 0.13);
     border-radius: 0;
     background: rgba(255, 255, 255, 0.045);
-    font-size:15.5px;
+    font-size: 13px;
   }
 
   #settings .settings-nav-button.is-active {
-    box-shadow: inset 0 3px 0 #2dd4bf;
+    box-shadow: inset 0 3px 0 var(--v11-cy);
   }
 
   #settings.premium-view[data-settings-theme="light"] .settings-nav-button {
@@ -393,4 +432,72 @@
     min-width: 0;
     width: 100%;
   }
+
+  /* Der Status-Chip ("Lokal gespeichert") steht mit white-space: nowrap in
+     einer Zeile und ist damit 134 px breit. Auf einem 320-px-Telefon passt er
+     neben der Ueberschrift nicht mehr: die Ansicht liess sich um 7 px seitlich
+     schieben. Wenig, aber es ist derselbe Fehler wie jeder grosse — die Seite
+     wackelt beim Wischen. Hier darf der Chip umbrechen; ab 480 px bleibt er
+     einzeilig wie entworfen. Gemessen mit npm run measure:responsive. */
+  #settings .settings-status {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  /* Umbrechen allein reichte nicht: die Kopfzeile ist eine Flex-Reihe mit
+     nowrap, und der Chip steht auf flex: 0 0 auto — er schrumpft also nicht,
+     und solange sein Kasten breit genug bleibt, bricht auch der Text nicht um.
+     Erst wenn die ZEILE umbricht, rutscht der Chip unter die Ueberschrift und
+     die Ansicht passt wieder ins Fenster. */
+  #settings .settings-header {
+    flex-wrap: wrap;
+  }
+}
+
+
+/* --- Mockup V11, Bildschirm 55: Untertitel je Bereich + Suchfeld -------- */
+#settings .settings-nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+#settings .settings-nav-name {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+#settings .settings-nav-sub {
+  font-size: 13.5px;
+  color: rgba(242, 245, 244, 0.62);
+  font-weight: 400;
+}
+#settings .settings-nav-button.is-active .settings-nav-name { color: #ffffff; }
+#settings .settings-suche {
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 10px 13px;
+  font-size: 15px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.24);
+  color: #f2f5f4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+#settings .settings-suche:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--v11-cy), 0 0 0 3px var(--v11-cy-glow);
+}
+
+
+/* Bildschirm 45: die Vorschauzeile, die sofort mitwaechst */
+#settings .settings-schriftprobe {
+  margin: 4px 0 14px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  color: #f2f5f4;
+  font-size: 1em;
+  line-height: 1.6;
 }

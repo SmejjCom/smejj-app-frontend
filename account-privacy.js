@@ -1,12 +1,15 @@
 import { STORAGE_KEYS } from "./config.js";
 import { initServerSessionControls, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
-  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=8";
+  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=b46";
 import { languageOptionsMarkup } from "./language-options.js?v=1";
 import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=1";
 import { clearProfilePicture } from "./profile-picture-store.js?v=1";
 import { afterFirstPaint } from "./deferred-start.js";
-import { applyAuthState } from "./account-auth-state.js?v=1";
+// Ohne ?v=: siehe die Begruendung in account-auth-state.js. Eine Marke hier
+// wuerde erzwingen, dass diese ABO-GESPERRTE Datei bei jeder Stil-Aenderung
+// wieder angefasst wird — genau das soll die Auslagerung verhindern.
+import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js";
 import { usageSummary } from "./usage-meter.js?v=1";
 import { initOnboardingWelcome } from "./onboarding-welcome.js?v=1";
 
@@ -119,11 +122,35 @@ async function hydrateBillingStatus(view) {
   renderBillingState(view, billing);
 }
 
+// "Bezahlt wurde mit"-Zeile. Halb-Commit repariert (Nutzertest 2026-08-17):
+// der Aufruf stand im Repo, die Funktion fehlte — renderBillingState crashte
+// mit ReferenceError und die ganze Abo-Anzeige blieb leer. Fail-safe: ohne
+// paidEmail verschwindet die Zeile, es wird nie etwas erfunden.
+function renderZugang(panel, billing) {
+  const bisher = panel.querySelector(".zahl-adresse");
+  const mail = String(billing?.paidEmail || "").trim();
+  if (!mail) { bisher?.remove(); return; }
+  let zeile = bisher;
+  if (!zeile) {
+    zeile = document.createElement("p");
+    zeile.className = "zahl-adresse";
+    const anker = panel.querySelector(".account-plan");
+    if (anker) anker.after(zeile); else panel.append(zeile);
+  }
+  zeile.textContent = `Bezahlt wurde mit: ${mail}`;
+}
+
 // Serverstand -> Panel: aktueller Plan gross und klar, Verlaengerungs- bzw.
 // Auslaufdatum, "Abo verwalten"-Knopf, aktueller Plan in der Liste markiert.
 function renderBillingState(view, billing) {
   const panel = view.querySelector('[data-account-panel="billing"]');
   if (!panel) return;
+  // Bildschirm 41, die wichtigste Zeile der Kontoseite: "Bezahlt wurde mit".
+  // Genau daran ist das erste echte Abo unsichtbar geworden — bezahlt unter
+  // einer anderen Adresse als angemeldet. paidEmail kommt seit 2026-08-15 aus
+  // /api/billing/status (nur fuer den Kontoinhaber). Bestandsabos von vor dem
+  // Feld haben es nicht — dann erscheint die Zeile nicht.
+  renderZugang(panel, billing);
   const label = PLAN_LABELS[billing.plan];
   const aktiv = Boolean(label);
   const planName = panel.querySelector(".plan-name");
@@ -206,7 +233,7 @@ function startOrSwitchPlan(view, plan) {
 function markup() {
   return `<header class="account-header"><div><p class="eyebrow">${t("Konto & Datenschutz")}</p><h2>${t("Konto")}</h2><p class="subhead">${t("Identität, Sitzungen und Daten sicher verwalten. Secrets werden weder angezeigt noch exportiert.")}</p></div><span class="account-security">Lokal-first · fail-closed</span></header>
   <div class="account-layout"><nav class="account-nav" role="tablist" aria-label="${t("Kontobereiche")}">
-    ${nav("identity", "Profil")}${nav("personalization", "Personalisierung")}${nav("voice", "Sprache & Stimme")}${nav("apps", "Verbundene Apps")}${nav("notifications", "Benachrichtigungen")}${nav("security", "Anmeldung & Sicherheit")}${nav("billing", "Abo & Zahlungen")}${nav("usage", "Nutzung & Limits")}${nav("data", "Daten & Datenschutz")}
+    ${nav("identity", "Profil")}${nav("personalization", "Personalisierung")}${nav("voice", "Sprache & Stimme")}${nav("apps", "Verbundene Apps")}${nav("notifications", "Benachrichtigungen")}${nav("security", "Anmeldung & Sicherheit")}${nav("billing", "Mein Plan")}${nav("usage", "Nutzung & Limits")}${nav("data", "Meine Daten")}
   </nav><div class="account-content">
     ${panel("identity", "Profil", `${profilePictureMarkup()}<div class="account-grid"><label>${t("Name")}<input id="profileName" placeholder="${t("Dein Name")}"></label><label>${t("E-Mail")}<input id="profileEmail" placeholder="name@example.com" inputmode="email"></label><label>${t("Sprache")}<select id="language" aria-label="${t("Sprache")}">${languageOptionsMarkup()}</select></label><label>${t("Antwortmodus")}<select id="mode" aria-label="${t("Antwortmodus")}"><option value="safe">Free-safe</option><option value="byok">${t("BYOK vorbereitet")}</option><option value="local">${t("Lokal")}</option></select></label></div><div class="account-actions"><button id="saveProfile" type="button">${t("Profil speichern")}</button><button id="registerLocal" type="button">${t("Lokales Profil erstellen")}</button></div>`)}
     ${panel("personalization", "Personalisierung", `<div class="account-list">${statusRow("Gedächtnis", "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.", "Bald verfügbar")}</div><label class="account-textarea"><strong>${t("Eigene Anweisungen")}</strong><textarea id="personalInstructions" rows="4" placeholder="${t("z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.")}"></textarea></label><p class="account-note">${t("Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.")}</p><div class="account-actions"><button id="savePersonalization" type="button">${t("Anweisungen speichern")}</button></div>`)}
@@ -214,9 +241,13 @@ function markup() {
     ${panel("apps", "Verbundene Apps", `<div class="account-list">${dataAction("KI-Modelle & API-Keys", "GLM-5.2 aktiv · eigene Schlüssel und Modellwahl liegen in den Einstellungen.", "modelsSettingsOpen", "Einstellungen öffnen")}${statusRow("GitHub", "Für Coding: über die rechte Seitenleiste der App verbunden.", "In der App", true)}${statusRow("Google Drive", "Dateien direkt in den Chat holen.", "Bald verfügbar")}${statusRow("Google Kalender", "Termine ansehen und vorlesen lassen — nur lesend.", "Bald verfügbar")}${statusRow("Slack", "Zusammenfassungen aus Kanälen holen.", "Bald verfügbar")}</div><p class="account-note">${t("Apps sehen nur, was du ausdrücklich freigibst — Zugriff jederzeit widerrufbar.")}</p>`)}
     ${panel("notifications", "Benachrichtigungen", `<div class="account-list">${toggle("Coding-Agent fertig", "notifyAgentDone", "Meldung, wenn eine lange Aufgabe abgeschlossen ist.")}${toggle("Antwort fertig", "notifyReplyDone", "Wenn du die App verlassen hast, während smejj noch arbeitet.")}${toggle("Limit fast erreicht", "notifyLimit80", "Hinweis bei 80 % — Limits starten erst mit den Plänen.")}${statusRow("Sicherheitswarnungen", "Neue Anmeldung, neues Gerät — immer per E-Mail.", "Immer an", true)}${statusRow("Rechnungen & Zahlungen", "Kommt mit den Bezahl-Plänen.", "Immer an", true)}</div><p class="account-note">${t("Diese Auswahl gilt auf diesem Gerät.")}</p>`)}
     ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
-    ${panel("billing", "Abo & Zahlungen", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">Free — 0 €</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div><p class="account-note">${t("Alle Preise sind Gesamtpreise pro Monat inkl. gesetzlicher Umsatzsteuer. Das kostenpflichtige Abo hat eine Laufzeit von einem Monat und verlängert sich automatisch um jeweils einen weiteren Monat, bis du kündigst. Jederzeit zum Ende des bezahlten Monats kündbar.")}</p><div class="account-list">${dataAction("Plus — 9 € / Monat", "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.", "planPlusOpen", "Zahlungspflichtig abonnieren")}${dataAction("Pro — 19 € / Monat", "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.", "planProOpen", "Zahlungspflichtig abonnieren")}${dataAction("Max — 39 € / Monat", "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.", "planMaxOpen", "Zahlungspflichtig abonnieren")}</div><p class="account-note">${t("Mit „Zahlungspflichtig abonnieren“ wirst du zum Zahlungsdienstleister Stripe weitergeleitet und schließt dort ein kostenpflichtiges Abo ab. Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Nach der Zahlung bekommst du eine Bestätigung per E-Mail. Es gelten unsere")} <a href="/agb.html">${t("AGB")}</a> ${t("und die")} <a href="/widerruf.html">${t("Widerrufsbelehrung")}</a>.</p><div class="account-actions"><button id="planManageOpen" type="button" hidden>${t("Abo verwalten — Rechnungen, Plan & Kündigung")}</button><button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}
+    ${panel("billing", "Mein Plan", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">Free — 0 €</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div><p class="account-note">${t("Alle Preise sind Gesamtpreise pro Monat inkl. gesetzlicher Umsatzsteuer. Das kostenpflichtige Abo hat eine Laufzeit von einem Monat und verlängert sich automatisch um jeweils einen weiteren Monat, bis du kündigst. Jederzeit zum Ende des bezahlten Monats kündbar.")}</p><div class="account-list">${dataAction("Plus — 9 € / Monat", "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.", "planPlusOpen", "Zahlungspflichtig abonnieren")}${dataAction("Pro — 19 € / Monat", "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.", "planProOpen", "Zahlungspflichtig abonnieren")}${dataAction("Max — 39 € / Monat", "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.", "planMaxOpen", "Zahlungspflichtig abonnieren")}</div><p class="account-note">${t("Mit „Zahlungspflichtig abonnieren“ wirst du zum Zahlungsdienstleister Stripe weitergeleitet und schließt dort ein kostenpflichtiges Abo ab. Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Nach der Zahlung bekommst du eine Bestätigung per E-Mail. Es gelten unsere")} <a href="/agb.html">${t("AGB")}</a> ${t("und die")} <a href="/widerruf.html">${t("Widerrufsbelehrung")}</a>.</p><div class="account-actions"><button id="planManageOpen" type="button" hidden>${t("Abo verwalten — Rechnungen, Plan & Kündigung")}</button><button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}
     ${panel("usage", "Nutzung & Limits", `<div class="account-list">${usageRow("Nachrichten", "Aufbauphase: ohne Limit.", "usageMessages")}${usageRow("Sprachminuten (Premium-Stimme)", "Zählt erst, wenn die Premium-Stimme aktiv ist.", "usageVoice")}${usageRow("Coding-Aufgaben", "Nur erfolgreich gestartete Läufe zählen.", "usageCoding")}</div><p class="account-note" id="usagePeriodNote">${t("Zähler laufen nur auf diesem Gerät und setzen sich jeden Monat automatisch zurück. Mit den Plänen bekommt jede Zeile einen Balken: verbraucht und noch offen.")}</p>`)}
-    ${panel("data", "Daten & Datenschutz", `<h4 class="account-subhead">${t("Datenschutz")}</h4><div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.")}</p><h4 class="account-subhead">${t("Berechtigungen")}</h4><div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div><h4 class="account-subhead">${t("Daten verwalten")}</h4><div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">${t("Datenschutzerklärung öffnen")}</button></div>`)}
+    ${panel("data", "Meine Daten", `<div class="daten-fragen">
+      <div class="daten-karte"><h5>${t("Wo liegen sie?")}</h5><p>${t("In deinem eigenen Bereich bei IDrive e2, verschlüsselt — nicht in einem gemeinsamen Topf mit anderen Nutzern.")}</p></div>
+      <div class="daten-karte"><h5>${t("Wer liest mit?")}</h5><p>${t("Zum Training werden deine Texte nur mit deinem ausdrücklichen Ja benutzt — die Einwilligung ist standardmäßig aus.")}</p></div>
+      <div class="daten-karte"><h5>${t("Wie komme ich raus?")}</h5><p>${t("Ein Klick unter Daten verwalten — der Export kommt sofort, ohne Nachfrage und ohne Wartezeit.")}</p></div>
+    </div><h4 class="account-subhead">${t("Datenschutz")}</h4><div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.")}</p><h4 class="account-subhead">${t("Berechtigungen")}</h4><div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div><h4 class="account-subhead">${t("Daten verwalten")}</h4><div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">${t("Datenschutzerklärung öffnen")}</button></div>`)}
   </div></div><div id="profileOutput" class="output" role="status" aria-live="polite"></div>`;
 }
 
@@ -511,5 +542,5 @@ function dataAction(label, hint, id, text, danger = false) { return `<div class=
 // Versionsmarke: GitHub Pages liefert Assets mit max-age, ohne ?v= sieht der
 // Browser eine Aenderung erst nach Ablauf der Frist. Gleiche Konvention wie die
 // Stylesheet-Links in index.html. Bei jeder Aenderung an der CSS-Datei erhoehen.
-const STYLE_VERSION = "konto-glas-hell-20260726e";
+const STYLE_VERSION = KONTO_STIL_MARKE;
 function loadStyles() { const href = `/assets/account-privacy.css?v=${STYLE_VERSION}`; if (document.querySelector(`link[href^="/assets/account-privacy.css"]`)) return; const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href; document.head.append(link); }

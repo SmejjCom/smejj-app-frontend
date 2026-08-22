@@ -23,13 +23,22 @@
   --konto-danger-line: rgba(255, 110, 100, 0.35);
   --konto-danger-hover: rgba(255, 110, 100, 0.12);
   --konto-ok-text: #7ee8da;
-  --konto-ok-bg: rgba(45, 212, 191, 0.15);
-  --konto-ok-line: rgba(45, 212, 191, 0.4);
+  --konto-ok-bg: rgba(50, 246, 234, 0.15);
+  --konto-ok-line: rgba(50, 246, 234, 0.4);
+  /* Fokusring: eigene Variable, weil der Akzentton allein es NICHT tut.
+     Nachgerechnet am 2026-08-22 (WCAG non-text, Schwelle 3.0):
+       #32f6ea auf hellem Grund 1.35 — durchgefallen
+       #2dd4bf auf hellem Grund 1.86 — ebenfalls durchgefallen
+     Der alte Wert stand hier fest verdrahtet UND war im Test gepinnt
+     ("Akzentfarbe traegt in hell und dunkel") — die Zusicherung war seit
+     jeher unwahr, nur hat sie niemand nachgerechnet. Auf Dunkel traegt
+     der V11-Ton mit 13.84 muehelos. */
+  --konto-fokus: var(--v11-cy);
   padding: 72px clamp(14px, 4vw, 48px) 28px;
-  /* Farbige Lichtflecken NUR in dieser Ansicht — die App-Huelle bleibt unberuehrt. */
-  background-image:
-    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.10), transparent 60%),
-    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.07), transparent 60%);
+  /* Die "farbigen Lichtflecken NUR in dieser Ansicht" sind am 2026-08-22
+     entfallen — genau das war der Punkt: sie galten nur hier, und seit dem
+     Abraeumen von design-cyan-views.css trug jede ANDERE Ansicht den ruhigen
+     Grundton der App. Damit war diese hier (mit /settings) die letzte bunte. */
 }
 
 /* Helles Farbschema (Befund iPhone-PWA 2026-07-26: Systemschema "hell" macht
@@ -52,12 +61,15 @@
   --konto-danger-line: rgba(179, 38, 30, 0.4);
   --konto-danger-hover: rgba(179, 38, 30, 0.08);
   --konto-ok-text: #0c6b5e;
-  --konto-ok-bg: rgba(45, 212, 191, 0.16);
+  --konto-ok-bg: rgba(50, 246, 234, 0.16);
   --konto-ok-line: rgba(12, 107, 94, 0.45);
-  background-image:
-    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.14), transparent 60%),
-    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.10), transparent 60%),
-    linear-gradient(180deg, #fbfbf9, #f3f4f1);
+  /* Derselbe Ton, den das helle Schema schon fuer "ok" benutzt: 6.18
+     gegen den Grund #fbfbf9 — gut ueber der Schwelle von 3.0. */
+  --konto-fokus: #0c6b5e;
+  /* Der DECKENDE Verlauf bleibt — er ist der Fail-safe gegen dunklen Text
+     auf dunklem Glas (Befund iPhone-PWA 2026-07-26, siehe Kommentar oben).
+     Entfallen sind nur die zwei Lichtflecken darueber. */
+  background-image: linear-gradient(180deg, #fbfbf9, #f3f4f1);
 }
 
 /* Primaer-Knopf: app-surfaces.css (Start-Lock) faerbt #saveProfile per
@@ -78,20 +90,24 @@
     radial-gradient(ellipse at 50% 82%, transparent 0 8px, rgba(23, 25, 29, 0.55) 8.5px 12px, transparent 12.5px);
 }
 
-/* Glas-Grundfläche: Cyan Light-Leak Beleuchtungsrahmen, Weichzeichner, edle Radien */
+/* Glas-Grundflaeche nach der V11-Behaelterregel (2026-08-22).
+   VORHER trug dieselbe Regel VIER Signale fuer eine einzige Aussage: Flaeche
+   UND Rahmen UND Radius UND drei Leuchtschatten ("Light-Leak"). V11 erlaubt
+   genau eines — "Glas ist die FLAECHE, die Linie ist der TRENNER, der Abstand
+   ist die GRUPPE, nie zwei davon am selben Element".
+   Der Leuchtrahmen benutzte ausserdem --v11-marke (#02fdfd). Deren Regel in
+   design-v11.css ist unmissverstaendlich: "Nur fuer das Zeichen selbst — nie
+   fuer Flaechen, sonst kippt der Kontrast." Dazu die Betreiber-Ansage vom
+   2026-08-16 ("leuchtet zu viel, Augen schonen"), die anderswo laengst
+   umgesetzt war — hier nicht, weil diese Datei nie mitgezogen wurde. */
 #profile .account-nav,
 #profile .account-panel,
 #profile .output {
+  border: 0;
   background: var(--konto-glass);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
   backdrop-filter: blur(22px) saturate(150%);
-  border: 1px solid rgba(2, 253, 253, 0.35);
-  border-top-color: rgba(126, 232, 218, 0.6);
-  border-radius: 16px;
-  box-shadow: 
-    0 0 35px rgba(2, 253, 253, 0.25),
-    0 0 60px rgba(45, 212, 191, 0.12),
-    inset 0 0 15px rgba(2, 253, 253, 0.08);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
 }
 
 #profile .account-header {
@@ -125,16 +141,39 @@
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   color: var(--premium-muted, #9fa8ad);
-  font-size:14.5px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
+/* Zwei Spalten, die von selbst umbrechen — und zwar nach dem Platz, den die
+   FLAECHE hat, nicht nach der Fenstergroesse. Der Unterschied ist bei
+   smejj.com betraechtlich: bei 768 px stehen links 200 px Schublade und,
+   sobald die rechte Flaeche angedockt ist, rechts noch einmal 200 px. Von
+   768 px bleiben dann 368 px uebrig. Ein festes `250px <Inhalt>`-Raster
+   kannte diesen Unterschied nicht: die Medienabfrage sah 768 px und liess
+   beide Spalten stehen, der Inhalt bekam 168 px und lief 200 px ueber den
+   Rand (gemessen mit `npm run measure:responsive`). Als umbrechende
+   Flex-Zeile entscheidet der tatsaechliche Platz: reicht er fuer 250 px
+   Navigation UND rund 420 px Inhalt, stehen sie nebeneinander wie bisher,
+   sonst rutscht der Inhalt darunter. Auf dem Schreibtisch aendert sich
+   nichts. */
 #profile .account-layout {
-  display: grid;
-  grid-template-columns: 250px minmax(0, 820px);
-  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: clamp(18px, 3vw, 40px);
   padding-top: 24px;
+}
+
+#profile .account-layout > .account-nav {
+  flex: 1 1 250px;
+  max-width: 250px;
+}
+
+#profile .account-layout > .account-content {
+  flex: 1 1 420px;
+  min-width: 0;
+  max-width: 820px;
 }
 
 /* Navigation links: eine Glasleiste, Punkte durch hauchduenne Linien getrennt,
@@ -154,7 +193,7 @@
   border-radius: 0;
   background: transparent;
   color: var(--premium-muted, #9fa8ad);
-  font-size:16.5px;
+  font-size: 14px;
   font-weight: 600;
   text-align: start;
   cursor: pointer;
@@ -171,8 +210,10 @@
 
 #profile .account-nav button.is-active {
   color: var(--premium-text, #eef1f2);
-  background: rgba(2, 253, 253, 0.12);
-  box-shadow: inset 3px 0 0 #02fdfd, 0 0 15px rgba(2, 253, 253, 0.25);
+  /* Gleiche Anmutung wie der aktive Punkt in den Einstellungen: ruhige
+     Toenung plus Akzentbalken, KEIN Schein (Betreiber 2026-08-16). */
+  background: rgba(255, 255, 255, 0.085);
+  box-shadow: inset 3px 0 0 var(--v11-cy);
   font-weight: 700;
 }
 
@@ -187,14 +228,14 @@
 #profile .account-panel h3 {
   margin: 0 0 14px;
   color: var(--premium-text, #eef1f2);
-  font-size:23px;
+  font-size: 20px;
   font-weight: 650;
 }
 
 #profile .account-subhead {
   margin: 26px 0 10px;
   color: var(--premium-muted, #9fa8ad);
-  font-size:14.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -231,14 +272,14 @@
 
 #profile .account-row strong {
   color: var(--premium-text, #eef1f2);
-  font-size:17px;
+  font-size: 14.5px;
   font-weight: 650;
 }
 
 #profile .account-row small {
   color: var(--premium-muted, #9fa8ad);
-  font-size:15.5px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 /* Viereckige Schalter statt nackter Checkboxen. */
@@ -268,8 +309,8 @@
 }
 
 #profile .account-row input[type="checkbox"]:checked {
-  background: #2dd4bf;
-  border-color: #2dd4bf;
+  background: var(--v11-cy);
+  border-color: var(--v11-cy);
 }
 
 #profile .account-row input[type="checkbox"]:checked::after {
@@ -286,7 +327,7 @@
   border-radius: 0;
   background: var(--konto-glass-strong);
   color: var(--premium-muted, #c6cdd1);
-  font-size:13.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -309,21 +350,21 @@
   margin-bottom: 16px;
   border: 1px solid var(--konto-ok-line);
   border-radius: 0;
-  background: rgba(45, 212, 191, 0.07);
-  box-shadow: inset 0 3px 0 #2dd4bf;
+  background: rgba(50, 246, 234, 0.07);
+  box-shadow: inset 0 3px 0 var(--v11-cy);
 }
 
 #profile .account-plan .plan-name {
   display: block;
   margin: 4px 0 3px;
   color: var(--premium-text, #eef1f2);
-  font-size:22px;
+  font-size: 19px;
   font-weight: 700;
 }
 
 #profile .account-plan small {
   color: var(--premium-muted, #9fa8ad);
-  font-size:15.5px;
+  font-size: 13px;
 }
 
 /* Eigene Anweisungen (Personalisierung). */
@@ -335,7 +376,7 @@
 
 #profile .account-textarea strong {
   color: var(--premium-muted, #9fa8ad);
-  font-size:14.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -351,8 +392,8 @@
   background: var(--konto-field-bg);
   color: var(--premium-text, #eef1f2);
   font-family: inherit;
-  font-size:17.5px;
-  line-height: 1.62;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 #profile .account-grid {
@@ -366,7 +407,7 @@
   display: grid;
   gap: 8px;
   color: var(--premium-muted, #9fa8ad);
-  font-size:14.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -380,7 +421,7 @@
   border-radius: 0;
   background: var(--konto-field-bg);
   color: var(--premium-text, #eef1f2);
-  font-size:17.5px;
+  font-size: 15px;
   font-weight: 500;
   letter-spacing: normal;
   text-transform: none;
@@ -401,7 +442,7 @@
   border-radius: 0;
   background: var(--konto-glass-strong);
   color: var(--premium-text, #eef1f2);
-  font-size:16px;
+  font-size: 13.5px;
   font-weight: 650;
   cursor: pointer;
   white-space: nowrap;
@@ -461,7 +502,7 @@
 
 #profile .account-status strong {
   color: var(--premium-muted, #9fa8ad);
-  font-size:13.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -469,14 +510,14 @@
 
 #profile .account-status span {
   color: var(--premium-text, #eef1f2);
-  font-size:16.5px;
+  font-size: 14px;
 }
 
 #profile .account-note {
   margin: 14px 0 0;
   color: var(--premium-muted, #9fa8ad);
-  font-size:15.5px;
-  line-height: 1.65;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 /* Profilbild-Zeile (Markup aus profile-picture-control.js). */
@@ -493,7 +534,7 @@
   width: 60px;
   height: 60px;
   border-radius: 0;
-  border: 1px solid rgba(45, 212, 191, 0.45);
+  border: 1px solid rgba(50, 246, 234, 0.45);
 }
 
 #profile .account-picture-body {
@@ -504,12 +545,13 @@
 
 #profile .account-picture-body small {
   color: var(--premium-muted, #9fa8ad);
-  font-size:15.5px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 #profile .account-picture-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-inline-start: auto;
   flex-shrink: 0;
@@ -522,7 +564,7 @@
   border-radius: 0;
   background: var(--konto-glass-strong);
   color: var(--premium-text, #eef1f2);
-  font-size:16px;
+  font-size: 13.5px;
   font-weight: 650;
   cursor: pointer;
   white-space: nowrap;
@@ -555,7 +597,7 @@
 }
 
 #profile #profilePictureInput:focus-visible + .account-picture-choose {
-  outline: 2px solid #2dd4bf;
+  outline: 2px solid var(--konto-fokus);
   outline-offset: 2px;
 }
 
@@ -564,13 +606,20 @@
   min-height: 46px;
   padding: 13px 16px;
   color: var(--premium-muted, #9fa8ad);
-  font-size:16px;
+  font-size: 13.5px;
 }
 
-/* Mobil: Navigation wird zur umbrechenden Chip-Leiste — kein Scroll-Verlust. */
-@media (max-width: 760px) {
-  #profile .account-layout {
-    grid-template-columns: minmax(0, 1fr);
+/* Mobil UND Tablet: Navigation wird zur umbrechenden Chip-Leiste — kein
+   Scroll-Verlust. Die Grenze lag bis 2026-08-22 bei 760 px und war damit zu
+   niedrig: bei 768 px steht links noch die 200-px-Schublade, von den
+   uebrigen 568 px nahm die 250-px-Navigation den Loewenanteil, und fuer den
+   Inhalt blieben 234 px. Die Profilbild-Zeile braucht rund 350 px und lief
+   um 78 px ueber den Rand hinaus. Gemessen mit
+   `npm run measure:responsive`. */
+@media (max-width: 900px) {
+  #profile .account-layout > .account-nav {
+    flex-basis: 100%;
+    max-width: none;
   }
 
   #profile .account-nav {
@@ -590,11 +639,11 @@
     border: 1px solid var(--konto-line);
     border-radius: 0;
     background: var(--konto-glass);
-    font-size:15.5px;
+    font-size: 13px;
   }
 
   #profile .account-nav button.is-active {
-    box-shadow: inset 0 3px 0 #2dd4bf;
+    box-shadow: inset 0 3px 0 var(--v11-cy);
   }
 
   #profile .account-grid {
@@ -620,7 +669,6 @@
   #profile .account-picture {
     flex-wrap: wrap;
   }
-
   #profile .account-picture-actions {
     margin-inline-start: 0;
   }
@@ -661,7 +709,7 @@
 }
 
 #profile .usage-count strong {
-  font-size:25px;
+  font-size: 22px;
   font-weight: 750;
   color: #7ee8da;
   line-height: 1.1;
@@ -669,7 +717,7 @@
 
 #profile .usage-count small {
   color: var(--premium-muted, #9fa8ad);
-  font-size:13.5px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -697,7 +745,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size:15.5px;
+  font-size: 13px;
 }
 
 /* Exakt die Optik der vorhandenen Konto-Felder (.account-grid input, Zeile 370):
@@ -710,7 +758,7 @@
   border-radius: 0;
   background: var(--konto-field-bg);
   color: var(--premium-text, #eef1f2);
-  font-size:17.5px;
+  font-size: 15px;
   font-weight: 500;
   letter-spacing: normal;
   text-transform: none;
@@ -718,10 +766,10 @@
 
 /* Fokusring in der Akzentfarbe, nicht in --konto-edge: die Kante ist im HELLEN
    Schema rgba(255,255,255,0.9) — ein weisser Ring auf hellem Grund ist kein Ring.
-   #2dd4bf traegt in beiden Schemata und ist dieselbe Farbe wie beim Bildwaehler
+   var(--v11-cy) traegt in beiden Schemata und ist dieselbe Farbe wie beim Bildwaehler
    weiter oben in dieser Datei. */
 #profile .account-inline-form input:focus-visible {
-  outline: 2px solid #2dd4bf;
+  outline: 2px solid var(--konto-fokus);
   outline-offset: 2px;
 }
 
@@ -729,19 +777,30 @@
   margin-top: 4px;
 }
 
-/* Light-Leak Rahmen-Beleuchtung (weicher, warmer Lichtschein in Logo-Farbe #2dd4bf) */
-#profile .account-panel,
-#profile .account-nav,
+/* Light-Leak Rahmen-Beleuchtung — seit 2026-08-22 nur noch auf der
+   Willkommens-Karte.
+   Der Effekt kam am 2026-08-11 (efe767d7) "across login onboarding and
+   profile". Am 2026-08-16 folgte die Betreiber-Ansage "Leuchten gedaempft,
+   Augen schonen" (f77dc46e) — sie zog design-v11.css und die Spur nach,
+   fasste diese Datei aber nie an. Der Konto-Bereich leuchtete deshalb als
+   einziger weiter, fuenf Tage nach der Gegenansage.
+   Die Willkommens-Karte behaelt ihn: sie ist eine einmalige Begruessung,
+   kein Arbeitsbereich, an dem jemand lange sitzt. */
 .onboarding-card {
   position: relative;
   box-shadow: 
-    0 0 25px rgba(45, 212, 191, 0.28),
+    0 0 25px rgba(50, 246, 234, 0.28),
     0 0 60px rgba(126, 232, 218, 0.15),
-    inset 0 0 15px rgba(45, 212, 191, 0.12);
+    inset 0 0 15px rgba(50, 246, 234, 0.12);
   transition: box-shadow 0.4s ease, border-color 0.4s ease;
 }
 
-#profile .account-panel::before,
+/* position bleibt: andere Regeln setzen darin absolut positionierte Kinder. */
+#profile .account-panel,
+#profile .account-nav {
+  position: relative;
+}
+
 .onboarding-card::before {
   content: "";
   position: absolute;
@@ -749,14 +808,13 @@
   right: -40px;
   width: 220px;
   height: 220px;
-  background: radial-gradient(circle, rgba(45, 212, 191, 0.35) 0%, rgba(126, 232, 218, 0.1) 45%, transparent 70%);
+  background: radial-gradient(circle, rgba(50, 246, 234, 0.35) 0%, rgba(126, 232, 218, 0.1) 45%, transparent 70%);
   pointer-events: none;
   z-index: 1;
   border-radius: 50%;
   filter: blur(10px);
 }
 
-#profile .account-panel::after,
 .onboarding-card::after {
   content: "";
   position: absolute;
@@ -764,10 +822,75 @@
   left: -40px;
   width: 220px;
   height: 220px;
-  background: radial-gradient(circle, rgba(45, 212, 191, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(50, 246, 234, 0.25) 0%, transparent 70%);
   pointer-events: none;
   z-index: 1;
   border-radius: 50%;
   filter: blur(10px);
 }
 
+/* Die Media-Query, die den Schein bei schmalen Fenstern in die Ecke
+   HINEINrueckte, ist mit den Leuchtkugeln des Konto-Bereichs entfallen —
+   sie nannte ausschliesslich #profile .account-panel. Ihr Befund bleibt
+   fuer die Nachwelt festgehalten: die 40 px Ueberstand liegen bei voller
+   Panelbreite ausserhalb des Fensters, zu sehen ist davon nichts, aber die
+   Seite bekommt seitlichen Bildlauf und wackelt beim Wischen (bei 320 px
+   gemessene 33 px, `npm run measure:responsive`). Wer den Schein je
+   zurueckholt, braucht sie wieder. */
+
+
+
+/* Bildschirm 41: "Dein Zugang" — Angemeldet mit / Bezahlt wurde mit */
+#profile .account-zugang {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13);
+}
+#profile .zugang-zeile {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 15px;
+}
+#profile .zugang-was {
+  min-width: 150px;
+  color: rgba(242, 245, 244, 0.58);
+}
+#profile .zugang-wert { display: inline-flex; gap: 9px; align-items: center; flex-wrap: wrap; }
+#profile .zugang-hinweis {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: #ffd68a;
+}
+
+
+/* Bildschirm 46: der groesste Knopf der Seite */
+#profile .sicherheit-panik {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 0 0 18px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(255, 214, 138, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(255, 214, 138, 0.35);
+}
+#profile .sicherheit-panik > div { flex: 1; min-width: 220px; display: grid; gap: 4px; }
+#profile .sicherheit-panik strong { font-size: 17px; }
+#profile .sicherheit-panik span { font-size: 14.5px; color: rgba(242, 245, 244, 0.78); line-height: 1.5; }
+#profile .sicherheit-panik-knopf {
+  padding: 14px 22px !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  background: #ffd68a !important;
+  color: #241a04 !important;
+  border: 0 !important;
+}

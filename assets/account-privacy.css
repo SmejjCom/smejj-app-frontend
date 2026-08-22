@@ -23,13 +23,22 @@
   --konto-danger-line: rgba(255, 110, 100, 0.35);
   --konto-danger-hover: rgba(255, 110, 100, 0.12);
   --konto-ok-text: #7ee8da;
-  --konto-ok-bg: rgba(45, 212, 191, 0.15);
-  --konto-ok-line: rgba(45, 212, 191, 0.4);
+  --konto-ok-bg: rgba(50, 246, 234, 0.15);
+  --konto-ok-line: rgba(50, 246, 234, 0.4);
+  /* Fokusring: eigene Variable, weil der Akzentton allein es NICHT tut.
+     Nachgerechnet am 2026-08-22 (WCAG non-text, Schwelle 3.0):
+       #32f6ea auf hellem Grund 1.35 — durchgefallen
+       #2dd4bf auf hellem Grund 1.86 — ebenfalls durchgefallen
+     Der alte Wert stand hier fest verdrahtet UND war im Test gepinnt
+     ("Akzentfarbe traegt in hell und dunkel") — die Zusicherung war seit
+     jeher unwahr, nur hat sie niemand nachgerechnet. Auf Dunkel traegt
+     der V11-Ton mit 13.84 muehelos. */
+  --konto-fokus: var(--v11-cy);
   padding: 72px clamp(14px, 4vw, 48px) 28px;
-  /* Farbige Lichtflecken NUR in dieser Ansicht — die App-Huelle bleibt unberuehrt. */
-  background-image:
-    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.10), transparent 60%),
-    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.07), transparent 60%);
+  /* Die "farbigen Lichtflecken NUR in dieser Ansicht" sind am 2026-08-22
+     entfallen — genau das war der Punkt: sie galten nur hier, und seit dem
+     Abraeumen von design-cyan-views.css trug jede ANDERE Ansicht den ruhigen
+     Grundton der App. Damit war diese hier (mit /settings) die letzte bunte. */
 }
 
 /* Helles Farbschema (Befund iPhone-PWA 2026-07-26: Systemschema "hell" macht
@@ -52,12 +61,15 @@
   --konto-danger-line: rgba(179, 38, 30, 0.4);
   --konto-danger-hover: rgba(179, 38, 30, 0.08);
   --konto-ok-text: #0c6b5e;
-  --konto-ok-bg: rgba(45, 212, 191, 0.16);
+  --konto-ok-bg: rgba(50, 246, 234, 0.16);
   --konto-ok-line: rgba(12, 107, 94, 0.45);
-  background-image:
-    radial-gradient(950px 520px at 82% -8%, rgba(45, 212, 191, 0.14), transparent 60%),
-    radial-gradient(750px 550px at -8% 42%, rgba(88, 101, 242, 0.10), transparent 60%),
-    linear-gradient(180deg, #fbfbf9, #f3f4f1);
+  /* Derselbe Ton, den das helle Schema schon fuer "ok" benutzt: 6.18
+     gegen den Grund #fbfbf9 — gut ueber der Schwelle von 3.0. */
+  --konto-fokus: #0c6b5e;
+  /* Der DECKENDE Verlauf bleibt — er ist der Fail-safe gegen dunklen Text
+     auf dunklem Glas (Befund iPhone-PWA 2026-07-26, siehe Kommentar oben).
+     Entfallen sind nur die zwei Lichtflecken darueber. */
+  background-image: linear-gradient(180deg, #fbfbf9, #f3f4f1);
 }
 
 /* Primaer-Knopf: app-surfaces.css (Start-Lock) faerbt #saveProfile per
@@ -78,20 +90,24 @@
     radial-gradient(ellipse at 50% 82%, transparent 0 8px, rgba(23, 25, 29, 0.55) 8.5px 12px, transparent 12.5px);
 }
 
-/* Glas-Grundfläche: Cyan Light-Leak Beleuchtungsrahmen, Weichzeichner, edle Radien */
+/* Glas-Grundflaeche nach der V11-Behaelterregel (2026-08-22).
+   VORHER trug dieselbe Regel VIER Signale fuer eine einzige Aussage: Flaeche
+   UND Rahmen UND Radius UND drei Leuchtschatten ("Light-Leak"). V11 erlaubt
+   genau eines — "Glas ist die FLAECHE, die Linie ist der TRENNER, der Abstand
+   ist die GRUPPE, nie zwei davon am selben Element".
+   Der Leuchtrahmen benutzte ausserdem --v11-marke (#02fdfd). Deren Regel in
+   design-v11.css ist unmissverstaendlich: "Nur fuer das Zeichen selbst — nie
+   fuer Flaechen, sonst kippt der Kontrast." Dazu die Betreiber-Ansage vom
+   2026-08-16 ("leuchtet zu viel, Augen schonen"), die anderswo laengst
+   umgesetzt war — hier nicht, weil diese Datei nie mitgezogen wurde. */
 #profile .account-nav,
 #profile .account-panel,
 #profile .output {
+  border: 0;
   background: var(--konto-glass);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
   backdrop-filter: blur(22px) saturate(150%);
-  border: 1px solid rgba(2, 253, 253, 0.35);
-  border-top-color: rgba(126, 232, 218, 0.6);
-  border-radius: 16px;
-  box-shadow: 
-    0 0 35px rgba(2, 253, 253, 0.25),
-    0 0 60px rgba(45, 212, 191, 0.12),
-    inset 0 0 15px rgba(2, 253, 253, 0.08);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
 }
 
 #profile .account-header {
@@ -194,8 +210,10 @@
 
 #profile .account-nav button.is-active {
   color: var(--premium-text, #eef1f2);
-  background: rgba(2, 253, 253, 0.12);
-  box-shadow: inset 3px 0 0 #02fdfd, 0 0 15px rgba(2, 253, 253, 0.25);
+  /* Gleiche Anmutung wie der aktive Punkt in den Einstellungen: ruhige
+     Toenung plus Akzentbalken, KEIN Schein (Betreiber 2026-08-16). */
+  background: rgba(255, 255, 255, 0.085);
+  box-shadow: inset 3px 0 0 var(--v11-cy);
   font-weight: 700;
 }
 
@@ -291,8 +309,8 @@
 }
 
 #profile .account-row input[type="checkbox"]:checked {
-  background: #2dd4bf;
-  border-color: #2dd4bf;
+  background: var(--v11-cy);
+  border-color: var(--v11-cy);
 }
 
 #profile .account-row input[type="checkbox"]:checked::after {
@@ -332,8 +350,8 @@
   margin-bottom: 16px;
   border: 1px solid var(--konto-ok-line);
   border-radius: 0;
-  background: rgba(45, 212, 191, 0.07);
-  box-shadow: inset 0 3px 0 #2dd4bf;
+  background: rgba(50, 246, 234, 0.07);
+  box-shadow: inset 0 3px 0 var(--v11-cy);
 }
 
 #profile .account-plan .plan-name {
@@ -516,7 +534,7 @@
   width: 60px;
   height: 60px;
   border-radius: 0;
-  border: 1px solid rgba(45, 212, 191, 0.45);
+  border: 1px solid rgba(50, 246, 234, 0.45);
 }
 
 #profile .account-picture-body {
@@ -579,7 +597,7 @@
 }
 
 #profile #profilePictureInput:focus-visible + .account-picture-choose {
-  outline: 2px solid #2dd4bf;
+  outline: 2px solid var(--konto-fokus);
   outline-offset: 2px;
 }
 
@@ -625,7 +643,7 @@
   }
 
   #profile .account-nav button.is-active {
-    box-shadow: inset 0 3px 0 #2dd4bf;
+    box-shadow: inset 0 3px 0 var(--v11-cy);
   }
 
   #profile .account-grid {
@@ -748,10 +766,10 @@
 
 /* Fokusring in der Akzentfarbe, nicht in --konto-edge: die Kante ist im HELLEN
    Schema rgba(255,255,255,0.9) — ein weisser Ring auf hellem Grund ist kein Ring.
-   #2dd4bf traegt in beiden Schemata und ist dieselbe Farbe wie beim Bildwaehler
+   var(--v11-cy) traegt in beiden Schemata und ist dieselbe Farbe wie beim Bildwaehler
    weiter oben in dieser Datei. */
 #profile .account-inline-form input:focus-visible {
-  outline: 2px solid #2dd4bf;
+  outline: 2px solid var(--konto-fokus);
   outline-offset: 2px;
 }
 
@@ -759,19 +777,30 @@
   margin-top: 4px;
 }
 
-/* Light-Leak Rahmen-Beleuchtung (weicher, warmer Lichtschein in Logo-Farbe #2dd4bf) */
-#profile .account-panel,
-#profile .account-nav,
+/* Light-Leak Rahmen-Beleuchtung — seit 2026-08-22 nur noch auf der
+   Willkommens-Karte.
+   Der Effekt kam am 2026-08-11 (efe767d7) "across login onboarding and
+   profile". Am 2026-08-16 folgte die Betreiber-Ansage "Leuchten gedaempft,
+   Augen schonen" (f77dc46e) — sie zog design-v11.css und die Spur nach,
+   fasste diese Datei aber nie an. Der Konto-Bereich leuchtete deshalb als
+   einziger weiter, fuenf Tage nach der Gegenansage.
+   Die Willkommens-Karte behaelt ihn: sie ist eine einmalige Begruessung,
+   kein Arbeitsbereich, an dem jemand lange sitzt. */
 .onboarding-card {
   position: relative;
   box-shadow: 
-    0 0 25px rgba(45, 212, 191, 0.28),
+    0 0 25px rgba(50, 246, 234, 0.28),
     0 0 60px rgba(126, 232, 218, 0.15),
-    inset 0 0 15px rgba(45, 212, 191, 0.12);
+    inset 0 0 15px rgba(50, 246, 234, 0.12);
   transition: box-shadow 0.4s ease, border-color 0.4s ease;
 }
 
-#profile .account-panel::before,
+/* position bleibt: andere Regeln setzen darin absolut positionierte Kinder. */
+#profile .account-panel,
+#profile .account-nav {
+  position: relative;
+}
+
 .onboarding-card::before {
   content: "";
   position: absolute;
@@ -779,14 +808,13 @@
   right: -40px;
   width: 220px;
   height: 220px;
-  background: radial-gradient(circle, rgba(45, 212, 191, 0.35) 0%, rgba(126, 232, 218, 0.1) 45%, transparent 70%);
+  background: radial-gradient(circle, rgba(50, 246, 234, 0.35) 0%, rgba(126, 232, 218, 0.1) 45%, transparent 70%);
   pointer-events: none;
   z-index: 1;
   border-radius: 50%;
   filter: blur(10px);
 }
 
-#profile .account-panel::after,
 .onboarding-card::after {
   content: "";
   position: absolute;
@@ -794,32 +822,21 @@
   left: -40px;
   width: 220px;
   height: 220px;
-  background: radial-gradient(circle, rgba(45, 212, 191, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(50, 246, 234, 0.25) 0%, transparent 70%);
   pointer-events: none;
   z-index: 1;
   border-radius: 50%;
   filter: blur(10px);
 }
 
-/* Schmale Bildschirme: der Schein rueckt in die Ecke HINEIN statt darueber
-   hinaus. Sobald die Tafel die volle Breite einnimmt, liegen die 40 px
-   Ueberstand ausserhalb des Fensters — zu sehen ist davon nichts, aber die
-   Seite bekommt einen seitlichen Bildlauf und wackelt beim Wischen (bei 320 px
-   gemessene 33 px, `npm run measure:responsive`). Auf dem Schreibtisch bleibt
-   der Schein unveraendert, dort ist links und rechts Platz.
-   Diese Regeln muessen NACH den Grundregeln stehen: eine Media-Query erhoeht
-   die Spezifitaet nicht, weiter oben im Blatt haetten sie nichts bewirkt. */
-@media (max-width: 900px) {
-  #profile .account-panel::before {
-    top: 0;
-    right: 0;
-  }
-
-  #profile .account-panel::after {
-    bottom: 0;
-    left: 0;
-  }
-}
+/* Die Media-Query, die den Schein bei schmalen Fenstern in die Ecke
+   HINEINrueckte, ist mit den Leuchtkugeln des Konto-Bereichs entfallen —
+   sie nannte ausschliesslich #profile .account-panel. Ihr Befund bleibt
+   fuer die Nachwelt festgehalten: die 40 px Ueberstand liegen bei voller
+   Panelbreite ausserhalb des Fensters, zu sehen ist davon nichts, aber die
+   Seite bekommt seitlichen Bildlauf und wackelt beim Wischen (bei 320 px
+   gemessene 33 px, `npm run measure:responsive`). Wer den Schein je
+   zurueckholt, braucht sie wieder. */
 
 
 

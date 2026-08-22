@@ -6,7 +6,10 @@ import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=1";
 import { clearProfilePicture } from "./profile-picture-store.js?v=1";
 import { afterFirstPaint } from "./deferred-start.js";
-import { applyAuthState } from "./account-auth-state.js?v=1";
+// Ohne ?v=: siehe die Begruendung in account-auth-state.js. Eine Marke hier
+// wuerde erzwingen, dass diese ABO-GESPERRTE Datei bei jeder Stil-Aenderung
+// wieder angefasst wird — genau das soll die Auslagerung verhindern.
+import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js";
 import { usageSummary } from "./usage-meter.js?v=1";
 import { initOnboardingWelcome } from "./onboarding-welcome.js?v=1";
 
@@ -539,5 +542,5 @@ function dataAction(label, hint, id, text, danger = false) { return `<div class=
 // Versionsmarke: GitHub Pages liefert Assets mit max-age, ohne ?v= sieht der
 // Browser eine Aenderung erst nach Ablauf der Frist. Gleiche Konvention wie die
 // Stylesheet-Links in index.html. Bei jeder Aenderung an der CSS-Datei erhoehen.
-const STYLE_VERSION = "responsive-b48";
+const STYLE_VERSION = KONTO_STIL_MARKE;
 function loadStyles() { const href = `/assets/account-privacy.css?v=${STYLE_VERSION}`; if (document.querySelector(`link[href^="/assets/account-privacy.css"]`)) return; const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href; document.head.append(link); }

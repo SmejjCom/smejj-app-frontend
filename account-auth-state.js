@@ -14,6 +14,29 @@
 // Nichts wird geloescht: Alle Bedienelemente bleiben im DOM und damit
 // funktionsfaehig — sie werden nur zustandsabhaengig ein-/ausgeblendet.
 
+// --- Stil-Marke der Kontoseite -------------------------------------------
+// Steht hier und NICHT in account-privacy.js, obwohl sie dorthin gehoert.
+// Der Grund (Betreiber-Freigabe 2026-08-22, "Marke auslagern"):
+// account-privacy.js liegt im ABO-LOCK und ist byte-genau eingefroren. Die
+// CSS-Marke muss aber bei JEDER Aenderung an account-privacy.css steigen,
+// sonst laedt ein offener Browser die alte Datei. Damit brach kuenftig jede
+// Designarbeit am Kontobereich die Zahlungs-Sperre — und wer sie dann
+// routinemaessig neu stempelt, gewoehnt sich genau das ab, wovor sie
+// schuetzt. Gemessen am 2026-08-22: der Lock war rot, und der GESAMTE
+// Unterschied zum eingefrorenen Stand war diese eine Zeile.
+//
+// Warum keine eigene Datei: die muesste in den sw.js-Precache, und sw.js
+// liegt im Start-Lock — das waere eine zweite Sperre fuer denselben Zweck.
+// Diese Datei ist ungesperrt, liegt bereits im Precache und wird von
+// account-privacy.js ohnehin importiert.
+//
+// WICHTIG: Der Import drueben traegt bewusst KEIN ?v= mehr. Sonst muesste
+// bei jeder Aenderung hier wieder die gesperrte Datei angefasst werden —
+// dasselbe Problem, nur eine Ebene weiter. Frisch wird diese Datei ueber
+// den Service-Worker-Vorrat (CACHE_NAME-Bump), wie autonomous-intent.js
+// und die anderen markenlosen Module auch.
+export const KONTO_STIL_MARKE = "v11-tokens-b50";
+
 const LOGIN_CONTROLS = ["#googleSignIn", "#passkeyLogin", "#loginLocal"];
 // "Passkey einrichten" gehoert NICHT zu den Anmelde-Wegen (Befund 2026-08-07):
 // Das Einrichten verlangt serverseitig eine Sitzung — ohne sie antwortet

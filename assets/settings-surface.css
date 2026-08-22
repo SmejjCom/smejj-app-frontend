@@ -1,12 +1,19 @@
 /* smejj.com — Einstellungen im viereckigen Glas-Design (Freigabe 2026-07-26,
    "komplett fertig machen"). Gleiche Formensprache wie der Kontobereich:
    rechteckige Glasflaechen (border-radius 0), Felder nur durch hauchduenne
-   Linien getrennt, feine helle Kante oben, Akzent fest tuerkis (#2dd4bf).
+   Linien getrennt, feine helle Kante oben. Der Akzent kommt seit dem
+   2026-08-22 aus var(--v11-cy) — vorher stand hier der ALTE Ton #2dd4bf
+   fest verdrahtet, und genau diese Ton-Vielfalt sollte V11 beenden.
    Markup, IDs und die Verhaltens-Hooks (data-settings-density/font-size/
    theme/diagnostics) bleiben unveraendert. Hell-Modus wird mitgezogen. */
 
 #settings.premium-view {
   padding: 72px clamp(14px, 4vw, 48px) 28px;
+  /* Fokusring: eigene Variable, weil der Akzentton auf hellem Grund
+     durchfaellt. Nachgerechnet 2026-08-22 (WCAG non-text, Schwelle 3.0):
+     #32f6ea gegen #f2f4f4 = 1.36. Auf Dunkel traegt er mit 13.84.
+     Gleiche Loesung wie im Kontobereich (--konto-fokus). */
+  --set-fokus: var(--v11-cy);
   /* 2026-08-22: die zwei cyan/violetten Lichtflecken sind hier RAUS. Am
      selben Tag wurde design-cyan-views.css abgeraeumt — seither tragen alle
      anderen Ansichten den ruhigen Grundton der App. Diese Ansicht brachte
@@ -123,7 +130,7 @@
 #settings .settings-nav-button.is-active {
   color: var(--premium-text, #eef1f2);
   background: rgba(255, 255, 255, 0.085);
-  box-shadow: inset 3px 0 0 #2dd4bf;
+  box-shadow: inset 3px 0 0 var(--v11-cy);
 }
 
 #settings .settings-content {
@@ -263,8 +270,8 @@
 }
 
 #settings .settings-switch input:checked + span {
-  background: #2dd4bf;
-  border-color: #2dd4bf;
+  background: var(--v11-cy);
+  border-color: var(--v11-cy);
 }
 
 #settings .settings-switch input:checked + span::after {
@@ -273,7 +280,7 @@
 }
 
 #settings .settings-switch input:focus-visible + span {
-  outline: 2px solid #2dd4bf;
+  outline: 2px solid var(--set-fokus);
   outline-offset: 2px;
 }
 
@@ -301,7 +308,7 @@
 }
 
 #settings .settings-links a {
-  color: #2dd4bf;
+  color: var(--v11-cy);
   text-decoration: none;
   font-weight: 650;
   font-size: 13.5px;
@@ -309,6 +316,8 @@
 
 /* Hell-Modus: gleiche Formen, helle Flaechen, dunkle Haarlinien. */
 #settings.premium-view[data-settings-theme="light"] {
+  /* 6.20 gegen #f2f4f4 — derselbe dunkle Tuerkiston wie im Kontobereich. */
+  --set-fokus: #0c6b5e;
   /* Die deckende Flaeche bleibt (Fail-safe gegen dunklen Text auf dunklem
      Glas, Befund iPhone-PWA 2026-07-26). Nur die zwei Lichtflecken sind
      raus — wie im Dunkel-Block oben. */
@@ -401,7 +410,7 @@
   }
 
   #settings .settings-nav-button.is-active {
-    box-shadow: inset 0 3px 0 #2dd4bf;
+    box-shadow: inset 0 3px 0 var(--v11-cy);
   }
 
   #settings.premium-view[data-settings-theme="light"] .settings-nav-button {
@@ -477,7 +486,7 @@
 }
 #settings .settings-suche:focus {
   outline: none;
-  box-shadow: inset 0 0 0 1px #32f6ea, 0 0 0 3px rgba(50, 246, 234, 0.22);
+  box-shadow: inset 0 0 0 1px var(--v11-cy), 0 0 0 3px var(--v11-cy-glow);
 }
 
 

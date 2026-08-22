@@ -53,7 +53,14 @@
 .view.premium-view .status-grid,
 .view.premium-view .output,
 .view.premium-view .surface,
-.view.premium-view .feed-item {
+.view.premium-view .feed-item,
+/* Nachtrag 2026-08-22: diese vier bekamen ihre Flaeche bisher NUR aus
+   design-cyan-views.css (cyaner Rand, 14px Radius, Glow, Blur). Mit dem
+   Abraeumen dieser Datei waeren sie sonst flaechenlos geworden — sie
+   gehoeren in dieselbe Liste wie alle anderen Behaelter. */
+.view.premium-view .search-shell,
+.view.premium-view .search-log,
+.view.premium-view .project-card {
   border: 0;
   border-radius: var(--v11-r);
   background: var(--v11-glas);
@@ -219,7 +226,13 @@
  * Menues am Schreibfeld (design-v11.css), damit es EIN Menue-Aussehen gibt.
  */
 .view.premium-view .more-menu .menu-panel,
-.view.premium-view .more-menu > div[role="menu"] {
+.view.premium-view .more-menu > div[role="menu"],
+/* Der Dialog gehoert in dieselbe Familie: er liegt ueber Text und braucht
+   darum dieselbe dichte Flaeche. Zweiter Selektor ohne .view, weil Dialoge
+   in dieser App teilweise am BODY haengen (gleiche Falle wie beim
+   Drei-Punkte-Menue) — dort greift .view.premium-view nie. */
+.view.premium-view .modal,
+.modal {
   border: 0;
   border-radius: var(--v11-r);
   background: rgba(14, 20, 28, 0.82);
@@ -230,3 +243,118 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
     0 0 0 1px var(--v11-cy-line);
 }
+
+/* ===================================================================
+ * 6. Die Grundflaeche — was hier BEWUSST NICHT steht
+ * ===================================================================
+ * Bis zum 2026-08-22 faerbte design-cyan-views.css die Flaeche unter
+ * allen 19 Nicht-Start-Ansichten ein: background-color #080d14 (kalt,
+ * blaustichig) plus zwei cyane Radial-Verlaeufe auf .premium-view und
+ * ::before. Das war der eigentliche Bruch zwischen Start und Rest — die
+ * Startseite trug laengst den warmen Grundton der App (styles.css:
+ * #141517 -> #0d0e10), jede andere Ansicht einen anderen.
+ *
+ * Behoben wurde das NICHT durch eine Gegenregel an dieser Stelle,
+ * sondern durch Abraeumen der Schicht: design-cyan-views.css ist leer.
+ * Darunter lag die ganze Zeit schon die richtige Fassung —
+ * app-surfaces.css Zeile 427ff setzt .premium-view auf
+ * `background: transparent` und ::before auf einen grauen Verlauf ohne
+ * jedes Cyan. Sie war nur ueberdeckt.
+ *
+ * MERKREGEL fuer den naechsten, der hier eine Flaechenfarbe vermisst:
+ * Erst pruefen, ob eine aeltere Schicht sie schon setzt und nur
+ * ueberdeckt wird. Eine vierte Generation von Gegenregeln ist genau
+ * das, was diese Datei laut ihrem eigenen Kopf abschaffen soll.
+ *
+ * EINE Regel steht dann doch hier, und zwar diese:
+ * Nach dem Abraeumen war die Flaeche zwar farblos, aber immer noch
+ * DUNKLER als die Startseite. Gemessen am 2026-08-22:
+ *   Startseite (body)   rgb(20,21,23) -> rgb(16,17,19) -> rgb(13,14,16)
+ *   jede Ansicht        rgb(15,17,18) -> rgb( 9,10,12) -> rgb( 5, 6, 8)
+ * Die zweite Zeile ist die Vollbildschicht .premium-view::before aus
+ * app-surfaces.css — sie liegt fix ueber dem Fenster und deckt den
+ * App-Verlauf ab. Farbe war also nur die HAELFTE des Bruchs zwischen
+ * Start und Rest; die andere Haelfte war Helligkeit.
+ *
+ * Der Verlauf des body ist bereits der richtige — die Schicht muss ihn
+ * nur durchlassen. Sie bleibt als Element bestehen (andere Regeln
+ * haengen an ihr), traegt aber keine eigene Flaeche mehr.
+ *
+ * NICHT in app-surfaces.css geaendert: die Datei steht im Start-Lock,
+ * eine Aenderung dort braucht einen neuen Stempel.
+ */
+.view.premium-view::before {
+  background: transparent;
+}
+
+/* ===================================================================
+ * 7. smejjBot: die letzte Ansicht mit eigener Farbwelt
+ * ===================================================================
+ * autonomous-coding.css stammt aus der Zeit vor V11 und bringt eine
+ * komplett eigene Palette mit — #11151a, #20262d, #101419, #12171c,
+ * #0b0e12, #252a31 als DECKENDE Flaechen, dazu eigene Zustandsfarben.
+ * Kein einziges --v11-*-Token, gemessen am 2026-08-22.
+ *
+ * Die Datei selbst bleibt unangetastet: sie steht im Start-Lock. Hier
+ * steht nur die Uebersetzung, und sie gewinnt trotz spaeterer Ladung,
+ * weil .view.premium-view eine Klasse mehr traegt.
+ *
+ * ZWEI Flaechen bleiben BEWUSST deckend — Glas waere dort ein Fehler:
+ * der sticky Tabellenkopf (unter ihm scrollt Text durch) und die
+ * Code-/Diff-Bloecke (Monospace auf durchscheinendem Grund ist genau
+ * die Unlesbarkeit, die V11 vermeiden will). Sie bekommen die V11-
+ * Dunkelheit, nicht die V11-Transparenz.
+ */
+.view.premium-view .ac-table-wrap,
+.view.premium-view .ac-facts > div {
+  border: 0;
+  background: var(--v11-glas);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+}
+
+/* Das Gitter zeichnet seine Trennlinien ueber `gap` auf der eigenen
+   Flaeche — das ist bereits die V11-Idee (der Abstand ist die Gruppe),
+   nur im falschen Ton. */
+.view.premium-view .ac-facts {
+  background: var(--v11-hair);
+}
+
+/* Deckend, mit Absicht (siehe Kopf des Abschnitts). */
+.view.premium-view .ac-table-wrap th {
+  background: #12161c;
+  color: rgba(246, 243, 238, 0.62);
+}
+
+.view.premium-view .ac-verification,
+.view.premium-view .ac-diff {
+  border: 0;
+  background: rgba(0, 0, 0, 0.34);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+}
+
+/* Das Bett des Fortschrittsbalkens ist eine Vertiefung, keine Flaeche. */
+.view.premium-view .ac-progress {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+/* Die eine Hauptaktion — dieselbe Fuellung wie in jeder anderen
+   Werkzeugleiste (Abschnitt 2), statt eines eigenen Gruen. */
+.view.premium-view .ac-primary {
+  border: 0;
+  background: var(--v11-cy);
+  color: #04211f;
+  box-shadow: 0 0 20px var(--v11-cy-glow);
+  font-weight: 700;
+}
+.view.premium-view .ac-primary:hover:not(:disabled) {
+  background: var(--v11-cy);
+  color: #04211f;
+  box-shadow: 0 0 28px var(--v11-cy-glow);
+}
+
+/* Zustand traegt Farbe UND Wort (V11-Grundregel) — die Woerter stehen
+   schon im Markup, hier kommen nur die drei Toene der App dazu. */
+.view.premium-view .ac-state-passed { color: var(--v11-ok); }
+.view.premium-view .ac-state-blocked { color: var(--v11-bad); }
+.view.premium-view .ac-state-active { color: var(--v11-cy-ink); }
+.view.premium-view .ac-progress span { background: var(--v11-ok); }
