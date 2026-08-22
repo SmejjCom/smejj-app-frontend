@@ -102,6 +102,18 @@
   min-height: 180px;
 }
 
+/* Eine Spalte, die nie breiter wird als die Flaeche. Ohne diese Zeile bemisst
+   sich die (nicht angegebene) Rasterspalte am breitesten Kind — und das ist
+   hier das Modell-Auswahlfeld, dessen Mindestbreite von der laengsten
+   Modellbezeichnung kommt. Bei 368 px Flaeche (Tablet mit angedockter rechter
+   Flaeche) wurde die Spalte so 474 px breit, und die ganze Ansicht liess sich
+   seitlich schieben. `minmax(0, 1fr)` deckelt sie an der Flaeche; Felder mit
+   `width: min(420px, 100%)` schrumpfen dann von selbst mit.
+   Gemessen mit `npm run measure:responsive`. */
+.premium-view.is-active {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .system-model-field {
   grid-column: 1 / -1;
 }
@@ -113,6 +125,14 @@
 .model-registry-panel {
   display: grid;
   border-block: 1px solid var(--premium-line);
+  /* Die Modell-Liste ist eine Tabelle: vier Spalten, zusammen mindestens
+     474 px. Auf dem Handy klappt sie ab 760 px auf zwei Spalten zusammen, aber
+     die Fenstergroesse ist nicht der ganze Platz — bei 768 px mit angedockter
+     rechter Flaeche bleiben der Ansicht nur 368 px, und dann schob sich die
+     GANZE Ansicht seitlich weg. Hier scrollt stattdessen die Liste allein,
+     unabhaengig davon, wie schmal die Flaeche gerade ist. Passt sie, sieht man
+     davon nichts. */
+  overflow-x: auto;
 }
 
 .model-registry-row {

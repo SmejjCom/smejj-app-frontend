@@ -49,12 +49,35 @@
   white-space: nowrap;
 }
 
+/* Zwei Spalten, die von selbst umbrechen — und zwar nach dem Platz, den die
+   FLAECHE hat, nicht nach der Fenstergroesse. Der Unterschied ist bei
+   smejj.com betraechtlich: bei 768 px stehen links 200 px Schublade und,
+   sobald die rechte Flaeche angedockt ist, rechts noch einmal 200 px. Von
+   768 px bleiben dann 368 px uebrig. Ein festes `250px <Inhalt>`-Raster
+   kannte diesen Unterschied nicht: die Medienabfrage sah 768 px und liess
+   beide Spalten stehen, der Inhalt bekam 168 px und lief 200 px ueber den
+   Rand (gemessen mit `npm run measure:responsive`). Als umbrechende
+   Flex-Zeile entscheidet der tatsaechliche Platz: reicht er fuer 250 px
+   Navigation UND rund 420 px Inhalt, stehen sie nebeneinander wie bisher,
+   sonst rutscht der Inhalt darunter. Auf dem Schreibtisch aendert sich
+   nichts. */
 #settings .settings-shell {
-  display: grid;
-  grid-template-columns: 250px minmax(0, 820px);
-  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: clamp(18px, 3vw, 40px);
   padding-top: 24px;
+}
+
+#settings .settings-shell > .settings-nav {
+  flex: 1 1 250px;
+  max-width: 250px;
+}
+
+#settings .settings-shell > .settings-content {
+  flex: 1 1 420px;
+  min-width: 0;
+  max-width: 820px;
 }
 
 /* Navigation: eine Glasleiste, Punkte durch hauchduenne Linien getrennt. */
@@ -345,9 +368,13 @@
 }
 
 /* Mobil: Navigation als umbrechende Chip-Leiste. */
-@media (max-width: 760px) {
-  #settings .settings-shell {
-    grid-template-columns: minmax(0, 1fr);
+@media (max-width: 900px) {
+  /* Die Navigation nimmt die volle Breite ein und wird zur Chip-Leiste.
+     Die Grenze lag bis 2026-08-22 bei 760 px — bei 768 px stand links noch
+     die 200-px-Schublade, sodass fuer den Inhalt nur 234 px blieben. */
+  #settings .settings-shell > .settings-nav {
+    flex-basis: 100%;
+    max-width: none;
   }
 
   #settings .settings-nav {

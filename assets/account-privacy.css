@@ -129,12 +129,35 @@
   white-space: nowrap;
 }
 
+/* Zwei Spalten, die von selbst umbrechen — und zwar nach dem Platz, den die
+   FLAECHE hat, nicht nach der Fenstergroesse. Der Unterschied ist bei
+   smejj.com betraechtlich: bei 768 px stehen links 200 px Schublade und,
+   sobald die rechte Flaeche angedockt ist, rechts noch einmal 200 px. Von
+   768 px bleiben dann 368 px uebrig. Ein festes `250px <Inhalt>`-Raster
+   kannte diesen Unterschied nicht: die Medienabfrage sah 768 px und liess
+   beide Spalten stehen, der Inhalt bekam 168 px und lief 200 px ueber den
+   Rand (gemessen mit `npm run measure:responsive`). Als umbrechende
+   Flex-Zeile entscheidet der tatsaechliche Platz: reicht er fuer 250 px
+   Navigation UND rund 420 px Inhalt, stehen sie nebeneinander wie bisher,
+   sonst rutscht der Inhalt darunter. Auf dem Schreibtisch aendert sich
+   nichts. */
 #profile .account-layout {
-  display: grid;
-  grid-template-columns: 250px minmax(0, 820px);
-  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: clamp(18px, 3vw, 40px);
   padding-top: 24px;
+}
+
+#profile .account-layout > .account-nav {
+  flex: 1 1 250px;
+  max-width: 250px;
+}
+
+#profile .account-layout > .account-content {
+  flex: 1 1 420px;
+  min-width: 0;
+  max-width: 820px;
 }
 
 /* Navigation links: eine Glasleiste, Punkte durch hauchduenne Linien getrennt,
@@ -510,6 +533,7 @@
 
 #profile .account-picture-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-inline-start: auto;
   flex-shrink: 0;
@@ -567,10 +591,17 @@
   font-size: 13.5px;
 }
 
-/* Mobil: Navigation wird zur umbrechenden Chip-Leiste — kein Scroll-Verlust. */
-@media (max-width: 760px) {
-  #profile .account-layout {
-    grid-template-columns: minmax(0, 1fr);
+/* Mobil UND Tablet: Navigation wird zur umbrechenden Chip-Leiste — kein
+   Scroll-Verlust. Die Grenze lag bis 2026-08-22 bei 760 px und war damit zu
+   niedrig: bei 768 px steht links noch die 200-px-Schublade, von den
+   uebrigen 568 px nahm die 250-px-Navigation den Loewenanteil, und fuer den
+   Inhalt blieben 234 px. Die Profilbild-Zeile braucht rund 350 px und lief
+   um 78 px ueber den Rand hinaus. Gemessen mit
+   `npm run measure:responsive`. */
+@media (max-width: 900px) {
+  #profile .account-layout > .account-nav {
+    flex-basis: 100%;
+    max-width: none;
   }
 
   #profile .account-nav {
@@ -620,7 +651,6 @@
   #profile .account-picture {
     flex-wrap: wrap;
   }
-
   #profile .account-picture-actions {
     margin-inline-start: 0;
   }
@@ -769,6 +799,26 @@
   z-index: 1;
   border-radius: 50%;
   filter: blur(10px);
+}
+
+/* Schmale Bildschirme: der Schein rueckt in die Ecke HINEIN statt darueber
+   hinaus. Sobald die Tafel die volle Breite einnimmt, liegen die 40 px
+   Ueberstand ausserhalb des Fensters — zu sehen ist davon nichts, aber die
+   Seite bekommt einen seitlichen Bildlauf und wackelt beim Wischen (bei 320 px
+   gemessene 33 px, `npm run measure:responsive`). Auf dem Schreibtisch bleibt
+   der Schein unveraendert, dort ist links und rechts Platz.
+   Diese Regeln muessen NACH den Grundregeln stehen: eine Media-Query erhoeht
+   die Spezifitaet nicht, weiter oben im Blatt haetten sie nichts bewirkt. */
+@media (max-width: 900px) {
+  #profile .account-panel::before {
+    top: 0;
+    right: 0;
+  }
+
+  #profile .account-panel::after {
+    bottom: 0;
+    left: 0;
+  }
 }
 
 

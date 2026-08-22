@@ -5715,3 +5715,27 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: #04211f;
   clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
 }
+@media (max-width: 600px) {
+  #start .prompt-glass .ghost-button.icon-button,
+  #start .prompt-glass .send-button {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+  .nav-start .nav-button,
+  .sidebar .nav-vier .nav-button {
+    min-height: 44px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .spur-reiter button,
+  #fuehrungBlase button {
+    min-height: 44px;
+  }
+  #code #codeAufgabe {
+    min-height: 44px;
+  }
+  #code .repochip {
+    min-width: 44px;
+  }
+}
