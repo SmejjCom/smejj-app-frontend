@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Proveedor y privacidad.",
   "Impressum": "Aviso legal",
   "Datenschutz": "Privacidad",
+  "AGB": "Términos",
+  "Widerruf": "Derecho de desistimiento",
   "Gespeichert": "Guardado",
   "Standardeinstellungen wiederhergestellt": "Ajustes predeterminados restaurados",
   "Konto & Datenschutz": "Cuenta y privacidad",

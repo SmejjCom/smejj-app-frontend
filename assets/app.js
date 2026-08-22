@@ -72,7 +72,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
-const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=b41b").then((m) => (m.enhancePremiumSurfaces(), m)));
+const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=b41c").then((m) => (m.enhancePremiumSurfaces(), m)));
 boot();
 
 // Buendelt, was projects-surface.js aus der App braucht — eine Stelle statt neun.

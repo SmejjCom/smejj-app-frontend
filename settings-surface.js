@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from "./config.js";
-import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=4";
+import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=b39";
 // api-keys-surface.js und provider-settings.js werden BEWUSST nicht statisch
 // importiert (Seitengewicht, Freigabe Wof Kadavanich 2026-08-04). Beide rendern
 // ausschliesslich in das Panel "models", und der Startreiter ist "general" —
@@ -24,12 +24,21 @@ const DEFAULTS = {
   offlineCache: true, diagnostics: false
 };
 
+// Namen nach Mockup V11, Bildschirm 55 ("jeder mit Untertitel"). Der dritte
+// Eintrag je Zeile ist die Unterzeile — sie beschreibt den ECHTEN Inhalt des
+// Bereichs, nicht den Beispieltext des Mockups: eine Zeile, die Schalter
+// verspricht, die es nicht gibt, waere eine Luege.
 const GROUPS = [
-  ["general", "Allgemein"], ["appearance", "Darstellung"],
-  ["behavior", "Verhalten"], ["models", "Modelle"],
-  ["personalization", "Personalisierung"], ["coding", "Coding"],
-  ["permissions", "Berechtigungen"], ["notifications", "Mitteilungen"],
-  ["storage", "Speicher & Sync"], ["advanced", "Erweitert"]
+  ["general", "Allgemein", "Sprache, Start, Sicherheitsmodus"],
+  ["appearance", "Aussehen & Schriftgröße", "Größe, Farbschema, Dichte"],
+  ["behavior", "Wie smejj antwortet", "Länge, Gründlichkeit, Stil"],
+  ["models", "KI-Modelle & Anbieter", "Modelle und eigene Schlüssel"],
+  ["personalization", "Persönliches", "Deine Anweisungen an smejj"],
+  ["coding", "Programmieren", "Prüfungen, Vorschau, Zugriff"],
+  ["permissions", "Sicherheit", "Bestätigungen und Grenzen"],
+  ["notifications", "Benachrichtigungen", "Wenn ein Auftrag fertig ist"],
+  ["storage", "Dateien & Speicher", "Offline, Sync, Platz"],
+  ["advanced", "Erweitert", "Diagnose und Zurücksetzen"]
 ];
 
 const FIELDS = {
@@ -56,6 +65,26 @@ export function initSettingsSurface() {
   loadStyles();
   initSettingsRuntime();
   view.addEventListener("click", (event) => handleClick(view, event));
+  // Das Suchfeld (Mockup Bildschirm 55): filtert die Bereichsliste ueber Name
+  // und Unterzeile; Enter oeffnet den ersten Treffer. Bewusst nur die Liste,
+  // nicht die einzelnen Schalter — die Unterzeilen nennen den Inhalt, damit
+  // "Schrift" den Bereich "Aussehen & Schriftgröße" findet.
+  // DELEGIERT wie der Klick daruber, nicht direkt am Feld: render() zeichnet
+  // die Oberflaeche neu (z. B. nach einem Sprachwechsel), und eine direkte
+  // Bindung stuerbe mit dem alten Feld — live gemessen am 2026-08-15: das
+  // Feld war da, aber der Filter tat nichts.
+  view.addEventListener("input", (event) => {
+    if (event.target.id !== "settingsSuche") return;
+    const frage = event.target.value.trim().toLowerCase();
+    view.querySelectorAll("[data-settings-tab]").forEach((knopf) => {
+      knopf.hidden = Boolean(frage) && !knopf.textContent.toLowerCase().includes(frage);
+    });
+  });
+  view.addEventListener("keydown", (event) => {
+    if (event.target.id !== "settingsSuche" || event.key !== "Enter") return;
+    const erster = view.querySelector("[data-settings-tab]:not([hidden])");
+    if (erster) activate(view, erster.dataset.settingsTab);
+  });
   view.addEventListener("change", (event) => handleChange(view, event));
   // Synchron rendern: der i18n-Sprachcache macht t() sofort einsatzbereit,
   // damit app.js-Boot-Bindings die gerenderten Elemente vorfinden.
@@ -121,45 +150,56 @@ function markup() {
   // ARIA-Reiter wie auf der Kontoseite (QA-Welle 2, Befund W2-04): role=tab,
   // aria-selected und tablist-Container — vorher waren es zehn nackte Knoepfe,
   // deren aktiver Zustand nur farblich erkennbar war.
-  const nav = GROUPS.map(([id, label]) => `<button type="button" role="tab" id="settings-tab-${id}" class="settings-nav-button" data-settings-tab="${id}" aria-controls="settings-${id}" aria-selected="false" tabindex="-1">${t(label)}</button>`).join("");
-  return `<header class="settings-header"><div><p class="eyebrow">${t("Einstellungen")}</p><h2>${t("Einstellungen")}</h2><p class="subhead">${t("Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.")}</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">${t("Lokal gespeichert")}</div></header>
-    <div class="settings-shell"><nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${nav}</nav><div class="settings-content">
+  const nav = GROUPS.map(([id, label, sub]) => `<button type="button" role="tab" id="settings-tab-${id}" class="settings-nav-button" data-settings-tab="${id}" aria-controls="settings-${id}" aria-selected="false" tabindex="-1"><span class="settings-nav-name">${t(label)}</span><span class="settings-nav-sub">${t(sub)}</span></button>`).join("");
+  // Das Suchfeld ueber den Bereichen (Mockup Bildschirm 55): "wer Passwort
+  // tippt, landet in Sicherheit, ohne den Bereichsnamen zu kennen". Gefiltert
+  // wird ueber Name UND Unterzeile; Enter springt in den ersten Treffer.
+  const suche = `<input type="search" id="settingsSuche" class="settings-suche" placeholder="${t("Einstellung suchen…")}" aria-label="${t("Einstellung suchen…")}">`;
+  // Betreiber 2026-08-16: keine doppelten Ueberschriften — die kleine Zeile
+  // "Einstellungen" stand direkt ueber der grossen "Einstellungen".
+  return `<header class="settings-header"><div><h2>${t("Einstellungen")}</h2><p class="subhead">${t("Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.")}</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">${t("Lokal gespeichert")}</div></header>
+    <div class="settings-shell"><nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${suche}${nav}</nav><div class="settings-content">
       ${panel("general", "Allgemein", "Grundlegendes Verhalten der App.", [
         select("Sprache", "settingsLanguage", LANGUAGE_OPTIONS, false),
-        select("Beim Öffnen anzeigen", "settingsStartView", [["last", "Letzte Ansicht"], ["start", "Startseite"], ["projects", "Arbeitsbereich"]]),
+        select("Beim Öffnen anzeigen", "settingsStartView", [["start", "Startseite"], ["last", "Letzte Ansicht"], ["projects", "smejjCloud"]]),
         select("Sicherheitsmodus", "settingsMode", [["safe", "Free-safe"], ["byok", "BYOK vorbereitet"], ["local", "Lokal"]])])}
-      ${panel("appearance", "Darstellung", "Gilt nur außerhalb der geschützten Startseite.", [
-        select("Farbschema", "settingsTheme", [["system", "System"], ["dark", "Dunkel"], ["light", "Hell"]]),
-        select("Oberflächendichte", "settingsDensity", [["comfortable", "Komfortabel"], ["compact", "Kompakt"]]),
-        select("Schriftgröße", "settingsFontSize", [["small", "Klein"], ["medium", "Mittel"], ["large", "Groß"]])])}
-      ${panel("behavior", "Verhalten", "Lege fest, wie selbstständig smejj.com arbeiten darf.", [
+      ${panel("appearance", "Aussehen & Schriftgröße", "Gilt nur außerhalb der geschützten Startseite.", [
+        select("Schriftgröße", "settingsFontSize", [["small", "Normal · 16 px"], ["medium", "Groß · 19 px"], ["large", "Sehr groß · 23 px"]]),
+        `<p class="settings-schriftprobe" aria-live="polite">${t("So sieht dein Text dann überall aus. Auch Knöpfe und Menüs wachsen mit — nicht nur der Fließtext.")}</p>`,
+        select("Helligkeit", "settingsTheme", [["dark", "Dunkel"], ["light", "Hell"], ["system", "So wie mein Gerät"]]),
+        select("Oberflächendichte", "settingsDensity", [["comfortable", "Komfortabel"], ["compact", "Kompakt"]])])}
+      ${panel("behavior", "Wie smejj antwortet", "Lege fest, wie selbstständig smejj.com arbeiten darf.", [
         select("Bestätigungen", "settingsConfirmations", [["strict", "Immer bestätigen"], ["balanced", "Bei wichtigen Aktionen"], ["trusted", "Nur externe Auswirkungen"]]),
-        select("Antwortstil", "settingsResponseStyle", [["concise", "Kompakt"], ["balanced", "Ausgewogen"], ["detailed", "Ausführlich"]]),
+        select("Wie ausführlich?", "settingsResponseStyle", [["concise", "Kurz"], ["balanced", "Ausgewogen"], ["detailed", "Ausführlich"]]),
         toggle("Projektkontext automatisch berücksichtigen", "settingsAutoContext", "Relevante Projektdateien und Anweisungen einbeziehen.")])}
-      ${panel("models", "Modelle", "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.", [
+      ${panel("models", "KI-Modelle & Anbieter", "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.", [
         select("Reasoning-Aufwand", "settingsReasoningEffort", [["medium", "Mittel"], ["high", "Hoch"], ["max", "Maximal"]]),
         action("Modellverwaltung", "Standardmodell, BYOK und lokale Modelle.", "KI-Modelle öffnen", "ai")])}
-      ${panel("personalization", "Personalisierung", "Dauerhafte Hinweise für Antworten und Zusammenarbeit.", [
+      ${panel("personalization", "Persönliches", "Dauerhafte Hinweise für Antworten und Zusammenarbeit.", [
         `<div class="settings-row settings-row-stack"><div class="settings-row-copy"><strong id="settingsPersonalizationLabel">${t("Persönliche Anweisungen")}</strong></div><textarea id="settingsPersonalization" aria-labelledby="settingsPersonalizationLabel" maxlength="4000" placeholder="${t("Zum Beispiel: Antworte auf Deutsch und erkläre Entscheidungen kurz.")}"></textarea></div>`])}
-      ${panel("coding", "Coding", "Standards für Coding-Aufgaben und Verifikation.", [
+      ${panel("coding", "Programmieren", "Standards für Coding-Aufgaben und Verifikation.", [
         toggle("Prüfungen automatisch ausführen", "settingsRunChecks", "Build, Typecheck, Lint und Tests vor Abschluss."),
         toggle("Browser-Vorschau bei UI-Aufgaben", "settingsBrowserPreview", "Visuelle Prüfung und Screenshots."),
         action("Coding-Arbeitsbereich", "Jobs, Diffs, Tests und Freigaben.", "Coding öffnen", "smejjClaw")])}
-      ${panel("permissions", "Berechtigungen", "Sichere Standardwerte für Werkzeuge und externe Zugriffe.", [
+      ${panel("permissions", "Sicherheit", "Sichere Standardwerte für Werkzeuge und externe Zugriffe.", [
         toggle("Netzwerkzugriff für Aufgaben", "settingsNetworkAccess", "Standardmäßig aus; externe Zugriffe bleiben fail-closed."),
         info("Dateien und Terminal", "Schreibaktionen und nicht erlaubte Befehle benötigen weiterhin eine sichere Freigabe.")])}
-      ${panel("notifications", "Mitteilungen", "Wähle, wann smejj.com dich informiert.", [
+      ${panel("notifications", "Benachrichtigungen", "Wähle, wann smejj.com dich informiert.", [
         toggle("Aufgabe abgeschlossen", "settingsNotifyComplete", "Nach erfolgreicher Verifikation."),
         toggle("Freigabe erforderlich", "settingsNotifyApproval", "Wenn ein Diff oder externer Schritt wartet."),
         toggle("Fehler und Abbruch", "settingsNotifyError", "Bei fehlgeschlagenen oder gestoppten Aufgaben.")])}
-      ${panel("storage", "Speicher & Sync", "Lokale Daten und IDrive-e2 Object Brain.", [
+      ${panel("storage", "Dateien & Speicher", "Lokale Daten und IDrive-e2 Object Brain.", [
         toggle("Offline-Cache verwenden", "settingsOfflineCache", "App-Shell und lokale Arbeitsdaten offline halten."),
         action("Speicherstatus", "Lokalen Speicher, IDrive e2 und Sync prüfen.", "Speicher öffnen", "storageView"),
         action("Lokale Einstellungsdaten", "Standardeinstellungen wiederherstellen.", "Zurücksetzen", "reset")])}
       ${panel("advanced", "Erweitert", "Diagnose und rechtliche Informationen.", [
         toggle("Diagnoseinformationen anzeigen", "settingsDiagnostics", "Technische Statusdetails in Nicht-Start-Bereichen."),
         action("Systemstatus", "Verbindungen, Modelle und Betrieb prüfen.", "Status öffnen", "tools"),
-        `<div class="settings-row"><div class="settings-row-copy"><strong>${t("Rechtliches")}</strong><span>${t("Anbieter und Datenschutz.")}</span></div><div class="settings-links"><a href="/impressum.html">${t("Impressum")}</a><a href="/datenschutz.html">${t("Datenschutz")}</a></div></div>`])}
+        // AGB und Widerruf standen bis 2026-08-22 zwar live (agb.html,
+        // widerruf.html), waren aus der App heraus aber nirgends erreichbar.
+        // Sobald ein Abo verkauft wird, muessen sie es sein — beide gehoeren
+        // zur Pflichtinformation vor Vertragsschluss.
+        `<div class="settings-row"><div class="settings-row-copy"><strong>${t("Rechtliches")}</strong><span>${t("Anbieter und Datenschutz.")}</span></div><div class="settings-links"><a href="/impressum.html">${t("Impressum")}</a><a href="/datenschutz.html">${t("Datenschutz")}</a><a href="/agb.html">${t("AGB")}</a><a href="/widerruf.html">${t("Widerruf")}</a></div></div>`])}
     </div></div>`;
   // Hier standen bis 2026-07-28 drei leere Platzhalter-Knoepfe (#saveSettings,
   // #showOfflinePage, #showErrorPage) und #settingsOutput. Sie waren nur da,
@@ -293,7 +333,7 @@ function applyValues(view, settings) {
 function loadStyles() {
   // Versionsmarke wie in account-privacy.js: GitHub Pages liefert Assets mit
   // max-age; ohne ?v= saehe ein offener Browser die neue Datei erst spaeter.
-  const href = "/assets/settings-surface.css?v=glas-hell-20260726b";
+  const href = "/assets/settings-surface.css?v=b48";
   if (document.querySelector('link[href^="/assets/settings-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";

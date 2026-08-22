@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Provider and privacy.",
   "Impressum": "Imprint",
   "Datenschutz": "Privacy",
+  "AGB": "Terms",
+  "Widerruf": "Right of withdrawal",
   "Gespeichert": "Saved",
   "Standardeinstellungen wiederhergestellt": "Default settings restored",
   "Konto & Datenschutz": "Account & Privacy",

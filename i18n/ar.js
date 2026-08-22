@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "المزوّد والخصوصية.",
   "Impressum": "بيان قانوني",
   "Datenschutz": "الخصوصية",
+  "AGB": "الشروط والأحكام",
+  "Widerruf": "حق الانسحاب",
   "Gespeichert": "تم الحفظ",
   "Standardeinstellungen wiederhergestellt": "تمت استعادة الإعدادات الافتراضية",
   "Konto & Datenschutz": "الحساب والخصوصية",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "صف مهمة أو اطرح سؤالاً.",
   "Generiere ein Bild von:": "ولّد صورة لـ:",
   "Generiere ein Video von:": "ولّد فيديو لـ:",
+  "Erledige mit der Maus im Browser:": "نفّذ بالفأرة في المتصفح:",
 };

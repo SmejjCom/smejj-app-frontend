@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "المزوّد والخصوصية.",
   "Impressum": "بيان قانوني",
   "Datenschutz": "الخصوصية",
+  "AGB": "الشروط والأحكام",
+  "Widerruf": "حق الانسحاب",
   "Gespeichert": "تم الحفظ",
   "Standardeinstellungen wiederhergestellt": "تمت استعادة الإعدادات الافتراضية",
   "Konto & Datenschutz": "الحساب والخصوصية",

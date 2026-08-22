@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Fournisseur et confidentialité.",
   "Impressum": "Mentions légales",
   "Datenschutz": "Confidentialité",
+  "AGB": "Conditions",
+  "Widerruf": "Droit de rétractation",
   "Gespeichert": "Enregistré",
   "Standardeinstellungen wiederhergestellt": "Paramètres par défaut restaurés",
   "Konto & Datenschutz": "Compte et confidentialité",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "Décrivez une tâche ou posez une question.",
   "Generiere ein Bild von:": "Génère une image de :",
   "Generiere ein Video von:": "Génère une vidéo de :",
+  "Erledige mit der Maus im Browser:": "Fais-le avec la souris dans le navigateur :",
 };

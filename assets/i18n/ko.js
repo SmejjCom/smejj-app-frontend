@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "제공자 및 개인정보 보호.",
   "Impressum": "법적 고지",
   "Datenschutz": "개인정보 보호",
+  "AGB": "이용약관",
+  "Widerruf": "청약철회",
   "Gespeichert": "저장됨",
   "Standardeinstellungen wiederhergestellt": "기본 설정이 복원되었습니다",
   "Konto & Datenschutz": "계정 및 개인정보 보호",

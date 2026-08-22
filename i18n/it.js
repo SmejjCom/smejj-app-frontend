@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Fornitore e privacy.",
   "Impressum": "Note legali",
   "Datenschutz": "Privacy",
+  "AGB": "Termini",
+  "Widerruf": "Diritto di recesso",
   "Gespeichert": "Salvato",
   "Standardeinstellungen wiederhergestellt": "Impostazioni predefinite ripristinate",
   "Konto & Datenschutz": "Account e privacy",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "Descrivi un compito o fai una domanda.",
   "Generiere ein Bild von:": "Genera un'immagine di:",
   "Generiere ein Video von:": "Genera un video di:",
+  "Erledige mit der Maus im Browser:": "Fallo con il mouse nel browser:",
 };

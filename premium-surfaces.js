@@ -1,8 +1,8 @@
 import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js";
 import { applyServerAiStatus } from "/assets/storage/index.js";
 import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=5";
-import { initSettingsSurface } from "./settings-surface.js?v=4";
-import { initAccountPrivacySurface } from "./account-privacy.js?v=2";
+import { initSettingsSurface } from "./settings-surface.js?v=b42";
+import { initAccountPrivacySurface } from "./account-privacy.js?v=b46m";
 import { afterFirstPaint } from "./deferred-start.js";
 
 export function enhancePremiumSurfaces() {
@@ -176,7 +176,11 @@ function loadPremiumStyles() {
   // app-surfaces.css in den Kopf und gewinnt darum bei gleicher Spezifitaet —
   // das Cyan-Cockpit (Screens 4-14, Betreiber-Freigabe 2026-08-13) legt sich
   // ueber den Premium-Unterbau, ersetzt ihn aber nicht.
-  for (const href of ["/assets/app-surfaces.css", "/assets/design-cyan-views.css"]) {
+  // design-v11-views.css steht als LETZTES (Betreiber-Ansage 2026-08-15:
+  // "Muss 1 zu 1 wie in Mockup steht sein"): es raeumt die Rahmen der beiden
+  // Vorgaenger ab — 21 Rahmen in einer Ansicht, gemessen — und gewinnt nur
+  // durch diese Position. Wer hier etwas dahinterhaengt, holt sie zurueck.
+  for (const href of ["/assets/app-surfaces.css", "/assets/design-cyan-views.css", "/assets/design-v11-views.css"]) {
     if (document.querySelector(`link[href="${href}"]`)) continue;
     const link = document.createElement("link");
     link.rel = "stylesheet";

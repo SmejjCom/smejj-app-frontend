@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "提供方与隐私。",
   "Impressum": "法律声明",
   "Datenschutz": "隐私政策",
+  "AGB": "条款",
+  "Widerruf": "撤回权",
   "Gespeichert": "已保存",
   "Standardeinstellungen wiederhergestellt": "已恢复默认设置",
   "Konto & Datenschutz": "账户与隐私",

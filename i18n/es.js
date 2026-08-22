@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Proveedor y privacidad.",
   "Impressum": "Aviso legal",
   "Datenschutz": "Privacidad",
+  "AGB": "Términos",
+  "Widerruf": "Derecho de desistimiento",
   "Gespeichert": "Guardado",
   "Standardeinstellungen wiederhergestellt": "Ajustes predeterminados restaurados",
   "Konto & Datenschutz": "Cuenta y privacidad",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "Describe una tarea o haz una pregunta.",
   "Generiere ein Bild von:": "Genera una imagen de:",
   "Generiere ein Video von:": "Genera un vídeo de:",
+  "Erledige mit der Maus im Browser:": "Hazlo con el ratón en el navegador:",
 };

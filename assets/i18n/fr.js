@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Fournisseur et confidentialité.",
   "Impressum": "Mentions légales",
   "Datenschutz": "Confidentialité",
+  "AGB": "Conditions",
+  "Widerruf": "Droit de rétractation",
   "Gespeichert": "Enregistré",
   "Standardeinstellungen wiederhergestellt": "Paramètres par défaut restaurés",
   "Konto & Datenschutz": "Compte et confidentialité",

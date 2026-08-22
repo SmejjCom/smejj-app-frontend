@@ -195,7 +195,11 @@ function markup() {
       ${panel("advanced", "Erweitert", "Diagnose und rechtliche Informationen.", [
         toggle("Diagnoseinformationen anzeigen", "settingsDiagnostics", "Technische Statusdetails in Nicht-Start-Bereichen."),
         action("Systemstatus", "Verbindungen, Modelle und Betrieb prüfen.", "Status öffnen", "tools"),
-        `<div class="settings-row"><div class="settings-row-copy"><strong>${t("Rechtliches")}</strong><span>${t("Anbieter und Datenschutz.")}</span></div><div class="settings-links"><a href="/impressum.html">${t("Impressum")}</a><a href="/datenschutz.html">${t("Datenschutz")}</a></div></div>`])}
+        // AGB und Widerruf standen bis 2026-08-22 zwar live (agb.html,
+        // widerruf.html), waren aus der App heraus aber nirgends erreichbar.
+        // Sobald ein Abo verkauft wird, muessen sie es sein — beide gehoeren
+        // zur Pflichtinformation vor Vertragsschluss.
+        `<div class="settings-row"><div class="settings-row-copy"><strong>${t("Rechtliches")}</strong><span>${t("Anbieter und Datenschutz.")}</span></div><div class="settings-links"><a href="/impressum.html">${t("Impressum")}</a><a href="/datenschutz.html">${t("Datenschutz")}</a><a href="/agb.html">${t("AGB")}</a><a href="/widerruf.html">${t("Widerruf")}</a></div></div>`])}
     </div></div>`;
   // Hier standen bis 2026-07-28 drei leere Platzhalter-Knoepfe (#saveSettings,
   // #showOfflinePage, #showErrorPage) und #settingsOutput. Sie waren nur da,

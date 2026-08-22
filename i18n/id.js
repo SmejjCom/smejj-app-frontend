@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Penyedia dan privasi.",
   "Impressum": "Pemberitahuan hukum",
   "Datenschutz": "Privasi",
+  "AGB": "Syarat & Ketentuan",
+  "Widerruf": "Hak pembatalan",
   "Gespeichert": "Tersimpan",
   "Standardeinstellungen wiederhergestellt": "Pengaturan bawaan dipulihkan",
   "Konto & Datenschutz": "Akun & Privasi",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "Jelaskan tugas atau ajukan pertanyaan.",
   "Generiere ein Bild von:": "Hasilkan gambar tentang:",
   "Generiere ein Video von:": "Hasilkan video tentang:",
+  "Erledige mit der Maus im Browser:": "Kerjakan dengan mouse di browser:",
 };

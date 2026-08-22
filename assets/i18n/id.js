@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Penyedia dan privasi.",
   "Impressum": "Pemberitahuan hukum",
   "Datenschutz": "Privasi",
+  "AGB": "Syarat & Ketentuan",
+  "Widerruf": "Hak pembatalan",
   "Gespeichert": "Tersimpan",
   "Standardeinstellungen wiederhergestellt": "Pengaturan bawaan dipulihkan",
   "Konto & Datenschutz": "Akun & Privasi",

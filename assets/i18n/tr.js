@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Sağlayıcı ve gizlilik.",
   "Impressum": "Yasal bildirim",
   "Datenschutz": "Gizlilik",
+  "AGB": "Koşullar",
+  "Widerruf": "Cayma hakkı",
   "Gespeichert": "Kaydedildi",
   "Standardeinstellungen wiederhergestellt": "Varsayılan ayarlar geri yüklendi",
   "Konto & Datenschutz": "Hesap ve Gizlilik",

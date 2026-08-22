@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "সরবরাহকারী ও গোপনীয়তা।",
   "Impressum": "আইনি বিজ্ঞপ্তি",
   "Datenschutz": "গোপনীয়তা",
+  "AGB": "শর্তাবলী",
+  "Widerruf": "প্রত্যাহারের অধিকার",
   "Gespeichert": "সংরক্ষিত",
   "Standardeinstellungen wiederhergestellt": "ডিফল্ট সেটিংস পুনরুদ্ধার করা হয়েছে",
   "Konto & Datenschutz": "অ্যাকাউন্ট ও গোপনীয়তা",

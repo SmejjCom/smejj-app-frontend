@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Провайдер и конфиденциальность.",
   "Impressum": "Правовая информация",
   "Datenschutz": "Конфиденциальность",
+  "AGB": "Условия",
+  "Widerruf": "Право на отказ",
   "Gespeichert": "Сохранено",
   "Standardeinstellungen wiederhergestellt": "Настройки по умолчанию восстановлены",
   "Konto & Datenschutz": "Аккаунт и конфиденциальность",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "Опишите задачу или задайте вопрос.",
   "Generiere ein Bild von:": "Создай изображение:",
   "Generiere ein Video von:": "Создай видео:",
+  "Erledige mit der Maus im Browser:": "Сделай мышью в браузере:",
 };

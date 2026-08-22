@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Provider and privacy.",
   "Impressum": "Imprint",
   "Datenschutz": "Privacy",
+  "AGB": "Terms",
+  "Widerruf": "Right of withdrawal",
   "Gespeichert": "Saved",
   "Standardeinstellungen wiederhergestellt": "Default settings restored",
   "Konto & Datenschutz": "Account & Privacy",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "Describe a task or ask a question.",
   "Generiere ein Bild von:": "Generate an image of:",
   "Generiere ein Video von:": "Generate a video of:",
+  "Erledige mit der Maus im Browser:": "Do this with the mouse in the browser:",
 };

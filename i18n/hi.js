@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "प्रदाता और गोपनीयता।",
   "Impressum": "कानूनी सूचना",
   "Datenschutz": "गोपनीयता",
+  "AGB": "नियम व शर्तें",
+  "Widerruf": "निरसन का अधिकार",
   "Gespeichert": "सहेजा गया",
   "Standardeinstellungen wiederhergestellt": "डिफ़ॉल्ट सेटिंग्स बहाल की गईं",
   "Konto & Datenschutz": "खाता और गोपनीयता",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "कोई कार्य बताइए या कोई प्रश्न पूछिए।",
   "Generiere ein Bild von:": "इसका चित्र बनाओ:",
   "Generiere ein Video von:": "इसका वीडियो बनाओ:",
+  "Erledige mit der Maus im Browser:": "ब्राउज़र में माउस से करो:",
 };

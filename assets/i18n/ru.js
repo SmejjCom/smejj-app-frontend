@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Провайдер и конфиденциальность.",
   "Impressum": "Правовая информация",
   "Datenschutz": "Конфиденциальность",
+  "AGB": "Условия",
+  "Widerruf": "Право на отказ",
   "Gespeichert": "Сохранено",
   "Standardeinstellungen wiederhergestellt": "Настройки по умолчанию восстановлены",
   "Konto & Datenschutz": "Аккаунт и конфиденциальность",

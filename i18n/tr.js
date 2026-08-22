@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Sağlayıcı ve gizlilik.",
   "Impressum": "Yasal bildirim",
   "Datenschutz": "Gizlilik",
+  "AGB": "Koşullar",
+  "Widerruf": "Cayma hakkı",
   "Gespeichert": "Kaydedildi",
   "Standardeinstellungen wiederhergestellt": "Varsayılan ayarlar geri yüklendi",
   "Konto & Datenschutz": "Hesap ve Gizlilik",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "Bir görev tanımlayın veya bir soru sorun.",
   "Generiere ein Bild von:": "Şunun görselini üret:",
   "Generiere ein Video von:": "Şunun videosunu üret:",
+  "Erledige mit der Maus im Browser:": "Tarayıcıda fareyle hallet:",
 };

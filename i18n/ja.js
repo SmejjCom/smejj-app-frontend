@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "提供者とプライバシー。",
   "Impressum": "法的表示",
   "Datenschutz": "プライバシー",
+  "AGB": "利用規約",
+  "Widerruf": "撤回権",
   "Gespeichert": "保存しました",
   "Standardeinstellungen wiederhergestellt": "既定の設定に戻しました",
   "Konto & Datenschutz": "アカウントとプライバシー",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "タスクを説明するか、質問してください。",
   "Generiere ein Bild von:": "次の画像を生成：",
   "Generiere ein Video von:": "次の動画を生成：",
+  "Erledige mit der Maus im Browser:": "ブラウザでマウス操作して：",
 };

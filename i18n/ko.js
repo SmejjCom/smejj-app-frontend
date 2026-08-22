@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "제공자 및 개인정보 보호.",
   "Impressum": "법적 고지",
   "Datenschutz": "개인정보 보호",
+  "AGB": "이용약관",
+  "Widerruf": "청약철회",
   "Gespeichert": "저장됨",
   "Standardeinstellungen wiederhergestellt": "기본 설정이 복원되었습니다",
   "Konto & Datenschutz": "계정 및 개인정보 보호",
@@ -336,4 +338,5 @@ export default {
   "Frag mich alles": "작업을 설명하거나 질문해 주세요.",
   "Generiere ein Bild von:": "다음 이미지를 생성:",
   "Generiere ein Video von:": "다음 비디오를 생성:",
+  "Erledige mit der Maus im Browser:": "브라우저에서 마우스로 처리：",
 };

@@ -93,6 +93,8 @@ export default {
   "Anbieter und Datenschutz.": "Fornitore e privacy.",
   "Impressum": "Note legali",
   "Datenschutz": "Privacy",
+  "AGB": "Termini",
+  "Widerruf": "Diritto di recesso",
   "Gespeichert": "Salvato",
   "Standardeinstellungen wiederhergestellt": "Impostazioni predefinite ripristinate",
   "Konto & Datenschutz": "Account e privacy",
