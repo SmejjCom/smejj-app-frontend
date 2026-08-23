@@ -3,7 +3,7 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
-import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=2";
+import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=3";
 import { initGlobalSearch } from "./search.js?v=b51";
 import { openSearchOverlay } from "./search-overlay.js?v=b58";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
@@ -328,7 +328,7 @@ function bindStartComposer() {
   };
   send.addEventListener("click", submit);
   bindPasteAttach({ getInput: () => input });
-  ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=werkzeuge-4").then((m) => m.initComposerTools()));
+  ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=werkzeuge-5").then((m) => m.initComposerTools()));
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {

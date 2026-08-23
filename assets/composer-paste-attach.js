@@ -53,7 +53,7 @@ function ensureRow(input) {
     row = document.createElement("div");
     row.id = "pasteAttachRow";
     row.className = "paste-attach-row";
-    row.setAttribute("aria-label", "Eingefuegte Texte");
+    row.setAttribute("aria-label", "Eingefügte Texte");
     input.parentElement.insertBefore(row, input);
   }
   return row;
@@ -85,7 +85,7 @@ function renderChips(input) {
     const restore = document.createElement("button");
     restore.type = "button";
     restore.className = "paste-attach-restore";
-    restore.textContent = "Als Text einfuegen";
+    restore.textContent = "Als Text einfügen";
     restore.addEventListener("click", () => {
       input.value = input.value ? `${input.value}\n${chip.text}` : chip.text;
       removeChip(chip.id);
@@ -97,13 +97,13 @@ function renderChips(input) {
     const dismiss = document.createElement("button");
     dismiss.type = "button";
     dismiss.className = "paste-attach-remove";
-    dismiss.setAttribute("aria-label", "Eingefuegten Text entfernen");
+    dismiss.setAttribute("aria-label", "Eingefügten Text entfernen");
     dismiss.title = "Entfernen";
     dismiss.textContent = "×";
     dismiss.addEventListener("click", () => {
       removeChip(chip.id);
       renderChips(input);
-      showToast("Eingefuegter Text entfernt");
+      showToast("Eingefügter Text entfernt");
     });
 
     element.append(label, restore, dismiss);
@@ -130,7 +130,7 @@ export function bindPasteAttach({ getInput }) {
     chips.push({ id: chipSeq, text });
     renderChips(input);
     notifyInputChanged(input);
-    showToast(`Langer Text als Anhang uebernommen (${formatZeichen(text.length)} Zeichen)`);
+    showToast(`Langer Text als Anhang übernommen (${formatZeichen(text.length)} Zeichen)`);
   });
 }
 
