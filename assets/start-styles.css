@@ -5744,20 +5744,29 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
     min-width: 44px;
   }
 }
+#start .prompt-glass .send-button,
+#start .prompt-glass .send-button.ist-sprache,
+#start .prompt-glass .send-button:not(.ist-sprache),
+#code .codeleiste #codeSenden,
+#code #codeSenden,
+.send-button {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
 #start .prompt-glass .send-button.ist-stopp,
-#code .codeleiste #codeSenden.ist-stopp,
 #code #codeSenden.ist-stopp,
 .send-button.ist-stopp {
   border-radius: 0 !important;
-  background: #0a0f16;
   color: #02fdfd;
-  box-shadow: inset 0 0 0 1.5px #02fdfd;
   animation: stopp-quadrat-puls 1.6s ease-in-out infinite;
 }
 .send-button.ist-stopp:hover,
-.send-button.ist-stopp:focus-visible { background: rgba(2, 253, 253, 0.14); animation: none; }
-.send-button.ist-stopp .stopp-quadrat { width: 18px; height: 18px; }
+.send-button.ist-stopp:focus-visible { animation: none; }
+.send-button.ist-stopp .stopp-quadrat { width: 22px; height: 22px; }
 .send-button.ist-stopp .stopp-quadrat rect { fill: currentColor; stroke: none; }
+#code #codeSenden.ist-stopp svg { width: 20px; height: 20px; fill: currentColor; stroke: none; }
+#start .start-arbeit, #code .code-arbeit, #startArbeit, #codeArbeit { display: none !important; }
 @keyframes stopp-quadrat-puls {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.55; }
