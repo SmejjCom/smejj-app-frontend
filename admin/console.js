@@ -32,7 +32,10 @@
     (window.adminStage7 || {}).seiten || {},
     (window.adminStage8 || {}).seiten || {},
     (window.adminStage9 || {}).seiten || {},
-    (window.adminStage11 || {}).seiten || {}
+    (window.adminStageCockpit || {}).seiten || {},
+    (window.adminStage10 || {}).seiten || {},
+    (window.adminStage11 || {}).seiten || {},
+    (window.adminStage12 || {}).seiten || {}
   );
   Object.keys(ANGEMELDET).forEach(function (pfad) {
     SEITEN.push({ id: ANGEMELDET[pfad].id, pfad: pfad, gruppe: ANGEMELDET[pfad].gruppe, name: ANGEMELDET[pfad].name });
@@ -70,9 +73,16 @@
   // Notfall weiter bedienbar ist, ohne die (gesperrte) Auslieferung anzufassen.
   const PFAD_MODUS = /(^|\.)smejj\.com$/.test(location.hostname);
 
+  // Welche Seite unter der nackten Adresse /admin/ liegt. Seit 2026-08-14 das
+  // Cockpit: es beantwortet in einem Satz, ob gerade etwas zu tun ist. Vorher
+  // lag dort die Uebersicht — die zeigt Zahlen, aber sie sagt einem nicht, ob
+  // man sie lesen muss. Die Uebersicht bleibt erreichbar unter
+  // /admin/uebersicht/ (der Ordner existiert im Frontend-Repo).
+  const STARTSEITE = "cockpit";
+
   function seitenLink(pfad) {
     if (!PFAD_MODUS) return "#" + pfad;
-    return pfad === "uebersicht" ? "/admin/" : "/admin/" + pfad + "/";
+    return pfad === STARTSEITE ? "/admin/" : "/admin/" + pfad + "/";
   }
 
   /** Wohin navigieren — im Pfad-Modus als echte Navigation, sonst per Hash. */
@@ -90,12 +100,12 @@
 
   /** Das Ziel aus der Adresse lesen — Pfad zuerst, alte #-Links bleiben gueltig. */
   function aktuellerPfad() {
-    if (!PFAD_MODUS) return (location.hash || "#uebersicht").replace(/^#/, "");
+    if (!PFAD_MODUS) return (location.hash || ("#" + STARTSEITE)).replace(/^#/, "");
     const akte = new URLSearchParams(location.search).get("akte");
     if (akte) return "akte/" + akte;
     const teil = location.pathname.replace(/^\/admin\/?/, "").replace(/\/$/, "");
     if (teil) return teil;
-    return (location.hash || "#uebersicht").replace(/^#/, "");
+    return (location.hash || ("#" + STARTSEITE)).replace(/^#/, "");
   }
 
   function schreibeNav(aktiv) {
@@ -454,7 +464,9 @@
       setzeKopf("Nutzerakte");
       return zeigeAkte(decodeURIComponent(ziel.slice("akte/".length)));
     }
-    const treffer = SEITEN.filter(function (s) { return s.pfad === ziel; })[0] || SEITEN[0];
+    const treffer = SEITEN.filter(function (s) { return s.pfad === ziel; })[0]
+      || SEITEN.filter(function (s) { return s.pfad === STARTSEITE; })[0]
+      || SEITEN[0];
     schreibeNav(treffer.pfad);
     setzeKopf(treffer.name);
     if (treffer.pfad === "nutzer") return zeigeNutzer();
@@ -478,7 +490,7 @@
   const KEIN_ADMIN = ["admin_role_required", "admin_account_not_active"];
 
   async function start() {
-    schreibeNav("uebersicht");
+    schreibeNav(STARTSEITE);
     laedt("Anmeldung wird geprüft …");
     const antwort = await A.ich();
     if (!antwort.ok) {
@@ -528,6 +540,7 @@
     // Konsole ueberhaupt sichtbar werden.
     GATE.freigeben();
     zustand.akteur = antwort.data.actor || {};
+    // (zeigeUmgebung() steht weiter unten, nach den Kopfzeilen-Feldern.)
     // Damit der Sicherheitsdialog sagen kann, WOHIN der Code ging, statt nur
     // "deine Admin-E-Mail-Adresse". Beim allerersten Aufruf einer noch nicht
     // bestaetigten Adresse steht das hier noch nicht — dort greift der
@@ -542,10 +555,38 @@
     const stufe = document.getElementById("stufe");
     stufe.textContent = "Stufe " + (antwort.data.stage || 2)
       + (antwort.data.writable ? " · schreibend" : " · nur lesend");
+    zeigeUmgebung();
     // Im Pfad-Modus ist jeder Seitenwechsel eine echte Navigation — es gibt
     // nichts zu beobachten. Der Hash-Horcher bleibt dem Rueckfallweg vorbehalten.
     if (!PFAD_MODUS) window.addEventListener("hashchange", route);
     route();
+  }
+
+  /**
+   * Sagt, WO diese Konsole gerade arbeitet.
+   *
+   * Befund 2026-08-15 (A-bis-Z-Pruefung): in index.html stand fest
+   * "Produktion" — kein Skript hat das je gesetzt. Eine Konsole auf einem
+   * Testserver haette genauso ausgesehen, und wer zwei Fenster offen hat,
+   * konnte sie nicht unterscheiden. Ein Etikett, das immer dasselbe sagt,
+   * sagt nichts.
+   *
+   * Jetzt steht dort der Host, von dem diese Konsole ausgeliefert wird. Das
+   * ist genau die Frage, die das Etikett beantworten soll: "Ist das hier die
+   * echte?" Nur smejj.com und der Rueckfallweg heissen weiter "Produktion",
+   * jeder andere Host wird beim Namen genannt.
+   *
+   * Bewusst aus `location` und nicht aus api.js: dessen Auswahl der API-Basis
+   * ist privat, und api.js liegt unter dem Admin-Lock. Eine zweite Kopie
+   * dieser Logik wuerde frueher oder spaeter auseinanderlaufen.
+   */
+  function zeigeUmgebung() {
+    const feld = document.getElementById("umgebung");
+    if (!feld) return;
+    const host = String(location.hostname || "").toLowerCase();
+    const echt = host === "smejj.com" || host === "www.smejj.com" || host === "smejj-control.zeabur.app";
+    feld.textContent = echt ? "Produktion" : (host || "unbekannt");
+    feld.title = "Diese Konsole wird von " + (host || "unbekannt") + " ausgeliefert";
   }
 
   start();
