@@ -10,7 +10,7 @@
 // fragt nie nach. Nur das ENDGUELTIGE Loeschen verlangt einen zweiten Klick
 // auf denselben Knopf — der Knopf selbst wird zur Rueckfrage.
 
-import { listGeloeschteChats, restoreChat, endgueltigLoeschen } from "/assets/chat-store.js?v=b62";
+import { listGeloeschteChats, restoreChat, endgueltigLoeschen } from "/assets/chat-store.js?v=b63";
 
 function zeitHer(iso) {
   const tage = Math.round((Date.now() - new Date(iso).getTime()) / 86400000);

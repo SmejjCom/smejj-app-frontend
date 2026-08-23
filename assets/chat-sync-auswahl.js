@@ -117,3 +117,31 @@ export function erzeugeVorfahrt({ jetztSenden }) {
     get stroeme() { return laufendeStroeme; }
   };
 }
+
+/**
+ * Ein kurzlebiger Zwischenspeicher für den Abgleich.
+ *
+ * DER BEFUND (Startphase gemessen 2026-08-23): `/api/chats?nurAbgleich=1`
+ * wurde ZWEIMAL geholt — bei 2.317 ms von pull(), bei 7.324 ms von push().
+ * Beide fragen dasselbe, im Abstand von fünf Sekunden, und die zweite Anfrage
+ * brauchte allein 1.504 ms. Bis 8,8 s nach dem Laden war die Leitung belegt;
+ * genau darum kostete die erste Chat-Frage 11 Sekunden statt einer.
+ *
+ * Die Frist ist mit Absicht kurz: ein veralteter Abgleich ließe einen Chat
+ * liegen, den ein anderes Gerät gerade geändert hat. Fünf Sekunden decken den
+ * Start ab und sind kürzer als jede menschliche Bedenkzeit.
+ */
+export function erzeugeAbgleichsSpeicher({ frist = 5000, uhr = () => Date.now() } = {}) {
+  let karte = null;
+  let zeitpunkt = 0;
+  return {
+    merke(neueKarte) { karte = neueKarte; zeitpunkt = uhr(); },
+    /** Gibt die Karte zurück — oder null, wenn sie zu alt oder nie gesetzt ist. */
+    hole() {
+      if (!karte) return null;
+      return uhr() - zeitpunkt <= frist ? karte : null;
+    },
+    /** Nach einem Schreibvorgang stimmt sie nicht mehr. */
+    verwerfen() { karte = null; zeitpunkt = 0; }
+  };
+}
