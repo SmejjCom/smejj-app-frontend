@@ -2677,3 +2677,36 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   color: rgba(242, 245, 244, 0.55);
 }
 #startLog .chat-frage-stand:empty { display: none; }
+
+/* --- "@"-Erwaehnung im Startfeld (Betreiber 2026-08-23, Vorbild Antigravity
+ * "@ to mention"): Liste der eigenen Chats ueber dem Feld, viereckig. */
+#start .prompt-glass { position: relative; }
+#start .erwaehnung-menue {
+  left: 16px;
+  bottom: calc(100% + 8px);
+  border-radius: 0 !important;
+  max-height: 320px;
+  overflow-y: auto;
+}
+#start .erwaehnung-menue .erwaehnung-kopf {
+  padding: 6px 10px 8px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(242, 245, 244, 0.5);
+}
+#start .erwaehnung-menue [role="menuitem"] {
+  display: block;
+  width: 100%;
+  text-align: left;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 0 !important;
+  background: transparent;
+  color: #f2f5f4;
+  font-size: 15px;
+}
+#start .erwaehnung-menue [role="menuitem"]:hover,
+#start .erwaehnung-menue [role="menuitem"]:focus-visible { background: rgba(242, 245, 244, 0.08); }
+#start .erwaehnung-menue [role="menuitem"] b { font-weight: 600; color: var(--v11-cy); }
+.chat-erwaehnung[hidden] { display: none !important; }

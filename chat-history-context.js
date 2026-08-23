@@ -69,8 +69,10 @@ export function collectConversationHistory(scope = document, logSelector = "#sta
   const log = scope.querySelector?.(logSelector);
   if (!log) return [];
   const history = [];
-  for (const node of log.querySelectorAll(".entry.user, .entry.assistant")) {
-    const role = node.classList.contains("user") ? "user" : "assistant";
+  // Erwaehnungs-Kontext (erwaehnung.js, "@Titel"): unsichtbare Knoten, die
+  // als Nutzernachricht mitgehen — KEIN .entry, darum hier ausdruecklich.
+  for (const node of log.querySelectorAll(".entry.user, .entry.assistant, [data-smejj-erwaehnung]")) {
+    const role = node.classList.contains("user") || node.dataset?.smejjErwaehnung === "true" ? "user" : "assistant";
     const content = entryText(node);
     if (content) history.push({ role, content });
   }
