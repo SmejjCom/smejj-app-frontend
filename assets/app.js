@@ -18,7 +18,7 @@ import { afterFirstPaint } from "./deferred-start.js";
 import { initGoogleLogin } from "./google-login.js";
 import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
 import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39u";
-import { chatOhneMedienauftrag } from "./medien-absicht.js?v=4";
+import { chatOhneMedienauftrag } from "./medien-absicht.js?v=5";
 import { mausAuftragErledigt } from "./maus-absicht.js?v=19";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
 import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2";

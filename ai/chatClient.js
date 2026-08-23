@@ -258,9 +258,10 @@ function meldeStrom(delta) {
   } catch { /* fail-safe: die Antwort laeuft auch ohne Signal */ }
 }
 
-async function runClineChat({ task, output, offlineNotice }) {
+async function runClineChat({ task, output, offlineNotice, clearThinking = () => {} }) {
   const token = holeZugriffsToken();
   if (!token) {
+    clearThinking();
     output.textContent = nichtAngemeldetText();
     return true;
   }
@@ -274,6 +275,7 @@ async function runClineChat({ task, output, offlineNotice }) {
     if (autoAktiv()) {
       const wahl = await sorgeFuerModell(task, { dateien: contextFiles?.length || 0 });
       if (!wahl.ok) {
+        clearThinking();
         output.textContent = "Automatische Modellwahl hat nicht geklappt — bitte ein Modell von Hand waehlen.";
         return true;
       }
@@ -296,7 +298,6 @@ async function runClineChat({ task, output, offlineNotice }) {
     const decoder = new TextDecoder();
     let buffer = "";
     let answer = "";
-    output.textContent = "";
     while (true) {
       const { value, done } = await reader.read();
       if (done || stoppVerlangt) break;
@@ -312,14 +313,16 @@ async function runClineChat({ task, output, offlineNotice }) {
         if (choice.finish_reason === "error") throw new Error(choice.error?.message || "Cline stream error");
         const delta = choice.delta?.content || choice.message?.content || "";
         if (delta) {
+          if (!answer) clearThinking();
           answer += delta;
           output.textContent = answer;
         }
       }
     }
     anbieterLeser.delete(reader);
-    if (!answer) output.textContent = "(leere Antwort)";
+    if (!answer) { clearThinking(); output.textContent = "(leere Antwort)"; }
   } catch (error) {
+    clearThinking();
     output.textContent = `Cline-Fehler: ${String(error?.message || error).slice(0, 400)}`;
   } finally {
     meldeStrom(-1);
@@ -505,7 +508,10 @@ export async function runClientChat({ task, model, output, offlineNotice = "" } 
   };
   let handled = false;
   const selected = localStorage.getItem(STORAGE_KEYS.model) || "";
-  if (selected === "Cline") { clearThinking(); handled = await runClineChat({ task, output, offlineNotice }); }
+  // Betreiber-Freigabe 2026-08-23 (Nutzerreise): "smejj denkt nach …" bleibt im
+  // Cline-Pfad stehen, bis der erste Text kommt — gemessen waren es 3,6 s leere
+  // Blase mit Kopier-/Daumen-Leiste. Der Wartetext faellt erst beim ersten Delta.
+  if (selected === "Cline") { handled = await runClineChat({ task, output, offlineNotice, clearThinking }); }
   if (!handled && selected.startsWith("key:")) {
     const providerId = selected.slice(4);
     if (/^[a-z][a-z0-9-]{1,40}$/.test(providerId)) { clearThinking(); handled = await runProviderChat({ providerId, task, output, offlineNotice }); }
