@@ -9,6 +9,7 @@
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
 import { fetchStreamWithRetry } from "./fetch-retry.js";
+import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js";
 import { frageLokal, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js";
 
 // Gleicher Schluessel wie in auth/auth-page.js, account-sessions.js und
@@ -544,26 +545,7 @@ export function stoppeChatStrom() {
 // ("läuft … 40 s"), ein Modell streamt ohnehin laufend. Wer 90 Sekunden lang
 // gar nichts sagt, sagt nichts mehr. Kurzer gewaehlt wuerde ein langsames
 // Modell abgewuergt.
-const STILLE_GRENZE_MS = 90_000;
 
-function starteStilleWache(reader, beiStille) {
-  let uhr = null;
-  let ausgeloest = false;
-  const neuStellen = () => {
-    clearTimeout(uhr);
-    uhr = setTimeout(() => {
-      ausgeloest = true;
-      beiStille();
-      try { reader.cancel(); } catch { /* Strom war schon zu */ }
-    }, STILLE_GRENZE_MS);
-  };
-  neuStellen();
-  return {
-    lebenszeichen: neuStellen,
-    beenden: () => clearTimeout(uhr),
-    get hatZugeschlagen() { return ausgeloest; }
-  };
-}
 
 /**
  * STUFE 0 — das Modell im Browser des Nutzers, vor jedem Netzaufruf.
@@ -728,10 +710,11 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // haengenden Video-Auftrag). Ehrlich sagen statt endlos "läuft" zeigen —
   // und die bisherige Teilantwort behalten, sie ist nicht falsch.
   if (stilleGemeldet) {
-    const bisher = entferneAbgerisseneMedien(output.textContent).trim();
-    output.textContent = bisher
-      ? `${bisher}\n\n_Abgebrochen: der Server hat sich 90 Sekunden lang nicht mehr gemeldet. Bitte erneut versuchen._`
-      : "Abgebrochen: der Server hat sich 90 Sekunden lang nicht mehr gemeldet. Bitte erneut versuchen.";
+    // Wortlaut aus strom-stillstand.js, gemeinsam mit chatClient.js: derselbe
+    // Vorfall darf nicht je nach Modellwahl anders klingen. Die Saeuberung
+    // bleibt DAVOR — ein abgerissener Bildstrom soll nicht als base64-Wand
+    // stehen bleiben, nur weil die Meldung jetzt woanders herkommt.
+    output.textContent = stilleText(entferneAbgerisseneMedien(output.textContent));
     renderMarkdown?.(output);
     falteSchritte(output, schritteOhneFundZahl);
     return;
