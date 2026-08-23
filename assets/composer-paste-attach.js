@@ -77,7 +77,9 @@ function renderChips(input) {
 
     const label = document.createElement("span");
     label.className = "paste-attach-label";
-    label.textContent = `Eingefuegter Text · ${formatZeichen(chip.text.length)} Zeichen`;
+    label.textContent = chip.name
+      ? `${chip.name} · ${formatZeichen(chip.text.length)} Zeichen`
+      : `Eingefügter Text · ${formatZeichen(chip.text.length)} Zeichen`;
     label.title = `${chip.text.slice(0, 400)}${chip.text.length > 400 ? " …" : ""}`;
 
     const restore = document.createElement("button");
@@ -132,11 +134,35 @@ export function bindPasteAttach({ getInput }) {
   });
 }
 
+/**
+ * Eine Datei als Text-Anhang (Chip) uebernehmen — derselbe Weg wie ein
+ * langer eingefuegter Text, nur mit Dateinamen.
+ *
+ * LIVE GEMESSEN 2026-08-23 (Abnahme): "+ > Datei hinzufuegen" schrieb nur
+ * "[Anhang: abnahme-test.txt (1 KB)]" in die Frage; der Inhalt ging nie mit,
+ * und das Modell antwortete "Ich kann leider keine Datei ... sehen". Jetzt
+ * geht der Inhalt als Chip mit und wird beim Senden mitgeschickt.
+ *
+ * @param {string} name Dateiname (fuer den Chip und den Block-Kopf)
+ * @param {string} text Dateiinhalt
+ * @param {HTMLTextAreaElement} input das Schreibfeld
+ */
+export function uebernehmeTextAnhang(name, text, input) {
+  if (!input || !text) return false;
+  chipSeq += 1;
+  chips.push({ id: chipSeq, text, name: String(name || "Datei") });
+  renderChips(input);
+  notifyInputChanged(input);
+  return true;
+}
+
 // Beim Senden: getippte Aufgabe und Chip-Inhalte zu EINEM Text verbinden.
 // Die Chips gelten danach als verschickt und verschwinden.
 export function composePastedTask(typed) {
   if (chips.length === 0) return typed;
-  const bloecke = chips.map((chip) => `[Eingefuegter Text, ${formatZeichen(chip.text.length)} Zeichen]\n${chip.text}`);
+  const bloecke = chips.map((chip) => (chip.name
+    ? `[Datei: ${chip.name}, ${formatZeichen(chip.text.length)} Zeichen]\n${chip.text}`
+    : `[Eingefuegter Text, ${formatZeichen(chip.text.length)} Zeichen]\n${chip.text}`));
   chips.length = 0;
   document.getElementById("pasteAttachRow")?.remove();
   return [typed, ...bloecke].filter(Boolean).join("\n\n");

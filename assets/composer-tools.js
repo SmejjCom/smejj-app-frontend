@@ -32,7 +32,7 @@ import { createThinkingCue } from "./voice-thinking-cue.js";
 import { createPremiumVoice } from "./voice-premium-tts.js";
 import { CLIENT_ROUTES } from "./config.js";
 // Plus-Menue (Anhaenge) — ausgelagert, Verhalten unveraendert.
-import { bindPlusMenu } from "./composer-plus-menu.js?v=werkzeuge-2";
+import { bindPlusMenu } from "./composer-plus-menu.js?v=werkzeuge-3";
 // Mikrofon-Diktat — ausgelagert (800-Zeilen-Regel), Verhalten unveraendert.
 import { createDictation } from "./composer-dictation.js";
 

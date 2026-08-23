@@ -5,6 +5,20 @@
 // verlangt die Cache-Version dort ausdruecklich, also zieht dieser Import nach.
 import { showToast } from "./components.js?v=b48";
 import { bindBildAnhang, uebernehmeBildDatei } from "./composer-bild-anhang.js";
+import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=2";
+
+// Was als Text mitgeht: Textarten und die ueblichen Quell-/Daten-Endungen,
+// hoechstens 200 KB — mehr traegt keine Frage sinnvoll (Server kuerzt ohnehin).
+const TEXT_ANHANG_MAX_BYTES = 200 * 1024;
+const TEXT_ANHANG_MAX_ZEICHEN = 200_000;
+const TEXT_ENDUNGEN = /\.(txt|md|markdown|csv|tsv|json|js|mjs|cjs|ts|tsx|jsx|py|rb|go|rs|java|kt|swift|c|h|cpp|hpp|cs|php|sh|zsh|bash|yml|yaml|toml|ini|cfg|conf|env|xml|html|htm|css|scss|sql|log|srt|vtt|tex|rtf)$/i;
+export function istTextdatei(file) {
+  if (!file || file.size > TEXT_ANHANG_MAX_BYTES) return false;
+  const typ = String(file.type || "");
+  if (typ.startsWith("text/")) return true;
+  if (/^application\/(json|xml|javascript|x-yaml|toml|sql)$/i.test(typ)) return true;
+  return !typ && TEXT_ENDUNGEN.test(String(file.name || "")) || TEXT_ENDUNGEN.test(String(file.name || ""));
+}
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -42,10 +56,22 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
         input.value = `${input.value}\n${referenzen.join("\n")}`;
       }
     }
-    if (andere.length) {
-      const references = andere.map((file) => `[${label}: ${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)]`);
+    // Textdateien gehen MIT INHALT mit (Abnahme 2026-08-23: vorher nur ein
+    // toter Verweis, das Modell sah keine Datei). Der Chip-Weg gehoert zum
+    // Start-Feld (composePastedTask in app.js); im Code-Feld bleibt der
+    // Verweis, dort wird er als Arbeitsdatei gelesen.
+    const textdateien = input.id === "startMessage" ? andere.filter(istTextdatei) : [];
+    for (const file of textdateien) {
+      try {
+        const text = (await file.text()).slice(0, TEXT_ANHANG_MAX_ZEICHEN);
+        if (uebernehmeTextAnhang(file.name, text, input)) showToast(`Datei angehängt: ${file.name}`);
+      } catch { /* unlesbar: unten als Verweis */ textdateien.splice(textdateien.indexOf(file), 1); }
+    }
+    const restliche = andere.filter((file) => !textdateien.includes(file));
+    if (restliche.length) {
+      const references = restliche.map((file) => `[${label}: ${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)]`);
       input.value = input.value ? `${input.value}\n${references.join("\n")}` : references.join("\n");
-      showToast(andere.length === 1 ? `${label} hinzugefuegt: ${andere[0].name}` : `${andere.length} Dateien hinzugefuegt`);
+      showToast(restliche.length === 1 ? `${label} hinzugefügt: ${restliche[0].name}` : `${restliche.length} Dateien hinzugefügt`);
     }
     notifyInputChanged(input);
     input.focus();
