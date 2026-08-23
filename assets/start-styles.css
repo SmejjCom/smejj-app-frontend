@@ -5802,3 +5802,49 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (prefers-reduced-motion: reduce) {
   #startLog .chat-schritt-gruppe-titel { animation: none; }
 }
+#startLog .chat-frage {
+  border: 1px solid rgba(242, 245, 244, 0.14);
+  border-radius: 0 !important;
+  padding: 14px 16px 12px;
+  margin-top: 8px;
+}
+#startLog .chat-frage-titel {
+  margin: 0 0 10px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.45;
+}
+#startLog .chat-frage-optionen { display: flex; flex-wrap: wrap; gap: 8px; }
+#startLog .chat-frage-option {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 0 !important;
+  border: 1px solid rgba(242, 245, 244, 0.22);
+  background: rgba(242, 245, 244, 0.06);
+  color: #f2f5f4;
+  font-size: 15px;
+  cursor: pointer;
+}
+#startLog .chat-frage-option:first-child {
+  background: #f2f5f4;
+  color: #0a0f16;
+  border-color: #f2f5f4;
+}
+#startLog .chat-frage-option:hover:not([disabled]) { border-color: var(--v11-cy); }
+#startLog .chat-frage-ueberspringen {
+  background: transparent;
+  color: rgba(242, 245, 244, 0.6);
+  border-color: transparent;
+}
+#startLog .chat-frage-option[disabled] { opacity: 0.45; cursor: default; }
+#startLog .chat-frage-option.gewaehlt {
+  opacity: 1;
+  border-color: var(--v11-cy);
+  box-shadow: inset 0 0 0 1px var(--v11-cy);
+}
+#startLog .chat-frage-stand {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: rgba(242, 245, 244, 0.55);
+}
+#startLog .chat-frage-stand:empty { display: none; }

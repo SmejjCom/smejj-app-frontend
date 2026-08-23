@@ -583,6 +583,91 @@ export function beendeDenken(output, jetzt = () => Date.now()) {
   return zeile;
 }
 
+// ---------------------------------------------------------------------------
+// Frage-Karte (Betreiber 2026-08-23, Vorbild Antigravity): der Server schickt
+// `smejj_frage` {frage, optionen}, wenn das Modell per Werkzeug frage_stellen
+// eine Entscheidung braucht. Die Karte steht als EIGENER Assistenten-Eintrag
+// NACH der Antwort — so steht die Frage im Verlauf (das Modell weiss beim
+// naechsten Zug, was es gefragt hat), und die Optionen sind echte Knoepfe.
+// Ein Klick schickt die Option als naechste Nutzernachricht ueber den ganz
+// normalen Sendeweg; "Ueberspringen" schickt eine Weiter-Anweisung. Danach
+// ist die Karte beantwortet (Knoepfe aus, gewaehlte Option markiert) —
+// wie "Skipped" bei Antigravity. Viereckig, ohne Farbe ausser dem Akzent.
+
+const FRAGE_UEBERSPRINGEN_TEXT = "Übersprungen — entscheide selbst und mach weiter.";
+
+function sendeAlsNutzer(text) {
+  const feld = document.getElementById("startMessage");
+  const knopf = document.getElementById("startSend");
+  if (!feld || !knopf) return false;
+  feld.value = text;
+  feld.dispatchEvent(new Event("input", { bubbles: true }));
+  knopf.click();
+  return true;
+}
+
+/**
+ * Zeigt die Frage-Karte hinter dem Antwort-Knoten.
+ * @param {HTMLElement} output Antwort-Knoten.
+ * @param {{frage:string, optionen:string[]}} frage Vom Server.
+ * @param {{senden?: (text:string) => boolean}} [optionen] Testbarer Sendeweg.
+ * @returns {HTMLElement|null} die Karte.
+ */
+export function zeigeFrage(output, frage, { senden = sendeAlsNutzer } = {}) {
+  if (!output?.parentElement || typeof document === "undefined") return null;
+  const text = String(frage?.frage || "").trim();
+  const wahl = (Array.isArray(frage?.optionen) ? frage.optionen : [])
+    .map((o) => String(o || "").trim()).filter(Boolean).slice(0, 4);
+  if (!text || wahl.length < 2) return null;
+  const karte = document.createElement("article");
+  karte.className = "entry assistant chat-frage";
+  karte.dataset.smejjFrage = "true";
+  karte.setAttribute("role", "group");
+  karte.setAttribute("aria-label", "Rückfrage");
+  const titel = document.createElement("p");
+  titel.className = "chat-frage-titel";
+  titel.textContent = text;
+  const leiste = document.createElement("div");
+  leiste.className = "chat-frage-optionen";
+  const stand = document.createElement("p");
+  stand.className = "chat-frage-stand";
+  const schliesse = (gewaehlt, antwort) => {
+    if (karte.dataset.beantwortet === "true") return;
+    if (!senden(antwort)) return;
+    karte.dataset.beantwortet = "true";
+    for (const k of [...(leiste.children || [])]) {
+      k.disabled = true;
+      k.setAttribute("disabled", "");
+      if (k === gewaehlt) k.classList.add("gewaehlt");
+    }
+    stand.textContent = gewaehlt ? `Gewählt: ${gewaehlt.dataset.option}` : "Übersprungen";
+  };
+  wahl.forEach((option, i) => {
+    const knopf = document.createElement("button");
+    knopf.type = "button";
+    knopf.className = "chat-frage-option";
+    // Gebaut, nie zusammengeklebt: der Text kommt aus der Modellausgabe.
+    knopf.textContent = i === 0 ? `${option} (Empfehlung)` : option;
+    knopf.dataset.option = option;
+    knopf.addEventListener("click", () => schliesse(knopf, option));
+    leiste.append(knopf);
+  });
+  const ueberspringen = document.createElement("button");
+  ueberspringen.type = "button";
+  ueberspringen.className = "chat-frage-option chat-frage-ueberspringen";
+  ueberspringen.textContent = "Überspringen";
+  ueberspringen.addEventListener("click", () => schliesse(null, FRAGE_UEBERSPRINGEN_TEXT));
+  leiste.append(ueberspringen);
+  karte.append(titel, leiste, stand);
+  // Hinter die Antwort. nextElementSibling-Einfuegen statt output.after():
+  // das gibt es im Test-Dokument nicht.
+  const eltern = output.parentElement;
+  const naechster = output.nextElementSibling ?? null;
+  if (naechster) eltern.insertBefore(karte, naechster);
+  else eltern.append(karte);
+  return karte;
+}
+
 /**
  * Der Wartetext ("smejj denkt nach ...") steht als innerHTML im Antwort-Knoten
  * und muss weg, sobald echter Text kommt — sonst klebt die Antwort daran.
@@ -803,6 +888,13 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
       clearThinkingState(output);
       try {
         const payload = JSON.parse(text);
+        // Rueckfrage: eigene Karte hinter der Antwort, NICHT in die Antwort.
+        if (payload.smejj_frage) {
+          // Eigener Fang: faellt die Karte, landet das rohe JSON sonst ueber
+          // den catch unten als Text in der Antwort (Test 2026-08-23).
+          try { zeigeFrage(output, payload.smejj_frage); } catch { /* Karte ist Zugabe */ }
+          continue;
+        }
         // Arbeitsschritt: gehoert in die Schrittliste, NICHT in die Antwort.
         if (payload.smejj_schritt) {
           if (payload.smejj_schritt.zustand === "fertig") {

@@ -117,7 +117,7 @@ const FORTSETZUNGS_AUFTRAG = "Deine letzte Antwort wurde gestoppt. Setze sie"
  * @returns {Promise<boolean>} true, wenn fortgesetzt wurde.
  */
 async function setzeFort(bereich) {
-  const blasen = document.querySelectorAll("#startLog .entry.assistant");
+  const blasen = document.querySelectorAll("#startLog .entry.assistant:not(.chat-frage):not(.chat-schritte)");
   const output = blasen[blasen.length - 1];
   if (!output || !output.textContent.trim()) {
     // Nichts zum Fortsetzen (gestoppt vor dem ersten Zeichen): der alte

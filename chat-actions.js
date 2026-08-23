@@ -42,7 +42,7 @@ import { groundingFor } from "/assets/browser-context.js";
 // Warteschlange aus demselben Modul haette es zerrissen. Gleiche Falle wie bei
 // settings-runtime.js in sw v184/v185.
 import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=blitz-20260726";
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=b59";
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=b61";
 import { showToast } from "/assets/components.js?v=b48";
 
 const SETTLE_MS = 900;
@@ -216,6 +216,7 @@ function refreshBars(entries) {
     // Status-Elemente (Arbeitsschritte/Fortschritt) sind KEINE Nachrichten —
     // Kopieren/Daumen darunter wirkte doppelt und unprofessionell (2026-08-12).
     if (entry.classList.contains("chat-schritte")) continue;
+    if (entry.classList.contains("chat-frage")) continue; // Frage-Karte hat eigene Knoepfe
     ensureBar(entry);
   }
 }
