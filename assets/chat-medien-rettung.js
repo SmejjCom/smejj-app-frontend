@@ -208,3 +208,67 @@ export async function rettteUndSpeichere(id, { laden, speichern, auslagern, gren
     return { gerettet: false, grund: "fehlgeschlagen" };
   }
 }
+
+/** Merker, damit der Bestandslauf hoechstens einmal am Tag anfaellt. */
+export const BESTAND_MERKER = "smejj.chat.bestandslauf.v1";
+const EIN_TAG_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * WARUM ES DIESEN LAUF BRAUCHT — der Befund aus dem Live-Test 2026-08-23:
+ *
+ * Die Rettung oben haengt am Sende-Weg: sie greift, wenn der Server einen
+ * Chat abweist. Das setzt voraus, dass er ueberhaupt gesendet wird. Gemessen
+ * am echten Konto (113 Chats) arbeitet sich push() der Reihe nach durch alle
+ * Gespraeche, und die zehn grossen liegen verstreut dazwischen — nach gut
+ * einer Minute war genau EINER gerettet. Wer die App kurz oeffnet und wieder
+ * schliesst, kommt nie bei seinem Bestand an.
+ *
+ * Dieser Lauf dreht die Richtung um: er sucht die betroffenen Chats direkt,
+ * statt auf eine Absage zu warten. Danach passen sie durch und werden vom
+ * normalen Sync gesichert.
+ *
+ * HOECHSTENS EINMAL AM TAG, und das ist Absicht: die Pruefung muss jeden
+ * Chat einmal serialisieren (im gemessenen Konto rund 15 MB). Das ist zu
+ * teuer fuer jeden Seitenaufruf und zu billig, um es ganz zu lassen.
+ *
+ * FAIL-SAFE wie ueberall: jeder Fehler beendet den Lauf still. Es ist eine
+ * Aufraeumarbeit im Hintergrund, kein Weg, den der Nutzer gerade braucht.
+ *
+ * @param {{listen: Function, laden: Function, speichern: Function,
+ *          auslagern: Function, jetzt?: number, speicher?: Storage,
+ *          grenze?: number, hoechstens?: number}} deps
+ * @returns {Promise<{gelaufen: boolean, geprueft?: number, gerettet?: number, offen?: number}>}
+ */
+export async function raeumeBestandAuf({
+  listen, laden, speichern, auslagern,
+  jetzt = Date.now(), speicher = globalThis.localStorage,
+  grenze = MAX_CHAT_BYTES, hoechstens = 25
+}) {
+  try {
+    const zuletzt = Number(speicher?.getItem(BESTAND_MERKER) || 0);
+    if (zuletzt && jetzt - zuletzt < EIN_TAG_MS) return { gelaufen: false, grund: "heute_schon" };
+    // Der Merker wird VOR dem Lauf gesetzt: bricht er in der Mitte ab, soll
+    // er nicht bei jedem Seitenaufruf von vorn beginnen und dabei jedes Mal
+    // dieselben Uploads versuchen.
+    speicher?.setItem(BESTAND_MERKER, String(jetzt));
+
+    const kurzliste = await listen();
+    let gerettet = 0;
+    let geprueft = 0;
+    let offen = 0;
+    for (const kurz of kurzliste || []) {
+      if (gerettet >= hoechstens) { offen += 1; continue; }
+      const chat = await laden(kurz?.id ?? kurz);
+      geprueft += 1;
+      if (!brauchtRettung(chat, grenze)) continue;
+      const ergebnis = await rettteChat(chat, { auslagern, grenze });
+      if (ergebnis.ersetzt > 0) {
+        await speichern(ergebnis.chat);
+        gerettet += 1;
+      }
+    }
+    return { gelaufen: true, geprueft, gerettet, offen };
+  } catch {
+    return { gelaufen: false, grund: "fehlgeschlagen" };
+  }
+}

@@ -33,7 +33,7 @@ const ZIEL = "code";
 /** Holt die Flaeche und startet sie. `initCodeFlaeche` ist gegen Doppelaufrufe
  *  abgesichert (dataset.bereit) und steigt aus, wenn die Flaeche fehlt. */
 function laden() {
-  return import("./code-flaeche.js?v=47")
+  return import("./code-flaeche.js?v=48")
     .then((modul) => { modul.initCodeFlaeche?.(); return modul; })
     .catch((fehler) => {
       console.error("[smejj.com] Code-Flaeche konnte nicht nachgeladen werden:", fehler);

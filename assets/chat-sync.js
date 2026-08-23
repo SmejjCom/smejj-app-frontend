@@ -47,7 +47,7 @@ async function meldeAbweisung(kennung, status, grund) {
   abgewiesen.add(kennung);
   try {
     const { showToast } = await import("/assets/components.js?v=b48");
-    const { istZuGross } = await import("./chat-medien-rettung.js?v=2").catch(() => ({ istZuGross: () => false }));
+    const { istZuGross } = await import("./chat-medien-rettung.js?v=3").catch(() => ({ istZuGross: () => false }));
     const text = istZuGross(status, grund)
       ? "Ein Chat ist zu gross und wurde NICHT gesichert — er bleibt nur auf diesem Geraet."
       : `Ein Chat konnte nicht gesichert werden (${status}${grund ? `: ${grund}` : ""}) — er bleibt nur auf diesem Geraet.`;
@@ -177,7 +177,7 @@ async function rette(id) {
     const s = store();
     if (!s?.getChat || !s?.importChat) return false;
     const [{ rettteUndSpeichere }, { lagereMedienAusText }] = await Promise.all([
-      import("./chat-medien-rettung.js?v=2"),
+      import("./chat-medien-rettung.js?v=3"),
       import("./chat-medien.js?v=2")
     ]);
     const ergebnis = await rettteUndSpeichere(id, {
@@ -189,6 +189,30 @@ async function rette(id) {
   } catch {
     return false;
   }
+}
+
+/**
+ * Einmal am Tag den Bestand durchgehen und zu grosse Chats retten.
+ * Still und fail-safe: schlaegt etwas fehl, bleibt alles wie es war.
+ */
+async function bestandAufraeumen() {
+  try {
+    const s = store();
+    if (!s?.listChats || !s?.getChat || !s?.importChat) return;
+    const [{ raeumeBestandAuf }, { lagereMedienAusText }] = await Promise.all([
+      import("./chat-medien-rettung.js?v=3"),
+      import("./chat-medien.js?v=2")
+    ]);
+    const ergebnis = await raeumeBestandAuf({
+      listen: () => s.listChats(),
+      laden: (id) => s.getChat(id),
+      speichern: (chat) => s.importChat(chat),
+      auslagern: lagereMedienAusText
+    });
+    // Gerettete Chats passen jetzt durch — den Sync anstossen, damit sie
+    // auch wirklich ankommen und nicht bis zur naechsten Aenderung warten.
+    if (ergebnis?.gerettet > 0) planePush();
+  } catch { /* still: Aufraeumarbeit, kein Weg, den jemand gerade braucht */ }
 }
 
 async function push() {
@@ -217,7 +241,7 @@ async function push() {
       // ist die Pruefung in istZuGross zustaendig, nicht die Statusklasse.
       const rohgrund = antwort.status >= 400 ? await grundAus(antwort) : "";
       const grossFehler = antwort.status >= 400 && antwort.status < 500;
-      const { istZuGross } = await import("./chat-medien-rettung.js?v=2").catch(() => ({ istZuGross: () => false }));
+      const { istZuGross } = await import("./chat-medien-rettung.js?v=3").catch(() => ({ istZuGross: () => false }));
       if (grossFehler || istZuGross(antwort.status, rohgrund)) {
         const grund = rohgrund;
         // "Zu gross" ist der EINZIGE 4xx-Grund, den wir selbst beheben
@@ -347,6 +371,14 @@ function init() {
     pull().then(() => planePush());
     pullProjekte().then(() => planeProjektePush());
   }, 1500);
+  // Der Bestand, spaeter und im Hintergrund. Die Rettung oben haengt am
+  // Sende-Weg und setzt voraus, dass ein Chat ueberhaupt gesendet wird —
+  // gemessen 2026-08-23 arbeitet sich push() durch 113 Gespraeche, und nach
+  // gut einer Minute war genau EINER der zehn grossen gerettet. Wer die App
+  // kurz oeffnet, kommt nie bei seinem Bestand an. Dieser Lauf sucht sie
+  // direkt. 12 s Verzoegerung, damit er dem ersten Rendern und dem Pull
+  // nicht in die Quere kommt; hoechstens einmal am Tag (Merker im Modul).
+  setTimeout(() => { bestandAufraeumen(); }, 12_000);
 }
 
 init();
