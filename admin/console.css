@@ -505,6 +505,14 @@ html.smejj-gate-zu{visibility:hidden!important;}
 .ap-detail-titel{font-size:23px;font-weight:600;}
 .ap-bereich{margin-left:auto;}
 .ap-detail .kpi .v{font-size:26px;}
+/* ---- AL · Auslieferung ---- */
+.al-leiste{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+.al-bau{display:block;margin-top:3px;font-size:13.5px;color:var(--sm-ink-faint);}
+.al-satz{font-size:14.5px;line-height:1.5;color:var(--sm-ink-dim);max-width:44ch;}
+.al-lehren{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;}
+.al-lehre{padding:14px 16px;border:1px solid var(--sm-border);background:var(--sm-card);}
+.al-lehre b{display:block;font-size:16px;margin-bottom:6px;}
+.al-lehre span{font-size:14.5px;line-height:1.55;color:var(--sm-ink-dim);}
 @media (max-width:900px){
   .ap-was span{display:none;}
   .ap-bereich{flex-basis:100%;margin-left:0;}
