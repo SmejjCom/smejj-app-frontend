@@ -57,73 +57,6 @@
    * das auch. "0" heisst hier "keiner in den letzten N Eintraegen", nicht
    * "nie einer gewesen"; alles andere waere eine falsche Beruhigung.
    */
-  function alarmLage(audit) {
-    const eintraege = (audit && audit.entries) || [];
-    const alarme = eintraege.filter(function (eintrag) { return eintrag && eintrag.action === "security.alarm"; });
-    return {
-      anzahl: alarme.length,
-      geprueft: eintraege.length,
-      letzter: alarme[0] || null   // Audit-Seite liefert neueste zuerst
-    };
-  }
-
-  function uebersicht(d) {
-    const index = d.nutzer && d.nutzer.index ? d.nutzer.index : {};
-    const kette = d.audit && d.audit.chain ? d.audit.chain : {};
-    const systeme = (d.compliance && d.compliance.systeme) || [];
-    const pflichtig = systeme.filter((s) => s.transparenzpflicht).length;
-    const alarm = alarmLage(d.audit);
-
-    const kacheln = '<div class="kpis">'
-      + kachel("Konten", index.count == null ? "—" : String(index.count),
-        index.unreadable ? index.unreadable + " unlesbar" : "alle lesbar", index.unreadable ? "wr" : "up")
-      + kachel("Index-Alter", A.dauer(index.ageSeconds),
-        index.refreshing ? "wird gerade aufgefrischt" : "aktuell", index.refreshing ? "wr" : "up")
-      + kachel("Audit-Eintraege", d.audit && d.audit.total != null ? String(d.audit.total) : "—",
-        "Zeitraum " + e((d.audit && d.audit.window) || "—"))
-      + kachel("Nachweiskette", kette.ok ? "intakt" : "gebrochen",
-        kette.ok ? "lueckenlos geprueft" : String(kette.reason || ""), kette.ok ? "up" : "dn")
-      + kachel("KI-Systeme", String(systeme.length),
-        pflichtig + " mit Transparenzpflicht")
-      + kachel("Sicherheitsalarme", String(alarm.anzahl),
-        alarm.anzahl > 0
-          ? "zuletzt " + A.zeit(alarm.letzter.at)
-          : "keiner in den letzten " + alarm.geprueft + " Eintraegen",
-        alarm.anzahl > 0 ? "dn" : "up")
-      + '</div>';
-
-    const dienste = tabelle(["Bereich", "Stand", "Anmerkung"], [
-      '<tr><td><b>Nutzer-Index</b></td><td>' + (index.count == null ? pille("nicht gebaut", "bad") : pille("bereit", "ok"))
-        + '</td><td>' + e(index.builtAt ? "gebaut " + A.zeit(index.builtAt) : "—") + '</td></tr>',
-      '<tr><td><b>Audit-Log</b></td><td>' + (kette.ok ? pille("unveraendert", "ok") : pille("pruefen", "bad"))
-        + '</td><td>' + e(kette.ok ? "Hash-Kette lueckenlos" : String(kette.reason || "")) + '</td></tr>',
-      '<tr><td><b>EU AI Act</b></td><td>' + (d.compliance && d.compliance.hochrisiko === false
-        ? pille("kein Hochrisiko", "ok") : pille("unbekannt", "warn"))
-        + '</td><td>' + e(d.compliance ? "Durchsetzung ab " + (d.compliance.rechtsrahmen || {}).durchsetzungAb : "—") + '</td></tr>',
-      '<tr><td><b>Schreibende Aktionen</b></td><td>' + pille("mit Nachweis", "ok")
-        + '</td><td>Löschen und Rollenvergabe nur mit vier Augen</td></tr>',
-      '<tr><td><b>Offene Freigaben</b></td><td>' + ((d.freigaben || 0) > 0
-        ? pille(String(d.freigaben) + " warten", "warn") : pille("keine", "ok"))
-        + '</td><td>Anträge verfallen nach 24 Stunden</td></tr>',
-      // Die Wache meldet MUSTER, nicht Einzelvorgaenge: gedrosselte Anfragen an
-      // der Vortuer und falsche Step-up-Codes. Ein Alarm heisst "abgewehrt und
-      // auffaellig oft", nicht "eingebrochen".
-      '<tr><td><b>Sicherheitswache</b></td><td>' + (alarm.anzahl > 0
-        ? pille(String(alarm.anzahl) + (alarm.anzahl === 1 ? " Alarm" : " Alarme"), "bad")
-        : pille("ruhig", "ok"))
-        + '</td><td>' + (alarm.anzahl > 0
-          ? e("zuletzt " + String((alarm.letzter && alarm.letzter.target) || "") + " — " + String((alarm.letzter && alarm.letzter.reason) || ""))
-          : "Abgewehrte Muster stehen als security.alarm im Audit-Log")
-        + '</td></tr>'
-    ]);
-
-    return kopf("A", "Cockpit", "Übersicht",
-      "Der Betriebszustand auf einen Blick. Alle Zahlen kommen live aus der eigenen API — nichts ist hier fest verdrahtet.")
-      + kacheln + '<div class="stack">' + panel("Zustand", "live abgefragt", dienste) + '</div>';
-  }
-
-  // ---- B · Nutzer -------------------------------------------------------------
-
   // ---- B · Nutzer (Design-Vorschlag "Nutzer — und die Zeile, die euch mal
   // Stunden gekostet hat", 2026-08-23): Suchen, Plan sehen, Verbrauch sehen —
   // und sofort erkennen, wenn ein Konto unter einer anderen Adresse bezahlt.
@@ -556,7 +489,6 @@
     pilleBlock: pille,
     freigaben: freigaben,
     support: support,
-    uebersicht: uebersicht,
     nutzer: nutzer,
     akte: akte,
     audit: audit,

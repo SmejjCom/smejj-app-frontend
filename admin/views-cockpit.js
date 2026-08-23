@@ -178,6 +178,14 @@
       + ' <a class="ck-link" href="/admin/freigaben/">Ansehen</a></div></div></div>';
   }
 
+  function alarmBlock(m) {
+    const a = m.alarme || {};
+    if (!a.anzahl) return "";
+    return '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + zahl(a.anzahl) + " Sicherheitsalarm" + (a.anzahl === 1 ? "" : "e") + " in den letzten " + zahl(a.geprueft) + " Audit-Einträgen</div>"
+      + '<div class="ns">' + (a.letzter ? "Zuletzt " + e(relativ(a.letzter.am)) + (a.letzter.ziel ? " · " + e(a.letzter.ziel) : "") + (a.letzter.grund ? " — " + e(a.letzter.grund) : "") : "")
+      + ' <a class="ck-link" href="/admin/audit/">Audit-Log</a></div></div></div>';
+  }
+
   function cockpit(d) {
     if (!d || d.ok === false) {
       return V.kopfBlock("CK", "Cockpit", "Cockpit", "Die eine Frage: muss ich gerade etwas tun?")
@@ -197,7 +205,7 @@
       + '<div class="stack">'
       + '<div class="al-leiste"><span class="s">gemessen ' + e(relativ(d.zeitpunkt)) + " · " + e(A.zeit(d.zeitpunkt)) + '</span><span class="btn" data-ckNeu>Neu messen</span></div>'
       + lageBlock(d)
-      + (m ? vierAugenBlock(m) : "")
+      + (m ? alarmBlock(m) + vierAugenBlock(m) : "")
       + (m ? '<div class="ck-zwei">' + diensteBlock(m) + protokollBlock(m) + "</div>" : "")
       + automatikenBlock(d)
       + speicherBlock(d)

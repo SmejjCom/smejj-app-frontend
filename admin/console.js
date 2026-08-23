@@ -10,7 +10,6 @@
   const V = window.adminViews;
 
   const SEITEN = [
-    { id: "A", pfad: "uebersicht", gruppe: "Überblick", name: "Übersicht" },
     { id: "B", pfad: "nutzer", gruppe: "Menschen", name: "Nutzerverwaltung" },
     { id: "C", pfad: "rollen", gruppe: "Menschen", name: "Rollen & Rechte" },
     { id: "D", pfad: "support", gruppe: "Menschen", name: "Support & Impersonation" },
@@ -74,11 +73,12 @@
   const PFAD_MODUS = /(^|\.)smejj\.com$/.test(location.hostname);
 
   // Welche Seite unter der nackten Adresse /admin/ liegt. Seit 2026-08-14 das
-  // Cockpit: es beantwortet in einem Satz, ob gerade etwas zu tun ist. Vorher
-  // lag dort die Uebersicht — die zeigt Zahlen, aber sie sagt einem nicht, ob
-  // man sie lesen muss. Die Uebersicht bleibt erreichbar unter
-  // /admin/uebersicht/ (der Ordner existiert im Frontend-Repo).
+  // Cockpit: es beantwortet in einem Satz, ob gerade etwas zu tun ist. Die alte
+  // Seite A "Uebersicht" ist seit 2026-08-23 aufgeloest — das Cockpit traegt
+  // alles, was sie zeigte (Konten, Freigaben, Protokoll, Sicherheitsalarme).
+  // Alte Lesezeichen auf /admin/uebersicht/ landen still auf /admin/.
   const STARTSEITE = "cockpit";
+  const AUFGELOEST = { uebersicht: STARTSEITE };
 
   function seitenLink(pfad) {
     if (!PFAD_MODUS) return "#" + pfad;
@@ -141,19 +141,6 @@
   }
 
   // ---- Ansichten laden --------------------------------------------------------
-
-  async function zeigeUebersicht() {
-    laedt("Betriebszustand wird geholt …");
-    const [nutzer, audit, compliance, freigaben] = await Promise.all([
-      A.nutzer({ limit: 1 }), A.audit({ limit: 50 }), A.compliance(), A.freigaben()
-    ]);
-    if (!nutzer.ok && nutzer.status !== 409) return zeigeFehler(nutzer.fehler);
-    const offen = ((freigaben.data || {}).approvals || []).filter(function (a) { return a.status === "pending"; }).length;
-    seite.innerHTML = V.uebersicht({
-      nutzer: nutzer.data, audit: audit.data, compliance: compliance.data, freigaben: offen
-    });
-    zeigeStand(nutzer.data && nutzer.data.index, audit.data && audit.data.chain);
-  }
 
   async function zeigeNutzer() {
     laedt("Konten werden geholt …");
@@ -452,7 +439,11 @@
   // ---- Routing ----------------------------------------------------------------
 
   function route() {
-    const ziel = aktuellerPfad();
+    let ziel = aktuellerPfad();
+    if (AUFGELOEST[ziel]) {
+      ziel = AUFGELOEST[ziel];
+      if (PFAD_MODUS) history.replaceState(null, "", seitenLink(ziel));
+    }
     // Ein alter #-Link auf der neuen Auslieferung: Adresse still bereinigen,
     // damit Lesezeichen und geteilte Links ab jetzt ohne # weiterwandern.
     if (PFAD_MODUS && location.hash) {
@@ -480,7 +471,9 @@
       return ANGEMELDET[treffer.pfad].laden(seitenKontext(treffer.pfad));
     }
     if (treffer.pfad === "compliance") return zeigeCompliance();
-    return zeigeUebersicht();
+    // Kein Treffer mehr moeglich: das Cockpit ist registriert und faengt auf.
+    laedt("wird geladen …");
+    return ANGEMELDET[STARTSEITE].laden(seitenKontext(STARTSEITE));
   }
 
   // Spiegel zu public/admin/console.js. Hier liegt gate.js NICHT daneben:
