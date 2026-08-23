@@ -348,6 +348,16 @@ function ruesteSendeknopf(bereich, viereck, handeln) {
   document.addEventListener("click", (e) => {
     if (!knopf.classList.contains("ist-stopp")) return;
     if (!(e.target instanceof Node) || !knopf.contains(e.target)) return;
+    // Betreiber 2026-08-24 (Code-Bereich: "Ich frage was und kommt nichts"):
+    // code-flaeche.js sendet ueber einen programmatischen Klick auf
+    // #startSend — NACHDEM der Vorlauf beide Vierecke auf "an" gestellt hat.
+    // Mit Projektordner (await davor) stand der Knopf da schon auf Stopp, und
+    // dieser Fang schluckte den Sendeklick: Feld geleert, Quadrat an, nichts
+    // geschickt. Regel: steht TEXT im Feld, will der Nutzer SENDEN — der
+    // Klick geht unveraendert an den Sendeweg. Nur der Klick bei leerem Feld
+    // ist ein Stopp.
+    const feld = document.getElementById(bereich.feld);
+    if (String(feld?.value || "").trim()) return;
     e.preventDefault();
     e.stopImmediatePropagation();
     handeln();
