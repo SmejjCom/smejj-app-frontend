@@ -536,3 +536,6 @@ span.mono.warn{color:var(--sm-warn);}
 .rg-text b{display:block;font-size:17px;margin-bottom:6px;}
 .rg-vorfall,.rg-heute{font-size:15px;line-height:1.6;color:var(--sm-ink-dim);margin-top:4px;}
 .rg-vorfall .s,.rg-heute .s{color:var(--sm-ink-faint);}
+
+/* Das hidden-Attribut darf keine display-Regel verlieren (2026-08-23: Stand-Pillen) */
+[hidden]{display:none!important;}

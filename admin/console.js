@@ -127,17 +127,28 @@
     document.title = name + " — smejj.com Operations Console";
   }
 
+  // Nur zeigen, was einen Wert hat: die Pillen bleiben versteckt, bis eine
+  // Seite ihren Stand liefert — und verschwinden beim Seitenwechsel wieder.
   function zeigeStand(index, kette) {
     const i = document.getElementById("indexStand");
     if (index) {
       i.textContent = "Index " + A.dauer(index.ageSeconds) + (index.refreshing ? " · frischt auf" : "");
       i.className = "pill " + (index.refreshing ? "warn" : "ok");
+      i.hidden = false;
     }
     const k = document.getElementById("ketteStand");
     if (kette) {
       k.textContent = kette.ok ? "Kette intakt" : "Kette gebrochen";
       k.className = "pill " + (kette.ok ? "ok" : "bad");
+      k.hidden = false;
     }
+  }
+
+  function versteckeStand() {
+    ["indexStand", "ketteStand"].forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) el.hidden = true;
+    });
   }
 
   // ---- Ansichten laden --------------------------------------------------------
@@ -461,6 +472,7 @@
       || SEITEN[0];
     schreibeNav(treffer.pfad);
     setzeKopf(treffer.name);
+    versteckeStand();
     if (treffer.pfad === "nutzer") return zeigeNutzer();
     if (treffer.pfad === "rollen") return zeigeRollen();
     if (treffer.pfad === "audit") return zeigeAudit();

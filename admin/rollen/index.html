@@ -47,8 +47,11 @@
     <header class="topbar">
       <div class="crumb">Operations Console · <b id="crumb">Übersicht</b></div>
       <div class="spacer"></div>
-      <div class="pill" id="indexStand">Index —</div>
-      <div class="pill" id="ketteStand">Kette —</div>
+      <!-- Die beiden Stand-Pillen erscheinen nur, wenn eine Seite einen Wert
+           liefert (Nutzer: Index-Alter, Audit: Kette). Ein dauerhaftes "—" auf
+           allen anderen Seiten war eine Pille ohne Aussage (Befund 2026-08-23). -->
+      <div class="pill" id="indexStand" hidden>Index —</div>
+      <div class="pill" id="ketteStand" hidden>Kette —</div>
     </header>
     <div id="seite"></div>
   </div>
