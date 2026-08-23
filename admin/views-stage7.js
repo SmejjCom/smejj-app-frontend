@@ -145,9 +145,72 @@
       + "</div>";
   }
 
+
+  // ---- G · API & Schluessel ------------------------------------------------------
+  //
+  // Vier Fragen, vier Bloecke: wie viele Konten/Schluessel, was wurde verbraucht
+  // (heute/7/30 Tage), wer ist das je Kunde, wo muss ich hinsehen (Alarme).
+  // Marge steht BEWUSST nicht hier — der Einkauf je Modell ist nicht erfasst.
+
+  function usd(n) { return (Number(n) || 0).toFixed(2) + " USD"; }
+  function zahl(n) { return e(String(Number(n) || 0)); }
+
+  function api(d) {
+    if (d.ok === false) {
+      return V.kopfBlock("G", "API", "API & Schlüssel", "Die öffentliche API aus Betreibersicht.")
+        + '<div class="note glass fehler"><div class="nx">▲</div><div>'
+        + '<div class="nt">Nicht lesbar</div><div class="ns">' + e(d.error || "") + "</div></div></div>";
+    }
+    const kontenZeilen = (d.konten || []).map(function (k) {
+      return "<tr><td>" + (k.konto ? "<b>" + e(k.konto) + "</b>" : '<span class="s">nicht zugeordnet</span>')
+        + '<br><span class="s mono">' + e(k.kontoId) + "</span></td>"
+        + "<td>" + pille(usd(k.guthabenUsd), k.guthabenUsd < 1 ? "bad" : "ok") + "</td>"
+        + "<td>" + zahl(k.aktiveSchluessel) + (k.widerrufeneSchluessel ? ' <span class="s">(+' + zahl(k.widerrufeneSchluessel) + " widerrufen)</span>" : "") + "</td>"
+        + "<td>" + zahl(k.anfragenHeute) + " / " + zahl(k.anfragen7) + " / " + zahl(k.anfragen30) + "</td>"
+        + "<td>" + zahl(k.tokens30) + "</td>"
+        + "<td>" + e(usd(k.umsatz30Usd)) + "</td>"
+        + "<td>" + e(usd(k.aufgeladenUsd)) + "</td>"
+        + "<td>" + (k.letzteAnfrageAm ? e(A.datum(k.letzteAnfrageAm)) : "—") + "</td>"
+        + "<td>" + (k.alarm ? pille(k.alarm, "warn") : "—") + "</td></tr>";
+    });
+    const modellZeilen = (d.nachModell || []).map(function (m) {
+      return "<tr><td><b>" + e(m.modell) + "</b></td><td>" + zahl(m.konten) + "</td><td>" + zahl(m.anfragen) + "</td>"
+        + "<td>" + zahl(m.tokens) + "</td><td>" + e(usd(m.umsatzUsd)) + "</td></tr>";
+    });
+    const preisZeilen = Object.keys(d.preise || {}).map(function (id) {
+      const p = d.preise[id];
+      return "<tr><td><b>" + e(id) + "</b></td><td>" + e(p.eingabe.toFixed(2)) + "</td><td>" + e(p.ausgabe.toFixed(2)) + "</td></tr>";
+    });
+    const luecken = (d.nichtErfasst || []).map(function (p) {
+      return "<tr><td><b>" + e(p.was) + "</b></td><td>" + e(p.warum) + "</td></tr>";
+    });
+    const alarmHinweis = (d.alarme || 0) > 0
+      ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + d.alarme + " Konto/Konten mit Hinweis</div>"
+        + '<div class="ns">Guthaben fast leer oder Testzahlung — steht in der Spalte „Hinweis“.</div></div></div>'
+      : '<div class="note glass"><div class="nx">◆</div><div><div class="nt">Keine Hinweise</div><div class="ns">' + e(d.hinweis || "") + "</div></div></div>";
+
+    return V.kopfBlock("G", "API", "API & Schlüssel",
+      "Wer nutzt smejj als Modellanbieter — Konten, Schlüssel, Verbrauch, Umsatz.")
+      + '<div class="kpis">'
+      + V.kachelBlock("Konten", String(d.kontenMitApi || 0), String(d.kontenMitAktivemSchluessel || 0) + " mit aktivem Schlüssel")
+      + V.kachelBlock("Schlüssel", String(d.aktiveSchluessel || 0), "aktiv")
+      + V.kachelBlock("Heute", zahl((d.heute || {}).anfragen), "Anfragen · " + usd((d.heute || {}).umsatzUsd))
+      + V.kachelBlock("30 Tage", zahl((d.tage30 || {}).anfragen), "Anfragen · " + usd((d.tage30 || {}).umsatzUsd))
+      + V.kachelBlock("Eingezahlt", usd(d.eingezahltUsd), (d.eingezahltTestUsd ? "+ " + usd(d.eingezahltTestUsd) + " Test" : "echte Zahlungen"))
+      + V.kachelBlock("Guthaben offen", usd(d.guthabenGesamtUsd), "Summe aller Konten", "dim")
+      + "</div>"
+      + '<div class="stack">' + alarmHinweis
+      + V.panelBlock("Kunden", "größter Umsatz (30 Tage) zuerst",
+        V.tabelleBlock(["Konto", "Guthaben", "Schlüssel", "Anfragen h/7/30", "Token 30 T", "Umsatz 30 T", "Aufgeladen", "Zuletzt", "Hinweis"], kontenZeilen))
+      + V.panelBlock("Nach Modell", "30 Tage", V.tabelleBlock(["Modell", "Konten", "Anfragen", "Token", "Umsatz"], modellZeilen))
+      + V.panelBlock("Preisliste", "USD je 1 Mio Token", V.tabelleBlock(["Modell", "Eingabe", "Ausgabe"], preisZeilen))
+      + V.panelBlock("Nicht erfasst", "was hier bewusst fehlt", V.tabelleBlock(["Was fehlt", "Warum"], luecken))
+      + "</div>";
+  }
+
   function zeile(name, wert) {
     return "<tr><td><b>" + e(name) + "</b></td><td>" + e(wert) + "</td></tr>";
   }
 
-  window.adminViewsStage7 = { abos: abos, kosten: kosten };
+  window.adminViewsStage7 = { abos: abos, kosten: kosten, api: api };
 })();

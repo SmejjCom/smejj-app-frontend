@@ -105,23 +105,15 @@
         + '<div class="ns">' + e(ev.grund || "") + " — die leere Liste bedeutet hier NICHT, dass nichts passiert ist.</div></div></div>"
       : "";
 
-    const lg = d.lage || {};
-    const lageAusfall = lg.erreichbar === false
-      ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Sicherheitslage nicht lesbar</div><div class="ns">' + e(lg.grund || "") + "</div></div></div>"
-      : "";
-
-    return V.kopfBlock("L", "Sicherheit", "Sicherheit — Sperren, Vier-Augen, Zugänge",
-      "Was eingefroren ist, was auf eine zweite Person wartet, wer Schlüssel hat. Gezählt wird, was zu ist — nicht, was offen ist.")
-      + (lg.erreichbar === false ? "" : lageKacheln(lg))
-      + '<div class="stack">' + lageAusfall + (lg.erreichbar === false ? "" : lageBloecke(lg))
-      + '<h3 class="ap-abschnitt">Ereignisse</h3>'
+    return V.kopfBlock("L", "Sicherheit", "Sicherheit",
+      "Sicherheitsrelevante Ereignisse und auffällige Konten.")
       + '<div class="kpis">'
       + V.kachelBlock("Ereignisse", ev.erreichbar === false ? "—" : String(ev.gesamtImZeitraum || 0), "seit " + e(d.zeitraumAbTag || ""))
       + V.kachelBlock("Hohes Gewicht", ev.erreichbar === false ? "—" : String(ev.davonHoch || 0), (ev.davonHoch || 0) > 0 ? "ansehen" : "keine", (ev.davonHoch || 0) > 0 ? "dn" : "up")
       + V.kachelBlock("Anmeldung gesperrt", ko.erreichbar === false ? "—" : String(ko.anmeldungGesperrt || 0), "gerade aktiv")
       + V.kachelBlock("Konten gesperrt", ko.erreichbar === false ? "—" : String(ko.blockiert || 0), "dauerhaft")
       + "</div>"
-      + ausfall + hinweis
+      + '<div class="stack">' + ausfall + hinweis
       + V.panelBlock("Nach Art", "schwerste zuerst",
         V.tabelleBlock(["Ereignis", "Gewicht", "Anzahl", "Zuletzt"], artZeilen))
       + V.panelBlock("Zuletzt", "Kopfdaten — die Begründung steht im Audit-Log",
@@ -129,62 +121,6 @@
       + V.panelBlock("Auffällige Konten", "gesperrt oder blockiert",
         V.tabelleBlock(["Konto", "Stand", "Gesperrt bis", "Offene Sitzungen"], kontoZeilen))
       + "</div>";
-  }
-
-  // ---- L, Teil 2: die Lage (Design-Vorschlag "Sicherheit", 2026-08-23) ----
-  function lageKacheln(lg) {
-    const ep = lg.endpunkte || {};
-    const va = lg.vierAugen || {};
-    const pflichtFehlt = (lg.pflichtFehlt || []).length;
-    return '<div class="kpis">'
-      + V.kachelBlock("Endpunkte geschlossen", (ep.geschlossen || 0) + " / " + (ep.bekannt || 0), "Erlaubnisliste, kein Verbot — " + (ep.offen || 0) + " offen mit Grund", "up")
-      + V.kachelBlock("Sperren eingefroren", (lg.sperrenStimmen || 0) + " / " + (lg.sperren || []).length, (lg.sperrenVeraendert || 0) > 0 ? lg.sperrenVeraendert + " verändert — ansehen" : "im Abbild byte-genau", (lg.sperrenVeraendert || 0) > 0 ? "dn" : "up")
-      + V.kachelBlock("Vier-Augen offen", va.erreichbar === false ? "—" : String(va.offen || 0), va.erreichbar === false ? "Freigaben nicht lesbar" : (va.offen || 0) > 0 ? "wartet auf zweite Person" : "nichts wartet", (va.offen || 0) > 0 ? "wr" : "")
-      + V.kachelBlock("Zugänge gesetzt", (lg.zugaengeGesetzt || 0) + " / " + (lg.zugaenge || []).length, pflichtFehlt ? pflichtFehlt + " Pflichtwert fehlt" : "alle Pflichtwerte da", pflichtFehlt ? "dn" : "up")
-      + "</div>";
-  }
-
-  function lageBloecke(lg) {
-    const sperrenZeilen = (lg.sperren || []).map(function (s) {
-      const ton = s.zustand === "stimmt" ? "ok" : s.zustand === "veraendert" ? "bad" : "dim";
-      const wort = s.zustand === "stimmt" ? "Stimmt" : s.zustand === "veraendert" ? "Verändert" : s.zustand === "fehlt" ? "Fehlt" : "Nicht im Abbild";
-      return "<tr><td><b>" + e(s.name) + "</b></td><td>" + e(String(s.dateien || 0)) + " Dateien"
-        + (s.eingefrorenAm ? ' <span class="s">· ' + e(A.zeit(s.eingefrorenAm)) + "</span>" : "") + "</td>"
-        + "<td>" + pille(wort, ton) + "</td><td class=\"al-satz\">" + e(s.satz || "")
-        + (s.abweichend && s.abweichend.length ? '<div class="s mono">' + s.abweichend.map(e).join("<br>") + "</div>" : "") + "</td></tr>";
-    });
-    const zugangZeilen = (lg.zugaenge || []).map(function (z) {
-      const p = z.zustand === "gesetzt" ? pille("Gesetzt", "ok") : z.zustand === "fehlt-pflicht" ? pille("FEHLT — Pflicht", "bad") : pille("nicht gesetzt", "dim");
-      return "<tr><td><b>" + e(z.wofuer) + '</b><span class="s al-bau mono">' + e(z.name) + "</span></td><td>" + p + "</td>"
-        + '<td class="al-satz">' + e(z.beleg || (z.zustand === "gesetzt" ? "gesetzt — kein eigener Nachweis" : "—")) + "</td></tr>";
-    });
-    const va = lg.vierAugen || {};
-    const vaZeilen = (va.liste || []).map(function (a) {
-      return "<tr><td><b>" + e(String(a.aktion).replace(/[._]/g, " ")) + '</b><span class="s al-bau mono">' + e(a.ziel) + "</span></td>"
-        + "<td>" + e(a.angefragtVon || "—") + '<span class="s al-bau">vor ' + e(String(a.wartetSeitMin)) + " Minuten</span></td>"
-        + '<td class="al-satz">' + e(a.grund || "") + "</td>"
-        + '<td><a class="btn" href="/admin/freigaben/">Ansehen</a></td></tr>';
-    });
-    const ep = lg.endpunkte || {};
-    const sperrenHinweis = (lg.sperrenVeraendert || 0) > 0
-      ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">»Verändert« heißt nicht kaputt</div><div class="ns">Es heißt: jemand hat die Messlatte verschoben. Erst ansehen, was sich geändert hat, dann neu einfrieren. Nie umgekehrt.</div></div></div>'
-      : "";
-    return sperrenHinweis
-      + V.panelBlock("Eingefrorene Sperren", "byte-genau gegen das Manifest im gebauten Abbild",
-        V.tabelleBlock(["Sperre", "Deckt ab", "Zustand", "Befund"], sperrenZeilen))
-      + V.panelBlock("Wartet auf Vier Augen", va.erreichbar === false ? "Freigaben nicht lesbar" : (va.offen || 0) + " offen · " + (va.gesamt || 0) + " gesamt",
-        vaZeilen.length
-          ? V.tabelleBlock(["Aktion", "Angefragt von", "Grund", ""], vaZeilen)
-          : '<div class="pb"><div class="leer">' + (va.erreichbar === false ? e(va.grund || "nicht lesbar") : "Nichts wartet auf eine zweite Person.") + "</div></div>")
-      + V.panelBlock("Zugänge", "nur ob gesetzt und ob ein Nachweis vorliegt — Werte verlassen den Server nie",
-        V.tabelleBlock(["Wofür", "Zustand", "Nachweis"], zugangZeilen))
-      + V.panelBlock("Endpunkte", e(ep.politik || ""),
-        '<div class="pb"><b>' + e(String(ep.geschlossen || 0)) + " von " + e(String(ep.bekannt || 0)) + " bekannten API-Pfaden geschlossen.</b> "
-        + '<span class="s">Offen mit Grund: </span><span class="mono s">' + (ep.offeneListe || []).map(e).join(" · ") + "</span></div>")
-      + V.panelBlock("Was der Server NICHT messen kann", "steht hier, statt als grün zu erscheinen",
-        V.tabelleBlock(["Prüfung", "Warum nicht"], (lg.nichtMessbar || []).map(function (p) {
-          return "<tr><td><b>" + e(p.name) + "</b></td><td>" + pille("nur lokal", "dim") + " " + e(p.satz) + "</td></tr>";
-        })));
   }
 
   function gewichtPille(gewicht) {

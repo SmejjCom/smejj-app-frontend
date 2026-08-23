@@ -19,7 +19,8 @@
   window.adminStage7 = {
     seiten: {
       abrechnung: { id: "E", gruppe: "Geld", name: "Abrechnung & Abos", laden: lade("abos", S.abos) },
-      kosten: { id: "F", gruppe: "Geld", name: "Kosten & Budgets", laden: lade("kosten", S.kosten) }
+      kosten: { id: "F", gruppe: "Geld", name: "Kosten & Budgets", laden: lade("kosten", S.kosten) },
+      api: { id: "G", gruppe: "Geld", name: "API & Schlüssel", laden: lade("api", S.api) }
     }
   };
 })();

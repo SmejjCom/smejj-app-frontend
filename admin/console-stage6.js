@@ -55,16 +55,7 @@
     },
     ereignisse: {
       id: "L", gruppe: "Sicherheit", name: "Sicherheit",
-      // Zwei Quellen, eine Seite: die Lage (Endpunkte, Sperren, Vier-Augen,
-      // Zugaenge) und die Ereignisse (Audit-Linse). Faellt eine aus, bleibt
-      // die andere stehen — mit sichtbarer Luecke statt leerer Seite.
-      laden: async function (ctx) {
-        const beide = await Promise.all([A.hole("/api/admin/sicherheit/lage"), A.hole("/api/admin/sicherheit/ereignisse")]);
-        if (!beide[0].ok && !beide[1].ok) return ctx.fehler(beide[0].fehler || beide[1].fehler);
-        const daten = Object.assign({}, beide[1].ok ? beide[1].data : { ereignisse: { erreichbar: false, grund: beide[1].fehler }, konten: { erreichbar: false } });
-        daten.lage = beide[0].ok ? beide[0].data : { erreichbar: false, grund: beide[0].fehler };
-        ctx.zeichne(S.ereignisse(daten));
-      }
+      laden: lade("ereignisse", S.ereignisse)
     },
     adminverwaltung: {
       id: "Z", gruppe: "Verwaltung", name: "Admin-Verwaltung",
