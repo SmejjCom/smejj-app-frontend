@@ -47,7 +47,16 @@
   }
 
   function letzterLaufText(a) {
-    if (!a.letzterLauf) return "noch keiner gemessen";
+    if (!a.letzterLauf) {
+      // Tagessummen ohne Einzellauf: "noch keiner" waere falsch — er HAT
+      // gemeldet, nur der letzte Einzellauf fehlt (siehe ampelGrund).
+      const tage = a.tage || [];
+      const t = tage.length ? tage[tage.length - 1] : null;
+      return t
+        ? "kein Einzellauf gespeichert — zuletzt gemessener Tag: " + t.tag
+          + " (" + ((t.ok || 0) + (t.fehler || 0)) + " Läufe)"
+        : "noch keiner gemessen";
+    }
     const wann = A.zeit(a.letzterLauf.am);
     const wie = a.letzterLauf.status === "ok" ? "erfolgreich" : "FEHLER";
     return wann + " — " + wie;
@@ -177,7 +186,18 @@
       + '<div class="ap-quote">' + quote + "</div></div>";
   }
 
-  function vorfallBlock(vorfaelle) {
+  /**
+   * Vorfaelle tragen den Namen, der zur Zeit des Vorfalls galt — nach der
+   * Umbenennung vom 2026-08-14 stand unten "29. 24/7 Synthetic User & Full-
+   * Stack E2E Watchdog", oben "Probe-Nutzer". Ein Autopilot, ein Name:
+   * nachgeschlagen wird ueber die Kennung in der aktuellen Liste.
+   */
+  function anzeigeName(v, alle) {
+    const a = (alle || []).filter(function (x) { return x.id === v.id; })[0];
+    return a ? nummer(a) + e(a.name) : e(v.name || v.id);
+  }
+
+  function vorfallBlock(vorfaelle, alle) {
     if (!vorfaelle || !vorfaelle.length) {
       return V.panelBlock("Vorfall-Protokoll", "jede Rot- und Gelb-Phase, von wann bis wann",
         '<div class="pb"><div class="leer">Kein Vorfall aufgezeichnet. Jede künftige Rot- oder Gelb-Phase landet hier — mit Beginn, Ende, Dauer und Grund.</div></div>');
@@ -187,7 +207,7 @@
       // Vorfaelle ohne art stammen aus der Zeit, als nur Rot protokolliert
       // wurde — sie waren also Ausfaelle.
       const gelb = v.art === "gelb";
-      return "<tr><td><b>" + e(v.name || v.id) + "</b></td>"
+      return "<tr><td><b>" + anzeigeName(v, alle) + "</b></td>"
         + "<td>" + (gelb ? pille("Verspätung", "warn") : pille("Ausfall", "bad")) + "</td>"
         + "<td>" + e(A.zeit(v.von)) + "</td>"
         + "<td>" + (offen ? pille("läuft noch", gelb ? "warn" : "bad") : e(A.zeit(v.bis))) + "</td>"
@@ -209,11 +229,21 @@
   // ist das normal, bei einer stuendlichen waere es ein Befund. "Schläft" wuerde
   // beides zu "alles gut" verklaeren, und das ist genau die Sorte Beschoenigung,
   // die die Ampel hier nirgends macht.
+  //
+  // Grau ist ZWEIERLEI (seit 2026-08-23 getrennt): Ein Autopilot, der melden
+  // SOLL und es nicht tut (messung "heartbeat", kein Herzschlag), ist ein
+  // Befund — er gehoert zu "Braucht dich", sonst steht "Kein Alarm" ueber
+  // einem Pruefer, der seit Tagen nichts liefert. Ein stillgelegter (messung
+  // "geplant") ist dagegen normal still.
+  function stummTrotzPflicht(a) {
+    return a.ampel === "grau" && a.messung === "heartbeat";
+  }
+
   const REGISTER = [
     {
       id: "achtung", name: "Braucht dich",
-      passt: function (a) { return a.ampel === "rot" || a.ampel === "gelb"; },
-      leer: "Niemand braucht dich gerade. Kein Ausfall, keine Verspätung."
+      passt: function (a) { return a.ampel === "rot" || a.ampel === "gelb" || stummTrotzPflicht(a); },
+      leer: "Niemand braucht dich gerade. Kein Ausfall, keine Verspätung, keiner stumm."
     },
     {
       id: "arbeit", name: "Arbeitet",
@@ -222,8 +252,8 @@
     },
     {
       id: "still", name: "Still",
-      passt: function (a) { return a.ampel === "grau"; },
-      leer: "Von jeder Automatik liegt eine Messung vor. Keine ist stumm."
+      passt: function (a) { return a.ampel === "grau" && !stummTrotzPflicht(a); },
+      leer: "Keine Automatik ist stillgelegt."
     },
     {
       // Erscheint nur, wenn wirklich jemand stummgeschaltet ist — ein Register
@@ -373,6 +403,12 @@
       lage = '<div class="note glass"><div class="nx">◆</div><div>'
         + '<div class="nt">' + d.gelb + " verspätet — noch kein Ausfall</div>"
         + '<div class="ns">Die Schonfrist läuft. Bleibt es gelb, wird es von allein rot.</div></div></div>';
+    } else if (alle.some(stummTrotzPflicht)) {
+      const stumme = alle.filter(stummTrotzPflicht).map(function (a) { return a.name; });
+      lage = '<div class="note glass"><div class="nx">◆</div><div>'
+        + '<div class="nt">' + stumme.length + (stumme.length === 1 ? " meldet sich nicht" : " melden sich nicht") + "</div>"
+        + '<div class="ns">Kein Ausfall gemessen — aber ' + e(stumme.join(", "))
+        + (stumme.length === 1 ? " sollte" : " sollten") + " Herzschläge schicken und tun es nicht. Der Grund steht jeweils unter der Ampel.</div></div></div>";
     } else {
       lage = '<div class="note glass"><div class="nx">✓</div><div>'
         + '<div class="nt">Kein Alarm</div>'
@@ -398,7 +434,7 @@
         ? liste(sichtbar, auswahl ? auswahl.id : null) + detail(auswahl)
         : '<div class="ap-register-leer">' + e(reg.leer) + "</div>")
       + "</div>"
-      + vorfallBlock(d.vorfaelle)
+      + vorfallBlock(d.vorfaelle, alle)
       + "</div>";
   }
 
