@@ -21,6 +21,10 @@
          frame-ancestors fehlt absichtlich: In einer Meta-CSP ignorieren Browser die
          Angabe. Den Klickjacking-Schutz uebernimmt der Rahmenwaechter in app.js. -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
+    <!-- Fruehes Tor (Betreiber-Freigabe 2026-08-23): Anonyme sofort zur Landeseite,
+         statt 3,7 s (Desktop) / 15 s (iPhone) die App-Huelle zu sehen. Kein Modul,
+         kein Import — laeuft vor dem ersten Pixel. Regeln bleiben in auth-gate.js. -->
+    <script src="/assets/auth-gate-frueh.js?v=1"></script>
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="theme-color" content="#f7f7f4">
     <meta name="description" content="smejj.com ist ein schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben.">
