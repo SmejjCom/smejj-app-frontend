@@ -19,7 +19,12 @@ import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Verlauf kein Markdown kopieren und keinen Zeitstempel zeigen.
 import { clampVersionIndex, metaOf, seedMeta } from "/assets/chat-messages.js?v=1";
 // Besitzer-Logik separat und Node-testbar (tests/chat-owner.test.mjs).
-import { OWNER_KEY, gehoertNutzer, ownerDecision, sessionUserId } from "/assets/chat-owner.js?v=2";
+import { OWNER_KEY, gehoertNutzer, kontoAliase, ownerDecision, sessionUserId } from "/assets/chat-owner.js?v=3";
+
+// Stufe 4: Besitzpruefung mit dem Server-Alias der Sitzung (chat-owner.js).
+function eigen(objekt, userId, geraeteBesitzer) {
+  return gehoertNutzer(objekt, userId, geraeteBesitzer, kontoAliase(localStorage, userId));
+}
 
 const DB_NAME = "smejj-chats";
 const DB_VERSION = 1;
@@ -403,7 +408,7 @@ export async function listChats() {
   // Stufe 2: nur die eigenen Chats. Ohne Sitzung bleibt die Liste leer.
   const userId = aktuellerNutzer();
   const alt = geraeteBesitzer();
-  const eigene = chats.filter((chat) => gehoertNutzer(chat, userId, alt));
+  const eigene = chats.filter((chat) => eigen(chat, userId, alt));
   // Papierkorb: Geloeschte tauchen in keiner normalen Liste auf —
   // sie leben in listGeloeschteChats(), 30 Tage lang.
   const sichtbar = eigene.filter((chat) => !chat.deletedAt);
@@ -431,7 +436,7 @@ export function getChat(id) {
     const request = store.get(String(id || ""));
     request.onsuccess = () => resolve(request.result || null);
     request.onerror = () => reject(request.error);
-  })).then((chat) => (chat && gehoertNutzer(chat, aktuellerNutzer(), geraeteBesitzer()) ? chat : null))
+  })).then((chat) => (chat && eigen(chat, aktuellerNutzer(), geraeteBesitzer()) ? chat : null))
     .catch(() => null);
 }
 
@@ -527,7 +532,7 @@ export async function listGeloeschteChats() {
   })).catch(() => []);
   const userId = aktuellerNutzer();
   const alt = geraeteBesitzer();
-  const eigene = alle.filter((chat) => gehoertNutzer(chat, userId, alt) && chat.deletedAt);
+  const eigene = alle.filter((chat) => eigen(chat, userId, alt) && chat.deletedAt);
   const grenze = Date.now() - PAPIERKORB_TAGE * 86400000;
   const frisch = [];
   for (const chat of eigene) {
@@ -540,7 +545,7 @@ export async function listGeloeschteChats() {
 async function rohEigenerChat(id) {
   const roh = await tx(STORE, "readonly", (store) => store.get(String(id || ""))).catch(() => null);
   if (!roh) return null;
-  return gehoertNutzer(roh, aktuellerNutzer(), geraeteBesitzer()) ? roh : null;
+  return eigen(roh, aktuellerNutzer(), geraeteBesitzer()) ? roh : null;
 }
 
 /**
@@ -747,7 +752,7 @@ function init() {
         // ?v=2: Projekte-Sync (2026-08-13). Ohne den Bump haelt der
         // HTTP-Cache die alte Fassung fest — die Datei ist nicht im
         // Service-Worker-Buendel und erneuert sich sonst nie zuverlaessig.
-        import("/assets/chat-sync.js?v=8").catch(() => {});
+        import("/assets/chat-sync.js?v=9").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */
@@ -776,7 +781,7 @@ if (document.readyState === "loading") {
 export async function importChat(chat) {
   const userId = aktuellerNutzer();
   if (!userId || !chat || typeof chat !== "object" || !chat.id) return false;
-  if (!gehoertNutzer(chat, userId, geraeteBesitzer())) return false;
+  if (!eigen(chat, userId, geraeteBesitzer())) return false;
   // Grabstein vom Server (Stufe 3): Der Chat wurde auf einem anderen Geraet
   // geloescht — hier ebenfalls entfernen. Direkt in der Datenbank, NICHT ueber
   // deleteChat: das wuerde die Loeschung erneut zum Server melden (Kreis).
@@ -823,7 +828,7 @@ export async function listProjekte() {
   const userId = aktuellerNutzer();
   const alt = geraeteBesitzer();
   return projekte
-    .filter((projekt) => gehoertNutzer(projekt, userId, alt))
+    .filter((projekt) => eigen(projekt, userId, alt))
     .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "de"));
 }
 
@@ -832,7 +837,7 @@ export function getProjekt(id) {
     const request = store.get(String(id || ""));
     request.onsuccess = () => resolve(request.result || null);
     request.onerror = () => reject(request.error);
-  })).then((projekt) => (projekt && gehoertNutzer(projekt, aktuellerNutzer(), geraeteBesitzer()) ? projekt : null))
+  })).then((projekt) => (projekt && eigen(projekt, aktuellerNutzer(), geraeteBesitzer()) ? projekt : null))
     .catch(() => null);
 }
 
@@ -954,7 +959,7 @@ export async function setzeChatProjekt(chatId, projektId) {
 export async function importProjekt(projekt) {
   const userId = aktuellerNutzer();
   if (!userId || !projekt || typeof projekt !== "object" || !projekt.id) return false;
-  if (!gehoertNutzer(projekt, userId, geraeteBesitzer())) return false;
+  if (!eigen(projekt, userId, geraeteBesitzer())) return false;
   if (projekt.geloescht === true) {
     await tx(PROJEKT_STORE, "readwrite", (store) => store.delete(String(projekt.id)));
     notifyProjekteChanged();

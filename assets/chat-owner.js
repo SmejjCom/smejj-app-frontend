@@ -34,11 +34,16 @@ export function ownerDecision(ownerId, userId) {
 //  - Keine Sitzung            → nichts anzeigen. Fail-closed: lieber ein leerer
 //    Verlauf als der Verlauf eines Fremden.
 // Input: chat (Objekt), userId, geraeteBesitzer. Output: boolean.
-export function gehoertNutzer(chat, userId, geraeteBesitzer) {
+export function gehoertNutzer(chat, userId, geraeteBesitzer, aliase = []) {
   const user = String(userId || "").trim();
   if (!user) return false;
   const besitzer = String(chat?.ownerId || "").trim();
-  if (besitzer) return besitzer === user;
+  // Stufe 4 (2026-08-23): der Server stempelt JEDE Datei mit SEINER
+  // Kontokennung (SHA-256 der Adresse, seit 15.08.), die Sitzung traegt eine
+  // andere. Ohne Alias galt darum jeder Chat vom Server als fremd — der
+  // Geraete-Sync war tot, live 26 Chats unsichtbar. Der Alias kommt nur aus
+  // einer angemeldeten Server-Antwort fuer GENAU diese Sitzung (kontoAliase).
+  if (besitzer) return besitzer === user || (Array.isArray(aliase) && aliase.includes(besitzer));
   const alt = String(geraeteBesitzer || "").trim();
   return alt ? alt === user : true;
 }
@@ -53,5 +58,32 @@ export function sessionUserId(storage) {
     return String(session.userId || "").trim();
   } catch {
     return "";
+  }
+}
+
+// Stufe 4: die Kontokennung des Servers als Alias der Sitzung.
+//
+// Der Server liefert sie in der Abgleich-Antwort (`konto`) — er hat den Nutzer
+// dafuer angemeldet und liest nur dessen eigenen Ordner, die Angabe ist also
+// so vertrauenswuerdig wie die Sitzung selbst. Gemerkt wird sie ZUSAMMEN mit
+// der userId, und sie gilt nur, solange dieselbe userId angemeldet ist:
+// ein zweites Konto am selben Browser erbt sie nie (fail-closed).
+export const KONTO_KEY = "smejj.chat.kontoKennung.v1";
+
+export function merkeKontoKennung(storage, userId, konto) {
+  const user = String(userId || "").trim();
+  const kennung = String(konto || "").trim();
+  if (!user || !/^user_[A-Za-z0-9_-]{1,64}$/.test(kennung)) return false;
+  try { storage.setItem(KONTO_KEY, JSON.stringify({ userId: user, konto: kennung })); return true; } catch { return false; }
+}
+
+export function kontoAliase(storage, userId) {
+  const user = String(userId || "").trim();
+  if (!user) return [];
+  try {
+    const roh = JSON.parse(storage.getItem(KONTO_KEY) || "{}") || {};
+    return roh.userId === user && roh.konto && roh.konto !== user ? [String(roh.konto)] : [];
+  } catch {
+    return [];
   }
 }

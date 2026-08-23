@@ -14,7 +14,7 @@
 //   hochgereicht. Massstab ist updatedAt — dieselbe Regel wie serverseitig.
 // - Jeder Fehler ist still: Sync ist Komfort, der Chat laeuft immer weiter.
 import { API_ORIGIN } from "/assets/config.js";
-import { OWNER_KEY, gehoertNutzer, sessionUserId } from "/assets/chat-owner.js?v=2";
+import { OWNER_KEY, gehoertNutzer, kontoAliase, merkeKontoKennung, sessionUserId } from "/assets/chat-owner.js?v=3";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
@@ -123,6 +123,10 @@ async function pull() {
   let daten;
   try { daten = await antwort.json(); } catch { return; }
   const nutzer = sessionUserId(localStorage);
+  // Stufe 4: die Kontokennung des Servers merken — ab jetzt gelten seine
+  // Dateien als eigene (siehe kontoAliase in chat-owner.js).
+  if (daten?.konto) merkeKontoKennung(localStorage, nutzer, daten.konto);
+  const aliase = kontoAliase(localStorage, nutzer);
   let besitzer = "";
   try { besitzer = localStorage.getItem(OWNER_KEY) || ""; } catch { besitzer = ""; }
   let fremd = 0;
@@ -143,7 +147,7 @@ async function pull() {
       // wieder als "fehlt" gilt.
       // Geprueft wird mit DERSELBEN Funktion, die auch importiert — deshalb
       // kann hier nichts uebersprungen werden, was sonst angekommen waere.
-      if (!gehoertNutzer(fern, nutzer, besitzer)) { fremd += 1; continue; }
+      if (!gehoertNutzer(fern, nutzer, besitzer, aliase)) { fremd += 1; continue; }
 
       const voll = Array.isArray(fern.messages) ? fern : await holeVollstaendig(fern.id, kopf);
       // OHNE Nachrichten wird NICHTS importiert. Ein Eintrag ohne `messages`
