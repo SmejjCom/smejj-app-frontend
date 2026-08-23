@@ -29,3 +29,13 @@
 .dev-meldung[data-art="fehler"] { color: #d64545; }
 .dev-verbrauch { display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: 1.05rem; }
 pre.dev-code { overflow-x: auto; padding: 1rem; border: 1px solid rgba(127,127,127,.35); }
+
+/* Gemeinsames Konto-Modul (api-konto-surface.js): Karten + Preistabelle. */
+.dev-konto { display: grid; gap: 1.2rem; }
+.dev-karte { border: 1px solid rgba(127,127,127,.35); padding: 1rem 1.1rem; }
+.dev-karte h3 { margin: 0 0 .6rem; font-size: 1.2rem; }
+.dev-klein { font-size: .95rem; opacity: .8; }
+.dev-guthaben { font-size: 1.6rem; margin: .2rem 0; }
+.dev-preise { border-collapse: collapse; width: 100%; font-size: 1.05rem; }
+.dev-preise th, .dev-preise td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid rgba(127,127,127,.3); }
+.dev-preise th:not(:first-child), .dev-preise td:not(:first-child) { text-align: right; }
