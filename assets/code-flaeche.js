@@ -28,7 +28,7 @@
 // index.html — das <script>-Tag fehlte, ALLE Knoepfe der Code-Seite waren
 // tot. Der module-queries-Test prueft jetzt auch dieses Glied.
 
-import { listProjekte, neuesGespraechImBereich, newChat } from "/assets/chat-store.js?v=b63";
+import { listProjekte, neuesGespraechImBereich, newChat } from "/assets/chat-store.js?v=b64";
 // OHNE ?v — dieselbe Kennung wie app.js/cline-model-menu.js ("./config.js"),
 // sonst entsteht eine zweite Modulinstanz (module-queries-Waechter).
 import { API_ORIGIN } from "./config.js";
@@ -568,11 +568,11 @@ export function initCodeFlaeche() {
   // Notbremse: meldet sich binnen 90 s gar kein Strom, geht der Vorlauf von
   // selbst aus. Sonst blinkt es ewig, wenn der Server verstummt (dieselbe
   // Grenze wie die Stille-Wache in chat-stream.js).
+  const anzeigeFremd = Boolean(window.smejjArbeitsanzeige); // seit 2026-08-23 in chat-stopp.js (jede Seite)
   const VORLAUF_GRENZE_MS = 90_000;
-  let vorlauf = false;
-  let stromLaeuft = false;
-  let vorlaufUhr = 0;
+  let vorlauf = false, stromLaeuft = false, vorlaufUhr = 0;
   function zeigeArbeit() {
+    if (anzeigeFremd) return;
     const an = vorlauf || stromLaeuft;
     document.getElementById("codeArbeit")?.classList.toggle("an", an);
     document.getElementById("startArbeit")?.classList.toggle("an", an);

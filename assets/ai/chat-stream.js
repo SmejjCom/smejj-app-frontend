@@ -802,15 +802,36 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
   if (!urteil.ok) return false;
 
   let text = "";
-  const ergebnis = await frageLokal(lage.frage, {
-    system: "Du bist der Assistent von smejj.com. Antworte kurz, korrekt und in der Sprache des Nutzers.",
-    verlauf: lage.verlauf,
-    onDelta: (zuwachs) => {
-      text += zuwachs;
-      output.textContent = text;
-    }
-  });
-  if (!ergebnis.ok) {
+  // LIVE GEMESSEN 2026-08-23 (Abnahme): vier Fragen nacheinander beantwortete
+  // das Browser-Modell — ohne dass das Viereck leuchtete, ohne dass Stopp
+  // griff (kein Leser, kein Stromsignal) und OHNE den Hinweis unten: der
+  // Renderer nimmt nur den Knoten, das zweite Argument fiel still weg.
+  // Regel 2 oben ("SICHTBAR machen") war damit gebrochen. Darum: ein
+  // Stopp-Anker in der Leser-Menge (stoppeChatStrom erreicht ihn), das
+  // Stromsignal wie beim Server-Weg, und der Hinweis ueber textContent.
+  let gestoppt = false;
+  const anker = { cancel: () => { gestoppt = true; } };
+  aktiveLeser.add(anker);
+  meldeStromstand();
+  let ergebnis;
+  try {
+    ergebnis = await frageLokal(lage.frage, {
+      system: "Du bist der Assistent von smejj.com. Antworte kurz, korrekt und in der Sprache des Nutzers.",
+      verlauf: lage.verlauf,
+      abgebrochen: () => gestoppt,
+      onDelta: (zuwachs) => {
+        text += zuwachs;
+        output.textContent = text;
+      }
+    });
+  } finally {
+    aktiveLeser.delete(anker);
+    meldeStromstand();
+  }
+  // Der Nutzer hat gestoppt: Teilantwort behalten, NICHT zum Server — sie
+  // bekommt unten denselben Hinweis und denselben einen Renderaufruf.
+  const gestoppteTeilantwort = ergebnis.grund === "gestoppt" ? text : "";
+  if (!ergebnis.ok && !gestoppteTeilantwort) {
     // Nichts stehen lassen, was der Server gleich ueberschreibt.
     output.textContent = "";
     return false;
@@ -822,11 +843,14 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
     output.textContent = "";
     return false;
   }
-  const hinweis = "\n\nAuf deinem Geraet beantwortet — ohne Server, ohne Kosten."
-    + " Fuer eine gruendlichere Antwort schreibe \u00bbgenauer\u00ab dazu.";
-  const ganz = `${ergebnis.text}${hinweis}`;
-  if (typeof renderMarkdown === "function") renderMarkdown(output, ganz);
-  else output.textContent = ganz;
+  const hinweis = "\n\nAuf deinem Gerät beantwortet — ohne Server, ohne Kosten."
+    + " Für eine gründlichere Antwort schreibe \u00bbgenauer\u00ab dazu.";
+  // Ueber textContent, nicht als zweites Argument: renderChatMarkdown(node)
+  // liest den Knoten — ein zweites Argument wurde still verworfen (live
+  // 2026-08-23: der Hinweis fehlte in jeder lokalen Antwort).
+  output.textContent = `${gestoppteTeilantwort || ergebnis.text}${hinweis}`;
+  // Der EINE Renderaufruf dieses Pfads (tests/chat-markdown.test.mjs zaehlt).
+  if (typeof renderMarkdown === "function") renderMarkdown(output);
   return true;
 }
 

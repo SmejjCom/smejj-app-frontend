@@ -5541,6 +5541,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   max-height: none;
 }
 #code .codegruss { padding: 2px 2px 0; }
+@media (max-width: 767px) { #code .codegruss { padding-left: 40px; } }
+@media (min-width: 768px) { body.spur-zu #code .codegruss { padding-left: 40px; } }
 #code .codeunten { margin-top: auto; padding: 4px 0 0; }
 #code .code-log-halter .start-log .entry { max-width: none; }
 #code .code-log-halter .msg-actions { max-width: none; }
@@ -5601,6 +5603,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 .voice-mode-transcript { text-align: left; }
 @media (max-width: 600px) {
+  #arbeitsbereiche #bereichNeu { min-height: 44px; }
   #code .codeleiste .icon-button.code-mini,
   #code .codeleiste #codeSenden {
     width: 44px;

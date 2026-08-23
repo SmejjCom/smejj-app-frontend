@@ -271,10 +271,24 @@ function titleFrom(messages) {
 //
 // Dynamischer Import und stiller Fehlschlag mit Absicht: ist das Modul nicht
 // ladbar oder die Ablage aus, wird gespeichert wie bisher — nie schlechter.
+// LIVE GEMESSEN 2026-08-23 (Abnahme, Bild-Auftrag): der Bild-Strom lief von
+// 1,6 s bis 64,9 s. Bei 59,0 s wurde der Datenberg HALB hochgeladen — der
+// Beobachter unten speichert 600 ms nach jeder Ruhe, und mitten in der base64
+// gab es eine Luecke. Der halbe data:-URL wurde durch die kurze Adresse
+// ersetzt, der Rest der base64 haengte sich hinten an die Adresse; am Ende
+// stand "!Erstelltes Bild" als Link statt ein Bild, und der Chat-Upload
+// danach bekam 400. Darum: solange ein Strom laeuft, wird NICHT ausgelagert —
+// gespeichert wird wie zuvor, ausgelagert beim naechsten Speichern nach dem
+// Stromende (das loest der Renderer selbst aus).
+let stromLaeuft = false;
+if (typeof window !== "undefined") {
+  window.addEventListener("smejj:chat-strom", (e) => { stromLaeuft = (Number(e.detail?.laufen) || 0) > 0; });
+}
+
 async function medienAuslagern() {
   try {
     const log = startLog();
-    if (!log) return;
+    if (!log || stromLaeuft) return;
     const { lagereMedienAus, lagereMedienAusText, lagereMedienAusTextknoten } =
       await import("./chat-medien.js?v=2");
     for (const eintrag of log.querySelectorAll(":scope > .entry.assistant")) {

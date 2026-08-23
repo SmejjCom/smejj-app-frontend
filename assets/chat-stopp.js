@@ -54,6 +54,52 @@ if (typeof window !== "undefined") {
   });
 }
 
+// ---- Arbeits-Anzeige (.an) — HIER, nicht nur in code-flaeche.js.
+//
+// LIVE GEMESSEN 2026-08-23 (Abnahme): code-flaeche.js wird seit dem 20.08.
+// erst nachgeladen, wenn /code aufgeht (code-nachladen.js, Seitengewicht).
+// Auf der Startseite setzte darum NIEMAND mehr die Klasse .an: das Viereck
+// leuchtete nie, das Stopp-Quadrat im Senden-Knopf erschien nie (ein Klick
+// auf den Knopf oeffnete mitten in der Antwort den Sprachmodus), und
+// handeln() oben hielt den Strom nach dem 3-s-Gnadenfenster fuer "frei" —
+// ein Klick bei 26 s: 6.916 -> 7.816 Zeichen, nichts gestoppt.
+//
+// Dieselbe Logik wie in code-flaeche.js (Vorlauf ab dem Absenden ODER Strom
+// laeuft), nur in dem Modul, das auf JEDER Seite geladen ist. code-flaeche.js
+// erkennt die Flagge und haengt seine Kopie nicht noch einmal ein.
+const VORLAUF_GRENZE_MS = 90_000;
+function ruesteArbeitsanzeige() {
+  if (typeof window === "undefined" || window.smejjArbeitsanzeige) return;
+  window.smejjArbeitsanzeige = "chat-stopp";
+  let vorlauf = false;
+  let stromLaeuft = false;
+  let vorlaufUhr = 0;
+  const zeige = () => {
+    const an = vorlauf || stromLaeuft;
+    for (const b of BEREICHE) document.getElementById(b.viereck)?.classList.toggle("an", an);
+  };
+  const beginnt = () => {
+    vorlauf = true;
+    clearTimeout(vorlaufUhr);
+    vorlaufUhr = setTimeout(() => { vorlauf = false; zeige(); }, VORLAUF_GRENZE_MS);
+    zeige();
+  };
+  window.addEventListener("smejj:chat-strom", (event) => {
+    stromLaeuft = (Number(event.detail?.laufen) || 0) > 0;
+    if (!stromLaeuft) { vorlauf = false; clearTimeout(vorlaufUhr); }
+    zeige();
+  });
+  const meldeWennText = (feldId) => (e) => {
+    if (e.type === "keydown" && (e.key !== "Enter" || e.shiftKey)) return;
+    const feld = document.getElementById(feldId);
+    if (feld && String(feld.value || "").trim()) beginnt();
+  };
+  for (const b of BEREICHE) {
+    document.getElementById(b.senden)?.addEventListener("click", meldeWennText(b.feld), true);
+    document.getElementById(b.feld)?.addEventListener("keydown", meldeWennText(b.feld), true);
+  }
+}
+
 function merke(bereich) {
   const feld = document.getElementById(bereich.feld);
   const text = String(feld?.value || "").trim();
@@ -312,6 +358,7 @@ function ruesteSendeknopf(bereich, viereck, handeln) {
 
 export function initChatStopp() {
   let gesetzt = 0;
+  ruesteArbeitsanzeige();
   for (const bereich of BEREICHE) if (ruesteViereck(bereich)) gesetzt += 1;
   // NACHZUEGLER-BREMSE. Gemessen am 2026-08-18 im Code-Bereich: ein
   // stoppeChatStrom() beendet nur den LAUFENDEN Leser — vier Sekunden

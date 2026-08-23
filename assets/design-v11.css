@@ -2170,6 +2170,12 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   max-height: none;
 }
 #code .codegruss { padding: 2px 2px 0; }
+/* Abnahme 2026-08-23, gemessen bei 375 px: der feste Menue-Knopf (0-44 px)
+   lag ueber dem Gruss (x 14-312, y 6-35) — das "W" stand unter dem Logo.
+   Wo der Knopf ueber der Flaeche schwebt (Handy; Schreibtisch mit
+   geschlossener Spur), beginnt der Gruss rechts von ihm. */
+@media (max-width: 767px) { #code .codegruss { padding-left: 40px; } }
+@media (min-width: 768px) { body.spur-zu #code .codegruss { padding-left: 40px; } }
 #code .codeunten { margin-top: auto; padding: 4px 0 0; }
 #code .code-log-halter .start-log .entry { max-width: none; }
 #code .code-log-halter .msg-actions { max-width: none; }
@@ -2266,6 +2272,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
  * start-glass.css) — keine zweite Wahrheit daneben.
  * ===================================================================== */
 @media (max-width: 600px) {
+  /* Abnahme 2026-08-23: "Neues Project anlegen" mass 188x42 px (measure:touch:app). */
+  #arbeitsbereiche #bereichNeu { min-height: 44px; }
   #code .codeleiste .icon-button.code-mini,
   #code .codeleiste #codeSenden {
     width: 44px;
