@@ -496,6 +496,9 @@
   const KEIN_ADMIN = ["admin_role_required", "admin_account_not_active"];
 
   async function start() {
+    // Auch mit einer alten, noch im Browser-Cache liegenden index.html ohne
+    // hidden-Attribut: die Pillen starten versteckt.
+    versteckeStand();
     schreibeNav(STARTSEITE);
     laedt("Anmeldung wird geprüft …");
     const antwort = await A.ich();
