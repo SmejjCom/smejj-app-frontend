@@ -18,7 +18,7 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=b57";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=b58";
 import { merkmaleVon } from "/assets/chat-history-text.js?v=b47b";
 import { Icons } from "/assets/components.js?v=b48";
 // OHNE ?v — dieselbe Kennung wie app.js/code-flaeche.js, sonst zweite Instanz.

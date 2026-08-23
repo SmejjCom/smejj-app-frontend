@@ -66,8 +66,43 @@ export function istZuGross(status, grund) {
   return status >= 400 && /request too large|payload too large|body too large/.test(text);
 }
 
-/** Server-Grenze aus control-server/src/chats/chatSyncStore.js. */
+/**
+ * Server-Grenze aus control-server/src/chats/chatSyncStore.js.
+ *
+ * Die Zahl steht damit an ZWEI Stellen, und das ist eine Falle: laufen sie
+ * auseinander, winkt der Client genau die Chats durch, die der Server abweist —
+ * der stille Verlust, gegen den diese ganze Datei gebaut ist. Ein Import ist
+ * hier nicht moeglich (Browser-Modul gegen Server-Modul), darum haelt ein Test
+ * die beiden Werte zusammen: tests/chat-medien-rettung.test.mjs vergleicht sie
+ * direkt gegeneinander. Wer eine der beiden aendert, sieht die andere rot.
+ */
 export const MAX_CHAT_BYTES = 512 * 1024;
+
+/**
+ * VORSORGE-SCHWELLE — der Rest, den die Rettung sonst nie erreicht.
+ *
+ * BEFUND 2026-08-23, gemessen an der echten Ablage: Vier Chats liegen bei
+ * 466 / 293 / 280 / 263 KB — also UNTER der 512-KB-Grenze. Sie werden nie
+ * abgewiesen, also nie gerettet: `brauchtRettung` verlangt "zu gross UND hat
+ * Medien", und die erste Bedingung trifft nicht zu. Trotzdem traegt jeder
+ * dieser vier ein komplettes Video im `raw`-Feld — bei 466,3 KB entfallen
+ * 464,6 KB allein darauf. Nachgerechnet schrumpfen die vier zusammen von
+ * 1.301,9 KB auf 8,1 KB.
+ *
+ * Sie sind heute nicht kaputt, aber eine einzige weitere Nachricht kippt sie
+ * ueber die Grenze — und dann faellt genau der Chat aus, in dem der Nutzer
+ * gerade arbeitet. Der Bestandslauf entlastet sie darum vorsorglich.
+ *
+ * 128 KB als Schwelle, nicht 0: Ein kleines eingebettetes Bild in einem
+ * 20-KB-Chat ist kein Problem und waere den Upload nicht wert. Ab 128 KB ist
+ * ein Medium im Chat so gross, dass es dort nicht hingehoert — und es bleibt
+ * ein Viertel des Deckels Luft, bevor etwas eng wird.
+ *
+ * Gilt NUR fuer den Bestandslauf (raeumeBestandAuf). Der Sende-Weg bleibt bei
+ * der echten Grenze: dort ist die Frage "kommt dieser Chat durch?", und die
+ * beantwortet allein MAX_CHAT_BYTES.
+ */
+export const VORSORGE_BYTES = 128 * 1024;
 
 // image und video, KEIN audio — und das ist eine Entscheidung, keine Luecke.
 // Abgestimmt mit der Parallelsitzung, die den Auslagerungs-Fix vom 22.08.
@@ -227,6 +262,13 @@ const EIN_TAG_MS = 24 * 60 * 60 * 1000;
  * statt auf eine Absage zu warten. Danach passen sie durch und werden vom
  * normalen Sync gesichert.
  *
+ * Er misst dabei mit VORSORGE_BYTES (128 KB), nicht mit der Server-Grenze:
+ * Wer erst bei 512 KB anfaengt, laesst genau die Chats liegen, die knapp
+ * darunter stehen — am echten Konto vier Stueck mit zusammen 1,3 MB, jeder mit
+ * einem vollstaendigen Video im `raw`-Feld. Die sind heute nicht kaputt, aber
+ * eine weitere Nachricht kippt sie. Vorsorge ist hier billiger als Rettung:
+ * derselbe Upload, nur ohne dass vorher etwas fehlschlaegt.
+ *
  * HOECHSTENS EINMAL AM TAG, und das ist Absicht: die Pruefung muss jeden
  * Chat einmal serialisieren (im gemessenen Konto rund 15 MB). Das ist zu
  * teuer fuer jeden Seitenaufruf und zu billig, um es ganz zu lassen.
@@ -242,7 +284,7 @@ const EIN_TAG_MS = 24 * 60 * 60 * 1000;
 export async function raeumeBestandAuf({
   listen, laden, speichern, auslagern,
   jetzt = Date.now(), speicher = globalThis.localStorage,
-  grenze = MAX_CHAT_BYTES, hoechstens = 25
+  grenze = VORSORGE_BYTES, hoechstens = 25
 }) {
   try {
     const zuletzt = Number(speicher?.getItem(BESTAND_MERKER) || 0);
