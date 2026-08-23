@@ -517,3 +517,6 @@ html.smejj-gate-zu{visibility:hidden!important;}
   .ap-was span{display:none;}
   .ap-bereich{flex-basis:100%;margin-left:0;}
 }
+/* Abschnittstitel innerhalb einer Seite (L: Lage oben, Ereignisse unten) */
+.ap-abschnitt{margin:18px 0 0;font-size:13px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--sm-ink-faint);}
+a.btn{text-decoration:none;display:inline-block;}
