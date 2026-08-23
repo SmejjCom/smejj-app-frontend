@@ -2405,16 +2405,22 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
  * verliert :placeholder-shown. Der Knopf haengt also am Feld selbst —
  * es gibt keinen zweiten Zustand, der auseinanderlaufen koennte.
  * ===================================================================== */
+/* NACHTRAG 2026-08-24 (Betreiber: "sende icon sieht man nicht mehr"): seit
+ * der Knopf ueberall transparent ist (Abnahme 23.08.), machte die alte
+ * helle Flaeche dieses Blocks keinen Sinn mehr — uebrig blieb ihr DUNKLES
+ * Zeichen auf dunklem Grund: der Pfeil war in Chat und Code unsichtbar,
+ * sobald Text im Feld stand. Jetzt: Text da -> HELLES Zeichen, weiter ohne
+ * Flaeche; Hover Logo-Cyan. */
 #start .prompt-glass:has(#startMessage:not(:placeholder-shown)) .send-button,
 #code .codefeld:has(#codeAufgabe:not(:placeholder-shown)) #codeSenden {
-  background: #f2f5f4;
-  color: #0a0f16;
+  background: transparent;
+  color: #f2f5f4;
   box-shadow: none;
 }
 #start .prompt-glass:has(#startMessage:not(:placeholder-shown)) .send-button:hover,
 #code .codefeld:has(#codeAufgabe:not(:placeholder-shown)) #codeSenden:hover {
-  background: #dfe5e3;
-  color: #0a0f16;
+  background: transparent;
+  color: #02fdfd;
 }
 
 /* =====================================================================

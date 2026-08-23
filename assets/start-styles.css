@@ -5677,14 +5677,14 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 #start .prompt-glass:has(#startMessage:not(:placeholder-shown)) .send-button,
 #code .codefeld:has(#codeAufgabe:not(:placeholder-shown)) #codeSenden {
-  background: #f2f5f4;
-  color: #0a0f16;
+  background: transparent;
+  color: #f2f5f4;
   box-shadow: none;
 }
 #start .prompt-glass:has(#startMessage:not(:placeholder-shown)) .send-button:hover,
 #code .codefeld:has(#codeAufgabe:not(:placeholder-shown)) #codeSenden:hover {
-  background: #dfe5e3;
-  color: #0a0f16;
+  background: transparent;
+  color: #02fdfd;
 }
 #chatStopp.chat-stopp {
   border-radius: 0 !important;
