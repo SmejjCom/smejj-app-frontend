@@ -627,7 +627,7 @@
     const feld = document.getElementById("umgebung");
     if (!feld) return;
     const host = String(location.hostname || "").toLowerCase();
-    const echt = host === "smejj.com" || host === "www.smejj.com" || host === "smejj-control.zeabur.app";
+    const echt = host === "smejj.com" || host === "www.smejj.com" || host === "smejj-control.zeabur.app" || host === "api.smejj.com";
     feld.textContent = echt ? "Produktion" : (host || "unbekannt");
     feld.title = "Diese Konsole wird von " + (host || "unbekannt") + " ausgeliefert";
   }

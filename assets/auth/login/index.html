@@ -9,10 +9,12 @@
          frame-ancestors steht bewusst nicht hier — die Direktive wirkt nur als
          HTTP-Kopf, den GitHub Pages nicht setzen kann; dafuer gibt es
          frame-guard.js (siehe dort). -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; connect-src 'self' https://smejj-control.zeabur.app">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; connect-src 'self' https://api.smejj.com https://smejj-control.zeabur.app">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#101113">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
     <title>Anmelden · smejj.com</title>
     <!-- Favicon-Verweise (QA-Welle 1, Befund F-10) — identisch mit allen anderen
          Seiten; ergaenzt mit der Freigabe "smejj.com 100 % fertig" (2026-07-28),
@@ -23,14 +25,392 @@
     <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
     <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="/assets/auth/auth.css?v=logo-20260725">
+    <link rel="stylesheet" href="/auth/auth.css?v=logo-20260812">
+  <style id="authInlineStyle">
+/* smejj.com — Anmelde-/Registrierungsseiten (Codex-Stil, Freigabe 2026-07-21).
+   Prinzip: eine Frage pro Schritt, grosse Knoepfe, kurze Wege.
+   Dunkles Design ist Standard (wie die App); helles Design folgt der
+   Systemeinstellung. Eigenstaendige Seiten ausserhalb des Start-Locks. */
+
+:root {
+  color-scheme: dark light;
+  --auth-bg: #0d0f12;
+  --auth-panel: #14171c;
+  --auth-ink: #ececf1;
+  --auth-muted: #9096a1;
+  --auth-line: #262a31;
+  --auth-line-strong: #343943;
+  --auth-accent: #2fd4c9;
+  --auth-primary-bg: #ececf1;
+  --auth-primary-ink: #101216;
+  --auth-error: #e5726f;
+  --auth-success: #5fe0c6;
+  --auth-focus: rgba(47, 212, 201, 0.45);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --auth-bg: #f7f8f9;
+    --auth-panel: #ffffff;
+    --auth-ink: #17191d;
+    --auth-muted: #6a7078;
+    --auth-line: #e1e4e8;
+    --auth-line-strong: #cfd4da;
+    --auth-accent: #0ea89f;
+    --auth-primary-bg: #17191d;
+    --auth-primary-ink: #ffffff;
+    --auth-error: #c93b3b;
+    --auth-success: #0a6c58;
+    --auth-focus: rgba(14, 168, 159, 0.35);
+  }
+}
+
+* { box-sizing: border-box; }
+
+/* Fail-closed-Sichtbarkeit: [hidden] gewinnt gegen jedes display der Komponenten
+   (nicht konfigurierte Login-Wege und das zugeklappte Passwortfeld bleiben unsichtbar). */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--auth-bg);
+  color: var(--auth-ink);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Marke mittig ueber der Ueberschrift (Mockup 4) */
+.auth-brand {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 34px 32px 8px;
+  color: var(--auth-ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.auth-brand-mark {
+  width: 26px;
+  height: 26px;
+  background: url("/icons/smejj_favicon.svg") center / contain no-repeat;
+  display: inline-flex;
+}
+
+/* Mockup V11 Bildschirm 4 (Betreiber-Freigabe 2026-08-15): KEINE Leuchtkarte
+   mehr — flache, schmale Spalte auf dunklem Grund, Design VIERECKIG (8px),
+   Farbe nur wo sie etwas sagt (Marken-Icons, aktive E-Mail-Zeile). */
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 22px 32px;
+  display: flex;
+  flex-direction: column;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.auth-eyebrow { display: none; }
+
+h1 {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  margin: 0 0 10px;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.auth-subhead {
+  margin: 0 0 26px;
+  color: var(--auth-muted);
+  text-align: center;
+  font-size: 15px;
+}
+
+/* Felder */
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.auth-field input {
+  height: 46px;
+  border-radius: 10px;
+  border: 1px solid var(--auth-line-strong);
+  background: var(--auth-panel);
+  color: var(--auth-ink);
+  padding: 0 14px;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.auth-field input::placeholder { color: var(--auth-muted); }
+
+.auth-field input:focus-visible,
+.auth-button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--auth-focus);
+  outline-offset: 2px;
+}
+
+/* Knoepfe: alle gleich gross, volle Breite */
+.auth-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-button {
+  height: 56px;
+  width: 100%;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 15.5px;
+  font-weight: 600;
+  border: 1px solid var(--auth-line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--auth-ink);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+/* Vierte Zeile (Mockup 4): die cyan umrandete E-Mail-Eingabe mit Pfeil. */
+.auth-mailzeile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 8px 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--auth-accent);
+  background: rgba(255, 255, 255, 0.03);
+}
+.auth-mailzeile .auth-ic { color: var(--auth-muted); }
+.auth-mailzeile input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--auth-ink);
+  font: inherit;
+  font-size: 15.5px;
+  outline: none;
+  text-align: center;
+}
+.auth-mailzeile input::placeholder { color: var(--auth-muted); font-weight: 600; }
+.auth-mailzeile .auth-pfeil {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--auth-primary-bg);
+  color: var(--auth-primary-ink);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-button:hover { border-color: var(--auth-accent); }
+
+.auth-button.primary {
+  background: var(--auth-primary-bg);
+  color: var(--auth-primary-ink);
+  border-color: transparent;
+}
+
+.auth-button.primary:hover { opacity: 0.92; }
+
+.auth-button:disabled { opacity: 0.55; cursor: default; }
+
+.auth-ic { display: inline-flex; flex: none; }
+
+/* Trennlinie "oder" */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--auth-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 22px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--auth-line);
+}
+
+/* Kurzer Hinweis unter dem Primaer-Knopf */
+.auth-note {
+  font-size: 12px;
+  color: var(--auth-muted);
+  text-align: center;
+  margin: 14px 0 0;
+}
+
+.auth-inline-note { text-align: left; margin: 0 0 12px; }
+.auth-inline-note a { color: var(--auth-accent); text-decoration: none; font-weight: 600; }
+
+/* "Passwort vergessen?" ist eine Aktion, kein Ziel — als <button> ausgezeichnet
+   (vorher <a href="#">, das ohne JavaScript ins Leere lief). Sieht unveraendert
+   aus, ist aber fuer Tastatur und Screenreader korrekt. */
+.auth-linkbutton {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--auth-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+.auth-linkbutton:focus-visible {
+  outline: 2px solid var(--auth-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Hinweis plus Weg zurueck in die App, wenn schon eine Sitzung besteht. */
+.auth-signedin {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+.auth-signedin .auth-note { margin: 0; }
+.auth-signedin .auth-button { text-decoration: none; }
+
+.auth-terms {
+  font-size: 12px;
+  color: var(--auth-muted);
+  text-align: center;
+  margin: 12px 0 0;
+}
+
+/* Status (Erfolg/Fehler) */
+.auth-status {
+  min-height: 20px;
+  margin: 14px 0 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.auth-status[data-tone="error"] { color: var(--auth-error); }
+.auth-status[data-tone="success"] { color: var(--auth-success); }
+
+/* Wechsel Anmelden/Registrieren */
+.auth-footer {
+  text-align: center;
+  margin: 24px 0 0;
+  color: var(--auth-muted);
+  font-size: 14px;
+}
+
+.auth-footer a {
+  color: var(--auth-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-legal {
+  text-align: center;
+  color: var(--auth-muted);
+  font-size: 12px;
+  padding: 26px 0 30px;
+  margin-top: auto;
+}
+
+/* Klickflaeche mindestens 24x24 px (F-21): "Datenschutz" und "Impressum" waren
+   71x14 bzw. 62x14 px. Nur die Flaeche waechst, das Schriftbild bleibt. */
+.auth-legal a {
+  color: var(--auth-muted);
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+/* Auch "Konto erstellen" / "Anmelden" in der Fusszeile (war 102x17 px). */
+.auth-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+/* Passwortstaerke (Registrierung) */
+.auth-strength {
+  display: flex;
+  gap: 6px;
+  margin: 2px 0 4px;
+}
+
+.auth-strength span {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--auth-line-strong);
+}
+
+.auth-strength[data-score="1"] span:nth-child(-n+1),
+.auth-strength[data-score="2"] span:nth-child(-n+2),
+.auth-strength[data-score="3"] span:nth-child(-n+3),
+.auth-strength[data-score="4"] span:nth-child(-n+4) { background: var(--auth-accent); }
+
+.auth-strength-note {
+  font-size: 12px;
+  color: var(--auth-muted);
+  margin: 0 0 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-button { transition: none; }
+}
+
+@media (max-width: 420px) {
+  .auth-brand { padding: 20px 20px; }
+  h1 { font-size: 26px; }
+}
+
+</style>
   </head>
   <body data-auth-mode="login">
     <main class="auth-shell">
       <a class="auth-brand" id="homeLink" href="/" aria-label="smejj.com Startseite"><span class="auth-brand-mark" aria-hidden="true"></span><span>smejj.com</span></a>
       <section class="auth-card" aria-labelledby="authTitle">
-        <h1 id="authTitle">Willkommen zurück</h1>
-        <p class="auth-subhead">Melde dich an, um weiterzumachen.</p>
+        <!-- Bildschirm 4 (Mockup V11, Betreiber-Freigabe 2026-08-15 im Chat:
+             "Anmeldeseite auch 1 zu 1 machen, freigegeben"): EINE Seite fuer
+             Anmelden UND Registrieren, vier gleiche Zeilen, kein "ODER".
+             EHRLICH gegenueber dem Deck: die "20 Punkte im Monat" gibt es
+             nicht (kein Punktesystem) und statt "Wir erkennen an deiner
+             Adresse, ob du schon ein Konto hast" steht die wahre Mechanik —
+             jeder Weg (Google/GitHub/Passkey/E-Mail-Link) funktioniert fuer
+             neue wie bestehende Konten gleichermassen. -->
+        <h1 id="authTitle">Anmelden oder registrieren</h1>
+        <p class="auth-subhead">Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.</p>
 
         <!-- Sichtbar nur bei bestehender Sitzung: bis QA-Welle 1 landeten
              Angemeldete hier in einer Sackgasse — volles Anmeldeformular, kein
@@ -41,45 +421,62 @@
           <a class="auth-button primary" id="continueToApp" href="/">Weiter zu smejj.com</a>
         </div>
 
-        <label class="auth-field" for="profileEmail">E-Mail<input id="profileEmail" type="email" autocomplete="email" placeholder="name@example.com"></label>
-        <input id="profileName" type="hidden" value="">
-        <div id="emailFormGroup" hidden>
-          <label class="auth-field" for="emailPassword">Passwort<input id="emailPassword" type="password" autocomplete="current-password" placeholder="Mindestens 10 Zeichen"></label>
-          <p class="auth-note auth-inline-note"><button type="button" class="auth-linkbutton" id="passwordResetLink">Passwort vergessen?</button></p>
-        </div>
-
-        <div class="auth-stack">
-          <button class="auth-button primary" id="emailLogin" type="button">Weiter</button>
-        </div>
-        <p class="auth-note">Wir fragen danach nur, was nötig ist: Passwort, Passkey oder Login-Link.</p>
-
-        <div class="auth-divider"><span>oder</span></div>
-
+        <!-- Express-Reihenfolge wie auf der Registrierungsseite (und wie bei
+             Claude/ChatGPT): 1-Klick-Wege zuerst, E-Mail darunter. Befund
+             2026-08-12: Login hatte als einzige Seite E-Mail zuerst. -->
+        <!-- Vier gleichwertige Zeilen (Bildschirm 4): "Alle Anmeldewege
+             untereinander, gleich hoch, gleich breit. Der E-Mail-Weg ist
+             einfach die vierte Zeile." Apple bleibt fail-closed versteckt
+             im DOM (auth-page.js blendet nur serverseitig Konfiguriertes ein). -->
         <div class="auth-stack" id="authProviders">
           <button class="auth-button secondary" id="googleLogin" type="button" data-method="google">
-            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.788 5.108a9 9 0 1 0 3.212 6.892h-8"/></svg></span>Mit Google anmelden
-          </button>
-          <button class="auth-button secondary" id="appleLogin" type="button" data-method="apple" hidden>
-            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.286 7.008c-3.216 0 -4.286 3.23 -4.286 5.92c0 3.229 2.143 8.072 4.286 8.072c1.165 -.05 1.799 -.538 3.214 -.538c1.406 0 1.607 .538 3.214 .538s4.286 -3.229 4.286 -5.381c-.03 -.011 -2.649 -.434 -2.679 -3.23c-.02 -2.335 2.589 -3.179 2.679 -3.228c-1.096 -1.606 -3.101 -1.643 -3.607 -1.643c-1.586 0 -2.607 .538 -3.214 .538c-.607 0 -1.607 -.538 -2.679 -.538z"/><path d="M12 4a2 2 0 0 0 2 -2a2 2 0 0 0 -2 2"/></svg></span>Mit Apple anmelden
-          </button>
-          <button class="auth-button secondary" id="githubLogin" type="button" data-method="github" hidden>
-            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6.1a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6.1c-.6 .6 -.6 1.2 -.5 2v3.5"/></svg></span>Mit GitHub anmelden
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.39 3.62v3h3.86c2.26-2.08 3.58-5.15 3.58-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.91l-3.86-3c-1.07.72-2.44 1.15-4.08 1.15-3.13 0-5.78-2.12-6.73-4.96H1.28v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.9 12c0-.79.14-1.56.37-2.28v-3.1H1.28a12 12 0 0 0 0 10.76l3.99-3.1z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.35.6 4.6 1.8l3.42-3.42A11.96 11.96 0 0 0 12 0 12 12 0 0 0 1.28 6.62l3.99 3.1C6.22 6.89 8.87 4.77 12 4.77z"/></svg></span>Mit Google fortfahren
           </button>
           <button class="auth-button secondary" id="passkeyLogin" type="button" data-method="passkey">
-            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.977a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.977a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0z"/><path d="M15 9h.01"/></svg></span>Mit Passkey anmelden
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.9 7a8 8 0 0 1 1.1 5v1a6 6 0 0 0 .8 3"/><path d="M8 11a4 4 0 0 1 8 0v1a10 10 0 0 0 2 6"/><path d="M12 11v2a14 14 0 0 0 2.5 8"/><path d="M8 15a18 18 0 0 0 1.8 6"/><path d="M4.9 19a22 22 0 0 1-.9-7v-1a8 8 0 0 1 12-6.95"/></svg></span>Mit Fingerabdruck fortfahren
           </button>
-          <button class="auth-button secondary" id="magicLinkLogin" type="button" data-method="magicLink" hidden>
-            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/></svg></span>Link per E-Mail schicken
+          <button class="auth-button secondary" id="githubLogin" type="button" data-method="github">
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.05 11.05 0 0 1 5.78 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.7 5.38-5.26 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg></span>Mit GitHub fortfahren
           </button>
+          <!-- Vierte Zeile = die E-Mail-Eingabe selbst (Mockup 4): cyan
+               umrandet, Platzhalter "Mit E-Mail fortfahren", Pfeil sendet.
+               #profileEmail bleibt DIE Adresse fuer auth-page.js. -->
+          <div class="auth-mailzeile" id="emailWeg">
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6l-6 6"/></svg></span>
+            <input id="profileEmail" type="email" autocomplete="email" placeholder="Mit E-Mail fortfahren" aria-label="E-Mail-Adresse">
+            <button class="auth-pfeil" id="emailPfeil" type="button" aria-label="Mit E-Mail fortfahren">↑</button>
+          </div>
+          <button class="auth-button secondary" id="appleLogin" type="button" data-method="apple" hidden>
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.286 7.008c-3.216 0 -4.286 3.23 -4.286 5.92c0 3.229 2.143 8.072 4.286 8.072c1.165 -.05 1.799 -.538 3.214 -.538c1.406 0 1.607 .538 3.214 .538s4.286 -3.229 4.286 -5.381c-.03 -.011 -2.649 -.434 -2.679 -3.23c-.02 -2.335 2.589 -3.179 2.679 -3.228c-1.096 -1.606 -3.101 -1.643 -3.607 -1.643c-1.586 0 -2.607 .538 -3.214 .538c-.607 0 -1.607 -.538 -2.679 -.538z"/><path d="M12 4a2 2 0 0 0 2 -2a2 2 0 0 0 -2 2"/></svg></span>Mit Apple fortfahren
+          </button>
+        </div>
+
+        <!-- Passwort/Login-Link klappen unter der vierten Zeile auf
+             (vier-zeilen.js): beim Pfeil-Klick, bei Fokus mit ?reset=/?email=
+             oder wenn auth-page.js das Passwortfeld selbst zeigt. -->
+        <div id="emailWegBlock" hidden>
+          <input id="profileName" type="hidden" value="">
+          <div id="emailFormGroup" hidden>
+            <label class="auth-field" for="emailPassword">Passwort<input id="emailPassword" type="password" autocomplete="current-password" placeholder="Mindestens 10 Zeichen"></label>
+            <p class="auth-note auth-inline-note"><button type="button" class="auth-linkbutton" id="passwordResetLink">Passwort vergessen?</button></p>
+          </div>
+          <div class="auth-stack">
+            <button class="auth-button primary" id="emailLogin" type="button">Weiter</button>
+            <button class="auth-button secondary" id="magicLinkLogin" type="button" data-method="magicLink" hidden>
+              <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/></svg></span>Link per E-Mail schicken
+            </button>
+          </div>
+          <p class="auth-note">Wir fragen danach nur, was nötig ist: Passwort, Passkey oder Login-Link.</p>
         </div>
 
         <p class="auth-status" id="profileOutput" role="status" aria-live="polite"></p><span id="sessionStatus" hidden></span>
-        <p class="auth-footer">Neu hier? <a href="/auth/register/">Konto erstellen</a></p>
+        <p class="auth-footer">Wir erkennen an deiner Adresse, ob du schon ein Konto hast.<br>Du musst dich nicht entscheiden.</p>
       </section>
-      <p class="auth-legal"><a href="/datenschutz.html">Datenschutz</a> · <a href="/impressum.html">Impressum</a></p>
+      <p class="auth-legal"><a href="/agb.html">Nutzungsbedingungen</a> · <a href="/datenschutz.html">Datenschutz</a> · <a href="/impressum.html">Impressum</a></p>
     </main>
-    <script type="module" src="/assets/frame-guard.js?v=1"></script>
-    <script type="module" src="/assets/auth/auth-page.js?v=google-fix-20260812"></script>
-    <script type="module" src="/assets/auth/passkey-ui.js"></script>
+    <script type="module" src="/frame-guard.js?v=1"></script>
+    <script type="module" src="/auth/auth-page.js?v=kontowechsel-20260813"></script>
+    <script type="module" src="/auth/passkey-ui.js"></script>
+    <script type="module" src="/auth/vier-zeilen.js?v=1"></script>
   </body>
 </html>

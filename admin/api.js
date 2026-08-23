@@ -27,7 +27,10 @@
   // Gleicher Schluessel wie assets/auth-page.js und assets/account-sessions.js —
   // wer sich auf smejj.com anmeldet, ist damit auch in der Konsole angemeldet.
   const TOKEN_KEY = "smejj.auth.accessToken.v1";
-  const CONTROL_ORIGIN = "https://smejj-control.zeabur.app";
+  // Eigene API-Domain (Betreiber-Freigabe 2026-08-23, Nutzerreise): die Konsole
+  // spricht api.smejj.com; die Zeabur-Adresse bleibt als zweiter Zugang gueltig.
+  const CONTROL_ORIGIN = "https://api.smejj.com";
+  const ALT_ORIGIN = "https://smejj-control.zeabur.app";
   const AKTIV_KEY = "smejj.admin.apiOrigin.aktiv.v1";
 
   let apiBasis = CONTROL_ORIGIN;
@@ -35,7 +38,7 @@
   (function () {
     try {
       sessionStorage.removeItem(AKTIV_KEY);
-      if (location.origin === CONTROL_ORIGIN) { apiBasis = ""; return; }
+      if (location.origin === CONTROL_ORIGIN || location.origin === ALT_ORIGIN) { apiBasis = ""; return; }
       const eigen = localStorage.getItem("smejj.apiOrigin.v1");
       if (eigen && /^https?:\/\//.test(eigen)) { apiBasis = eigen.replace(/\/+$/, ""); return; }
       apiBasis = CONTROL_ORIGIN;

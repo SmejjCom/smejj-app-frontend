@@ -20,7 +20,7 @@
          localStorage "smejj.apiOrigin.v1" auf die Zeabur-Adresse setzen.
          frame-ancestors fehlt absichtlich: In einer Meta-CSP ignorieren Browser die
          Angabe. Den Klickjacking-Schutz uebernimmt der Rahmenwaechter in app.js. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="theme-color" content="#f7f7f4">
     <meta name="description" content="smejj.com ist ein schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben.">
@@ -980,7 +980,7 @@
     <script src="/assets/profile-dock.js?v=b47" type="module"></script>
     <script src="/assets/chat-store.js?v=b61" type="module"></script>
     <script src="/assets/chat-history-view.js?v=b55" type="module"></script>
-    <script src="/assets/chat-actions.js?v=b34" type="module"></script>
+    <script src="/assets/chat-actions.js?v=b35" type="module"></script>
     <script src="/assets/chat-code-copy.js?v=zcode2-20260816" type="module"></script>
     <script src="/assets/chat-runter-pfeil.js?v=3" type="module"></script>
     <script src="/assets/chat-warte-reste.js?v=1" type="module"></script>

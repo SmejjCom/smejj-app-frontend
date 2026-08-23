@@ -9,7 +9,7 @@
 (function () {
   "use strict";
   const TOKEN_KEY = "smejj.auth.accessToken.v1";
-  const CONTROL = "https://smejj-control.zeabur.app";
+  const CONTROL = "https://api.smejj.com";
 
   const form = document.getElementById("supportForm");
   if (!form) return;

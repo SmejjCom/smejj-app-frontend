@@ -59,7 +59,8 @@
   // Ausliefern. Wuerde das Gate dort greifen, sperrte es rechtmaessig
   // angemeldete Betreiber aus einer Seite aus, die der Server ihnen gerade
   // bewusst gegeben hat.
-  var CONTROL_ORIGIN = "https://smejj-control.zeabur.app";
+  var CONTROL_ORIGIN = "https://api.smejj.com";
+  var ALT_ORIGIN = "https://smejj-control.zeabur.app";
 
   var wurzel = document.documentElement;
 
@@ -126,7 +127,7 @@
   // --- Ab hier laeuft das Gate ---------------------------------------------
 
   // Auf dem Control-Server hat der Server bereits entschieden: nichts tun.
-  if (location.origin === CONTROL_ORIGIN) {
+  if (location.origin === CONTROL_ORIGIN || location.origin === ALT_ORIGIN) {
     window.smejjAdminGate = { freigeben: function () {}, abweisen: function () {} };
     return;
   }

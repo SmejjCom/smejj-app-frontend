@@ -9,7 +9,10 @@
          frame-ancestors steht bewusst nicht hier — die Direktive wirkt nur als
          HTTP-Kopf, den GitHub Pages nicht setzen kann; dafuer gibt es
          frame-guard.js (siehe dort). -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; connect-src 'self' https://smejj-control.zeabur.app">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; connect-src 'self' https://api.smejj.com https://smejj-control.zeabur.app">
+    <meta name="theme-color" content="#101113">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="robots" content="noindex, nofollow">
     <title>Registrieren · smejj.com</title>
@@ -20,7 +23,362 @@
     <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
     <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="/assets/auth/auth.css?v=logo-20260725">
+    <link rel="stylesheet" href="/auth/auth.css?v=logo-20260812">
+  <style id="authInlineStyle">
+/* smejj.com — Anmelde-/Registrierungsseiten (Codex-Stil, Freigabe 2026-07-21).
+   Prinzip: eine Frage pro Schritt, grosse Knoepfe, kurze Wege.
+   Dunkles Design ist Standard (wie die App); helles Design folgt der
+   Systemeinstellung. Eigenstaendige Seiten ausserhalb des Start-Locks. */
+
+:root {
+  color-scheme: dark light;
+  --auth-bg: #0d0f12;
+  --auth-panel: #14171c;
+  --auth-ink: #ececf1;
+  --auth-muted: #9096a1;
+  --auth-line: #262a31;
+  --auth-line-strong: #343943;
+  --auth-accent: #2fd4c9;
+  --auth-primary-bg: #ececf1;
+  --auth-primary-ink: #101216;
+  --auth-error: #e5726f;
+  --auth-success: #5fe0c6;
+  --auth-focus: rgba(47, 212, 201, 0.45);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --auth-bg: #f7f8f9;
+    --auth-panel: #ffffff;
+    --auth-ink: #17191d;
+    --auth-muted: #6a7078;
+    --auth-line: #e1e4e8;
+    --auth-line-strong: #cfd4da;
+    --auth-accent: #0ea89f;
+    --auth-primary-bg: #17191d;
+    --auth-primary-ink: #ffffff;
+    --auth-error: #c93b3b;
+    --auth-success: #0a6c58;
+    --auth-focus: rgba(14, 168, 159, 0.35);
+  }
+}
+
+* { box-sizing: border-box; }
+
+/* Fail-closed-Sichtbarkeit: [hidden] gewinnt gegen jedes display der Komponenten
+   (nicht konfigurierte Login-Wege und das zugeklappte Passwortfeld bleiben unsichtbar). */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--auth-bg);
+  color: var(--auth-ink);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Marke oben links, wie in der App */
+.auth-brand {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 26px 32px;
+  color: var(--auth-ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.auth-brand-mark {
+  width: 26px;
+  height: 26px;
+  background: url("/icons/smejj_favicon.svg") center / contain no-repeat;
+  display: inline-flex;
+}
+
+/* Inhalt: Anmelde-Karte mit Cyan Light-Leak Rahmen-Beleuchtung */
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 32px 26px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(20, 23, 28, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(2, 253, 253, 0.35);
+  border-radius: 20px;
+  box-shadow: 
+    0 0 35px rgba(2, 253, 253, 0.35),
+    0 0 70px rgba(45, 212, 191, 0.18),
+    inset 0 0 15px rgba(2, 253, 253, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: "";
+  position: absolute;
+  top: -45px;
+  right: -45px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(2, 253, 253, 0.35) 0%, rgba(45, 212, 191, 0.08) 50%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.auth-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+.auth-eyebrow { display: none; }
+
+h1 {
+  font-size: 30px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.auth-subhead {
+  margin: 0 0 26px;
+  color: var(--auth-muted);
+  text-align: center;
+  font-size: 15px;
+}
+
+/* Felder */
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.auth-field input {
+  height: 46px;
+  border-radius: 10px;
+  border: 1px solid var(--auth-line-strong);
+  background: var(--auth-panel);
+  color: var(--auth-ink);
+  padding: 0 14px;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.auth-field input::placeholder { color: var(--auth-muted); }
+
+.auth-field input:focus-visible,
+.auth-button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--auth-focus);
+  outline-offset: 2px;
+}
+
+/* Knoepfe: alle gleich gross, volle Breite */
+.auth-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-button {
+  height: 46px;
+  width: 100%;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  border: 1px solid var(--auth-line-strong);
+  background: var(--auth-panel);
+  color: var(--auth-ink);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.auth-button:hover { border-color: var(--auth-accent); }
+
+.auth-button.primary {
+  background: var(--auth-primary-bg);
+  color: var(--auth-primary-ink);
+  border-color: transparent;
+}
+
+.auth-button.primary:hover { opacity: 0.92; }
+
+.auth-button:disabled { opacity: 0.55; cursor: default; }
+
+.auth-ic { display: inline-flex; flex: none; }
+
+/* Trennlinie "oder" */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--auth-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 22px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--auth-line);
+}
+
+/* Kurzer Hinweis unter dem Primaer-Knopf */
+.auth-note {
+  font-size: 12px;
+  color: var(--auth-muted);
+  text-align: center;
+  margin: 14px 0 0;
+}
+
+.auth-inline-note { text-align: left; margin: 0 0 12px; }
+.auth-inline-note a { color: var(--auth-accent); text-decoration: none; font-weight: 600; }
+
+/* "Passwort vergessen?" ist eine Aktion, kein Ziel — als <button> ausgezeichnet
+   (vorher <a href="#">, das ohne JavaScript ins Leere lief). Sieht unveraendert
+   aus, ist aber fuer Tastatur und Screenreader korrekt. */
+.auth-linkbutton {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--auth-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+.auth-linkbutton:focus-visible {
+  outline: 2px solid var(--auth-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Hinweis plus Weg zurueck in die App, wenn schon eine Sitzung besteht. */
+.auth-signedin {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+.auth-signedin .auth-note { margin: 0; }
+.auth-signedin .auth-button { text-decoration: none; }
+
+.auth-terms {
+  font-size: 12px;
+  color: var(--auth-muted);
+  text-align: center;
+  margin: 12px 0 0;
+}
+
+/* Status (Erfolg/Fehler) */
+.auth-status {
+  min-height: 20px;
+  margin: 14px 0 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.auth-status[data-tone="error"] { color: var(--auth-error); }
+.auth-status[data-tone="success"] { color: var(--auth-success); }
+
+/* Wechsel Anmelden/Registrieren */
+.auth-footer {
+  text-align: center;
+  margin: 24px 0 0;
+  color: var(--auth-muted);
+  font-size: 14px;
+}
+
+.auth-footer a {
+  color: var(--auth-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-legal {
+  text-align: center;
+  color: var(--auth-muted);
+  font-size: 12px;
+  padding: 26px 0 30px;
+  margin-top: auto;
+}
+
+/* Klickflaeche mindestens 24x24 px (F-21): "Datenschutz" und "Impressum" waren
+   71x14 bzw. 62x14 px. Nur die Flaeche waechst, das Schriftbild bleibt. */
+.auth-legal a {
+  color: var(--auth-muted);
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+/* Auch "Konto erstellen" / "Anmelden" in der Fusszeile (war 102x17 px). */
+.auth-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+/* Passwortstaerke (Registrierung) */
+.auth-strength {
+  display: flex;
+  gap: 6px;
+  margin: 2px 0 4px;
+}
+
+.auth-strength span {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--auth-line-strong);
+}
+
+.auth-strength[data-score="1"] span:nth-child(-n+1),
+.auth-strength[data-score="2"] span:nth-child(-n+2),
+.auth-strength[data-score="3"] span:nth-child(-n+3),
+.auth-strength[data-score="4"] span:nth-child(-n+4) { background: var(--auth-accent); }
+
+.auth-strength-note {
+  font-size: 12px;
+  color: var(--auth-muted);
+  margin: 0 0 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-button { transition: none; }
+}
+
+@media (max-width: 420px) {
+  .auth-brand { padding: 20px 20px; }
+  h1 { font-size: 26px; }
+}
+
+</style>
   </head>
   <body data-auth-mode="register">
     <main class="auth-shell">
@@ -66,10 +424,10 @@
         <p class="auth-status" id="profileOutput" role="status" aria-live="polite"></p><span id="sessionStatus" hidden></span>
         <p class="auth-footer">Schon registriert? <a href="/auth/login/">Anmelden</a></p>
       </section>
-      <p class="auth-legal"><a href="/datenschutz.html">Datenschutz</a> · <a href="/impressum.html">Impressum</a></p>
+      <p class="auth-legal"><a href="/agb.html">Nutzungsbedingungen</a> · <a href="/datenschutz.html">Datenschutz</a> · <a href="/impressum.html">Impressum</a></p>
     </main>
-    <script type="module" src="/assets/frame-guard.js?v=1"></script>
-    <script type="module" src="/assets/auth/auth-page.js?v=google-fix-20260812"></script>
-    <script type="module" src="/assets/auth/passkey-ui.js"></script>
+    <script type="module" src="/frame-guard.js?v=1"></script>
+    <script type="module" src="/auth/auth-page.js?v=kontowechsel-20260813"></script>
+    <script type="module" src="/auth/passkey-ui.js"></script>
   </body>
 </html>

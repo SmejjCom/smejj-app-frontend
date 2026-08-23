@@ -1,7 +1,7 @@
 // smejj.com — API-Origin: Standard ist der Zeabur-Control-Server. Die Origin
 // steht hier als Konstante und kann per localStorage "smejj.apiOrigin.v1"
 // uebersteuert werden (nur https; lokales HTTP nur fuer Loopback-Testserver).
-const DEFAULT_API_ORIGIN = "https://smejj-control.zeabur.app";
+const DEFAULT_API_ORIGIN = "https://api.smejj.com";
 
 function resolveApiOrigin() {
   const pageOrigin = String(globalThis.location?.origin || "").trim().replace(/\/+$/, "");
@@ -22,14 +22,16 @@ const API_PATHS = {
   // 100% Zeabur Primary Operating Path (Salad-Exit 2026-08-11):
   agent: "https://smejj-chat-bridge.zeabur.app/api/agent",
   chat: "https://smejj-chat-bridge.zeabur.app/api/chat",
-  agentFallback: "https://smejj-control.zeabur.app/api/agent",
-  chatFallback: "https://smejj-control.zeabur.app/api/chat",
+  agentFallback: "https://api.smejj.com/api/agent",
+  chatFallback: "https://api.smejj.com/api/chat",
   voiceStatus: "https://smejj-chat-bridge.zeabur.app/api/voice/status",
   voiceTts: "https://smejj-chat-bridge.zeabur.app/api/voice/tts",
   voiceTranscribe: "https://smejj-chat-bridge.zeabur.app/api/voice/transcribe",
   authConfig: "/api/auth/config",
   browserFetch: "/api/browser/fetch",
   browserRemote: "/api/browser/remote",
+  // Nur-Plan-Route der Maus: der Server plant und prueft, das Panel faehrt.
+  mausRun: "/api/maus/run",
   browserSession: "/api/browser/session",
   browserSessionAct: "/api/browser/session/act",
   browserSessionClose: "/api/browser/session/close",
@@ -68,7 +70,7 @@ export const CLIENT_ROUTES = {
 
 export const UI_COPY = {
   startup: "Hallo. Frag mich etwas, starte ein Projekt oder lass uns Code bauen.",
-  chatOffline: "Chat-Stream aktuell nicht erreichbar. Free-safe gestoppt: keine kostenpflichtigen Fallbacks gestartet.",
+  chatOffline: "smejj konnte gerade nicht antworten \u2014 die Verbindung steht nicht. Deine Frage steht noch im Feld, du musst nichts neu tippen. Probier es gleich noch einmal. (Es wurde nichts gestartet, das Geld kostet.)",
   testCommand: "pnpm run check",
   localOnly: "Diese Funktion ist in der Online-Version bewusst geschuetzt oder lokal gespeichert, damit keine versteckten Kosten und keine unsicheren Schreibzugriffe entstehen."
 };

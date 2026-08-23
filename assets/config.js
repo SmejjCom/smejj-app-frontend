@@ -1,7 +1,7 @@
 // smejj.com — API-Origin: Standard ist der Zeabur-Control-Server. Die Origin
 // steht hier als Konstante und kann per localStorage "smejj.apiOrigin.v1"
 // uebersteuert werden (nur https; lokales HTTP nur fuer Loopback-Testserver).
-const DEFAULT_API_ORIGIN = "https://smejj-control.zeabur.app";
+const DEFAULT_API_ORIGIN = "https://api.smejj.com";
 
 function resolveApiOrigin() {
   const pageOrigin = String(globalThis.location?.origin || "").trim().replace(/\/+$/, "");
@@ -22,8 +22,8 @@ const API_PATHS = {
   // 100% Zeabur Primary Operating Path (Salad-Exit 2026-08-11):
   agent: "https://smejj-chat-bridge.zeabur.app/api/agent",
   chat: "https://smejj-chat-bridge.zeabur.app/api/chat",
-  agentFallback: "https://smejj-control.zeabur.app/api/agent",
-  chatFallback: "https://smejj-control.zeabur.app/api/chat",
+  agentFallback: "https://api.smejj.com/api/agent",
+  chatFallback: "https://api.smejj.com/api/chat",
   voiceStatus: "https://smejj-chat-bridge.zeabur.app/api/voice/status",
   voiceTts: "https://smejj-chat-bridge.zeabur.app/api/voice/tts",
   voiceTranscribe: "https://smejj-chat-bridge.zeabur.app/api/voice/transcribe",

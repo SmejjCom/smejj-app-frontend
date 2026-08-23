@@ -42,7 +42,7 @@ import { groundingFor } from "/assets/browser-context.js";
 // Warteschlange aus demselben Modul haette es zerrissen. Gleiche Falle wie bei
 // settings-runtime.js in sw v184/v185.
 import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=blitz-20260726";
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=b61";
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=b59";
 import { showToast } from "/assets/components.js?v=b48";
 
 const SETTLE_MS = 900;
@@ -580,7 +580,7 @@ function moveMenuFocus(step) {
 // auth-gate.js (TOKEN) und hilfe-support.js (CONTROL) — bewusst dieselben
 // Konstanten, damit ein Schluesselwechsel alle drei Stellen gemeinsam findet.
 const FEEDBACK_TOKEN_KEY = "smejj.auth.accessToken.v1";
-const FEEDBACK_URL = "https://smejj-control.zeabur.app/api/feedback";
+const FEEDBACK_URL = "https://api.smejj.com/api/feedback";
 
 function sendeDaumenSignal(entry, richtung) {
   try {

@@ -29,7 +29,7 @@ export const DIENSTE = Object.freeze([
     // Seit dem Zeabur-Umzug melden sich Nutzer HIER an — die alte Salad-Adresse
     // zu messen war eine Falschmessung: sie haette "laeuft" gezeigt, selbst wenn
     // der echte Anmelde-Server tot ist (korrigiert 2026-08-13, Salad-Abschaltung).
-    url: "https://smejj-control.zeabur.app/api/health",
+    url: "https://api.smejj.com/api/health",
     kritisch: true
   },
   {
@@ -52,7 +52,7 @@ export const DIENSTE = Object.freeze([
     // keine oeffentliche Domain, darum misst dieser Eintrag das Gesundheits-Relay
     // am Control: der pingt den Worker intern (/health, kein Render, kein Token)
     // und uebersetzt in 200/503. Salad-loganberry ist damit messfrei und stoppbar.
-    url: "https://smejj-control.zeabur.app/api/browser/remote/health",
+    url: "https://api.smejj.com/api/browser/remote/health",
     kritisch: false
   }
 ]);
@@ -158,7 +158,14 @@ if (typeof document !== "undefined" && document.querySelector("#statusListe")) {
   document.querySelector("#statusErneut")?.addEventListener("click", () => statusAktualisieren());
   // Alle 60 Sekunden von selbst nachsehen, aber nur solange der Reiter sichtbar
   // ist — im Hintergrund fragt niemand ins Leere.
-  setInterval(() => {
+  const takt = setInterval(() => {
     if (document.visibilityState === "visible") statusAktualisieren();
   }, 60000);
+  // Beim Verlassen der Seite abraeumen. Ohne das laeuft der Takt im
+  // Zurueck-Vorwaerts-Zwischenspeicher (bfcache) weiter: Safari und Chrome
+  // frieren eine verlassene Seite ein, statt sie zu verwerfen — sie kann
+  // Minuten spaeter reaktiviert werden und haette dann zwei Takte. "pagehide"
+  // ist der Ereignisname, der dabei zuverlaessig feuert; "unload" verhindert
+  // die Zwischenspeicherung sogar.
+  window.addEventListener("pagehide", () => clearInterval(takt));
 }

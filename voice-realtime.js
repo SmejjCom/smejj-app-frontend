@@ -5,7 +5,7 @@
 // mit minimaler Latenz (< 300 ms) wieder — exakt wie ChatGPT Advanced Voice Mode.
 
 export function createRealtimeAudioSession({
-  wsUrl = "wss://smejj-control.zeabur.app/api/voice-realtime",
+  wsUrl = "wss://api.smejj.com/api/voice-realtime",
   onAudioStart,
   onAudioChunk,
   onAudioEnd,
