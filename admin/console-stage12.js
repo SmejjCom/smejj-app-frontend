@@ -18,9 +18,15 @@
     });
   }
 
+  // Die Regeln brauchen keinen Server: sie sind Text aus den eigenen Vorfaellen.
+  async function ladenRegeln(ctx) {
+    ctx.zeichne(S.regeln());
+  }
+
   window.adminStage12 = {
     seiten: {
-      auslieferung: { id: "AL", gruppe: "Betrieb", name: "Auslieferung", laden: laden }
+      auslieferung: { id: "AL", gruppe: "Betrieb", name: "Auslieferung", laden: laden },
+      regeln: { id: "RG", gruppe: "Überblick", name: "Regeln", laden: ladenRegeln }
     }
   };
 })();

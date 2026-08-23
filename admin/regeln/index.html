@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<!-- Die Konsole wird an zwei Orten ausgeliefert: statisch von smejj.com/admin
+     (GitHub Pages setzt KEINE Kopfzeilen — deshalb steht die Regel hier im
+     Markup) und vom Control-Server (der zusaetzlich seine eigene Kopfzeile
+     setzt; es gilt dann die Schnittmenge, und die ist dieselbe).
+     connect-src listet den Control-Server, weil die Konsole von smejj.com aus
+     fremde Herkunft anspricht. WER DIE API-ADRESSE AENDERT, MUSS SIE HIER
+     EINTRAGEN — sonst blockiert der Browser jede Abfrage. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://smejj-control.zeabur.app; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<title>smejj.com — Operations Console</title>
+<link rel="stylesheet" href="/admin/console.css">
+<!-- Tuersteher: verbirgt die Huelle und leitet Abgemeldete zur Anmeldung.
+     MUSS im <head> stehen und ohne defer laden, sonst blitzt der Adminbereich
+     kurz auf, bevor umgeleitet wird. Siehe gate.js fuer den Befund. -->
+<script src="/admin/gate.js"></script>
+<!-- Klickjacking-Schutz. MUSS mit, weil GitHub Pages keine eigenen Kopfzeilen
+     setzen kann und frame-ancestors in einer meta-CSP wirkungslos ist. Auf dem
+     Control-Server faengt stattdessen dessen Kopfzeile x-frame-options: DENY.
+     Befund 2026-08-14: das Modul gab es laengst, hing aber nur an 3 von 12
+     Seiten — der Adminbereich war NICHT dabei. -->
+<script type="module" src="/frame-guard.js?v=1"></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="rail-brand">
+      <div class="mark"><div class="dot"></div><b>smejj.com</b></div>
+      <div class="sub">Operations Console</div>
+    </div>
+    <div class="rail-env"><span class="live"></span> <span id="umgebung">Produktion</span></div>
+    <nav class="rail-nav" id="nav"></nav>
+    <div class="rail-foot">
+      <div class="rail-user">
+        <div class="av" id="akteurKuerzel">··</div>
+        <div><div class="nm" id="akteurName">wird geladen …</div><div class="rl" id="akteurRolle">—</div></div>
+      </div>
+      <div class="pill acc" id="stufe">Stufe 2 · nur lesend</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb">Operations Console · <b id="crumb">Übersicht</b></div>
+      <div class="spacer"></div>
+      <div class="pill" id="indexStand">Index —</div>
+      <div class="pill" id="ketteStand">Kette —</div>
+    </header>
+    <div id="seite"></div>
+  </div>
+</div>
+
+<script src="/admin/dialog.js"></script>
+<script src="/admin/api.js"></script>
+<script src="/admin/views.js"></script>
+<script src="/admin/views-stage4.js"></script>
+<script src="/admin/console-stage4.js"></script>
+<script src="/admin/views-stage5.js"></script>
+<script src="/admin/console-stage5.js"></script>
+<script src="/admin/views-stage6.js"></script>
+<script src="/admin/console-stage6.js"></script>
+<script src="/admin/views-stage7.js"></script>
+<script src="/admin/console-stage7.js"></script>
+<script src="/admin/views-stage8.js"></script>
+<script src="/admin/console-stage8.js"></script>
+<script src="/admin/views-stage9.js"></script>
+<script src="/admin/console-stage9.js"></script>
+    <script src="/admin/views-cockpit.js"></script>
+    <script src="/admin/console-cockpit.js"></script>
+    <script src="/admin/views-stage10.js"></script>
+    <script src="/admin/console-stage10.js"></script>
+<script src="/admin/views-stage11.js"></script>
+<script src="/admin/console-stage11.js"></script>
+<script src="/admin/views-stage12.js"></script>
+<script src="/admin/console-stage12.js"></script>
+<script src="/admin/console.js"></script>
+</body>
+</html>
