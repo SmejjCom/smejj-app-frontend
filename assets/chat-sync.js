@@ -47,7 +47,7 @@ async function meldeAbweisung(kennung, status, grund) {
   abgewiesen.add(kennung);
   try {
     const { showToast } = await import("/assets/components.js?v=b48");
-    const { istZuGross } = await import("./chat-medien-rettung.js?v=4").catch(() => ({ istZuGross: () => false }));
+    const { istZuGross } = await import("./chat-medien-rettung.js?v=5").catch(() => ({ istZuGross: () => false }));
     const text = istZuGross(status, grund)
       ? "Ein Chat ist zu gross und wurde NICHT gesichert — er bleibt nur auf diesem Geraet."
       : `Ein Chat konnte nicht gesichert werden (${status}${grund ? `: ${grund}` : ""}) — er bleibt nur auf diesem Geraet.`;
@@ -177,7 +177,7 @@ async function rette(id) {
     const s = store();
     if (!s?.getChat || !s?.importChat) return false;
     const [{ rettteUndSpeichere }, { lagereMedienAusText }] = await Promise.all([
-      import("./chat-medien-rettung.js?v=4"),
+      import("./chat-medien-rettung.js?v=5"),
       import("./chat-medien.js?v=2")
     ]);
     const ergebnis = await rettteUndSpeichere(id, {
@@ -200,7 +200,7 @@ async function bestandAufraeumen() {
     const s = store();
     if (!s?.listChats || !s?.getChat || !s?.importChat) return;
     const [{ raeumeBestandAuf }, { lagereMedienAusText }] = await Promise.all([
-      import("./chat-medien-rettung.js?v=4"),
+      import("./chat-medien-rettung.js?v=5"),
       import("./chat-medien.js?v=2")
     ]);
     const ergebnis = await raeumeBestandAuf({
@@ -241,7 +241,7 @@ async function push() {
       // ist die Pruefung in istZuGross zustaendig, nicht die Statusklasse.
       const rohgrund = antwort.status >= 400 ? await grundAus(antwort) : "";
       const grossFehler = antwort.status >= 400 && antwort.status < 500;
-      const { istZuGross } = await import("./chat-medien-rettung.js?v=4").catch(() => ({ istZuGross: () => false }));
+      const { istZuGross } = await import("./chat-medien-rettung.js?v=5").catch(() => ({ istZuGross: () => false }));
       if (grossFehler || istZuGross(antwort.status, rohgrund)) {
         const grund = rohgrund;
         // "Zu gross" ist der EINZIGE 4xx-Grund, den wir selbst beheben

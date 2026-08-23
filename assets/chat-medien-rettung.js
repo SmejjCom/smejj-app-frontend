@@ -213,10 +213,44 @@ export async function rettteWert(wert, { auslagern, karte = new Map() }) {
  *
  * @returns {Promise<{gerettet: boolean, vorher: number, nachher: number, ersetzt: number, gescheitert: number}>}
  */
+/**
+ * Ein geretteter Chat braucht einen neuen Zeitstempel — sonst kommt er nie an.
+ *
+ * BEFUND AUS DEM LIVE-TEST 2026-08-23: Die Rettung lief, der Chat schrumpfte
+ * lokal von 466 KB auf 2 KB — und auf dem Server blieb er 466 KB gross. Der
+ * Grund steht in speichereChat (chatSyncStore.js): bei GLEICHEM `updatedAt`
+ * wird uebersprungen ("server_ist_neuer"). Fuer die zu grossen Chats fiel das
+ * nicht auf, weil die serverseitig gar nicht oder nur in einem aelteren Stand
+ * lagen. Die grenznahen liegen dort aber mit EXAKT demselben Zeitstempel — der
+ * geheilte Stand wurde jedes Mal stillschweigend verworfen.
+ *
+ * `updatedAt` traegt naemlich zwei Bedeutungen, die hier auseinanderfallen:
+ * "zuletzt vom Nutzer bearbeitet" (danach sortiert die Verlauf-Ansicht) und
+ * "zuletzt geaendert" (danach entscheidet der Sync). Eine Rettung aendert das
+ * Zweite, nicht das Erste.
+ *
+ * EINE MILLISEKUNDE loest beides: der Sync sieht einen neueren Stand, die
+ * Sortierung bleibt, wo sie war — die Nachbarn im Verlauf liegen Stunden bis
+ * Tage entfernt. Bewusst nicht `new Date()`: das waere ein Sprung von Tagen
+ * und wuerde einen Monate alten Chat an die Spitze der Liste heben, obwohl
+ * niemand ihn angefasst hat.
+ */
+export function naechsterZeitstempel(updatedAt) {
+  const ms = Date.parse(String(updatedAt || ""));
+  if (Number.isNaN(ms)) return updatedAt;
+  return new Date(ms + 1).toISOString();
+}
+
 export async function rettteChat(chat, { auslagern, grenze = MAX_CHAT_BYTES }) {
   const vorher = groesseInBytes(chat);
   const karte = new Map();
   const { wert, ersetzt, gescheitert } = await rettteWert(chat, { auslagern, karte });
+  // Nur wenn wirklich etwas ersetzt wurde: ein unveraenderter Chat darf keinen
+  // frischen Zeitstempel bekommen, sonst schoebe jeder Leerlauf den ganzen
+  // Verlauf durcheinander.
+  if (ersetzt > 0 && wert && typeof wert === "object" && wert.updatedAt) {
+    wert.updatedAt = naechsterZeitstempel(wert.updatedAt);
+  }
   const nachher = groesseInBytes(wert);
   return { chat: wert, gerettet: nachher <= grenze && ersetzt > 0, vorher, nachher, ersetzt, gescheitert };
 }
