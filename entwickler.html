@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="de" class="p-recht p-entwickler">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' https://smejj-control.zeabur.app https://api.smejj.com http://localhost:* http://127.0.0.1:*">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="theme-color" content="#101113">
+    <meta name="description" content="Die smejj-API einbinden: Basis-URL, Modellname und ein eigener Schlüssel. OpenAI-kompatibel, funktioniert in ZCode, Cline, Cursor und jedem OpenAI-SDK.">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://smejj.com/entwickler">
+    <title>Entwickler – smejj.com API</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <!-- Bewusst OHNE eigene Favicon-Verweise: der Favicon-Lock friert die
+         Verweise JEDER HTML-Seite unter public/ ein, und eine neue Seite mit
+         eigenen Verweisen bricht ihn. Der Browser holt /favicon.ico von sich
+         aus — die Seite sieht im Tab genauso aus, der Lock bleibt unberuehrt. -->
+    <link rel="stylesheet" href="/assets/static-pages.css">
+    <link rel="stylesheet" href="/assets/entwickler.css?v=1">
+    <script type="module" src="/assets/frame-guard.js?v=1"></script>
+    <script type="module" src="/assets/entwickler.js?v=1"></script>
+  </head>
+  <body>
+    <main>
+      <a class="legal-brand" href="/" aria-label="smejj.com Startseite">
+        <img src="/icons/smejj_icon.svg" alt="smejj.com" width="2000" height="1532">
+      </a>
+      <h1>Die smejj-API einbinden</h1>
+      <p class="hilfe-vorspann">
+        smejj spricht das OpenAI-Protokoll. Wer schon ein Werkzeug hat, das mit
+        OpenAI redet — ZCode, Cline, Cursor, das offizielle SDK —, trägt drei
+        Angaben ein und ist fertig. Es braucht keine eigene Bibliothek.
+      </p>
+
+      <h2 id="drei-angaben">Die drei Angaben</h2>
+      <div class="card">
+        <p><strong>Basis-URL:</strong> <code data-dev="basis-url">https://smejj.com/v1</code></p>
+        <p><strong>Modell:</strong> <code>smejj-1.0</code></p>
+        <p><strong>API-Schlüssel:</strong> unten erzeugen (beginnt mit <code>smejj-live-</code>)</p>
+      </div>
+
+      <h2 id="meine-schluessel">Meine Schlüssel</h2>
+      <div class="card">
+        <p class="dev-meldung" data-dev="meldung" role="status" aria-live="polite">Wird geladen …</p>
+
+        <div class="dev-neuer-key" data-dev="neuer-key" hidden>
+          <p><strong>Einmalige Anzeige.</strong> Kopieren Sie den Schlüssel jetzt — er wird
+            nie wieder angezeigt. Gespeichert ist bei uns nur sein Prüfwert, nicht er selbst.</p>
+          <p><code data-dev="neuer-key-wert"></code></p>
+          <button type="button" class="dev-knopf" data-dev="kopieren">Kopieren</button>
+        </div>
+
+        <ul class="dev-key-liste" data-dev="liste"></ul>
+
+        <form class="dev-feld" data-dev="form">
+          <label class="visually-hidden" for="devKeyName">Name des Schlüssels</label>
+          <input type="text" id="devKeyName" name="name" maxlength="60" placeholder="Wofür? z. B. ZCode auf dem Laptop">
+          <button type="submit" class="dev-knopf" data-dev="erzeugen">Neuen Schlüssel erzeugen</button>
+        </form>
+      </div>
+
+      <h2 id="verbrauch">Verbrauch heute</h2>
+      <div class="card">
+        <div class="dev-verbrauch">
+          <span><strong data-dev="v-anfragen">0</strong> Anfragen</span>
+          <span><strong data-dev="v-tokens">0</strong> Token gesamt</span>
+          <span><strong data-dev="v-eingabe">0</strong> Eingabe</span>
+          <span><strong data-dev="v-ausgabe">0</strong> Ausgabe</span>
+        </div>
+        <p>Der Zähler setzt täglich um 00:00 UTC zurück.</p>
+      </div>
+
+      <h2 id="beispiel">Beispiel</h2>
+      <div class="card">
+        <p>Mit <code>curl</code>:</p>
+        <pre class="dev-code"><code>curl <span data-dev="basis-url-2">https://smejj.com/v1</span>/chat/completions \
+  -H "Authorization: Bearer smejj-live-…" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"smejj-1.0","messages":[{"role":"user","content":"Hallo"}]}'</code></pre>
+        <p>Mit dem OpenAI-SDK (Python):</p>
+        <pre class="dev-code"><code>from openai import OpenAI
+client = OpenAI(base_url="<span data-dev="basis-url-3">https://smejj.com/v1</span>", api_key="smejj-live-…")
+antwort = client.chat.completions.create(
+    model="smejj-1.0",
+    messages=[{"role": "user", "content": "Hallo"}],
+)
+print(antwort.choices[0].message.content)</code></pre>
+      </div>
+
+      <h2 id="modelle">Modelle</h2>
+      <div class="card">
+        <p><code>smejj-1.0</code> — Allzweck, die Voreinstellung.</p>
+        <p><code>smejj-1.0-fast</code> — kurze Antwortzeit für knappe Fragen.</p>
+        <p><code>smejj-1.0-code</code> — Programmieren, tiefe Spur.</p>
+        <p><code>smejj-1.0-reasoning</code> — mehrschrittiges Denken.</p>
+        <p>Welches Modell dahinter rechnet, entscheidet smejj und kann sich ändern —
+          Ihr Aufruf bleibt gleich.</p>
+      </div>
+
+      <h2 id="grenzen">Grenzen</h2>
+      <div class="card">
+        <p>60 Anfragen Vorrat je Konto, eine pro Sekunde kommt zurück (HTTP 429 mit
+          <code>Retry-After</code>, wenn er leer ist).</p>
+        <p>Tageskontingent je Konto in Token; bei Erreichen antwortet die API mit
+          <code>429 daily_quota_exceeded</code>.</p>
+        <p>Unterstützt: <code>stream</code>, <code>temperature</code>, <code>max_tokens</code>,
+          <code>tools</code>, <code>tool_choice</code>, <code>response_format</code>.</p>
+      </div>
+    </main>
+  </body>
+</html>
