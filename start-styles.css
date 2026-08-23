@@ -5762,3 +5762,24 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (prefers-reduced-motion: reduce) {
   .send-button.ist-stopp { animation: none; }
 }
+#startLog .chat-denken { margin: 0; }
+#startLog .chat-denken-titel { border-radius: 0 !important; }
+#startLog .chat-denken[data-fertig="true"] .chat-denken-titel { opacity: 0.9; }
+#startLog .chat-denken:not([data-fertig="true"]) .chat-denken-titel {
+  animation: chat-schritt-puls 1.4s ease-in-out infinite;
+}
+#startLog .chat-denken-text {
+  margin: 6px 0 4px 4px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(242, 245, 244, 0.55);
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 320px;
+  overflow-y: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  #startLog .chat-denken-titel { animation: none; }
+}

@@ -450,6 +450,68 @@ export function starteWartesignal(output, {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Denk-Zeile (Betreiber 2026-08-23, Vorbild Antigravity "Thought for 1s ›"):
+// Denk-Text des Modells (delta.reasoning_content) gehoert NICHT in die
+// Antwort. Bis hierher wurde er schlicht an output.textContent gehaengt — die
+// Antwort begann mit dem Selbstgespraech des Modells. Jetzt landet er in einer
+// eingeklappten Zeile in der Schrittliste: "Denkt …" solange er kommt,
+// "Dachte 3 s ›" sobald der erste Antworttext da ist; Aufklappen zeigt den Text.
+// Viereckig, gedaempft, ohne Farbe — wie die uebrigen Schrittzeilen.
+
+function findeDenkZeile(output) {
+  const liste = findeSchrittListe(output);
+  if (!liste) return null;
+  for (const kind of liste.children || []) {
+    if (kind.dataset?.denken === "true") return kind;
+  }
+  return null;
+}
+
+/**
+ * Haengt Denk-Text an die Denk-Zeile an (legt sie beim ersten Stueck an).
+ * @param {HTMLElement} output Antwort-Knoten (die Zeile kommt davor).
+ * @param {string} text Ein Stueck Denk-Text.
+ * @param {() => number} [jetzt] Zeitquelle (fuer Tests einspeisbar).
+ */
+export function zeigeDenken(output, text, jetzt = () => Date.now()) {
+  if (!text || typeof document === "undefined") return null;
+  let zeile = findeDenkZeile(output);
+  if (!zeile) {
+    const liste = schrittListe(output);
+    if (!liste) return null;
+    zeile = document.createElement("details");
+    zeile.className = "chat-schritte-falte chat-denken";
+    zeile.dataset.denken = "true";
+    zeile.dataset.beginn = String(jetzt());
+    const titel = document.createElement("summary");
+    titel.className = "chat-schritte-titel chat-denken-titel";
+    titel.textContent = "Denkt …";
+    const inhalt = document.createElement("div");
+    inhalt.className = "chat-denken-text";
+    zeile.append(titel, inhalt);
+    liste.append(zeile);
+  }
+  const inhalt = zeile.lastElementChild || zeile.children?.[zeile.children.length - 1];
+  if (inhalt) inhalt.textContent += text;
+  return zeile;
+}
+
+/**
+ * Schliesst die Denk-Zeile ab: "Dachte N s". Mehrfach aufrufbar, wirkt einmal.
+ * @param {HTMLElement} output Antwort-Knoten.
+ * @param {() => number} [jetzt] Zeitquelle.
+ */
+export function beendeDenken(output, jetzt = () => Date.now()) {
+  const zeile = findeDenkZeile(output);
+  if (!zeile || zeile.dataset.fertig === "true") return null;
+  zeile.dataset.fertig = "true";
+  const sekunden = Math.max(1, Math.round((jetzt() - Number(zeile.dataset.beginn || jetzt())) / 1000));
+  const titel = zeile.firstElementChild || zeile.children?.[0];
+  if (titel) titel.textContent = `Dachte ${sekunden} s`;
+  return zeile;
+}
+
 /**
  * Der Wartetext ("smejj denkt nach ...") steht als innerHTML im Antwort-Knoten
  * und muss weg, sobald echter Text kommt — sonst klebt die Antwort daran.
@@ -684,7 +746,13 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
           continue;
         }
         const delta = payload.choices?.[0]?.delta;
-        output.textContent += delta?.content || delta?.reasoning_content || "";
+        // Denk-Text in die Denk-Zeile, Antwort-Text in die Blase — nie beides
+        // in die Blase (so stand das Selbstgespraech vor der Antwort).
+        if (delta?.reasoning_content) zeigeDenken(output, delta.reasoning_content);
+        if (delta?.content) {
+          beendeDenken(output);
+          output.textContent += delta.content;
+        }
       } catch {
         output.textContent += text;
       }
@@ -702,10 +770,13 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
     wache.beenden();
     aktiveLeser.delete(reader);
     meldeStromstand();
+    // Auch bei Abriss oder Stopp: "Denkt …" darf nicht ewig stehen bleiben.
+    beendeDenken(output);
   }
   // Auch wenn der Strom ohne ein einziges Ereignis endet: das Signal muss weg.
   stoppeWartesignal();
   clearThinkingState(output);
+  beendeDenken(output);
   // Der Weg ist mitten in der Arbeit verstummt (gemessen 2026-08-17 an einem
   // haengenden Video-Auftrag). Ehrlich sagen statt endlos "läuft" zeigen —
   // und die bisherige Teilantwort behalten, sie ist nicht falsch.

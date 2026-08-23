@@ -9,6 +9,7 @@
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
 import { fetchStreamWithRetry } from "./fetch-retry.js";
+import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js";
 import { frageLokal, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js";
 
 // Gleicher Schluessel wie in auth/auth-page.js, account-sessions.js und
@@ -449,6 +450,68 @@ export function starteWartesignal(output, {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Denk-Zeile (Betreiber 2026-08-23, Vorbild Antigravity "Thought for 1s ›"):
+// Denk-Text des Modells (delta.reasoning_content) gehoert NICHT in die
+// Antwort. Bis hierher wurde er schlicht an output.textContent gehaengt — die
+// Antwort begann mit dem Selbstgespraech des Modells. Jetzt landet er in einer
+// eingeklappten Zeile in der Schrittliste: "Denkt …" solange er kommt,
+// "Dachte 3 s ›" sobald der erste Antworttext da ist; Aufklappen zeigt den Text.
+// Viereckig, gedaempft, ohne Farbe — wie die uebrigen Schrittzeilen.
+
+function findeDenkZeile(output) {
+  const liste = findeSchrittListe(output);
+  if (!liste) return null;
+  for (const kind of liste.children || []) {
+    if (kind.dataset?.denken === "true") return kind;
+  }
+  return null;
+}
+
+/**
+ * Haengt Denk-Text an die Denk-Zeile an (legt sie beim ersten Stueck an).
+ * @param {HTMLElement} output Antwort-Knoten (die Zeile kommt davor).
+ * @param {string} text Ein Stueck Denk-Text.
+ * @param {() => number} [jetzt] Zeitquelle (fuer Tests einspeisbar).
+ */
+export function zeigeDenken(output, text, jetzt = () => Date.now()) {
+  if (!text || typeof document === "undefined") return null;
+  let zeile = findeDenkZeile(output);
+  if (!zeile) {
+    const liste = schrittListe(output);
+    if (!liste) return null;
+    zeile = document.createElement("details");
+    zeile.className = "chat-schritte-falte chat-denken";
+    zeile.dataset.denken = "true";
+    zeile.dataset.beginn = String(jetzt());
+    const titel = document.createElement("summary");
+    titel.className = "chat-schritte-titel chat-denken-titel";
+    titel.textContent = "Denkt …";
+    const inhalt = document.createElement("div");
+    inhalt.className = "chat-denken-text";
+    zeile.append(titel, inhalt);
+    liste.append(zeile);
+  }
+  const inhalt = zeile.lastElementChild || zeile.children?.[zeile.children.length - 1];
+  if (inhalt) inhalt.textContent += text;
+  return zeile;
+}
+
+/**
+ * Schliesst die Denk-Zeile ab: "Dachte N s". Mehrfach aufrufbar, wirkt einmal.
+ * @param {HTMLElement} output Antwort-Knoten.
+ * @param {() => number} [jetzt] Zeitquelle.
+ */
+export function beendeDenken(output, jetzt = () => Date.now()) {
+  const zeile = findeDenkZeile(output);
+  if (!zeile || zeile.dataset.fertig === "true") return null;
+  zeile.dataset.fertig = "true";
+  const sekunden = Math.max(1, Math.round((jetzt() - Number(zeile.dataset.beginn || jetzt())) / 1000));
+  const titel = zeile.firstElementChild || zeile.children?.[0];
+  if (titel) titel.textContent = `Dachte ${sekunden} s`;
+  return zeile;
+}
+
 /**
  * Der Wartetext ("smejj denkt nach ...") steht als innerHTML im Antwort-Knoten
  * und muss weg, sobald echter Text kommt — sonst klebt die Antwort daran.
@@ -499,6 +562,23 @@ export async function readableError(response, offlineNotice = "") {
 // meldet die Zahl laufender Stroeme an die Oberflaeche (Stopp-Knopf).
 const aktiveLeser = new Set();
 
+/**
+ * Ein abgerissener Bild-/Video-Strom hinterlaesst ein `![...](data:...`-Markdown
+ * ohne schliessende Klammer — dann steht 100+ KB base64 als Rohtext im Chat
+ * (live gesehen 2026-08-13 bei einem Bruecken-Neustart mitten im Malen).
+ * Das Fragment wird abgeschnitten und durch einen verstaendlichen Satz ersetzt.
+ */
+export function entferneAbgerisseneMedien(text) {
+  const roh = String(text || "");
+  const start = roh.lastIndexOf("![");
+  if (start === -1) return roh;
+  const rest = roh.slice(start);
+  const klammer = rest.indexOf("](data:");
+  if (klammer === -1 || rest.indexOf(")", klammer) !== -1) return roh;
+  const art = rest.slice(klammer).startsWith("](data:video") ? "Video" : "Bild";
+  return `${roh.slice(0, start).trimEnd()}\n\nDie ${art}-Übertragung ist abgerissen — bitte fordere es einfach noch einmal an.`;
+}
+
 function meldeStromstand() {
   try {
     window.dispatchEvent(new CustomEvent("smejj:chat-strom", { detail: { laufen: aktiveLeser.size } }));
@@ -527,26 +607,7 @@ export function stoppeChatStrom() {
 // ("läuft … 40 s"), ein Modell streamt ohnehin laufend. Wer 90 Sekunden lang
 // gar nichts sagt, sagt nichts mehr. Kurzer gewaehlt wuerde ein langsames
 // Modell abgewuergt.
-const STILLE_GRENZE_MS = 90_000;
 
-function starteStilleWache(reader, beiStille) {
-  let uhr = null;
-  let ausgeloest = false;
-  const neuStellen = () => {
-    clearTimeout(uhr);
-    uhr = setTimeout(() => {
-      ausgeloest = true;
-      beiStille();
-      try { reader.cancel(); } catch { /* Strom war schon zu */ }
-    }, STILLE_GRENZE_MS);
-  };
-  neuStellen();
-  return {
-    lebenszeichen: neuStellen,
-    beenden: () => clearTimeout(uhr),
-    get hatZugeschlagen() { return ausgeloest; }
-  };
-}
 
 /**
  * STUFE 0 — das Modell im Browser des Nutzers, vor jedem Netzaufruf.
@@ -685,31 +746,46 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
           continue;
         }
         const delta = payload.choices?.[0]?.delta;
-        output.textContent += delta?.content || delta?.reasoning_content || "";
+        // Denk-Text in die Denk-Zeile, Antwort-Text in die Blase — nie beides
+        // in die Blase (so stand das Selbstgespraech vor der Antwort).
+        if (delta?.reasoning_content) zeigeDenken(output, delta.reasoning_content);
+        if (delta?.content) {
+          beendeDenken(output);
+          output.textContent += delta.content;
+        }
       } catch {
         output.textContent += text;
       }
     }
     output.scrollIntoView({ block: "end" });
   }
+  } catch (abriss) {
+    // Netzabbruch mitten im Bild-/Video-Strom: ohne Saeuberung stuenden hier
+    // 100+ KB base64-Rohtext in der Blase.
+    output.textContent = entferneAbgerisseneMedien(output.textContent);
+    throw abriss;
   } finally {
     // Immer deregistrieren — auch wenn read() wirft (Netzabbruch): sonst
     // bliebe der Stopp-Knopf fuer immer stehen.
     wache.beenden();
     aktiveLeser.delete(reader);
     meldeStromstand();
+    // Auch bei Abriss oder Stopp: "Denkt …" darf nicht ewig stehen bleiben.
+    beendeDenken(output);
   }
   // Auch wenn der Strom ohne ein einziges Ereignis endet: das Signal muss weg.
   stoppeWartesignal();
   clearThinkingState(output);
+  beendeDenken(output);
   // Der Weg ist mitten in der Arbeit verstummt (gemessen 2026-08-17 an einem
   // haengenden Video-Auftrag). Ehrlich sagen statt endlos "läuft" zeigen —
   // und die bisherige Teilantwort behalten, sie ist nicht falsch.
   if (stilleGemeldet) {
-    const bisher = output.textContent.trim();
-    output.textContent = bisher
-      ? `${bisher}\n\n_Abgebrochen: der Server hat sich 90 Sekunden lang nicht mehr gemeldet. Bitte erneut versuchen._`
-      : "Abgebrochen: der Server hat sich 90 Sekunden lang nicht mehr gemeldet. Bitte erneut versuchen.";
+    // Wortlaut aus strom-stillstand.js, gemeinsam mit chatClient.js: derselbe
+    // Vorfall darf nicht je nach Modellwahl anders klingen. Die Saeuberung
+    // bleibt DAVOR — ein abgerissener Bildstrom soll nicht als base64-Wand
+    // stehen bleiben, nur weil die Meldung jetzt woanders herkommt.
+    output.textContent = stilleText(entferneAbgerisseneMedien(output.textContent));
     renderMarkdown?.(output);
     falteSchritte(output, schritteOhneFundZahl);
     return;
@@ -717,6 +793,7 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // Der Lauf endete ohne Schlussantwort (alle Runden gingen in Werkzeuge).
   // Dann ist die letzte Arbeitsnotiz besser als eine leere Blase.
   if (!output.textContent.trim() && letzteNotiz.trim()) output.textContent = letzteNotiz;
+  output.textContent = entferneAbgerisseneMedien(output.textContent);
   // VOR renderMarkdown: der Renderer liest textContent und ersetzt innerHTML —
   // danach angehaengter Text bliebe roher Stern-Text.
   output.textContent += quellenHinweis({

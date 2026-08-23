@@ -41,6 +41,10 @@ function isPlaceholder(node) {
 
 function entryText(node) {
   if (isPlaceholder(node)) return "";
+  // Die Schrittliste (Werkzeugzeilen, Denk-Zeile) ist KEIN Gespraechsinhalt:
+  // "Websuche … ✓ 3 Treffer" oder das Selbstgespraech des Modells gehoeren
+  // nicht als Assistenten-Antwort in die naechste Anfrage (2026-08-23).
+  if (node?.dataset?.smejjSchritte === "true") return "";
   const text = (node?.textContent || "").trim();
   if (!text) return "";
   if (SKIP_PATTERNS.some((pattern) => pattern.test(text))) return "";
