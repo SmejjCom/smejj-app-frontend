@@ -15,7 +15,7 @@
 // - Jeder Fehler ist still: Sync ist Komfort, der Chat laeuft immer weiter.
 import { API_ORIGIN } from "/assets/config.js";
 import { OWNER_KEY, gehoertNutzer, kontoAliase, merkeKontoKennung, sessionUserId } from "/assets/chat-owner.js?v=3";
-import { abgleichsKarte, teileAuf } from "./chat-sync-auswahl.js?v=1";
+import { abgleichsKarte, teileAuf, erzeugeVorfahrt } from "./chat-sync-auswahl.js?v=2";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
@@ -220,10 +220,21 @@ async function bestandAufraeumen() {
   } catch { /* still: Aufraeumarbeit, kein Weg, den jemand gerade braucht */ }
 }
 
+// Vorfahrt fuer die Antwort: solange ein Strom laeuft, wartet die Sicherung.
+// Gemessen 2026-08-23: die Modell-Anfrage ging erst nach 10,5 s raus, weil
+// zwei Verlauf-Anfragen die Verbindungen belegten — der Server war nach
+// 1,3 s fertig. Was hier liegen bleibt, wird nachgeholt, sobald frei ist.
+const vorfahrt = erzeugeVorfahrt({ jetztSenden: () => planePush() });
+try {
+  window.addEventListener("smejj:chat-strom", (e) => vorfahrt.stromstand(e?.detail?.laufen));
+} catch { /* ohne Fenster (Tests) egal */ }
+
 async function push() {
   const kopf = kopfzeilen();
   const s = store();
   if (!kopf || !s || serverSagtNein || laeuft) return;
+  // Der Nutzer wartet auf die Antwort, nicht auf die Sicherung.
+  if (!vorfahrt.darfSenden()) return;
   laeuft = true;
   try {
     const alle = await s.listChats(); // Stufe 2: nur eigene

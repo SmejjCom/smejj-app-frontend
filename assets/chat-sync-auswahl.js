@@ -77,3 +77,43 @@ export function teileAuf(chats, karte) {
   const senden = alle.filter((c) => mussGesendetWerden(c, karte));
   return { senden, gespart: alle.length - senden.length, gesamt: alle.length };
 }
+
+/**
+ * Die Vorfahrt-Regel: solange eine Antwort läuft, wartet die Sicherung.
+ *
+ * DER BEFUND (live gemessen 2026-08-23, nachdem die Upload-Flut behoben war):
+ * Die Modell-Anfrage ging erst nach 10,5 Sekunden raus. Davor lagen zwei
+ * Verlauf-Anfragen (5,6 s und 6,9 s) auf der Leitung — der Browser öffnet pro
+ * Gegenstelle nur eine Handvoll Verbindungen, und die waren belegt. Der
+ * Server war die ganze Zeit fertig: die Antwort selbst brauchte 1,3 Sekunden.
+ *
+ * Der Nutzer wartet auf die Antwort, nicht auf die Sicherung. Der Verlauf
+ * kann drei Sekunden später gesichert werden, die Antwort nicht.
+ *
+ * NACHHOLEN IST PFLICHT, nicht Kür: was während der Antwort liegen bleibt,
+ * muss danach von selbst laufen. Sonst wäre aus einer Verzögerung ein
+ * Datenverlust geworden — der schlechtere Tausch.
+ */
+export function erzeugeVorfahrt({ jetztSenden }) {
+  let laufendeStroeme = 0;
+  let ausgesetzt = false;
+  return {
+    /** Aus dem Ereignis smejj:chat-strom, das BEIDE Stromfamilien senden. */
+    stromstand(laufen) {
+      const vorher = laufendeStroeme;
+      laufendeStroeme = Math.max(0, Number(laufen) || 0);
+      // Gerade frei geworden und es liegt etwas an -> nachholen.
+      if (vorher > 0 && laufendeStroeme === 0 && ausgesetzt) {
+        ausgesetzt = false;
+        jetztSenden();
+      }
+    },
+    /** Darf gesendet werden? Nein -> merken, dass nachzuholen ist. */
+    darfSenden() {
+      if (laufendeStroeme > 0) { ausgesetzt = true; return false; }
+      return true;
+    },
+    get wartet() { return ausgesetzt; },
+    get stroeme() { return laufendeStroeme; }
+  };
+}
