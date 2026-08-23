@@ -247,7 +247,67 @@ export function ruesteViereck(bereich) {
     e.preventDefault();
     handeln();
   });
+  ruesteSendeknopf(bereich, viereck, handeln);
   return true;
+}
+
+// Das Stopp-Quadrat im Senden-Knopf (Betreiber 2026-08-23, Vorbild
+// Antigravity: "der rote Punkt ... nicht rot, sondern unsere Logo-Farbe").
+// Bei Antigravity wird der Senden-Knopf waehrend der Antwort zum Stopp-Knopf
+// (rotes Quadrat im Kreis). Bei uns: Quadrat in Logo-Cyan #02fdfd auf
+// dunklem, VIERECKIGEM Feld — die Form ist Betreiber-Regel, die Farbe kommt
+// aus icons/smejj_full_logo_on_dark.svg.
+const STOPP_QUADRAT = '<svg viewBox="0 0 24 24" aria-hidden="true" class="stopp-quadrat">'
+  + '<rect x="6" y="6" width="12" height="12" fill="currentColor" stroke="none"/></svg>';
+
+/**
+ * Spiegelt den Arbeitszustand des Vierecks auf den Senden-Knopf: leuchtet
+ * das Viereck (.an), zeigt der Knopf das Stopp-Quadrat und ein Klick stoppt;
+ * erlischt es, gibt der Knopf sein vorheriges Gesicht (Pfeil/Welle) zurueck.
+ * Rein additiv: composer-sendetaste.js bleibt die Wahrheit fuer Pfeil/Welle
+ * und zeichnet auf "smejj:composer-changed" neu.
+ */
+function ruesteSendeknopf(bereich, viereck, handeln) {
+  const knopf = document.getElementById(bereich.senden);
+  if (!knopf || knopf.dataset.stoppKnopf === "an") return;
+  knopf.dataset.stoppKnopf = "an";
+  let merkmal = null;
+  const zeichne = () => {
+    const laeuft = viereck.classList.contains("an") && !viereck.classList.contains("gestoppt");
+    const zeigt = knopf.classList.contains("ist-stopp");
+    if (laeuft === zeigt) return;
+    if (laeuft) {
+      merkmal = { html: knopf.innerHTML, label: knopf.getAttribute("aria-label"), title: knopf.getAttribute("title") };
+      knopf.classList.add("ist-stopp");
+      knopf.innerHTML = STOPP_QUADRAT;
+      knopf.setAttribute("aria-label", "Antwort stoppen");
+      knopf.setAttribute("title", "Stoppen");
+      return;
+    }
+    knopf.classList.remove("ist-stopp");
+    if (merkmal) {
+      knopf.innerHTML = merkmal.html;
+      if (merkmal.label) knopf.setAttribute("aria-label", merkmal.label);
+      if (merkmal.title) knopf.setAttribute("title", merkmal.title);
+    }
+    // Die Sendetaste entscheidet selbst, ob jetzt Pfeil oder Welle passt.
+    try { document.dispatchEvent(new CustomEvent("smejj:composer-changed")); } catch { /* still */ }
+  };
+  // Im Stopp-Zustand faengt der Klick VOR allen anderen — am DOKUMENT in der
+  // Capture-Phase, nicht am Knopf: composer-sendetaste.js haengt frueher am
+  // Knopf selbst (capture) und ruft bei leerem Feld stopImmediatePropagation
+  // — ein Klick auf das Stopp-Quadrat oeffnete so den Sprachmodus statt zu
+  // stoppen (lokal gemessen 2026-08-23). Die Capture-Phase laeuft von oben
+  // nach unten; das Dokument kommt immer vor dem Knopf dran.
+  document.addEventListener("click", (e) => {
+    if (!knopf.classList.contains("ist-stopp")) return;
+    if (!(e.target instanceof Node) || !knopf.contains(e.target)) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    handeln();
+  }, true);
+  new MutationObserver(zeichne).observe(viereck, { attributes: true, attributeFilter: ["class"] });
+  zeichne();
 }
 
 export function initChatStopp() {
