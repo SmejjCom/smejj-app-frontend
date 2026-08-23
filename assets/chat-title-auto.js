@@ -32,7 +32,7 @@
 // ein abweichender Spezifizierer erzeugt eine ZWEITE Modulinstanz mit eigenem
 // Zustand. chat-store.js laeuft unter "?v=pin-20260806", chat-stream.js und
 // config.js ohne Kennung. tests/module-queries.test.mjs haelt das fest.
-import { listChats, setAutoTitle } from "/assets/chat-store.js?v=b55";
+import { listChats, setAutoTitle } from "/assets/chat-store.js?v=b56";
 import { CLIENT_ROUTES } from "/assets/config.js";
 import { bridgeAuthHeaders } from "/assets/ai/chat-stream.js";
 

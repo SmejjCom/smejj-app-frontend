@@ -47,7 +47,8 @@ async function meldeAbweisung(kennung, status, grund) {
   abgewiesen.add(kennung);
   try {
     const { showToast } = await import("/assets/components.js?v=b48");
-    const text = grund === "chat_zu_gross"
+    const { istZuGross } = await import("./chat-medien-rettung.js?v=2").catch(() => ({ istZuGross: () => false }));
+    const text = istZuGross(status, grund)
       ? "Ein Chat ist zu gross und wurde NICHT gesichert — er bleibt nur auf diesem Geraet."
       : `Ein Chat konnte nicht gesichert werden (${status}${grund ? `: ${grund}` : ""}) — er bleibt nur auf diesem Geraet.`;
     showToast(text, "warn");
@@ -176,7 +177,7 @@ async function rette(id) {
     const s = store();
     if (!s?.getChat || !s?.importChat) return false;
     const [{ rettteUndSpeichere }, { lagereMedienAusText }] = await Promise.all([
-      import("./chat-medien-rettung.js?v=1"),
+      import("./chat-medien-rettung.js?v=2"),
       import("./chat-medien.js?v=2")
     ]);
     const ergebnis = await rettteUndSpeichere(id, {
@@ -208,8 +209,17 @@ async function push() {
       if (antwort.status === 503) { serverSagtNein = true; break; }
       // 4xx betrifft GENAU DIESEN Chat und wird sich von selbst nie aendern —
       // also melden und mit dem naechsten weitermachen, nicht abbrechen.
-      if (antwort.status >= 400 && antwort.status < 500) {
-        const grund = await grundAus(antwort);
+      // 4xx UND das 500 des Body-Lesers: "Request too large" kommt roh
+      // heraus, BEVOR die Chat-Pruefung laeuft (maxJsonBodyBytes = 1 MB).
+      // Bis heute fiel genau das durch — sechs der zehn ungesicherten Chats
+      // des Betreibers lagen ueber 1 MB und wurden deshalb weder gerettet
+      // noch gemeldet. Ein 500 aus anderem Grund bleibt unberuehrt: dafuer
+      // ist die Pruefung in istZuGross zustaendig, nicht die Statusklasse.
+      const rohgrund = antwort.status >= 400 ? await grundAus(antwort) : "";
+      const grossFehler = antwort.status >= 400 && antwort.status < 500;
+      const { istZuGross } = await import("./chat-medien-rettung.js?v=2").catch(() => ({ istZuGross: () => false }));
+      if (grossFehler || istZuGross(antwort.status, rohgrund)) {
+        const grund = rohgrund;
         // "Zu gross" ist der EINZIGE 4xx-Grund, den wir selbst beheben
         // koennen — und der haeufigste: zehn Chats im Konto des Betreibers
         // lagen am 2026-08-23 darueber und waren seit Wochen ungesichert.
@@ -217,7 +227,7 @@ async function push() {
         // nur bei neuen Chats; der Bestand blieb liegen. Hier wird er
         // eingeholt: auslagern, zurueckschreiben, EINMAL erneut senden.
         // Erst wenn auch das scheitert, wird der Nutzer behelligt.
-        if (grund === "chat_zu_gross" && await rette(chat.id)) {
+        if (istZuGross(antwort.status, grund) && await rette(chat.id)) {
           const gerettet = await s.getChat(chat.id);
           const zweiter = gerettet && await fetch(`${API_ORIGIN}/api/chats`, {
             method: "PUT",

@@ -34,6 +34,38 @@
 // Es wird NIE etwas geloescht — nur ersetzt, was nachweislich wieder
 // abrufbar ist.
 
+/**
+ * ZWEI GRENZEN, ZWEI ANTWORTEN — live gemessen 2026-08-23, und das ist der
+ * Grund, warum es diese Funktion gibt:
+ *
+ *   512 KB - 1 MB   ->  HTTP 400  {"error":"chat_zu_gross"}
+ *                       (MAX_CHAT_BYTES in chatSyncStore.js, saubere Absage)
+ *   ueber 1 MB      ->  HTTP 500  {"error":"Request too large"}
+ *                       (maxJsonBodyBytes in securityPolicy.js — der
+ *                        Body-Leser bricht ab, BEVOR die Chat-Pruefung
+ *                        ueberhaupt laeuft)
+ *
+ * Die zweite Antwort war der stille Fall: chat-sync.js meldete nur bei
+ * 400-499. Ein 500 fiel durch — kein Hinweis, kein Rettungsversuch, nichts.
+ * Von den zehn ungesicherten Chats des Betreibers lagen SECHS ueber 1 MB und
+ * damit in genau diesem blinden Fleck. Wer nur auf "chat_zu_gross" hoert,
+ * rettet die vier kleinen und laesst die sechs grossen liegen.
+ *
+ * 413 steht mit drin, weil das die HTTP-richtige Antwort waere; sollte der
+ * Server sie eines Tages geben, greift die Rettung ohne weitere Aenderung.
+ *
+ * @param {number} status
+ * @param {string} grund
+ * @returns {boolean}
+ */
+export function istZuGross(status, grund) {
+  const text = String(grund || "").toLowerCase();
+  if (status === 413) return true;
+  if (text.includes("chat_zu_gross")) return true;
+  // "Request too large" kommt roh aus dem Body-Leser, ohne eigene Kennung.
+  return status >= 400 && /request too large|payload too large|body too large/.test(text);
+}
+
 /** Server-Grenze aus control-server/src/chats/chatSyncStore.js. */
 export const MAX_CHAT_BYTES = 512 * 1024;
 
