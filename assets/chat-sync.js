@@ -15,6 +15,7 @@
 // - Jeder Fehler ist still: Sync ist Komfort, der Chat laeuft immer weiter.
 import { API_ORIGIN } from "/assets/config.js";
 import { OWNER_KEY, gehoertNutzer, kontoAliase, merkeKontoKennung, sessionUserId } from "/assets/chat-owner.js?v=3";
+import { abgleichsKarte, teileAuf } from "./chat-sync-auswahl.js?v=1";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
@@ -225,7 +226,21 @@ async function push() {
   if (!kopf || !s || serverSagtNein || laeuft) return;
   laeuft = true;
   try {
-    const chats = await s.listChats(); // Stufe 2: nur eigene
+    const alle = await s.listChats(); // Stufe 2: nur eigene
+    // ERST FRAGEN, DANN SENDEN — gemessen 2026-08-23: eine einzige Chat-Frage
+    // loeste ueber 100 PUTs aus (einzelne mit 188 KB), waehrend das Modell
+    // schon geantwortet hatte. Die Antwort erschien nach 43 s statt nach 2.
+    // Der Server verwirft die meisten dieser Uploads ohnehin sofort
+    // ("server_ist_neuer"). Ein Abgleich holt id/updatedAt fuer ALLE Chats
+    // in einer Anfrage; gesendet wird nur, was er auch annehmen wuerde.
+    // Faellt der Abgleich aus, wird alles gesendet wie bisher.
+    let karte = null;
+    try {
+      const a = await fetch(`${API_ORIGIN}/api/chats?nurAbgleich=1`, { headers: kopf });
+      if (a.ok) karte = abgleichsKarte(await a.json());
+    } catch { /* ohne Karte: alles senden, nichts auslassen */ }
+    const { senden: chats, gespart } = teileAuf(alle, karte);
+    if (gespart > 0) console.info(`smejj Verlauf-Sync: ${gespart} von ${alle.length} Chats sind schon aktuell.`);
     for (const kurz of chats) {
       const chat = await s.getChat(kurz.id);
       if (!chat) continue;
