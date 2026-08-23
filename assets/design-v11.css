@@ -78,9 +78,11 @@
   border-radius: var(--v11-r) !important;
 }
 
-/* Rund bleibt nur der eine Hauptknopf — und Avatare (Regel aus eckig.css). */
+/* Betreiber 2026-08-23: auch der Hauptknopf ist VIERECKIG (Design-Regel:
+   das gesamte smejj-Design ist eckig; die Rund-Ausnahme vom 15.08. ist
+   aufgehoben). Rund bleiben nur Avatare (Regel aus eckig.css). */
 .send-button {
-  border-radius: 999px !important;
+  border-radius: 0 !important;
 }
 
 /* --- Der Hauptknopf: leer = Sprache, getippt = senden -------------------
@@ -720,6 +722,9 @@ body.is-resizing-panel #rightPanelResize {
   min-height: 38px;
   border-radius: 999px !important;
 }
+/* Hauptknopf eckig (Betreiber 2026-08-23), die Geist-Knoepfe daneben
+   behalten vorerst ihre Form. */
+#start .prompt-glass .send-button { border-radius: 0 !important; }
 
 /* Hauptknopf: WEISS mit schwarzer Welle (Mockup .fknopf.haupt); beim
    Tippen CYAN mit dunklem Pfeil (Mockup .fknopf.haupt.aktiv). */
@@ -1487,7 +1492,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   width: 32px;
   height: 32px;
   min-height: 32px;
-  border-radius: 999px !important;
+  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
   background: #ffffff;
   color: #0a0f16;
   display: grid;
@@ -2418,7 +2423,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
  * Knopf. Jetzt deckt es den Senden-Knopf exakt und traegt dieselbe Form.
  * ===================================================================== */
 #chatStopp.chat-stopp {
-  border-radius: 999px !important;
+  border-radius: 0 !important; /* eckig wie der Senden-Knopf (2026-08-23) */
   min-height: 0;
   box-sizing: border-box;
   padding: 0;

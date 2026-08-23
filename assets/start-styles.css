@@ -3976,7 +3976,7 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   border-radius: var(--v11-r) !important;
 }
 .send-button {
-  border-radius: 999px !important;
+  border-radius: 0 !important;
 }
 .send-button {
   background: #ffffff;
@@ -4426,6 +4426,7 @@ body.is-resizing-panel #rightPanelResize {
   min-height: 38px;
   border-radius: 999px !important;
 }
+#start .prompt-glass .send-button { border-radius: 0 !important; }
 .send-button.ist-sprache {
   background: #ffffff;
   color: #0a0f16;
@@ -5002,7 +5003,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   width: 32px;
   height: 32px;
   min-height: 32px;
-  border-radius: 999px !important;
+  border-radius: 0 !important;
   background: #ffffff;
   color: #0a0f16;
   display: grid;
@@ -5683,7 +5684,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   color: #0a0f16;
 }
 #chatStopp.chat-stopp {
-  border-radius: 999px !important;
+  border-radius: 0 !important;
   min-height: 0;
   box-sizing: border-box;
   padding: 0;
