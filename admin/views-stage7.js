@@ -50,20 +50,72 @@
         + "<td>" + e(String(p.zahlend)) + "</td></tr>";
     });
 
-    return V.kopfBlock("E", "Abrechnung", "Abrechnung & Abos",
-      "Abo-Vorgänge mit Handlungsbedarf zuerst — Beträge bleiben bei Stripe.")
-      + '<div class="kpis">'
-      + V.kachelBlock("Abos", String(d.total || 0), "insgesamt")
-      + V.kachelBlock("Zahlend", String(d.zahlend || 0), "aktiv oder Testphase")
-      + V.kachelBlock("Offen", String(d.handlungsbedarf || 0), (d.handlungsbedarf || 0) > 0 ? "abarbeiten" : "keine", (d.handlungsbedarf || 0) > 0 ? "dn" : "up")
-      + V.kachelBlock("Läuft aus", String(d.gekuendigtZumPeriodenende || 0), "gekündigt zum Periodenende")
-      + "</div>"
+    const z = d.umsatz || null;
+    return V.kopfBlock("E", "Geld", "Abos & Umsatz",
+      "Was hereinkommt, was rausgeht, und wo Konten abspringen. Jede Zahl sagt, woher sie kommt — Beträge werden bei Stripe gemessen, nicht hier gespiegelt.")
+      + (z ? umsatzKacheln(z) : '<div class="kpis">'
+        + V.kachelBlock("Abos", String(d.total || 0), "insgesamt")
+        + V.kachelBlock("Zahlend", String(d.zahlend || 0), "aktiv oder Testphase") + "</div>")
       + '<div class="stack">' + warnung
+      + (z ? umsatzBloecke(z) : "")
       + V.panelBlock("Vorgänge", "dringendste zuerst",
         V.tabelleBlock(["Konto", "Plan", "Stand", "Laufzeit bis", "Hinweis", "Nächster Schritt"], zeilen))
-      + V.panelBlock("Nach Plan", "größte Gruppe zuerst",
-        V.tabelleBlock(["Plan", "Gesamt", "Zahlend"], planZeilen))
+      + (z ? "" : V.panelBlock("Nach Plan", "größte Gruppe zuerst", V.tabelleBlock(["Plan", "Gesamt", "Zahlend"], planZeilen)))
       + "</div>";
+  }
+
+  // ---- E, Teil 2: Umsatz (Design-Vorschlag "Abos & Umsatz", 2026-08-23) ----
+  function geld(cent, waehrung) {
+    const w = String(waehrung || "eur").toUpperCase() === "EUR" ? "€" : String(waehrung || "").toUpperCase();
+    return (Number(cent || 0) / 100).toFixed(2).replace(".", ",") + " " + w;
+  }
+
+  function umsatzKacheln(z) {
+    const m = z.mrr || {};
+    const a = z.aufladungen || {};
+    const k = z.kosten || {};
+    const mod = k.modelleSeitNeustart || {};
+    return '<div class="kpis">'
+      + V.kachelBlock("Monatlich wiederkehrend", geld(m.cent, m.waehrung),
+        (m.gemessen ? m.abos + " aktive Abos bei Stripe" : "GESCHÄTZT aus Planpreisen") + (m.testAbos ? " · " + m.testAbos + " Test" : ""), m.gemessen ? "up" : "wr")
+      + V.kachelBlock("Aufladungen (API, 30 Tage)", a.erreichbar ? usd(a.umsatz30Usd) : "—",
+        a.erreichbar ? "eingezahlt gesamt " + usd(a.eingezahltUsd) + " · Guthaben " + usd(a.guthabenUsd) : "API-Übersicht nicht lesbar", a.erreichbar ? "" : "wr")
+      + V.kachelBlock("Kosten Betrieb", usd(k.festeUsdProMonat) + " / Monat",
+        "fest (Kostenpolitik) · Modelle seit Neustart: " + usd(mod.usd) + (mod.tageOhnePreis ? " (+" + mod.tageOhnePreis + " Tag(e) ohne Preis)" : ""), "")
+      + V.kachelBlock("Bleibt übrig", usd(z.bleibtUebrigUsdVorModellen), "vor Modellkosten · MRR + Aufladungen − feste Kosten", (z.bleibtUebrigUsdVorModellen || 0) >= 0 ? "up" : "dn")
+      + "</div>";
+  }
+
+  function umsatzBloecke(z) {
+    const m = z.mrr || {};
+    const planZeilen = (z.jePlan || []).map(function (p) {
+      return "<tr><td><b>" + e(p.plan) + "</b></td><td>" + e(String(p.konten)) + "</td><td>" + e(String(p.zahlend)) + "</td>"
+        + "<td>" + (p.preisCent ? e(geld(p.preisCent, m.waehrung)) : '<span class="s">kein Preis hinterlegt</span>') + "</td>"
+        + "<td>" + (p.umsatzCentProMonat !== null ? "<b>" + e(geld(p.umsatzCentProMonat, m.waehrung)) + "</b>" : "—") + "</td>"
+        + '<td><span class="s">nicht erfasst</span></td><td><span class="s">nicht erfasst</span></td></tr>';
+    });
+    const ab = z.abspruenge || {};
+    const abZeilen = (ab.laeuftAus || []).map(function (x) {
+      return "<tr><td><b>" + e(x.konto || x.zahlendeAdresse || "nicht zugeordnet") + "</b></td><td>" + e(x.plan || "—") + "</td>"
+        + "<td>" + (x.laufzeitEndeAm ? e(A.datum(x.laufzeitEndeAm)) : "—") + (x.tageBisEnde === null || x.tageBisEnde === undefined ? "" : '<br><span class="s">' + fristText(x.tageBisEnde) + "</span>") + "</td>"
+        + '<td><span class="s">Grund nicht erfasst</span></td></tr>';
+    });
+    const zh = z.zahlung || {};
+    const r = zh.offeneRechnungen || {};
+    const zahlungZeilen = [
+      "<tr><td><b>Stripe-Schlüssel</b></td><td>" + (zh.schluesselGesetzt ? pille("gesetzt", "ok") : pille("fehlt", "bad")) + "</td><td>" + (zh.stripeErreichbar ? "Stripe antwortet — MRR gemessen" : "Stripe nicht lesbar — Zahlen geschätzt") + "</td></tr>",
+      "<tr><td><b>Webhook-Geheimnis</b></td><td>" + (zh.webhookGeheimnisGesetzt ? pille("gesetzt", "ok") : pille("fehlt", "bad")) + "</td><td>Ohne Geheimnis werden Stripe-Rückrufe abgewiesen — Abos blieben dann unsichtbar.</td></tr>",
+      "<tr><td><b>Offene Rechnungen</b></td><td>" + (r.gemessen ? (r.anzahl ? pille(String(r.anzahl), "warn") : pille("0", "ok")) : pille("nicht messbar", "dim")) + "</td><td>" + (r.gemessen ? (r.anzahl ? "Zahlung ausstehend oder fehlgeschlagen: " + geld(r.cent, m.waehrung) : "Keine offene Rechnung bei Stripe.") : e(r.grund || "")) + "</td></tr>",
+      "<tr><td><b>Vorgänge mit Handlungsbedarf</b></td><td>" + ((zh.handlungsbedarf || 0) > 0 ? pille(String(zh.handlungsbedarf), "bad") : pille("0", "ok")) + "</td><td>Aus den hier verarbeiteten Stripe-Ereignissen — Liste unten.</td></tr>"
+    ];
+    return '<div class="note glass"><div class="nx">◆</div><div><div class="nt">Woher die Zahlen kommen</div><div class="ns">Monatlich wiederkehrend: ' + e(m.quelle || "") + ". Modellkosten zählen seit dem letzten Neustart — kein Monatswert.</div></div></div>"
+      + V.panelBlock("Je Plan", "Umsatz = Zahlende × Planpreis; Punkte und Marge je Plan werden nicht erfasst",
+        V.tabelleBlock(["Plan", "Konten", "Zahlend", "Preis / Monat", "Umsatz / Monat", "Punkte verbraucht", "Marge"], planZeilen))
+      + V.panelBlock("Absprünge", "wer zum Periodenende ausläuft — Gründe werden nicht erfasst",
+        abZeilen.length ? V.tabelleBlock(["Konto", "Plan", "Läuft aus", "Grund"], abZeilen) : '<div class="pb"><div class="leer">Niemand hat gekündigt.</div></div>')
+      + V.panelBlock("Zahlung", "Stripe-Anbindung und offene Rechnungen", V.tabelleBlock(["", "Zustand", "Was das heißt"], zahlungZeilen))
+      + V.panelBlock("Was hier NICHT gemessen wird", "steht hier, statt als Zahl zu erscheinen",
+        V.tabelleBlock(["Was", "Warum nicht"], (z.nichtErfasst || []).map(function (p) { return "<tr><td><b>" + e(p.was) + "</b></td><td>" + e(p.warum) + "</td></tr>"; })));
   }
 
   function zustandPille(a) {
