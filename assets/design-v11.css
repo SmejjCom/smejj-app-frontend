@@ -2685,7 +2685,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   left: 16px;
   bottom: calc(100% + 8px);
   border-radius: 0 !important;
-  max-height: 320px;
+  /* Nie ueber den oberen Fensterrand hinaus (live 23.08.: Kopfzeile abgeschnitten). */
+  max-height: min(320px, calc(100vh - 360px));
   overflow-y: auto;
 }
 #start .erwaehnung-menue .erwaehnung-kopf {
