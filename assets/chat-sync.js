@@ -15,7 +15,7 @@
 // - Jeder Fehler ist still: Sync ist Komfort, der Chat laeuft immer weiter.
 import { API_ORIGIN } from "/assets/config.js";
 import { OWNER_KEY, gehoertNutzer, kontoAliase, merkeKontoKennung, sessionUserId } from "/assets/chat-owner.js?v=3";
-import { abgleichsKarte, teileAuf, erzeugeVorfahrt } from "./chat-sync-auswahl.js?v=2";
+import { abgleichsKarte, teileAuf, erzeugeVorfahrt, erzeugeAbgleichsSpeicher } from "./chat-sync-auswahl.js?v=3";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
@@ -123,6 +123,8 @@ async function pull() {
   if (!antwort.ok) return;
   let daten;
   try { daten = await antwort.json(); } catch { return; }
+  // Denselben Abgleich kann push() gleich weiterverwenden.
+  abgleichsSpeicher.merke(abgleichsKarte(daten));
   const nutzer = sessionUserId(localStorage);
   // Stufe 4: die Kontokennung des Servers merken — ab jetzt gelten seine
   // Dateien als eigene (siehe kontoAliase in chat-owner.js).
@@ -225,6 +227,11 @@ async function bestandAufraeumen() {
 // zwei Verlauf-Anfragen die Verbindungen belegten — der Server war nach
 // 1,3 s fertig. Was hier liegen bleibt, wird nachgeholt, sobald frei ist.
 const vorfahrt = erzeugeVorfahrt({ jetztSenden: () => planePush() });
+// pull() und push() fragen dasselbe. In der Startphase lagen die beiden
+// Abfragen fuenf Sekunden auseinander (2317 ms und 7324 ms, die zweite allein
+// 1504 ms lang) und hielten die Leitung bis 8,8 s belegt — die erste
+// Chat-Frage kostete deshalb 11 s statt einer. Jetzt teilen sie sich eine.
+const abgleichsSpeicher = erzeugeAbgleichsSpeicher();
 try {
   window.addEventListener("smejj:chat-strom", (e) => vorfahrt.stromstand(e?.detail?.laufen));
 } catch { /* ohne Fenster (Tests) egal */ }
@@ -245,14 +252,20 @@ async function push() {
     // ("server_ist_neuer"). Ein Abgleich holt id/updatedAt fuer ALLE Chats
     // in einer Anfrage; gesendet wird nur, was er auch annehmen wuerde.
     // Faellt der Abgleich aus, wird alles gesendet wie bisher.
-    let karte = null;
-    try {
-      const a = await fetch(`${API_ORIGIN}/api/chats?nurAbgleich=1`, { headers: kopf });
-      if (a.ok) karte = abgleichsKarte(await a.json());
-    } catch { /* ohne Karte: alles senden, nichts auslassen */ }
+    let karte = abgleichsSpeicher.hole();
+    if (!karte) {
+      try {
+        const a = await fetch(`${API_ORIGIN}/api/chats?nurAbgleich=1`, { headers: kopf });
+        if (a.ok) { karte = abgleichsKarte(await a.json()); abgleichsSpeicher.merke(karte); }
+      } catch { /* ohne Karte: alles senden, nichts auslassen */ }
+    }
     const { senden: chats, gespart } = teileAuf(alle, karte);
     if (gespart > 0) console.info(`smejj Verlauf-Sync: ${gespart} von ${alle.length} Chats sind schon aktuell.`);
     for (const kurz of chats) {
+      // Faengt WAEHREND des Laufs eine Antwort an, hat sie Vorfahrt: der Rest
+      // wird nachgeholt, sobald sie durch ist. Beim Start ist genau das der
+      // Fall — der Sync laeuft schon, wenn die erste Frage kommt.
+      if (!vorfahrt.darfSenden()) break;
       const chat = await s.getChat(kurz.id);
       if (!chat) continue;
       const antwort = await fetch(`${API_ORIGIN}/api/chats`, {
@@ -296,6 +309,8 @@ async function push() {
       }
     }
   } catch { /* still: naechster Anlauf beim naechsten Ereignis */ }
+  // Geschrieben heisst: die Karte ist veraltet.
+  abgleichsSpeicher.verwerfen();
   laeuft = false;
 }
 
