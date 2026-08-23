@@ -157,7 +157,8 @@
 
   async function zeigeNutzer() {
     laedt("Konten werden geholt …");
-    const antwort = await A.nutzer({ limit: 50, query: zustand.suchbegriff });
+    // Seit 2026-08-23: die Nutzer-Lage (Plan, bezahlt als, zuletzt, Verbrauch) statt der reinen Index-Seite.
+    const antwort = await A.hole("/api/admin/users/lage?" + new URLSearchParams({ limit: "50", query: zustand.suchbegriff || "" }).toString());
     if (!antwort.ok) {
       seite.innerHTML = V.fehlerblock(antwort.fehler)
         + (antwort.data && antwort.data.hint ? '<div class="bar"><span class="btn" id="neubauKnopf">Index jetzt bauen</span></div>' : "");

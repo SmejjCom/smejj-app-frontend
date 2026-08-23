@@ -520,3 +520,6 @@ html.smejj-gate-zu{visibility:hidden!important;}
 /* Abschnittstitel innerhalb einer Seite (L: Lage oben, Ereignisse unten) */
 .ap-abschnitt{margin:18px 0 0;font-size:13px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--sm-ink-faint);}
 a.btn{text-decoration:none;display:inline-block;}
+
+/* B · "bezahlt als" weicht ab: sichtbar, ohne zu schreien */
+span.mono.warn{color:var(--sm-warn);}

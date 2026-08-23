@@ -124,37 +124,96 @@
 
   // ---- B · Nutzer -------------------------------------------------------------
 
+  // ---- B · Nutzer (Design-Vorschlag "Nutzer — und die Zeile, die euch mal
+  // Stunden gekostet hat", 2026-08-23): Suchen, Plan sehen, Verbrauch sehen —
+  // und sofort erkennen, wenn ein Konto unter einer anderen Adresse bezahlt.
+  function relativ(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "—";
+    const sek = Math.max(0, (Date.now() - d.getTime()) / 1000);
+    if (sek < 60) return "jetzt";
+    if (sek < 3600) return "vor " + Math.round(sek / 60) + " min";
+    if (sek < 86400) return "vor " + Math.round(sek / 3600) + " Std.";
+    const tage = Math.round(sek / 86400);
+    return "vor " + tage + (tage === 1 ? " Tag" : " Tagen");
+  }
+
+  function methodePille(m) {
+    const namen = { google: "Google", github: "GitHub", passkey: "Passkey", email: "E-Mail", "magic-link": "Magic-Link" };
+    return pille(namen[m] || m || "—", "");
+  }
+
   function nutzer(d) {
     const index = d.index || {};
-    const eintraege = d.entries || [];
-    const zeilen = eintraege.map((n) =>
-      '<tr class="klickbar" data-akte="' + e(n.userId) + '">'
-      + '<td><b>' + e(n.name || "—") + '</b><br><span class="mono">' + e(n.email) + '</span></td>'
-      + '<td><span class="mono">' + e(n.userId) + '</span></td>'
-      + '<td>' + (n.role === "user" ? '<span class="pill">user</span>' : pille(n.role, "acc")) + '</td>'
-      + '<td>' + (n.status === "active" ? pille("aktiv", "ok") : pille(n.status, "bad")) + '</td>'
-      + '<td>' + (n.emailVerified ? pille("ja", "ok") : pille("nein", "warn")) + '</td>'
-      + '<td>' + e(String(n.activeSessions)) + '</td>'
-      + '<td>' + e(A.zeit(n.createdAt)) + '</td>'
-      + '<td><span class="act">Akte öffnen</span></td></tr>');
+    const konten = d.konten || {};
+    const abos = d.abos || {};
+    const zeilen = (d.eintraege || []).map((n) => {
+      const bezahlt = n.bezahltAls === null ? '<span class="s">—</span>'
+        : n.bezahltAls === "dieselbe" ? '<span class="s">dieselbe</span>'
+          : n.bezahltAls === "unbekannt" ? pille("unbekannt", "warn")
+            : '<span class="mono warn">' + e(n.bezahltAls) + "</span>";
+      const verbrauch = n.verbrauch
+        ? e(String(n.verbrauch.anfragen)) + " Anfragen" + (n.verbrauch.kostenUsd !== null && n.verbrauch.kostenUsd !== undefined ? ' <span class="s">· ' + e(n.verbrauch.kostenUsd.toFixed(3)) + " $</span>" : "")
+        : '<span class="s">—</span>';
+      return '<tr class="klickbar" data-akte="' + e(n.userId) + '">'
+        + '<td><b>' + e(n.name || "Unbenannt") + '</b><br><span class="mono">' + e(n.email) + "</span>"
+        + (n.status !== "active" ? " " + pille(n.status === "blocked" ? "gesperrt" : n.status, "bad") : "") + "</td>"
+        + "<td>" + methodePille(n.method) + "</td>"
+        + "<td>" + bezahlt + "</td>"
+        + "<td><b>" + e(n.plan || "Frei") + "</b>" + (n.aboKlartext ? '<br><span class="s">' + e(n.aboKlartext) + "</span>" : "") + "</td>"
+        + "<td>" + verbrauch + "</td>"
+        + "<td>" + e(relativ(n.lastSeenAt)) + (n.activeSessions ? '<br><span class="s">' + e(String(n.activeSessions)) + " Sitzung" + (n.activeSessions === 1 ? "" : "en") + "</span>" : "") + "</td>"
+        + '<td><span class="act">Akte öffnen</span></td></tr>';
+    });
 
     const werkzeuge = '<span class="btn" id="neubauKnopf">Index neu bauen</span>';
     const suche = '<div class="bar"><input class="suche-feld" id="sucheFeld" type="search" '
-      + 'placeholder="Name, E-Mail oder Konto-ID …" value="' + e(d.suchbegriff || "") + '">'
+      + 'placeholder="Nach Name, Adresse oder Kennung suchen …" value="' + e(d.suchbegriff || "") + '">'
       + '<span class="btn" id="sucheKnopf">Suchen</span>'
       + (d.suchbegriff ? '<span class="btn" id="sucheLeeren">Zurücksetzen</span>' : "") + '</div>';
 
     const stand = "Index " + A.dauer(index.ageSeconds) + " alt"
       + (index.refreshing ? " · wird aufgefrischt" : "")
-      + (index.unreadable ? " · " + index.unreadable + " unlesbar" : "");
+      + (index.unreadable ? " · " + index.unreadable + " unlesbar" : "")
+      + (index.kenntZuletzt ? "" : " · »Zuletzt« erst nach dem nächsten Neubau");
 
-    return kopf("B", "Nutzer", "Nutzerverwaltung",
-      "Suchen und blättern. Die Liste zeigt nur Metadaten — der Blick in eine Akte verlangt einen Grund und wird protokolliert.")
+    const offene = (abos.nichtZugeordnetListe || []).map((a) =>
+      "<tr><td><b>" + e(a.plan || "—") + '</b><br><span class="s">' + e(a.klartext || a.zustand || "") + "</span></td>"
+      + '<td><span class="mono">' + e(a.zahlendeAdresse || "Adresse unbekannt") + "</span></td>"
+      + "<td>" + e(a.naechsterSchritt || "Mit dieser Adresse anmelden, oder das Abo auf die Konto-Adresse umhängen.") + "</td></tr>");
+    const offenBlock = offene.length
+      ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + offene.length + " bezahlte Abo(s) passen zu keinem Konto</div>"
+        + '<div class="ns">Der Kunde hat bezahlt und sieht in der App trotzdem »Frei«. Die Adresse, mit der bezahlt wurde, gehört zu keinem Konto hier.</div></div></div>'
+        + panel("Abos ohne Konto", "wen du anschreiben musst", tabelle(["Plan", "Bezahlt als", "Nächster Schritt"], offene))
+      : "";
+    const aboAusfall = abos.erreichbar === false
+      ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Abos nicht lesbar</div><div class="ns">' + e(abos.grund || "") + " — Plan und »bezahlt als« fehlen in der Liste; das heißt NICHT, dass niemand zahlt.</div></div></div>"
+      : "";
+
+    const aktionen = '<div class="pb"><table><tbody>'
+      + "<tr><td><b>Sperren / Entsperren</b></td><td>Mit Grund. Wird im Protokoll vermerkt.</td></tr>"
+      + "<tr><td><b>E-Mail bestätigen · Login-Sperre aufheben · Sitzungen widerrufen</b></td><td>Mit Grund und Step-up-Code.</td></tr>"
+      + "<tr><td><b>Support-Vorgang beantragen</b></td><td>Nur mit Grund; der Nutzer sieht es in seinem Konto.</td></tr>"
+      + "<tr><td><b>Rolle vergeben · Konto löschen</b></td><td>Braucht eine zweite Person (Vier Augen). Den eigenen Antrag darfst du nicht durchwinken.</td></tr>"
+      + "</tbody></table>"
+      + '<div class="leer">Was hier NICHT geht: in fremde Gespräche schauen. Auch als Betreiber nicht. Das ist der Kern des Versprechens — und eine Ausnahme davon würde es wertlos machen.</div></div>';
+
+    return kopf("B", "Nutzer", "Nutzer — und die Zeile, die einmal Stunden gekostet hat",
+      "Suchen, Plan sehen, Verbrauch sehen. Und sofort erkennen, wenn ein Konto unter einer anderen Adresse bezahlt als angemeldet — deshalb steht »bezahlt als« als eigene Spalte.")
+      + '<div class="kpis">'
+      + kachel("Konten gesamt", String(konten.gesamt || 0), "+" + (konten.neuDieseWoche || 0) + " diese Woche", "")
+      + kachel("Zahlend", abos.erreichbar === false ? "—" : String(abos.zahlend || 0), konten.gesamt ? Math.round(((abos.zahlend || 0) / konten.gesamt) * 1000) / 10 + " % der Konten" : "", "up")
+      + kachel("Heute aktiv", index.kenntZuletzt ? String(konten.heuteAktiv || 0) : "—", index.kenntZuletzt ? "in den letzten 24 Stunden" : "erst nach Index-Neubau", "")
+      + kachel("Zwei Adressen", abos.erreichbar === false ? "—" : String((abos.zweiAdressen || 0) + (abos.nichtZugeordnet || 0)), (abos.nichtZugeordnet || 0) > 0 ? abos.nichtZugeordnet + " ohne Konto — anschreiben" : "bezahlt ≠ angemeldet", (abos.nichtZugeordnet || 0) > 0 ? "dn" : "")
+      + "</div>"
       + suche
-      + '<div class="stack">' + panel(
-        "Konten", (d.total || 0) + " Treffer · " + stand,
-        tabelle(["Nutzer", "Konto-ID", "Rolle", "Status", "Verifiziert", "Sitzungen", "Registriert", ""], zeilen),
-        werkzeuge) + '</div>';
+      + '<div class="stack">' + aboAusfall + offenBlock
+      + panel("Konten", (d.total || 0) + " Treffer · " + stand,
+        tabelle(["Konto", "Angemeldet mit", "Bezahlt als", "Plan", "Verbrauch seit Neustart", "Zuletzt", ""], zeilen),
+        werkzeuge)
+      + panel("Was du an einem Konto tun kannst", "in der Akte — jede Änderung mit Grund, Step-up und Audit-Eintrag", aktionen)
+      + "</div>";
   }
 
   // ---- B2 · Nutzerakte --------------------------------------------------------
