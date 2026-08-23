@@ -21,7 +21,7 @@ import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39u"
 import { chatOhneMedienauftrag } from "./medien-absicht.js?v=5";
 import { mausAuftragErledigt } from "./maus-absicht.js?v=19";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
-import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2";
+import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=3";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
 import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b50";
 import { applyViewTitle } from "./view-title.js";

@@ -158,7 +158,9 @@ export function bindPanelResize(selector, side, { $ }) {
   handle.addEventListener("pointerdown", (event) => {
     event.preventDefault();
     document.body.classList.add("is-resizing-panel");
-    handle.setPointerCapture?.(event.pointerId);
+    // Ein ungueltiger pointerId (z. B. aus Tests) warf hier und riss den
+    // ganzen Handler ab — das Ziehen war dann tot, ohne Fehlermeldung.
+    try { handle.setPointerCapture?.(event.pointerId); } catch { /* ohne Capture zieht es trotzdem */ }
     const move = (moveEvent) => {
       const width = side === "left" ? moveEvent.clientX : window.innerWidth - moveEvent.clientX;
       setPanelWidth(side, width);
@@ -178,12 +180,35 @@ export function restorePanelWidths() {
   setPanelWidth("right", getPanelWidth("right"), { persist: false });
 }
 
+// Wie viel Mitte dem Chat mindestens bleiben muss, wenn das RECHTE Panel
+// sich breit macht (Betreiber 2026-08-23, Screenshot: Chat auf ~140 px
+// zusammengedrueckt). Dieselbe Zahl wie CHAT_MIN_PX in browser-pane.js —
+// dort griff sie nur beim Oeffnen per openPane(); beim Wiederherstellen
+// einer gemerkten Breite oder beim Ziehen lief sie ins Leere.
+const CHAT_MIN_PX = 380;
+
+/**
+ * Obergrenze fuer die Panelbreite — reine Rechnung, ohne DOM.
+ * Rechts zaehlt die linke Spur mit: Fenster minus Spur minus Chat-Minimum.
+ * Nie unter min (sonst ist das Panel selbst unbrauchbar), nie ueber max.
+ */
+export function maxPanelBreite(side, { fenster, mitteLinks = 0 }) {
+  const frei = side === "right"
+    ? fenster - Math.max(0, mitteLinks) - CHAT_MIN_PX
+    : fenster - PANEL_WIDTHS.centerMin;
+  return Math.max(PANEL_WIDTHS.min, Math.min(PANEL_WIDTHS.max, frei));
+}
+
+function mitteLinksGemessen() {
+  try { return Math.round(document.querySelector("main")?.getBoundingClientRect().left || 0); } catch { return 0; }
+}
+
 export function setPanelWidth(side, rawWidth, { persist = true } = {}) {
   if (rawWidth < PANEL_WIDTHS.close) {
     setPanelOpen(side, false);
     return;
   }
-  const maxWidth = Math.max(PANEL_WIDTHS.min, Math.min(PANEL_WIDTHS.max, window.innerWidth - PANEL_WIDTHS.centerMin));
+  const maxWidth = maxPanelBreite(side, { fenster: window.innerWidth, mitteLinks: side === "right" ? mitteLinksGemessen() : 0 });
   // Beide Seiten duerfen bis zur schmalen Spur (96 px) heruntergezogen werden.
   // Bis 2026-08-13 klemmte die rechte Seite bei min=188 fest — ihre
   // is-compact-Schwelle (96) war damit unerreichbar, und die CSS-Regeln fuer
@@ -192,7 +217,12 @@ export function setPanelWidth(side, rawWidth, { persist = true } = {}) {
   const width = Math.round(Math.min(Math.max(rawWidth, PANEL_WIDTHS.compact), maxWidth));
   const prop = side === "left" ? "--left-panel-width" : "--right-panel-width";
   document.documentElement.style.setProperty(prop, `${width}px`);
-  applyPanelCompact(side, width, side === "left" ? PANEL_WIDTHS.min - 1 : PANEL_WIDTHS.compact);
+  // Rechts galt bis 2026-08-16 die 28px-Schwelle: zwischen 28 und 188 zeigte
+  // das schmale Panel sein VOLLES Menue — der Kopfzeilen-Knopf lag ueber dem
+  // ersten Eintrag ("Browser" war fuer echte Klicks tot, live gemessen bei
+  // 176 px). Beide Seiten schalten jetzt unter 188 px auf Nur-Icons um;
+  // das Kleinziehen selbst bleibt wie vom Betreiber entschieden.
+  applyPanelCompact(side, width, PANEL_WIDTHS.min - 1);
   if (persist) localStorage.setItem(PANEL_WIDTH_KEYS[side], String(width));
 }
 

@@ -4,8 +4,8 @@ import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=1";
-import { initGlobalSearch } from "./search.js?v=b41";
-import { openSearchOverlay } from "./search-overlay.js?v=b48";
+import { initGlobalSearch } from "./search.js?v=b50";
+import { openSearchOverlay } from "./search-overlay.js?v=b57";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
@@ -18,10 +18,10 @@ import { afterFirstPaint } from "./deferred-start.js";
 import { initGoogleLogin } from "./google-login.js";
 import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
 import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39u";
-import { chatOhneMedienauftrag } from "./medien-absicht.js?v=4";
+import { chatOhneMedienauftrag } from "./medien-absicht.js?v=5";
 import { mausAuftragErledigt } from "./maus-absicht.js?v=19";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
-import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2";
+import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=3";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
 import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b50";
 import { applyViewTitle } from "./view-title.js";
@@ -72,7 +72,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
-const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=b41c").then((m) => (m.enhancePremiumSurfaces(), m)));
+const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=b42c").then((m) => (m.enhancePremiumSurfaces(), m)));
 boot();
 
 // Buendelt, was projects-surface.js aus der App braucht — eine Stelle statt neun.

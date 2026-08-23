@@ -180,12 +180,35 @@ export function restorePanelWidths() {
   setPanelWidth("right", getPanelWidth("right"), { persist: false });
 }
 
+// Wie viel Mitte dem Chat mindestens bleiben muss, wenn das RECHTE Panel
+// sich breit macht (Betreiber 2026-08-23, Screenshot: Chat auf ~140 px
+// zusammengedrueckt). Dieselbe Zahl wie CHAT_MIN_PX in browser-pane.js —
+// dort griff sie nur beim Oeffnen per openPane(); beim Wiederherstellen
+// einer gemerkten Breite oder beim Ziehen lief sie ins Leere.
+const CHAT_MIN_PX = 380;
+
+/**
+ * Obergrenze fuer die Panelbreite — reine Rechnung, ohne DOM.
+ * Rechts zaehlt die linke Spur mit: Fenster minus Spur minus Chat-Minimum.
+ * Nie unter min (sonst ist das Panel selbst unbrauchbar), nie ueber max.
+ */
+export function maxPanelBreite(side, { fenster, mitteLinks = 0 }) {
+  const frei = side === "right"
+    ? fenster - Math.max(0, mitteLinks) - CHAT_MIN_PX
+    : fenster - PANEL_WIDTHS.centerMin;
+  return Math.max(PANEL_WIDTHS.min, Math.min(PANEL_WIDTHS.max, frei));
+}
+
+function mitteLinksGemessen() {
+  try { return Math.round(document.querySelector("main")?.getBoundingClientRect().left || 0); } catch { return 0; }
+}
+
 export function setPanelWidth(side, rawWidth, { persist = true } = {}) {
   if (rawWidth < PANEL_WIDTHS.close) {
     setPanelOpen(side, false);
     return;
   }
-  const maxWidth = Math.max(PANEL_WIDTHS.min, Math.min(PANEL_WIDTHS.max, window.innerWidth - PANEL_WIDTHS.centerMin));
+  const maxWidth = maxPanelBreite(side, { fenster: window.innerWidth, mitteLinks: side === "right" ? mitteLinksGemessen() : 0 });
   // Beide Seiten duerfen bis zur schmalen Spur (96 px) heruntergezogen werden.
   // Bis 2026-08-13 klemmte die rechte Seite bei min=188 fest — ihre
   // is-compact-Schwelle (96) war damit unerreichbar, und die CSS-Regeln fuer
