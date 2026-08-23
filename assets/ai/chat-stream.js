@@ -146,6 +146,69 @@ function schrittListe(output) {
   return liste;
 }
 
+// ---------------------------------------------------------------------------
+// Schrittgruppen (Betreiber 2026-08-23, Vorbild Antigravity "Exploring 1 file ˅"
+// mit Unterzeilen): aufeinanderfolgende Schritte DERSELBEN Art stehen in einer
+// aufklappbaren Gruppe, deren Titel live mitzaehlt ("Suche … 2 von 3",
+// "3 Seiten gelesen ✓"). Waehrend der Arbeit ist die Gruppe offen, nach dem
+// Ende klappt falteSchritte sie zu. Alte Clients/Tests, die Zeilen direkt in der
+// Liste erwarten, finden sie ueber alleZeilen().
+
+const GRUPPEN_WORT = {
+  suche: ["Suche", "Suchen"],
+  seite: ["Seite gelesen", "Seiten gelesen"],
+  bild: ["Bild gemalt", "Bilder gemalt"]
+};
+
+function gruppenTitel(art, gesamt, fertig) {
+  const [eins, viele] = GRUPPEN_WORT[art] || ["Schritt", "Schritte"];
+  const symbol = SCHRITT_SYMBOL[art] || "•";
+  if (fertig >= gesamt) return `${symbol} ${gesamt} ${gesamt === 1 ? eins : viele} ✓`;
+  const laeuft = art === "suche" ? "Suche" : art === "seite" ? "Lese" : eins;
+  return `${symbol} ${laeuft} … ${fertig} von ${gesamt}`;
+}
+
+/** Alle Schrittzeilen der Liste, ob in Gruppen oder (alt) direkt darin. */
+function alleZeilen(liste) {
+  const aus = [];
+  for (const kind of liste?.children || []) {
+    if (kind.dataset?.gruppe === "true") {
+      for (const enkel of kind.children || []) if (enkel.dataset?.schritt) aus.push(enkel);
+    } else if (kind.dataset?.schritt) {
+      aus.push(kind);
+    }
+  }
+  return aus;
+}
+
+function aktualisiereGruppe(gruppe) {
+  const zeilen = [...(gruppe.children || [])].filter((k) => k.dataset?.schritt);
+  const fertig = zeilen.filter((k) => k.dataset.zustand === "fertig").length;
+  const titel = gruppe.children?.[0];
+  if (titel?.tagName?.toLowerCase?.() === "summary" || titel?.tagName === "summary") {
+    titel.textContent = gruppenTitel(gruppe.dataset.art, zeilen.length, fertig);
+  }
+  gruppe.dataset.zustand = fertig >= zeilen.length ? "fertig" : "laeuft";
+}
+
+/** Die Gruppe, in die ein neuer Schritt dieser Art gehoert — oder eine neue. */
+function gruppeFuer(liste, art) {
+  const kinder = liste.children || [];
+  const letzte = kinder[kinder.length - 1];
+  if (letzte?.dataset?.gruppe === "true" && letzte.dataset.art === art) return letzte;
+  const gruppe = document.createElement("details");
+  gruppe.className = "chat-schritte-falte chat-schritt-gruppe";
+  gruppe.dataset.gruppe = "true";
+  gruppe.dataset.art = art;
+  gruppe.open = true;
+  gruppe.setAttribute("open", "");
+  const titel = document.createElement("summary");
+  titel.className = "chat-schritte-titel chat-schritt-gruppe-titel";
+  gruppe.append(titel);
+  liste.append(gruppe);
+  return gruppe;
+}
+
 /**
  * Zeigt einen Arbeitsschritt an. "laeuft" legt eine Zeile an, "fertig"
  * aktualisiert dieselbe Zeile — sonst haette jeder Schritt zwei Eintraege.
@@ -162,7 +225,7 @@ export function zeigeSchritt(output, schritt) {
   // haette in einem Selektor nichts verloren. Die Kinder durchgehen ist hier
   // ohnehin billiger — es sind hoechstens eine Handvoll Zeilen.
   let zeile = null;
-  for (const kind of liste.children || []) {
+  for (const kind of alleZeilen(liste)) {
     if (kind.dataset?.schritt === kennung) { zeile = kind; break; }
   }
   if (!zeile) {
@@ -171,7 +234,7 @@ export function zeigeSchritt(output, schritt) {
     zeile.dataset.schritt = kennung;
     // Gebaut, nie zusammengeklebt: Der Suchbegriff kommt aus der Modellausgabe.
     beschrifteZeile(zeile, schritt);
-    liste.append(zeile);
+    gruppeFuer(liste, schritt.art).append(zeile);
   }
   const fertig = schritt.zustand === "fertig";
   zeile.dataset.zustand = fertig ? "fertig" : "laeuft";
@@ -191,6 +254,7 @@ export function zeigeSchritt(output, schritt) {
     ? (schritt.stand ? ` ✓ ${schritt.stand}` : schritt.treffer > 0 ? ` ✓ ${schritt.treffer} Treffer` : " ✓ nichts gefunden")
     : ` ${schritt.stand || "läuft …"}`;
   zeile.append(anhang);
+  if (zeile.parentElement?.dataset?.gruppe === "true") aktualisiereGruppe(zeile.parentElement);
   // Bild-Platzhalter: waehrend der Bild-Maler arbeitet, schimmert eine leere
   // Bildkarte (wie bei Midjourney/ChatGPT); bei "fertig" verschwindet sie —
   // das echte Bild folgt direkt darunter als normale Antwort.
@@ -261,10 +325,13 @@ export function falteSchritte(output, ohneFund = 0) {
   if (!liste || liste.dataset?.gefaltet === "true") return null;
   // Das Wartesignal ist kein Arbeitsschritt — es zaehlt nicht mit und wird
   // ohnehin schon vom Stopp-Aufruf entfernt.
-  const zeilen = [...(liste.children || [])].filter(
-    (k) => k.dataset?.schritt && k.dataset.schritt !== "wartesignal"
-  );
+  const zeilen = alleZeilen(liste).filter((k) => k.dataset.schritt !== "wartesignal");
   if (!zeilen.length) return null;
+  // Verschoben werden die Gruppen (und alte Einzelzeilen) — die Denk-Zeile
+  // bleibt oben stehen, sie ist kein Arbeitsschritt.
+  const bloecke = [...(liste.children || [])].filter(
+    (k) => k.dataset?.gruppe === "true" || (k.dataset?.schritt && k.dataset.schritt !== "wartesignal")
+  );
 
   const details = document.createElement("details");
   details.className = "chat-schritte-falte";
@@ -278,7 +345,11 @@ export function falteSchritte(output, ohneFund = 0) {
   details.append(titel);
   // Erst herausnehmen, dann anhaengen: im echten DOM verschiebt append von
   // allein, ein Testdoppel muss es nicht nachbauen.
-  for (const zeile of zeilen) { zeile.remove(); details.append(zeile); }
+  for (const block of bloecke) {
+    block.remove();
+    if (block.dataset?.gruppe === "true") { block.open = false; block.removeAttribute?.("open"); }
+    details.append(block);
+  }
   liste.append(details);
   liste.dataset.gefaltet = "true";
   // Der Ticker ist vorbei — ein "polite"-Bereich, der sich nicht mehr aendert,

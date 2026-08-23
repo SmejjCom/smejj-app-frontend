@@ -5783,3 +5783,22 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (prefers-reduced-motion: reduce) {
   #startLog .chat-denken-titel { animation: none; }
 }
+#startLog .chat-schritt-gruppe { margin: 0; }
+#startLog .chat-schritt-gruppe-titel { border-radius: 0 !important; }
+#startLog .chat-schritt-gruppe[data-zustand="laeuft"] .chat-schritt-gruppe-titel {
+  animation: chat-schritt-puls 1.4s ease-in-out infinite;
+}
+#startLog .chat-schritt-gruppe[data-zustand="fertig"] .chat-schritt-gruppe-titel { opacity: 0.9; }
+#startLog .chat-schritt-gruppe[open] .chat-schritt {
+  margin-left: 4px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+#startLog .chat-schritte-falte[open] > .chat-schritt-gruppe {
+  margin-left: 4px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  #startLog .chat-schritt-gruppe-titel { animation: none; }
+}
