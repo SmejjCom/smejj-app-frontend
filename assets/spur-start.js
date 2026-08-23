@@ -23,6 +23,14 @@ import { merkmaleVon } from "/assets/chat-history-text.js?v=b47b";
 import { Icons } from "/assets/components.js?v=b48";
 // OHNE ?v — dieselbe Kennung wie app.js/code-flaeche.js, sonst zweite Instanz.
 import { API_ORIGIN } from "./config.js";
+// Nutzerreise USA 2026-08-23: die Spur blieb auf Englisch deutsch ("Neuer
+// Chat", "Heute", "Gestern", "Alle 127 Gespräche"). t() liefert fail-safe den
+// deutschen Quelltext, solange kein Wörterbuch geladen ist.
+import { t } from "./i18n/ui.js?v=3";
+
+function alleGespraeche(n) {
+  return t("Alle {n} Gespräche").replace("{n}", String(n));
+}
 
 const START_ANSICHTEN = new Set(["start", "code"]);
 const MAX_LETZTE = 5;
@@ -115,7 +123,7 @@ async function zeichneStartSpur(halter) {
     // er wohnt unter Auftraege. Ohne erfundene Abzeichen und Uhrzeiten.
     // Claude nennt den Punkt kurz "Neu" — unser "Neuer Auftrag" wurde in der
     // schmalen Spur abgeschnitten ("Neuer Auf…", Betreiber-Chrome 2026-08-16).
-    halter.append(punkt({ icon: "plus", text: "Neu", kuerzel: "⌘K", aktiv: true, aktion: () => {
+    halter.append(punkt({ icon: "plus", text: t("Neu"), kuerzel: "⌘K", aktiv: true, aktion: () => {
       // Betreiber-Befund 2026-08-16 ("Warum schreibst du unter alte Chat?"):
       // nur das Feld zu leeren liess den offenen Chat WEITERLAUFEN — die
       // naechste Aufgabe landete im alten Gespraech. Erst newChat() trennt.
@@ -123,10 +131,10 @@ async function zeichneStartSpur(halter) {
       const feld = document.getElementById("codeAufgabe");
       if (feld) { feld.value = ""; feld.focus(); }
     } }));
-    halter.append(punkt({ icon: "projects", text: "Meine Projekte", aktion: () => geheZu("projects") }));
-    halter.append(punkt({ icon: "automation", text: "Nach Zeitplan", aktion: () => geheZu("automation") }));
-    halter.append(punkt({ icon: "sliders", text: "Regeln", aktion: () => geheZu("settings") }));
-    halter.append(punkt({ icon: "chevron", text: "Mehr", aktion: () => geheZu("settings") }));
+    halter.append(punkt({ icon: "projects", text: t("Meine Projekte"), aktion: () => geheZu("projects") }));
+    halter.append(punkt({ icon: "automation", text: t("Nach Zeitplan"), aktion: () => geheZu("automation") }));
+    halter.append(punkt({ icon: "sliders", text: t("Regeln"), aktion: () => geheZu("settings") }));
+    halter.append(punkt({ icon: "chevron", text: t("Mehr"), aktion: () => geheZu("settings") }));
     let chats = [];
     try { chats = await listChats(); } catch { /* Spur bleibt nutzbar */ }
     if (veraltet()) return;
@@ -165,7 +173,7 @@ async function zeichneStartSpur(halter) {
       const alle = document.createElement("button");
       alle.type = "button";
       alle.className = "nav-button spur-alle";
-      alle.textContent = `Alle ${chats.length} Gespräche`;
+      alle.textContent = alleGespraeche(chats.length);
       alle.addEventListener("click", () => geheZu("chatHistory"));
       halter.append(alle);
     }
@@ -173,8 +181,8 @@ async function zeichneStartSpur(halter) {
   }
 
   const startAktiv = document.querySelector("#start")?.classList.contains("is-active");
-  halter.append(punkt({ icon: "plus", text: "Neuer Chat", kuerzel: "⌘K", aktiv: startAktiv, aktion: () => { newChat(); geheZu("start"); } }));
-  halter.append(punkt({ icon: "search", text: "Suchen", aktion: () => geheZu("search") }));
+  halter.append(punkt({ icon: "plus", text: t("Neuer Chat"), kuerzel: "⌘K", aktiv: startAktiv, aktion: () => { newChat(); geheZu("start"); } }));
+  halter.append(punkt({ icon: "search", text: t("Suchen"), aktion: () => geheZu("search") }));
   halter.append(punkt({ icon: "projects", text: "smejjCloud", aktion: () => geheZu("projects") }));
   halter.append(punkt({ icon: "automation", text: "smejjBot", aktion: () => geheZu("automation") }));
 
@@ -189,7 +197,7 @@ async function zeichneStartSpur(halter) {
   let letzteGruppe = "";
   for (const chat of sortiert) {
     const tage = tageHer(chat.updatedAt);
-    const gruppe = tage <= 0 ? "Heute" : tage === 1 ? "Gestern" : "Früher";
+    const gruppe = tage <= 0 ? t("Heute") : tage === 1 ? t("Gestern") : t("Früher");
     if (gruppe !== letzteGruppe) {
       const kopf = document.createElement("div");
       kopf.className = "nav-gruppe";
@@ -212,7 +220,7 @@ async function zeichneStartSpur(halter) {
     const alle = document.createElement("button");
     alle.type = "button";
     alle.className = "nav-button spur-alle";
-    alle.textContent = `Alle ${chats.length} Gespräche`;
+    alle.textContent = alleGespraeche(chats.length);
     alle.addEventListener("click", () => geheZu("chatHistory"));
     halter.append(alle);
   }
@@ -232,7 +240,7 @@ export function initSpurStart() {
   vier.classList.add("nav-vier");
   const halter = document.createElement("nav");
   halter.className = "nav nav-start";
-  halter.setAttribute("aria-label", "Start und letzte Gespräche");
+  halter.setAttribute("aria-label", t("Start und letzte Gespräche"));
   vier.before(halter);
   // Ansichtswechsel laufen ueber Klicks und den Verlauf (gleiches Muster wie
   // topbar-krume.js) — plus ein Lauscher auf Chat-Aenderungen, damit ein

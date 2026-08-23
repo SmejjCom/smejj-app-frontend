@@ -119,7 +119,7 @@ function showSignedIn(user, deps) {
     state.session = { authenticated: false, mode: PROJECT_ROLES.localOnly };
     localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));
     refreshSessionStatus();
-    $("#googleSignIn").textContent = "Abgemeldet. Seite neu laden fuer Google Login.";
+    $("#googleSignIn").textContent = "Abgemeldet. Seite neu laden für Google Login.";
     writeOutput("#profileOutput", "Google Session beendet.");
   });
   $("#googleSignIn").append(button);
@@ -134,7 +134,7 @@ function showSignedIn(user, deps) {
   };
   localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));
   refreshSessionStatus();
-  writeOutput("#profileOutput", `Google Login aktiv fuer ${user.email}.`);
+  writeOutput("#profileOutput", `Google Login aktiv für ${user.email}.`);
 }
 
 function loadGoogleIdentity() {
