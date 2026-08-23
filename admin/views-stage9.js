@@ -20,10 +20,18 @@
   const e = A.escapeHtml;
   const pille = (t, ton) => '<span class="pill ' + (ton || "") + '">' + e(t) + "</span>";
 
-  // Grau ist ZWEIERLEI: wer melden SOLL (messung "heartbeat") und es nicht
-  // tut, ist ein Befund ("Kein Signal"); ein Stillgelegter ist "Aus".
+  // Grau ist DREIERLEI: wer melden SOLL (messung "heartbeat") und es nicht
+  // tut, ist ein Befund ("Kein Signal"); ein Stillgelegter ist "Aus"; und wer
+  // HEUTE schon gemessen wurde, aber seit dem letzten Neustart des Control-
+  // Servers noch keinen Einzellauf hat, ist nur "ohne Einzellauf" — nach jedem
+  // Neustart stehen sonst 30 Minuten lang 38 Autopiloten unter "Braucht dich"
+  // (live gesehen 2026-08-23 05:14Z), obwohl die Tages-Statistik sie traegt.
+  function heuteGemessen(a) {
+    const utcTag = new Date().toISOString().slice(0, 10);
+    return (a.tage || []).some(function (t) { return t.tag === utcTag && (t.ok + t.fehler) > 0; });
+  }
   function stummTrotzPflicht(a) {
-    return a.ampel === "grau" && a.messung === "heartbeat";
+    return a.ampel === "grau" && a.messung === "heartbeat" && !heuteGemessen(a);
   }
 
   function zustand(a) {
@@ -31,9 +39,9 @@
     if (a.ampel === "gelb") return { wort: "Verspätet", ton: "warn", farbe: "gelb" };
     if (a.ampel === "rot") return { wort: "Ausfall", ton: "bad", farbe: "rot" };
     if (a.ampel === "wartung") return { wort: "Wartung", ton: "acc", farbe: "wartung" };
-    return stummTrotzPflicht(a)
-      ? { wort: "Kein Signal", ton: "warn", farbe: "grau" }
-      : { wort: "Aus", ton: "dim", farbe: "grau" };
+    if (stummTrotzPflicht(a)) return { wort: "Kein Signal", ton: "warn", farbe: "grau" };
+    if (a.messung === "heartbeat") return { wort: "Ohne Einzellauf", ton: "dim", farbe: "grau" };
+    return { wort: "Aus", ton: "dim", farbe: "grau" };
   }
 
   function punkt(farbe) {
@@ -223,7 +231,7 @@
     },
     {
       id: "still", name: "Aus",
-      passt: function (a) { return (a.ampel === "grau" && !stummTrotzPflicht(a)) || a.ampel === "wartung"; },
+      passt: function (a) { return (a.ampel === "grau" && a.messung !== "heartbeat") || a.ampel === "wartung"; },
       leer: "Keine Automatik ist stillgelegt oder stummgeschaltet."
     }
   ];
@@ -293,9 +301,11 @@
     }
     if (alle.some(stummTrotzPflicht)) {
       const stumme = alle.filter(stummTrotzPflicht).map(function (a) { return a.name; });
+      // Hoechstens fuenf Namen im Satz — 39 Namen sind kein Satz mehr (live gesehen).
+      const genannt = stumme.slice(0, 5).join(", ") + (stumme.length > 5 ? " und " + (stumme.length - 5) + " weitere" : "");
       return '<div class="note glass"><div class="nx">◆</div><div>'
         + '<div class="nt">' + stumme.length + (stumme.length === 1 ? " meldet sich nicht" : " melden sich nicht") + "</div>"
-        + '<div class="ns">Kein Ausfall gemessen — aber ' + e(stumme.join(", "))
+        + '<div class="ns">Kein Ausfall gemessen — aber ' + e(genannt)
         + (stumme.length === 1 ? " sollte" : " sollten") + " Herzschläge schicken und tun es nicht. Der Grund steht in der Akte.</div></div></div>";
     }
     return '<div class="note glass"><div class="nx">✓</div><div>'
