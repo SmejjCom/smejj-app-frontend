@@ -17,6 +17,7 @@
 
 import { API_ORIGIN, STORAGE_KEYS } from "./config.js";
 import { initOfflineBanner } from "./offline-banner.js";
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=1";
 
 // App-Shell-weiter Offline-Hinweis (Audit 2026-08-09). Hier eingehaengt, weil das
 // Gate ohnehin auf allen App- und Landeseiten laeuft (profile-dock.js,
@@ -200,7 +201,7 @@ export async function holeApiTokenUeberCookie(win, { fetchFn = globalThis.fetch,
  * @param {{fetchFn?: Function, apiOrigin?: string, jetztPruefen?: boolean}} [deps]
  * @returns {Promise<"kein-token"|"gueltig"|"abgelaufen"|"unklar"|"oeffentlich">}
  */
-export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, apiOrigin = API_ORIGIN } = {}) {
+export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, apiOrigin = API_ORIGIN, speicher = authMeSpeicher } = {}) {
   let token = "";
   try {
     token = win.localStorage.getItem(AUTH_TOKEN_KEY) || "";
@@ -211,12 +212,19 @@ export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, api
 
   let urteil = null;
   try {
-    const antwort = await fetchFn(`${apiOrigin}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
-      signal: AbortSignal.timeout(SESSION_CHECK_TIMEOUT_MS)
+    // Ueber den gemeinsamen Speicher: google-login.js stellt dieselbe Frage
+    // 3,5 s spaeter und bekommt dann diese Antwort, statt eine zweite zu
+    // holen (gemessen 2026-08-23: 750 ms + 503 ms fuer denselben Zustand).
+    const payload = await speicher.hole(async () => {
+      const antwort = await fetchFn(`${apiOrigin}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+        signal: AbortSignal.timeout(SESSION_CHECK_TIMEOUT_MS)
+      });
+      // 5xx o. ae. — keine Aussage ueber das Token, und NICHTS zu merken.
+      if (!antwort.ok) return { ok: false };
+      return antwort.json();
     });
-    if (!antwort.ok) return "unklar"; // 5xx o. ae. — keine Aussage ueber das Token.
-    const payload = await antwort.json();
+    if (payload?.ok === false) return "unklar";
     urteil = payload?.authenticated;
     if (urteil === true && payload?.accessToken) {
       try {

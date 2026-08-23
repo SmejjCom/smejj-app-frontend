@@ -13,6 +13,7 @@
 import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js";
 import { PROJECT_ROLES } from "/assets/storage/index.js";
 import { getJson, postJson } from "./shared/http-json.js";
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=1";
 
 export async function initGoogleLogin(deps) {
   const { $, state, writeOutput, refreshSessionStatus } = deps;
@@ -20,9 +21,14 @@ export async function initGoogleLogin(deps) {
   // (kein Boot-Wasserfall). authMe wird ohnehin gebraucht; der In-Flight-Dedup
   // in getJson faellt mit einem etwaigen parallelen Boot-Aufruf zusammen, sodass
   // kein doppelter /api/auth/me entsteht. Gleiche Endpunkte, gleiche Antworten.
+  // GEAENDERT 2026-08-23: der In-Flight-Dedup in getJson greift nur bei
+  // GLEICHZEITIGEN Anfragen. Gemessen lagen die beiden auth/me-Aufrufe 3,5 s
+  // auseinander (750 ms vom Gate, 503 ms hier) — er fiel also nie zusammen.
+  // Der gemeinsame Speicher deckt genau diese Luecke ab.
   const [config, session] = await Promise.all([
     getJson(CLIENT_ROUTES.api.authConfig).catch(() => null),
-    getJson(CLIENT_ROUTES.api.authMe).catch(() => ({ authenticated: false, user: null }))
+    authMeSpeicher.hole(() => getJson(CLIENT_ROUTES.api.authMe))
+      .catch(() => ({ authenticated: false, user: null }))
   ]);
   if (!config) {
     $("#googleSignIn").textContent = "Google Login: Control Server ist noch nicht online.";
