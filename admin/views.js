@@ -163,7 +163,8 @@
         + "<td>" + bezahlt + "</td>"
         + "<td><b>" + e(n.plan || "Frei") + "</b>" + (n.aboKlartext ? '<br><span class="s">' + e(n.aboKlartext) + "</span>" : "") + "</td>"
         + "<td>" + verbrauch + "</td>"
-        + "<td>" + e(relativ(n.lastSeenAt)) + (n.activeSessions ? '<br><span class="s">' + e(String(n.activeSessions)) + " Sitzung" + (n.activeSessions === 1 ? "" : "en") + "</span>" : "") + "</td>"
+        + "<td>" + (n.lastSeenAt ? e(relativ(n.lastSeenAt)) : (n.zuletztMessbar ? '<span class="s">noch nie</span>' : '<span class="s">nicht messbar</span>'))
+        + (n.activeSessions ? '<br><span class="s">' + e(String(n.activeSessions)) + " Sitzung" + (n.activeSessions === 1 ? "" : "en") + "</span>" : "") + "</td>"
         + '<td><span class="act">Akte öffnen</span></td></tr>';
     });
 
@@ -176,7 +177,7 @@
     const stand = "Index " + A.dauer(index.ageSeconds) + " alt"
       + (index.refreshing ? " · wird aufgefrischt" : "")
       + (index.unreadable ? " · " + index.unreadable + " unlesbar" : "")
-      + (index.kenntZuletzt ? "" : " · »Zuletzt« erst nach dem nächsten Neubau");
+      + (index.kenntZuletzt || !(index.zuletztMessbarKonten || 0) ? "" : " · »Zuletzt« erst nach dem nächsten Neubau");
 
     const offene = (abos.nichtZugeordnetListe || []).map((a) =>
       "<tr><td><b>" + e(a.plan || "—") + '</b><br><span class="s">' + e(a.klartext || a.zustand || "") + "</span></td>"
@@ -204,13 +205,15 @@
       + '<div class="kpis">'
       + kachel("Konten gesamt", String(konten.gesamt || 0), "+" + (konten.neuDieseWoche || 0) + " diese Woche", "")
       + kachel("Zahlend", abos.erreichbar === false ? "—" : String(abos.zahlend || 0), konten.gesamt ? Math.round(((abos.zahlend || 0) / konten.gesamt) * 1000) / 10 + " % der Konten" : "", "up")
-      + kachel("Heute aktiv", index.kenntZuletzt ? String(konten.heuteAktiv || 0) : "—", index.kenntZuletzt ? "in den letzten 24 Stunden" : "erst nach Index-Neubau", "")
+      // Ehrlich: Google/GitHub/Passkey-Sitzungen hinterlassen keine Spur im
+      // Datensatz — nur E-Mail-Konten sind hier zaehlbar, und das steht dran.
+      + kachel("Heute aktiv", String(konten.heuteAktiv || 0), "nur messbar für " + (index.zuletztMessbarKonten || 0) + " E-Mail-Konto" + ((index.zuletztMessbarKonten || 0) === 1 ? "" : "en") + " — Google/GitHub hinterlassen keine Spur", (index.zuletztMessbarKonten || 0) ? "" : "wr")
       + kachel("Zwei Adressen", abos.erreichbar === false ? "—" : String((abos.zweiAdressen || 0) + (abos.nichtZugeordnet || 0)), (abos.nichtZugeordnet || 0) > 0 ? abos.nichtZugeordnet + " ohne Konto — anschreiben" : "bezahlt ≠ angemeldet", (abos.nichtZugeordnet || 0) > 0 ? "dn" : "")
       + "</div>"
       + suche
       + '<div class="stack">' + aboAusfall + offenBlock
       + panel("Konten", (d.total || 0) + " Treffer · " + stand,
-        tabelle(["Konto", "Angemeldet mit", "Bezahlt als", "Plan", "Verbrauch seit Neustart", "Zuletzt", ""], zeilen),
+        tabelle(["Konto", "Angemeldet mit", "Bezahlt als", "Plan", "Verbrauch seit Neustart", "Zuletzt (nur E-Mail-Konten)", ""], zeilen),
         werkzeuge)
       + panel("Was du an einem Konto tun kannst", "in der Akte — jede Änderung mit Grund, Step-up und Audit-Eintrag", aktionen)
       + "</div>";
