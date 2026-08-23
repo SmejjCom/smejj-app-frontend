@@ -409,6 +409,27 @@
     const funktionen = '<ul class="ap-funktionen">'
       + (a.funktionen || []).map(function (f) { return "<li>" + e(f) + "</li>"; }).join("") + "</ul>";
 
+    const ein = a.einstellungen || {};
+    const dauerText = function (ms) {
+      if (!Number.isFinite(ms)) return "—";
+      const h = ms / 3600000;
+      if (h >= 24) return (h / 24) + " Tag" + (h / 24 === 1 ? "" : "e");
+      if (h >= 1) return h + " Stunde" + (h === 1 ? "" : "n");
+      return Math.round(ms / 60000) + " Minuten";
+    };
+    const einstellungen = V.tabelleBlock(["", "", ""], [
+      "<tr><td><b>Takt</b><br><span class=\"s\">Wie oft er läuft.</span></td><td>" + e(a.zeitplan || "—") + "</td><td><span class=\"s\">erwartet spätestens alle " + e(dauerText(ein.erwartetAlleMs)) + "</span></td></tr>",
+      "<tr><td><b>Alarm bei</b><br><span class=\"s\">Ab wann die Ampel rot wird.</span></td><td>Schonfrist " + e(dauerText(ein.schonfristMs)) + "</td><td><span class=\"s\">" + e(ein.alarm || "") + "</span></td></tr>",
+      "<tr><td><b>Selbstheilung</b><br><span class=\"s\">Darf er neu gestartet werden?</span></td><td>" + (a.messung === "heartbeat" ? "ja, mit Bremse" : "nein") + "</td><td><span class=\"s\">" + e(ein.selbstheilung || "") + "</span></td></tr>",
+      "<tr><td><b>Stummschaltung</b><br><span class=\"s\">Wartung: kein Alarm, keine Mail.</span></td><td>" + (a.wartung ? pille("aktiv", "acc") : "aus") + "</td><td><span class=\"s\">" + (a.wartung ? e("seit " + A.zeit(a.wartung.seit) + (a.wartung.grund ? " — " + a.wartung.grund : "")) : "über den Knopf oben — mit Grund, steht im Audit-Log") + "</span></td></tr>"
+    ]);
+    const herkunft = V.tabelleBlock(["", ""], [
+      "<tr><td><b>Wo er läuft</b></td><td>" + e(a.ort || "—") + "</td></tr>",
+      "<tr><td><b>Kennung</b></td><td><code>" + e(a.id) + "</code>" + (a.nummer ? ' <span class="s">· Autopilot ' + e(a.nummer) + "</span>" : "") + "</td></tr>",
+      "<tr><td><b>Registriert in</b></td><td><code>control-server/src/admin/opsAutopilotenListe" + (["ai-evolution-engine", "missing-function-detector", "autopilot-supervisor", "evolution-ablage", "nachweis-kette"].indexOf(a.id) !== -1 ? "Evolution" : "") + ".js</code> · Bereich: <code>opsAutopilotenBereiche.js</code></td></tr>",
+      "<tr><td><b>Geprüft durch</b></td><td><code>control-server/src/admin/opsAutopiloten.test.js</code> <span class=\"s\">(Ampelregeln, Nummern, Bereiche)</span></td></tr>"
+    ]);
+
     const anleitung = '<div class="ap-bedienung">'
       + "<div><b>So startest du ihn von Hand:</b>"
       + '<div class="ap-anleitung">' + e(a.startAnleitung || "—") + "</div></div>"
@@ -432,6 +453,8 @@
           : '<div class="pb"><div class="leer">Noch kein Lauf gemessen.</div></div>')
       + V.panelBlock("Steckbrief", null, steckbrief)
       + V.panelBlock("Was macht er genau?", null, '<div class="pb">' + funktionen + "</div>")
+      + V.panelBlock("Einstellungen", "die Regeln, nach denen diese Ampel schaltet — Einstellungen, keine Handlungen", einstellungen)
+      + V.panelBlock("Woher er kommt", "Datei, Kennung, Prüfung", herkunft)
       + V.panelBlock("Von Hand", "Klartext statt toter Knöpfe", '<div class="pb">' + anleitung + "</div>")
       + "</div>";
   }
