@@ -274,6 +274,40 @@
     const leeren = document.getElementById("sucheLeeren");
     if (leeren) leeren.addEventListener("click", function () { zustand.suchbegriff = ""; zeigeNutzer(); });
     bindeNeubau();
+    bindeAboUmhaengen();
+  }
+
+  // Abo ohne Konto -> auf ein bestehendes Konto haengen. Zwei Fragen (welches
+  // Konto, warum), dann dieselbe Kontoaktion wie alle anderen: Step-up, Recht,
+  // Audit mit Vorher/Nachher. Die Kaufadresse bleibt als Beleg am Kunden.
+  function bindeAboUmhaengen() {
+    document.querySelectorAll("[data-aboUmhaengen]").forEach(function (knopf) {
+      knopf.addEventListener("click", async function () {
+        const kundenId = knopf.getAttribute("data-aboUmhaengen");
+        const konto = await D.text({
+          titel: "Abo auf ein Konto umhängen",
+          absaetze: ["Das Abo " + kundenId + " wird dem Konto mit dieser Adresse zugeordnet. Die Adresse, mit der bezahlt wurde, bleibt als Beleg erhalten; bei Stripe ändert sich nichts."],
+          platzhalter: "Konto-Adresse, z. B. name@example.org",
+          minLaenge: 5,
+          okText: "Weiter"
+        });
+        if (!konto || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(konto).trim())) return;
+        const grund = await D.text({
+          titel: "Warum?",
+          absaetze: ["Der Grund steht dauerhaft im Audit-Log."],
+          platzhalter: "z. B. Kunde hat unter seiner Zweitadresse bezahlt",
+          minLaenge: 3,
+          okText: "Umhängen"
+        });
+        if (grund === null || String(grund).trim().length < 3) return;
+        knopf.textContent = "läuft …";
+        knopf.setAttribute("disabled", "disabled");
+        const antwort = await A.aktion(String(konto).trim().toLowerCase(), "billing.relink", { reason: String(grund).trim(), customerId: kundenId });
+        if (!antwort.ok) { meldung(antwort.fehler, true); knopf.textContent = "Auf ein Konto umhängen"; knopf.removeAttribute("disabled"); return; }
+        meldung("Abo umgehängt — das Konto sieht jetzt seinen Plan.", false);
+        zeigeNutzer();
+      });
+    });
   }
 
   function bindeNeubau() {

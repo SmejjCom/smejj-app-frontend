@@ -115,7 +115,8 @@
     const offene = (abos.nichtZugeordnetListe || []).map((a) =>
       "<tr><td><b>" + e(a.plan || "—") + '</b><br><span class="s">' + e(a.klartext || a.zustand || "") + "</span></td>"
       + '<td><span class="mono">' + e(a.zahlendeAdresse || "Adresse unbekannt") + "</span></td>"
-      + "<td>" + e(a.naechsterSchritt || "Mit dieser Adresse anmelden, oder das Abo auf die Konto-Adresse umhängen.") + "</td></tr>");
+      + "<td>" + e(a.naechsterSchritt || "Mit dieser Adresse anmelden, oder das Abo auf die Konto-Adresse umhängen.")
+      + '<br><span class="btn" data-aboUmhaengen="' + e(a.kundenId || "") + '">Auf ein Konto umhängen</span></td></tr>");
     const offenBlock = offene.length
       ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + offene.length + " bezahlte Abo(s) passen zu keinem Konto</div>"
         + '<div class="ns">Der Kunde hat bezahlt und sieht in der App trotzdem »Frei«. Die Adresse, mit der bezahlt wurde, gehört zu keinem Konto hier.</div></div></div>'
