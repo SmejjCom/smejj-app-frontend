@@ -3,11 +3,16 @@
 // Gleiches Muster wie Stufe 4/5: reine Funktionen, Daten rein, HTML raus,
 // kein Zustand, keine style="..."-Attribute (die eigene CSP verbietet sie).
 //
-// Haltung dieser Ansicht: kinderleicht. Eine Ampel pro Automatik, der Grund
-// in einem ganzen Satz daneben, und zu JEDER Automatik steht da, wie man sie
-// von Hand startet und wie man sie ausschaltet — als Klartext-Anleitung statt
-// als toter Knopf. Ein Knopf, der nur so tut, waere das Gegenteil von
-// idiotensicher.
+// Aufbau seit 2026-08-23 nach dem Design-Vorschlag "Adminbereich" (Struktur
+// uebernommen, Optik bleibt die der Konsole: viereckig, grosse Schrift, eine
+// Akzentfarbe). Zwei Bildschirme statt Master-Detail:
+//   1. LISTE — alle Autopiloten als Tabelle, nach BEREICH gruppiert, mit den
+//      fuenf Spalten "Nr · Was er tut · Takt · Zustand · Letzter echter Lauf".
+//      Die letzte Spalte ist die wichtigste: ohne "letzten echten Lauf" sagt
+//      eine graue Ampel nichts.
+//   2. DETAIL — ein Autopilot von innen: die zwei Knoepfe zuerst, vier Zahlen,
+//      dann Grund, Verlauf, Steckbrief, Anleitung.
+// Kein Zustand nur als Farbe — immer auch als Wort.
 (function () {
   "use strict";
   const A = window.adminApi;
@@ -15,68 +20,86 @@
   const e = A.escapeHtml;
   const pille = (t, ton) => '<span class="pill ' + (ton || "") + '">' + e(t) + "</span>";
 
-  const AMPEL = {
-    gruen: { text: "GRÜN · läuft", ton: "ok" },
-    gelb: { text: "GELB · verspätet", ton: "warn" },
-    rot: { text: "ROT · Ausfall", ton: "bad" },
-    grau: { text: "KEINE MESSUNG", ton: "dim" },
-    wartung: { text: "WARTUNG · stummgeschaltet", ton: "acc" }
-  };
-
-  function ampelPille(farbe) {
-    const a = AMPEL[farbe] || AMPEL.grau;
-    return pille(a.text, a.ton);
+  // Grau ist ZWEIERLEI: wer melden SOLL (messung "heartbeat") und es nicht
+  // tut, ist ein Befund ("Kein Signal"); ein Stillgelegter ist "Aus".
+  function stummTrotzPflicht(a) {
+    return a.ampel === "grau" && a.messung === "heartbeat";
   }
 
-  /**
-   * Die laufende Nummer vor dem Namen — klein und leise.
-   *
-   * Sie stand bis 2026-08-14 IM Namen ("24. Autonomous Multi-File
-   * Repo-Architect Autopilot") und schob damit das Wort, das etwas sagt, aus
-   * der schmalen Spalte heraus. Sie ganz wegzunehmen war zu viel des Guten:
-   * der Betreiber verstaendigt sich ueber sie ("schau dir mal Autopilot 06
-   * an"). Also beides — Nummer als eigenes, ruhiges Element, Name als
-   * Hauptsache.
-   */
-  function nummer(a) {
-    return a.nummer ? '<span class="ap-nr">' + e(a.nummer) + "</span>" : "";
+  function zustand(a) {
+    if (a.ampel === "gruen") return { wort: "Läuft", ton: "ok", farbe: "gruen" };
+    if (a.ampel === "gelb") return { wort: "Verspätet", ton: "warn", farbe: "gelb" };
+    if (a.ampel === "rot") return { wort: "Ausfall", ton: "bad", farbe: "rot" };
+    if (a.ampel === "wartung") return { wort: "Wartung", ton: "acc", farbe: "wartung" };
+    return stummTrotzPflicht(a)
+      ? { wort: "Kein Signal", ton: "warn", farbe: "grau" }
+      : { wort: "Aus", ton: "dim", farbe: "grau" };
   }
 
   function punkt(farbe) {
     return '<span class="ap-dot ' + e(farbe) + '"></span>';
   }
 
-  function letzterLaufText(a) {
-    if (!a.letzterLauf) {
-      // Tagessummen ohne Einzellauf: "noch keiner" waere falsch — er HAT
-      // gemeldet, nur der letzte Einzellauf fehlt (siehe ampelGrund).
-      const tage = a.tage || [];
-      const t = tage.length ? tage[tage.length - 1] : null;
-      return t
-        ? "kein Einzellauf gespeichert — zuletzt gemessener Tag: " + t.tag
-          + " (" + ((t.ok || 0) + (t.fehler || 0)) + " Läufe)"
-        : "noch keiner gemessen";
-    }
-    const wann = A.zeit(a.letzterLauf.am);
-    const wie = a.letzterLauf.status === "ok" ? "erfolgreich" : "FEHLER";
-    return wann + " — " + wie;
+  function zustandZelle(a) {
+    const z = zustand(a);
+    return '<span class="ap-zustand">' + punkt(z.farbe) + '<span class="' + z.ton + '">' + e(z.wort) + "</span></span>";
   }
 
-  // ---------- "Was hat er HEUTE gemacht?" (2026-08-14) ----------
-  //
-  // Die Seite konnte bisher alles beantworten AUSSER der Frage, die man als
-  // erstes stellt. Ampel, 90-Tage-Balken und Verlauf sind Fachantworten;
-  // "was hat das Ding heute getan" ist die Laienfrage.
-  //
-  // ZWEI KALENDER, und das ist der Grund fuer die Sorgfalt hier:
-  //   - a.verlauf hat echte Zeitstempel, aber nur die letzten 20 Laeufe.
-  //   - a.tage zaehlt vollstaendig, aber je UTC-Kalendertag (so legt der
-  //     Server sie ab, so zeichnet auch der 90-Tage-Balken).
-  // Der Betreiber sitzt in der Pazifikzeit; ab 17 Uhr seiner Uhr ist der
-  // UTC-Tag schon der naechste. "Heute" heisst deshalb hier SEIN heute, aus
-  // verlauf gerechnet — und wenn der Verlauf randvoll ist, sagen wir
-  // "mindestens N" statt eine Zahl zu erfinden. Die exakte UTC-Tageszahl
-  // steht als Zusatzzeile darunter, statt sie als "heute" auszugeben.
+  function nummer(a) {
+    return a.nummer ? '<span class="ap-nr">' + e(a.nummer) + "</span>" : "";
+  }
+
+  /** "vor 12 min", "vor 3 Std.", "gestern 04:12", "vor 9 Tagen" — Laienzeit. */
+  function relativ(iso) {
+    const d = new Date(iso);
+    if (!iso || isNaN(d.getTime())) return "—";
+    const sek = Math.max(0, (Date.now() - d.getTime()) / 1000);
+    if (sek < 60) return "gerade eben";
+    if (sek < 3600) return "vor " + Math.round(sek / 60) + " min";
+    if (sek < 6 * 3600) return "vor " + Math.round(sek / 3600) + " Std.";
+    const uhr = A.zeit(iso).slice(-5);
+    const heute = new Date(); heute.setHours(0, 0, 0, 0);
+    if (d >= heute) return "heute " + uhr;
+    if (d >= new Date(heute.getTime() - 86400000)) return "gestern " + uhr;
+    const tage = Math.round((heute.getTime() - d.getTime()) / 86400000);
+    return "vor " + tage + (tage === 1 ? " Tag" : " Tagen");
+  }
+
+  /** Die wichtigste Spalte: letzter ECHTER Lauf, nie aus der Konfiguration. */
+  function letzterLaufZelle(a) {
+    const l = a.letzterLauf;
+    if (l) {
+      return "<b>" + e(relativ(l.am)) + "</b> · " + (l.status === "ok"
+        ? '<span class="ok">erfolgreich</span>' : '<span class="bad">FEHLER</span>');
+    }
+    const tage = a.tage || [];
+    const t = tage.length ? tage[tage.length - 1] : null;
+    return t
+      ? '<span class="s">kein Einzellauf gespeichert · zuletzt am ' + e(t.tag) + "</span>"
+      : '<span class="s">noch keiner gemessen</span>';
+  }
+
+  function letzterLaufText(a) {
+    if (a.letzterLauf) {
+      return A.zeit(a.letzterLauf.am) + " — " + (a.letzterLauf.status === "ok" ? "erfolgreich" : "FEHLER");
+    }
+    const tage = a.tage || [];
+    const t = tage.length ? tage[tage.length - 1] : null;
+    return t
+      ? "kein Einzellauf gespeichert — zuletzt gemessener Tag: " + t.tag + " (" + ((t.ok || 0) + (t.fehler || 0)) + " Läufe)"
+      : "noch keiner gemessen";
+  }
+
+  /** Takt kurz: der Teil vor der ersten Klammer, gedeckelt. Voll im title. */
+  function taktKurz(zeitplan) {
+    const voll = String(zeitplan || "—");
+    let kurz = voll.split(" (")[0].split(" — ")[0];
+    if (kurz.length > 34) kurz = kurz.slice(0, 33) + "…";
+    return '<span title="' + e(voll) + '">' + e(kurz) + "</span>";
+  }
+
+  // ---------- "Was hat er HEUTE gemacht?" ----------
+  // Zwei Kalender: a.verlauf hat Zeitstempel (nur 20), a.tage zaehlt je UTC-Tag.
   const VERLAUF_MAX = 20;
 
   function istHeute(iso) {
@@ -92,14 +115,12 @@
     const verlauf = a.verlauf || [];
     const laeufe = verlauf.filter(function (l) { return istHeute(l.am); });
     const fehler = laeufe.filter(function (l) { return l.status !== "ok"; }).length;
-    // Randvoll heisst: es koennen mehr gewesen sein, wir wissen es nur nicht.
     const gedeckelt = laeufe.length >= VERLAUF_MAX && verlauf.length >= VERLAUF_MAX;
     const utcTag = new Date().toISOString().slice(0, 10);
     const tag = (a.tage || []).filter(function (t) { return t.tag === utcTag; })[0] || null;
     return { laeufe: laeufe, fehler: fehler, gedeckelt: gedeckelt, tag: tag };
   }
 
-  /** Ein Satz, ohne Fachwort, fuer Liste und Detail. */
   function heuteSatz(a) {
     if (a.wartung) return "Stummgeschaltet — er meldet heute nichts.";
     const b = heuteBilanz(a);
@@ -115,49 +136,12 @@
       + (b.fehler === 1 ? " mit Fehler." : " mit Fehlern.");
   }
 
-  function heuteBlock(a) {
+  function heuteZahl(a) {
     const b = heuteBilanz(a);
-    const zahl = b.laeufe.length
-      ? (b.gedeckelt ? VERLAUF_MAX + "+" : String(b.laeufe.length))
-      : "0";
-    const ton = a.wartung ? "" : (b.fehler > 0 ? " fehler" : "");
-
-    const zeilen = b.laeufe.slice(0, 6).map(function (l) {
-      const uhr = A.zeit(l.am).slice(-5);
-      return '<li><b>' + e(uhr) + "</b> — "
-        + (l.status === "ok" ? "erfolgreich" : "FEHLER")
-        + (l.dauerMs === null || l.dauerMs === undefined ? "" : " · " + e(A.dauer(l.dauerMs / 1000)))
-        + (l.meldung ? " · " + e(l.meldung) : "") + "</li>";
-    });
-    const rest = b.laeufe.length > 6
-      ? '<li class="s">… und ' + (b.laeufe.length - 6) + " weitere, alle im Verlauf unten.</li>"
-      : "";
-
-    // Die Vollzaehlung des Servers steht NUR da, wenn sie von der Zahl oben
-    // abweicht — sonst waere sie zwei Zahlen fuer dieselbe Sache, also genau
-    // das Gegenteil von uebersichtlich. Weicht sie ab, erklaert der Satz auch
-    // warum: der Server rechnet in UTC-Tagen, die Zahl oben in deinen.
-    const utcGesamt = b.tag ? (b.tag.ok + b.tag.fehler) : null;
-    const utc = (utcGesamt !== null && utcGesamt !== b.laeufe.length)
-      ? '<div class="ap-heute-utc">Oben steht dein Tag nach deiner Uhr. '
-        + "Der Server zählt in UTC-Tagen — dort stehen für den laufenden UTC-Tag "
-        + "<b>" + utcGesamt + " Läufe</b>, " + b.tag.fehler + " davon mit Fehler.</div>"
-      : "";
-
-    return V.panelBlock("Was hat er heute gemacht?", "die Antwort in einem Satz",
-      '<div class="pb"><div class="ap-heute' + ton + '">'
-      + '<div class="ap-heute-zahl">' + e(zahl) + "</div>"
-      + '<div class="ap-heute-text">' + e(heuteSatz(a))
-      + '<div class="s">Nächster Lauf: ' + e(a.zeitplan || "—") + "</div></div></div>"
-      + (zeilen.length
-        ? '<ul class="ap-heute-liste">' + zeilen.join("") + rest + "</ul>"
-        : '<div class="s ap-heute-leer">Kein Lauf mit heutigem Zeitstempel. Das ist bei Wochen- und Nacht-Automatiken der Normalfall.</div>')
-      + utc + "</div>");
+    return b.laeufe.length ? (b.gedeckelt ? VERLAUF_MAX + "+" : String(b.laeufe.length)) : "0";
   }
 
-  // 90-Tage-Balken wie auf den Status-Seiten der grossen Anbieter — nur ehrlich:
-  // eine Zelle je KALENDERTAG, grau heisst "an diesem Tag nichts gemessen"
-  // (bei einem Montags-Autopiloten sind sechs graue Zellen pro Woche normal).
+  // 90-Tage-Balken: eine Zelle je KALENDERTAG, grau = nichts gemessen.
   function tageBalken(a) {
     const jeTag = {};
     (a.tage || []).forEach(function (t) { jeTag[t.tag] = t; });
@@ -166,10 +150,7 @@
     for (let i = 89; i >= 0; i -= 1) {
       const tag = new Date(heute - i * 86400000).toISOString().slice(0, 10);
       const t = jeTag[tag];
-      // Kein "leer" als Klassenname: die Konsole hat bereits ein globales
-      // .leer (Leerzustands-Absatz mit 22px Padding), das die 90 schmalen
-      // Zellen zu 32px-Bloecken aufpumpen wuerde — am 2026-08-09 live gesehen.
-      // Die Basisklasse .ap-tag IST bereits der "nichts gemessen"-Look.
+      // Kein "leer" als Klassenname (globales .leer wuerde die Zellen aufpumpen).
       const klasse = !t ? "" : (t.fehler > 0 ? "bad" : "ok");
       const titel = !t
         ? tag + " · nichts gemessen"
@@ -186,26 +167,25 @@
       + '<div class="ap-quote">' + quote + "</div></div>";
   }
 
-  /**
-   * Vorfaelle tragen den Namen, der zur Zeit des Vorfalls galt — nach der
-   * Umbenennung vom 2026-08-14 stand unten "29. 24/7 Synthetic User & Full-
-   * Stack E2E Watchdog", oben "Probe-Nutzer". Ein Autopilot, ein Name:
-   * nachgeschlagen wird ueber die Kennung in der aktuellen Liste.
-   */
+  // ---------- Vorfall-Protokoll ----------
+  // Vorfaelle tragen den Namen zur Zeit des Vorfalls — nachgeschlagen wird
+  // ueber die Kennung, damit oben und unten derselbe Name steht.
   function anzeigeName(v, alle) {
     const a = (alle || []).filter(function (x) { return x.id === v.id; })[0];
     return a ? nummer(a) + e(a.name) : e(v.name || v.id);
   }
 
-  function vorfallBlock(vorfaelle, alle) {
+  const VORFAELLE_KURZ = 8;
+
+  function vorfallBlock(vorfaelle, alle, alleZeigen) {
+    const titel = "Vorfall-Protokoll";
     if (!vorfaelle || !vorfaelle.length) {
-      return V.panelBlock("Vorfall-Protokoll", "jede Rot- und Gelb-Phase, von wann bis wann",
+      return V.panelBlock(titel, "jede Rot- und Gelb-Phase, von wann bis wann",
         '<div class="pb"><div class="leer">Kein Vorfall aufgezeichnet. Jede künftige Rot- oder Gelb-Phase landet hier — mit Beginn, Ende, Dauer und Grund.</div></div>');
     }
-    const zeilen = vorfaelle.map(function (v) {
+    const gezeigt = alleZeigen ? vorfaelle : vorfaelle.slice(0, VORFAELLE_KURZ);
+    const zeilen = gezeigt.map(function (v) {
       const offen = v.bis === null || v.bis === undefined;
-      // Vorfaelle ohne art stammen aus der Zeit, als nur Rot protokolliert
-      // wurde — sie waren also Ausfaelle.
       const gelb = v.art === "gelb";
       return "<tr><td><b>" + anzeigeName(v, alle) + "</b></td>"
         + "<td>" + (gelb ? pille("Verspätung", "warn") : pille("Ausfall", "bad")) + "</td>"
@@ -214,58 +194,37 @@
         + "<td>" + (offen || !Number.isFinite(v.dauerMs) ? "—" : e(A.dauer(v.dauerMs / 1000))) + "</td>"
         + "<td>" + e(v.grund || "—") + "</td></tr>";
     });
-    return V.panelBlock("Vorfall-Protokoll", "jede Rot- und Gelb-Phase, von wann bis wann",
-      V.tabelleBlock(["Autopilot", "Art", "Von", "Bis", "Dauer", "Grund"], zeilen));
+    const rest = vorfaelle.length - gezeigt.length;
+    const fuss = rest > 0
+      ? '<div class="pb"><span class="btn" data-apVorfaelle="alle">… ' + rest + " weitere anzeigen (" + vorfaelle.length + " gesamt)</span></div>"
+      : (alleZeigen && vorfaelle.length > VORFAELLE_KURZ
+        ? '<div class="pb"><span class="btn" data-apVorfaelle="kurz">Nur die letzten ' + VORFAELLE_KURZ + " zeigen</span></div>"
+        : "");
+    return V.panelBlock(titel, "jede Rot- und Gelb-Phase, von wann bis wann — die jüngsten zuerst",
+      V.tabelleBlock(["Autopilot", "Art", "Von", "Bis", "Dauer", "Grund"], zeilen) + fuss);
   }
 
-  // ---------- Register: welche Automatiken sehe ich gerade? (2026-08-14) ----------
-  //
-  // Dreissig Zeilen untereinander sind eine Liste, keine Uebersicht. Wer die
-  // Seite oeffnet, will EINE Sache wissen: muss ich jetzt etwas tun? Die
-  // Register beantworten genau das, bevor man ueberhaupt liest.
-  //
-  // Wortwahl mit Absicht: das dritte Register heisst "Still", NICHT "Schläft".
-  // Grau bedeutet in diesem Haus "keine Messung" — bei einer Montags-Automatik
-  // ist das normal, bei einer stuendlichen waere es ein Befund. "Schläft" wuerde
-  // beides zu "alles gut" verklaeren, und das ist genau die Sorte Beschoenigung,
-  // die die Ampel hier nirgends macht.
-  //
-  // Grau ist ZWEIERLEI (seit 2026-08-23 getrennt): Ein Autopilot, der melden
-  // SOLL und es nicht tut (messung "heartbeat", kein Herzschlag), ist ein
-  // Befund — er gehoert zu "Braucht dich", sonst steht "Kein Alarm" ueber
-  // einem Pruefer, der seit Tagen nichts liefert. Ein stillgelegter (messung
-  // "geplant") ist dagegen normal still.
-  function stummTrotzPflicht(a) {
-    return a.ampel === "grau" && a.messung === "heartbeat";
-  }
-
+  // ---------- Register ----------
   const REGISTER = [
-    {
-      id: "achtung", name: "Braucht dich",
-      passt: function (a) { return a.ampel === "rot" || a.ampel === "gelb" || stummTrotzPflicht(a); },
-      leer: "Niemand braucht dich gerade. Kein Ausfall, keine Verspätung, keiner stumm."
-    },
-    {
-      id: "arbeit", name: "Arbeitet",
-      passt: function (a) { return a.ampel === "gruen"; },
-      leer: "Gerade arbeitet keine Automatik nachweislich — es liegt für keine ein frischer Herzschlag vor."
-    },
-    {
-      id: "still", name: "Still",
-      passt: function (a) { return a.ampel === "grau" && !stummTrotzPflicht(a); },
-      leer: "Keine Automatik ist stillgelegt."
-    },
-    {
-      // Erscheint nur, wenn wirklich jemand stummgeschaltet ist — ein Register
-      // mit dauerhafter Null waere ein Knopf, der nie etwas tut.
-      id: "wartung", name: "In Wartung", nurWennVorhanden: true,
-      passt: function (a) { return a.ampel === "wartung"; },
-      leer: "Keine Automatik ist stummgeschaltet."
-    },
     {
       id: "alle", name: "Alle",
       passt: function () { return true; },
       leer: "Es ist keine einzige Automatik eingetragen."
+    },
+    {
+      id: "arbeit", name: "Läuft",
+      passt: function (a) { return a.ampel === "gruen"; },
+      leer: "Gerade arbeitet keine Automatik nachweislich — es liegt für keine ein frischer Herzschlag vor."
+    },
+    {
+      id: "achtung", name: "Braucht dich",
+      passt: function (a) { return a.ampel === "rot" || a.ampel === "gelb" || stummTrotzPflicht(a); },
+      leer: "Niemand braucht dich gerade. Kein Ausfall, keine Verspätung, kein fehlendes Signal."
+    },
+    {
+      id: "still", name: "Aus",
+      passt: function (a) { return (a.ampel === "grau" && !stummTrotzPflicht(a)) || a.ampel === "wartung"; },
+      leer: "Keine Automatik ist stillgelegt oder stummgeschaltet."
     }
   ];
 
@@ -273,24 +232,13 @@
     return REGISTER.filter(function (r) { return r.id === id; })[0] || null;
   }
 
-  /** Die Register, die gerade gezeigt werden — ohne die dauerhaft leeren. */
-  function registerListe(alle) {
-    return REGISTER.filter(function (r) {
-      return !r.nurWennVorhanden || alle.some(r.passt);
-    });
-  }
-
-  /**
-   * Welches Register ist offen, wenn noch keins gewaehlt wurde?
-   * Antwort: das mit dem Problem. Wer die Seite aufschlaegt und einen Ausfall
-   * hat, soll ihn sehen und nicht erst danach suchen muessen.
-   */
+  /** Ohne Wahl: das Register mit dem Problem — sonst "Alle". */
   function standardRegister(alle) {
     return alle.some(registerFuer("achtung").passt) ? "achtung" : "alle";
   }
 
   function registerLeiste(alle, aktivId) {
-    return '<div class="ap-register">' + registerListe(alle).map(function (r) {
+    return '<div class="ap-register">' + REGISTER.map(function (r) {
       const anzahl = alle.filter(r.passt).length;
       const dringend = r.id === "achtung" && anzahl > 0;
       return '<span class="ap-reg' + (r.id === aktivId ? " on" : "") + (dringend ? " warn" : "")
@@ -299,61 +247,136 @@
     }).join("") + "</div>";
   }
 
-  function liste(autopiloten, auswahlId) {
-    if (!autopiloten.length) return "";
-    return '<div class="ap-liste">' + autopiloten.map(function (a) {
-      return '<a class="ap-item' + (a.id === auswahlId ? " on" : "") + '" data-ap="' + e(a.id) + '">'
-        + punkt(a.ampel)
-        + '<span class="t"><b>' + nummer(a) + e(a.name) + "</b>"
-        + '<span class="h">' + e(heuteSatz(a)) + "</span>"
-        + "<span>" + e(a.ort) + " · " + e(a.zeitplan) + "</span></span></a>";
-    }).join("") + "</div>";
+  function sucheFeld(suche) {
+    return '<div class="ap-suche"><input type="search" data-apSuche placeholder="Nach Name, Nummer oder Bereich suchen" value="'
+      + e(suche || "") + '" aria-label="Autopiloten durchsuchen"></div>';
   }
 
-  function detail(a) {
-    if (!a) return V.fehlerblock("Kein Autopilot ausgewählt.");
+  function passtSuche(a, suche) {
+    const s = String(suche || "").trim().toLowerCase();
+    if (!s) return true;
+    return [a.nummer, a.name, a.kurz, a.bereich, a.id, a.zeitplan].some(function (f) {
+      return String(f || "").toLowerCase().indexOf(s) !== -1;
+    });
+  }
 
-    const grund = '<div class="note glass' + (a.ampel === "rot" ? " fehler" : "") + '">'
-      + '<div class="nx">' + (a.ampel === "rot" ? "▲" : a.ampel === "gruen" ? "✓" : "◆") + "</div><div>"
-      + '<div class="nt">Warum diese Ampel?</div>'
-      + '<div class="ns">' + e(a.ampelGrund || "") + "</div></div></div>";
+  // ---------- Bildschirm 1: Liste ----------
+  function zeile(a) {
+    return '<tr class="ap-row" data-ap="' + e(a.id) + '">'
+      + '<td class="ap-nr-zelle">' + e(a.nummer || "—") + "</td>"
+      + '<td class="ap-was"><b>' + e(a.name) + "</b><span>" + e(a.kurz || "") + "</span></td>"
+      + "<td>" + taktKurz(a.zeitplan) + "</td>"
+      + "<td>" + zustandZelle(a) + "</td>"
+      + "<td>" + letzterLaufZelle(a) + "</td></tr>";
+  }
 
-    // Nummer und technischer Name stehen hier unten, nicht in der Ueberschrift:
-    // oben soll stehen, was das Ding TUT. Wer sie braucht — fuer eine Notiz,
-    // ein Zettel-Verweis, eine Fehlersuche im Log — findet sie hier.
-    const steckbrief = V.tabelleBlock(["", ""], [
-      "<tr><td><b>Wo läuft er?</b></td><td>" + e(a.ort) + "</td></tr>",
-      "<tr><td><b>Wann läuft er?</b></td><td>" + e(a.zeitplan) + "</td></tr>",
-      "<tr><td><b>Letzter Lauf</b></td><td>" + e(letzterLaufText(a)) + "</td></tr>",
-      "<tr><td><b>Nummer und Kennung</b></td><td><span class=\"s\">"
-        + (a.nummer ? "Autopilot " + e(a.nummer) + " · " : "")
-        + "<code>" + e(a.id) + "</code></span></td></tr>"
-    ]);
+  function gruppen(sichtbar, bereiche) {
+    return bereiche.map(function (b) {
+      const drin = sichtbar.filter(function (a) { return a.bereich === b; });
+      if (!drin.length) return "";
+      return V.panelBlock(b, drin.length + (drin.length === 1 ? " Autopilot" : " Autopiloten"),
+        V.tabelleBlock(["Nr.", "Was er tut", "Takt", "Zustand", "Letzter echter Lauf"], drin.map(zeile)));
+    }).join("");
+  }
 
-    const funktionen = "<ul class=\"ap-funktionen\">"
-      + (a.funktionen || []).map(function (f) { return "<li>" + e(f) + "</li>"; }).join("")
-      + "</ul>";
+  function lageSatz(d, alle) {
+    if ((d.rot || 0) > 0) {
+      const rote = alle.filter(function (a) { return a.ampel === "rot"; }).map(function (a) { return a.name; });
+      return '<div class="note glass fehler"><div class="nx">▲</div><div>'
+        + '<div class="nt">' + d.rot + " auf Rot</div>"
+        + '<div class="ns">Zuerst ansehen: ' + e(rote.join(", ")) + ". Der Grund steht in der Akte.</div></div></div>";
+    }
+    if ((d.gelb || 0) > 0) {
+      return '<div class="note glass"><div class="nx">◆</div><div>'
+        + '<div class="nt">' + d.gelb + " verspätet — noch kein Ausfall</div>"
+        + '<div class="ns">Die Schonfrist läuft. Bleibt es gelb, wird es von allein rot.</div></div></div>';
+    }
+    if (alle.some(stummTrotzPflicht)) {
+      const stumme = alle.filter(stummTrotzPflicht).map(function (a) { return a.name; });
+      return '<div class="note glass"><div class="nx">◆</div><div>'
+        + '<div class="nt">' + stumme.length + (stumme.length === 1 ? " meldet sich nicht" : " melden sich nicht") + "</div>"
+        + '<div class="ns">Kein Ausfall gemessen — aber ' + e(stumme.join(", "))
+        + (stumme.length === 1 ? " sollte" : " sollten") + " Herzschläge schicken und tun es nicht. Der Grund steht in der Akte.</div></div></div>";
+    }
+    return '<div class="note glass"><div class="nx">✓</div><div>'
+      + '<div class="nt">Kein Alarm</div>'
+      + '<div class="ns">Alles Gemessene ist pünktlich und erfolgreich gelaufen. ' + e(d.hinweis || "") + "</div></div></div>";
+  }
 
-    // Echte Knöpfe zuerst, Anleitungen darunter. Die Knöpfe können nur, was
-    // dieser Server wirklich kann — für alles andere bleibt die Anleitung
-    // stehen, statt eine Attrappe hinzustellen.
-    const knoepfe = '<div class="ap-knoepfe">'
+  function liste(d, zustandUI) {
+    const alle = d.autopiloten || [];
+    const reg = registerFuer(zustandUI.register) || registerFuer(standardRegister(alle));
+    const sichtbar = alle.filter(reg.passt).filter(function (a) { return passtSuche(a, zustandUI.suche); });
+    const bereiche = (d.bereiche && d.bereiche.length) ? d.bereiche : alle.map(function (a) { return a.bereich; })
+      .filter(function (b, i, arr) { return arr.indexOf(b) === i; });
+    const inhalt = sichtbar.length
+      ? gruppen(sichtbar, bereiche)
+      : '<div class="ap-register-leer">' + (zustandUI.suche
+        ? "Nichts gefunden für »" + e(zustandUI.suche) + "«."
+        : e(reg.leer)) + "</div>";
+    return V.kopfBlock("AP", "Autopiloten", "Alle Autopiloten auf einer Seite",
+      "Jeder mit Nummer, Klartext, Takt, Zustand und letztem echten Lauf. Die letzte Spalte ist die wichtigste: ohne echten Lauf sagt eine graue Ampel nichts.")
+      + '<div class="stack">' + lageSatz(d, alle)
+      + '<div class="ap-leiste">' + registerLeiste(alle, reg.id) + sucheFeld(zustandUI.suche) + "</div>"
+      + inhalt
+      + vorfallBlock(d.vorfaelle, alle, zustandUI.vorfaelleAlle)
+      + "</div>";
+  }
+
+  // ---------- Bildschirm 2: Detail ----------
+  function kennzahlen(a) {
+    const b = heuteBilanz(a);
+    const q = a.erfolgsquote90;
+    const l = a.letzterLauf;
+    return '<div class="kpis">'
+      + V.kachelBlock("Letzter Lauf", l ? relativ(l.am) : "—",
+        l ? (l.status === "ok" ? "erfolgreich" : "FEHLER") : letzterLaufText(a), l ? (l.status === "ok" ? "up" : "dn") : "")
+      + V.kachelBlock("Läufe heute", heuteZahl(a),
+        b.fehler ? b.fehler + " mit Fehler" : (b.laeufe.length ? "alle erfolgreich" : "nach deiner Uhr"), b.fehler ? "dn" : "")
+      + V.kachelBlock("Erfolgsquote 90 Tage", q ? String(q.prozent).replace(".", ",") + " %" : "—",
+        q ? q.laeufe + " Läufe an " + q.tage + " Tagen" : "noch keine Tages-Statistik", q && q.prozent < 95 ? "wr" : "")
+      + V.kachelBlock("Takt", taktKurz(a.zeitplan), e(a.ort || ""), "")
+      + "</div>";
+  }
+
+  function knoepfe(a) {
+    return '<div class="ap-knoepfe">'
       + (a.id === "brueckenwaechter"
-        ? '<span class="btn" data-apPruefen="' + e(a.id) + '">Jetzt prüfen</span>'
+        ? '<span class="btn primary" data-apPruefen="' + e(a.id) + '">Jetzt prüfen</span>'
         : "")
       + (a.wartung
         ? '<span class="btn" data-apWartungAus="' + e(a.id) + '">Wartung beenden</span>'
         : '<span class="btn" data-apWartungEin="' + e(a.id) + '">In Wartung setzen</span>')
-      + '<span class="s ap-knopf-hinweis">Jede Änderung braucht eine frische Bestätigung und steht danach im Audit-Log.</span>'
+      + '<span class="s ap-knopf-hinweis">Jede Änderung braucht eine frische Bestätigung und steht danach im Audit-Log. '
+      + "Was dieser Server nicht selbst kann, steht unten als Anleitung — kein toter Knopf.</span>"
       + "</div>";
+  }
 
-    const bedienung = '<div class="ap-bedienung">'
-      + knoepfe
-      + "<div><b>So startest du ihn von Hand:</b>"
-      + '<div class="ap-anleitung">' + e(a.startAnleitung || "—") + "</div></div>"
-      + "<div><b>So schaltest du ihn aus:</b>"
-      + '<div class="ap-anleitung">' + e(a.stopAnleitung || "—") + "</div></div>"
-      + "</div>";
+  function detail(a) {
+    if (!a) return V.fehlerblock("Kein Autopilot ausgewählt.");
+    const z = zustand(a);
+    const grund = '<div class="note glass' + (a.ampel === "rot" ? " fehler" : "") + '">'
+      + '<div class="nx">' + (a.ampel === "rot" ? "▲" : a.ampel === "gruen" ? "✓" : "◆") + "</div><div>"
+      + '<div class="nt">Warum »' + e(z.wort) + "«?</div>"
+      + '<div class="ns">' + e(a.ampelGrund || "") + "</div></div></div>";
+
+    const heute = heuteBilanz(a);
+    const heuteZeilen = heute.laeufe.slice(0, 6).map(function (l) {
+      return '<li><b>' + e(A.zeit(l.am).slice(-5)) + "</b> — "
+        + (l.status === "ok" ? "erfolgreich" : "FEHLER")
+        + (l.dauerMs === null || l.dauerMs === undefined ? "" : " · " + e(A.dauer(l.dauerMs / 1000)))
+        + (l.meldung ? " · " + e(l.meldung) : "") + "</li>";
+    });
+    const heuteBlock = V.panelBlock("Was hat er heute gemacht?", "die Antwort in einem Satz",
+      '<div class="pb"><div class="ap-heute' + (heute.fehler > 0 && !a.wartung ? " fehler" : "") + '">'
+      + '<div class="ap-heute-zahl">' + e(heuteZahl(a)) + "</div>"
+      + '<div class="ap-heute-text">' + e(heuteSatz(a))
+      + '<div class="s">Nächster Lauf: ' + e(a.zeitplan || "—") + "</div></div></div>"
+      + (heuteZeilen.length
+        ? '<ul class="ap-heute-liste">' + heuteZeilen.join("")
+          + (heute.laeufe.length > 6 ? '<li class="s">… und ' + (heute.laeufe.length - 6) + " weitere, alle im Verlauf unten.</li>" : "") + "</ul>"
+        : '<div class="s ap-heute-leer">Kein Lauf mit heutigem Zeitstempel. Das ist bei Wochen- und Nacht-Automatiken der Normalfall.</div>')
+      + "</div>");
 
     const verlaufZeilen = (a.verlauf || []).map(function (l) {
       return "<tr><td>" + e(A.zeit(l.am)) + "</td>"
@@ -362,80 +385,57 @@
         + "<td>" + (l.meldung ? e(l.meldung) : '<span class="s">—</span>') + "</td></tr>";
     });
 
-    return '<div class="ap-detail">'
-      + '<div class="ap-detail-kopf">' + punkt(a.ampel) + "<h2>" + nummer(a) + e(a.name) + "</h2>" + ampelPille(a.ampel) + "</div>"
-      + '<p class="ap-kurz">' + e(a.kurz) + "</p>"
+    const steckbrief = V.tabelleBlock(["", ""], [
+      "<tr><td><b>Bereich</b></td><td>" + e(a.bereich || "—") + "</td></tr>",
+      "<tr><td><b>Wo läuft er?</b></td><td>" + e(a.ort) + "</td></tr>",
+      "<tr><td><b>Wann läuft er?</b></td><td>" + e(a.zeitplan) + "</td></tr>",
+      "<tr><td><b>Letzter Lauf</b></td><td>" + e(letzterLaufText(a)) + "</td></tr>",
+      "<tr><td><b>Nummer und Kennung</b></td><td><span class=\"s\">"
+        + (a.nummer ? "Autopilot " + e(a.nummer) + " · " : "") + "<code>" + e(a.id) + "</code></span></td></tr>"
+    ]);
+
+    const funktionen = '<ul class="ap-funktionen">'
+      + (a.funktionen || []).map(function (f) { return "<li>" + e(f) + "</li>"; }).join("") + "</ul>";
+
+    const anleitung = '<div class="ap-bedienung">'
+      + "<div><b>So startest du ihn von Hand:</b>"
+      + '<div class="ap-anleitung">' + e(a.startAnleitung || "—") + "</div></div>"
+      + "<div><b>So schaltest du ihn aus:</b>"
+      + '<div class="ap-anleitung">' + e(a.stopAnleitung || "—") + "</div></div>"
+      + "</div>";
+
+    return V.kopfBlock("AP", "Autopiloten · " + e(a.name), e(a.name), e(a.kurz || ""))
+      + '<div class="stack ap-detail">'
+      + '<div class="ap-detail-kopf"><span class="btn" data-apZurueck>← Alle Autopiloten</span>'
+      + punkt(z.farbe) + '<span class="ap-detail-titel">' + nummer(a) + e(a.name) + "</span>" + pille(z.wort, z.ton)
+      + '<span class="s ap-bereich">' + e(a.bereich || "") + "</span></div>"
+      + knoepfe(a)
+      + kennzahlen(a)
       + grund
-      + heuteBlock(a)
+      + heuteBlock
       + V.panelBlock("Zuverlässigkeit", "die letzten 90 Tage, ein Kästchen je Tag", tageBalken(a))
-      + V.panelBlock("Steckbrief", null, steckbrief)
-      + V.panelBlock("Was macht er genau?", null, '<div class="pb">' + funktionen + "</div>")
-      + V.panelBlock("Bedienung", "Klartext statt toter Knöpfe", '<div class="pb">' + bedienung + "</div>")
-      + V.panelBlock("Verlauf", "die letzten gemessenen Läufe",
+      + V.panelBlock("Die letzten Läufe", "gemessen, nicht behauptet",
         verlaufZeilen.length
           ? V.tabelleBlock(["Wann", "Ergebnis", "Dauer", "Meldung"], verlaufZeilen)
           : '<div class="pb"><div class="leer">Noch kein Lauf gemessen.</div></div>')
+      + V.panelBlock("Steckbrief", null, steckbrief)
+      + V.panelBlock("Was macht er genau?", null, '<div class="pb">' + funktionen + "</div>")
+      + V.panelBlock("Von Hand", "Klartext statt toter Knöpfe", '<div class="pb">' + anleitung + "</div>")
       + "</div>";
   }
 
-  function autopiloten(d, auswahlId, registerId) {
+  /**
+   * Einstieg. zustandUI = { ansicht: "liste"|"detail", auswahl, register,
+   * suche, vorfaelleAlle } — lebt im Bedienmodul, hier nur gelesen.
+   */
+  function autopiloten(d, zustandUI) {
+    const z = zustandUI || {};
     const alle = d.autopiloten || [];
-    // Das Register entscheidet, WAS in der Liste steht; die Auswahl wird
-    // danach INNERHALB des Registers aufgeloest. Sonst zeigte die Liste das
-    // eine und die Akte daneben ein anderes — der haeufigste Weg, wie eine
-    // Master-Detail-Ansicht luegt.
-    // Nur ein Register waehlen, das gerade auch als Reiter dasteht: wird der
-    // letzte Wartungsfall beendet, waehrend das Register offen ist, stuende
-    // sonst eine leere Liste ohne hervorgehobenen Reiter da.
-    const gezeigt = registerListe(alle);
-    const gewaehlt = gezeigt.filter(function (r) { return r.id === registerId; })[0];
-    const reg = gewaehlt || registerFuer(standardRegister(alle));
-    const sichtbar = alle.filter(reg.passt);
-    const auswahl = sichtbar.filter(function (a) { return a.id === auswahlId; })[0] || sichtbar[0] || null;
-
-    let lage;
-    if ((d.rot || 0) > 0) {
-      const rote = alle.filter(function (a) { return a.ampel === "rot"; }).map(function (a) { return a.name; });
-      lage = '<div class="note glass fehler"><div class="nx">▲</div><div>'
-        + '<div class="nt">' + d.rot + " auf Rot</div>"
-        + '<div class="ns">Zuerst ansehen: ' + e(rote.join(", ")) + ". Der Grund steht jeweils direkt unter der Ampel.</div></div></div>";
-    } else if ((d.gelb || 0) > 0) {
-      lage = '<div class="note glass"><div class="nx">◆</div><div>'
-        + '<div class="nt">' + d.gelb + " verspätet — noch kein Ausfall</div>"
-        + '<div class="ns">Die Schonfrist läuft. Bleibt es gelb, wird es von allein rot.</div></div></div>';
-    } else if (alle.some(stummTrotzPflicht)) {
-      const stumme = alle.filter(stummTrotzPflicht).map(function (a) { return a.name; });
-      lage = '<div class="note glass"><div class="nx">◆</div><div>'
-        + '<div class="nt">' + stumme.length + (stumme.length === 1 ? " meldet sich nicht" : " melden sich nicht") + "</div>"
-        + '<div class="ns">Kein Ausfall gemessen — aber ' + e(stumme.join(", "))
-        + (stumme.length === 1 ? " sollte" : " sollten") + " Herzschläge schicken und tun es nicht. Der Grund steht jeweils unter der Ampel.</div></div></div>";
-    } else {
-      lage = '<div class="note glass"><div class="nx">✓</div><div>'
-        + '<div class="nt">Kein Alarm</div>'
-        + '<div class="ns">Alles Gemessene ist pünktlich und erfolgreich gelaufen. ' + e(d.hinweis || "") + "</div></div></div>";
+    if (z.ansicht === "detail") {
+      const a = alle.filter(function (x) { return x.id === z.auswahl; })[0] || null;
+      if (a) return detail(a);
     }
-
-    // Die Zahlenkacheln standen frueher hier (Grün/Gelb/Rot/Wartung). Sie sind
-    // ab 2026-08-14 weg: die Register darunter zeigen dieselben Zahlen, nur
-    // anklickbar — dieselbe Zahl an zwei Stellen ist das Gegenteil von
-    // uebersichtlich. Die Aufteilung gelb/rot, die den Registern fehlt, steht
-    // im Lage-Satz direkt darueber ("N auf Rot", "N verspätet").
-    //
-    // Mit weg ist die Kachel "DPO Self-Training / 24/7 Aktiv": sie war ein
-    // fest verdrahteter Text, der nie etwas anderes sagen konnte, also auch
-    // keinen Ausfall. Genau so eine Behauptung ohne Messung ist auf dieser
-    // Seite verboten (docs/approvals/2026-08-12-ampel-ehrlich-messen.md).
-    return V.kopfBlock("AP", "Autopiloten", "Autopiloten",
-      "Alle Automatiken auf einen Blick. Grün ist gemessen, nie behauptet: ohne Herzschlag gibt es kein Grün.")
-      + '<div class="stack">' + lage
-      + registerLeiste(alle, reg.id)
-      + '<div class="ap-wrap">'
-      + (sichtbar.length
-        ? liste(sichtbar, auswahl ? auswahl.id : null) + detail(auswahl)
-        : '<div class="ap-register-leer">' + e(reg.leer) + "</div>")
-      + "</div>"
-      + vorfallBlock(d.vorfaelle, alle)
-      + "</div>";
+    return liste(d, z);
   }
 
   window.adminViewsStage9 = { autopiloten: autopiloten };

@@ -484,3 +484,28 @@ select.dlg-feld{cursor:pointer;}
    weist jedes Setzen von element.style ab (live gemessen 2026-08-14 — der
    erste Fix sah richtig aus und wirkte nicht). */
 html.smejj-gate-zu{visibility:hidden!important;}
+
+/* ---- AP · Liste als Tabelle nach Bereichen (Design-Vorschlag, 2026-08-23) ----
+   Viereckig, grosse Schrift, eine Akzentfarbe: die Struktur kommt aus dem
+   Vorschlag "Adminbereich", die Optik bleibt die der Konsole. */
+.ap-leiste{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;}
+.ap-suche{flex:1 1 280px;max-width:440px;}
+.ap-suche input{width:100%;padding:11px 14px;font-size:16px;font-family:inherit;color:var(--sm-ink);
+  background:var(--sm-field);border:1px solid var(--sm-border);outline:none;}
+.ap-suche input:focus{border-color:var(--sm-accent-border);}
+.ap-row{cursor:pointer;}
+.ap-row:hover td{background:var(--sm-card-strong);}
+.ap-nr-zelle{width:56px;color:var(--sm-ink-dim);font-variant-numeric:tabular-nums;}
+.ap-was b{display:block;font-size:16px;}
+.ap-was span{display:block;margin-top:3px;font-size:14.5px;line-height:1.5;color:var(--sm-ink-faint);max-width:62ch;}
+.ap-zustand{display:inline-flex;align-items:center;gap:9px;font-size:15.5px;font-weight:500;white-space:nowrap;}
+.ap-zustand .ok{color:var(--sm-ok);} .ap-zustand .bad{color:var(--sm-danger);}
+.ap-zustand .warn{color:var(--sm-warn);} .ap-zustand .dim{color:var(--sm-ink-faint);}
+.ap-zustand .acc{color:var(--sm-accent-text);}
+.ap-detail-titel{font-size:23px;font-weight:600;}
+.ap-bereich{margin-left:auto;}
+.ap-detail .kpi .v{font-size:26px;}
+@media (max-width:900px){
+  .ap-was span{display:none;}
+  .ap-bereich{flex-basis:100%;margin-left:0;}
+}
