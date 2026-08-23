@@ -79,7 +79,7 @@ async function holePanel() {
 //
 // Ist die Bruecke nicht da, bleibt der ferne Weg unveraendert bestehen.
 async function ueberChrome({ aufgabe, ziel, schreibe }) {
-  const { brueckeDa, sendeAnChrome } = await import("./maus-chrome.js?v=1");
+  const { brueckeDa, sendeAnChrome } = await import("./maus-chrome.js?v=2");
   if (!brueckeDa()) return false;
 
   const panel = await holePanel();

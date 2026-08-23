@@ -39,17 +39,21 @@ export function brueckeVersion() {
 }
 
 /**
- * Schickt EINE Aktion an den eigenen Chrome und wartet auf die Antwort.
+ * Der Transport, einmal. Alles darunter reicht nur eine fertige Nachricht
+ * durch — das Wort darin (`aktion`, `zustand`, `hallo`) entscheidet drueben
+ * der Hintergrund.
+ *
+ * WARUM getrennt: vorher war die Nachricht fest als `{ aktion }` verdrahtet.
+ * Der Hintergrund verstand laengst auch `zustand` und `hallo` — nur konnte
+ * die Seite die Woerter gar nicht aussprechen. Gebaut und nicht
+ * angeschlossen, dieselbe Falle wie schon zweimal.
  *
  * Die Zeitgrenze ist Pflicht, kein Luxus: haengt die Erweiterung (Seite
  * laedt ewig, Dienst-Worker eingeschlafen), bliebe der freie Lauf sonst
  * fuer immer stehen — ohne Zeile, ohne Fehler, ohne Ende. Ein Auftrag, der
  * nie zurueckkommt, ist schlimmer als einer, der ehrlich abbricht.
- *
- * @param {object} aktion  dieselbe Form wie fuer den fernen Browser
- * @returns {Promise<{ok:boolean, error?:string, beobachtung?:object, gelesen?:string}>}
  */
-export function sendeAnChrome(aktion, { fenster = typeof window !== "undefined" ? window : null, grenzeMs = ANTWORT_GRENZE_MS } = {}) {
+function sendeNachricht(nachricht, { fenster = typeof window !== "undefined" ? window : null, grenzeMs = ANTWORT_GRENZE_MS } = {}) {
   if (!fenster) return Promise.resolve({ ok: false, error: "kein_fenster" });
   zaehler += 1;
   const ruf = `${MARKE}-${zaehler}`;
@@ -71,13 +75,49 @@ export function sendeAnChrome(aktion, { fenster = typeof window !== "undefined" 
     };
     const uhr = setTimeout(() => schluss({ ok: false, error: "bruecke_antwortet_nicht" }), grenzeMs);
     fenster.addEventListener("message", horcher);
-    fenster.postMessage({ marke: MARKE, ruf, nachricht: { aktion } }, fenster.location.origin);
+    fenster.postMessage({ marke: MARKE, ruf, nachricht }, fenster.location.origin);
   });
 }
 
-/** Kurzer Anklopf-Test — beantwortet der Hintergrund ueberhaupt? */
-export async function brueckeAntwortet() {
+/**
+ * Schickt EINE Aktion an den eigenen Chrome und wartet auf die Antwort.
+ *
+ * @param {object} aktion  dieselbe Form wie fuer den fernen Browser
+ * @returns {Promise<{ok:boolean, error?:string, beobachtung?:object, gelesen?:string}>}
+ */
+export function sendeAnChrome(aktion, optionen = {}) {
+  return sendeNachricht({ aktion }, optionen);
+}
+
+/**
+ * Fragt die Bruecke, wie es um sie steht — nur lesend.
+ *
+ * WOZU: Am 2026-08-20/21 sind mehrere Runden daran verlorengegangen, dass
+ * das Fenster "Freigegeben noch 30 Minuten" zeigte, der Speicher aber leer
+ * war. Niemand konnte beide Seiten gleichzeitig sehen. Diese Frage nennt
+ * sie nebeneinander: was die Bruecke gemerkt hat UND was Chrome wirklich an
+ * Rechten haelt. Weichen sie ab, ist der Befund sofort da statt nach einer
+ * Stunde Raten.
+ *
+ * Kurze Zeitgrenze mit Absicht: eine Auskunft, die man erst nach 30 Sekunden
+ * bekommt, sieht man sich nicht an.
+ *
+ * @returns {Promise<{ok:boolean, version?:string, freigaben?:Array, chromeRechte?:Array, arbeitsTab?:number|null, error?:string}>}
+ */
+export function frageZustand(optionen = {}) {
+  return sendeNachricht({ zustand: true }, { grenzeMs: 3000, ...optionen });
+}
+
+/**
+ * Kurzer Anklopf-Test — beantwortet der Hintergrund ueberhaupt?
+ *
+ * Nimmt den `hallo`-Weg, den der Hintergrund dafuer vorhaelt. Vorher ging
+ * hier eine leere Aktion raus, die drueben im alten Adapter-Weg landete:
+ * sie kam zwar zurueck, aber ueber die falsche Tuer — und der `hallo`-Weg
+ * hatte gar keinen Absender.
+ */
+export async function brueckeAntwortet(optionen = {}) {
   if (!brueckeDa()) return false;
-  const antwort = await sendeAnChrome(undefined, { grenzeMs: 3000 });
+  const antwort = await sendeNachricht({ hallo: true }, { grenzeMs: 3000, ...optionen });
   return antwort?.ok === true || antwort?.error !== "bruecke_antwortet_nicht";
 }
