@@ -99,11 +99,13 @@
   }
 
   /** Takt kurz: der Teil vor der ersten Klammer, gedeckelt. Voll im title. */
-  function taktKurz(zeitplan) {
+  function taktText(zeitplan) {
     const voll = String(zeitplan || "—");
-    let kurz = voll.split(" (")[0].split(" — ")[0];
-    if (kurz.length > 34) kurz = kurz.slice(0, 33) + "…";
-    return '<span title="' + e(voll) + '">' + e(kurz) + "</span>";
+    const kurz = voll.split(" (")[0].split(" — ")[0];
+    return kurz.length > 34 ? kurz.slice(0, 33) + "…" : kurz;
+  }
+  function taktKurz(zeitplan) {
+    return '<span title="' + e(String(zeitplan || "—")) + '">' + e(taktText(zeitplan)) + "</span>";
   }
 
   // ---------- "Was hat er HEUTE gemacht?" ----------
@@ -345,7 +347,7 @@
         b.fehler ? b.fehler + " mit Fehler" : (b.laeufe.length ? "alle erfolgreich" : "nach deiner Uhr"), b.fehler ? "dn" : "")
       + V.kachelBlock("Erfolgsquote 90 Tage", q ? String(q.prozent).replace(".", ",") + " %" : "—",
         q ? q.laeufe + " Läufe an " + q.tage + " Tagen" : "noch keine Tages-Statistik", q && q.prozent < 95 ? "wr" : "")
-      + V.kachelBlock("Takt", taktKurz(a.zeitplan), e(a.ort || ""), "")
+      + V.kachelBlock("Takt", taktText(a.zeitplan), a.ort || "", "")
       + "</div>";
   }
 
@@ -414,7 +416,7 @@
       + '<div class="ap-anleitung">' + e(a.stopAnleitung || "—") + "</div></div>"
       + "</div>";
 
-    return V.kopfBlock("AP", "Autopiloten · " + e(a.name), e(a.name), e(a.kurz || ""))
+    return V.kopfBlock("AP", "Autopiloten · " + a.name, a.name, a.kurz || "")
       + '<div class="stack ap-detail">'
       + '<div class="ap-detail-kopf"><span class="btn" data-apZurueck>← Alle Autopiloten</span>'
       + punkt(z.farbe) + '<span class="ap-detail-titel">' + nummer(a) + e(a.name) + "</span>" + pille(z.wort, z.ton)
