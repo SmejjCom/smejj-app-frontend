@@ -29,7 +29,9 @@
     if (!knopf) return;
     leiste.querySelectorAll("button").forEach(function (b) { b.classList.toggle("an", b === knopf); });
     var satz = document.getElementById("fokusSatz");
-    if (satz) satz.textContent = SAETZE[knopf.dataset.fokus] || SAETZE.alles;
+    // Sprache des Besuchers (willkommen-sprache.js, laeuft davor); ohne sie deutsch.
+    var T = window.smejjWillkommenT || function (text) { return text; };
+    if (satz) satz.textContent = T(SAETZE[knopf.dataset.fokus] || SAETZE.alles);
     var plaene = document.querySelectorAll(".plaene .plan");
     plaene.forEach(function (p, i) { p.classList.toggle("fokus", i === FOKUS_PLAN[knopf.dataset.fokus]); });
   });
