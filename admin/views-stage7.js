@@ -82,7 +82,9 @@
         a.erreichbar ? "eingezahlt gesamt " + usd(a.eingezahltUsd) + " · Guthaben " + usd(a.guthabenUsd) : "API-Übersicht nicht lesbar", a.erreichbar ? "" : "wr")
       + V.kachelBlock("Kosten Betrieb", usd(k.festeUsdProMonat) + " / Monat",
         "fest (Kostenpolitik) · Modelle seit Neustart: " + usd(mod.usd) + (mod.tageOhnePreis ? " (+" + mod.tageOhnePreis + " Tag(e) ohne Preis)" : ""), "")
-      + V.kachelBlock("Bleibt übrig", usd(z.bleibtUebrigUsdVorModellen), "vor Modellkosten · MRR + Aufladungen − feste Kosten", (z.bleibtUebrigUsdVorModellen || 0) >= 0 ? "up" : "dn")
+      // Ehrlich: MRR kommt in Euro, Aufladungen und Kosten in US-Dollar. Die
+      // Summe rechnet beides 1:1 — das steht dran, statt eine Waehrung zu erfinden.
+      + V.kachelBlock("Bleibt übrig", usd(z.bleibtUebrigUsdVorModellen), "vor Modellkosten · MRR (€) + Aufladungen ($) − feste Kosten ($), Währungen 1:1 gezählt", (z.bleibtUebrigUsdVorModellen || 0) >= 0 ? "up" : "dn")
       + "</div>";
   }
 
