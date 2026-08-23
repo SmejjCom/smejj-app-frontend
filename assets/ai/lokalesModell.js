@@ -201,6 +201,22 @@ export function taugtFuerLokal({ frage = "", dateien = 0, verlauf = [], bilder =
  * @param {{onDelta?: (text: string) => void, system?: string}} optionen
  * @returns {Promise<{ok: boolean, text: string, ms: number, grund: string}>}
  */
+/**
+ * Ist die Antwort des kleinen Modells eine RUECKFRAGE statt einer Antwort?
+ * Live gemessen 2026-08-23 ("Plane mir einen Wochenendtrip" → "Wo wohnst du?
+ * Was interessiert dich? …"): das Geraet kann keine Frage-Karte stellen, der
+ * Server schon (Werkzeug frage_stellen). Also: Rueckfragen gehoeren zum
+ * Server — Regel 3, "bei jedem Zweifel weiterreichen".
+ */
+export function istRueckfrage(text) {
+  const t = String(text || "").trim();
+  if (!t) return false;
+  const fragezeichen = (t.match(/\?/g) || []).length;
+  if (fragezeichen >= 2) return true;
+  return /\b(brauche|ben[oö]tige|bräuchte|braeuchte) ich (noch |zuerst |vorher )?(ein paar|einige|folgende|mehr|kurz)?\s*(infos|informationen|angaben|details)/i.test(t)
+    || /\b(ein paar|einige) (fragen|rückfragen|rueckfragen)\b/i.test(t);
+}
+
 export async function frageLokal(frage, { onDelta, system = "", verlauf = [], umgebung = globalThis, jetzt = () => Date.now() } = {}) {
   const start = jetzt();
   const pruefung = await lokalVerfuegbar(umgebung);

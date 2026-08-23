@@ -10,7 +10,7 @@
 // (chat-history-context.js). Dieses Modul empfaengt nur.
 import { fetchStreamWithRetry } from "./fetch-retry.js";
 import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js";
-import { frageLokal, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js";
+import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js";
 
 // Gleicher Schluessel wie in auth/auth-page.js, account-sessions.js und
 // auth-gate.js — dort bewusst dupliziert, damit kein Modul den anderen nur
@@ -812,6 +812,13 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
   });
   if (!ergebnis.ok) {
     // Nichts stehen lassen, was der Server gleich ueberschreibt.
+    output.textContent = "";
+    return false;
+  }
+  // Rueckfrage statt Antwort: das kann nur der Server als Karte stellen.
+  if (istRueckfrage(ergebnis.text)) {
+    console.info("[lokal] " + JSON.stringify({ lokal: false, grund: "rueckfrage-an-server" }));
+    merkeEntscheidung("rueckfrage-an-server");
     output.textContent = "";
     return false;
   }
