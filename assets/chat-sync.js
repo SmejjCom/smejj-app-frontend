@@ -161,6 +161,35 @@ async function pull() {
   }
 }
 
+/**
+ * Holt einen zu grossen Chat unter die Grenze: jede eingebettete Datei wandert
+ * in die Medien-Ablage, im Chat bleibt eine kurze Adresse.
+ *
+ * Dynamischer Import mit stillem Fehlschlag, wie bei medienAuslagern in
+ * chat-store.js: sind die Module nicht ladbar oder die Ablage aus, wird
+ * gemeldet wie bisher — nie schlechter als vorher.
+ *
+ * @returns {Promise<boolean>} true, wenn ein zweiter Sendeversuch lohnt
+ */
+async function rette(id) {
+  try {
+    const s = store();
+    if (!s?.getChat || !s?.importChat) return false;
+    const [{ rettteUndSpeichere }, { lagereMedienAusText }] = await Promise.all([
+      import("./chat-medien-rettung.js?v=1"),
+      import("./chat-medien.js?v=2")
+    ]);
+    const ergebnis = await rettteUndSpeichere(id, {
+      laden: (kennung) => s.getChat(kennung),
+      speichern: (chat) => s.importChat(chat),
+      auslagern: lagereMedienAusText
+    });
+    return Boolean(ergebnis?.gerettet);
+  } catch {
+    return false;
+  }
+}
+
 async function push() {
   const kopf = kopfzeilen();
   const s = store();
@@ -180,7 +209,26 @@ async function push() {
       // 4xx betrifft GENAU DIESEN Chat und wird sich von selbst nie aendern —
       // also melden und mit dem naechsten weitermachen, nicht abbrechen.
       if (antwort.status >= 400 && antwort.status < 500) {
-        await meldeAbweisung(chat.id, antwort.status, await grundAus(antwort));
+        const grund = await grundAus(antwort);
+        // "Zu gross" ist der EINZIGE 4xx-Grund, den wir selbst beheben
+        // koennen — und der haeufigste: zehn Chats im Konto des Betreibers
+        // lagen am 2026-08-23 darueber und waren seit Wochen ungesichert.
+        // Die Medien-Auslagerung vom 22.08. greift nur beim Speichern, also
+        // nur bei neuen Chats; der Bestand blieb liegen. Hier wird er
+        // eingeholt: auslagern, zurueckschreiben, EINMAL erneut senden.
+        // Erst wenn auch das scheitert, wird der Nutzer behelligt.
+        if (grund === "chat_zu_gross" && await rette(chat.id)) {
+          const gerettet = await s.getChat(chat.id);
+          const zweiter = gerettet && await fetch(`${API_ORIGIN}/api/chats`, {
+            method: "PUT",
+            headers: kopf,
+            body: JSON.stringify({ chat: gerettet })
+          });
+          if (zweiter?.ok) continue;
+          await meldeAbweisung(chat.id, zweiter?.status || antwort.status, await grundAus(zweiter || antwort));
+        } else {
+          await meldeAbweisung(chat.id, antwort.status, grund);
+        }
       }
     }
   } catch { /* still: naechster Anlauf beim naechsten Ereignis */ }
