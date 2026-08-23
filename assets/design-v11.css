@@ -720,7 +720,7 @@ body.is-resizing-panel #rightPanelResize {
   width: 38px;
   height: 38px;
   min-height: 38px;
-  border-radius: 999px !important;
+  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
 }
 /* Hauptknopf eckig (Betreiber 2026-08-23), die Geist-Knoepfe daneben
    behalten vorerst ihre Form. */
@@ -741,7 +741,7 @@ body.is-resizing-panel #rightPanelResize {
 
 /* Die Pille "Nachdenken" (Mockup .fpille): leise, rund, mit Icon */
 .fpille-nachdenken {
-  border-radius: 999px !important;
+  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
   background: transparent;
   box-shadow: none;
   color: rgba(242, 245, 244, 0.74);
@@ -802,7 +802,7 @@ body.is-resizing-panel #rightPanelResize {
   align-items: center;
   gap: 8px;
   padding: 9px 15px;
-  border-radius: 999px !important;
+  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
   font-size: 15px;
   color: rgba(242, 245, 244, 0.74);
   white-space: nowrap;
@@ -1505,7 +1505,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   gap: 8px;
 }
 #code .code-wchips button {
-  border-radius: 999px !important;
+  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
   font-size: 15px;
   padding: 9px 15px;
   width: auto;
@@ -1617,7 +1617,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
      nur 2px Innenbreite, Anhang- und Diktat-Icon waren unsichtbare Striche
      (Betreiber-Testlauf 2026-08-16). */
   padding: 0;
-  border-radius: 999px !important;
+  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
 }
 #code .code-mini svg {
   width: 16px; height: 16px; flex: none;

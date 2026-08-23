@@ -4424,7 +4424,7 @@ body.is-resizing-panel #rightPanelResize {
   width: 38px;
   height: 38px;
   min-height: 38px;
-  border-radius: 999px !important;
+  border-radius: 0 !important;
 }
 #start .prompt-glass .send-button { border-radius: 0 !important; }
 .send-button.ist-sprache {
@@ -4438,7 +4438,7 @@ body.is-resizing-panel #rightPanelResize {
   box-shadow: 0 0 22px var(--v11-cy-glow);
 }
 .fpille-nachdenken {
-  border-radius: 999px !important;
+  border-radius: 0 !important;
   background: transparent;
   box-shadow: none;
   color: rgba(242, 245, 244, 0.74);
@@ -4495,7 +4495,7 @@ body.is-resizing-panel #rightPanelResize {
   align-items: center;
   gap: 8px;
   padding: 9px 15px;
-  border-radius: 999px !important;
+  border-radius: 0 !important;
   font-size: 15px;
   color: rgba(242, 245, 244, 0.74);
   white-space: nowrap;
@@ -5016,7 +5016,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   gap: 8px;
 }
 #code .code-wchips button {
-  border-radius: 999px !important;
+  border-radius: 0 !important;
   font-size: 15px;
   padding: 9px 15px;
   width: auto;
@@ -5092,7 +5092,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #code .code-mini {
   width: 30px; height: 30px; min-height: 30px;
   padding: 0;
-  border-radius: 999px !important;
+  border-radius: 0 !important;
 }
 #code .code-mini svg {
   width: 16px; height: 16px; flex: none;
