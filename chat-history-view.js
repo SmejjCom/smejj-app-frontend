@@ -29,7 +29,7 @@
 import {
   listChats, openChat, renameChat, deleteChat, activeChatId, togglePinChat, newChat,
   listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
-} from "/assets/chat-store.js?v=pin-20260806";
+} from "/assets/chat-store.js?v=b54";
 // Holt fuer Chats ohne eigenen Titel einen aus der Bruecke. Von HIER importiert
 // und nicht aus index.html, damit die Startseite unter dem Start-Lock bleibt
 // (gleiches Muster wie icon-nutzung.js in profile-dock.js). Das Modul meldet
@@ -42,18 +42,33 @@ import "/assets/chat-title-auto.js";
 // Teilmenge von text.js aus dem zweiten Schnitt — ist entfallen.
 import {
   anzeigeTitel, anzeigeVorschau, ersteFrage, gruppeVon, mitHervorhebung,
-  ohneBallast, trefferAusschnitt, volltext, zeitText, themaVon, sichereAlsMarkdown,
+  ohneBallast, trefferAusschnitt, volltext, zeitText, themaVon, merkmaleVon, sichereAlsMarkdown,
   projektGruppen
-} from "/assets/chat-history-text.js";
-import { createCardBuilders } from "/assets/chat-history-cards.js?v=split-20260810";
+} from "/assets/chat-history-text.js?v=b47b";
+import { createCardBuilders, createProjektAktionen } from "/assets/chat-history-cards.js?v=b48";
 
 const STYLE_ID = "chatHistoryStyles";
 
 let confirmingId = "";
+// Halb-Commit repariert (Nutzertest 2026-08-17): menuSchliessen setzte diese
+// Variable, deklariert war sie NIE — jeder ⋯-Klick warf einen ReferenceError,
+// bevor das Menue erschien. Umbenennen/Anheften/Loeschen waren unerreichbar.
+let confirmingProjektId = "";
 let confirmTimer = null;
 let suchbegriff = "";
 let themenFilter = "";
 let offenesMenu = null;
+
+// Projekt-Menues (chat-history-cards.js) an den Zustand DIESER Ansicht binden
+// (2026-08-13 dorthin verschoben, 800-Zeilen-Regel). MUSS vor createCardBuilders
+// stehen: dessen ctx reicht oeffneProjektMenu weiter — als const erst ab hier
+// belegt (TDZ), waehrend die uebrigen Rueckrufe gehoistete Funktionen sind.
+const { oeffneProjektMenu, zeigeProjektPicker } = createProjektAktionen({
+  menuSchliessen, render,
+  getAlleProjekte: () => alleProjekte,
+  setOffenesMenu: (menu) => { offenesMenu = menu; },
+  armConfirmTimer: (rueckruf, ms) => { clearTimeout(confirmTimer); confirmTimer = setTimeout(rueckruf, ms); }
+});
 
 // Karten-Bausteine (chat-history-cards.js) an den Zustand DIESER Ansicht
 // binden: sie lesen Suchbegriff/Themenfilter/offenes Menue ueber Getter und
@@ -177,6 +192,8 @@ function injectStyles() {
        ::after als Trennlinie; der ⋯-Knopf bekommt order: 2 und steht damit
        HINTER der Linie am rechten Rand. position: relative, weil das
        Projekt-Menue (.ch-menu) absolut am Kopf haengt. */
+    .ch-gruppe-n { font-weight: 400; text-transform: none; letter-spacing: 0;
+      font-size: 13px; opacity: .75; margin-left: 8px; order: 3; }
     .ch-gruppe.ch-projekt { position: relative; opacity: .72; }
     .ch-projekt .ch-projekt-name { color: #78dce8; }
     .ch-projekt .ch-projekt-leer { font-weight: 400; text-transform: none; letter-spacing: 0; opacity: .6; }
@@ -320,13 +337,19 @@ function zeichne(target) {
     chat,
     titel: anzeigeTitel(chat),
     vorschau: anzeigeVorschau(chat),
-    thema: themaVon(chat)
+    thema: themaVon(chat),
+    merkmale: merkmaleVon(chat)
   }));
   entdoppeln(aufbereitet);
 
   const nadel = suchbegriff.trim().toLowerCase();
+  // themenFilter traegt seit Bildschirm 47 MERKMAL-Schluessel
+  // (angeheftet/datei/bild/code) statt Themennamen — gefiltert wird nach dem,
+  // was nachweisbar in der Unterhaltung steckt, nicht nach geratenem Thema.
+  const passtFilter = (eintrag) => !themenFilter
+    || (themenFilter === "angeheftet" ? eintrag.chat.pinned === true : eintrag.merkmale?.[themenFilter] === true);
   const treffer = aufbereitet.filter((eintrag) =>
-    (!themenFilter || eintrag.thema === themenFilter)
+    passtFilter(eintrag)
     && (!nadel || volltext(eintrag.chat).toLowerCase().includes(nadel)));
 
   const stueck = document.createDocumentFragment();
@@ -346,7 +369,7 @@ function zeichne(target) {
 
   if (!treffer.length) {
     beobachterAus();
-    stueck.append(bausteinLeer(nadel ? `Nichts gefunden für „${suchbegriff.trim()}".` : "In diesem Thema liegt nichts."));
+    stueck.append(bausteinLeer(nadel ? `Nichts gefunden für „${suchbegriff.trim()}".` : "Mit diesem Merkmal liegt nichts."));
     ziel.replaceChildren(stueck);
     return;
   }
@@ -380,7 +403,14 @@ function zeichne(target) {
 
   // Angeheftete stehen immer vollstaendig da: es sind wenige, und sie sind
   // ausdruecklich als wichtig markiert. Nachgeladen wird nur die Zeitliste.
-  nachladeZustand = { rest: ohneProjektRest, index: 0, letzteGruppe: "", aktiv, nadel };
+  // Mockup Bildschirm 47: der Gruppenkopf traegt die Anzahl. Einmal vorab
+  // gezaehlt — das Nachladen haengt Karten an, die Koepfe brauchen die Summe.
+  const gruppenAnzahl = new Map();
+  for (const eintrag of ohneProjektRest) {
+    const g = gruppeVon(eintrag.chat.updatedAt);
+    gruppenAnzahl.set(g, (gruppenAnzahl.get(g) || 0) + 1);
+  }
+  nachladeZustand = { rest: ohneProjektRest, index: 0, letzteGruppe: "", aktiv, nadel, gruppenAnzahl };
   stueck.append(naechsteKarten());
   const marke = document.createElement("div");
   marke.className = "ch-marke";
@@ -437,7 +467,7 @@ function naechsteKarten(anzahl = ERSTER_BLOCK) {
     const eintrag = rest[i];
     const gruppe = gruppeVon(eintrag.chat.updatedAt);
     if (gruppe !== nachladeZustand.letzteGruppe) {
-      teil.append(bausteinGruppe(gruppe));
+      teil.append(bausteinGruppe(gruppe, nachladeZustand.gruppenAnzahl?.get(gruppe)));
       nachladeZustand.letzteGruppe = gruppe;
     }
     teil.append(bausteinKarte(eintrag, aktiv, nadel));
@@ -619,155 +649,6 @@ function zeigeUmbenennen(karte, chat) {
   eingabe.select();
 }
 
-/* ------------------------------------------------------------------ *
- *  Projekte (2026-08-13): Menue am Gruppenkopf + Picker an der Karte.
- *  Beide nutzen dasselbe offenesMenu-Handle wie das Chat-Menue — damit
- *  greifen Render-Sperre (zeichne) und Outside-Click-Schliessen mit.
- * ------------------------------------------------------------------ */
-
-let confirmingProjektId = "";
-
-function oeffneProjektMenu(kopf, projekt) {
-  const menu = document.createElement("div");
-  menu.className = "ch-menu ch-projekt-menu";
-  menu.dataset.projektId = projekt.id;
-  menu.addEventListener("click", (event) => event.stopPropagation());
-
-  const eintrag = (text, aktion, gefaehrlich) => {
-    const knopf = document.createElement("button");
-    knopf.type = "button";
-    knopf.textContent = text;
-    if (gefaehrlich) knopf.classList.add("is-danger");
-    knopf.addEventListener("click", aktion);
-    return knopf;
-  };
-
-  menu.append(eintrag("✎ Umbenennen", () => { menuSchliessen(); zeigeProjektUmbenennen(kopf, projekt); }));
-  menu.append(document.createElement("hr"));
-
-  // Zweistufig wie beim Chat — mit dem Hinweis, dass die Chats NICHT
-  // mitgeloescht werden (sie rutschen in die Datumsgruppen zurueck).
-  const loeschen = eintrag("🗑 Löschen…", async () => {
-    if (confirmingProjektId !== projekt.id) {
-      confirmingProjektId = projekt.id;
-      loeschen.textContent = "🗑 Wirklich? Chats bleiben erhalten";
-      clearTimeout(confirmTimer);
-      confirmTimer = setTimeout(() => { menuSchliessen(); }, 4000);
-      return;
-    }
-    menuSchliessen();
-    await loescheProjekt(projekt.id).catch(() => {});
-    render();
-  }, true);
-  menu.append(loeschen);
-
-  kopf.append(menu);
-  offenesMenu = menu;
-}
-
-function zeigeProjektUmbenennen(kopf, projekt) {
-  if (kopf.querySelector(".ch-umbenennen")) return;
-  const zeile = document.createElement("div");
-  zeile.className = "ch-umbenennen ch-projekt-umbenennen";
-  zeile.addEventListener("click", (event) => event.stopPropagation());
-
-  const eingabe = document.createElement("input");
-  eingabe.type = "text";
-  eingabe.maxLength = 60;
-  eingabe.value = projekt.name || "";
-  eingabe.setAttribute("aria-label", "Neuer Projektname");
-
-  const speichern = document.createElement("button");
-  speichern.type = "button";
-  speichern.textContent = "Speichern";
-  const abbrechen = document.createElement("button");
-  abbrechen.type = "button";
-  abbrechen.textContent = "Abbrechen";
-
-  const senden = async () => {
-    await benenneProjektUm(projekt.id, eingabe.value).catch(() => {});
-    render();
-  };
-  speichern.addEventListener("click", senden);
-  abbrechen.addEventListener("click", () => zeile.remove());
-  eingabe.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") senden();
-    if (event.key === "Escape") zeile.remove();
-  });
-
-  zeile.append(eingabe, speichern, abbrechen);
-  kopf.after(zeile);
-  eingabe.focus();
-  eingabe.select();
-}
-
-// Picker: Chat einem Projekt zuordnen. Bei null Projekten direkt die
-// Eingabe fuer das erste — ein leerer Picker waere eine Sackgasse.
-function zeigeProjektPicker(karte, chat) {
-  const menu = document.createElement("div");
-  menu.className = "ch-menu ch-projekt-picker";
-  menu.dataset.chatId = chat.id;
-  menu.addEventListener("click", (event) => event.stopPropagation());
-
-  const eintrag = (text, aktion, aktivGewaehlt) => {
-    const knopf = document.createElement("button");
-    knopf.type = "button";
-    knopf.textContent = text;
-    if (aktivGewaehlt) knopf.classList.add("is-gewaehlt");
-    knopf.addEventListener("click", aktion);
-    return knopf;
-  };
-
-  const zuordnen = async (projektId) => {
-    menuSchliessen();
-    await setzeChatProjekt(chat.id, projektId).catch(() => {});
-    render();
-  };
-
-  for (const projekt of alleProjekte) {
-    const gewaehlt = chat.projectId === projekt.id;
-    menu.append(eintrag(`${gewaehlt ? "✓ " : ""}📁 ${projekt.name}`, () => zuordnen(gewaehlt ? "" : projekt.id), gewaehlt));
-  }
-  if (chat.projectId && alleProjekte.some((projekt) => projekt.id === chat.projectId)) {
-    menu.append(eintrag("Kein Projekt", () => zuordnen("")));
-  }
-  if (alleProjekte.length) menu.append(document.createElement("hr"));
-
-  const neu = eintrag("＋ Neues Projekt…", () => {
-    // Menue-Inhalt gegen die Eingabezeile tauschen — kein zweites Overlay.
-    menu.replaceChildren();
-    const zeile = document.createElement("div");
-    zeile.className = "ch-projekt-neu";
-    const eingabe = document.createElement("input");
-    eingabe.type = "text";
-    eingabe.maxLength = 60;
-    eingabe.placeholder = "Projektname";
-    eingabe.setAttribute("aria-label", "Name des neuen Projekts");
-    const anlegen = document.createElement("button");
-    anlegen.type = "button";
-    anlegen.textContent = "Anlegen";
-    const senden = async () => {
-      const name = eingabe.value;
-      menuSchliessen();
-      const projektId = await erstelleProjekt(name).catch(() => "");
-      if (projektId) await setzeChatProjekt(chat.id, projektId).catch(() => {});
-      render();
-    };
-    anlegen.addEventListener("click", senden);
-    eingabe.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") senden();
-      if (event.key === "Escape") menuSchliessen();
-    });
-    zeile.append(eingabe, anlegen);
-    menu.append(zeile);
-    eingabe.focus();
-  });
-  menu.append(neu);
-
-  karte.append(menu);
-  offenesMenu = menu;
-  if (!alleProjekte.length) neu.click();
-}
 
 
 /* ------------------------------------------------------------------ *

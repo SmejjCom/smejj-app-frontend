@@ -26,7 +26,7 @@
 // fail-safe: scheitert der Versand, bleibt die Bewertung lokal sichtbar.
 
 import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=1";
-import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=1";
+import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=4";
 // OHNE ?v=-Kennung — app.js importiert "./browser-context.js" (also
 // /assets/browser-context.js). Ein anderer Spezifizierer erzeugt eine ZWEITE
 // Modulinstanz mit eigenem Quellen-Gedaechtnis; der Menuepunkt "Quellen
@@ -42,19 +42,21 @@ import { groundingFor } from "/assets/browser-context.js";
 // Warteschlange aus demselben Modul haette es zerrissen. Gleiche Falle wie bei
 // settings-runtime.js in sw v184/v185.
 import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=blitz-20260726";
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=pin-20260806";
-import { showToast } from "/assets/components.js?v=chat-markdown-20260717";
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=b54";
+import { showToast } from "/assets/components.js?v=b48";
 
 const SETTLE_MS = 900;
 const COPY_FEEDBACK_MS = 2000;
 const UNDO_MS = 5000;
 
 const ICONS = Object.freeze({
-  copy: '<svg viewBox="0 0 24 24"><path d="M9 9h10v10H9Z"/><path d="M15 9V5H5v10h4"/></svg>',
+  copy: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M4 16c-1.1 0-2-.9-2-2V5c0-1.65 1.35-3 3-3h9c1.1 0 2 .9 2 2"/></svg>',
   check: '<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>',
+  volume: '<svg viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>',
   edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16Z"/><path d="m14 6 4 4"/></svg>',
-  up: '<svg viewBox="0 0 24 24"><path d="M7 20V10l4-6 1 1v5h5.5a2 2 0 0 1 2 2.3l-1 6a2 2 0 0 1-2 1.7Z"/><path d="M7 10H4v10h3"/></svg>',
-  down: '<svg viewBox="0 0 24 24"><path d="M7 4v10l4 6 1-1v-5h5.5a2 2 0 0 0 2-2.3l-1-6A2 2 0 0 0 16.5 4Z"/><path d="M7 14H4V4h3"/></svg>',
+  // ZCode-Abgleich 2026-08-16: exakt ZCodes Daumen-Zeichnungen (Lucide).
+  up: '<svg viewBox="0 0 24 24"><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/><path d="M7 10v12"/></svg>',
+  down: '<svg viewBox="0 0 24 24"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>',
   regen: '<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v6h-6"/></svg>',
   more: '<svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></svg>',
   left: '<svg viewBox="0 0 24 24"><path d="m14 7-5 5 5 5"/></svg>',
@@ -90,6 +92,28 @@ function barOf(entry) {
   return next && next.classList?.contains("msg-actions") ? next : null;
 }
 
+// Uhrzeit wie ZCode am Ende der Antwort-Zeile. Unbedenklich als Textknoten:
+// die Leiste ist GESCHWISTER des Eintrags, chat-store speichert nur dessen
+// textContent (das Versions-Label hier drin ist seit je Text). Wird bei jedem
+// ensureBar aufgefrischt — falls die Wiederherstellung meta.createdAt erst
+// nach dem ersten Leistenbau setzt (seedMeta), heilt der naechste Tick.
+function syncZeit(bar, meta) {
+  if (!bar || meta.role !== "assistant") return;
+  const d = new Date(meta.createdAt || "");
+  if (Number.isNaN(d.getTime())) return;
+  let zeit = bar.querySelector(".msg-zeit");
+  if (!zeit) {
+    zeit = document.createElement("span");
+    zeit.className = "msg-zeit";
+    bar.append(zeit);
+  }
+  const text = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (zeit.textContent !== text) {
+    zeit.textContent = text;
+    zeit.title = d.toLocaleString();
+  }
+}
+
 // Leiste anlegen oder auffrischen. Idempotent — der Beobachter ruft das oft.
 function ensureBar(entry) {
   const meta = metaOf(entry);
@@ -108,12 +132,33 @@ function ensureBar(entry) {
     entry.after(bar);
   }
   bar.dataset.for = meta.id;
+  syncZeit(bar, meta);
   syncRating(bar, meta);
   syncVersions(bar, meta);
+  // Einen Tick verzoegert: beim Wiederherstellen ist das Layout (Schrift,
+  // Zeilenumbruch) oft noch nicht fertig — sofort gemessen war das
+  // Textende 0x0 und die Leiste blieb unten (live beobachtet). Kein rAF:
+  // das feuert im versteckten Tab nie.
+  setTimeout(() => positioniereInline(bar, entry), 60);
   return bar;
 }
 
+// Betreiber 2026-08-18, RUECKBAU auf den Stand von gestern (vor 22:42):
+// die Leiste steht wieder in einer EIGENEN ZEILE unter der Antwort,
+// linksbuendig — nicht mehr hinter dem letzten Wort. Der Betreiber hat
+// den Inline-Auftrag vom 16.08. ausdruecklich zurueckgenommen.
+//
+// Die Funktion bleibt als Aufraeumer bestehen: sie loescht die von der
+// alten Fassung gesetzten Inline-Abstaende, damit wiederhergestellte
+// Leisten aus dem Verlauf nicht in ihrer alten Position haengen bleiben.
+function positioniereInline(bar) {
+  if (!bar) return;
+  bar.style.marginTop = "";
+  bar.style.marginLeft = "";
+}
+
 function syncRating(bar, meta) {
+  if (!bar) return;
   for (const act of ["rate-up", "rate-down"]) {
     const button = bar.querySelector(`[data-act="${act}"]`);
     if (!button) continue;
@@ -155,7 +200,11 @@ function syncVersions(bar, meta) {
       + `<button type="button" class="msg-act msg-version-step" data-act="version-next" aria-label="Nächste Version"><span class="msg-act-icon" aria-hidden="true">${iconMarkup("right")}</span></button>`;
     bar.append(picker);
   }
-  setText(picker.querySelector(".msg-version-label"), versionLabel(meta.active, total));
+  // Mockup-Bildschirm 26, der Zusatz: es steht dabei, WANN geaendert wurde —
+  // sonst weiss man beim Zurueckblaettern nicht, welche Fassung die neuere ist.
+  const aktiveFassung = meta.versions[meta.active];
+  const zusatz = aktiveFassung?.editedAt ? ` · geändert ${vorText(aktiveFassung.editedAt)}` : "";
+  setText(picker.querySelector(".msg-version-label"), versionLabel(meta.active, total) + zusatz);
   setDisabled(picker.querySelector('[data-act="version-prev"]'), meta.active <= 0);
   setDisabled(picker.querySelector('[data-act="version-next"]'), meta.active >= total - 1);
 }
@@ -254,7 +303,7 @@ async function copyText(text, button, html = "") {
       await navigator.clipboard.writeText(kompakt);
       flashCopied(button);
     } catch {
-      showToast("Kopieren wurde vom Browser abgelehnt.", "warn");
+      showToast("Dein Browser laesst das Kopieren nicht zu. Markier den Text und nimm Strg+C \u2014 oder Cmd+C am Mac.", "warn");
     }
   }
 }
@@ -563,14 +612,19 @@ const HANDLERS = {
   speak: (entry) => speakEntry(entry),
   fork: (entry) => forkFrom(entry),
   remove: (entry) => removeFrom(entry),
-  "rate-up": (entry, button) => {
+  "rate-up": (entry) => {
+    // Seit dem Drei-Punkte-Umbau (2026-08-16) kommt der Klick aus dem Menue am
+    // BODY — button.closest(".msg-actions") war dort null, syncRating warf und
+    // riss das Daumen-Signal an den Antwort-TUEV mit ab. Die Leiste des
+    // Eintrags liefert ensureBar; ihr Klassen-Toggle stoesst zugleich den
+    // Verlauf-Save an (MutationObserver im Log).
     setRating(entry, "up");
-    syncRating(button.closest(".msg-actions"), metaOf(entry));
+    syncRating(ensureBar(entry), metaOf(entry));
     sendeDaumenSignal(entry, "up");
   },
-  "rate-down": (entry, button) => {
+  "rate-down": (entry) => {
     setRating(entry, "down");
-    syncRating(button.closest(".msg-actions"), metaOf(entry));
+    syncRating(ensureBar(entry), metaOf(entry));
     sendeDaumenSignal(entry, "down");
   },
   "version-prev": (entry) => showVersion(entry, metaOf(entry).active - 1),
@@ -651,14 +705,24 @@ function onSettled() {
   if (!plan.ok) return;
   metaOf(plan.ziel).versions = pendingVersions.slice();
   pendingVersions = null;
-  addVersion(plan.ziel, { raw: plan.raw, html: plan.ziel.innerHTML });
+  addVersion(plan.ziel, { raw: plan.raw, html: plan.ziel.innerHTML, editedAt: new Date().toISOString() });
   ensureBar(plan.ziel);
 }
 
+let inlineTimer = null;
 function onLogChanged(entries) {
   refreshBars(entries);
   clearTimeout(settleTimer);
   settleTimer = setTimeout(onSettled, SETTLE_MS);
+  // Nach jeder Log-Aenderung die Inline-Position nachziehen — der
+  // 60ms-Tick in ensureBar kam beim Wiederherstellen VOR dem fertigen
+  // Layout (live gemessen: Styles blieben leer, resize heilte es).
+  clearTimeout(inlineTimer);
+  inlineTimer = setTimeout(() => {
+    for (const bar of document.querySelectorAll(".msg-actions.is-assistant")) {
+      positioniereInline(bar, bar.previousElementSibling);
+    }
+  }, 250);
 }
 
 function init() {
@@ -672,7 +736,18 @@ function init() {
     // Das Menue liegt am Viewport, nicht in der Nachricht. Scrollt das Log oder
     // aendert sich die Fenstergroesse, wuerde es von seinem Ausloeser abdriften.
     container.addEventListener("scroll", () => closeMenu(), { passive: true });
-    window.addEventListener("resize", () => closeMenu());
+    const alleNeuPositionieren = () => {
+      for (const bar of document.querySelectorAll(".msg-actions.is-assistant")) {
+        positioniereInline(bar, bar.previousElementSibling);
+      }
+    };
+    window.addEventListener("resize", () => {
+      closeMenu();
+      // Zeilenumbrueche verschieben das Textende — Inline-Position nachziehen.
+      alleNeuPositionieren();
+    });
+    // Nach dem Schrift-Laden verschieben sich Zeilenenden — nachziehen.
+    document.fonts?.ready?.then(() => setTimeout(alleNeuPositionieren, 50)).catch(() => {});
     refreshBars();
   } catch {
     /* fail-safe: ohne Aktionsleiste laeuft der Chat unveraendert weiter */
@@ -683,4 +758,13 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", init, { once: true });
 } else {
   init();
+}
+
+
+// "vor 8 Sekunden" / "vor 3 Minuten" / Uhrzeit — kurz und deutsch.
+function vorText(iso) {
+  const s = Math.round((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return `vor ${Math.max(1, s)} Sekunden`;
+  if (s < 3600) return `vor ${Math.round(s / 60)} Minuten`;
+  return `um ${new Date(iso).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}`;
 }

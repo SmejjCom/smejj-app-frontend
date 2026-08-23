@@ -257,15 +257,39 @@ function titleFrom(messages) {
 // durch eine kurze Adresse. Danach ist der Schnappschuss klein und das Medium
 // ueberlebt Neuladen und Geraetewechsel.
 //
+// DREI ORTE, nicht einer (gemessen 2026-08-22 an 113 echten Gespraechen):
+// Zehn lagen ueber MAX_CHAT_BYTES und wurden deshalb NIE gesichert. Der Median
+// aller Chats ist 7 KB — es war nie zu viel Text, immer ein Medium. Dasselbe
+// Medium steckt in `html` (innerHTML), `text` (textContent) UND `raw` (die
+// Modell-Antwort in den Metadaten); gemessen 4 / 7 / 10 Vorkommen. Der reine
+// DOM-Weg erreichte davon drei. Darum unten drei Schritte statt einem.
+//
 // Dynamischer Import und stiller Fehlschlag mit Absicht: ist das Modul nicht
 // ladbar oder die Ablage aus, wird gespeichert wie bisher — nie schlechter.
 async function medienAuslagern() {
   try {
     const log = startLog();
     if (!log) return;
-    const { lagereMedienAus } = await import("./chat-medien.js?v=1");
+    const { lagereMedienAus, lagereMedienAusText, lagereMedienAusTextknoten } =
+      await import("./chat-medien.js?v=2");
     for (const eintrag of log.querySelectorAll(":scope > .entry.assistant")) {
-      await lagereMedienAus(eintrag);
+      // EINE Karte je Eintrag: dasselbe Medium steht unten in bis zu drei
+      // Feldern, soll aber nur einmal hochgeladen werden.
+      const karte = new Map();
+      // 1. Die Elemente (<img>, <video>) — der urspruengliche Weg.
+      await lagereMedienAus(eintrag, { karte });
+      // 2. Textknoten: nicht gerenderter Markdown, der sowohl in `html` als
+      //    auch in `text` landet.
+      await lagereMedienAusTextknoten(eintrag, { karte });
+      // 3. Die Metadaten. readEntries() speichert `raw` (die Modell-Antwort)
+      //    und die letzten Fassungen — beide erreicht kein DOM-Weg.
+      const meta = metaOf(eintrag);
+      if (!meta) continue;
+      if (meta.raw) meta.raw = (await lagereMedienAusText(meta.raw, { karte })).text;
+      for (const fassung of Array.isArray(meta.versions) ? meta.versions : []) {
+        if (fassung?.raw) fassung.raw = (await lagereMedienAusText(fassung.raw, { karte })).text;
+        if (fassung?.html) fassung.html = (await lagereMedienAusText(fassung.html, { karte })).text;
+      }
     }
   } catch { /* fail-safe: lieber ein grosser Chat als gar keiner */ }
 }
@@ -274,7 +298,7 @@ async function medienAuslagern() {
 // wurde. Still und ohne Netz-Zwang — kommt nichts, bleibt die Adresse stehen.
 async function medienHolen(log) {
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=1");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2");
     await rehydriereMedien(log);
   } catch { /* fail-safe: lieber ein leeres Bild als ein kaputter Verlauf */ }
 }
@@ -327,10 +351,13 @@ async function persistActive() {
     titleEdited: Boolean(existing && existing.titleEdited),
     titleAuto: Boolean(existing && existing.titleAuto),
     pinned: existing?.pinned === true,
+    // Papierkorb (Bildschirm 48): das Loeschdatum uebersteht das Speichern —
+    // dieselbe Feldlisten-Falle wie bei pinned und titleAuto.
+    deletedAt: existing?.deletedAt || "",
     // Projekt-Zugehoerigkeit uebernehmen — dieselbe Falle wie bei pinned und
     // titleAuto (siehe oben): fehlt die Zeile, wirft jeder Tastendruck den
     // Chat lautlos aus seinem Projekt.
-    projectId: String(existing?.projectId || ""),
+    projectId: existing?.projectId || verbraucheBereichVormerkung(),
     createdAt: existing && existing.createdAt ? existing.createdAt : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     model: safeModelName(),
@@ -377,8 +404,11 @@ export async function listChats() {
   const userId = aktuellerNutzer();
   const alt = geraeteBesitzer();
   const eigene = chats.filter((chat) => gehoertNutzer(chat, userId, alt));
+  // Papierkorb: Geloeschte tauchen in keiner normalen Liste auf —
+  // sie leben in listGeloeschteChats(), 30 Tage lang.
+  const sichtbar = eigene.filter((chat) => !chat.deletedAt);
   // Angepinnte zuerst (Konkurrenz-Radar V4), innerhalb der Gruppen neueste oben.
-  return eigene.sort((a, b) => ((b.pinned === true) - (a.pinned === true)) || String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  return sichtbar.sort((a, b) => ((b.pinned === true) - (a.pinned === true)) || String(b.updatedAt).localeCompare(String(a.updatedAt)));
 }
 
 // Anpinnen/Loesen (Konkurrenz-Radar V4, 2026-08-06). updatedAt bleibt bewusst
@@ -444,13 +474,20 @@ export async function renameChat(id, title) {
   return true;
 }
 
+// Papierkorb (Bildschirm 48: "30 Tage lang ist nichts verloren").
+// "Loeschen" ist ab jetzt WEICH: der Chat bekommt ein Loeschdatum und
+// verschwindet aus allen Listen, bleibt aber 30 Tage wiederherstellbar.
+// Erst das endgueltige Loeschen (aus dem Papierkorb oder durch die
+// 30-Tage-Raeumung) entfernt den Datensatz und meldet es dem Konto.
+const PAPIERKORB_TAGE = 30;
+
 export async function deleteChat(id) {
-  // Nur eigene Chats loeschen (Stufe 2). getChat liefert fuer fremde null.
-  if (!(await getChat(id))) return false;
-  await tx(STORE, "readwrite", (store) => store.delete(String(id || "")));
-  // Stufe 3: das Loeschen dem Konto melden (chat-sync.js reicht es zum Server
-  // weiter). Eigenes Ereignis statt Import — der Store kennt den Sync nicht.
-  try { window.dispatchEvent(new CustomEvent("smejj:chat-geloescht", { detail: { id: String(id || "") } })); } catch { /* still */ }
+  // Nur eigene Chats (Stufe 2). getChat liefert fuer fremde null — aber auch
+  // fuer schon weich geloeschte, darum roh nachfassen.
+  const chat = await getChat(id) || await rohEigenerChat(id);
+  if (!chat) return false;
+  chat.deletedAt = new Date().toISOString();
+  await tx(STORE, "readwrite", (store) => store.put(chat));
   if (activeChatId() === id) {
     try {
       sessionStorage.removeItem(ACTIVE_KEY_SESSION);
@@ -459,6 +496,51 @@ export async function deleteChat(id) {
   }
   notifyChanged();
   return true;
+}
+
+export async function restoreChat(id) {
+  const chat = await rohEigenerChat(id);
+  if (!chat || !chat.deletedAt) return false;
+  delete chat.deletedAt;
+  await tx(STORE, "readwrite", (store) => store.put(chat));
+  notifyChanged();
+  return true;
+}
+
+export async function endgueltigLoeschen(id) {
+  if (!(await rohEigenerChat(id))) return false;
+  await tx(STORE, "readwrite", (store) => store.delete(String(id || "")));
+  // Stufe 3: das Loeschen dem Konto melden (chat-sync.js reicht es zum Server
+  // weiter). Eigenes Ereignis statt Import — der Store kennt den Sync nicht.
+  try { window.dispatchEvent(new CustomEvent("smejj:chat-geloescht", { detail: { id: String(id || "") } })); } catch { /* still */ }
+  notifyChanged();
+  return true;
+}
+
+// Alle weich geloeschten eigenen Chats — und die 30-Tage-Raeumung in einem:
+// was zu alt ist, wird beim Lesen endgueltig entfernt.
+export async function listGeloeschteChats() {
+  const alle = await tx(STORE, "readonly", (store) => new Promise((resolve, reject) => {
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  })).catch(() => []);
+  const userId = aktuellerNutzer();
+  const alt = geraeteBesitzer();
+  const eigene = alle.filter((chat) => gehoertNutzer(chat, userId, alt) && chat.deletedAt);
+  const grenze = Date.now() - PAPIERKORB_TAGE * 86400000;
+  const frisch = [];
+  for (const chat of eigene) {
+    if (new Date(chat.deletedAt).getTime() < grenze) await endgueltigLoeschen(chat.id).catch(() => {});
+    else frisch.push(chat);
+  }
+  return frisch.sort((a, b) => String(b.deletedAt).localeCompare(String(a.deletedAt)));
+}
+
+async function rohEigenerChat(id) {
+  const roh = await tx(STORE, "readonly", (store) => store.get(String(id || ""))).catch(() => null);
+  if (!roh) return null;
+  return gehoertNutzer(roh, aktuellerNutzer(), geraeteBesitzer()) ? roh : null;
 }
 
 /**
@@ -543,11 +625,23 @@ export async function openChat(id) {
   if (!chat || !log) return false;
   setActiveChatId(chat.id);
   renderEntriesInto(log, chat.messages || []);
+  // Bereichs-Anweisung in den Sitzungsspeicher — diese Zeile stand bis
+  // 2026-08-16 NACH dem return und lief darum nie (toter Code): die
+  // Dauer-Anweisung eines Projects fehlte beim Oeffnen seiner Gespraeche.
+  aktualisiereBereichsAnweisung(chat.projectId).catch(() => {});
   goToStart();
   return true;
 }
 
 export function newChat() {
+  // Vorgemerkter Bereich ("Neues Gespraech hier"): die Dauer-Anweisung
+  // SOFORT in den Sitzungsspeicher — sie muss schon fuer die erste
+  // Nachricht im Systemprompt stehen, nicht erst nach dem Speichern.
+  try {
+    const vormerkung = sessionStorage.getItem(BEREICH_NEU_KEY);
+    if (vormerkung) aktualisiereBereichsAnweisung(vormerkung).catch(() => {});
+    else sessionStorage.removeItem(BEREICH_ANWEISUNG_KEY);
+  } catch { /* still */ }
   const log = startLog();
   if (log && readEntries().length) {
     // aktueller Stand ist durch den Observer bereits gespeichert
@@ -592,8 +686,18 @@ async function restoreOnBoot() {
 
 function bindNewChatButton() {
   document.addEventListener("click", (event) => {
-    const button = event.target.closest('.nav-button[data-view="start"][data-icon="plus"]');
-    if (button) newChat();
+    // Seit der Vier-Gruppen-Spur (Mockup V11, Bildschirm 19) heisst der Knopf
+    // "Chat" und traegt das Chat-Symbol; das Plus-Icon bleibt als Altform
+    // erkannt, falls eine zwischengespeicherte Huelle noch die alte Leiste hat.
+    const button = event.target.closest('.nav-button[data-view="start"][data-icon="chat"], .nav-button[data-view="start"][data-icon="plus"]');
+    if (!button) return;
+    // Betreiber-Befund 2026-08-16 ("mein Chat verschwindet"): der Knopf
+    // warf das LAUFENDE Gespraech weg. Jetzt wechselt er ZUM Gespraech;
+    // ein neues startet er nur, wenn gerade keines sichtbar ist. Der
+    // ausdrueckliche Weg bleibt "Neuer Chat" (Start-Spur, Cmd+K).
+    const log = startLog();
+    if (log && log.children.length > 0) return; // bindNav wechselt nur die Ansicht
+    newChat();
   }, true);
 }
 
@@ -643,7 +747,7 @@ function init() {
         // ?v=2: Projekte-Sync (2026-08-13). Ohne den Bump haelt der
         // HTTP-Cache die alte Fassung fest — die Datei ist nicht im
         // Service-Worker-Buendel und erneuert sich sonst nie zuverlaessig.
-        import("/assets/chat-sync.js?v=2").catch(() => {});
+        import("/assets/chat-sync.js?v=3").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */
@@ -765,6 +869,58 @@ export async function benenneProjektUm(id, name) {
   await tx(PROJEKT_STORE, "readwrite", (store) => store.put(projekt));
   notifyProjekteChanged();
   return true;
+}
+
+// Bildschirm 36: die Dauer-Anweisung des Arbeitsbereichs. Sie wird beim
+// Oeffnen eines Gespraechs dieses Bereichs in den Sitzungsspeicher gelegt
+// und von settings-runtime.buildPreferenceBlock() in den Systemprompt
+// uebernommen — sie WIRKT also wirklich, in jedem Gespraech des Bereichs.
+export async function setzeProjektAnweisung(id, text) {
+  const projekt = await getProjekt(id);
+  if (!projekt) return false;
+  projekt.anweisung = String(text || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, 2000);
+  projekt.updatedAt = new Date().toISOString();
+  await tx(PROJEKT_STORE, "readwrite", (store) => store.put(projekt));
+  notifyProjekteChanged();
+  await aktualisiereBereichsAnweisung((await getChat(activeChatId()))?.projectId);
+  return true;
+}
+
+const BEREICH_ANWEISUNG_KEY = "smejj.bereichAnweisung.v1";
+const BEREICH_NEU_KEY = "smejj.bereichNeu.v1";
+
+async function aktualisiereBereichsAnweisung(projectId) {
+  try {
+    const projekt = projectId ? await getProjekt(projectId) : null;
+    if (projekt?.anweisung) {
+      sessionStorage.setItem(BEREICH_ANWEISUNG_KEY, JSON.stringify({ name: projekt.name, anweisung: projekt.anweisung }));
+    } else {
+      sessionStorage.removeItem(BEREICH_ANWEISUNG_KEY);
+    }
+  } catch { /* Anweisung ist Beiwerk — nie das Oeffnen stoeren */ }
+}
+
+/** Merkt vor: das NAECHSTE neue Gespraech gehoert in diesen Bereich. */
+export function neuesGespraechImBereich(projektId) {
+  try { sessionStorage.setItem(BEREICH_NEU_KEY, String(projektId || "")); } catch { /* still */ }
+}
+
+// Gegenstueck: persistActive holt die Vormerkung beim ERSTEN Speichern eines
+// neuen Gespraechs ab und loescht sie — einmal vormerken, einmal wirken.
+//
+// DIESE Funktion wurde beim Bereichs-Bau (2026-08-15) aufgerufen, aber NIE
+// definiert (Halb-Commit, drittes Vorkommen). Folge: JEDER persistActive-Lauf
+// starb still am ReferenceError — der Fehlerfaenger in scheduleSave schluckte
+// ihn, und seit dem Abend wurde KEIN Chat mehr gespeichert. node --check und
+// die Suite sehen so etwas nicht; nur der Live-Lauf tat es.
+function verbraucheBereichVormerkung() {
+  try {
+    const id = sessionStorage.getItem(BEREICH_NEU_KEY) || "";
+    if (id) sessionStorage.removeItem(BEREICH_NEU_KEY);
+    return id;
+  } catch {
+    return "";
+  }
 }
 
 export async function loescheProjekt(id) {

@@ -133,6 +133,62 @@ export function deuteChromeFehler(kennung, ziel) {
 }
 
 /**
+ * Deutet die Zustandsauskunft der Bruecke — und zwar so, dass ein AUSEINANDER-
+ * LAUFEN der beiden Seiten sofort auffaellt.
+ *
+ * WARUM GENAU DAS DIE FRAGE IST (2026-08-20/21, mehrere Runden verloren):
+ * Das kleine Fenster zeigte "Freigegeben noch 30 Minuten", der Speicher der
+ * Bruecke war leer — und niemand konnte beides gleichzeitig sehen. Wer nur
+ * EINE der zwei Zahlen anzeigt, baut genau diese Falle wieder auf. Darum
+ * vergleicht diese Funktion sie und meldet den Unterschied als Handgriff,
+ * nicht als Zahlenpaar.
+ *
+ * @param {{ok?:boolean, error?:string, version?:string, freigaben?:Array<{herkunft:string, restMinuten:number}>, chromeRechte?:string[]}} zustand
+ * @param {{installiert?:boolean}} lage
+ * @returns {{ton:"gut"|"warnung"|"fehlt", text:string}}
+ */
+export function deuteBrueckenZustand(zustand, { installiert = true } = {}) {
+  if (!installiert) {
+    return { ton: "fehlt", text: "Maus-Bruecke nicht installiert — die Maus arbeitet im fernen Browser." };
+  }
+  if (!zustand?.ok) {
+    return { ton: "warnung", text: deuteChromeFehler(zustand?.error, "") };
+  }
+
+  // "https://mail.google.com/*" und "https://mail.google.com/" meinen dieselbe
+  // Herkunft wie "https://mail.google.com" — sonst meldet der Vergleich einen
+  // Unterschied, den es nicht gibt.
+  const alsHerkunft = (muster) => String(muster || "").replace(/\/\*$/, "").replace(/\/$/, "");
+  const rechte = new Set((zustand.chromeRechte || []).map(alsHerkunft).filter(Boolean));
+  const offen = (zustand.freigaben || []).filter((f) => Number(f.restMinuten) > 0);
+  const marke = zustand.version ? `Bruecke ${zustand.version}` : "Bruecke";
+
+  // Der Fall vom 2026-08-20: gemerkt, aber Chrome haelt das Recht nicht.
+  const ohneRecht = offen.filter((f) => !rechte.has(alsHerkunft(f.herkunft)));
+  if (ohneRecht.length) {
+    return {
+      ton: "warnung",
+      text: `${marke}: fuer ${ohneRecht.map((f) => kurzeAdresse(f.herkunft)).join(", ")} ist eine Freigabe gemerkt, aber Chrome haelt das Recht NICHT. Freigabe in Chrome noch einmal erteilen.`
+    };
+  }
+  // Der umgekehrte Fall — er sieht harmlos aus und ist es nicht: die Maus
+  // wird das Recht nicht benutzen, weil sie es nicht kennt.
+  const gemerkt = new Set(offen.map((f) => alsHerkunft(f.herkunft)));
+  const ohneFreigabe = [...rechte].filter((h) => !gemerkt.has(h));
+  if (ohneFreigabe.length) {
+    return {
+      ton: "warnung",
+      text: `${marke}: Chrome haelt ein Recht fuer ${ohneFreigabe.map(kurzeAdresse).join(", ")}, das die Bruecke nicht kennt — sie wird es nicht benutzen.`
+    };
+  }
+  if (!offen.length) return { ton: "gut", text: `${marke} bereit — keine Freigabe aktiv.` };
+  return {
+    ton: "gut",
+    text: `${marke} — freigegeben: ${offen.map((f) => `${kurzeAdresse(f.herkunft)} (noch ${f.restMinuten} min)`).join(", ")}`
+  };
+}
+
+/**
  * Oeffnet das Ziel — auch wenn das Panel seine sieben Taebe schon voll hat.
  *
  * WARUM ES DAS BRAUCHT (live gemessen 2026-08-18 im Browser des Betreibers):

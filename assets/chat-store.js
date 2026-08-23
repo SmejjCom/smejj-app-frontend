@@ -257,15 +257,39 @@ function titleFrom(messages) {
 // durch eine kurze Adresse. Danach ist der Schnappschuss klein und das Medium
 // ueberlebt Neuladen und Geraetewechsel.
 //
+// DREI ORTE, nicht einer (gemessen 2026-08-22 an 113 echten Gespraechen):
+// Zehn lagen ueber MAX_CHAT_BYTES und wurden deshalb NIE gesichert. Der Median
+// aller Chats ist 7 KB — es war nie zu viel Text, immer ein Medium. Dasselbe
+// Medium steckt in `html` (innerHTML), `text` (textContent) UND `raw` (die
+// Modell-Antwort in den Metadaten); gemessen 4 / 7 / 10 Vorkommen. Der reine
+// DOM-Weg erreichte davon drei. Darum unten drei Schritte statt einem.
+//
 // Dynamischer Import und stiller Fehlschlag mit Absicht: ist das Modul nicht
 // ladbar oder die Ablage aus, wird gespeichert wie bisher — nie schlechter.
 async function medienAuslagern() {
   try {
     const log = startLog();
     if (!log) return;
-    const { lagereMedienAus } = await import("./chat-medien.js?v=1");
+    const { lagereMedienAus, lagereMedienAusText, lagereMedienAusTextknoten } =
+      await import("./chat-medien.js?v=2");
     for (const eintrag of log.querySelectorAll(":scope > .entry.assistant")) {
-      await lagereMedienAus(eintrag);
+      // EINE Karte je Eintrag: dasselbe Medium steht unten in bis zu drei
+      // Feldern, soll aber nur einmal hochgeladen werden.
+      const karte = new Map();
+      // 1. Die Elemente (<img>, <video>) — der urspruengliche Weg.
+      await lagereMedienAus(eintrag, { karte });
+      // 2. Textknoten: nicht gerenderter Markdown, der sowohl in `html` als
+      //    auch in `text` landet.
+      await lagereMedienAusTextknoten(eintrag, { karte });
+      // 3. Die Metadaten. readEntries() speichert `raw` (die Modell-Antwort)
+      //    und die letzten Fassungen — beide erreicht kein DOM-Weg.
+      const meta = metaOf(eintrag);
+      if (!meta) continue;
+      if (meta.raw) meta.raw = (await lagereMedienAusText(meta.raw, { karte })).text;
+      for (const fassung of Array.isArray(meta.versions) ? meta.versions : []) {
+        if (fassung?.raw) fassung.raw = (await lagereMedienAusText(fassung.raw, { karte })).text;
+        if (fassung?.html) fassung.html = (await lagereMedienAusText(fassung.html, { karte })).text;
+      }
     }
   } catch { /* fail-safe: lieber ein grosser Chat als gar keiner */ }
 }
@@ -274,7 +298,7 @@ async function medienAuslagern() {
 // wurde. Still und ohne Netz-Zwang — kommt nichts, bleibt die Adresse stehen.
 async function medienHolen(log) {
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=1");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2");
     await rehydriereMedien(log);
   } catch { /* fail-safe: lieber ein leeres Bild als ein kaputter Verlauf */ }
 }

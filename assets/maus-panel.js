@@ -151,5 +151,63 @@ export function openMausReplay({ capsuleRef = "", planId = "", runId = "", live 
   tab.status = "ready";
   persistTabs();
   render();
+  // Nach dem Rendern, nie davor: render() baut das Panel neu auf und wuerde
+  // eine vorher gesetzte Zeile wieder wegwischen.
+  void zeigeBrueckenZustand();
   return true;
+}
+
+// --- Der Zustand der Bruecke, sichtbar ---------------------------------------
+//
+// WARUM HIER UND NICHT IM KLEINEN CHROME-FENSTER: Das Fenster der Erweiterung
+// stirbt, sobald Chrome seinen eigenen Freigabe-Dialog zeigt — es ist der
+// unzuverlaessigste Ort, den es fuer eine Anzeige gibt. Das Panel steht
+// ohnehin offen, wenn die Maus arbeitet.
+//
+// WARUM PER JS ERZEUGT: public/index.html steht unter dem Start-Lock. Diese
+// Zeile kommt darum aus dem Modul selbst, ohne eine gesperrte Datei und ohne
+// neue Datei im Vorrat des Service Workers.
+const ZUSTAND_KLASSE = "maus-bruecken-zustand";
+const TON_FARBE = { gut: "#7ee3c7", warnung: "#ffcf6b", fehlt: "#9aa4b2" };
+
+function zustandsZeile() {
+  if (!refs.root || typeof document === "undefined") return null;
+  const vorhanden = refs.root.querySelector(`.${ZUSTAND_KLASSE}`);
+  if (vorhanden) return vorhanden;
+  const zeile = document.createElement("p");
+  zeile.className = ZUSTAND_KLASSE;
+  // role=status: die Meldung wird vorgelesen, ohne den Fokus zu stehlen.
+  zeile.setAttribute("role", "status");
+  // 16px, nicht kleiner: der Betreiber liest kleine Schrift nicht.
+  zeile.style.cssText = "margin:0;padding:8px 12px;font-size:16px;line-height:1.4;border-top:1px solid rgba(255,255,255,.08)";
+  const anker = refs.content;
+  if (anker?.parentNode) anker.parentNode.insertBefore(zeile, anker);
+  else refs.root.appendChild(zeile);
+  return zeile;
+}
+
+/**
+ * Fragt die Bruecke und schreibt den Befund ins Panel.
+ *
+ * Fail-closed: kann nicht gefragt werden, steht das auch da. Eine leere Zeile
+ * waere die schlechteste Antwort — sie sieht aus wie "alles in Ordnung".
+ *
+ * @returns {Promise<{ton:string, text:string}|null>} null nur ohne Panel.
+ */
+export async function zeigeBrueckenZustand() {
+  const zeile = zustandsZeile();
+  if (!zeile) return null;
+  let befund;
+  try {
+    const bruecke = await import("./maus-chrome.js?v=1");
+    const deutung = await import("./maus-absicht.js?v=18");
+    const installiert = bruecke.brueckeDa();
+    const zustand = installiert ? await bruecke.frageZustand() : null;
+    befund = deutung.deuteBrueckenZustand(zustand, { installiert });
+  } catch (error) {
+    befund = { ton: "warnung", text: `Zustand der Bruecke nicht lesbar: ${String(error?.message || error).slice(0, 120)}` };
+  }
+  zeile.textContent = befund.text;
+  zeile.style.color = TON_FARBE[befund.ton] || TON_FARBE.fehlt;
+  return befund;
 }

@@ -7,7 +7,7 @@
 //
 // WICHTIG: derselbe chat-store-Spezifizierer wie in search.js und
 // chat-history-view.js — ein abweichender Pfad erzeugt eine ZWEITE Modulinstanz.
-import { listChats } from "/assets/chat-store.js?v=pin-20260806";
+import { listChats } from "/assets/chat-store.js?v=b54";
 import {
   anzeigeTitel,
   anzeigeVorschau,
@@ -15,7 +15,7 @@ import {
   zeitText,
   trefferAusschnitt,
   mitHervorhebung
-} from "/assets/chat-history-text.js";
+} from "/assets/chat-history-text.js?v=b47b";
 
 // Chats zuerst: wer sucht, sucht fast immer eine alte Unterhaltung.
 const GRUPPEN_REIHENFOLGE = ["Chats", "Projekte", "Projekt-Dateien", "Dateien", "Aufgaben", "Arbeitsbereiche", "Einstellungen", "Werkzeuge", "Memory"];
