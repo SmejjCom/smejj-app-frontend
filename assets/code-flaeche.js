@@ -36,6 +36,7 @@ import { API_ORIGIN } from "./config.js";
 // Modul (800-Zeilen-Regel des Master-Prompts). OHNE ?v — gleiche Kennung
 // ueberall, sonst zweite Modulinstanz (module-queries-Waechter).
 import {
+import { zieheAnhaengeAusFeld, nimmAnhaengeMit } from "./code-anhaenge.js?v=1";
   MODELL_KEY,
   CLINE_MODEL_KEY,
   AUTO_MARKE,
@@ -194,56 +195,6 @@ function holeLog() {
   requestAnimationFrame(() => { halter.scrollTop = halter.scrollHeight; });
 }
 
-// --- Anhang-Chips (Betreiber 2026-08-16: "[Bild angehaengt: …] als Text im
-// Schreibfeld ist nicht professionell"). Verweis-Zeilen der Anhang-Module
-// wandern aus dem Feld in Chips ueber dem Text; beim Senden reisen sie
-// unsichtbar mit. Das Feld bleibt frei fuer die eigentliche Aufgabe.
-const ANHANG_ZEILE = /^\[(?:Anhang|Bild angehaengt|Bild|Foto)[^\n\]]*:\s*[^\n\]]+\]$/;
-let anhaenge = [];
-
-function zeichneAnhaenge() {
-  const halter = document.getElementById("codeAnhaenge");
-  if (!halter) return;
-  halter.innerHTML = "";
-  halter.hidden = anhaenge.length === 0;
-  anhaenge.forEach((ref, i) => {
-    const chip = document.createElement("span");
-    chip.className = "code-anhang-chip";
-    const name = ref.replace(/^\[[^:]*:\s*/, "").replace(/\]$/, "");
-    const wort = document.createElement("span");
-    wort.textContent = name;
-    const weg = document.createElement("button");
-    weg.type = "button";
-    weg.className = "code-anhang-weg";
-    weg.setAttribute("aria-label", `${name} entfernen`);
-    weg.textContent = "×";
-    weg.addEventListener("click", () => {
-      const [entfernt] = anhaenge.splice(i, 1);
-      // Ein Bild-Anhang traegt echten Inhalt im Zwischenspeicher — beim
-      // Entfernen mit verwerfen, sonst haengt er an der naechsten Frage.
-      if (/^\[Bild angehaengt/.test(entfernt || "")) window.smejjBildAnhang?.take?.();
-      zeichneAnhaenge();
-    });
-    chip.append(wort, weg);
-    halter.append(chip);
-  });
-}
-
-function zieheAnhaengeAusFeld(feld) {
-  if (!feld.value.includes("[")) return;
-  const zeilen = String(feld.value).split("\n");
-  const rest = [];
-  let gefunden = false;
-  for (const zeile of zeilen) {
-    if (ANHANG_ZEILE.test(zeile.trim())) { anhaenge.push(zeile.trim()); gefunden = true; }
-    else rest.push(zeile);
-  }
-  if (gefunden) {
-    feld.value = rest.join("\n").replace(/^\n+/, "").replace(/\n+$/, "");
-    zeichneAnhaenge();
-  }
-}
-
 async function senden() {
   const feld = document.getElementById("codeAufgabe");
   const start = document.getElementById("startMessage");
@@ -266,9 +217,7 @@ async function senden() {
   // ein Ordner verbunden, reisen dessen Textdateien als Kontext mit —
   // das Modell arbeitet mit den ECHTEN Dateien. Der Klick auf Senden ist
   // die Nutzergeste, die Chrome fuer die Ordner-Erlaubnis verlangt.
-  let auftrag = [text, ...anhaenge].filter(Boolean).join("\n");
-  anhaenge = [];
-  zeichneAnhaenge();
+  let auftrag = [text, ...nimmAnhaengeMit()].filter(Boolean).join("\n");
   const projektId = localStorage.getItem(CODE_PROJEKT) || "";
   if (projektId && window.smejjProjektOrdner) {
     try {

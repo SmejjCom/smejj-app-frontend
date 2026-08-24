@@ -326,6 +326,7 @@ const SHELL = [
   "/assets/topbar-krume.js",
   "/assets/spur-start.js",
   "/assets/code-flaeche.js",
+  "/assets/code-anhaenge.js",
   "/assets/code-nachladen.js",
   "/assets/code-modell-menue.js",
   "/assets/kamera.js",
