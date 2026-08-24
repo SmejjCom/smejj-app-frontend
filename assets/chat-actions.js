@@ -41,7 +41,9 @@ import { groundingFor } from "/assets/browser-context.js";
 // Funktion sanitizeForSpeech benutzt, es ging also nichts kaputt; die
 // Warteschlange aus demselben Modul haette es zerrissen. Gleiche Falle wie bei
 // settings-runtime.js in sw v184/v185.
-import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=blitz-20260726";
+// sanitizeForSpeech erst beim Vorlese-Klick laden (2026-08-24 "Startseite
+// abspecken") — derselbe Spezifizierer wie ueberall, sonst laedt der Browser
+// die Datei doppelt (Vorfall 2026-07-29, siehe oben).
 import { createChatFrom, openChat } from "/assets/chat-store.js?v=b64";
 import { showToast } from "/assets/components.js?v=b48";
 
@@ -380,7 +382,7 @@ function commitEdit(editor) {
   applyResubmitPlan(plan);
 }
 
-function speakEntry(entry) {
+async function speakEntry(entry) {
   const synthesis = window.speechSynthesis;
   if (!synthesis) {
     showToast("Sprachausgabe wird von diesem Browser nicht unterstützt.", "warn");
@@ -388,6 +390,14 @@ function speakEntry(entry) {
   }
   synthesis.cancel();
   document.querySelector('[data-start-tool="speaker"]')?.classList.remove("is-speaking");
+  let sanitizeForSpeech;
+  try {
+    ({ sanitizeForSpeech } = await import("/assets/voice-speech-queue.js?v=blitz-20260726"));
+  } catch (fehler) {
+    console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler);
+    showToast("Vorlesen gerade nicht möglich — bitte noch einmal versuchen.", "warn");
+    return;
+  }
   const text = sanitizeForSpeech(rawOf(entry), { lang: "de" });
   if (!text) return;
   const utterance = new SpeechSynthesisUtterance(text);

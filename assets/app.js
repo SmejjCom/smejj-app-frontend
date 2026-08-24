@@ -1,25 +1,17 @@
 import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js";
 import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
-import { clearThinkingState, streamChatAnswer } from "/assets/ai/chat-stream.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=3";
-import { initGlobalSearch } from "./search.js?v=b51";
-import { openSearchOverlay } from "./search-overlay.js?v=b58";
+import { initGlobalSearch, oeffneSuchOverlay } from "./search.js?v=b51";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
-import { routeAutonomousRequest } from "./autonomous-intent.js";
 import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js";
 import { lesbarerStatus } from "./system-status-text.js";
-import { groundTask, modelForTask } from "./browser-context.js";
 import { afterFirstPaint } from "./deferred-start.js";
-import { initGoogleLogin } from "./google-login.js";
-import { createFreeCodingJob, formatFreeCodingJob, formatFreeExecutorResult, isFreeCodingFallbackTask, runFreeExecutorIfAppTask, saveFreeExecutorArtifact } from "./free-coding-fallback.js";
 import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39u";
-import { chatOhneMedienauftrag } from "./medien-absicht.js?v=5";
-import { mausAuftragErledigt } from "./maus-absicht.js?v=19";
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
 import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=3";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
@@ -41,6 +33,28 @@ const state = {
 
 const workspace = createLocalWorkspace();
 const aiRouter = createAiRouter();
+
+// Sendepfad-Module erst beim ERSTEN Senden laden (Betreiber-Freigabe
+// 2026-08-24 "Startseite abspecken", Fortsetzung von "unter 300 KB" vom
+// 19.08.): Strom, Maus-/Medien-/Autonomie-Weichen und die Gratis-Reserve
+// zaehlen erst, wenn wirklich gesendet wird — vorher lagen sie mit ~45 KB
+// in JEDEM Seitenstart. Der Service Worker haelt sie im Precache, darum
+// kostet der erste Send praktisch nichts extra. Fail-safe: schlaegt das
+// Laden fehl (Netz weg), zeigt submitTask die Offline-Meldung und der
+// naechste Versuch laedt erneut.
+let sendepfadGeladen = null;
+function holeSendepfad() {
+  sendepfadGeladen ||= Promise.all([
+    import("/assets/ai/chat-stream.js"),
+    import("./autonomous-intent.js"),
+    import("./browser-context.js"),
+    import("./medien-absicht.js?v=5"),
+    import("./maus-absicht.js?v=19"),
+    import("./free-coding-fallback.js")
+  ]).then((teile) => Object.assign({}, ...teile))
+    .catch((fehler) => { sendepfadGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler); throw fehler; });
+  return sendepfadGeladen;
+}
 let taskIndicatorTimer;
 // Antwortstufen (Konkurrenz-Radar V3, Freigabe Betreiber 2026-08-06,
 // Container-Neustart 2026-08-08): der Chip zeigt normalen Nutzern nur noch
@@ -106,7 +120,7 @@ function boot() {
   $("#ragText").value = state.rag;
   refreshLocalWorkspaceStatus(projektAbhaengigkeiten());
   afterFirstPaint([
-    () => initGoogleLogin({ $, state, writeOutput, refreshSessionStatus }).catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")),
+    () => import("./google-login.js").then((m) => m.initGoogleLogin({ $, state, writeOutput, refreshSessionStatus })).catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")),
     () => refreshSessionStatus(),
     () => { refreshKimiVaultStatus({ quiet: true }).catch(() => {}); refreshGlmVaultStatus({ quiet: true }).catch(() => {}); }
   ]);
@@ -147,7 +161,10 @@ function bindNavigation() {
       setBrowserPanelOpen(false);
       // Suche oeffnet als Overlay ueber der aktuellen Ansicht (wie Cmd+K);
       // die Such-Seite bleibt Rueckfallebene, falls das Overlay fehlt.
-      if (button.dataset.view === "search" && openSearchOverlay()) return;
+      if (button.dataset.view === "search") {
+        Promise.resolve(oeffneSuchOverlay()).then((offen) => { if (!offen) goToView("search"); }).catch(() => goToView("search"));
+        return;
+      }
       goToView(button.dataset.view);
     });
   }
@@ -347,40 +364,48 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   showTaskIndicator("active");
   addEntry(task, "user", target);
   const output = addEntry("", "assistant", target);
+  let M;
   try {
-    if (routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
-    if (await mausAuftragErledigt({ task, output })) return showTaskIndicator("done");
-    if (await chatOhneMedienauftrag({ task: await groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
+    M = await holeSendepfad();
+  } catch {
+    output.textContent = UI_COPY.chatOffline;
+    hideTaskIndicator();
+    return;
+  }
+  try {
+    if (M.routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
+    if (await M.mausAuftragErledigt({ task, output })) return showTaskIndicator("done");
+    if (await M.chatOhneMedienauftrag({ task: await M.groundTask(task), model: state.settings.model, output, offlineNotice: UI_COPY.chatOffline })) return showTaskIndicator("done");
     try {
       const anfrage = {
-        task: await groundTask(task),
-        model: modelForTask(task, state.settings.model) || "smejj 1.0",
+        task: await M.groundTask(task),
+        model: M.modelForTask(task, state.settings.model) || "smejj 1.0",
         files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { stufe: normalizeStufe(state.settings.stufe), ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}), ...(window.smejjBildAnhang?.take?.() || {}) },
         history: buildRequestHistory(task)
       };
       // Die Reserve laeuft ueber /api/chat: ihr Stand kennt `history` in
       // /api/agent nicht (siehe buildChatTargets / buildReserveChatRequest).
-      await streamChatAnswer(
+      await M.streamChatAnswer(
         buildChatTargets({ primary: CLIENT_ROUTES.api.agent, reserve: CLIENT_ROUTES.api.chatFallback }, anfrage),
         anfrage, output, { renderMarkdown: renderChatMarkdown, offlineNotice: UI_COPY.chatOffline }
       );
       return showTaskIndicator("done");
     } catch (streamError) {
       output.textContent = "";
-      if (isFreeCodingFallbackTask(task)) {
-        const codingJob = await createFreeCodingJob(task);
-        if (codingJob?.ok) output.textContent = `${formatFreeCodingJob(codingJob)}\n\n`;
-        const executorResult = await runFreeExecutorIfAppTask(task);
+      if (M.isFreeCodingFallbackTask(task)) {
+        const codingJob = await M.createFreeCodingJob(task);
+        if (codingJob?.ok) output.textContent = `${M.formatFreeCodingJob(codingJob)}\n\n`;
+        const executorResult = await M.runFreeExecutorIfAppTask(task);
         if (executorResult?.ok) {
-          saveFreeExecutorArtifact(executorResult, state);
-          output.textContent += `${formatFreeExecutorResult(executorResult)}\n\n`;
+          M.saveFreeExecutorArtifact(executorResult, state);
+          output.textContent += `${M.formatFreeExecutorResult(executorResult)}\n\n`;
         }
       }
       if (!output.textContent.trim()) throw streamError;
     }
     showTaskIndicator("done");
   } catch (error) {
-    clearThinkingState(output);
+    M.clearThinkingState(output);
     // "network error" ist Chromes nackter Text fuer einen Strom-Abriss
     // (live gesehen beim Bruecken-Neustart mitten in einer Bild-Antwort).
     const message = error?.message === "Failed to fetch"

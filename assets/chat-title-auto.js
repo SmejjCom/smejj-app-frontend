@@ -34,7 +34,10 @@
 // config.js ohne Kennung. tests/module-queries.test.mjs haelt das fest.
 import { listChats, setAutoTitle } from "/assets/chat-store.js?v=b64";
 import { CLIENT_ROUTES } from "/assets/config.js";
-import { bridgeAuthHeaders } from "/assets/ai/chat-stream.js";
+// bridgeAuthHeaders erst beim Titel-Erzeugen laden (2026-08-24 "Startseite
+// abspecken"): der statische Import zog die komplette chat-stream-Kette
+// (~29 KB) in JEDEN Seitenstart, obwohl ein Auto-Titel erst NACH der ersten
+// Antwort entsteht.
 
 // Zwei Nachrichten genuegen — genau so viele gehen ohnehin an die Bruecke.
 // Der Wert stand bei vier, weil ein Chat mit nur einer Frage und einem
@@ -183,7 +186,7 @@ async function holeTitel(chat) {
   try {
     const antwort = await fetch(CLIENT_ROUTES.api.chat, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() },
+      headers: { "Content-Type": "application/json", ...(await import("/assets/ai/chat-stream.js")).bridgeAuthHeaders() },
       body: JSON.stringify({ messages: [...nachrichten, { role: "user", content: AUFTRAG }], model: "" }),
       signal: abbruch.signal
     });
