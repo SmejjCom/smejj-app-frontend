@@ -228,6 +228,7 @@ const SHELL = [
   "/assets/account-privacy-formulare.css",
   "/assets/panel-backdrop.css",
   "/assets/browser-pane.js",
+  "/assets/browser-pane-persistenz.js",
   "/assets/auth-gate-frueh.js",
   "/assets/browser-nachladen.js",
   "/assets/browser-pane-backdrop.js",

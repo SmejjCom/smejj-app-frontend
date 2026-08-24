@@ -122,10 +122,10 @@ export async function setzeProjektAnweisung(id, text) {
   return true;
 }
 
-const BEREICH_ANWEISUNG_KEY = "smejj.bereichAnweisung.v1";
-const BEREICH_NEU_KEY = "smejj.bereichNeu.v1";
+export const BEREICH_ANWEISUNG_KEY = "smejj.bereichAnweisung.v1";
+export const BEREICH_NEU_KEY = "smejj.bereichNeu.v1";
 
-async function aktualisiereBereichsAnweisung(projectId) {
+export async function aktualisiereBereichsAnweisung(projectId) {
   try {
     const projekt = projectId ? await getProjekt(projectId) : null;
     if (projekt?.anweisung) {
@@ -149,7 +149,7 @@ export function neuesGespraechImBereich(projektId) {
 // starb still am ReferenceError — der Fehlerfaenger in scheduleSave schluckte
 // ihn, und seit dem Abend wurde KEIN Chat mehr gespeichert. node --check und
 // die Suite sehen so etwas nicht; nur der Live-Lauf tat es.
-function verbraucheBereichVormerkung() {
+export function verbraucheBereichVormerkung() {
   try {
     const id = sessionStorage.getItem(BEREICH_NEU_KEY) || "";
     if (id) sessionStorage.removeItem(BEREICH_NEU_KEY);
