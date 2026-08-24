@@ -543,4 +543,14 @@ function dataAction(label, hint, id, text, danger = false) { return `<div class=
 // Browser eine Aenderung erst nach Ablauf der Frist. Gleiche Konvention wie die
 // Stylesheet-Links in index.html. Bei jeder Aenderung an der CSS-Datei erhoehen.
 const STYLE_VERSION = KONTO_STIL_MARKE;
-function loadStyles() { const href = `/assets/account-privacy.css?v=${STYLE_VERSION}`; if (document.querySelector(`link[href^="/assets/account-privacy.css"]`)) return; const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href; document.head.append(link); }
+function loadStyles() {
+  // Seit der Zeilen-Diaet (25.08.) zwei Teile — gleiche Marke, gleiche Kaskade:
+  // erst der Grundteil, dann die Formular-Feinheiten.
+  for (const name of ["account-privacy.css", "account-privacy-formulare.css"]) {
+    if (document.querySelector(`link[href^="/assets/${name}"]`)) continue;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `/assets/${name}?v=${STYLE_VERSION}`;
+    document.head.append(link);
+  }
+}
