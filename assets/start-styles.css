@@ -1002,6 +1002,10 @@ body.is-resizing-panel .panel-resizer::before {
   display: grid;
   gap: 20px;
 }
+/* DESIGN LOCK: smejj start design lock v1.
+   Nicht aendern ohne schriftliche Bestaetigung des Nutzers.
+   Geschuetzt: Startseite, dunkler Mittelbereich, unteres Eingabefeld,
+   Modellname, Icon-Zeile, Trennlinie und kompakte Seitenleisten. */
 #start.view.is-active {
   display: grid;
   grid-template-rows: 1fr;
@@ -1097,6 +1101,7 @@ body.is-resizing-panel .panel-resizer::before {
   overflow-y: auto;
   resize: none;
 }
+/* END DESIGN LOCK: smejj start design lock v1. */
 .prompt-glass textarea::placeholder {
   color: rgba(151, 158, 171, 0.78);
 }
