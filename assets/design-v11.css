@@ -1,57 +1,22 @@
-/* smejj.com — Design V11: eine Quelle fuer Farbe, Kante und Bewegung.
- * Freigabe des Betreibers vom 2026-08-15: "Du kannst V11 umsetzen ...
- * Ich gebe dir alle Rechte".
- *
- * Befund, der zu dieser Datei fuehrte (gemessen am 2026-08-14):
- * Cyan lag in SECHS Dateien verstreut und in DREI verschiedenen Toenen —
- * #2dd4bf, #32f6ea, #2fd4c9. Jede Farbaenderung zog sechs Nacharbeiten nach
- * sich, und irgendeine wurde vergessen. Ab hier gibt es genau einen Ton.
- *
- * Die eine Regel, die alles traegt:
- *   Glas ist die FLAECHE. Die Linie ist der TRENNER. Der Abstand ist die
- *   GRUPPE. Nie zwei davon am selben Element.
- *
- * Laedt als LETZTES im Buendel (nach eckig.css) und gewinnt darum bei
- * gleicher Spezifitaet. Bewusst nur Tokens und wenige Grundregeln — kein
- * Umbau einzelner Ansichten. Wer eine Ansicht anfasst, nimmt die Tokens.
- *
- * ACHTUNG Rundung: eckig.css setzt app-weit border-radius 0. Der Betreiber
- * hat am 2026-08-14 ausdruecklich "leichte Knick, aber sehr leicht"
- * verlangt — deshalb steht hier 8 px als bewusste, dokumentierte Ausnahme.
- */
-
 :root {
-  /* --- Farbe: EIN Cyanton --------------------------------------------- */
   --v11-cy: #32f6ea;
   --v11-cy-ink: #7ee8da;
   --v11-cy-line: rgba(50, 246, 234, 0.30);
   --v11-cy-line-on: rgba(50, 246, 234, 0.85);
   --v11-cy-glow: rgba(50, 246, 234, 0.10);
   --v11-cy-fill: rgba(50, 246, 234, 0.12);
-  /* Die Logofarbe aus public/icons/smejj_favicon.svg. Nur fuer das Zeichen
-     selbst — nie fuer Flaechen, sonst kippt der Kontrast. */
   --v11-marke: #02fdfd;
-
-  /* --- Kante und Flaeche ---------------------------------------------- */
   --v11-hair: rgba(255, 255, 255, 0.075);
   --v11-glas: rgba(255, 255, 255, 0.045);
   --v11-glas-2: rgba(255, 255, 255, 0.075);
-  /* iOS-Specular: der helle Strich NUR an der Oberkante. Das ist es, was
-     Glas zu Glas macht — nicht ein Rahmen ringsum. */
   --v11-lichtkante: rgba(255, 255, 255, 0.07);
-
-  /* --- Zustand: immer Farbe UND Wort im Markup ------------------------- */
   --v11-ok: #7ef0c2;
   --v11-warn: #ffd68a;
   --v11-bad: #ff9a9c;
-
-  /* --- Kante, Abstand, Bewegung ---------------------------------------- */
-  --v11-r: 8px;      /* der "leichte Knick" */
+  --v11-r: 8px;
   --v11-r-sm: 6px;
-  --v11-takt: 160ms; /* EINE Dauer fuer alles */
+  --v11-takt: 160ms;
 }
-
-/* --- Eine Bewegungsdauer ---------------------------------------------- */
 @media (prefers-reduced-motion: no-preference) {
   .ghost-button,
   .send-button,
@@ -64,10 +29,6 @@
       color var(--v11-takt) ease;
   }
 }
-
-/* --- Der leichte Knick -------------------------------------------------
- * Bewusste Ausnahme zu eckig.css (Betreiber-Ansage 2026-08-14). Bewusst
- * eng gefasst: nur Bedienelemente und Flaechen, nicht "alles". */
 .prompt-glass,
 .plus-menu,
 .model-menu,
@@ -77,18 +38,9 @@
 .text-chip {
   border-radius: var(--v11-r) !important;
 }
-
-/* Betreiber 2026-08-23: auch der Hauptknopf ist VIERECKIG (Design-Regel:
-   das gesamte smejj-Design ist eckig; die Rund-Ausnahme vom 15.08. ist
-   aufgehoben). Rund bleiben nur Avatare (Regel aus eckig.css). */
 .send-button {
   border-radius: 0 !important;
 }
-
-/* --- Der Hauptknopf: leer = Sprache, getippt = senden -------------------
- * Die Zustaende setzt composer-sendetaste.js. Hier steht nur, wie sie
- * aussehen. Weiss fuer "senden" (wie ChatGPT), Cyan-Fuellung fuer
- * "Sprachmodus" — zwei Rollen, zwei Farben, nie dieselbe. */
 .send-button {
   background: #ffffff;
   color: #0a0f16;
@@ -101,14 +53,10 @@
   color: var(--v11-cy);
   box-shadow: inset 0 0 0 1px var(--v11-cy-line-on), 0 0 18px var(--v11-cy-glow);
 }
-/* Die Miniatur-Welle ist gefuellt, nicht gestrichelt — duenne Striche
-   verschluckt der Browser bei 18 px. */
 .send-button .sendetaste-welle rect {
   fill: currentColor;
   stroke: none;
 }
-
-/* --- Glas: Flaeche plus Lichtkante oben, KEIN Rahmen ringsum ----------- */
 .prompt-glass {
   background: var(--v11-glas);
   -webkit-backdrop-filter: blur(30px) saturate(160%);
@@ -117,17 +65,11 @@
   border: 0;
 }
 .prompt-glass:focus-within {
-  /* Betreiber 2026-08-16: Raender leuchten nur noch leise — Augen schonen. */
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
     0 0 0 1px var(--v11-cy-line),
     0 0 12px var(--v11-cy-glow);
 }
-
-/* Menues schweben: staerkeres Glas, damit der Text darunter nicht stoert.
-   #profileDockMenu dabei (Betreiber 2026-08-16: "Profil-Menue soll auch
-   Glas Edel aussehen") — mit !important, weil die Runtime-CSS der
-   Premium-Flaechen nach dem Buendel laedt und sonst gewinnt. */
 #profileDockMenu {
   background: rgba(14, 20, 28, 0.78) !important;
   -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
@@ -150,10 +92,6 @@
     0 0 0 1px var(--v11-cy-line);
   border: 0;
 }
-
-/* --- Rahmen raus, Haarstrich rein --------------------------------------
- * Befund des Betreibers: "so viele Rahmen stoehnen mich auch". Ein Rahmen
- * trennt; wenn alles getrennt ist, gehoert nichts zusammen. */
 .start-chips button,
 .ghost-button,
 .text-chip {
@@ -166,10 +104,6 @@
 .text-chip:hover {
   background: rgba(255, 255, 255, 0.09);
 }
-
-/* --- Zwei Schriftstaerken, nie 500 oder 600 ----------------------------
- * Das ist der halbe Grund, warum ChatGPT sauber wirkt: es gibt nur normal
- * und fett, nichts dazwischen. */
 .home-hero h2 {
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -178,89 +112,39 @@
 .text-chip {
   font-weight: 400;
 }
-
-/* --- Lesbarkeit: nichts unter 15 px, nichts blasser als 58 % -----------
- * Der Betreiber liest --sm-ink-faint nicht. Das ist gemessen, nicht
- * vermutet — deshalb hier als harte Untergrenze. */
 .start-chips button {
   font-size: 15px;
 }
-
-/* --- Das Schreibfeld am Telefon: EINE Zeile ----------------------------
- * Betreiber-Ansage 2026-08-14: "Am Handy: Soll auch Schreibfeld eine
- * Zeile sein."
- *
- * Vorher standen zwei Kaesten uebereinander — das Textfeld (44 px) und
- * darunter die Werkzeugleiste (min-height 64 px). Zusammen ueber 110 px
- * Hoehe, auf einem 812-px-Telefon ein Siebtel des Bildschirms fuer eine
- * Leiste, die man erst beim Tippen braucht.
- *
- * Der Trick ist `display: contents` auf .prompt-actions: die Leiste
- * verliert ihren eigenen Kasten (Rahmen, Polster, Mindesthoehe), ihre
- * Knoepfe werden direkte Flex-Kinder des Glases und stehen damit in
- * derselben Zeile wie das Textfeld. Kein Markup wird angefasst und kein
- * Knopf umgehaengt — die Menues von Plus und Modell haengen weiter an
- * ihren eigenen position:relative-Huellen und oeffnen an der richtigen
- * Stelle.
- *
- * Was in der Zeile steht:  [+] [Modell] [Textfeld] [Mikro] [Hauptknopf]
- *
- * Der Audio-Knopf verschwindet dabei NICHT als Funktion. Er ist am
- * Telefon nur nicht mehr doppelt: der Hauptknopf ist bei leerem Feld
- * selbst der Sprachknopf (composer-sendetaste.js klickt genau dieses
- * Element weiter, und ein programmatischer Klick geht auch auf ein
- * ausgeblendetes Element). Der Lautsprecher-Knopf war hier schon vorher
- * ausgeblendet (start-glass.css) — das ist kein neuer Verlust.
- *
- * 560 px als Grenze, weil styles.css und start-glass.css dieselbe Kante
- * benutzen. Eine zweite Kante daneben waere eine zweite Wahrheit. */
 @media (max-width: 560px) {
   .prompt-glass {
     display: flex;
-    /* flex-end, damit die Knoepfe unten bleiben, wenn das Textfeld bei
-       langem Text mehrzeilig wird. */
     align-items: flex-end;
     gap: 6px;
     padding: 6px 8px;
   }
-
-  /* Der Kasten der Leiste faellt weg, die Knoepfe bleiben. */
   .prompt-actions {
     display: contents;
   }
-
   .prompt-glass textarea {
     order: 3;
-    /* min-width:0 ist der Teil, den man vergisst: ohne ihn weigert sich
-       ein Flex-Kind zu schrumpfen und drueckt den Hauptknopf hinaus. */
     flex: 1 1 auto;
     min-width: 0;
     min-height: 40px;
     height: 40px;
     padding: 9px 4px;
   }
-
   .prompt-actions .plus-picker { order: 1; }
   .prompt-actions .model-picker { order: 2; }
   .prompt-actions [data-start-tool="voice"] { order: 4; }
   .prompt-actions .send-button { order: 5; }
-
-  /* Der Platzhalter schob die Knoepfe auseinander — in einer Zeile mit
-     dehnbarem Textfeld hat er keine Aufgabe mehr. */
   .prompt-actions .prompt-spacer { display: none; }
   .prompt-glass [data-start-tool="audio"] { display: none; }
-
-  /* Knoepfe duerfen nicht schrumpfen, sonst wird aus einem 34-px-Ziel
-     ein 12-px-Ziel, sobald der Text laenger wird. */
   .prompt-glass .plus-picker,
   .prompt-glass .model-picker,
   .prompt-glass [data-start-tool],
   .prompt-glass .send-button {
     flex: 0 0 auto;
   }
-
-  /* Der Modellname darf die Zeile nicht sprengen: bei 375 px bleiben dem
-     Textfeld sonst unter 100 px. 76 px reichen fuer "smejj 1.0". */
   .model-picker .text-chip {
     max-width: 76px;
     overflow: hidden;
@@ -269,29 +153,12 @@
     font-size: 13px;
     padding: 0 8px;
   }
-
-  /* Am 2026-08-15 im echten Chrome nachgemessen: ohne diese Regel bricht
-     der Platzhalter "Beschreibe eine Aufgabe oder stelle eine Frage." in
-     dem 139 px schmalen Feld auf zwei Zeilen um, und die zweite Zeile
-     wird auf halber Hoehe abgeschnitten — das sieht kaputt aus. Mit
-     nowrap steht eine saubere Zeile, die am Rand endet.
-     Wichtig: das gilt NUR fuer den Platzhalter. Getippter Text bricht
-     weiter normal um, weil ::placeholder ein eigenes Pseudo-Element ist.
-     (text-overflow: ellipsis nimmt Chrome hier nicht an — gemessen,
-     nicht vermutet. Es bleibt bei einem harten Schnitt.) */
   .prompt-glass textarea::placeholder {
     white-space: nowrap;
     overflow: hidden;
     font-size: 14px;
   }
 }
-
-
-/* --- Die Vier-Gruppen-Spur (Mockup V11, Bildschirm 19) ------------------
- * Werte 1:1 aus dem Mockup-Endstand (.gruppe): 11 px Versalien mit weitem
- * Abstand. Das ist eine BEWUSSTE Ausnahme von der 15-px-Untergrenze oben:
- * die Beschriftung ist eine Gruppen-Ueberschrift, kein Inhalt — im Mockup
- * hat der Betreiber genau diese Anmutung abgenommen. */
 .nav-gruppe {
   padding: 16px 14px 4px;
   font-size: 11px;
@@ -304,33 +171,20 @@
 .nav .nav-gruppe:first-child {
   padding-top: 8px;
 }
-
-
-/* Live-Befund 2026-08-16 (Nachtlauf): Bei 760 px Fensterhoehe war die
-   Vier-Gruppen-Spur 61 px laenger als ihre Scroll-Flaeche — "KI-Modelle"
-   und "Speicher" lagen unsichtbar unter der Kante, der Kostenschutz-Fuss
-   darueber. Niedrige Fenster bekommen darum kompaktere Eintraege (alle
-   passen ohne Scrollen), und die Spur zeigt eine duenne Scroll-Leiste,
-   falls es doch einmal ueberlaeuft. */
 .sidebar .nav { scrollbar-width: thin; }
 @media (max-height: 840px) {
   .sidebar .nav-vier .nav-button { min-height: 30px; padding-top: 4px; padding-bottom: 4px; }
   .sidebar .nav-vier .nav-gruppe { padding-top: 6px; padding-bottom: 2px; }
 }
-
-/* --- Fusszeile der Spur: Kosten immer sichtbar (Mockup Bildschirm 19) --- */
 .nav-kosten {
   font-size: 13.5px;
 }
 .nav-kosten .button-icon {
   color: var(--v11-ok);
 }
-
-/* --- Die Brotkrume oben (Mockup .crumb: 14.5px, gedaempft) -------------- */
 .top-krume {
   position: fixed;
   top: 18px;
-  /* rechts neben dem Wortzeichen; das Logo ist ~150 px breit plus Rand */
   left: 210px;
   z-index: 30;
   font-size: 14.5px;
@@ -347,9 +201,6 @@
 @media (max-width: 720px) {
   .top-krume { display: none; }
 }
-
-
-/* --- Das Werkzeuge-Menue (Mockup "Alle Werkzeuge auf einmal") ----------- */
 .plus-menu-werkzeuge {
   min-width: 340px;
   max-width: 92vw;
@@ -390,16 +241,9 @@
   font-style: italic;
   color: var(--v11-cy-ink);
 }
-
-
-/* --- Die Start-Spur (Mockup Bildschirme 24/25/32) ----------------------
- * Zwei Spuren, eine sichtbar: .spur-start-aktiv (Koerperklasse aus
- * spur-start.js) blendet auf Start/Code die kompakte Spur ein und die
- * Vier-Gruppen-Spur aus — ueberall sonst umgekehrt. */
 .nav-start { display: none; }
 body.spur-start-aktiv .nav-start { display: flex; flex-direction: column; }
 body.spur-start-aktiv .nav-vier { display: none; }
-
 .spur-reiter {
   display: flex;
   gap: 4px;
@@ -425,14 +269,12 @@ body.spur-start-aktiv .nav-vier { display: none; }
   color: var(--v11-cy);
   box-shadow: inset 0 0 0 1px var(--v11-cy-line-on);
 }
-
 .nav-kuerzel {
   margin-left: auto;
   font-size: 11.5px;
   color: rgba(242, 245, 244, 0.45);
   letter-spacing: 0.06em;
 }
-
 .nav-start .spur-chat {
   font-size: 13.5px;
   overflow: hidden;
@@ -445,9 +287,6 @@ body.spur-start-aktiv .nav-vier { display: none; }
   color: var(--v11-cy-ink);
   font-size: 14px;
 }
-
-
-/* --- Bildschirm 32: Vorschlagzeilen, Chipreihe, Nachdenken-Pille -------- */
 .start-vorschlaege {
   flex-direction: column;
   align-items: stretch;
@@ -466,14 +305,8 @@ body.spur-start-aktiv .nav-vier { display: none; }
   padding: 10px 6px;
   font-size: 15.5px;
 }
-/* Betreiber 2026-08-15: "als Text mit Link, ohne Hintergrund, ohne Rahmen" —
-   beim Zeigen wird nur die Schrift heller, keine Flaeche. */
 .start-vorschlaege button:hover { background: transparent; color: #f2f5f4; }
 .start-vorschlaege button:last-child { border-bottom: 0; }
-
-/* Betreiber 2026-08-16: die Werkzeuge "nur als Icons, alle eine Zeile"
-   direkt unter dem Schreibfeld. Der Name bleibt als title/aria-label und
-   als Tooltip — das Wort daneben faellt weg. 44 px = Touch-Regel. */
 .start-chipreihe {
   flex-wrap: nowrap;
   justify-content: center;
@@ -488,17 +321,9 @@ body.spur-start-aktiv .nav-vier { display: none; }
 }
 .start-chipreihe .chip-label { display: none; }
 .start-chipreihe button svg { width: 20px; height: 20px; }
-
-/* Betreiber 2026-08-16: das Plus-Menue kompakt wie bei ChatGPT — Icon und
-   Name in EINER Zeile, keine Erklaertexte, keine Beispielsaetze, keine
-   Gruppen-Ueberschriften. Alles bleibt im Markup (Screenreader-Weg und
-   Mockup-Texte unangetastet), nur die Anzeige ist kompakt. */
 .plus-menu-werkzeuge .werk-was,
 .plus-menu-werkzeuge .werk-bsp,
 .plus-menu-werkzeuge .plus-gruppe { display: none !important; }
-/* !important durchgehend: die Runtime-CSS (design-v11-views laedt NACH dem
-   Buendel) stellte die Eintraege sonst wieder untereinander und zentriert —
-   Betreiber 2026-08-16: "Icon und dann Beschreibung, EINE Zeile, buendig". */
 .plus-menu-werkzeuge button[role="menuitem"] {
   display: flex !important;
   flex-direction: row !important;
@@ -530,8 +355,6 @@ body.spur-start-aktiv .nav-vier { display: none; }
   stroke-linejoin: round;
   opacity: 0.85;
 }
-
-/* Spur-Icons ruhiger und einheitlich (Betreiber: "modern wie ChatGPT"). */
 .nav-start .button-icon svg,
 .nav-vier .button-icon svg {
   width: 18px;
@@ -540,8 +363,6 @@ body.spur-start-aktiv .nav-vier { display: none; }
 }
 .nav-start .nav-button,
 .nav-vier .nav-button { letter-spacing: 0.01em; }
-/* Betreiber 2026-08-16 ("jede Platz brauchen wir"): die Spur-Liste ist
-   KOMPAKT — flache Zeilen, wenig Abstand, wie Claudes Verlaufsliste. */
 .nav-start .nav-button {
   min-height: 28px;
   padding-top: 3px;
@@ -549,22 +370,14 @@ body.spur-start-aktiv .nav-vier { display: none; }
 }
 .nav-start { gap: 1px; }
 .nav-start .side-block { margin-top: 2px; }
-
-/* Betreiber 2026-08-16: das LOGO oben links ist der Spur-Schalter (wie
-   ChatGPT). Das alte grosse Doppel-Logo daneben faellt weg. */
 .app-menu-button .menu-logo { width: 24px; height: 24px; display: block; }
 .app-brand-logo { display: none !important; }
-
-/* Rechts oben das Profil-Zeichen im Ecken-Knopf (Betreiber 2026-08-16):
-   runder Kreis mit den echten Initialen, wie bei ChatGPT. */
 .browser-button .profil-initialen {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 26px;
   height: 26px;
-  /* !important gegen eckig.css (app-weit border-radius 0); Avatare sind
-     dort die dokumentierte Ausnahme. */
   border-radius: 999px !important;
   background: var(--v11-cy-fill);
   color: var(--v11-cy-ink);
@@ -572,18 +385,10 @@ body.spur-start-aktiv .nav-vier { display: none; }
   font-weight: 700;
   letter-spacing: 0.02em;
 }
-
-/* Betreiber 2026-08-16: das Plus-Menue oeffnet nach UNTEN (wie ChatGPT auf
-   der leeren Startseite). Sobald der Chat laeuft (Feld unten, startLog
-   sichtbar), klappt es automatisch wieder nach oben — sonst raus aus dem
-   Bild. */
 #start:has(#startLog[hidden]) .plus-menu {
   bottom: auto;
   top: calc(100% + 10px);
 }
-
-/* Project-Anlegen bleibt AUF der Seite (Betreiber 2026-08-16, wie
-   chatgpt.com/projects): aufklappendes Eingabefeld statt Browser-Dialog. */
 .bereich-neu-formular {
   display: flex;
   align-items: center;
@@ -613,11 +418,6 @@ body.spur-start-aktiv .nav-vier { display: none; }
   cursor: pointer;
 }
 .bereich-neu-meldung { flex-basis: 100%; font-size: 14px; color: var(--v11-warn); }
-
-/* Die Zieh-Griffe SICHTBAR machen (Betreiber 2026-08-16: "warum kann ich
-   nicht ziehen" — man sah schlicht nicht, WO). Dezenter Streifen in der
-   Mitte, beim Draufzeigen cyan. Die Position setzt spur-schalter.js als
-   Inline-Style; background bleibt bewusst dem CSS. */
 #leftPanelResize,
 #rightPanelResize {
   background: linear-gradient(to right, transparent 5px, rgba(255, 255, 255, 0.16) 5px, rgba(255, 255, 255, 0.16) 7px, transparent 7px) !important;
@@ -628,9 +428,6 @@ body.is-resizing-panel #leftPanelResize,
 body.is-resizing-panel #rightPanelResize {
   background: linear-gradient(to right, transparent 4px, rgba(50, 246, 234, 0.6) 4px, rgba(50, 246, 234, 0.6) 8px, transparent 8px) !important;
 }
-
-/* Panels als Glas (Betreiber: "glaenzen, edel wie die Startseite"):
-   dieselbe Optik wie die schwebenden Menues — Glas, Blur, Lichtkante. */
 .sidebar,
 #browserPanel {
   background: rgba(13, 18, 25, 0.62);
@@ -638,14 +435,9 @@ body.is-resizing-panel #rightPanelResize {
   backdrop-filter: blur(34px) saturate(170%);
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
 }
-
 .fpille-nachdenken {
   font-size: 14px;
   padding: 0 11px;
-  /* start-glass.css ordnet die Zeile per order (Plus 1, Modell 2, Platz 3,
-     Werkzeuge 4, Senden 5). Ohne eigenen Wert (0) rutschte die Pille an den
-     Zeilenanfang — im Mockup steht sie RECHTS vom Feld, vor dem Mikrofon.
-     Gleicher Wert wie die Werkzeuge; die DOM-Reihenfolge stellt sie davor. */
   order: 4;
 }
 .fpille-nachdenken.an {
@@ -654,34 +446,19 @@ body.is-resizing-panel #rightPanelResize {
   box-shadow: inset 0 0 0 1px var(--v11-cy-line-on);
 }
 @media (max-width: 560px) {
-  /* In der Ein-Zeilen-Fassung am Telefon ist kein Platz fuer die Pille —
-     die Gruendlich-Stufe bleibt ueber das Modellmenue erreichbar. */
   .fpille-nachdenken { display: none; }
 }
-
-
-/* =======================================================================
- * Bildschirm 32, exakt — der Start-Composer als EINE Pille
- * =======================================================================
- * Der Mockup-Composer (.feldzeile) ist eine 999px-Pille in EINER Zeile:
- * [+] [Feld] [Nachdenken] [Mikro] [Hauptknopf]. Die Ein-Zeilen-Technik ist
- * dieselbe wie am Telefon (display:contents) — hier gilt sie fuer den Start
- * auf JEDER Breite. */
 #start .prompt-glass {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 9px 9px 9px 16px;
-  /* Betreiber 2026-08-16 (Screenshot): die 999px-Pille wurde bei
-     mehrzeiligem Text zum haesslichen Oval. Wie Claude: fast viereckig,
-     nur der leichte Knick. */
   border-radius: 14px !important;
   background: rgba(255, 255, 255, 0.06);
   -webkit-backdrop-filter: blur(34px) saturate(170%);
   backdrop-filter: blur(34px) saturate(170%);
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
 }
-/* Im laufenden Chat klebt das Feld GANZ unten — kaum Rand, wie Claude. */
 #start.has-start-chat .prompt-glass { margin-bottom: 6px; }
 #start .prompt-actions {
   display: contents;
@@ -700,34 +477,19 @@ body.is-resizing-panel #rightPanelResize {
 #start .prompt-actions [data-start-tool="voice"] { order: 4; }
 #start .prompt-actions .send-button { order: 5; }
 #start .prompt-actions .prompt-spacer { display: none; }
-/* Der Sprachmodus liegt im Hauptknopf (leeres Feld) — der doppelte
-   Audio-Knopf entfaellt wie am Telefon. Der Modellchip steht im Mockup
-   nicht im Feld; Modellwahl bleibt unter Einstellungen -> KI-Modelle &
-   Anbieter und in der KI-Modelle-Ansicht erreichbar. */
 #start .prompt-glass [data-start-tool="audio"] { display: none; }
-/* Betreiber 2026-08-16: Modell-Waehler ist wieder sichtbar (Claude-Stil,
-   Regel weiter unten). ACHTUNG: der sed-Umbau hatte die Sammelregel
-   zerrissen — der Audio-Knopf verlor sein display:none und die doppelte
-   Sprachwelle stand wieder im Feld (Betreiber-Befund v458-v463). */
 #start .prompt-glass .plus-picker,
 #start .prompt-glass [data-start-tool],
 #start .prompt-glass .send-button,
 #start .prompt-glass .fpille-nachdenken { flex: 0 0 auto; }
-
-/* Die runden Knoepfe rechts (Mockup .fknopf: 38px, rund) */
 #start .prompt-glass .ghost-button.icon-button,
 #start .prompt-glass .send-button {
   width: 38px;
   height: 38px;
   min-height: 38px;
-  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
+  border-radius: 0 !important;
 }
-/* Hauptknopf eckig (Betreiber 2026-08-23), die Geist-Knoepfe daneben
-   behalten vorerst ihre Form. */
 #start .prompt-glass .send-button { border-radius: 0 !important; }
-
-/* Hauptknopf: WEISS mit schwarzer Welle (Mockup .fknopf.haupt); beim
-   Tippen CYAN mit dunklem Pfeil (Mockup .fknopf.haupt.aktiv). */
 .send-button.ist-sprache {
   background: #ffffff;
   color: #0a0f16;
@@ -738,10 +500,8 @@ body.is-resizing-panel #rightPanelResize {
   color: #04211f;
   box-shadow: 0 0 22px var(--v11-cy-glow);
 }
-
-/* Die Pille "Nachdenken" (Mockup .fpille): leise, rund, mit Icon */
 .fpille-nachdenken {
-  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
+  border-radius: 0 !important;
   background: transparent;
   box-shadow: none;
   color: rgba(242, 245, 244, 0.74);
@@ -760,8 +520,6 @@ body.is-resizing-panel #rightPanelResize {
 }
 .fpille-nachdenken:hover { background: rgba(255, 255, 255, 0.07); }
 .fpille-nachdenken.an { background: var(--v11-cy-fill); color: var(--v11-cy-ink); box-shadow: none; }
-
-/* Vorschlagzeilen (Mockup .vorschlagzeile): KEINE Linien, Icon + 16.5px */
 .start-vorschlaege button {
   display: flex;
   align-items: center;
@@ -788,8 +546,6 @@ body.is-resizing-panel #rightPanelResize {
   color: rgba(242, 245, 244, 0.58);
 }
 .start-vorschlaege button:hover { background: rgba(255, 255, 255, 0.05); color: #f2f5f4; }
-
-/* Werkzeug-Chips (Mockup .wchip): runde Pillen, Icon, "an" in Cyan */
 .start-chipreihe {
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -802,7 +558,7 @@ body.is-resizing-panel #rightPanelResize {
   align-items: center;
   gap: 8px;
   padding: 9px 15px;
-  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
+  border-radius: 0 !important;
   font-size: 15px;
   color: rgba(242, 245, 244, 0.74);
   white-space: nowrap;
@@ -814,8 +570,6 @@ body.is-resizing-panel #rightPanelResize {
   box-shadow: inset 0 0 0 1px var(--v11-cy-line);
 }
 .start-chipreihe button.an svg { color: var(--v11-cy); }
-
-/* Reiter mit Icons (Mockup .reiter): aktiv = weisse Flaeche, Icon cyan */
 .spur-reiter button {
   display: inline-flex;
   align-items: center;
@@ -837,28 +591,17 @@ body.is-resizing-panel #rightPanelResize {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 .spur-reiter button.an svg { color: var(--v11-cy); }
-
-/* Fusszeile im Start-Modus: der Plan steht unter dem Namen (Mockup
-   .railfuss); die Kostenzeile gehoert zur Vier-Gruppen-Spur. */
 .profile-dock-plan {
   display: block;
   font-size: 13px;
   color: rgba(242, 245, 244, 0.58);
 }
 body.spur-start-aktiv .nav-kosten { display: none; }
-
-
-/* =======================================================================
- * Bildschirm 26 — der Code-Bereich: Schreibfeld sitzt unten
- * ======================================================================= */
 #code .codeflaeche {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 62vh;
-  /* Betreiber 2026-08-16: das Schreibfeld bleibt wie bei Claude UNTEN FEST —
-     die Flaeche waechst nie ueber den Bildschirm hinaus, der Chat scrollt
-     in seinem Halter (overflow: auto dort). */
   max-height: calc(100vh - 130px);
 }
 #code .codegruss {
@@ -868,15 +611,8 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   letter-spacing: -0.03em;
 }
 #code .codeleer { flex: 1; min-height: 80px; }
-
-/* Der adoptierte Chat-Stream (echter #startLog) fuellt die freie Flaeche —
-   der Auftrag streamt auf der Code-Seite selbst, wie bei Codex/Claude. */
 #code .code-log-halter { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; }
 #code .code-log-halter .start-log { flex: 1; }
-
-/* Betreiber 2026-08-16: der Chat ist RAHMENLOS wie bei Claude — Texte
-   fliessen hintereinander. Die Nutzer-Zeile bleibt eine dezente Flaeche
-   (ohne Kante), die Antwort steht nackt auf dem Grund. */
 .start-log .entry,
 .start-log .entry.assistant {
   border: 0;
@@ -887,8 +623,6 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   border: 0;
   background: rgba(255, 255, 255, 0.07);
 }
-
-/* Projekt-Menue am Chip: gleiche Glas-Ruhe wie das Profilmenue, viereckig. */
 #code .repozeile { position: relative; }
 .code-projekt-menue {
   position: absolute;
@@ -912,22 +646,12 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   min-height: 44px;
   background: none;
   border: 0;
-  /* KEINE Trennstriche (Betreiber 2026-08-16, wie Claude): styles.css gibt
-     jedem Knopf eine Lichtkante + Grundton — hier gemessen als "Striche"
-     zwischen den Zeilen. Beides aus. */
   box-shadow: none;
   color: inherit;
   font: inherit;
   cursor: pointer;
 }
 .code-projekt-menue button:hover { background: rgba(94, 234, 212, 0.12); }
-
-/* Rechtes Panel OHNE transform-Animation am Desktop (Nachtlauf 2026-08-16):
-   Die translateX-Transition liess die HIT-Flaeche um Panelbreite+18 neben dem
-   gemalten Panel haengen — sichtbar offen, echte Klicks gingen ins Leere
-   (drittes Vorkommen der Familie "sichtbar != klickbar"; sogar !important
-   auf transform verlor gegen die haengende Transition). Animation laeuft
-   darum ueber `right`; transform ist hart aus. */
 @media (min-width: 768px) {
   #browserPanel {
     transform: none !important;
@@ -936,13 +660,6 @@ body.spur-start-aktiv .nav-kosten { display: none; }
   }
   #browserPanel.is-open { right: 0; }
 }
-
-/* Betreiber 2026-08-16 (Screenshot Claude-App als Vorbild):
-   1) Der Modell-Waehler steht wie bei Claude ("Fable 5 · Hoch") dezent
-      RECHTS in der Schreibleiste — er war seit dem Icon-Umbau versteckt,
-      obwohl Menue und Verdrahtung laengst leben. Echte Werte, echter Wechsel.
-   2) Sind BEIDE Fenster zu, ist die Mitte rahmenlos wie bei Claude:
-      keine Linie ueber dem Chat, keine Lichtkante ueber dem Feld. */
 #start .prompt-glass .model-picker { display: block; }
 #start .prompt-glass .model-picker .text-chip,
 #start .prompt-glass #modelPickerButton {
@@ -954,17 +671,11 @@ body.spur-start-aktiv .nav-kosten { display: none; }
 }
 #start .prompt-glass #modelPickerButton:hover { color: rgba(242, 245, 244, 0.92); }
 .prompt-actions .model-picker { order: 4; }
-
 body.spur-zu:not(.right-panel-open) .start-log { border-top: 0; }
 body.spur-zu:not(.right-panel-open) .prompt-glass {
   box-shadow: none;
   border-top: 0;
 }
-
-/* Betreiber 2026-08-16 ("Ich meine bei smejj Code"): die CODE-Seite wird
-   bei zugeklappten Fenstern flach wie Claude Code — das Schreibfeld ohne
-   Lichtkante auf ruhigem Grund, die Vorlagen-Chips ohne Karten-Look.
-   Das Feld selbst ist einzeilig (rows=1 im Markup). */
 body.spur-zu:not(.right-panel-open) #code .codefeld {
   box-shadow: none;
   background: rgba(255, 255, 255, 0.035);
@@ -974,45 +685,21 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.10);
 }
 #code .codefeld textarea { min-height: 26px; }
-
-/* Betreiber 2026-08-16, Runde 2 (ZCode-Abgleich, ersetzt die "dieselbe
-   Zeile"-Regel vom selben Tag — die war fuer NUR drei Punkte gebaut):
-   Antworten tragen wie ZCode eine eigene Zeile darunter, linksbuendig:
-   Kopieren, Daumen, Menue, Uhrzeit. Nur bei eigenen (rechtsbuendigen)
-   Nachrichten bleiben die drei Punkte in der letzten Blasenzeile. */
 #startLog .msg-actions {
   justify-content: flex-start;
   align-items: center;
-  /* Betreiber 2026-08-16 ("Icons sollen die letzte Textzeile treffen"):
-     die gemessene Luecke (7px Eintrag-Polster + ~6px Icon-Kopfraum) wird
-     exakt aufgehoben — die Icons haengen an der Textunterkante. */
   margin-top: -13px;
   pointer-events: none;
 }
 #startLog .msg-actions .msg-act { pointer-events: auto; }
-/* Blasen-Ueberlagerung der eigenen Nachricht: margin-top -34px weiter
-   unten (Betreiber-Regel "in der letzten Zeile der Blase"). */
 #startLog .msg-actions.is-user { justify-content: flex-start; }
-
-/* Betreiber 2026-08-16: "gesamten Chat-Kontakt sehen" — der Chat wird DICHT.
-   Zwischen Frage und Antwort kaum Luft, getrennt nur durch einen leichten
-   Haarstrich; die Drei-Punkte sitzen in der letzten Zeile (Regel oben).
-   Dazu die App insgesamt kompakter: engere Koepfe und Raster. */
 #startLog { gap: 0; }
 #startLog .entry { margin: 0; padding-top: 6px; padding-bottom: 6px; }
 #startLog .entry.user { padding: 6px 11px; }
-/* Betreiber-Nachtrag 2026-08-16 ("keine Trennlinie zwischen Texten,
-   kompakt"): der Haarstrich zwischen den Eintraegen ist WEG — die Blase
-   der eigenen Nachricht trennt optisch genug. */
 #startLog .entry:not(:first-child) { border-top: 0; }
-
 .view-header { margin-bottom: 10px; }
 .view-header .subhead { margin-top: 2px; }
 .panel-grid { gap: 8px; }
-
-/* Betreiber 2026-08-16: Verlauf und Suche kompakt wie der Chat — flache
-   Zeilen statt Karten, getrennt nur durch den Haarstrich. Die aktive
-   Zeile behaelt ihre leichte Cyan-Flaeche (Orientierung). */
 #chatHistory .ch-karte {
   background: none;
   box-shadow: none;
@@ -1022,14 +709,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 #chatHistory .ch-karte + .ch-karte { border-top: 1px solid var(--v11-hair); }
 #chatHistory .ch-karte.is-active { background: rgba(120, 220, 232, 0.10); }
-
 .search-overlay-row { padding-top: 4px; padding-bottom: 4px; }
 .search-overlay-row + .search-overlay-row { border-top: 1px solid var(--v11-hair); }
-
-/* Voll-Audit 2026-08-16: Bei schmalen Fenstern (Betreiber-Zoom) schob sich
-   in den Einstellungen das Auswahlfeld UEBER den Zeilennamen
-   ("SicherheitsmoduFree-safe", per Zoom-Screenshot belegt). Die Zeile darf
-   jetzt umbrechen; der Name behaelt seine Mindestbreite. */
 #settings .settings-row {
   flex-wrap: wrap;
   gap: 6px 12px;
@@ -1038,44 +719,20 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #settings .settings-row-copy { flex: 1 1 160px; min-width: 0; }
 #settings .settings-row select,
 #settings .settings-row input[type="text"] { max-width: 100%; }
-
-/* Betreiber 2026-08-16 (schriftlich im Chat): Das Code-Schreibfeld sitzt
-   wie bei Claude GANZ UNTEN, und darunter ist NICHTS — die Vorlagen-Chips
-   ("Fehler suchen", "Funktion einbauen", ...) sind weg, die Flaeche bleibt
-   leer. Die Chips existieren im Markup weiter (Rote Liste), sind aber
-   unsichtbar. */
 #code .code-wchips { display: none; }
-/* Auch die zugeklappte "Editor & Dateien"-Zeile unter dem Feld: weg —
-   der Betreiber will unter dem Schreibfeld NICHTS. Markup bleibt. */
 #code .code-werkzeuge { display: none; }
 #code .codeflaeche {
   height: calc(100vh - 96px);
   max-height: none;
   overflow: hidden;
 }
-/* Betreiber 2026-08-16 (Screenshots): KEINE Leerflaechen — der Chat dockt
-   GANZ OBEN an (der Gruss weicht, sobald ein Gespraech laeuft, wie bei
-   Claude), scrollt INTERN, und das Schreibfeld klebt IMMER am Boden. */
 #code .codeflaeche:has(#codeLogHalter #startLog:not([hidden])) .codegruss { display: none; }
 #code .codeflaeche:has(#codeLogHalter #startLog:not([hidden])) .codeleer { display: none; }
 #code .code-log-halter { flex: 1 1 auto; }
 #code .codeunten { margin-top: auto; padding-bottom: 14px; }
-
-/* Betreiber 2026-08-16: das Mikrofon (und der Anhang) bleiben in der
-   unteren Leiste sichtbar wie bei Claude — ihre Icons wurden ohne feste
-   Groesse als winzige Punkte gerendert. */
 #code .code-mini { width: 34px; height: 34px; flex: 0 0 auto; }
 #code .code-mini svg { width: 18px; height: 18px; stroke: currentColor; }
-
-/* Betreiber 2026-08-16: Auf der Code-Seite KEIN Zurueck-Pfeil und KEIN X
-   oben — wie Claude Code. Die Escape-Logik von view-chrome bleibt. */
 #code .view-chrome { display: none; }
-
-/* Ordner je Project: Speichern-Knopf sitzt neben dem Kopieren-Knopf am
-   Codeblock; der Verbinden-Knopf auf der Projects-Karte wie die anderen.
-   Anordnung (ZCode-Abgleich 2026-08-16, rechts nach links): Chevron,
-   Download, Kopieren, Speichern — alle Knoepfe sind wie bei ZCode reine
-   Icon-Knoepfe mit fester Breite, die Abstaende bleiben darum stabil. */
 .chat-code-klapp { right: 4px; }
 .chat-code-download { right: 48px; }
 .chat-code-copy[data-code-copy] { right: 92px; }
@@ -1086,9 +743,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   .chat-code-copy[data-code-copy] { right: 62px; }
   .chat-code-save { right: 90px; }
 }
-
-/* Projekt-Zeile im Code-Menue: links Name (waehlt Project), rechts der
-   📁-Knopf (waehlt den Ordner — direkt hier, kein Seitenwechsel). */
 .code-projekt-zeile { display: flex; align-items: stretch; }
 .code-projekt-zeile button:first-child { flex: 1 1 auto; }
 .code-projekt-zeile .code-projekt-ordner {
@@ -1099,15 +753,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   white-space: nowrap;
   color: rgba(242, 245, 244, 0.72);
 }
-
-/* Modus-Menue (wie Claude Code): Name fett, Hinweis als zweite Zeile. */
 #code .codefeld { position: relative; }
-
-/* Plus-Menue der CODE-Ansicht (Betreiber 2026-08-16, "wie bei Claude,
-   1 zu 1"): Masse an claude.ai gemessen — Kasten rgb(32,32,31), 302px,
-   Radius 12 (nimmt eckig.css app-weit zurueck), Zeilen 32px hoch,
-   14px Schrift, 8px Icon-Abstand, Kuerzel/Untermenue-Pfeil rechts
-   gedaempft, Trennlinie als Haarstrich. Oeffnet sich NACH OBEN. */
 .code-plus-menu {
   position: absolute;
   left: 8px;
@@ -1171,13 +817,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   margin: 6px 4px;
   background: rgba(255, 255, 255, 0.08);
 }
-
-/* Modell-Menue oeffnet DIREKT UEBER dem Modellnamen (rechts in der
-   Leiste), nicht links am Feld — wie bei Claude (Betreiber 2026-08-17). */
 #codeModellMenue { left: auto; right: 10px; }
-
-/* Konnektoren-Flyout (Betreiber-Screenshot 2026-08-16): oeffnet wie bei
-   Claude RECHTS neben dem Menuepunkt; auf schmalen Geraeten darueber. */
 .code-plus-unter {
   position: absolute;
   left: calc(100% + 6px);
@@ -1187,8 +827,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (max-width: 720px) {
   .code-plus-unter { left: auto; right: 0; bottom: calc(100% + 6px); }
 }
-/* Schalter wie Claudes Toggle, aber VIERECKIG (Betreiber-Designgesetz).
-   Aus-Zustand grau, Ein-Zustand cyan; der Knubbel faehrt herueber. */
 .code-schalter {
   position: relative;
   flex: 0 0 auto;
@@ -1208,42 +846,18 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: #f2f5f4;
   transition: transform 120ms ease;
 }
-/* Staerker als die span-flex-Regel des Menues: der Schalter bleibt 34px. */
 .code-plus-menu [role="menuitemcheckbox"] .code-schalter { flex: 0 0 34px; width: 34px; }
 [aria-checked="true"] .code-schalter { background: var(--v11-cy); }
 [aria-checked="true"] .code-schalter::after { transform: translateX(14px); }
-
-/* Arbeits-Viereck wie bei Claude (Betreiber 2026-08-16): sitzt rechts
-   oben im Schreibfeld. Frei = gedaempfter Umriss; arbeitet = in
-   Logo-Cyan gefuellt mit leisem Puls (Augen-Regel: kein Leuchten). */
 #code .code-arbeit {
   position: absolute;
-  /* Betreiber-Abgleich mit Claude 2026-08-18: das Viereck steht dort auf
-     HOEHE DER TEXTZEILE, nicht am oberen Feldrand. Gemessen: bei uns lag
-     die Mitte auf 16 px, die Textzeile auf 37 px — sobald der Ordner-Chip
-     darueber liegt, driftete es 21 px nach oben weg. Der Anker ist darum
-     die Textzeile selbst. NACHTRAG 2026-08-18 (375-px-Messung): ein
-     FESTER Wert war falsch — am Telefon steht der Text weiter oben, das
-     Viereck rutschte 23 px darunter. code-flaeche.js richtet es darum
-     zur Laufzeit an der Textzeile aus (--code-arbeit-top); der Wert hier
-     ist nur der Startwert, bis die Messung greift.
-     Groesse und Form bleiben unveraendert (Betreiber: "das Viereck war
-     gut, es soll NUR beleuchtet werden"). */
   top: var(--code-arbeit-top, 31px);
   right: 12px;
   width: 11px;
   height: 11px;
   pointer-events: none;
-  /* Betreiber-Klarstellung 2026-08-17: SICHTBAR als ruhiger Umriss wie
-     bei Claude — aber ohne jedes Leuchten. Nur beim Arbeiten leuchtet
-     es cyan (Regel darunter). */
-  /* Betreiber 2026-08-17 ("Rahmen scharf stellen"): deutlicher Umriss. */
   border: 1.5px solid rgba(242, 245, 244, 0.55);
 }
-/* Betreiber 2026-08-18, RUECKGAENGIG: "das Viereck war gut, es soll NUR
-   beleuchtet werden". Groesse, Platz und Form bleiben also exakt wie
-   vorher (11 px, top 10 / right 12 aus der Grundregel) — im
-   Arbeitszustand aendert sich AUSSCHLIESSLICH die Beleuchtung. */
 #code .code-arbeit.an {
   border-color: var(--v11-cy);
   background: var(--v11-cy);
@@ -1256,9 +870,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (prefers-reduced-motion: reduce) {
   #code .code-arbeit.an { animation: none; }
 }
-
-/* Slash-Palette (code-flaeche.js): gleicher Kasten wie das Plus-Menue,
-   Befehl in Mono links, die Vorlage gedaempft rechts. */
 #codeSlashMenue { max-height: 300px; overflow-y: auto; }
 #codeSlashMenue [role="menuitem"] b {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -1271,21 +882,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-size: 12.5px;
   color: rgba(240, 239, 236, 0.5);
 }
-
-/* Der alte Arbeits-Punkt links in der Leiste (v491) ist ERSETZT durch
-   das Claude-Viereck rechts oben im Feld (#codeArbeit, Regeln oben) —
-   seine Dauer-Cyan-Regel faerbte das neue Viereck mit (2026-08-17
-   live gemessen). */
-/* Modus-Menue 1:1 wie Claude (Betreiber-Screenshot 2026-08-16):
-   Kopf "Modus", Zeilen linksbuendig OHNE Trennstriche, Beschreibung
-   gedaempft darunter (eine Zeile, Punkte), rechts Haken + Ziffer. */
 .code-modus-menue {
-  /* Betreiber 2026-08-17 ("Freiflaeche rausnehmen, Fenster klein"):
-     Breite = Inhalt, keine Leerflaeche rechts — wie Claudes Menue. */
   min-width: 0;
   width: max-content;
   max-width: min(320px, 92vw);
-  /* Der Modell-Katalog ist lang — deckeln und innen scrollen (2026-08-17). */
   max-height: 60vh;
   overflow-y: auto;
 }
@@ -1300,8 +900,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   gap: 10px;
   border: 0;
   min-height: 0;
-  /* Betreiber 2026-08-17: Modelle KOMPAKT, Schrift wie die Leisten-Chips
-     (Auto/Schnell, 13px), leicht statt fett — edel und eng gepackt. */
   padding: 1px 12px;
   text-align: left;
 }
@@ -1311,8 +909,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   display: block;
   text-align: left;
 }
-/* Wie Claudes Modell-Menue (Betreiber-Screenshot 2026-08-17):
-   normale Schrift, nicht fett, Claude-Groesse. */
 .code-modus-menue button b { display: block; font-weight: 400; font-size: 14.5px; line-height: 1.5; color: rgba(242, 245, 244, 0.92); }
 .code-modus-menue button small {
   display: block;
@@ -1329,16 +925,11 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   gap: 9px;
   flex: 0 0 auto;
 }
-/* Mit ID-Gewicht gegen jede generische Knopf-Regel (gemessen: bg 0.055 und
-   Lichtkante blieben trotz background:none der Basisklasse). */
 #code .code-projekt-menue button,
 #code .code-modus-menue button {
   background: transparent;
   box-shadow: none;
 }
-/* Live gemessen 2026-08-17: app-surfaces gibt jedem premium-view-Knopf
-   min-height 40px + padding 0 14px und gewann bei gleicher Spezifitaet —
-   darum hier MIT ID-Gewicht die engen Claude-Zeilen erzwingen. */
 .code-modus-menue.code-modus-menue button {
   min-height: 0;
   height: auto;
@@ -1364,10 +955,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   flex-wrap: wrap;
   align-items: center;
 }
-/* Betreiber 2026-08-16 ("ohne Hintergrund, ganz schmal, modern"): die
-   Leisten-Chips sind Geister — kein Pillen-Grund, gedaempfte Schrift,
-   Hover hellt nur auf. Der aktive Projekt-Chip zeigt Cyan als FARBE,
-   nicht als Fuellung; lange Projektnamen kappen mit Punkten. */
 #code .repochip {
   display: inline-flex;
   align-items: center;
@@ -1388,11 +975,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   transition: color 120ms ease;
 }
 #code .repochip:hover { color: #f2f5f4; background: transparent; }
-/* Betreiber 2026-08-16 ("bei Claude sieht man das nicht"): der
-   Projekt-Chip ist UNSICHTBAR — die Leiste zeigt wie Claude nur
-   Auto/Gruendlich/+/Mikro. Der Knopf bleibt im DOM: das Plus-Menue
-   ("Ordner hinzufuegen" ohne gewaehltes Project) und code-flaeche.js
-   klicken ihn programmatisch, um die Projektwahl zu oeffnen. */
 #code #codeProjektChip { display: none; }
 #code .repochip.an {
   background: transparent;
@@ -1406,12 +988,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
   border: 0;
   border-radius: var(--v11-r);
-  /* ultra-schmal (Betreiber 2026-08-16, Variante A): wirkt wie EINE Zeile */
   padding: 5px 10px 4px;
 }
-
-/* Anhang-Chips im Schreibfeld (code-flaeche.js zeichneAnhaenge): kleine
-   Zeile UEBER dem Text — der Verweis steht nie als Text im Feld. */
 #code .code-anhaenge {
   display: flex;
   flex-wrap: wrap;
@@ -1460,8 +1038,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   margin-top: 2px;
   flex-wrap: wrap;
 }
-/* Icon-Knoepfe der Leiste als Geister: kein runder Grund (Betreiber
-   2026-08-16, "modern professionell wie Claude"). */
 #code .codeleiste .icon-button.code-mini {
   background: transparent;
   border: 0;
@@ -1484,15 +1060,13 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-size: 14.5px;
   color: rgba(242, 245, 244, 0.74);
 }
-/* Betreiber 2026-08-17: Modellname NICHT fett, gleiche Groesse wie die
-   Chips links (Auto/Schnell, 13px). */
 #code .code-rechts b { color: rgba(242, 245, 244, 0.8); font-weight: 400; font-size: 13px; }
 #code .code-rechts { font-size: 13px; }
 #code #codeSenden {
   width: 32px;
   height: 32px;
   min-height: 32px;
-  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
+  border-radius: 0 !important;
   background: #ffffff;
   color: #0a0f16;
   display: grid;
@@ -1505,12 +1079,11 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   gap: 8px;
 }
 #code .code-wchips button {
-  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
+  border-radius: 0 !important;
   font-size: 15px;
   padding: 9px 15px;
   width: auto;
 }
-/* Die alten Editor-Werkzeuge: vollstaendig erhalten, eingeklappt darunter. */
 #code .code-werkzeuge { margin-top: 18px; }
 #code .code-werkzeuge summary {
   cursor: pointer;
@@ -1518,22 +1091,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   color: rgba(242, 245, 244, 0.58);
   padding: 8px 0;
 }
-
-
-/* =======================================================================
- * Bildschirm 24: "Spalten beruehren sich" — die Spur ist am Desktop OFFEN
- * =======================================================================
- * Im Mockup gibt es am Desktop keinen Menue-Knopf: die Spur steht immer
- * links, die Mitte schliesst mit einem Haarstrich an. Der Klapp-Mechanismus
- * bleibt fuer schmale Schirme vollstaendig erhalten — diese Regeln greifen
- * erst ab 1024 px. */
 @media (min-width: 768px) {
-  /* Betreiber-Entscheid 2026-08-15 (Chat): die Spur muss auch am Desktop
-     ZUGEHEN — und zwar schon ab 768 px: der Betreiber arbeitet mit Zoom,
-     sein Fenster hat effektiv ~778 CSS-px, die 1024er-Schwelle griff NIE.
-     ZUGEHEN. Standard bleibt offen; der Menue-Knopf links oben schaltet
-     body.spur-zu (app.js merkt sich den Zustand). Groesser/kleiner ziehen
-     uebernehmen die vorhandenen Griffe (#leftPanelResize/#rightPanelResize). */
   body:not(.spur-zu) .sidebar {
     transform: none !important;
     visibility: visible !important;
@@ -1546,21 +1104,14 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
     visibility: hidden !important;
   }
   body.spur-zu main.shell { margin-left: 0; }
-  /* Der Menue-Knopf bleibt sichtbar — er ist jetzt der Schalter. */
   .app-menu-button { display: inline-flex; }
   .sidebar-backdrop { display: none !important; }
-  /* Die Brotkrume beginnt rechts der Spur, nicht unter dem Logo. */
   body:not(.spur-zu) .top-krume { left: calc(var(--left-panel-width, 196px) + 26px); }
   body.spur-zu .top-krume { left: 96px; }
-  /* Spur und Mitte trennt EIN Haarstrich — kein Abstand, kein Schatten. */
   .sidebar {
     border-right: 1px solid var(--v11-hair);
     box-shadow: none;
   }
-  /* Der Zieh-Griff als FIXES Overlay an der Spur-Kante (Betreiber-Befund
-     2026-08-15: als Sidebar-Kind verschluckte der Hit-Test jeden Klick —
-     elementFromPoint traf BODY statt Griff). position:fixed loest ihn aus
-     Clip und Stapel der Spur; die Breiten-Variable haelt ihn an der Kante. */
   body:not(.spur-zu) .left-panel-resizer {
     position: fixed !important;
     left: calc(var(--left-panel-width, 196px) - 6px) !important;
@@ -1573,15 +1124,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   }
   body.spur-zu .left-panel-resizer { display: none; }
 }
-
-/* Profilzeile unten wie ChatGPT (Betreiber 2026-08-15): runder Avatar,
-   Name, Plan — KEIN separates Zahnrad; Einstellungen wohnen im Menue. */
 .profile-dock-gear { display: none !important; }
 .profile-avatar { border-radius: 999px; overflow: hidden; }
-
-/* Der Hilfe-Knopf oben rechts (Mockup-Topbar). Bewusst mit Abstand zu den
-   fixen Ecken-Knoepfen (Befund b0fb345: dort kollidierte schon einmal
-   etwas). */
 .top-hilfe {
   position: fixed;
   top: 14px;
@@ -1602,9 +1146,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (max-width: 1023px) {
   .top-hilfe { display: none; }
 }
-
-
-/* Bildschirm 18, Feinschliff: Gruss mit Zeichen, Mini-Knoepfe der Leiste */
 #code .codegruss { display: flex; align-items: center; gap: 11px; }
 #code .codegruss-zeichen {
   width: 24px; height: 24px; flex: none;
@@ -1613,20 +1154,14 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 #code .code-mini {
   width: 30px; height: 30px; min-height: 30px;
-  /* ghost-button bringt padding 0 14px mit — im 30px-Knopf blieben dem SVG
-     nur 2px Innenbreite, Anhang- und Diktat-Icon waren unsichtbare Striche
-     (Betreiber-Testlauf 2026-08-16). */
   padding: 0;
-  border-radius: 0 !important; /* eckig, Betreiber 2026-08-23 */
+  border-radius: 0 !important;
 }
 #code .code-mini svg {
   width: 16px; height: 16px; flex: none;
   fill: none; stroke: currentColor; stroke-width: 2.2;
   stroke-linecap: round; stroke-linejoin: round;
 }
-
-
-/* Bildschirm 40: Profilmenue — Wert rechts, Trennlinien statt Ueberschriften */
 .profile-dock-menu [role="menuitem"] {
   display: flex;
   align-items: center;
@@ -1645,9 +1180,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: var(--v11-hair);
 }
 .profile-dock-menu .profile-dock-menu-logout { color: var(--v11-bad); }
-
-
-/* Bildschirm 48: der Papierkorb */
 #papierkorb .papierkorb-zeile {
   display: flex;
   align-items: center;
@@ -1661,11 +1193,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #papierkorb .papierkorb-text strong { font-size: 15.5px; }
 #papierkorb .papierkorb-text span { font-size: 13.5px; color: rgba(242, 245, 244, 0.62); }
 #papierkorb .papierkorb-leer { color: rgba(242, 245, 244, 0.62); font-size: 15.5px; }
-
-
-/* =======================================================================
- * Bildschirm 29 — der Sprachmodus im neuen Kleid (gleiche Funktion)
- * ======================================================================= */
 .voice-mode-overlay, #voiceOverlay, .voice-overlay {
   background: rgba(7, 11, 17, 0.92) !important;
   -webkit-backdrop-filter: blur(40px) saturate(160%);
@@ -1710,11 +1237,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   color: #ffb4b6;
   box-shadow: inset 0 0 0 1px rgba(255, 122, 124, 0.55);
 }
-
-
-/* =======================================================================
- * Bildschirme 35+36 — Kamera-Overlay und Arbeitsbereiche
- * ======================================================================= */
 #kameraOverlay {
   position: fixed;
   inset: 0;
@@ -1763,7 +1285,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-weight: 700;
 }
 #kameraOverlay .kamera-hinweis { margin: 0; font-size: 13.5px; color: rgba(242, 245, 244, 0.62); }
-
 #arbeitsbereiche .bereich-karte {
   padding: 14px 4px 16px;
   border-bottom: 1px solid var(--v11-hair);
@@ -1804,9 +1325,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-weight: 700 !important;
   margin-bottom: 14px;
 }
-
-
-/* Bildschirm 16: die Fuehrungs-Blase (Mockup .coach) */
 #fuehrungBlase {
   position: fixed;
   z-index: 300;
@@ -1848,9 +1366,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   color: #04211f;
   font-weight: 700;
 }
-
-
-/* Bildschirm 35 Stufe 2: die angedockte Live-Vorschau */
 #kameraOverlay.ist-live {
   inset: auto 18px 18px auto;
   background: transparent;
@@ -1862,8 +1377,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #kameraOverlay.ist-live .kamera-hinweis { display: none; }
 #kameraOverlay.ist-live [data-kamera="aufnehmen"],
 #kameraOverlay.ist-live [data-kamera="live"] { display: none; }
-
-/* Bildschirm 27: die Arbeitsflaeche rechts */
 #arbeitsflaeche {
   display: grid;
   gap: 10px;
@@ -1888,8 +1401,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: rgba(255,255,255,.055); color: #f2f5f4;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
 }
-
-/* Die Karte unter der Antwort (Mockup: "Anschreiben · Text · 1 Seite") */
 .af-karte {
   display: flex; align-items: center; gap: 10px;
   margin: 6px 0 12px; padding: 10px 14px;
@@ -1901,16 +1412,9 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 .af-karte strong { font-size: 15px; }
 .af-karte span { color: rgba(242,245,244,.62); }
 .af-karte em { margin-left: auto; font-style: normal; color: var(--v11-cy-ink); }
-
-/* Bildschirm 39: die Datei-Tabelle */
 #files .datei-tabelle { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 #files .datei-tabelle th { text-align: left; color: rgba(242,245,244,.58); font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; padding: 8px 10px; border-bottom: 1px solid var(--v11-hair); }
 #files .datei-tabelle td { padding: 9px 10px; border-bottom: 1px solid var(--v11-hair); }
-
-/* Betreiber 2026-08-16 ("ohne Rahmen, transparent, ohne Hintergrund"):
-   die Aktions-Icons unter Nachrichten tragen KEINEN Kasten — die
-   generische Knopf-Regel (Grundton 0.055 + Lichtkante, live gemessen)
-   wird hier mit Doppelklassen-Gewicht abgeschaltet; nur Hover toent. */
 .msg-actions .msg-act.msg-act {
   background: transparent;
   border-color: transparent;
@@ -1920,18 +1424,9 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 .msg-actions .msg-act.msg-act:focus-visible {
   background: rgba(255, 255, 255, 0.08);
 }
-
-/* Betreiber 2026-08-16 ("Warum hast du ... mit Rahmen gemacht — soll mit
-   Text gleiche Zeile sein"): die drei Punkte liegen NIE auf einem Rahmen.
-   Nach einer Werkzeug-Karte sitzen sie knapp UNTER der Karte statt auf
-   ihrem Rand; bei eigenen Nachrichten sitzen sie IN der letzten Zeile der
-   Blase — der Text bekommt dafuer rechts Platz. */
 #startLog .af-karte + .msg-actions { margin-top: -10px; }
 #startLog .entry.user { padding-right: 40px; }
 #startLog .msg-actions.is-user { margin-top: -34px; padding-right: 6px; }
-
-/* Betreiber 2026-08-16 ("Chat-Funktion wie ChatGPT"): der Runter-Pfeil.
-   Sitzt mittig ueber dem Schreibfeld, nur sichtbar wenn hochgescrollt. */
 .chat-runter {
   position: fixed;
   left: 50%;
@@ -1950,8 +1445,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 .chat-runter:hover { background: rgba(40, 48, 58, 0.95); }
 .chat-runter svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-/* Stopp-Knopf waehrend der Antwort (Overlay ueber dem Senden-Pfeil) */
 .chat-stopp {
   position: fixed;
   z-index: 70;
@@ -1964,13 +1457,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 .chat-stopp:hover { background: #dfe5e3; }
 .chat-stopp svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
-
-/* Betreiber 2026-08-16 ("Code-Bereich wie die ZCode-App"): Codebloecke
-   mit Kopfzeile — Sprachname links, die Icon-Knoepfe (chat-code-copy.js,
-   chat-code-download.js) sitzen rechts darin. JEDER Block traegt eine
-   Sprache (chat-markdown.js liefert sie, chat-code-copy.js setzt sonst
-   "text" nach). ::before steht nicht in textContent — Verlauf und
-   Modellkontext bleiben sauber. */
 #startLog .entry.assistant .chat-code[data-language] {
   padding-top: 0;
 }
@@ -1979,10 +1465,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   display: block;
   position: sticky;
   left: 0;
-  /* ZCode-Abgleich 2026-08-16: die Sprachzeile ist bei ZCode KEIN eigener
-     Streifen — kleine Mono-Schrift, gedaempft, ohne Grund und ohne
-     Trennlinie, im selben Kasten wie der Code. Hoch genug fuer die
-     42px-Touch-Knoepfe; bei praezisem Zeigegeraet kompakt (h-8 wie ZCode). */
   margin: 0 -12px 6px;
   padding: 15px 12px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -1997,13 +1479,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
     padding: 8px 12px;
   }
 }
-
-/* ZCode-Abgleich Runde 2 (Betreiber 2026-08-16, "Code-Bereich wie die
-   ZCode-App"): die Knoepfe in der Kopfzeile sind wie bei ZCode reine
-   Icon-Knoepfe — randlos, gedaempft, Hover/Fokus hellt NUR die Farbe auf
-   (ZCode: text-muted-foreground -> text-foreground, kein Grundwechsel).
-   Die Grundregeln (Groesse, Fokusring, immer sichtbar) bleiben in
-   chat-markdown.css und gelten weiter. */
 #startLog .chat-code-wrap .chat-code-copy {
   top: 3px;
   border-color: transparent;
@@ -2020,16 +1495,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (pointer: fine) {
   #startLog .chat-code-wrap .chat-code-copy { top: 4px; }
 }
-/* Wie ZCode: kein geschriebenes "Kopieren" am Codeblock — nur das Icon,
-   der Name bleibt im aria-label/title. Die ::after-Beschriftung aus
-   chat-markdown.css gilt weiter fuer alle Kopierknoepfe ausserhalb. */
 #startLog .chat-code-wrap .chat-code-copy::after { content: none; }
 #startLog .chat-code-wrap .chat-code-copy svg { width: 14px; height: 14px; }
-
-/* Werkzeug-Karte wie ZCodes Datei-Karte (chat-code-copy.js zeigeDateiKarte,
-   Betreiber 2026-08-16): sichtbare Spur nach "In den Project-Ordner
-   speichern". Name und Unterzeile kommen aus data-Attributen (attr()) —
-   nichts davon steht in textContent. */
 .chat-code-wrap .code-datei-karte {
   display: grid;
   grid-template-columns: 36px 1fr;
@@ -2073,10 +1540,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-size: 12px;
   color: rgba(242, 245, 244, 0.5);
 }
-
-/* Arbeitsschritte-Falte im ZCode-Look ("Worked for … >"): gedaempfte
-   Zeile mit drehendem Chevron statt des Aufklapp-Dreiecks; die Schritte
-   darunter ruecken mit Haarstrich ein wie bei ZCode. */
 #startLog .chat-schritte-titel {
   display: inline-flex;
   align-items: center;
@@ -2101,11 +1564,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding-left: 10px;
   border-left: 1px solid rgba(255, 255, 255, 0.12);
 }
-
-/* Ein-/Ausklappen wie ZCodes einklappbare Zeilen ("1 file changed"-Muster;
-   chat-code-copy.js setzt data-zu am
-   Wrapper): zu sehen bleibt nur der Kopfstreifen, der Chevron dreht zur
-   Seite. Die Hoehen entsprechen dem Kopfstreifen samt Rahmen. */
 #startLog .chat-code-wrap[data-zu] .chat-code[data-language] {
   max-height: 50px;
   overflow: hidden;
@@ -2116,51 +1574,27 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 .chat-code-klapp svg { transition: transform 150ms ease; }
 .chat-code-wrap[data-zu] .chat-code-klapp svg { transform: rotate(-90deg); }
-
-/* ZCode-Abgleich Runde 3 (2026-08-16): Inline-Code als Chip exakt wie
-   ZCodes streamdown-inline-code (rounded bg-muted px-1.5 py-0.5 font-mono
-   text-sm) — gefuellter Grund, KEIN Rahmen, 0.875em. Die Rundung nimmt
-   eckig.css app-weit zurueck (Betreiber-Designgesetz). Codebloecke sind
-   ausgenommen (chat-markdown.css setzt padding/bg dort zurueck). */
 #startLog .entry.assistant code {
   padding: 2px 6px;
   background: rgba(255, 255, 255, 0.09);
   font-size: 0.875em;
 }
-/* Codebloecke sind KEINE Chips: der Reset aus chat-markdown.css verliert
-   gegen die ID-Regel oben — hier mit gleicher Staerke wiederholen (im
-   Fixture gemessen: sonst traegt jede Blockzeile einen Chip-Grund). */
 #startLog .entry.assistant .chat-code code {
   padding: 0;
   background: none;
   font-size: 0.92em;
 }
-
-/* Syntax-Farben der Codebloecke (chat-code-farben.js) — ZCode-Abgleich
-   2026-08-16: die GitHub-Dark-Farbwelt, in der auch ZCode zeichnet
-   (Kommentar grau, String hellblau, Zahl blau, Schluesselwort koralle,
-   Funktion violett). */
 .chat-code .cf-kom { color: #8b949e; font-style: italic; }
 .chat-code .cf-str { color: #a5d6ff; }
 .chat-code .cf-zahl { color: #79c0ff; }
 .chat-code .cf-schl { color: #ff7b72; }
 .chat-code .cf-fn { color: #d2a8ff; }
-
-/* Betreiber 2026-08-16 ("gesamte Flaeche nutzen, kompakt, keine
-   Freiflaeche"): die CODE-Seite randlos wie Claude. Die Ansicht selbst ist
-   eine Bildschirm-hohe Flex-Spalte — oben nur Platz fuer die fixe
-   Logo-Zeile, links/rechts 12px, unten schliesst das Schreibfeld buendig
-   ab. Der Text im Gespraech deckt die volle Breite (die 980px-Mitte der
-   Startseite gilt hier nicht). */
 #code.view.is-active {
   display: flex;
   flex-direction: column;
   height: 100dvh;
   max-height: 100dvh;
   overflow: hidden;
-  /* Betreiber-Nachtrag ("Text ganz oben, ueber Browser-Icon"): kein
-     reservierter Kopfstreifen — der Text beginnt an der Oberkante, das
-     fixe Browser-Icon schwebt rechts darueber. */
   padding: 4px 12px 0;
 }
 #code .codeflaeche {
@@ -2170,21 +1604,12 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   max-height: none;
 }
 #code .codegruss { padding: 2px 2px 0; }
-/* Abnahme 2026-08-23, gemessen bei 375 px: der feste Menue-Knopf (0-44 px)
-   lag ueber dem Gruss (x 14-312, y 6-35) — das "W" stand unter dem Logo.
-   Wo der Knopf ueber der Flaeche schwebt (Handy; Schreibtisch mit
-   geschlossener Spur), beginnt der Gruss rechts von ihm. */
 @media (max-width: 767px) { #code .codegruss { padding-left: 40px; padding-right: 40px; } }
 @media (min-width: 768px) { body.spur-zu #code .codegruss { padding-left: 40px; } }
 #code .codeunten { margin-top: auto; padding: 4px 0 0; }
 #code .code-log-halter .start-log .entry { max-width: none; }
 #code .code-log-halter .msg-actions { max-width: none; }
-/* Das Schreibfeld waechst beim Tippen nach OBEN mit (code-flaeche.js) —
-   ab 40% Bildhoehe scrollt es innen statt weiterzuwachsen. */
 #code .codefeld textarea { max-height: 40vh; overflow-y: auto; }
-
-/* Claude-Abgleich 2026-08-16: "Zuletzt verwendet"-Eintraege tragen wie bei
-   Claude einen kleinen Kreis; das offene Gespraech fuellt ihn (cyan). */
 .nav-start .spur-chat::before {
   content: "";
   flex: 0 0 auto;
@@ -2195,14 +1620,10 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   border-radius: 50%;
 }
 .nav-start .spur-chat.is-active::before {
-  /* dezent statt Leuchtpunkt (Betreiber 2026-08-16) */
   border-color: rgba(50, 246, 234, 0.55);
   background: rgba(50, 246, 234, 0.55);
 }
 .nav-start .spur-chat { display: flex; align-items: center; }
-
-/* Status IM rechten Panel (panel-status.js): die echte status-grid der
-   Systemzustand-Ansicht, im schmalen Panel einspaltig und kompakt. */
 .panel-status { padding: 10px 12px; overflow: auto; }
 .panel-status .status-grid {
   display: flex;
@@ -2218,23 +1639,11 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding-bottom: 6px;
 }
 .panel-status .status-grid span { text-align: right; opacity: 0.8; }
-
-/* =======================================================================
- * Betreiber 2026-08-17: Start-Composer wie der CODE-Bereich —
- * das Schreibfeld ist ZEILE 1 (volle Breite, waechst, der GANZE Text
- * bleibt sichtbar), die Werkzeuge sind eine FESTE ZWEITE ZEILE unten.
- * Steht bewusst am DATEIENDE: schlaegt die Ein-Pillen-Regeln (Desktop
- * Bildschirm 32 und Telefon-Block) bei gleicher Spezifitaet.
- * ===================================================================== */
 #start .prompt-glass { flex-wrap: wrap; align-items: center; }
 #start .prompt-glass textarea {
   order: 0;
   flex: 1 1 100%;
   width: 100%;
-  /* !important, weil die Ein-Pillen-Regel weiter oben height:40px setzt
-     und sogar den Inline-Stil des Autogrow schlaegt (live gemessen:
-     scrollHeight 120, sichtbar 44). field-sizing waechst nativ, das JS
-     unten ist der Fallback fuer Browser ohne Unterstuetzung. */
   height: auto !important;
   field-sizing: content;
   min-height: 40px !important;
@@ -2247,10 +1656,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #start .prompt-actions .model-picker { order: 4; display: block; }
 #start .prompt-actions [data-start-tool="voice"] { order: 5; }
 #start .prompt-actions .send-button { order: 6; }
-
-/* Betreiber 2026-08-17: die Antwort im Sprachmodus liest sich wie Text —
-   linksbuendig, normale Groesse, ruhige Zeilen. Zentriert und riesig war
-   sie unlesbar, sobald sie laenger als ein Satz wurde. */
 .voice-mode-reply {
   text-align: left;
   font-size: 16px;
@@ -2260,19 +1665,7 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding: 0 4px;
 }
 .voice-mode-transcript { text-align: left; }
-
-/* =======================================================================
- * Betreiber-Freigabe 2026-08-18 ("nur am Handy vergroessern"): unter
- * 600 px erfuellen die Bedienknoepfe der CODE-Leiste das Touch-Ziel des
- * Projekts (44 px). Am Desktop bleibt alles schmal und edel wie bestellt
- * — die Regel greift AUSSCHLIESSLICH hier.
- * Gemessen im integrierten Browser bei 375 px: Anhang/Diktat 30x30,
- * Senden 32x32, Chips 19 px hoch.
- * 600 px ist die im Projekt schon benutzte Kante (styles.css,
- * start-glass.css) — keine zweite Wahrheit daneben.
- * ===================================================================== */
 @media (max-width: 600px) {
-  /* Abnahme 2026-08-23: "Neues Project anlegen" mass 188x42 px (measure:touch:app). */
   #arbeitsbereiche #bereichNeu { min-height: 44px; }
   #code .codeleiste .icon-button.code-mini,
   #code .codeleiste #codeSenden {
@@ -2285,18 +1678,8 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
     padding-top: 0;
     padding-bottom: 0;
   }
-  /* Die Zeile darf dabei nicht enger werden als die Knoepfe hoch sind. */
   #code .codeleiste { gap: 4px; }
 }
-
-/* =======================================================================
- * Arbeits-Viereck im CHAT-Bereich (Betreiber 2026-08-18: "kannst du das
- * fuer den Chat-Bereich auch machen — sieht gut aus").
- * Erbt Groesse, Form und Beleuchtung von .code-arbeit; hier steht nur,
- * WO es sitzt: im Glas-Schreibfeld der Startseite, rechts neben der
- * Textzeile. Die Hoehe misst code-flaeche.js zur Laufzeit
- * (--start-arbeit-top) — ein fester Wert versagte am Telefon.
- * ===================================================================== */
 #start .prompt-glass { position: relative; }
 #start .start-arbeit {
   position: absolute;
@@ -2313,19 +1696,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: var(--v11-cy);
   animation: code-arbeit-puls 1.6s ease-in-out infinite;
 }
-
-/* =======================================================================
- * Betreiber-Freigabe 2026-08-18: das CHAT-Schreibfeld klebt unten fest —
- * wie im CODE-Bereich und wie bei Claude/ChatGPT.
- *
- * Befund, live gemessen: bei langem Verlauf stand das Glas-Feld 10938 px
- * tief; man scrollte es aus dem Bild und erreichte weder Eingabe noch
- * Arbeits-Viereck. Der Verlauf scrollt jetzt INNEN, das Feld bleibt
- * stehen.
- *
- * Bewusst nur im Chat-Zustand (.has-start-chat): der leere
- * Willkommens-Bildschirm behaelt seine mittige Kapsel unveraendert.
- * ===================================================================== */
 #start.has-start-chat .home-feed {
   display: flex;
   flex-direction: column;
@@ -2342,15 +1712,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   flex: 0 0 auto;
   margin-top: auto;
 }
-
-/* =====================================================================
- * Betreiber 2026-08-18: "unten sollen nicht zwei viereckige Rahmen
- * stehen — nur der leuchtende bleibt, der andere raus, bei Code UND
- * Chat." Also: die Icon-Knoepfe der Eingabeleiste verlieren ihre
- * Flaeche und ihren Innenstrich; sichtbar bleibt nur das Zeichen.
- * Der Senden-Knopf (.send-button) behaelt seinen Block — er ist der
- * leuchtende.
- * ===================================================================== */
 #start .prompt-glass .ghost-button.icon-button,
 #code .codeleiste .ghost-button.icon-button {
   background: transparent;
@@ -2362,19 +1723,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: transparent;
   color: #f2f5f4;
 }
-
-/* =====================================================================
- * Betreiber 2026-08-18, zweiter Durchgang: "bei Chat auch raus nehmen —
- * nur Denkzeit, Arbeitszeit und so weiter sollen beleuchten; wenn
- * beendet, soll nicht beleuchten."
- *
- * Also ruht auch der Hauptknopf als blosses Zeichen: keine gefuellte
- * Flaeche, kein Schein — weder leer (weisse Welle) noch getippt (Cyan).
- * Hell bleibt in der Leiste nur, was WIRKLICH gerade arbeitet:
- *   - das Arbeits-Viereck (#startArbeit / #codeArbeit, Klasse .an)
- *   - das Stopp-Quadrat waehrend der laufenden Antwort (.chat-stopp)
- * Beide sind unveraendert und bleiben die einzigen hellen Flaechen.
- * ===================================================================== */
 #start .prompt-glass .send-button,
 #start .prompt-glass .send-button.ist-sprache,
 #start .prompt-glass .send-button:not(.ist-sprache),
@@ -2390,27 +1738,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: transparent;
   color: #f2f5f4;
 }
-
-/* =====================================================================
- * Betreiber 2026-08-18: "genau 1 zu 1 wie bei Claude, fuer Chat UND Code,
- * mit der Beleuchtung."
- *
- * Claudes Hauptknopf kennt drei Zustaende:
- *   leer      -> aus (nur das Zeichen, keine Flaeche)
- *   Text da   -> HELL gefuellt, dunkles Zeichen (bereit zum Senden)
- *   Antwort   -> Stopp-Quadrat (bei uns .chat-stopp bzw. das pulsende
- *                Arbeits-Viereck im Code-Feld)
- *
- * "Text da" wird ohne neues JavaScript erkannt: ein Textfeld mit Inhalt
- * verliert :placeholder-shown. Der Knopf haengt also am Feld selbst —
- * es gibt keinen zweiten Zustand, der auseinanderlaufen koennte.
- * ===================================================================== */
-/* NACHTRAG 2026-08-24 (Betreiber: "sende icon sieht man nicht mehr"): seit
- * der Knopf ueberall transparent ist (Abnahme 23.08.), machte die alte
- * helle Flaeche dieses Blocks keinen Sinn mehr — uebrig blieb ihr DUNKLES
- * Zeichen auf dunklem Grund: der Pfeil war in Chat und Code unsichtbar,
- * sobald Text im Feld stand. Jetzt: Text da -> HELLES Zeichen, weiter ohne
- * Flaeche; Hover Logo-Cyan. */
 #start .prompt-glass:has(#startMessage:not(:placeholder-shown)) .send-button,
 #code .codefeld:has(#codeAufgabe:not(:placeholder-shown)) #codeSenden {
   background: transparent;
@@ -2422,53 +1749,19 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: transparent;
   color: #02fdfd;
 }
-
-/* =====================================================================
- * Betreiber 2026-08-18: "im Chat kommt beim Senden-Icon immer noch ein
- * viereckiger Rahmen — soll aussehen wie im Code."
- *
- * Der Uebeltaeter war NICHT der Senden-Knopf, sondern das Stopp-Quadrat,
- * das waehrend der Antwort darueber liegt (.chat-stopp). Zwei fremde
- * Regeln haben es verformt:
- *   *, ::before, ::after { border-radius: 0 !important }  -> eckig
- *   button { min-height: 42px }                           -> 4 px zu hoch
- * Beide schlugen die eigenen Werte des Overlays, weil die ohne
- * !important standen. Es sass darum als kantiger Klotz ueber dem runden
- * Knopf. Jetzt deckt es den Senden-Knopf exakt und traegt dieselbe Form.
- * ===================================================================== */
 #chatStopp.chat-stopp {
-  border-radius: 0 !important; /* eckig wie der Senden-Knopf (2026-08-23) */
+  border-radius: 0 !important;
   min-height: 0;
   box-sizing: border-box;
   padding: 0;
   border: 0;
 }
-
-/* =====================================================================
- * Betreiber 2026-08-18: das leuchtende Viereck IST jetzt der Knopf; der
- * runde Stopp-Knopf darunter faellt weg. Drei Zustaende, siehe
- * chat-stopp.js:
- *   frei      -> gedaempfter Umriss (Regeln weiter oben, unveraendert)
- *   arbeitet  -> gefuellt und pulsend, Klick stoppt
- *   gestoppt  -> bleibt hell, wird zum Play-Dreieck, Klick schickt neu
- *
- * Das Dreieck entsteht aus derselben Flaeche (clip-path) — kein zweites
- * Zeichen, das nachgeladen werden koennte.
- *
- * Klickflaeche: sichtbar bleiben es 11 px (Betreiber: "das Viereck war
- * gut"), fassbar sind 30 px. Das leistet ein unsichtbares ::before —
- * die Flaeche liegt UEBER dem Feldrand rechts oben, nicht ueber dem Text.
- * ===================================================================== */
 #chatStopp, .chat-stopp { display: none !important; }
-
 #start .start-arbeit[role="button"],
 #code .code-arbeit[role="button"] {
   pointer-events: auto;
   cursor: pointer;
 }
-/* Betreiber 2026-08-19 ("stoppen funktioniert nicht"): 29 px Trefferfeld
-   war zu klein — wer das 11-px-Viereck knapp verfehlte, stoppte nichts.
-   Jetzt 45 px (Touch-Regel: mindestens 44 px, siehe Charta). */
 #start .start-arbeit[role="button"]::before,
 #code .code-arbeit[role="button"]::before {
   content: "";
@@ -2476,14 +1769,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   inset: -17px;
   border-radius: 0;
 }
-/* Das Dreieck sitzt bewusst auf einem ::after und NICHT als clip-path auf
-   dem Viereck selbst: ein clip-path haette die unsichtbare Klickflaeche
-   gleich mitgeschnitten, der Knopf waere im Play-Zustand 11 px klein
-   geworden. */
-/* Betreiber 2026-08-19 ("bei zwei Zustaenden nicht mehr beleuchtet"):
-   gestoppt bleibt das VIERECK selbst hell — cyan gefuellt, ohne Puls —
-   und das Play-Dreieck sitzt DUNKEL DARIN. Vorher stand nur ein winziges
-   cyanes Dreieck auf leerem Grund, das als "aus" gelesen wurde. */
 #start .start-arbeit.gestoppt,
 #code .code-arbeit.gestoppt {
   border-color: var(--v11-cy);
@@ -2498,80 +1783,30 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   background: #04211f;
   clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
 }
-
-/* =======================================================================
- * Touch-Ziele am Handy — zweiter Teil (Betreiber-Freigabe 2026-08-22:
- * "wie im Code-Bereich").
- *
- * Am 2026-08-18 wurde genau das schon einmal freigegeben, aber nur fuer die
- * CODE-Leiste: "nur am Handy vergroessern", unter 600 px 44 px, am
- * Schreibtisch bleibt alles schmal und edel. Die Chat-Leiste, das Startmenue,
- * die Spur-Reiter und die Einfuehrung haben diesen Schritt nie mitgemacht —
- * `npm run measure:touch:app` meldete dort am 2026-08-22 noch 32 Ziele unter
- * 44 px. Der Grund war nicht Nachlaessigkeit, sondern die Kaskade: design-v11
- * steht als LETZTE Quelle im Buendel (bundle-start-styles.mjs) und hat die
- * alten 600-px-Regeln aus styles.css mit den Mockup-Massen ueberschrieben
- * (".fknopf: 38px"). Deshalb steht dieser Block hier ganz am Ende — spaeter
- * als jede Regel, die er heben soll. Eine Medienabfrage erhoeht die
- * Spezifitaet NICHT; weiter oben haette er nichts bewirkt.
- *
- * 600 px ist die im Projekt schon benutzte Kante (styles.css,
- * start-glass.css, der Code-Block oben) — keine zweite Wahrheit daneben.
- * ===================================================================== */
 @media (max-width: 600px) {
-  /* Die runden Knoepfe der Chat-Eingabe (Plus, Mikrofon, Senden). Sichtbar
-     bleiben Form und Farbe aus dem Mockup, nur das Mass waechst von 38 auf
-     44 px — dieselbe Aenderung, die die Code-Leiste am 18.08. bekam. */
   #start .prompt-glass .ghost-button.icon-button,
   #start .prompt-glass .send-button {
     width: 44px;
     height: 44px;
     min-height: 44px;
   }
-
-  /* Das Startmenue: 28 px hohe Zeilen sind mit dem Finger nicht sicher zu
-     treffen. Der Abstand waechst mit, damit die Schrift nicht am Rand klebt. */
   .nav-start .nav-button,
   .sidebar .nav-vier .nav-button {
     min-height: 44px;
     padding-top: 8px;
     padding-bottom: 8px;
   }
-
-  /* Spur-Reiter ("Start" / "Code") und die Knoepfe der Einfuehrung lagen bei
-     42 px — zwei Pixel unter dem Ziel, aber die Regel ist eine Grenze und
-     kein Richtwert. */
   .spur-reiter button,
   #fuehrungBlase button {
     min-height: 44px;
   }
-
-  /* Code-Ansicht: das Auftragsfeld war 26 px hoch, der Modus-Chip 40 px
-     breit (hoch war er schon 44). */
   #code #codeAufgabe {
     min-height: 44px;
   }
-
   #code .repochip {
     min-width: 44px;
   }
 }
-
-/* --- Stopp-Quadrat im Senden-Knopf (Betreiber 2026-08-23) ----------------
- * Vorbild Antigravity (Google): waehrend die Antwort laeuft, wird der
- * Senden-Knopf zum Stopp-Knopf — dort rotes Quadrat im Kreis. Bei uns:
- * Quadrat in der LOGO-Farbe #02fdfd (aus smejj_full_logo_on_dark.svg, nicht
- * das Cockpit-Cyan) auf dunklem Feld, und das Feld ist VIERECKIG — die
- * einzige Stelle, an der der sonst runde Hauptknopf seine Ecken zeigt.
- * Den Zustand setzt chat-stopp.js (Klasse .ist-stopp); Pfeil und Welle
- * gehoeren weiter composer-sendetaste.js. */
-/* Betreiber 2026-08-23 ("zwei viereckig", Wortlaut: "nimmst du obere
-   viereckig raus, Untere viereckig soll transparent ohne Hintergrund sein und
-   soll nur eine viereckig sein ... Chat Bereich und Code bereich"):
-   Das kleine Viereck rechts oben im Feld ist WEG (Regel ganz unten). Der
-   Knopf nach dem Mikrofon hat keinen Hintergrund und keinen Rahmen; beim
-   Stoppen zeigt er nur das Stopp-Quadrat in Logo-Cyan — das EINZIGE Viereck,
-   im Chat- und im Code-Bereich gleich. */
 #start .prompt-glass .send-button,
 #start .prompt-glass .send-button.ist-sprache,
 #start .prompt-glass .send-button:not(.ist-sprache),
@@ -2594,7 +1829,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 .send-button.ist-stopp .stopp-quadrat { width: 22px; height: 22px; }
 .send-button.ist-stopp .stopp-quadrat rect { fill: currentColor; stroke: none; }
 #code #codeSenden.ist-stopp svg { width: 20px; height: 20px; fill: currentColor; stroke: none; }
-/* Das obere Viereck ist raus — nur noch Zustandstraeger fuer chat-stopp.js. */
 #start .start-arbeit, #code .code-arbeit, #startArbeit, #codeArbeit { display: none !important; }
 @keyframes stopp-quadrat-puls {
   0%, 100% { opacity: 1; }
@@ -2603,12 +1837,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (prefers-reduced-motion: reduce) {
   .send-button.ist-stopp { animation: none; }
 }
-
-/* --- Denk-Zeile (Betreiber 2026-08-23, Vorbild Antigravity "Thought for 1s ›")
- * Eingeklappte Zeile in der Schrittliste: "Denkt …" waehrend der Denk-Text
- * kommt, "Dachte 3 s ›" sobald die Antwort beginnt. Aufklappen zeigt den
- * Denk-Text gedaempft, eingerueckt mit Haarstrich — derselbe Look wie die
- * gefalteten Arbeitsschritte, viereckig, ohne Farbe. */
 #startLog .chat-denken { margin: 0; }
 #startLog .chat-denken-titel { border-radius: 0 !important; }
 #startLog .chat-denken[data-fertig="true"] .chat-denken-titel { opacity: 0.9; }
@@ -2630,11 +1858,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (prefers-reduced-motion: reduce) {
   #startLog .chat-denken-titel { animation: none; }
 }
-
-/* --- Schrittgruppen (Betreiber 2026-08-23, Vorbild Antigravity "Exploring
- * 1 file ˅"): Schritte gleicher Art stehen in einer aufklappbaren Gruppe,
- * der Titel zaehlt live mit. Offen waehrend der Arbeit, zugeklappt danach;
- * die Unterzeilen ruecken mit Haarstrich ein — viereckig, ohne Farbe. */
 #startLog .chat-schritt-gruppe { margin: 0; }
 #startLog .chat-schritt-gruppe-titel { border-radius: 0 !important; }
 #startLog .chat-schritt-gruppe[data-zustand="laeuft"] .chat-schritt-gruppe-titel {
@@ -2646,8 +1869,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   padding-left: 10px;
   border-left: 1px solid rgba(255, 255, 255, 0.12);
 }
-/* In der Endfalte liegen die Gruppen eine Stufe tiefer: eigene Haarlinie,
-   die Zeilen darunter noch einmal eingerueckt. */
 #startLog .chat-schritte-falte[open] > .chat-schritt-gruppe {
   margin-left: 4px;
   padding-left: 10px;
@@ -2656,12 +1877,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 @media (prefers-reduced-motion: reduce) {
   #startLog .chat-schritt-gruppe-titel { animation: none; }
 }
-
-/* --- Frage-Karte (Betreiber 2026-08-23, Vorbild Antigravity) -------------
- * Eigener Assistenten-Eintrag hinter der Antwort: Frage fett, darunter die
- * Optionen als viereckige Knoepfe (erste = Empfehlung, hell), "Ueberspringen"
- * gedaempft. Beantwortet: Knoepfe aus, gewaehlte Option mit Akzent-Rahmen,
- * darunter "Gewaehlt: …" bzw. "Uebersprungen" — wie "Skipped" dort. */
 #startLog .chat-frage {
   border: 1px solid rgba(242, 245, 244, 0.14);
   border-radius: 0 !important;
@@ -2708,15 +1923,11 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   color: rgba(242, 245, 244, 0.55);
 }
 #startLog .chat-frage-stand:empty { display: none; }
-
-/* --- "@"-Erwaehnung im Startfeld (Betreiber 2026-08-23, Vorbild Antigravity
- * "@ to mention"): Liste der eigenen Chats ueber dem Feld, viereckig. */
 #start .prompt-glass { position: relative; }
 #start .erwaehnung-menue {
   left: 16px;
   bottom: calc(100% + 8px);
   border-radius: 0 !important;
-  /* Nie ueber den oberen Fensterrand hinaus (live 23.08.: Kopfzeile abgeschnitten). */
   max-height: min(320px, calc(100vh - 360px));
   overflow-y: auto;
 }

@@ -1,27 +1,18 @@
-/* Such-Overlay (Cmd+K) — eigene Datei, weil public/styles.css am
-   Ratchet-Limit (1589 Zeilen) eingefroren ist (scripts/check-guidelines.mjs).
-   Farben folgen dem Cyan-Cockpit (design-cyan.css), aber mit eigenen Werten:
-   die --design-*-Variablen leben dort im Scope .premium-view und sind hier
-   nicht verfuegbar. */
-
 .search-overlay {
   position: fixed;
   inset: 0;
-  z-index: 80; /* ueber Sidebar (70) und Modellmenue (60) */
+  z-index: 80;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding: min(12vh, 96px) 16px 16px;
 }
-
 .search-overlay[hidden] {
   display: none;
 }
-
 body.search-overlay-open {
   overflow: hidden;
 }
-
 .search-overlay-backdrop {
   position: absolute;
   inset: 0;
@@ -29,7 +20,6 @@ body.search-overlay-open {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
-
 .search-overlay-panel {
   position: relative;
   display: grid;
@@ -47,7 +37,6 @@ body.search-overlay-open {
     0 24px 64px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(126, 232, 218, 0.22);
 }
-
 .search-overlay-form {
   display: flex;
   gap: 8px;
@@ -55,7 +44,6 @@ body.search-overlay-open {
   padding: 8px 10px;
   border-bottom: 1px solid rgba(50, 246, 234, 0.26);
 }
-
 .search-overlay-form input {
   flex: 1;
   min-width: 0;
@@ -66,11 +54,9 @@ body.search-overlay-open {
   color: #f6f3ee;
   font-size: 17px;
 }
-
 .search-overlay-form input::placeholder {
   color: rgba(151, 158, 171, 0.78);
 }
-
 .search-overlay-close {
   min-width: 44px;
   min-height: 44px;
@@ -82,7 +68,6 @@ body.search-overlay-open {
   font-weight: 700;
   cursor: pointer;
 }
-
 .search-overlay-log {
   overflow-y: auto;
   display: grid;
@@ -90,12 +75,10 @@ body.search-overlay-open {
   gap: 10px;
   padding: 8px;
 }
-
 .search-overlay-group {
   display: grid;
   gap: 2px;
 }
-
 .search-overlay-group h3 {
   margin: 0;
   padding: 6px 10px 4px;
@@ -105,7 +88,6 @@ body.search-overlay-open {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-
 .search-overlay-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -121,21 +103,18 @@ body.search-overlay-open {
   font: inherit;
   cursor: pointer;
 }
-
 .search-overlay-row .row-title {
   overflow: hidden;
   font-weight: 600;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-
 .search-overlay-row .row-meta {
   align-self: center;
   color: rgba(151, 158, 171, 0.85);
   font-size: 12px;
   white-space: nowrap;
 }
-
 .search-overlay-row .row-detail {
   grid-column: 1 / -1;
   overflow: hidden;
@@ -144,25 +123,20 @@ body.search-overlay-open {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-
-/* Maus-Hover und Tastatur-Auswahl sehen gleich aus — es gibt EINE Markierung. */
 .search-overlay-row.is-active {
   border-color: rgba(50, 246, 234, 0.4);
   background: rgba(50, 246, 234, 0.14);
 }
-
 .search-overlay-log mark {
   border-radius: 3px;
   padding: 0 1px;
   background: rgba(50, 246, 234, 0.3);
   color: #eafffb;
 }
-
 .search-overlay-empty {
   padding: 14px;
   color: rgba(246, 243, 238, 0.72);
 }
-
 .search-overlay-hints {
   display: flex;
   gap: 16px;
@@ -172,7 +146,6 @@ body.search-overlay-open {
   color: rgba(151, 158, 171, 0.85);
   font-size: 12px;
 }
-
 .search-overlay-hints kbd {
   display: inline-block;
   min-width: 18px;
@@ -186,17 +159,14 @@ body.search-overlay-open {
   font-size: 11px;
   text-align: center;
 }
-
 @media (max-width: 560px) {
   .search-overlay {
     padding: 8px;
   }
-
   .search-overlay-panel {
     max-height: calc(100dvh - 16px);
   }
-
   .search-overlay-hints {
-    display: none; /* Tastatur-Hinweise nuetzen auf dem Handy nichts */
+    display: none;
   }
 }

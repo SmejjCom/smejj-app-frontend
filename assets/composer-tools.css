@@ -1,12 +1,7 @@
-/* smejj.com — Styles fuer Composer-Werkzeuge (Plus-Menue, Diktat, Sprachmodus, Vorlesen).
-   Eigene Datei, damit die design-gelockte styles.css (Ratchet-Baseline) nicht waechst.
-   Design-Sprache identisch zum bestehenden .model-menu (dunkel, Glas, dezente Linien). */
-
 .plus-picker {
      position: relative;
      z-index: 50;
 }
-
 .plus-menu {
      position: absolute;
      left: 0;
@@ -22,7 +17,6 @@
      backdrop-filter: blur(24px) saturate(1.2);
      -webkit-backdrop-filter: blur(24px) saturate(1.2);
 }
-
 .plus-menu button {
      display: flex;
      align-items: center;
@@ -40,12 +34,10 @@
      text-align: left;
      cursor: pointer;
 }
-
 .plus-menu button:hover {
      background: rgba(255, 255, 255, 0.06);
      color: #ffffff;
 }
-
 .plus-menu button svg {
      width: 17px;
      height: 17px;
@@ -57,32 +49,21 @@
      stroke-linejoin: round;
      pointer-events: none;
 }
-
 .plus-menu .visually-hidden-input {
      display: none;
 }
-
-/* Diktat aktiv: Mikrofon pulsiert rot. */
-
 [data-start-tool="voice"].is-recording {
      color: #ff5c5c;
      animation: composer-pulse 1.4s ease-in-out infinite;
 }
-
-/* Vorlesen aktiv: Lautsprecher hervorgehoben. */
-
 [data-start-tool="speaker"].is-speaking {
      color: #7fd4a8;
      animation: composer-pulse 1.8s ease-in-out infinite;
 }
-
 @keyframes composer-pulse {
      0%, 100% { opacity: 1; }
      50% { opacity: 0.45; }
 }
-
-/* Sprachmodus-Overlay (Gespraech). */
-
 .voice-mode-overlay {
      position: fixed;
      inset: 0;
@@ -99,11 +80,9 @@
      text-align: center;
      padding: 24px;
 }
-
 .voice-mode-overlay[hidden] {
      display: none;
 }
-
 .voice-mode-wave {
      display: flex;
      align-items: center;
@@ -111,7 +90,6 @@
      gap: 7px;
      height: 84px;
 }
-
 .voice-mode-wave span {
      width: 9px;
      height: 18px;
@@ -119,34 +97,26 @@
      background: rgba(246, 243, 238, 0.9);
      animation: voice-wave 1.15s ease-in-out infinite;
 }
-
 .voice-mode-wave span:nth-child(2) { animation-delay: 0.12s; }
 .voice-mode-wave span:nth-child(3) { animation-delay: 0.24s; }
 .voice-mode-wave span:nth-child(4) { animation-delay: 0.36s; }
 .voice-mode-wave span:nth-child(5) { animation-delay: 0.48s; }
-
 @keyframes voice-wave {
      0%, 100% { transform: scaleY(0.45); }
      50% { transform: scaleY(1); }
 }
-
-/* Zustaende: Zuhoeren (weiss), Denken (gedimmt, langsam), Sprechen (gruenlich). */
-
 .voice-mode-overlay[data-mode="thinking"] .voice-mode-wave span {
      animation-duration: 2.2s;
      background: rgba(246, 243, 238, 0.45);
 }
-
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-wave span {
      background: #7fd4a8;
 }
-
 .voice-mode-status {
      font-size: 20px;
      font-weight: 500;
      margin: 0;
 }
-
 .voice-mode-transcript {
      max-width: 640px;
      min-height: 24px;
@@ -155,8 +125,6 @@
      color: rgba(246, 243, 238, 0.6);
      line-height: 1.62;
 }
-
-/* Live-Mitschrift der Antwort im Sprachmodus (Konkurrenz-Radar V2) */
 .voice-mode-reply {
      max-width: 640px;
      max-height: 38vh;
@@ -168,11 +136,9 @@
      white-space: pre-wrap;
      overflow-wrap: anywhere;
 }
-
 .voice-mode-reply:empty {
      display: none;
 }
-
 .voice-mode-close {
      display: grid;
      place-items: center;
@@ -185,11 +151,9 @@
      color: #101114;
      cursor: pointer;
 }
-
 .voice-mode-close:hover {
      background: #ffffff;
 }
-
 .voice-mode-close svg {
      width: 18px;
      height: 18px;
@@ -199,7 +163,6 @@
      stroke-linecap: round;
      pointer-events: none;
 }
-
 .voice-mode-hint {
      position: absolute;
      bottom: 28px;
@@ -209,17 +172,12 @@
      font-size: 14.5px;
      color: rgba(246, 243, 238, 0.45);
 }
-
-/* Sprachmodus neu: animiertes smejj.com Zeichen — linke und rechte Klammer
-   sprechen im Wechsel, je ein Punkt gehoert zu einer Seite. */
-
 .voice-mode-logo {
      position: relative;
      display: flex;
      align-items: center;
      justify-content: center;
 }
-
 .voice-mode-logo::before {
      content: "";
      position: absolute;
@@ -231,12 +189,10 @@
      animation: voice-aura-pulse 3s ease-in-out infinite;
      z-index: -1;
 }
-
 .voice-mode-logo svg {
      width: 150px;
      height: 109px;
 }
-
 .voice-mode-logo path {
      fill: none;
      stroke: #14e0dc;
@@ -245,104 +201,70 @@
      stroke-linejoin: round;
      filter: drop-shadow(0 0 12px rgba(20, 224, 220, 0.4));
 }
-
 .voice-mode-logo circle {
      fill: #14e0dc;
      filter: drop-shadow(0 0 8px rgba(20, 224, 220, 0.6));
 }
-
 .voice-logo-left { animation: voice-talk-left 2.4s ease-in-out infinite; }
 .voice-logo-right { animation: voice-talk-right 2.4s ease-in-out infinite; }
 .voice-logo-dot-a { animation: voice-dot-a 2.4s ease-in-out infinite; }
 .voice-logo-dot-b { animation: voice-dot-b 2.4s ease-in-out infinite; }
-
 @keyframes voice-talk-left {
      0%, 40%, 100% { transform: translateX(0) scale(1); }
      15% { transform: translateX(-7px) scale(1.06); }
      28% { transform: translateX(0) scale(1); }
 }
-
 @keyframes voice-talk-right {
      0%, 50%, 100% { transform: translateX(0) scale(1); }
      65% { transform: translateX(7px) scale(1.06); }
      78% { transform: translateX(0) scale(1); }
 }
-
 @keyframes voice-dot-a {
      0%, 40%, 100% { opacity: 0.25; }
      15% { opacity: 1; }
 }
-
 @keyframes voice-dot-b {
      0%, 50%, 100% { opacity: 0.25; }
      65% { opacity: 1; }
 }
-
 @keyframes voice-aura-pulse {
      0%, 100% { transform: scale(0.92); opacity: 0.45; }
      50% { transform: scale(1.12); opacity: 0.9; }
 }
-
-/* Zustaende des Zeichens: Denken (langsam), Sprechen (gruen).
-   Stumm: Das Zeichen bleibt bewusst farbig und animiert — der Sprachmodus
-   laeuft weiter, nur das Mikrofon ist aus (Signal traegt der rote Mic-Button). */
-
-/* Denken = Dialog-Puls (Betreiber-Auftrag + Freigabe 2026-08-13).
-
-   Vorher wurde die Bewegung beim Denken LANGSAMER (2,4 s -> 3,6 s) — genau in
-   dem Moment, wo der Nutzer wissen will, ob gearbeitet wird, wirkte das
-   Zeichen am totesten ("dieser Moment, wo arbeitet ... soll rechts links
-   bewegen wie zwei Menschen reden"). Jetzt schwingen die Klammern abwechselnd
-   deutlich aufeinander zu (±15 px statt ±7) und die Punkte blinken versetzt
-   wie ein Wortwechsel — ein Herzschlag-Takt von 1,1 s. Hoeren bleibt ruhig,
-   Sprechen bleibt gruen: die drei Zustaende sind jetzt auf einen Blick
-   unterscheidbar. */
-
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-left {
      animation: voice-puls-left 1.1s ease-in-out infinite;
 }
-
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-right {
      animation: voice-puls-right 1.1s ease-in-out infinite;
 }
-
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-a {
      animation: voice-puls-dot-a 1.1s ease-in-out infinite;
 }
-
 .voice-mode-overlay[data-mode="thinking"] .voice-logo-dot-b {
      animation: voice-puls-dot-b 1.1s ease-in-out infinite;
 }
-
 @keyframes voice-puls-left {
      0%, 100% { transform: translateX(0) scale(1); }
      25% { transform: translateX(15px) scale(1.08); }
      50% { transform: translateX(0) scale(1); }
 }
-
 @keyframes voice-puls-right {
      0%, 50% { transform: translateX(0) scale(1); }
      75% { transform: translateX(-15px) scale(1.08); }
      100% { transform: translateX(0) scale(1); }
 }
-
 @keyframes voice-puls-dot-a {
      0%, 45%, 100% { opacity: 0.3; }
      20% { opacity: 1; }
 }
-
 @keyframes voice-puls-dot-b {
      0%, 55%, 100% { opacity: 0.3; }
      75% { opacity: 1; }
 }
-
 .voice-mode-overlay[data-mode="thinking"] .voice-mode-logo::before {
      background: radial-gradient(circle, rgba(20, 224, 220, 0.3) 0%, rgba(20, 224, 220, 0) 70%);
      animation-duration: 1.1s;
 }
-
-/* Bewegung nur, wenn der Nutzer sie nicht abbestellt hat — der Puls ist die
-   kraeftigste Animation der App und braucht diese Bremse zwingend. */
 @media (prefers-reduced-motion: reduce) {
      .voice-logo-left, .voice-logo-right, .voice-logo-dot-a, .voice-logo-dot-b,
      .voice-mode-overlay[data-mode="thinking"] .voice-logo-left,
@@ -353,31 +275,24 @@
           animation: none;
      }
 }
-
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-logo path {
      stroke: #7fd4a8;
      filter: drop-shadow(0 0 14px rgba(127, 212, 168, 0.5));
 }
-
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-logo circle {
      fill: #7fd4a8;
      filter: drop-shadow(0 0 10px rgba(127, 212, 168, 0.7));
 }
-
 .voice-mode-overlay[data-mode="speaking"] .voice-mode-logo::before {
      background: radial-gradient(circle, rgba(127, 212, 168, 0.32) 0%, rgba(127, 212, 168, 0) 70%);
      animation-duration: 2s;
 }
-
-/* Untere Leiste im Sprachmodus: Eingabefeld mit Plus, Mikrofon (stumm), Beenden. */
-
 .voice-mode-bar {
      display: flex;
      align-items: center;
      gap: 10px;
      width: min(560px, 100%);
 }
-
 .voice-mode-input-wrap {
      flex: 1 1 auto;
      display: flex;
@@ -389,7 +304,6 @@
      border-radius: 24px;
      background: rgba(255, 255, 255, 0.05);
 }
-
 .voice-mode-input-wrap button {
      display: grid;
      place-items: center;
@@ -402,12 +316,10 @@
      cursor: pointer;
      flex: 0 0 auto;
 }
-
 .voice-mode-input-wrap button:hover {
      background: rgba(255, 255, 255, 0.08);
      color: #ffffff;
 }
-
 .voice-mode-input-wrap svg {
      width: 18px;
      height: 18px;
@@ -417,7 +329,6 @@
      stroke-linecap: round;
      pointer-events: none;
 }
-
 #voiceModeInput {
      flex: 1 1 auto;
      min-width: 0;
@@ -427,33 +338,24 @@
      font-size: 16.5px;
      outline: none;
 }
-
 #voiceModeInput::placeholder {
      color: rgba(246, 243, 238, 0.4);
 }
-
-/* Sende-Button (Pfeil nach oben, wie ChatGPT): ohne Hintergrund, transparent —
-   nur mit Text aktiv (Freigabe-Wortlaut 2026-07-21: "ohne Hintergrund und Transparent"). */
-
 #voiceModeSend {
      background: transparent;
 }
-
 #voiceModeSend:hover {
      background: transparent;
      color: #ffffff;
 }
-
 #voiceModeSend:disabled {
      background: transparent;
      color: rgba(246, 243, 238, 0.35);
      cursor: default;
 }
-
 #voiceModeSend svg {
      stroke-width: 2.4;
 }
-
 .voice-mode-mic {
      display: grid;
      place-items: center;
@@ -467,11 +369,9 @@
      cursor: pointer;
      transition: color 0.15s ease;
 }
-
 .voice-mode-mic:hover {
      background: rgba(255, 255, 255, 0.1);
 }
-
 .voice-mode-mic svg {
      width: 20px;
      height: 20px;
@@ -482,56 +382,34 @@
      stroke-linejoin: round;
      pointer-events: none;
 }
-
 .voice-mode-mic .voice-mic-slash {
      display: none;
 }
-
-/* Stumm: Button-Optik bleibt identisch zu den anderen Buttons —
-   nur das Mikrofon-Icon wird rot (ruhiges "laeuft weiter"-Signal). */
-
 .voice-mode-mic.is-muted {
      color: #e24b4a;
 }
-
 .voice-mode-mic.is-muted:hover {
      background: rgba(255, 255, 255, 0.1);
 }
-
 .voice-mode-mic.is-muted .voice-mic-slash {
      display: block;
 }
-
-/* Nach dem Upgrade steht der Hinweis im Fluss (kein Overlap mit der Leiste).
-   Das Overlay zentriert per justify-content ALLES als einen Block — dadurch
-   hing die untere Leiste in der Bildmitte statt am unteren Rand. Zwei
-   auto-Margins teilen den Freiraum: das Zeichen bleibt mittig, Hinweis und
-   Leiste rutschen ganz nach unten. Bewusst EINE Regel pro Selektor — zwei
-   Regeln mit gleichem Selektor (margin:0 vs. margin-top:auto) waeren wieder
-   die Spezifitaetsfalle vom Konto-Tab-Fix. */
-
 .voice-mode-overlay[data-upgraded="true"] .voice-mode-logo {
      margin-top: auto;
 }
-
 .voice-mode-overlay[data-upgraded="true"] .voice-mode-hint {
      position: static;
      margin: auto 0 0;
 }
-
 .voice-mode-overlay[data-upgraded="true"] .voice-mode-bar {
      margin-bottom: 8px;
 }
-
-/* Code-Uebernahme aus Chat-Antworten in den Workspace. */
-
 .chat-code-actions {
      display: flex;
      flex-wrap: wrap;
      gap: 8px;
      margin: 6px 0 2px;
 }
-
 .chat-code-save {
      min-height: 30px;
      padding: 4px 12px;
@@ -543,12 +421,10 @@
      font-weight: 500;
      cursor: pointer;
 }
-
 .chat-code-save:hover:not(:disabled) {
      background: rgba(255, 255, 255, 0.09);
      color: #ffffff;
 }
-
 .chat-code-save:disabled {
      border-color: rgba(127, 212, 168, 0.4);
      color: #7fd4a8;
