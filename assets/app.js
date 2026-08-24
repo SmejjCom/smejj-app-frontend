@@ -6,6 +6,7 @@ import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v
 import { initGlobalSearch, oeffneSuchOverlay } from "./search.js?v=b51";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
+import { holeSendepfad } from "./sendepfad-nachladen.js?v=1";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
 import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js";
@@ -33,28 +34,6 @@ const state = {
 
 const workspace = createLocalWorkspace();
 const aiRouter = createAiRouter();
-
-// Sendepfad-Module erst beim ERSTEN Senden laden (Betreiber-Freigabe
-// 2026-08-24 "Startseite abspecken", Fortsetzung von "unter 300 KB" vom
-// 19.08.): Strom, Maus-/Medien-/Autonomie-Weichen und die Gratis-Reserve
-// zaehlen erst, wenn wirklich gesendet wird — vorher lagen sie mit ~45 KB
-// in JEDEM Seitenstart. Der Service Worker haelt sie im Precache, darum
-// kostet der erste Send praktisch nichts extra. Fail-safe: schlaegt das
-// Laden fehl (Netz weg), zeigt submitTask die Offline-Meldung und der
-// naechste Versuch laedt erneut.
-let sendepfadGeladen = null;
-function holeSendepfad() {
-  sendepfadGeladen ||= Promise.all([
-    import("/assets/ai/chat-stream.js"),
-    import("./autonomous-intent.js"),
-    import("./browser-context.js"),
-    import("./medien-absicht.js?v=5"),
-    import("./maus-absicht.js?v=19"),
-    import("./free-coding-fallback.js")
-  ]).then((teile) => Object.assign({}, ...teile))
-    .catch((fehler) => { sendepfadGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler); throw fehler; });
-  return sendepfadGeladen;
-}
 let taskIndicatorTimer;
 // Antwortstufen (Konkurrenz-Radar V3, Freigabe Betreiber 2026-08-06,
 // Container-Neustart 2026-08-08): der Chip zeigt normalen Nutzern nur noch
@@ -87,8 +66,7 @@ if ("serviceWorker" in navigator) {
 }
 
 const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=b42d").then((m) => (m.enhancePremiumSurfaces(), m)));
-// Google-Login gehoert zur Profilseite — geladen wird er wie die Flaechen erst
-// beim Verlassen der Start-/Chat-Ansicht (2026-08-24 "Startseite abspecken").
+// Google-Login gehoert zur Profilseite — laedt erst beim Verlassen von Start/Chat.
 const holeGoogleLogin = ladeBeiAnsicht(["start", "chat"], () => import("./google-login.js")
   .then((m) => m.initGoogleLogin({ $, state, writeOutput, refreshSessionStatus }))
   .catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")));
@@ -165,10 +143,7 @@ function bindNavigation() {
       setBrowserPanelOpen(false);
       // Suche oeffnet als Overlay ueber der aktuellen Ansicht (wie Cmd+K);
       // die Such-Seite bleibt Rueckfallebene, falls das Overlay fehlt.
-      if (button.dataset.view === "search") {
-        Promise.resolve(oeffneSuchOverlay()).then((offen) => { if (!offen) goToView("search"); }).catch(() => goToView("search"));
-        return;
-      }
+      if (button.dataset.view === "search") { Promise.resolve(oeffneSuchOverlay()).then((offen) => { if (!offen) goToView("search"); }).catch(() => goToView("search")); return; }
       goToView(button.dataset.view);
     });
   }
@@ -369,14 +344,8 @@ async function submitTask(task, { target = "#startLog" } = {}) {
   showTaskIndicator("active");
   addEntry(task, "user", target);
   const output = addEntry("", "assistant", target);
-  let M;
-  try {
-    M = await holeSendepfad();
-  } catch {
-    output.textContent = UI_COPY.chatOffline;
-    hideTaskIndicator();
-    return;
-  }
+  const M = await holeSendepfad().catch(() => null);
+  if (!M) { output.textContent = UI_COPY.chatOffline; hideTaskIndicator(); return; }
   try {
     if (M.routeAutonomousRequest({ task, output, goToView, eventTarget: window })) return showTaskIndicator("done");
     if (await M.mausAuftragErledigt({ task, output })) return showTaskIndicator("done");

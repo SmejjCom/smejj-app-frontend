@@ -125,6 +125,53 @@ export function enforceAuthGate(win) {
 //  2. Sie laeuft NACH dem Rendern und blockiert nichts. Die Seite soll nicht
 //     auf einen Netzaufruf warten.
 const SESSION_CHECK_TIMEOUT_MS = 8000;
+const HINWEIS_ID = "smejj-sitzung-abgelaufen";
+
+
+/**
+ * Ein Streifen am oberen Rand: "Deine Anmeldung ist abgelaufen."
+ *
+ * Warum kein Abmelden und keine Umleitung: Der Betreiber hat den dauerhaften
+ * Login ausdruecklich freigegeben (Commit 9a46b01). Diese Freigabe bleibt.
+ * Falsch war nur das SCHWEIGEN — die App sah angemeldet aus, waehrend der
+ * Server das Konto nicht kannte.
+ *
+ * Bewusst ohne neue CSS-Datei: die Startseite laedt genau EIN Stylesheet, und
+ * das steht unter dem Start-Lock. Die CSP der App erlaubt `style-src
+ * 'unsafe-inline'`, deshalb reichen hier Inline-Stile — kein Bundle, kein
+ * CACHE_NAME-Sprung, keine Lock-Aenderung.
+ */
+export function zeigeAbgelaufenHinweis(win) {
+  const dok = win?.document;
+  if (!dok?.body || dok.getElementById(HINWEIS_ID)) return false;
+
+  const streifen = dok.createElement("div");
+  streifen.id = HINWEIS_ID;
+  streifen.setAttribute("role", "status");
+  streifen.style.cssText = [
+    "position:fixed", "top:0", "left:0", "right:0", "z-index:2147483000",
+    "display:flex", "gap:12px", "align-items:center", "justify-content:center",
+    "padding:10px 16px", "background:#3a2a12", "color:#ffd9a0",
+    "border-bottom:1px solid #6b4d1d", "font:500 15px/1.4 system-ui,sans-serif"
+  ].join(";");
+
+  const text = dok.createElement("span");
+  text.textContent = "Deine Anmeldung ist abgelaufen — der Server kennt diese Sitzung nicht mehr.";
+  const link = dok.createElement("a");
+  link.href = loginUrlFuer(win);
+  link.textContent = "Neu anmelden";
+  link.style.cssText = "color:#ffd9a0;font-weight:700;text-decoration:underline";
+  const zu = dok.createElement("button");
+  zu.type = "button";
+  zu.textContent = "Später";
+  zu.style.cssText = "background:none;border:1px solid #6b4d1d;color:#ffd9a0;padding:4px 10px;font:inherit;cursor:pointer";
+  zu.addEventListener("click", () => streifen.remove());
+
+  streifen.append(text, link, zu);
+  dok.body.appendChild(streifen);
+  return true;
+}
+
 
 // --- Der zweite Schluesselbund: smejj.apiToken.v1 ------------------------------
 //
@@ -243,6 +290,9 @@ export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, api
     const rawSession = win.localStorage.getItem(STORAGE_KEYS.session);
     const session = rawSession ? JSON.parse(rawSession) : {};
     if (session && session.authenticated === true) {
+      // Portiert aus der Bau-Branch-Fassung (Konsolidierung 2026-08-24): die
+      // Freigabe des dauerhaften Logins bleibt — aber SCHWEIGEN war der Fehler.
+      zeigeAbgelaufenHinweis(win);
       return "gueltig";
     }
   } catch {}
