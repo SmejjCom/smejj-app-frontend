@@ -50,11 +50,16 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]"], () => import("./kamer
   }
 }
 
-// 5. Codeblock-Werkzeuge (Kopieren, Farben, Download) — erst wenn im Chat
-//    wirklich ein Codeblock steht. Ein Beobachter auf dem Log wartet auf das
-//    erste pre.chat-code und loest sich dann auf; die Module bringen ihre
-//    eigenen Beobachter fuer alle weiteren Bloecke mit.
+// 5. Chat-Log-Helfer, zweistufig am selben Beobachter: Sobald der Log seinen
+//    ERSTEN Inhalt bekommt, kommen Runter-Pfeil und Warte-Reste-Aufraeumer;
+//    sobald der erste CODEBLOCK auftaucht, die Codeblock-Werkzeuge (Kopieren,
+//    Farben, Download). Die Module bringen eigene Beobachter fuer alles
+//    Weitere mit; der hiesige loest sich auf, wenn beide Stufen geladen sind.
 {
+  const ladeLogHelfer = () => Promise.all([
+    import("./chat-runter-pfeil.js?v=3"),
+    import("./chat-warte-reste.js?v=1")
+  ]).catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
   const ladeCodeWerkzeuge = () => Promise.all([
     import("./chat-code-copy.js?v=zcode2-20260816"),
     import("./chat-code-farben.js?v=1"),
@@ -62,15 +67,24 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]"], () => import("./kamer
   ]).catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
   const log = document.querySelector("#startLog");
   if (log) {
-    if (log.querySelector("pre.chat-code")) {
-      ladeCodeWerkzeuge();
-    } else {
-      const beobachter = new MutationObserver(() => {
-        if (!log.querySelector("pre.chat-code")) return;
-        beobachter.disconnect();
-        ladeCodeWerkzeuge();
-      });
+    let helferDa = false;
+    let codeDa = false;
+    const pruefe = () => {
+      if (!helferDa && log.childElementCount > 0) { helferDa = true; ladeLogHelfer(); }
+      if (!codeDa && log.querySelector("pre.chat-code")) { codeDa = true; ladeCodeWerkzeuge(); }
+      return helferDa && codeDa;
+    };
+    if (!pruefe()) {
+      const beobachter = new MutationObserver(() => { if (pruefe()) beobachter.disconnect(); });
       beobachter.observe(log, { childList: true, subtree: true });
     }
   }
+}
+
+// 6. Projects/Arbeitsbereiche — erst wenn die Ansicht aufgeht (Klick in der
+//    Spur oder Direkteinstieg ueber die URL).
+if (location.pathname.includes("arbeitsbereiche") || location.pathname.includes("projects")) {
+  import("./arbeitsbereiche.js?v=18");
+} else {
+  ladeBeiKlick(['[data-view="arbeitsbereiche"]', '[data-jump="arbeitsbereiche"]'], () => import("./arbeitsbereiche.js?v=18"));
 }

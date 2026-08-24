@@ -87,6 +87,11 @@ if ("serviceWorker" in navigator) {
 }
 
 const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=b42d").then((m) => (m.enhancePremiumSurfaces(), m)));
+// Google-Login gehoert zur Profilseite — geladen wird er wie die Flaechen erst
+// beim Verlassen der Start-/Chat-Ansicht (2026-08-24 "Startseite abspecken").
+const holeGoogleLogin = ladeBeiAnsicht(["start", "chat"], () => import("./google-login.js")
+  .then((m) => m.initGoogleLogin({ $, state, writeOutput, refreshSessionStatus }))
+  .catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")));
 boot();
 
 // Buendelt, was projects-surface.js aus der App braucht — eine Stelle statt neun.
@@ -120,7 +125,6 @@ function boot() {
   $("#ragText").value = state.rag;
   refreshLocalWorkspaceStatus(projektAbhaengigkeiten());
   afterFirstPaint([
-    () => import("./google-login.js").then((m) => m.initGoogleLogin({ $, state, writeOutput, refreshSessionStatus })).catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")),
     () => refreshSessionStatus(),
     () => { refreshKimiVaultStatus({ quiet: true }).catch(() => {}); refreshGlmVaultStatus({ quiet: true }).catch(() => {}); }
   ]);
@@ -291,6 +295,7 @@ function goToView(viewId, { replace = false } = {}) {
     history[method]({ viewId: resolvedViewId }, "", nextUrl);
   }
   holeFlaechen(resolvedViewId);
+  holeGoogleLogin(resolvedViewId);
   updateCanonical();
   applyViewTitle(target, resolvedViewId); // Seitentitel je Ansicht (W2-05)
   if (resolvedViewId === "tools") refreshLiveSystemStatus();
