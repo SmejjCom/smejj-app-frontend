@@ -4916,6 +4916,13 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   box-shadow: none;
   transition: color 120ms ease;
 }
+
+/* ---- design-v11-flaechen.css ---- */
+/* smejj.com — Design V11, Teil 2 (Code-Bereich & Feinheiten).
+   Aufgeteilt am 2026-08-25 (Zeilen-Diaet, Buendel-Projekt Stufe 3): Teil 1 ist
+   design-v11.css. BEIDE sind reine Buendel-Quellen (scripts/build/
+   bundle-start-styles.mjs) — ausgeliefert wird weiterhin nur start-styles.css;
+   der CSS-KERN bleibt byte-identisch zur ungeteilten Fassung (bewiesen). */
 #code .repochip:hover { color: #f2f5f4; background: transparent; }
 #code #codeProjektChip { display: none; }
 #code .repochip.an {
