@@ -14,6 +14,10 @@
 // Versionierter Pfad wie in components.js (QA-Welle 1, Befund F-07) — sonst laedt
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
+// Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=1";
+export { restoreChat, endgueltigLoeschen, listGeloeschteChats, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=1";
+
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und
 // Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
 // Verlauf kein Markdown kopieren und keinen Zeitstempel zeigen.
@@ -22,21 +26,21 @@ import { clampVersionIndex, metaOf, seedMeta } from "/assets/chat-messages.js?v=
 import { OWNER_KEY, gehoertNutzer, kontoAliase, ownerDecision, sessionUserId } from "/assets/chat-owner.js?v=3";
 
 // Stufe 4: Besitzpruefung mit dem Server-Alias der Sitzung (chat-owner.js).
-function eigen(objekt, userId, geraeteBesitzer) {
+export function eigen(objekt, userId, geraeteBesitzer) {
   return gehoertNutzer(objekt, userId, geraeteBesitzer, kontoAliase(localStorage, userId));
 }
 
 const DB_NAME = "smejj-chats";
 const DB_VERSION = 1;
-const STORE = "chats";
+export const STORE = "chats";
 // Projekte (2026-08-13): benannte Sammlungen, jeder Chat kann zu genau einem
 // Projekt gehoeren (chat.projectId). Eigener Object-Store in DERSELBEN
 // Datenbank — ein zweites DB-Handle waere nur ein zweiter Fehlerort.
-const PROJEKT_STORE = "projekte";
+export const PROJEKT_STORE = "projekte";
 const ACTIVE_KEY_SESSION = "smejj.chat.activeId.v1";
 const ACTIVE_KEY_LAST = "smejj.chat.lastActiveId.v1";
 const MAX_CHATS = 500; // gleich MAX_CHATS_PRO_KONTO im Server (Waechter tests/chat-grenze.test.mjs)
-const MAX_PROJEKTE = 50;
+export const MAX_PROJEKTE = 50;
 const MAX_TITLE = 60;
 const SAVE_DEBOUNCE_MS = 600;
 // Obergrenze fuer gespeicherte Antwort-Fassungen je Nachricht (2026-07-28).
@@ -107,7 +111,7 @@ function openDb() {
   return dbPromise;
 }
 
-function tx(storeName, mode, work) {
+export function tx(storeName, mode, work) {
   return openDb().then((db) => new Promise((resolve, reject) => {
     const transaction = db.transaction(storeName, mode);
     const store = transaction.objectStore(storeName);
@@ -146,11 +150,11 @@ function setActiveChatId(id) {
 // Verlauf geleert. Bestandsgeraete ohne Merker: der Verlauf gehoert dem gerade
 // angemeldeten Nutzer, nichts wird geloescht (Migration).
 // Wer ist gerade angemeldet? Kurzform fuer die vielen Aufrufstellen.
-function aktuellerNutzer() {
+export function aktuellerNutzer() {
   return sessionUserId(localStorage);
 }
 
-function geraeteBesitzer() {
+export function geraeteBesitzer() {
   try { return localStorage.getItem(OWNER_KEY) || ""; } catch { return ""; }
 }
 
@@ -322,7 +326,7 @@ async function medienHolen(log) {
   } catch { /* fail-safe: lieber ein leeres Bild als ein kaputter Verlauf */ }
 }
 
-async function persistActive() {
+export async function persistActive() {
   await medienAuslagern();
   const messages = readEntries();
   // ERST der Schnappschuss, DANN die Anzeige. Genau in dieser Reihenfolge:
@@ -517,46 +521,8 @@ export async function deleteChat(id) {
   return true;
 }
 
-export async function restoreChat(id) {
-  const chat = await rohEigenerChat(id);
-  if (!chat || !chat.deletedAt) return false;
-  delete chat.deletedAt;
-  await tx(STORE, "readwrite", (store) => store.put(chat));
-  notifyChanged();
-  return true;
-}
 
-export async function endgueltigLoeschen(id) {
-  if (!(await rohEigenerChat(id))) return false;
-  await tx(STORE, "readwrite", (store) => store.delete(String(id || "")));
-  // Stufe 3: das Loeschen dem Konto melden (chat-sync.js reicht es zum Server
-  // weiter). Eigenes Ereignis statt Import — der Store kennt den Sync nicht.
-  try { window.dispatchEvent(new CustomEvent("smejj:chat-geloescht", { detail: { id: String(id || "") } })); } catch { /* still */ }
-  notifyChanged();
-  return true;
-}
-
-// Alle weich geloeschten eigenen Chats — und die 30-Tage-Raeumung in einem:
-// was zu alt ist, wird beim Lesen endgueltig entfernt.
-export async function listGeloeschteChats() {
-  const alle = await tx(STORE, "readonly", (store) => new Promise((resolve, reject) => {
-    const request = store.getAll();
-    request.onsuccess = () => resolve(request.result || []);
-    request.onerror = () => reject(request.error);
-  })).catch(() => []);
-  const userId = aktuellerNutzer();
-  const alt = geraeteBesitzer();
-  const eigene = alle.filter((chat) => eigen(chat, userId, alt) && chat.deletedAt);
-  const grenze = Date.now() - PAPIERKORB_TAGE * 86400000;
-  const frisch = [];
-  for (const chat of eigene) {
-    if (new Date(chat.deletedAt).getTime() < grenze) await endgueltigLoeschen(chat.id).catch(() => {});
-    else frisch.push(chat);
-  }
-  return frisch.sort((a, b) => String(b.deletedAt).localeCompare(String(a.deletedAt)));
-}
-
-async function rohEigenerChat(id) {
+export async function rohEigenerChat(id) {
   const roh = await tx(STORE, "readonly", (store) => store.get(String(id || ""))).catch(() => null);
   if (!roh) return null;
   return eigen(roh, aktuellerNutzer(), geraeteBesitzer()) ? roh : null;
@@ -683,11 +649,11 @@ function goToStart() {
   }
 }
 
-function notifyChanged() {
+export function notifyChanged() {
   window.dispatchEvent(new CustomEvent("smejj:chats-changed"));
 }
 
-function scheduleSave() {
+export function scheduleSave() {
   if (restoring) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => { persistActive().catch(() => {}); }, SAVE_DEBOUNCE_MS);
@@ -819,172 +785,14 @@ export async function importChat(chat) {
  *  eine projectId ohne lebendes Projekt als "kein Projekt".
  * ------------------------------------------------------------------ */
 
-function neueProjektId() {
+export function neueProjektId() {
   return `proj_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function notifyProjekteChanged() {
+export function notifyProjekteChanged() {
   window.dispatchEvent(new CustomEvent("smejj:projekte-geaendert"));
 }
 
-function sauberProjektName(name) {
+export function sauberProjektName(name) {
   return String(name || "").replace(/\s+/g, " ").trim().slice(0, MAX_TITLE);
 }
-
-export async function listProjekte() {
-  const projekte = await tx(PROJEKT_STORE, "readonly", (store) => new Promise((resolve, reject) => {
-    const request = store.getAll();
-    request.onsuccess = () => resolve(request.result || []);
-    request.onerror = () => reject(request.error);
-  })).catch(() => []);
-  // Nur die eigenen — dieselbe Regel wie listChats. Sortiert nach Name; die
-  // Ansicht sortiert die Gruppen selbst nach dem juengsten enthaltenen Chat.
-  const userId = aktuellerNutzer();
-  const alt = geraeteBesitzer();
-  return projekte
-    .filter((projekt) => eigen(projekt, userId, alt))
-    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "de"));
-}
-
-export function getProjekt(id) {
-  return tx(PROJEKT_STORE, "readonly", (store) => new Promise((resolve, reject) => {
-    const request = store.get(String(id || ""));
-    request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject(request.error);
-  })).then((projekt) => (projekt && eigen(projekt, aktuellerNutzer(), geraeteBesitzer()) ? projekt : null))
-    .catch(() => null);
-}
-
-/** @returns {Promise<string>} Kennung des neuen Projekts, leer bei Misserfolg */
-export async function erstelleProjekt(name) {
-  const sauber = sauberProjektName(name);
-  if (!sauber) return "";
-  const vorhandene = await listProjekte();
-  if (vorhandene.length >= MAX_PROJEKTE) return "";
-  const now = new Date().toISOString();
-  const projekt = {
-    id: neueProjektId(),
-    ownerId: aktuellerNutzer(),
-    name: sauber,
-    createdAt: now,
-    updatedAt: now
-  };
-  const ok = await tx(PROJEKT_STORE, "readwrite", (store) => store.put(projekt)).then(() => true).catch(() => false);
-  if (!ok) return "";
-  notifyProjekteChanged();
-  return projekt.id;
-}
-
-export async function benenneProjektUm(id, name) {
-  const projekt = await getProjekt(id);
-  if (!projekt) return false;
-  const sauber = sauberProjektName(name);
-  if (!sauber) return false;
-  projekt.name = sauber;
-  // Anders als beim Chat-Umbenennen bumpt der Name hier updatedAt: es ist die
-  // EINZIGE inhaltliche Aenderung, die ein Projekt kennt — ohne frischen
-  // Zeitstempel wuerde Last-Write-Wins sie nie auf andere Geraete tragen.
-  projekt.updatedAt = new Date().toISOString();
-  await tx(PROJEKT_STORE, "readwrite", (store) => store.put(projekt));
-  notifyProjekteChanged();
-  return true;
-}
-
-// Bildschirm 36: die Dauer-Anweisung des Arbeitsbereichs. Sie wird beim
-// Oeffnen eines Gespraechs dieses Bereichs in den Sitzungsspeicher gelegt
-// und von settings-runtime.buildPreferenceBlock() in den Systemprompt
-// uebernommen — sie WIRKT also wirklich, in jedem Gespraech des Bereichs.
-export async function setzeProjektAnweisung(id, text) {
-  const projekt = await getProjekt(id);
-  if (!projekt) return false;
-  projekt.anweisung = String(text || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, 2000);
-  projekt.updatedAt = new Date().toISOString();
-  await tx(PROJEKT_STORE, "readwrite", (store) => store.put(projekt));
-  notifyProjekteChanged();
-  await aktualisiereBereichsAnweisung((await getChat(activeChatId()))?.projectId);
-  return true;
-}
-
-const BEREICH_ANWEISUNG_KEY = "smejj.bereichAnweisung.v1";
-const BEREICH_NEU_KEY = "smejj.bereichNeu.v1";
-
-async function aktualisiereBereichsAnweisung(projectId) {
-  try {
-    const projekt = projectId ? await getProjekt(projectId) : null;
-    if (projekt?.anweisung) {
-      sessionStorage.setItem(BEREICH_ANWEISUNG_KEY, JSON.stringify({ name: projekt.name, anweisung: projekt.anweisung }));
-    } else {
-      sessionStorage.removeItem(BEREICH_ANWEISUNG_KEY);
-    }
-  } catch { /* Anweisung ist Beiwerk — nie das Oeffnen stoeren */ }
-}
-
-/** Merkt vor: das NAECHSTE neue Gespraech gehoert in diesen Bereich. */
-export function neuesGespraechImBereich(projektId) {
-  try { sessionStorage.setItem(BEREICH_NEU_KEY, String(projektId || "")); } catch { /* still */ }
-}
-
-// Gegenstueck: persistActive holt die Vormerkung beim ERSTEN Speichern eines
-// neuen Gespraechs ab und loescht sie — einmal vormerken, einmal wirken.
-//
-// DIESE Funktion wurde beim Bereichs-Bau (2026-08-15) aufgerufen, aber NIE
-// definiert (Halb-Commit, drittes Vorkommen). Folge: JEDER persistActive-Lauf
-// starb still am ReferenceError — der Fehlerfaenger in scheduleSave schluckte
-// ihn, und seit dem Abend wurde KEIN Chat mehr gespeichert. node --check und
-// die Suite sehen so etwas nicht; nur der Live-Lauf tat es.
-function verbraucheBereichVormerkung() {
-  try {
-    const id = sessionStorage.getItem(BEREICH_NEU_KEY) || "";
-    if (id) sessionStorage.removeItem(BEREICH_NEU_KEY);
-    return id;
-  } catch {
-    return "";
-  }
-}
-
-export async function loescheProjekt(id) {
-  if (!(await getProjekt(id))) return false;
-  await tx(PROJEKT_STORE, "readwrite", (store) => store.delete(String(id || "")));
-  // Loeschung dem Sync melden — Spiegel von smejj:chat-geloescht.
-  try { window.dispatchEvent(new CustomEvent("smejj:projekt-geloescht", { detail: { id: String(id || "") } })); } catch { /* still */ }
-  notifyProjekteChanged();
-  return true;
-}
-
-/** Chat einem Projekt zuordnen ("" = kein Projekt). */
-export async function setzeChatProjekt(chatId, projektId) {
-  const chat = await getChat(chatId);
-  if (!chat) return false;
-  chat.projectId = String(projektId || "");
-  // updatedAt MUSS mitwandern: die Zuordnung reist nur per Last-Write-Wins zu
-  // anderen Geraeten. Preis: der Chat sortiert sich ueberall nach oben.
-  chat.updatedAt = new Date().toISOString();
-  await tx(STORE, "readwrite", (store) => store.put(chat));
-  notifyChanged();
-  return true;
-}
-
-/**
- * Projekt von einem anderen Geraet uebernehmen — Spiegel von importChat:
- * nie fremdes Material uebernehmen, Grabstein loescht direkt in der Datenbank
- * (NICHT ueber loescheProjekt — das wuerde die Loeschung erneut zum Server
- * melden, ein Kreisverkehr).
- */
-export async function importProjekt(projekt) {
-  const userId = aktuellerNutzer();
-  if (!userId || !projekt || typeof projekt !== "object" || !projekt.id) return false;
-  if (!eigen(projekt, userId, geraeteBesitzer())) return false;
-  if (projekt.geloescht === true) {
-    await tx(PROJEKT_STORE, "readwrite", (store) => store.delete(String(projekt.id)));
-    notifyProjekteChanged();
-    return true;
-  }
-  await tx(PROJEKT_STORE, "readwrite", (store) => store.put({ ...projekt, ownerId: userId }));
-  notifyProjekteChanged();
-  return true;
-}
-
-window.smejjChatStore = {
-  listChats, getChat, openChat, newChat, renameChat, deleteChat, activeChatId, importChat,
-  listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt, importProjekt
-};

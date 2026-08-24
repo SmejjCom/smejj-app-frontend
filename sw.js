@@ -294,6 +294,7 @@ const SHELL = [
   "/assets/ai/fetch-retry.js",
   "/assets/composer-dictation.js",
   "/assets/chat-store.js",
+  "/assets/chat-store-bereiche.js",
   "/assets/chat-history-view.js",
   "/assets/chat-history-text.js",
   "/assets/chat-history-cards.js",
