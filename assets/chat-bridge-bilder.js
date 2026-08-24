@@ -20,6 +20,9 @@
 // Fail-safe: false = kein Byte gesendet, der Text-Weg uebernimmt unveraendert.
 
 import { meldeAktion } from "./chat-bridge-evolution.js";
+// Weg 0 (Betreiber-Entscheidung 2026-08-14): externer Maler fuer die Qualitaet,
+// die der CPU-Server nicht liefern kann. Ohne Schluessel existiert er nicht.
+import { controlMalerBereit, erzeugeBildUeberControl, erzeugeExternesBild, externMalerName, externerMalerBereit } from "./chat-bridge-bilder-extern.js";
 
 // Eigene Namen (BILDER_*): das Deploy-Buendel legt alle Bridge-Module in EINEN
 // Gueltigkeitsbereich (bundle_chat_bridge.mjs prueft Kollisionen hart).
@@ -48,9 +51,15 @@ const VIDEO_ANDRANG_MAX = Number(process.env.SMEJJ_VIDEO_ANDRANG_MAX || 3);
 let videoAndrang = 0;
 // Malen ist langsam (CPU): eigenes Budget statt REQUEST_TIMEOUT_MS.
 const BILDER_FOTO_TIMEOUT_MS = Number(process.env.SMEJJ_BILDER_FOTO_TIMEOUT_MS || 150000);
+// Geduld beim besetzten Maler (2026-08-13): seit der Maler im Threadpool malt,
+// feuert sein Sofort-429 wirklich — 429 heisst nur noch "gerade malt ein
+// anderer", nicht "kaputt". Darum warten statt sofort zur SVG-Reserve.
+const BILDER_WARTE_MAX_MS = Number(process.env.SMEJJ_BILDER_WARTE_MAX_MS || 120000);
+const BILDER_WARTE_TAKT_MS = Number(process.env.SMEJJ_BILDER_WARTE_TAKT_MS || 5000);
 const BILDER_HEALTH_TIMEOUT_MS = 2500;
 // PNG-Deckel: 512px-PNG liegt bei 300-800 KB, base64 +33 %.
 const BILDER_MAX_B64 = 4_000_000;
+
 
 // Mal-Auftrag = Mal-Verb UND Motivwort in der Frage (deutsch/englisch).
 const BILDER_VERB = /\b(zeichne|zeichnen|zeichen|zeichene|zeig|zeige|zeigen|male|malen|erstelle|erstellen|erstell|generiere|generieren|generier|erzeuge|erzeugen|erzeug|mach|mache|machen|bau|bauen|draw|paint|generate|create|make|kannst|kann|moechte|möchte|will)\b/i;
@@ -165,17 +174,18 @@ export function sichereVideoAntwort(daten) {
 }
 
 // Fragt den Bild-Maler, ob er wach und geladen ist. false = SVG-Weg.
-async function bilderMalerBereit() {
-  return (await bilderMalerZustand()).bereit;
+async function bilderMalerBereit(fetchImpl = fetch) {
+  return (await bilderMalerZustand(fetchImpl)).bereit;
 }
 
-// Wie bilderMalerBereit, aber mit dem GRUND. Befund 2026-08-14: waehrend der
-// Maler nach einem Neustart sein Modell laedt (Minuten — die Gewichte kommen
-// aus dem Netz), ist "bereit" false. Faellt dann auch die SVG-Reserve aus,
-// uebernahm bisher der Text-Weg, und smejj antwortete "Ich kann leider keine
-// Bilder malen". Der Nutzer erfaehrt also das Gegenteil der Wahrheit: die
-// Faehigkeit ist da, sie waermt nur auf. Dafuer brauchen wir den Zustand,
-// nicht bloss ein Ja/Nein.
+// Wie bilderMalerBereit, aber mit dem GRUND. Befund 2026-08-14, zweimal live
+// gemessen: waehrend der Maler nach einem Neustart sein Modell laedt (Minuten,
+// die Gewichte kommen aus dem Netz), meldet /health bereit:false. Fiel dann
+// auch die SVG-Reserve aus, uebernahm der Text-Weg — und smejj antwortete
+// "Ich kann leider keine Bilder malen". Sachlich falsch: die Faehigkeit ist
+// da, sie waermt nur auf. Und endgueltig, weil danach niemand mehr fragt.
+// Fuer eine ehrliche Auskunft braucht die Spur den Zustand, nicht bloss ja/nein.
+// `fetchImpl` ist die Naht, an der die Tests das Netz ersetzen.
 export async function bilderMalerZustand(fetchImpl = fetch) {
   if (!BILDER_WORKER_URL) return { bereit: false, grund: "nicht eingerichtet" };
   try {
@@ -184,8 +194,8 @@ export async function bilderMalerZustand(fetchImpl = fetch) {
     const daten = await antwort.json();
     if (daten?.bereit === true) return { bereit: true, grund: "" };
     if (daten?.fehler) return { bereit: false, grund: "gestoert" };
-    // ladezeitSek zaehlt seit dem Start des Ladens — das ist die einzige
-    // ehrliche Zahl, die wir dem Wartenden nennen koennen.
+    // ladezeitSek zaehlt seit dem Beginn des Ladens — die einzige ehrliche
+    // Zahl, die wir dem Wartenden nennen koennen.
     return { bereit: false, grund: "waermt auf", ladezeitSek: Number(daten?.ladezeitSek) || 0 };
   } catch {
     return { bereit: false, grund: "nicht erreichbar" };
@@ -241,6 +251,30 @@ async function erzeugeSvgInhalt(prompt, timeoutMs) {
 // 2026-08-12: "Segelboot bei Sonnenuntergang" kam ohne Boot). smejj 1.0
 // uebersetzt den Auftrag in eine kurze englische Foto-Beschreibung;
 // fail-safe: bei jedem Fehler malt unveraendert der Original-Prompt.
+// Wie aus "Zeichne mir einen roten Leuchtturm am Meer" ein Bildauftrag wird.
+//
+// Befund 2026-08-14, zweimal live: das Bild zeigte Meer und Sonnenuntergang —
+// aber KEINEN Leuchtturm. Der Uebersetzer lieferte einen stimmungsvollen,
+// langen Satz ("A dramatic golden sunset over the sea with orange clouds,
+// waves crashing, a red lighthouse on rocks, 8k, highly detailed"). Das
+// Hauptmotiv stand in der Mitte.
+//
+// Warum das durchfaellt: Der Textleser von SD-Turbo verarbeitet nur die
+// ersten 77 Tokens, und was frueh steht, wiegt schwerer. Ein langer
+// Stimmungs-Satz verduennt das Motiv oder schneidet es ganz ab. Deshalb:
+// SUBJEKT ZUERST, kurz halten, Stimmung nur als knapper Nachsatz.
+//
+// Der Personen-Schutz (2026-08-13, Persoenlichkeitsrechte) bleibt WORTGLEICH
+// erhalten — er ist der Grund, warum dieser Umweg ueberhaupt existiert.
+const BILDER_UEBERSETZER_PROMPT = [
+  "Turn the user's image request into ONE English image prompt for Stable Diffusion.",
+  "RULE 1: begin with the MAIN SUBJECT — the concrete thing to depict — in the first three words.",
+  "RULE 2: at most 20 words total. The text encoder only reads the beginning; a long mood sentence dilutes or cuts off the subject.",
+  "RULE 3: after the subject add only setting and lighting, then stop. No lists of quality words.",
+  "Reply with the prompt only — no quotes, no explanation.",
+  "EXCEPTION: if the request depicts a real, identifiable person (any celebrity or any named individual), reply with exactly: PERSON_GESPERRT"
+].join(" ");
+
 async function uebersetzeMalPrompt(prompt) {
   if (!BILDER_API_KEY || !BILDER_BASE_URL) return prompt;
   try {
@@ -251,12 +285,12 @@ async function uebersetzeMalPrompt(prompt) {
       body: JSON.stringify({
         model: BILDER_MODEL,
         messages: [
-          { role: "system", content: "Turn the user's image request into ONE short English photo prompt (subject, setting, lighting, style). Reply with the prompt only — no quotes, no explanation." },
+          { role: "system", content: BILDER_UEBERSETZER_PROMPT },
           { role: "user", content: prompt }
         ],
         stream: false,
         temperature: 0.2,
-        max_tokens: 120
+        max_tokens: 60
       })
     });
     if (!antwort.ok) return prompt;
@@ -267,15 +301,29 @@ async function uebersetzeMalPrompt(prompt) {
   }
 }
 
-// Laesst den eigenen Bild-Maler ein Foto malen. Liefert Markdown oder "".
-// Der Grund fuer ein misslungenes Bild wurde frueher WEGGEWORFEN: jeder Fehler
-// — Zeitgrenze, abgewiesener Schluessel, kaputte Antwort, zu grosses Bild —
-// endete in `return ""`. Gemessen 2026-08-14: der Maler MELDETE Erfolg
-// ("3/3 [01:47]" in seinem Log), der Chat sagte trotzdem "fehlgeschlagen", und
-// nirgends stand warum. Die `notiz` traegt den Grund jetzt nach oben, ohne den
-// Rueckgabewert zu aendern (der bleibt Inhalt oder leer).
-// Exportiert NUR fuer die Tests: ohne sie waere jeder Grund wieder nur eine
-// Behauptung. `fetchImpl` ist die Naht, an der das Netz ersetzt wird.
+// Personen-Schutz (2026-08-13, Persoenlichkeitsrechte): der Uebersetzer meldet
+// reale, benennbare Personen mit dem Sentinel — Foto- UND Video-Weg lehnen
+// dann hoeflich ab, statt zu malen. Die SVG-Reserve bleibt stilisiert und
+// ungefiltert. Fail-open ist akzeptiert: ohne Groq-Schluessel malt ohnehin nichts.
+function istPersonGesperrt(text) {
+  return String(text || "").includes("PERSON_GESPERRT");
+}
+
+const PERSONEN_ABSAGE = "Aus Rücksicht auf Persönlichkeitsrechte male ich keine realen, erkennbaren Personen. Gern male ich dir eine frei erfundene Person oder eine andere Szene — beschreib sie mir einfach.";
+
+// Laesst den eigenen Bild-Maler ein Foto malen. Liefert Markdown, "besetzt"
+// wenn gerade ein anderes Bild entsteht (HTTP 429), sonst "".
+//
+// DER GRUND EINES MISSLUNGENEN BILDES WURDE WEGGEWORFEN: jeder Fehlweg —
+// Zeitgrenze, abgewiesener Schluessel, kaputte Antwort, zu grosses Bild —
+// endete gleich in `return ""`. Gemessen 2026-08-14 im echten Chat: der Maler
+// schrieb "3/3 [01:47]" in sein Log, also Erfolg, und der Chat sagte trotzdem
+// "Das Malen ist gerade fehlgeschlagen". Nirgends stand warum — dieselbe
+// Stille wie beim verschluckten 400 der Verlauf-Sicherung.
+//
+// Die `notiz` traegt den Grund nach oben, OHNE den Rueckgabewert anzutasten:
+// "" heisst weiterhin misslungen, "besetzt" weiterhin besetzt. `fetchImpl` ist
+// nur die Naht fuer die Tests — ohne sie waere jeder Grund eine Behauptung.
 export async function erzeugeFotoInhalt(prompt, timeoutMs, notiz = {}, fetchImpl = fetch) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -296,6 +344,9 @@ export async function erzeugeFotoInhalt(prompt, timeoutMs, notiz = {}, fetchImpl
       },
       body: JSON.stringify({ prompt })
     });
+    // "besetzt" ist KEIN Fehler, sondern die Aufforderung zu warten — der
+    // Aufrufer behandelt es eigens. Darum vor allen Fehlwegen.
+    if (antwort.status === 429) return "besetzt";
     if (!antwort.ok) return scheitern(`maler_http_${antwort.status}`);
     let daten;
     try {
@@ -311,14 +362,38 @@ export async function erzeugeFotoInhalt(prompt, timeoutMs, notiz = {}, fetchImpl
     notiz.sekunden = Math.round((Date.now() - beginn) / 1000);
     return `Hier ist dein Bild:\n\n![Erstelltes Bild](data:image/png;base64,${b64})`;
   } catch (fehler) {
-    // Der Abbruch durch die eigene Zeitgrenze sieht wie ein Netzfehler aus —
+    // Der Abbruch durch die EIGENE Zeitgrenze sieht wie ein Netzfehler aus —
     // er ist aber der haeufigste Fall und verdient einen eigenen Namen.
-    const abgebrochen = controller.signal.aborted;
-    return scheitern(abgebrochen
+    return scheitern(controller.signal.aborted
       ? `zeitgrenze_${Math.round(timeoutMs / 1000)}s_erreicht`
       : `netzfehler:${String(fehler?.message || fehler).slice(0, 60)}`);
   } finally {
     clearTimeout(timer);
+  }
+}
+
+// Wartet hoeflich, bis der Bild-Maler frei ist — dasselbe Muster wie
+// erzeugeVideoMitGeduld: der Maler kann nur EIN Bild zugleich (2 Kerne) und
+// antwortet sonst ehrlich mit 429. Ohne diese Schleife hiesse jedes 429 sofort
+// SVG-Reserve, obwohl nichts kaputt, sondern nur besetzt ist.
+// `melde(phase)` faerbt den laufenden Fortschritt ("wartet" statt "läuft").
+// Exportiert fuer den Verhaltenstest (tests/chat-bridge-foto-geduld.test.mjs).
+export async function erzeugeFotoMitGeduld(prompt, timeoutMs, melde, notiz = {}) {
+  const bis = Date.now() + BILDER_WARTE_MAX_MS;
+  for (;;) {
+    const inhalt = await erzeugeFotoInhalt(prompt, timeoutMs, notiz);
+    if (inhalt !== "besetzt") return inhalt;
+    // Besetzt: warten, aber nie laenger als das Geduldsbudget. Danach
+    // uebernimmt die SVG-Reserve — besser stilisiert als gar kein Bild.
+    // Auch DAS ist ein Grund, der bisher verschwand: "hat gewartet und den
+    // Platz nie bekommen" sieht am Ende genauso aus wie "kaputt".
+    if (Date.now() >= bis) {
+      notiz.grund = `geduld_${Math.round(BILDER_WARTE_MAX_MS / 1000)}s_erschoepft_maler_besetzt`;
+      return "";
+    }
+    melde("wartet auf freien Platz");
+    await new Promise((weiter) => setTimeout(weiter, BILDER_WARTE_TAKT_MS));
+    melde("läuft");
   }
 }
 
@@ -546,13 +621,24 @@ async function streamVideoSpur(res, body, videoPrompt, deps) {
       uebersetzeMalPrompt(videoPrompt),
       schreibeErzaehltext(videoPrompt)
     ]);
-    video = await erzeugeVideoMitGeduld(malPrompt, erzaehltext, (neu) => {
-      phase = neu;
-    });
+    if (istPersonGesperrt(malPrompt)) {
+      video = "PERSON_GESPERRT";
+    } else {
+      video = await erzeugeVideoMitGeduld(malPrompt, erzaehltext, (neu) => {
+        phase = neu;
+      });
+    }
   } finally {
     clearInterval(takt);
   }
 
+  if (video === "PERSON_GESPERRT") {
+    videoSchritt(res, "fertig", "abgelehnt (reale Person)");
+    bilderSendeInhalt(res, PERSONEN_ABSAGE);
+    res.write("data: [DONE]\n\n");
+    res.end();
+    return true;
+  }
   if (video) {
     videoSchritt(res, "fertig", "fertig");
     // Ehrlich sagen, WAS sich bewegt — sonst erwartet der Nutzer bei
@@ -606,34 +692,73 @@ export async function streamBilderLane(res, body, task, deps) {
 
   // deps.fetchImpl gibt es nur im Test — im Betrieb bleibt es das echte fetch.
   const malerZustand = await bilderMalerZustand(deps.fetchImpl || fetch);
+  // Nutzer-Token fuer den Control-Weg aus res.req (Node haengt die Anfrage dort
+  // an) statt durch `deps`: chat-bridge.js steht unter dem Security-Lock.
+  const autorisierung = res?.req?.headers?.authorization || "";
+  // Zwei externe Wege: fal (falls je ein Schluessel gesetzt wird) und der eigene
+  // Control-Dienst mit CogView (Regelfall — der Zhipu-Zugang steht dort schon).
+  // Das Token gehoert in die BEDINGUNG, nicht nur in den Aufruf: ohne Anmeldung
+  // kann Control nicht malen, und wer den Zweig trotzdem betritt, hat schon
+  // Bytes gesendet und zerstoert den stillen Rueckfall auf die Textspur.
+  const controlAn = controlMalerBereit() && Boolean(autorisierung);
+  const externAn = externerMalerBereit() || controlAn;
 
-  // Weg 1: der eigene Bild-Maler (nur wenn wach UND Modell geladen).
-  if (malerZustand.bereit) {
-    bilderSseKopf(res, deps, body, "bilder-foto", "bild-maler:sd-turbo");
-    bilderSchritt(res, "laeuft", "läuft … (ca. 1 Minute)");
+  // Weg 0 (extern, beste Qualitaet) und Weg 1 (eigener Maler) teilen sich
+  // Kopf, Personen-Schutz und Fortschrittsanzeige. Extern kommt ZUERST: es ist
+  // nicht nur besser, sondern auch ~3 s statt ~2 min — und es nimmt dem
+  // geteilten 8-GB-Server die Last (der Maler zieht 203 % CPU je Bild).
+  if (externAn || malerZustand.bereit) {
+    bilderSseKopf(res, deps, body,
+      externAn ? "bilder-foto-extern" : "bilder-foto",
+      externAn ? `extern:${externMalerName()}` : "bild-maler:sd-turbo");
+    bilderSchritt(res, "laeuft", externAn ? "läuft …" : "läuft … (ca. 1 Minute)");
     const beginn = Date.now();
+    let phase = "läuft";
     // Lebenszeichen alle 10 s, damit Zwischenknoten die Leitung nicht kappen.
     const takt = setInterval(() => {
-      bilderSchritt(res, "laeuft", `läuft … ${Math.round((Date.now() - beginn) / 1000)} s`);
+      bilderSchritt(res, "laeuft", `${phase} … ${Math.round((Date.now() - beginn) / 1000)} s`);
     }, 10000);
     let inhalt = "";
+    let gesperrt = false;
     const notiz = {};
     try {
-      inhalt = await erzeugeFotoInhalt(await uebersetzeMalPrompt(prompt), BILDER_FOTO_TIMEOUT_MS, notiz);
+      const malPrompt = await uebersetzeMalPrompt(prompt);
+      gesperrt = istPersonGesperrt(malPrompt);
+      if (!gesperrt && externerMalerBereit()) {
+        inhalt = await erzeugeExternesBild(malPrompt, notiz, deps.fetchImpl || fetch);
+      }
+      if (!gesperrt && !inhalt && controlAn) {
+        inhalt = await erzeugeBildUeberControl(malPrompt, autorisierung, notiz, deps.fetchImpl || fetch);
+      }
+      // Extern aus oder gescheitert: der eigene Maler bleibt der Rueckfall —
+      // ein langsames echtes Foto ist besser als gar keins.
+      if (!gesperrt && !inhalt && malerZustand.bereit) {
+        if (externAn) bilderSchritt(res, "laeuft", "eigener Maler übernimmt … (ca. 1 Minute)");
+        inhalt = await erzeugeFotoMitGeduld(malPrompt, BILDER_FOTO_TIMEOUT_MS, (neu) => {
+          phase = neu;
+        }, notiz);
+      }
     } finally {
       clearInterval(takt);
+    }
+    if (gesperrt) {
+      bilderSchritt(res, "fertig", "abgelehnt (reale Person)");
+      bilderSendeInhalt(res, PERSONEN_ABSAGE);
+      res.write("data: [DONE]\n\n");
+      res.end();
+      return true;
     }
     if (!inhalt) {
       // Mitten im Strom: kein Rueckweg zum Text-Pfad mehr — SVG als Reserve.
       bilderSchritt(res, "laeuft", "ausgelastet — zeichne als Vektorgrafik …");
       inhalt = await erzeugeSvgInhalt(prompt, deps.timeoutMs);
     }
-    // Scheitert AUCH die Reserve, ist der Grund des ersten Versuchs das
-    // einzige, was noch etwas erklaert — sonst steht dort ein nacktes
-    // "fehlgeschlagen", aus dem niemand etwas ableiten kann.
+    // Scheitert AUCH die SVG-Reserve, ist der Grund des ersten Versuchs das
+    // Einzige, was noch etwas erklaert. Ein nacktes "fehlgeschlagen" laesst
+    // Nutzer UND Betreiber raten — genau das ist heute passiert.
     bilderSchritt(res, "fertig", inhalt
       ? "fertig"
-      : `fehlgeschlagen (${notiz.grund || "unbekannt"})`);
+      : `fehlgeschlagen (${[notiz.externGrund, notiz.grund].filter(Boolean).join(" / ") || "unbekannt"})`);
     bilderSendeInhalt(res, inhalt || "Das Malen ist gerade fehlgeschlagen — bitte versuch es gleich noch einmal.");
     res.write("data: [DONE]\n\n");
     res.end();
@@ -646,23 +771,23 @@ export async function streamBilderLane(res, body, task, deps) {
   if (!inhalt) {
     // Weg 3: Beide Wege aus — aber ein Mal-Auftrag WURDE erkannt. Frueher fiel
     // das stumm auf den Text-Weg, und smejj antwortete "Ich kann leider keine
-    // Bilder malen" (live gemessen 2026-08-14, zweimal). Das ist die
-    // schlechteste aller Antworten: sachlich falsch, und der Nutzer versucht
-    // es nie wieder. Waermt der Maler nur auf, sagen wir genau das.
+    // Bilder malen" (2026-08-14 zweimal live gemessen). Sachlich falsch und
+    // endgueltig: danach fragt niemand mehr. Waermt der Maler nur auf, sagen
+    // wir genau das — mit der gemessenen Ladezeit, nicht mit einer Schaetzung.
     if (malerZustand.grund === "waermt auf" || malerZustand.grund === "gestoert") {
       const sek = Number(malerZustand.ladezeitSek) || 0;
       const seit = sek > 0 ? ` (seit ${sek} s)` : "";
       bilderSseKopf(res, deps, body, "bilder-warten", "bild-maler:aufwaermen");
       bilderSchritt(res, "fertig", "Bild-Dienst startet gerade");
       bilderSendeInhalt(res, malerZustand.grund === "gestoert"
-        ? "Der Bild-Dienst meldet gerade eine Stoerung. Ich kann sonst Bilder malen — bitte versuch es in ein paar Minuten noch einmal."
-        : `Der Bild-Dienst startet gerade${seit} und laedt sein Modell. Ich kann Bilder malen — bitte versuch es in ein bis zwei Minuten noch einmal.`);
+        ? "Der Bild-Dienst meldet gerade eine Störung. Ich kann sonst Bilder malen — bitte versuch es in ein paar Minuten noch einmal."
+        : `Der Bild-Dienst startet gerade${seit} und lädt sein Modell. Ich kann Bilder malen — bitte versuch es in ein bis zwei Minuten noch einmal.`);
       res.write("data: [DONE]\n\n");
       res.end();
       return true;
     }
-    // Gar nicht eingerichtet (z. B. in Tests oder von einem fremden Standort
-    // aus): unveraendert fail-safe zurueck auf den Text-Weg.
+    // Gar nicht eingerichtet (Testumgebung, fremder Standort): unveraendert
+    // fail-safe zurueck auf den Text-Weg, ohne ein einziges gesendetes Byte.
     return false;
   }
   bilderSseKopf(res, deps, body, "bilder-svg", `groq:${BILDER_MODEL}`);

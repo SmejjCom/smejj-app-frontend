@@ -11,6 +11,8 @@
 // bekommt sie gereicht und gibt die drei Handler zurueck.
 import { readAudioBody, transcribeWithGroq } from "./chat-bridge-voice-ear.js";
 
+import { meldeAktion } from "./chat-bridge-evolution.js";
+
 export function createVoiceTts({
   json,
   readJson,
@@ -31,10 +33,6 @@ export function createVoiceTts({
   // Entscheidung); die Bridge selbst bleibt CPU-only.
   const VOICE_TTS_ORIGIN = trimUrl(process.env.SMEJJ_VOICE_TTS_ORIGIN || "");
   // Gateway-Auth des TTS-Workers (kein offener GPU-Endpunkt) — Org-Key-Fallback.
-  // Salad-Ausstieg 2026-08-15: neutraler Name zuerst. Der Altname bleibt als
-  // Rueckfall, weil /health premiumVoiceConfigured=true meldet und von aussen
-  // nicht erkennbar ist, an welcher Variable das haengt. Erst entfernen, wenn
-  // die Zeabur-Umgebung geprueft ist — sonst verstummt die Stimme lautlos.
   const VOICE_TTS_API_KEY = process.env.SMEJJ_VOICE_TTS_API_KEY || process.env.SMEJJ_LLM_SALAD_API_KEY || "";
   // v107: Mit internem Token laufen Sprecher-Daten und tts_stream ueber den
   // Control-Proxy (/api/voice/worker/*) — nur der Control traegt den Org-Schluessel
@@ -165,16 +163,23 @@ export function createVoiceTts({
   async function pipeWav(res, upstream) {
     res.writeHead(200, { "Content-Type": "audio/wav", "Cache-Control": "no-store", ...securityHeaders() });
     const reader = upstream.body.getReader();
+    let bytes = 0;
     try {
       for (;;) {
         const { value, done } = await reader.read();
         if (done) break;
+        bytes += value.byteLength || 0;
         res.write(Buffer.from(value));
       }
     } catch {
       // Klient hat abgebrochen (Barge-in) oder Upstream-Stream riss ab — sauber beenden.
     }
     res.end();
+    // AI Evolution Engine: hier laeuft ALLE gesprochene Ausgabe durch. Gemessen
+    // werden die Bytes — eine stumme oder abgerissene Stimme faellt damit auf,
+    // statt nur beim Nutzer im Ohr zu fehlen. Ein Abbruch durch Barge-in
+    // liefert ebenfalls Bytes; nur ein wirklich leerer Strom ist ein Fund.
+    meldeAktion({ art: "audio", ergebnis: { url: "stream:wav", bytes }, quelle: "bruecke-stimme", betrifft: "sprachausgabe" });
   }
 
   // Stufe 4 (Groq-Ohr): rohes Aufnahme-Audio -> Transkript; Pruefungen und

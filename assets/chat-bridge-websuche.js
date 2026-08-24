@@ -9,6 +9,8 @@
 // kommt ein leerer Text zurueck — der Aufrufer laeuft dann ohne Web-Kontext
 // weiter, statt die Antwort zu verlieren.
 
+import { meldeAktion } from "./chat-bridge-evolution.js";
+
 /** Hoechstzahl uebernommener Treffer. Mehr verduennt den Prompt, statt zu helfen. */
 const MAX_TREFFER = 6;
 
@@ -32,6 +34,16 @@ export async function buildWebContext(task, controlOrigin, { fetchFn = fetch, no
       const snippet = String(item.snippet || item.text || "").replace(/\s+/g, " ").slice(0, 320);
       const href = String(item.url || item.href || "").slice(0, 260);
       return `${index + 1}. ${title}\nURL: ${href}\nAuszug: ${snippet}`;
+    });
+    // AI Evolution Engine: eine Recherche OHNE Quelle ist eine Behauptung.
+    // Genau das misst der Recherche-Prüfer — hier, wo die Quellen noch als
+    // Daten vorliegen und nicht schon in Fließtext gegossen sind.
+    meldeAktion({
+      art: "recherche",
+      prompt: task,
+      ergebnis: { text: lines.join("\n"), quellen: results.map((r) => ({ url: String(r.url || r.href || "") })) },
+      quelle: "bruecke-websuche",
+      betrifft: "websuche"
     });
     return `Live-Internet-Ergebnisse, Stand ${now().toISOString()}:\n${lines.join("\n\n")}`;
   } catch {
