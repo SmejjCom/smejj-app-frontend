@@ -289,6 +289,7 @@ const SHELL = [
   "/assets/voice-premium-tts.js",
   "/assets/voice-warmup.js",
   "/assets/ai/chat-stream.js",
+  "/assets/ai/chat-schritte-anzeige.js",
   "/assets/ai/strom-stillstand.js",
   "/assets/ai/fetch-retry.js",
   "/assets/composer-dictation.js",
