@@ -32,7 +32,9 @@ import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } fr
 // Modulinstanz mit eigenem Quellen-Gedaechtnis; der Menuepunkt "Quellen
 // anzeigen" waere dann nie erschienen. Beim lokalen Test 2026-07-28 genau so
 // passiert.
-import { groundingFor } from "/assets/browser-context.js";
+// browser-context laedt seit 2026-08-24 ("Startseite abspecken") erst beim
+// Senden (app.js-Sendepfad); attachSources laeuft immer NACH einer Antwort,
+// da ist das Modul laengst da — der Import unten loest sofort aus dem Cache.
 // EXAKT dieselbe Kennung wie in composer-tools.js und voice-landing.js.
 // Bis 2026-07-29 stand hier ?v=1 — der Browser lud voice-speech-queue.js
 // dadurch ZWEIMAL (live gemessen: zwei Eintraege in
@@ -691,13 +693,15 @@ function onKeydown(event) {
 // Die Zuordnung laeuft deshalb ueber die Frage direkt vor der Antwort — nicht
 // ueber "die letzte Quelle", die bei schnellem Nachfassen zur falschen Antwort
 // gehoeren koennte.
-function attachSources() {
+async function attachSources() {
   try {
     const entries = Array.from(log()?.querySelectorAll(":scope > .entry") || []);
     const last = entries[entries.length - 1];
     if (!last || last.classList.contains("user") || hasSources(last)) return;
     const frage = previousUserEntry(last);
     if (!frage) return;
+    // WICHTIG: exakt derselbe Spezifizierer wie in app.js — sonst zweite Instanz.
+    const { groundingFor } = await import("/assets/browser-context.js");
     const quelle = groundingFor(rawOf(frage));
     if (!quelle) return;
     addSources(last, [quelle]);
