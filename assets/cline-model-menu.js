@@ -308,6 +308,10 @@ function shortModel(model) {
 
 async function api(path, { method = "GET", body } = {}) {
   let token = sessionStorage.getItem(TOKEN_KEY) || "";
+  // iPhone-PWA (25.08.): der Cookie-Weg zu api.smejj.com ist dort Third-Party
+  // und blockiert — das Menue zeigte "Cline-Key verbinden", waehrend der Chat
+  // laengst lief. Das App-Token des Chat-Wegs gilt am selben Server: zuerst.
+  if (!token) { try { token = localStorage.getItem("smejj.auth.accessToken.v1") || ""; } catch { /* Privatmodus */ } }
   if (!token) token = await recoverSessionToken();
   const response = await fetch(`${PROVIDER_PREFIX}${path}`, {
     method,
