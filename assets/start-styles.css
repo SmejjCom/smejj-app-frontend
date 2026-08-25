@@ -5397,6 +5397,19 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 
+/* ---- mobil-composer.css ---- */
+/* Mobil-Composer (Betreiber-Befund 2026-08-25, iPhone-PWA).
+   Der Modell-Chip waechst mit "(Gruendlich)" und ragte ueber das Glas hinaus;
+   die Zeile ist nowrap und lief rechts aus dem Bild. Chip begrenzen (Ellipsis),
+   und als Sicherheitsnetz darf die Zeile sauber umbrechen statt ueberzulaufen. */
+@media (max-width: 600px) {
+  .prompt-actions { flex-wrap: wrap; row-gap: 6px; }
+  .prompt-actions .model-picker button,
+  .prompt-actions .model-picker .mode-pill {
+    max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+}
+
 /* ---- design-v11-fein.css ---- */
 /* smejj.com — Design V11, Teil 3 (Feinheiten). Aufgeteilt 2026-08-25
    (Zeilen-Diaet); reine Buendel-Quelle wie Teil 1 und 2, Regeln unveraendert. */
@@ -5910,15 +5923,3 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 #start .erwaehnung-menue [role="menuitem"]:focus-visible { background: rgba(242, 245, 244, 0.08); }
 #start .erwaehnung-menue [role="menuitem"] b { font-weight: 600; color: var(--v11-cy); }
 .chat-erwaehnung[hidden] { display: none !important; }
-
-/* ---- mobil-composer.css (Betreiber-Befund 2026-08-25, iPhone-PWA) ---- */
-/* Der Modell-Chip waechst mit "(Gruendlich)" und ragte ueber das Glas hinaus;
-   die Zeile ist nowrap und lief rechts aus dem Bild. Chip begrenzen (Ellipsis),
-   und als Sicherheitsnetz darf die Zeile sauber umbrechen statt ueberzulaufen. */
-@media (max-width: 600px) {
-  .prompt-actions { flex-wrap: wrap; row-gap: 6px; }
-  .prompt-actions .model-picker button,
-  .prompt-actions .model-picker .mode-pill {
-    max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-}
