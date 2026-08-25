@@ -384,9 +384,8 @@ function commitEdit(editor) {
   applyResubmitPlan(plan);
 }
 
-// Merkt sich, WELCHE Nachricht gerade vorgelesen wird: der zweite Klick auf
-// denselben Knopf ist ein STOPP, kein Neustart. Vorher las jeder Klick von
-// vorn, und es gab keinen Weg, eine laufende Ansage zu beenden (Befund 25.08.).
+// Vorlese-Zustand (25.08.): zweiter Klick = STOPP, kein Neustart. Utterance
+// referenziert halten — Chromes GC frisst sonst onend und die Ausgabe.
 let vorleseQuelle = null;
 let vorleseUtterance = null;
 
@@ -396,15 +395,12 @@ async function speakEntry(entry) {
     showToast("Sprachausgabe wird von diesem Browser nicht unterstützt.", "warn");
     return;
   }
-  // VOR dem cancel() lesen: danach ist speaking immer false. Und nur ein
-  // Klick, waehrend WIRKLICH gesprochen wird, ist ein Stopp — Chrome feuert
-  // onend nicht zuverlaessig (GC-Eigenheit), ein blosses Merken der Quelle
-  // wuerde sich sonst festfahren und jeden weiteren Start schlucken.
+  // VOR cancel() lesen (danach immer false); nur ein Klick WAEHREND einer
+  // laufenden Ansage ist ein Stopp — sonst faehrt sich der Umschalter fest.
   const warAmSprechen = synthesis.speaking;
   synthesis.cancel();
   document.querySelector('[data-start-tool="speaker"]')?.classList.remove("is-speaking");
   if (vorleseQuelle === entry && warAmSprechen) {
-    // Zweiter Klick auf dieselbe Nachricht: nur stoppen.
     vorleseQuelle = null;
     return;
   }
@@ -421,12 +417,7 @@ async function speakEntry(entry) {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "de-DE";
   vorleseQuelle = entry;
-  // Referenz halten: Chrome sammelt lokale Utterances ein und laesst dann
-  // Ereignisse (und teils die Ausgabe selbst) fallen.
   vorleseUtterance = utterance;
-  // Nach dem natuerlichen Ende (oder einem Abbruch von anderer Stelle) ist
-  // der naechste Klick wieder ein Start. Der Guard schuetzt den Fall, dass
-  // inzwischen eine ANDERE Nachricht angestossen wurde.
   utterance.onend = () => { if (vorleseQuelle === entry) { vorleseQuelle = null; vorleseUtterance = null; } };
   synthesis.speak(utterance);
 }
