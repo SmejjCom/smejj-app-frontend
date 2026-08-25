@@ -384,6 +384,11 @@ function commitEdit(editor) {
   applyResubmitPlan(plan);
 }
 
+// Merkt sich, WELCHE Nachricht gerade vorgelesen wird: der zweite Klick auf
+// denselben Knopf ist ein STOPP, kein Neustart. Vorher las jeder Klick von
+// vorn, und es gab keinen Weg, eine laufende Ansage zu beenden (Befund 25.08.).
+let vorleseQuelle = null;
+
 async function speakEntry(entry) {
   const synthesis = window.speechSynthesis;
   if (!synthesis) {
@@ -392,6 +397,11 @@ async function speakEntry(entry) {
   }
   synthesis.cancel();
   document.querySelector('[data-start-tool="speaker"]')?.classList.remove("is-speaking");
+  if (vorleseQuelle === entry) {
+    // Zweiter Klick auf dieselbe Nachricht: nur stoppen.
+    vorleseQuelle = null;
+    return;
+  }
   let sanitizeForSpeech;
   try {
     ({ sanitizeForSpeech } = await import("/assets/voice-speech-queue.js?v=blitz-20260726"));
@@ -404,6 +414,11 @@ async function speakEntry(entry) {
   if (!text) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "de-DE";
+  vorleseQuelle = entry;
+  // Nach dem natuerlichen Ende (oder einem Abbruch von anderer Stelle) ist
+  // der naechste Klick wieder ein Start. Der Guard schuetzt den Fall, dass
+  // inzwischen eine ANDERE Nachricht angestossen wurde.
+  utterance.onend = () => { if (vorleseQuelle === entry) vorleseQuelle = null; };
   synthesis.speak(utterance);
 }
 
