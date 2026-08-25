@@ -105,6 +105,18 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
         });
         ctx = new (window.AudioContext || window.webkitAudioContext)();
+        // iOS startet AudioContexte "suspended" — ohne resume() liefert der
+        // Analyser nur Stille (Pegel 0) und der Automat laeuft ins Zeitlimit.
+        await ctx.resume().catch(() => { /* wecken uebernimmt */ });
+        if (ctx.state === "suspended") {
+          const wecken = () => {
+            document.removeEventListener("touchend", wecken);
+            document.removeEventListener("click", wecken);
+            ctx?.resume?.().catch(() => { /* Kontext bereits zu */ });
+          };
+          document.addEventListener("touchend", wecken, { once: true });
+          document.addEventListener("click", wecken, { once: true });
+        }
         const quelle = ctx.createMediaStreamSource(stream);
         const analyser = ctx.createAnalyser();
         analyser.fftSize = 512;

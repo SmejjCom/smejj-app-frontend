@@ -18,7 +18,7 @@ import { createBrowserTts } from "./voice-browser-tts.js";
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
 import { createServerEar, createEarSend } from "./voice-ear.js";
-import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=1";
+import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=2";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
@@ -740,9 +740,9 @@ function openVoiceMode() {
       overlay.hidden = false;
       voiceFocus.enter(overlay);
       if (!RecognitionCtor) {
-              // iOS/Safari ohne Web-Speech-Erkennung: Overlay im Diktat-Fallback oeffnen
-              // statt den Sprachmodus komplett zu verweigern.
-              enterVoiceFallback("Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.");
+              // iOS/Safari ohne Web-Speech (2026-08-25): ZUERST das eigene Ohr solo
+              // zuhoeren lassen — nur ohne Mikrofon/Ohr in den Tipp-Fallback.
+              if (!ohrSolo.aktivieren()) enterVoiceFallback("Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.");
               return;
       }
       voiceModeListen();
