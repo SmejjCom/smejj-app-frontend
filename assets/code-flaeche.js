@@ -35,8 +35,9 @@ import { API_ORIGIN } from "./config.js";
 // Modellwahl und Modell-Menue liegen seit 2026-08-18 in einem eigenen
 // Modul (800-Zeilen-Regel des Master-Prompts). OHNE ?v — gleiche Kennung
 // ueberall, sonst zweite Modulinstanz (module-queries-Waechter).
-import {
+// Anhang-Chips (Datei anhaengen) — eigenes Modul seit der Zeilen-Diaet.
 import { zieheAnhaengeAusFeld, nimmAnhaengeMit } from "./code-anhaenge.js?v=1";
+import {
   MODELL_KEY,
   CLINE_MODEL_KEY,
   AUTO_MARKE,

@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v694";
+const CACHE_NAME = "smejj-shell-v695";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -255,6 +255,9 @@ const SHELL = [
   "/assets/panel-backdrop.js",
   "/assets/premium-surfaces.js",
   "/assets/settings-surface.js",
+  // api-konto-surface wird von settings-surface.js dynamisch geladen —
+  // ohne Precache-Eintrag ist die API-Konto-Ansicht offline tot (Befund 25.08.).
+  "/assets/api-konto-surface.js",
   "/assets/settings-runtime.js",
   "/assets/provider-settings.js",
   "/assets/cline-model-menu.js",
