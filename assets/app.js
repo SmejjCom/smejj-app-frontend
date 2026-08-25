@@ -325,7 +325,7 @@ function bindStartComposer() {
   };
   send.addEventListener("click", submit);
   bindPasteAttach({ getInput: () => input });
-  ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=werkzeuge-5").then((m) => m.initComposerTools()));
+  ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=werkzeuge-6").then((m) => m.initComposerTools()));
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {

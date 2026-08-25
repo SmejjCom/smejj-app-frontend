@@ -18,6 +18,7 @@ import { createBrowserTts } from "./voice-browser-tts.js";
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
 import { createServerEar, createEarSend } from "./voice-ear.js";
+import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=1";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
@@ -54,6 +55,7 @@ const state = {
       voiceModeActive: false,
       voiceMuted: false,
       voiceFallback: false,
+      ohrSoloAktiv: false,
       voiceFailStreak: 0,
       voiceListenStartedAt: 0,
       voiceRecognition: null,
@@ -95,6 +97,16 @@ const earSend = createEarSend({
       sollNachfragenFn: sollNachfragen,
       nachfragen: () => nachfragenStattSenden(),
       senden: (task) => voiceModeSend(task)
+});
+// Ohr-Solo (2026-08-25): Ist Chromes Erkennung taub (sofortiges onend ohne
+// onstart/onerror, z. B. Google-Dienst im Netz blockiert), hoert das eigene
+// Ohr allein zu. Verdrahtung wohnt in voice-ohr-solo.js (800-Zeilen-Regel).
+const ohrSolo = verdrahteOhrSolo({
+      createServerEar, url: CLIENT_ROUTES.api.voiceTranscribe, state,
+      earAlive: () => serverEar.isAlive(),
+      setStatus: setVoiceModeStatus, setTranskript: setVoiceModeTranscript,
+      senden: voiceModeSend, fallback: enterVoiceFallback,
+      stopInterrupt, stopBarge: stopBargeListener, hoerenNeu: voiceModeListen
 });
 
 // Stufe B: Premium-Stimme des Servers (WebAudio) — nur im Sprachmodus aktiv,
@@ -183,6 +195,8 @@ const voiceFocus = createVoiceFocusTrap();
 
 function closeVoiceMode() {
       serverEar.cancel();
+      ohrSolo.stop();
+      state.ohrSoloAktiv = false;
       state.voiceModeActive = false;
       state.voiceMuted = false;
       state.voiceFallback = false;
@@ -380,8 +394,8 @@ function nachfragenStattSenden() {
 
 function voiceModeListen() {
       if (!state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
-      // Nur eine Erkennung gleichzeitig — ein noch laufender Barge-Listener oder
-      // Pegel-Detektor wuerde recognition.start() scheitern lassen (Fallback-Falle).
+      if (state.ohrSoloAktiv) return ohrSolo.hoeren();
+      // Nur eine Erkennung gleichzeitig (sonst scheitert recognition.start()).
       stopInterrupt();
       stopBargeListener();
       setVoiceModeStatus("listening", "Ich höre zu ...");
@@ -394,9 +408,8 @@ function voiceModeListen() {
       let finalTranscript = "";
       // Stufe 3: beste Konfidenz der finalen Ergebnisse (NaN = Browser liefert keine).
       let bestConfidence = NaN;
-      // Stufe 2a: Kommen bei vorhandenem Text ~850 ms keine neuen Zwischen-
-      // ergebnisse, das Erkennungs-Ende sofort erzwingen (stop -> finales
-      // Ergebnis) statt die 1-2 s Browser-Endpause abzuwarten.
+      // Stufe 2a: ~850 ms ohne neue Zwischenergebnisse -> Ende sofort erzwingen
+      // (stop -> finales Ergebnis) statt die Browser-Endpause abzuwarten.
       const watchdog = createSilenceWatchdog(() => {
               if (state.voiceRecognition !== recognition) return;
               try {
@@ -422,8 +435,7 @@ function voiceModeListen() {
               const heard = (finalTranscript + interim).trim();
               setVoiceModeTranscript(heard);
               watchdog.update(heard); // Stufe 3a: Text statt Ja/Nein -> adaptive Wartezeit
-              // Stufe 1e: Beim finalen Ergebnis SOFORT senden statt auf onend zu
-              // warten — voiceModeSend loest die Erkennung selbst ab (Guard in onend).
+              // Stufe 1e: beim finalen Ergebnis SOFORT senden (Guard in onend).
               const task = finalTranscript.trim();
               if (sawFinal && task && !state.voiceMuted && state.voiceRecognition === recognition) {
                         watchdog.stop();
@@ -442,14 +454,12 @@ function voiceModeListen() {
       };
       recognition.onend = () => {
               watchdog.stop();
-              // Nach abort() (z. B. getippte Frage) feuert onend trotzdem — nur die noch
-              // aktive Erkennung darf den Loop fortsetzen, sonst hoert sie parallel zum
-              // Denken/Vorlesen weiter und nimmt das eigene Echo als Frage auf.
+              // Nach abort() feuert onend trotzdem — nur die noch aktive Erkennung
+              // darf den Loop fortsetzen (sonst hoert sie das eigene Echo als Frage).
               if (state.voiceRecognition !== recognition) return;
               state.voiceRecognition = null;
               if (!state.voiceModeActive || state.voiceFallback) return;
-              // Stummschalten heisst Stummschalten: der Mikrofon-Knopf darf NIE senden
-              // (stand das Senden davor, warf ein Mute-Klick die Antwort weg; 2026-08-02).
+              // Stummschalten heisst Stummschalten: der Mikrofon-Knopf darf NIE senden (2026-08-02).
               if (state.voiceMuted) return;
               const task = finalTranscript.trim();
               if (task) {
@@ -457,11 +467,11 @@ function voiceModeListen() {
                         earSend(task, bestConfidence);
                         return;
               }
-              // Endet die Erkennung mehrfach sofort ohne Ergebnis (typisch iOS/Safari),
-              // nicht endlos neu starten, sondern in den Diktat-Fallback wechseln.
+              // Mehrfach sofortiges Ende ohne Ergebnis: nicht endlos neu starten.
               if (Date.now() - state.voiceListenStartedAt < 1500) {
                         state.voiceFailStreak += 1;
                         if (state.voiceFailStreak >= 3) {
+                                    if (ohrSolo.aktivieren()) return;
                                     enterVoiceFallback("Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.");
                                     return;
                         }
@@ -476,7 +486,7 @@ function voiceModeListen() {
               recognition.start();
               serverEar.start(); // Stufe 4: parallel aufnehmen (leise, fail-safe)
       } catch {
-              enterVoiceFallback("Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.");
+              if (!ohrSolo.aktivieren()) enterVoiceFallback("Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.");
       }
 }
 
@@ -487,8 +497,7 @@ function voiceModeSend(task, { getippt = false } = {}) {
               closeVoiceMode();
               return;
       }
-      // Stufe 3: erkannte Duplikate nicht doppelt senden (onresult UND onend
-      // liefern dieselbe Aeusserung); getippte Fragen sind Absicht.
+      // Stufe 3: erkannte Duplikate nicht doppelt senden; getippte Fragen sind Absicht.
       if (!getippt && doppelschutz.blockiert(task)) {
               stopBargeListener();
               // Laufende Erkennung abloesen, sonst scheitert der Neustart.
@@ -665,12 +674,11 @@ function toggleVoiceMute() {
       syncVoiceMicVisual();
       if (state.voiceMuted) {
               serverEar.cancel();
+              ohrSolo.stop();
               stopInterrupt();
               stopBargeListener();
               try {
-                        // abort() statt stop(): Stummschalten verwirft das Gehoerte, es wird
-                        // NICHT mehr als Frage abgeschickt. Die laufende Sprachausgabe bleibt
-                        // bewusst unangetastet — "stumm" schaltet nur den Eingang ab.
+                        // abort() statt stop(): "stumm" verwirft das Gehoerte, nur der Eingang geht aus.
                         state.voiceRecognition?.abort?.();
               } catch {
                         // Recognition war bereits gestoppt.
@@ -683,10 +691,8 @@ function toggleVoiceMute() {
               setVoiceModeStatus("thinking", "Einen Moment ...");
               return;
       }
-      // Laeuft noch eine Antwort (Denken ODER Sprechen)? Dann NICHT zuhoeren
-      // anfangen — sonst nimmt das Mikrofon den eigenen Lautsprecher auf.
-      // speechSynthesis.speaking allein genuegt nicht: die Premium-Stimme laeuft
-      // ueber WebAudio und meldet dort immer false.
+      // Laeuft noch eine Antwort, NICHT zuhoeren (Mikrofon naehme den eigenen
+      // Lautsprecher auf); Premium-Stimme meldet in speechSynthesis immer false.
       const audioPlaying = premiumVoice.isSpeaking()
         || (("speechSynthesis" in window) && window.speechSynthesis.speaking === true);
       if (audioPlaying || state.speechQueue?.isActive?.() === true) {
