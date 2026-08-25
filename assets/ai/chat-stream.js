@@ -345,7 +345,12 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
   let ergebnis;
   try {
     ergebnis = await frageLokal(lage.frage, {
-      system: "Du bist der Assistent von smejj.com. Antworte kurz, korrekt und in der Sprache des Nutzers.",
+      // Sprachmodus (25.08.): auch das Geraetemodell muss "sprechbar" antworten
+      // — sonst kamen Emojis und Listen, die die Stimme stoerten.
+      system: "Du bist der Assistent von smejj.com. Antworte kurz, korrekt und in der Sprache des Nutzers."
+        + (body?.preferences?.voiceMode === true
+          ? " Der Nutzer HOERT deine Antwort als Sprachausgabe: 1-3 Saetze, gespraechig, keine Listen, kein Markdown, keine URLs, keine Emojis."
+          : ""),
       verlauf: lage.verlauf,
       abgebrochen: () => gestoppt,
       onDelta: (zuwachs) => {
