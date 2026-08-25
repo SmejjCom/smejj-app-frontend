@@ -324,6 +324,11 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
   // eine lokal beantwortete Frage erzeugt KEINE Server-Logzeile.
   merkeEntscheidung(urteil.grund);
   if (!urteil.ok) return false;
+  // Ab hier antwortet WIRKLICH das Geraet: Wartetext + Denk-Flag muessen weg,
+  // sonst haelt alles Nachgelagerte (Aktionsleiste, Vorlesen, Sprachmodus,
+  // Verlauf, Markdown-Renderer) die fertige Antwort fuer einen Platzhalter —
+  // Betreiber-Befund 25.08.: Schlagzeilen-Antwort blieb roh, stumm, ohne Leiste.
+  clearThinkingState(output);
 
   let text = "";
   // LIVE GEMESSEN 2026-08-23 (Abnahme): vier Fragen nacheinander beantwortete

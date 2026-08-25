@@ -64,7 +64,7 @@ const MAX_ZEICHEN = 1_500;
 // Woerter, die nach TAGESAKTUALITAET riechen. Das lokale Modell hat keinen
 // Internetzugang und wuerde raten statt zu suchen — der teuerste Fehler, den es
 // machen kann, weil er selbstsicher klingt.
-const AKTUALITAET = /\b(heute|gestern|aktuell|momentan|gerade|neueste?n?|jetzt|kurs|preis|wetter|nachrichten|news|version|20\d\d)\b/i;
+const AKTUALITAET = /\b(heute|gestern|aktuell|momentan|gerade|neueste?n?|jetzt|kurs|preis|wetter|nachrichten|news|schlagzeilen?|presse|zeitung|version|20\d\d)\b/i;
 
 // Woerter, die auf unsere eigenen Funktionen zeigen. Darauf kann nur der Server
 // mit Projektwissen antworten; das lokale Modell kennt smejj.com nicht.
