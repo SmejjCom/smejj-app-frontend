@@ -3,7 +3,7 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=3";
-import { initGlobalSearch, oeffneSuchOverlay } from "./search.js?v=b51";
+import { bindeSuchNachlader, holeSuche } from "./such-nachladen.js?v=1";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
 import { holeSendepfad } from "./sendepfad-nachladen.js?v=1";
@@ -143,7 +143,7 @@ function bindNavigation() {
       setBrowserPanelOpen(false);
       // Suche oeffnet als Overlay ueber der aktuellen Ansicht (wie Cmd+K);
       // die Such-Seite bleibt Rueckfallebene, falls das Overlay fehlt.
-      if (button.dataset.view === "search") { Promise.resolve(oeffneSuchOverlay()).then((offen) => { if (!offen) goToView("search"); }).catch(() => goToView("search")); return; }
+      if (button.dataset.view === "search") { holeSuche().then((m) => Promise.resolve(m.oeffneSuchOverlay())).then((offen) => { if (!offen) goToView("search"); }).catch(() => goToView("search")); return; }
       goToView(button.dataset.view);
     });
   }
@@ -337,7 +337,7 @@ function bindStartComposer() {
 }
 
 function bindSearch() {
-  initGlobalSearch({ $, goToView, showTaskIndicator, showToast, state, workspace });
+  bindeSuchNachlader({ $, goToView, showTaskIndicator, showToast, state, workspace, ladeBeiAnsicht });
 }
 async function submitTask(task, { target = "#startLog" } = {}) {
   if (!task) return;
