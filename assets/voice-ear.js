@@ -35,6 +35,22 @@ export function pickRecorderMime(supported = (typ) => typeof MediaRecorder !== "
   return "";
 }
 
+// Anmelde-Header wie in voice-premium-tts.js — Schluessel bewusst dupliziert,
+// damit das Modul ohne Auth-Modul lauffaehig bleibt. Die Bruecke bindet die
+// Transcribe-Route an die Anmeldung (kein Token = 401); ohne diesen Header
+// bekam auch ein ANGEMELDETER Nutzer nie ein Transkript — im Web-Speech-Duett
+// unsichtbar (der Browser-Text gewann still), im Ohr-Solo (iOS) fatal
+// (A-Z-Simulatorbeweis 2026-08-26: fuenfmal 401 trotz frischer Sitzung).
+const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
+function authHeaders(extra = {}) {
+  try {
+    const token = typeof localStorage !== "undefined" ? localStorage.getItem(AUTH_TOKEN_KEY) : "";
+    return token ? { ...extra, Authorization: `Bearer ${token}` } : { ...extra };
+  } catch {
+    return { ...extra }; // Storage gesperrt (Privatmodus): ohne Header versuchen
+  }
+}
+
 /**
  * createServerEar({ url, budgetMs }) -> { start, finish, cancel, isAlive }
  *
@@ -120,7 +136,7 @@ export function createServerEar({ url, budgetMs = EAR_BUDGET_MS, fetchFn } = {})
       try {
         const antwort = await holen(url, {
           method: "POST",
-          headers: { "Content-Type": mime },
+          headers: authHeaders({ "Content-Type": mime }),
           body: blob,
           signal: abbruch.signal
         });
