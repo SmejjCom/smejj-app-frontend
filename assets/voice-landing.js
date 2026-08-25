@@ -11,7 +11,7 @@
 import { darfSprechen, buildLoginCta } from "./voice-landing-signin.js?v=3";
 import { CLIENT_ROUTES } from "./config.js";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue } from "./voice-speech-queue.js?v=blitz-20260726";
+import { createSpeechQueue } from "./voice-speech-queue.js?v=emojifrei-20260825";
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
 import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung

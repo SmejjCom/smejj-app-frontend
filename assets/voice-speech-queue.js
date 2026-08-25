@@ -110,7 +110,10 @@ export function sanitizeForSpeech(text, { lang } = {}) {
       .replace(MD_BULLET, "")
       .replace(MD_BOLD, "")
       .replace(MD_EMPHASIS, "$1$2")
-      .replace(/`/g, "");
+      .replace(/`/g, "")
+      // Emojis sind fuers Auge, nicht fuers Ohr: iOS/macOS-Stimmen lesen sonst
+      // den Symbolnamen vor — Betreiber hoerte woertlich "Sanduhr" (25.08.).
+      .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}\u{20E3}\u{1F3FB}-\u{1F3FF}]/gu, " ");
     if (speechPageLang(lang).startsWith("de")) {
       // Fuers Ohr: "17.6°C" -> "17,6 Grad" (deutsche TTS spricht das Komma natuerlich).
       out = out

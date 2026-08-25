@@ -406,7 +406,7 @@ async function speakEntry(entry) {
   }
   let sanitizeForSpeech;
   try {
-    ({ sanitizeForSpeech } = await import("/assets/voice-speech-queue.js?v=blitz-20260726"));
+    ({ sanitizeForSpeech } = await import("/assets/voice-speech-queue.js?v=emojifrei-20260825"));
   } catch (fehler) {
     console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler);
     showToast("Vorlesen gerade nicht möglich — bitte noch einmal versuchen.", "warn");

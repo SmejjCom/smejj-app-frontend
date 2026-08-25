@@ -3,7 +3,7 @@
 // Zweck: initComposerTools() verdrahtet die Icon-Zeile des Start-Composers.
 import { showToast } from "./components.js?v=b48"; // versioniert wie app.js (F-07)
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=blitz-20260726";
+import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=emojifrei-20260825";
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
 import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
 // Overlay-Gestalt und Fokusfuehrung — ausgelagert (800-Zeilen-Regel).

@@ -7,7 +7,7 @@
   "display": "standalone",
   "background_color": "#f6f7f9",
   "theme_color": "#f7f7f4",
-  "description": "KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben — direkt im Browser.",
+  "description": "smejj.com ist ein schneller KI- und Code-Assistent: Chat, Websuche, Bilder, Sprachmodus und Programmieren in einem Fenster.",
   "icons": [
     {
       "src": "/icons/pwa-192x192.png",
@@ -32,6 +32,39 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Neuer Chat",
+      "url": "/?neu=1",
+      "description": "Direkt eine neue Unterhaltung beginnen"
+    },
+    {
+      "name": "Sprachmodus",
+      "url": "/?sprechen=1",
+      "description": "Sofort mit smejj sprechen"
+    },
+    {
+      "name": "Programmieren",
+      "url": "/code",
+      "description": "Den Code-Bereich oeffnen"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/screenshot-start-390.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Startseite"
+    },
+    {
+      "src": "/icons/screenshot-chat-390.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Chat"
     }
   ]
 }
