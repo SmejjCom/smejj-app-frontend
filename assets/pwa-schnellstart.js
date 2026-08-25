@@ -34,3 +34,23 @@ if (willNeu || willSprechen) {
     }, 200);
   }
 }
+
+// PWA-Selbst-Aktualisierung (25.08.): Uebernimmt ein frisch installierter
+// Service Worker die Kontrolle (controllerchange nach skipWaiting), laedt die
+// Seite GENAU EINMAL neu — sonst nutzt die laufende PWA bis zum naechsten
+// Kaltstart alte Module (iOS haelt Apps tagelang warm; der Betreiber musste
+// die App von Hand wegwischen). Schutz vor Datenverlust: Kein Reload, wenn
+// gerade eine Antwort laeuft oder Text im Eingabefeld steht — dann greift
+// der Reload einfach beim naechsten App-Start.
+if ("serviceWorker" in navigator) {
+  let schonNeuGeladen = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (schonNeuGeladen || !navigator.serviceWorker.controller) return;
+    const antwortLaeuft = document.body?.classList?.contains("task-indicator-active");
+    const feld = document.querySelector("#startMessage, .prompt-glass textarea");
+    const tipptGerade = Boolean(feld && feld.value && feld.value.trim());
+    if (antwortLaeuft || tipptGerade) return; // naechster Start uebernimmt
+    schonNeuGeladen = true;
+    location.reload();
+  });
+}
