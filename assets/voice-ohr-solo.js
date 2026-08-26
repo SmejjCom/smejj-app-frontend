@@ -172,7 +172,7 @@ export function verdrahteOhrSolo(host) {
     aufLeer: () => { const s = host.state; if (s.voiceModeActive && !s.voiceMuted && s.ohrSoloAktiv) solo.start(); },
     aufFehler: () => host.fallback()
   });
-  return {
+  const anschluss = {
     stop: () => solo.stop(),
     hoeren() {
       host.stopInterrupt();
@@ -187,6 +187,39 @@ export function verdrahteOhrSolo(host) {
       host.state.voiceFailStreak = 0;
       host.hoerenNeu();
       return true;
+    },
+    // Taubheits-Wache (Betreiber-Livebefund 2026-08-26, Desktop-Chrome hinter
+    // Netz-Sperre): Die Web-Speech-Erkennung kann STILL taub sein — sie haengt
+    // in "Ich höre zu ..." ohne je ein Ergebnis, ein "no-speech" oder ein Ende
+    // zu liefern, oder sie endet traege und leer. Der alte Schutz zaehlte nur
+    // SOFORT-Enden (<1,5 s). Unterscheidung hier: SCHWEIGEN ist gesund —
+    // Chrome meldet es ehrlich als onerror "no-speech" binnen ~8 s. TAUB ist,
+    // wer weder Ergebnis noch "no-speech" liefert. Zwei taube Runden (oder ein
+    // 12-s-Haenger + ein leeres Ende) -> das eigene Ohr uebernimmt.
+    bewache(recognition, { taubMs = 12_000 } = {}) {
+      let ergebnisse = 0;
+      let noSpeech = false;
+      const s = host.state;
+      const wecker = setTimeout(() => {
+        if (s.voiceRecognition !== recognition || ergebnisse) return;
+        s.voiceFailStreak += 1; // der stumme Haenger zaehlt wie ein leeres Ende
+        try { recognition.abort(); } catch { /* loest onend aus */ }
+      }, taubMs);
+      return {
+        ergebnis() { ergebnisse += 1; clearTimeout(wecker); },
+        fehler(art) { if (art === "no-speech") noSpeech = true; },
+        /** true = Taubheit erkannt und uebernommen — der Host kehrt sofort um. */
+        ende() {
+          clearTimeout(wecker);
+          if (ergebnisse || noSpeech) { s.voiceFailStreak = 0; return false; }
+          s.voiceFailStreak += 1;
+          if (s.voiceFailStreak < 2) return false;
+          if (anschluss.aktivieren()) return true;
+          host.fallback("Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.");
+          return true;
+        }
+      };
     }
   };
+  return anschluss;
 }

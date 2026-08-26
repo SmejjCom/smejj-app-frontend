@@ -18,7 +18,7 @@ import { createBrowserTts } from "./voice-browser-tts.js";
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
 import { createServerEar, createEarSend } from "./voice-ear.js";
-import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=2";
+import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=3";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
@@ -172,6 +172,8 @@ const dictation = createDictation({
       notifyInputChanged,
       showToast,
       RecognitionCtor,
+      // Eigenes Ohr fuers Diktat (2026-08-26): taube Web-Speech schreibt sonst nie.
+      serverOhr: createServerEar({ url: CLIENT_ROUTES.api.voiceTranscribe, budgetMs: 6000 }),
       lang: SPEECH_LANG,
       speechSupported,
       setVisual: (active) => $('[data-start-tool="voice"]')?.classList.toggle("is-recording", active),
@@ -419,6 +421,7 @@ function voiceModeListen() {
               }
       });
       recognition.onresult = (event) => {
+              taubwache.ergebnis();
               let interim = "";
               let sawFinal = false;
               for (let index = event.resultIndex; index < event.results.length; index += 1) {
@@ -447,6 +450,7 @@ function voiceModeListen() {
               }
       };
       recognition.onerror = (event) => {
+              taubwache.fehler(event.error);
               if (event.error === "not-allowed" || event.error === "service-not-allowed") {
                         showToast("Mikrofon-Zugriff verweigert. Bitte in den Browser-Einstellungen erlauben.", "warn");
                         enterVoiceFallback("Mikrofon nicht erlaubt — Frage unten eintippen.");
@@ -467,21 +471,15 @@ function voiceModeListen() {
                         earSend(task, bestConfidence);
                         return;
               }
-              // Mehrfach sofortiges Ende ohne Ergebnis: nicht endlos neu starten.
-              if (Date.now() - state.voiceListenStartedAt < 1500) {
-                        state.voiceFailStreak += 1;
-                        if (state.voiceFailStreak >= 3) {
-                                    if (ohrSolo.aktivieren()) return;
-                                    enterVoiceFallback("Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.");
-                                    return;
-                        }
-              } else {
-                        state.voiceFailStreak = 0;
-              }
-              // Nichts verstanden — weiter zuhoeren.
+              // Taubheit (Livebefund 2026-08-26): Ende ohne Ergebnis UND ohne
+              // Chromes ehrliches "no-speech" heisst, der Sprachdienst antwortet
+              // nicht (Netz-Sperre) — die Wache uebernimmt dann aufs eigene Ohr.
+              // Schweigen ("no-speech") bleibt gesund und hoert einfach weiter.
+              if (taubwache.ende()) return;
               voiceModeListen();
       };
       state.voiceListenStartedAt = Date.now();
+      const taubwache = ohrSolo.bewache(recognition);
       try {
               recognition.start();
               serverEar.start(); // Stufe 4: parallel aufnehmen (leise, fail-safe)
