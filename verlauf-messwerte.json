@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "smejj.com-qualitaetsverlauf",
-  "erzeugtAm": "2026-08-26T04:10:08.473Z",
+  "erzeugtAm": "2026-08-27T04:10:07.723Z",
   "quelle": "smejj-training-loop, GET /verlauf (containerintern)",
   "suite": {
     "suiteId": "smejj-chat-core",
@@ -120,24 +120,18 @@
       "abgelegt": false
     },
     {
-      "zeitpunkt": "2026-08-26T04:10:08.473Z",
-      "punktzahl": 0.9706,
+      "zeitpunkt": "2026-08-27T04:10:07.723Z",
+      "punktzahl": 1,
       "faelle": 14,
-      "bestanden": 13,
+      "bestanden": 14,
       "nichtBestanden": 0,
-      "kritischeFehler": 1,
-      "p95Ms": 5807,
-      "medianMs": 2929,
+      "kritischeFehler": 0,
+      "p95Ms": 5981,
+      "medianMs": 2704,
       "wiederholungen": 3,
-      "wackelig": 1,
-      "wackeligeFaelle": [
-        {
-          "fall": "naming-schreibweise",
-          "bestanden": 2,
-          "laeufe": 3
-        }
-      ],
-      "urteil": "blocked",
+      "wackelig": 0,
+      "wackeligeFaelle": null,
+      "urteil": "passed",
       "abgelegt": false
     }
   ]
