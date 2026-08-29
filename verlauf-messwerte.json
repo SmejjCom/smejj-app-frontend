@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "smejj.com-qualitaetsverlauf",
-  "erzeugtAm": "2026-08-29T04:10:20.338Z",
+  "erzeugtAm": "2026-08-29T16:10:07.281Z",
   "quelle": "smejj-training-loop, GET /verlauf (containerintern)",
   "suite": {
     "suiteId": "smejj-chat-core",
@@ -120,29 +120,18 @@
       "abgelegt": false
     },
     {
-      "zeitpunkt": "2026-08-29T04:10:20.338Z",
-      "punktzahl": 0.9608,
+      "zeitpunkt": "2026-08-29T16:10:07.281Z",
+      "punktzahl": 1,
       "faelle": 14,
-      "bestanden": 12,
+      "bestanden": 14,
       "nichtBestanden": 0,
-      "kritischeFehler": 2,
-      "p95Ms": 6390,
-      "medianMs": 3710,
+      "kritischeFehler": 0,
+      "p95Ms": 5963,
+      "medianMs": 3196,
       "wiederholungen": 3,
-      "wackelig": 2,
-      "wackeligeFaelle": [
-        {
-          "fall": "kosten-github-free",
-          "bestanden": 2,
-          "laeufe": 3
-        },
-        {
-          "fall": "patch-unified-diff",
-          "bestanden": 2,
-          "laeufe": 3
-        }
-      ],
-      "urteil": "blocked",
+      "wackelig": 0,
+      "wackeligeFaelle": null,
+      "urteil": "passed",
       "abgelegt": false
     }
   ]
