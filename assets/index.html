@@ -2,7 +2,7 @@
 <html lang="de">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <!-- Sicherheitsregeln (QA-Welle 1, Befund F-04). GitHub Pages Free kann keine
          eigenen HTTP-Header setzen, deshalb steht die Content-Security-Policy hier
          als Meta-Angabe. Die App enthaelt bewusst KEIN Inline-Skript und KEINEN
@@ -20,11 +20,34 @@
          localStorage "smejj.apiOrigin.v1" auf die Zeabur-Adresse setzen.
          frame-ancestors fehlt absichtlich: In einer Meta-CSP ignorieren Browser die
          Angabe. Den Klickjacking-Schutz uebernimmt der Rahmenwaechter in app.js. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-VlE1d5xGlwIC45bSDwQ4QJLlWTgImI8lmE9DYAk8JMQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
+    <!-- Kaltstart (Freigabe 25.08.): Stylesheet sofort anstossen — vorher
+         startete es erst NACH dem Tor-Skript, eine volle Runde spaeter. -->
+    <link rel="preload" href="/assets/start-styles.css?v=mobilfix3-20260830" as="style">
     <!-- Fruehes Tor (Betreiber-Freigabe 2026-08-23): Anonyme sofort zur Landeseite,
          statt 3,7 s (Desktop) / 15 s (iPhone) die App-Huelle zu sehen. Kein Modul,
          kein Import — laeuft vor dem ersten Pixel. Regeln bleiben in auth-gate.js. -->
-    <script src="/assets/auth-gate-frueh.js?v=1"></script>
+    <script>// smejj.com — das fruehe Tor der Startseite (Betreiber-Freigabe 2026-08-23,
+// Nutzerreise USA). GEMESSEN: das volle Gate (auth-gate.js) haengt an
+// profile-dock.js, Modul-Skript 24 von 34 — ein anonymer Besucher sah 3,7 s
+// (Desktop) bis 15 s (iPhone) die App-Huelle samt deutscher Fuehrung, bevor die
+// Landeseite kam. Dieses Skript laeuft als ERSTES im <head>, ohne Import, ohne
+// Modul: kein Token, kein lokales Profil -> sofort zur Landeseite.
+//
+// Bewusst nur die Wurzel ("/" und "/index.html"): alle anderen Pfade, das
+// Rueckkehr-Ziel (?next=) und der Cookie-Weg bleiben Sache von auth-gate.js —
+// die Regeln stehen dort EINMAL, hier nur der Vorgriff fuer den Erstbesuch.
+(function () {
+  try {
+    var pfad = String(location.pathname || "/");
+    if (pfad !== "/" && pfad !== "/index.html") return;
+    if (localStorage.getItem("smejj.auth.accessToken.v1")) return;
+    var sitzung = JSON.parse(localStorage.getItem("smejj.session.v1") || "{}") || {};
+    if (sitzung.authenticated === true) return;
+    location.replace("/willkommen.html");
+  } catch (fehler) { /* Speicher gesperrt: das volle Gate entscheidet spaeter */ }
+})();
+</script>
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="theme-color" content="#f7f7f4">
     <meta name="description" content="smejj.com ist ein schneller KI- und Code-Assistent fuer Chat, Programmierung und Agenten-Aufgaben.">
@@ -70,7 +93,7 @@
          1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
-    <link rel="stylesheet" href="/assets/start-styles.css?v=pfeilhell-20260824">
+    <link rel="stylesheet" href="/assets/start-styles.css?v=mobilfix3-20260830">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -958,24 +981,24 @@
       <div id="voiceModeReply" class="voice-mode-reply"></div>
       <p class="voice-mode-hint">Sprich einfach — zum Beenden X druecken oder Escape.</p>
     </div>
+    <script src="/assets/fehler-faenger.js" type="module"></script>
     <script src="/assets/frame-guard.js?v=1" type="module"></script>
     <script src="/assets/start-chips.js?v=b32b" type="module"></script>
     <script src="/assets/composer-sendetaste.js?v=v11-20260815" type="module"></script>
     <script src="/assets/nav-absichten.js?v=b32" type="module"></script>
     <script src="/assets/topbar-krume.js?v=b33f" type="module"></script>
-    <script src="/assets/papierkorb.js?v=12" type="module"></script>
-    <script src="/assets/arbeitsbereiche.js?v=18" type="module"></script>
-    <script src="/assets/kamera.js?v=b35live2" type="module"></script>
-    <script src="/assets/fuehrung.js?v=2" type="module"></script>
     <script src="/assets/knopf-puffer.js?v=2"></script>
     <script src="/assets/arbeitsflaeche.js?v=2" type="module"></script>
     <script src="/assets/spur-schalter.js?v=9" type="module"></script>
     <script src="/assets/spur-start.js?v=b45" type="module"></script>
-    <script src="/assets/projekt-ordner.js?v=1" type="module"></script>
     <!-- holt code-flaeche.js (27,1 KB) erst, wenn #code aufgeht — Begruendung im Modul -->
-    <script src="/assets/code-nachladen.js?v=13" type="module"></script>
-    <script src="/assets/app.js?v=b94" type="module"></script>
-    <script src="/assets/cline-model-menu.js?v=cline-submenu-20260817-5" type="module"></script>
+    <script src="/assets/code-nachladen.js?v=14" type="module"></script>
+    <!-- Peripherie (Fuehrung, Papierkorb, Kamera, @-Erwaehnung, Codeblock-Werkzeuge)
+         laedt erst bei ihrer Handlung — Betreiber-Freigabe 2026-08-24 "Startseite abspecken". -->
+    <script src="/assets/bedarf-nachladen.js?v=1" type="module"></script>
+    <script src="/assets/app.js?v=b102" type="module"></script>
+    <script src="/assets/pwa-schnellstart.js?v=3" type="module"></script>
+    <script src="/assets/cline-model-menu.js?v=cline-submenu-20260825-6" type="module"></script>
     <!-- Browser-Panel und Maus-Panel: erst wenn sie gebraucht werden.
          63,3 KB von 335,6 KB zahlte bisher jeder Seitenaufruf fuer zwei
          Flaechen, die beim ersten Bildaufbau niemand sieht (browser-nachladen.js). -->
@@ -985,15 +1008,9 @@
     <script src="/assets/profile-dock.js?v=b48" type="module"></script>
     <script src="/assets/chat-store.js?v=b64" type="module"></script>
     <script src="/assets/chat-history-view.js?v=b58" type="module"></script>
-    <script src="/assets/chat-actions.js?v=b40" type="module"></script>
-    <script src="/assets/chat-code-copy.js?v=zcode2-20260816" type="module"></script>
-    <script src="/assets/chat-runter-pfeil.js?v=3" type="module"></script>
-    <script src="/assets/chat-warte-reste.js?v=1" type="module"></script>
+    <script src="/assets/chat-actions.js?v=b44" type="module"></script>
     <script src="/assets/panel-status.js?v=1" type="module"></script>
     <script src="/assets/chat-stopp.js?v=11" type="module"></script>
-    <script src="/assets/erwaehnung.js?v=2" type="module"></script>
     <script src="/assets/modell-menue-start.js?v=1" type="module"></script>
-    <script src="/assets/chat-code-farben.js?v=1" type="module"></script>
-    <script src="/assets/chat-code-download.js?v=2" type="module"></script>
   </body>
 </html>
