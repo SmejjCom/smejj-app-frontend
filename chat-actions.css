@@ -22,8 +22,10 @@
      Touch-Ziel des Projekts. Jetzt wandert der Versionswaehler in eine zweite
      Zeile und die Knoepfe behalten ihre Groesse. */
   flex-wrap: wrap;
-  gap: 2px;
-  margin: -3px 0 2px;
+  gap: 0;
+  /* dicht unter der Textunterkante (Betreiber 2026-08-16: "fast mit
+     oberer Kante treffen"), klein und edel */
+  margin: -7px 0 2px;
   max-width: min(980px, 100%);
 }
 
@@ -72,8 +74,8 @@
 }
 
 .msg-act svg {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
@@ -99,6 +101,16 @@
   color: rgba(246, 243, 238, 0.24);
 }
 
+/* Uhrzeit am Zeilenende wie ZCode (chat-actions.js syncZeit) — reine
+   Anzeige, kein Knopf. */
+.msg-zeit {
+  margin-left: 6px;
+  font-size: 11.5px;
+  color: rgba(246, 243, 238, 0.4);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 /* Versionswaehler: lesbares Label statt zwei namenloser Pfeile. */
 .msg-versions {
   display: inline-flex;
@@ -120,9 +132,9 @@
 
 @media (pointer: fine) {
   .msg-act {
-    width: 28px;
-    height: 28px;
-    min-height: 28px;
+    width: 26px;
+    height: 26px;
+    min-height: 26px;
   }
 
   .msg-version-step {
@@ -156,6 +168,29 @@
   }
 }
 
+/* Betreiber-Anweisung 2026-08-30 ("Icons in einer Zeile und nicht unten
+   rutschen"): Das Wort-Label des Versionswaehlers ("Version 2 von 3", je
+   Fassung laenger mit "· geändert …") machte die Leiste bei 375–430 px zu
+   breit — der Waehler wanderte in eine zweite Zeile (der Umbruch war am
+   2026-07-28 bewusst gewaehlt worden, um die Touch-Ziele zu halten).
+   Ohne Label passt die Regelmaessigkeit: sechs Aktionen (264 px) stehen
+   immer in einer Zeile; mit Versionspfeilen (358 px) wird bei 375 px um
+   wenige Pixel WAAGRECHT gescrollt statt zu umbrechen — die 44-px-Ziele
+   bleiben unangetastet. Die Nummer traegt der title des Waehlers
+   (chat-actions.js). Nutzerzeilen starten linksbündig, sobald die Zeile
+   voll ist: Eine rechtsbündige, ueberlaufende Flexbox-Zeile ist im Browser
+   nach links nicht erreichbar (scrollLeft geht nicht unter 0). */
+@media (max-width: 600px) {
+  .msg-version-label { display: none; }
+  .msg-actions {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none; /* die Leiste ist kein Scroll-Bereich, nur Netz */
+  }
+  .msg-actions::-webkit-scrollbar { display: none; }
+  .msg-actions.is-user { justify-content: flex-start; }
+}
+
 @media (max-width: 600px) and (pointer: fine) {
   #startLog .msg-act,
   .msg-actions .msg-act.msg-act {
@@ -176,7 +211,7 @@
 }
 
 .msg-version-label {
-  font-size:14.5px;
+  font-size: 14.5px;
   line-height: 1;
   white-space: nowrap;
   color: rgba(246, 243, 238, 0.62);
@@ -203,7 +238,7 @@
 .msg-menu-head {
   margin: 0;
   padding: 6px 10px 8px;
-  font-size:14.5px;
+  font-size: 14.5px;
   line-height: 1.3;
   color: rgba(246, 243, 238, 0.52);
 }
@@ -219,7 +254,7 @@
   background: transparent;
   color: rgba(246, 243, 238, 0.92);
   font: inherit;
-  font-size:15.5px;
+  font-size: 15.5px;
   text-align: left;
   cursor: pointer;
 }
@@ -309,7 +344,7 @@
 }
 
 .msg-editor-note {
-  font-size:14.5px;
+  font-size: 14.5px;
   color: rgba(246, 243, 238, 0.64);
 }
 
@@ -325,7 +360,7 @@
   background: transparent;
   color: rgba(246, 243, 238, 0.86);
   font: inherit;
-  font-size:15.5px;
+  font-size: 15.5px;
   cursor: pointer;
 }
 
@@ -360,7 +395,7 @@
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 6px;
-  font-size:14.5px;
+  font-size: 14.5px;
   color: rgba(246, 243, 238, 0.62);
 }
 
@@ -371,7 +406,7 @@
   background: transparent;
   color: rgba(246, 243, 238, 0.78);
   font: inherit;
-  font-size:14.5px;
+  font-size: 14.5px;
   min-height: 0;
   cursor: pointer;
 }
@@ -398,7 +433,7 @@
 
 .msg-source-url {
   color: #9ecbf0;
-  font-size:15.5px;
+  font-size: 15.5px;
   text-decoration: none;
   overflow-wrap: anywhere;
 }
@@ -413,7 +448,7 @@
 }
 
 .msg-source-meta {
-  font-size:14.5px;
+  font-size: 14.5px;
   color: rgba(246, 243, 238, 0.56);
   overflow-wrap: anywhere;
 }
@@ -429,7 +464,7 @@
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
-  font-size:15.5px;
+  font-size: 15.5px;
   color: rgba(246, 243, 238, 0.86);
 }
 
@@ -440,7 +475,7 @@
   background: transparent;
   color: #f6f3ee;
   font: inherit;
-  font-size:15.5px;
+  font-size: 15.5px;
   cursor: pointer;
 }
 
@@ -483,7 +518,7 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   color: rgba(246, 243, 238, 0.82);
-  font-size:16.5px;
+  font-size: 16.5px;
   line-height: 1.2;
 }
 
@@ -509,7 +544,7 @@
 }
 
 .paste-attach-remove {
-  font-size:21px;
+  font-size: 21px;
   line-height: 1;
 }
 

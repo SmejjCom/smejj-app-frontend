@@ -3317,6 +3317,16 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     min-height: 44px;
   }
 }
+@media (max-width: 600px) {
+  .msg-version-label { display: none; }
+  .msg-actions {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .msg-actions::-webkit-scrollbar { display: none; }
+  .msg-actions.is-user { justify-content: flex-start; }
+}
 @media (max-width: 600px) and (pointer: fine) {
   #startLog .msg-act,
   .msg-actions .msg-act.msg-act {
@@ -3932,6 +3942,22 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
 .profile-avatar,
 #settings .ak-avatar {
   border-radius: 999px !important;
+}
+
+/* ---- mobil-composer.css ---- */
+@media (max-width: 600px) {
+  .prompt-actions { flex-wrap: nowrap; row-gap: 6px; }
+  .prompt-actions .model-picker button,
+  .prompt-actions .model-picker .mode-pill {
+    max-width: 28vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .prompt-actions .fpille-nachdenken { max-width: 24vw; }
+  .prompt-actions .fpille-nachdenken .chip-label {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+}
+@media (max-width: 360px) {
+  .prompt-actions .fpille-nachdenken .chip-label { display: none; }
 }
 
 /* ---- design-v11.css ---- */

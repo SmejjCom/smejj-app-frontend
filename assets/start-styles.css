@@ -1002,10 +1002,6 @@ body.is-resizing-panel .panel-resizer::before {
   display: grid;
   gap: 20px;
 }
-/* DESIGN LOCK: smejj start design lock v1.
-   Nicht aendern ohne schriftliche Bestaetigung des Nutzers.
-   Geschuetzt: Startseite, dunkler Mittelbereich, unteres Eingabefeld,
-   Modellname, Icon-Zeile, Trennlinie und kompakte Seitenleisten. */
 #start.view.is-active {
   display: grid;
   grid-template-rows: 1fr;
@@ -1101,7 +1097,6 @@ body.is-resizing-panel .panel-resizer::before {
   overflow-y: auto;
   resize: none;
 }
-/* END DESIGN LOCK: smejj start design lock v1. */
 .prompt-glass textarea::placeholder {
   color: rgba(151, 158, 171, 0.78);
 }
@@ -3322,6 +3317,16 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     min-height: 44px;
   }
 }
+@media (max-width: 600px) {
+  .msg-version-label { display: none; }
+  .msg-actions {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .msg-actions::-webkit-scrollbar { display: none; }
+  .msg-actions.is-user { justify-content: flex-start; }
+}
 @media (max-width: 600px) and (pointer: fine) {
   #startLog .msg-act,
   .msg-actions .msg-act.msg-act {
@@ -3939,6 +3944,22 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   border-radius: 999px !important;
 }
 
+/* ---- mobil-composer.css ---- */
+@media (max-width: 600px) {
+  .prompt-actions { flex-wrap: nowrap; row-gap: 6px; }
+  .prompt-actions .model-picker button,
+  .prompt-actions .model-picker .mode-pill {
+    max-width: 28vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .prompt-actions .fpille-nachdenken { max-width: 24vw; }
+  .prompt-actions .fpille-nachdenken .chip-label {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+}
+@media (max-width: 360px) {
+  .prompt-actions .fpille-nachdenken .chip-label { display: none; }
+}
+
 /* ---- design-v11.css ---- */
 :root {
   --v11-cy: #32f6ea;
@@ -4401,10 +4422,6 @@ body.is-resizing-panel #rightPanelResize {
   backdrop-filter: blur(34px) saturate(170%);
   box-shadow: inset 0 1px 0 var(--v11-lichtkante);
 }
-
-/* ---- design-v11-spur.css ---- */
-/* smejj.com — Design V11, Teil 1b (Spur & Panels). Aufgeteilt 2026-08-25
-   (Zeilen-Diaet); reine Buendel-Quelle, Regeln unveraendert. */
 #start.has-start-chat .prompt-glass { margin-bottom: 6px; }
 #start .prompt-actions {
   display: contents;
@@ -4920,13 +4937,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   box-shadow: none;
   transition: color 120ms ease;
 }
-
-/* ---- design-v11-flaechen.css ---- */
-/* smejj.com — Design V11, Teil 2 (Code-Bereich & Feinheiten).
-   Aufgeteilt am 2026-08-25 (Zeilen-Diaet, Buendel-Projekt Stufe 3): Teil 1 ist
-   design-v11.css. BEIDE sind reine Buendel-Quellen (scripts/build/
-   bundle-start-styles.mjs) — ausgeliefert wird weiterhin nur start-styles.css;
-   der CSS-KERN bleibt byte-identisch zur ungeteilten Fassung (bewiesen). */
 #code .repochip:hover { color: #f2f5f4; background: transparent; }
 #code #codeProjektChip { display: none; }
 #code .repochip.an {
@@ -5396,23 +5406,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   cursor: pointer;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
-
-/* ---- mobil-composer.css ---- */
-/* Mobil-Composer (Betreiber-Befund 2026-08-25, iPhone-PWA).
-   Der Modell-Chip waechst mit "(Gruendlich)" und ragte ueber das Glas hinaus;
-   die Zeile ist nowrap und lief rechts aus dem Bild. Chip begrenzen (Ellipsis),
-   und als Sicherheitsnetz darf die Zeile sauber umbrechen statt ueberzulaufen. */
-@media (max-width: 600px) {
-  .prompt-actions { flex-wrap: wrap; row-gap: 6px; }
-  .prompt-actions .model-picker button,
-  .prompt-actions .model-picker .mode-pill {
-    max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-}
-
-/* ---- design-v11-fein.css ---- */
-/* smejj.com — Design V11, Teil 3 (Feinheiten). Aufgeteilt 2026-08-25
-   (Zeilen-Diaet); reine Buendel-Quelle wie Teil 1 und 2, Regeln unveraendert. */
 .chat-runter:hover { background: rgba(40, 48, 58, 0.95); }
 .chat-runter svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .chat-stopp {

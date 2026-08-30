@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v687";
+const CACHE_NAME = "smejj-shell-v713";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -211,6 +211,7 @@ const SHELL = [
   "/assets/api-keys-surface.js",
   "/assets/api-keys-surface.css",
   "/assets/auth-gate.js",
+  "/assets/fehler-faenger.js",
   "/assets/offline-banner.js",
   "/assets/chat-history-context.js",
   "/assets/system-status-text.js",
@@ -224,8 +225,10 @@ const SHELL = [
   "/assets/design-v11-views.css",
   "/assets/settings-surface.css",
   "/assets/account-privacy.css",
+  "/assets/account-privacy-formulare.css",
   "/assets/panel-backdrop.css",
   "/assets/browser-pane.js",
+  "/assets/browser-pane-persistenz.js",
   "/assets/auth-gate-frueh.js",
   "/assets/browser-nachladen.js",
   "/assets/browser-pane-backdrop.js",
@@ -252,6 +255,9 @@ const SHELL = [
   "/assets/panel-backdrop.js",
   "/assets/premium-surfaces.js",
   "/assets/settings-surface.js",
+  // api-konto-surface wird von settings-surface.js dynamisch geladen —
+  // ohne Precache-Eintrag ist die API-Konto-Ansicht offline tot (Befund 25.08.).
+  "/assets/api-konto-surface.js",
   "/assets/settings-runtime.js",
   "/assets/provider-settings.js",
   "/assets/cline-model-menu.js",
@@ -271,6 +277,10 @@ const SHELL = [
   "/assets/search-overlay.js",
   "/assets/view-chrome.js",
   "/assets/composer-tools.js",
+  "/assets/pwa-schnellstart.js",
+  "/assets/such-nachladen.js",
+  // Ohr-Solo der Sprachwelle (25.08.): statischer Import aus composer-tools.
+  "/assets/voice-ohr-solo.js",
   "/assets/composer-plus-menu.js",
   "/assets/composer-bild-anhang.js",
   "/assets/voice-typed-send.js",
@@ -287,10 +297,12 @@ const SHELL = [
   "/assets/voice-premium-tts.js",
   "/assets/voice-warmup.js",
   "/assets/ai/chat-stream.js",
+  "/assets/ai/chat-schritte-anzeige.js",
   "/assets/ai/strom-stillstand.js",
   "/assets/ai/fetch-retry.js",
   "/assets/composer-dictation.js",
   "/assets/chat-store.js",
+  "/assets/chat-store-bereiche.js",
   "/assets/chat-history-view.js",
   "/assets/chat-history-text.js",
   "/assets/chat-history-cards.js",
@@ -324,6 +336,7 @@ const SHELL = [
   "/assets/topbar-krume.js",
   "/assets/spur-start.js",
   "/assets/code-flaeche.js",
+  "/assets/code-anhaenge.js",
   "/assets/code-nachladen.js",
   "/assets/code-modell-menue.js",
   "/assets/kamera.js",
@@ -411,6 +424,8 @@ const SHELL = [
   "/assets/chat-owner.js",
   "/assets/medien-absicht.js",
   "/assets/nachladen.js",
+  "/assets/bedarf-nachladen.js",
+  "/assets/sendepfad-nachladen.js",
 ];
 
 self.addEventListener("install", (event) => {
