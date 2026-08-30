@@ -165,12 +165,28 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
  */
 export function verdrahteOhrSolo(host) {
   const ear = host.createServerEar({ url: host.url, budgetMs: 4000 });
+  // Betreiber-Befund 2026-08-30 ("Sprachwelle am iPhone getestet — geht nicht"):
+  // iOS-Home-Bildschirm-PWAs verweigern getUserMedia mit NotAllowedError, OHNE
+  // je einen Dialog gezeigt zu haben. Der alte Einheits-Fehlertext ("Sprach-
+  // erkennung nicht verfügbar") klang nach Geraetedefekt und verriet den echten
+  // Hebel nicht. Darum unterscheidet die Meldung jetzt die Ursache — der Rest
+  // des Automaten bleibt unberuehrt (Non-Regression).
+  function soloFehlertext(fehler) {
+    const art = fehler?.name || "";
+    if (art === "NotAllowedError" || art === "SecurityError" || art === "PermissionDeniedError") {
+      return "Mikrofon ist für diese App gesperrt — bitte unter Einstellungen › Datenschutz › Mikrofon für smejj.com erlauben (oder einmal in Safari öffnen) und es erneut versuchen. Bis dahin: Frage unten eintippen, die Antwort wird vorgelesen.";
+    }
+    if (art === "NotFoundError" || art === "OverconstrainedError") {
+      return "Kein Mikrofon gefunden — Frage unten eintippen, die Antwort wird vorgelesen.";
+    }
+    return "";
+  }
   const solo = createOhrSolo({
     ear,
     aufStatus: () => host.setStatus("listening", "Ich höre zu ..."),
     aufTranskript: (text) => { host.setTranskript(text); host.senden(text); },
     aufLeer: () => { const s = host.state; if (s.voiceModeActive && !s.voiceMuted && s.ohrSoloAktiv) solo.start(); },
-    aufFehler: () => host.fallback()
+    aufFehler: (fehler) => host.fallback(soloFehlertext(fehler))
   });
   const anschluss = {
     stop: () => solo.stop(),
