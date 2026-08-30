@@ -1,0 +1,470 @@
+/* smejj.com — Konto & Datenschutz, Teil 2 (Zeilen-Diaet 2026-08-25).
+   Teil 1 ist account-privacy.css; BEIDE laedt account-privacy.js (loadStyles)
+   mit derselben Versionsmarke. Regeln unveraendert uebernommen. */
+#profile .account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+#profile .account-actions button,
+#profile .account-row button {
+  padding: 10px 18px;
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
+  border-radius: 0;
+  background: var(--konto-glass-strong);
+  color: var(--premium-text, #eef1f2);
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#profile .account-actions button:hover,
+#profile .account-row button:hover {
+  background: var(--konto-glass-hover);
+}
+
+#profile .account-row button {
+  flex-shrink: 0;
+  width: auto;
+}
+
+#profile #logoutLocal {
+  border-color: var(--konto-danger-line);
+  background: transparent;
+  color: var(--konto-danger-text);
+}
+
+#profile #logoutLocal:hover {
+  background: var(--konto-danger-hover);
+}
+
+#profile .danger-action {
+  border-color: var(--konto-danger-line) !important;
+  background: transparent !important;
+  color: var(--konto-danger-text) !important;
+}
+
+#profile .danger-action:hover {
+  background: var(--konto-danger-hover) !important;
+}
+
+#profile .account-status {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--konto-line-soft);
+  border-radius: 0;
+}
+
+#profile .account-status div {
+  display: grid;
+  gap: 3px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--konto-line-soft);
+}
+
+#profile .account-status div:nth-child(even) {
+  border-inline-start: 1px solid var(--konto-line-soft);
+}
+
+#profile .account-status div:nth-child(n + 3) {
+  border-bottom: 0;
+}
+
+#profile .account-status strong {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#profile .account-status span {
+  color: var(--premium-text, #eef1f2);
+  font-size: 14px;
+}
+
+#profile .account-note {
+  margin: 14px 0 0;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Profilbild-Zeile (Markup aus profile-picture-control.js). */
+#profile .account-picture {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--konto-line-soft);
+  border-radius: 0;
+}
+
+#profile .account-picture .profile-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 0;
+  border: 1px solid rgba(50, 246, 234, 0.45);
+}
+
+#profile .account-picture-body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+#profile .account-picture-body small {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+#profile .account-picture-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+
+#profile .account-picture-choose {
+  padding: 10px 18px;
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
+  border-radius: 0;
+  background: var(--konto-glass-strong);
+  color: var(--premium-text, #eef1f2);
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#profile .account-picture-choose:hover {
+  background: var(--konto-glass-hover);
+}
+
+/* Der native File-Input wird verborgen; bedient wird der sichtbare Knopf
+   daneben (.account-picture-choose, 167x44). Zwei Dinge, die 2026-08-09
+   auffielen, als der Touch-Waechter ihn mit 30x44 meldete:
+
+   - `min-height` schlaegt `height`, egal wie spezifisch die height-Regel ist.
+     app-surfaces.css setzt `.premium-view input { min-height: 50px }`, damit
+     blieb das Feld 44+ px hoch statt 1 px. Deshalb hier ausdruecklich
+     min-height: 1px.
+   - Verborgen war er trotzdem, aber allein durch `clip` — eine veraltete
+     Eigenschaft, die nur bei position: absolute wirkt. Faellt eine der beiden
+     weg, stuende ein natives Datei-Widget mitten in der Konto-Ansicht.
+     clip-path ist der moderne Ersatz und sichert es doppelt ab. */
+#profile #profilePictureInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+}
+
+#profile #profilePictureInput:focus-visible + .account-picture-choose {
+  outline: 2px solid var(--konto-fokus);
+  outline-offset: 2px;
+}
+
+#profile .output {
+  margin-top: 18px;
+  min-height: 46px;
+  padding: 13px 16px;
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 13.5px;
+}
+
+/* Mobil UND Tablet: Navigation wird zur umbrechenden Chip-Leiste — kein
+   Scroll-Verlust. Die Grenze lag bis 2026-08-22 bei 760 px und war damit zu
+   niedrig: bei 768 px steht links noch die 200-px-Schublade, von den
+   uebrigen 568 px nahm die 250-px-Navigation den Loewenanteil, und fuer den
+   Inhalt blieben 234 px. Die Profilbild-Zeile braucht rund 350 px und lief
+   um 78 px ueber den Rand hinaus. Gemessen mit
+   `npm run measure:responsive`. */
+@media (max-width: 900px) {
+  #profile .account-layout > .account-nav {
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  #profile .account-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px;
+    background: transparent;
+    border: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  #profile .account-nav button {
+    width: auto;
+    padding: 9px 14px;
+    border: 1px solid var(--konto-line);
+    border-radius: 0;
+    background: var(--konto-glass);
+    font-size: 13px;
+  }
+
+  #profile .account-nav button.is-active {
+    box-shadow: inset 0 3px 0 var(--v11-cy);
+  }
+
+  #profile .account-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #profile .account-status {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #profile .account-status div:nth-child(even) {
+    border-inline-start: 0;
+  }
+
+  #profile .account-status div:nth-child(n + 3) {
+    border-bottom: 1px solid var(--konto-line-soft);
+  }
+
+  #profile .account-status div:last-child {
+    border-bottom: 0;
+  }
+
+  #profile .account-picture {
+    flex-wrap: wrap;
+  }
+  #profile .account-picture-actions {
+    margin-inline-start: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  #profile.premium-view {
+    padding-top: 64px;
+  }
+
+  #profile .account-row {
+    flex-wrap: wrap;
+  }
+
+  #profile .account-row button,
+  #profile .state-badge,
+  #profile .permission-state {
+    margin-inline-start: 0;
+  }
+}
+
+/* Fix 2026-07-26b (Live-Befund): Ein globaler Label-Stil der Premium-Flaechen
+   setzt text-transform uppercase — Schalter-Zeilen (label.account-row) sollen
+   aber normale Schreibweise zeigen wie die div-Zeilen daneben. */
+#profile label.account-row,
+#profile label.account-row strong,
+#profile label.account-row small {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Nutzungszaehler (Schritt 2, 2026-07-26): rechte Spalte der Nutzungs-Zeilen. */
+#profile .usage-count {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+#profile .usage-count strong {
+  font-size: 22px;
+  font-weight: 750;
+  color: #7ee8da;
+  line-height: 1.1;
+}
+
+#profile .usage-count small {
+  color: var(--premium-muted, #9fa8ad);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Konto-Formulare im Seitenfluss (2026-08-04).
+   Passwortwechsel und Kontoloeschung liefen bis dahin ueber Browser-Dialoge —
+   die maskieren nicht und kennen keine Passwortverwaltung. Die Felder liegen
+   jetzt hier, in derselben Optik wie der Rest der Konto-Ansicht. */
+#profile .account-inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--konto-line);
+  border-top-color: var(--konto-edge);
+  /* --konto-glass, nicht ein eigener Wert: die Variable kennt BEIDE Farbschemata.
+     Hier stand zuerst `var(--konto-panel, rgba(255,255,255,0.03))` — die Variable
+     gibt es gar nicht, der weisse Rueckfallwert galt also immer und haette im
+     hellen Schema eine fremde Flaeche erzeugt. */
+  background: var(--konto-glass);
+}
+
+#profile .account-inline-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+/* Exakt die Optik der vorhandenen Konto-Felder (.account-grid input, Zeile 370):
+   gleiche Polsterung, gleiche Linie, gleicher Feldgrund. Ein eigener Stil waere
+   hier ein zweiter Ort, an dem das Konto-Glas gepflegt werden muesste. */
+#profile .account-inline-form input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--konto-line);
+  border-radius: 0;
+  background: var(--konto-field-bg);
+  color: var(--premium-text, #eef1f2);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Fokusring in der Akzentfarbe, nicht in --konto-edge: die Kante ist im HELLEN
+   Schema rgba(255,255,255,0.9) — ein weisser Ring auf hellem Grund ist kein Ring.
+   var(--v11-cy) traegt in beiden Schemata und ist dieselbe Farbe wie beim Bildwaehler
+   weiter oben in dieser Datei. */
+#profile .account-inline-form input:focus-visible {
+  outline: 2px solid var(--konto-fokus);
+  outline-offset: 2px;
+}
+
+#profile .account-inline-form .account-actions {
+  margin-top: 4px;
+}
+
+/* Light-Leak Rahmen-Beleuchtung — seit 2026-08-22 nur noch auf der
+   Willkommens-Karte.
+   Der Effekt kam am 2026-08-11 (efe767d7) "across login onboarding and
+   profile". Am 2026-08-16 folgte die Betreiber-Ansage "Leuchten gedaempft,
+   Augen schonen" (f77dc46e) — sie zog design-v11.css und die Spur nach,
+   fasste diese Datei aber nie an. Der Konto-Bereich leuchtete deshalb als
+   einziger weiter, fuenf Tage nach der Gegenansage.
+   Die Willkommens-Karte behaelt ihn: sie ist eine einmalige Begruessung,
+   kein Arbeitsbereich, an dem jemand lange sitzt. */
+.onboarding-card {
+  position: relative;
+  box-shadow: 
+    0 0 25px rgba(50, 246, 234, 0.28),
+    0 0 60px rgba(126, 232, 218, 0.15),
+    inset 0 0 15px rgba(50, 246, 234, 0.12);
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+/* position bleibt: andere Regeln setzen darin absolut positionierte Kinder. */
+#profile .account-panel,
+#profile .account-nav {
+  position: relative;
+}
+
+.onboarding-card::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(50, 246, 234, 0.35) 0%, rgba(126, 232, 218, 0.1) 45%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 50%;
+  filter: blur(10px);
+}
+
+.onboarding-card::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(50, 246, 234, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 50%;
+  filter: blur(10px);
+}
+
+/* Die Media-Query, die den Schein bei schmalen Fenstern in die Ecke
+   HINEINrueckte, ist mit den Leuchtkugeln des Konto-Bereichs entfallen —
+   sie nannte ausschliesslich #profile .account-panel. Ihr Befund bleibt
+   fuer die Nachwelt festgehalten: die 40 px Ueberstand liegen bei voller
+   Panelbreite ausserhalb des Fensters, zu sehen ist davon nichts, aber die
+   Seite bekommt seitlichen Bildlauf und wackelt beim Wischen (bei 320 px
+   gemessene 33 px, `npm run measure:responsive`). Wer den Schein je
+   zurueckholt, braucht sie wieder. */
+
+
+
+/* Bildschirm 41: "Dein Zugang" — Angemeldet mit / Bezahlt wurde mit */
+#profile .account-zugang {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13);
+}
+#profile .zugang-zeile {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 15px;
+}
+#profile .zugang-was {
+  min-width: 150px;
+  color: rgba(242, 245, 244, 0.58);
+}
+#profile .zugang-wert { display: inline-flex; gap: 9px; align-items: center; flex-wrap: wrap; }
+#profile .zugang-hinweis {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: #ffd68a;
+}
+
+
+/* Bildschirm 46: der groesste Knopf der Seite */
+#profile .sicherheit-panik {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 0 0 18px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(255, 214, 138, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(255, 214, 138, 0.35);
+}
+#profile .sicherheit-panik > div { flex: 1; min-width: 220px; display: grid; gap: 4px; }
+#profile .sicherheit-panik strong { font-size: 17px; }
+#profile .sicherheit-panik span { font-size: 14.5px; color: rgba(242, 245, 244, 0.78); line-height: 1.5; }
+#profile .sicherheit-panik-knopf {
+  padding: 14px 22px !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  background: #ffd68a !important;
+  color: #241a04 !important;
+  border: 0 !important;
+}

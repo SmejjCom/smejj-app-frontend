@@ -1,8 +1,19 @@
+/* smejj.com — Betreiber-Regel 2026-08-13: das GESAMTE Design ist viereckig.
+   (Eckig-Kontrolle ueber alle 17 Ansichten, Betreiber-Wahl
+   "Alles ausser Avatar".) EINE Regel statt ~200 Einzelkorrekturen in 20
+   Dateien; laedt als letztes Stylesheet und gewinnt per !important auch
+   gegen Inline-Stile. Wer kuenftig bewusst rundet, braucht hier eine
+   dokumentierte Ausnahme — genau so ist es gedacht. */
+
 *,
 *::before,
 *::after {
   border-radius: 0 !important;
 }
+
+/* Einzige freigegebene Ausnahme: Avatare bleiben Kreise (Betreiber-Wahl,
+   Branchenstandard). Profil-Knopf unten links + Anbieter-Kreise im
+   API-Schluessel-Bereich. */
 .profile-avatar,
 #settings .ak-avatar {
   border-radius: 999px !important;

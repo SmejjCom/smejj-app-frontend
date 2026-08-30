@@ -1,0 +1,385 @@
+/* smejj.com — Design V11 fuer ALLE Ansichten ausser der Startseite.
+ * Betreiber-Ansage 2026-08-15: "Muss 1 zu 1 wie in Mockup steht sein."
+ *
+ * Der Befund, der diese Datei ausgeloest hat (live gemessen am 2026-08-15
+ * in "Meine Dateien"): EINUNDZWANZIG Rahmen in einer einzigen Ansicht, zwei
+ * cyan GEFUELLTE Knoepfe, und der alte Cyanton rgba(45,212,191) an jedem
+ * Knopfrand. Genau das, was V11 verbietet — und genau der Befund des
+ * Betreibers vom 2026-08-14: "So viele Rahmen stoehnen mich auch."
+ *
+ * Die Ursache ist keine schlechte Regel, sondern VIER Generationen
+ * uebereinander: styles.css legt Kaesten an, app-surfaces.css legt
+ * Premium-Kaesten darueber, design-cyan-views.css faerbt deren Raender cyan,
+ * ui-modern.css bringt noch einmal eigene. Jede Generation hat nur
+ * hinzugefuegt, keine hat aufgeraeumt.
+ *
+ * Diese Datei raeumt auf. Sie traegt die eine Regel aus V11:
+ *
+ *   Glas ist die FLAECHE. Die Linie ist der TRENNER. Der Abstand ist die
+ *   GRUPPE. Nie zwei davon am selben Element.
+ *
+ * und die zweite:
+ *
+ *   Farbe nur da, wo sie etwas BEDEUTET. Die EINE Hauptaktion ist gefuellt
+ *   (.btn.pri im Mockup), Aktiv-Zustaende tragen Kante, alles andere Grau.
+ *
+ * LADEREIHENFOLGE — der Grund, warum das hier ueberhaupt wirkt:
+ * premium-surfaces.js haengt app-surfaces.css und design-cyan-views.css zur
+ * Laufzeit in den Kopf, also NACH dem Buendel. design-v11.css sitzt im
+ * Buendel und verliert deshalb gegen sie. Diese Datei wird von derselben
+ * Stelle geladen und steht dort als LETZTE — sie gewinnt bei gleicher
+ * Spezifitaet durch Reihenfolge. Wer hier eine Datei dahinterhaengt, dreht
+ * die Wirkung wieder zurueck.
+ *
+ * Bewusst OHNE !important: die Selektoren tragen eine Klasse mehr
+ * (.view.premium-view statt .premium-view), damit spaetere, ansichts-eigene
+ * Dateien wie account-privacy.css ihre Sonderfaelle weiter durchsetzen
+ * koennen. !important wuerde ihnen genau das nehmen.
+ *
+ * Farben kommen aus design-v11.css (:root im Buendel) — hier steht kein
+ * einziger Farbwert doppelt.
+ */
+
+/* ===================================================================
+ * 1. Behaelter: Flaeche statt Kasten
+ * ===================================================================
+ * Vorher hatte jeder Behaelter Rahmen UND Hintergrund UND Radius — drei
+ * Signale fuer dieselbe Aussage "das gehoert zusammen". Ab hier traegt die
+ * Flaeche allein, plus ein Lichtstrich an der Oberkante (das ist es, was
+ * Glas zu Glas macht — nicht ein Rahmen ringsum).
+ */
+.view.premium-view .toolbar,
+.view.premium-view .panel-grid,
+.view.premium-view .status-grid,
+.view.premium-view .output,
+.view.premium-view .surface,
+.view.premium-view .feed-item,
+/* Nachtrag 2026-08-22: diese vier bekamen ihre Flaeche bisher NUR aus
+   design-cyan-views.css (cyaner Rand, 14px Radius, Glow, Blur). Mit dem
+   Abraeumen dieser Datei waeren sie sonst flaechenlos geworden — sie
+   gehoeren in dieselbe Liste wie alle anderen Behaelter. */
+.view.premium-view .search-shell,
+.view.premium-view .search-log,
+.view.premium-view .project-card {
+  border: 0;
+  border-radius: var(--v11-r);
+  background: var(--v11-glas);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+}
+
+/* Der leere Zustand ist kein Gegenstand, sondern eine Abwesenheit. Er
+   bekommt darum gar keine Flaeche — nur Abstand und Text. */
+.view.premium-view .empty-state,
+.view.premium-view .search-empty {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Die Zellen INNERHALB eines Rasters bekamen bisher noch einmal je einen
+   eigenen Rahmen — Kasten im Kasten im Kasten. Sie trennt jetzt der
+   Abstand, den das Raster ohnehin schon setzt. */
+.view.premium-view .panel-grid > *,
+.view.premium-view .status-grid > * {
+  border: 0;
+  border-radius: var(--v11-r-sm);
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow: none;
+}
+
+/* ===================================================================
+ * 2. Knoepfe: der cyane Rand war Deko, keine Aussage
+ * ===================================================================
+ * design-cyan-views.css gab JEDEM Knopf einen cyanen Rand. Wenn alles
+ * hervorgehoben ist, ist nichts hervorgehoben — und der Nutzer sieht nicht
+ * mehr, welcher Knopf der wichtige ist.
+ */
+.view.premium-view button,
+.view.premium-view .more-actions summary,
+.view.premium-view .more-menu summary {
+  border: 0;
+  border-radius: var(--v11-r);
+  background: rgba(255, 255, 255, 0.055);
+  color: #f2f5f4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  /* Zwei Schriftstaerken, nie 500 oder 600 — das ist der halbe Grund,
+     warum ChatGPT sauber wirkt. */
+  font-weight: 400;
+  /* Mockup-Wert (.btn: 15.5px) — und Betreiber-Regel: nie unter 14 px. */
+  font-size: 15.5px;
+}
+
+.view.premium-view button:hover,
+.view.premium-view .more-actions summary:hover,
+.view.premium-view .more-menu summary:hover,
+.view.premium-view .more-menu[open] summary {
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Die EINE Hauptaktion je Werkzeugleiste — 1:1 nach Mockup .btn.pri.
+   Die ID-Liste unten spiegelt design-cyan-views.css: dort stehen dieselben
+   sechs Knoepfe mit Doppel-ID-Selektor (1,2,0) und voller Cyan-FUELLUNG.
+   Eine Klassenregel verliert dagegen immer — live gemessen am 2026-08-15:
+   trotz Fundament blieben "Projekt erstellen" und "Projekt speichern"
+   gefuellt. Darum hier dieselben Selektoren, eine Position spaeter. */
+.view.premium-view .toolbar > button:first-child,
+#projects #projectCreate,
+#projects #projectSave,
+#search #searchSubmit,
+#settings #saveSettings,
+#profile #saveProfile,
+#files #storageAgain {
+  /* 1:1 aus dem Mockup (.btn.pri, Endstand): volle Fuellung, dunkle
+     Schrift, Glow, fett. Die aeltere Regel "Kante statt Fuellung" gilt im
+     V11-Mockup nur fuer AKTIV-Zustaende (Karten, Segmente) — die EINE
+     Hauptaktion ist dort ausdruecklich gefuellt. */
+  background: var(--v11-cy);
+  color: #04211f;
+  box-shadow: 0 0 20px var(--v11-cy-glow);
+  font-weight: 700;
+}
+.view.premium-view .toolbar > button:first-child:hover,
+#projects #projectCreate:hover,
+#projects #projectSave:hover,
+#search #searchSubmit:hover,
+#settings #saveSettings:hover,
+#profile #saveProfile:hover,
+#files #storageAgain:hover {
+  background: var(--v11-cy);
+  color: #04211f;
+  box-shadow: 0 0 28px var(--v11-cy-glow);
+}
+
+/* Gefahr — 1:1 nach Mockup .btn.danger. */
+.view.premium-view .danger-action,
+.view.premium-view button.danger {
+  /* 1:1 aus dem Mockup (.btn.danger): rote Schrift und rote Haarlinie
+     immer sichtbar — Gefahr kuendigt sich an, bevor der Zeiger dort ist. */
+  background: transparent;
+  color: var(--v11-bad);
+  box-shadow: inset 0 0 0 1px rgba(255, 77, 79, 0.45);
+}
+.view.premium-view .danger-action:hover,
+.view.premium-view button.danger:hover {
+  background: rgba(255, 122, 124, 0.14);
+  color: #ffb4b6;
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 124, 0.55);
+}
+
+/* ===================================================================
+ * 3. Felder duerfen eine Linie haben
+ * ===================================================================
+ * Hier ist die Ausnahme zur Regel oben, und sie hat einen Grund: ein
+ * Eingabefeld muss man als Eingabefeld ERKENNEN, bevor man hineinklickt.
+ * Eine reine Flaeche ohne Kante sieht aus wie Text.
+ */
+.view.premium-view input,
+.view.premium-view select,
+.view.premium-view textarea {
+  border: 0;
+  border-radius: var(--v11-r-sm);
+  /* 1:1 aus dem Mockup (.inp, Endstand): dunkle Flaeche, Lichtkante NUR
+     oben — kein Ring ringsum. Schrift 15.5px wie dort. */
+  background: rgba(0, 0, 0, 0.24);
+  color: #f2f5f4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  font-size: 15.5px;
+}
+/* --- Der Fokusring, EINE Wahrheit fuer alle Ansichten -------------------
+ * Nachgerechnet am 2026-08-22 (WCAG non-text, Schwelle 3.0). Die App hat
+ * ein helles Schema, und zwar fuer JEDE premium-view
+ * (app-surfaces.css:627), nicht nur fuer Einstellungen und Konto:
+ *   app-surfaces  rgba(255,255,255,0.09) auf #fdfdfb -> ~1.0 (weiss auf
+ *                 weiss, buchstaeblich unsichtbar)
+ *   --v11-cy      #32f6ea auf #fdfdfb                -> 1.33
+ *   --v11-cy      #32f6ea auf dunkel #101216         -> 13.84
+ * Auf Dunkel traegt der Akzentton also muehelos, auf Hell faellt er durch
+ * — und die aeltere Fassung darunter war noch schlechter.
+ *
+ * Gefunden, weil derselbe Fehler im Kontobereich auffiel: dort pinnte ein
+ * Test den Farbwert und behauptete dazu "traegt in hell und dunkel",
+ * ohne je zu rechnen. Der Rest der App hatte dieselbe Luecke, nur ohne
+ * Test, der sie behauptet haette.
+ */
+.view.premium-view {
+  --v11-fokus: var(--v11-cy);
+}
+.view.premium-view[data-settings-theme="light"] {
+  /* 6.29 gegen #fdfdfb — derselbe Ton, den das helle Schema schon fuer
+     "ok" benutzt (--konto-ok-text). */
+  --v11-fokus: #0c6b5e;
+}
+
+.view.premium-view input:focus,
+.view.premium-view select:focus,
+.view.premium-view textarea:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--v11-fokus), 0 0 0 3px var(--v11-cy-glow);
+}
+
+/* ===================================================================
+ * 4. Kopf der Ansicht: ein Haarstrich trennt, kein Rahmen
+ * =================================================================== */
+.view.premium-view .view-header {
+  border-bottom: 1px solid var(--v11-hair);
+}
+
+/* Die Augenbraue schrie bisher in vollem Cyan. Sie ist eine Einordnung,
+   keine Aktion — gedaempft, aber nie unter 14 px und nie blasser als das,
+   was der Betreiber ohne Brille liest. */
+.view.premium-view .eyebrow {
+  color: var(--v11-cy-ink);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.view.premium-view .subhead {
+  color: rgba(246, 243, 238, 0.72);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* ===================================================================
+ * 5. Schwebende Menues
+ * ===================================================================
+ * Sie liegen ueber Text und brauchen darum eine dichtere Flaeche als der
+ * Rest — sonst liest man den Hintergrund mit. Gleiche Anmutung wie die
+ * Menues am Schreibfeld (design-v11.css), damit es EIN Menue-Aussehen gibt.
+ */
+.view.premium-view .more-menu .menu-panel,
+.view.premium-view .more-menu > div[role="menu"],
+/* Der Dialog gehoert in dieselbe Familie: er liegt ueber Text und braucht
+   darum dieselbe dichte Flaeche. Zweiter Selektor ohne .view, weil Dialoge
+   in dieser App teilweise am BODY haengen (gleiche Falle wie beim
+   Drei-Punkte-Menue) — dort greift .view.premium-view nie. */
+.view.premium-view .modal,
+.modal {
+  border: 0;
+  border-radius: var(--v11-r);
+  background: rgba(14, 20, 28, 0.82);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px var(--v11-cy-line);
+}
+
+/* ===================================================================
+ * 6. Die Grundflaeche — was hier BEWUSST NICHT steht
+ * ===================================================================
+ * Bis zum 2026-08-22 faerbte design-cyan-views.css die Flaeche unter
+ * allen 19 Nicht-Start-Ansichten ein: background-color #080d14 (kalt,
+ * blaustichig) plus zwei cyane Radial-Verlaeufe auf .premium-view und
+ * ::before. Das war der eigentliche Bruch zwischen Start und Rest — die
+ * Startseite trug laengst den warmen Grundton der App (styles.css:
+ * #141517 -> #0d0e10), jede andere Ansicht einen anderen.
+ *
+ * Behoben wurde das NICHT durch eine Gegenregel an dieser Stelle,
+ * sondern durch Abraeumen der Schicht: design-cyan-views.css ist leer.
+ * Darunter lag die ganze Zeit schon die richtige Fassung —
+ * app-surfaces.css Zeile 427ff setzt .premium-view auf
+ * `background: transparent` und ::before auf einen grauen Verlauf ohne
+ * jedes Cyan. Sie war nur ueberdeckt.
+ *
+ * MERKREGEL fuer den naechsten, der hier eine Flaechenfarbe vermisst:
+ * Erst pruefen, ob eine aeltere Schicht sie schon setzt und nur
+ * ueberdeckt wird. Eine vierte Generation von Gegenregeln ist genau
+ * das, was diese Datei laut ihrem eigenen Kopf abschaffen soll.
+ *
+ * EINE Regel steht dann doch hier, und zwar diese:
+ * Nach dem Abraeumen war die Flaeche zwar farblos, aber immer noch
+ * DUNKLER als die Startseite. Gemessen am 2026-08-22:
+ *   Startseite (body)   rgb(20,21,23) -> rgb(16,17,19) -> rgb(13,14,16)
+ *   jede Ansicht        rgb(15,17,18) -> rgb( 9,10,12) -> rgb( 5, 6, 8)
+ * Die zweite Zeile ist die Vollbildschicht .premium-view::before aus
+ * app-surfaces.css — sie liegt fix ueber dem Fenster und deckt den
+ * App-Verlauf ab. Farbe war also nur die HAELFTE des Bruchs zwischen
+ * Start und Rest; die andere Haelfte war Helligkeit.
+ *
+ * Der Verlauf des body ist bereits der richtige — die Schicht muss ihn
+ * nur durchlassen. Sie bleibt als Element bestehen (andere Regeln
+ * haengen an ihr), traegt aber keine eigene Flaeche mehr.
+ *
+ * NICHT in app-surfaces.css geaendert: die Datei steht im Start-Lock,
+ * eine Aenderung dort braucht einen neuen Stempel.
+ */
+.view.premium-view::before {
+  background: transparent;
+}
+
+/* ===================================================================
+ * 7. smejjBot: die letzte Ansicht mit eigener Farbwelt
+ * ===================================================================
+ * autonomous-coding.css stammt aus der Zeit vor V11 und bringt eine
+ * komplett eigene Palette mit — #11151a, #20262d, #101419, #12171c,
+ * #0b0e12, #252a31 als DECKENDE Flaechen, dazu eigene Zustandsfarben.
+ * Kein einziges --v11-*-Token, gemessen am 2026-08-22.
+ *
+ * Die Datei selbst bleibt unangetastet: sie steht im Start-Lock. Hier
+ * steht nur die Uebersetzung, und sie gewinnt trotz spaeterer Ladung,
+ * weil .view.premium-view eine Klasse mehr traegt.
+ *
+ * ZWEI Flaechen bleiben BEWUSST deckend — Glas waere dort ein Fehler:
+ * der sticky Tabellenkopf (unter ihm scrollt Text durch) und die
+ * Code-/Diff-Bloecke (Monospace auf durchscheinendem Grund ist genau
+ * die Unlesbarkeit, die V11 vermeiden will). Sie bekommen die V11-
+ * Dunkelheit, nicht die V11-Transparenz.
+ */
+.view.premium-view .ac-table-wrap,
+.view.premium-view .ac-facts > div {
+  border: 0;
+  background: var(--v11-glas);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+}
+
+/* Das Gitter zeichnet seine Trennlinien ueber `gap` auf der eigenen
+   Flaeche — das ist bereits die V11-Idee (der Abstand ist die Gruppe),
+   nur im falschen Ton. */
+.view.premium-view .ac-facts {
+  background: var(--v11-hair);
+}
+
+/* Deckend, mit Absicht (siehe Kopf des Abschnitts). */
+.view.premium-view .ac-table-wrap th {
+  background: #12161c;
+  color: rgba(246, 243, 238, 0.62);
+}
+
+.view.premium-view .ac-verification,
+.view.premium-view .ac-diff {
+  border: 0;
+  background: rgba(0, 0, 0, 0.34);
+  box-shadow: inset 0 1px 0 var(--v11-lichtkante);
+}
+
+/* Das Bett des Fortschrittsbalkens ist eine Vertiefung, keine Flaeche. */
+.view.premium-view .ac-progress {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+/* Die eine Hauptaktion — dieselbe Fuellung wie in jeder anderen
+   Werkzeugleiste (Abschnitt 2), statt eines eigenen Gruen. */
+.view.premium-view .ac-primary {
+  border: 0;
+  background: var(--v11-cy);
+  color: #04211f;
+  box-shadow: 0 0 20px var(--v11-cy-glow);
+  font-weight: 700;
+}
+.view.premium-view .ac-primary:hover:not(:disabled) {
+  background: var(--v11-cy);
+  color: #04211f;
+  box-shadow: 0 0 28px var(--v11-cy-glow);
+}
+
+/* Zustand traegt Farbe UND Wort (V11-Grundregel) — die Woerter stehen
+   schon im Markup, hier kommen nur die drei Toene der App dazu. */
+.view.premium-view .ac-state-passed { color: var(--v11-ok); }
+.view.premium-view .ac-state-blocked { color: var(--v11-bad); }
+.view.premium-view .ac-state-active { color: var(--v11-cy-ink); }
+.view.premium-view .ac-progress span { background: var(--v11-ok); }

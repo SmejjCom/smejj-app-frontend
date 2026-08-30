@@ -32,13 +32,21 @@ const ELEMENTE = Object.freeze([
 
   { id: "nav:start", wo: "Seitenleiste", name: "Neu", selektor: '.nav-button[data-view="start"]' },
   { id: "nav:search", wo: "Seitenleiste", name: "Suche", selektor: '.nav-button[data-view="search"]' },
-  { id: "nav:smejjClaw", wo: "Seitenleiste", name: "Coding", selektor: '.nav-button[data-view="smejjClaw"]' },
+  // Zeigte bis 2026-08-15 auf [data-view="smejjClaw"] — einen Knopf, den es in
+  // der Seitenleiste nie gab. Der Zaehler stand damit dauerhaft auf 0, und
+  // genau das haette der Radar-Bericht als "diesen Bereich findet niemand"
+  // gemeldet: ein Fehlsignal in dem Bericht, der unbenutzte Bedienelemente
+  // aufspueren soll. Der echte Knopf heisst [data-view="code"] und traegt seit
+  // der Klartext-Runde die Beschriftung "Programmieren".
+  // Die Kennung wandert von "nav:smejjClaw" auf "nav:code" mit — es geht kein
+  // Zaehlerstand verloren, weil nie etwas gezaehlt wurde.
+  { id: "nav:code", wo: "Seitenleiste", name: "Programmieren", selektor: '.nav-button[data-view="code"]' },
   { id: "nav:projects", wo: "Seitenleiste", name: "Arbeitsbereich", selektor: '.nav-button[data-view="projects"]' },
   { id: "nav:files", wo: "Seitenleiste", name: "Dateien", selektor: '.nav-button[data-view="files"]' },
   { id: "nav:chatHistory", wo: "Seitenleiste", name: "Verlauf", selektor: '.nav-button[data-view="chatHistory"]' },
   { id: "nav:settings", wo: "Seitenleiste", name: "Einstellungen", selektor: '.nav-button[data-view="settings"]' },
 
-  { id: "jump:websites", wo: "Rechtes Panel", name: "Browser", selektor: '[data-jump="websites"]' },
+  { id: "browser-oeffnen", wo: "Rechtes Panel", name: "Browser", selektor: "[data-browser-oeffnen]" },
   { id: "jump:files", wo: "Rechtes Panel", name: "Quellen", selektor: '[data-jump="files"]' },
   { id: "jump:automation", wo: "Rechtes Panel", name: "GitHub", selektor: '[data-jump="automation"]' },
   { id: "jump:browser", wo: "Rechtes Panel", name: "Vorschau", selektor: '[data-jump="browser"]' },
@@ -53,7 +61,10 @@ const ELEMENTE = Object.freeze([
 
   { id: "plus:datei", wo: "Plus-Menü", name: "Datei anhängen", selektor: '[data-composer-action="attach-file"]' },
   { id: "plus:foto", wo: "Plus-Menü", name: "Foto oder Bild", selektor: '[data-composer-action="attach-photo"]' },
-  { id: "plus:workspace", wo: "Plus-Menü", name: "Workspace-Datei", selektor: '[data-composer-action="attach-workspace"]' },
+  // Werkzeuge-Menue (Mockup-Umbau 2026-08-15): workspace-Eintrag entfiel,
+  // die neuen Menue-Wege werden stattdessen gezaehlt.
+  { id: "plus:diktat", wo: "Plus-Menü", name: "Sprechen statt tippen", selektor: '[data-composer-action="diktat"]' },
+  { id: "plus:vorlage", wo: "Plus-Menü", name: "Vorlagen-Eintrag", selektor: '[data-composer-action="vorlage"]' },
 
   { id: "voice:beenden", wo: "Sprachmodus", name: "Beenden (X)", selektor: "#voiceModeClose" },
   { id: "voice:stumm", wo: "Sprachmodus", name: "Stummschalten", selektor: "#voiceModeMic" }

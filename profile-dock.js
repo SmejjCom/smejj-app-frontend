@@ -9,24 +9,29 @@
 // Das Dock liest den Profil-Zustand ausschliesslich aus localStorage
 // (Single Source of Truth von app.js) und schreibt ihn nie zurueck.
 
-import "./auth-gate.js?v=2";
+import "./auth-gate.js?v=4";
 // Anonyme Icon-Nutzungsmessung (Konkurrenz-Radar Ausbaustufe 5). Hier
 // eingehaengt statt per <script> in index.html, weil die Startseite unter dem
 // Start-Lock steht — gleiches Muster wie auth-gate.js eine Zeile darueber.
-import "./icon-nutzung.js?v=1";
 // Quellen-Panel (Konkurrenz-Radar V5) — ebenfalls hier eingehaengt, damit
 // index.html unter dem Start-Lock bleibt.
-import "./quellen-panel.js?v=1";
 import { STORAGE_KEYS } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
 import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=1";
-import { initProfileDockMenu, renderProfileDockMenu } from "./profile-dock-menu.js?v=b46";
+import { ladeBeiKlick } from "./nachladen.js?v=1";
 import { initUsageCapture } from "./usage-meter.js?v=1";
 
 // Buttons, nach deren Klick sich Name/Session aendern koennen (app.js schreibt
 // localStorage synchron im Handler; das Neuzeichnen laeuft danach im Makrotask).
 // Schluessel aus account-sessions.js — bewusst dupliziert statt importiert:
 // das Dock soll ohne Auth-Modul startfaehig bleiben (fail-safe).
+let menueGeladen = null;
+let letzterMenueStand = ["", "", false];
+function holeMenue() {
+  menueGeladen ||= import("./profile-dock-menu.js?v=b46").catch((f) => { menueGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", f); throw f; });
+  return menueGeladen;
+}
+
 const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
 const REFRESH_TRIGGERS = "#saveProfile, #registerLocal, #loginLocal, #logoutLocal, #clearLocal";
 
@@ -38,7 +43,14 @@ export function initProfileDock() {
   // Nutzungszaehler-Beobachter: hier eingehaengt, weil profile-dock.js auf der
   // App-Shell laeuft und NICHT unter dem Start-Lock steht (Muster auth-gate.js).
   initUsageCapture();
-  initProfileDockMenu();
+  // Seit 2026-08-24 ("Startseite abspecken") laden Avatar-Menue, Quellen-Panel
+  // und Icon-Zaehler erst bei ihrer Handlung; alle drei liegen im SW-Precache.
+  ladeBeiKlick(["#profileDockButton"], () => holeMenue().then((m) => { m.initProfileDockMenu(); m.renderProfileDockMenu(...letzterMenueStand); return m; }));
+  window.addEventListener("smejj:chats-changed", function quellenEinmal() {
+    window.removeEventListener("smejj:chats-changed", quellenEinmal);
+    import("./quellen-panel.js?v=1").catch((f) => console.error("[smejj.com] Nachladen fehlgeschlagen:", f));
+  });
+  document.addEventListener("pointerdown", () => import("./icon-nutzung.js?v=1").catch(() => {}), { once: true, capture: true });
   render();
   window.addEventListener(PROFILE_PICTURE_EVENT, render);
   window.addEventListener("storage", (event) => {
@@ -65,7 +77,8 @@ function render() {
   button.setAttribute("aria-label", `${t("Profil")}: ${displayName}`);
   button.setAttribute("title", displayName);
   const email = isSignedIn() ? (read(STORAGE_KEYS.session).email || read(STORAGE_KEYS.profile).email || "") : "";
-  renderProfileDockMenu(displayName, email, isSignedIn());
+  letzterMenueStand = [displayName, email, isSignedIn()];
+  if (menueGeladen) menueGeladen.then((m) => m.renderProfileDockMenu(...letzterMenueStand)).catch(() => {});
   face.replaceChildren();
   face.classList.toggle("has-picture", Boolean(picture));
   face.classList.toggle("is-empty", !picture && !initial);

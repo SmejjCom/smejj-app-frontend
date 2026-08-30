@@ -4,7 +4,7 @@
 // Chip-Inhalte wieder an die Aufgabe an; "Als Text einfuegen" holt einen
 // Chip in die Eingabezeile zurueck. Versionierter Import wie in app.js —
 // der Schutztest aus QA-Welle 1 (F-07) verlangt die Cache-Version dort.
-import { showToast } from "./components.js?v=chat-markdown-20260717";
+import { showToast } from "./components.js?v=b48";
 // Bild-Einfuegen (2026-08-14): der Betreiber fuegte einen Screenshot per
 // Cmd+V ein und nichts passierte — dieser Handler kannte nur Text. Bilder
 // laufen jetzt ueber DENSELBEN Weg wie der Datei-Waehler (eine Quelle).
@@ -53,7 +53,7 @@ function ensureRow(input) {
     row = document.createElement("div");
     row.id = "pasteAttachRow";
     row.className = "paste-attach-row";
-    row.setAttribute("aria-label", "Eingefuegte Texte");
+    row.setAttribute("aria-label", "Eingefügte Texte");
     input.parentElement.insertBefore(row, input);
   }
   return row;
@@ -77,13 +77,15 @@ function renderChips(input) {
 
     const label = document.createElement("span");
     label.className = "paste-attach-label";
-    label.textContent = `Eingefuegter Text · ${formatZeichen(chip.text.length)} Zeichen`;
+    label.textContent = chip.name
+      ? `${chip.name} · ${formatZeichen(chip.text.length)} Zeichen`
+      : `Eingefügter Text · ${formatZeichen(chip.text.length)} Zeichen`;
     label.title = `${chip.text.slice(0, 400)}${chip.text.length > 400 ? " …" : ""}`;
 
     const restore = document.createElement("button");
     restore.type = "button";
     restore.className = "paste-attach-restore";
-    restore.textContent = "Als Text einfuegen";
+    restore.textContent = "Als Text einfügen";
     restore.addEventListener("click", () => {
       input.value = input.value ? `${input.value}\n${chip.text}` : chip.text;
       removeChip(chip.id);
@@ -95,13 +97,13 @@ function renderChips(input) {
     const dismiss = document.createElement("button");
     dismiss.type = "button";
     dismiss.className = "paste-attach-remove";
-    dismiss.setAttribute("aria-label", "Eingefuegten Text entfernen");
+    dismiss.setAttribute("aria-label", "Eingefügten Text entfernen");
     dismiss.title = "Entfernen";
     dismiss.textContent = "×";
     dismiss.addEventListener("click", () => {
       removeChip(chip.id);
       renderChips(input);
-      showToast("Eingefuegter Text entfernt");
+      showToast("Eingefügter Text entfernt");
     });
 
     element.append(label, restore, dismiss);
@@ -128,15 +130,39 @@ export function bindPasteAttach({ getInput }) {
     chips.push({ id: chipSeq, text });
     renderChips(input);
     notifyInputChanged(input);
-    showToast(`Langer Text als Anhang uebernommen (${formatZeichen(text.length)} Zeichen)`);
+    showToast(`Langer Text als Anhang übernommen (${formatZeichen(text.length)} Zeichen)`);
   });
+}
+
+/**
+ * Eine Datei als Text-Anhang (Chip) uebernehmen — derselbe Weg wie ein
+ * langer eingefuegter Text, nur mit Dateinamen.
+ *
+ * LIVE GEMESSEN 2026-08-23 (Abnahme): "+ > Datei hinzufuegen" schrieb nur
+ * "[Anhang: abnahme-test.txt (1 KB)]" in die Frage; der Inhalt ging nie mit,
+ * und das Modell antwortete "Ich kann leider keine Datei ... sehen". Jetzt
+ * geht der Inhalt als Chip mit und wird beim Senden mitgeschickt.
+ *
+ * @param {string} name Dateiname (fuer den Chip und den Block-Kopf)
+ * @param {string} text Dateiinhalt
+ * @param {HTMLTextAreaElement} input das Schreibfeld
+ */
+export function uebernehmeTextAnhang(name, text, input) {
+  if (!input || !text) return false;
+  chipSeq += 1;
+  chips.push({ id: chipSeq, text, name: String(name || "Datei") });
+  renderChips(input);
+  notifyInputChanged(input);
+  return true;
 }
 
 // Beim Senden: getippte Aufgabe und Chip-Inhalte zu EINEM Text verbinden.
 // Die Chips gelten danach als verschickt und verschwinden.
 export function composePastedTask(typed) {
   if (chips.length === 0) return typed;
-  const bloecke = chips.map((chip) => `[Eingefuegter Text, ${formatZeichen(chip.text.length)} Zeichen]\n${chip.text}`);
+  const bloecke = chips.map((chip) => (chip.name
+    ? `[Datei: ${chip.name}, ${formatZeichen(chip.text.length)} Zeichen]\n${chip.text}`
+    : `[Eingefuegter Text, ${formatZeichen(chip.text.length)} Zeichen]\n${chip.text}`));
   chips.length = 0;
   document.getElementById("pasteAttachRow")?.remove();
   return [typed, ...bloecke].filter(Boolean).join("\n\n");

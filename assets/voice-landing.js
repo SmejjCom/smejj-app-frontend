@@ -8,7 +8,7 @@
 // das Modul initialisiert sich nur auf Seiten OHNE App-Composer (#startSend).
 // Inhalt oeffentlich, Interaktion angemeldet: fuer Abgemeldete steht auf den
 // Sprachseiten nur ein Anmelde-Knopf (Begruendung im Modulkopf dort).
-import { darfSprechen, buildLoginCta } from "./voice-landing-signin.js?v=3";
+import { darfSprechen, buildLoginCta } from "./voice-landing-signin.js?v=4";
 import { CLIENT_ROUTES } from "./config.js";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
 import { createSpeechQueue } from "./voice-speech-queue.js?v=emojifrei-20260825";

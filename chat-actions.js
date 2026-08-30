@@ -32,7 +32,9 @@ import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } fr
 // Modulinstanz mit eigenem Quellen-Gedaechtnis; der Menuepunkt "Quellen
 // anzeigen" waere dann nie erschienen. Beim lokalen Test 2026-07-28 genau so
 // passiert.
-import { groundingFor } from "/assets/browser-context.js";
+// browser-context laedt seit 2026-08-24 ("Startseite abspecken") erst beim
+// Senden (app.js-Sendepfad); attachSources laeuft immer NACH einer Antwort,
+// da ist das Modul laengst da — der Import unten loest sofort aus dem Cache.
 // EXAKT dieselbe Kennung wie in composer-tools.js und voice-landing.js.
 // Bis 2026-07-29 stand hier ?v=1 — der Browser lud voice-speech-queue.js
 // dadurch ZWEIMAL (live gemessen: zwei Eintraege in
@@ -41,8 +43,10 @@ import { groundingFor } from "/assets/browser-context.js";
 // Funktion sanitizeForSpeech benutzt, es ging also nichts kaputt; die
 // Warteschlange aus demselben Modul haette es zerrissen. Gleiche Falle wie bei
 // settings-runtime.js in sw v184/v185.
-import { sanitizeForSpeech } from "/assets/voice-speech-queue.js?v=blitz-20260726";
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=b61";
+// sanitizeForSpeech erst beim Vorlese-Klick laden (2026-08-24 "Startseite
+// abspecken") — derselbe Spezifizierer wie ueberall, sonst laedt der Browser
+// die Datei doppelt (Vorfall 2026-07-29, siehe oben).
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=b65";
 import { showToast } from "/assets/components.js?v=b48";
 
 const SETTLE_MS = 900;
@@ -380,18 +384,41 @@ function commitEdit(editor) {
   applyResubmitPlan(plan);
 }
 
-function speakEntry(entry) {
+// Vorlese-Zustand (25.08.): zweiter Klick = STOPP, kein Neustart. Utterance
+// referenziert halten — Chromes GC frisst sonst onend und die Ausgabe.
+let vorleseQuelle = null;
+let vorleseUtterance = null;
+
+async function speakEntry(entry) {
   const synthesis = window.speechSynthesis;
   if (!synthesis) {
     showToast("Sprachausgabe wird von diesem Browser nicht unterstützt.", "warn");
     return;
   }
+  // VOR cancel() lesen (danach immer false); nur ein Klick WAEHREND einer
+  // laufenden Ansage ist ein Stopp — sonst faehrt sich der Umschalter fest.
+  const warAmSprechen = synthesis.speaking;
   synthesis.cancel();
   document.querySelector('[data-start-tool="speaker"]')?.classList.remove("is-speaking");
+  if (vorleseQuelle === entry && warAmSprechen) {
+    vorleseQuelle = null;
+    return;
+  }
+  let sanitizeForSpeech;
+  try {
+    ({ sanitizeForSpeech } = await import("/assets/voice-speech-queue.js?v=emojifrei-20260825"));
+  } catch (fehler) {
+    console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler);
+    showToast("Vorlesen gerade nicht möglich — bitte noch einmal versuchen.", "warn");
+    return;
+  }
   const text = sanitizeForSpeech(rawOf(entry), { lang: "de" });
   if (!text) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "de-DE";
+  vorleseQuelle = entry;
+  vorleseUtterance = utterance;
+  utterance.onend = () => { if (vorleseQuelle === entry) { vorleseQuelle = null; vorleseUtterance = null; } };
   synthesis.speak(utterance);
 }
 
@@ -681,13 +708,15 @@ function onKeydown(event) {
 // Die Zuordnung laeuft deshalb ueber die Frage direkt vor der Antwort — nicht
 // ueber "die letzte Quelle", die bei schnellem Nachfassen zur falschen Antwort
 // gehoeren koennte.
-function attachSources() {
+async function attachSources() {
   try {
     const entries = Array.from(log()?.querySelectorAll(":scope > .entry") || []);
     const last = entries[entries.length - 1];
     if (!last || last.classList.contains("user") || hasSources(last)) return;
     const frage = previousUserEntry(last);
     if (!frage) return;
+    // WICHTIG: exakt derselbe Spezifizierer wie in app.js — sonst zweite Instanz.
+    const { groundingFor } = await import("/assets/browser-context.js");
     const quelle = groundingFor(rawOf(frage));
     if (!quelle) return;
     addSources(last, [quelle]);

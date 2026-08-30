@@ -6,7 +6,7 @@ export const SETTINGS_VERSION = 2;
 
 const SAFE_VALUES = {
   theme: new Set(["system", "dark", "light"]),
-  startView: new Set(["last", "start", "projects"]),
+  startView: new Set(["last", "start"]),
   density: new Set(["comfortable", "compact"]),
   fontSize: new Set(["small", "medium", "large"]),
   responseStyle: new Set(["concise", "balanced", "detailed"]),
@@ -70,7 +70,12 @@ export function taskPreferences() {
     verificationRequired: settings.runChecks,
     browserVerificationRequired: settings.browserPreview,
     autonomousNetworkAllowed: settings.networkAccess,
-    confirmationMode: settings.confirmations
+    confirmationMode: settings.confirmations,
+    // Berechtigungs-Modus der Code-Seite: reist zum Server (Chat-Bruecke),
+    // damit der Halt DORT durchgesetzt wird — die reine Systemprompt-Zeile
+    // im Client verlor gegen den Coding-Prompt der Bruecke (live gemessen
+    // 2026-08-16, zweimal).
+    modus: (() => { try { return localStorage.getItem("smejj.codeModus.v1") || "auto"; } catch { return "auto"; } })()
   };
 }
 
@@ -100,6 +105,30 @@ export function buildPreferenceBlock() {
   if (settings.personalization) lines.push(`Persoenliche Anweisung: ${settings.personalization}`);
   const accountInstructions = readAccountInstructions();
   if (accountInstructions) lines.push(`Eigene Anweisungen des Nutzers (Konto): ${accountInstructions}`);
+  // Bildschirm 36: die Dauer-Anweisung des aktiven Arbeitsbereichs. chat-store
+  // legt sie beim Oeffnen eines Bereichs-Gespraechs in den Sitzungsspeicher —
+  // damit wirkt sie in JEDEM Gespraech des Bereichs, ohne dass man sie je
+  // wieder eintippen muss.
+  try {
+    const bereich = JSON.parse(sessionStorage.getItem("smejj.bereichAnweisung.v1") || "null");
+    if (bereich?.anweisung) lines.push(`Dauer-Anweisung des Arbeitsbereichs "${bereich.name}": ${bereich.anweisung}`);
+  } catch { /* Beiwerk */ }
+  // Berechtigungs-Modus der Code-Seite (Betreiber 2026-08-16, wie Claude
+  // Code). Er wirkt ueber DENSELBEN bewiesenen Weg wie die Bereichs-
+  // Anweisung: als Verhaltensregel im Systemprompt. "auto" ist der
+  // Normalzustand und braucht keine Zeile.
+  try {
+    // Live gemessen 2026-08-16: eine weiche Formulierung ("warte auf
+    // Freigabe") verliert gegen den Coding-Systemprompt — das Modell haengte
+    // den Diff direkt an den Plan. Darum ausdruecklich: KEIN Code in dieser
+    // Antwort.
+    const modusText = {
+      manuell: "WICHTIGSTE REGEL (Berechtigungs-Modus MANUELL): Antworte zuerst NUR mit 1-3 Saetzen, WAS du tun wuerdest, und der Frage \"Soll ich das so machen?\". Schreibe in dieser Antwort KEINEN Code, keine Diffs und keine fertigen Dateien — erst nach einem Ja des Nutzers.",
+      akzeptieren: "Berechtigungs-Modus AUTOMATISCH AKZEPTIEREN: Fuehre Code- und Datei-Arbeit ohne Rueckfragen in einem Zug aus und fasse am Ende kurz zusammen, was du getan hast.",
+      plan: "WICHTIGSTE REGEL (Berechtigungs-Modus PLAN): Antworte NUR mit einem kurzen nummerierten Plan und der Schlussfrage \"Soll ich so umsetzen?\". Schreibe in dieser Antwort KEINEN Code, keine Diffs und keine fertigen Dateien — die Umsetzung kommt erst nach der Freigabe des Nutzers."
+    }[localStorage.getItem("smejj.codeModus.v1")];
+    if (modusText) lines.push(modusText);
+  } catch { /* Beiwerk */ }
   return lines.join("\n");
 }
 
@@ -171,7 +200,11 @@ function taskStateLabel(state) {
 }
 
 function applyPreferredStartView() {
-  const settings = readRuntimeSettings();
-  if (location.pathname !== "/" || settings.startView !== "projects") return;
-  document.querySelector('[data-view="projects"]')?.click();
+  // STILLGELEGT (Betreiber-Befund 2026-08-15): Wer smejj.com oeffnet, stand
+  // ploetzlich in "Meine Dateien" — die gespeicherte Wahl "projects" leitete
+  // JEDE Oeffnung der Wurzel dorthin um. Betreiber-Ansage: Oeffnen heisst
+  // Startseite (dorthin fuehrt auch der Login, Regel "Login-Ziel ist der
+  // Chat"). Die Umleitung entfaellt; wer in "Meine Dateien" will, hat den
+  // Spur-Punkt. Die Funktion bleibt als Stumpf stehen, damit ihr Aufrufer
+  // keine Weiche braucht.
 }

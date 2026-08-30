@@ -196,7 +196,7 @@
   background: rgba(20, 20, 20, 0.55);
   color: rgba(246, 243, 238, 0.62);
   font: inherit;
-  font-size:14.5px;
+  font-size: 14.5px;
   line-height: 1.55;
   cursor: pointer;
   transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
@@ -211,7 +211,7 @@
     min-width: 0;
     min-height: 26px;
     padding: 0 8px;
-    font-size:13.5px;
+    font-size: 13.5px;
   }
 }
 

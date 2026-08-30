@@ -24,10 +24,100 @@ export function buildExternalFallbackHtml({ url, title, message }) {
   <main class="bp-fallback">
     <strong>${safeTitle}</strong>
     <span>${safeMessage}</span>
-    <a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a>
+    <a href="${safeUrl}" target="_blank" rel="noopener">Extern öffnen</a>
   </main>
 </body>
 </html>`;
+}
+
+// Fehlerseite wie in Chrome.
+//
+// Vorher gab es bei einem Ladefehler nur eine schmale Hinweiszeile ueber
+// leerem Grund ("Seite konnte nicht geladen werden: ..."). Chrome zeigt
+// stattdessen eine ganze Seite: ein Symbol, einen Satz in Alltagssprache,
+// darunter den technischen Grund fuer alle, die ihn brauchen — und einen
+// Knopf "Erneut laden". Genau daran haelt sich das hier.
+//
+// Der Knopf meldet sich beim Panel per postMessage: die Shell laeuft
+// sandboxed ohne allow-same-origin, kann also nichts direkt aufrufen.
+const FEHLER_TEXTE = Object.freeze({
+  dns: {
+    titel: "Diese Website ist nicht erreichbar",
+    hinweis: "Die Adresse konnte nicht gefunden werden. Prüfe, ob sie richtig geschrieben ist."
+  },
+  netz: {
+    titel: "Keine Verbindung",
+    hinweis: "Die Seite hat nicht geantwortet. Prüfe deine Internetverbindung und versuch es noch einmal."
+  },
+  zeit: {
+    titel: "Die Seite braucht zu lange",
+    hinweis: "Der Server hat nicht rechtzeitig geantwortet."
+  },
+  allgemein: {
+    titel: "Die Seite konnte nicht geladen werden",
+    hinweis: "Etwas ist dazwischengekommen. Ein erneuter Versuch hilft oft."
+  }
+});
+
+/** Ordnet eine technische Meldung einer verstaendlichen Erklaerung zu. */
+export function fehlerArt(grund = "") {
+  const text = String(grund).toLowerCase();
+  if (/enotfound|dns|getaddrinfo|nicht gefunden/.test(text)) return "dns";
+  if (/timeout|zeit|timed out|abort/.test(text)) return "zeit";
+  if (/econnrefused|econnreset|network|fetch failed|verbindung/.test(text)) return "netz";
+  return "allgemein";
+}
+
+export function buildErrorPageHtml({ url = "", grund = "" } = {}) {
+  const art = fehlerArt(grund);
+  const { titel, hinweis } = FEHLER_TEXTE[art] || FEHLER_TEXTE.allgemein;
+  const safeUrl = escapeHtml(url);
+  const safeHost = escapeHtml(hostAus(url));
+  const safeGrund = escapeHtml(String(grund || "").slice(0, 200));
+  return `<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html,body{height:100%;margin:0;background:#101113;color:#f6f3ee;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{min-height:100%;display:grid;place-content:center;justify-items:start;gap:14px;padding:32px;max-width:520px;box-sizing:border-box}
+    .zeichen{font-size:44px;line-height:1;opacity:.55}
+    h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
+    p{margin:0;color:rgba(246,243,238,.66);font-size:14px;line-height:1.5}
+    .adresse{color:rgba(246,243,238,.5);font-size:13px;word-break:break-all}
+    button{min-height:36px;padding:0 16px;border:1px solid rgba(159,231,212,.42);border-radius:8px;background:rgba(159,231,212,.12);color:#f6f3ee;font-size:13px;font-weight:700;cursor:pointer}
+    button:hover{background:rgba(159,231,212,.2)}
+    button:focus-visible{outline:2px solid #9fe7d4;outline-offset:2px}
+    details{color:rgba(246,243,238,.42);font-size:12px}
+    summary{cursor:pointer}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="zeichen" aria-hidden="true">⚠</div>
+    <h1>${escapeHtml(titel)}</h1>
+    <p>${escapeHtml(hinweis)}</p>
+    <p class="adresse">${safeHost || safeUrl}</p>
+    <button type="button" id="nochmal">Erneut laden</button>
+    ${safeGrund ? `<details><summary>Technischer Grund</summary><code>${safeGrund}</code></details>` : ""}
+  </main>
+  <!-- Bedienlogik EXTERN in browser-stage.js: srcdoc erbt die CSP des
+       Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
+       hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
+       unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
+  <script src="/assets/browser-stage.js?v=5"></script>
+</body>
+</html>`;
+}
+
+function hostAus(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
 }
 
 export function isRemoteScreenshot(value) {
@@ -77,7 +167,7 @@ export function buildRemoteBrowserHtml({ url, title, screenshot, reason = "", ca
 </head>
 <body>
   <main class="bp-remote-browser" data-reason="${safeReason}">
-    <header><strong>${safeTitle}</strong><span>Remote-Browser</span><a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a></header>
+    <header><strong>${safeTitle}</strong><span>Remote-Browser</span><a href="${safeUrl}" target="_blank" rel="noopener">Extern öffnen</a></header>
     <div class="bp-remote-scroll" id="bpScroll" tabindex="0">
       <div class="bp-remote-page">
         <img src="${safeScreenshot}" alt="Remote-Browser-Ansicht von ${safeTitle}">
@@ -85,44 +175,11 @@ export function buildRemoteBrowserHtml({ url, title, screenshot, reason = "", ca
       </div>
     </div>
   </main>
-  <script>(function () {
-    var scroller = document.getElementById("bpScroll");
-    if (!scroller) return;
-    var pending = null;
-    function report() {
-      pending = null;
-      var max = Math.max(1, scroller.scrollHeight - scroller.clientHeight);
-      parent.postMessage({ type: "smejj.browser.scrollState", top: scroller.scrollTop, max: max }, "*");
-    }
-    scroller.addEventListener("scroll", function () {
-      if (pending) return;
-      pending = setTimeout(report, 150);
-    }, { passive: true });
-    var wantedRatio = -1;
-    function applyWantedRatio() {
-      if (wantedRatio < 0) return;
-      scroller.scrollTop = wantedRatio * Math.max(0, scroller.scrollHeight - scroller.clientHeight);
-    }
-    window.addEventListener("message", function (event) {
-      var data = event.data || {};
-      if (data.type !== "smejj.browser.restoreScroll") return;
-      wantedRatio = Math.min(1, Math.max(0, Number(data.ratio) || 0));
-      applyWantedRatio();
-    });
-    var image = scroller.querySelector("img");
-    if (image) image.addEventListener("load", applyWantedRatio);
-    window.addEventListener("load", applyWantedRatio);
-    document.addEventListener("click", function (event) {
-      var anchor = event.target && event.target.closest ? event.target.closest("a[data-nav]") : null;
-      if (!anchor) return;
-      event.preventDefault();
-      event.stopPropagation();
-      parent.postMessage({ type: "smejj.browser.navigate", url: anchor.getAttribute("data-nav") }, "*");
-    }, true);
-    function grabFocus() { try { scroller.focus({ preventScroll: true }); } catch (error) {} }
-    window.addEventListener("load", grabFocus);
-    grabFocus();
-  })();</script>
+  <!-- Bedienlogik EXTERN in browser-stage.js: srcdoc erbt die CSP des
+       Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
+       hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
+       unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
+  <script src="/assets/browser-stage.js?v=5"></script>
 </body>
 </html>`;
 }
@@ -150,120 +207,56 @@ export function buildLiveBrowserHtml({ url, title, screenshot, viewport = {} } =
     .bp-live-stage{position:relative;overflow:hidden;background:#fff;outline:none;cursor:default}
     .bp-live-stage img{display:block;width:100%;height:100%;object-fit:contain;background:#fff;user-select:none;-webkit-user-drag:none}
     .bp-live-stage.is-busy img{opacity:.72;transition:opacity .15s ease}
+    /* JS-Dialog der Seite (alert/confirm/prompt). Er liegt UEBER dem Bild,
+       weil die Seite dahinter wirklich blockiert ist — ein halbdurchsichtiger
+       Schleier sagt das ehrlicher als jede Beschriftung. Viereckig nach
+       Betreiber-Regel, grosse Schrift (15px), Knoepfe 44px hoch. */
+    .bp-dialog{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(16,17,19,.62);padding:16px;box-sizing:border-box}
+    .bp-dialog.is-open{display:flex}
+    .bp-dialog-box{width:min(420px,100%);background:#18191c;border:1px solid rgba(246,243,238,.18);box-sizing:border-box}
+    .bp-dialog-kopf{padding:10px 14px;border-bottom:1px solid rgba(246,243,238,.12);font-size:12px;color:#9fe7d4;text-transform:uppercase;letter-spacing:.04em}
+    .bp-dialog-text{padding:14px;font-size:15px;line-height:1.45;white-space:pre-wrap;word-break:break-word;max-height:38vh;overflow:auto}
+    .bp-dialog-eingabe{display:none;width:calc(100% - 28px);margin:0 14px 14px;padding:10px;font-size:15px;font-family:inherit;color:#f6f3ee;background:#101113;border:1px solid rgba(246,243,238,.24);box-sizing:border-box}
+    .bp-dialog-eingabe.is-open{display:block}
+    .bp-dialog-knoepfe{display:flex;gap:8px;padding:0 14px 14px}
+    .bp-dialog-knoepfe button{flex:1;min-height:44px;font-size:15px;font-family:inherit;font-weight:700;color:#101113;background:#9fe7d4;border:0;cursor:pointer}
+    .bp-dialog-knoepfe button.ist-zweitrangig{color:#f6f3ee;background:transparent;border:1px solid rgba(246,243,238,.28)}
   </style>
 </head>
 <body>
   <main class="bp-live-browser">
-    <header><strong id="bpTitle">${safeTitle}</strong><span class="bp-live-state" id="bpState">Live</span><a href="${safeUrl}" target="_blank" rel="noopener">Extern oeffnen</a></header>
+    <!-- KEINE Titelzeile mehr (Chrome-Abgleich 2026-08-17).
+         Hier stand Titel + "Live" + "Extern oeffnen" — alle drei stehen
+         bereits in unserer eigenen Leiste darueber: der Titel im Tab, der
+         Zustand in der Hinweiszeile, "Extern oeffnen" als Knopf. Chrome hat
+         zwischen Adressleiste und Seite gar nichts. Die Zeile kostete rund
+         30 px Seitenhoehe fuer dreifach dieselbe Auskunft.
+         Die Skript-Zugriffe auf bpTitle/bpState sind gegen Fehlen
+         abgesichert (if (titleEl …)) und laufen unveraendert weiter. -->
     <div class="bp-live-stage" id="bpStage" tabindex="0">
       <img id="bpFrame" src="${safeScreenshot}" alt="Live-Browser-Ansicht von ${safeTitle}">
+      <!-- Das Dialogfenster der SEITE (alert/confirm/prompt). Leer und
+           versteckt, bis browser-stage.js eine Frage hereinreicht. Die
+           Beschriftungen kommen von dort — hier steht bewusst kein Text,
+           damit es nie kurz eine leere Frage zeigt. -->
+      <div class="bp-dialog" id="bpDialog" role="alertdialog" aria-modal="true" aria-labelledby="bpDialogText">
+        <div class="bp-dialog-box">
+          <div class="bp-dialog-kopf" id="bpDialogKopf"></div>
+          <div class="bp-dialog-text" id="bpDialogText"></div>
+          <input class="bp-dialog-eingabe" id="bpDialogEingabe" type="text" autocomplete="off">
+          <div class="bp-dialog-knoepfe">
+            <button type="button" id="bpDialogOk">OK</button>
+            <button type="button" class="ist-zweitrangig" id="bpDialogAbbruch">Abbrechen</button>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
-  <script>(function () {
-    var stage = document.getElementById("bpStage");
-    var frame = document.getElementById("bpFrame");
-    var titleEl = document.getElementById("bpTitle");
-    var stateEl = document.getElementById("bpState");
-    if (!stage || !frame) return;
-    var pendingText = "";
-    var textTimer = 0;
-    var wheelDelta = 0;
-    var wheelTimer = 0;
-
-    function sendAction(action) {
-      parent.postMessage({ type: "smejj.browser.sessionAct", action: action }, "*");
-    }
-    function flushText() {
-      clearTimeout(textTimer);
-      textTimer = 0;
-      if (!pendingText) return;
-      var text = pendingText;
-      pendingText = "";
-      sendAction({ type: "type", text: text });
-    }
-    function flushWheel() {
-      clearTimeout(wheelTimer);
-      wheelTimer = 0;
-      if (!wheelDelta) return;
-      var delta = Math.round(wheelDelta);
-      wheelDelta = 0;
-      sendAction({ type: "scroll", deltaY: delta });
-    }
-    // Klickposition relativ zum tatsaechlich gezeichneten Bild (object-fit:
-    // contain kann Raender erzeugen) in Prozent des Remote-Viewports umrechnen.
-    function toPct(event) {
-      var rect = frame.getBoundingClientRect();
-      var natural = frame.naturalWidth && frame.naturalHeight
-        ? frame.naturalWidth / frame.naturalHeight
-        : rect.width / Math.max(1, rect.height);
-      var shown = rect.width / Math.max(1, rect.height);
-      var drawW = rect.width;
-      var drawH = rect.height;
-      var offX = 0;
-      var offY = 0;
-      if (shown > natural) {
-        drawW = rect.height * natural;
-        offX = (rect.width - drawW) / 2;
-      } else if (shown < natural) {
-        drawH = rect.width / natural;
-        offY = (rect.height - drawH) / 2;
-      }
-      var x = ((event.clientX - rect.left - offX) / Math.max(1, drawW)) * 100;
-      var y = ((event.clientY - rect.top - offY) / Math.max(1, drawH)) * 100;
-      if (x < 0 || x > 100 || y < 0 || y > 100) return null;
-      return { x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 };
-    }
-    stage.addEventListener("click", function (event) {
-      event.preventDefault();
-      flushText();
-      var pct = toPct(event);
-      if (pct) sendAction({ type: "click", xPct: pct.x, yPct: pct.y, button: "left" });
-      try { stage.focus({ preventScroll: true }); } catch (error) {}
-    });
-    stage.addEventListener("contextmenu", function (event) {
-      event.preventDefault();
-      flushText();
-      var pct = toPct(event);
-      if (pct) sendAction({ type: "click", xPct: pct.x, yPct: pct.y, button: "right" });
-    });
-    stage.addEventListener("wheel", function (event) {
-      event.preventDefault();
-      wheelDelta += event.deltaY;
-      if (!wheelTimer) wheelTimer = setTimeout(flushWheel, 200);
-    }, { passive: false });
-    var specialKeys = ["Enter", "Tab", "Escape", "Backspace", "Delete",
-      "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End"];
-    window.addEventListener("keydown", function (event) {
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
-      if (specialKeys.indexOf(event.key) !== -1) {
-        event.preventDefault();
-        flushText();
-        sendAction({ type: "key", key: event.key });
-        return;
-      }
-      if (event.key && event.key.length === 1) {
-        event.preventDefault();
-        pendingText += event.key;
-        clearTimeout(textTimer);
-        textTimer = setTimeout(flushText, 350);
-      }
-    });
-    window.addEventListener("message", function (event) {
-      var data = event.data || {};
-      if (data.type === "smejj.browser.sessionFrame") {
-        if (typeof data.screenshot === "string" && data.screenshot.indexOf("data:image/") === 0) frame.src = data.screenshot;
-        if (titleEl && typeof data.title === "string" && data.title) titleEl.textContent = data.title;
-        return;
-      }
-      if (data.type === "smejj.browser.sessionState" && stateEl) {
-        stage.classList.toggle("is-busy", data.busy === true);
-        stateEl.textContent = data.busy === true ? "…" : (typeof data.label === "string" && data.label ? data.label : "Live");
-      }
-    });
-    function grabFocus() { try { stage.focus({ preventScroll: true }); } catch (error) {} }
-    window.addEventListener("load", grabFocus);
-    grabFocus();
-  })();</script>
+  <!-- Bedienlogik EXTERN in browser-stage.js: srcdoc erbt die CSP des
+       Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
+       hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
+       unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
+  <script src="/assets/browser-stage.js?v=5"></script>
 </body>
 </html>`;
 }
@@ -274,4 +267,69 @@ function escapeHtml(value) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+
+/**
+ * Das Grundgeruest des Panels (Tableiste, Werkzeugleiste, Inhalt).
+ *
+ * AUSGELAGERT 2026-08-17: browser-pane.js stand exakt an der 800-Zeilen-Grenze,
+ * und die naechste Erweiterung haette sie gerissen. Eine Markup-Vorlage ist
+ * der risikoaermste Teil zum Ausziehen — sie ist reine Zeichenkette ohne
+ * Zustand. Die Werte kommen als Argumente herein, damit hier nichts ueber die
+ * Panel-Logik gewusst werden muss.
+ */
+export function buildPaneShellHtml({ neuerTabTitel = "Neuer Tab", maxTabs = 7 } = {}) {
+  return `
+    <div class="bp-tabstrip" role="tablist" aria-label="Browser Tabs">
+      <div class="bp-tab-left">
+        <button class="bp-tab-add" type="button" title="Neuer Tab (⌘T)" aria-label="Neuer Tab">+</button>
+      </div>
+      <div class="bp-tabs"></div>
+      <div class="bp-tab-right">
+        <button class="bp-maus" type="button" title="Maus beauftragen — sie bedient diesen Browser" aria-label="Maus beauftragen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l6.5 17 2.5-7 7-2.5z"/></svg>
+        </button>
+        <span class="bp-tab-spacer" aria-hidden="true"></span>
+      </div>
+    </div>
+    <div class="bp-toolbar">
+      <div class="bp-toolbar-left">
+        <button class="bp-nav-back" type="button" title="Zurück" aria-label="Zurück" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        </button>
+        <button class="bp-nav-forward" type="button" title="Vorwärts" aria-label="Vorwärts" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="bp-nav-reload" type="button" title="Diese Seite neu laden (⌘R)" aria-label="Diese Seite neu laden">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>
+        </button>
+      </div>
+      <form class="bp-address-form">
+        <input class="bp-address" type="text" inputmode="url" autocomplete="off" spellcheck="false"
+          placeholder="Suchen oder URL eingeben" aria-label="Adressleiste und Suchleiste">
+        <div class="bp-vorschlaege" hidden></div>
+      </form>
+      <div class="bp-toolbar-right">
+        <button class="bp-open-external" type="button" title="In neuem Tab öffnen" aria-label="In neuem Tab öffnen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 13v6H5V6h6"/></svg>
+        </button>
+        <button class="bp-menu" type="button" title="Browser anpassen und einstellen" aria-label="Browser anpassen und einstellen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <button class="bp-close" type="button" title="Browser schließen" aria-label="Browser schließen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="bp-progress" hidden><span></span></div>
+    <div class="bp-hint" hidden></div>
+    <div class="bp-content">
+      <div class="bp-empty">
+        <div class="bp-empty-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>
+        </div>
+        <strong>${neuerTabTitel}</strong>
+        <span>Suchen oder URL eingeben — bis zu ${maxTabs} Tabs.</span>
+      </div>
+    </div>`;
 }

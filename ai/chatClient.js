@@ -9,6 +9,7 @@
 // in app.js bleibt unveraendert zustaendig.
 import { validateByokConfig } from "./byok.js";
 import { autoAktiv, sorgeFuerModell } from "./modellRouter.js";
+import { starteStilleWache, stilleText } from "./strom-stillstand.js";
 import { API_ORIGIN, STORAGE_KEYS } from "../config.js";
 
 const MAX_HISTORY_MESSAGES = 12;
@@ -165,9 +166,16 @@ async function streamOpenAiCompatible({ baseUrl, apiKey, model, messages, output
   let buffer = "";
   let text = "";
   output.textContent = "";
+  // Stille-Wache wie in chat-stream.js: schweigt der Strom 90 s, gilt er als
+  // tot. Ohne sie wartet reader.read() fuer immer — genau so blieb am
+  // 2026-08-23 eine von fuenf Anfragen auf "smejj denkt nach …" stehen.
+  let stilleGemeldet = false;
+  const wache = starteStilleWache(reader, () => { stilleGemeldet = true; });
+  try {
   while (true) {
     const { value, done } = await reader.read();
     if (done || stoppVerlangt) break;
+    wache.lebenszeichen();
     buffer += decoder.decode(value, { stream: true });
     const lines = buffer.split("\n");
     buffer = lines.pop() || "";
@@ -186,7 +194,11 @@ async function streamOpenAiCompatible({ baseUrl, apiKey, model, messages, output
       }
     }
   }
+  } finally {
+    wache.beenden();
+  }
   anbieterLeser.delete(reader);
+  if (stilleGemeldet) { output.textContent = stilleText(text); return; }
   if (!text) output.textContent = "(leere Antwort)";
 }
 
@@ -298,9 +310,13 @@ async function runClineChat({ task, output, offlineNotice, clearThinking = () =>
     const decoder = new TextDecoder();
     let buffer = "";
     let answer = "";
+    // Stille-Wache: derselbe Schutz wie in chat-stream.js (strom-stillstand.js).
+    let stilleGemeldet = false;
+    const wache = starteStilleWache(reader, () => { stilleGemeldet = true; });
     while (true) {
       const { value, done } = await reader.read();
       if (done || stoppVerlangt) break;
+      wache.lebenszeichen();
       buffer += decoder.decode(value, { stream: true });
       const events = buffer.split("\n\n");
       buffer = events.pop() || "";
@@ -319,7 +335,9 @@ async function runClineChat({ task, output, offlineNotice, clearThinking = () =>
         }
       }
     }
+    wache.beenden();
     anbieterLeser.delete(reader);
+    if (stilleGemeldet) { clearThinking(); output.textContent = stilleText(answer); return; }
     if (!answer) { clearThinking(); output.textContent = "(leere Antwort)"; }
   } catch (error) {
     clearThinking();
@@ -359,9 +377,13 @@ async function runProviderChat({ providerId, task, output, offlineNotice }) {
     let buffer = "";
     let answer = "";
     output.textContent = "";
+    // Stille-Wache: derselbe Schutz wie in chat-stream.js (strom-stillstand.js).
+    let stilleGemeldet = false;
+    const wache = starteStilleWache(reader, () => { stilleGemeldet = true; });
     while (true) {
       const { value, done } = await reader.read();
       if (done || stoppVerlangt) break;
+      wache.lebenszeichen();
       buffer += decoder.decode(value, { stream: true });
       const events = buffer.split("\n\n");
       buffer = events.pop() || "";
@@ -375,7 +397,9 @@ async function runProviderChat({ providerId, task, output, offlineNotice }) {
         if (delta) { answer += delta; output.textContent = answer; }
       }
     }
+    wache.beenden();
     anbieterLeser.delete(reader);
+    if (stilleGemeldet) { output.textContent = stilleText(answer); return; }
     if (!answer) output.textContent = "(leere Antwort)";
   } catch (error) {
     output.textContent = `Anbieter-Fehler: ${String(error?.message || error).slice(0, 400)}`;

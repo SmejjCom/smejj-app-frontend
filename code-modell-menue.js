@@ -221,12 +221,30 @@ export async function oeffneModellMenue(kontext = {}) {
     }
   });
   // Hausmodell: nutzt den bestehenden Stufen-Weg (Auto/Gruendlich/Schnell).
+  const istOx = localStorage.getItem(MODELL_KEY) === "Ox Alpha";
   zeile({
     titel: "smejj 1.0",
-    aktiv: !istCline,
+    aktiv: !istCline && !istOx,
     aktion: () => {
       localStorage.setItem(MODELL_KEY, "smejj 1.0");
       window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "smejj 1.0" } }));
+      zu();
+      kontext.beiWahl?.();
+    }
+  });
+  // Ox Alpha (Betreiber-Auftrag 2026-08-26: "an 3. Stelle — 1. Auto,
+  // 2. smejj 1.0, 3. Ox Alpha"): Registry-Modell ueber OpenRouter
+  // (src/shared/modelRegistry.js, id ox-alpha). Die Wahl reist als
+  // body.model zur Bruecke; die Schnellspur gibt \box\b ab und der
+  // Control-Router loest den Alias auf. Fail-closed: ohne Env-Freigabe
+  // antwortet stabil GLM-5.2 (x-smejj-model-fallback: true).
+  zeile({
+    titel: "Ox Alpha",
+    hinweis: "OpenRouter-Preview: Coding und lange Agent-Arbeit, 1M Kontext",
+    aktiv: istOx,
+    aktion: () => {
+      localStorage.setItem(MODELL_KEY, "Ox Alpha");
+      window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Ox Alpha" } }));
       zu();
       kontext.beiWahl?.();
     }

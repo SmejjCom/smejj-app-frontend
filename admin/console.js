@@ -10,6 +10,7 @@
   const V = window.adminViews;
 
   const SEITEN = [
+    { id: "A", pfad: "uebersicht", gruppe: "Überblick", name: "Übersicht" },
     { id: "B", pfad: "nutzer", gruppe: "Menschen", name: "Nutzerverwaltung" },
     { id: "C", pfad: "rollen", gruppe: "Menschen", name: "Rollen & Rechte" },
     { id: "D", pfad: "support", gruppe: "Menschen", name: "Support & Impersonation" },
@@ -30,12 +31,7 @@
     (window.adminStage6 || {}).seiten || {},
     (window.adminStage7 || {}).seiten || {},
     (window.adminStage8 || {}).seiten || {},
-    (window.adminStage9 || {}).seiten || {},
-    (window.adminStageCockpit || {}).seiten || {},
-    (window.adminStage10 || {}).seiten || {},
-    (window.adminStage11 || {}).seiten || {},
-    (window.adminStage12 || {}).seiten || {},
-    (window.adminStage13 || {}).seiten || {}
+    (window.adminStage9 || {}).seiten || {}
   );
   Object.keys(ANGEMELDET).forEach(function (pfad) {
     SEITEN.push({ id: ANGEMELDET[pfad].id, pfad: pfad, gruppe: ANGEMELDET[pfad].gruppe, name: ANGEMELDET[pfad].name });
@@ -73,17 +69,9 @@
   // Notfall weiter bedienbar ist, ohne die (gesperrte) Auslieferung anzufassen.
   const PFAD_MODUS = /(^|\.)smejj\.com$/.test(location.hostname);
 
-  // Welche Seite unter der nackten Adresse /admin/ liegt. Seit 2026-08-14 das
-  // Cockpit: es beantwortet in einem Satz, ob gerade etwas zu tun ist. Die alte
-  // Seite A "Uebersicht" ist seit 2026-08-23 aufgeloest — das Cockpit traegt
-  // alles, was sie zeigte (Konten, Freigaben, Protokoll, Sicherheitsalarme).
-  // Alte Lesezeichen auf /admin/uebersicht/ landen still auf /admin/.
-  const STARTSEITE = "cockpit";
-  const AUFGELOEST = { uebersicht: STARTSEITE };
-
   function seitenLink(pfad) {
     if (!PFAD_MODUS) return "#" + pfad;
-    return pfad === STARTSEITE ? "/admin/" : "/admin/" + pfad + "/";
+    return pfad === "uebersicht" ? "/admin/" : "/admin/" + pfad + "/";
   }
 
   /** Wohin navigieren — im Pfad-Modus als echte Navigation, sonst per Hash. */
@@ -101,12 +89,12 @@
 
   /** Das Ziel aus der Adresse lesen — Pfad zuerst, alte #-Links bleiben gueltig. */
   function aktuellerPfad() {
-    if (!PFAD_MODUS) return (location.hash || ("#" + STARTSEITE)).replace(/^#/, "");
+    if (!PFAD_MODUS) return (location.hash || "#uebersicht").replace(/^#/, "");
     const akte = new URLSearchParams(location.search).get("akte");
     if (akte) return "akte/" + akte;
     const teil = location.pathname.replace(/^\/admin\/?/, "").replace(/\/$/, "");
     if (teil) return teil;
-    return (location.hash || ("#" + STARTSEITE)).replace(/^#/, "");
+    return (location.hash || "#uebersicht").replace(/^#/, "");
   }
 
   function schreibeNav(aktiv) {
@@ -128,36 +116,37 @@
     document.title = name + " — smejj.com Operations Console";
   }
 
-  // Nur zeigen, was einen Wert hat: die Pillen bleiben versteckt, bis eine
-  // Seite ihren Stand liefert — und verschwinden beim Seitenwechsel wieder.
   function zeigeStand(index, kette) {
     const i = document.getElementById("indexStand");
     if (index) {
       i.textContent = "Index " + A.dauer(index.ageSeconds) + (index.refreshing ? " · frischt auf" : "");
       i.className = "pill " + (index.refreshing ? "warn" : "ok");
-      i.hidden = false;
     }
     const k = document.getElementById("ketteStand");
     if (kette) {
       k.textContent = kette.ok ? "Kette intakt" : "Kette gebrochen";
       k.className = "pill " + (kette.ok ? "ok" : "bad");
-      k.hidden = false;
     }
-  }
-
-  function versteckeStand() {
-    ["indexStand", "ketteStand"].forEach(function (id) {
-      const el = document.getElementById(id);
-      if (el) el.hidden = true;
-    });
   }
 
   // ---- Ansichten laden --------------------------------------------------------
 
+  async function zeigeUebersicht() {
+    laedt("Betriebszustand wird geholt …");
+    const [nutzer, audit, compliance, freigaben] = await Promise.all([
+      A.nutzer({ limit: 1 }), A.audit({ limit: 50 }), A.compliance(), A.freigaben()
+    ]);
+    if (!nutzer.ok && nutzer.status !== 409) return zeigeFehler(nutzer.fehler);
+    const offen = ((freigaben.data || {}).approvals || []).filter(function (a) { return a.status === "pending"; }).length;
+    seite.innerHTML = V.uebersicht({
+      nutzer: nutzer.data, audit: audit.data, compliance: compliance.data, freigaben: offen
+    });
+    zeigeStand(nutzer.data && nutzer.data.index, audit.data && audit.data.chain);
+  }
+
   async function zeigeNutzer() {
     laedt("Konten werden geholt …");
-    // Seit 2026-08-23: die Nutzer-Lage (Plan, bezahlt als, zuletzt, Verbrauch) statt der reinen Index-Seite.
-    const antwort = await A.hole("/api/admin/users/lage?" + new URLSearchParams({ limit: "50", query: zustand.suchbegriff || "" }).toString());
+    const antwort = await A.nutzer({ limit: 50, query: zustand.suchbegriff });
     if (!antwort.ok) {
       seite.innerHTML = V.fehlerblock(antwort.fehler)
         + (antwort.data && antwort.data.hint ? '<div class="bar"><span class="btn" id="neubauKnopf">Index jetzt bauen</span></div>' : "");
@@ -275,40 +264,6 @@
     const leeren = document.getElementById("sucheLeeren");
     if (leeren) leeren.addEventListener("click", function () { zustand.suchbegriff = ""; zeigeNutzer(); });
     bindeNeubau();
-    bindeAboUmhaengen();
-  }
-
-  // Abo ohne Konto -> auf ein bestehendes Konto haengen. Zwei Fragen (welches
-  // Konto, warum), dann dieselbe Kontoaktion wie alle anderen: Step-up, Recht,
-  // Audit mit Vorher/Nachher. Die Kaufadresse bleibt als Beleg am Kunden.
-  function bindeAboUmhaengen() {
-    document.querySelectorAll("[data-aboUmhaengen]").forEach(function (knopf) {
-      knopf.addEventListener("click", async function () {
-        const kundenId = knopf.getAttribute("data-aboUmhaengen");
-        const konto = await D.text({
-          titel: "Abo auf ein Konto umhängen",
-          absaetze: ["Das Abo " + kundenId + " wird dem Konto mit dieser Adresse zugeordnet. Die Adresse, mit der bezahlt wurde, bleibt als Beleg erhalten; bei Stripe ändert sich nichts."],
-          platzhalter: "Konto-Adresse, z. B. name@example.org",
-          minLaenge: 5,
-          okText: "Weiter"
-        });
-        if (!konto || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(konto).trim())) return;
-        const grund = await D.text({
-          titel: "Warum?",
-          absaetze: ["Der Grund steht dauerhaft im Audit-Log."],
-          platzhalter: "z. B. Kunde hat unter seiner Zweitadresse bezahlt",
-          minLaenge: 3,
-          okText: "Umhängen"
-        });
-        if (grund === null || String(grund).trim().length < 3) return;
-        knopf.textContent = "läuft …";
-        knopf.setAttribute("disabled", "disabled");
-        const antwort = await A.aktion(String(konto).trim().toLowerCase(), "billing.relink", { reason: String(grund).trim(), customerId: kundenId });
-        if (!antwort.ok) { meldung(antwort.fehler, true); knopf.textContent = "Auf ein Konto umhängen"; knopf.removeAttribute("disabled"); return; }
-        meldung("Abo umgehängt — das Konto sieht jetzt seinen Plan.", false);
-        zeigeNutzer();
-      });
-    });
   }
 
   function bindeNeubau() {
@@ -485,11 +440,7 @@
   // ---- Routing ----------------------------------------------------------------
 
   function route() {
-    let ziel = aktuellerPfad();
-    if (AUFGELOEST[ziel]) {
-      ziel = AUFGELOEST[ziel];
-      if (PFAD_MODUS) history.replaceState(null, "", seitenLink(ziel));
-    }
+    const ziel = aktuellerPfad();
     // Ein alter #-Link auf der neuen Auslieferung: Adresse still bereinigen,
     // damit Lesezeichen und geteilte Links ab jetzt ohne # weiterwandern.
     if (PFAD_MODUS && location.hash) {
@@ -502,12 +453,9 @@
       setzeKopf("Nutzerakte");
       return zeigeAkte(decodeURIComponent(ziel.slice("akte/".length)));
     }
-    const treffer = SEITEN.filter(function (s) { return s.pfad === ziel; })[0]
-      || SEITEN.filter(function (s) { return s.pfad === STARTSEITE; })[0]
-      || SEITEN[0];
+    const treffer = SEITEN.filter(function (s) { return s.pfad === ziel; })[0] || SEITEN[0];
     schreibeNav(treffer.pfad);
     setzeKopf(treffer.name);
-    versteckeStand();
     if (treffer.pfad === "nutzer") return zeigeNutzer();
     if (treffer.pfad === "rollen") return zeigeRollen();
     if (treffer.pfad === "audit") return zeigeAudit();
@@ -518,23 +466,19 @@
       return ANGEMELDET[treffer.pfad].laden(seitenKontext(treffer.pfad));
     }
     if (treffer.pfad === "compliance") return zeigeCompliance();
-    // Kein Treffer mehr moeglich: das Cockpit ist registriert und faengt auf.
-    laedt("wird geladen …");
-    return ANGEMELDET[STARTSEITE].laden(seitenKontext(STARTSEITE));
+    return zeigeUebersicht();
   }
 
-  // Spiegel zu public/admin/console.js. Hier liegt gate.js NICHT daneben:
-  // adminUiRoutes.js prueft schon vor dem Ausliefern und gibt ohne Adminrolle
-  // keine Datei heraus. Der Fallback macht die Zeilen damit wirkungslos — sie
-  // stehen trotzdem hier, damit die beiden Kopien nicht auseinanderlaufen.
+  // Tuersteher aus gate.js. Auf dem Control-Server ist er absichtlich untaetig
+  // (dort prueft adminUiRoutes.js schon vor dem Ausliefern), und in Tests fehlt
+  // er ganz — deshalb ueberall mit Fallback aufrufen, nie blind.
   const GATE = window.smejjAdminGate || { freigeben: function () {}, abweisen: function () {} };
+
+  // Die einzigen Absagen, die "kein Adminkonto" bedeuten (adminAuth.js).
   const KEIN_ADMIN = ["admin_role_required", "admin_account_not_active"];
 
   async function start() {
-    // Auch mit einer alten, noch im Browser-Cache liegenden index.html ohne
-    // hidden-Attribut: die Pillen starten versteckt.
-    versteckeStand();
-    schreibeNav(STARTSEITE);
+    schreibeNav("uebersicht");
     laedt("Anmeldung wird geprüft …");
     const antwort = await A.ich();
     if (!antwort.ok) {
@@ -584,7 +528,6 @@
     // Konsole ueberhaupt sichtbar werden.
     GATE.freigeben();
     zustand.akteur = antwort.data.actor || {};
-    // (zeigeUmgebung() steht weiter unten, nach den Kopfzeilen-Feldern.)
     // Damit der Sicherheitsdialog sagen kann, WOHIN der Code ging, statt nur
     // "deine Admin-E-Mail-Adresse". Beim allerersten Aufruf einer noch nicht
     // bestaetigten Adresse steht das hier noch nicht — dort greift der
@@ -599,38 +542,10 @@
     const stufe = document.getElementById("stufe");
     stufe.textContent = "Stufe " + (antwort.data.stage || 2)
       + (antwort.data.writable ? " · schreibend" : " · nur lesend");
-    zeigeUmgebung();
     // Im Pfad-Modus ist jeder Seitenwechsel eine echte Navigation — es gibt
     // nichts zu beobachten. Der Hash-Horcher bleibt dem Rueckfallweg vorbehalten.
     if (!PFAD_MODUS) window.addEventListener("hashchange", route);
     route();
-  }
-
-  /**
-   * Sagt, WO diese Konsole gerade arbeitet.
-   *
-   * Befund 2026-08-15 (A-bis-Z-Pruefung): in index.html stand fest
-   * "Produktion" — kein Skript hat das je gesetzt. Eine Konsole auf einem
-   * Testserver haette genauso ausgesehen, und wer zwei Fenster offen hat,
-   * konnte sie nicht unterscheiden. Ein Etikett, das immer dasselbe sagt,
-   * sagt nichts.
-   *
-   * Jetzt steht dort der Host, von dem diese Konsole ausgeliefert wird. Das
-   * ist genau die Frage, die das Etikett beantworten soll: "Ist das hier die
-   * echte?" Nur smejj.com und der Rueckfallweg heissen weiter "Produktion",
-   * jeder andere Host wird beim Namen genannt.
-   *
-   * Bewusst aus `location` und nicht aus api.js: dessen Auswahl der API-Basis
-   * ist privat, und api.js liegt unter dem Admin-Lock. Eine zweite Kopie
-   * dieser Logik wuerde frueher oder spaeter auseinanderlaufen.
-   */
-  function zeigeUmgebung() {
-    const feld = document.getElementById("umgebung");
-    if (!feld) return;
-    const host = String(location.hostname || "").toLowerCase();
-    const echt = host === "smejj.com" || host === "www.smejj.com" || host === "smejj-control.zeabur.app" || host === "api.smejj.com";
-    feld.textContent = echt ? "Produktion" : (host || "unbekannt");
-    feld.title = "Diese Konsole wird von " + (host || "unbekannt") + " ausgeliefert";
   }
 
   start();

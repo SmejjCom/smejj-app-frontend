@@ -1,3 +1,10 @@
+/* smejj.com — Glas-Startseite (Screen 1), Freigabe:
+   docs/approvals/2026-08-13-startseite-glas-design-freigabe.md
+   Laedt NACH dem start-styles-Buendel und ueberschreibt nur Screen 1.
+   styles.css bleibt unangetastet (Ratchet 1589). */
+
+/* ── Leerer Zustand: Begruessung + Kapsel mittig ─────────────────── */
+
 #start:not(.has-start-chat) .home-feed {
   display: flex;
   flex-direction: column;
@@ -10,24 +17,31 @@
     radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
     linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%);
 }
+
 #start:not(.has-start-chat) .home-hero {
   display: block;
   min-height: 0;
   padding: 0 16px;
 }
+
 #start:not(.has-start-chat) .home-hero h2 {
   font-size: clamp(22px, 2.6vw, 30px);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
+
 .home-hero .start-markenwort {
   color: #35e0d0;
   text-shadow: 0 0 18px rgba(50, 246, 234, 0.35);
 }
+
+/* ── Eingabe-Kapsel: Glas statt Kante — gilt in beiden Zustaenden ── */
+
 .prompt-glass {
   width: min(760px, calc(100% - 24px));
   margin: 0 auto;
   border: 1px solid rgba(126, 232, 218, 0.32);
+  /* Betreiber-Regel 2026-08-13: das gesamte Design ist viereckig. */
   border-radius: 0;
   padding: 6px 10px 6px;
   background:
@@ -40,6 +54,7 @@
   -webkit-backdrop-filter: blur(22px) saturate(150%);
   backdrop-filter: blur(22px) saturate(150%);
 }
+
 .prompt-glass:focus-within {
   border-color: rgba(50, 246, 234, 0.62);
   box-shadow:
@@ -47,10 +62,13 @@
     0 0 34px rgba(50, 246, 234, 0.26),
     0 14px 40px rgba(0, 0, 0, 0.42);
 }
+
+/* Laufender Chat: Kapsel bleibt Kapsel, nur breiter und unten angedockt. */
 #start.has-start-chat .prompt-glass {
   width: min(980px, calc(100% - 20px));
   margin: 0 auto 10px;
 }
+
 .prompt-glass textarea {
   height: auto;
   min-height: 44px;
@@ -58,70 +76,120 @@
   font-size: 16.5px;
   line-height: 1.5;
 }
+
 .prompt-actions {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* Werkzeugleiste gruppieren (Betreiber-Befund 2026-08-13: "smejj 1.0" schwebte
+   allein in der Mitte, die Luecke wirkte unfertig). Links steht, WAS ich
+   schicke (Anhang + Modell), rechts, WIE es rausgeht (Diktat, Sprache,
+   Senden) — dieselbe Aufteilung wie bei ChatGPT.
+   Bewusst nur per `order`: das Markup in index.html bleibt unangetastet, die
+   Reihenfolge fuer Tastatur und Screenreader also auch. */
 .prompt-actions .plus-picker { order: 1; }
 .prompt-actions .model-picker { order: 2; }
 .prompt-actions .prompt-spacer { order: 3; }
 .prompt-actions [data-start-tool] { order: 4; }
 .prompt-actions .send-button { order: 5; }
+
+/* Vorlesen wohnt jetzt nur noch im Antwort-Menue („speak" in
+   chat-actions-menu.js) — der dritte Audio-Knopf verwirrte nur. */
 .prompt-glass [data-start-tool="speaker"] {
   display: none;
 }
+
+/* ── Beispiel-Chips: die Leerflaeche arbeitet ─────────────────────── */
+
 .start-chips {
   display: flex;
+  /* Umbruch BLEIBT erlaubt: auf schmalen Schirmen ist eine zweite Zeile
+     richtig; nowrap wuerde die Chips dort zusammenquetschen. */
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
+  /* 760 px reichten fuer vier Chips. Mit dem fuenften ("Video generieren",
+     2026-08-14) brauchen sie 743 px NETTO — die 32 px Innenabstand kippten
+     damit genau einen Chip in die zweite Zeile. 940 px geben Luft, bewusst
+     mehr als die ~775 px, die Deutsch braucht: die Beschriftungen sind
+     uebersetzt, und "Générer des images" oder "Создать изображения" tragen
+     breiter auf. Die Eingabe-Kapsel darueber bleibt bei 760 px — die Chips
+     duerfen breiter stehen, sie sind kein Eingabefeld. */
   max-width: 940px;
   padding: 0 16px;
 }
+
 #start.has-start-chat .start-chips {
   display: none;
 }
+
 .start-chips button {
   min-height: 44px;
   padding: 10px 18px;
   border: 1px solid rgba(255, 255, 255, 0.14);
+  /* Betreiber-Regel 2026-08-13: das gesamte Design ist viereckig. */
   border-radius: 0;
   background: rgba(17, 23, 30, 0.5);
   color: rgba(200, 209, 218, 0.92);
+  /* 14 px statt 13,5: Betreiber-Regel "nie unter 14 px" (er liest ohne
+     Brille). Die Chips waren die letzte Stelle der Startseite darunter. */
   font-size: 14px;
   cursor: pointer;
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   transition: border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
 }
+
 .start-chips button:hover,
 .start-chips button:focus-visible {
   border-color: rgba(50, 246, 234, 0.5);
   color: #f0f6f5;
   box-shadow: 0 0 16px rgba(50, 246, 234, 0.18);
 }
+
+/* ── Rand-Icons: 44-px-Touchziele auch auf dem Desktop (2026-08-13) ──
+   Mobil (<600px) stehen die 44er schon im start-styles-Buendel; hier ziehen
+   Menue-, Browser- und Maus-Knopf auf allen Breiten nach. Doppelklasse gibt
+   Gewicht 0,2,0 wie beim Buendel-Vorbild. */
+
 .glass-icon.glass-icon {
   width: 44px;
   height: 44px;
   min-height: 44px;
 }
+
+/* Der Maus-Knopf traegt right:36px als Inline-Stil (CSP-Hash, index.html ist
+   Start-Lock) — mit 44-px-Knoepfen ueberlappt das den Browser-Knopf, darum
+   hier per !important daneben gesetzt: 48px = 44px Knopf + Luft. */
 #mausButton {
   right: calc(env(safe-area-inset-right) + 48px) !important;
 }
+
+/* Das Logo sass bei left:36px neben dem 28er-Menue-Knopf; der endet jetzt
+   bei 44. Gleicher Zug wie die Mobil-Regel im Buendel (left: +48px), und als
+   Klickziel waechst es selbst auf 44. */
 .app-brand-logo {
   left: calc(env(safe-area-inset-left) + 48px);
   width: 44px;
   height: 44px;
 }
+
 body[data-left-menu-state="expanded"] .app-brand-logo {
   height: 44px;
 }
+
+/* ── Mobil ────────────────────────────────────────────────────────── */
+
 @media (max-width: 600px) {
   #start:not(.has-start-chat) .home-hero h2 {
     font-size: 22px;
   }
+
   .prompt-glass {
     width: calc(100% - 16px);
   }
+
+  /* Auf kleinen Schirmen reichen zwei Chips. */
   .start-chips button:nth-child(n + 3) {
     display: none;
   }

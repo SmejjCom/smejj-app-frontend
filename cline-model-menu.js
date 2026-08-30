@@ -9,12 +9,19 @@ import { API_ORIGIN, STORAGE_KEYS } from "./config.js";
 const TOKEN_KEY = "smejj.apiToken.v1";
 const CLINE_MODEL_KEY = "smejj.cline.model.v1";
 const PROVIDER_PREFIX = `${API_ORIGIN}/api/providers/cline`;
-const GROUP_ORDER = ["cline-pass", "free", "recommended"];
+// "free" steht bewusst NICHT mehr drin: die Gratis-Gruppe gibt Cline nur an
+// eigene Apps aus ("only available via Cline product surfaces", 403 live
+// gemessen 2026-08-17) — hier waren es tote Knoepfe.
+const GROUP_ORDER = ["cline-pass", "recommended"];
 const GROUP_LABELS = Object.freeze({
   "cline-pass": "Cline Pass",
-  free: "Kostenlos",
   recommended: "Empfohlen"
 });
+// Blindgaenger-Verbot: beide antworten mit HTTP 200, aber 0 Zeichen Inhalt —
+// nach 90 s (Qwen 3.7 Max) bzw. 72-123 s (Grok 4.5), live gemessen 2026-08-17.
+const BLINDGAENGER = new Set(["cline-pass/qwen3.7-max", "x-ai/grok-4.5"]);
+// Merkwert des Routers (ai/modellRouter.js) — keine Katalog-ID.
+const AUTO_MARKE = "auto";
 const HINT_NO_KEY = "Cline-Key in Einstellungen verbinden";
 
 let catalogPromise = null;
@@ -55,14 +62,26 @@ function init() {
   restoreClineLabel();
 }
 
-function openSubmenu(trigger, submenu) {
-  if (!submenu.hidden) return;
+function openSubmenu(trigger, submenu, erzwingen = false) {
+  if (!submenu.hidden && !erzwingen) return;
   submenu.hidden = false;
   trigger.setAttribute("aria-expanded", "true");
   renderNote(submenu, "Cline-Modelle werden geladen…");
   loadCatalog()
     .then((catalog) => renderCatalog(submenu, catalog))
-    .catch(() => renderKeyHint(submenu));
+    .catch((fehler) => {
+      // Gebremst ist NICHT dasselbe wie "kein Key" (Betreiber-Befund
+      // 2026-08-17: mal die ganze Liste, mal nur zwei Zeilen). Der Server
+      // bremst bei 12 Anfragen pro Minute; dann ehrlich sagen und selbst
+      // nachladen, statt "Key verbinden" zu behaupten.
+      if (fehler?.status === 429) {
+        const sek = Number(fehler.retryAfterSec) || 5;
+        renderNote(submenu, `Liste lädt gleich … (${sek} s — der Server bremst gerade zu viele Anfragen ab)`);
+        setTimeout(() => { if (!submenu.hidden) openSubmenu(trigger, submenu, true); }, (sek + 1) * 1000);
+        return;
+      }
+      renderKeyHint(submenu);
+    });
 }
 
 function closeSubmenu(trigger, submenu) {
@@ -98,8 +117,9 @@ function renderCatalog(submenu, { models, status }) {
   }
   submenu.replaceChildren();
   const active = localStorage.getItem(CLINE_MODEL_KEY) || status.selectedModel || "";
+  submenu.append(autoButton(submenu, active));
   for (const category of GROUP_ORDER) {
-    const entries = models.filter((model) => model.category === category);
+    const entries = models.filter((model) => model.category === category && !BLINDGAENGER.has(model.id));
     if (entries.length === 0) continue;
     const heading = document.createElement("div");
     heading.className = "model-submenu-group";
@@ -111,6 +131,40 @@ function renderCatalog(submenu, { models, status }) {
     renderNote(submenu, "Keine Cline-Modelle verfügbar.");
   }
   appendSettingsEntry(submenu);
+}
+
+// "Auto" steht ueber den Gruppen — die sparsame Voreinstellung.
+// Anders als ein Modellknopf ruft er KEIN /select: welches Modell laeuft,
+// entscheidet der Router erst, wenn der Auftrag da ist (ai/modellRouter.js).
+// Darum ist er sofort fertig und kann nicht scheitern.
+function autoButton(submenu, active) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.setAttribute("role", "menuitemradio");
+  button.dataset.clineModel = AUTO_MARKE;
+  button.title = "Alltag guenstig ueber das Abo, harte Faelle ueber Guthaben";
+  const label = document.createElement("span");
+  label.className = "model-submenu-name";
+  label.textContent = "Auto";
+  button.append(label);
+  const check = document.createElement("span");
+  check.className = "model-submenu-check";
+  check.setAttribute("aria-hidden", "true");
+  check.textContent = "✓";
+  button.append(check);
+  const isActive = active === AUTO_MARKE;
+  button.setAttribute("aria-checked", String(isActive));
+  button.classList.toggle("is-active", isActive);
+  const select = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    activateCline(AUTO_MARKE);
+    refreshActiveMarks(submenu);
+    closeAllMenus();
+  };
+  button.addEventListener("pointerdown", select);
+  button.addEventListener("click", select);
+  return button;
 }
 
 function modelButton(submenu, model, active) {
@@ -151,7 +205,7 @@ async function selectModel(submenu, modelId) {
     if (error?.status === 401 || error?.code === "authentication_required" || error?.code === "provider_not_configured") {
       renderKeyHint(submenu);
     } else {
-      renderNote(submenu, "Modellwechsel fehlgeschlagen. Bitte erneut versuchen.");
+      renderNote(submenu, "Das Modell liess sich gerade nicht wechseln. Dein bisheriges bleibt aktiv \u2014 es geht also weiter. Probier es gleich noch einmal.");
       appendSettingsEntry(submenu);
     }
   }
@@ -247,12 +301,17 @@ function setPickerLabel(model) {
 }
 
 function shortModel(model) {
+  if (model === AUTO_MARKE) return "Auto";
   const value = String(model).split("/").pop() || String(model);
   return value.length > 22 ? `${value.slice(0, 21)}…` : value;
 }
 
 async function api(path, { method = "GET", body } = {}) {
   let token = sessionStorage.getItem(TOKEN_KEY) || "";
+  // iPhone-PWA (25.08.): der Cookie-Weg zu api.smejj.com ist dort Third-Party
+  // und blockiert — das Menue zeigte "Cline-Key verbinden", waehrend der Chat
+  // laengst lief. Das App-Token des Chat-Wegs gilt am selben Server: zuerst.
+  if (!token) { try { token = localStorage.getItem("smejj.auth.accessToken.v1") || ""; } catch { /* Privatmodus */ } }
   if (!token) token = await recoverSessionToken();
   const response = await fetch(`${PROVIDER_PREFIX}${path}`, {
     method,

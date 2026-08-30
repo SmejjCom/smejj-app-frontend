@@ -1,10 +1,24 @@
+/* view-chrome.css — Navigation fuer App-Views: Zurueck-Pfeil (ganz oben links)
+   und Schliessen-X (ganz oben rechts). Ohne Hintergrund, transparent, schmal,
+   leicht fett; besetzt keinen Platz. Nur auf Views ausser #start; die
+   Startseite bleibt unveraendert (Design-Lock).
+   Hinweis: !important ist hier bewusst gesetzt, weil generische Button-Regeln
+   der Premium-Flaechen (app-surfaces/settings-surface) sonst Hintergrund,
+   Rahmen, Hoehe und SVG-Groesse ueberschreiben. */
+
 .view.has-view-chrome {
   position: relative;
   padding-top: 52px;
 }
+
 .view-chrome {
   position: absolute;
   top: 8px;
+  /* In den Ecken sitzen die FIXEN Knoepfe der App (Menue links, Browser-Panel
+     rechts, styles.css .glass-icon). Die Leiste muss neben ihnen beginnen,
+     nicht unter ihnen: mit 14px lag das Schliessen-X exakt auf dem
+     Browser-Knopf (Betreiber-Befund 2026-08-13, gemessen 34px Ueberlappung
+     bei 375px). 48px = 28px Knopf + Luft; die Handy-Werte stehen unten. */
   left: calc(env(safe-area-inset-left) + 48px);
   right: calc(env(safe-area-inset-right) + 48px);
   z-index: 5;
@@ -13,6 +27,7 @@
   justify-content: space-between;
   pointer-events: none;
 }
+
 .view .view-chrome button,
 .premium-view .view-chrome button {
   pointer-events: auto;
@@ -33,16 +48,19 @@
   opacity: 0.85;
   transition: opacity 0.15s ease;
 }
+
 .view .view-chrome button:hover,
 .premium-view .view-chrome button:hover {
   opacity: 1;
   background: transparent !important;
 }
+
 .view .view-chrome button:focus-visible,
 .premium-view .view-chrome button:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
+
 .view .view-chrome button svg,
 .premium-view .view-chrome button svg {
   width: 20px !important;
@@ -51,62 +69,129 @@
   min-height: 20px !important;
   flex: none !important;
 }
+
+/* Dunkle Premium-Views: helle Icons ueber die vorhandenen Premium-Variablen. */
 .premium-view .view-chrome button {
   color: var(--premium-text, #f8f6f2);
 }
+
 @media (max-width: 640px) {
   .view.has-view-chrome {
     padding-top: 46px;
   }
+
   .view-chrome {
     top: 6px;
+    /* Auf schmalen Schirmen sind die Ecken-Knoepfe 44px (Touch-Regel unten):
+       52px = 44px Knopf + Luft. Gemessen bei 375px: X endet bei 323px, der
+       Browser-Knopf beginnt bei 331px — 8px frei statt 34px Ueberdeckung. */
     left: calc(env(safe-area-inset-left) + 52px);
     right: calc(env(safe-area-inset-right) + 52px);
   }
 }
+
+/* Touch-Ziel auf schmalen Schirmen (2026-08-09). Gemessen bei 375 px in ALLEN
+   15 Ansichten: Zurueck und Schliessen waren 32x32 — die kleinsten Ziele der
+   App. Das Symbol bleibt 20 px, nur die Flaeche waechst.
+
+   Das !important ist nicht Zierde: die Regel oben setzt width/height selbst mit
+   !important (um die Knopf-Grundregeln der Ansichten zu schlagen), und dagegen
+   kommt eine normale Deklaration nicht an. */
 @media (max-width: 600px) {
   .view .view-chrome button,
   .premium-view .view-chrome button {
     width: 44px !important;
     height: 44px !important;
   }
+
+  /* Die Leiste liegt absolut ueber dem Inhalt. Wird sie 12 px hoeher, muss der
+     Inhalt entsprechend tiefer anfangen, sonst deckt der Knopf die Ueberschrift. */
   .view.has-view-chrome,
   .premium-view.has-view-chrome {
     padding-top: 58px;
   }
 }
+
+/* Grundposition des Maus-Knopfs. Stand bis 2026-08-09 als style="right: 36px"
+   im HTML — inline schlaegt jede Media-Query, die Handy-Regel unten waere
+   wirkungslos geblieben. */
 #mausButton {
   right: calc(env(safe-area-inset-right) + 36px);
 }
+
+/* Die folgenden zwei Bloecke standen bis 2026-08-09 in styles.css und sind
+   hierher gezogen, als die Ratchet-Grenze dort riss. Sie gehoeren ohnehin
+   eher hierher: es ist die Groesse der App-Chrome, nicht des Grundgeruests.
+   Die Kaskade aendert sich dadurch nicht — view-chrome.css liegt im selben
+   Buendel NACH styles.css, und die Selektoren tragen ihr Gewicht selbst. */
+
+/* Touch-Ziele auf schmalen Schirmen (2026-08-09).
+   Live gemessen bei 375 px mit echter Geraete-Emulation: die vier Icons der
+   Kopfleiste waren 28x28, die fuenf Knoepfe der Eingabezeile 30x38 bzw. 34x38 —
+   deutlich unter den 44 px, die Apple und Google fuer Touch nennen. Auf dem
+   Desktop bleibt alles wie es war, die Regeln greifen nur unterhalb 600 px.
+
+   Die Doppelklasse gibt den Regeln Gewicht 0,2,0: app-surfaces.css bringt
+   `.premium-view button` (0,1,1) mit und setzt mobil width: 100%. Auf der
+   Startseite greift das zwar nicht, aber die Knoepfe wandern erfahrungsgemaess. */
 @media (max-width: 600px) {
   .glass-icon.glass-icon {
     width: 44px;
     height: 44px;
     min-height: 44px;
   }
+
+  /* Der Maus-Knopf steht links neben dem Browser-Knopf. Mit 28 px genuegten
+     36 px Abstand; bei 44 px wuerden sich beide ueberlappen. */
   #mausButton {
     right: calc(env(safe-area-inset-right) + 44px);
   }
+
+  /* Eingabezeile: Hoehe fuer alle Knoepfe der Reihe (auch den Modell-Chip,
+     der sonst als einziger 38 px hoch bliebe), Breite nur fuer die Symbole —
+     der Chip traegt Text und muss mitwachsen duerfen. */
   .prompt-actions .ghost-button.ghost-button,
   .prompt-actions .send-button.send-button {
     height: 44px;
     min-height: 44px;
   }
+
   .prompt-actions .ghost-button.icon-button,
   .prompt-actions .send-button.send-button {
     width: 44px;
   }
+
+  /* Gemessen 2026-08-09: mit 44er Knoepfen braucht die Reihe 382 px bei 375 px
+     Fenster. Sie wird dabei NICHT gequetscht, sondern zieht die ganze Spalte
+     hinaus — `.home-feed` ist ein Grid-Item und hat damit min-width: auto,
+     waechst also mit seinem breitesten Kind (dieselbe Ursache wie bei der
+     Chip-Leiste des Verlaufs, sw v252). Statt am Container zu drehen, wird
+     hier der Platz beschafft: engere Abstaende, schmaleres Polster. Gemessen
+     bleiben danach ueber 20 px Luft. */
   .prompt-actions {
     gap: 4px;
     padding: 0 6px;
   }
 }
+
+/* Linkes Menue und Browser-Panel: 44 px hohe Eintraege auf schmalen Schirmen
+   (2026-08-09). Gemessen waren 178x36 bzw. 179x36 — breit genug zum Treffen,
+   es fehlte nur Hoehe. Der Anker `.sidebar` gibt Gewicht 0,2,0 und schlaegt
+   damit sowohl `.nav-button` (0,1,0) als auch `.premium-view button` (0,1,1). */
 @media (max-width: 600px) {
   .sidebar .nav-button,
   .browser-panel-nav button {
     min-height: 44px;
   }
 }
+
+/* Aussenkante der App: ein zarter Lichtsaum in der Logo-Farbe #02fdfd —
+   dasselbe Cyan-Light-Leak wie die Anmeldekarte (public/auth/auth.css,
+   .auth-card), nur schwaecher: dort umrandet es eine kleine Karte, hier die
+   ganze Flaeche. Die erste Fassung (0.14/0.10/0.06) war dem Betreiber am
+   2026-08-13 live zu schwach — jetzt gut die Haelfte der Anmeldekarte.
+   Reine Deko, deshalb fixiert, ohne Mausfang
+   und ohne eigene Groesse — die Kante folgt immer dem Fenster. */
 body::after {
   content: "";
   position: fixed;
@@ -118,33 +203,76 @@ body::after {
     inset 0 0 26px rgba(2, 253, 253, 0.22),
     inset 0 0 72px rgba(50, 246, 234, 0.13);
 }
+
+/* ===== Schmale Spur: was styles.css nicht mehr aufnehmen darf =====
+   styles.css steht an seiner Ratchet-Baseline (1589 Zeilen, siehe
+   scripts/check-guidelines.mjs) — neue Regeln der App-Chrome gehoeren hierher.
+   Die Werte in styles.css sind nur geaendert, nicht vermehrt worden. */
+
+/* Kraeftigerer Strich in der Spur (Betreiber 2026-08-13, "Icons fetter"):
+   bei 16 px traegt die Strichstaerke die Lesbarkeit, nicht die Flaeche. */
 .sidebar.is-compact .button-icon svg,
 .browser-panel.is-compact .browser-panel-nav button svg {
   stroke-width: 2.4;
 }
+
 .sidebar.is-compact .nav-button,
 .sidebar.is-compact .profile-dock,
 .browser-panel.is-compact .browser-panel-nav button {
   border-radius: 12px;
 }
+
+/* Die Mitte weicht den Seiten aus (Betreiber 2026-08-13: "Mittlere Schrift
+   soll sich automatisch anpassen, nicht unter Feldern bleiben"). Bis dahin
+   galt margin-left: 0 — die Sidebar ist position:fixed und lag als Overlay
+   ueber dem Inhalt, sodass Text und Eingabezeile unter der Spur verschwanden.
+   Schwelle 681 px — dieselbe Grenze, an der styles.css schon die rechte Seite
+   schiebt. Der erste Versuch stand bei 921 px und griff auf dem Bildschirm des
+   Betreibers (915 px Fensterbreite) genau NICHT. Darunter bleibt die Sidebar
+   die Schublade mit Abdunkeln (siehe panel-backdrop.css). */
 @media (min-width: 681px) {
   body.left-panel-open .workspace {
     margin-left: min(var(--left-panel-width), calc(100vw - 120px));
   }
 }
+
+/* Das Maus-Zeichen gehoert IN die rechte Spur, nicht daneben (Betreiber
+   2026-08-13: "Maus bleibt draussen ... soll auch automatisch in rechte Seite
+   reingehen"). Grundstellung ist 36 px links vom Panel-Knopf; bei offenem
+   Panel rueckt es in dessen Spalte, eine Zeile darunter. */
 body:has(#browserPanel.is-open) #mausButton {
   top: calc(env(safe-area-inset-top) + 32px);
   right: env(safe-area-inset-right);
 }
+
+/* In der schmalen rechten Spur sitzt das Maus-Zeichen in der obersten Zeile.
+   Die Liste darunter muss tiefer beginnen, sonst liegt das erste Zeichen
+   (Browser) unter dem Zeiger — beim ersten Bau genau so passiert. */
 .browser-panel.is-compact {
   padding-top: 64px;
 }
+
+/* Eine SPUR ist Rahmen, eine SCHUBLADE ist Overlay (2026-08-13, Nacht-Modus).
+   Auf dem Handy blieb die Mitte auch bei schmaler Spur unter der Leiste: die
+   680-px-Regel in styles.css setzt beide Raender auf 0, weil sie fuer die
+   breite Schublade mit Abdunkeln gedacht ist. Eine 28-px-Spur ist aber keine
+   Schublade — sie steht dauerhaft und darf den Text nicht verdecken. Darum
+   weicht die Mitte IMMER aus, wenn die Seite im Spur-Zustand ist; die
+   Schublade bleibt Overlay wie bisher. */
 body.left-panel-open:has(.sidebar.is-compact) .workspace {
   margin-left: min(var(--left-panel-width), calc(100vw - 120px));
 }
+
 body.right-panel-open:has(#browserPanel.is-compact) .workspace {
   margin-right: min(var(--right-panel-width), calc(100vw - 120px));
 }
+
+/* Auf dem Handy schiebt nur EINE Spur (2026-08-13, gemessen bei 375 px):
+   die Eingabereihe braucht dort 344 px. Mit einer Spur bleiben 347 px — es
+   passt. Mit beiden Spuren blieben 319 px, und die Reihe zog die Spalte 25 px
+   aus dem Bild (dieselbe Ursache wie 2026-08-09: `.home-feed` ist Grid-Item
+   mit min-width: auto). Die linke Spur ist die Hauptnavigation und schiebt;
+   die rechte bleibt auf schmalen Schirmen ein Overlay. */
 @media (max-width: 600px) {
   body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     margin-right: 0;

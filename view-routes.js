@@ -24,9 +24,8 @@ export const ALIAS_PATHS = Object.freeze({
 export const VIEW_PATHS = Object.freeze({
   start: "/",
   search: "/search",
-  websites: "/websites",
   smejjClaw: "/smejj-claw",
-  automation: "/automation",
+  automation: "/smejjBot",
   chatHistory: "/chat-history",
   browser: "/browser",
   code: "/code",
@@ -34,6 +33,8 @@ export const VIEW_PATHS = Object.freeze({
   files: "/files",
   storageView: "/storage",
   memory: "/memory",
+  papierkorb: "/papierkorb",
+  arbeitsbereiche: "/bereiche",
   ai: "/ai",
   cost: "/cost",
   tools: "/status",
@@ -45,7 +46,11 @@ export const VIEW_PATHS = Object.freeze({
 
 export const PATH_VIEWS = Object.freeze({
   ...Object.fromEntries(Object.entries(VIEW_PATHS).map(([viewId, path]) => [path, viewId])),
-  "/chat": "start"
+  "/chat": "start",
+  // Betreiber 2026-08-16: die Seite heisst ueberall smejjBot. Die alten
+  // Adressen bleiben als Aliase gueltig (Lesezeichen, Tipp-Kleinschreibung).
+  "/automation": "automation",
+  "/smejjbot": "automation"
 });
 
 export function getViewFromUrl() {

@@ -67,6 +67,7 @@ export function renderProfileDockMenu(displayName, email, signedIn = true) {
 }
 
 function setOpen(button, menu, open) {
+  fuelleWerte();
   menu.hidden = !open;
   button.setAttribute("aria-expanded", String(open));
   if (open) placeAboveButton(button, menu);
@@ -86,7 +87,26 @@ function placeAboveButton(button, menu) {
 function runAction(action) {
   if (action === "account") return goTo("/profile");
   if (action === "settings") return goTo("/settings");
+  if (action === "hilfe") { location.href = "/hilfe.html"; return; }
   if (action === "logout") return logout();
+}
+
+// Bildschirm 40: der Wert rechts an der Zeile — echt oder gar nicht.
+// Plan aus der Fusszeile (spur-start.js befuellt sie aus /api/billing/status),
+// Sprache aus der gespeicherten Laufzeitwahl.
+function fuelleWerte() {
+  try {
+    const plan = document.getElementById("profileDockPlan")?.textContent.trim() || "";
+    const kurz = document.getElementById("dockWertPlanKurz");
+    const voll = document.getElementById("dockWertPlan");
+    if (kurz) kurz.textContent = plan;
+    if (voll) voll.textContent = plan === "Frei" ? "Frei · 0,00 €" : plan;
+    let sprachRoh = "de";
+    try { sprachRoh = (JSON.parse(localStorage.getItem("smejj.settings.v1") || "{}").language) || navigator.language || "de"; } catch { /* de */ }
+    const sprache = document.getElementById("dockWertSprache");
+    const NAMEN = { de: "Deutsch", en: "English", fr: "Français", es: "Español", it: "Italiano", pt: "Português", ru: "Русский", tr: "Türkçe", ar: "العربية", hi: "हिन्दी", bn: "বাংলা", id: "Bahasa", ja: "日本語", ko: "한국어", zh: "中文" };
+    if (sprache) sprache.textContent = NAMEN[sprachRoh.slice(0, 2)] || sprachRoh;
+  } catch { /* Werte sind Beiwerk — nie die Bedienung stoeren */ }
 }
 
 // Navigation ohne Reload: app.js hoert auf popstate und stellt die View wieder her.
@@ -101,7 +121,7 @@ function goTo(path) {
 // kein Sitzungsdatum, und "Lokale Daten loeschen" bleibt der Weg dafuer.
 async function logout() {
   try {
-    const module = await import("./account-sessions.js?v=8");
+    const module = await import("./account-sessions.js?v=b46");
     await module.logoutCurrentSession();
   } catch {
     /* fail-safe: auch ohne Server-Antwort lokal abmelden */

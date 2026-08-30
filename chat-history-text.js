@@ -31,11 +31,30 @@ function ersteFrage(chat) {
 // Vorschau auf Karten, obwohl darunter eine richtige Antwort lag.
 const PLATZHALTER = /^(smejj denkt nach|authentication_required|autonomer auftrag wird als|wird geladen|…|\.\.\.)/i;
 
+// Markdown-Bilder und -Links duerfen in der Vorschau nie roh stehen —
+// gemessen 2026-08-15: ein Video-Chat zeigte "![Erzähltes Video](data:video/
+// mp4;base64,AAAA…" als Vorschauzeile. Das Bild wird durch seinen Alt-Text
+// ersetzt, der Link durch seinen Linktext, uebrige data:-Ungetueme fallen weg.
+function ohneMarkdownRohbau(text) {
+  return text
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    // Abgeschnittene Anhaenge: MAX_CHAT_BYTES kappt riesige data:-URIs mitten
+    // im base64 — die Klammer schliesst dann NIE (gemessen: 655-KB-Video-
+    // Nachricht ohne einziges ")"). Darum auch das offene Ende aufraeumen.
+    .replace(/!?\[([^\]]*)\]\([^)]*$/, "$1")
+    // "mp4" enthaelt eine Ziffer — die Zeichenklasse braucht 0-9, sonst
+    // matcht schon "data:video/mp4" nicht.
+    .replace(/data:[a-z0-9/+.;=-]+,[A-Za-z0-9+/=…]*/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function letzteAntwort(chat) {
   const messages = Array.isArray(chat.messages) ? chat.messages : [];
   let notnagel = "";
   for (let i = messages.length - 1; i >= 0; i -= 1) {
-    const text = String(messages[i]?.text || "").replace(/\s+/g, " ").trim();
+    const text = ohneMarkdownRohbau(String(messages[i]?.text || "").replace(/\s+/g, " ").trim());
     if (messages[i]?.role === "user" || !text) continue;
     if (PLATZHALTER.test(text)) {
       if (!notnagel) notnagel = text;
@@ -253,6 +272,28 @@ function gruppeVon(iso) {
   return "Älter";
 }
 
+
+/* ------------------------------------------------------------------ *
+ *  Merkmale (Mockup V11, Bildschirm 47)
+ * ------------------------------------------------------------------ */
+
+// "Werkzeug-Kennzeichen" statt geratener Themen: das Mockup filtert den
+// Verlauf nach dem, was NACHWEISBAR in der Unterhaltung steckt — Datei,
+// Bild, Code. Die Muster sind bewusst eng: lieber ein Kennzeichen zu wenig
+// als ein Filter, der luegt.
+const MERKMAL_DATEI = /\[anhang:|\.pdf\b|\.docx?\b|\.xlsx?\b|\.csv\b|\.zip\b/i;
+const MERKMAL_BILD = /\.jpe?g\b|\.png\b|\.heic\b|\.webp\b|screenshot|generiere ein bild/i;
+const MERKMAL_CODE = /```|\bfunction\b|\bconst \w+ =|\bimport \w+ from\b|<\/?[a-z]+>|\bdef \w+\(/;
+
+function merkmaleVon(chat) {
+  const text = volltext(chat).slice(0, 20000);
+  return {
+    datei: MERKMAL_DATEI.test(text),
+    bild: MERKMAL_BILD.test(text),
+    code: MERKMAL_CODE.test(text)
+  };
+}
+
 /* ------------------------------------------------------------------ *
  *  Suche
  * ------------------------------------------------------------------ */
@@ -384,6 +425,7 @@ export {
   anzeigeTitel,
   anzeigeVorschau,
   themaVon,
+  merkmaleVon,
   zeitText,
   gruppeVon,
   projektGruppen,

@@ -35,7 +35,7 @@
 // dasselbe Problem, nur eine Ebene weiter. Frisch wird diese Datei ueber
 // den Service-Worker-Vorrat (CACHE_NAME-Bump), wie autonomous-intent.js
 // und die anderen markenlosen Module auch.
-export const KONTO_STIL_MARKE = "v11-tokens-b50";
+export const KONTO_STIL_MARKE = "v11-tokens-b51";
 
 const LOGIN_CONTROLS = ["#googleSignIn", "#passkeyLogin", "#loginLocal"];
 // "Passkey einrichten" gehoert NICHT zu den Anmelde-Wegen (Befund 2026-08-07):

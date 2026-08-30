@@ -33,7 +33,11 @@ const ZIEL = "code";
 /** Holt die Flaeche und startet sie. `initCodeFlaeche` ist gegen Doppelaufrufe
  *  abgesichert (dataset.bereit) und steigt aus, wenn die Flaeche fehlt. */
 function laden() {
-  return import("./code-flaeche.js?v=56")
+  // projekt-ordner.js gehoert zur Code-Flaeche (window.smejjProjektOrdner) und
+  // haengt seit 2026-08-24 nicht mehr als eigener <script>-Tag an index.html —
+  // er kommt hier mit, sobald die Flaeche wirklich gebraucht wird.
+  import("./projekt-ordner.js?v=1").catch(() => {});
+  return import("./code-flaeche.js?v=57")
     .then((modul) => { modul.initCodeFlaeche?.(); return modul; })
     .catch((fehler) => {
       console.error("[smejj.com] Code-Flaeche konnte nicht nachgeladen werden:", fehler);

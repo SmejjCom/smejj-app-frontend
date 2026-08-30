@@ -2,10 +2,21 @@ import { CLIENT_ROUTES } from "./config.js";
 // Chats kommen aus dem Speicher, nicht aus dem DOM (QA-Welle 2, Befund W2-01).
 // WICHTIG: derselbe Pfad wie in chat-history-view.js — ein abweichender
 // Spezifizierer (z. B. "./chat-store.js") erzeugt eine ZWEITE Modulinstanz.
-import { listChats, openChat } from "/assets/chat-store.js?v=b54";
+import { listChats, openChat } from "/assets/chat-store.js?v=b65";
 // Overlay-Logik (Cmd+K, Rendern, Tastatur) wohnt in search-overlay.js — diese
 // Datei bleibt klein und die Such-Seite hier ist nur noch die Rueckfallebene.
-import { initSearchOverlay, toggleSearchOverlay } from "./search-overlay.js?v=b48";
+// Seit 2026-08-24 ("Startseite abspecken") wird das Overlay erst beim ERSTEN
+// Cmd+K bzw. Such-Klick geladen und initialisiert; der Service Worker haelt
+// es im Precache, darum ist der erste Aufruf praktisch sofort da.
+let overlayGeladen = null;
+let overlayLader = () => null;
+
+/** Oeffnet das Such-Overlay (laedt es bei Bedarf). Fuer app.js: Promise<boolean>
+ *  oder null, solange initGlobalSearch noch nicht lief (dann Rueckfallebene). */
+export function oeffneSuchOverlay() {
+  const geladen = overlayLader();
+  return geladen ? geladen.then((m) => m.openSearchOverlay()) : null;
+}
 
 // Bildschirm 38: das eine Feld findet auch Einstellungen und Hilfe.
 // Die Bereichsliste spiegelt GROUPS aus settings-surface.js — dort ist die
@@ -82,18 +93,24 @@ export function initGlobalSearch({ $, goToView, showTaskIndicator, showToast, st
     if (!button) return;
     openResult({ view: button.dataset.searchView, label: button.dataset.searchLabel, jobId: button.dataset.searchJobId, chatId: button.dataset.searchChatId }, goToView, showTaskIndicator, showToast);
   });
+  overlayLader = () => {
+    overlayGeladen ||= import("./search-overlay.js?v=b59").then((m) => {
+      m.initSearchOverlay({
+        findResults: (query) => findResults(query, state, workspace),
+        openResult: (result) => openResult(result, goToView, showTaskIndicator, showToast)
+      });
+      return m;
+    }).catch((fehler) => { overlayGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler); throw fehler; });
+    return overlayGeladen;
+  };
   document.addEventListener("keydown", (event) => {
     if (event.key.toLowerCase() !== "k" || (!event.metaKey && !event.ctrlKey)) return;
     event.preventDefault();
     // Overlay zuerst; die Such-Seite bleibt Rueckfallebene, falls das
-    // Overlay-Markup fehlt. Ein Cmd+K darf nie ins Leere gehen.
-    if (toggleSearchOverlay()) return;
-    goToView("search");
-    requestAnimationFrame(() => input.focus());
-  });
-  initSearchOverlay({
-    findResults: (query) => findResults(query, state, workspace),
-    openResult: (result) => openResult(result, goToView, showTaskIndicator, showToast)
+    // Overlay-Markup fehlt oder das Nachladen scheitert. Ein Cmd+K darf nie
+    // ins Leere gehen.
+    const zurueckfall = () => { goToView("search"); requestAnimationFrame(() => input.focus()); };
+    overlayLader().then((m) => { if (!m.toggleSearchOverlay()) zurueckfall(); }).catch(zurueckfall);
   });
   renderResults(log, [], "");
 }

@@ -57,100 +57,104 @@
    * das auch. "0" heisst hier "keiner in den letzten N Eintraegen", nicht
    * "nie einer gewesen"; alles andere waere eine falsche Beruhigung.
    */
-  // ---- B · Nutzer (Design-Vorschlag "Nutzer — und die Zeile, die euch mal
-  // Stunden gekostet hat", 2026-08-23): Suchen, Plan sehen, Verbrauch sehen —
-  // und sofort erkennen, wenn ein Konto unter einer anderen Adresse bezahlt.
-  function relativ(iso) {
-    if (!iso) return "—";
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return "—";
-    const sek = Math.max(0, (Date.now() - d.getTime()) / 1000);
-    if (sek < 60) return "jetzt";
-    if (sek < 3600) return "vor " + Math.round(sek / 60) + " min";
-    if (sek < 86400) return "vor " + Math.round(sek / 3600) + " Std.";
-    const tage = Math.round(sek / 86400);
-    return "vor " + tage + (tage === 1 ? " Tag" : " Tagen");
+  function alarmLage(audit) {
+    const eintraege = (audit && audit.entries) || [];
+    const alarme = eintraege.filter(function (eintrag) { return eintrag && eintrag.action === "security.alarm"; });
+    return {
+      anzahl: alarme.length,
+      geprueft: eintraege.length,
+      letzter: alarme[0] || null   // Audit-Seite liefert neueste zuerst
+    };
   }
 
-  function methodePille(m) {
-    const namen = { google: "Google", github: "GitHub", passkey: "Passkey", email: "E-Mail", "magic-link": "Magic-Link" };
-    return pille(namen[m] || m || "—", "");
+  function uebersicht(d) {
+    const index = d.nutzer && d.nutzer.index ? d.nutzer.index : {};
+    const kette = d.audit && d.audit.chain ? d.audit.chain : {};
+    const systeme = (d.compliance && d.compliance.systeme) || [];
+    const pflichtig = systeme.filter((s) => s.transparenzpflicht).length;
+    const alarm = alarmLage(d.audit);
+
+    const kacheln = '<div class="kpis">'
+      + kachel("Konten", index.count == null ? "—" : String(index.count),
+        index.unreadable ? index.unreadable + " unlesbar" : "alle lesbar", index.unreadable ? "wr" : "up")
+      + kachel("Index-Alter", A.dauer(index.ageSeconds),
+        index.refreshing ? "wird gerade aufgefrischt" : "aktuell", index.refreshing ? "wr" : "up")
+      + kachel("Audit-Eintraege", d.audit && d.audit.total != null ? String(d.audit.total) : "—",
+        "Zeitraum " + e((d.audit && d.audit.window) || "—"))
+      + kachel("Nachweiskette", kette.ok ? "intakt" : "gebrochen",
+        kette.ok ? "lueckenlos geprueft" : String(kette.reason || ""), kette.ok ? "up" : "dn")
+      + kachel("KI-Systeme", String(systeme.length),
+        pflichtig + " mit Transparenzpflicht")
+      + kachel("Sicherheitsalarme", String(alarm.anzahl),
+        alarm.anzahl > 0
+          ? "zuletzt " + A.zeit(alarm.letzter.at)
+          : "keiner in den letzten " + alarm.geprueft + " Eintraegen",
+        alarm.anzahl > 0 ? "dn" : "up")
+      + '</div>';
+
+    const dienste = tabelle(["Bereich", "Stand", "Anmerkung"], [
+      '<tr><td><b>Nutzer-Index</b></td><td>' + (index.count == null ? pille("nicht gebaut", "bad") : pille("bereit", "ok"))
+        + '</td><td>' + e(index.builtAt ? "gebaut " + A.zeit(index.builtAt) : "—") + '</td></tr>',
+      '<tr><td><b>Audit-Log</b></td><td>' + (kette.ok ? pille("unveraendert", "ok") : pille("pruefen", "bad"))
+        + '</td><td>' + e(kette.ok ? "Hash-Kette lueckenlos" : String(kette.reason || "")) + '</td></tr>',
+      '<tr><td><b>EU AI Act</b></td><td>' + (d.compliance && d.compliance.hochrisiko === false
+        ? pille("kein Hochrisiko", "ok") : pille("unbekannt", "warn"))
+        + '</td><td>' + e(d.compliance ? "Durchsetzung ab " + (d.compliance.rechtsrahmen || {}).durchsetzungAb : "—") + '</td></tr>',
+      '<tr><td><b>Schreibende Aktionen</b></td><td>' + pille("mit Nachweis", "ok")
+        + '</td><td>Löschen und Rollenvergabe nur mit vier Augen</td></tr>',
+      '<tr><td><b>Offene Freigaben</b></td><td>' + ((d.freigaben || 0) > 0
+        ? pille(String(d.freigaben) + " warten", "warn") : pille("keine", "ok"))
+        + '</td><td>Anträge verfallen nach 24 Stunden</td></tr>',
+      // Die Wache meldet MUSTER, nicht Einzelvorgaenge: gedrosselte Anfragen an
+      // der Vortuer und falsche Step-up-Codes. Ein Alarm heisst "abgewehrt und
+      // auffaellig oft", nicht "eingebrochen".
+      '<tr><td><b>Sicherheitswache</b></td><td>' + (alarm.anzahl > 0
+        ? pille(String(alarm.anzahl) + (alarm.anzahl === 1 ? " Alarm" : " Alarme"), "bad")
+        : pille("ruhig", "ok"))
+        + '</td><td>' + (alarm.anzahl > 0
+          ? e("zuletzt " + String((alarm.letzter && alarm.letzter.target) || "") + " — " + String((alarm.letzter && alarm.letzter.reason) || ""))
+          : "Abgewehrte Muster stehen als security.alarm im Audit-Log")
+        + '</td></tr>'
+    ]);
+
+    return kopf("A", "Cockpit", "Übersicht",
+      "Der Betriebszustand auf einen Blick. Alle Zahlen kommen live aus der eigenen API — nichts ist hier fest verdrahtet.")
+      + kacheln + '<div class="stack">' + panel("Zustand", "live abgefragt", dienste) + '</div>';
   }
+
+  // ---- B · Nutzer -------------------------------------------------------------
 
   function nutzer(d) {
     const index = d.index || {};
-    const konten = d.konten || {};
-    const abos = d.abos || {};
-    const zeilen = (d.eintraege || []).map((n) => {
-      const bezahlt = n.bezahltAls === null ? '<span class="s">—</span>'
-        : n.bezahltAls === "dieselbe" ? '<span class="s">dieselbe</span>'
-          : n.bezahltAls === "unbekannt" ? pille("unbekannt", "warn")
-            : '<span class="mono warn">' + e(n.bezahltAls) + "</span>";
-      const verbrauch = n.verbrauch
-        ? e(String(n.verbrauch.anfragen)) + " Anfragen" + (n.verbrauch.kostenUsd !== null && n.verbrauch.kostenUsd !== undefined ? ' <span class="s">· ' + e(n.verbrauch.kostenUsd.toFixed(3)) + " $</span>" : "")
-        : '<span class="s">—</span>';
-      return '<tr class="klickbar" data-akte="' + e(n.userId) + '">'
-        + '<td><b>' + e(n.name || "Unbenannt") + '</b><br><span class="mono">' + e(n.email) + "</span>"
-        + (n.status !== "active" ? " " + pille(n.status === "blocked" ? "gesperrt" : n.status, "bad") : "") + "</td>"
-        + "<td>" + methodePille(n.method) + "</td>"
-        + "<td>" + bezahlt + "</td>"
-        + "<td><b>" + e(n.plan || "Frei") + "</b>" + (n.aboKlartext ? '<br><span class="s">' + e(n.aboKlartext) + "</span>" : "") + "</td>"
-        + "<td>" + verbrauch + "</td>"
-        + "<td>" + (n.lastSeenAt ? e(relativ(n.lastSeenAt)) : (n.zuletztMessbar ? '<span class="s">noch nie</span>' : '<span class="s">nicht messbar</span>'))
-        + (n.activeSessions ? '<br><span class="s">' + e(String(n.activeSessions)) + " Sitzung" + (n.activeSessions === 1 ? "" : "en") + "</span>" : "") + "</td>"
-        + '<td><span class="act">Akte öffnen</span></td></tr>';
-    });
+    const eintraege = d.entries || [];
+    const zeilen = eintraege.map((n) =>
+      '<tr class="klickbar" data-akte="' + e(n.userId) + '">'
+      + '<td><b>' + e(n.name || "—") + '</b><br><span class="mono">' + e(n.email) + '</span></td>'
+      + '<td><span class="mono">' + e(n.userId) + '</span></td>'
+      + '<td>' + (n.role === "user" ? '<span class="pill">user</span>' : pille(n.role, "acc")) + '</td>'
+      + '<td>' + (n.status === "active" ? pille("aktiv", "ok") : pille(n.status, "bad")) + '</td>'
+      + '<td>' + (n.emailVerified ? pille("ja", "ok") : pille("nein", "warn")) + '</td>'
+      + '<td>' + e(String(n.activeSessions)) + '</td>'
+      + '<td>' + e(A.zeit(n.createdAt)) + '</td>'
+      + '<td><span class="act">Akte öffnen</span></td></tr>');
 
     const werkzeuge = '<span class="btn" id="neubauKnopf">Index neu bauen</span>';
     const suche = '<div class="bar"><input class="suche-feld" id="sucheFeld" type="search" '
-      + 'placeholder="Nach Name, Adresse oder Kennung suchen …" value="' + e(d.suchbegriff || "") + '">'
+      + 'placeholder="Name, E-Mail oder Konto-ID …" value="' + e(d.suchbegriff || "") + '">'
       + '<span class="btn" id="sucheKnopf">Suchen</span>'
       + (d.suchbegriff ? '<span class="btn" id="sucheLeeren">Zurücksetzen</span>' : "") + '</div>';
 
     const stand = "Index " + A.dauer(index.ageSeconds) + " alt"
       + (index.refreshing ? " · wird aufgefrischt" : "")
-      + (index.unreadable ? " · " + index.unreadable + " unlesbar" : "")
-      + (index.kenntZuletzt || !(index.zuletztMessbarKonten || 0) ? "" : " · »Zuletzt« erst nach dem nächsten Neubau");
+      + (index.unreadable ? " · " + index.unreadable + " unlesbar" : "");
 
-    const offene = (abos.nichtZugeordnetListe || []).map((a) =>
-      "<tr><td><b>" + e(a.plan || "—") + '</b><br><span class="s">' + e(a.klartext || a.zustand || "") + "</span></td>"
-      + '<td><span class="mono">' + e(a.zahlendeAdresse || "Adresse unbekannt") + "</span></td>"
-      + "<td>" + e(a.naechsterSchritt || "Mit dieser Adresse anmelden, oder das Abo auf die Konto-Adresse umhängen.")
-      + '<br><span class="btn" data-aboUmhaengen="' + e(a.kundenId || "") + '">Auf ein Konto umhängen</span></td></tr>');
-    const offenBlock = offene.length
-      ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + offene.length + " bezahlte Abo(s) passen zu keinem Konto</div>"
-        + '<div class="ns">Der Kunde hat bezahlt und sieht in der App trotzdem »Frei«. Die Adresse, mit der bezahlt wurde, gehört zu keinem Konto hier.</div></div></div>'
-        + panel("Abos ohne Konto", "wen du anschreiben musst", tabelle(["Plan", "Bezahlt als", "Nächster Schritt"], offene))
-      : "";
-    const aboAusfall = abos.erreichbar === false
-      ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Abos nicht lesbar</div><div class="ns">' + e(abos.grund || "") + " — Plan und »bezahlt als« fehlen in der Liste; das heißt NICHT, dass niemand zahlt.</div></div></div>"
-      : "";
-
-    const aktionen = '<div class="pb"><table><tbody>'
-      + "<tr><td><b>Sperren / Entsperren</b></td><td>Mit Grund. Wird im Protokoll vermerkt.</td></tr>"
-      + "<tr><td><b>E-Mail bestätigen · Login-Sperre aufheben · Sitzungen widerrufen</b></td><td>Mit Grund und Step-up-Code.</td></tr>"
-      + "<tr><td><b>Support-Vorgang beantragen</b></td><td>Nur mit Grund; der Nutzer sieht es in seinem Konto.</td></tr>"
-      + "<tr><td><b>Rolle vergeben · Konto löschen</b></td><td>Braucht eine zweite Person (Vier Augen). Den eigenen Antrag darfst du nicht durchwinken.</td></tr>"
-      + "</tbody></table>"
-      + '<div class="leer">Was hier NICHT geht: in fremde Gespräche schauen. Auch als Betreiber nicht. Das ist der Kern des Versprechens — und eine Ausnahme davon würde es wertlos machen.</div></div>';
-
-    return kopf("B", "Nutzer", "Nutzer — und die Zeile, die einmal Stunden gekostet hat",
-      "Suchen, Plan sehen, Verbrauch sehen. Und sofort erkennen, wenn ein Konto unter einer anderen Adresse bezahlt als angemeldet — deshalb steht »bezahlt als« als eigene Spalte.")
-      + '<div class="kpis">'
-      + kachel("Konten gesamt", String(konten.gesamt || 0), "+" + (konten.neuDieseWoche || 0) + " diese Woche", "")
-      + kachel("Zahlend", abos.erreichbar === false ? "—" : String(abos.zahlend || 0), konten.gesamt ? Math.round(((abos.zahlend || 0) / konten.gesamt) * 1000) / 10 + " % der Konten" : "", "up")
-      // Ehrlich: Google/GitHub/Passkey-Sitzungen hinterlassen keine Spur im
-      // Datensatz — nur E-Mail-Konten sind hier zaehlbar, und das steht dran.
-      + kachel("Heute aktiv", String(konten.heuteAktiv || 0), "nur messbar für " + (index.zuletztMessbarKonten || 0) + " E-Mail-Konto" + ((index.zuletztMessbarKonten || 0) === 1 ? "" : "en") + " — Google/GitHub hinterlassen keine Spur", (index.zuletztMessbarKonten || 0) ? "" : "wr")
-      + kachel("Zwei Adressen", abos.erreichbar === false ? "—" : String((abos.zweiAdressen || 0) + (abos.nichtZugeordnet || 0)), (abos.nichtZugeordnet || 0) > 0 ? abos.nichtZugeordnet + " ohne Konto — anschreiben" : "bezahlt ≠ angemeldet", (abos.nichtZugeordnet || 0) > 0 ? "dn" : "")
-      + "</div>"
+    return kopf("B", "Nutzer", "Nutzerverwaltung",
+      "Suchen und blättern. Die Liste zeigt nur Metadaten — der Blick in eine Akte verlangt einen Grund und wird protokolliert.")
       + suche
-      + '<div class="stack">' + aboAusfall + offenBlock
-      + panel("Konten", (d.total || 0) + " Treffer · " + stand,
-        tabelle(["Konto", "Angemeldet mit", "Bezahlt als", "Plan", "Verbrauch seit Neustart", "Zuletzt (nur E-Mail-Konten)", ""], zeilen),
-        werkzeuge)
-      + panel("Was du an einem Konto tun kannst", "in der Akte — jede Änderung mit Grund, Step-up und Audit-Eintrag", aktionen)
-      + "</div>";
+      + '<div class="stack">' + panel(
+        "Konten", (d.total || 0) + " Treffer · " + stand,
+        tabelle(["Nutzer", "Konto-ID", "Rolle", "Status", "Verifiziert", "Sitzungen", "Registriert", ""], zeilen),
+        werkzeuge) + '</div>';
   }
 
   // ---- B2 · Nutzerakte --------------------------------------------------------
@@ -193,53 +197,7 @@
       + panel("Stammdaten", u.userId || "", stamm)
       + panel("Sitzungen", (u.sessions || []).length + " insgesamt",
         tabelle(["Gerät", "Sitzung", "Zuletzt", "Läuft ab", "Stand"], sitzungen))
-      + akteAktionen(u)
       + '</div>';
-  }
-
-  /**
-   * Die Aktionsleiste der Nutzerakte.
-   *
-   * WARUM SIE HIER STEHT: console.js bindet seit dem 28.07.2026 Handler an
-   * `#akteAktionen` und `[data-aktion]` — nur hat diese Leiste NIE jemand
-   * gezeichnet. `getElementById` gab null, `bindeAkteAktionen()` kehrte still
-   * zurueck, und damit war der komplette schreibende Teil des Adminbereichs
-   * (sperren, entsperren, bestaetigen, entriegeln, abmelden, Rolle vergeben,
-   * loeschen, Support-Vorgang) fuer den Betreiber unerreichbar — waehrend
-   * Server, Vier-Augen-Freigabe, Step-up und Audit-Log vollstaendig da waren
-   * und gruen getestet wurden. Gefunden bei der A-bis-Z-Pruefung am 14.08.2026.
-   *
-   * GEZEIGT WIRD NUR, WAS AUCH ETWAS TUT. Ein "E-Mail bestätigen" an einer
-   * laengst bestaetigten Adresse waere ein Knopf, der nichts bewirkt — genau
-   * die Sorte Attrappe, die diese Konsole nicht haben will. Die Rechte prueft
-   * weiterhin der Server; die Leiste rät sie nicht nach.
-   */
-  function akteAktionen(u) {
-    // Eine geloeschte Huelle hat nichts mehr, was man an ihr tun koennte.
-    if (u.status === "deleted") {
-      return panel("Aktionen", "gelöscht",
-        '<div class="pb"><div class="leer">Dieses Konto ist gelöscht. Es gibt nichts mehr zu ändern.</div></div>');
-    }
-
-    const knopf = (aktion, text, ton) =>
-      '<button type="button" class="btn' + (ton ? " " + ton : "") + '" data-aktion="' + e(aktion) + '">'
-      + e(text) + "</button>";
-
-    const knoepfe = [];
-    knoepfe.push(u.status === "blocked"
-      ? knopf("unblock", "Entsperren")
-      : knopf("block", "Sperren", "danger"));
-    if (!u.emailVerifiedAt) knoepfe.push(knopf("verify", "E-Mail bestätigen"));
-    if ((u.loginGuard || {}).lockedUntil) knoepfe.push(knopf("unlock", "Login-Sperre aufheben"));
-    if ((u.sessions || []).some((s) => s.active)) knoepfe.push(knopf("sessions.revoke", "Sitzungen widerrufen"));
-    knoepfe.push(knopf("impersonation", "Support-Vorgang beantragen"));
-    knoepfe.push(knopf("role.grant", "Rolle vergeben"));
-    knoepfe.push(knopf("delete", "Konto löschen", "danger"));
-
-    return panel("Aktionen", "jede Änderung braucht Grund, Step-up und Audit-Eintrag",
-      '<div class="pb"><div class="bar" id="akteAktionen">' + knoepfe.join("") + '</div>'
-      + '<div class="leer">Rolle vergeben und Konto löschen brauchen zusätzlich die '
-      + 'Freigabe einer zweiten Person — du selbst darfst deinen eigenen Antrag nicht durchwinken.</div></div>');
   }
 
   // ---- O · Audit --------------------------------------------------------------
@@ -299,44 +257,16 @@
       + '<div class="nt">Serverseitig durchgesetzt, nicht im Browser</div>'
       + '<div class="ns">Diese Liste zeigt nur, was der Server ohnehin erzwingt. Die Rolle wird bei '
       + 'jeder Anfrage frisch aus dem Nutzer-Store gelesen — nie aus dem Sitzungs-Token.'
+      + (d.actor && d.actor.roleSource === "bootstrap"
+        ? ' Diese Rolle stammt aus <span class="mono">SMEJJ_ADMIN_OWNER_EMAILS</span>, nicht aus dem Konto.'
+        : "")
       + '</div></div></div>';
 
     return kopf("C", "Rollen", "Deine Rechte",
       "Was dein Konto in dieser Konsole darf — und was zusätzlich eine zweite Freigabe oder eine Einwilligung braucht.")
-      + '<div class="stack">' + hinweis + herkunftDerRolle(d.actor || {})
+      + '<div class="stack">' + hinweis
       + panel("Berechtigungen", "Rolle: " + ((d.actor || {}).role || "—"),
         tabelle(["Berechtigung", "Stufe"], zeilen)) + '</div>';
-  }
-
-  /**
-   * Woher die eigenen Rechte kommen — und was passiert, wenn diese Quelle wegfällt.
-   *
-   * BEFUND 2026-08-14: Am selben Tag hat ein einziger fehlerhafter Aufruf die
-   * Zeabur-Umgebung von smejj-control ersetzt. `SMEJJ_ADMIN_OWNER_EMAILS` war
-   * weg — und mit ihr der gesamte Adminzugang, denn im Konto des Betreibers
-   * steht als Rolle nur `user`. Der alte Hinweis erwähnte die Variable zwar,
-   * aber in einem Nebensatz und ohne die Folge zu nennen.
-   *
-   * Hier steht jetzt beides: die Herkunft UND was ihr Verlust bedeutet.
-   * Bewusst kein Knopf daneben: eine Rollenvergabe ist eine Rechteausweitung
-   * und braucht nach `adminRoles.js` für JEDE Rolle eine zweite Person —
-   * auch für den Owner. Wer sich hier selbst eintragen könnte, hätte das
-   * Vier-Augen-Prinzip mit einem Klick ausgehebelt.
-   */
-  function herkunftDerRolle(actor) {
-    if (actor.roleSource !== "bootstrap") return "";
-    const gespeichert = actor.storedRole || "user";
-    return '<div class="note glass"><div class="nx">!</div><div>'
-      + '<div class="nt">Deine Rechte hängen an einer einzelnen Umgebungsvariablen</div>'
-      + '<div class="ns">Du bist <b>' + e(actor.role || "owner") + '</b>, weil deine Adresse in '
-      + '<span class="mono">SMEJJ_ADMIN_OWNER_EMAILS</span> steht. In deinem Konto ist als Rolle '
-      + 'nur <span class="mono">' + e(gespeichert) + '</span> hinterlegt. Geht die Variable verloren, '
-      + 'ist die Konsole für alle zu — genau das ist am 14.08.2026 passiert. '
-      + 'Wiederherstellen: <span class="mono">control_umgebung_wiederherstellen.mjs</span>; '
-      + 'der Wert liegt dafür in <span class="mono">env.local</span> bereit. '
-      + 'Eine dauerhafte Rolle im Konto kann dir nur eine zweite Person geben — '
-      + 'Rollenvergabe ist Vier-Augen, auch für dich.'
-      + '</div></div></div>';
   }
 
   // ---- N · EU AI Act ----------------------------------------------------------
@@ -490,6 +420,7 @@
     pilleBlock: pille,
     freigaben: freigaben,
     support: support,
+    uebersicht: uebersicht,
     nutzer: nutzer,
     akte: akte,
     audit: audit,

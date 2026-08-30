@@ -64,7 +64,7 @@ const MAX_ZEICHEN = 1_500;
 // Woerter, die nach TAGESAKTUALITAET riechen. Das lokale Modell hat keinen
 // Internetzugang und wuerde raten statt zu suchen — der teuerste Fehler, den es
 // machen kann, weil er selbstsicher klingt.
-const AKTUALITAET = /\b(heute|gestern|aktuell|momentan|gerade|neueste?n?|jetzt|kurs|preis|wetter|nachrichten|news|version|20\d\d)\b/i;
+const AKTUALITAET = /\b(heute|gestern|aktuell|momentan|gerade|neueste?n?|jetzt|kurs|preis|wetter|nachrichten|news|schlagzeilen?|presse|zeitung|version|20\d\d)\b/i;
 
 // Woerter, die auf unsere eigenen Funktionen zeigen. Darauf kann nur der Server
 // mit Projektwissen antworten; das lokale Modell kennt smejj.com nicht.
@@ -217,7 +217,10 @@ export function istRueckfrage(text) {
     || /\b(ein paar|einige) (fragen|rückfragen|rueckfragen)\b/i.test(t);
 }
 
-export async function frageLokal(frage, { onDelta, system = "", verlauf = [], umgebung = globalThis, jetzt = () => Date.now() } = {}) {
+// `abgebrochen` (2026-08-23): liefert true, sobald der Nutzer gestoppt hat —
+// die Schleife endet dann beim naechsten Stueck, die Teilantwort kommt als
+// `ok:false, grund:"gestoppt"` zurueck (kein Server-Rueckfall auf einen Stopp).
+export async function frageLokal(frage, { onDelta, system = "", verlauf = [], umgebung = globalThis, jetzt = () => Date.now(), abgebrochen = () => false } = {}) {
   const start = jetzt();
   const pruefung = await lokalVerfuegbar(umgebung);
   if (!pruefung.da) return { ok: false, text: "", ms: 0, grund: pruefung.grund };
@@ -242,6 +245,7 @@ export async function frageLokal(frage, { onDelta, system = "", verlauf = [], um
         // Chrome lieferte je nach Fassung mal das GANZE bisherige Ergebnis, mal
         // nur den Zuwachs. Beides muss richtig ankommen, sonst steht der Text
         // doppelt in der Blase.
+        if (abgebrochen()) return { ok: false, text, ms: jetzt() - start, grund: "gestoppt" };
         const zuwachs = stueck.startsWith(text) ? stueck.slice(text.length) : stueck;
         text = stueck.startsWith(text) ? stueck : text + stueck;
         if (zuwachs && typeof onDelta === "function") onDelta(zuwachs);

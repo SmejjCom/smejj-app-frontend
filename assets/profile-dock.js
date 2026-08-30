@@ -9,7 +9,7 @@
 // Das Dock liest den Profil-Zustand ausschliesslich aus localStorage
 // (Single Source of Truth von app.js) und schreibt ihn nie zurueck.
 
-import "./auth-gate.js?v=3";
+import "./auth-gate.js?v=4";
 // Anonyme Icon-Nutzungsmessung (Konkurrenz-Radar Ausbaustufe 5). Hier
 // eingehaengt statt per <script> in index.html, weil die Startseite unter dem
 // Start-Lock steht — gleiches Muster wie auth-gate.js eine Zeile darueber.

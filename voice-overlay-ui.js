@@ -32,6 +32,11 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
     + '<button id="voiceModeAttach" type="button" aria-label="Datei anhängen" title="Datei anhängen">'
     + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
     + '</button>'
+    // Bildschirm 35: das Auge — smejj sieht mit. Ein Bild je Aufnahme
+    // (kamera.js), durch den vorhandenen Bild-Verstehen-Weg.
+    + '<button type="button" data-kamera-start="kamera" aria-label="Kamera — smejj sieht mit" title="Kamera — smejj sieht mit">'
+    + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>'
+    + '</button>'
     + '<input id="voiceModeInput" type="text" placeholder="Frage schreiben ..." autocomplete="off">'
     + `<button id="voiceModeSend" type="button" aria-label="Senden" title="Senden" disabled>${sendIcon}</button>`
     + '</div>'
@@ -51,8 +56,8 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
   eingabe?.addEventListener("paste", async (event) => {
     try {
       const [{ bildDateienAusClipboard }, { uebernehmeBildDatei }] = await Promise.all([
-        import("./composer-paste-attach.js?v=1"),
-        import("./composer-bild-anhang.js?v=1")
+        import("./composer-paste-attach.js?v=3"),
+        import("./composer-bild-anhang.js")
       ]);
       const bilder = bildDateienAusClipboard(event.clipboardData);
       if (!bilder.length) return;
@@ -131,10 +136,30 @@ export function setVoiceModeTranscript(text) {
 // Live-Mitschrift der Antwort (Konkurrenz-Radar V2, 2026-08-06): Die Antwort
 // streamt sichtbar unter der Welle mit statt nur als "Ich spreche ...".
 // Bewusst NUR Text (textContent) — kein HTML aus dem Log uebernehmen.
+// Betreiber 2026-08-17 ("Keiner braucht diese komische Schriftarten — User
+// wollen nur die Information"): im Sprachmodus stand die Antwort ROH da —
+// "```js", "**fett**", "### Ueberschrift" als Zeichen, riesig und zentriert.
+// Hier fallen die Auszeichnungs-Zeichen weg; der Text bleibt Text
+// (textContent, kein HTML aus dem Log). Der Vorlese-Offset bleibt
+// unberuehrt — die Sprachausgabe liest weiter aus ihrer eigenen Quelle.
+export function lesbarerSprechtext(roh) {
+  return String(roh || "")
+    .replace(/```[a-z0-9+-]*\n?/gi, "")   // Codezaun-Zeilen
+    .replace(/`([^`\n]+)`/g, "$1")        // Inline-Code
+    .replace(/^\s{0,3}#{1,6}\s+/gm, "")   // Ueberschriften
+    .replace(/\*\*([^*\n]+)\*\*/g, "$1")  // fett
+    .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,;:!?]|$)/g, "$1$2") // kursiv
+    .replace(/^\s{0,3}>\s?/gm, "")        // Zitatzeichen
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 export function setVoiceModeReply(text) {
   const reply = document.querySelector("#voiceModeReply");
-  if (!reply || reply.textContent === text) return;
-  reply.textContent = text;
+  if (!reply) return;
+  const sauber = lesbarerSprechtext(text);
+  if (reply.textContent === sauber) return;
+  reply.textContent = sauber;
   reply.scrollTop = reply.scrollHeight;
 }
 

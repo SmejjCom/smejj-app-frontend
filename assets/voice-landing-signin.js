@@ -18,7 +18,7 @@
 // (AI_Guidelines 2, Single Responsibility) — dieselbe Loesung wie bei
 // maus-panel.js und browser-pane-backdrop.js.
 
-import { hasSession } from "./auth-gate.js?v=3";
+import { hasSession } from "./auth-gate.js?v=4";
 
 const LOGIN_URL = "/auth/login/";
 // Eigener Stil statt des Landing-Blocks: der Knopf steht fuer sich und soll

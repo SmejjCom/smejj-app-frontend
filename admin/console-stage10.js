@@ -4,8 +4,7 @@
 // lagen, stehen hier zum Durchklicken — je Vorschlag Ja / Nein / Später.
 //
 // Bewusst OHNE Server-Endpunkt: Die Berichte kommen als statische Datei
-// von derselben Herkunft (zwei Auslieferungswege, siehe QUELLEN weiter unten);
-// die Konsole braucht dafuer
+// (/radar/berichte.json) von derselben Herkunft; die Konsole braucht dafuer
 // keinen laufenden Control-Server und keine neue API. Die Entscheidungen
 // bleiben im Browser (localStorage) und werden als Klartext ausgegeben —
 // der Betreiber gibt diesen Text weiter, danach wird gebaut. Ein Klick hier
@@ -108,44 +107,15 @@
     }
   }
 
-  // ZWEI HERKUENFTE, und das ist kein Versehen. Die Konsole wird von zwei
-  // Stellen ausgeliefert: von GitHub Pages unter smejj.com/admin/ (das ist der
-  // Weg, den der Betreiber benutzt) und vom Control-Server unter
-  // smejj-control.zeabur.app/admin (der zweite Zugang). Pages kennt die Datei
-  // unter /radar/berichte.json, der Control-Server liefert sie hinter der
-  // Admin-Anmeldung unter /admin/radar-berichte.json aus. Ein einzelner Pfad
-  // waere auf genau einem der beiden Wege tot — deshalb der Reihe nach beide.
-  // Reihenfolge mit Absicht: der Admin-Pfad zuerst. Er ist die bessere erste
-  // Wahl — hinter der Anmeldung, mit richtigem Inhaltstyp, aus der einen
-  // Quelle im Repo ausgeliefert. Auf GitHub Pages gibt es ihn nicht (404),
-  // dann greift der zweite. Beide Wege funktionieren, nur die Reihenfolge
-  // aendert sich; und der Pruefstand sieht jetzt eine Adresse, die wirklich
-  // bei einem Handler ankommt.
-  const QUELLEN = ["/admin/radar-berichte.json", "/radar/berichte.json"];
-
-  async function holeBerichte() {
-    let letzterStatus = 0;
-    for (const quelle of QUELLEN) {
-      try {
-        const antwort = await fetch(quelle, { headers: { Accept: "application/json" } });
-        if (antwort.ok) return { ok: true, daten: await antwort.json() };
-        letzterStatus = antwort.status;
-      } catch (fehler) {
-        // Netzfehler auf dem einen Weg heisst nicht, dass der andere tot ist.
-      }
-    }
-    return { ok: false, status: letzterStatus };
-  }
-
   async function laden(ctx) {
     if (!daten) {
-      const ergebnis = await holeBerichte();
-      if (!ergebnis.ok) {
-        return ctx.fehler(ergebnis.status
-          ? "Radar-Berichte nicht gefunden (HTTP " + ergebnis.status + ")."
-          : "Radar-Berichte konnten nicht geladen werden.");
+      try {
+        const antwort = await fetch("/radar/berichte.json", { headers: { Accept: "application/json" } });
+        if (!antwort.ok) return ctx.fehler("Radar-Berichte nicht gefunden (HTTP " + antwort.status + ").");
+        daten = await antwort.json();
+      } catch (fehler) {
+        return ctx.fehler("Radar-Berichte konnten nicht geladen werden.");
       }
-      daten = ergebnis.daten;
     }
     zeichne(ctx);
   }

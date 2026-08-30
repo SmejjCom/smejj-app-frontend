@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de" class="p-recht">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app http://localhost:* http://127.0.0.1:*">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="theme-color" content="#101113">
+    <meta name="description" content="Danke für dein smejj.com Abo — deine Zahlung ist eingegangen.">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Danke – dein Abo bei smejj.com</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/favicon.ico?v=112" sizes="any">
+    <link rel="icon" href="/icons/smejj_favicon.svg?v=112" type="image/svg+xml">
+    <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
+    <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+    <link rel="stylesheet" href="/assets/static-pages.css">
+  <!-- Klickjacking-Schutz. MUSS mit, weil GitHub Pages keine eigenen Kopfzeilen
+     setzen kann und frame-ancestors in einer meta-CSP wirkungslos ist. Auf dem
+     Control-Server faengt stattdessen dessen Kopfzeile x-frame-options: DENY.
+     Befund 2026-08-14: das Modul gab es laengst, hing aber nur an 3 von 12
+     Seiten — der Adminbereich war NICHT dabei. -->
+<script type="module" src="/frame-guard.js?v=1"></script>
+</head>
+  <body>
+    <main>
+      <a class="legal-brand" href="/" aria-label="smejj.com Startseite">
+        <img src="/icons/smejj_icon.svg" alt="smejj.com" width="2000" height="1532">
+      </a>
+      <h1>Danke — deine Zahlung ist eingegangen</h1>
+      <div class="card">
+        <p id="aboStatus" aria-live="polite">
+          Dein Abo wird gerade aktiviert. Das dauert normalerweise nur wenige
+          Augenblicke.
+        </p>
+        <p>
+          Du bekommst zusätzlich eine Bestätigung per E-Mail. Dein Abo siehst
+          und verwaltest du jederzeit in der App unter
+          <strong>Konto&nbsp;→&nbsp;Abo&nbsp;&amp;&nbsp;Zahlungen</strong> —
+          dort kannst du auch den Plan wechseln, Rechnungen einsehen und
+          kündigen.
+        </p>
+        <p><a href="/">Zur App</a></p>
+      </div>
+    </main>
+    <script type="module" src="/danke-abo.js"></script>
+  </body>
+</html>

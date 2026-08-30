@@ -111,10 +111,21 @@ export function initServerSessionControls(view, output) {
 
   security.insertAdjacentHTML("beforeend", `
     <div id="serverSessionsBlock">
+      <!-- Bildschirm 46: "Wer glaubt, jemand sei in seinem Konto, sucht genau
+           einen Knopf. Er muss der groesste auf der Seite sein." Der Knopf ist
+           die vorhandene Funktion (alle anderen Sitzungen beenden) — nur die
+           Prominenz und der Wortlaut sind neu. Gespraeche und Dateien bleiben
+           unberuehrt, es geht nur um die Anmeldung. -->
+      <div class="sicherheit-panik">
+        <div>
+          <strong>Kommt dir etwas komisch vor?</strong>
+          <span>Wirft alle Geräte raus außer diesem. Deine Gespräche und Dateien bleiben unberührt — es geht nur um die Anmeldung.</span>
+        </div>
+        <button id="serverSessionsRevokeOthers" type="button" class="sicherheit-panik-knopf">Überall abmelden</button>
+      </div>
       <h4>Server-Sitzungen</h4>
       <div class="account-actions">
         <button id="serverSessionsLoad" type="button">Aktive Sitzungen anzeigen</button>
-        <button id="serverSessionsRevokeOthers" type="button">Alle anderen Sitzungen beenden</button>
         <button id="serverPasswordChange" type="button">Passwort ändern</button>
         <button id="serverLogout" type="button">Serverseitig abmelden</button>
       </div>

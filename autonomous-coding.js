@@ -102,7 +102,7 @@ function surfaceMarkup() {
         <button id="acReplay" type="button" disabled>Wiederholen</button>
         <button id="acDownloadDiff" type="button" disabled>Diff herunterladen</button>
       </div>
-      <div class="ac-follow-up"><label>Follow-up<input id="acFollowUpTask" maxlength="20000" placeholder="Naechste Aenderung im selben Kontext"></label><button id="acFollowUp" type="button" disabled>Starten</button></div>
+      <div class="ac-follow-up"><label>Follow-up<input id="acFollowUpTask" maxlength="20000" placeholder="Nächste Änderung im selben Kontext"></label><button id="acFollowUp" type="button" disabled>Starten</button></div>
       <pre id="acVerification" class="ac-verification">Noch kein Ergebnis.</pre>
       <pre id="acDiff" class="ac-diff" tabindex="0">Noch kein Diff.</pre>
     </section>`;

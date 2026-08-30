@@ -41,7 +41,7 @@
 .profile-dock-name {
   min-width: 0;
   overflow: hidden;
-  font-size:16.5px;
+  font-size: 16.5px;
   line-height: 1.16;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -100,7 +100,7 @@
 .sidebar.is-compact .profile-dock .profile-avatar {
   width: 20px;
   height: 20px;
-  font-size:13.5px;
+  font-size: 13.5px;
 }
 
 .sidebar.is-compact .profile-dock-name {
@@ -165,7 +165,7 @@
 
 .profile-dock-menu-head strong {
   overflow: hidden;
-  font-size:15.5px;
+  font-size: 15.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -173,7 +173,7 @@
 .profile-dock-menu-head span {
   overflow: hidden;
   color: rgba(246, 243, 238, 0.6);
-  font-size:14.5px;
+  font-size: 14.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -186,7 +186,7 @@
   color: rgba(246, 243, 238, 0.86);
   cursor: pointer;
   font: inherit;
-  font-size:15.5px;
+  font-size: 15.5px;
   text-align: left;
 }
 

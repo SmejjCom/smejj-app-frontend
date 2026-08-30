@@ -6,10 +6,26 @@
 
 // createDictation({...}) -> { toggle, stop, isActive }
 // Der Host liefert seine DOM-/UI-Helfer; das Modul haelt nur Diktat-Zustand.
-export function createDictation({ getInput, notifyInputChanged, showToast, RecognitionCtor, lang, speechSupported, setVisual, onBeforeToggle }) {
-  const state = { active: false, recognition: null, baseText: "" };
+//
+// serverOhr (2026-08-26, Betreiber-Livebefund "Knopf rot, schreibt nichts"):
+// Chromes Web-Speech kann hinter einer Netz-Sperre TAUB sein — der Knopf
+// leuchtet, es kommt nie Text. Darum nimmt das eigene Ohr (MediaRecorder ->
+// Bridge -> Groq) PARALLEL auf. Hat Web-Speech bis zum Stopp-Klick keinen
+// einzigen Text geliefert, schreibt das Ohr-Transkript den Text ins Feld;
+// hat Web-Speech geliefert, wird die Aufnahme verworfen. Fail-safe: ohne
+// serverOhr (oder wenn es leer liefert) bleibt alles exakt wie bisher.
+export function createDictation({ getInput, notifyInputChanged, showToast, RecognitionCtor, lang, speechSupported, setVisual, onBeforeToggle, serverOhr = null }) {
+  const state = { active: false, recognition: null, baseText: "", hatText: false };
+
+  function uebernimmOhrText(text) {
+    const input = getInput();
+    if (!input || !text) return;
+    input.value = `${state.baseText}${text} `.trimStart();
+    notifyInputChanged(input);
+  }
 
   function stop() {
+    const warTaub = state.active && !state.hatText;
     state.active = false;
     setVisual?.(false);
     try {
@@ -18,6 +34,13 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       // Recognition war bereits gestoppt.
     }
     state.recognition = null;
+    if (!serverOhr) return;
+    if (warTaub) {
+      // Web-Speech blieb stumm — das parallel aufnehmende Ohr liefert den Text.
+      serverOhr.finish().then((text) => uebernimmOhrText(String(text || "").trim())).catch(() => {});
+    } else {
+      try { serverOhr.cancel(); } catch { /* Ohr war still */ }
+    }
   }
 
   function start() {
@@ -29,9 +52,12 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     recognition.interimResults = true;
     state.recognition = recognition;
     state.active = true;
+    state.hatText = false;
     state.baseText = input.value ? `${input.value.replace(/\s+$/, "")} ` : "";
     setVisual?.(true);
+    try { serverOhr?.start(); } catch { /* Ohr bleibt still, Web-Speech laeuft */ }
     recognition.onresult = (event) => {
+      state.hatText = true;
       let interim = "";
       for (let index = event.resultIndex; index < event.results.length; index += 1) {
         const result = event.results[index];

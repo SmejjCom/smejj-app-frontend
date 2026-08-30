@@ -6,6 +6,91 @@
 
 const ACT_QUEUE_MAX = 6;
 
+// Eine Live-Browser-Sitzung startet einen echten Browser auf unserer Maschine
+// und laesst ihn fremde Seiten ansteuern. Bis 2026-08-14 ging das ohne jede
+// Anmeldung: /api/browser/session stand auf keiner Schutzliste, und dieser
+// Client schickte nie einen Token mit. Beides ist jetzt geschlossen — die
+// Route ist anmeldepflichtig, und hier kommt die Anmeldung mit.
+// Gleicher Schluessel wie in account-sessions.js und shared/http-json.js.
+const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
+
+// WARUM DER LIVE-BROWSER STILL ZUM STANDBILD WURDE (Befund 2026-08-17):
+//
+// Der Betreiber sah Amazon als Bild — kein Scrollen, kein Weiterklicken. Die
+// Ursache lag nicht im Fern-Browser, sondern hier: /api/browser/session ist
+// anmeldepflichtig, dieser Client las den Nachweis aber NUR aus localStorage.
+// Zwei Wege fuehrten dort ins Leere:
+//
+//   1. Der Auffrischer in account-sessions.js legt frische Nachweise in
+//      sessionStorage ab — gelesen wurde localStorage. Aneinander vorbei.
+//   2. War gar keiner da, wurde auch keiner geholt. Andere Flaechen holen
+//      sich ueber /api/auth/session-token (mit Cookie) Nachschub; hier nicht.
+//
+// Folge: HTTP 401, `open()` gab null zurueck, und der Aufrufer fiel wortlos
+// auf das Standbild zurueck. Ein stiller Rueckfall auf die schlechtere
+// Ansicht sieht aus wie "die Funktion kann das nicht" — dabei fehlte nur der
+// Nachweis. Deshalb wird hier jetzt aktiv nachgeholt, und der Rueckfall sagt
+// im Aufrufer, dass er stattgefunden hat.
+let gemerktesToken = "";
+
+/**
+ * ALLE in Frage kommenden Nachweise, in der Reihenfolge ihrer Verlaesslichkeit.
+ *
+ * KORREKTUR 2026-08-17, noch am selben Abend: Meine erste Fassung nahm den
+ * ERSTEN gefundenen Wert und sah dabei sessionStorage zuerst an. Genau das
+ * hat den Live-Browser kaputtgemacht, der vorher lief: lag in sessionStorage
+ * ein abgelaufener Nachweis, gewann der falsche — und der gute in
+ * localStorage, mit dem es bis dahin funktioniert hatte, kam nie zum Zug.
+ *
+ * Lehre: Wer eine funktionierende Quelle um eine zweite ERGAENZT, darf sie
+ * nicht gleichzeitig VERDRAENGEN. Jetzt werden beide probiert, localStorage
+ * zuerst — das ist die Quelle, die nachweislich getragen hat.
+ */
+function tokenKandidaten() {
+  const gefunden = [];
+  if (gemerktesToken) gefunden.push(gemerktesToken);
+  for (const speicher of [globalThis.localStorage, globalThis.sessionStorage]) {
+    try {
+      const wert = speicher?.getItem(AUTH_TOKEN_KEY);
+      if (wert && !gefunden.includes(wert)) gefunden.push(wert);
+    } catch {
+      // Speicher gesperrt: naechsten versuchen.
+    }
+  }
+  return gefunden;
+}
+
+/**
+ * Letzter Ausweg: Nachweis aus dem Anmelde-Cookie holen.
+ *
+ * WICHTIG, damit niemand sich darauf verlaesst: Seite (smejj.com) und Server
+ * (…zeabur.app) sind verschiedene Registrierungs-Domains. Das Cookie gilt
+ * dort als FREMD, und aktuelle Browser blockieren fremde Cookies. Dieser Weg
+ * schlaegt im Normalfall also fehl — er kostet nichts und hilft in den Faellen
+ * mit gleicher Domain, aber der tragende Weg sind die Nachweise aus dem
+ * Speicher oben.
+ */
+async function frischesToken(apiOrigin, fetchImpl) {
+  if (!apiOrigin) return "";
+  try {
+    const response = await fetchImpl(`${apiOrigin}/api/auth/session-token`, { credentials: "include" });
+    if (!response.ok) return "";
+    const data = await response.json().catch(() => null);
+    const token = String(data?.accessToken || "");
+    if (token) {
+      gemerktesToken = token;
+      try { globalThis.sessionStorage?.setItem(AUTH_TOKEN_KEY, token); } catch { /* gesperrt */ }
+    }
+    return token;
+  } catch {
+    return "";
+  }
+}
+
+function mitAnmeldung(extra, token) {
+  return token ? { ...extra, Authorization: `Bearer ${token}` } : { ...extra };
+}
+
 function endpointReady(value) {
   return typeof value === "string" && value.startsWith("https://");
 }
@@ -18,10 +103,15 @@ function shortHostName(url) {
   }
 }
 
-export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch } = {}) {
+export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, apiOrigin = "" } = {}) {
   const api = routes.api || {};
   const openIds = new Set();
   const queues = new Map();
+  // Herkunft des Servers: entweder hineingereicht oder aus einer der Routen
+  // abgeleitet — der Nachschub-Endpunkt liegt auf demselben Server.
+  const herkunft = apiOrigin || (() => {
+    try { return new URL(api.browserSession).origin; } catch { return ""; }
+  })();
 
   function ready() {
     return endpointReady(api.browserSession)
@@ -29,13 +119,39 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch } = 
       && endpointReady(api.browserSessionClose);
   }
 
+  async function sende(endpoint, body, token) {
+    return fetchImpl(endpoint, {
+      method: "POST",
+      headers: mitAnmeldung({ "content-type": "application/json" }, token),
+      // Das Cookie mitschicken: dann geht es auch, wenn gar kein Token
+      // vorliegt, der Nutzer aber angemeldet ist.
+      credentials: "include",
+      body: JSON.stringify(body)
+    });
+  }
+
+  // Einmal nachfassen, nie oefter: Ist der Nachweis abgelaufen, hilft ein
+  // frischer. Hilft der auch nicht, ist der Nutzer wirklich nicht angemeldet
+  // — dann waere jede Wiederholung nur Last ohne Aussicht.
   async function post(endpoint, body) {
     try {
-      const response = await fetchImpl(endpoint, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(body)
-      });
+      // Jeden bekannten Nachweis probieren, bevor aufgegeben wird. Vorher
+      // wurde nur EINER versucht — und wenn das der abgelaufene war, fiel das
+      // Panel wortlos auf das Standbild zurueck.
+      let response = null;
+      for (const token of tokenKandidaten()) {
+        response = await sende(endpoint, body, token);
+        if (response.status !== 401 && response.status !== 403) {
+          gemerktesToken = token;
+          break;
+        }
+      }
+      // Kein Kandidat da oder alle abgewiesen: ohne Nachweis bzw. per Cookie.
+      if (!response) response = await sende(endpoint, body, "");
+      if (response.status === 401 || response.status === 403) {
+        const frisch = await frischesToken(herkunft, fetchImpl);
+        if (frisch) response = await sende(endpoint, body, frisch);
+      }
       const data = await response.json().catch(() => null);
       return data && typeof data === "object" ? data : null;
     } catch {
@@ -46,7 +162,12 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch } = 
   async function open(url, viewport) {
     if (!ready()) return null;
     const data = await post(api.browserSession, { url, viewport });
-    if (!data?.ok || !data.sessionId || !data.screenshot) return null;
+    // Ein Bild ist Pflicht — ausser die Seite hat schon beim Laden gefragt
+    // (alert/confirm direkt im onload). Dann gibt es kein Bild, und ohne
+    // diese Ausnahme gaelte die Sitzung als fehlgeschlagen, obwohl sie
+    // laeuft und nur auf eine Antwort wartet.
+    if (!data?.ok || !data.sessionId) return null;
+    if (!data.screenshot && !data.dialog) return null;
     openIds.add(data.sessionId);
     return data;
   }
@@ -60,7 +181,7 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch } = 
     try {
       fetchImpl(api.browserSessionClose, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: mitAnmeldung({ "content-type": "application/json" }),
         body: JSON.stringify({ sessionId }),
         keepalive: true
       }).catch(() => {});
@@ -84,15 +205,37 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch } = 
     const data = await post(api.browserSessionAct, { sessionId, action });
     postToFrame(tab, { type: "smejj.browser.sessionState", busy: false });
     if (tab.sessionId !== sessionId) return; // Tab hat inzwischen neu verbunden.
+    // JS-DIALOG (2026-08-21). Zwei Gruende, warum das VOR der Bildpruefung
+    // steht:
+    // 1. Bei offenem Dialog kann der Worker kein neues Bild machen — Chromium
+    //    blockiert die Seite. Die Antwort traegt dann das letzte Bild oder gar
+    //    keins. Stuende die Dialogpruefung unten, fiele genau der Fall in den
+    //    Fehlerzweig und die Sitzung gaelte als verloren.
+    // 2. Auch ein 409 "dialog_offen" (die Aktion wurde abgelehnt, weil eine
+    //    Frage offen steht) traegt den Dialog mit. Der Nutzer soll die Frage
+    //    sehen, statt einen Klick zu machen, der ins Leere geht.
+    postToFrame(tab, { type: "smejj.browser.sessionDialog", dialog: data?.dialog || null });
+    if (data?.dialog) {
+      if (data.screenshot) {
+        postToFrame(tab, { type: "smejj.browser.sessionFrame", screenshot: data.screenshot, title: data.title || "" });
+      }
+      return data;
+    }
     if (data?.ok && data.screenshot) {
       postToFrame(tab, { type: "smejj.browser.sessionFrame", screenshot: data.screenshot, title: data.title || "" });
+      // Die Suche liefert ihre Trefferzahl als Beifang der Aktion mit. Sie
+      // geht denselben Weg wie im Proxy-Rahmen, damit die Suchleiste nicht
+      // wissen muss, in welcher Ansicht sie gerade steht.
+      if (typeof data.treffer === "number") {
+        hooks?.onSuchErgebnis?.(data.treffer, action?.index || 0);
+      }
       const finalUrl = typeof data.finalUrl === "string" ? data.finalUrl : "";
       if (finalUrl && finalUrl !== tab.url) {
         tab.url = finalUrl;
         tab.title = data.title || shortHostName(finalUrl);
         hooks?.onNavigated?.(tab);
       }
-      return;
+      return data;
     }
     const error = String(data?.error || "");
     if (error === "session_busy") return; // Aktion verworfen — naechste kommt durch.
@@ -129,5 +272,17 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch } = 
     window.addEventListener("pagehide", closeAll);
   }
 
-  return { ready, open, close, closeAll, handleAct };
+  /**
+   * Wie handleAct, aber es WARTET und gibt die Antwort zurueck.
+   *
+   * Das Bindeglied der Maus braucht das: es muss nach jedem Schritt wissen,
+   * ob er gelungen ist — sonst laeuft ein Plan blind weiter. handleAct ist
+   * fuer den Nutzer gedacht (feuern und vergessen) und taugt dafuer nicht.
+   */
+  async function actUndWarte(tab, action, hooks) {
+    if (!tab?.sessionId) return null;
+    return runAct(tab, action, hooks);
+  }
+
+  return { ready, open, close, closeAll, handleAct, actUndWarte };
 }
