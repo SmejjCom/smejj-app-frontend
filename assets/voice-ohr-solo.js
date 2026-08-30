@@ -20,9 +20,14 @@
 //   "zeitlimit" -> maxMs erreicht, ohne dass ein Ende erkannt wurde
 // Grundrauschen wird nur UNTERHALB der Schwelle mitgelernt — aus Sprache
 // lernt der Automat nie (dieselbe Ueberlegung wie in voice-vad.js).
+// stilleMs 750 (war 1100, Betreiber-Massgabe 2026-08-30 "fluessig wie
+// ChatGPT"): ChatGPT/Gemini senden nach ~600-800 ms Sprechpause. 1100 ms
+// fuehlte sich zaeh an; 750 liegt ueber der typischen Satz-Innenpause und
+// unter der Fuehlbarkeitsgrenze.
+
 export function createSoloAutomat({
   warmupMs = 400, floorFactor = 2.6, minLevel = 0.015, adaptRate = 0.05,
-  minSprechMs = 250, stilleMs = 1100, maxMs = 45_000
+  minSprechMs = 250, stilleMs = 750, maxMs = 45_000
 } = {}) {
   let startAt = -1;
   let floor = 0;
@@ -71,7 +76,7 @@ export function rmsPegel(daten) {
  *          Hooks; der Aufrufer entscheidet, ob er erneut start() ruft.
  * stop():  Runde abbrechen und alles freigeben (Mute, Schliessen).
  */
-export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehler,
+export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehler, aufPegel,
   automatFactory = createSoloAutomat, taktMs = 80 } = {}) {
   let takt = 0;
   let ctx = null;
@@ -81,6 +86,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
   const freigeben = () => {
     clearInterval(takt);
     takt = 0;
+    try { aufPegel?.(0); } catch { /* Anzeige egal */ }
     try { stream?.getTracks?.().forEach((t) => t.stop()); } catch { /* schon zu */ }
     stream = null;
     const alterCtx = ctx;
@@ -128,7 +134,9 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
         takt = setInterval(async () => {
           if (!laeuft) return;
           analyser.getByteTimeDomainData(daten);
-          const stand = automat.sample(rmsPegel(daten), Date.now());
+          const pegel = rmsPegel(daten);
+          try { aufPegel?.(pegel); } catch { /* Anzeige darf nie stoeren */ }
+          const stand = automat.sample(pegel, Date.now());
           if (stand === "spricht" && !sprichtGemeldet) {
             sprichtGemeldet = true;
             aufStatus?.("hoert-sprache");
@@ -186,7 +194,14 @@ export function verdrahteOhrSolo(host) {
     aufStatus: () => host.setStatus("listening", "Ich höre zu ..."),
     aufTranskript: (text) => { host.setTranskript(text); host.senden(text); },
     aufLeer: () => { const s = host.state; if (s.voiceModeActive && !s.voiceMuted && s.ohrSoloAktiv) solo.start(); },
-    aufFehler: (fehler) => host.fallback(soloFehlertext(fehler))
+    aufFehler: (fehler) => host.fallback(soloFehlertext(fehler)),
+    // Lebendes Sprach-Logo (Betreiber-Massgabe 2026-08-30 "wie ChatGPT"): der
+    // Pegel dieser Runde steuert Chevron-Spitzen, Punkte und Aura im Overlay.
+    // Sprach-RMS liegt typisch bei 0,03-0,2 — Faktor 4,5 hebt das auf 0,14-0,9.
+    aufPegel: (pegel) => {
+      const overlay = document.getElementById("voiceModeOverlay");
+      if (overlay) overlay.style.setProperty("--pegel", Math.min(1, pegel * 4.5).toFixed(3));
+    }
   });
   const anschluss = {
     stop: () => solo.stop(),

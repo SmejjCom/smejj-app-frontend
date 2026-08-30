@@ -8,6 +8,31 @@
 // Fail-safe: fehlt etwas (abgemeldet, Knopf nie da), passiert nichts weiter;
 // der Parameter wird immer aus der Adresse geputzt, damit ein Reload ihn
 // nicht wiederholt.
+
+// Tastatur-Bruecke (Betreiber-Massgabe 2026-08-30 "100 % mobil"): Auf
+// Android verkleinert das Viewport-Meta (interactive-widget=resizes-content)
+// die Layout-Flaeche — der Composer rueckt ueber die Tastatur. iOS (Safari
+// UND Chrome, beide WebKit) ignoriert das: Nur die SICHTBARE Flaeche
+// (visualViewport) schrumpft, fixe Elemente wie das Sprach-Overlay stehen
+// HINTER der Tastatur (Eingabefeld des Tipp-Fallbacks unerreichbar).
+// Dieser Block misst den Rueckstand und legt ihn als --tastatur-hoehe auf
+// <html>; Verbraucher: .voice-mode-overlay (Polster, composer-tools.css).
+// Fail-safe: ohne visualViewport passiert nichts (Variable fehlt -> 0px).
+{
+  const vv = window.visualViewport;
+  if (vv) {
+    const anpassen = () => {
+      // offsetTop dazu: iOS scrollt die sichtbare Flaeche auch HOCH — nur
+      // der Teil UNTERHALB der sichtbaren Kante ist wirklich Tastatur.
+      const tastatur = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+      document.documentElement.style.setProperty("--tastatur-hoehe", `${tastatur}px`);
+    };
+    vv.addEventListener("resize", anpassen);
+    vv.addEventListener("scroll", anpassen);
+    anpassen();
+  }
+}
+
 const params = new URLSearchParams(location.search);
 const willNeu = params.get("neu") === "1";
 const willSprechen = params.get("sprechen") === "1";

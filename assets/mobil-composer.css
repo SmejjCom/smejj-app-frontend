@@ -1,0 +1,71 @@
+/* Mobil-Composer (Betreiber-Befund 2026-08-25, iPhone-PWA).
+   Der Modell-Chip waechst mit "(Gruendlich)" und ragte ueber das Glas hinaus;
+   Chip begrenzen (Ellipsis).
+
+   Betreiber-Anweisung 2026-08-30 ("Icons muessen in einer Zeile stehen,
+   nicht unten rutschen"): Die Werkzeugzeile des Composers (+, Nachdenken,
+   Modell, Mikrofon, Senden) darf NICHT mehr umbrechen. Das alte
+   Sicherheitsnetz (flex-wrap: wrap) schickte bei gewachsenem Chip Knöpfe
+   in eine dritte Zeile. Jetzt werden Chip UND Nachdenken-Pille so
+   geklemmt, dass die Zeile bei 375–430 px passt:
+   38 + 92 + 109 + 38 + 38 + 5·6 px Steg = 345 px ≤ 358 px (390er iPhone).
+   Unter 360 px fällt das Pillen-Wort weg (Icon bleibt), das Icon allein
+   reicht zum Erkennen; der Zustand steht im aria-pressed. */
+@media (max-width: 600px) {
+  .prompt-actions { flex-wrap: nowrap; row-gap: 6px; }
+  .prompt-actions .model-picker button,
+  .prompt-actions .model-picker .mode-pill {
+    max-width: 28vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .prompt-actions .fpille-nachdenken { max-width: 24vw; }
+  .prompt-actions .fpille-nachdenken .chip-label {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+}
+@media (max-width: 360px) {
+  .prompt-actions .fpille-nachdenken .chip-label { display: none; }
+}
+
+/* Pull-to-Refresh verhindern (Betreiber-Massgabe 2026-08-30 "100 % mobil"):
+   Im Browser-Tab zog ein Over-Scroll am oberen Rand die Seite neu laden
+   (Chrome/iOS) — mitten im Chat. overscroll-behavior-y schaltet das ab,
+   ohne das Gummiband-Gefuehl in den inneren Scroll-Flaechen anzutasten. */
+html { overscroll-behavior-y: none; }
+
+/* Querformat-Handys (Betreiber-Befund 2026-08-30, iPhone Chrome quer,
+   844x390 live gemessen): Ab ~700 px Breite griff das Desktop-Styling —
+   Chips (Klasse .ghost-button, 34 px) und Icon-Knöpfe (38 px) unter dem
+   44-px-Touchziel. Die Portrait-44er-Regel (v264) galt nur bis 600 px
+   Breite; Handy-Querformat ist BREIT aber FLACH — (max-height: 500px)
+   trifft es geometrisch. Bewusst ohne pointer-Guard (Automatisierungs-
+   Browser melden coarse falsch; kurze Desktop-Fenster verlieren nichts).
+   Spezifitäts-Lehre: design-v11.css bleibt vertragsgemaess das Kaskaden-
+   Ende — diese Datei liegt DAVOR. Deshalb schlagen die Icon-Regeln die
+   ID-Regel dort durch den zusaetzlichen .prompt-actions-Schritt (1,4,0
+   gegen 1,3,0), die Chips reichen mit Klassen (0,2,1 gegen 0,1,0). */
+@media (max-height: 500px) {
+  #start .prompt-glass .prompt-actions .ghost-button.icon-button,
+  #start .prompt-glass .prompt-actions .send-button {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+  .prompt-actions .model-picker button,
+  .prompt-actions .model-picker .mode-pill,
+  .prompt-actions .fpille-nachdenken {
+    min-height: 44px;
+  }
+}
+
+/* Adressleisten-Lehre (iPhone Chrome/Safari, 2026-08-30): 100vh rechnet
+   die Leiste mit ein — Code-Flaeche und Chat-Halter ragten hinter die
+   Kante. dvh misst die ECHTE Flaeche; die vh-Zeilen bleiben als Fallback
+   in design-v11.css stehen. Doppel-Klassen-Schritt nur fuer die
+   Spezifitaet (1,2,0 schlaegt 1,1,0 trotz frueherer Kaskadenstelle). */
+#code .codeflaeche.codeflaeche {
+  max-height: calc(100dvh - 130px);
+  height: calc(100dvh - 96px);
+}
+#start .erwaehnung-menue.erwaehnung-menue {
+  max-height: min(320px, calc(100dvh - 360px));
+}

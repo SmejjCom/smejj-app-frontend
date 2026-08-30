@@ -2,7 +2,7 @@
 <html lang="de">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <!-- Sicherheitsregeln (QA-Welle 1, Befund F-04). GitHub Pages Free kann keine
          eigenen HTTP-Header setzen, deshalb steht die Content-Security-Policy hier
          als Meta-Angabe. Die App enthaelt bewusst KEIN Inline-Skript und KEINEN
@@ -23,7 +23,7 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-VlE1d5xGlwIC45bSDwQ4QJLlWTgImI8lmE9DYAk8JMQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
     <!-- Kaltstart (Freigabe 25.08.): Stylesheet sofort anstossen — vorher
          startete es erst NACH dem Tor-Skript, eine volle Runde spaeter. -->
-    <link rel="preload" href="/assets/start-styles.css?v=mobilfix2-20260825" as="style">
+    <link rel="preload" href="/assets/start-styles.css?v=mobilfix3-20260830" as="style">
     <!-- Fruehes Tor (Betreiber-Freigabe 2026-08-23): Anonyme sofort zur Landeseite,
          statt 3,7 s (Desktop) / 15 s (iPhone) die App-Huelle zu sehen. Kein Modul,
          kein Import — laeuft vor dem ersten Pixel. Regeln bleiben in auth-gate.js. -->
@@ -93,7 +93,7 @@
          1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
-    <link rel="stylesheet" href="/assets/start-styles.css?v=mobilfix2-20260825">
+    <link rel="stylesheet" href="/assets/start-styles.css?v=mobilfix3-20260830">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -996,8 +996,8 @@
     <!-- Peripherie (Fuehrung, Papierkorb, Kamera, @-Erwaehnung, Codeblock-Werkzeuge)
          laedt erst bei ihrer Handlung — Betreiber-Freigabe 2026-08-24 "Startseite abspecken". -->
     <script src="/assets/bedarf-nachladen.js?v=1" type="module"></script>
-    <script src="/assets/app.js?v=b100" type="module"></script>
-    <script src="/assets/pwa-schnellstart.js?v=2" type="module"></script>
+    <script src="/assets/app.js?v=b102" type="module"></script>
+    <script src="/assets/pwa-schnellstart.js?v=3" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260825-6" type="module"></script>
     <!-- Browser-Panel und Maus-Panel: erst wenn sie gebraucht werden.
          63,3 KB von 335,6 KB zahlte bisher jeder Seitenaufruf fuer zwei
