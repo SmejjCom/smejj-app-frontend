@@ -40,11 +40,39 @@
   // Nach Gruppen ordnen, sonst erscheint dieselbe Ueberschrift zweimal: die
   // Stufe-4-Seiten haengen sich hinten an, gehoeren aber teils in bestehende
   // Gruppen.
-  const GRUPPEN_REIHENFOLGE = ["Überblick", "Menschen", "Sicherheit", "Geld", "Betrieb", "Produkt", "Recht", "Verwaltung"];
+  //
+  // Reihenfolge seit Freigabe 2026-08-31 (App-Repo docs/approvals/
+  // 2026-08-31-admin-reihenfolge.md): die Nummer gilt konsoleweit, die vier
+  // Stufen sind zugleich Nummernbereiche. Eine neue Seite ohne Nummer haengt
+  // bewusst hinten an "Produktsteuerung" an, statt mittendrin aufzutauchen.
+  const PRIORITAET = {
+    uebersicht: 0,
+    autopiloten: 1, analytik: 2, nutzer: 3, modelle: 4, jobs: 5, worker: 6,
+    kosten: 7, abrechnung: 8, api: 9, email: 10,
+    freigaben: 11, ereignisse: 12, moderation: 13, deploy: 14, speicher: 15,
+    schluessel: 16, audit: 17, dsgvo: 18,
+    adminverwaltung: 19, rollen: 20, compliance: 21, support: 22, aufgaben: 23,
+    flags: 24, ankuendigungen: 25, wissen: 26, experimente: 27, sprachen: 28
+  };
+  const STUFEN = [
+    { bis: 10, name: "Betrieb & Entscheidungen" },
+    { bis: 18, name: "Governance & Sicherheit" },
+    { bis: 23, name: "Zugänge & Recht" },
+    { bis: 999, name: "Produktsteuerung" }
+  ];
+  function gruppeVon(pfad) {
+    if (pfad === "uebersicht") return "Überblick";
+    for (let i = 0; i < STUFEN.length; i++) {
+      if (PRIORITAET[pfad] && PRIORITAET[pfad] <= STUFEN[i].bis) return STUFEN[i].name;
+    }
+    return STUFEN[STUFEN.length - 1].name;
+  }
   SEITEN.sort(function (a, b) {
-    const links = GRUPPEN_REIHENFOLGE.indexOf(a.gruppe);
-    const rechts = GRUPPEN_REIHENFOLGE.indexOf(b.gruppe);
-    return (links < 0 ? 99 : links) - (rechts < 0 ? 99 : rechts);
+    // Bewusst ueber "undefined" statt "|| 999": die Uebersicht traegt die
+    // Nummer 0, und 0 || 999 wuerde sie ans Ende werfen statt an den Anfang.
+    const links = PRIORITAET[a.pfad] === undefined ? 999 : PRIORITAET[a.pfad];
+    const rechts = PRIORITAET[b.pfad] === undefined ? 999 : PRIORITAET[b.pfad];
+    return links - rechts;
   });
 
   /** Was die angemeldeten Ansichten vom Kern brauchen — bewusst klein gehalten. */
@@ -101,7 +129,8 @@
     let gruppe = null;
     nav.innerHTML = SEITEN.map(function (s) {
       let vorsatz = "";
-      if (s.gruppe !== gruppe) { gruppe = s.gruppe; vorsatz = '<div class="rail-group">' + A.escapeHtml(s.gruppe) + '</div>'; }
+      const stufe = gruppeVon(s.pfad);
+      if (stufe !== gruppe) { gruppe = stufe; vorsatz = '<div class="rail-group">' + A.escapeHtml(stufe) + '</div>'; }
       return vorsatz + '<a class="rail-item' + (s.pfad === aktiv ? " on" : "") + '" href="' + seitenLink(s.pfad) + '">'
         + '<span class="ltr">' + s.id + '</span><span>' + A.escapeHtml(s.name) + '</span></a>';
     }).join("");
