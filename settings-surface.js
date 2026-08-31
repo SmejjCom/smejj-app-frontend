@@ -174,9 +174,7 @@ function markup() {
       ${panel("models", "KI-Modelle & Anbieter", "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.", [
         select("Reasoning-Aufwand", "settingsReasoningEffort", [["medium", "Mittel"], ["high", "Hoch"], ["max", "Maximal"]]),
         action("Modellverwaltung", "Standardmodell, BYOK und lokale Modelle.", "KI-Modelle öffnen", "ai")])}
-      // OpenRouter-Look: das Panel hat KEINE eigene Ueberschrift — die Flaeche
-      // bringt das grosse "API-Keys" selbst mit.
-      ${`<section id="settings-api" class="settings-panel" data-settings-panel="api"><div class="settings-list"><div id="apiCenterSurface" data-api-center></div></div></section>`}
+      ${/* OpenRouter-Look: kein Panel-Kopf, die Flaeche bringt "API-Keys" selbst mit */ `<section id="settings-api" class="settings-panel" data-settings-panel="api"><div class="settings-list"><div id="apiCenterSurface" data-api-center></div></div></section>`}
       ${panel("personalization", "Persönliches", "Dauerhafte Hinweise für Antworten und Zusammenarbeit.", [
         `<div class="settings-row settings-row-stack"><div class="settings-row-copy"><strong id="settingsPersonalizationLabel">${t("Persönliche Anweisungen")}</strong></div><textarea id="settingsPersonalization" aria-labelledby="settingsPersonalizationLabel" maxlength="4000" placeholder="${t("Zum Beispiel: Antworte auf Deutsch und erkläre Entscheidungen kurz.")}"></textarea></div>`])}
       ${panel("coding", "Programmieren", "Standards für Coding-Aufgaben und Verifikation.", [
