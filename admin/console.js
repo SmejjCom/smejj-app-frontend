@@ -74,6 +74,15 @@
     const rechts = PRIORITAET[b.pfad] === undefined ? 999 : PRIORITAET[b.pfad];
     return links - rechts;
   });
+  // Kuerzel auf der Plakette (Freigabe 2026-08-31, zweites "Ja"): die
+  // Uebersicht behaelt als Startseite ihr "A", alle nummerierten Bereiche
+  // tragen ihre Nummer statt des Buchstabens — die Kuerzel waren doppelt
+  // vergeben (G, Y) und sagten nichts ueber den Rang.
+  function kuerzelVon(s) {
+    if (s.pfad === "uebersicht") return "A";
+    const nr = PRIORITAET[s.pfad];
+    return nr === undefined ? s.id : String(nr);
+  }
 
   /** Was die angemeldeten Ansichten vom Kern brauchen — bewusst klein gehalten. */
   function seitenKontext(pfad) {
@@ -132,7 +141,7 @@
       const stufe = gruppeVon(s.pfad);
       if (stufe !== gruppe) { gruppe = stufe; vorsatz = '<div class="rail-group">' + A.escapeHtml(stufe) + '</div>'; }
       return vorsatz + '<a class="rail-item' + (s.pfad === aktiv ? " on" : "") + '" href="' + seitenLink(s.pfad) + '">'
-        + '<span class="ltr">' + s.id + '</span><span>' + A.escapeHtml(s.name) + '</span></a>';
+        + '<span class="ltr">' + kuerzelVon(s) + '</span><span>' + A.escapeHtml(s.name) + '</span></a>';
     }).join("");
   }
 
