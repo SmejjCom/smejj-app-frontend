@@ -1,215 +1,205 @@
-/* smejj.com — zentraler API-Bereich (OpenRouter-Stil). Eine Datenquelle,
-   ein Muster, zwei Orte: Einstellungen-Reiter "API" und /entwickler.html.
-   scoped an .ac-surface, damit weder die Einstellungen noch die geschuetzte
-   Startseite beruehrt werden. Handy: Zeilen stapeln zu Karten (≤760 px). */
+/* smejj.com — zentraler API-Bereich, Layout 1:1 nach OpenRouter/keys:
+   grosse Ueberschrift + ein Hauptknopf oben rechts, eine Karte mit grosser
+   Suche, Tabelle (Schlüssel · Typ · Läuft ab · Zuletzt genutzt · Verbrauch ·
+   Limit · ⋮), Fusszeile "N Schlüssel". Verbindung & Preise eingeklappt.
+   scoped an .ac-surface. Handy (≤760 px): nur Schlüssel + Menü, Rest
+   untereinander. */
 
 .ac-surface {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
   width: 100%;
+  color: var(--premium-text, #f2f4f8);
 }
 
-/* ── Kopf + Aktion ───────────────────────────────────────────── */
-.ac-head h2 { font-size: 22px; font-weight: 700; line-height: 1.2; }
-.ac-head .ac-subhead { margin-top: 4px; font-size: 13px; color: var(--premium-muted, #9aa4b2); }
-.ac-actionbar { display: flex; align-items: center; gap: 12px; }
-.ac-actionbar .ac-sub { font-size: 12.5px; color: var(--premium-muted, #9aa4b2); }
+/* ── Kopf: Titel links, Hauptknopf rechts ───────────────────── */
+.ac-head { display: flex; align-items: flex-start; gap: 16px; }
+.ac-head h2 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; }
+/* html.p-recht h2 (entwickler.html) setzt 2em Abstand — hier bewusst drueber */
+.ac-surface .ac-head h2 { margin: 0; font-size: 30px; }
+.ac-head .ac-subhead { margin-top: 8px; font-size: 15px; color: var(--premium-muted, #9aa4b2); }
 .ac-spacer { flex: 1 1 auto; }
 .ac-primary {
-  flex: 0 0 auto; min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px;
-  background: #2f6bff; color: #fff; font-weight: 600; font-size: 13.5px; cursor: pointer;
+  flex: 0 0 auto; min-height: 42px; padding: 0 18px; border: 0; border-radius: 10px;
+  background: #2f6bff; color: #fff; font-weight: 700; font-size: 15px; cursor: pointer;
 }
 .ac-primary:hover { background: #2a60e6; }
 .ac-primary[disabled] { opacity: .5; cursor: default; }
+.ac-sub { font-size: 13px; color: var(--premium-muted, #9aa4b2); }
 
-/* ── Guthaben-Leiste ─────────────────────────────────────────── */
-.ac-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.ac-stat {
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.10); border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03); padding: 10px 14px;
+/* schlanke Konto-Zeile statt Kacheln: Guthaben · Verbraucht · Heute */
+.ac-kontozeile {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px;
+  font-size: 13.5px; color: var(--premium-muted, #9aa4b2);
 }
-.ac-stat-cap { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--premium-muted, #9aa4b2); }
-.ac-stat-val { margin-top: 3px; font-size: 18px; font-weight: 700; }
-.ac-stat-val small { font-size: 12px; font-weight: 500; color: var(--premium-muted, #9aa4b2); }
+.ac-kontozeile b { color: var(--premium-text, #f2f4f8); font-weight: 600; }
 .ac-aufladen {
-  margin-left: 8px; font-size: 12px; color: #7aa6ff; text-decoration: none; cursor: pointer;
+  font-size: 13px; color: #7aa6ff; text-decoration: none; cursor: pointer;
   background: transparent; border: 0; padding: 0;
 }
 .ac-aufladen:hover { text-decoration: underline; }
 .ac-stufen {
-  position: absolute; top: calc(100% + 6px); left: 10px; z-index: 40;
-  display: flex; flex-direction: column; gap: 4px; min-width: 150px;
-  padding: 6px; border-radius: 12px; background: #14171c;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+  position: absolute; z-index: 40;
+  display: flex; flex-direction: column; gap: 2px; min-width: 170px;
+  padding: 6px; border-radius: 12px; background: #101418;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
 }
-.ac-stufen button {
-  min-height: 36px; padding: 0 10px; border: 0; border-radius: 8px;
-  background: transparent; color: inherit; font-size: 13px; text-align: left; cursor: pointer;
-}
-.ac-stufen button:hover { background: rgba(255, 255, 255, 0.07); }
 
-/* hidden-Attribut schlaegt gegen Autoren-display: ohne diese Regeln bliebe
-   die Leiste mit Platzhaltern sichtbar, solange kein Konto geladen ist. */
-.ac-stats[hidden] { display: none; }
-.ac-search[hidden] { display: none; }
-.ac-stufen[hidden] { display: none; }
-
-/* ── Tabellen-Karte ──────────────────────────────────────────── */
+/* ── Die eine Karte: Suche + Tabelle + Fusszeile ────────────── */
 .ac-card {
-  border: 1px solid rgba(255, 255, 255, 0.10); border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03); overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02); overflow: visible;
 }
-.ac-toolbar {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  padding: 10px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
+.ac-toolbar { padding: 16px 16px 6px; }
 .ac-search {
-  flex: 0 1 320px; min-width: 160px; min-height: 38px; padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04); color: inherit; font-size: 13.5px;
+  width: 100%; max-width: 560px; min-height: 46px; padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04); color: inherit;
+  font-size: 15px;
 }
-.ac-chips { display: flex; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 10px; overflow: hidden; }
+.ac-search::placeholder { color: #6d7787; }
+.ac-search[hidden] { display: none; }
+.ac-count-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px 0; font-size: 12px; color: var(--premium-muted, #9aa4b2);
+}
+.ac-chips { display: flex; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 9px; overflow: hidden; }
 .ac-chip {
-  min-height: 38px; padding: 0 14px; border: 0; border-left: 1px solid rgba(255, 255, 255, 0.12);
+  min-height: 32px; padding: 0 13px; border: 0; border-left: 1px solid rgba(255, 255, 255, 0.10);
   background: transparent; color: var(--premium-muted, #9aa4b2); font-size: 12.5px; cursor: pointer;
 }
 .ac-chip:first-child { border-left: 0; }
-.ac-chip[aria-pressed="true"] { background: rgba(96, 150, 255, 0.16); color: #a9c4ff; font-weight: 600; }
-.ac-count { margin-left: auto; font-size: 12px; color: var(--premium-muted, #9aa4b2); }
+.ac-chip[aria-pressed="true"] { background: rgba(96, 150, 255, 0.18); color: #bcd0ff; font-weight: 600; }
 
+/* Tabelle */
+.ac-cols, .ac-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.6fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 0.9fr) 44px;
+  gap: 14px; align-items: center;
+}
 .ac-cols {
-  display: grid; grid-template-columns: minmax(0, 2.4fr) 110px 150px 110px 44px;
-  gap: 10px; align-items: center; padding: 9px 14px;
-  font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600;
-  color: #77839a; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 14px; padding: 12px 16px;
+  font-size: 14px; color: #8d97a7;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 .ac-rows { display: flex; flex-direction: column; }
 .ac-row {
+  padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
-  display: grid; grid-template-columns: minmax(0, 2.4fr) 110px 150px 110px 44px;
-  gap: 10px; align-items: center; padding: 11px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 .ac-rows .ac-row:last-child { border-bottom: 0; }
-.ac-row-red { background: rgba(227, 93, 93, 0.06); }
-.ac-row-off .ac-name, .ac-row-off .ac-sub { opacity: .5; }
+.ac-row-off .ac-name, .ac-row-off .ac-sub, .ac-row-off .ac-cell { opacity: .4; }
 
-.ac-who { display: flex; align-items: center; gap: 11px; min-width: 0; }
-.ac-kennung { min-width: 0; display: flex; flex-direction: column; }
-.ac-avatar {
-  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%;
-  display: grid; place-items: center; background: rgba(255, 255, 255, 0.10);
-  font-weight: 700; font-size: 13px;
-}
-.ac-name { font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ac-kennung { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ac-name { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ac-sub {
-  margin-top: 2px; font-size: 12px; color: var(--premium-muted, #9aa4b2);
+  font-size: 13px; color: #8d97a7;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.ac-sub code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; color: #8fa0bb; }
+.ac-sub code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: #97a1b2; }
+.ac-hinweis { font-size: 12px; color: #e9b23c; }
 
-.ac-pill {
-  justify-self: start; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
-}
-.ac-pill-smejj { background: rgba(96, 150, 255, 0.16); color: #a9c4ff; }
-.ac-pill-prov { background: rgba(255, 255, 255, 0.07); color: #b6c0d0; }
-
-.ac-state { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: #cfd7e4; white-space: nowrap; }
-.ac-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-.ac-dot-g { background: #37c26b; }
-.ac-dot-y { background: #e9b23c; }
-.ac-dot-r { background: #e35d5d; }
-.ac-dot-o { background: #5b6575; }
-.ac-dim { font-size: 12.5px; color: var(--premium-muted, #9aa4b2); white-space: nowrap; }
+.ac-cell { font-size: 14px; color: #c3cbd8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-cell-dim { font-size: 14px; color: #8d97a7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .ac-kebab {
-  width: 34px; height: 34px; justify-self: end; border-radius: 8px;
-  border: 1px solid transparent; background: transparent; color: var(--premium-muted, #9aa4b2);
-  font-size: 16px; line-height: 1; cursor: pointer;
+  width: 40px; height: 40px; justify-self: end; border-radius: 9px;
+  border: 1px solid transparent; background: transparent; color: #c3cbd8;
+  font-size: 18px; line-height: 1; letter-spacing: 0; cursor: pointer;
 }
-.ac-kebab:hover { border-color: rgba(255, 255, 255, 0.16); background: rgba(255, 255, 255, 0.06); }
+.ac-kebab:hover { border-color: rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.05); }
 
-/* Menue + Modellliste (Popover je Zeile) */
+/* ── ⋮-Menue wie OpenRouter: gross, mit Icons ───────────────── */
 .ac-popover {
-  position: absolute; top: calc(100% - 6px); right: 10px; z-index: 40;
-  min-width: 240px; max-width: 340px; max-height: 320px; overflow: auto;
-  padding: 6px; border-radius: 12px; background: #14171c;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+  position: absolute; top: calc(100% - 8px); right: 14px; z-index: 40;
+  min-width: 260px; max-height: 340px; overflow: auto;
+  padding: 8px; border-radius: 14px; background: #101418;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.55);
 }
-.ac-pop-head { font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--premium-muted, #9aa4b2); padding: 8px 10px 4px; }
+.ac-pop-head { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--premium-muted, #9aa4b2); padding: 8px 12px 4px; }
 .ac-item {
-  display: block; width: 100%; min-height: 36px; text-align: left; padding: 8px 10px;
-  border: 0; background: transparent; color: inherit; border-radius: 8px;
-  cursor: pointer; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 42px; text-align: left;
+  padding: 9px 12px; border: 0; background: transparent; color: inherit;
+  border-radius: 10px; cursor: pointer; font-size: 14.5px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+.ac-item .ac-item-icon { flex: 0 0 auto; width: 20px; text-align: center; font-size: 15px; color: #c3cbd8; }
 .ac-item:hover { background: rgba(255, 255, 255, 0.07); }
 .ac-item[aria-checked="true"] { color: #7aa6ff; }
-.ac-item-danger:hover { background: rgba(227, 93, 93, 0.16); }
-.ac-pop-empty, .ac-pop-loading, .ac-pop-more { padding: 10px; font-size: 12.5px; color: var(--premium-muted, #9aa4b2); }
+.ac-item-danger:hover { background: rgba(227, 93, 93, 0.14); }
+.ac-pop-empty, .ac-pop-loading, .ac-pop-more { padding: 12px; font-size: 13px; color: var(--premium-muted, #9aa4b2); }
 
-.ac-foot { padding: 9px 14px; font-size: 12px; color: var(--premium-muted, #9aa4b2); border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.ac-foot { padding: 14px 16px; font-size: 14px; color: #8d97a7; border-top: 1px solid rgba(255, 255, 255, 0.06); }
 
-/* ── Verbindung + Preise ─────────────────────────────────────── */
-.ac-lower { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.ac-mini { border: 1px solid rgba(255, 255, 255, 0.10); border-radius: 14px; background: rgba(255, 255, 255, 0.03); padding: 13px 16px; }
-.ac-mini h3 { margin: 0 0 6px; font-size: 13px; font-weight: 700; }
-.ac-mini-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; font-size: 12.5px; color: var(--premium-muted, #9aa4b2); }
+/* ── Verbindung & Preise: eingeklappt, OpenRouter-Look bleibt clean ── */
+details.ac-anhang {
+  border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02); padding: 0 16px;
+}
+details.ac-anhang summary {
+  cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px;
+  min-height: 52px; font-size: 15px; font-weight: 600; color: #c3cbd8;
+}
+details.ac-anhang summary::-webkit-details-marker { display: none; }
+details.ac-anhang summary::after { content: "▸"; margin-left: auto; color: #8d97a7; font-size: 13px; }
+details.ac-anhang[open] summary::after { content: "▾"; }
+.ac-anhang-inhalt { padding: 4px 0 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.ac-mini h3 { margin: 0 0 8px; font-size: 13px; font-weight: 700; color: #c3cbd8; }
+.ac-mini-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; font-size: 13px; color: var(--premium-muted, #9aa4b2); }
 .ac-code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px;
-  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.14);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 7px; padding: 4px 9px; color: #cdd7e6; user-select: all; word-break: break-all;
 }
-.ac-mini-link { font-size: 12.5px; color: #7aa6ff; text-decoration: none; cursor: pointer; background: transparent; border: 0; padding: 0; }
+.ac-mini-link { font-size: 13px; color: #7aa6ff; text-decoration: none; cursor: pointer; background: transparent; border: 0; padding: 0; }
 .ac-mini-link:hover { text-decoration: underline; }
 .ac-copy {
-  width: 30px; height: 30px; border-radius: 7px; border: 1px solid rgba(255, 255, 255, 0.14);
+  width: 30px; height: 30px; border-radius: 7px; border: 1px solid rgba(255, 255, 255, 0.12);
   background: transparent; color: inherit; cursor: pointer; font-size: 13px; line-height: 1;
 }
 .ac-copy:hover { background: rgba(255, 255, 255, 0.06); }
-.ac-preise { border-collapse: collapse; width: 100%; font-size: 12.5px; margin-top: 4px; }
-.ac-preise th, .ac-preise td { text-align: left; padding: 5px 8px 5px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.ac-preise { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 4px; }
+.ac-preise th, .ac-preise td { text-align: left; padding: 5px 8px 5px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
 .ac-preise th:not(:first-child), .ac-preise td:not(:first-child) { text-align: right; }
 .ac-preise tr:last-child td { border-bottom: 0; }
-.ac-klein { margin-top: 8px; font-size: 12px; color: var(--premium-muted, #9aa4b2); }
-details.ac-beispiel { margin-top: 6px; }
-details.ac-beispiel summary { cursor: pointer; font-size: 12.5px; color: #7aa6ff; }
-details.ac-beispiel pre {
+.ac-klein { margin-top: 8px; font-size: 12.5px; color: var(--premium-muted, #9aa4b2); }
+.ac-beispiel pre {
   margin: 8px 0 0; overflow-x: auto; padding: 10px 12px; border-radius: 9px;
-  border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10); background: rgba(255, 255, 255, 0.04);
   font-family: ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.5;
 }
 
 /* ── Formular (Schluessel erstellen) ─────────────────────────── */
 .ac-form {
   display: flex; flex-direction: column; gap: 12px;
-  padding: 14px; border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 16px; border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px; background: rgba(255, 255, 255, 0.03);
 }
 .ac-form[hidden] { display: none; }
-.ac-field { display: grid; gap: 6px; font-size: 12.5px; color: var(--premium-muted, #9aa4b2); }
+.ac-field { display: grid; gap: 6px; font-size: 13px; color: var(--premium-muted, #9aa4b2); }
 .ac-field input, .ac-field select {
-  width: 100%; min-height: 42px; padding: 0 12px;
+  width: 100%; min-height: 44px; padding: 0 12px;
   border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04); color: inherit; font-size: 14px; text-transform: none;
+  background: rgba(255, 255, 255, 0.04); color: inherit; font-size: 15px; text-transform: none;
 }
 .ac-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.02em; }
 .ac-help {
-  padding: 9px 12px; border-radius: 9px; font-size: 12.5px;
+  padding: 9px 12px; border-radius: 9px; font-size: 13px;
   background: rgba(96, 150, 255, 0.12); border: 1px solid rgba(120, 170, 255, 0.3);
 }
-.ac-link { font-size: 12.5px; color: #7aa6ff; text-decoration: none; }
+.ac-link { font-size: 13px; color: #7aa6ff; text-decoration: none; }
 .ac-link:hover { text-decoration: underline; }
 .ac-ghost {
-  min-height: 40px; padding: 0 14px; border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px; background: transparent; color: inherit; font-size: 13.5px; cursor: pointer;
+  min-height: 42px; padding: 0 16px; border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px; background: transparent; color: inherit; font-size: 14px; cursor: pointer;
 }
 .ac-ghost:hover { background: rgba(255, 255, 255, 0.06); }
 .ac-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.ac-actions .ac-ghost, .ac-actions .ac-primary { flex: 0 1 auto; }
 .ac-reveal {
   display: flex; flex-direction: column; gap: 5px;
   padding: 10px 12px; border-radius: 9px;
@@ -218,40 +208,40 @@ details.ac-beispiel pre {
 .ac-reveal[hidden] { display: none; }
 .ac-reveal-key { display: flex; align-items: center; gap: 8px; }
 .ac-reveal-key code { font-family: ui-monospace, Menlo, monospace; font-size: 13px; word-break: break-all; }
-.ac-reveal-note { font-size: 11.5px; color: var(--premium-muted, #9aa4b2); }
+.ac-reveal-note { font-size: 12px; color: var(--premium-muted, #9aa4b2); }
 
 /* ── Status ──────────────────────────────────────────────────── */
-.ac-status { margin: 0; font-size: 12.5px; color: var(--premium-muted, #9aa4b2); line-height: 1.5; }
+.ac-status { margin: 0; font-size: 13px; color: var(--premium-muted, #9aa4b2); line-height: 1.5; }
 .ac-status[data-error="true"] { color: #ffb9b9; }
 
-/* ── Tablet ──────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .ac-cols, .ac-row { grid-template-columns: minmax(0, 2fr) 96px 140px 44px; }
-  .ac-col-erstellt { display: none; }
-  .ac-row .ac-erstellt { display: none; }
-}
+/* hidden schlaegt gegen Autoren-display */
+.ac-kontozeile[hidden] { display: none; }
+.ac-stufen[hidden] { display: none; }
+.ac-search[hidden] { display: none; }
 
-/* ── Handy: Zeilen werden zu Karten ──────────────────────────── */
+/* ── Handy ───────────────────────────────────────────────────── */
+@media (max-width: 980px) {
+  .ac-cols, .ac-row { grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.9fr) 44px; }
+  .ac-col-verbrauch, .ac-row .ac-zelle-verbrauch,
+  .ac-col-limit, .ac-row .ac-zelle-limit { display: none; }
+}
 @media (max-width: 760px) {
-  .ac-stats { grid-template-columns: 1fr 1fr; }
-  .ac-stat-val { font-size: 16px; }
-  .ac-lower { grid-template-columns: 1fr; }
+  .ac-head { flex-wrap: wrap; }
+  .ac-head h2 { font-size: 25px; }
+  .ac-primary { flex: 1 1 100%; min-height: 44px; }
   .ac-cols { display: none; }
   .ac-row {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 12px 13px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 14px;
   }
-  .ac-who { flex: 1 1 100%; order: 2; }
-  .ac-pill { order: 1; }
-  .ac-state { order: 1; margin-left: auto; }
-  .ac-kebab { order: 1; width: 44px; height: 44px; }
-  .ac-erstellt { order: 3; flex: 1 1 100%; }
+  .ac-who { flex: 1 1 100%; order: 1; }
+  .ac-cell, .ac-cell-dim { order: 2; font-size: 13px; }
+  .ac-zelle-menu { order: 3; margin-left: auto; }
+  .ac-kebab { width: 44px; height: 44px; }
   .ac-row .ac-popover { left: 10px; right: 10px; max-width: none; }
-  .ac-search { flex: 1 1 100%; min-height: 44px; }
+  .ac-search { min-height: 44px; }
   .ac-chip { min-height: 44px; }
-  .ac-primary { min-height: 44px; }
-  .ac-actionbar { flex-wrap: wrap; }
-  .ac-actionbar .ac-primary { flex: 1 1 100%; }
-  .ac-stufen button { min-height: 44px; }
+  .ac-anhang-inhalt { grid-template-columns: 1fr; }
   .ac-form .ac-ghost, .ac-form .ac-primary { flex: 1 1 100%; }
   .ac-field input, .ac-field select { min-height: 44px; }
+  .ac-kontozeile { font-size: 12.5px; }
 }

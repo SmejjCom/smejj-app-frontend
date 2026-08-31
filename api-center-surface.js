@@ -60,34 +60,29 @@ export function initApiCenter(wurzel, optionen = {}) {
 function markup(kopf) {
   const anbieterOptionen = selectableProviders()
     .map((entry) => `<option value="${entry.id}">${entry.name}</option>`).join("");
-  const kopfZeile = kopf === "voll"
-    ? `<div class="ac-head"><h2>${t("API-Keys")}</h2><p class="ac-subhead">${t("Schlüssel erstellen und verwalten — smejj-Schlüssel und eigene Anbieter, verschlüsselt gespeichert.")}</p></div>`
-    : `<span class="ac-sub">${t("smejj-Schlüssel und eigene Anbieter — verschlüsselt gespeichert.")}</span>`;
+  // Layout 1:1 nach OpenRouter/keys: grosse Ueberschrift, ein Hauptknopf,
+  // keine Kacheln — das Konto liegt als schlanke Zeile darunter.
+  const kopfZeile = kopf === "kompakt"
+    ? `<span class="ac-sub">${t("smejj-Schlüssel und eigene Anbieter — verschlüsselt gespeichert.")}</span>`
+    : "";
   return `<div class="api-center-surface ac-surface" data-ac-root>
     ${kopfZeile}
-    <div class="ac-actionbar">
+    <div class="ac-head">
+      <div>
+        <h2>${t("API-Keys")}</h2>
+        <p class="ac-subhead">${t("Schlüssel erstellen und verwalten.")}</p>
+      </div>
       <span class="ac-spacer"></span>
       <button type="button" class="ac-primary" data-ac="neu">＋ ${t("Schlüssel erstellen")}</button>
     </div>
 
-    <div class="ac-stats" data-ac-stats hidden>
-      <div class="ac-stat">
-        <div class="ac-stat-cap">${t("Guthaben")}</div>
-        <div class="ac-stat-val"><span data-ac-guthaben>–</span> <small>USD</small><button type="button" class="ac-aufladen" data-ac="aufladen" hidden>${t("Aufladen")}</button></div>
-        <div class="ac-stufen" data-ac-stufen hidden></div>
-      </div>
-      <div class="ac-stat">
-        <div class="ac-stat-cap">${t("Verbraucht")}</div>
-        <div class="ac-stat-val"><span data-ac-verbraucht>–</span> <small>USD</small></div>
-      </div>
-      <div class="ac-stat">
-        <div class="ac-stat-cap">${t("Anfragen heute")}</div>
-        <div class="ac-stat-val" data-ac-anfragen>0</div>
-      </div>
-      <div class="ac-stat">
-        <div class="ac-stat-cap">${t("Token heute")}</div>
-        <div class="ac-stat-val" data-ac-token>0</div>
-      </div>
+    <div class="ac-kontozeile" data-ac-stats hidden>
+      <span>${t("Guthaben")} <b><span data-ac-guthaben>–</span> USD</b></span>
+      <span>${t("Verbraucht")} <b><span data-ac-verbraucht>–</span> USD</b></span>
+      <span>${t("Anfragen heute")} <b data-ac-anfragen>0</b></span>
+      <span>${t("Token heute")} <b data-ac-token>0</b></span>
+      <span class="ac-aufladen-halter"><button type="button" class="ac-aufladen" data-ac="aufladen" hidden>${t("Aufladen")}</button></span>
+      <div class="ac-stufen" data-ac-stufen hidden></div>
     </div>
 
     <form class="ac-form" data-ac-form hidden>
@@ -125,40 +120,45 @@ function markup(kopf) {
 
     <div class="ac-card">
       <div class="ac-toolbar">
-        <input type="search" class="ac-search" data-ac-suche placeholder="${t("Key suchen …")}" aria-label="${t("Key suchen …")}">
+        <input type="search" class="ac-search" data-ac-suche placeholder="${t("Nach Name oder Schlüssel suchen …")}" aria-label="${t("Nach Name oder Schlüssel suchen …")}">
+      </div>
+      <div class="ac-count-row">
+        <span class="ac-count" data-ac-count></span>
         <div class="ac-chips" role="group" aria-label="${t("Nach Typ filtern")}">
           <button type="button" class="ac-chip" data-ac="filter" data-filter="alle" aria-pressed="true">${t("Alle")}</button>
           <button type="button" class="ac-chip" data-ac="filter" data-filter="smejj" aria-pressed="false">smejj</button>
           <button type="button" class="ac-chip" data-ac="filter" data-filter="anbieter" aria-pressed="false">${t("Anbieter")}</button>
         </div>
-        <span class="ac-count" data-ac-count></span>
       </div>
       <div class="ac-cols" aria-hidden="true">
-        <span>${t("Schlüssel")}</span><span>${t("Typ")}</span><span>${t("Status")}</span><span class="ac-col-erstellt">${t("Erstellt")}</span><span></span>
+        <span>${t("Schlüssel")}</span><span>${t("Typ")}</span><span>${t("Läuft ab")}</span><span>${t("Zuletzt genutzt")}</span><span class="ac-col-verbrauch">${t("Verbrauch")}</span><span class="ac-col-limit">${t("Limit")}</span><span></span>
       </div>
       <div class="ac-rows" data-ac-rows></div>
       <p class="ac-foot" data-ac-foot>${t("Widerrufene Schlüssel bleiben sichtbar. Klartext wird nie wieder angezeigt.")}</p>
     </div>
 
-    <div class="ac-lower">
-      <section class="ac-mini">
-        <h3>${t("Verbinden")}</h3>
-        <div class="ac-mini-row">${t("Basis-URL")} <code class="ac-code" data-ac-basis-url>https://api.smejj.com/v1</code><button type="button" class="ac-copy" data-ac="kopiere-basis" title="${t("Kopieren")}" aria-label="${t("Kopieren")}">⧉</button></div>
-        <div class="ac-mini-row">${t("Modell")} <code class="ac-code">smejj-1.0</code></div>
-        <details class="ac-beispiel">
-          <summary>${t("curl-Beispiel anzeigen")}</summary>
-          <pre><code>curl <span data-ac-basis-url-2>https://api.smejj.com/v1</span>/chat/completions \\
-  -H "Authorization: Bearer smejj-live-…" \\
-  -H "Content-Type: application/json" \\
+    <details class="ac-anhang">
+      <summary>${t("Verbinden & Preise")}</summary>
+      <div class="ac-anhang-inhalt">
+        <section class="ac-mini">
+          <h3>${t("Verbinden")}</h3>
+          <div class="ac-mini-row">${t("Basis-URL")} <code class="ac-code" data-ac-basis-url>https://api.smejj.com/v1</code><button type="button" class="ac-copy" data-ac="kopiere-basis" title="${t("Kopieren")}" aria-label="${t("Kopieren")}">⧉</button></div>
+          <div class="ac-mini-row">${t("Modell")} <code class="ac-code">smejj-1.0</code></div>
+          <div class="ac-beispiel">
+            <button type="button" class="ac-mini-link" data-ac="zeige-beispiel">${t("curl-Beispiel anzeigen")}</button>
+            <pre data-ac-beispiel hidden><code>curl <span data-ac-basis-url-2>https://api.smejj.com/v1</span>/chat/completions \
+  -H "Authorization: Bearer smejj-live-…" \
+  -H "Content-Type: application/json" \
   -d '{"model":"smejj-1.0","messages":[{"role":"user","content":"Hallo"}]}'</code></pre>
-        </details>
-      </section>
-      <section class="ac-mini">
-        <h3>${t("Preise")}</h3>
-        <table class="ac-preise"><thead><tr><th>${t("Modell")}</th><th>${t("Eingabe")}</th><th>${t("Ausgabe")}</th></tr></thead><tbody data-ac-preise></tbody></table>
-        <p class="ac-klein">${t("USD je 1 Million Token. Welches Modell dahinter rechnet, entscheidet smejj — Ihr Aufruf bleibt gleich.")}</p>
-      </section>
-    </div>
+          </div>
+        </section>
+        <section class="ac-mini">
+          <h3>${t("Preise")}</h3>
+          <table class="ac-preise"><thead><tr><th>${t("Modell")}</th><th>${t("Eingabe")}</th><th>${t("Ausgabe")}</th></tr></thead><tbody data-ac-preise></tbody></table>
+          <p class="ac-klein">${t("USD je 1 Million Token. Welches Modell dahinter rechnet, entscheidet smejj — Ihr Aufruf bleibt gleich.")}</p>
+        </section>
+      </div>
+    </details>
 
     <p class="ac-status" data-ac-status role="status" aria-live="polite">${t("Wird geladen …")}</p>
   </div>`;
@@ -295,31 +295,34 @@ function zeichneListe(root, zustand) {
   const liste = root.querySelector("[data-ac-rows]");
   liste.textContent = "";
   liste.innerHTML = eintraege.map((eintrag) => zeilenMarkup(eintrag, zustand)).join("");
-  const suche = root.querySelector("[data-ac-suche]");
-  const zeigeSuche = eintraege.length >= SUCHSCHWELLE;
-  suche.hidden = !zeigeSuche;
-  if (!zeigeSuche) { suche.value = ""; zustand.such = ""; }
+  // OpenRouter zeigt das Suchfeld immer — auch mit wenigen Schluesseln.
   const anzahl = eintraege.length;
   root.querySelector("[data-ac-count]").textContent = anzahl ? `${zahl(anzahl)} ${t("Schlüssel")}` : "";
   filtere(root, zustand);
 }
 
 function zeilenMarkup(eintrag, zustand) {
-  const pill = eintrag.art === "smejj"
-    ? `<span class="ac-pill ac-pill-smejj">smejj API</span>`
-    : `<span class="ac-pill ac-pill-prov">${t("Anbieter")}</span>`;
+  const typ = eintrag.art === "smejj" ? "smejj API" : t("Anbieter");
   const suchText = escapeAttr(`${eintrag.name} ${eintrag.hinweis} ${eintrag.art}`.toLowerCase());
   const klassen = ["ac-row"];
   if (eintrag.status.lvl === "r") klassen.push("ac-row-red");
   if (eintrag.off) klassen.push("ac-row-off");
+  // Zusatzzeile nur wenn der Zustand es verlangt (wie OpenRouter: gesunde
+  // Zeilen zeigen nichts Extra) — sonst bleibt die Tabelle still.
+  const hinweis = eintrag.off || eintrag.status.lvl === "g"
+    ? ""
+    : `<span class="ac-hinweis">${escapeHtml(eintrag.status.txt)}</span>`;
   return `<div class="${klassen.join(" ")}" data-ac-zeile="${escapeAttr(eintrag.id)}" data-art="${eintrag.art}" data-name="${suchText}">
-    <div class="ac-who"><span class="ac-avatar">${escapeHtml(buchstabe(eintrag))}</span>
+    <div class="ac-who">
       <span class="ac-kennung"><span class="ac-name">${escapeHtml(eintrag.name)}</span>
-      <span class="ac-sub"><code>${escapeHtml(eintrag.hinweis)}</code>${eintrag.erstellt ? ` · ${escapeHtml(eintrag.erstellt)}` : ""}</span></span></div>
-    ${pill}
-    <span class="ac-state"><span class="ac-dot ac-dot-${eintrag.status.lvl}"></span>${escapeHtml(eintrag.status.txt)}</span>
-    <span class="ac-dim ac-erstellt">${escapeHtml(eintrag.erstellt || "—")}</span>
-    <button type="button" class="ac-kebab" data-ac="menue" data-popid="${escapeAttr(popId(eintrag))}" aria-haspopup="menu" aria-expanded="false" aria-label="${t("Weitere Aktionen")}">⋯</button>
+      <span class="ac-sub"><code>${escapeHtml(eintrag.hinweis)}</code>${eintrag.erstellt ? ` · ${escapeHtml(eintrag.erstellt)}` : ""}</span>${hinweis}</span>
+    </div>
+    <span class="ac-cell-dim">${escapeHtml(typ)}</span>
+    <span class="ac-cell-dim">${t("Nie")}</span>
+    <span class="ac-cell-dim">${eintrag.status.lvl === "o" ? t("Nie") : "—"}</span>
+    <span class="ac-cell-dim ac-zelle-verbrauch">—</span>
+    <span class="ac-cell-dim ac-zelle-limit">${t("Unbegrenzt")}</span>
+    <span class="ac-zelle-menu"><button type="button" class="ac-kebab" data-ac="menue" data-popid="${escapeAttr(popId(eintrag))}" aria-haspopup="menu" aria-expanded="false" aria-label="${t("Weitere Aktionen")}">⋮</button></span>
     <div class="ac-popover" data-ac-pop="${escapeAttr(popId(eintrag))}" role="menu" hidden></div>
   </div>`;
 }
@@ -345,6 +348,11 @@ async function klick(root, zustand, event) {
   if (aktion === "entfernen") return entferne(root, zustand, trigger.dataset.id);
   if (aktion === "aufladen") return stufenMenue(root, trigger);
   if (aktion === "kopiere-basis") return kopiereText(root, root.querySelector("[data-ac-basis-url]")?.textContent || "");
+  if (aktion === "zeige-beispiel") {
+    const pre = root.querySelector("[data-ac-beispiel]");
+    if (pre) pre.hidden = !pre.hidden;
+    return;
+  }
   if (aktion === "stufe") {
     root.querySelector("[data-ac-stufen]").hidden = true;
     return ladeAuf(root, Number(trigger.dataset.betrag));
@@ -452,18 +460,18 @@ function menueMarkup(root, zustand, popid) {
   if (!eintrag) return `<div class="ac-pop-empty">${t("Keine Modelle verfügbar.")}</div>`;
   const teile = [];
   if (eintrag.art === "smejj") {
-    teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="kopieren" data-id="${escapeAttr(eintrag.id)}">${t("Maskierten Schlüssel kopieren")}</button>`);
-    teile.push(`<button type="button" role="menuitem" class="ac-item ac-item-danger" data-ac="widerrufen" data-id="${escapeAttr(eintrag.id)}">${t("Widerrufen")}</button>`);
+    teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="kopieren" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">⧉</span>${t("Maskierten Schlüssel kopieren")}</button>`);
+    teile.push(`<button type="button" role="menuitem" class="ac-item ac-item-danger" data-ac="widerrufen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">⊘</span>${t("Widerrufen")}</button>`);
   } else {
     const cat = catalogProvider(baseAnbieterId(eintrag.id));
     if (eintrag.provider.modelCount > 1 || eintrag.provider.selectedModel) {
-      teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="modell-waehlen" data-popid="${escapeAttr(popid)}">${t("Modell wählen")} ▾</button>`);
+      teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="modell-waehlen" data-popid="${escapeAttr(popid)}"><span class="ac-item-icon">☰</span>${t("Modell wählen")}</button>`);
     }
     if (cat?.billingUrl) {
-      teile.push(`<a role="menuitem" class="ac-item" href="${escapeAttr(cat.billingUrl)}" target="_blank" rel="noopener noreferrer">${t("Guthaben aufladen")}</a>`);
+      teile.push(`<a role="menuitem" class="ac-item" href="${escapeAttr(cat.billingUrl)}" target="_blank" rel="noopener noreferrer"><span class="ac-item-icon">＋</span>${t("Guthaben aufladen")}</a>`);
     }
-    teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="kopieren" data-id="${escapeAttr(eintrag.id)}">${t("Maskierten Schlüssel kopieren")}</button>`);
-    teile.push(`<button type="button" role="menuitem" class="ac-item ac-item-danger" data-ac="entfernen" data-id="${escapeAttr(eintrag.id)}">${t("Entfernen")}</button>`);
+    teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="kopieren" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">⧉</span>${t("Maskierten Schlüssel kopieren")}</button>`);
+    teile.push(`<button type="button" role="menuitem" class="ac-item ac-item-danger" data-ac="entfernen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">🗑</span>${t("Entfernen")}</button>`);
   }
   return teile.join("");
 }
@@ -748,6 +756,6 @@ function loadStyles() {
   if (document.querySelector('link[href^="/assets/api-center-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "/assets/api-center-surface.css?v=1";
+  link.href = "/assets/api-center-surface.css?v=3";
   document.head.append(link);
 }
