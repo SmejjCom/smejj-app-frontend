@@ -69,3 +69,15 @@ html { overscroll-behavior-y: none; }
 #start .erwaehnung-menue.erwaehnung-menue {
   max-height: min(320px, calc(100dvh - 360px));
 }
+
+/* Seitenleisten-Trennlinie am Handy (Betreiber-Befund 2026-08-31, 375 px):
+   Die helle Linie ueber der Profilzeile kommt aus styles.css (.sidebar
+   .bottom-nav, border-top) und gehoert zum Bild der am Desktop immer offenen
+   Spur. In der Handy-Schublade steht sie als Fremdkoerper im Leerraum ueber
+   der Profilzeile — dort bleibt die Zeile bewusst frei.
+   767 px ist dieselbe Kante, ab der design-v11.css die Spur als Desktop-Spur
+   fuehrt (min-width: 768). Gleiche Spezifitaet (0,2,0) wie die Regel in
+   styles.css, aber spaeter im Buendel — sie gewinnt deshalb dort. */
+@media (max-width: 767px) {
+  .sidebar .bottom-nav { border-top: 0; }
+}

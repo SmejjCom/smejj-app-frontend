@@ -4002,6 +4002,9 @@ html { overscroll-behavior-y: none; }
 #start .erwaehnung-menue.erwaehnung-menue {
   max-height: min(320px, calc(100dvh - 360px));
 }
+@media (max-width: 767px) {
+  .sidebar .bottom-nav { border-top: 0; }
+}
 
 /* ---- design-v11.css ---- */
 :root {
