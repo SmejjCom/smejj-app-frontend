@@ -226,6 +226,9 @@ function smejjEintrag(k) {
     name: k.name || t("Ohne Namen"),
     hinweis: k.keyHint || "",
     erstellt: datum(k.erstelltAm),
+    zuletztBenutzt: datum(k.zuletztBenutztAm),
+    nutzungAnfragen: (k.nutzung && k.nutzung.anfragen) || 0,
+    nutzungToken: (k.nutzung && k.nutzung.token) || 0,
     status: widerrufen ? { lvl: "o", txt: t("Widerrufen") } : { lvl: "g", txt: t("Aktiv") },
     off: widerrufen
   };
@@ -318,9 +321,9 @@ function zeilenMarkup(eintrag, zustand) {
       <span class="ac-sub"><code>${escapeHtml(eintrag.hinweis)}</code>${eintrag.erstellt ? ` · ${escapeHtml(eintrag.erstellt)}` : ""}</span>${hinweis}</span>
     </div>
     <span class="ac-cell-dim">${escapeHtml(typ)}</span>
-    <span class="ac-cell-dim">${t("Nie")}</span>
-    <span class="ac-cell-dim">${eintrag.status.lvl === "o" ? t("Nie") : "—"}</span>
-    <span class="ac-cell-dim ac-zelle-verbrauch">—</span>
+    <span class="ac-cell-dim">—</span>
+    <span class="ac-cell-dim">${eintrag.zuletztBenutzt || t("Nie")}</span>
+    <span class="ac-cell-dim ac-zelle-verbrauch">${eintrag.nutzungAnfragen ? eintrag.nutzungAnfragen + " / " + kurzZahl(eintrag.nutzungToken) + " T" : "—"}</span>
     <span class="ac-cell-dim ac-zelle-limit">${t("Unbegrenzt")}</span>
     <span class="ac-zelle-menu"><button type="button" class="ac-kebab" data-ac="menue" data-popid="${escapeAttr(popId(eintrag))}" aria-haspopup="menu" aria-expanded="false" aria-label="${t("Weitere Aktionen")}">⋮</button></span>
     <div class="ac-popover" data-ac-pop="${escapeAttr(popId(eintrag))}" role="menu" hidden></div>
@@ -721,6 +724,13 @@ function usd(wert) {
 
 function zahl(wert) {
   return new Intl.NumberFormat("de-DE").format(Number(wert) || 0);
+}
+
+function kurzZahl(wert) {
+  const n = Number(wert) || 0;
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(".0", "") + " M";
+  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(".0", "") + " k";
+  return String(n);
 }
 
 function datum(iso) {
