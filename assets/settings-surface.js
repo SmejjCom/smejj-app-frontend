@@ -1,14 +1,12 @@
 import { STORAGE_KEYS } from "./config.js";
 import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=b39";
-// api-keys-surface.js und provider-settings.js werden BEWUSST nicht statisch
-// importiert (Seitengewicht, Freigabe Wof Kadavanich 2026-08-04). Beide rendern
-// ausschliesslich in das Panel "models", und der Startreiter ist "general" —
-// bis der Nutzer dorthin wechselt, wird ihr Code nie gebraucht. Zusammen mit
-// ihrem selbst nachgeladenen CSS sind das 13,8 KB, die jeder Seitenaufruf
-// bisher mitschleppte. Sie bleiben im Precache: beim Reiterwechsel kommen sie
+// api-center-surface.js und provider-settings.js werden BEWUSST nicht statisch
+// importiert (Seitengewicht). Der Startreiter ist "general" — bis der Nutzer
+// dorthin wechselt, wird ihr Code nie gebraucht. Zusammen mit ihrem selbst
+// nachgeladenen CSS bleiben sie im Precache: beim Reiterwechsel kommen sie
 // aus dem Cache, also ohne Netz und ohne spuerbare Wartezeit.
 // Geprueft vor dem Umbau: app.js (Start-Lock) bindet KEINE der von ihnen
-// erzeugten Kennungen (ak*, apiKeysSurface, cline*) — die Boot-Bindings von
+// erzeugten Kennungen (ac*, apiCenterSurface, cline*) — die Boot-Bindings von
 // app.js koennen dadurch nichts verlieren.
 import { LANGUAGE_OPTIONS } from "./language-options.js?v=1";
 import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
@@ -32,8 +30,8 @@ const GROUPS = [
   ["general", "Allgemein", "Sprache, Start, Sicherheitsmodus"],
   ["appearance", "Aussehen & Schriftgröße", "Größe, Farbschema, Dichte"],
   ["behavior", "Wie smejj antwortet", "Länge, Gründlichkeit, Stil"],
-  ["models", "KI-Modelle & Anbieter", "Modelle und eigene Schlüssel"],
-  ["api", "API & Schlüssel", "smejj in ZCode, Cline, Cursor nutzen"],
+  ["models", "KI-Modelle & Anbieter", "Modelle und Reasoning"],
+  ["api", "API", "Schlüssel, Guthaben, Preise"],
   ["personalization", "Persönliches", "Deine Anweisungen an smejj"],
   ["coding", "Programmieren", "Prüfungen, Vorschau, Zugriff"],
   ["permissions", "Sicherheit", "Bestätigungen und Grenzen"],
@@ -176,8 +174,8 @@ function markup() {
       ${panel("models", "KI-Modelle & Anbieter", "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.", [
         select("Reasoning-Aufwand", "settingsReasoningEffort", [["medium", "Mittel"], ["high", "Hoch"], ["max", "Maximal"]]),
         action("Modellverwaltung", "Standardmodell, BYOK und lokale Modelle.", "KI-Modelle öffnen", "ai")])}
-      ${panel("api", "API & Schlüssel", "Eigene Schlüssel, Guthaben, Verbrauch und Preise — smejj als Modellanbieter in deinen Werkzeugen.", [
-        `<div id="apiKontoSurface" data-api-konto></div>`])}
+      ${panel("api", "API", "smejj-Schlüssel und eigene Anbieter an einem Ort — für ZCode, Cline, Cursor und den Chat.", [
+        `<div id="apiCenterSurface" data-api-center></div>`])}
       ${panel("personalization", "Persönliches", "Dauerhafte Hinweise für Antworten und Zusammenarbeit.", [
         `<div class="settings-row settings-row-stack"><div class="settings-row-copy"><strong id="settingsPersonalizationLabel">${t("Persönliche Anweisungen")}</strong></div><textarea id="settingsPersonalization" aria-labelledby="settingsPersonalizationLabel" maxlength="4000" placeholder="${t("Zum Beispiel: Antworte auf Deutsch und erkläre Entscheidungen kurz.")}"></textarea></div>`])}
       ${panel("coding", "Programmieren", "Standards für Coding-Aufgaben und Verifikation.", [
@@ -250,37 +248,28 @@ function handleClick(view, event) {
   } else if (jump) document.querySelector(`[data-view="${jump}"]`)?.click();
 }
 
-// Holt die beiden Modell-Bereiche beim ersten Wechsel auf den Reiter "models".
+// Holt den Cline-Bereich beim ersten Wechsel auf den Reiter "models".
 // Kein eigener Zwischenspeicher noetig: der Browser liefert ein zweites
-// import() aus dem Modulspeicher, und beide init-Funktionen steigen von selbst
+// import() aus dem Modulspeicher, und die init-Funktion steigt von selbst
 // aus, wenn ihr Wurzelelement bereits steht (idempotent).
 // Fail-safe wie im ganzen Modul: schlaegt ein Import fehl (offline, Cache
 // geraeumt), bleiben die uebrigen Einstellungen vollstaendig bedienbar.
 async function ladeModellBereiche(view) {
   try {
-    const [schluessel, cline] = await Promise.all([
-      import("./api-keys-surface.js?v=1"),
-      import("./provider-settings.js?v=1")
-    ]);
-    schluessel.initApiKeysSurface(view);
+    const cline = await import("./provider-settings.js?v=1");
     cline.initClineProviderSurface(view);
   } catch {
-    /* fail-safe: Einstellungen bleiben ohne diese beiden Bereiche nutzbar */
+    /* fail-safe: Einstellungen bleiben ohne diesen Bereich nutzbar */
   }
 }
 
-// API-Konto (Schluessel, Guthaben, Preise) erst beim Wechsel auf "api" —
-// gleiches Muster wie die Modell-Bereiche: 0 KB, solange niemand hinsieht.
-async function ladeApiKonto(view) {
+// Zentraler API-Bereich (Schluessel, Guthaben, Preise) erst beim Wechsel auf
+// "api" — gleiches Muster wie der Modell-Bereich: 0 KB, solange niemand
+// hinsieht. Kompakter Kopf: die Panel-Ueberschrift liefert den Titel.
+async function ladeApiZentrum(view) {
   try {
-    if (!document.querySelector('link[href^="/assets/entwickler.css"]')) {
-      const css = document.createElement("link");
-      css.rel = "stylesheet";
-      css.href = "/assets/entwickler.css?v=2";
-      document.head.append(css);
-    }
-    const modul = await import("./api-konto-surface.js?v=1");
-    modul.initApiKontoSurface(view.querySelector("#apiKontoSurface"));
+    const modul = await import("./api-center-surface.js?v=2");
+    modul.initApiCenter(view.querySelector("#apiCenterSurface"), { kopf: "kompakt" });
   } catch {
     /* fail-safe: uebrige Einstellungen bleiben bedienbar */
   }
@@ -289,7 +278,7 @@ async function ladeApiKonto(view) {
 function activate(view, id) {
   activeTab = id;
   if (id === "models") void ladeModellBereiche(view);
-  if (id === "api") void ladeApiKonto(view);
+  if (id === "api") void ladeApiZentrum(view);
   view.querySelectorAll("[data-settings-tab]").forEach((button) => {
     const active = button.dataset.settingsTab === id;
     button.classList.toggle("is-active", active);

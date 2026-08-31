@@ -1,6 +1,7 @@
-// smejj.com — Einzelseite /entwickler.html: duenner Rahmen um das gemeinsame
-// API-Konto-Modul (api-konto-surface.js), das auch im Einstellungsreiter
-// "API & Schluessel" laeuft. Eine Implementierung, zwei Orte.
-import { initApiKontoSurface } from "./api-konto-surface.js?v=1";
+// smejj.com — Einzelseite /entwickler.html: duenner Rahmen um den zentralen
+// API-Bereich (api-center-surface.js), der auch im Einstellungsreiter "API"
+// laeuft. Eine Implementierung, zwei Orte — hier mit vollem Kopf, weil die
+// Seite keine Panel-Ueberschrift mitbringt.
+import { initApiCenter } from "./api-center-surface.js?v=2";
 
-initApiKontoSurface(document.querySelector("[data-dev-mount]"));
+initApiCenter(document.querySelector("[data-dev-mount]"), { kopf: "voll" });

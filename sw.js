@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v717";
+const CACHE_NAME = "smejj-shell-v718";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -208,8 +208,11 @@ const SHELL = [
   "/assets/view-routes.js",
   "/assets/ai/providers-catalog.js",
   "/assets/account-sessions.js",
-  "/assets/api-keys-surface.js",
-  "/assets/api-keys-surface.css",
+  // api-center-surface ist der zentrale API-Bereich (Einstellungen "API" +
+  // /entwickler.html) und wird von settings-surface.js bzw. entwickler.js
+  // dynamisch geladen — ohne Precache-Eintrag ist die Ansicht offline tot.
+  "/assets/api-center-surface.js",
+  "/assets/api-center-surface.css",
   "/assets/auth-gate.js",
   "/assets/fehler-faenger.js",
   "/assets/offline-banner.js",
@@ -255,9 +258,6 @@ const SHELL = [
   "/assets/panel-backdrop.js",
   "/assets/premium-surfaces.js",
   "/assets/settings-surface.js",
-  // api-konto-surface wird von settings-surface.js dynamisch geladen —
-  // ohne Precache-Eintrag ist die API-Konto-Ansicht offline tot (Befund 25.08.).
-  "/assets/api-konto-surface.js",
   "/assets/settings-runtime.js",
   "/assets/provider-settings.js",
   "/assets/cline-model-menu.js",
