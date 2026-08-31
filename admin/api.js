@@ -88,15 +88,26 @@
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
+  // Zeitlimit je Versuch (Befund 2026-08-31): Ohne Limit hing ein zaeherr Ruf
+  // beliebig lange — der Tuersteher meldete dann "Konsole nicht geladen",
+  // bevor der bewaehrte Host-Wechsel ueberhaupt drankam. 12 s decken jeden
+  // beobachteten Ruf ab (langsamster Live-Wert 4 s) und lassen dem
+  // Ausweichhost noch Luft innerhalb der 30-s-Wache aus gate.js.
   async function holeEinmal(pfad) {
+    const wache = new AbortController();
+    const uhr = setTimeout(function () { wache.abort(); }, 12000);
     try {
-      const antwort = await fetch(url(pfad), { headers: kopf(), cache: "no-store" });
+      const antwort = await fetch(url(pfad), { headers: kopf(), cache: "no-store", signal: wache.signal });
+      clearTimeout(uhr);
       const text = await antwort.text();
       let data = {};
       try { data = text ? JSON.parse(text) : {}; } catch { data = {}; }
       if (!antwort.ok) return { ok: false, status: antwort.status, data, fehler: fehlertext(antwort.status, data) };
       return { ok: true, status: antwort.status, data, fehler: "" };
     } catch (error) {
+      clearTimeout(uhr);
+      // Der Abbruch durch die Wache ist Status 0 wie jeder andere Netzfehler —
+      // holeDirekt weicht dann auf den zweiten Host aus.
       return { ok: false, status: 0, data: {}, fehler: "Keine Verbindung zum Control-Server: " + String(error && error.message || error) };
     }
   }

@@ -145,6 +145,13 @@
    * Download einer der 20 Konsolendateien), bliebe die Seite dauerhaft weiss.
    * Dann lieber eine lesbare Erklaerung als ein stummes Nichts — aber immer
    * noch OHNE die Huelle. Verbergen bleibt die Voreinstellung, auch im Fehler.
+   *
+   * 30 statt 15 Sekunden (Befund 2026-08-31, live gemessen): der Kaltstart
+   * holt ~20 Dateien von GitHub Pages und bestaetigt den Akteur am
+   * Control-Server — genau diese Kette dauerte im Abendstau 13,5 s und die
+   * alte Wache meldete "Konsole nicht geladen", obwohl nichts kaputt war
+   * (der erneute Versuch ging schnell, weil alles im Cache lag). 30 s geben
+   * der Kette Luft; ein wirklich toter Ladevorgang wird weiterhin erklaert.
    */
   var netz = setTimeout(function () {
     abweisen({
@@ -152,7 +159,7 @@
       text: "Die Operations Console hat sich nicht gemeldet. Das liegt fast immer am Netz oder am Control-Server.",
       neuLaden: true
     });
-  }, 15000);
+  }, 30000);
 
   function freigeben() {
     clearTimeout(netz);
