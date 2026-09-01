@@ -323,4 +323,9 @@
   <url><loc>https://smejj.com/hilfe.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://smejj.com/impressum.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://smejj.com/datenschutz.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://smejj.com/willkommen.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://smejj.com/programmieren.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://smejj.com/entwickler.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://smejj.com/agb.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://smejj.com/widerruf.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
