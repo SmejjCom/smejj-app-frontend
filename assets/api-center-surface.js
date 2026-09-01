@@ -64,24 +64,34 @@ function markup(kopf) {
   // keine Kacheln — das Konto liegt als schlanke Zeile darunter.
   const kopfZeile = kopf === "kompakt"
     ? `<span class="ac-sub">${t("smejj-Schlüssel und eigene Anbieter — verschlüsselt gespeichert.")}</span>`
-    : "";
+    : `<span class="ac-breadcrumb">${t("Schlüssel erstellen und verwalten.")}</span>`;
   return `<div class="api-center-surface ac-surface" data-ac-root>
     ${kopfZeile}
     <div class="ac-head">
       <div>
         <h2>${t("API-Keys")}</h2>
-        <p class="ac-subhead">${t("Schlüssel erstellen und verwalten.")}</p>
+        <p class="ac-subhead">${t("Schlüssel erstellen und verwalten — smejj-Schlüssel für Programme und eigene Anbieter-Schlüssel für den Chat. Alles verschlüsselt gespeichert.")}</p>
       </div>
       <span class="ac-spacer"></span>
       <button type="button" class="ac-primary" data-ac="neu">＋ ${t("Schlüssel erstellen")}</button>
     </div>
 
-    <div class="ac-kontozeile" data-ac-stats hidden>
-      <span>${t("Guthaben")} <b><span data-ac-guthaben>–</span> USD</b></span>
-      <span>${t("Verbraucht")} <b><span data-ac-verbraucht>–</span> USD</b></span>
-      <span>${t("Anfragen heute")} <b data-ac-anfragen>0</b></span>
-      <span>${t("Token heute")} <b data-ac-token>0</b></span>
-      <span class="ac-aufladen-halter"><button type="button" class="ac-aufladen" data-ac="aufladen" hidden>${t("Aufladen")}</button></span>
+    <div class="ac-stats" data-ac-stats hidden>
+      <div class="ac-stat-block">
+        <span class="ac-stat-label">GUTHABEN</span>
+        <span class="ac-stat-value"><span data-ac-guthaben>–</span> USD</span>
+        <button type="button" class="ac-stat-link" data-ac="aufladen" hidden>${t("Aufladen")}</button>
+      </div>
+      <div class="ac-stat-divider"></div>
+      <div class="ac-stat-block">
+        <span class="ac-stat-label">${t("Verbraucht")} (30 TAGE)</span>
+        <span class="ac-stat-value"><span data-ac-verbraucht>–</span></span>
+      </div>
+      <div class="ac-stat-divider"></div>
+      <div class="ac-stat-block">
+        <span class="ac-stat-label">${t("HEUTE")}</span>
+        <span class="ac-stat-value"><span data-ac-anfragen>0</span> ${t("Anfragen")}</span>
+      </div>
       <div class="ac-stufen" data-ac-stufen hidden></div>
     </div>
 
@@ -120,10 +130,7 @@ function markup(kopf) {
 
     <div class="ac-card">
       <div class="ac-toolbar">
-        <input type="search" class="ac-search" data-ac-suche placeholder="${t("Nach Name oder Schlüssel suchen …")}" aria-label="${t("Nach Name oder Schlüssel suchen …")}">
-      </div>
-      <div class="ac-count-row">
-        <span class="ac-count" data-ac-count></span>
+        <input type="search" class="ac-search" data-ac-suche placeholder="• ${t("Nach Name suchen …")}" aria-label="${t("Nach Name oder Schlüssel suchen …")}">
         <div class="ac-chips" role="group" aria-label="${t("Nach Typ filtern")}">
           <button type="button" class="ac-chip" data-ac="filter" data-filter="alle" aria-pressed="true">${t("Alle")}</button>
           <button type="button" class="ac-chip" data-ac="filter" data-filter="smejj" aria-pressed="false">smejj</button>
@@ -131,13 +138,22 @@ function markup(kopf) {
         </div>
       </div>
       <div class="ac-cols" aria-hidden="true">
-        <span>${t("Schlüssel")}</span><span>${t("Typ")}</span><span>${t("Läuft ab")}</span><span>${t("Zuletzt genutzt")}</span><span class="ac-col-verbrauch">${t("Verbrauch")}</span><span class="ac-col-limit">${t("Limit")}</span><span></span>
+        <span>${t("Schlüssel")}</span><span>${t("Typ")}</span><span>${t("Status")}</span><span>${t("Zuletzt genutzt")}</span><span></span>
       </div>
       <div class="ac-rows" data-ac-rows></div>
-      <p class="ac-foot" data-ac-foot>${t("Widerrufene Schlüssel bleiben sichtbar. Klartext wird nie wieder angezeigt.")}</p>
+      <div class="ac-foot-row">
+        <span class="ac-count" data-ac-count title="${t("Läuft ab")}"></span>
+        <p class="ac-foot" title="${t("Widerrufene Schlüssel bleiben sichtbar. Klartext wird nie wieder angezeigt.")}">${t("Widerrufene Schlüssel bleiben 30 Tage sichtbar • Schlüssel werden nie im Klartext angezeigt")}</p>
+      </div>
     </div>
 
-    <details class="ac-anhang">
+    <div class="ac-unten">
+      <section class="ac-unten-karte ac-token-card" data-ac-token-card hidden>
+        <h3>${t("Token heute")}</h3>
+        <span class="ac-token-big" data-ac-token>0</span>
+        <span class="ac-token-verdacht">${t("Anfragen heute")}: —</span>
+      </section>
+      <details class="ac-anhang">
       <summary>${t("Verbinden & Preise")}</summary>
       <div class="ac-anhang-inhalt">
         <section class="ac-mini">
@@ -160,6 +176,7 @@ function markup(kopf) {
       </div>
     </details>
 
+    </div>
     <p class="ac-status" data-ac-status role="status" aria-live="polite">${t("Wird geladen …")}</p>
   </div>`;
 }
@@ -265,6 +282,15 @@ function zeichneKonto(root, zustand) {
   const aufladen = root.querySelector("[data-ac='aufladen']");
   aufladen.hidden = guthaben.aufladenMoeglich === false;
   aufladen.dataset.stufen = JSON.stringify(guthaben.stufenUsd || []);
+  // Token-Karte
+  const tokenCard = root.querySelector("[data-ac-token-card]");
+  const tokens = verbrauch?.gesamtTokens || 0;
+  const anfragenVal = verbrauch?.anfragen || 0;
+  tokenCard.hidden = !tokens && !anfragenVal;
+  root.querySelector("[data-ac-token]").textContent = kurzZahl(tokens);
+  const verd = root.querySelector(".ac-token-verdacht");
+  const verbrauchtUsd = guthaben?.verbrauchtUsd || 0;
+  verd.textContent = verbrauchtUsd ? `$${usd(verbrauchtUsd)} · ${kurzZahl(tokens)} Token` : "—";
 }
 
 function zeichneVerbindung(root, zustand) {
@@ -304,28 +330,23 @@ function zeichneListe(root, zustand) {
   filtere(root, zustand);
 }
 
+
 function zeilenMarkup(eintrag, zustand) {
   const typ = eintrag.art === "smejj" ? "smejj API" : t("Anbieter");
   const suchText = escapeAttr(`${eintrag.name} ${eintrag.hinweis} ${eintrag.art}`.toLowerCase());
   const klassen = ["ac-row"];
   if (eintrag.status.lvl === "r") klassen.push("ac-row-red");
   if (eintrag.off) klassen.push("ac-row-off");
-  // Zusatzzeile nur wenn der Zustand es verlangt (wie OpenRouter: gesunde
-  // Zeilen zeigen nichts Extra) — sonst bleibt die Tabelle still.
-  const hinweis = eintrag.off || eintrag.status.lvl === "g"
-    ? ""
-    : `<span class="ac-hinweis">${escapeHtml(eintrag.status.txt)}</span>`;
+  const badge = `<span class="ac-badge ac-badge-${eintrag.status.lvl}">• ${escapeHtml(eintrag.status.txt)}</span>`;
   return `<div class="${klassen.join(" ")}" data-ac-zeile="${escapeAttr(eintrag.id)}" data-art="${eintrag.art}" data-name="${suchText}">
     <div class="ac-who">
-      <span class="ac-kennung"><span class="ac-name">${escapeHtml(eintrag.name)}</span>
-      <span class="ac-sub"><code>${escapeHtml(eintrag.hinweis)}</code>${eintrag.erstellt ? ` · ${escapeHtml(eintrag.erstellt)}` : ""}</span>${hinweis}</span>
+      <span class="ac-name">${escapeHtml(eintrag.name)}</span>
+      <span class="ac-sub"><code>${escapeHtml(eintrag.hinweis)}</code>${eintrag.erstellt ? ` · ${escapeHtml(eintrag.erstellt)}` : ""}</span>
     </div>
-    <span class="ac-cell-dim">${escapeHtml(typ)}</span>
-    <span class="ac-cell-dim">—</span>
-    <span class="ac-cell-dim">${eintrag.zuletztBenutzt || t("Nie")}</span>
-    <span class="ac-cell-dim ac-zelle-verbrauch">${eintrag.nutzungAnfragen ? eintrag.nutzungAnfragen + " / " + kurzZahl(eintrag.nutzungToken) + " T" : "—"}</span>
-    <span class="ac-cell-dim ac-zelle-limit">${t("Unbegrenzt")}</span>
-    <span class="ac-zelle-menu"><button type="button" class="ac-kebab" data-ac="menue" data-popid="${escapeAttr(popId(eintrag))}" aria-haspopup="menu" aria-expanded="false" aria-label="${t("Weitere Aktionen")}">⋮</button></span>
+    <span class="ac-cell ac-cell-typ">${escapeHtml(typ)}</span>
+    <span class="ac-cell ac-cell-status">${badge}</span>
+    <span class="ac-cell ac-cell-when">${eintrag.zuletztBenutzt || t("Nie")}</span>
+    <span class="ac-zelle-menu"><button type="button" class="ac-kebab" data-ac="menue" data-popid="${escapeAttr(popId(eintrag))}" aria-haspopup="menu" aria-expanded="false" aria-label="${t("Weitere Aktionen")}">…</button></span>
     <div class="ac-popover" data-ac-pop="${escapeAttr(popId(eintrag))}" role="menu" hidden></div>
   </div>`;
 }
@@ -766,6 +787,6 @@ function loadStyles() {
   if (document.querySelector('link[href^="/assets/api-center-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "/assets/api-center-surface.css?v=3";
+  link.href = "/assets/api-center-surface.css?v=4";
   document.head.append(link);
 }
