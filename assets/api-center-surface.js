@@ -238,6 +238,10 @@ function alleEintraege(zustand) {
 
 function smejjEintrag(k) {
   const widerrufen = k.zustand === "widerrufen";
+  const inaktiv = k.zustand === "inaktiv";
+  const status = widerrufen ? { lvl: "o", txt: t("Widerrufen") }
+    : inaktiv ? { lvl: "o", txt: t("Inaktiv") }
+    : { lvl: "g", txt: t("Aktiv") };
   return {
     art: "smejj", id: k.id,
     name: k.name || t("Ohne Namen"),
@@ -246,7 +250,8 @@ function smejjEintrag(k) {
     zuletztBenutzt: datum(k.zuletztBenutztAm),
     nutzungAnfragen: (k.nutzung && k.nutzung.anfragen) || 0,
     nutzungToken: (k.nutzung && k.nutzung.token) || 0,
-    status: widerrufen ? { lvl: "o", txt: t("Widerrufen") } : { lvl: "g", txt: t("Aktiv") },
+    widerrufen, inaktiv,
+    status,
     off: widerrufen
   };
 }
@@ -370,6 +375,9 @@ async function klick(root, zustand, event) {
   if (aktion === "modell-waehlen") return modellMenue(root, zustand, trigger.dataset.popid);
   if (aktion === "kopieren") return kopiereHint(root, zustand, trigger.dataset.id);
   if (aktion === "widerrufen") return widerrufe(root, zustand, trigger.dataset.id);
+  if (aktion === "umbenennen") return umbenenne(root, zustand, trigger.dataset.id);
+  if (aktion === "umschalten") return schalteUm(root, zustand, trigger.dataset.id);
+  if (aktion === "aktivitaet") return zeigeAktivitaet(root, zustand, trigger.dataset.id);
   if (aktion === "entfernen") return entferne(root, zustand, trigger.dataset.id);
   if (aktion === "aufladen") return stufenMenue(root, trigger);
   if (aktion === "kopiere-basis") return kopiereText(root, root.querySelector("[data-ac-basis-url]")?.textContent || "");
@@ -485,8 +493,16 @@ function menueMarkup(root, zustand, popid) {
   if (!eintrag) return `<div class="ac-pop-empty">${t("Keine Modelle verfügbar.")}</div>`;
   const teile = [];
   if (eintrag.art === "smejj") {
+    // Menue 1:1 wie OpenRouter/keys: Bearbeiten, Aktivitaet, Deaktivieren, Loeschen.
+    if (!eintrag.widerrufen) {
+      teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="umbenennen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">✎</span>${t("Bearbeiten")}</button>`);
+      teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="aktivitaet" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">📊</span>${t("Aktivität")}</button>`);
+      teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="umschalten" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">⊗</span>${eintrag.inaktiv ? t("Aktivieren") : t("Deaktivieren")}</button>`);
+    }
     teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="kopieren" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">⧉</span>${t("Maskierten Schlüssel kopieren")}</button>`);
-    teile.push(`<button type="button" role="menuitem" class="ac-item ac-item-danger" data-ac="widerrufen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">⊘</span>${t("Widerrufen")}</button>`);
+    if (!eintrag.widerrufen) {
+      teile.push(`<button type="button" role="menuitem" class="ac-item ac-item-danger" data-ac="widerrufen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">🗑</span>${t("Löschen")}</button>`);
+    }
   } else {
     const cat = catalogProvider(baseAnbieterId(eintrag.id));
     if (eintrag.provider.modelCount > 1 || eintrag.provider.selectedModel) {
@@ -588,6 +604,55 @@ async function entferne(root, zustand, id) {
   } catch (error) {
     melde(root, fehlerText(error), true);
   }
+}
+
+async function umbenenne(root, zustand, id) {
+  schliessePopovers(root);
+  const eintrag = alleEintraege(zustand).find((e) => e.id === id);
+  if (!eintrag) return;
+  const name = prompt(t("Neuer Name für den Schlüssel"), eintrag.name);
+  if (name === null) return;
+  if (!name.trim()) return melde(root, t("Der Name darf nicht leer sein."), true);
+  try {
+    await api(`${DEV_PREFIX}/${encodeURIComponent(id)}/rename`, { method: "POST", body: { name: name.trim() } });
+    await laden(root, zustand);
+    melde(root, t("Name geändert."));
+  } catch (error) {
+    melde(root, fehlerText(error), true);
+  }
+}
+
+async function schalteUm(root, zustand, id) {
+  schliessePopovers(root);
+  const eintrag = alleEintraege(zustand).find((e) => e.id === id);
+  if (!eintrag) return;
+  const aktiv = !!eintrag.inaktiv;
+  try {
+    await api(`${DEV_PREFIX}/${encodeURIComponent(id)}/toggle`, { method: "POST", body: { aktiv } });
+    await laden(root, zustand);
+    melde(root, aktiv ? t("Schlüssel aktiviert.") : t("Schlüssel deaktiviert — Aufrufe bekommen jetzt 401."));
+  } catch (error) {
+    melde(root, fehlerText(error), true);
+  }
+}
+
+function zeigeAktivitaet(root, zustand, id) {
+  schliessePopovers(root);
+  const eintrag = alleEintraege(zustand).find((e) => e.id === id);
+  if (!eintrag) return;
+  const zeilen = [
+    [t("Zuletzt genutzt"), eintrag.zuletztBenutzt || t("Nie")],
+    [t("Anfragen"), zahl(eintrag.nutzungAnfragen)],
+    [t("Token"), zahl(eintrag.nutzungToken)],
+    [t("Erstellt"), eintrag.erstellt || "—"]
+  ];
+  const pop = root.querySelector(`[data-ac-zeile="${cssEscape(id)}"] .ac-popover`);
+  if (!pop) return;
+  pop.innerHTML = `<div class="ac-aktivitaet">
+    <div class="ac-pop-head">${escapeHtml(eintrag.name)}</div>
+    ${zeilen.map(([label, wert]) => `<div class="ac-aktivitaet-zeile"><span>${escapeHtml(label)}</span><b>${escapeHtml(String(wert))}</b></div>`).join("")}
+  </div>`;
+  pop.hidden = false;
 }
 
 // ---- Formular absenden --------------------------------------------------------
@@ -789,6 +854,6 @@ function loadStyles() {
   if (document.querySelector('link[href^="/assets/api-center-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "/assets/api-center-surface.css?v=5";
+  link.href = "/assets/api-center-surface.css?v=6";
   document.head.append(link);
 }

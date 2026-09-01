@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v724";
+const CACHE_NAME = "smejj-shell-v725";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -213,6 +213,7 @@ const SHELL = [
   // dynamisch geladen — ohne Precache-Eintrag ist die Ansicht offline tot.
   "/assets/api-center-surface.js",
   "/assets/api-center-surface.css",
+  "/assets/api-center-helfer.js",
   "/assets/auth-gate.js",
   "/assets/fehler-faenger.js",
   "/assets/offline-banner.js",
