@@ -71,7 +71,7 @@
     }
     .leiste img { height: 26px; width: auto; }
     .leiste nav { display: flex; gap: 18px; font-size: 15px; color: var(--ink-dim); }
-    .leiste nav a { text-decoration: none; }
+    .leiste nav a { text-decoration: none; display: inline-block; padding: 12px 0; }
     .leiste nav a:hover { color: var(--ink); }
     .leiste .rechts { margin-left: auto; display: flex; gap: 10px; }
     /* Handy (Nutzerreise USA, 2026-08-23, gemessen bei 375 px): die Leiste war
@@ -81,7 +81,7 @@
     @media (max-width: 640px) {
       .leiste { gap: 10px 12px; padding: 12px 16px; }
       .leiste nav { order: 3; width: 100%; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
-      .leiste nav a { padding: 6px 0; }
+      .leiste nav a { padding: 12px 0; }
       .leiste .rechts { gap: 8px; }
       .leiste .knopf { padding: 10px 12px; font-size: 14.5px; }
     }
