@@ -1,35 +1,24 @@
-/* smejj.com — zentraler API-Bereich, Design 1:1 nach Vorschlag:
-   Breadcrumb, Ueberschrift + Beschreibung, blauer Hauptknopf,
-   3-Block Stats-Leiste (GUTHABEN / VERBRAUCHT / HEUTE),
-   Suchfeld + Typfilter-Chips in einer Zeile,
-   Tabelle mit 4 Spalten (Schluessel, Typ, Status, Zuletzt genutzt) + Menue,
-   Fusszeile mit Zaehler + Hinweis,
-   Token-Karte + Verbinden/Preise als untere Sektion.
-   Handy: Karten statt Tabelle, einspaltig.
-   scoped an .ac-surface. */
+/* smejj.com — zentraler API-Bereich, Layout 1:1 nach OpenRouter/keys:
+   grosse Ueberschrift + ein Hauptknopf oben rechts, eine Karte mit grosser
+   Suche, Tabelle (Schlüssel · Typ · Läuft ab · Zuletzt genutzt · Verbrauch ·
+   Limit · ⋮), Fusszeile "N Schlüssel". Verbindung & Preise eingeklappt.
+   scoped an .ac-surface. Handy (≤760 px): nur Schlüssel + Menü, Rest
+   untereinander. */
 
 .ac-surface {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
   width: 100%;
   color: var(--premium-text, #f2f4f8);
 }
 
-/* ── Breadcrumb ─────────────────────────────────────────────── */
-.ac-breadcrumb {
-  font-size: 13px;
-  color: var(--premium-muted, #9aa4b2);
-}
-
 /* ── Kopf: Titel links, Hauptknopf rechts ───────────────────── */
 .ac-head { display: flex; align-items: flex-start; gap: 16px; }
-.ac-head h2 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; }
-.ac-surface .ac-head h2 { margin: 0; font-size: 28px; }
-.ac-head .ac-subhead {
-  margin-top: 6px; font-size: 14px; color: var(--premium-muted, #9aa4b2);
-  max-width: 560px; line-height: 1.5;
-}
+.ac-head h2 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; }
+/* html.p-recht h2 (entwickler.html) setzt 2em Abstand — hier bewusst drueber */
+.ac-surface .ac-head h2 { margin: 0; font-size: 30px; }
+.ac-head .ac-subhead { margin-top: 8px; font-size: 15px; color: var(--premium-muted, #9aa4b2); }
 .ac-spacer { flex: 1 1 auto; }
 .ac-primary {
   flex: 0 0 auto; min-height: 42px; padding: 0 18px; border: 0; border-radius: 10px;
@@ -37,35 +26,19 @@
 }
 .ac-primary:hover { background: #2a60e6; }
 .ac-primary[disabled] { opacity: .5; cursor: default; }
+.ac-sub { font-size: 13px; color: var(--premium-muted, #9aa4b2); }
 
-/* ── Stats-Leiste: 3 Bloecke mit Trennstrichen ──────────────── */
-.ac-stats {
-  display: flex; align-items: center; gap: 0;
-  padding: 16px 20px; border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* schlanke Konto-Zeile statt Kacheln: Guthaben · Verbraucht · Heute */
+.ac-kontozeile {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px;
+  font-size: 13.5px; color: var(--premium-muted, #9aa4b2);
 }
-.ac-stat-block {
-  display: flex; align-items: center; gap: 10px;
-  padding: 0 20px;
-}
-.ac-stat-block:first-child { padding-left: 0; }
-.ac-stat-label {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--premium-muted, #9aa4b2);
-}
-.ac-stat-value {
-  font-size: 18px; font-weight: 700; color: var(--premium-text, #f2f4f8);
-}
-.ac-stat-link {
+.ac-kontozeile b { color: var(--premium-text, #f2f4f8); font-weight: 600; }
+.ac-aufladen {
   font-size: 13px; color: #7aa6ff; text-decoration: none; cursor: pointer;
-  background: transparent; border: 0; padding: 0; font-weight: 600;
+  background: transparent; border: 0; padding: 0;
 }
-.ac-stat-link:hover { text-decoration: underline; }
-.ac-stat-divider {
-  width: 1px; height: 36px;
-  background: rgba(255, 255, 255, 0.10);
-}
+.ac-aufladen:hover { text-decoration: underline; }
 .ac-stufen {
   position: absolute; z-index: 40;
   display: flex; flex-direction: column; gap: 2px; min-width: 170px;
@@ -74,29 +47,23 @@
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
 }
 
-/* ── Die Tabelle-Karte ─────────────────────────────────────── */
+/* ── Die eine Karte: Suche + Tabelle + Fusszeile ────────────── */
 .ac-card {
   border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 12px;
   background: rgba(255, 255, 255, 0.02); overflow: visible;
 }
-.ac-toolbar {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
+.ac-toolbar { padding: 16px 16px 6px; }
 .ac-search {
-  flex: 1 1 auto; min-height: 40px; padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.10); border-radius: 9px;
-  background: rgba(255, 255, 255, 0.03); color: inherit;
-  font-size: 14px;
+  width: 100%; max-width: 560px; min-height: 46px; padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04); color: inherit;
+  font-size: 15px;
 }
 .ac-search::placeholder { color: #6d7787; }
 .ac-search[hidden] { display: none; }
-
-/* Filter-Chips rechts im Toolbar */
-.ac-toolbar .ac-chips {
-  flex: 0 0 auto;
-  margin-left: auto;
+.ac-count-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px 0; font-size: 12px; color: var(--premium-muted, #9aa4b2);
 }
 .ac-chips { display: flex; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 9px; overflow: hidden; }
 .ac-chip {
@@ -106,74 +73,47 @@
 .ac-chip:first-child { border-left: 0; }
 .ac-chip[aria-pressed="true"] { background: rgba(96, 150, 255, 0.18); color: #bcd0ff; font-weight: 600; }
 
-/* Tabellen-Kopf */
+/* Tabelle */
 .ac-cols, .ac-row {
   display: grid;
-  grid-template-columns: minmax(0, 2.8fr) minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1.2fr) 44px;
+  grid-template-columns: minmax(0, 2.6fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 0.9fr) 44px;
   gap: 14px; align-items: center;
 }
 .ac-cols {
-  padding: 10px 16px;
-  font-size: 11px; font-weight: 600; letter-spacing: 0.05em; color: #6d7787;
-  text-transform: uppercase;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 14px; padding: 12px 16px;
+  font-size: 14px; color: #8d97a7;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 .ac-rows { display: flex; flex-direction: column; }
-
-/* Tabellen-Zeilen */
 .ac-row {
-  padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
 }
 .ac-rows .ac-row:last-child { border-bottom: 0; }
 .ac-row-off .ac-name, .ac-row-off .ac-sub, .ac-row-off .ac-cell { opacity: .4; }
 
-/* Schlüssel-Spalte: Name + Hint */
-.ac-who { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.ac-name { font-size: 14.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ac-kennung { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ac-name { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ac-sub {
-  font-size: 12.5px; color: #8d97a7;
+  font-size: 13px; color: #8d97a7;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.ac-sub code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #97a1b2; }
+.ac-sub code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: #97a1b2; }
+.ac-hinweis { font-size: 12px; color: #e9b23c; }
 
-/* Typ-Spalte */
-.ac-cell { font-size: 13.5px; color: #c3cbd8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ac-cell-typ { color: #8d97a7; }
+.ac-cell { font-size: 14px; color: #c3cbd8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-cell-dim { font-size: 14px; color: #8d97a7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* Status-Badge */
-.ac-cell-status { display: flex; }
-.ac-badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 12.5px; font-weight: 500; padding: 3px 10px;
-  border-radius: 20px;
-}
-.ac-badge-g { color: #6dd68c; background: rgba(55, 194, 107, 0.12); }
-.ac-badge-o { color: #9aa4b2; background: rgba(154, 164, 178, 0.12); }
-.ac-badge-y { color: #e9b23c; background: rgba(233, 178, 60, 0.12); }
-.ac-badge-r { color: #ff8a8a; background: rgba(227, 93, 93, 0.12); }
-
-/* Zuletzt-genutzt-Spalte */
-.ac-cell-when { color: #8d97a7; font-size: 13px; }
-
-/* Menue-Knopf */
 .ac-kebab {
-  width: 36px; height: 36px; justify-self: end; border-radius: 8px;
+  width: 40px; height: 40px; justify-self: end; border-radius: 9px;
   border: 1px solid transparent; background: transparent; color: #c3cbd8;
-  font-size: 20px; line-height: 1; letter-spacing: -2px; cursor: pointer;
+  font-size: 18px; line-height: 1; letter-spacing: 0; cursor: pointer;
 }
 .ac-kebab:hover { border-color: rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.05); }
 
-/* Fusszeile */
-.ac-foot-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-.ac-count { font-size: 12.5px; color: var(--premium-muted, #9aa4b2); }
-.ac-foot { margin: 0; font-size: 12px; color: #6d7787; }
-
-/* ── Popover-Menue ─────────────────────────────────────────── */
+/* ── ⋮-Menue wie OpenRouter: gross, mit Icons ───────────────── */
 .ac-popover {
   position: absolute; top: calc(100% - 8px); right: 14px; z-index: 40;
   min-width: 260px; max-height: 340px; overflow: auto;
@@ -181,6 +121,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 22px 56px rgba(0, 0, 0, 0.55);
 }
+.ac-pop-head { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--premium-muted, #9aa4b2); padding: 8px 12px 4px; }
 .ac-item {
   display: flex; align-items: center; gap: 12px; width: 100%; min-height: 42px; text-align: left;
   padding: 9px 12px; border: 0; background: transparent; color: inherit;
@@ -193,35 +134,16 @@
 .ac-item-danger:hover { background: rgba(227, 93, 93, 0.14); }
 .ac-pop-empty, .ac-pop-loading, .ac-pop-more { padding: 12px; font-size: 13px; color: var(--premium-muted, #9aa4b2); }
 
-/* ── Unterer Bereich: Token-Karte + Verbinden & Preise ─────── */
-.ac-unten {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
-}
-.ac-token-card {
-  padding: 18px 20px; border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.ac-token-card h3 {
-  margin: 0 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--premium-muted, #9aa4b2);
-}
-.ac-token-big {
-  display: block; font-size: 26px; font-weight: 700;
-  color: var(--premium-text, #f2f4f8);
-}
-.ac-token-verdacht {
-  font-size: 13px; color: #8d97a7;
-}
+.ac-foot { padding: 14px 16px; font-size: 14px; color: #8d97a7; border-top: 1px solid rgba(255, 255, 255, 0.06); }
 
-/* ── Verbinden & Preise ────────────────────────────────────── */
+/* ── Verbindung & Preise: eingeklappt, OpenRouter-Look bleibt clean ── */
 details.ac-anhang {
   border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 12px;
   background: rgba(255, 255, 255, 0.02); padding: 0 16px;
 }
 details.ac-anhang summary {
   cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px;
-  min-height: 48px; font-size: 14px; font-weight: 600; color: #c3cbd8;
+  min-height: 52px; font-size: 15px; font-weight: 600; color: #c3cbd8;
 }
 details.ac-anhang summary::-webkit-details-marker { display: none; }
 details.ac-anhang summary::after { content: "▸"; margin-left: auto; color: #8d97a7; font-size: 13px; }
@@ -293,51 +215,33 @@ details.ac-anhang[open] summary::after { content: "▾"; }
 .ac-status[data-error="true"] { color: #ffb9b9; }
 
 /* hidden schlaegt gegen Autoren-display */
-.ac-stats[hidden] { display: none; }
+.ac-kontozeile[hidden] { display: none; }
 .ac-stufen[hidden] { display: none; }
 .ac-search[hidden] { display: none; }
-.ac-token-card[hidden] { display: none; }
 
-/* ── Handy: Karten statt Tabelle ─────────────────────────────── */
+/* ── Handy ───────────────────────────────────────────────────── */
+@media (max-width: 980px) {
+  .ac-cols, .ac-row { grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.9fr) 44px; }
+  .ac-col-verbrauch, .ac-row .ac-zelle-verbrauch,
+  .ac-col-limit, .ac-row .ac-zelle-limit { display: none; }
+}
 @media (max-width: 760px) {
   .ac-head { flex-wrap: wrap; }
-  .ac-head h2 { font-size: 22px; }
-  .ac-head .ac-subhead { font-size: 13px; }
+  .ac-head h2 { font-size: 25px; }
   .ac-primary { flex: 1 1 100%; min-height: 44px; }
-
-  /* Stats vertikal */
-  .ac-stats {
-    flex-direction: column; align-items: stretch; gap: 10px;
-  }
-  .ac-stat-divider { width: 100%; height: 1px; }
-  .ac-stat-block { padding: 0; flex-direction: column; align-items: flex-start; gap: 2px; }
-
-  /* Toolbar: Suchfeld ueber Chips */
-  .ac-toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
-  .ac-toolbar .ac-chips { margin-left: 0; justify-content: stretch; }
-  .ac-toolbar .ac-chip { flex: 1 1 0; text-align: center; min-height: 40px; }
-
-  /* Keine Tabellen-Kopfzeile, Zeilen als Karten */
   .ac-cols { display: none; }
   .ac-row {
-    display: flex; flex-direction: column; gap: 8px;
-    padding: 14px 16px; border-radius: 10px;
-    background: rgba(255, 255, 255, 0.02);
-    margin: 6px 10px; border-bottom: 0;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 14px;
   }
-  .ac-who { order: 1; }
-  .ac-cell-status { order: 2; }
-  .ac-cell-when { order: 3; font-size: 12.5px; }
-  .ac-cell-typ { order: 4; font-size: 12.5px; }
-  .ac-zelle-menu { order: 5; justify-self: start; }
+  .ac-who { flex: 1 1 100%; order: 1; }
+  .ac-cell, .ac-cell-dim { order: 2; font-size: 13px; }
+  .ac-zelle-menu { order: 3; margin-left: auto; }
+  .ac-kebab { width: 44px; height: 44px; }
   .ac-row .ac-popover { left: 10px; right: 10px; max-width: none; }
-
-  /* Unterer Bereich einspaltig */
-  .ac-unten { grid-template-columns: 1fr; }
+  .ac-search { min-height: 44px; }
+  .ac-chip { min-height: 44px; }
   .ac-anhang-inhalt { grid-template-columns: 1fr; }
-
-  .ac-foot-row { flex-direction: column; align-items: flex-start; gap: 6px; }
   .ac-form .ac-ghost, .ac-form .ac-primary { flex: 1 1 100%; }
   .ac-field input, .ac-field select { min-height: 44px; }
-  .ac-kebab { width: 44px; height: 44px; }
+  .ac-kontozeile { font-size: 12.5px; }
 }

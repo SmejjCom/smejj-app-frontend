@@ -342,6 +342,7 @@ function zeilenMarkup(eintrag, zustand) {
     <div class="ac-who">
       <span class="ac-name">${escapeHtml(eintrag.name)}</span>
       <span class="ac-sub"><code>${escapeHtml(eintrag.hinweis)}</code>${eintrag.erstellt ? ` · ${escapeHtml(eintrag.erstellt)}` : ""}</span>
+      <button type="button" class="ac-row-copy" data-ac="kopieren" data-id="${escapeAttr(eintrag.id)}" title="${t("Kopieren")}" aria-label="${t("Kopieren")}">⧉</button>
     </div>
     <span class="ac-cell ac-cell-typ">${escapeHtml(typ)}</span>
     <span class="ac-cell ac-cell-status">${badge}</span>
@@ -644,7 +645,8 @@ function zeigeEinmal(root, apiKey) {
   box.hidden = false;
   box.innerHTML = `<div class="ac-reveal-key"><code>${escapeHtml(apiKey)}</code>
     <button type="button" class="ac-copy" data-ac-kopiere-voll title="${t("Kopieren")}" aria-label="${t("Kopieren")}">⧉</button></div>
-    <span class="ac-reveal-note">${t("wird danach nicht mehr angezeigt")}</span>`;
+    <span class="ac-reveal-note">${t("wird danach nicht mehr angezeigt")}</span>
+    <button type="button" class="ac-primary ac-reveal-done" data-ac="form-zu">${t("Fertig")}</button>`;
   box.querySelector("[data-ac-kopiere-voll]").addEventListener("click", () => {
     navigator.clipboard?.writeText(apiKey).then(() => melde(root, t("In die Zwischenablage kopiert.")));
   });
@@ -787,6 +789,6 @@ function loadStyles() {
   if (document.querySelector('link[href^="/assets/api-center-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "/assets/api-center-surface.css?v=4";
+  link.href = "/assets/api-center-surface.css?v=5";
   document.head.append(link);
 }

@@ -5,7 +5,7 @@
 //
 // Auth-Guard: Nur angemeldete Nutzer sehen den API-Bereich.
 import { API_ORIGIN } from "./config.js";
-import { initApiCenter } from "./api-center-surface.js?v=7";
+import { initApiCenter } from "./api-center-surface.js?v=8";
 
 const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
 const mount = document.querySelector("[data-dev-mount]");
