@@ -4004,6 +4004,7 @@ html { overscroll-behavior-y: none; }
 }
 @media (max-width: 767px) {
   .sidebar .bottom-nav { border-top: 0; }
+  .sidebar .left-panel-resizer { display: none; }
 }
 
 /* ---- design-v11.css ---- */
