@@ -143,7 +143,7 @@ function markup(kopf) {
       <div class="ac-rows" data-ac-rows></div>
       <div class="ac-foot-row">
         <span class="ac-count" data-ac-count title="${t("Läuft ab")}"></span>
-        <p class="ac-foot" title="${t("Widerrufene Schlüssel bleiben sichtbar. Klartext wird nie wieder angezeigt.")}">${t("Widerrufene Schlüssel bleiben 30 Tage sichtbar • Schlüssel werden nie im Klartext angezeigt")}</p>
+        <p class="ac-foot">${t("Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt")}</p>
       </div>
     </div>
 
@@ -376,6 +376,7 @@ async function klick(root, zustand, event) {
   if (aktion === "kopieren") return kopiereHint(root, zustand, trigger.dataset.id);
   if (aktion === "widerrufen") return widerrufe(root, zustand, trigger.dataset.id);
   if (aktion === "umbenennen") return umbenenne(root, zustand, trigger.dataset.id);
+  if (aktion === "loeschen") return loescheEndgueltig(root, zustand, trigger.dataset.id);
   if (aktion === "umschalten") return schalteUm(root, zustand, trigger.dataset.id);
   if (aktion === "aktivitaet") return zeigeAktivitaet(root, zustand, trigger.dataset.id);
   if (aktion === "entfernen") return entferne(root, zustand, trigger.dataset.id);
@@ -494,15 +495,16 @@ function menueMarkup(root, zustand, popid) {
   const teile = [];
   if (eintrag.art === "smejj") {
     // Menue 1:1 wie OpenRouter/keys: Bearbeiten, Aktivitaet, Deaktivieren, Loeschen.
+    // Loeschen ist ENDGUELTIG (Eintrag verschwindet sofort und fuer immer) — der
+    // umkehrbare Schritt ist "Deaktivieren". Widerrufene bleiben nur bis zum
+    // naechsten Klick: "Endgültig löschen" nimmt sie ganz raus.
     if (!eintrag.widerrufen) {
       teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="umbenennen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">✎</span>${t("Bearbeiten")}</button>`);
       teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="aktivitaet" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">📊</span>${t("Aktivität")}</button>`);
       teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="umschalten" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">⊗</span>${eintrag.inaktiv ? t("Aktivieren") : t("Deaktivieren")}</button>`);
     }
     teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="kopieren" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">⧉</span>${t("Maskierten Schlüssel kopieren")}</button>`);
-    if (!eintrag.widerrufen) {
-      teile.push(`<button type="button" role="menuitem" class="ac-item ac-item-danger" data-ac="widerrufen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">🗑</span>${t("Löschen")}</button>`);
-    }
+    teile.push(`<button type="button" role="menuitem" class="ac-item ac-item-danger" data-ac="loeschen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">🗑</span>${eintrag.widerrufen ? t("Endgültig löschen") : t("Löschen")}</button>`);
   } else {
     const cat = catalogProvider(baseAnbieterId(eintrag.id));
     if (eintrag.provider.modelCount > 1 || eintrag.provider.selectedModel) {
@@ -579,14 +581,14 @@ function kopiereText(root, text) {
   navigator.clipboard?.writeText(text).then(() => melde(root, t("In die Zwischenablage kopiert.")));
 }
 
-async function widerrufe(root, zustand, id) {
+async function loescheEndgueltig(root, zustand, id) {
   const eintrag = alleEintraege(zustand).find((e) => e.id === id);
   const name = eintrag ? `\n${eintrag.name}` : "";
-  if (!confirm(`${t("Diesen Schlüssel dauerhaft widerrufen? Programme, die ihn benutzen, bekommen danach 401.")}${name}`)) return;
+  if (!confirm(`${t("Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.")}${name}`)) return;
   try {
-    await api(`${DEV_PREFIX}/${encodeURIComponent(id)}/revoke`, { method: "POST", body: {} });
+    await api(`${DEV_PREFIX}/${encodeURIComponent(id)}/delete`, { method: "POST", body: {} });
     await laden(root, zustand);
-    melde(root, t("Schlüssel widerrufen."));
+    melde(root, t("Schlüssel endgültig gelöscht."));
   } catch (error) {
     melde(root, fehlerText(error), true);
   }
@@ -754,6 +756,6 @@ function loadStyles() {
   if (document.querySelector('link[href^="/assets/api-center-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "/assets/api-center-surface.css?v=6";
+  link.href = "/assets/api-center-surface.css?v=7";
   document.head.append(link);
 }

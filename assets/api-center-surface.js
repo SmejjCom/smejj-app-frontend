@@ -20,8 +20,8 @@ import { afterFirstPaint } from "./deferred-start.js";
 import { API_ORIGIN } from "./config.js";
 import { catalogProvider, selectableProviders } from "./ai/providers-catalog.js?v=1";
 import { t } from "./i18n/ui.js?v=3";
+import { api, baseAnbieterId, cssEscape, datum, escapeAttr, escapeHtml, fehlerText, kurz, kurzZahl, statusStufe, usd, zahl } from "./api-center-helfer.js?v=1";
 
-const TOKEN_KEY = "smejj.apiToken.v1";
 const MODELL_KEY = "smejj.model.selected.v2";
 const AKTIVER_ANBIETER_KEY = "smejj.activeProvider.v1";
 const BYOK_PREFIX = `${API_ORIGIN}/api/keys`;
@@ -143,7 +143,7 @@ function markup(kopf) {
       <div class="ac-rows" data-ac-rows></div>
       <div class="ac-foot-row">
         <span class="ac-count" data-ac-count title="${t("Läuft ab")}"></span>
-        <p class="ac-foot" title="${t("Widerrufene Schlüssel bleiben sichtbar. Klartext wird nie wieder angezeigt.")}">${t("Widerrufene Schlüssel bleiben 30 Tage sichtbar • Schlüssel werden nie im Klartext angezeigt")}</p>
+        <p class="ac-foot">${t("Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt")}</p>
       </div>
     </div>
 
@@ -376,6 +376,7 @@ async function klick(root, zustand, event) {
   if (aktion === "kopieren") return kopiereHint(root, zustand, trigger.dataset.id);
   if (aktion === "widerrufen") return widerrufe(root, zustand, trigger.dataset.id);
   if (aktion === "umbenennen") return umbenenne(root, zustand, trigger.dataset.id);
+  if (aktion === "loeschen") return loescheEndgueltig(root, zustand, trigger.dataset.id);
   if (aktion === "umschalten") return schalteUm(root, zustand, trigger.dataset.id);
   if (aktion === "aktivitaet") return zeigeAktivitaet(root, zustand, trigger.dataset.id);
   if (aktion === "entfernen") return entferne(root, zustand, trigger.dataset.id);
@@ -494,15 +495,16 @@ function menueMarkup(root, zustand, popid) {
   const teile = [];
   if (eintrag.art === "smejj") {
     // Menue 1:1 wie OpenRouter/keys: Bearbeiten, Aktivitaet, Deaktivieren, Loeschen.
+    // Loeschen ist ENDGUELTIG (Eintrag verschwindet sofort und fuer immer) — der
+    // umkehrbare Schritt ist "Deaktivieren". Widerrufene bleiben nur bis zum
+    // naechsten Klick: "Endgültig löschen" nimmt sie ganz raus.
     if (!eintrag.widerrufen) {
       teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="umbenennen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">✎</span>${t("Bearbeiten")}</button>`);
       teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="aktivitaet" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">📊</span>${t("Aktivität")}</button>`);
       teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="umschalten" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">⊗</span>${eintrag.inaktiv ? t("Aktivieren") : t("Deaktivieren")}</button>`);
     }
     teile.push(`<button type="button" role="menuitem" class="ac-item" data-ac="kopieren" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">⧉</span>${t("Maskierten Schlüssel kopieren")}</button>`);
-    if (!eintrag.widerrufen) {
-      teile.push(`<button type="button" role="menuitem" class="ac-item ac-item-danger" data-ac="widerrufen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">🗑</span>${t("Löschen")}</button>`);
-    }
+    teile.push(`<button type="button" role="menuitem" class="ac-item ac-item-danger" data-ac="loeschen" data-id="${escapeAttr(eintrag.id)}"><span class="ac-item-icon">🗑</span>${eintrag.widerrufen ? t("Endgültig löschen") : t("Löschen")}</button>`);
   } else {
     const cat = catalogProvider(baseAnbieterId(eintrag.id));
     if (eintrag.provider.modelCount > 1 || eintrag.provider.selectedModel) {
@@ -579,14 +581,14 @@ function kopiereText(root, text) {
   navigator.clipboard?.writeText(text).then(() => melde(root, t("In die Zwischenablage kopiert.")));
 }
 
-async function widerrufe(root, zustand, id) {
+async function loescheEndgueltig(root, zustand, id) {
   const eintrag = alleEintraege(zustand).find((e) => e.id === id);
   const name = eintrag ? `\n${eintrag.name}` : "";
-  if (!confirm(`${t("Diesen Schlüssel dauerhaft widerrufen? Programme, die ihn benutzen, bekommen danach 401.")}${name}`)) return;
+  if (!confirm(`${t("Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.")}${name}`)) return;
   try {
-    await api(`${DEV_PREFIX}/${encodeURIComponent(id)}/revoke`, { method: "POST", body: {} });
+    await api(`${DEV_PREFIX}/${encodeURIComponent(id)}/delete`, { method: "POST", body: {} });
     await laden(root, zustand);
-    melde(root, t("Schlüssel widerrufen."));
+    melde(root, t("Schlüssel endgültig gelöscht."));
   } catch (error) {
     melde(root, fehlerText(error), true);
   }
@@ -729,113 +731,13 @@ function providerGewechselt(root) {
   } else help.hidden = true;
 }
 
-// ---- Netzwerk / Auth (Muster wie in provider-settings.js, dort begruendet) ------
-
-async function api(url, { method = "GET", body } = {}) {
-  const token = sessionStorage.getItem(TOKEN_KEY) || holeLokalesToken() || await holeSitzungsToken();
-  const response = await fetch(url, {
-    method,
-    credentials: "include",
-    headers: {
-      ...(body ? { "Content-Type": "application/json" } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    },
-    ...(body ? { body: JSON.stringify(body) } : {})
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const error = new Error(payload.message || payload.error || `HTTP ${response.status}`);
-    error.status = response.status;
-    error.code = payload.error || "";
-    error.retryAfterSec = payload.retryAfterSec;
-    throw error;
-  }
-  return payload;
-}
-
-function holeLokalesToken() {
-  const token = String(localStorage.getItem("smejj.auth.accessToken.v1") || "");
-  if (!/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) return "";
-  sessionStorage.setItem(TOKEN_KEY, token);
-  return token;
-}
-
-async function holeSitzungsToken() {
-  const response = await fetch(`${API_ORIGIN}/api/auth/session-token`, { credentials: "include" }).catch(() => null);
-  if (!response?.ok) return "";
-  const payload = await response.json().catch(() => ({}));
-  const token = String(payload.accessToken || "");
-  if (/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) sessionStorage.setItem(TOKEN_KEY, token);
-  return token;
-}
-
-function fehlerText(error) {
-  if (error?.code === "authentication_required" || error?.status === 401) return t("Bitte zuerst bei smejj.com anmelden.");
-  if (error?.code === "public_api_disabled") return t("Die Entwickler-API ist auf diesem Server noch nicht eingeschaltet.");
-  if (error?.code === "api_key_limit_reached") return t("Zu viele aktive Schlüssel. Bitte zuerst einen widerrufen.");
-  if (error?.code === "billing_not_configured") return t("Aufladen ist auf diesem Server noch nicht eingerichtet.");
-  if (error?.status === 429) return t("Zu viele Versuche. Bitte kurz warten.");
-  if (error?.code === "provider_api_key_rejected") return t("Der API-Key wurde vom Anbieter abgelehnt (ungültig).");
-  if (error?.code === "provider_insufficient_credits" || error?.status === 402) return t("Der Anbieter meldet unzureichendes Guthaben. Kein kostenpflichtiger Fallback gestartet.");
-  if (error?.code === "provider_rate_limit") return t("Rate-Limit erreicht. Bitte später erneut versuchen.");
-  if (error?.code === "provider_credential_encryption_not_configured") return t("Der verschlüsselte Credential-Vault ist serverseitig noch nicht konfiguriert.");
-  return `${t("Verbindung fehlgeschlagen:")} ${String(error?.message || error).slice(0, 240)}`;
-}
-
-// ---- Kleine Helfer ------------------------------------------------------------
-
-function statusStufe(p) {
-  if (p.status === "invalid" || p.status === "error" || p.status === "no_credits") return "red";
-  if (p.status === "low_credits") return "yellow";
-  return "green";
-}
-
-function baseAnbieterId(id) {
-  return String(id || "").replace(/^custom-/, "").replace(/-[a-z0-9]{1,6}$/, "");
-}
+// ---- Oberflaechen-Helfer (Netzwerk/Format/Escaping liegen in api-center-helfer.js) ----
 
 function buchstabe(eintrag) {
   if (eintrag.art === "smejj") return "s";
   const cat = catalogProvider(baseAnbieterId(eintrag.id));
   if (cat?.logo) return cat.logo;
   return (eintrag.name || "?").trim().slice(0, 1).toUpperCase();
-}
-
-function kurz(model) {
-  const value = String(model).split("/").pop() || String(model);
-  return value.length > 28 ? `${value.slice(0, 27)}…` : value;
-}
-
-function usd(wert) {
-  return new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(wert) || 0);
-}
-
-function zahl(wert) {
-  return new Intl.NumberFormat("de-DE").format(Number(wert) || 0);
-}
-
-function kurzZahl(wert) {
-  const n = Number(wert) || 0;
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(".0", "") + " M";
-  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(".0", "") + " k";
-  return String(n);
-}
-
-function datum(iso) {
-  const zeit = new Date(iso || "");
-  return Number.isNaN(zeit.getTime()) ? "" : zeit.toLocaleDateString("de-DE");
-}
-
-function escapeHtml(value) {
-  return String(value || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
-
-function escapeAttr(value) {
-  return escapeHtml(value).replace(/`/g, "&#96;");
-}
-
-function cssEscape(value) {
-  return String(value).replace(/["\\]/g, "\\$&");
 }
 
 function setzeBeschaeftigt(root, beschaeftigt) {
@@ -854,6 +756,6 @@ function loadStyles() {
   if (document.querySelector('link[href^="/assets/api-center-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "/assets/api-center-surface.css?v=6";
+  link.href = "/assets/api-center-surface.css?v=7";
   document.head.append(link);
 }
