@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "К переключателю",
   "Vorlesen": "Озвучить",
   "Ändern": "Изменить",
+  "Erste Schritte": "Первые шаги",
+  "Frag etwas": "Спроси что-нибудь",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Задай вопрос своими словами — ответ придёт сразу.",
+  "Bild erzeugen": "Создать изображение",
+  "Beschreibe ein Motiv, smejj malt es.": "Опиши сюжет, smejj нарисует.",
+  "Code schreiben": "Написать код",
+  "Sag, was das Programm tun soll.": "Скажи, что должна делать программа.",
+  "Ausblenden": "Скрыть",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Объясни в трёх предложениях, что ты можешь для меня сделать.",
 };

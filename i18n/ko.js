@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "스위치로 이동",
   "Vorlesen": "읽어주기",
   "Ändern": "변경",
+  "Erste Schritte": "첫걸음",
+  "Frag etwas": "무엇이든 물어보기",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "자신의 말로 질문하면 답이 바로 옵니다.",
+  "Bild erzeugen": "이미지 만들기",
+  "Beschreibe ein Motiv, smejj malt es.": "소재를 설명하면 smejj가 그립니다.",
+  "Code schreiben": "코드 작성",
+  "Sag, was das Programm tun soll.": "프로그램이 무엇을 해야 하는지 말해 주세요.",
+  "Ausblenden": "숨기기",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "네가 나를 위해 할 수 있는 일을 세 문장으로 설명해 줘.",
 };

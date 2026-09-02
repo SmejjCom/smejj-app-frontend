@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "Ke sakelar",
   "Vorlesen": "Bacakan",
   "Ändern": "Ubah",
+  "Erste Schritte": "Langkah pertama",
+  "Frag etwas": "Tanyakan sesuatu",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Ajukan pertanyaan dengan kata-katamu — jawaban langsung datang.",
+  "Bild erzeugen": "Buat gambar",
+  "Beschreibe ein Motiv, smejj malt es.": "Gambarkan sebuah objek, smejj melukisnya.",
+  "Code schreiben": "Tulis kode",
+  "Sag, was das Programm tun soll.": "Katakan apa yang harus dilakukan program.",
+  "Ausblenden": "Sembunyikan",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Jelaskan dalam tiga kalimat apa yang bisa kamu lakukan untukku.",
 };

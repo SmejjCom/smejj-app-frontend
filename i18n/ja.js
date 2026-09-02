@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "スイッチへ",
   "Vorlesen": "読み上げ",
   "Ändern": "変更",
+  "Erste Schritte": "はじめの一歩",
+  "Frag etwas": "何か聞く",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "自分の言葉で質問すると、すぐに答えが返ってきます。",
+  "Bild erzeugen": "画像を作る",
+  "Beschreibe ein Motiv, smejj malt es.": "題材を伝えると、smejjが描きます。",
+  "Code schreiben": "コードを書く",
+  "Sag, was das Programm tun soll.": "プログラムに何をさせたいか伝えてください。",
+  "Ausblenden": "非表示",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "あなたが私のためにできることを三文で説明して。",
 };

@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "Ir al interruptor",
   "Vorlesen": "Leer en voz alta",
   "Ändern": "Cambiar",
+  "Erste Schritte": "Primeros pasos",
+  "Frag etwas": "Pregunta algo",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Haz una pregunta con tus palabras — la respuesta llega al instante.",
+  "Bild erzeugen": "Crear una imagen",
+  "Beschreibe ein Motiv, smejj malt es.": "Describe un motivo, smejj lo pinta.",
+  "Code schreiben": "Escribir código",
+  "Sag, was das Programm tun soll.": "Di qué debe hacer el programa.",
+  "Ausblenden": "Ocultar",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Explícame en tres frases qué puedes hacer por mí.",
 };

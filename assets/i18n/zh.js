@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "前往开关",
   "Vorlesen": "朗读",
   "Ändern": "修改",
+  "Erste Schritte": "第一步",
+  "Frag etwas": "问点什么",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "用你自己的话提问，答案马上就来。",
+  "Bild erzeugen": "生成图片",
+  "Beschreibe ein Motiv, smejj malt es.": "描述一个主题，smejj 来画。",
+  "Code schreiben": "编写代码",
+  "Sag, was das Programm tun soll.": "说说程序应该做什么。",
+  "Ausblenden": "隐藏",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "用三句话说明你能为我做什么。",
 };

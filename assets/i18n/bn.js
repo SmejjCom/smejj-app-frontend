@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "সুইচে যান",
   "Vorlesen": "জোরে পড়ুন",
   "Ändern": "পরিবর্তন",
+  "Erste Schritte": "প্রথম ধাপ",
+  "Frag etwas": "কিছু জিজ্ঞাসা করুন",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "নিজের ভাষায় প্রশ্ন করুন — উত্তর সঙ্গে সঙ্গে আসে।",
+  "Bild erzeugen": "ছবি তৈরি করুন",
+  "Beschreibe ein Motiv, smejj malt es.": "একটি বিষয় বর্ণনা করুন, smejj আঁকবে।",
+  "Code schreiben": "কোড লিখুন",
+  "Sag, was das Programm tun soll.": "বলুন প্রোগ্রামটি কী করবে।",
+  "Ausblenden": "লুকান",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "তিন বাক্যে বোঝাও তুমি আমার জন্য কী করতে পারো।",
 };

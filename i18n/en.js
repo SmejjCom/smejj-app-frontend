@@ -527,4 +527,13 @@ export default {
   "Zum Schalter": "Go to the switch",
   "Vorlesen": "Read aloud",
   "Ändern": "Change",
+  "Erste Schritte": "First steps",
+  "Frag etwas": "Ask something",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Ask a question in your own words — the answer comes right away.",
+  "Bild erzeugen": "Create an image",
+  "Beschreibe ein Motiv, smejj malt es.": "Describe a subject, smejj paints it.",
+  "Code schreiben": "Write code",
+  "Sag, was das Programm tun soll.": "Say what the program should do.",
+  "Ausblenden": "Hide",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Explain in three sentences what you can do for me.",
 };

@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "Vai all'interruttore",
   "Vorlesen": "Leggi ad alta voce",
   "Ändern": "Modifica",
+  "Erste Schritte": "Primi passi",
+  "Frag etwas": "Chiedi qualcosa",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Fai una domanda con parole tue — la risposta arriva subito.",
+  "Bild erzeugen": "Crea un'immagine",
+  "Beschreibe ein Motiv, smejj malt es.": "Descrivi un soggetto, smejj lo dipinge.",
+  "Code schreiben": "Scrivi codice",
+  "Sag, was das Programm tun soll.": "Di' cosa deve fare il programma.",
+  "Ausblenden": "Nascondi",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Spiegami in tre frasi cosa puoi fare per me.",
 };

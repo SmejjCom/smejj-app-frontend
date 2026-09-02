@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "Vers l'interrupteur",
   "Vorlesen": "Lire à voix haute",
   "Ändern": "Modifier",
+  "Erste Schritte": "Premiers pas",
+  "Frag etwas": "Pose une question",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Pose une question avec tes mots — la réponse arrive tout de suite.",
+  "Bild erzeugen": "Créer une image",
+  "Beschreibe ein Motiv, smejj malt es.": "Décris un sujet, smejj le peint.",
+  "Code schreiben": "Écrire du code",
+  "Sag, was das Programm tun soll.": "Dis ce que le programme doit faire.",
+  "Ausblenden": "Masquer",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Explique-moi en trois phrases ce que tu peux faire pour moi.",
 };

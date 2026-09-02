@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "إلى المفتاح",
   "Vorlesen": "قراءة بصوت عالٍ",
   "Ändern": "تغيير",
+  "Erste Schritte": "الخطوات الأولى",
+  "Frag etwas": "اسأل شيئًا",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "اطرح سؤالًا بكلماتك — يأتي الجواب فورًا.",
+  "Bild erzeugen": "إنشاء صورة",
+  "Beschreibe ein Motiv, smejj malt es.": "صف مشهدًا، وسيرسمه smejj.",
+  "Code schreiben": "كتابة كود",
+  "Sag, was das Programm tun soll.": "قل ما يجب أن يفعله البرنامج.",
+  "Ausblenden": "إخفاء",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "اشرح لي في ثلاث جمل ما يمكنك فعله من أجلي.",
 };

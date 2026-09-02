@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "स्विच पर जाएँ",
   "Vorlesen": "ज़ोर से पढ़ें",
   "Ändern": "बदलें",
+  "Erste Schritte": "पहले कदम",
+  "Frag etwas": "कुछ पूछें",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "अपने शब्दों में सवाल पूछें — जवाब तुरंत आता है।",
+  "Bild erzeugen": "चित्र बनाएँ",
+  "Beschreibe ein Motiv, smejj malt es.": "एक विषय बताएँ, smejj उसे बनाता है।",
+  "Code schreiben": "कोड लिखें",
+  "Sag, was das Programm tun soll.": "बताएँ कि प्रोग्राम को क्या करना है।",
+  "Ausblenden": "छिपाएँ",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "तीन वाक्यों में समझाओ कि तुम मेरे लिए क्या कर सकते हो।",
 };

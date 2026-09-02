@@ -529,4 +529,13 @@ export default {
   "Zum Schalter": "Anahtara git",
   "Vorlesen": "Sesli oku",
   "Ändern": "Değiştir",
+  "Erste Schritte": "İlk adımlar",
+  "Frag etwas": "Bir şey sor",
+  "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Kendi sözlerinle bir soru sor — yanıt hemen gelir.",
+  "Bild erzeugen": "Görsel oluştur",
+  "Beschreibe ein Motiv, smejj malt es.": "Bir konu tarif et, smejj çizsin.",
+  "Code schreiben": "Kod yaz",
+  "Sag, was das Programm tun soll.": "Programın ne yapması gerektiğini söyle.",
+  "Ausblenden": "Gizle",
+  "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Benim için neler yapabileceğini üç cümleyle açıkla.",
 };
