@@ -1,4 +1,7 @@
 // smejj.com — Ueberlaufmenue und reine Bausteine der Nachrichten-Aktionen
+// Wörter unter den Symbolen auf dem Handy (UI/UX 02.09., Nr. 4): dieses Modul lädt
+// mit der Leiste beim Start — chat-stream.js kommt erst beim ersten Senden.
+if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js").catch(() => {});
 // (2026-07-28).
 //
 // Zweck: Die Aktionsleiste unter einer Nachricht traegt nur die haeufigsten
