@@ -25,6 +25,28 @@ const MIN_ZEILEN = 20;
 let quellEntry = null;
 let quellInhalt = null;
 
+// UI/UX Nr. 6, Wurzel gefunden 03.09. (Stack im Chrome: oeffneRechts -> panelAuf -> browserButton):
+// beim Start stellt die App den letzten Chat wieder her; eine lange Antwort darin liess den
+// Beobachter unten das Panel bei JEDEM Laden mit altem Inhalt aufklappen — auch am Handy.
+// Von selbst oeffnen darf die Flaeche nur, was in dieser Seite gerade gestroemt ist
+// (smejj:chat-strom laeuft oder ist keine 5 s her) und nur am grossen Bildschirm.
+// Wiederhergestellte Antworten bekommen weiter die Karte "Rechts oeffnen" — der Nutzer klickt.
+const NACHLAUF_MS = 5000;
+const MIN_BREITE = 900;
+let stromLaeuft = false;
+let stromEnde = -Infinity;
+if (typeof window !== "undefined") {
+  window.addEventListener("smejj:chat-strom", (e) => {
+    const laufen = (Number(e.detail?.laufen) || 0) > 0;
+    if (stromLaeuft && !laufen) stromEnde = Date.now();
+    stromLaeuft = laufen;
+  });
+}
+export function darfAutoOeffnen({ laeuft = stromLaeuft, ende = stromEnde, jetzt = Date.now(), breite = globalThis.innerWidth || 0 } = {}) {
+  if (breite < MIN_BREITE) return false;
+  return laeuft || (jetzt - ende) < NACHLAUF_MS;
+}
+
 function verdient(entry) {
   if (entry.querySelector("table, pre")) return true;
   return (entry.innerText.match(/\n/g) || []).length >= MIN_ZEILEN;
@@ -148,7 +170,7 @@ export function initArbeitsflaeche() {
         entry.dataset.afGeprueft = "an";
         if (verdient(entry)) {
           karteAn(entry);
-          oeffneRechts(entry);
+          if (darfAutoOeffnen()) oeffneRechts(entry);
         }
       }
     }, 1200);
