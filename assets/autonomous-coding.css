@@ -79,7 +79,9 @@
 }
 
 .autonomous-coding button {
-  min-height: 40px;
+  /* 44 px statt 40: Betreiber-Regel Touch-Ziele — die smejjBot-Aktionen
+     (Starten, Anmelden, Diff freigeben ...) massen am 2026-09-02 42 px. */
+  min-height: 44px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   background: #20262d;

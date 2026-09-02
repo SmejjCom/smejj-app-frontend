@@ -70,7 +70,9 @@
 .view:not(#start) .toolbar button,
 .view:not(#start) .search-shell button,
 .modal button {
-  min-height: 38px;
+  /* 44 px statt 38: Betreiber-Regel Touch-Ziele (Betriebswache Nr. 42 mass
+     am 2026-09-02 die Claw-Knoepfe smejjBot/Arbeitsbereich mit 42 px). */
+  min-height: 44px;
   padding: 0 14px;
   border: 1px solid var(--sm-border);
   border-radius: var(--sm-radius-sm);
@@ -406,7 +408,7 @@ button.danger:hover {
 
   .view:not(#start) .toolbar button {
     flex: 1 1 calc(50% - 7px);
-    min-height: 42px;
+    min-height: 44px;
   }
 
   .more-menu {
