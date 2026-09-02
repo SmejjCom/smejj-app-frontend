@@ -6,6 +6,8 @@ if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js").c
 if (typeof document !== "undefined") import("/assets/erste-schritte.js").catch(() => {});
 // Deutsch durchgängig + Modell-Chips erklärt zur Laufzeit (UI/UX 02.09., Nr. 7+8) — bis das Markup folgt.
 if (typeof document !== "undefined") import("/assets/deutsch-klartext.js").catch(() => {});
+// Code-Bereich: Schreibfeld am unteren Rand (Betreiber-Befund 03.09.) — Stil aus dem Modul.
+if (typeof document !== "undefined") import("/assets/code-feld-unten.js").catch(() => {});
 // (2026-07-28).
 //
 // Zweck: Die Aktionsleiste unter einer Nachricht traegt nur die haeufigsten
