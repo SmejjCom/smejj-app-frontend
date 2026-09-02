@@ -518,4 +518,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "Supprimer définitivement ? La clé disparaîtra complètement et ne pourra pas être récupérée. Les programmes utilisant cette clé recevront 401.",
   "Schlüssel endgültig gelöscht.": "Clé supprimée définitivement.",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "Les clés supprimées disparaissent définitivement • Les clés ne sont jamais affichées en clair",
+  "Datenschutz & Training": "Confidentialité & entraînement",
+  "Was gesammelt wird, dein Ja": "Ce qui est collecté, ton oui",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "En clair : ce que smejj.com collecte et où tu dis oui ou non.",
+  "Was gesammelt wird": "Ce qui est collecté",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "Seulement tes questions — jamais les réponses, jamais de fichiers. Et seulement si tu autorises expressément l'entraînement du modèle. Désactivé par défaut.",
+  "Wofür": "Pour quoi",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "Pour que smejj 1.1 apprenne de vraies questions de vraies personnes. Révocable à tout moment ; ensuite plus rien n'est enregistré.",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "L'interrupteur se trouve dans ton compte sous Mes données.",
+  "Zum Schalter": "Vers l'interrupteur",
 };

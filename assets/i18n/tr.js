@@ -518,4 +518,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "Kalıcı olarak sil? Anahtar tamamen kaybolacak ve kurtarılamayacak. Bu anahtarı kullanan programlar 401 alacak.",
   "Schlüssel endgültig gelöscht.": "Anahtar kalıcı olarak silindi.",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "Silinen anahtarlar kalıcı olarak kaybolur • Anahtarlar asla düz metin olarak gösterilmez",
+  "Datenschutz & Training": "Gizlilik ve eğitim",
+  "Was gesammelt wird, dein Ja": "Ne toplanır, senin evetin",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "Açıkça: smejj.com neyi toplar ve nerede evet ya da hayır dersin.",
+  "Was gesammelt wird": "Ne toplanır",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "Yalnızca soruların — asla yanıtlar, asla dosyalar. Ve yalnızca model eğitimine açıkça izin verirsen. Varsayılan olarak kapalıdır.",
+  "Wofür": "Ne için",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "smejj 1.1 gerçek insanların gerçek sorularından öğrensin diye. İstediğin zaman geri alınabilir; sonra hiçbir şey kaydedilmez.",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "Anahtar hesabında Verilerim altında.",
+  "Zum Schalter": "Anahtara git",
 };

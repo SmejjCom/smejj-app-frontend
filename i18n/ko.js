@@ -518,4 +518,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "영구 삭제하시겠습니까? 키가 완전히 사라지며 복구할 수 없습니다. 이 키를 사용하는 프로그램은 401을 받습니다.",
   "Schlüssel endgültig gelöscht.": "키가 영구적으로 삭제되었습니다.",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "삭제된 키는 영구적으로 사라집니다 • 키는 평문으로 표시되지 않습니다",
+  "Datenschutz & Training": "개인정보 및 학습",
+  "Was gesammelt wird, dein Ja": "무엇이 수집되는지, 당신의 동의",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "쉽게 말해: smejj.com이 무엇을 수집하고 어디서 예/아니오를 정하는지.",
+  "Was gesammelt wird": "무엇이 수집되는지",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "오직 당신의 질문만 — 답변이나 파일은 절대 아닙니다. 그리고 모델 학습을 명시적으로 허용한 경우에만. 기본값은 꺼짐입니다.",
+  "Wofür": "무엇을 위해",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "smejj 1.1이 실제 사람들의 실제 질문에서 배우도록. 언제든 철회할 수 있으며, 이후에는 아무것도 저장되지 않습니다.",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "스위치는 계정의 내 데이터 아래에 있습니다.",
+  "Zum Schalter": "스위치로 이동",
 };

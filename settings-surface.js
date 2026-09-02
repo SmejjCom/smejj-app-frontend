@@ -37,6 +37,7 @@ const GROUPS = [
   ["permissions", "Sicherheit", "Bestätigungen und Grenzen"],
   ["notifications", "Benachrichtigungen", "Wenn ein Auftrag fertig ist"],
   ["storage", "Dateien & Speicher", "Offline, Sync, Platz"],
+  ["privacy", "Datenschutz & Training", "Was gesammelt wird, dein Ja"],
   ["advanced", "Erweitert", "Diagnose und Zurücksetzen"]
 ];
 
@@ -192,6 +193,10 @@ function markup() {
         toggle("Offline-Cache verwenden", "settingsOfflineCache", "App-Shell und lokale Arbeitsdaten offline halten."),
         action("Speicherstatus", "Lokalen Speicher, IDrive e2 und Sync prüfen.", "Speicher öffnen", "storageView"),
         action("Lokale Einstellungsdaten", "Standardeinstellungen wiederherstellen.", "Zurücksetzen", "reset")])}
+      ${panel("privacy", "Datenschutz & Training", "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.", [
+        info("Was gesammelt wird", "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus."),
+        info("Wofür", "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert."),
+        action("Modelltraining erlauben", "Der Schalter liegt in deinem Konto unter Meine Daten.", "Zum Schalter", "kontoDaten")])}
       ${panel("advanced", "Erweitert", "Diagnose und rechtliche Informationen.", [
         toggle("Diagnoseinformationen anzeigen", "settingsDiagnostics", "Technische Statusdetails in Nicht-Start-Bereichen."),
         action("Systemstatus", "Verbindungen, Modelle und Betrieb prüfen.", "Status öffnen", "tools"),
@@ -244,6 +249,14 @@ function handleClick(view, event) {
     sprachwahlVomNutzer = DEFAULTS.language;
     save(view, t("Standardeinstellungen wiederhergestellt"));
     loadUiLanguage(DEFAULTS.language).then(() => render(view));
+  } else if (jump === "kontoDaten") {
+    // UI/UX-Programm 02.09., Nr. 5: zwei Klicks bis zum Schalter. Der Konto-
+    // Bereich rendert nach dem Wechsel; der Reiter wird kurz danach gewaehlt.
+    document.querySelector('[data-view="profile"]')?.click();
+    setTimeout(() => {
+      document.querySelector('[data-account-tab="data"]')?.click();
+      document.getElementById("privacyTraining")?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, 250);
   } else if (jump) document.querySelector(`[data-view="${jump}"]`)?.click();
 }
 

@@ -518,4 +518,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "स्थायी रूप से हटाएं? कुंजी पूरी तरह गायब हो जाएगी और उसे वापस नहीं किया जा सकता। इस कुंजी वाले प्रोग्राम को 401 मिलेगा।",
   "Schlüssel endgültig gelöscht.": "कुंजी स्थायी रूप से हटा दी गई।",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "हटाई गई कुंजियाँ हमेशा के लिए समाप्त हो जाती हैं • कुंजियाँ कभी सादे पाठ में नहीं दिखाई जातीं",
+  "Datenschutz & Training": "गोपनीयता और प्रशिक्षण",
+  "Was gesammelt wird, dein Ja": "क्या इकट्ठा होता है, आपकी हाँ",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "साफ़ शब्दों में: smejj.com क्या इकट्ठा करता है और आप कहाँ हाँ या ना कहते हैं।",
+  "Was gesammelt wird": "क्या इकट्ठा होता है",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "सिर्फ़ आपके सवाल — कभी जवाब नहीं, कभी फ़ाइलें नहीं। और सिर्फ़ तब, जब आप मॉडल प्रशिक्षण की स्पष्ट अनुमति दें। डिफ़ॉल्ट रूप से बंद।",
+  "Wofür": "किसलिए",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "ताकि smejj 1.1 असली लोगों के असली सवालों से सीखे। कभी भी वापस लिया जा सकता है; उसके बाद कुछ भी सहेजा नहीं जाता।",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "स्विच आपके खाते में मेरा डेटा के अंतर्गत है।",
+  "Zum Schalter": "स्विच पर जाएँ",
 };

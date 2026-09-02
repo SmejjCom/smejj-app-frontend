@@ -518,4 +518,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "永久删除？密钥将完全消失且无法恢复。使用此密钥的程序将收到 401。",
   "Schlüssel endgültig gelöscht.": "密钥已永久删除。",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "已删除的密钥将永久消失 • 密钥绝不以明文显示",
+  "Datenschutz & Training": "隐私与训练",
+  "Was gesammelt wird, dein Ja": "收集什么，你的同意",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "直白地说：smejj.com 收集什么，以及你在哪里说“是”或“否”。",
+  "Was gesammelt wird": "收集什么",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "只收集你的问题——从不收集回答，从不收集文件。而且只有在你明确允许模型训练时才会收集。默认关闭。",
+  "Wofür": "用来做什么",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "让 smejj 1.1 从真实的人的真实问题中学习。随时可以撤回，之后不再保存任何内容。",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "开关在你账户的“我的数据”下。",
+  "Zum Schalter": "前往开关",
 };

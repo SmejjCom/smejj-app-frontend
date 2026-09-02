@@ -516,4 +516,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "Delete permanently? The key will disappear completely and cannot be recovered. Programs using this key will get 401.",
   "Schlüssel endgültig gelöscht.": "Key permanently deleted.",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "Deleted keys are gone for good • Keys are never shown in plain text",
+  "Datenschutz & Training": "Privacy & Training",
+  "Was gesammelt wird, dein Ja": "What is collected, your yes",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "In plain words: what smejj.com collects and where you say yes or no.",
+  "Was gesammelt wird": "What is collected",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "Only your questions — never the answers, never files. And only if you explicitly allow model training. It is off by default.",
+  "Wofür": "What for",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "So that smejj 1.1 learns from real questions by real people. Revocable at any time; then nothing more is stored.",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "The switch is in your account under My data.",
+  "Zum Schalter": "Go to the switch",
 };

@@ -518,4 +518,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "Hapus permanen? Kunci akan hilang sepenuhnya dan tidak dapat dipulihkan. Program dengan kunci ini akan mendapat 401.",
   "Schlüssel endgültig gelöscht.": "Kunci dihapus permanen.",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "Kunci yang dihapus hilang permanen • Kunci tidak pernah ditampilkan sebagai teks biasa",
+  "Datenschutz & Training": "Privasi & pelatihan",
+  "Was gesammelt wird, dein Ja": "Apa yang dikumpulkan, persetujuanmu",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "Dengan jelas: apa yang dikumpulkan smejj.com dan di mana kamu bilang ya atau tidak.",
+  "Was gesammelt wird": "Apa yang dikumpulkan",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "Hanya pertanyaanmu — tidak pernah jawabannya, tidak pernah berkas. Dan hanya jika kamu secara tegas mengizinkan pelatihan model. Nonaktif secara bawaan.",
+  "Wofür": "Untuk apa",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "Agar smejj 1.1 belajar dari pertanyaan nyata orang sungguhan. Bisa dicabut kapan saja; setelah itu tidak ada lagi yang disimpan.",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "Sakelarnya ada di akunmu di bawah Data saya.",
+  "Zum Schalter": "Ke sakelar",
 };

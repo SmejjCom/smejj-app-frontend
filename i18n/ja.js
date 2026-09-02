@@ -518,4 +518,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "完全に削除しますか？キーは完全に消え、復元できません。このキーを使用するプログラムは401を受け取ります。",
   "Schlüssel endgültig gelöscht.": "キーを完全に削除しました。",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "削除されたキーは永久に消えます • キーが平文で表示されることはありません",
+  "Datenschutz & Training": "プライバシーと学習",
+  "Was gesammelt wird, dein Ja": "何が集められるか、あなたの同意",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "わかりやすく：smejj.com が何を集め、どこで「はい／いいえ」を決めるか。",
+  "Was gesammelt wird": "何が集められるか",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "あなたの質問だけ — 回答やファイルは決して集めません。しかもモデル学習を明示的に許可した場合のみ。初期設定はオフです。",
+  "Wofür": "何のために",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "smejj 1.1 が実際の人の実際の質問から学ぶためです。いつでも取り消せ、その後は何も保存されません。",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "スイッチはアカウントの「マイデータ」にあります。",
+  "Zum Schalter": "スイッチへ",
 };

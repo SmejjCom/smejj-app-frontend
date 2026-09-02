@@ -518,4 +518,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "স্থায়ীভাবে মুছবেন? কীটি সম্পূর্ণভাবে অদৃশ্য হয়ে যাবে এবং পুনরুদ্ধার করা যাবে না। এই কী ব্যবহারকারী প্রোগ্রাম 401 পাবে।",
   "Schlüssel endgültig gelöscht.": "কী স্থায়ীভাবে মুছে ফেলা হয়েছে।",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "মুছে ফেলা কী চিরতরে চলে যায় • কী কখনো সাধারণ লেখায় দেখানো হয় না",
+  "Datenschutz & Training": "গোপনীয়তা ও প্রশিক্ষণ",
+  "Was gesammelt wird, dein Ja": "কী সংগ্রহ হয়, আপনার হ্যাঁ",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "সহজ কথায়: smejj.com কী সংগ্রহ করে এবং আপনি কোথায় হ্যাঁ বা না বলেন।",
+  "Was gesammelt wird": "কী সংগ্রহ হয়",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "শুধু আপনার প্রশ্ন — কখনও উত্তর নয়, কখনও ফাইল নয়। এবং শুধু তখনই, যখন আপনি স্পষ্টভাবে মডেল প্রশিক্ষণের অনুমতি দেন। ডিফল্টে বন্ধ।",
+  "Wofür": "কিসের জন্য",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "যাতে smejj 1.1 সত্যিকারের মানুষের সত্যিকারের প্রশ্ন থেকে শেখে। যেকোনো সময় প্রত্যাহারযোগ্য; তারপর আর কিছু সংরক্ষিত হয় না।",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "সুইচটি আপনার অ্যাকাউন্টে আমার ডেটা-র অধীনে আছে।",
+  "Zum Schalter": "সুইচে যান",
 };

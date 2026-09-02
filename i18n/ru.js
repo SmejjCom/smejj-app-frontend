@@ -518,4 +518,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "Удалить окончательно? Ключ исчезнет полностью и не может быть восстановлен. Программы с этим ключом получат 401.",
   "Schlüssel endgültig gelöscht.": "Ключ окончательно удалён.",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "Удалённые ключи исчезают навсегда • Ключи никогда не показываются в открытом виде",
+  "Datenschutz & Training": "Конфиденциальность и обучение",
+  "Was gesammelt wird, dein Ja": "Что собирается, ваше «да»",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "Простыми словами: что собирает smejj.com и где вы говорите «да» или «нет».",
+  "Was gesammelt wird": "Что собирается",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "Только ваши вопросы — никогда ответы, никогда файлы. И только если вы явно разрешили обучение модели. По умолчанию выключено.",
+  "Wofür": "Для чего",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "Чтобы smejj 1.1 учился на настоящих вопросах настоящих людей. Отзыв возможен в любой момент; после этого ничего не сохраняется.",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "Переключатель находится в вашем аккаунте в разделе «Мои данные».",
+  "Zum Schalter": "К переключателю",
 };

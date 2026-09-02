@@ -518,4 +518,13 @@ export default {
   "Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.": "Eliminare definitivamente? La chiave scomparirà completamente e non potrà essere recuperata. I programmi con questa chiave riceveranno 401.",
   "Schlüssel endgültig gelöscht.": "Chiave eliminata definitivamente.",
   "Gelöschte Schlüssel verschwinden endgültig • Schlüssel werden nie im Klartext angezeigt": "Le chiavi eliminate spariscono per sempre • Le chiavi non sono mai mostrate in chiaro",
+  "Datenschutz & Training": "Privacy e addestramento",
+  "Was gesammelt wird, dein Ja": "Cosa viene raccolto, il tuo sì",
+  "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.": "In chiaro: cosa raccoglie smejj.com e dove dici sì o no.",
+  "Was gesammelt wird": "Cosa viene raccolto",
+  "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus.": "Solo le tue domande — mai le risposte, mai i file. E solo se autorizzi espressamente l'addestramento del modello. Di default è disattivato.",
+  "Wofür": "A cosa serve",
+  "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "Perché smejj 1.1 impari da domande vere di persone vere. Revocabile in ogni momento; poi non viene più salvato nulla.",
+  "Der Schalter liegt in deinem Konto unter Meine Daten.": "L'interruttore è nel tuo account sotto I miei dati.",
+  "Zum Schalter": "Vai all'interruttore",
 };
