@@ -286,6 +286,45 @@ export function clearThinkingState(output) {
  * Eine HTML-Seite (typisch fuer ein Gateway) ist fuer Nutzer wertlos — dann
  * lieber der eigene Offline-Hinweis.
  */
+/**
+ * Klartext statt Code (UI/UX-Programm 2026-09-02, Nr. 3): Der Server schickt
+ * Codes wie "authentication_required"; ein Anfaenger braucht einen Satz und
+ * eine Handlung. Unbekannte Texte gehen unveraendert durch.
+ */
+export function verstaendlicheMeldung(status, roh) {
+  const code = String(roh || "").trim();
+  if (status === 401 || /authentication_required|session_revoked_or_expired/.test(code)) return "Du bist nicht mehr angemeldet. Nach der Anmeldung geht es hier weiter.";
+  if (status === 403) return "Dafür fehlt die Berechtigung in deinem Konto.";
+  if (status === 429 || /rate_limit/.test(code)) return "Gerade zu viele Anfragen auf einmal. In 20 Sekunden kannst du es noch einmal schicken.";
+  if (status === 402) return "Dein Guthaben ist aufgebraucht. Unter Einstellungen → API kannst du es aufladen.";
+  if (status >= 500 || /backends failed|model_unavailable/i.test(code)) return "Die Modelle antworten gerade nicht. Das ist unser Fehler, nicht deiner.";
+  return code;
+}
+
+/**
+ * Zu jeder Meldung die passende Handlung: Anmelden, Erneut versuchen oder ein
+ * kurzer Zaehler bei 429. Nie ein Rat ohne Knopf.
+ */
+export function fehlerAktion(output, status, frage, { senden = sendeAlsNutzer, gehZu = (ziel) => location.assign(ziel) } = {}) {
+  if (status === 401 || status === 403) {
+    const knopf = haengeAktionsKnopf(output, "Anmelden", "anmelden", { senden: () => gehZu("/auth/login/?zurueck=" + encodeURIComponent(location.pathname)) });
+    return knopf;
+  }
+  if (status === 402) return haengeAktionsKnopf(output, "Zu den Einstellungen", "einstellungen", { senden: () => gehZu("/settings") });
+  if (!frage) return null;
+  const knopf = haengeAktionsKnopf(output, status === 429 ? "In 20 s erneut versuchen" : "Erneut versuchen", frage, { senden });
+  if (knopf && status === 429) {
+    knopf.disabled = true;
+    let rest = 20;
+    const takt = setInterval(() => {
+      rest -= 1;
+      if (rest <= 0) { clearInterval(takt); knopf.disabled = false; knopf.textContent = "Erneut versuchen"; return; }
+      knopf.textContent = `In ${rest} s erneut versuchen`;
+    }, 1000);
+  }
+  return knopf;
+}
+
 export async function readableError(response, offlineNotice = "") {
   const text = await response.text();
   try {
@@ -496,7 +535,8 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   if (!response.ok || !response.body) {
     stoppeWartesignal();
     clearThinkingState(output);
-    output.textContent = await readableError(response, offlineNotice);
+    output.textContent = verstaendlicheMeldung(response.status, await readableError(response, offlineNotice));
+    fehlerAktion(output, response.status, letzteNutzerfrage(body));
     return;
   }
 
