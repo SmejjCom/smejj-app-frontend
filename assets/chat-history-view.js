@@ -27,7 +27,7 @@
 // Versionierter Pfad wie in index.html (QA-Welle 1, Befund F-07): Ein abweichender
 // Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js mit eigenem Zustand.
 import {
-  listChats, openChat, renameChat, deleteChat, activeChatId, togglePinChat, newChat,
+  listChats, openChat, renameChat, deleteChat, restoreChat, activeChatId, togglePinChat, newChat,
   listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
 } from "/assets/chat-store.js?v=b65";
 // Holt fuer Chats ohne eigenen Titel einen aus der Bruecke. Von HIER importiert
@@ -593,17 +593,14 @@ function oeffneMenu(karte, chat) {
   menu.append(eintrag("⤓ Als Markdown sichern", () => { menuSchliessen(); sichereAlsMarkdown(chat); }));
   menu.append(document.createElement("hr"));
 
-  const loeschen = eintrag("🗑 Löschen…", async () => {
-    if (confirmingId !== chat.id) {
-      confirmingId = chat.id;
-      loeschen.textContent = "🗑 Wirklich löschen?";
-      clearTimeout(confirmTimer);
-      confirmTimer = setTimeout(() => { menuSchliessen(); }, 4000);
-      return;
-    }
+  // UI/UX-Programm 02.09., Nr. 10: Rueckgaengig statt Bestaetigung. Loeschen ist
+  // weich (Papierkorb, 30 Tage) — also sofort tun und 8 s lang zuruecknehmbar
+  // machen, statt "Wirklich loeschen?" zu fragen. Kein Fehler ist endgueltig.
+  const loeschen = eintrag("🗑 Löschen", async () => {
     menuSchliessen();
-    await deleteChat(chat.id).catch(() => {});
+    const ok = await deleteChat(chat.id).catch(() => false);
     render();
+    if (ok) zeigeRueckgaengig(chat);
   }, true);
   menu.append(loeschen);
 
@@ -611,6 +608,38 @@ function oeffneMenu(karte, chat) {
   offenesMenu = menu;
 }
 
+const RUECKGAENGIG_MS = 8000;
+let rueckgaengig = null;
+function schliesseRueckgaengig() {
+  if (!rueckgaengig) return;
+  clearTimeout(rueckgaengig.timer);
+  rueckgaengig.leiste.remove();
+  rueckgaengig = null;
+}
+/** Leiste unter der Liste: ein Klick holt den Chat aus dem Papierkorb zurueck. */
+export function zeigeRueckgaengig(chat, { container = view(), restore = restoreChat, neuZeichnen = render } = {}) {
+  if (!container) return null;
+  schliesseRueckgaengig();
+  const leiste = document.createElement("div");
+  leiste.className = "msg-undo ch-undo";
+  leiste.setAttribute("role", "status");
+  const text = document.createElement("span");
+  text.textContent = `„${(chat.titel || chat.title || "Gespräch").slice(0, 40)}“ in den Papierkorb verschoben — 30 Tage wiederherstellbar.`;
+  const knopf = document.createElement("button");
+  knopf.type = "button";
+  knopf.className = "msg-undo-button";
+  knopf.textContent = "Rückgängig";
+  knopf.addEventListener("click", async () => {
+    knopf.disabled = true;
+    await Promise.resolve(restore(chat.id)).catch(() => {});
+    schliesseRueckgaengig();
+    neuZeichnen();
+  });
+  leiste.append(text, knopf);
+  container.prepend(leiste);
+  rueckgaengig = { leiste, timer: setTimeout(schliesseRueckgaengig, RUECKGAENGIG_MS) };
+  return leiste;
+}
 function zeigeUmbenennen(karte, chat) {
   if (karte.querySelector(".ch-umbenennen")) return;
   const zeile = document.createElement("div");
