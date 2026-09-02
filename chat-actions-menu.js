@@ -8,6 +8,8 @@ if (typeof document !== "undefined") import("/assets/erste-schritte.js").catch((
 if (typeof document !== "undefined") import("/assets/deutsch-klartext.js").catch(() => {});
 // Code-Bereich: Schreibfeld am unteren Rand (Betreiber-Befund 03.09.) — Stil aus dem Modul.
 if (typeof document !== "undefined") import("/assets/code-feld-unten.js").catch(() => {});
+// Kompakt-Programm (Betreiber 03.09.): halbe Abstände in allen Ansichten — Stil aus dem Modul.
+if (typeof document !== "undefined") import("/assets/kompakt.js").catch(() => {});
 // (2026-07-28).
 //
 // Zweck: Die Aktionsleiste unter einer Nachricht traegt nur die haeufigsten
