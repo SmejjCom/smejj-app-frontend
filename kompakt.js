@@ -5,6 +5,8 @@
 //     (view-header 12 px + 10 px, Ansicht-Gap 20 px, output 18 px)
 //   Einstellungen: 72 px Rand oben, Kopf 18 px, Schale 24 px, Kacheln 24 px
 //   Verlauf: 24 px vor jeder Gruppe
+//   Chat (Stufe 2): Schreibfeld 9 px Polster, 6 px Rand unten; leere Startseite 20 px zwischen
+//     Kopfzeile, Feld und Chips
 // Ziel: halbe Abstände, gleiche Ordnung. Nur Ränder und Abstände — keine Größen von
 // Zielen (44 px bleiben), keine Schriftgrößen (große Schrift, Betreiber-Regel).
 // Stil aus dem Modul: die Regeln liegen in start-styles.css (Start-Bündel, gesperrt).
@@ -21,7 +23,12 @@ export const REGELN = [
   "body #settings .settings-shell.settings-shell{padding-top:12px}",
   "body #settings .settings-panel.settings-panel{padding:14px}",
   "body #chatHistory .ch-gruppe.ch-gruppe{margin-top:12px}",
-  "body #chatHistory .ch-kopf.ch-kopf{margin-bottom:8px}"
+  "body #chatHistory .ch-kopf.ch-kopf{margin-bottom:8px}",
+  // Stufe 2 (Chat, gemessen 22:12 UTC): Schreibfeld 9 px Polster + 6 px Rand unten, Kopfzeile→Feld→Chips je 20 px.
+  "body #start .prompt-glass.prompt-glass{padding:6px 8px 6px 12px;margin-bottom:env(safe-area-inset-bottom,0px)}",
+  "body #start .home-hero.home-hero + .prompt-glass{margin-top:12px}",
+  "body #start .prompt-glass + .start-chipreihe.start-chipreihe{margin-top:12px}",
+  "body #startLog.start-log{padding:4px 11px 6px}"
 ].join("");
 
 export function sorgeFuerStil(doc = document) {
