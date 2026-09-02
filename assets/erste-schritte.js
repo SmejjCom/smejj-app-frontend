@@ -10,7 +10,10 @@
 // (#startLog bekommt Kinder), verschwinden sie. Zum Prüfen mit Bestand: ?erste-schritte=1.
 // Stil aus dem Modul (Start-Bündel ist gesperrt), eigenes Modul (800-Zeilen-Regel).
 import { t } from "/assets/i18n/ui.js?v=3";
-import { listChats } from "/assets/chat-store.js";
+// Derselbe Spezifizierer wie index.html und alle anderen Module (?v=b65): ein abweichender
+// Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js — 12,9 KB doppelt übertragen,
+// zweite IndexedDB-Verbindung, eigener Zustand (Web-Vitals-Befund 2026-09-03, Gewicht 324 KB).
+import { listChats } from "/assets/chat-store.js?v=b65";
 
 export const MERKER = "smejj.erste-schritte.v1";
 const STIL_ID = "erste-schritte-stil";
