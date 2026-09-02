@@ -5,8 +5,8 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f6f7f9",
-  "theme_color": "#f7f7f4",
+  "background_color": "#101113",
+  "theme_color": "#101113",
   "description": "smejj.com ist ein schneller KI- und Code-Assistent: Chat, Websuche, Bilder, Sprachmodus und Programmieren in einem Fenster.",
   "icons": [
     {

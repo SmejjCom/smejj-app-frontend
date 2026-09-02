@@ -49,11 +49,11 @@
 })();
 </script>
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="theme-color" content="#f7f7f4">
+    <meta name="theme-color" content="#101113">
     <meta name="description" content="smejj.com ist ein schneller KI- und Code-Assistent für Chat, Programmierung und Agenten-Aufgaben.">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="smejj.com">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
     <meta property="og:type" content="website">
@@ -169,7 +169,7 @@
           <button class="nav-button" type="button" data-view="code" data-icon="code" title="Programmieren">Programmieren</button>
           <button class="nav-button" type="button" data-browser-oeffnen data-icon="websites" title="Browser bedienen">Browser bedienen</button>
           <button class="nav-button" type="button" data-view="automation" data-icon="automation" title="smejjBot">smejjBot</button>
-          <button class="nav-button" type="button" data-view="arbeitsbereiche" data-icon="projects" title="Projects">Projects</button>
+          <button class="nav-button" type="button" data-view="arbeitsbereiche" data-icon="projects" title="Projekte">Projekte</button>
           <div class="nav-gruppe" aria-hidden="true">Meine Sachen</div>
           <button class="nav-button" type="button" data-view="chatHistory" data-icon="history" title="Verlauf">Verlauf</button>
           <button class="nav-button" type="button" data-view="projects" data-icon="projects" title="smejjCloud">smejjCloud</button>
@@ -332,11 +332,11 @@
                 </div>
                 <span class="prompt-spacer"></span>
                 <div class="model-picker">
-                  <button id="modelPickerButton" class="ghost-button text-chip" type="button" aria-haspopup="menu" aria-expanded="false" title="Modell wechseln">smejj 1.0</button>
+                  <button id="modelPickerButton" class="ghost-button text-chip" type="button" aria-haspopup="menu" aria-expanded="false" title="Modell wechseln: Schnell, Gründlich oder Experten-Modelle">smejj 1.0</button>
                   <div id="modelPickerMenu" class="model-menu" role="menu" hidden>
-                    <button type="button" role="menuitem" data-model="smejj 1.0" data-stufe="auto">smejj 1.0 (Standard)</button>
-                    <button type="button" role="menuitem" data-stufe="schnell">Schnell</button>
-                    <button type="button" role="menuitem" data-stufe="gruendlich">Gründlich</button>
+                    <button type="button" role="menuitem" data-model="smejj 1.0" data-stufe="auto" title="Wählt selbst zwischen schnell und gründlich">smejj 1.0 (Standard) — passt sich der Frage an</button>
+                    <button type="button" role="menuitem" data-stufe="schnell" title="Kurze Antwort in Sekunden">Schnell — Antwort in Sekunden</button>
+                    <button type="button" role="menuitem" data-stufe="gruendlich" title="Nimmt sich Zeit und antwortet ausführlich (langsamer)">Gründlich — ausführlich, dauert länger</button>
                     <p class="eyebrow model-menu-label" role="separator" aria-hidden="true">Erweiterte Modelle (BYOK)</p>
                     <button type="button" role="menuitem" data-model="GLM-5.2">Kraftvoll (GLM-5.2)</button>
                     <button type="button" role="menuitem" data-model="Kimi K3">Neuestes (Kimi K3)</button>
@@ -347,7 +347,7 @@
                 <!-- Bildschirm 32: die Pille "Nachdenken" — sie schaltet die ECHTE
                      Gruendlich-Stufe (dieselbe, die im Modellmenue liegt), keine
                      Attrappe. Verdrahtung in nav-absichten.js. -->
-                <button id="stufeNachdenken" class="ghost-button text-chip fpille-nachdenken" type="button" aria-pressed="false" title="Gründlich nachdenken"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="chip-label">Nachdenken</span></button>
+                <button id="stufeNachdenken" class="ghost-button text-chip fpille-nachdenken" type="button" aria-pressed="false" title="Nimmt sich Zeit und antwortet gründlicher (langsamer)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="chip-label">Nachdenken</span></button>
                 <button class="ghost-button icon-button" type="button" data-start-tool="voice" aria-label="Mikrofon" title="Mikrofon">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0V7a4 4 0 0 0-4-4Z"/><path d="M5 11v1a7 7 0 0 0 14 0v-1"/><path d="M12 19v3"/></svg>
                 </button>
@@ -610,10 +610,10 @@
           </div>
           <div class="toolbar">
             <button id="createLocalProject" type="button">Lokales Projekt erstellen</button>
-            <button id="saveWorkspaceFile" type="button">In Workspace speichern</button>
+            <button id="saveWorkspaceFile" type="button">Im Arbeitsbereich speichern</button>
             <button id="snapshotWorkspace" type="button">Snapshot erzeugen</button>
             <button id="restoreWorkspace" type="button">Aus Manifest wiederherstellen</button>
-            <button id="workspaceStatus" type="button">Workspace Status</button>
+            <button id="workspaceStatus" type="button">Arbeitsbereich-Status</button>
           </div>
           <div id="codeOutput" class="output"></div>
         </details>
@@ -740,8 +740,8 @@
             <label>
               KI-Modus
               <select id="aiModeSelect" aria-label="KI-Modus">
-                <option value="disabled">Disabled</option>
-                <option value="local-browser">Local Browser</option>
+                <option value="disabled">Aus</option>
+                <option value="local-browser">Lokaler Browser</option>
                 <option value="byok-openai-compatible">BYOK OpenAI-kompatibel</option>
                 <option value="free-demo-hardlimit">Free Demo Hard-Limit</option>
                 <option value="glm-5-2-fp8-vault">GLM-5.2 FP8 Vault</option>
@@ -800,14 +800,14 @@
             <p class="subhead">Läuft · gemeldet-aber-still · steht. Grau heißt nur: kein Herzschlag angekommen — nicht, dass etwas kaputt ist.</p>
           </header>
           <div class="toolbar">
-            <button id="capabilities" type="button">Capabilities</button>
+            <button id="capabilities" type="button">Fähigkeiten</button>
             <button id="health" type="button">Health</button>
             <button id="freeGuard" type="button">Free-Guard Hinweis</button>
-            <button id="localWorkspaceStatus" type="button">Local Workspace</button>
+            <button id="localWorkspaceStatus" type="button">Lokaler Arbeitsbereich</button>
           </div>
           <div class="status-grid" aria-label="Aktueller Betriebsstatus">
             <div><strong>Storage</strong><span id="storageStatusText">local-browser</span></div>
-            <div><strong>Local Workspace</strong><span id="workspaceStatusText">lokal</span></div>
+            <div><strong>Lokaler Arbeitsbereich</strong><span id="workspaceStatusText">lokal</span></div>
             <div><strong>IDrive e2</strong><span id="idriveStatusText">presigned sync später</span></div>
             <div><strong>AI Mode</strong><span id="aiModeText">disabled</span></div>
             <div><strong>K2.7 Vault</strong><span id="kimiVaultStatusText">geprüft / Inferenz deaktiviert</span></div>
@@ -908,10 +908,10 @@
           <div id="profileOutput" class="output"></div>
         </section>
 
-        <section id="arbeitsbereiche" class="view" aria-label="Projects">
+        <section id="arbeitsbereiche" class="view" aria-label="Projekte">
           <header class="view-header">
             <p class="eyebrow">Arbeiten</p>
-            <h2>Projects</h2>
+            <h2>Projekte</h2>
             <!-- Bildschirm 36: ein Ordner mit eigenem Wissen und eigener
                  Anweisung. Die Dauer-Anweisung WIRKT: chat-store legt sie beim
                  Oeffnen eines Bereichs-Gespraechs in den Sitzungsspeicher,
