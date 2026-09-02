@@ -162,9 +162,40 @@ function sorgeFuerAktionsStil() {
   document.head.appendChild(stil);
 }
 
-export function haengeAktionsKnopf(output, beschriftung, text, { senden = sendeAlsNutzer } = {}) {
+// Der Verlauf wird nach jeder Antwort neu aufgebaut (Speicher/Sync schreiben
+// log.innerHTML aus dem gespeicherten Text) — ein angehaengter Knopf ist danach
+// weg (live gemessen 2026-09-02, 17:09). Darum merkt sich das Modul die letzten
+// Antworten samt Knopf und haengt ihn nach jedem Neuaufbau wieder an.
+const aktionsMerker = [];
+function merkeAktion(output, beschriftung, text) {
+  const antwort = String(output.textContent || "").trim();
+  if (!antwort) return;
+  aktionsMerker.push({ antwort, beschriftung, text });
+  if (aktionsMerker.length > 20) aktionsMerker.shift();
+  beobachteNeuaufbau();
+}
+function beobachteNeuaufbau() {
+  const log = document.getElementById("startLog");
+  if (!log || log.dataset.aktionBeobachtet) return;
+  log.dataset.aktionBeobachtet = "an";
+  let wecker = 0;
+  new MutationObserver(() => {
+    clearTimeout(wecker);
+    wecker = setTimeout(() => {
+      for (const entry of log.querySelectorAll(":scope > .entry.assistant")) {
+        if (entry.querySelector(".antwort-aktion")) continue;
+        const text = String(entry.textContent || "").trim();
+        const treffer = aktionsMerker.find((m) => m.antwort === text);
+        if (treffer) haengeAktionsKnopf(entry, treffer.beschriftung, treffer.text, { merken: false });
+      }
+    }, 400);
+  }).observe(log, { childList: true, subtree: true });
+}
+
+export function haengeAktionsKnopf(output, beschriftung, text, { senden = sendeAlsNutzer, merken = true } = {}) {
   if (!output || !text) return null;
   sorgeFuerAktionsStil();
+  if (merken) merkeAktion(output, beschriftung, text);
   const zeile = document.createElement("p");
   zeile.className = "antwort-aktion";
   const knopf = document.createElement("button");
