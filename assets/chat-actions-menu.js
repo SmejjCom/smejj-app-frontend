@@ -12,6 +12,8 @@ if (typeof document !== "undefined") import("/assets/code-feld-unten.js").catch(
 if (typeof document !== "undefined") import("/assets/kompakt.js").catch(() => {});
 // Verlauf steht nach dem Öffnen ganz unten (Betreiber-Befund 03.09.) — Beobachter auf #startLog.
 if (typeof document !== "undefined") import("/assets/verlauf-unten.js").catch(() => {});
+// Werkzeugzeile am Handy in einer Zeile (Betreiber-Screenshot 03.09.) — Stil aus dem Modul.
+if (typeof document !== "undefined") import("/assets/composer-zeile.js").catch(() => {});
 // (2026-07-28).
 //
 // Zweck: Die Aktionsleiste unter einer Nachricht traegt nur die haeufigsten
