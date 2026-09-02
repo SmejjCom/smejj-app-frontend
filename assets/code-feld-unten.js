@@ -5,12 +5,15 @@
 // im Code-Bereich längst ausgeblendet ist. Profi-Bauart (ChatGPT, Claude, Codex): das Feld ist
 // eine eigene Schicht am unteren Rand, der Verlauf scrollt darüber in seinem eigenen Container
 // (#codeLogHalter, overflow:auto — gibt es schon). Also: die Fläche füllt die Ansicht
-// (#code ist eine Flex-Spalte), statt eine feste Höhe zu raten; unten bleibt ein Rand von
-// 14 px bzw. die Home-Leiste des iPhones (safe-area). Stil im Modul, weil mobil-composer.css im
+// (#code ist eine Flex-Spalte), statt eine feste Höhe zu raten; die Leiste sitzt auf der
+// unteren Kante, nur die Home-Leiste des iPhones (safe-area) bleibt frei. Stil im Modul, weil mobil-composer.css im
 // gesperrten Start-Bündel (start-styles.css) liegt. Drei Klassen nur für die Spezifität.
 export const STIL_ID = "code-feld-unten-stil";
 export const REGELN = "#code .codeflaeche.codeflaeche.codeflaeche{flex:1 1 auto;height:auto;max-height:none;min-height:0}"
-  + "#code .codeunten.codeunten{padding-bottom:max(14px,env(safe-area-inset-bottom))}";
+  // Betreiber 03.09.: „Leiste soll die untere Kante treffen“ — kein Rand mehr, nur die
+  // iPhone-Home-Leiste (safe-area) bleibt; das Feld selbst gibt seine 4 px unten ab.
+  + "#code .codeunten.codeunten{padding-bottom:env(safe-area-inset-bottom,0px)}"
+  + "#code .codefeld.codefeld{padding-bottom:0}";
 
 export function sorgeFuerStil(doc = document) {
   if (doc.getElementById(STIL_ID)) return false;
