@@ -252,7 +252,10 @@ function handleClick(view, event) {
   } else if (jump === "kontoDaten") {
     // UI/UX-Programm 02.09., Nr. 5: zwei Klicks bis zum Schalter. Der Konto-
     // Bereich rendert nach dem Wechsel; der Reiter wird kurz danach gewaehlt.
-    document.querySelector('[data-view="profile"]')?.click();
+    // Es gibt keinen Knopf mit data-view="profile"; die App hoert aber auf
+    // popstate und stellt die Ansicht aus der Adresse her (app.js restoreViewFromUrl).
+    window.history.pushState({}, "", "/profile");
+    window.dispatchEvent(new PopStateEvent("popstate"));
     setTimeout(() => {
       document.querySelector('[data-account-tab="data"]')?.click();
       document.getElementById("privacyTraining")?.scrollIntoView({ block: "center", behavior: "smooth" });
