@@ -132,6 +132,11 @@ function sendeAlsNutzer(text) {
 
 /** Letzte Nutzerfrage aus dem Sendekoerper — fuer Knoepfe, die sie erneut schicken. */
 export function letzteNutzerfrage(body) {
+  // Die App schickt die Frage als `task` (app.js: { task, model, files, preferences,
+  // history }); `messages` ist die Form der Bruecke. Live 16:50 UTC: ohne diese
+  // Zeile schickte der Knopf nur "genauer:" ohne Frage.
+  const task = String(body?.task ?? "").trim();
+  if (task) return task;
   const nachrichten = Array.isArray(body?.messages) ? body.messages : [];
   for (let i = nachrichten.length - 1; i >= 0; i -= 1) {
     if (nachrichten[i]?.role === "user") return String(nachrichten[i].content ?? nachrichten[i].text ?? "").trim();

@@ -37,6 +37,9 @@ export function einwilligungLokal(storage = globalThis.localStorage) {
 
 /** Die letzte Nutzerfrage aus dem Sendekoerper — Anhaenge und Praefixe bleiben draussen. */
 export function letzteFrage(body) {
+  // Die App schickt die Frage als `task` (app.js), die Bruecke als `messages`.
+  const task = String(body?.task ?? "").replace(/\s+/g, " ").trim();
+  if (task) return task.replace(/^genauer:\s*/i, "").slice(0, MAX_ZEICHEN);
   const nachrichten = Array.isArray(body?.messages) ? body.messages : [];
   for (let i = nachrichten.length - 1; i >= 0; i -= 1) {
     const n = nachrichten[i];
