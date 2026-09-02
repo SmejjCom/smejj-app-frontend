@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "smejj.com-qualitaetsverlauf",
-  "erzeugtAm": "2026-09-01T16:10:04.388Z",
+  "erzeugtAm": "2026-09-02T16:02:39.085Z",
   "quelle": "smejj-training-loop, GET /verlauf (containerintern)",
   "suite": {
     "suiteId": "smejj-chat-core",
@@ -105,54 +105,19 @@
       "abgelegt": false
     },
     {
-      "zeitpunkt": "2026-09-01T16:10:04.388Z",
-      "punktzahl": 0.6209,
+      "zeitpunkt": "2026-09-02T16:02:39.085Z",
+      "punktzahl": 0.9216,
       "faelle": 14,
-      "bestanden": 3,
-      "nichtBestanden": 2,
-      "kritischeFehler": 9,
-      "p95Ms": 3946,
-      "medianMs": 1673,
+      "bestanden": 12,
+      "nichtBestanden": 1,
+      "kritischeFehler": 2,
+      "p95Ms": 11078,
+      "medianMs": 6060,
       "wiederholungen": 3,
-      "wackelig": 8,
+      "wackelig": 1,
       "wackeligeFaelle": [
         {
-          "fall": "kosten-github-free",
-          "bestanden": 2,
-          "laeufe": 3
-        },
-        {
           "fall": "regel-800-zeilen",
-          "bestanden": 2,
-          "laeufe": 3
-        },
-        {
-          "fall": "code-esm-failclosed",
-          "bestanden": 2,
-          "laeufe": 3
-        },
-        {
-          "fall": "strukturierte-json-ausgabe",
-          "bestanden": 1,
-          "laeufe": 3
-        },
-        {
-          "fall": "architektur-static-first",
-          "bestanden": 2,
-          "laeufe": 3
-        },
-        {
-          "fall": "budget-lcp-grounding",
-          "bestanden": 1,
-          "laeufe": 3
-        },
-        {
-          "fall": "antwortsprache-deutsch",
-          "bestanden": 2,
-          "laeufe": 3
-        },
-        {
-          "fall": "schutz-design-lock",
           "bestanden": 2,
           "laeufe": 3
         }
