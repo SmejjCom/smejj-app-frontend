@@ -130,6 +130,53 @@ function sendeAlsNutzer(text) {
   return true;
 }
 
+/** Letzte Nutzerfrage aus dem Sendekoerper — fuer Knoepfe, die sie erneut schicken. */
+export function letzteNutzerfrage(body) {
+  const nachrichten = Array.isArray(body?.messages) ? body.messages : [];
+  for (let i = nachrichten.length - 1; i >= 0; i -= 1) {
+    if (nachrichten[i]?.role === "user") return String(nachrichten[i].content ?? nachrichten[i].text ?? "").trim();
+  }
+  return "";
+}
+
+/**
+ * Ein Knopf statt eines Tipps (UI/UX-Programm 2026-09-02, Punkt 1): Wer eine
+ * gruendlichere Antwort will, soll nicht »genauer« abtippen, sondern klicken.
+ * Dasselbe Muster bei "Verbindung unterbrochen": ein Klick schickt die Frage neu.
+ * @returns {HTMLButtonElement|null}
+ */
+const AKTION_STIL_ID = "antwort-aktion-stil";
+// Der Stil kommt aus dem Modul, nicht aus chat-actions.css: die CSS liegt im
+// Start-Buendel (start-styles.css, Start-Lock) — ein Stempel nur fuer zwei
+// Regeln waere unverhaeltnismaessig. Viereckig, ruhig, 44 px (Betreiber-Regeln).
+function sorgeFuerAktionsStil() {
+  if (document.getElementById(AKTION_STIL_ID)) return;
+  const stil = document.createElement("style");
+  stil.id = AKTION_STIL_ID;
+  stil.textContent = ".antwort-aktion{margin:12px 0 0}"
+    + ".antwort-aktion-knopf{min-height:44px;padding:0 16px;border-radius:0;font:inherit;font-weight:600;"
+    + "border:1px solid rgba(127,127,127,.4);background:transparent;color:inherit;cursor:pointer}"
+    + ".antwort-aktion-knopf:hover{background:rgba(127,127,127,.12)}"
+    + ".antwort-aktion-knopf:disabled{opacity:.55;cursor:default}"
+    + ".antwort-aktion-knopf:focus-visible{outline:2px solid currentColor;outline-offset:2px}";
+  document.head.appendChild(stil);
+}
+
+export function haengeAktionsKnopf(output, beschriftung, text, { senden = sendeAlsNutzer } = {}) {
+  if (!output || !text) return null;
+  sorgeFuerAktionsStil();
+  const zeile = document.createElement("p");
+  zeile.className = "antwort-aktion";
+  const knopf = document.createElement("button");
+  knopf.type = "button";
+  knopf.className = "ghost-button antwort-aktion-knopf";
+  knopf.textContent = beschriftung;
+  knopf.addEventListener("click", () => { knopf.disabled = true; senden(text); });
+  zeile.appendChild(knopf);
+  output.appendChild(zeile);
+  return knopf;
+}
+
 /**
  * Zeigt die Frage-Karte hinter dem Antwort-Knoten.
  * @param {HTMLElement} output Antwort-Knoten.
@@ -377,14 +424,15 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
     output.textContent = "";
     return false;
   }
-  const hinweis = "\n\nAuf deinem Gerät beantwortet — ohne Server, ohne Kosten."
-    + " Für eine gründlichere Antwort schreibe \u00bbgenauer\u00ab dazu.";
+  const hinweis = "\n\nAuf deinem Gerät beantwortet — ohne Server, ohne Kosten.";
   // Ueber textContent, nicht als zweites Argument: renderChatMarkdown(node)
   // liest den Knoten — ein zweites Argument wurde still verworfen (live
   // 2026-08-23: der Hinweis fehlte in jeder lokalen Antwort).
   output.textContent = `${gestoppteTeilantwort || ergebnis.text}${hinweis}`;
   // Der EINE Renderaufruf dieses Pfads (tests/chat-markdown.test.mjs zaehlt).
   if (typeof renderMarkdown === "function") renderMarkdown(output);
+  // Nach dem Rendern, damit der Knopf kein Markdown ist: ein Klick statt »genauer« tippen.
+  haengeAktionsKnopf(output, "Gründlicher antworten", `genauer: ${letzteNutzerfrage(body)}`);
   return true;
 }
 
@@ -410,7 +458,8 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   } catch {
     stoppeWartesignal();
     clearThinkingState(output);
-    output.textContent = "Verbindung zum Server unterbrochen — bitte gleich erneut versuchen.";
+    output.textContent = "Verbindung zum Server unterbrochen.";
+    haengeAktionsKnopf(output, "Erneut versuchen", letzteNutzerfrage(body));
     return;
   }
   if (!response.ok || !response.body) {

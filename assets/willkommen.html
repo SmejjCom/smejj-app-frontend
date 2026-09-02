@@ -79,6 +79,11 @@
        Unter 640 px: Logo + Knöpfe in Reihe 1, die Bereichs-Links als eigene,
        umbrechende Reihe darunter. Nichts wird versteckt, nichts ragt hinaus. */
     @media (max-width: 640px) {
+      /* Anfänger-Handy: alle Ziele der Probier-Zeile mindestens 44 px (UI/UX-Programm 02.09.) */
+      .probier { padding: 8px 10px; }
+      .probier input { min-height: 44px; }
+      .probier .los { width: 44px; height: 44px; }
+      .probier .chip, .schwerpunkte button { min-height: 44px; display: inline-flex; align-items: center; }
       .leiste { gap: 10px 12px; padding: 12px 16px; }
       .leiste nav { order: 3; width: 100%; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
       .leiste nav a { padding: 12px 0; }
