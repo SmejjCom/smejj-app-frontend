@@ -4,6 +4,8 @@
 if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js").catch(() => {});
 // Erste-Schritte-Karten auf der leeren Startseite (UI/UX 02.09., Nr. 9) — gleicher Weg.
 if (typeof document !== "undefined") import("/assets/erste-schritte.js").catch(() => {});
+// Deutsch durchgängig + Modell-Chips erklärt zur Laufzeit (UI/UX 02.09., Nr. 7+8) — bis das Markup folgt.
+if (typeof document !== "undefined") import("/assets/deutsch-klartext.js").catch(() => {});
 // (2026-07-28).
 //
 // Zweck: Die Aktionsleiste unter einer Nachricht traegt nur die haeufigsten
