@@ -15,6 +15,8 @@ export const REGELN = [
   "body .view.is-active.is-active:has(> .view-chrome){padding-top:42px}",
   "body .view .view-header.view-header{padding-bottom:6px;margin-bottom:4px}",
   "body .view > .output.output{padding-top:10px;padding-bottom:10px}",
+  // #settings.view.is-active (Bündel, Spezifität 1,2,0) schlägt die Klassenregel oben — darum mit id.
+  "body #settings.view.is-active{padding-top:28px}",
   "body #settings .settings-header.settings-header{padding-bottom:10px}",
   "body #settings .settings-shell.settings-shell{padding-top:12px}",
   "body #settings .settings-panel.settings-panel{padding:14px}",
