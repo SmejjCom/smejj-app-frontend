@@ -26,8 +26,8 @@ export const REGELN = [
   "body #chatHistory .ch-kopf.ch-kopf{margin-bottom:8px}",
   // Stufe 2 (Chat, gemessen 22:12 UTC): Schreibfeld 9 px Polster + 6 px Rand unten, Kopfzeile→Feld→Chips je 20 px.
   "body #start .prompt-glass.prompt-glass{padding:6px 8px 6px 12px;margin-bottom:env(safe-area-inset-bottom,0px)}",
-  "body #start .home-hero.home-hero + .prompt-glass{margin-top:12px}",
-  "body #start .prompt-glass + .start-chipreihe.start-chipreihe{margin-top:12px}",
+  // Die 20 px zwischen Kopfzeile, Feld und Chips sind der Raster-Abstand der Startfläche (gemessen 22:15 UTC).
+  "body #start .home-feed.home-feed{gap:12px}",
   "body #startLog.start-log{padding:4px 11px 6px}"
 ].join("");
 
