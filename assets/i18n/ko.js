@@ -527,4 +527,6 @@ export default {
   "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "smejj 1.1이 실제 사람들의 실제 질문에서 배우도록. 언제든 철회할 수 있으며, 이후에는 아무것도 저장되지 않습니다.",
   "Der Schalter liegt in deinem Konto unter Meine Daten.": "스위치는 계정의 내 데이터 아래에 있습니다.",
   "Zum Schalter": "스위치로 이동",
+  "Vorlesen": "읽어주기",
+  "Ändern": "변경",
 };

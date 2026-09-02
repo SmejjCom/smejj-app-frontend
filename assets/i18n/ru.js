@@ -527,4 +527,6 @@ export default {
   "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "Чтобы smejj 1.1 учился на настоящих вопросах настоящих людей. Отзыв возможен в любой момент; после этого ничего не сохраняется.",
   "Der Schalter liegt in deinem Konto unter Meine Daten.": "Переключатель находится в вашем аккаунте в разделе «Мои данные».",
   "Zum Schalter": "К переключателю",
+  "Vorlesen": "Озвучить",
+  "Ändern": "Изменить",
 };

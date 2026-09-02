@@ -527,4 +527,6 @@ export default {
   "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "Pour que smejj 1.1 apprenne de vraies questions de vraies personnes. Révocable à tout moment ; ensuite plus rien n'est enregistré.",
   "Der Schalter liegt in deinem Konto unter Meine Daten.": "L'interrupteur se trouve dans ton compte sous Mes données.",
   "Zum Schalter": "Vers l'interrupteur",
+  "Vorlesen": "Lire à voix haute",
+  "Ändern": "Modifier",
 };

@@ -527,4 +527,6 @@ export default {
   "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "smejj 1.1 gerçek insanların gerçek sorularından öğrensin diye. İstediğin zaman geri alınabilir; sonra hiçbir şey kaydedilmez.",
   "Der Schalter liegt in deinem Konto unter Meine Daten.": "Anahtar hesabında Verilerim altında.",
   "Zum Schalter": "Anahtara git",
+  "Vorlesen": "Sesli oku",
+  "Ändern": "Değiştir",
 };

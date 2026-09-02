@@ -527,4 +527,6 @@ export default {
   "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "যাতে smejj 1.1 সত্যিকারের মানুষের সত্যিকারের প্রশ্ন থেকে শেখে। যেকোনো সময় প্রত্যাহারযোগ্য; তারপর আর কিছু সংরক্ষিত হয় না।",
   "Der Schalter liegt in deinem Konto unter Meine Daten.": "সুইচটি আপনার অ্যাকাউন্টে আমার ডেটা-র অধীনে আছে।",
   "Zum Schalter": "সুইচে যান",
+  "Vorlesen": "জোরে পড়ুন",
+  "Ändern": "পরিবর্তন",
 };

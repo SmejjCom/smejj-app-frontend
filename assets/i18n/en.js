@@ -525,4 +525,6 @@ export default {
   "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "So that smejj 1.1 learns from real questions by real people. Revocable at any time; then nothing more is stored.",
   "Der Schalter liegt in deinem Konto unter Meine Daten.": "The switch is in your account under My data.",
   "Zum Schalter": "Go to the switch",
+  "Vorlesen": "Read aloud",
+  "Ändern": "Change",
 };

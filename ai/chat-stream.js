@@ -150,6 +150,10 @@ export function letzteNutzerfrage(body) {
  * Dasselbe Muster bei "Verbindung unterbrochen": ein Klick schickt die Frage neu.
  * @returns {HTMLButtonElement|null}
  */
+// Wörter unter den Symbolen der Antwort-Leiste auf dem Handy (UI/UX Nr. 4) —
+// eigenes Modul, dynamisch, stumm bei Fehlern; die Leiste selbst bleibt unberührt.
+if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js").catch(() => {});
+
 const AKTION_STIL_ID = "antwort-aktion-stil";
 // Der Stil kommt aus dem Modul, nicht aus chat-actions.css: die CSS liegt im
 // Start-Buendel (start-styles.css, Start-Lock) — ein Stempel nur fuer zwei

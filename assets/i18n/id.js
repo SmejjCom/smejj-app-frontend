@@ -527,4 +527,6 @@ export default {
   "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "Agar smejj 1.1 belajar dari pertanyaan nyata orang sungguhan. Bisa dicabut kapan saja; setelah itu tidak ada lagi yang disimpan.",
   "Der Schalter liegt in deinem Konto unter Meine Daten.": "Sakelarnya ada di akunmu di bawah Data saya.",
   "Zum Schalter": "Ke sakelar",
+  "Vorlesen": "Bacakan",
+  "Ändern": "Ubah",
 };

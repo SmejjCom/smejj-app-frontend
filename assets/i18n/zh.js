@@ -527,4 +527,6 @@ export default {
   "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "让 smejj 1.1 从真实的人的真实问题中学习。随时可以撤回，之后不再保存任何内容。",
   "Der Schalter liegt in deinem Konto unter Meine Daten.": "开关在你账户的“我的数据”下。",
   "Zum Schalter": "前往开关",
+  "Vorlesen": "朗读",
+  "Ändern": "修改",
 };

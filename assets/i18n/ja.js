@@ -527,4 +527,6 @@ export default {
   "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "smejj 1.1 が実際の人の実際の質問から学ぶためです。いつでも取り消せ、その後は何も保存されません。",
   "Der Schalter liegt in deinem Konto unter Meine Daten.": "スイッチはアカウントの「マイデータ」にあります。",
   "Zum Schalter": "スイッチへ",
+  "Vorlesen": "読み上げ",
+  "Ändern": "変更",
 };

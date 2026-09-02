@@ -527,4 +527,6 @@ export default {
   "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.": "لكي يتعلم smejj 1.1 من أسئلة حقيقية لأشخاص حقيقيين. يمكن التراجع في أي وقت؛ بعدها لا يُحفظ شيء.",
   "Der Schalter liegt in deinem Konto unter Meine Daten.": "المفتاح في حسابك تحت بياناتي.",
   "Zum Schalter": "إلى المفتاح",
+  "Vorlesen": "قراءة بصوت عالٍ",
+  "Ändern": "تغيير",
 };
