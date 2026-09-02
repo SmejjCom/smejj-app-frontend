@@ -29,6 +29,15 @@ const PANEL_OPEN_KEYS = Object.freeze({
 // darum gilt das Merken nur am grossen Bildschirm.
 const RESTORE_MIN_WIDTH = 900;
 
+// UI/UX-Programm 02.09., Nr. 6: Die RECHTE Seite (Browser-Panel) kommt nur in
+// DIESER Browser-Sitzung wieder — sessionStorage statt localStorage. Gemessen
+// 02.09. (Desktop, angemeldet): das Panel oeffnete nach Tagen mit dem Inhalt der
+// letzten Sitzung, 499 px breit, ohne dass der Nutzer es je gebraucht hatte.
+// Die linke Spur bleibt dauerhaft gemerkt (Betreiber-Wunsch 2026-08-13).
+function speicherFuer(side) {
+  return side === "right" ? sessionStorage : localStorage;
+}
+
 function panelSide(panel) {
   return panel.classList.contains("sidebar") ? "left" : "right";
 }
@@ -54,7 +63,8 @@ if (typeof window !== "undefined") {
 function rememberPanelOpen(panel) {
   if (!nutzerNah()) return;
   try {
-    localStorage.setItem(PANEL_OPEN_KEYS[panelSide(panel)], panel.classList.contains("is-open") ? "1" : "0");
+    const side = panelSide(panel);
+    speicherFuer(side).setItem(PANEL_OPEN_KEYS[side], panel.classList.contains("is-open") ? "1" : "0");
   } catch {
     // Privater Modus ohne Speicher: das Merken entfaellt, die App laeuft weiter.
   }
@@ -85,7 +95,7 @@ const rueckdrehZaehler = { left: 0, right: 0 };
 // (Das Boot-Zuklappen selbst schreibt dank nutzerNah-Wache nie.)
 function gemerktJetzt(side) {
   try {
-    const wert = localStorage.getItem(PANEL_OPEN_KEYS[side]);
+    const wert = speicherFuer(side).getItem(PANEL_OPEN_KEYS[side]);
     return wert === null ? GEMERKT_BEIM_START[side] : wert;
   } catch {
     return GEMERKT_BEIM_START[side];
@@ -111,8 +121,8 @@ function bootZuklappenZuruedrehen(panel) {
 const GEMERKT_BEIM_START = (() => {
   const werte = { left: null, right: null };
   try {
-    werte.left = localStorage.getItem(PANEL_OPEN_KEYS.left);
-    werte.right = localStorage.getItem(PANEL_OPEN_KEYS.right);
+    werte.left = speicherFuer("left").getItem(PANEL_OPEN_KEYS.left);
+    werte.right = speicherFuer("right").getItem(PANEL_OPEN_KEYS.right);
   } catch {
     // Ohne Speicher gibt es nichts wiederherzustellen.
   }
