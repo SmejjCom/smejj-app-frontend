@@ -389,6 +389,10 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
 }
 
 export async function streamChatAnswer(url, body, output, { renderMarkdown, offlineNotice = "" } = {}) {
+  // Fragen-Erfassung (Trainingsplan smejj 1.1, Stufe 1): loest nur aus, wartet
+  // nie, bricht nie — der Server entscheidet aus Ledger und Schalter. Dynamisch
+  // nachgeladen, damit ein fehlendes Modul den Chat nicht beruehrt.
+  import("/assets/ai/frage-erfassung.js").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
   // Stufe 0 zuerst: was das Geraet des Nutzers selbst beantworten kann, kostet
   // niemanden etwas und ist meist schneller (gemessen 1,7-3,5 s gegen 2,9-6,6 s).
   if (await versucheLokaleAntwort(body, output, renderMarkdown)) return;
