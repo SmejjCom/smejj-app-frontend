@@ -1,19 +1,47 @@
 // smejj.com — Ueberlaufmenue und reine Bausteine der Nachrichten-Aktionen
-// Wörter unter den Symbolen auf dem Handy (UI/UX 02.09., Nr. 4): dieses Modul lädt
-// mit der Leiste beim Start — chat-stream.js kommt erst beim ersten Senden.
-if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js").catch(() => {});
-// Erste-Schritte-Karten auf der leeren Startseite (UI/UX 02.09., Nr. 9) — gleicher Weg.
-if (typeof document !== "undefined") import("/assets/erste-schritte.js").catch(() => {});
-// Deutsch durchgängig + Modell-Chips erklärt zur Laufzeit (UI/UX 02.09., Nr. 7+8) — bis das Markup folgt.
-if (typeof document !== "undefined") import("/assets/deutsch-klartext.js").catch(() => {});
-// Code-Bereich: Schreibfeld am unteren Rand (Betreiber-Befund 03.09.) — Stil aus dem Modul.
-if (typeof document !== "undefined") import("/assets/code-feld-unten.js").catch(() => {});
-// Kompakt-Programm (Betreiber 03.09.): halbe Abstände in allen Ansichten — Stil aus dem Modul.
-if (typeof document !== "undefined") import("/assets/kompakt.js").catch(() => {});
-// Verlauf steht nach dem Öffnen ganz unten (Betreiber-Befund 03.09.) — Beobachter auf #startLog.
-if (typeof document !== "undefined") import("/assets/verlauf-unten.js").catch(() => {});
-// Werkzeugzeile am Handy in einer Zeile (Betreiber-Screenshot 03.09.) — Stil aus dem Modul.
-if (typeof document !== "undefined") import("/assets/composer-zeile.js").catch(() => {});
+// Laufzeit-Haken (UI/UX 02./03.09.): Module, die index.html wegen des Start-Locks nicht laden
+// darf, haengen hier an der Aktionsleiste. Seit 03.09. (Web-Vitals: Gewicht 312 KB > 300 KB,
+// chat-store.js doppelt) laedt jeder Haken erst, wenn er gebraucht wird — Handy-Stile nur am
+// Handy, Verlaufs- und Code-Helfer erst mit offenem Chat bzw. Code-Bereich. Jeder Haken behaelt
+// die Form import("/assets/…").catch(() => {}) — die Modultests pruefen genau diese Zeile.
+if (typeof document !== "undefined") {
+  const beiHandy = (lade) => {
+    try {
+      const mq = matchMedia("(max-width:600px)");
+      if (mq.matches) return lade();
+      const wecker = (e) => { if (e.matches) { mq.removeEventListener("change", wecker); lade(); } };
+      mq.addEventListener("change", wecker);
+    } catch { lade(); }
+  };
+  const beiKindern = (knoten, lade) => {
+    if (!knoten) return;
+    if (knoten.childElementCount > 0) return lade();
+    const b = new MutationObserver(() => { if (knoten.childElementCount > 0) { b.disconnect(); lade(); } });
+    b.observe(knoten, { childList: true });
+  };
+  const beiKlasse = (knoten, klasse, lade) => {
+    if (!knoten) return;
+    if (knoten.classList.contains(klasse) || location.pathname === "/code") return lade();
+    const b = new MutationObserver(() => { if (knoten.classList.contains(klasse)) { b.disconnect(); lade(); } });
+    b.observe(knoten, { attributes: true, attributeFilter: ["class"] });
+  };
+  const start = document.getElementById("startMessage");
+  let kartenWeg = false;
+  try { kartenWeg = JSON.parse(localStorage.getItem("smejj.erste-schritte.v1") || "{}")?.weg === true; } catch { kartenWeg = false; }
+  // Kompakt-Programm (Betreiber 03.09.): halbe Abstaende in allen Ansichten — sofort, sonst springt das Layout.
+  import("/assets/kompakt.js").catch(() => {});
+  // Deutsch durchgaengig + Modell-Chips erklaert (UI/UX 02.09., Nr. 7+8) — nur auf der Startseite.
+  if (start) import("/assets/deutsch-klartext.js").catch(() => {});
+  // Erste-Schritte-Karten (UI/UX 02.09., Nr. 9) — nur Startseite und nur, solange nicht weggeklickt.
+  if (start && !kartenWeg) import("/assets/erste-schritte.js").catch(() => {});
+  // Woerter unter den Symbolen (UI/UX 02.09., Nr. 4) und Werkzeugzeile in einer Zeile (03.09.) — nur am Handy.
+  beiHandy(() => import("/assets/chat-actions-woerter.js").catch(() => {}));
+  beiHandy(() => import("/assets/composer-zeile.js").catch(() => {}));
+  // Verlauf steht nach dem Oeffnen ganz unten (Betreiber-Befund 03.09.) — erst, wenn ein Chat im Log steht.
+  beiKindern(document.getElementById("startLog"), () => import("/assets/verlauf-unten.js").catch(() => {}));
+  // Code-Bereich: Schreibfeld am unteren Rand (Betreiber-Befund 03.09.) — erst im Code-Bereich.
+  beiKlasse(document.getElementById("code"), "is-active", () => import("/assets/code-feld-unten.js").catch(() => {}));
+}
 // (2026-07-28).
 //
 // Zweck: Die Aktionsleiste unter einer Nachricht traegt nur die haeufigsten
