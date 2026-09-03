@@ -428,3 +428,39 @@ select.dlg-feld{cursor:pointer;}
    weist jedes Setzen von element.style ab (live gemessen 2026-08-14 — der
    erste Fix sah richtig aus und wirkte nicht). */
 html.smejj-gate-zu{visibility:hidden!important;}
+
+
+/* ---------- Modul AP · Register, Nummern, Suche (nachgezogen aus dem Bauzweig, 03.09.2026) ---------- */
+/* ---------- Modul AP · Autopiloten (Stufe 9) ----------
+   Master-Detail: links die Automatiken mit Ampelpunkt, rechts die Akte des
+   gewaehlten. Die Punkte sind bewusst viereckig — das ganze Haus ist es
+   (--radius:0 mit !important), und ein Status-Wuerfel liest sich wie eine LED. */
+/* Register ueber der Liste (2026-08-14): "Braucht dich" zuerst, weil das die
+   einzige Frage ist, mit der man die Seite aufschlaegt. Steht dort eine Zahl
+   groesser null, faerbt sich das Register rot und zieht den Blick — steht dort
+   eine Null, ist die Seite in einer Sekunde abgearbeitet. */
+.ap-register{display:flex;flex-wrap:wrap;gap:6px;}
+.ap-reg{display:flex;align-items:center;gap:9px;padding:11px 16px;cursor:pointer;
+  font-size:15px;border:1px solid var(--sm-border);background:var(--sm-card);
+  color:var(--sm-ink-dim);user-select:none;}
+.ap-reg:hover{border-color:var(--sm-border-strong);color:var(--sm-ink);}
+.ap-reg .n{font-size:15.5px;font-weight:600;color:var(--sm-ink);}
+.ap-reg.warn{border-color:var(--sm-danger-border);background:var(--sm-danger-bg);
+  color:var(--sm-danger);}
+.ap-reg.warn .n{color:var(--sm-danger);}
+.ap-reg.on{border-color:var(--sm-border-strong);background:var(--sm-card-strong);
+  color:var(--sm-ink);box-shadow:inset 2px 0 0 var(--sm-accent);}
+.ap-reg.on .n{color:var(--sm-ink);}
+.ap-reg.warn.on{border-color:var(--sm-danger);background:var(--sm-danger-bg);
+  color:var(--sm-danger);}
+.ap-register-leer{grid-column:1/-1;padding:26px 18px;font-size:16px;line-height:1.65;
+  color:var(--sm-ink-dim);border:1px solid var(--sm-border);background:var(--sm-card);}
+/* Laufende Nummer vor dem Namen: da, aber leise. Tabellenziffern, damit
+   die Namen in der Liste trotz zweistelliger Nummern buendig starten. */
+.ap-nr{display:inline;color:var(--sm-ink-dim);font-weight:500;margin-right:8px;
+  font-variant-numeric:tabular-nums;}
+.ap-suche{flex:1 1 280px;max-width:440px;}
+.ap-suche input{width:100%;padding:11px 14px;font-size:16px;font-family:inherit;color:var(--sm-ink);
+  background:var(--sm-field);border:1px solid var(--sm-border);outline:none;}
+.ap-suche input:focus{border-color:var(--sm-accent-border);}
+.ap-nr-zelle{width:56px;color:var(--sm-ink-dim);font-variant-numeric:tabular-nums;}
