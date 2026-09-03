@@ -11,6 +11,8 @@
 // den Kommentaren der jeweiligen Funktion und in
 // docs/frontend/SW_VERSIONSVERLAUF_2026-08-ARCHIV-B.md (v237 bis v246).
 
+import { merkmaleVon, volltext } from "./chat-merkmale.js?v=1";
+
 const MAX_TITEL = 62;
 const MAX_VORSCHAU = 130;
 
@@ -281,27 +283,12 @@ function gruppeVon(iso) {
 // Verlauf nach dem, was NACHWEISBAR in der Unterhaltung steckt — Datei,
 // Bild, Code. Die Muster sind bewusst eng: lieber ein Kennzeichen zu wenig
 // als ein Filter, der luegt.
-const MERKMAL_DATEI = /\[anhang:|\.pdf\b|\.docx?\b|\.xlsx?\b|\.csv\b|\.zip\b/i;
-const MERKMAL_BILD = /\.jpe?g\b|\.png\b|\.heic\b|\.webp\b|screenshot|generiere ein bild/i;
-const MERKMAL_CODE = /```|\bfunction\b|\bconst \w+ =|\bimport \w+ from\b|<\/?[a-z]+>|\bdef \w+\(/;
-
-function merkmaleVon(chat) {
-  const text = volltext(chat).slice(0, 20000);
-  return {
-    datei: MERKMAL_DATEI.test(text),
-    bild: MERKMAL_BILD.test(text),
-    code: MERKMAL_CODE.test(text)
-  };
-}
+// merkmaleVon wohnt seit 2026-09-03 in chat-merkmale.js (Startseite braucht nur das) und
+// wird unten unveraendert mit exportiert.
 
 /* ------------------------------------------------------------------ *
  *  Suche
  * ------------------------------------------------------------------ */
-
-function volltext(chat) {
-  const messages = Array.isArray(chat.messages) ? chat.messages : [];
-  return `${chat.title || ""} ${messages.map((message) => message?.text || "").join(" ")}`;
-}
 
 // Ausschnitt rund um den Treffer — sonst zeigt die Karte bei einem Fund tief im
 // Gespraech weiter die Standard-Vorschau und man sieht nicht, warum sie da ist.

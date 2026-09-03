@@ -30,22 +30,49 @@ import {
   listChats, openChat, renameChat, deleteChat, restoreChat, activeChatId, togglePinChat, newChat,
   listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
 } from "/assets/chat-store.js?v=b65";
-// Holt fuer Chats ohne eigenen Titel einen aus der Bruecke. Von HIER importiert
-// und nicht aus index.html, damit die Startseite unter dem Start-Lock bleibt
-// (gleiches Muster wie icon-nutzung.js in profile-dock.js). Das Modul meldet
-// seine Ergebnisse ueber "smejj:chats-changed" — die Ansicht zeichnet dann neu.
-import "/assets/chat-title-auto.js";
-// Zusammenfuehrung zweier paralleler Aufteilungen (2026-08-10): die reinen
-// Anzeige-Helfer UND Themen/Export wohnen in chat-history-text.js (der live
-// ausgelieferte Schnitt); die zustandsbehafteten Karten-Bausteine in
-// chat-history-cards.js (Factory, der Zustand bleibt hier). format.js — die
-// Teilmenge von text.js aus dem zweiten Schnitt — ist entfallen.
-import {
-  anzeigeTitel, anzeigeVorschau, ersteFrage, gruppeVon, mitHervorhebung,
-  ohneBallast, trefferAusschnitt, volltext, zeitText, themaVon, merkmaleVon, sichereAlsMarkdown,
-  projektGruppen
-} from "/assets/chat-history-text.js?v=b47b";
-import { createCardBuilders, createProjektAktionen } from "/assets/chat-history-cards.js?v=b59";
+// Verlaufs-Text (Titel, Vorschau, Themen, Export), Karten-Bausteine und die
+// Titel-Automatik aus der Bruecke kommen ERST, wenn der Verlauf sichtbar wird
+// (2026-09-03, Web-Vitals: Gewicht > 300 KB — die drei Module wogen 19 KB am Start,
+// obwohl die Startseite den Verlauf nicht zeichnet). Vorher: statische Importe von
+// HIER, nicht aus index.html, damit die Startseite unter dem Start-Lock bleibt.
+// Die Kennungen (?v=) sind dieselben wie ueberall — ein abweichender Spezifizierer
+// erzeugt eine zweite Modulinstanz (tests/modul-einmal-instanz.test.mjs).
+let anzeigeTitel, anzeigeVorschau, gruppeVon, volltext, themaVon, merkmaleVon, sichereAlsMarkdown, projektGruppen;
+let entdoppeln, bausteinLeer, bausteinGruppe, bausteinNeuKnopf, schmalerSchirm, bausteinKopf, bausteinChips, bausteinKarte, bausteinProjektGruppe;
+let oeffneProjektMenu, zeigeProjektPicker;
+let bausteineBereit = null;
+
+/** Laedt Text-Helfer, Karten-Bausteine und Titel-Automatik einmal und bindet sie an DIESE Ansicht. */
+function ladeBausteine() {
+  if (bausteineBereit) return bausteineBereit;
+  bausteineBereit = Promise.all([
+    import("/assets/chat-history-text.js?v=b47b"),
+    import("/assets/chat-history-cards.js?v=b59"),
+    import("/assets/chat-title-auto.js")
+  ]).then(([text, karten]) => {
+    ({ anzeigeTitel, anzeigeVorschau, gruppeVon, volltext, themaVon, merkmaleVon, sichereAlsMarkdown, projektGruppen } = text);
+    // Projekt-Menues zuerst: ihr oeffneProjektMenu wandert in den ctx der Karten-Bausteine.
+    ({ oeffneProjektMenu, zeigeProjektPicker } = karten.createProjektAktionen({
+      menuSchliessen, render,
+      getAlleProjekte: () => alleProjekte,
+      setOffenesMenu: (menu) => { offenesMenu = menu; },
+      armConfirmTimer: (rueckruf, ms) => { clearTimeout(confirmTimer); confirmTimer = setTimeout(rueckruf, ms); }
+    }));
+    // Karten-Bausteine lesen Suchbegriff/Themenfilter/offenes Menue ueber Getter und
+    // schreiben ueber Setter zurueck — der eine Wahrheitsort bleibt hier.
+    ({ entdoppeln, bausteinLeer, bausteinGruppe, bausteinNeuKnopf, schmalerSchirm, bausteinKopf, bausteinChips, bausteinKarte, bausteinProjektGruppe } = karten.createCardBuilders({
+      getSuchbegriff: () => suchbegriff, setSuchbegriff: (wert) => { suchbegriff = wert; },
+      getThemenFilter: () => themenFilter, setThemenFilter: (wert) => { themenFilter = wert; },
+      getOffenesMenu: () => offenesMenu,
+      zeichne, host, menuSchliessen, oeffneMenu, oeffneProjektMenu
+    }));
+  }).catch((fehler) => {
+    bausteineBereit = null;
+    console.error("[smejj.com] Verlauf: Bausteine konnten nicht nachgeladen werden:", fehler);
+    throw fehler;
+  });
+  return bausteineBereit;
+}
 
 const STYLE_ID = "chatHistoryStyles";
 
@@ -59,26 +86,7 @@ let suchbegriff = "";
 let themenFilter = "";
 let offenesMenu = null;
 
-// Projekt-Menues (chat-history-cards.js) an den Zustand DIESER Ansicht binden
-// (2026-08-13 dorthin verschoben, 800-Zeilen-Regel). MUSS vor createCardBuilders
-// stehen: dessen ctx reicht oeffneProjektMenu weiter — als const erst ab hier
-// belegt (TDZ), waehrend die uebrigen Rueckrufe gehoistete Funktionen sind.
-const { oeffneProjektMenu, zeigeProjektPicker } = createProjektAktionen({
-  menuSchliessen, render,
-  getAlleProjekte: () => alleProjekte,
-  setOffenesMenu: (menu) => { offenesMenu = menu; },
-  armConfirmTimer: (rueckruf, ms) => { clearTimeout(confirmTimer); confirmTimer = setTimeout(rueckruf, ms); }
-});
-
-// Karten-Bausteine (chat-history-cards.js) an den Zustand DIESER Ansicht
-// binden: sie lesen Suchbegriff/Themenfilter/offenes Menue ueber Getter und
-// schreiben ueber Setter zurueck — der eine Wahrheitsort bleibt hier.
-const { entdoppeln, bausteinLeer, bausteinGruppe, bausteinNeuKnopf, schmalerSchirm, bausteinKopf, bausteinChips, bausteinKarte, bausteinProjektGruppe } = createCardBuilders({
-  getSuchbegriff: () => suchbegriff, setSuchbegriff: (wert) => { suchbegriff = wert; },
-  getThemenFilter: () => themenFilter, setThemenFilter: (wert) => { themenFilter = wert; },
-  getOffenesMenu: () => offenesMenu,
-  zeichne, host, menuSchliessen, oeffneMenu, oeffneProjektMenu
-});
+// Projekt-Menues und Karten-Bausteine werden in ladeBausteine() gebunden (siehe oben).
 
 function view() {
   return document.querySelector("#chatHistory");
@@ -291,6 +299,7 @@ let alleChats = [];
 let alleProjekte = [];
 
 async function render() {
+  await ladeBausteine();
   const target = host();
   if (!target) return;
   injectStyles();
@@ -310,6 +319,7 @@ async function render() {
 let zeichnenAusstehend = false;
 
 function zeichne(target) {
+  if (!entdoppeln) { ladeBausteine().then(() => zeichne(target)).catch(() => {}); return; }
   if (offenesMenu) {
     zeichnenAusstehend = true;
     return;
@@ -706,9 +716,10 @@ function bind() {
   // JavaScript ("30 Nachr." und der kurze Platzhalter) — die muessen beim
   // Drehen des Geraets mitwechseln. Neu gezeichnet wird nur beim echten
   // Wechsel der Schwelle, nicht bei jedem Pixel.
-  let warSchmal = schmalerSchirm();
+  let warSchmal = null;
   window.addEventListener("resize", () => {
     if (offenesMenu) menuSchliessen();
+    if (!schmalerSchirm) return; // Verlauf noch nie gezeichnet — nichts umzubrechen
     const jetztSchmal = schmalerSchirm();
     if (jetztSchmal !== warSchmal) {
       warSchmal = jetztSchmal;

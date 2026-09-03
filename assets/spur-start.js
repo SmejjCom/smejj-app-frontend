@@ -19,7 +19,8 @@
 // und oeffnen per openChat — keine Attrappen.
 
 import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=b65";
-import { merkmaleVon } from "/assets/chat-history-text.js?v=b47b";
+// Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
+import { merkmaleVon } from "/assets/chat-merkmale.js?v=1";
 import { Icons } from "/assets/components.js?v=b48";
 // OHNE ?v — dieselbe Kennung wie app.js/code-flaeche.js, sonst zweite Instanz.
 import { API_ORIGIN } from "./config.js";
