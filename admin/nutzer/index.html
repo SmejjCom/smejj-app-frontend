@@ -11,13 +11,9 @@
      connect-src listet den Control-Server, weil die Konsole von smejj.com aus
      fremde Herkunft anspricht. WER DIE API-ADRESSE AENDERT, MUSS SIE HIER
      EINTRAGEN — sonst blockiert der Browser jede Abfrage. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://redbean-caesar-yccqb9olg70i1ehu.salad.cloud https://smejj-control.zeabur.app; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.smejj.com https://smejj-control.zeabur.app; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <title>smejj.com — Operations Console</title>
 <link rel="stylesheet" href="/admin/console.css">
-<!-- Verbindungs-Vorbereitung zum Control-Server (Befund 2026-08-31): der
-     TLS-Handshake startet beim Seitenbeginn statt erst nach dem Laden von
-     ~20 Skripten beim ersten API-Ruf (Auth-Bestaetigung). -->
-<link rel="preconnect" href="https://smejj-control.zeabur.app" crossorigin>
 <!-- Tuersteher: verbirgt die Huelle und leitet Abgemeldete zur Anmeldung.
      MUSS im <head> stehen und ohne defer laden, sonst blitzt der Adminbereich
      kurz auf, bevor umgeleitet wird. Siehe gate.js fuer den Befund. -->
@@ -51,8 +47,11 @@
     <header class="topbar">
       <div class="crumb">Operations Console · <b id="crumb">Übersicht</b></div>
       <div class="spacer"></div>
-      <div class="pill" id="indexStand">Index —</div>
-      <div class="pill" id="ketteStand">Kette —</div>
+      <!-- Die beiden Stand-Pillen erscheinen nur, wenn eine Seite einen Wert
+           liefert (Nutzer: Index-Alter, Audit: Kette). Ein dauerhaftes "—" auf
+           allen anderen Seiten war eine Pille ohne Aussage (Befund 2026-08-23). -->
+      <div class="pill" id="indexStand" hidden>Index —</div>
+      <div class="pill" id="ketteStand" hidden>Kette —</div>
     </header>
     <div id="seite"></div>
   </div>
@@ -73,8 +72,16 @@
 <script src="/admin/console-stage8.js"></script>
 <script src="/admin/views-stage9.js"></script>
 <script src="/admin/console-stage9.js"></script>
+    <script src="/admin/views-cockpit.js"></script>
+    <script src="/admin/console-cockpit.js"></script>
+    <script src="/admin/views-stage10.js"></script>
+    <script src="/admin/console-stage10.js"></script>
 <script src="/admin/views-stage11.js"></script>
 <script src="/admin/console-stage11.js"></script>
+<script src="/admin/views-stage12.js"></script>
+<script src="/admin/console-stage12.js"></script>
+<script src="/admin/views-stage13.js"></script>
+<script src="/admin/console-stage13.js"></script>
 <script src="/admin/console.js"></script>
 </body>
 </html>

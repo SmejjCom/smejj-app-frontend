@@ -50,20 +50,74 @@
         + "<td>" + e(String(p.zahlend)) + "</td></tr>";
     });
 
-    return V.kopfBlock("E", "Abrechnung", "Abrechnung & Abos",
-      "Abo-Vorgänge mit Handlungsbedarf zuerst — Beträge bleiben bei Stripe.")
-      + '<div class="kpis">'
-      + V.kachelBlock("Abos", String(d.total || 0), "insgesamt")
-      + V.kachelBlock("Zahlend", String(d.zahlend || 0), "aktiv oder Testphase")
-      + V.kachelBlock("Offen", String(d.handlungsbedarf || 0), (d.handlungsbedarf || 0) > 0 ? "abarbeiten" : "keine", (d.handlungsbedarf || 0) > 0 ? "dn" : "up")
-      + V.kachelBlock("Läuft aus", String(d.gekuendigtZumPeriodenende || 0), "gekündigt zum Periodenende")
-      + "</div>"
+    const z = d.umsatz || null;
+    return V.kopfBlock("E", "Geld", "Abos & Umsatz",
+      "Was hereinkommt, was rausgeht, und wo Konten abspringen. Jede Zahl sagt, woher sie kommt — Beträge werden bei Stripe gemessen, nicht hier gespiegelt.")
+      + (z ? umsatzKacheln(z) : '<div class="kpis">'
+        + V.kachelBlock("Abos", String(d.total || 0), "insgesamt")
+        + V.kachelBlock("Zahlend", String(d.zahlend || 0), "aktiv oder Testphase") + "</div>")
       + '<div class="stack">' + warnung
+      + (z ? umsatzBloecke(z) : "")
       + V.panelBlock("Vorgänge", "dringendste zuerst",
         V.tabelleBlock(["Konto", "Plan", "Stand", "Laufzeit bis", "Hinweis", "Nächster Schritt"], zeilen))
-      + V.panelBlock("Nach Plan", "größte Gruppe zuerst",
-        V.tabelleBlock(["Plan", "Gesamt", "Zahlend"], planZeilen))
+      + (z ? "" : V.panelBlock("Nach Plan", "größte Gruppe zuerst", V.tabelleBlock(["Plan", "Gesamt", "Zahlend"], planZeilen)))
       + "</div>";
+  }
+
+  // ---- E, Teil 2: Umsatz (Design-Vorschlag "Abos & Umsatz", 2026-08-23) ----
+  function geld(cent, waehrung) {
+    const w = String(waehrung || "eur").toUpperCase() === "EUR" ? "€" : String(waehrung || "").toUpperCase();
+    return (Number(cent || 0) / 100).toFixed(2).replace(".", ",") + " " + w;
+  }
+
+  function umsatzKacheln(z) {
+    const m = z.mrr || {};
+    const a = z.aufladungen || {};
+    const k = z.kosten || {};
+    const mod = k.modelleSeitNeustart || {};
+    return '<div class="kpis">'
+      + V.kachelBlock("Monatlich wiederkehrend", geld(m.cent, m.waehrung),
+        (m.gemessen ? m.abos + " aktive Abos bei Stripe" : "GESCHÄTZT aus Planpreisen") + (m.testAbos ? " · " + m.testAbos + " Test" : ""), m.gemessen ? "up" : "wr")
+      + V.kachelBlock("Aufladungen (API, 30 Tage)", a.erreichbar ? usd(a.umsatz30Usd) : "—",
+        a.erreichbar ? "eingezahlt gesamt " + usd(a.eingezahltUsd) + " · Guthaben " + usd(a.guthabenUsd) : "API-Übersicht nicht lesbar", a.erreichbar ? "" : "wr")
+      + V.kachelBlock("Kosten Betrieb", usd(k.festeUsdProMonat) + " / Monat",
+        "fest (Kostenpolitik) · Modelle seit Neustart: " + usd(mod.usd) + (mod.tageOhnePreis ? " (+" + mod.tageOhnePreis + " Tag(e) ohne Preis)" : ""), "")
+      // Ehrlich: MRR kommt in Euro, Aufladungen und Kosten in US-Dollar. Die
+      // Summe rechnet beides 1:1 — das steht dran, statt eine Waehrung zu erfinden.
+      + V.kachelBlock("Bleibt übrig", usd(z.bleibtUebrigUsdVorModellen), "vor Modellkosten · MRR (€) + Aufladungen ($) − feste Kosten ($), Währungen 1:1 gezählt", (z.bleibtUebrigUsdVorModellen || 0) >= 0 ? "up" : "dn")
+      + "</div>";
+  }
+
+  function umsatzBloecke(z) {
+    const m = z.mrr || {};
+    const planZeilen = (z.jePlan || []).map(function (p) {
+      return "<tr><td><b>" + e(p.plan) + "</b></td><td>" + e(String(p.konten)) + "</td><td>" + e(String(p.zahlend)) + "</td>"
+        + "<td>" + (p.preisCent ? e(geld(p.preisCent, m.waehrung)) : '<span class="s">kein Preis hinterlegt</span>') + "</td>"
+        + "<td>" + (p.umsatzCentProMonat !== null ? "<b>" + e(geld(p.umsatzCentProMonat, m.waehrung)) + "</b>" : "—") + "</td>"
+        + '<td><span class="s">nicht erfasst</span></td><td><span class="s">nicht erfasst</span></td></tr>';
+    });
+    const ab = z.abspruenge || {};
+    const abZeilen = (ab.laeuftAus || []).map(function (x) {
+      return "<tr><td><b>" + e(x.konto || x.zahlendeAdresse || "nicht zugeordnet") + "</b></td><td>" + e(x.plan || "—") + "</td>"
+        + "<td>" + (x.laufzeitEndeAm ? e(A.datum(x.laufzeitEndeAm)) : "—") + (x.tageBisEnde === null || x.tageBisEnde === undefined ? "" : '<br><span class="s">' + fristText(x.tageBisEnde) + "</span>") + "</td>"
+        + '<td><span class="s">Grund nicht erfasst</span></td></tr>';
+    });
+    const zh = z.zahlung || {};
+    const r = zh.offeneRechnungen || {};
+    const zahlungZeilen = [
+      "<tr><td><b>Stripe-Schlüssel</b></td><td>" + (zh.schluesselGesetzt ? pille("gesetzt", "ok") : pille("fehlt", "bad")) + "</td><td>" + (zh.stripeErreichbar ? "Stripe antwortet — MRR gemessen" : "Stripe nicht lesbar — Zahlen geschätzt") + "</td></tr>",
+      "<tr><td><b>Webhook-Geheimnis</b></td><td>" + (zh.webhookGeheimnisGesetzt ? pille("gesetzt", "ok") : pille("fehlt", "bad")) + "</td><td>Ohne Geheimnis werden Stripe-Rückrufe abgewiesen — Abos blieben dann unsichtbar.</td></tr>",
+      "<tr><td><b>Offene Rechnungen</b></td><td>" + (r.gemessen ? (r.anzahl ? pille(String(r.anzahl), "warn") : pille("0", "ok")) : pille("nicht messbar", "dim")) + "</td><td>" + (r.gemessen ? (r.anzahl ? "Zahlung ausstehend oder fehlgeschlagen: " + geld(r.cent, m.waehrung) : "Keine offene Rechnung bei Stripe.") : e(r.grund || "")) + "</td></tr>",
+      "<tr><td><b>Vorgänge mit Handlungsbedarf</b></td><td>" + ((zh.handlungsbedarf || 0) > 0 ? pille(String(zh.handlungsbedarf), "bad") : pille("0", "ok")) + "</td><td>Aus den hier verarbeiteten Stripe-Ereignissen — Liste unten.</td></tr>"
+    ];
+    return '<div class="note glass"><div class="nx">◆</div><div><div class="nt">Woher die Zahlen kommen</div><div class="ns">Monatlich wiederkehrend: ' + e(m.quelle || "") + ". Modellkosten zählen seit dem letzten Neustart — kein Monatswert.</div></div></div>"
+      + V.panelBlock("Je Plan", "Umsatz = Zahlende × Planpreis; Punkte und Marge je Plan werden nicht erfasst",
+        V.tabelleBlock(["Plan", "Konten", "Zahlend", "Preis / Monat", "Umsatz / Monat", "Punkte verbraucht", "Marge"], planZeilen))
+      + V.panelBlock("Absprünge", "wer zum Periodenende ausläuft — Gründe werden nicht erfasst",
+        abZeilen.length ? V.tabelleBlock(["Konto", "Plan", "Läuft aus", "Grund"], abZeilen) : '<div class="pb"><div class="leer">Niemand hat gekündigt.</div></div>')
+      + V.panelBlock("Zahlung", "Stripe-Anbindung und offene Rechnungen", V.tabelleBlock(["", "Zustand", "Was das heißt"], zahlungZeilen))
+      + V.panelBlock("Was hier NICHT gemessen wird", "steht hier, statt als Zahl zu erscheinen",
+        V.tabelleBlock(["Was", "Warum nicht"], (z.nichtErfasst || []).map(function (p) { return "<tr><td><b>" + e(p.was) + "</b></td><td>" + e(p.warum) + "</td></tr>"; })));
   }
 
   function zustandPille(a) {
@@ -189,6 +243,47 @@
         + '<div class="ns">Guthaben fast leer oder Testzahlung — steht in der Spalte „Hinweis“.</div></div></div>'
       : '<div class="note glass"><div class="nx">◆</div><div><div class="nt">Keine Hinweise</div><div class="ns">' + e(d.hinweis || "") + "</div></div></div>";
 
+    // ---- Ausgestellte Schluessel (Admin, smejj-adm-…) — Beschluss 2026-09-03 ----
+    const adm = d.ausgestellt || {};
+    const LAUFZEITEN = [["30t", "30 Tage"], ["90t", "90 Tage"], ["1j", "1 Jahr"], ["2j", "2 Jahre"], ["5j", "5 Jahre"],
+      ["10j", "10 Jahre"], ["20j", "20 Jahre"], ["30j", "30 Jahre"], ["unbefristet", "Unbefristet"]];
+    const optionen = LAUFZEITEN.map(function (p) {
+      return '<option value="' + p[0] + '"' + (p[0] === "1j" ? " selected" : "") + ">" + e(p[1]) + "</option>";
+    }).join("");
+    const admFormular = '<div class="bar">'
+      + '<input class="suche-feld" id="admFuer" type="text" placeholder="Ausgestellt für — Name oder E-Mail">'
+      + '<select id="admLaufzeit" aria-label="Laufzeit">' + optionen + "</select>"
+      + '<input class="suche-feld" id="admNotiz" type="text" placeholder="Notiz (optional)">'
+      + '<span class="act" id="admAusstellen">Schlüssel ausstellen</span>'
+      + "</div>";
+    const admFrisch = d.frisch && d.frisch.apiKey
+      ? '<div class="note glass"><div class="nx">🔑</div><div>'
+        + '<div class="nt">Neuer Schlüssel für ' + e((d.frisch.schluessel || {}).ausgestelltFuer || "") + " — wird nur jetzt angezeigt</div>"
+        + '<div class="ns mono">' + e(d.frisch.apiKey) + "</div>"
+        + '<div class="ns">Basis-URL ' + e(d.frisch.basisUrl || "https://api.smejj.com/v1") + " · Modell " + e(d.frisch.modell || "smejj-1.0")
+        + " · läuft ab " + ((d.frisch.schluessel || {}).laeuftAbAm ? e(A.datum(d.frisch.schluessel.laeuftAbAm)) : "nie (unbefristet)") + "</div>"
+        + "</div></div>"
+      : "";
+    const admZeilen = (adm.schluessel || []).map(function (s) {
+      const n = s.nutzung || {};
+      return "<tr><td><b>" + e(s.ausgestelltFuer) + "</b>" + (s.notiz ? '<br><span class="s">' + e(s.notiz) + "</span>" : "") + "</td>"
+        + '<td><span class="mono">' + e(s.keyHint) + "</span></td>"
+        + "<td>" + pille(s.zustand === "aktiv" ? "aktiv" : s.zustand === "abgelaufen" ? "abgelaufen" : "widerrufen",
+          s.zustand === "aktiv" ? "ok" : s.zustand === "abgelaufen" ? "warn" : "bad") + "</td>"
+        + "<td>" + (s.laeuftAbAm ? e(A.datum(s.laeuftAbAm)) : '<span class="s">unbefristet</span>') + "</td>"
+        + "<td>" + zahl(n.anfragen) + " / " + zahl(n.token) + "</td>"
+        + "<td>" + (s.zuletztBenutztAm ? e(A.datum(s.zuletztBenutztAm)) : "—") + "</td>"
+        + "<td>" + e(s.ausgestelltVon || "—") + '<br><span class="s">' + e(A.datum(s.erstelltAm)) + "</span></td>"
+        + "<td>" + (s.zustand === "widerrufen" ? "—" : '<span class="act dg" data-admWiderruf="' + e(s.id) + '">Widerrufen</span>') + "</td></tr>";
+    });
+    const admFehler = adm.ok === false
+      ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Ausgestellte Schlüssel nicht lesbar</div><div class="ns">' + e(adm.error || "") + "</div></div></div>"
+      : "";
+    const admPanel = V.panelBlock("Ausgestellte Schlüssel", "vom Betreiber vergeben · smejj-adm-… · Verbrauch auf dein Konto",
+      admFehler + admFrisch + admFormular
+      + V.tabelleBlock(["Für", "Kennzeichen", "Zustand", "Läuft ab", "Anfragen / Token", "Zuletzt", "Ausgestellt von", ""], admZeilen)
+      + '<div class="s">' + e(adm.hinweis || "Der Wert eines Schlüssels wird nie angezeigt — er erscheint genau einmal beim Ausstellen.") + "</div>");
+
     return V.kopfBlock("G", "API", "API & Schlüssel",
       "Wer nutzt smejj als Modellanbieter — Konten, Schlüssel, Verbrauch, Umsatz.")
       + '<div class="kpis">'
@@ -198,8 +293,9 @@
       + V.kachelBlock("30 Tage", zahl((d.tage30 || {}).anfragen), "Anfragen · " + usd((d.tage30 || {}).umsatzUsd))
       + V.kachelBlock("Eingezahlt", usd(d.eingezahltUsd), (d.eingezahltTestUsd ? "+ " + usd(d.eingezahltTestUsd) + " Test" : "echte Zahlungen"))
       + V.kachelBlock("Guthaben offen", usd(d.guthabenGesamtUsd), "Summe aller Konten", "dim")
+      + V.kachelBlock("Ausgestellt", String(adm.aktiv || 0), (adm.unbefristet || 0) + " unbefristet · " + (adm.abgelaufen || 0) + " abgelaufen", (adm.unbefristet || 0) > 0 ? "warn" : "dim")
       + "</div>"
-      + '<div class="stack">' + alarmHinweis
+      + '<div class="stack">' + alarmHinweis + admPanel
       + V.panelBlock("Kunden", "größter Umsatz (30 Tage) zuerst",
         V.tabelleBlock(["Konto", "Guthaben", "Schlüssel", "Anfragen h/7/30", "Token 30 T", "Umsatz 30 T", "Aufgeladen", "Zuletzt", "Hinweis"], kontenZeilen))
       + V.panelBlock("Nach Modell", "30 Tage", V.tabelleBlock(["Modell", "Konten", "Anfragen", "Token", "Umsatz"], modellZeilen))

@@ -48,9 +48,9 @@
     return '<span class="ap-dot ' + e(farbe) + '"></span>';
   }
 
-  function zustandZelle(a, ohnePunkt) {
+  function zustandZelle(a) {
     const z = zustand(a);
-    return '<span class="ap-zustand">' + (ohnePunkt ? "" : punkt(z.farbe)) + '<span class="' + z.ton + '">' + e(z.wort) + "</span></span>";
+    return '<span class="ap-zustand">' + punkt(z.farbe) + '<span class="' + z.ton + '">' + e(z.wort) + "</span></span>";
   }
 
   function nummer(a) {
@@ -276,12 +276,10 @@
   // ---------- Bildschirm 1: Liste ----------
   function zeile(a) {
     return '<tr class="ap-row" data-ap="' + e(a.id) + '">'
-      // Betreiber 2026-09-03: Nummer in derselben Zeile wie der Name, der leuchtende
-      // viereckige Punkt direkt UNTER der Nummer; die Zustand-Spalte traegt nur das Wort.
-      + '<td class="ap-nr-zelle"><span class="ap-nr-stapel"><span class="ap-nr-zahl">' + e(a.nummer || "—") + "</span>" + punkt(zustand(a).farbe) + "</span></td>"
+      + '<td class="ap-nr-zelle">' + e(a.nummer || "—") + "</td>"
       + '<td class="ap-was"><b>' + e(a.name) + "</b><span>" + e(a.kurz || "") + "</span></td>"
       + "<td>" + taktKurz(a.zeitplan) + "</td>"
-      + "<td>" + zustandZelle(a, true) + "</td>"
+      + "<td>" + zustandZelle(a) + "</td>"
       + "<td>" + letzterLaufZelle(a) + "</td></tr>";
   }
 

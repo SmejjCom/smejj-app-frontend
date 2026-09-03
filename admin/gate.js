@@ -59,7 +59,8 @@
   // Ausliefern. Wuerde das Gate dort greifen, sperrte es rechtmaessig
   // angemeldete Betreiber aus einer Seite aus, die der Server ihnen gerade
   // bewusst gegeben hat.
-  var CONTROL_ORIGIN = "https://smejj-control.zeabur.app";
+  var CONTROL_ORIGIN = "https://api.smejj.com";
+  var ALT_ORIGIN = "https://smejj-control.zeabur.app";
 
   var wurzel = document.documentElement;
 
@@ -126,7 +127,7 @@
   // --- Ab hier laeuft das Gate ---------------------------------------------
 
   // Auf dem Control-Server hat der Server bereits entschieden: nichts tun.
-  if (location.origin === CONTROL_ORIGIN) {
+  if (location.origin === CONTROL_ORIGIN || location.origin === ALT_ORIGIN) {
     window.smejjAdminGate = { freigeben: function () {}, abweisen: function () {} };
     return;
   }
@@ -145,13 +146,6 @@
    * Download einer der 20 Konsolendateien), bliebe die Seite dauerhaft weiss.
    * Dann lieber eine lesbare Erklaerung als ein stummes Nichts — aber immer
    * noch OHNE die Huelle. Verbergen bleibt die Voreinstellung, auch im Fehler.
-   *
-   * 30 statt 15 Sekunden (Befund 2026-08-31, live gemessen): der Kaltstart
-   * holt ~20 Dateien von GitHub Pages und bestaetigt den Akteur am
-   * Control-Server — genau diese Kette dauerte im Abendstau 13,5 s und die
-   * alte Wache meldete "Konsole nicht geladen", obwohl nichts kaputt war
-   * (der erneute Versuch ging schnell, weil alles im Cache lag). 30 s geben
-   * der Kette Luft; ein wirklich toter Ladevorgang wird weiterhin erklaert.
    */
   var netz = setTimeout(function () {
     abweisen({
@@ -159,7 +153,7 @@
       text: "Die Operations Console hat sich nicht gemeldet. Das liegt fast immer am Netz oder am Control-Server.",
       neuLaden: true
     });
-  }, 30000);
+  }, 15000);
 
   function freigeben() {
     clearTimeout(netz);

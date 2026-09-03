@@ -27,7 +27,10 @@
   // Gleicher Schluessel wie assets/auth-page.js und assets/account-sessions.js —
   // wer sich auf smejj.com anmeldet, ist damit auch in der Konsole angemeldet.
   const TOKEN_KEY = "smejj.auth.accessToken.v1";
-  const CONTROL_ORIGIN = "https://smejj-control.zeabur.app";
+  // Eigene API-Domain (Betreiber-Freigabe 2026-08-23, Nutzerreise): die Konsole
+  // spricht api.smejj.com; die Zeabur-Adresse bleibt als zweiter Zugang gueltig.
+  const CONTROL_ORIGIN = "https://api.smejj.com";
+  const ALT_ORIGIN = "https://smejj-control.zeabur.app";
   const AKTIV_KEY = "smejj.admin.apiOrigin.aktiv.v1";
 
   let apiBasis = CONTROL_ORIGIN;
@@ -35,7 +38,7 @@
   (function () {
     try {
       sessionStorage.removeItem(AKTIV_KEY);
-      if (location.origin === CONTROL_ORIGIN) { apiBasis = ""; return; }
+      if (location.origin === CONTROL_ORIGIN || location.origin === ALT_ORIGIN) { apiBasis = ""; return; }
       const eigen = localStorage.getItem("smejj.apiOrigin.v1");
       if (eigen && /^https?:\/\//.test(eigen)) { apiBasis = eigen.replace(/\/+$/, ""); return; }
       apiBasis = CONTROL_ORIGIN;
@@ -88,26 +91,15 @@
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
-  // Zeitlimit je Versuch (Befund 2026-08-31): Ohne Limit hing ein zaeherr Ruf
-  // beliebig lange — der Tuersteher meldete dann "Konsole nicht geladen",
-  // bevor der bewaehrte Host-Wechsel ueberhaupt drankam. 12 s decken jeden
-  // beobachteten Ruf ab (langsamster Live-Wert 4 s) und lassen dem
-  // Ausweichhost noch Luft innerhalb der 30-s-Wache aus gate.js.
   async function holeEinmal(pfad) {
-    const wache = new AbortController();
-    const uhr = setTimeout(function () { wache.abort(); }, 12000);
     try {
-      const antwort = await fetch(url(pfad), { headers: kopf(), cache: "no-store", signal: wache.signal });
-      clearTimeout(uhr);
+      const antwort = await fetch(url(pfad), { headers: kopf(), cache: "no-store" });
       const text = await antwort.text();
       let data = {};
       try { data = text ? JSON.parse(text) : {}; } catch { data = {}; }
       if (!antwort.ok) return { ok: false, status: antwort.status, data, fehler: fehlertext(antwort.status, data) };
       return { ok: true, status: antwort.status, data, fehler: "" };
     } catch (error) {
-      clearTimeout(uhr);
-      // Der Abbruch durch die Wache ist Status 0 wie jeder andere Netzfehler —
-      // holeDirekt weicht dann auf den zweiten Host aus.
       return { ok: false, status: 0, data: {}, fehler: "Keine Verbindung zum Control-Server: " + String(error && error.message || error) };
     }
   }

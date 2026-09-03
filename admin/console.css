@@ -404,16 +404,11 @@ select.dlg-feld{cursor:pointer;}
    die Namen in der Liste trotz zweistelliger Nummern buendig starten. */
 .ap-nr{display:inline;color:var(--sm-ink-dim);font-weight:500;margin-right:8px;
   font-variant-numeric:tabular-nums;}
-/* Betreiber 2026-09-03: der Punkt ist viereckig und LEUCHTET (Schein in seiner Farbe);
-   in der Liste steht er direkt unter der Nummer (ap-nr-stapel), die Nummer bleibt in
-   derselben Zeile wie der Name. */
-.ap-dot{width:12px;height:12px;flex:none;border-radius:0;}
-.ap-dot.gruen{background:var(--sm-ok);box-shadow:0 0 10px 1px var(--sm-ok);}
-.ap-dot.gelb{background:var(--sm-warn);box-shadow:0 0 10px 1px var(--sm-warn);}
-.ap-dot.rot{background:var(--sm-danger);box-shadow:0 0 10px 1px var(--sm-danger);}
-.ap-dot.grau{background:var(--sm-ink-faint);box-shadow:0 0 6px 0 var(--sm-ink-faint);}
-.ap-nr-stapel{display:inline-flex;flex-direction:column;align-items:flex-start;gap:8px;padding-top:2px;}
-.ap-nr-zahl{line-height:1.2;}
+.ap-dot{width:12px;height:12px;flex:none;}
+.ap-dot.gruen{background:var(--sm-ok);}
+.ap-dot.gelb{background:var(--sm-warn);}
+.ap-dot.rot{background:var(--sm-danger);}
+.ap-dot.grau{background:var(--sm-ink-faint);}
 .ap-detail{display:flex;flex-direction:column;gap:12px;min-width:0;}
 /* Technische Kennung im Steckbrief: sichtbar, aber leise. Sie ist eine
    Nachschlage-Angabe, keine Ueberschrift. */
