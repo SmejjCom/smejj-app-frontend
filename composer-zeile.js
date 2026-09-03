@@ -11,7 +11,9 @@ export const STIL_ID = "composer-zeile-stil";
 export const REGELN = "@media (max-width:600px){"
   + "body #start .prompt-glass.prompt-glass{gap:6px}"
   + "body #start .prompt-glass .fpille-nachdenken.fpille-nachdenken{max-width:20vw;min-width:0;padding:0 8px}"
-  + "body #start .prompt-glass .model-picker .text-chip.text-chip{max-width:22vw;min-width:0;padding:0 6px}"
+  // min-width 44 statt 0: mit 0 fiel der Modell-Chip auf 30 px (Betriebswache 03.09., Touch-Ziel 44 px);
+  // die Zeile hat bei 375 px Platz — gemessen 44+44+44+44+44 plus 4 x 6 = 244 von 327.
+  + "body #start .prompt-glass .model-picker .text-chip.text-chip{max-width:22vw;min-width:44px;padding:0 6px}"
   + "body #start .prompt-glass .ghost-button.icon-button.icon-button,body #start .prompt-glass .send-button.send-button{width:44px;min-width:44px;flex:0 0 44px}"
   + "}"
   + "@media (max-width:390px){"
