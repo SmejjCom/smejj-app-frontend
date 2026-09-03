@@ -83,6 +83,16 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
           showToast(r.grund === "verschluesselt" ? `PDF ist verschluesselt: ${file.name}` : `Kein lesbarer Text im PDF: ${file.name}`);
         } catch { /* Leser nicht ladbar: unten als Chip */ }
       }
+      // Word/Excel/PowerPoint (Stufe 2B, 2026-09-03): ZIP+XML im Browser lesen, Text als Chip MIT
+      // INHALT; alte Binaerformate (.doc/.xls/.ppt) bleiben Verweis-Chip.
+      if (input.id === "startMessage" && /\.(docx|xlsx|pptx)$/i.test(file.name || "")) {
+        try {
+          const { liesOfficeText } = await import("./anhang-office-text.js?v=1");
+          const r = await liesOfficeText(file);
+          if (r.ok && uebernehmeTextAnhang(file.name, r.text, input)) { showToast(`Dokument gelesen: ${file.name}`); continue; }
+          showToast(`Kein lesbarer Text im Dokument: ${file.name}`);
+        } catch { /* Leser nicht ladbar: unten als Chip */ }
+      }
       // Video/Audio (Stufe 2C, 2026-09-03): Tonspur im Browser holen, in 60-s-Stuecken an unser
       // Whisper-Ohr, Transkript als Chip MIT INHALT; der Datei-Chip bleibt als Verweis stehen.
       const istTon = /^(video|audio)\//.test(file.type || "") || /\.(mov|mp4|m4v|webm|m4a|mp3|wav|aac|ogg)$/i.test(file.name || "");
