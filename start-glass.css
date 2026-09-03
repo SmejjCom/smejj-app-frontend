@@ -189,8 +189,6 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
     width: calc(100% - 16px);
   }
 
-  /* Auf kleinen Schirmen reichen zwei Chips. */
-  .start-chips button:nth-child(n + 3) {
-    display: none;
-  }
+  /* Betreiber 2026-09-03: alle Werkzeug-Chips auch am Handy — die
+     wischbare Zeile steht in mobil-composer.css (frueher: ab Chip 3 weg). */
 }

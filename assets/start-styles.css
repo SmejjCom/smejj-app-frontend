@@ -3950,9 +3950,6 @@ body[data-left-menu-state="expanded"] .app-brand-logo {
   .prompt-glass {
     width: calc(100% - 16px);
   }
-  .start-chips button:nth-child(n + 3) {
-    display: none;
-  }
 }
 
 /* ---- eckig.css ---- */
@@ -4005,6 +4002,49 @@ html { overscroll-behavior-y: none; }
 @media (max-width: 767px) {
   .sidebar .bottom-nav { border-top: 0; }
   .sidebar .left-panel-resizer { display: none; }
+}
+@media (max-width: 600px) {
+  html { background: #050608; }
+  body {
+    padding: 0;
+    background:
+      radial-gradient(820px 520px at 18% -12%, rgba(50, 246, 234, 0.13), transparent 62%),
+      radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
+      linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%);
+  }
+  main.shell {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  #start:not(.has-start-chat) .home-feed { background: transparent; }
+}
+@media (max-width: 600px) {
+  #start:not(.has-start-chat) .home-feed { min-width: 0; max-width: 100%; }
+}
+@media (max-width: 600px) {
+  #start .start-chips.start-chipreihe {
+    width: 100%;
+    max-width: 100%;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 4px 24px 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 24px;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  }
+  #start .start-chips.start-chipreihe::-webkit-scrollbar { display: none; }
+  #start .start-chips.start-chipreihe button {
+    flex: none;
+    scroll-snap-align: start;
+  }
+}
+@media (max-width: 600px) {
+  #start.has-start-chat #startLog { padding-top: 52px; scroll-padding-top: 52px; }
 }
 
 /* ---- design-v11.css ---- */

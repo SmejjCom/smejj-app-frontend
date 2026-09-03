@@ -85,3 +85,81 @@ html { overscroll-behavior-y: none; }
   .sidebar .bottom-nav { border-top: 0; }
   .sidebar .left-panel-resizer { display: none; }
 }
+
+/* Vollbild am Handy (Betreiber-Befund 2026-09-03, iPhone-PWA): Statusleiste
+   (Uhr, Netz, Akku) und Home-Balken standen schwarz ueber und unter dem Glas.
+   Ursache: styles.css legt die Safe-Area als Polster auf den body, dort schien
+   der nackte Seitenhintergrund durch. Jetzt traegt der body das Glas-Gefaelle
+   der Startseite bis an alle vier Kanten (index.html liefert viewport-fit=cover
+   und black-translucent), das Safe-Area-Polster wandert nach innen auf die
+   Huelle, und die Startseite malt ihr Gefaelle nicht mehr doppelt (sonst ein
+   Nahtstoss an der Statusleiste). Alle Regeln nur bis 600 px — am Desktop
+   bleibt alles wie es ist. Die .home-feed-Regel hat denselben Selektor wie in
+   start-glass.css und gewinnt allein durch die spaetere Kaskadenstelle.
+   Hinweis Betrieb: iOS friert den Statusleisten-Stil beim Hinzufuegen zum
+   Home-Bildschirm ein — eine alte PWA muss einmal entfernt und neu hinzugefuegt
+   werden, sonst bleibt die Leiste schwarz. */
+@media (max-width: 600px) {
+  html { background: #050608; }
+  body {
+    padding: 0;
+    background:
+      radial-gradient(820px 520px at 18% -12%, rgba(50, 246, 234, 0.13), transparent 62%),
+      radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
+      linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%);
+  }
+  main.shell {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  #start:not(.has-start-chat) .home-feed { background: transparent; }
+}
+
+/* Raster-Falle (im Handy-Emulator gemessen, 375 px): #start ist ein Grid, die
+   .home-feed sein Kind mit min-width:auto — die wischbare Chip-Zeile (470 px
+   Inhalt) blies die Spalte auf 502 px auf, Ueberschrift und Glas ragten rechts
+   aus dem Schirm. min-width:0 laesst das Kind auf die Spalte schrumpfen, erst
+   dann kann die Zeile innen scrollen. */
+@media (max-width: 600px) {
+  #start:not(.has-start-chat) .home-feed { min-width: 0; max-width: 100%; }
+}
+
+/* Werkzeug-Chips am Handy (Betreiber 2026-09-03 "alle, die funktionieren"):
+   start-glass.css versteckte unter 600 px alles ab Chip 3 — sechs Werkzeuge
+   waren am Handy unerreichbar. Jetzt stehen alle acht in EINER wischbaren
+   Zeile (44-px-Touchziele bleiben), links buendig, die Kanten laufen weich aus,
+   damit man sieht, dass rechts mehr kommt. Kein Balken, kein Umbruch.
+   Spezifitaet: design-v11.css (Kaskaden-Ende) setzt .start-chipreihe auf
+   justify-content/overflow um — der ID-Schritt (1,2,0) schlaegt das. */
+@media (max-width: 600px) {
+  #start .start-chips.start-chipreihe {
+    width: 100%;
+    max-width: 100%;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 4px 24px 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 24px;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  }
+  #start .start-chips.start-chipreihe::-webkit-scrollbar { display: none; }
+  #start .start-chips.start-chipreihe button {
+    flex: none;
+    scroll-snap-align: start;
+  }
+}
+
+/* Chat-Zustand am Handy (im Emulator gemessen, 390 px, 2026-09-03): Die erste
+   Sprechblase begann bei y=5 — hinter dem schwebenden Menue-Knopf (0-44 px)
+   und dem Globus rechts oben (0-44 px). Ein Polster von 52 px schiebt den
+   Verlauf beim Start unter die Icon-Zeile; beim Scrollen darf der Text wie
+   bei ChatGPT unter den Glas-Icons hindurchlaufen. Zwei ID-Schritte (2,1,0)
+   gegen jede #startLog-Regel im Kaskaden-Ende. */
+@media (max-width: 600px) {
+  #start.has-start-chat #startLog { padding-top: 52px; scroll-padding-top: 52px; }
+}
