@@ -4046,6 +4046,30 @@ html { overscroll-behavior-y: none; }
 @media (max-width: 600px) {
   #start.has-start-chat #startLog { padding-top: 52px; scroll-padding-top: 52px; }
 }
+:root {
+  --sa-top: env(safe-area-inset-top, 0px);
+  --sa-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (max-width: 600px) {
+  .workspace,
+  .view,
+  .home-feed {
+    min-height: calc(100dvh - var(--sa-top) - var(--sa-bottom));
+  }
+  #start.has-start-chat .home-feed.home-feed,
+  #code.view.is-active.is-active {
+    min-height: 0;
+    height: calc(100dvh - var(--sa-top) - var(--sa-bottom));
+    max-height: calc(100dvh - var(--sa-top) - var(--sa-bottom));
+  }
+  #startLog .msg-actions.is-user { min-height: 34px; }
+}
+.entry.assistant .chat-table-wrap,
+.entry.assistant .chat-table,
+.entry.assistant .chat-table th,
+.entry.assistant .chat-table td {
+  white-space: normal;
+}
 
 /* ---- design-v11.css ---- */
 :root {

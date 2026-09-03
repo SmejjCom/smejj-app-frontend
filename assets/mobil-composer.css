@@ -163,3 +163,47 @@ html { overscroll-behavior-y: none; }
 @media (max-width: 600px) {
   #start.has-start-chat #startLog { padding-top: 52px; scroll-padding-top: 52px; }
 }
+
+/* Chat am Handy, drei Befunde vom iPhone (Betreiber-Screenshot 2026-09-03 15:10):
+   (1) Die Werkzeugzeile des Schreibfelds verschwand unter der Unterkante:
+       .home-feed (Chat-Zustand) und #code sind 100dvh hoch, die Huelle traegt
+       aber zusaetzlich die Safe-Area als Polster (oben 59, unten 34 px) —
+       zusammen 937 px auf einem 844-px-Schirm, im Emulator nachgestellt.
+       Jetzt: Hoehe = 100dvh minus beide Insets. Die Insets stehen als
+       Variablen an :root, damit der Emulator (env() = 0) sie setzen kann.
+       Doppelklassen-Schritt gegen design-v11.css (Kaskaden-Ende, 1,2,0).
+   (2) Die Frage-Blase ueberdeckte die Zeile "Arbeitsschritte": die Aktions-
+       leiste der eigenen Nachricht sitzt per margin-top:-34px in der Blase;
+       ist sie kuerzer als 34 px (leer, noch ohne Knoepfe), zieht sie den
+       naechsten Eintrag unter die Blase. min-height 34 macht die Marge
+       neutral.
+   (3) Quellen-Tabelle mit halbschirmhohen Zeilen: styles.css setzt .entry auf
+       white-space:pre-wrap — darin wird jeder Zeilenumbruch zwischen <tr>
+       zu einer anonymen Riesenzelle. Tabellen zurueck auf normal. */
+:root {
+  --sa-top: env(safe-area-inset-top, 0px);
+  --sa-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (max-width: 600px) {
+  /* styles.css gibt .workspace, .view und .home-feed min-height:100dvh —
+     das Minimum schlaegt jede kleinere Hoehe, darum auch hier abziehen
+     (im Emulator gemessen: height 751, aber min-height 844 gewann). */
+  .workspace,
+  .view,
+  .home-feed {
+    min-height: calc(100dvh - var(--sa-top) - var(--sa-bottom));
+  }
+  #start.has-start-chat .home-feed.home-feed,
+  #code.view.is-active.is-active {
+    min-height: 0;
+    height: calc(100dvh - var(--sa-top) - var(--sa-bottom));
+    max-height: calc(100dvh - var(--sa-top) - var(--sa-bottom));
+  }
+  #startLog .msg-actions.is-user { min-height: 34px; }
+}
+.entry.assistant .chat-table-wrap,
+.entry.assistant .chat-table,
+.entry.assistant .chat-table th,
+.entry.assistant .chat-table td {
+  white-space: normal;
+}
