@@ -20,7 +20,7 @@
          localStorage "smejj.apiOrigin.v1" auf die Zeabur-Adresse setzen.
          frame-ancestors fehlt absichtlich: In einer Meta-CSP ignorieren Browser die
          Angabe. Den Klickjacking-Schutz uebernimmt der Rahmenwaechter in app.js. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-VlE1d5xGlwIC45bSDwQ4QJLlWTgImI8lmE9DYAk8JMQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-VlE1d5xGlwIC45bSDwQ4QJLlWTgImI8lmE9DYAk8JMQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com wss://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
     <!-- Kaltstart (Freigabe 25.08.): Stylesheet sofort anstossen — vorher
          startete es erst NACH dem Tor-Skript, eine volle Runde spaeter. -->
     <link rel="preload" href="/assets/start-styles.css?v=mobil101-20260903" as="style">
