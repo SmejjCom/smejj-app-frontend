@@ -555,3 +555,14 @@
     min-height: 44px;
   }
 }
+
+/* Anhang-Chips (2026-09-03): Video/PDF/Dokument/weitere Bilder ueber dem Schreibfeld —
+   Vorschau oder Symbol links, Name und Untertitel, Entfernen rechts. Viereckig
+   (Betreiber-Regel), 44 px hoch = Touch-Ziel. */
+.anhang-chip { align-items: center; gap: 10px; max-width: 100%; padding: 6px 8px 6px 6px; }
+.anhang-chip-vorschau { width: 40px; height: 40px; flex: none; display: grid; place-items: center; overflow: hidden; background: rgba(255, 255, 255, 0.06); color: rgba(242, 245, 244, 0.75); }
+.anhang-chip-vorschau img, .anhang-chip-vorschau video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.anhang-chip-vorschau svg { width: 22px; height: 22px; }
+.anhang-chip-text { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+.anhang-chip-name { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 48vw; }
+.anhang-chip-unter { font-size: 12px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 48vw; }

@@ -3650,6 +3650,13 @@ body.right-panel-open:has(#browserPanel.is-compact) .workspace {
     min-height: 44px;
   }
 }
+.anhang-chip { align-items: center; gap: 10px; max-width: 100%; padding: 6px 8px 6px 6px; }
+.anhang-chip-vorschau { width: 40px; height: 40px; flex: none; display: grid; place-items: center; overflow: hidden; background: rgba(255, 255, 255, 0.06); color: rgba(242, 245, 244, 0.75); }
+.anhang-chip-vorschau img, .anhang-chip-vorschau video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.anhang-chip-vorschau svg { width: 22px; height: 22px; }
+.anhang-chip-text { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+.anhang-chip-name { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 48vw; }
+.anhang-chip-unter { font-size: 12px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 48vw; }
 
 /* ---- search-overlay.css ---- */
 .search-overlay {
@@ -4004,13 +4011,19 @@ html { overscroll-behavior-y: none; }
   .sidebar .left-panel-resizer { display: none; }
 }
 @media (max-width: 600px) {
-  html { background: #050608; }
-  body {
-    padding: 0;
+  html:root {
+    min-height: 100%;
     background:
       radial-gradient(820px 520px at 18% -12%, rgba(50, 246, 234, 0.13), transparent 62%),
       radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
-      linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%);
+      linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%) #050608;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+  body {
+    padding: 0;
+    min-height: 100%;
+    background: transparent;
   }
   main.shell {
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);

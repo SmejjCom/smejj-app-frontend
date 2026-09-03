@@ -5,7 +5,8 @@
 // verlangt die Cache-Version dort ausdruecklich, also zieht dieser Import nach.
 import { showToast } from "./components.js?v=b48";
 import { bindBildAnhang, uebernehmeBildDatei } from "./composer-bild-anhang.js";
-import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=3";
+import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=4";
+import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=1";
 
 // Was als Text mitgeht: Textarten und die ueblichen Quell-/Daten-Endungen,
 // hoechstens 200 KB — mehr traegt keine Frage sinnvoll (Server kuerzt ohnehin).
@@ -51,10 +52,8 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
     if (bilder.length) {
       const [erstes, ...rest] = bilder;
       await uebernehmeBildDatei(erstes, input, notifyInputChanged);
-      if (rest.length) {
-        const referenzen = rest.map((file) => `[Bild: ${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)]`);
-        input.value = `${input.value}\n${referenzen.join("\n")}`;
-      }
+      // Weitere Bilder als Chips (2026-09-03): kein toter Text im Feld.
+      for (const file of rest) uebernehmeAnhang(file, input, notifyInputChanged);
     }
     // Textdateien gehen MIT INHALT mit (Abnahme 2026-08-23: vorher nur ein
     // toter Verweis, das Modell sah keine Datei). Der Chip-Weg gehoert zum
@@ -67,12 +66,13 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
         if (uebernehmeTextAnhang(file.name, text, input)) showToast(`Datei angehängt: ${file.name}`);
       } catch { /* unlesbar: unten als Verweis */ textdateien.splice(textdateien.indexOf(file), 1); }
     }
+    // Video, PDF, Archiv, Dokument (Betreiber-Befund 2026-09-03, iPhone): frueher stand
+    // "[Anhang: IMG_5287.mov (63595 KB)]" als Textzeile im Feld. Jetzt ein Chip ueber dem
+    // Feld mit Vorschau/Symbol, Name, Groesse und Entfernen (composer-anhang-chips.js);
+    // der Verweis geht beim Senden ueber composePastedTask mit.
     const restliche = andere.filter((file) => !textdateien.includes(file));
-    if (restliche.length) {
-      const references = restliche.map((file) => `[${label}: ${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)]`);
-      input.value = input.value ? `${input.value}\n${references.join("\n")}` : references.join("\n");
-      showToast(restliche.length === 1 ? `${label} hinzugefügt: ${restliche[0].name}` : `${restliche.length} Dateien hinzugefügt`);
-    }
+    for (const file of restliche) uebernehmeAnhang(file, input, notifyInputChanged);
+    if (restliche.length) showToast(restliche.length === 1 ? `${label} hinzugefügt: ${restliche[0].name}` : `${restliche.length} Dateien hinzugefügt`);
     notifyInputChanged(input);
     input.focus();
   });

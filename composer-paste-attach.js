@@ -159,11 +159,13 @@ export function uebernehmeTextAnhang(name, text, input) {
 // Beim Senden: getippte Aufgabe und Chip-Inhalte zu EINEM Text verbinden.
 // Die Chips gelten danach als verschickt und verschwinden.
 export function composePastedTask(typed) {
-  if (chips.length === 0) return typed;
+  // Anhang-Chips (Video, PDF, weitere Bilder) liefern ihre Verweise mit (2026-09-03).
+  const verweise = (typeof window !== "undefined" && window.smejjAnhangChips?.nimmVerweise?.()) || [];
+  if (chips.length === 0) return verweise.length ? [typed, ...verweise].filter(Boolean).join("\n") : typed;
   const bloecke = chips.map((chip) => (chip.name
     ? `[Datei: ${chip.name}, ${formatZeichen(chip.text.length)} Zeichen]\n${chip.text}`
     : `[Eingefuegter Text, ${formatZeichen(chip.text.length)} Zeichen]\n${chip.text}`));
   chips.length = 0;
   document.getElementById("pasteAttachRow")?.remove();
-  return [typed, ...bloecke].filter(Boolean).join("\n\n");
+  return [typed, ...verweise, ...bloecke].filter(Boolean).join("\n\n");
 }

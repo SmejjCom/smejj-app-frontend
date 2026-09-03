@@ -100,13 +100,27 @@ html { overscroll-behavior-y: none; }
    Home-Bildschirm ein — eine alte PWA muss einmal entfernt und neu hinzugefuegt
    werden, sonst bleibt die Leiste schwarz. */
 @media (max-width: 600px) {
-  html { background: #050608; }
-  body {
-    padding: 0;
+  /* Betreiber-Screenshot 2026-09-03 19:49 (iPhone-PWA): schwarzer Streifen ueber dem
+     Home-Balken. iOS rechnet 100dvh im Vollbild kleiner als den Schirm, der body endete
+     darueber und der nackte html-Hintergrund schien durch. Das Gefaelle liegt darum auf
+     dem WURZELELEMENT: dessen Hintergrund malt der Browser auf die ganze Zeichenflaeche,
+     bis in jede Ecke, unabhaengig von jeder Hoehenrechnung. html/body haengen mit 100 %
+     am Anfangsblock (= ganzer Schirm inkl. Safe-Area bei viewport-fit=cover). */
+  /* :root statt html: styles.css setzt :root { background } (Spezifitaet 0,1,0) und schlug
+     die html-Regel — html:root (0,1,1) gewinnt an derselben Kaskadenstelle. */
+  html:root {
+    min-height: 100%;
     background:
       radial-gradient(820px 520px at 18% -12%, rgba(50, 246, 234, 0.13), transparent 62%),
       radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
-      linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%);
+      linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%) #050608;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+  body {
+    padding: 0;
+    min-height: 100%;
+    background: transparent;
   }
   main.shell {
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
