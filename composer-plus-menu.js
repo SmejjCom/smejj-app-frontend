@@ -83,7 +83,20 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
           showToast(r.grund === "verschluesselt" ? `PDF ist verschluesselt: ${file.name}` : `Kein lesbarer Text im PDF: ${file.name}`);
         } catch { /* Leser nicht ladbar: unten als Chip */ }
       }
+      // Video/Audio (Stufe 2C, 2026-09-03): Tonspur im Browser holen, in 60-s-Stuecken an unser
+      // Whisper-Ohr, Transkript als Chip MIT INHALT; der Datei-Chip bleibt als Verweis stehen.
+      const istTon = /^(video|audio)\//.test(file.type || "") || /\.(mov|mp4|m4v|webm|m4a|mp3|wav|aac|ogg)$/i.test(file.name || "");
       uebernehmeAnhang(file, input, notifyInputChanged);
+      if (input.id === "startMessage" && istTon) {
+        try {
+          const { transkribiereTonspur } = await import("./anhang-tonspur.js?v=1");
+          const { CLIENT_ROUTES } = await import("./config.js");
+          showToast(`Tonspur wird gelesen: ${file.name}`);
+          const r = await transkribiereTonspur(file, { url: CLIENT_ROUTES.api.voiceTranscribe, aufFortschritt: (f, g) => { if (f && f < g) showToast(`Tonspur ${f}/${g} Minuten …`); } });
+          if (r.ok && uebernehmeTextAnhang(`Tonspur von ${file.name}`, r.text, input)) showToast(`Tonspur gelesen: ${Math.round(r.sekunden / 60)} min, ${r.stuecke} Stuecke`);
+          else showToast(r.grund === "zu_lang" ? `Tonspur laenger als 15 Minuten — nur Verweis: ${file.name}` : r.grund === "nicht_angemeldet" ? "Tonspur: bitte anmelden" : `Tonspur nicht lesbar (${r.grund.split(":")[0]}) — nur Verweis`);
+        } catch { /* Leser nicht ladbar: Chip bleibt */ }
+      }
     }
     if (restliche.length) showToast(restliche.length === 1 ? `${label} hinzugefügt: ${restliche[0].name}` : `${restliche.length} Dateien hinzugefügt`);
     notifyInputChanged(input);
