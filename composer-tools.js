@@ -24,6 +24,7 @@ import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=6";
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
 import { createSpeechInterrupt } from "./voice-vad.js?v=blitz2-20260726";
 import { warmUpAgentConnection } from "./voice-warmup.js";
+import { verdrahteLive } from "./voice-realtime.js?v=1";
 // Stufe 2a/3a: Interim-Waechter — Sprech-Ende erkennen; seit 3a richtet sich die
 // Wartezeit nach dem Gesagten. Denk-Laut fuellt die Stille bis zur Antwort.
 import { createSilenceWatchdog } from "./voice-endpoint.js";
@@ -98,9 +99,9 @@ const earSend = createEarSend({
       nachfragen: () => nachfragenStattSenden(),
       senden: (task) => voiceModeSend(task)
 });
-// Ohr-Solo (2026-08-25): Ist Chromes Erkennung taub (sofortiges onend ohne
-// onstart/onerror, z. B. Google-Dienst im Netz blockiert), hoert das eigene
-// Ohr allein zu. Verdrahtung wohnt in voice-ohr-solo.js (800-Zeilen-Regel).
+// Ohr-Solo (2026-08-25, voice-ohr-solo.js): taube Erkennung -> eigenes Ohr. LIVE (2026-09-03,
+// voice-realtime.js): Sprache-zu-Sprache ueber den Relay, zuerst versucht, still zurueck auf Ohr/Erkennung.
+const liveWelle = verdrahteLive({ state, setStatus: setVoiceModeStatus, setTranskript: setVoiceModeTranscript, setReply: setVoiceModeReply });
 const ohrSolo = verdrahteOhrSolo({
       createServerEar, url: CLIENT_ROUTES.api.voiceTranscribe, state,
       earAlive: () => serverEar.isAlive(),
@@ -196,6 +197,7 @@ const syncVoiceMicVisual = () => zeigeMikrofonZustand(state.voiceMuted);
 const voiceFocus = createVoiceFocusTrap();
 
 function closeVoiceMode() {
+      liveWelle.stop();
       serverEar.cancel();
       ohrSolo.stop();
       state.ohrSoloAktiv = false;
@@ -670,6 +672,7 @@ function toggleVoiceMute() {
       }
       state.voiceMuted = !state.voiceMuted;
       syncVoiceMicVisual();
+      if (liveWelle.aktiv()) return liveWelle.mute(state.voiceMuted);
       if (state.voiceMuted) {
               serverEar.cancel();
               ohrSolo.stop();
@@ -737,13 +740,12 @@ function openVoiceMode() {
       }
       overlay.hidden = false;
       voiceFocus.enter(overlay);
-      if (!RecognitionCtor) {
-              // iOS/Safari ohne Web-Speech (2026-08-25): ZUERST das eigene Ohr solo
-              // zuhoeren lassen — nur ohne Mikrofon/Ohr in den Tipp-Fallback.
+      setVoiceModeStatus("listening", "Verbinde …");
+      // LIVE zuerst (2026-09-03); scheitert der Relay: iOS ohne Web-Speech ZUERST Ohr solo (2026-08-25), sonst Erkennung.
+      liveWelle.starten().then((an) => {
+              if (an || !state.voiceModeActive) return; if (RecognitionCtor) return voiceModeListen();
               if (!ohrSolo.aktivieren()) enterVoiceFallback("Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.");
-              return;
-      }
-      voiceModeListen();
+      });
 }
 
 function bindVoiceMode() {
