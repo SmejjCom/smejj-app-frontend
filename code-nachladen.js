@@ -37,7 +37,7 @@ function laden() {
   // haengt seit 2026-08-24 nicht mehr als eigener <script>-Tag an index.html —
   // er kommt hier mit, sobald die Flaeche wirklich gebraucht wird.
   import("./projekt-ordner.js?v=1").catch(() => {});
-  return import("./code-flaeche.js?v=57")
+  return import("./code-flaeche.js?v=58")
     .then((modul) => { modul.initCodeFlaeche?.(); return modul; })
     .catch((fehler) => {
       console.error("[smejj.com] Code-Flaeche konnte nicht nachgeladen werden:", fehler);

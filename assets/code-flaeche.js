@@ -28,7 +28,7 @@
 // index.html — das <script>-Tag fehlte, ALLE Knoepfe der Code-Seite waren
 // tot. Der module-queries-Test prueft jetzt auch dieses Glied.
 
-import { listProjekte, neuesGespraechImBereich, newChat } from "/assets/chat-store.js?v=b65";
+import { listProjekte, neuesGespraechImBereich, newChat } from "/assets/chat-store.js?v=b66";
 // OHNE ?v — dieselbe Kennung wie app.js/cline-model-menu.js ("./config.js"),
 // sonst entsteht eine zweite Modulinstanz (module-queries-Waechter).
 import { API_ORIGIN } from "./config.js";
