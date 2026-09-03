@@ -13,6 +13,12 @@
 // Pruefwert (keyHint). Wer ihn verliert, erzeugt einen neuen und widerruft
 // den alten. Alle sichtbaren Texte ueber t() (Deutsch als Basis).
 //
+// Laufzeit (Betreiber-Beschluss 2026-09-03, docs/api/PLAN_API_SCHLUESSEL_
+// LAUFZEIT_ADMIN_2026-09-03.md): beim Erstellen waehlt der Nutzer, wie lange
+// der Schluessel gilt — Vorauswahl 1 Jahr, "unbefristet" nur nach Rueckfrage.
+// Die Liste zeigt das Ablaufdatum, warnt 14 Tage vorher und markiert
+// Abgelaufene rot. Verlaengern = neuen Schluessel erzeugen (Rotation).
+//
 // Zwei Orte, ein Modul: Einstellungen-Reiter "API" (kopf: "kompakt", die
 // Panel-Ueberschrift liefert den Titel) und /entwickler.html
 // (kopf: "voll"). Idempotent — Doppel-Init steigt aus.
@@ -28,6 +34,15 @@ const BYOK_PREFIX = `${API_ORIGIN}/api/keys`;
 const DEV_PREFIX = `${API_ORIGIN}/api/developer/keys`;
 const DEV_GUTHABEN = `${API_ORIGIN}/api/developer/guthaben/checkout`;
 const SUCHSCHWELLE = 5;
+// Laufzeiten 1:1 wie der Server (publicApiKeys.js LAUFZEITEN). Der Server
+// nennt sie auch in GET /api/developer/keys (laufzeiten) — die Liste hier
+// ist die Anzeige-Reihenfolge samt Text, die Codes muessen dort vorkommen.
+const LAUFZEITEN = [
+  ["30t", "30 Tage"], ["90t", "90 Tage"], ["1j", "1 Jahr"], ["2j", "2 Jahre"], ["5j", "5 Jahre"],
+  ["10j", "10 Jahre"], ["20j", "20 Jahre"], ["30j", "30 Jahre"], ["unbefristet", "Unbefristet"]
+];
+const LAUFZEIT_VORAUSWAHL = "1j";
+const BALD_AB_MS = 14 * 86_400_000;
 
 export function initApiCenter(wurzel, optionen = {}) {
   if (!wurzel || wurzel.querySelector("[data-ac-root]")) return;
@@ -60,6 +75,8 @@ export function initApiCenter(wurzel, optionen = {}) {
 function markup(kopf) {
   const anbieterOptionen = selectableProviders()
     .map((entry) => `<option value="${entry.id}">${entry.name}</option>`).join("");
+  const laufzeitOptionen = LAUFZEITEN
+    .map(([code, text]) => `<option value="${code}"${code === LAUFZEIT_VORAUSWAHL ? " selected" : ""}>${t(text)}</option>`).join("");
   // Layout 1:1 nach OpenRouter/keys: grosse Ueberschrift, ein Hauptknopf,
   // keine Kacheln — das Konto liegt als schlanke Zeile darunter.
   const kopfZeile = kopf === "kompakt"
@@ -104,7 +121,10 @@ function markup(kopf) {
         <label class="ac-field">${t("Name des Schlüssels")}
           <input data-ac-dev-name type="text" maxlength="60" autocomplete="off" spellcheck="false" placeholder="${t("Wofür? z. B. ZCode auf dem Laptop")}">
         </label>
-        <p class="ac-klein">${t("Der Schlüssel beginnt mit")} <code class="ac-code">smejj-live-</code>${t("Er wird nur einmal angezeigt.")}</p>
+        <label class="ac-field">${t("Laufzeit")}
+          <select data-ac-laufzeit aria-label="${t("Laufzeit")}">${laufzeitOptionen}</select>
+        </label>
+        <p class="ac-klein">${t("Der Schlüssel beginnt mit")} <code class="ac-code">smejj-live-</code>${t("Er wird nur einmal angezeigt.")} ${t("Nach der Laufzeit lehnt die API ihn ab. Verlängern heißt: neuen Schlüssel erzeugen, alten widerrufen.")}</p>
       </div>
       <div data-ac-bereich="anbieter" hidden>
         <label class="ac-field">${t("Anbieter")}
@@ -239,20 +259,28 @@ function alleEintraege(zustand) {
 function smejjEintrag(k) {
   const widerrufen = k.zustand === "widerrufen";
   const inaktiv = k.zustand === "inaktiv";
+  // "abgelaufen" sagt der Server; die Vorwarnung (14 Tage) rechnet die Flaeche
+  // aus dem Ablaufdatum, damit kein zweiter Serverbegriff noetig ist.
+  const ablaufMs = Date.parse(k.laeuftAbAm || "");
+  const abgelaufen = k.zustand === "abgelaufen" || (Number.isFinite(ablaufMs) && ablaufMs <= Date.now() && !widerrufen);
+  const baldAb = !widerrufen && !abgelaufen && Number.isFinite(ablaufMs) && ablaufMs - Date.now() < BALD_AB_MS;
   const status = widerrufen ? { lvl: "o", txt: t("Widerrufen") }
+    : abgelaufen ? { lvl: "r", txt: t("Abgelaufen") }
     : inaktiv ? { lvl: "o", txt: t("Inaktiv") }
+    : baldAb ? { lvl: "y", txt: t("Läuft bald ab") }
     : { lvl: "g", txt: t("Aktiv") };
   return {
     art: "smejj", id: k.id,
     name: k.name || t("Ohne Namen"),
     hinweis: k.keyHint || "",
     erstellt: datum(k.erstelltAm),
+    laeuftAb: datum(k.laeuftAbAm),
     zuletztBenutzt: datum(k.zuletztBenutztAm),
     nutzungAnfragen: (k.nutzung && k.nutzung.anfragen) || 0,
     nutzungToken: (k.nutzung && k.nutzung.token) || 0,
-    widerrufen, inaktiv,
+    widerrufen, inaktiv, abgelaufen,
     status,
-    off: widerrufen
+    off: widerrufen || abgelaufen
   };
 }
 
@@ -346,7 +374,7 @@ function zeilenMarkup(eintrag, zustand) {
   return `<div class="${klassen.join(" ")}" data-ac-zeile="${escapeAttr(eintrag.id)}" data-art="${eintrag.art}" data-name="${suchText}">
     <div class="ac-who">
       <span class="ac-name">${escapeHtml(eintrag.name)}</span>
-      <span class="ac-sub"><code>${escapeHtml(eintrag.hinweis)}</code>${eintrag.erstellt ? ` · ${escapeHtml(eintrag.erstellt)}` : ""}</span>
+      <span class="ac-sub"><code>${escapeHtml(eintrag.hinweis)}</code>${eintrag.erstellt ? ` · ${escapeHtml(eintrag.erstellt)}` : ""}${eintrag.laeuftAb ? ` · ${t("Läuft ab")} ${escapeHtml(eintrag.laeuftAb)}` : ""}</span>
       <button type="button" class="ac-row-copy" data-ac="kopieren" data-id="${escapeAttr(eintrag.id)}" title="${t("Kopieren")}" aria-label="${t("Kopieren")}">⧉</button>
     </div>
     <span class="ac-cell ac-cell-typ">${escapeHtml(typ)}</span>
@@ -646,7 +674,8 @@ function zeigeAktivitaet(root, zustand, id) {
     [t("Zuletzt genutzt"), eintrag.zuletztBenutzt || t("Nie")],
     [t("Anfragen"), zahl(eintrag.nutzungAnfragen)],
     [t("Token"), zahl(eintrag.nutzungToken)],
-    [t("Erstellt"), eintrag.erstellt || "—"]
+    [t("Erstellt"), eintrag.erstellt || "—"],
+    [t("Läuft ab"), eintrag.laeuftAb || t("Unbefristet")]
   ];
   const pop = root.querySelector(`[data-ac-zeile="${cssEscape(id)}"] .ac-popover`);
   if (!pop) return;
@@ -667,11 +696,16 @@ async function absenden(root, zustand) {
 async function erzeugeSmejjSchluessel(root, zustand) {
   const feld = root.querySelector("[data-ac-dev-name]");
   const name = feld.value.trim();
+  const wahl = root.querySelector("[data-ac-laufzeit]");
+  const laufzeit = wahl?.value || LAUFZEIT_VORAUSWAHL;
+  // Unbefristet nur bewusst: einmal nachfragen, dann respektieren.
+  if (laufzeit === "unbefristet" && !confirm(t("Unbefristet wirklich? Dieser Schlüssel läuft nie von selbst ab. Er gilt, bis du ihn widerrufst."))) return;
   setzeBeschaeftigt(root, true);
   try {
-    const daten = await api(DEV_PREFIX, { method: "POST", body: { name } });
+    const daten = await api(DEV_PREFIX, { method: "POST", body: { name, laufzeit } });
     zeigeEinmal(root, daten.apiKey || "");
     feld.value = "";
+    if (wahl) wahl.value = LAUFZEIT_VORAUSWAHL;
     await laden(root, zustand);
     melde(root, t("Schlüssel erzeugt. Jetzt kopieren — er wird nicht noch einmal angezeigt."));
   } finally {
