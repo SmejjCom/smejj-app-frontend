@@ -71,7 +71,20 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
     // Feld mit Vorschau/Symbol, Name, Groesse und Entfernen (composer-anhang-chips.js);
     // der Verweis geht beim Senden ueber composePastedTask mit.
     const restliche = andere.filter((file) => !textdateien.includes(file));
-    for (const file of restliche) uebernehmeAnhang(file, input, notifyInputChanged);
+    for (const file of restliche) {
+      // PDF (Stufe 2A, 2026-09-03): Text im Browser lesen (pdf.js, nur bei Bedarf geladen) und
+      // wie eine Textdatei MIT INHALT anhaengen; ohne Textebene bleibt der Verweis-Chip.
+      if (input.id === "startMessage" && (/\.pdf$/i.test(file.name || "") || file.type === "application/pdf")) {
+        try {
+          showToast(`PDF wird gelesen: ${file.name}`);
+          const { liesPdfText } = await import("./anhang-pdf-text.js?v=2");
+          const r = await liesPdfText(file);
+          if (r.ok && uebernehmeTextAnhang(file.name, r.text, input)) { showToast(`PDF gelesen: ${file.name} (${r.seiten} Seiten)`); continue; }
+          showToast(r.grund === "verschluesselt" ? `PDF ist verschluesselt: ${file.name}` : `Kein lesbarer Text im PDF: ${file.name}`);
+        } catch { /* Leser nicht ladbar: unten als Chip */ }
+      }
+      uebernehmeAnhang(file, input, notifyInputChanged);
+    }
     if (restliche.length) showToast(restliche.length === 1 ? `${label} hinzugefügt: ${restliche[0].name}` : `${restliche.length} Dateien hinzugefügt`);
     notifyInputChanged(input);
     input.focus();
