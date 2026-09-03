@@ -43,7 +43,7 @@
   // Stufe-4-Seiten haengen sich hinten an, gehoeren aber teils in bestehende
   // Gruppen.
   //
-  // Reihenfolge seit Freigabe 2026-08-31 (App-Repo docs/approvals/
+  // Reihenfolge seit Freigabe 2026-08-31 (docs/approvals/
   // 2026-08-31-admin-reihenfolge.md): die Nummer gilt konsoleweit, die vier
   // Stufen sind zugleich Nummernbereiche. Eine neue Seite ohne Nummer haengt
   // bewusst hinten an "Produktsteuerung" an, statt mittendrin aufzutauchen.
@@ -509,12 +509,11 @@
     return zeigeUebersicht();
   }
 
-  // Tuersteher aus gate.js. Auf dem Control-Server ist er absichtlich untaetig
-  // (dort prueft adminUiRoutes.js schon vor dem Ausliefern), und in Tests fehlt
-  // er ganz — deshalb ueberall mit Fallback aufrufen, nie blind.
+  // Spiegel zu public/admin/console.js. Hier liegt gate.js NICHT daneben:
+  // adminUiRoutes.js prueft schon vor dem Ausliefern und gibt ohne Adminrolle
+  // keine Datei heraus. Der Fallback macht die Zeilen damit wirkungslos — sie
+  // stehen trotzdem hier, damit die beiden Kopien nicht auseinanderlaufen.
   const GATE = window.smejjAdminGate || { freigeben: function () {}, abweisen: function () {} };
-
-  // Die einzigen Absagen, die "kein Adminkonto" bedeuten (adminAuth.js).
   const KEIN_ADMIN = ["admin_role_required", "admin_account_not_active"];
 
   async function start() {
