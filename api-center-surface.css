@@ -79,7 +79,11 @@
    die beiden Trenner als 720 px breite Balken quer durch die Seite. Der
    Betreiber sieht die Seite als Erstes; sie muss aufgeraeumt wirken. */
 .ac-stats {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 26px;
+  /* flex-start, nicht center: der Guthaben-Block ist wegen des Aufladen-Knopfes
+     hoeher als die anderen zwei. Mit center rutschten seine Beschriftung und
+     sein Wert 19 px nach oben — die drei Zeilen fluchteten nicht (live
+     gemessen 2026-09-04). Der Trenner holt sich seine Mitte selbst. */
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 26px;
   margin-top: 16px; padding: 14px 18px;
   border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
@@ -103,7 +107,7 @@
 /* Ein schmaler senkrechter Strich — ohne Hoehe wuerde er als Balken ueber die
    ganze Breite laufen, genau das war live zu sehen. */
 .ac-stat-divider {
-  width: 1px; height: 34px; flex: 0 0 1px;
+  width: 1px; height: 34px; flex: 0 0 1px; align-self: center;
   background: rgba(255, 255, 255, 0.12);
 }
 @media (max-width: 560px) {
