@@ -168,6 +168,45 @@ body{
 .btn.on{background:var(--sm-accent-soft);border-color:var(--sm-accent-border);color:var(--sm-accent-text);}
 
 .stack{display:grid;gap:16px;}
+
+/* Ausgestellte Schluessel (2026-09-04): Der Ausloeser war ein 17-px-Text und
+   die Felder ohne Beschriftung — live als "macht nichts, ist kaputt" gemeldet.
+   Jetzt: Beschriftung ueber jedem Feld, alles mindestens 44 px hoch (Touch),
+   ein echter Knopf. */
+.adm-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px 18px;
+  margin:4px 0 18px;padding:16px;border:1px solid var(--sm-border);border-radius:12px;
+  background:rgba(255,255,255,.03);}
+.adm-feld{display:grid;gap:6px;min-width:0;}
+.adm-label{font-size:13.5px;color:var(--sm-ink-dim);}
+.adm-pflicht{font-size:12px;font-weight:600;color:var(--sm-accent-text);}
+.adm-opt{font-size:12px;color:var(--sm-ink-faint);font-weight:400;}
+.adm-feld input,.adm-feld select{width:100%;min-height:44px;padding:0 12px;font-size:15px;
+  border:1px solid var(--sm-border);border-radius:9px;background:var(--sm-field);color:inherit;}
+.adm-feld input:focus,.adm-feld select:focus{outline:2px solid var(--sm-accent-border);outline-offset:1px;}
+.adm-aktion{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;}
+.btn.adm-gross{min-height:44px;padding:0 22px;font-size:15.5px;border-radius:9px;}
+.adm-hinweis{font-size:13.5px;color:var(--sm-ink-faint);}
+.adm-hinweis.schlecht{color:var(--sm-danger);font-weight:600;}
+
+/* Der frisch ausgestellte Schluessel: einmal sichtbar, also unuebersehbar. */
+.adm-frisch{margin:0 0 18px;padding:16px;border:1px solid var(--sm-ok-border);border-radius:12px;
+  background:var(--sm-ok-bg);}
+.adm-frisch-kopf{font-size:16px;font-weight:700;color:var(--sm-ok);}
+.adm-frisch-warnung{margin-top:4px;font-size:13.5px;color:var(--sm-warn);font-weight:600;}
+.adm-frisch-key{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0 8px;}
+.adm-frisch-key code{flex:1;min-width:240px;padding:12px 14px;border-radius:9px;
+  background:rgba(5,6,8,.55);border:1px solid var(--sm-border);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;word-break:break-all;user-select:all;}
+.adm-frisch-key .btn{min-height:44px;padding:0 18px;}
+.adm-frisch-fuss{font-size:13px;color:var(--sm-ink-dim);}
+.adm-zeile-aktion{white-space:nowrap;}
+.adm-zeile-aktion .btn{min-height:36px;border-radius:8px;}
+.adm-zeile-aktion .btn+.btn{margin-left:8px;}
+@media (max-width:640px){
+  .adm-zeile-aktion{white-space:normal;}
+  .adm-zeile-aktion .btn{min-height:44px;margin:2px 0;display:block;width:100%;}
+  .adm-zeile-aktion .btn+.btn{margin-left:0;}
+}
 .cols2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
 @media(max-width:1150px){.cols2,.cols3{grid-template-columns:1fr;}}

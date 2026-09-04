@@ -250,40 +250,54 @@
     const optionen = LAUFZEITEN.map(function (p) {
       return '<option value="' + p[0] + '"' + (p[0] === "1j" ? " selected" : "") + ">" + e(p[1]) + "</option>";
     }).join("");
-    const admFormular = '<div class="bar">'
-      + '<input class="suche-feld" id="admFuer" type="text" placeholder="Ausgestellt für — Name oder E-Mail">'
-      + '<select id="admLaufzeit" aria-label="Laufzeit">' + optionen + "</select>"
-      + '<input class="suche-feld" id="admBudget" type="text" inputmode="numeric" placeholder="Monatsbudget in Token (optional)">'
-      + '<input class="suche-feld" id="admNotiz" type="text" placeholder="Notiz (optional)">'
-      + '<span class="act" id="admAusstellen">Schlüssel ausstellen</span>'
-      + "</div>";
+    // Ein Formular, das man nicht falsch bedienen kann: jedes Feld hat eine
+    // Beschriftung ueber sich, Pflicht steht dran, der Ausloeser ist ein
+    // richtiger Knopf (44 px) und keine Textzeile.
+    const admFormular = '<div class="adm-form">'
+      + '<label class="adm-feld"><span class="adm-label">Für wen ist der Schlüssel? <b class="adm-pflicht">Pflicht</b></span>'
+      + '<input id="admFuer" type="text" autocomplete="off" placeholder="Name oder E-Mail, z. B. Agentur Nord"></label>'
+      + '<label class="adm-feld"><span class="adm-label">Wie lange soll er gelten?</span>'
+      + '<select id="admLaufzeit">' + optionen + "</select></label>"
+      + '<label class="adm-feld"><span class="adm-label">Monatsbudget <span class="adm-opt">optional</span></span>'
+      + '<input id="admBudget" type="text" inputmode="numeric" placeholder="z. B. 100000 Token — leer = ohne Budget"></label>'
+      + '<label class="adm-feld"><span class="adm-label">Notiz <span class="adm-opt">optional</span></span>'
+      + '<input id="admNotiz" type="text" autocomplete="off" placeholder="wofür ist der Zugang?"></label>'
+      + '<div class="adm-aktion">'
+      + '<button type="button" class="btn primary adm-gross" id="admAusstellen">Schlüssel jetzt ausstellen</button>'
+      + '<span class="adm-hinweis" id="admHinweis">Der Schlüssel wird danach genau einmal angezeigt.</span>'
+      + "</div></div>";
+    // Der frische Schluessel ist das Wichtigste auf der Seite — er ist genau
+    // einmal zu sehen. Deshalb ein eigener grosser Kasten mit Kopier-Knopf,
+    // nicht eine Zeile im Fliesstext.
     const admFrisch = d.frisch && d.frisch.apiKey
-      ? '<div class="note glass"><div class="nx">🔑</div><div>'
-        + '<div class="nt">Neuer Schlüssel für ' + e((d.frisch.schluessel || {}).ausgestelltFuer || "") + " — wird nur jetzt angezeigt</div>"
-        + '<div class="ns mono">' + e(d.frisch.apiKey) + "</div>"
-        + '<div class="ns">Basis-URL ' + e(d.frisch.basisUrl || "https://api.smejj.com/v1") + " · Modell " + e(d.frisch.modell || "smejj-1.0")
-        + " · läuft ab " + ((d.frisch.schluessel || {}).laeuftAbAm ? e(A.datum(d.frisch.schluessel.laeuftAbAm)) : "nie (unbefristet)") + "</div>"
+      ? '<div class="adm-frisch">'
+        + '<div class="adm-frisch-kopf">✓ Schlüssel für <b>' + e((d.frisch.schluessel || {}).ausgestelltFuer || "") + "</b> ist fertig</div>"
+        + '<div class="adm-frisch-warnung">Jetzt kopieren — er wird nie wieder angezeigt.</div>'
+        + '<div class="adm-frisch-key"><code id="admFrischKey">' + e(d.frisch.apiKey) + "</code>"
+        + '<button type="button" class="btn primary" id="admKopieren">Kopieren</button></div>'
+        + '<div class="adm-frisch-fuss">Basis-URL <code>' + e(d.frisch.basisUrl || "https://api.smejj.com/v1") + "</code>"
+        + " · Modell <code>" + e(d.frisch.modell || "smejj-1.0") + "</code>"
+        + " · gültig bis " + ((d.frisch.schluessel || {}).laeuftAbAm ? "<b>" + e(A.datum(d.frisch.schluessel.laeuftAbAm)) + "</b>" : "<b>unbefristet</b>")
         + "</div></div>"
       : "";
     const admZeilen = (adm.schluessel || []).map(function (s) {
       const n = s.nutzung || {};
       return "<tr><td><b>" + e(s.ausgestelltFuer) + "</b>" + (s.notiz ? '<br><span class="s">' + e(s.notiz) + "</span>" : "") + "</td>"
         + '<td><span class="mono">' + e(s.keyHint) + "</span></td>"
-        + "<td>" + pille(s.zustand === "aktiv" ? "aktiv" : s.zustand === "abgelaufen" ? "abgelaufen" : "widerrufen",
-          s.zustand === "aktiv" ? "ok" : s.zustand === "abgelaufen" ? "warn" : "bad") + "</td>"
+        + "<td>" + zustandPilleAdm(s.zustand) + "</td>"
         + "<td>" + (s.laeuftAbAm ? e(A.datum(s.laeuftAbAm)) : '<span class="s">unbefristet</span>') + "</td>"
         + "<td>" + zahl(n.anfragen) + " / " + zahl(n.token) + "</td>"
         + "<td>" + budgetZelle(s) + "</td>"
         + "<td>" + (s.zuletztBenutztAm ? e(A.datum(s.zuletztBenutztAm)) : "—") + "</td>"
         + "<td>" + e(s.ausgestelltVon || "—") + '<br><span class="s">' + e(A.datum(s.erstelltAm)) + "</span></td>"
-        + "<td>" + (s.zustand === "widerrufen" ? "—"
-          : '<span class="act" data-admBudget="' + e(s.id) + '" data-admBudgetWert="' + e(String(s.budgetToken || 0)) + '">Budget</span>'
-            + '<span class="act dg" data-admWiderruf="' + e(s.id) + '">Widerrufen</span>') + "</td></tr>";
+        + '<td class="adm-zeile-aktion">' + (s.zustand === "widerrufen" ? '<span class="s">—</span>'
+          : '<button type="button" class="btn" data-admBudget="' + e(s.id) + '" data-admBudgetWert="' + e(String(s.budgetToken || 0)) + '">Budget</button>'
+            + '<button type="button" class="btn danger" data-admWiderruf="' + e(s.id) + '">Widerrufen</button>') + "</td></tr>";
     });
     const admFehler = adm.ok === false
       ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Ausgestellte Schlüssel nicht lesbar</div><div class="ns">' + e(adm.error || "") + "</div></div></div>"
       : "";
-    const admPanel = V.panelBlock("Ausgestellte Schlüssel", "vom Betreiber vergeben · smejj-adm-… · Verbrauch auf dein Konto",
+    const admPanel = V.panelBlock("Ausgestellte Schlüssel", "Zugänge für andere — sie brauchen kein smejj-Konto",
       admFehler + admFrisch + admFormular
       + V.tabelleBlock(["Für", "Kennzeichen", "Zustand", "Läuft ab", "Anfragen / Token", "Budget (Monat)", "Zuletzt", "Ausgestellt von", ""], admZeilen)
       + '<div class="s">' + e(adm.hinweis || "Der Wert eines Schlüssels wird nie angezeigt — er erscheint genau einmal beim Ausstellen.") + "</div>");
@@ -307,6 +321,15 @@
       + V.panelBlock("Preisliste", "USD je 1 Mio Token", V.tabelleBlock(["Modell", "Eingabe", "Ausgabe"], preisZeilen))
       + V.panelBlock("Nicht erfasst", "was hier bewusst fehlt", V.tabelleBlock(["Was fehlt", "Warum"], luecken))
       + "</div>";
+  }
+
+  // Zustand ausgeschrieben und farbig: gruen "Aktiv", gelb "Abgelaufen",
+  // rot "Widerrufen". Ein Punkt davor, damit die Farbe auch ohne Farbsehen
+  // eine Form hat.
+  function zustandPilleAdm(zustand) {
+    if (zustand === "aktiv") return pille("● Aktiv", "ok");
+    if (zustand === "abgelaufen") return pille("● Abgelaufen", "warn");
+    return pille("● Widerrufen", "bad");
   }
 
   // Budget je Schluessel: ohne Budget ein ehrlicher Strich, mit Budget der

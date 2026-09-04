@@ -42,14 +42,43 @@
     return el && typeof el.value === "string" ? el.value : "";
   }
 
+  /** Rueckmeldung DORT, wo geklickt wurde — nicht oben am Seitenrand. */
+  function sageAmKnopf(text, schlecht) {
+    const feld = document.getElementById("admHinweis");
+    if (!feld) return;
+    feld.textContent = text;
+    feld.className = schlecht ? "adm-hinweis schlecht" : "adm-hinweis";
+  }
+
   function admKnoepfe(ctx) {
+    const kopieren = document.getElementById("admKopieren");
+    if (kopieren) kopieren.addEventListener("click", function () {
+      const code = document.getElementById("admFrischKey");
+      if (!code || !navigator.clipboard) return;
+      navigator.clipboard.writeText(code.textContent.trim()).then(function () {
+        kopieren.textContent = "✓ Kopiert";
+        ctx.meldung("Schlüssel in der Zwischenablage.");
+      });
+    });
     const ausstellen = document.getElementById("admAusstellen");
     if (ausstellen) ausstellen.addEventListener("click", async function () {
       const fuer = String(wert("admFuer")).trim();
       const laufzeit = String(wert("admLaufzeit") || "1j");
       const notiz = String(wert("admNotiz")).trim();
       const budgetToken = String(wert("admBudget")).trim();
-      if (fuer.length < 2) return ctx.meldung("Bitte angeben, für wen der Schlüssel ist (Name oder E-Mail).", true);
+      if (fuer.length < 2) {
+        // Zum Pflichtfeld springen statt nur meckern.
+        const feld = document.getElementById("admFuer");
+        if (feld) { feld.focus(); feld.select(); }
+        sageAmKnopf("Bitte zuerst eintragen, für wen der Schlüssel ist.", true);
+        return ctx.meldung("Bitte angeben, für wen der Schlüssel ist (Name oder E-Mail).", true);
+      }
+      if (budgetToken && !/^\d+$/.test(budgetToken)) {
+        const feld = document.getElementById("admBudget");
+        if (feld) { feld.focus(); feld.select(); }
+        sageAmKnopf("Das Monatsbudget muss eine Zahl sein — oder leer bleiben.", true);
+        return;
+      }
       if (laufzeit === "unbefristet") {
         const ok = await D.bestaetige({
           titel: "Unbefristet wirklich?",
@@ -59,9 +88,24 @@
         });
         if (!ok) return;
       }
-      const antwort = await A.sende("/api/admin/geld/api/ausstellen",
-        { ausgestelltFuer: fuer, laufzeit: laufzeit, notiz: notiz, budgetToken: budgetToken ? Number(budgetToken) : 0 });
-      if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
+      // Sichtbar arbeiten: der Knopf sagt, dass etwas laeuft, und sperrt sich,
+      // damit kein zweiter Schluessel aus Ungeduld entsteht.
+      const beschriftung = ausstellen.textContent;
+      ausstellen.disabled = true;
+      ausstellen.textContent = "Wird ausgestellt …";
+      sageAmKnopf("Einen Moment …");
+      let antwort;
+      try {
+        antwort = await A.sende("/api/admin/geld/api/ausstellen",
+          { ausgestelltFuer: fuer, laufzeit: laufzeit, notiz: notiz, budgetToken: budgetToken ? Number(budgetToken) : 0 });
+      } finally {
+        ausstellen.disabled = false;
+        ausstellen.textContent = beschriftung;
+      }
+      if (!antwort.ok) {
+        sageAmKnopf(antwort.fehler || "Das hat nicht geklappt.", true);
+        return ctx.meldung(antwort.fehler, true);
+      }
       frisch = antwort.data;
       ctx.meldung("Schlüssel ausgestellt — jetzt kopieren, er wird nur einmal angezeigt.");
       ctx.neuLaden();
