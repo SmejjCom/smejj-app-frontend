@@ -30,6 +30,8 @@ import { API_ORIGIN } from "./config.js";
 import { catalogProvider, selectableProviders } from "./ai/providers-catalog.js?v=1";
 import { t } from "./i18n/ui.js?v=3";
 import { api, baseAnbieterId, cssEscape, datum, escapeAttr, escapeHtml, fehlerText, kurz, kurzZahl, statusStufe, usd, zahl } from "./api-center-helfer.js?v=1";
+// Die vier Listen-Aktionen liegen in einem eigenen Modul (800-Zeilen-Regel).
+import { entferne, loescheEndgueltig, schalteUm, umbenenne, zeigeAktivitaet } from "./api-center-aktionen.js?v=1";
 
 const MODELL_KEY = "smejj.model.selected.v2";
 const AKTIVER_ANBIETER_KEY = "smejj.activeProvider.v1";
@@ -247,6 +249,12 @@ async function devLaden() {
 // ---- Zeichnen -----------------------------------------------------------------
 
 /** Alle Eintraege beider Arten — fuer Nachschlagen per id (Menue, Aktionen). */
+// Umgebung fuer die ausgelagerten Aktionen (api-center-aktionen.js): dieselben drei
+// Helfer wie zuvor, nur ausdruecklich uebergeben statt im Modul mitgelesen.
+function hof() {
+  return { alleEintraege, laden, melde };
+}
+
 function alleEintraege(zustand) {
   const byokOk = zustand.byok && !zustand.byok.fehler ? zustand.byok : null;
   const devOk = zustand.dev && !zustand.dev.fehler ? zustand.dev : null;
@@ -418,11 +426,11 @@ async function klick(root, zustand, event) {
   if (aktion === "modell-waehlen") return modellMenue(root, zustand, trigger.dataset.popid);
   if (aktion === "kopieren") return kopiereHint(root, zustand, trigger.dataset.id);
   if (aktion === "widerrufen") return widerrufe(root, zustand, trigger.dataset.id);
-  if (aktion === "umbenennen") return umbenenne(root, zustand, trigger.dataset.id);
-  if (aktion === "loeschen") return loescheEndgueltig(root, zustand, trigger.dataset.id);
-  if (aktion === "umschalten") return schalteUm(root, zustand, trigger.dataset.id);
-  if (aktion === "aktivitaet") return zeigeAktivitaet(root, zustand, trigger.dataset.id);
-  if (aktion === "entfernen") return entferne(root, zustand, trigger.dataset.id);
+  if (aktion === "umbenennen") return umbenenne(root, zustand, trigger.dataset.id, hof());
+  if (aktion === "loeschen") return loescheEndgueltig(root, zustand, trigger.dataset.id, hof());
+  if (aktion === "umschalten") return schalteUm(root, zustand, trigger.dataset.id, hof());
+  if (aktion === "aktivitaet") return zeigeAktivitaet(root, zustand, trigger.dataset.id, hof());
+  if (aktion === "entfernen") return entferne(root, zustand, trigger.dataset.id, hof());
   if (aktion === "aufladen") return stufenMenue(root, trigger);
   if (aktion === "kopiere-basis") return kopiereText(root, root.querySelector("[data-ac-basis-url]")?.textContent || "");
   if (aktion === "zeige-beispiel") {
@@ -627,84 +635,6 @@ function kopiereText(root, text) {
   navigator.clipboard?.writeText(text).then(() => melde(root, t("In die Zwischenablage kopiert.")));
 }
 
-async function loescheEndgueltig(root, zustand, id) {
-  const eintrag = alleEintraege(zustand).find((e) => e.id === id);
-  const name = eintrag ? `\n${eintrag.name}` : "";
-  if (!confirm(`${t("Endgültig löschen? Der Schlüssel verschwindet komplett und kann nicht zurückgeholt werden. Programme mit diesem Schlüssel bekommen danach 401.")}${name}`)) return;
-  try {
-    await api(`${DEV_PREFIX}/${encodeURIComponent(id)}/delete`, { method: "POST", body: {} });
-    await laden(root, zustand);
-    melde(root, t("Schlüssel endgültig gelöscht."));
-  } catch (error) {
-    melde(root, fehlerText(error), true);
-  }
-}
-
-async function entferne(root, zustand, id) {
-  const eintrag = alleEintraege(zustand).find((e) => e.id === id);
-  if (!confirm(`${t("Verbindung wirklich entfernen?")}${eintrag ? ` (${eintrag.name})` : ""}`)) return;
-  try {
-    await api(`${BYOK_PREFIX}/${encodeURIComponent(id)}/remove`, { method: "POST", body: {} });
-    const byok = zustand.byok;
-    if (byok && !byok.fehler && localStorage.getItem(MODELL_KEY) === `key:${id}`) localStorage.removeItem(MODELL_KEY);
-    await laden(root, zustand);
-    melde(root, t("Verbindung wurde entfernt."));
-  } catch (error) {
-    melde(root, fehlerText(error), true);
-  }
-}
-
-async function umbenenne(root, zustand, id) {
-  schliessePopovers(root);
-  const eintrag = alleEintraege(zustand).find((e) => e.id === id);
-  if (!eintrag) return;
-  const name = prompt(t("Neuer Name für den Schlüssel"), eintrag.name);
-  if (name === null) return;
-  if (!name.trim()) return melde(root, t("Der Name darf nicht leer sein."), true);
-  try {
-    await api(`${DEV_PREFIX}/${encodeURIComponent(id)}/rename`, { method: "POST", body: { name: name.trim() } });
-    await laden(root, zustand);
-    melde(root, t("Name geändert."));
-  } catch (error) {
-    melde(root, fehlerText(error), true);
-  }
-}
-
-async function schalteUm(root, zustand, id) {
-  schliessePopovers(root);
-  const eintrag = alleEintraege(zustand).find((e) => e.id === id);
-  if (!eintrag) return;
-  const aktiv = !!eintrag.inaktiv;
-  try {
-    await api(`${DEV_PREFIX}/${encodeURIComponent(id)}/toggle`, { method: "POST", body: { aktiv } });
-    await laden(root, zustand);
-    melde(root, aktiv ? t("Schlüssel aktiviert.") : t("Schlüssel deaktiviert — Aufrufe bekommen jetzt 401."));
-  } catch (error) {
-    melde(root, fehlerText(error), true);
-  }
-}
-
-function zeigeAktivitaet(root, zustand, id) {
-  schliessePopovers(root);
-  const eintrag = alleEintraege(zustand).find((e) => e.id === id);
-  if (!eintrag) return;
-  const zeilen = [
-    [t("Zuletzt genutzt"), eintrag.zuletztBenutzt || t("Nie")],
-    [t("Anfragen"), zahl(eintrag.nutzungAnfragen)],
-    [t("Token"), zahl(eintrag.nutzungToken)],
-    [t("Erstellt"), eintrag.erstellt || "—"],
-    [t("Läuft ab"), eintrag.laeuftAb || t("Unbefristet")]
-  ];
-  const pop = root.querySelector(`[data-ac-zeile="${cssEscape(id)}"] .ac-popover`);
-  if (!pop) return;
-  pop.innerHTML = `<div class="ac-aktivitaet">
-    <div class="ac-pop-head">${escapeHtml(eintrag.name)}</div>
-    ${zeilen.map(([label, wert]) => `<div class="ac-aktivitaet-zeile"><span>${escapeHtml(label)}</span><b>${escapeHtml(String(wert))}</b></div>`).join("")}
-  </div>`;
-  pop.hidden = false;
-}
-
-// ---- Formular absenden --------------------------------------------------------
 
 async function absenden(root, zustand) {
   if (zustand.reiter === "smejj") return erzeugeSmejjSchluessel(root, zustand);
