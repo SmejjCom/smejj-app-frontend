@@ -302,7 +302,9 @@
       : "";
     const admPanel = V.panelBlock("Ausgestellte Schlüssel", "Zugänge für andere — sie brauchen kein smejj-Konto",
       admFehler + admFrisch + admFormular
+      + '<div class="adm-tabelle">'
       + V.tabelleBlock(["Für wen", "Kennzeichen", "Zustand", "Läuft ab", "Verbrauch (Monat)", ""], admZeilen)
+      + "</div>"
       + '<div class="s">' + e(adm.hinweis || "Der Wert eines Schlüssels wird nie angezeigt — er erscheint genau einmal beim Ausstellen.") + "</div>");
 
     return V.kopfBlock("G", "API", "API & Schlüssel",
