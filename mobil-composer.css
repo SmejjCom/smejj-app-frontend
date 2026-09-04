@@ -108,14 +108,31 @@ html { overscroll-behavior-y: none; }
      am Anfangsblock (= ganzer Schirm inkl. Safe-Area bei viewport-fit=cover). */
   /* :root statt html: styles.css setzt :root { background } (Spezifitaet 0,1,0) und schlug
      die html-Regel — html:root (0,1,1) gewinnt an derselben Kaskadenstelle. */
+  /* Betreiber-Screenshot 2026-09-05 01:47 (iPhone-PWA, zweiter Anlauf): unter dem
+     Inhalt stand WEITER ein schwarzer Balken in Hoehe der unteren Safe-Area (~34 pt,
+     im Bild rund 4 % der Schirmhoehe). Der Weg ueber das Wurzelelement reichte nicht:
+     "background-size: 100% 100%" malt das Gefaelle nur auf die HOEHE DER html-BOX, und
+     die endet im iOS-Vollbild ueber dem Home-Balken — darunter blieb nackte Flaeche.
+     Auch "min-height: 100%" half nicht, weil % dort am Anfangsblock haengt, den iOS im
+     Standalone-Modus KLEINER rechnet als den Schirm.
+     Ein FEST POSITIONIERTES Element kennt diese Rechnung nicht: "position: fixed;
+     inset: 0" ist bei viewport-fit=cover der GANZE Schirm, Safe-Areas eingeschlossen.
+     Darum malt jetzt body::before das Gefaelle, und das Wurzelelement traegt nur noch
+     den Grundton als Rueckfall. */
   html:root {
     min-height: 100%;
+    background: #050608;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background:
       radial-gradient(820px 520px at 18% -12%, rgba(50, 246, 234, 0.13), transparent 62%),
       radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
       linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%) #050608;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
   }
   body {
     padding: 0;

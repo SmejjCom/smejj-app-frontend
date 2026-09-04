@@ -4013,12 +4013,18 @@ html { overscroll-behavior-y: none; }
 @media (max-width: 600px) {
   html:root {
     min-height: 100%;
+    background: #050608;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background:
       radial-gradient(820px 520px at 18% -12%, rgba(50, 246, 234, 0.13), transparent 62%),
       radial-gradient(700px 480px at 88% 108%, rgba(13, 148, 210, 0.10), transparent 64%),
       linear-gradient(180deg, #0b1016 0%, #070a0e 62%, #050608 100%) #050608;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
   }
   body {
     padding: 0;
