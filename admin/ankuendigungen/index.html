@@ -57,6 +57,15 @@
     </div>
   </aside>
 
+  <!-- Zieh-Griff auf der Trennlinie (Betreiber-Freigabe 2026-09-04): mit der
+       Maus (oder dem Finger) auf die Kante zwischen Schiene und Inhalt gehen
+       und ziehen. Nach links bis zum Logo klappt die Schiene ein, nach rechts
+       wieder auf. role="separator" mit aria-valuenow, damit der Griff auch mit
+       der Tastatur bedienbar ist (Pfeiltasten). Logik: console.js (bindeGriff). -->
+  <div class="rail-griff" id="railGriff" role="separator" aria-orientation="vertical"
+       tabindex="0" aria-label="Breite des Menüs" aria-valuemin="68" aria-valuemax="420" aria-valuenow="284"
+       title="Ziehen: Menü breiter oder schmaler. Bis zum Logo ziehen klappt es ein. Doppelklick schaltet um."></div>
+
   <div class="main">
     <header class="topbar">
       <div class="crumb">Operations Console · <b id="crumb">Übersicht</b></div>
@@ -71,6 +80,9 @@
   </div>
 </div>
 
+<!-- Linke Schiene (Breite, Ein-/Ausklappen, Zieh-Griff) — muss VOR console.js
+     laden, console.js greift beim Start auf window.smejjAdminSchiene zu. -->
+<script src="/admin/schiene.js"></script>
 <script src="/admin/dialog.js"></script>
 <script src="/admin/api.js"></script>
 <script src="/admin/views.js"></script>

@@ -635,5 +635,31 @@ body.rail-zu .rail-item{grid-template-columns:1fr;justify-items:center;gap:0;pad
 body.rail-zu .rail-foot{padding:12px 0;justify-items:center;}
 body.rail-zu .rail-user{grid-template-columns:32px;}
 
+/* ---------- Zieh-Griff auf der Trennlinie (Freigabe 2026-09-04) ----------
+   Der Griff liegt FEST am Bildschirm, nicht in der Schiene: .rail hat
+   overflow:hidden und wuerde ihn abschneiden. Die Schiene klebt ohnehin bei
+   x=0 ueber die volle Hoehe (position:sticky, height:100vh), deshalb deckt
+   sich `left:var(--rail)` immer mit ihrer Kante.
+   10 px Trefferflaeche (Fitts: eine 1-px-Linie trifft niemand), aber optisch
+   nur eine 2-px-Linie beim Ueberfahren — die Trennlinie selbst bleibt ruhig. */
+.rail-griff{
+  position:fixed;top:0;left:var(--rail);z-index:30;
+  width:10px;height:100vh;transform:translateX(-5px);
+  cursor:col-resize;background:transparent;
+  touch-action:none;               /* sonst scrollt das Handy statt zu ziehen */
+}
+.rail-griff::after{
+  content:"";position:absolute;top:0;bottom:0;left:4px;width:2px;
+  background:var(--sm-accent);opacity:0;transition:opacity .12s ease;
+}
+.rail-griff:hover::after,
+.rail-griff:focus-visible::after,
+body.rail-zieht .rail-griff::after{opacity:.85;}
+.rail-griff:focus-visible{outline:none;}
+/* Waehrend des Ziehens: keine Uebergaenge (die Schiene wuerde dem Zeiger
+   hinterherhinken) und keine Textauswahl (sonst markiert der Zug die Seite). */
+body.rail-zieht{cursor:col-resize;user-select:none;-webkit-user-select:none;}
+body.rail-zieht .shell{transition:none;}
+
 /* Das hidden-Attribut darf keine display-Regel verlieren (2026-08-23: Stand-Pillen) */
 [hidden]{display:none!important;}

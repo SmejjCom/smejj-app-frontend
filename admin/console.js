@@ -602,29 +602,27 @@
   // eine ECHTE Navigation ist (eigener Ordner je Seite): ohne Ablage waere die
   // Schiene nach jedem Klick wieder offen. Rein oertlich, keine Kennung, kein
   // Netz — die Schiene ist eine Ansichtssache, kein Datum.
-  const RAIL_SCHLUESSEL = "smejj.admin.schiene";
-
-  function schieneLesen() {
-    try { return localStorage.getItem(RAIL_SCHLUESSEL) === "zu"; } catch (e) { return false; }
-  }
-
-  function schieneSetzen(zu) {
-    document.body.classList.toggle("rail-zu", !!zu);
-    const knopf = document.getElementById("markeKnopf");
-    if (knopf) knopf.setAttribute("aria-expanded", zu ? "false" : "true");
-    try { localStorage.setItem(RAIL_SCHLUESSEL, zu ? "zu" : "auf"); } catch (e) { /* Privatmodus: dann eben je Seite */ }
-  }
+  // Breite, Ein-/Ausklappen und der Zieh-Griff wohnen in schiene.js (eigene
+  // Datei wegen der 800-Zeilen-Regel). Immer mit Rueckfall aufrufen: in den
+  // Konsolen-Tests laeuft console.js ohne die Schienen-Datei.
+  const SCHIENE = window.smejjAdminSchiene || {
+    herstellen: function () {}, umschalten: function () {}, bindeGriff: function () {}
+  };
 
   function bindeMarke() {
-    const knopf = document.getElementById("markeKnopf");
-    if (!knopf) return;
     // Der gemerkte Zustand wird gesetzt, WAEHREND die Huelle noch verborgen ist
     // (gate.js gibt sie erst nach dem bestaetigten Akteur frei) — deshalb kein
     // Aufblitzen der offenen Schiene.
-    schieneSetzen(schieneLesen());
+    SCHIENE.herstellen();
+    SCHIENE.bindeGriff();
+    const knopf = document.getElementById("markeKnopf");
+    if (!knopf) return;
     knopf.addEventListener("click", function () {
+      // "Ziel zuerst, dann Klappe" (Betreiber-Wahl 2026-09-04): steht man
+      // woanders, fuehrt der Klick nach Hause; steht man schon dort, klappt er
+      // die Schiene zu und wieder auf.
       if (aktuellerPfad() !== STARTSEITE) { geheZu(STARTSEITE); return; }
-      schieneSetzen(!document.body.classList.contains("rail-zu"));
+      SCHIENE.umschalten();
     });
   }
 
