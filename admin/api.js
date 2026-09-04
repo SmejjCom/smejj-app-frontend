@@ -500,7 +500,23 @@
     zeit: zeit,
     datum: datum,
     dauer: dauer,
-    ich: function () { return hole("/api/admin/me"); },
+    // Der Anmelde-Ruf ist der erste und wichtigste: bis er da ist, bleibt die
+    // Huelle verborgen. Er startet deshalb NICHT hier, sondern schon beim Laden
+    // von api.js (siehe VORAB_ICH weiter unten) — hier wird nur abgeholt.
+    ich: function () {
+      if (VORAB_ICH.antwort) {
+        const versprechen = VORAB_ICH.antwort;
+        VORAB_ICH.antwort = null;      // genau einmal verbrauchen
+        return versprechen.then(function (antwort) {
+          // Verlangt die Antwort eine Bestaetigung (Step-up, Adresse noch nicht
+          // bestaetigt), wird der normale Weg MIT Dialog nachgeholt. Der
+          // Vorab-Ruf darf keinen Dialog oeffnen, siehe unten.
+          if (antwort && (antwort.ok || !istBestaetigungNoetig(antwort))) return antwort;
+          return hole("/api/admin/me");
+        });
+      }
+      return hole("/api/admin/me");
+    },
     nutzer: function (parameter) { return hole("/api/admin/users?" + new URLSearchParams(parameter || {}).toString()); },
     akte: function (id, grund) {
       return hole("/api/admin/users/" + encodeURIComponent(id) + "?reason=" + encodeURIComponent(grund));
@@ -540,4 +556,34 @@
     flags: function () { return hole("/api/admin/flags"); },
     flagSetzen: function (k) { return sende("/api/admin/flags/setzen", k); }
   };
+
+  // ---- Vorab-Anmeldung (Befund 2026-09-04) -----------------------------------
+  //
+  // DER BEFUND: Die Konsole laedt 28 Skripte. Bis heute fragte sie den
+  // Control-Server ERST, nachdem alle 28 durchgelaufen waren — die Antwortzeit
+  // des Servers lag damit vollstaendig HINTER dem Download, statt daneben.
+  // Gemessen auf dem Betreiber-Netz: TLS-Handshake zum Control-Server
+  // 0,6-1,7 s, Antwort 0,9-1,9 s. Zusammen mit 104 KB Skripten reichte die
+  // Summe ueber die 15-Sekunden-Wache in gate.js — die Konsole meldete
+  // "Konsole nicht geladen", obwohl nichts kaputt war.
+  //
+  // Jetzt startet der Ruf hier, als DRITTES von 28 Skripten, und laeuft parallel
+  // zu den restlichen 25 Downloads. Es ist derselbe eine Ruf, kein zweiter:
+  // adminApi.ich() holt genau diese Antwort ab.
+  //
+  // Bewusst holeDirekt und NICHT hole: hole() darf bei "Step-up noetig" einen
+  // Dialog oeffnen. Zu diesem Zeitpunkt gibt es weder eine Huelle noch
+  // dialog.js-Zustand, auf den sich das stuetzen koennte — der Dialog kaeme in
+  // eine leere Seite. Braucht die Antwort eine Bestaetigung, holt ich() den
+  // normalen Weg mit Dialog nach.
+  //
+  // Faellt der Ruf auf die Nase, wird NICHTS geschluckt: die Fehlerantwort von
+  // holeEinmal (ok:false, status:0) ist eine gueltige Antwort und wird von
+  // console.js genauso behandelt wie sonst.
+  const VORAB_ICH = { antwort: null };
+  try {
+    VORAB_ICH.antwort = holeDirekt("/api/admin/me");
+  } catch (fehler) {
+    VORAB_ICH.antwort = null;   // dann fragt ich() eben selbst
+  }
 })();

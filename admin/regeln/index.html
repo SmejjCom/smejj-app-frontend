@@ -14,6 +14,18 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.smejj.com https://smejj-control.zeabur.app; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <title>smejj.com — Operations Console</title>
 <link rel="stylesheet" href="/admin/console.css">
+<!-- Verbindungs-Vorbereitung zum Control-Server (Befund 2026-09-04): der erste
+     Ruf der Konsole geht an api.smejj.com. Ohne preconnect beginnt dessen
+     TLS-Handshake erst, wenn api.js laeuft — auf dem Betreiber-Netz gemessene
+     0,6-1,7 s, die vollstaendig im Wartebalken landen. Mit preconnect laeuft er
+     parallel zum Laden der Konsolen-Dateien.
+     crossorigin ist Pflicht: fetch() zu fremder Herkunft benutzt sonst eine
+     ANDERE Verbindung als die vorgewaermte, und die Zeile waere wirkungslos.
+     Die Zeabur-Adresse ist der zweite Zugang (api.js weicht dorthin aus) —
+     nur dns-prefetch, damit nicht zwei Handshakes um dieselbe Leitung streiten.
+     WER DIE API-ADRESSE AENDERT, AENDERT SIE HIER MIT. -->
+<link rel="preconnect" href="https://api.smejj.com" crossorigin>
+<link rel="dns-prefetch" href="https://smejj-control.zeabur.app">
 <!-- Tuersteher: verbirgt die Huelle und leitet Abgemeldete zur Anmeldung.
      MUSS im <head> stehen und ohne defer laden, sonst blitzt der Adminbereich
      kurz auf, bevor umgeleitet wird. Siehe gate.js fuer den Befund. -->

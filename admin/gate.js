@@ -142,21 +142,79 @@
   }
 
   /**
-   * Sicherheitsnetz: gibt console.js nie frei (Skriptfehler, abgebrochener
-   * Download einer der 20 Konsolendateien), bliebe die Seite dauerhaft weiss.
-   * Dann lieber eine lesbare Erklaerung als ein stummes Nichts — aber immer
-   * noch OHNE die Huelle. Verbergen bleibt die Voreinstellung, auch im Fehler.
+   * Sicherheitsnetz in ZWEI Stufen (ueberarbeitet 2026-09-04).
+   *
+   * DER BEFUND: Die Wache stand auf 15 Sekunden und schlug beim Betreiber zu,
+   * obwohl nichts kaputt war. Gemessen: die Konsole laedt 28 Skripte (104 KB
+   * komprimiert) und fragte den Control-Server ERST DANACH. Auf einer zaehen
+   * Leitung addieren sich Download und Antwortzeit (allein der TLS-Handshake
+   * zum Control-Server 0,6-1,7 s, dann 0,9-1,9 s bis zur Antwort) ueber die
+   * 15 Sekunden — und die Meldung "Konsole nicht geladen" nannte dazu noch die
+   * falsche Ursache. Die eigentliche Ursache ist behoben (api.js startet den
+   * Anmelde-Ruf jetzt sofort, parallel zu den restlichen Downloads); hier
+   * bleibt die Wache — aber ehrlich.
+   *
+   * Stufe 1 nach 1,5 s: eine ruhige Zeile "wird geladen". Vorher war die Seite
+   * bis zu 15 Sekunden SCHWARZ — man sah nicht, ob es laeuft oder haengt. Der
+   * Kasten verraet nichts ueber den Aufbau der Konsole, die Huelle bleibt weg.
+   *
+   * Stufe 2 nach 30 s: der Abbruch. Und zwar mit der Ursache, die wirklich
+   * zutrifft — dafuer wird nachgesehen, ob console.js ueberhaupt angekommen
+   * ist. Kam sie nicht an, ist es die Leitung; kam sie an, hat der
+   * Control-Server nicht geantwortet oder ein Skript ist gestolpert.
    */
+  var GEDULD_HINWEIS_MS = 1500;
+  var GEDULD_ABBRUCH_MS = 30000;
+
+  var hinweisNetz = setTimeout(function () { zeigeLaedt(); }, GEDULD_HINWEIS_MS);
   var netz = setTimeout(function () {
     abweisen({
       titel: "Konsole nicht geladen",
-      text: "Die Operations Console hat sich nicht gemeldet. Das liegt fast immer am Netz oder am Control-Server.",
+      text: ketteAngekommen()
+        ? "Die Konsolen-Dateien sind da, aber der Control-Server hat nicht geantwortet. Nochmal versuchen — bleibt es dabei, ist der Control-Server nicht erreichbar."
+        : "Die Konsolen-Dateien sind nicht vollstaendig angekommen. Das ist fast immer die Verbindung.",
       neuLaden: true
     });
-  }, 15000);
+  }, GEDULD_ABBRUCH_MS);
+
+  /**
+   * Ist die Skriptkette ueberhaupt eingetroffen? console.js ist die letzte der
+   * 28 Dateien — steht sie in der Ressourcen-Liste des Browsers, lag es nicht
+   * am Download.
+   */
+  function ketteAngekommen() {
+    try {
+      var eintraege = performance.getEntriesByType("resource") || [];
+      for (var i = 0; i < eintraege.length; i++) {
+        if (String(eintraege[i].name).indexOf("/admin/console.js") >= 0) return true;
+      }
+    } catch (e) { /* kein Performance-API: dann eben die allgemeine Meldung */ }
+    return false;
+  }
+
+  /** Die ruhige Zwischenmeldung. Ohne Huelle, ohne Modulnamen, nur ein Satz. */
+  function zeigeLaedt() {
+    try {
+      if (!document.body || document.getElementById("gateLaedt")) return;
+      var kasten = document.createElement("div");
+      kasten.className = "gate-hinweis";
+      kasten.id = "gateLaedt";
+      var titel = document.createElement("h1");
+      titel.textContent = "Konsole wird geladen …";
+      var text = document.createElement("p");
+      text.textContent = "Anmeldung wird geprüft. Bei langsamer Verbindung dauert das einen Moment.";
+      kasten.appendChild(titel);
+      kasten.appendChild(text);
+      document.body.appendChild(kasten);
+      zeigen();
+    } catch (e) { /* verborgen lassen ist das sichere Ende */ }
+  }
 
   function freigeben() {
     clearTimeout(netz);
+    clearTimeout(hinweisNetz);
+    var laedt = document.getElementById("gateLaedt");
+    if (laedt && laedt.parentNode) laedt.parentNode.removeChild(laedt);
     zeigen();
   }
 
@@ -182,6 +240,7 @@
    */
   function abweisen(was) {
     clearTimeout(netz);
+    clearTimeout(hinweisNetz);
     var o = (typeof was === "string" || !was) ? { text: was } : was;
     try {
       while (document.body.firstChild) document.body.removeChild(document.body.firstChild);

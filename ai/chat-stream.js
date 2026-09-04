@@ -162,8 +162,19 @@ function sorgeFuerAktionsStil() {
   if (document.getElementById(AKTION_STIL_ID)) return;
   const stil = document.createElement("style");
   stil.id = AKTION_STIL_ID;
+  // BEFUND 2026-09-04, live gemessen: Der Knopf war 30 px breit, vom Text
+  // "Gruendlicher antworten" stand nur "cher antworten" da. Ursache ist die
+  // geerbte Klasse .ghost-button — sie ist anderswo ein SYMBOL-Knopf und setzt
+  // width:30px, height:34px, padding:0 und display:grid. Die Regeln hier
+  // ueberschrieben Hoehe und Innenabstand, die BREITE aber nicht.
+  //
+  // Der Selektor ist bewusst zweiteilig (.antwort-aktion .antwort-aktion-knopf):
+  // bei gleicher Spezifitaet entscheidet nur die Reihenfolge, und dieses
+  // Stil-Element haengt zwar spaeter im Kopf — aber darauf soll sich der Knopf
+  // nicht verlassen muessen, wenn jemand die Ladefolge aendert.
   stil.textContent = ".antwort-aktion{margin:12px 0 0;padding-bottom:40px}"
-    + ".antwort-aktion-knopf{min-height:44px;padding:0 16px;border-radius:0;font:inherit;font-weight:600;white-space:nowrap;"
+    + ".antwort-aktion .antwort-aktion-knopf{display:inline-flex;align-items:center;justify-content:center;"
+    + "width:auto;height:auto;min-width:0;min-height:44px;padding:0 16px;border-radius:0;font:inherit;font-weight:600;white-space:nowrap;"
     + "border:1px solid rgba(127,127,127,.4);background:transparent;color:inherit;cursor:pointer}"
     + ".antwort-aktion-knopf:hover{background:rgba(127,127,127,.12)}"
     + ".antwort-aktion-knopf:disabled{opacity:.55;cursor:default}"
