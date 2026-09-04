@@ -4018,7 +4018,10 @@ html { overscroll-behavior-y: none; }
   body::before {
     content: "";
     position: fixed;
-    inset: 0;
+    top: -120px;
+    right: -120px;
+    bottom: -120px;
+    left: -120px;
     z-index: -1;
     pointer-events: none;
     background:

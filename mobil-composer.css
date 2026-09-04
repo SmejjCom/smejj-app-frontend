@@ -123,10 +123,26 @@ html { overscroll-behavior-y: none; }
     min-height: 100%;
     background: #050608;
   }
+  /* GEMESSEN AM GERAET 2026-09-05 02:45 (iPhone X-Klasse, Betreiber-Screenshot der
+     eingebauten Messanzeige): S812 V759 D53 SAoben53 SAunten29 ST1 DPR3.
+     Der Schirm ist 812 pt hoch, die Seite bekommt 759 — es fehlen 53 pt, und das
+     ist auf den Punkt die obere Safe-Area. iOS meldet im Vollbild mit
+     status-bar-style "black-translucent" einen um die Statusleiste VERKUERZTEN
+     Layout-Viewport, obwohl der Inhalt oben schon bei 0 beginnt. Alles, was sich
+     an dieser Zahl ausrichtet, endet 53 pt ueber der Geraetekante — auch
+     "position: fixed; inset: 0", denn fixed haengt am Layout-Viewport.
+     Darum reicht der Grund jetzt bewusst UEBER die Kante hinaus: 120 px Ueberstand
+     auf jeder Seite. Ein fest positioniertes Element erzeugt keinen Scrollbalken,
+     der Ueberstand kostet nichts und deckt jede Geraeteklasse.
+     (Die drei Anlaeufe davor scheiterten alle an derselben falschen Annahme,
+     der Viewport sei so hoch wie der Schirm.) */
   body::before {
     content: "";
     position: fixed;
-    inset: 0;
+    top: -120px;
+    right: -120px;
+    bottom: -120px;
+    left: -120px;
     z-index: -1;
     pointer-events: none;
     background:
