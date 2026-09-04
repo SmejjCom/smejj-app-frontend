@@ -4,67 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<!-- Die Konsole wird an zwei Orten ausgeliefert: statisch von smejj.com/admin
-     (GitHub Pages setzt KEINE Kopfzeilen — deshalb steht die Regel hier im
-     Markup) und vom Control-Server (der zusaetzlich seine eigene Kopfzeile
-     setzt; es gilt dann die Schnittmenge, und die ist dieselbe).
-     connect-src listet den Control-Server, weil die Konsole von smejj.com aus
-     fremde Herkunft anspricht. WER DIE API-ADRESSE AENDERT, MUSS SIE HIER
-     EINTRAGEN — sonst blockiert der Browser jede Abfrage. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://smejj-control.zeabur.app; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
-<title>smejj.com — Operations Console</title>
-<link rel="stylesheet" href="/admin/console.css">
+<meta http-equiv="refresh" content="0; url=/admin/jobs/">
+<title>Umgezogen — smejj.com Operations Console</title>
+<link rel="canonical" href="https://smejj.com/admin/jobs/">
 </head>
 <body>
-<div class="shell">
-  <aside class="rail">
-    <div class="rail-brand">
-      <div class="mark"><div class="dot"></div><b>smejj.com</b></div>
-      <div class="sub">Operations Console</div>
-    </div>
-    <div class="rail-env"><span class="live"></span> <span id="umgebung">Produktion</span></div>
-    <nav class="rail-nav" id="nav"></nav>
-    <div class="rail-foot">
-      <div class="rail-user">
-        <div class="av" id="akteurKuerzel">··</div>
-        <div><div class="nm" id="akteurName">wird geladen …</div><div class="rl" id="akteurRolle">—</div></div>
-      </div>
-      <div class="pill acc" id="stufe">Stufe 2 · nur lesend</div>
-    </div>
-  </aside>
-
-  <div class="main">
-    <header class="topbar">
-      <div class="admin-search-box" style="position:relative;display:flex;align-items:center;min-width:320px;max-width:480px;margin-right:14px;">
-        <input type="search" id="adminSearchInput" placeholder="🔍 Suchen (Live, Freigaben, Autopilot)..." style="background:rgba(5,6,8,0.85);border:1px solid var(--sm-accent-border);color:var(--sm-ink);padding:7px 16px;font-size:13px;width:100%;outline:none;border-radius:20px!important;box-shadow:0 2px 10px rgba(0,0,0,0.4);" />
-        <div id="adminSearchResults" style="display:none;position:absolute;top:40px;left:0;width:100%;max-width:480px;background:#151b2e;border:1px solid var(--sm-accent-border);box-shadow:0 12px 40px rgba(0,0,0,0.9);z-index:9999;padding:8px;border-radius:8px!important;"></div>
-      </div>
-      <div style="height:18px;width:1px;background:var(--sm-border);margin-right:14px;"></div>
-      <div class="crumb">Operations Console · <b id="crumb">Übersicht</b></div>
-      <div class="spacer"></div>
-      
-      <div class="pill" id="indexStand">Index —</div>
-      <div class="pill" id="ketteStand">Kette —</div>
-    </header>
-    <div id="seite"></div>
-  </div>
-</div>
-
-<script src="/admin/dialog.js"></script>
-<script src="/admin/api.js"></script>
-<script src="/admin/views.js"></script>
-<script src="/admin/views-stage4.js"></script>
-<script src="/admin/console-stage4.js"></script>
-<script src="/admin/views-stage5.js"></script>
-<script src="/admin/console-stage5.js"></script>
-<script src="/admin/views-stage6.js"></script>
-<script src="/admin/console-stage6.js"></script>
-<script src="/admin/views-stage7.js"></script>
-<script src="/admin/console-stage7.js"></script>
-<script src="/admin/views-stage8.js"></script>
-<script src="/admin/console-stage8.js"></script>
-<script src="/admin/views-stage9.js"></script>
-<script src="/admin/console-stage9.js"></script>
-<script src="/admin/console.js"></script>
+<p>Diese Adresse ist umgezogen. <a href="/admin/jobs/">Weiter zur Operations Console</a></p>
 </body>
 </html>

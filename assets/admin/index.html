@@ -4,61 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<!-- Die Konsole wird an zwei Orten ausgeliefert: statisch von smejj.com/admin
-     (GitHub Pages setzt KEINE Kopfzeilen — deshalb steht die Regel hier im
-     Markup) und vom Control-Server (der zusaetzlich seine eigene Kopfzeile
-     setzt; es gilt dann die Schnittmenge, und die ist dieselbe).
-     connect-src listet den Control-Server, weil die Konsole von smejj.com aus
-     fremde Herkunft anspricht. WER DIE API-ADRESSE AENDERT, MUSS SIE HIER
-     EINTRAGEN — sonst blockiert der Browser jede Abfrage. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://smejj-control.zeabur.app; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
-<title>smejj.com — Operations Console</title>
-<link rel="stylesheet" href="/admin/console.css">
+<meta http-equiv="refresh" content="0; url=/admin/">
+<title>Umgezogen — smejj.com Operations Console</title>
+<link rel="canonical" href="https://smejj.com/admin/">
 </head>
 <body>
-<div class="shell">
-  <aside class="rail">
-    <div class="rail-brand">
-      <div class="mark"><div class="dot"></div><b>smejj.com</b></div>
-      <div class="sub">Operations Console</div>
-    </div>
-    <div class="rail-env"><span class="live"></span> <span id="umgebung">Produktion</span></div>
-    <nav class="rail-nav" id="nav"></nav>
-    <div class="rail-foot">
-      <div class="rail-user">
-        <div class="av" id="akteurKuerzel">··</div>
-        <div><div class="nm" id="akteurName">wird geladen …</div><div class="rl" id="akteurRolle">—</div></div>
-      </div>
-      <div class="pill acc" id="stufe">Stufe 2 · nur lesend</div>
-    </div>
-  </aside>
-
-  <div class="main">
-    <header class="topbar">
-      <div class="crumb">Operations Console · <b id="crumb">Übersicht</b></div>
-      <div class="spacer"></div>
-      <div class="pill" id="indexStand">Index —</div>
-      <div class="pill" id="ketteStand">Kette —</div>
-    </header>
-    <div id="seite"></div>
-  </div>
-</div>
-
-<script src="/admin/dialog.js"></script>
-<script src="/admin/api.js"></script>
-<script src="/admin/views.js"></script>
-<script src="/admin/views-stage4.js"></script>
-<script src="/admin/console-stage4.js"></script>
-<script src="/admin/views-stage5.js"></script>
-<script src="/admin/console-stage5.js"></script>
-<script src="/admin/views-stage6.js"></script>
-<script src="/admin/console-stage6.js"></script>
-<script src="/admin/views-stage7.js"></script>
-<script src="/admin/console-stage7.js"></script>
-<script src="/admin/views-stage8.js"></script>
-<script src="/admin/console-stage8.js"></script>
-<script src="/admin/views-stage9.js"></script>
-<script src="/admin/console-stage9.js"></script>
-<script src="/admin/console.js"></script>
+<p>Diese Adresse ist umgezogen. <a href="/admin/">Weiter zur Operations Console</a></p>
 </body>
 </html>
