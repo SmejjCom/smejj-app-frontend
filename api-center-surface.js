@@ -401,12 +401,20 @@ function zeilenMarkup(eintrag, zustand) {
     </div>
     <span class="ac-cell ac-cell-status">${badge}</span>
     ${eintrag.art === "smejj"
-      ? `<span class="ac-cell ac-cell-ablauf">${eintrag.laeuftAb ? escapeHtml(eintrag.laeuftAb) : t("Unbefristet")}</span>
+      ? `<span class="ac-cell ac-cell-ablauf">${ablaufText(eintrag)}</span>
     <span class="ac-cell ac-cell-when">${eintrag.zuletztBenutzt || t("Nie")}</span>`
       : `<span class="ac-cell ac-cell-modell">${escapeHtml(eintrag.modell || "—")}</span>`}
     <span class="ac-zelle-menu"><button type="button" class="ac-kebab" data-ac="menue" data-popid="${escapeAttr(popId(eintrag))}" aria-haspopup="menu" aria-expanded="false" aria-label="${t("Weitere Aktionen")}">…</button></span>
     <div class="ac-popover" data-ac-pop="${escapeAttr(popId(eintrag))}" role="menu" hidden></div>
   </div>`;
+}
+
+// Ein widerrufener oder abgelaufener Schluessel laeuft nicht "unbefristet" —
+// er gilt gar nicht mehr. Live am 2026-09-04 stand in der Ablauf-Spalte
+// widerrufener Zeilen "Unbefristet"; das liest sich wie eine Zusage.
+function ablaufText(eintrag) {
+  if (eintrag.widerrufen || eintrag.abgelaufen) return "—";
+  return eintrag.laeuftAb ? escapeHtml(eintrag.laeuftAb) : t("Unbefristet");
 }
 
 function popId(eintrag) {
