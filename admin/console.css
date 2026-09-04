@@ -214,6 +214,9 @@ body{
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;word-break:break-all;user-select:all;}
 .adm-frisch-key .btn{min-height:44px;padding:0 18px;}
 .adm-frisch-fuss{font-size:13px;color:var(--sm-ink-dim);}
+/* Sicherheitsnetz: baut eine Sprache breiter als Deutsch, scrollt die Tabelle
+   waagerecht — statt Knoepfe aus dem Fenster zu schieben (Befund 2026-09-04). */
+.adm-tabelle{overflow-x:auto;}
 .adm-zeile-aktion{white-space:nowrap;}
 .adm-zeile-aktion .btn{min-height:36px;border-radius:8px;}
 .adm-zeile-aktion .btn+.btn{margin-left:8px;}
@@ -595,10 +598,6 @@ span.mono.warn{color:var(--sm-warn);}
 .rg-text b{display:block;font-size:17px;margin-bottom:6px;}
 .rg-vorfall,.rg-heute{font-size:15px;line-height:1.6;color:var(--sm-ink-dim);margin-top:4px;}
 .rg-vorfall .s,.rg-heute .s{color:var(--sm-ink-faint);}
-
-/* Sicherheitsnetz: baut eine Sprache breiter als Deutsch, scrollt die Tabelle
-   waagerecht — statt Knoepfe aus dem Fenster zu schieben (Befund 2026-09-04). */
-.adm-tabelle{overflow-x:auto;}
 
 /* ---------- Eingeklappte Schiene (Betreiber-Freigabe 2026-09-04) ----------
    Ein Klick auf das Logo (auf der Startseite) schaltet body.rail-zu. Die
