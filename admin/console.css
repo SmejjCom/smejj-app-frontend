@@ -613,8 +613,18 @@ span.mono.warn{color:var(--sm-warn);}
    bleiben stehen — sie sind eindeutig, die alten Buchstaben-Kuerzel waren es
    nicht. Der Name steht im title-Attribut. */
 body.rail-zu{--rail:68px;}
-.shell{transition:grid-template-columns .18s ease;}
-@media (prefers-reduced-motion:reduce){.shell{transition:none;}}
+/* AUSDRUECKLICH KEIN Uebergang auf grid-template-columns — bitte nicht
+   "schoener machen" (Befund 2026-09-04, im Browser des Betreibers gemessen):
+   Mit `transition:grid-template-columns .18s ease` hing die Schiene einen
+   Schritt HINTERHER. Gemessen 500 ms nach dem Klick: --rail rechnete auf .shell
+   korrekt 68px, grid-template-columns stand aber weiter auf "68px 1196px",
+   obwohl 300px faellig waren. Grund: der Wert kommt aus einer Custom Property,
+   und der Uebergang startet dann auf dem BEREITS geaenderten Ausgangswert — er
+   laeuft von 68 nach 68 und kommt nie an.
+   Zweiter Grund, unabhaengig davon: eine Animation auf Grid-Spuren rechnet in
+   JEDEM Bild das ganze Layout neu. Auf der 3G-Leitung und dem Geraet des
+   Betreibers ist das genau die Art Weichzeichner, die sich zaeh anfuehlt.
+   Die Schiene springt jetzt sofort — richtig und schnell. */
 body.rail-zu .rail-brand{padding:18px 0 14px;}
 body.rail-zu .rail-brand .mark{justify-content:center;gap:0;}
 body.rail-zu .rail-brand b,
@@ -659,7 +669,6 @@ body.rail-zieht .rail-griff::after{opacity:.85;}
 /* Waehrend des Ziehens: keine Uebergaenge (die Schiene wuerde dem Zeiger
    hinterherhinken) und keine Textauswahl (sonst markiert der Zug die Seite). */
 body.rail-zieht{cursor:col-resize;user-select:none;-webkit-user-select:none;}
-body.rail-zieht .shell{transition:none;}
 
 /* Das hidden-Attribut darf keine display-Regel verlieren (2026-08-23: Stand-Pillen) */
 [hidden]{display:none!important;}
