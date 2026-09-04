@@ -746,6 +746,6 @@ function loadStyles() {
   if (document.querySelector('link[href^="/assets/api-center-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "/assets/api-center-surface.css?v=8";
+  link.href = "/assets/api-center-surface.css?v=9";
   document.head.append(link);
 }

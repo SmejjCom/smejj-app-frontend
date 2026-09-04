@@ -73,6 +73,44 @@
 .ac-chip:first-child { border-left: 0; }
 .ac-chip[aria-pressed="true"] { background: rgba(96, 150, 255, 0.18); color: #bcd0ff; font-weight: 600; }
 
+/* Guthaben-Leiste (2026-09-04): Fuer .ac-stats gab es KEINE einzige Regel —
+   das Markup stand seit dem Umbau im September da, die Gestaltung fehlte.
+   Live sah das so aus: drei Bloecke untereinander statt nebeneinander, und
+   die beiden Trenner als 720 px breite Balken quer durch die Seite. Der
+   Betreiber sieht die Seite als Erstes; sie muss aufgeraeumt wirken. */
+.ac-stats {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 26px;
+  margin-top: 16px; padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  position: relative;
+}
+.ac-stats[hidden] { display: none; }
+.ac-stat-block { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ac-stat-label {
+  font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--premium-muted, #9aa4b2);
+}
+.ac-stat-value { font-size: 19px; font-weight: 700; line-height: 1.2; }
+.ac-stat-link {
+  align-self: flex-start; min-height: 32px; padding: 0 12px; margin-top: 2px;
+  border: 1px solid rgba(120, 170, 255, 0.35); border-radius: 8px;
+  background: rgba(96, 150, 255, 0.12); color: #bcd0ff;
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+}
+.ac-stat-link:hover { background: rgba(96, 150, 255, 0.2); }
+.ac-stat-link[hidden] { display: none; }
+/* Ein schmaler senkrechter Strich — ohne Hoehe wuerde er als Balken ueber die
+   ganze Breite laufen, genau das war live zu sehen. */
+.ac-stat-divider {
+  width: 1px; height: 34px; flex: 0 0 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+@media (max-width: 560px) {
+  .ac-stat-divider { display: none; }
+  .ac-stats { gap: 12px 20px; }
+}
+
 /* Reiter (2026-09-04): der Reiter ist der Filter — smejj-Schluessel und
    eigene Anbieter sind zwei Orte, keine zwei Zeilenarten in einer Liste. */
 .ac-reiter { display: flex; gap: 4px; margin: 18px 0 0; border-bottom: 1px solid rgba(255, 255, 255, 0.09); }
