@@ -14,7 +14,7 @@ export function holeSendepfad() {
     import("/assets/ai/chat-stream.js"),
     import("./autonomous-intent.js"),
     import("./browser-context.js"),
-    import("./medien-absicht.js?v=5"),
+    import("./medien-absicht.js?v=6"),
     import("./maus-absicht.js?v=19"),
     import("./free-coding-fallback.js")
   ]).then((teile) => Object.assign({}, ...teile))

@@ -517,6 +517,27 @@ export function attachCodeActions(output, documentRef = globalThis.document) {
   return blocks.length;
 }
 
+// LIVE GEMESSEN 2026-09-04 im Code-Bereich (Betreiber-Auftrag "teste mit einer
+// echten Aufgabe"): Mit gewaehltem Cline-Katalogmodell stand die Antwort als
+// ROHTEXT in der Blase — die ```-Zaeune sichtbar, kein Codeblock, kein Kopier-
+// oder Download-Knopf. Gegenprobe mit smejj 1.0 im selben Feld: <pre><code> plus
+// Knopfleiste. Ursache: jeder Weg in DIESER Datei endet mit `output.textContent`,
+// waehrend der Server-Weg (ai/chat-stream.js) am Ende des Stroms renderMarkdown
+// aufruft. Der Aufruf fehlte hier schlicht — fuer ALLE vier Client-Wege
+// (Cline-Katalog, eigener Anbieter-Schluessel, BYOK, lokales Browser-Modell).
+//
+// Der Renderer wird dynamisch geladen: diese Datei laeuft auch im Test ohne DOM,
+// und ein fehlgeschlagener Import darf die fertige Antwort nie verschlucken.
+async function rendereAntwort(output) {
+  // Sprachmodus rendert bewusst NICHT: die Vorlese-Warteschlange verfolgt den
+  // wachsenden Text ueber einen Offset (siehe Kopf von chat-markdown.js).
+  if (globalThis.smejjVoiceModePreferences?.voiceMode === true) return;
+  try {
+    const { renderChatMarkdown } = await import("/assets/chat-markdown.js?v=1");
+    renderChatMarkdown(output);
+  } catch { /* fail-safe: die Antwort bleibt als Rohtext lesbar */ }
+}
+
 /**
  * Beantwortet die Aufgabe client-seitig, wenn der Modell-Modus das erlaubt.
  * Rueckgabe true = erledigt (inkl. Hinweistexten), false = Server-Pfad nutzen.
@@ -542,6 +563,10 @@ export async function runClientChat({ task, model, output, offlineNotice = "" } 
   }
   if (!handled && model === "BYOK") { clearThinking(); handled = await runByokChat({ task, output, offlineNotice }); }
   if (!handled && model === "local browser") { clearThinking(); handled = await runLocalBrowserChat({ task, output }); }
-  if (handled) attachCodeActions(output);
+  if (handled) {
+    // Die Speichern-Knoepfe lesen die ```-Zaeune aus textContent — deshalb ZUERST.
+    attachCodeActions(output);
+    await rendereAntwort(output);
+  }
   return handled;
 }
