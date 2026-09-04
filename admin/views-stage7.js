@@ -280,16 +280,19 @@
         + " · gültig bis " + ((d.frisch.schluessel || {}).laeuftAbAm ? "<b>" + e(A.datum(d.frisch.schluessel.laeuftAbAm)) + "</b>" : "<b>unbefristet</b>")
         + "</div></div>"
       : "";
+    // Sechs Spalten. Neun waren breiter als das Fenster, und weil die Huelle
+    // nicht scrollt, war der Widerruf-Knopf schlicht nicht erreichbar
+    // (live gemessen 2026-09-04: Knopf bei x = 1496 in einem 1440-px-Fenster).
     const admZeilen = (adm.schluessel || []).map(function (s) {
       const n = s.nutzung || {};
-      return "<tr><td><b>" + e(s.ausgestelltFuer) + "</b>" + (s.notiz ? '<br><span class="s">' + e(s.notiz) + "</span>" : "") + "</td>"
+      return "<tr><td><b>" + e(s.ausgestelltFuer) + "</b>"
+        + (s.notiz ? '<br><span class="s">' + e(s.notiz) + "</span>" : "")
+        + '<br><span class="s">von ' + e(s.ausgestelltVon || "—") + " · " + e(A.datum(s.erstelltAm)) + "</span></td>"
         + '<td><span class="mono">' + e(s.keyHint) + "</span></td>"
         + "<td>" + zustandPilleAdm(s.zustand) + "</td>"
         + "<td>" + (s.laeuftAbAm ? e(A.datum(s.laeuftAbAm)) : '<span class="s">unbefristet</span>') + "</td>"
-        + "<td>" + zahl(n.anfragen) + " / " + zahl(n.token) + "</td>"
-        + "<td>" + budgetZelle(s) + "</td>"
-        + "<td>" + (s.zuletztBenutztAm ? e(A.datum(s.zuletztBenutztAm)) : "—") + "</td>"
-        + "<td>" + e(s.ausgestelltVon || "—") + '<br><span class="s">' + e(A.datum(s.erstelltAm)) + "</span></td>"
+        + "<td>" + zahl(n.anfragen) + " Anfragen<br>" + budgetZelle(s)
+        + '<br><span class="s">zuletzt ' + (s.zuletztBenutztAm ? e(A.datum(s.zuletztBenutztAm)) : "nie") + "</span></td>"
         + '<td class="adm-zeile-aktion">' + (s.zustand === "widerrufen" ? '<span class="s">—</span>'
           : '<button type="button" class="btn" data-admBudget="' + e(s.id) + '" data-admBudgetWert="' + e(String(s.budgetToken || 0)) + '">Budget</button>'
             + '<button type="button" class="btn danger" data-admWiderruf="' + e(s.id) + '">Widerrufen</button>') + "</td></tr>";
@@ -299,7 +302,7 @@
       : "";
     const admPanel = V.panelBlock("Ausgestellte Schlüssel", "Zugänge für andere — sie brauchen kein smejj-Konto",
       admFehler + admFrisch + admFormular
-      + V.tabelleBlock(["Für", "Kennzeichen", "Zustand", "Läuft ab", "Anfragen / Token", "Budget (Monat)", "Zuletzt", "Ausgestellt von", ""], admZeilen)
+      + V.tabelleBlock(["Für wen", "Kennzeichen", "Zustand", "Läuft ab", "Verbrauch (Monat)", ""], admZeilen)
       + '<div class="s">' + e(adm.hinweis || "Der Wert eines Schlüssels wird nie angezeigt — er erscheint genau einmal beim Ausstellen.") + "</div>");
 
     return V.kopfBlock("G", "API", "API & Schlüssel",
@@ -337,6 +340,7 @@
   function budgetZelle(s) {
     const budget = Number(s.budgetToken || 0);
     if (!budget) return '<span class="s">ohne Budget</span>';
+    // Mit Budget: "verbraucht / Budget" als Ampel — im Kopf steht, dass es der Monat ist.
     const m = s.monat || {};
     const verbraucht = String(m.monat || "") === new Date().toISOString().slice(0, 7) ? Number(m.token || 0) : 0;
     const voll = verbraucht >= budget;
