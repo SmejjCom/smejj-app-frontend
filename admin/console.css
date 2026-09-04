@@ -81,10 +81,17 @@ body{
   box-shadow:inset -1px 0 0 rgba(255,255,255,.06);
 }
 .rail-brand{padding:18px 16px 14px;border-bottom:1px solid var(--sm-border);}
-.rail-brand .mark{display:flex;align-items:center;gap:9px;}
-.rail-brand .dot{width:16px;height:16px;border:1.5px solid var(--sm-accent);
-  position:relative;}
-.rail-brand .dot::after{content:"";position:absolute;inset:4px;background:var(--sm-accent);}
+/* Die Marke ist seit 2026-09-04 ein Knopf (Startseite / Schiene ein- und
+   ausklappen). Der Browser-Knopf wird vollstaendig entkleidet, damit die Optik
+   exakt bleibt wie vorher — nur der Zeiger und der Fokusrahmen verraten ihn. */
+.rail-brand .mark{display:flex;align-items:center;gap:9px;width:100%;
+  margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;
+  cursor:pointer;-webkit-appearance:none;appearance:none;}
+.rail-brand .mark:focus-visible{outline:2px solid var(--sm-accent);outline-offset:3px;}
+.rail-brand .mark .logo{flex:0 0 auto;display:grid;place-items:center;width:22px;height:22px;
+  color:var(--sm-accent);}
+.rail-brand .mark .logo svg{display:block;width:20px;height:20px;}
+.rail-brand .mark:hover .logo{color:var(--sm-ink);}
 .rail-brand b{font-size:17.5px;font-weight:600;letter-spacing:.01em;}
 .rail-brand .sub{margin-top:8px;font-size:12px;font-weight:700;letter-spacing:.16em;
   text-transform:uppercase;color:var(--sm-accent);}
@@ -98,15 +105,23 @@ body{
 .rail-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);}
 .rail-group{margin:12px 8px 6px;font-size:12px;font-weight:700;letter-spacing:.16em;
   text-transform:uppercase;color:var(--sm-ink-faint);}
+/* Nummer der Gruppe (2026-09-04). NICHT .rg-nr nennen — die Klasse gehoert
+   schon der Regeln-Seite und waere dort ein 40px-Kasten. */
+.rail-group .grp-nr{display:inline-block;min-width:13px;margin-right:8px;color:var(--sm-accent);}
 .rail-item{
-  display:grid;grid-template-columns:26px 1fr;align-items:center;gap:11px;
+  display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:11px;
   padding:7px 8px;font-size:15px;color:var(--sm-ink-dim);cursor:pointer;
   border:1px solid transparent;text-decoration:none;
 }
 .rail-item .ltr{
-  display:grid;place-items:center;width:26px;height:26px;font-size:12px;font-weight:700;
+  display:grid;place-items:center;width:30px;height:26px;font-size:11.5px;font-weight:700;
+  letter-spacing:0;font-variant-numeric:tabular-nums;
   border:1px solid var(--sm-border);background:rgba(255,255,255,.05);color:var(--sm-ink-faint);
 }
+.rail-item .rail-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* Das alte Buchstaben-Kuerzel bleibt als leise Zweitkennung am Zeilenrand. */
+.rail-item .rail-kuerzel{font-size:10.5px;font-weight:700;letter-spacing:.08em;
+  color:var(--sm-ink-faint);opacity:.5;}
 .rail-item:hover{background:rgba(255,255,255,.05);color:var(--sm-ink);}
 .rail-item.on{
   background:var(--sm-card-strong);border-color:var(--sm-border-strong);color:var(--sm-ink);
@@ -590,6 +605,35 @@ span.mono.warn{color:var(--sm-warn);}
 .rg-text b{display:block;font-size:17px;margin-bottom:6px;}
 .rg-vorfall,.rg-heute{font-size:15px;line-height:1.6;color:var(--sm-ink-dim);margin-top:4px;}
 .rg-vorfall .s,.rg-heute .s{color:var(--sm-ink-faint);}
+
+/* ---------- Eingeklappte Schiene (Betreiber-Freigabe 2026-09-04) ----------
+   Ein Klick auf das Logo (auf der Startseite) schaltet body.rail-zu. Die
+   Schiene faellt auf eine Icon-Spur zusammen, statt ganz zu verschwinden: das
+   Logo MUSS sichtbar bleiben, sonst gaebe es keinen Weg zurueck. Die Nummern
+   bleiben stehen — sie sind eindeutig, die alten Buchstaben-Kuerzel waren es
+   nicht. Der Name steht im title-Attribut. */
+body.rail-zu{--rail:68px;}
+.shell{transition:grid-template-columns .18s ease;}
+@media (prefers-reduced-motion:reduce){.shell{transition:none;}}
+body.rail-zu .rail-brand{padding:18px 0 14px;}
+body.rail-zu .rail-brand .mark{justify-content:center;gap:0;}
+body.rail-zu .rail-brand b,
+body.rail-zu .rail-brand .sub,
+body.rail-zu .rail-env #umgebung,
+body.rail-zu .rail-item .rail-name,
+body.rail-zu .rail-item .rail-kuerzel,
+body.rail-zu .rail-group .grp-nr,
+body.rail-zu .rail-user > div:last-child,
+body.rail-zu .rail-foot .pill{display:none;}
+/* Die Gruppen-Ueberschrift wird zum Trennstrich statt zu verschwinden — sonst
+   verliert die Icon-Spur jede Gliederung. */
+body.rail-zu .rail-group{margin:12px 14px 8px;padding:0;height:1px;overflow:hidden;
+  font-size:0;line-height:0;color:transparent;background:var(--sm-border);}
+body.rail-zu .rail-env{justify-content:center;padding:10px 0;}
+body.rail-zu .rail-nav{padding:8px 0 14px;}
+body.rail-zu .rail-item{grid-template-columns:1fr;justify-items:center;gap:0;padding:7px 0;}
+body.rail-zu .rail-foot{padding:12px 0;justify-items:center;}
+body.rail-zu .rail-user{grid-template-columns:32px;}
 
 /* Das hidden-Attribut darf keine display-Regel verlieren (2026-08-23: Stand-Pillen) */
 [hidden]{display:none!important;}
