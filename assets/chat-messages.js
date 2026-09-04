@@ -478,3 +478,41 @@ export function observeLog(log, hooks = {}) {
   sweep();
   return observer;
 }
+
+// ---------------------------------------------------------------------------
+// Tote Aktionsknoepfe aus wiederhergestelltem Verlaufs-HTML
+//
+// BEFUND 2026-09-04, live gemessen: Unter einer alten Antwort stand
+// "Gruendlicher antworten" — 30 px breit, zu lesen war nur "cher antworten",
+// und ein Klick tat nichts.
+//
+// Zwei Ursachen greifen ineinander:
+//   1. readEntries() speichert node.innerHTML. Der Knopf, den chat-stream.js
+//      an die frische Antwort haengt, wird damit MITGESPEICHERT.
+//   2. Beim Wiederherstellen wird dieses HTML zurueckgeschrieben. Der Knopf
+//      ist dann ein Bild von einem Knopf: kein Klick-Ereignis (das lebte in
+//      der Funktion, die ihn erzeugt hat) und ohne Stil, weil chat-stream.js
+//      auf der Startseite gar nicht geladen ist (Startseiten-Diaet) — es
+//      bleibt allein .ghost-button, und die ist ein SYMBOL-Knopf mit
+//      width:30px.
+//
+// Ein Knopf, der nichts tut, ist schlimmer als kein Knopf. Er wird deshalb
+// beim Speichern UND beim Anzeigen entfernt; einen lebenden haengt
+// chat-stream.js in derselben Sitzung ohnehin wieder an (aktionsMerker).
+//
+// Bewusst eine Zeichenketten-Regel und kein DOM-Aufbau: die Funktion laeuft
+// in readEntries fuer jede Nachricht und darf nicht fuer jeden Aufruf ein
+// Dokument bauen. Der Block wird von uns selbst erzeugt, sein Aufbau ist
+// bekannt (<p class="antwort-aktion">…</p>), und Fremdtext steht nie darin.
+// ---------------------------------------------------------------------------
+const AKTIONS_BLOCK = /<p class="antwort-aktion">[\s\S]*?<\/p>/g;
+
+/**
+ * Entfernt gespeicherte Aktionsknoepfe aus Antwort-HTML.
+ * @param {string} html innerHTML einer Antwort
+ * @returns {string} dasselbe HTML ohne den Knopf-Block
+ */
+export function ohneToteAktion(html) {
+  const text = String(html || "");
+  return text.includes("antwort-aktion") ? text.replace(AKTIONS_BLOCK, "") : text;
+}

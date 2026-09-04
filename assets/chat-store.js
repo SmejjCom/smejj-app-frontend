@@ -21,7 +21,7 @@ export { restoreChat, endgueltigLoeschen, listGeloeschteChats, listProjekte, get
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und
 // Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
 // Verlauf kein Markdown kopieren und keinen Zeitstempel zeigen.
-import { clampVersionIndex, metaOf, seedMeta } from "/assets/chat-messages.js?v=1";
+import { clampVersionIndex, metaOf, ohneToteAktion, seedMeta } from "/assets/chat-messages.js?v=2";
 // Besitzer-Logik separat und Node-testbar (tests/chat-owner.test.mjs).
 import { OWNER_KEY, gehoertNutzer, kontoAliase, ownerDecision, sessionUserId } from "/assets/chat-owner.js?v=3";
 
@@ -234,7 +234,7 @@ function readEntries() {
     return {
       role: node.classList.contains("user") ? "user" : "assistant",
       text: String(node.textContent || ""),
-      html: node.classList.contains("user") ? "" : String(node.innerHTML || ""),
+      html: node.classList.contains("user") ? "" : ohneToteAktion(node.innerHTML), // ohne den Aktionsknopf: gespeichert waere er tot (Befund 2026-09-04)
       raw: String(meta.raw || ""),
       createdAt: String(meta.createdAt || ""),
       model: String(meta.model || ""),
@@ -571,7 +571,7 @@ function renderEntriesInto(log, messages) {
       const node = document.createElement("article");
       node.className = `entry ${message.role === "user" ? "user" : "assistant"}`;
       if (message.role === "assistant" && message.html) {
-        node.innerHTML = message.html; // eigene, bereits sanitisierte Render-Ausgabe
+        node.innerHTML = ohneToteAktion(message.html); // eigene, sanitisierte Ausgabe; Altbestand traegt noch tote Aktionsknoepfe
       } else {
         node.textContent = message.text;
         if (message.role === "assistant") renderChatMarkdown(node);
