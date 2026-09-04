@@ -212,8 +212,16 @@ export function zeigeSchritt(output, schritt) {
   // `stand` (z. B. "läuft … 40 s") erlaubt dem Server, dieselbe Zeile mit
   // wachsendem Fortschritt zu aktualisieren — vorher bekam jede 10-s-Meldung
   // einen neuen Text und damit eine NEUE Zeile (Stapel-Fehler, 2026-08-12).
+  // "1 Treffer" ist die Sprache der SUCHE. Eine gelesene Seite hat keine
+  // Treffer, sie ist gelesen oder nicht — bis 2026-09-04 stand hinter einer
+  // erfolgreich gelesenen Seite "nichts gefunden" (Zaehlung kannte die Art
+  // nicht, siehe zaehleTreffer im Control-Server).
   anhang.textContent = fertig
-    ? (schritt.stand ? ` ✓ ${schritt.stand}` : schritt.treffer > 0 ? ` ✓ ${schritt.treffer} Treffer` : " ✓ nichts gefunden")
+    ? (schritt.stand
+        ? ` ✓ ${schritt.stand}`
+        : schritt.treffer > 0
+          ? (schritt.art === "seite" ? " ✓ gelesen" : ` ✓ ${schritt.treffer} Treffer`)
+          : " ✓ nichts gefunden")
     : ` ${schritt.stand || "läuft …"}`;
   zeile.append(anhang);
   if (zeile.parentElement?.dataset?.gruppe === "true") aktualisiereGruppe(zeile.parentElement);
