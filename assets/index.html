@@ -24,11 +24,6 @@
     <!-- Kaltstart (Freigabe 25.08.): Stylesheet sofort anstossen — vorher
          startete es erst NACH dem Tor-Skript, eine volle Runde spaeter. -->
     <link rel="preload" href="/assets/start-styles.css?v=mobil102-20260903" as="style">
-    <!-- Verbindung zum Control-Server vorwaermen (Befund 2026-09-04): der erste
-         API-Ruf startete bei 2130 ms und brauchte 1014 ms, darin ein kalter
-         TLS-Handshake. crossorigin ist PFLICHT, sonst waermt es eine andere
-         Verbindung als fetch() benutzt. Adresse aendern -> hier mitaendern. -->
-    <link rel="preconnect" href="https://api.smejj.com" crossorigin>
     <!-- Fruehes Tor (Betreiber-Freigabe 2026-08-23): Anonyme sofort zur Landeseite,
          statt 3,7 s (Desktop) / 15 s (iPhone) die App-Huelle zu sehen. Kein Modul,
          kein Import — laeuft vor dem ersten Pixel. Regeln bleiben in auth-gate.js. -->
@@ -1001,7 +996,7 @@
     <!-- Peripherie (Fuehrung, Papierkorb, Kamera, @-Erwaehnung, Codeblock-Werkzeuge)
          laedt erst bei ihrer Handlung — Betreiber-Freigabe 2026-08-24 "Startseite abspecken". -->
     <script src="/assets/bedarf-nachladen.js?v=3" type="module"></script>
-    <script src="/assets/app.js?v=b129" type="module"></script>
+    <script src="/assets/app.js?v=b130" type="module"></script>
     <script src="/assets/pwa-schnellstart.js?v=5" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260825-6" type="module"></script>
     <!-- Browser-Panel und Maus-Panel: erst wenn sie gebraucht werden.

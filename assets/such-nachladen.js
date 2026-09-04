@@ -27,11 +27,29 @@ export function holeSuche() {
   return geladen;
 }
 
+/**
+ * Haken fuer den Ansichtswechsel: laedt die Suche, sobald die Such-Ansicht
+ * geoeffnet wird. app.js ruft ihn in goToView auf, wie holeFlaechen.
+ *
+ * LIVE GEMESSEN 2026-09-04: Hier stand `ladeBeiAnsicht(["search"], holeSuche)`
+ * — gleich zweimal falsch. Erstens nennt der erste Parameter jener Funktion die
+ * Ansichten, die NICHT ausloesen (so war ausgerechnet die Such-Ansicht
+ * ausgeschlossen). Zweitens wurde ihr Rueckgabewert verworfen, also rief ihn
+ * niemand je auf. Folge: search.js wurde NIE geladen, das Formular hatte keinen
+ * Handler, und die Suche zeigte auf jede Eingabe nur den Leertext. Kein Test
+ * schlug an, weil beide Module fuer sich fehlerfrei sind — die Falle
+ * "Modul laedt nie, kein Test merkt es".
+ *
+ * @param {string} ansichtId
+ */
+export function ladeSucheFuerAnsicht(ansichtId) {
+  if (ansichtId !== "search") return undefined;
+  return holeSuche().catch(() => { /* Meldung steht in holeSuche */ });
+}
+
 export function bindeSuchNachlader(optionen) {
-  const { goToView, ladeBeiAnsicht } = optionen;
+  const { goToView } = optionen;
   einrichtung = optionen;
-  // Such-Ansicht direkt angesteuert (Deep-Link, Spur): Formular-Bindung laden.
-  ladeBeiAnsicht(["search"], holeSuche);
   const fruehK = (event) => {
     if (String(event.key || "").toLowerCase() !== "k" || (!event.metaKey && !event.ctrlKey)) return;
     event.preventDefault();
