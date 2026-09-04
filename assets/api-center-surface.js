@@ -1,11 +1,14 @@
-// smejj.com — zentraler API-Bereich (OpenRouter-Stil). EINE Flaeche fuer
-// beides: smejj-Schluessel (/api/developer/keys, was wir nach aussen
-// anbieten) und eigene Anbieter-Schluessel (/api/keys, BYOK, serverseitig
-// AES-256-GCM verschluesselt). Ersetzt die zwei frueheren Orte
-// (Modelle-Panel "API-Keys" und das API-Konto mit sechs Karten) — gleiche
-// Funktionen, eine Uebersicht: Kopfzeile mit einem Hauptknopf,
-// Guthaben-Leiste, Suche + Typfilter, eine Liste fuer alle Schluessel,
-// Aktionen hinter dem Drei-Punkte-Menue, Verbindung & Preise darunter.
+// smejj.com — zentraler API-Bereich (OpenRouter-Stil). Eine Flaeche, ZWEI
+// REITER (Betreiber-Beschluss 2026-09-04, Plan Punkt 1):
+//   * "Meine smejj-Schluessel" — was wir nach aussen anbieten
+//     (/api/developer/keys), fuer Programme wie ZCode, Cline, Cursor. Oben die
+//     drei Angaben zum Verbinden, darunter die Liste.
+//   * "Eigene Anbieter" — BYOK (/api/keys), fremde Schluessel fuer den Chat,
+//     serverseitig AES-256-GCM verschluesselt.
+// Vorher lagen beide Arten gemischt in EINER Liste mit Typ-Spalte und
+// Filter-Chips. Das war der Grund fuer "nicht uebersichtlich": zwei Dinge, die
+// nichts miteinander zu tun haben, nebeneinander. Der Reiter IST jetzt der
+// Filter — Typ-Chips im Formular und Filter-Chips ueber der Liste entfallen.
 //
 // Sicherheitsregeln unveraendert uebernommen: Der Klartext-Schluessel wird
 // EINMAL angezeigt und nirgends abgelegt — kein localStorage, kein
@@ -50,7 +53,8 @@ export function initApiCenter(wurzel, optionen = {}) {
   const kopf = optionen.kopf === "voll" ? "voll" : "kompakt";
   wurzel.insertAdjacentHTML("beforeend", markup(kopf));
   const root = wurzel.querySelector("[data-ac-root]");
-  const zustand = { filter: "alle", such: "", typ: "smejj", byok: null, dev: null };
+  // reiter steuert alles: welche Liste, welches Formular, welche Spalten.
+  const zustand = { reiter: "smejj", such: "", byok: null, dev: null };
 
   root.addEventListener("click", (event) => klick(root, zustand, event));
   root.addEventListener("input", (event) => {
@@ -93,6 +97,11 @@ function markup(kopf) {
       <button type="button" class="ac-primary" data-ac="neu">＋ ${t("Schlüssel erstellen")}</button>
     </div>
 
+    <div class="ac-reiter" role="tablist" aria-label="${t("API-Keys")}">
+      <button type="button" class="ac-reiter-knopf" role="tab" data-ac="reiter" data-reiter="smejj" aria-selected="true">${t("Meine smejj-Schlüssel")}</button>
+      <button type="button" class="ac-reiter-knopf" role="tab" data-ac="reiter" data-reiter="anbieter" aria-selected="false">${t("Eigene Anbieter")}</button>
+    </div>
+
     <div class="ac-stats" data-ac-stats hidden>
       <div class="ac-stat-block">
         <span class="ac-stat-label">GUTHABEN</span>
@@ -113,10 +122,6 @@ function markup(kopf) {
     </div>
 
     <form class="ac-form" data-ac-form hidden>
-      <div class="ac-chips" role="group" aria-label="${t("Schlüssel erstellen")}">
-        <button type="button" class="ac-chip" data-ac="typ" data-typ="smejj" aria-pressed="true">${t("smejj-Schlüssel")}</button>
-        <button type="button" class="ac-chip" data-ac="typ" data-typ="anbieter" aria-pressed="false">${t("Anbieter-Key")}</button>
-      </div>
       <div data-ac-bereich="smejj">
         <label class="ac-field">${t("Name des Schlüssels")}
           <input data-ac-dev-name type="text" maxlength="60" autocomplete="off" spellcheck="false" placeholder="${t("Wofür? z. B. ZCode auf dem Laptop")}">
@@ -148,18 +153,21 @@ function markup(kopf) {
       <div class="ac-reveal" data-ac-reveal hidden></div>
     </form>
 
+    <section class="ac-verbinden" data-ac-verbinden>
+      <div class="ac-mini-row">${t("Basis-URL")} <code class="ac-code" data-ac-basis-url>https://api.smejj.com/v1</code><button type="button" class="ac-copy" data-ac="kopiere-basis" title="${t("Kopieren")}" aria-label="${t("Kopieren")}">⧉</button></div>
+      <div class="ac-mini-row">${t("Modell")} <code class="ac-code">smejj-1.0</code></div>
+      <button type="button" class="ac-mini-link" data-ac="zeige-beispiel">${t("curl-Beispiel anzeigen")}</button>
+      <pre data-ac-beispiel hidden><code>curl <span data-ac-basis-url-2>https://api.smejj.com/v1</span>/chat/completions \
+  -H "Authorization: Bearer smejj-live-…" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"smejj-1.0","messages":[{"role":"user","content":"Hallo"}]}'</code></pre>
+    </section>
+
     <div class="ac-card">
       <div class="ac-toolbar">
         <input type="search" class="ac-search" data-ac-suche placeholder="• ${t("Nach Name suchen …")}" aria-label="${t("Nach Name oder Schlüssel suchen …")}">
-        <div class="ac-chips" role="group" aria-label="${t("Nach Typ filtern")}">
-          <button type="button" class="ac-chip" data-ac="filter" data-filter="alle" aria-pressed="true">${t("Alle")}</button>
-          <button type="button" class="ac-chip" data-ac="filter" data-filter="smejj" aria-pressed="false">smejj</button>
-          <button type="button" class="ac-chip" data-ac="filter" data-filter="anbieter" aria-pressed="false">${t("Anbieter")}</button>
-        </div>
       </div>
-      <div class="ac-cols" aria-hidden="true">
-        <span>${t("Schlüssel")}</span><span>${t("Typ")}</span><span>${t("Status")}</span><span>${t("Zuletzt genutzt")}</span><span></span>
-      </div>
+      <div class="ac-cols" data-ac-cols aria-hidden="true"></div>
       <div class="ac-rows" data-ac-rows></div>
       <div class="ac-foot-row">
         <span class="ac-count" data-ac-count title="${t("Läuft ab")}"></span>
@@ -174,20 +182,8 @@ function markup(kopf) {
         <span class="ac-token-verdacht">${t("Anfragen heute")}: —</span>
       </section>
       <details class="ac-anhang">
-      <summary>${t("Verbinden & Preise")}</summary>
+      <summary>${t("Preise")}</summary>
       <div class="ac-anhang-inhalt">
-        <section class="ac-mini">
-          <h3>${t("Verbinden")}</h3>
-          <div class="ac-mini-row">${t("Basis-URL")} <code class="ac-code" data-ac-basis-url>https://api.smejj.com/v1</code><button type="button" class="ac-copy" data-ac="kopiere-basis" title="${t("Kopieren")}" aria-label="${t("Kopieren")}">⧉</button></div>
-          <div class="ac-mini-row">${t("Modell")} <code class="ac-code">smejj-1.0</code></div>
-          <div class="ac-beispiel">
-            <button type="button" class="ac-mini-link" data-ac="zeige-beispiel">${t("curl-Beispiel anzeigen")}</button>
-            <pre data-ac-beispiel hidden><code>curl <span data-ac-basis-url-2>https://api.smejj.com/v1</span>/chat/completions \
-  -H "Authorization: Bearer smejj-live-…" \
-  -H "Content-Type: application/json" \
-  -d '{"model":"smejj-1.0","messages":[{"role":"user","content":"Hallo"}]}'</code></pre>
-          </div>
-        </section>
         <section class="ac-mini">
           <h3>${t("Preise")}</h3>
           <table class="ac-preise"><thead><tr><th>${t("Modell")}</th><th>${t("Eingabe")}</th><th>${t("Ausgabe")}</th></tr></thead><tbody data-ac-preise></tbody></table>
@@ -226,9 +222,11 @@ function startmeldung(zustand) {
   if (fehler.length === 1 && fehler[0]?.code === "public_api_disabled") {
     return { text: t("Die Entwickler-API ist auf diesem Server noch nicht eingeschaltet."), fehler: true };
   }
-  if (!alleEintraege(zustand).length) {
+  if (!reiterEintraege(zustand).length) {
     if (fehler.length) return { text: fehlerText(fehler[0]), fehler: true };
-    return { text: t("Noch keine Schlüssel. Erstelle deinen ersten Schlüssel."), fehler: false };
+    return zustand.reiter === "smejj"
+      ? { text: t("Noch keine Schlüssel. Erstelle deinen ersten Schlüssel."), fehler: false }
+      : { text: t("Noch kein Anbieter verbunden. Hinterlege einen eigenen API-Key für den Chat."), fehler: false };
   }
   return null;
 }
@@ -248,12 +246,18 @@ async function devLaden() {
 
 // ---- Zeichnen -----------------------------------------------------------------
 
+/** Alle Eintraege beider Arten — fuer Nachschlagen per id (Menue, Aktionen). */
 function alleEintraege(zustand) {
   const byokOk = zustand.byok && !zustand.byok.fehler ? zustand.byok : null;
   const devOk = zustand.dev && !zustand.dev.fehler ? zustand.dev : null;
   const smejj = devOk ? (devOk.schluessel || []).map((k) => smejjEintrag(k)) : [];
   const anbieter = byokOk ? byokOk.providers.map((p) => anbieterEintrag(p, byokOk)) : [];
   return [...smejj, ...anbieter];
+}
+
+/** Was im offenen Reiter steht — die Liste zeigt nur diese. */
+function reiterEintraege(zustand) {
+  return alleEintraege(zustand).filter((e) => e.art === zustand.reiter);
 }
 
 function smejjEintrag(k) {
@@ -293,7 +297,11 @@ function anbieterEintrag(p, byok) {
   const status = lvl === "red" ? { lvl: "r", txt: t("Ungültig") }
     : lvl === "yellow" ? { lvl: "y", txt: t("Guthaben niedrig") }
     : { lvl: "g", txt: t("Getestet") };
-  return { art: "anbieter", id: p.id, provider: p, name: p.name.split(" · ")[0], hinweis, erstellt: "", status, off: false };
+  return {
+    art: "anbieter", id: p.id, provider: p, name: p.name.split(" · ")[0], hinweis, erstellt: "",
+    modell: p.selectedModel ? kurz(p.selectedModel) : "",
+    status, off: false
+  };
 }
 
 function zeichneAlles(root, zustand) {
@@ -353,19 +361,25 @@ function zeichneVerbindung(root, zustand) {
 }
 
 function zeichneListe(root, zustand) {
-  const eintraege = alleEintraege(zustand);
+  const eintraege = reiterEintraege(zustand);
   const liste = root.querySelector("[data-ac-rows]");
   liste.textContent = "";
   liste.innerHTML = eintraege.map((eintrag) => zeilenMarkup(eintrag, zustand)).join("");
-  // OpenRouter zeigt das Suchfeld immer — auch mit wenigen Schluesseln.
+  // Spaltenkoepfe gehoeren zum Reiter: ein Anbieter hat kein Ablaufdatum, ein
+  // smejj-Schluessel kein Modell. Eine gemeinsame Kopfzeile waere fuer beide falsch.
+  root.querySelector("[data-ac-cols]").innerHTML = zustand.reiter === "smejj"
+    ? `<span>${t("Schlüssel")}</span><span>${t("Status")}</span><span>${t("Läuft ab")}</span><span>${t("Zuletzt genutzt")}</span><span></span>`
+    : `<span>${t("Anbieter")}</span><span>${t("Status")}</span><span>${t("Modell")}</span><span></span>`;
+  root.querySelector("[data-ac-verbinden]").hidden = zustand.reiter !== "smejj";
   const anzahl = eintraege.length;
-  root.querySelector("[data-ac-count]").textContent = anzahl ? `${zahl(anzahl)} ${t("Schlüssel")}` : "";
+  root.querySelector("[data-ac-count]").textContent = anzahl
+    ? `${zahl(anzahl)} ${zustand.reiter === "smejj" ? t("Schlüssel") : t("Anbieter")}`
+    : "";
   filtere(root, zustand);
 }
 
 
 function zeilenMarkup(eintrag, zustand) {
-  const typ = eintrag.art === "smejj" ? "smejj API" : t("Anbieter");
   const suchText = escapeAttr(`${eintrag.name} ${eintrag.hinweis} ${eintrag.art}`.toLowerCase());
   const klassen = ["ac-row"];
   if (eintrag.status.lvl === "r") klassen.push("ac-row-red");
@@ -377,9 +391,11 @@ function zeilenMarkup(eintrag, zustand) {
       <span class="ac-sub"><code>${escapeHtml(eintrag.hinweis)}</code>${eintrag.erstellt ? ` · ${escapeHtml(eintrag.erstellt)}` : ""}${eintrag.laeuftAb ? ` · ${t("Läuft ab")} ${escapeHtml(eintrag.laeuftAb)}` : ""}</span>
       <button type="button" class="ac-row-copy" data-ac="kopieren" data-id="${escapeAttr(eintrag.id)}" title="${t("Kopieren")}" aria-label="${t("Kopieren")}">⧉</button>
     </div>
-    <span class="ac-cell ac-cell-typ">${escapeHtml(typ)}</span>
     <span class="ac-cell ac-cell-status">${badge}</span>
-    <span class="ac-cell ac-cell-when">${eintrag.zuletztBenutzt || t("Nie")}</span>
+    ${eintrag.art === "smejj"
+      ? `<span class="ac-cell ac-cell-ablauf">${eintrag.laeuftAb ? escapeHtml(eintrag.laeuftAb) : t("Unbefristet")}</span>
+    <span class="ac-cell ac-cell-when">${eintrag.zuletztBenutzt || t("Nie")}</span>`
+      : `<span class="ac-cell ac-cell-modell">${escapeHtml(eintrag.modell || "—")}</span>`}
     <span class="ac-zelle-menu"><button type="button" class="ac-kebab" data-ac="menue" data-popid="${escapeAttr(popId(eintrag))}" aria-haspopup="menu" aria-expanded="false" aria-label="${t("Weitere Aktionen")}">…</button></span>
     <div class="ac-popover" data-ac-pop="${escapeAttr(popId(eintrag))}" role="menu" hidden></div>
   </div>`;
@@ -395,10 +411,9 @@ async function klick(root, zustand, event) {
   const trigger = event.target.closest("[data-ac]");
   if (!trigger) return schliessePopovers(root);
   const aktion = trigger.dataset.ac;
-  if (aktion === "neu") return oeffneFormular(root, true);
-  if (aktion === "form-zu") return oeffneFormular(root, false);
-  if (aktion === "typ") return typWahl(root, zustand, trigger.dataset.typ);
-  if (aktion === "filter") return filterWahl(root, zustand, trigger.dataset.filter);
+  if (aktion === "neu") return oeffneFormular(root, true, zustand);
+  if (aktion === "form-zu") return oeffneFormular(root, false, zustand);
+  if (aktion === "reiter") return reiterWahl(root, zustand, trigger.dataset.reiter);
   if (aktion === "menue") return menue(root, zustand, trigger.dataset.popid);
   if (aktion === "modell-waehlen") return modellMenue(root, zustand, trigger.dataset.popid);
   if (aktion === "kopieren") return kopiereHint(root, zustand, trigger.dataset.id);
@@ -421,52 +436,55 @@ async function klick(root, zustand, event) {
   }
 }
 
-function oeffneFormular(root, offen) {
+function oeffneFormular(root, offen, zustand) {
   const form = root.querySelector("[data-ac-form]");
   form.hidden = !offen;
   if (offen) {
-    providerGewechselt(root);
-    form.querySelector("[data-ac-key]").focus();
+    // Das Formular gehoert zum offenen Reiter — es gibt keine zweite Wahl mehr.
+    formularFuerReiter(root, zustand);
+    if (zustand.reiter === "anbieter") providerGewechselt(root);
+    const erstes = zustand.reiter === "smejj"
+      ? form.querySelector("[data-ac-dev-name]")
+      : form.querySelector("[data-ac-key]");
+    erstes?.focus();
   } else {
     form.reset();
     form.querySelector("[data-ac-reveal]").hidden = true;
   }
 }
 
-function typWahl(root, zustand, typ) {
-  zustand.typ = typ === "anbieter" ? "anbieter" : "smejj";
+function formularFuerReiter(root, zustand) {
   const form = root.querySelector("[data-ac-form]");
-  form.querySelectorAll("[data-ac='typ']").forEach((chip) => {
-    chip.setAttribute("aria-pressed", String(chip.dataset.typ === zustand.typ));
-  });
-  form.querySelector("[data-ac-bereich='smejj']").hidden = zustand.typ !== "smejj";
-  form.querySelector("[data-ac-bereich='anbieter']").hidden = zustand.typ !== "anbieter";
-  form.querySelector("[data-ac-erstelle]").textContent = zustand.typ === "smejj"
+  form.querySelector("[data-ac-bereich='smejj']").hidden = zustand.reiter !== "smejj";
+  form.querySelector("[data-ac-bereich='anbieter']").hidden = zustand.reiter !== "anbieter";
+  form.querySelector("[data-ac-erstelle]").textContent = zustand.reiter === "smejj"
     ? t("Neuen Schlüssel erzeugen") : t("Prüfen und verbinden");
 }
 
-function filterWahl(root, zustand, filter) {
-  zustand.filter = filter;
-  root.querySelectorAll("[data-ac='filter']").forEach((chip) => {
-    chip.setAttribute("aria-pressed", String(chip.dataset.filter === filter));
+function reiterWahl(root, zustand, reiter) {
+  zustand.reiter = reiter === "anbieter" ? "anbieter" : "smejj";
+  root.querySelectorAll("[data-ac='reiter']").forEach((knopf) => {
+    knopf.setAttribute("aria-selected", String(knopf.dataset.reiter === zustand.reiter));
   });
-  filtere(root);
+  // Ein halb ausgefuelltes Formular des anderen Reiters waere eine Falle.
+  oeffneFormular(root, false, zustand);
+  zeichneListe(root, zustand);
+  const meldung = startmeldung(zustand);
+  melde(root, meldung ? meldung.text : "", Boolean(meldung?.fehler));
 }
 
+// Der Reiter hat schon aussortiert; hier wirkt nur noch die Suche.
 function filtere(root, zustand) {
   const frage = root.querySelector("[data-ac-suche]").value.trim().toLowerCase();
-  const filter = zustand.filter;
   let sichtbar = 0;
   root.querySelectorAll("[data-ac-zeile]").forEach((zeile) => {
-    const passtFilter = filter === "alle"
-      || (filter === "smejj" ? zeile.dataset.art === "smejj" : zeile.dataset.art === "anbieter");
-    const passtSuche = !frage || (zeile.dataset.name || "").includes(frage);
-    const zeige = passtFilter && passtSuche;
+    const zeige = !frage || (zeile.dataset.name || "").includes(frage);
     zeile.style.display = zeige ? "" : "none";
     if (zeige) sichtbar += 1;
   });
-  const zaehler = root.querySelector("[data-ac-count]");
-  if (filter !== "alle" || frage) zaehler.textContent = `${zahl(sichtbar)} ${t("Schlüssel")}`;
+  if (!frage) return;
+  const wort = zustand.reiter === "smejj" ? t("Schlüssel") : t("Anbieter");
+  root.querySelector("[data-ac-count]").textContent = `${zahl(sichtbar)} ${wort}`;
 }
 
 function schliessePopovers(root) {
@@ -689,7 +707,7 @@ function zeigeAktivitaet(root, zustand, id) {
 // ---- Formular absenden --------------------------------------------------------
 
 async function absenden(root, zustand) {
-  if (zustand.typ === "smejj") return erzeugeSmejjSchluessel(root, zustand);
+  if (zustand.reiter === "smejj") return erzeugeSmejjSchluessel(root, zustand);
   return verbindeAnbieter(root, zustand);
 }
 
@@ -790,6 +808,6 @@ function loadStyles() {
   if (document.querySelector('link[href^="/assets/api-center-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "/assets/api-center-surface.css?v=7";
+  link.href = "/assets/api-center-surface.css?v=8";
   document.head.append(link);
 }

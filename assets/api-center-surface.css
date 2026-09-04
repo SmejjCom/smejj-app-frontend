@@ -73,11 +73,35 @@
 .ac-chip:first-child { border-left: 0; }
 .ac-chip[aria-pressed="true"] { background: rgba(96, 150, 255, 0.18); color: #bcd0ff; font-weight: 600; }
 
-/* Tabelle */
+/* Reiter (2026-09-04): der Reiter ist der Filter — smejj-Schluessel und
+   eigene Anbieter sind zwei Orte, keine zwei Zeilenarten in einer Liste. */
+.ac-reiter { display: flex; gap: 4px; margin: 18px 0 0; border-bottom: 1px solid rgba(255, 255, 255, 0.09); }
+.ac-reiter-knopf {
+  min-height: 44px; padding: 0 16px; border: 0; border-bottom: 2px solid transparent;
+  background: transparent; color: #8d97a7; font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.ac-reiter-knopf[aria-selected="true"] { color: inherit; border-bottom-color: var(--premium-accent, #2f6bff); }
+.ac-reiter-knopf:hover { color: inherit; }
+
+/* Verbinden: die drei Angaben stehen im smejj-Reiter oben, nicht ausgeklappt unten. */
+.ac-verbinden {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px;
+  margin-top: 16px; padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ac-verbinden[hidden] { display: none; }
+.ac-verbinden pre { flex-basis: 100%; margin: 0; overflow-x: auto; }
+
+/* Tabelle — je Reiter ein eigenes Raster (smejj: 5 Spalten, Anbieter: 4). */
 .ac-cols, .ac-row {
   display: grid;
-  grid-template-columns: minmax(0, 2.6fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 0.9fr) 44px;
+  grid-template-columns: minmax(0, 2.6fr) minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 1fr) 44px;
   gap: 14px; align-items: center;
+}
+.ac-surface:has([data-ac="reiter"][data-reiter="anbieter"][aria-selected="true"]) .ac-cols,
+.ac-surface:has([data-ac="reiter"][data-reiter="anbieter"][aria-selected="true"]) .ac-row {
+  grid-template-columns: minmax(0, 2.6fr) minmax(0, 0.9fr) minmax(0, 1.4fr) 44px;
 }
 .ac-cols {
   margin-top: 14px; padding: 12px 16px;
