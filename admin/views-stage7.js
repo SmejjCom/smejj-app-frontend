@@ -253,6 +253,7 @@
     const admFormular = '<div class="bar">'
       + '<input class="suche-feld" id="admFuer" type="text" placeholder="Ausgestellt für — Name oder E-Mail">'
       + '<select id="admLaufzeit" aria-label="Laufzeit">' + optionen + "</select>"
+      + '<input class="suche-feld" id="admBudget" type="text" inputmode="numeric" placeholder="Monatsbudget in Token (optional)">'
       + '<input class="suche-feld" id="admNotiz" type="text" placeholder="Notiz (optional)">'
       + '<span class="act" id="admAusstellen">Schlüssel ausstellen</span>'
       + "</div>";
@@ -272,16 +273,19 @@
           s.zustand === "aktiv" ? "ok" : s.zustand === "abgelaufen" ? "warn" : "bad") + "</td>"
         + "<td>" + (s.laeuftAbAm ? e(A.datum(s.laeuftAbAm)) : '<span class="s">unbefristet</span>') + "</td>"
         + "<td>" + zahl(n.anfragen) + " / " + zahl(n.token) + "</td>"
+        + "<td>" + budgetZelle(s) + "</td>"
         + "<td>" + (s.zuletztBenutztAm ? e(A.datum(s.zuletztBenutztAm)) : "—") + "</td>"
         + "<td>" + e(s.ausgestelltVon || "—") + '<br><span class="s">' + e(A.datum(s.erstelltAm)) + "</span></td>"
-        + "<td>" + (s.zustand === "widerrufen" ? "—" : '<span class="act dg" data-admWiderruf="' + e(s.id) + '">Widerrufen</span>') + "</td></tr>";
+        + "<td>" + (s.zustand === "widerrufen" ? "—"
+          : '<span class="act" data-admBudget="' + e(s.id) + '" data-admBudgetWert="' + e(String(s.budgetToken || 0)) + '">Budget</span>'
+            + '<span class="act dg" data-admWiderruf="' + e(s.id) + '">Widerrufen</span>') + "</td></tr>";
     });
     const admFehler = adm.ok === false
       ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Ausgestellte Schlüssel nicht lesbar</div><div class="ns">' + e(adm.error || "") + "</div></div></div>"
       : "";
     const admPanel = V.panelBlock("Ausgestellte Schlüssel", "vom Betreiber vergeben · smejj-adm-… · Verbrauch auf dein Konto",
       admFehler + admFrisch + admFormular
-      + V.tabelleBlock(["Für", "Kennzeichen", "Zustand", "Läuft ab", "Anfragen / Token", "Zuletzt", "Ausgestellt von", ""], admZeilen)
+      + V.tabelleBlock(["Für", "Kennzeichen", "Zustand", "Läuft ab", "Anfragen / Token", "Budget (Monat)", "Zuletzt", "Ausgestellt von", ""], admZeilen)
       + '<div class="s">' + e(adm.hinweis || "Der Wert eines Schlüssels wird nie angezeigt — er erscheint genau einmal beim Ausstellen.") + "</div>");
 
     return V.kopfBlock("G", "API", "API & Schlüssel",
@@ -293,7 +297,8 @@
       + V.kachelBlock("30 Tage", zahl((d.tage30 || {}).anfragen), "Anfragen · " + usd((d.tage30 || {}).umsatzUsd))
       + V.kachelBlock("Eingezahlt", usd(d.eingezahltUsd), (d.eingezahltTestUsd ? "+ " + usd(d.eingezahltTestUsd) + " Test" : "echte Zahlungen"))
       + V.kachelBlock("Guthaben offen", usd(d.guthabenGesamtUsd), "Summe aller Konten", "dim")
-      + V.kachelBlock("Ausgestellt", String(adm.aktiv || 0), (adm.unbefristet || 0) + " unbefristet · " + (adm.abgelaufen || 0) + " abgelaufen", (adm.unbefristet || 0) > 0 ? "warn" : "dim")
+      + V.kachelBlock("Ausgestellt", String(adm.aktiv || 0), (adm.unbefristet || 0) + " unbefristet · " + (adm.abgelaufen || 0) + " abgelaufen"
+        + ((adm.amDeckel || 0) > 0 ? " · " + adm.amDeckel + " am Budget-Deckel" : ""), (adm.amDeckel || 0) > 0 || (adm.unbefristet || 0) > 0 ? "warn" : "dim")
       + "</div>"
       + '<div class="stack">' + alarmHinweis + admPanel
       + V.panelBlock("Kunden", "größter Umsatz (30 Tage) zuerst",
@@ -302,6 +307,17 @@
       + V.panelBlock("Preisliste", "USD je 1 Mio Token", V.tabelleBlock(["Modell", "Eingabe", "Ausgabe"], preisZeilen))
       + V.panelBlock("Nicht erfasst", "was hier bewusst fehlt", V.tabelleBlock(["Was fehlt", "Warum"], luecken))
       + "</div>";
+  }
+
+  // Budget je Schluessel: ohne Budget ein ehrlicher Strich, mit Budget der
+  // Monatsstand. Am Deckel rot — dort kommt beim Kunden 429 an.
+  function budgetZelle(s) {
+    const budget = Number(s.budgetToken || 0);
+    if (!budget) return '<span class="s">ohne Budget</span>';
+    const m = s.monat || {};
+    const verbraucht = String(m.monat || "") === new Date().toISOString().slice(0, 7) ? Number(m.token || 0) : 0;
+    const voll = verbraucht >= budget;
+    return pille(zahl(verbraucht) + " / " + zahl(budget), voll ? "bad" : verbraucht > budget * 0.8 ? "warn" : "ok");
   }
 
   function zeile(name, wert) {

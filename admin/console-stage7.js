@@ -48,6 +48,7 @@
       const fuer = String(wert("admFuer")).trim();
       const laufzeit = String(wert("admLaufzeit") || "1j");
       const notiz = String(wert("admNotiz")).trim();
+      const budgetToken = String(wert("admBudget")).trim();
       if (fuer.length < 2) return ctx.meldung("Bitte angeben, für wen der Schlüssel ist (Name oder E-Mail).", true);
       if (laufzeit === "unbefristet") {
         const ok = await D.bestaetige({
@@ -58,12 +59,34 @@
         });
         if (!ok) return;
       }
-      const antwort = await A.sende("/api/admin/geld/api/ausstellen", { ausgestelltFuer: fuer, laufzeit: laufzeit, notiz: notiz });
+      const antwort = await A.sende("/api/admin/geld/api/ausstellen",
+        { ausgestelltFuer: fuer, laufzeit: laufzeit, notiz: notiz, budgetToken: budgetToken ? Number(budgetToken) : 0 });
       if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
       frisch = antwort.data;
       ctx.meldung("Schlüssel ausgestellt — jetzt kopieren, er wird nur einmal angezeigt.");
       ctx.neuLaden();
     });
+    for (const knopf of document.querySelectorAll("[data-admBudget]")) {
+      knopf.addEventListener("click", async function () {
+        const id = String(knopf.getAttribute("data-admBudget") || "");
+        const jetzt = String(knopf.getAttribute("data-admBudgetWert") || "0");
+        const eingabe = await D.text({
+          titel: "Monatsbudget ändern",
+          absaetze: ["Wieviele Token darf dieser Schlüssel je Kalendermonat verbrauchen?",
+            "0 heißt: kein Budget. Der Zähler beginnt am Monatsersten wieder bei null."],
+          platzhalter: "z. B. 100000 — oder 0 für kein Budget",
+          vorgabe: jetzt,
+          okText: "Budget setzen"
+        });
+        if (eingabe === null) return;
+        const zahl = Number(String(eingabe).replace(/[^0-9]/g, ""));
+        if (!Number.isFinite(zahl)) return ctx.meldung("Bitte eine Zahl eingeben.", true);
+        const antwort = await A.sende("/api/admin/geld/api/budget", { id: id, budgetToken: zahl });
+        if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
+        ctx.meldung(zahl ? "Monatsbudget gesetzt." : "Budget entfernt — kein Limit mehr.");
+        ctx.neuLaden();
+      });
+    }
     for (const knopf of document.querySelectorAll("[data-admWiderruf]")) {
       knopf.addEventListener("click", async function () {
         const id = String(knopf.getAttribute("data-admWiderruf") || "");
