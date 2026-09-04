@@ -8,7 +8,7 @@
 // Alle anderen Modi geben false zurueck — der bestehende fail-closed Server-Pfad
 // in app.js bleibt unveraendert zustaendig.
 import { validateByokConfig } from "./byok.js";
-import { autoAktiv, sorgeFuerModell } from "./modellRouter.js";
+import { autoAktiv, pruefeAntwortModell, sorgeFuerModell } from "./modellRouter.js";
 import { starteStilleWache, stilleText } from "./strom-stillstand.js";
 import { API_ORIGIN, STORAGE_KEYS } from "../config.js";
 
@@ -301,6 +301,9 @@ async function runClineChat({ task, output, offlineNotice, clearThinking = () =>
       },
       body: JSON.stringify({ messages: buildMessages(task, offlineNotice, contextFiles) })
     });
+    // Meldet der Server ein anderes Modell als gemerkt (zweiter Tab), faellt
+    // der Merker — der naechste Auftrag setzt wieder ueber /select.
+    pruefeAntwortModell(response);
     if (!response.ok || !response.body) {
       const error = await response.json().catch(() => ({}));
       throw new Error(error.message || error.error || `HTTP ${response.status}`);
