@@ -7,14 +7,17 @@
 // Zustand traegt (sessionClient, refs, Zeichnen, Speichern), kommt als
 // Baustein herein — dasselbe Muster wie browser-pane-tableiste.js. Dadurch
 // bleibt die Familie ohne DOM testbar.
-import { buildLiveBrowserHtml, buildRemoteBrowserHtml } from "./browser-pane-render.js?v=browser-pane-20260822-1";
+import { buildLiveBrowserHtml, buildRemoteBrowserHtml } from "./browser-pane-render.js?v=browser-pane-20260905-5";
 import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260820-2";
 
 export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbackFrame, commitHistory, showHint, persistTabs, render }) {
   function remoteBrowserViewport() {
     const rect = refs.content?.getBoundingClientRect?.();
     const width = clampViewport(rect?.width, 360, 1920, 1365);
-    const height = clampViewport((rect?.height || 0) - 38, 360, 1200, 900);
+    // Kein Abzug mehr: die 38 px galten der Kopfzeile im Rahmen, die es seit
+    // dem 17.08. nicht mehr gibt. Mit dem Abzug war das Bild 38 px kuerzer als
+    // die Buehne — Rand statt Seite (Betreiber-Befund 05.09.).
+    const height = clampViewport(rect?.height || 0, 360, 1200, 900);
     return { width, height };
   }
 

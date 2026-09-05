@@ -199,13 +199,18 @@ export function buildLiveBrowserHtml({ url, title, screenshot, viewport = {} } =
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     html,body{height:100%;margin:0;background:#101113;color:#f6f3ee;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    main{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);box-sizing:border-box}
+    /* EINE Gitterzeile. Die Kopfzeile ist seit dem 17.08. weg — die zweite Zeile
+       "auto" blieb stehen, die Buehne rutschte hinein und wurde nur so hoch wie
+       das Bild. Darunter zeigte die leere 1fr-Zeile den dunklen Grund: der
+       Streifen unter der Seite, den der Betreiber am 05.09. sah (im Browser
+       nachgestellt: 213 px bei einem 600 px hohen Bild in 813 px Hoehe). */
+    main{height:100%;display:grid;grid-template-rows:minmax(0,1fr);box-sizing:border-box}
     header{display:flex;align-items:center;gap:10px;min-height:38px;padding:0 10px;border-bottom:1px solid rgba(246,243,238,.12);background:#18191c}
     strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
     header .bp-live-state{color:#9fe7d4;font-size:11px;white-space:nowrap}
     header a{margin-left:auto;color:#9fe7d4;font-size:12px;font-weight:700;text-decoration:none}
     .bp-live-stage{position:relative;overflow:hidden;background:#fff;outline:none;cursor:default}
-    .bp-live-stage img{display:block;width:100%;height:100%;object-fit:contain;background:#fff;user-select:none;-webkit-user-drag:none}
+    .bp-live-stage img{display:block;width:100%;height:100%;object-fit:contain;object-position:center top;background:#fff;user-select:none;-webkit-user-drag:none}
     .bp-live-stage.is-busy img{opacity:.72;transition:opacity .15s ease}
     /* JS-Dialog der Seite (alert/confirm/prompt). Er liegt UEBER dem Bild,
        weil die Seite dahinter wirklich blockiert ist — ein halbdurchsichtiger

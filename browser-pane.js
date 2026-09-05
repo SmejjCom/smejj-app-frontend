@@ -12,13 +12,13 @@
 // abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
 // instanzen mit getrennten CLIENT_ROUTES.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260822-1";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260905-5";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
   buildRemoteBrowserHtml
-} from "./browser-pane-render.js?v=browser-pane-20260822-1";
-export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260822-1";
+} from "./browser-pane-render.js?v=browser-pane-20260905-5";
+export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260905-5";
 import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260822-1";
 // Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
@@ -28,7 +28,7 @@ import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicher
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
 import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260819-4";
 import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
-import { verdrahteMausKnopf } from "./browser-pane-maus.js?v=browser-pane-20260905-3";
+import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260905-3";
 // Gefunden 2026-08-18 beim Livetest: dieser Import FEHLTE, obwohl init() die
 // Funktion benutzt. Folge war kein kleiner Schoenheitsfehler — browser-pane.js
 // warf beim Laden "baueNachrichtenEmpfang is not defined", das ganze Modul kam
@@ -36,7 +36,7 @@ import { verdrahteMausKnopf } from "./browser-pane-maus.js?v=browser-pane-202609
 // gemeldet: alle pruefen den QUELLTEXT, keiner laesst das Modul laufen.
 import { baueNachrichtenEmpfang } from "./browser-pane-nachrichten.js?v=browser-pane-20260709-2";
 let suche = null;
-import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260822-1";
+import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260905-5";
 // Reine Helfer (2026-08-19 ausgelagert, 800-Zeilen-Regel). Sie werden hier
 // zugleich WEITER EXPORTIERT, damit tests/browser-pane.test.mjs und jeder
 // bisherige Aufrufer sie unveraendert von browser-pane.js bekommt.
@@ -392,7 +392,13 @@ function scheduleRemoteRefit() {
   clearTimeout(state.remoteRefitTimer);
   state.remoteRefitTimer = setTimeout(() => {
     const tab = activeTab();
-    if (!tab || tab.mode !== "remote-browser" || !tab.url || tab.status === "loading") return;
+    // Auch der LIVE-Browser folgt der Panelgroesse: sein Bild kommt in der
+    // Groesse, die beim Oeffnen galt. Wird das Panel danach hoeher, blieb das
+    // Bild kuerzer als die Buehne (Betreiber-Befund 05.09.: Seite trifft die
+    // Unterkante nicht). Waehrend die Maus arbeitet, wird NICHT neu geoeffnet:
+    // das wuerde ihre Sitzung mitten im Schritt abreissen.
+    if (!tab || !["remote-browser", "live-browser"].includes(tab.mode) || !tab.url || tab.status === "loading") return;
+    if (tab.mode === "live-browser" && mausLaeuft()) return;
     const current = remoteBrowserViewport();
     const last = tab.remoteViewport;
     if (last &&
@@ -404,6 +410,7 @@ function scheduleRemoteRefit() {
       return;
     }
     state.lastRemoteRefitAt = now;
+    if (tab.mode === "live-browser") { oeffneImLiveBrowser(tab.url).catch(() => {}); return; }
     navigate(tab, tab.url, { push: false });
   }, REMOTE_REFIT_DEBOUNCE_MS);
 }
