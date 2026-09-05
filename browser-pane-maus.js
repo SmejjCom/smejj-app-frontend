@@ -477,7 +477,22 @@ export async function fuehreFreienLaufAus({
     // 1. HINSEHEN
     zeige(`Maus ${n}/${maxSchritte}: sieht sich die Seite an ...`);
     const blick = await sende({ type: "observe" });
-    if (!blick?.beobachtung) return { ok: false, grund: "Die Maus konnte die Seite nicht ansehen.", gelesen };
+    if (!blick?.beobachtung) {
+      // Auch das Hinsehen kann an einer verdraengten Sitzung scheitern (live
+      // 06.09.: "konnte die Seite nicht ansehen" ohne Grund, Schritt 5). Dann
+      // gilt dasselbe wie bei einer Aktion: einmal neu verbinden, Grund nennen.
+      const grund = blick?.error ? String(blick.error).slice(0, 120) : "keine Antwort";
+      const verloren = blick?.verloren === true || (braucheSitzung && !tab?.sessionId);
+      if (verloren && erneuere && !verlauf.some((z) => z.startsWith("UNTERBROCHEN"))) {
+        zeige(`Maus ${n}/${maxSchritte}: Live-Browser-Sitzung verloren, sie verbindet neu ...`);
+        const wieder = await Promise.resolve(erneuere()).catch(() => false);
+        if (!wieder) return { ok: false, grund: `Die Live-Browser-Sitzung ist abgerissen (${grund}) und liess sich nicht neu aufbauen — bitte den Auftrag noch einmal senden.`, gelesen };
+        verlauf.push("UNTERBROCHEN: Hinsehen — Sitzung neu aufgebaut");
+        n -= 1;
+        continue;
+      }
+      return { ok: false, grund: `Die Maus konnte die Seite nicht ansehen (${grund}) — bitte den Auftrag noch einmal senden.`, gelesen };
+    }
 
     // 2. ENTSCHEIDEN (auf dem Server: Modell + Pruefung)
     zeige(`Maus ${n}/${maxSchritte}: überlegt ...`);
@@ -609,6 +624,18 @@ export async function fuehreFreienLaufAus({
     // sie bei gleichem Seitenzustand jedes Mal dasselbe. Und ein GELESENER
     // WERT gehoert hinein: vorher kam er nie beim Modell an, und es las
     // dieselbe Ueberschrift ein zweites Mal (live 05.09.).
+    if (naechste.liestAls && typeof ergebnis.gelesen === "string" && !ergebnis.gelesen.trim()) {
+      // NICHTS GELESEN ist ein Fehlschlag, kein Ergebnis (live 06.09.: ".bday"
+      // dreimal hintereinander, jedes Mal leer — das Modell hielt »« fuer
+      // eine Antwort). Der Verlauf sagt es deutlich; nach zwei Mal ist Schluss.
+      fehlschlaege += 1;
+      if (fehlschlaege >= FEHLSCHLAG_GRENZE) {
+        return { ok: false, grund: `Maus gestoppt: »${naechste.beschreibung}« hat zweimal nichts gelesen — das Element gibt es auf der Seite nicht.`, gelesen };
+      }
+      verlauf.push(`FEHLGESCHLAGEN: ${naechste.beschreibung} — nichts gelesen (Element nicht gefunden oder leer); ein anderes Ziel waehlen oder direkt aus dem Seitentext antworten`);
+      zeige(`Maus ${n}/${maxSchritte}: ${naechste.beschreibung} — nichts gelesen, sie versucht es anders ...`);
+      continue;
+    }
     if (naechste.liestAls && typeof ergebnis.gelesen === "string") {
       gelesen[naechste.liestAls] = ergebnis.gelesen;
       verlauf.push(`${naechste.beschreibung} → »${ergebnis.gelesen.slice(0, 300)}«`);
