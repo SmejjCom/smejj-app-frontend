@@ -405,7 +405,19 @@ export const AUSSETZER_GRENZE = 3;
 /** Eine Entscheidung der Maus in eine Panel-Aktion uebersetzen. */
 export function entscheidungAlsAktion(entscheidung) {
   if (!entscheidung || typeof entscheidung !== "object") return { fehler: "keine_entscheidung" };
-  if (entscheidung.decision === "done") return { fertig: true, grund: entscheidung.reason || "fertig" };
+  if (entscheidung.decision === "done") {
+    // LIVE GESEHEN 2026-09-05 (Betreiber: "Erledige mit der Maus im Browser ...
+    // alle Fehler beheben"): Auf die Frage "welche Ueberschrift steht dort?"
+    // meldete die Maus "Maus fertig nach 0 Schritten: The heading is present on
+    // the current page." — die ANTWORT fehlte. Der Entscheidungs-Vertrag kennt
+    // dafuer zwei Felder: "result" ist das Ergebnis FUER DEN NUTZER, "reason"
+    // nur die Begruendung der Entscheidung. Gezeigt wurde bisher die
+    // Begruendung. Jetzt hat das Ergebnis Vorrang; die Begruendung bleibt
+    // Rueckfallebene, damit nie eine leere Meldung entsteht.
+    const ergebnis = String(entscheidung.result ?? "").trim();
+    const grund = String(entscheidung.reason ?? "").trim();
+    return { fertig: true, grund: ergebnis || grund || "fertig" };
+  }
   if (entscheidung.decision === "fail") return { fehler: entscheidung.reason || "maus_gibt_auf" };
   if (entscheidung.decision !== "act") return { fehler: `unbekannte_entscheidung:${entscheidung.decision}` };
   const u = alsSitzungsAktion(entscheidung.step);
