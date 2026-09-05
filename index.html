@@ -408,8 +408,8 @@
                 <span id="homeStorageSummary">Hauptspeicher vorbereitet</span>
               </article>
             </section>
-            <div id="homeOutput" class="output" hidden>Bereit. Lokale Arbeit startet sofort; Online-Sync und KI bleiben fail-closed, bis sie sicher konfiguriert sind.</div>
-            <div id="homeOutput" class="output" hidden>Bereit. Lokale Arbeit startet sofort; Online-Sync und KI bleiben fail-closed, bis sie sicher konfiguriert sind.</div>
+            <div id="homeOutput" class="output" hidden>Bereit. Lokale Arbeit startet sofort; Online-Abgleich und KI bleiben aus, bis sie sicher eingerichtet sind.</div>
+            <div id="homeOutput" class="output" hidden>Bereit. Lokale Arbeit startet sofort; Online-Abgleich und KI bleiben aus, bis sie sicher eingerichtet sind.</div>
           </div>
         </section>
 
@@ -663,17 +663,17 @@
           <div id="dateiTabelle" class="output" hidden></div>
           <div class="panel-grid">
             <label>
-              Upload-Staging
+              Dateien auswählen
               <input id="upload" type="file" accept=".css,.html,.js,.json,.md,.svg,.txt,text/*,application/json,image/svg+xml" multiple aria-label="Dateien für Upload auswählen">
             </label>
             <label>
-              Gestagte Uploads
-              <textarea id="uploadList" readonly aria-label="Gestagte Uploads"></textarea>
+              Wartende Dateien
+              <textarea id="uploadList" readonly aria-label="Wartende Dateien"></textarea>
             </label>
           </div>
           <div class="toolbar">
             <button id="storageAgain" type="button">IDrive e2 prüfen</button>
-            <button id="downloadUploadManifest" type="button">Upload-Liste downloaden</button>
+            <button id="downloadUploadManifest" type="button">Liste herunterladen</button>
           </div>
           <div id="fileOutput" class="output"></div>
         </section>
@@ -687,7 +687,7 @@
           <div class="status-grid" aria-label="Speicherstatus">
             <div><strong>Primärspeicher</strong><span>IDrive e2</span></div>
             <div><strong>Browser</strong><span>IndexedDB / OPFS</span></div>
-            <div><strong>Sync</strong><span>presigned URLs später</span></div>
+            <div><strong>Sync</strong><span>signierte Adressen folgen</span></div>
             <div><strong>K2.7 Vault</strong><span id="kimiVaultStorageText">geprüfte Metadaten bereit</span></div>
             <div><strong>GLM-5.2 FP8</strong><span id="glmVaultStorageText">Metadaten archiviert</span></div>
           </div>
@@ -720,7 +720,7 @@
           <div class="toolbar">
             <button id="saveMemory" type="button">Memory speichern</button>
             <button id="searchMemory" type="button">Memory/RAG suchen</button>
-            <button id="downloadMemory" type="button">Memory downloaden</button>
+            <button id="downloadMemory" type="button">Gedächtnis herunterladen</button>
             <input id="memoryQuery" placeholder="Suchbegriff" aria-label="Suchbegriff">
           </div>
           <div id="memoryOutput" class="output"></div>
@@ -808,7 +808,7 @@
           <div class="status-grid" aria-label="Aktueller Betriebsstatus">
             <div><strong>Storage</strong><span id="storageStatusText">local-browser</span></div>
             <div><strong>Lokaler Arbeitsbereich</strong><span id="workspaceStatusText">lokal</span></div>
-            <div><strong>IDrive e2</strong><span id="idriveStatusText">presigned sync später</span></div>
+            <div><strong>IDrive e2</strong><span id="idriveStatusText">signierter Abgleich folgt</span></div>
             <div><strong>AI Mode</strong><span id="aiModeText">disabled</span></div>
             <div><strong>K2.7 Vault</strong><span id="kimiVaultStatusText">geprüft / Inferenz deaktiviert</span></div>
             <div><strong>Kosten</strong><span id="costStatusText">0 EUR Risiko / blockiert</span></div>
@@ -996,7 +996,7 @@
     <!-- Peripherie (Fuehrung, Papierkorb, Kamera, @-Erwaehnung, Codeblock-Werkzeuge)
          laedt erst bei ihrer Handlung — Betreiber-Freigabe 2026-08-24 "Startseite abspecken". -->
     <script src="/assets/bedarf-nachladen.js?v=4" type="module"></script>
-    <script src="/assets/app.js?v=b136" type="module"></script>
+    <script src="/assets/app.js?v=b137" type="module"></script>
     <script src="/assets/pwa-schnellstart.js?v=6" type="module"></script>
     <script src="/assets/cline-model-menu.js?v=cline-submenu-20260825-6" type="module"></script>
     <!-- Browser-Panel und Maus-Panel: erst wenn sie gebraucht werden.
