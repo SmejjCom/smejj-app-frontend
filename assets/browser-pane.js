@@ -44,6 +44,9 @@ import {
   clampZoom, clampViewport, normalizeAddress, normalizeAgentBrowserUrl,
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl, shortHost
 } from "./browser-pane-adressen.js?v=browser-pane-20260820-2";
+import { applyZoom, baueZoomHaken } from "./browser-pane-zoom.js?v=1";
+// Der Zoom lebt in browser-pane-zoom.js; hier nur seine drei Anschluesse.
+const zoomHaken = baueZoomHaken({ activeTab: () => activeTab(), schedulePersist: () => schedulePersist(), zeigeHinweis: (t) => showHint(t) });
 export {
   clampZoom, normalizeAddress, normalizeAgentBrowserUrl,
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl
@@ -84,7 +87,6 @@ function paneBreite() {
 const NEW_TAB_TITLE = "Neuer Tab";
 
 const MAX_PERSISTED_HISTORY = 50;
-const ZOOM_STEP = 0.1;
 const REMOTE_REFIT_DEBOUNCE_MS = 600;
 const REMOTE_REFIT_MIN_DELTA_PX = 64;
 const REMOTE_REFIT_MIN_INTERVAL_MS = 1500;
@@ -331,7 +333,7 @@ function mountOnce() {
   refs.close.addEventListener("click", closePane);
 
   // Zoom wie in Chrome: Strg/Cmd mit +, - oder 0 (50–200 %).
-  document.addEventListener("keydown", onZoomShortcut);
+  document.addEventListener("keydown", zoomHaken);
   suche = verdrahtePanelSuche({
     wurzel: refs.root,
     activeTab,
@@ -361,41 +363,6 @@ function submitAddress() {
   if (!tab || !target) return;
   refs.address.blur();
   navigate(tab, target);
-}
-
-function onZoomShortcut(event) {
-  if (!document.body.classList.contains("browser-pane-open")) return;
-  if (!event.ctrlKey && !event.metaKey) return;
-  const tab = activeTab();
-  if (!tab?.frame) return;
-  let zoom = tab.zoom || 1;
-  if (event.key === "+" || event.key === "=") zoom += ZOOM_STEP;
-  else if (event.key === "-") zoom -= ZOOM_STEP;
-  else if (event.key === "0") zoom = 1;
-  else return;
-  event.preventDefault();
-  tab.zoom = clampZoom(zoom);
-  applyZoom(tab);
-  showHint(tab.zoom === 1 ? "" : `Zoom: ${Math.round(tab.zoom * 100)} %`);
-  schedulePersist();
-}
-
-
-function applyZoom(tab) {
-  const frame = tab?.frame;
-  if (!frame) return;
-  const zoom = clampZoom(tab.zoom || 1);
-  if (zoom === 1) {
-    frame.style.transform = "";
-    frame.style.transformOrigin = "";
-    frame.style.width = "";
-    frame.style.height = "";
-    return;
-  }
-  frame.style.transform = `scale(${zoom})`;
-  frame.style.transformOrigin = "0 0";
-  frame.style.width = `${Math.round(10000 / zoom) / 100}%`;
-  frame.style.height = `${Math.round(10000 / zoom) / 100}%`;
 }
 
 // Remote-Ansicht an neue Panelgroesse anpassen (debounced + Mindestintervall).
