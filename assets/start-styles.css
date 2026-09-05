@@ -4092,6 +4092,19 @@ html { overscroll-behavior-y: none; }
 .entry.assistant .chat-table td {
   white-space: normal;
 }
+.entry.assistant.medien-strom {
+  font-size: 0;
+  line-height: 0;
+  word-break: normal;
+}
+.entry.assistant.medien-strom::after {
+  content: attr(data-medien-art) " wird übertragen …";
+  display: block;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--v11-cy, #32f6ea);
+  opacity: 0.9;
+}
 
 /* ---- design-v11.css ---- */
 :root {

@@ -254,3 +254,28 @@ html { overscroll-behavior-y: none; }
 .entry.assistant .chat-table td {
   white-space: normal;
 }
+
+/* ---- Bild- und Video-Uebertragung sichtbar machen (2026-09-05) -------------
+   LIVE GEMESSEN mit dem Auftrag "Generiere ein Bild von: ein roter Apfel auf
+   einem Holztisch": Bis das fertige Bild erschien, vergingen 5 Minuten 45 — und
+   die ganze Zeit wuchs in der Blase eine Wand aus base64-Zeichen, am Ende
+   600.000 Zeichen Zeichensalat. Der Text SELBST ist richtig und wird gebraucht
+   (renderChatMarkdown baut daraus das Bild), er darf also nicht geloescht
+   werden. Verstecken laesst er sich nur in der Anzeige: chat-stream.js setzt
+   waehrend des offenen Datenstroms die Klasse .medien-strom, hier wird der
+   Rohtext unsichtbar und stattdessen ein Satz gezeigt. Sobald der Strom
+   geschlossen ist, faellt die Klasse und die Antwort erscheint normal.
+   Gilt auf ALLEN Breiten, nicht nur am Telefon — die Wand stoert ueberall. */
+.entry.assistant.medien-strom {
+  font-size: 0;
+  line-height: 0;
+  word-break: normal;
+}
+.entry.assistant.medien-strom::after {
+  content: attr(data-medien-art) " wird übertragen …";
+  display: block;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--v11-cy, #32f6ea);
+  opacity: 0.9;
+}

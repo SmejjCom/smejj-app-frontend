@@ -396,6 +396,39 @@ export function entferneAbgerisseneMedien(text) {
   return `${roh.slice(0, start).trimEnd()}\n\nDie ${art}-Übertragung ist abgerissen — bitte fordere es einfach noch einmal an.`;
 }
 
+/**
+ * Laeuft gerade ein Bild- oder Video-Strom, steht in der Blase ein noch NICHT
+ * geschlossenes `![...](data:...` — und dahinter waechst die base64-Wand.
+ *
+ * LIVE GEMESSEN 2026-09-05 (Auftrag "Generiere ein Bild von: ein roter Apfel"):
+ * 600.000 Zeichen Zeichensalat, sichtbar ueber 5 Minuten 45, bevor das fertige
+ * Bild erschien. Der Text selbst ist richtig und wird gebraucht —
+ * renderChatMarkdown baut daraus am Ende das <img>. Verstecken laesst er sich
+ * darum nur in der ANZEIGE: diese Marke setzt die Klasse, das Stylesheet
+ * blendet den Rohtext aus und zeigt stattdessen einen Satz.
+ *
+ * @param {HTMLElement} output
+ * @returns {boolean} true, solange ein Medienstrom offen ist
+ */
+export function markiereMedienStrom(output) {
+  if (!output?.classList) return false;
+  const roh = String(output.textContent || "");
+  const start = roh.lastIndexOf("![");
+  let offen = false;
+  let art = "Bild";
+  if (start !== -1) {
+    const rest = roh.slice(start);
+    const klammer = rest.indexOf("](data:");
+    // Offen = Datenblock begonnen, aber die schliessende Klammer fehlt noch.
+    offen = klammer !== -1 && rest.indexOf(")", klammer) === -1;
+    if (offen && rest.slice(klammer).startsWith("](data:video")) art = "Video";
+  }
+  output.classList.toggle("medien-strom", offen);
+  if (offen) output.dataset.medienArt = art;
+  else delete output.dataset.medienArt;
+  return offen;
+}
+
 function meldeStromstand() {
   try {
     window.dispatchEvent(new CustomEvent("smejj:chat-strom", { detail: { laufen: aktiveLeser.size } }));
@@ -624,9 +657,11 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
         if (delta?.content) {
           beendeDenken(output);
           output.textContent += delta.content;
+          markiereMedienStrom(output);
         }
       } catch {
         output.textContent += text;
+        markiereMedienStrom(output);
       }
     }
     output.scrollIntoView({ block: "end" });
@@ -635,6 +670,7 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
     // Netzabbruch mitten im Bild-/Video-Strom: ohne Saeuberung stuenden hier
     // 100+ KB base64-Rohtext in der Blase.
     output.textContent = entferneAbgerisseneMedien(output.textContent);
+    markiereMedienStrom(output);
     throw abriss;
   } finally {
     // Immer deregistrieren — auch wenn read() wirft (Netzabbruch): sonst
@@ -658,6 +694,7 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
     // bleibt DAVOR — ein abgerissener Bildstrom soll nicht als base64-Wand
     // stehen bleiben, nur weil die Meldung jetzt woanders herkommt.
     output.textContent = stilleText(entferneAbgerisseneMedien(output.textContent));
+    markiereMedienStrom(output);
     renderMarkdown?.(output);
     falteSchritte(output, schritteOhneFundZahl);
     return;
@@ -666,6 +703,9 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // Dann ist die letzte Arbeitsnotiz besser als eine leere Blase.
   if (!output.textContent.trim() && letzteNotiz.trim()) output.textContent = letzteNotiz;
   output.textContent = entferneAbgerisseneMedien(output.textContent);
+  // Die Anzeige-Marke MUSS hier fallen: sie blendet den Rohtext aus, und eine
+  // fertige Antwort waere sonst unsichtbar.
+  markiereMedienStrom(output);
   // VOR renderMarkdown: der Renderer liest textContent und ersetzt innerHTML —
   // danach angehaengter Text bliebe roher Stern-Text.
   output.textContent += quellenHinweis({
