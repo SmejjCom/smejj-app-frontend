@@ -6,7 +6,7 @@ import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v
 import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=5";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
-import { holeSendepfad } from "./sendepfad-nachladen.js?v=4";
+import { holeSendepfad } from "./sendepfad-nachladen.js?v=5";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
 import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js";

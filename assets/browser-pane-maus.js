@@ -111,7 +111,7 @@ export function beschreibe(step) {
   const roh = s.target?.selector || s.target || s.selector || {};
   const wo = sel?.name || sel?.value || roh.name || roh.value || "";
   switch (s.action) {
-    case "navigate": return `Seite oeffnen: ${kurz(s.url)}`;
+    case "navigate": return `Seite öffnen: ${kurz(s.url)}`;
     case "click": case "openLink": return `Klicken: ${kurz(wo)}`;
     case "type": case "fill": return `Tippen in ${kurz(wo)}`;
     case "extract": case "assert": return `Lesen: ${kurz(s.name || wo)}`;
@@ -194,7 +194,7 @@ export async function fuehreMausAuftragAus({
   auftrag, tab, planeUrl, holeToken = () => "", sende, zeige = () => {}, abbruch = () => false
 } = {}) {
   const hosts = erlaubteHosts(tab?.url);
-  if (!hosts.length) return { ok: false, grund: "Erst eine Seite oeffnen — die Maus arbeitet nur dort." };
+  if (!hosts.length) return { ok: false, grund: "Erst eine Seite öffnen — die Maus arbeitet nur dort." };
   if (!tab?.sessionId) return { ok: false, grund: "Die Maus braucht den Live-Browser. Diese Ansicht hat keinen." };
 
   zeige("Maus denkt nach ...");
@@ -224,9 +224,9 @@ export async function fuehreMausAuftragAus({
   const auftraege = planAlsAuftraege(plan);
   // Fail-closed: lieber gar nicht laufen als einen halb verstandenen Plan.
   if (auftraege.fehler?.length) {
-    return { ok: false, grund: `Maus hat den Plan nicht ganz verstanden (${auftraege.fehler.join("; ")}) — nichts ausgefuehrt.` };
+    return { ok: false, grund: `Maus hat den Plan nicht ganz verstanden (${auftraege.fehler.join("; ")}) — nichts ausgeführt.` };
   }
-  if (!auftraege.length) return { ok: false, grund: "Aus dem Plan ergab sich kein Schritt fuer diese Ansicht." };
+  if (!auftraege.length) return { ok: false, grund: "Aus dem Plan ergab sich kein Schritt für diese Ansicht." };
 
   const ergebnis = await fahreAuftraege({
     auftraege,
@@ -375,7 +375,7 @@ export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, send
     const auftrag = globalThis.prompt?.(
       "Was soll die Maus auf dieser Seite tun?\n\n" +
       "Sie arbeitet NUR auf " + (erlaubteHosts(activeTab()?.url)[0] || "dieser Seite") +
-      " und klickt selbstaendig. Sie sieht nach jedem Schritt neu hin.\n\n" +
+      " und klickt selbständig. Sie sieht nach jedem Schritt neu hin.\n\n" +
       "Tipp: mit \"plan:\" beginnen macht es schneller, aber starr."
     );
     if (!auftrag || !auftrag.trim()) return;
@@ -401,6 +401,16 @@ export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, send
 export const FREI_MAX_SCHRITTE = 10;
 export const VERWURF_GRENZE = 2;
 export const AUSSETZER_GRENZE = 3;
+// Wie lange das Panel auf EINE Entscheidung des Servers wartet.
+//
+// LIVE GESEHEN 2026-09-05: „Maus 1/10: überlegt ...“ stand minutenlang da —
+// ohne Zeile, ohne Fehler, ohne Ende. Der Server beantwortete dieselbe Frage
+// direkt gerufen in gut einer Sekunde; die eine Verbindung war es, die hing.
+// Ein fetch ohne Frist wartet ewig, und der Nutzer sieht einen Lauf, der weder
+// fertig wird noch scheitert. Drei Minuten liegen über dem, was die Planer-
+// Kette im Normalfall braucht, und unter dem, was die Plattform der Verbindung
+// überhaupt lässt (300 s) — so kommt die Meldung von uns, nicht vom Gateway.
+export const SCHRITT_FRIST_MS = 180_000;
 
 /** Eine Entscheidung der Maus in eine Panel-Aktion uebersetzen. */
 export function entscheidungAlsAktion(entscheidung) {
@@ -435,10 +445,11 @@ export function entscheidungAlsAktion(entscheidung) {
  */
 export async function fuehreFreienLaufAus({
   auftrag, tab, schrittUrl, holeToken = () => "", sende, zeige = () => {},
-  abbruch = () => false, maxSchritte = FREI_MAX_SCHRITTE, braucheSitzung = true
+  abbruch = () => false, maxSchritte = FREI_MAX_SCHRITTE, braucheSitzung = true,
+  schrittFristMs = SCHRITT_FRIST_MS
 } = {}) {
   const hosts = erlaubteHosts(tab?.url);
-  if (!hosts.length) return { ok: false, grund: "Erst eine Seite oeffnen — die Maus arbeitet nur dort." };
+  if (!hosts.length) return { ok: false, grund: "Erst eine Seite öffnen — die Maus arbeitet nur dort." };
   // Die Sitzungspflicht gilt nur fuer den FERNEN Browser. Arbeitet die Maus im
   // eigenen Chrome des Nutzers (Bruecken-Erweiterung), gibt es keine Sitzung,
   // die hochkommen muesste — die Seite ist ja schon offen. Genau daran ist der
@@ -463,13 +474,19 @@ export async function fuehreFreienLaufAus({
     if (!blick?.beobachtung) return { ok: false, grund: "Die Maus konnte die Seite nicht ansehen.", gelesen };
 
     // 2. ENTSCHEIDEN (auf dem Server: Modell + Pruefung)
-    zeige(`Maus ${n}/${maxSchritte}: ueberlegt ...`);
+    zeige(`Maus ${n}/${maxSchritte}: überlegt ...`);
     let antwort;
     try {
       const token = await holeToken();
+      // Frist je Entscheidung — siehe SCHRITT_FRIST_MS. Sie gilt auch fuer das
+      // Lesen der Antwort: ein Server, der die Verbindung offen haelt und nie
+      // zu Ende sendet, hinge sonst genauso.
+      const frist = new AbortController();
+      const uhr = setTimeout(() => frist.abort(), schrittFristMs);
       const r = await fetch(schrittUrl, {
         method: "POST",
         credentials: "include",
+        signal: frist.signal,
         headers: { "content-type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           naechsterSchritt: true,
@@ -482,6 +499,7 @@ export async function fuehreFreienLaufAus({
         })
       });
       antwort = await r.json().catch(() => null);
+      clearTimeout(uhr);
       if (!r.ok || !antwort?.ok) {
         // DIE GRUENDE MITNEHMEN. Der Server schickt bei einer abgelehnten
         // Entscheidung `gruende` mit — genau das, was man zum Verstehen
@@ -535,13 +553,23 @@ export async function fuehreFreienLaufAus({
         }
         return { ok: false, grund: `Maus konnte nicht entscheiden: ${antwort?.error || r.status}${gruende ? ` (${gruende})` : ""}`, gelesen };
       }
-    } catch {
+    } catch (fehler) {
+      if (fehler?.name === "AbortError") {
+        return { ok: false, grund: `Die Maus hat ${Math.round(schrittFristMs / 1000)} s auf eine Entscheidung gewartet und aufgehört — bitte den Auftrag noch einmal senden.`, gelesen };
+      }
       return { ok: false, grund: "Maus nicht erreichbar.", gelesen };
     }
 
     // 3. HANDELN
     const naechste = entscheidungAlsAktion(antwort.entscheidung);
-    if (naechste.fertig) return { ok: true, grund: `Maus fertig nach ${n - 1} Schritten: ${naechste.grund}`, gelesen };
+    if (naechste.fertig) {
+      // „fertig nach 0 Schritten“ (live 2026-09-05) las sich wie ein Fehler,
+      // war aber der beste Fall: die Antwort stand schon auf der Seite, kein
+      // Klick nötig. Das sagen wir so — und zählen richtig, nicht „1 Schritten“.
+      const getan = n - 1;
+      const wie = getan === 0 ? "Maus fertig, kein Klick nötig" : getan === 1 ? "Maus fertig nach 1 Schritt" : `Maus fertig nach ${getan} Schritten`;
+      return { ok: true, grund: `${wie}: ${naechste.grund}`, gelesen };
+    }
     if (naechste.fehler) return { ok: false, grund: `Maus gestoppt: ${naechste.fehler}`, gelesen };
 
     zeige(`Maus ${n}/${maxSchritte}: ${naechste.beschreibung}`);
@@ -554,5 +582,5 @@ export async function fuehreFreienLaufAus({
     // sie bei gleichem Seitenzustand jedes Mal dasselbe.
     verlauf.push(naechste.beschreibung);
   }
-  return { ok: false, grund: `Maus hat nach ${maxSchritte} Schritten aufgehoert (Obergrenze).`, gelesen };
+  return { ok: false, grund: `Maus hat nach ${maxSchritte} Schritten aufgehört (Obergrenze).`, gelesen };
 }

@@ -42,8 +42,8 @@
 // Dann zeigte activeTab() auf ein leeres Panel und starteMausLauf() meldete
 // ewig "Der Browser ist noch nicht bereit". Nichts waere kaputt zu sehen,
 // alles waere kaputt.
-const PANEL = "./browser-pane.js?v=browser-pane-20260905-2";
-const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260905-1";
+const PANEL = "./browser-pane.js?v=browser-pane-20260905-4";
+const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260905-3";
 
 async function holePanel() {
   const [pane, maus] = await Promise.all([import(PANEL), import(PANEL_MAUS)]);
@@ -56,7 +56,8 @@ async function holePanel() {
     refs: pane.refs,
     state: pane.state,
     starteMausLauf: maus.starteMausLauf,
-    starteMausLaufMitSender: maus.starteMausLaufMitSender
+    starteMausLaufMitSender: maus.starteMausLaufMitSender,
+    haltMausAn: maus.haltMausAn
   };
 }
 
@@ -85,7 +86,12 @@ async function ueberChrome({ aufgabe, ziel, schreibe }) {
   const panel = await holePanel();
   const { CLIENT_ROUTES } = await import("./config.js");
 
-  schreibe(`Ich arbeite in deinem eigenen Chrome — du siehst der Maus direkt zu. Ich oeffne ${kurzeAdresse(ziel)}.`);
+  // ERST ÖFFNEN, DANN ANKÜNDIGEN. Live gesehen 2026-09-05: „Ich arbeite in
+  // deinem eigenen Chrome …“ stand im Chat, und die nächste Zeile nahm es
+  // zurück („… ich nehme den eingebauten Browser“). Zwei Sätze, die sich
+  // widersprechen, sind schlimmer als einer, der einen Moment später kommt.
+  // Ob der eigene Chrome die Seite öffnen darf, weiß erst die Antwort der
+  // Brücke — also wird erst gefragt und dann gesagt, wo gearbeitet wird.
   const auf = await sendeAnChrome({ type: "navigate", url: ziel });
   if (!auf?.ok) {
     // FEHLENDE FREIGABE IST KEIN ABBRUCH, SONDERN EIN UMWEG.
@@ -99,13 +105,14 @@ async function ueberChrome({ aufgabe, ziel, schreibe }) {
     // Also: Grund nennen, Weg wechseln, weiterarbeiten. Wer den angemeldeten
     // Zugang braucht, erfaehrt im selben Satz, wie er ihn bekommt.
     if (String(auf?.error || "").startsWith("herkunft_nicht_freigegeben")) {
-      schreibe(`Fuer ${kurzeAdresse(ziel)} hast du deinem Chrome noch nichts erlaubt — ich nehme den eingebauten Browser. (Wenn die Maus dort ANGEMELDET arbeiten soll: Puzzleteil oben rechts, „smejj.com Maus-Bruecke“, „Fuer 30 Minuten erlauben“.)`);
+      schreibe(`Für ${kurzeAdresse(ziel)} hast du deinem eigenen Chrome noch nichts erlaubt — ich nehme den eingebauten Browser rechts. (Soll die Maus dort ANGEMELDET arbeiten: Puzzleteil oben rechts, „smejj.com Maus-Brücke“, „Für 30 Minuten erlauben“.)`);
       return false;
     }
     schreibe(deuteChromeFehler(auf?.error, ziel));
     return true;
   }
 
+  schreibe(`Ich arbeite in deinem eigenen Chrome — du siehst der Maus direkt zu. ${kurzeAdresse(ziel)} ist offen.`);
   const ergebnis = await panel.starteMausLaufMitSender({
     auftrag: aufgabe,
     sende: sendeAnChrome,
@@ -124,12 +131,12 @@ async function ueberChrome({ aufgabe, ziel, schreibe }) {
 export function deuteChromeFehler(kennung, ziel) {
   const text = String(kennung || "");
   if (text.startsWith("herkunft_nicht_freigegeben")) {
-    return `Fuer ${kurzeAdresse(ziel)} fehlt noch deine Freigabe. Klick in Chrome oben rechts auf das smejj-Symbol und dann auf „Fuer 30 Minuten erlauben“ — danach den Auftrag noch einmal senden.`;
+    return `Für ${kurzeAdresse(ziel)} fehlt noch deine Freigabe. Klick in Chrome oben rechts auf das smejj-Symbol und dann auf „Für 30 Minuten erlauben“ — danach den Auftrag noch einmal senden.`;
   }
-  if (text === "nur_https") return `${kurzeAdresse(ziel)} laeuft nicht ueber https. In deinem angemeldeten Chrome arbeitet die Maus nur auf verschluesselten Seiten.`;
-  if (text === "bruecke_antwortet_nicht") return "Die Maus-Bruecke in Chrome antwortet nicht. Oeffne chrome://extensions und pruefe, ob sie aktiv ist.";
-  if (text === "kein_maus_tab") return "Chrome hat den Arbeits-Tab nicht geoeffnet. Bitte den Auftrag noch einmal senden.";
-  return `Die Maus-Bruecke in Chrome meldet: ${text || "unbekannter Grund"}.`;
+  if (text === "nur_https") return `${kurzeAdresse(ziel)} läuft nicht über https. In deinem angemeldeten Chrome arbeitet die Maus nur auf verschlüsselten Seiten.`;
+  if (text === "bruecke_antwortet_nicht") return "Die Maus-Brücke in Chrome antwortet nicht. Öffne chrome://extensions und prüfe, ob sie aktiv ist.";
+  if (text === "kein_maus_tab") return "Chrome hat den Arbeits-Tab nicht geöffnet. Bitte den Auftrag noch einmal senden.";
+  return `Die Maus-Brücke in Chrome meldet: ${text || "unbekannter Grund"}.`;
 }
 
 /**
@@ -149,7 +156,7 @@ export function deuteChromeFehler(kennung, ziel) {
  */
 export function deuteBrueckenZustand(zustand, { installiert = true } = {}) {
   if (!installiert) {
-    return { ton: "fehlt", text: "Maus-Bruecke nicht installiert — die Maus arbeitet im fernen Browser." };
+    return { ton: "fehlt", text: "Maus-Brücke nicht installiert — die Maus arbeitet im fernen Browser." };
   }
   if (!zustand?.ok) {
     return { ton: "warnung", text: deuteChromeFehler(zustand?.error, "") };
@@ -161,14 +168,14 @@ export function deuteBrueckenZustand(zustand, { installiert = true } = {}) {
   const alsHerkunft = (muster) => String(muster || "").replace(/\/\*$/, "").replace(/\/$/, "");
   const rechte = new Set((zustand.chromeRechte || []).map(alsHerkunft).filter(Boolean));
   const offen = (zustand.freigaben || []).filter((f) => Number(f.restMinuten) > 0);
-  const marke = zustand.version ? `Bruecke ${zustand.version}` : "Bruecke";
+  const marke = zustand.version ? `Brücke ${zustand.version}` : "Brücke";
 
   // Der Fall vom 2026-08-20: gemerkt, aber Chrome haelt das Recht nicht.
   const ohneRecht = offen.filter((f) => !rechte.has(alsHerkunft(f.herkunft)));
   if (ohneRecht.length) {
     return {
       ton: "warnung",
-      text: `${marke}: fuer ${ohneRecht.map((f) => kurzeAdresse(f.herkunft)).join(", ")} ist eine Freigabe gemerkt, aber Chrome haelt das Recht NICHT. Freigabe in Chrome noch einmal erteilen.`
+      text: `${marke}: für ${ohneRecht.map((f) => kurzeAdresse(f.herkunft)).join(", ")} ist eine Freigabe gemerkt, aber Chrome hält das Recht NICHT. Freigabe in Chrome noch einmal erteilen.`
     };
   }
   // Der umgekehrte Fall — er sieht harmlos aus und ist es nicht: die Maus
@@ -178,7 +185,7 @@ export function deuteBrueckenZustand(zustand, { installiert = true } = {}) {
   if (ohneFreigabe.length) {
     return {
       ton: "warnung",
-      text: `${marke}: Chrome haelt ein Recht fuer ${ohneFreigabe.map(kurzeAdresse).join(", ")}, das die Bruecke nicht kennt — sie wird es nicht benutzen.`
+      text: `${marke}: Chrome hält ein Recht für ${ohneFreigabe.map(kurzeAdresse).join(", ")}, das die Brücke nicht kennt — sie wird es nicht benutzen.`
     };
   }
   if (!offen.length) return { ton: "gut", text: `${marke} bereit — keine Freigabe aktiv.` };
@@ -210,12 +217,12 @@ export function oeffneZiel(ziel, panel, schreibe) {
 
   const brauchbar = panel.normalizeAgentBrowserUrl ? panel.normalizeAgentBrowserUrl(ziel) : ziel;
   if (!brauchbar) {
-    return { ok: false, grund: `Diese Adresse kann der eingebaute Browser nicht oeffnen: ${ziel} — es geht nur https.` };
+    return { ok: false, grund: `Diese Adresse kann der eingebaute Browser nicht öffnen: ${ziel} — es geht nur https.` };
   }
 
   const adresszeile = panel.refs?.address;
   if (!adresszeile) {
-    return { ok: false, grund: "Der Browser rechts ist noch nicht aufgebaut. Bitte einmal den Browser oeffnen und den Auftrag noch einmal senden." };
+    return { ok: false, grund: "Der Browser rechts ist noch nicht aufgebaut. Bitte einmal den Browser öffnen und den Auftrag noch einmal senden." };
   }
 
   const anzahl = panel.state?.tabs?.length;
@@ -332,7 +339,52 @@ export function kurzeAdresse(url) {
 export async function mausAuftragErledigt({ task, output, deps = {} } = {}) {
   const vorlagen = await sammleVorlagen();
   if (!istMausAuftrag(task, vorlagen)) return false;
+  const strom = meldeMausStrom(deps);
+  try {
+    return await erledigeMausAuftrag({ task, output, deps, vorlagen });
+  } finally {
+    strom.ende();
+  }
+}
 
+/**
+ * DAS STOPP-VIERECK GEHÖRT AUCH DER MAUS.
+ *
+ * Live gesehen 2026-09-05: der Lauf war fertig, das Viereck im Eingabefeld
+ * blieb noch anderthalb Minuten stehen. chat-stopp.js kennt nur die
+ * Chat-Ströme (Ereignis smejj:chat-strom) und hörte von der Maus nichts — es
+ * blendete erst nach seinem Vorlauf aus. Und andersherum: ein Klick auf das
+ * Viereck beendete Ströme (smejj:chat-stoppen), die Maus klickte weiter.
+ *
+ * Beides läuft jetzt über dieselben zwei Ereignisse wie die Chat-Ströme:
+ * ein Knopf, ein Zustand. Mitgenommen wird, was daran hängt — der
+ * Verlauf-Sync hält den Vortritt, das Auslagern von Medien wartet.
+ *
+ * @param {{fenster?: EventTarget, halt?: Function}} deps  Tests reichen ein
+ *   eigenes Fenster und einen eigenen Halt herein.
+ */
+function meldeMausStrom(deps = {}) {
+  const fenster = deps.fenster || (typeof window !== "undefined" ? window : null);
+  const melde = (laufen) => {
+    try { fenster?.dispatchEvent(new CustomEvent("smejj:chat-strom", { detail: { laufen } })); } catch { /* ohne Fenster (Tests) egal */ }
+  };
+  const halt = () => {
+    try {
+      if (deps.halt) deps.halt();
+      else holePanel().then((p) => p.haltMausAn?.()).catch(() => {});
+    } catch { /* fail-safe: das Viereck bleibt bedienbar */ }
+  };
+  try { fenster?.addEventListener("smejj:chat-stoppen", halt); } catch { /* still */ }
+  melde(1);
+  return {
+    ende() {
+      try { fenster?.removeEventListener("smejj:chat-stoppen", halt); } catch { /* still */ }
+      melde(0);
+    }
+  };
+}
+
+async function erledigeMausAuftrag({ task, output, deps = {}, vorlagen }) {
   const schreibe = deps.schreibe || baueZeilenschreiber(output);
   const warte = deps.warte || ((ms) => new Promise((auf) => setTimeout(auf, ms)));
 
@@ -341,7 +393,7 @@ export async function mausAuftragErledigt({ task, output, deps = {} } = {}) {
     try {
       panel = await holePanel();
     } catch (fehler) {
-      schreibe(`Der eingebaute Browser laesst sich gerade nicht laden (${fehler?.message || fehler}). Bitte die Seite neu laden.`);
+      schreibe(`Der eingebaute Browser lässt sich gerade nicht laden (${fehler?.message || fehler}). Bitte die Seite neu laden.`);
       return true;
     }
   }
@@ -351,7 +403,7 @@ export async function mausAuftragErledigt({ task, output, deps = {} } = {}) {
 
   const aufgabe = mausAufgabeAus(task, vorlagen);
   if (!aufgabe) {
-    schreibe("Sag mir noch, WAS die Maus tun soll — zum Beispiel: „Erledige mit der Maus im Browser: auf smejj.com das Impressum oeffnen“.");
+    schreibe("Sag mir noch, WAS die Maus tun soll — zum Beispiel: „Erledige mit der Maus im Browser: auf smejj.com das Impressum öffnen“.");
     return true;
   }
 
@@ -364,7 +416,7 @@ export async function mausAuftragErledigt({ task, output, deps = {} } = {}) {
   const offen = tab()?.url || "";
   const ziel = genannt || offen;
   if (!ziel) {
-    schreibe("Ich weiss noch nicht, WO die Maus arbeiten soll. Nenne die Seite mit, zum Beispiel: „Erledige mit der Maus im Browser: auf smejj.com das Impressum oeffnen“.");
+    schreibe("Ich weiß noch nicht, WO die Maus arbeiten soll. Nenne die Seite mit, zum Beispiel: „Erledige mit der Maus im Browser: auf smejj.com das Impressum öffnen“.");
     return true;
   }
 
@@ -379,9 +431,9 @@ export async function mausAuftragErledigt({ task, output, deps = {} } = {}) {
   // Auftrag am 2026-08-18 immer wieder gescheitert — mal weil der Proxy tot
   // war, mal weil er wieder lebte. Jetzt wird der richtige Modus verlangt,
   // statt auf ihn zu hoffen.
-  schreibe(`Ich oeffne ${kurzeAdresse(ziel)} im Live-Browser rechts.`);
+  schreibe(`Ich öffne ${kurzeAdresse(ziel)} im Live-Browser rechts.`);
   const geoeffnet = deps.oeffne
-    ? (oeffne(ziel) ? { ok: true } : { ok: false, grund: `Diese Adresse kann der eingebaute Browser nicht oeffnen: ${ziel}` })
+    ? (oeffne(ziel) ? { ok: true } : { ok: false, grund: `Diese Adresse kann der eingebaute Browser nicht öffnen: ${ziel}` })
     : await panel.oeffneImLiveBrowser(ziel);
   if (!geoeffnet.ok) {
     schreibe(geoeffnet.grund);
@@ -394,7 +446,7 @@ export async function mausAuftragErledigt({ task, output, deps = {} } = {}) {
     return true;
   }
 
-  schreibe("Die Maus faengt an. Du siehst rechts jeden Schritt — der Maus-Knopf oben im Browser haelt sie an.");
+  schreibe("Die Maus fängt an. Du siehst rechts jeden Schritt — der Maus-Knopf oben im Browser hält sie an.");
   const ergebnis = await starte({ auftrag: aufgabe, zeige: schreibe });
   schreibe(ergebnis?.grund || (ergebnis?.ok ? "Maus fertig." : "Maus gestoppt."));
   return true;
