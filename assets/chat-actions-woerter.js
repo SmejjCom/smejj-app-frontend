@@ -35,7 +35,15 @@ function sorgeFuerStil(doc = document) {
   stil.id = STIL_ID;
   stil.textContent = ".msg-act-wort{display:none}"
     + "@media (max-width:600px){"
+    // GEMESSEN AM GERAET 2026-09-06 (iPhone 17 Pro, iOS 26.5): Die Symbole
+    // standen mit Abstand, die WOERTER darunter beruehrten sich — im Screenshot
+    // las sich die Leiste als "KopierenVorlesen". Der Knopf ist 44 px breit
+    // (Betreiber-Regel 30.08., Touch-Ziel), das Wort darunter ist breiter und
+    // ragt darueber hinaus, waehrend die Leiste ohne Steg auskam. Geloest wird
+    // es durch den Steg, NICHT durch breitere Knoepfe: 6 x 44 plus 5 x 6 = 294 px,
+    // die Zeile hat bei 375 px Schirmbreite 327 px.
     + ".msg-actions .msg-act.hat-wort{flex-direction:column;justify-content:center;gap:2px;height:auto;min-height:54px;padding:4px 2px}"
+    + ".msg-actions:has(.msg-act.hat-wort){gap:6px}"
     + ".msg-actions .msg-act-wort{display:block;font-size:10px;line-height:1;letter-spacing:.01em;opacity:.85;white-space:nowrap}"
     + "}";
   doc.head.appendChild(stil);
