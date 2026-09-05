@@ -284,7 +284,7 @@ export async function starteMausLauf({ auftrag, zeige } = {}) {
   if (laeuft) return { ok: false, grund: "Die Maus arbeitet schon an einem Auftrag." };
 
   const melde = zeige || bausteine.zeige || (() => {});
-  const { knopf, activeTab, planeUrl, holeToken, sende, render } = bausteine;
+  const { knopf, activeTab, planeUrl, holeToken, sende, render, erneuere } = bausteine;
 
   laeuft = true;
   anhalten = false;
@@ -307,7 +307,7 @@ export async function starteMausLauf({ auftrag, zeige } = {}) {
         tab, planeUrl, holeToken, sende, zeige: melde, abbruch: () => anhalten
       })
       : await fuehreFreienLaufAus({
-        auftrag: text, tab, schrittUrl: planeUrl, holeToken, sende, zeige: melde, abbruch: () => anhalten
+        auftrag: text, tab, schrittUrl: planeUrl, holeToken, sende, zeige: melde, abbruch: () => anhalten, erneuere
       });
   } finally {
     laeuft = false;
@@ -361,10 +361,10 @@ export async function starteMausLaufMitSender({ auftrag, sende, seitenUrl, schri
  * Nimmt die Panel-Bausteine — so bleibt in browser-pane.js eine Zeile stehen.
  * Dieselben Bausteine bedienen ab jetzt auch den Chat-Einstieg (starteMausLauf).
  */
-export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, sende, zeige, render }) {
+export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, sende, zeige, render, erneuere = null }) {
   // Die Bausteine werden AUCH ohne Knopf eingetragen: der Chat-Einstieg
   // braucht sie, der Knopf ist nur eine von zwei Tueren.
-  bausteine = { knopf: knopf || null, activeTab, planeUrl, holeToken, sende, zeige, render };
+  bausteine = { knopf: knopf || null, activeTab, planeUrl, holeToken, sende, zeige, render, erneuere };
   if (!knopf) return { laeuft: mausLaeuft };
 
   knopf.addEventListener("click", async () => {
@@ -401,6 +401,11 @@ export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, send
 export const FREI_MAX_SCHRITTE = 10;
 export const VERWURF_GRENZE = 2;
 export const AUSSETZER_GRENZE = 3;
+// Wie oft eine Aktion scheitern darf, bevor der Lauf endet. Ein Fehlschlag
+// ist meist ein falsches Ziel — das Modell kann es korrigieren, wenn es den
+// Grund erfaehrt. Zwei sind genug: wer zweimal danebenliegt, braucht einen
+// anderen Auftrag, keinen dritten Versuch.
+export const FEHLSCHLAG_GRENZE = 2;
 // Wie lange das Panel auf EINE Entscheidung des Servers wartet.
 //
 // LIVE GESEHEN 2026-09-05: „Maus 1/10: überlegt ...“ stand minutenlang da —
@@ -446,7 +451,7 @@ export function entscheidungAlsAktion(entscheidung) {
 export async function fuehreFreienLaufAus({
   auftrag, tab, schrittUrl, holeToken = () => "", sende, zeige = () => {},
   abbruch = () => false, maxSchritte = FREI_MAX_SCHRITTE, braucheSitzung = true,
-  schrittFristMs = SCHRITT_FRIST_MS
+  schrittFristMs = SCHRITT_FRIST_MS, erneuere = null
 } = {}) {
   const hosts = erlaubteHosts(tab?.url);
   if (!hosts.length) return { ok: false, grund: "Erst eine Seite öffnen — die Maus arbeitet nur dort." };
@@ -465,6 +470,7 @@ export async function fuehreFreienLaufAus({
   // Aussetzer sind etwas anderes als Ablehnungen: sie werden nicht gezaehlt
   // wie ein Schritt, weil nichts geschehen ist.
   let aussetzer = 0;
+  let fehlschlaege = 0;
   for (let n = 1; n <= maxSchritte; n += 1) {
     if (abbruch()) return { ok: false, grund: `Maus angehalten nach ${n - 1} Schritten.`, gelesen };
 
@@ -575,12 +581,40 @@ export async function fuehreFreienLaufAus({
     zeige(`Maus ${n}/${maxSchritte}: ${naechste.beschreibung}`);
     const ergebnis = await sende(naechste.aktion);
     if (!ergebnis || ergebnis.ok === false) {
-      return { ok: false, grund: `Maus gestoppt bei: ${naechste.beschreibung}`, gelesen };
+      const grund = ergebnis?.error ? String(ergebnis.error).slice(0, 120) : "keine Antwort";
+      // SITZUNG VERLOREN (live 05.09.: der ferne Browser haelt vier Sitzungen,
+      // die aelteste fliegt raus — mitten im Lauf). Nicht aufgeben, neu
+      // verbinden und den Schritt noch einmal versuchen. Einmal.
+      const verloren = ergebnis?.verloren === true || (braucheSitzung && !tab?.sessionId);
+      if (verloren && erneuere && !verlauf.some((z) => z.startsWith("UNTERBROCHEN"))) {
+        zeige(`Maus ${n}/${maxSchritte}: Live-Browser-Sitzung verloren, sie verbindet neu ...`);
+        const wieder = await Promise.resolve(erneuere()).catch(() => false);
+        if (!wieder) return { ok: false, grund: `Die Live-Browser-Sitzung ist abgerissen (${grund}) und liess sich nicht neu aufbauen — bitte den Auftrag noch einmal senden.`, gelesen };
+        verlauf.push(`UNTERBROCHEN: ${naechste.beschreibung} — Sitzung neu aufgebaut, Schritt noch NICHT ausgefuehrt`);
+        n -= 1; // der Schritt zaehlt nicht, es ist nichts geschehen
+        continue;
+      }
+      if (verloren) return { ok: false, grund: `Die Live-Browser-Sitzung ist abgerissen (${grund}) — bitte den Auftrag noch einmal senden.`, gelesen };
+      // EIN FEHLSCHLAG IST EIN HINWEIS, KEIN ENDE. Meist ein falsches Ziel;
+      // mit dem Grund im Verlauf waehlt das Modell ein anderes.
+      fehlschlaege += 1;
+      if (fehlschlaege >= FEHLSCHLAG_GRENZE) {
+        return { ok: false, grund: `Maus gestoppt: »${naechste.beschreibung}« ist zweimal fehlgeschlagen (${grund}).`, gelesen };
+      }
+      verlauf.push(`FEHLGESCHLAGEN: ${naechste.beschreibung} (${grund}) — bitte anders vorgehen`);
+      zeige(`Maus ${n}/${maxSchritte}: ${naechste.beschreibung} hat nicht geklappt (${grund}), sie versucht es anders ...`);
+      continue;
     }
-    if (naechste.liestAls && typeof ergebnis.gelesen === "string") gelesen[naechste.liestAls] = ergebnis.gelesen;
     // Der Verlauf haelt sie davon ab, im Kreis zu laufen: ohne ihn entscheidet
-    // sie bei gleichem Seitenzustand jedes Mal dasselbe.
-    verlauf.push(naechste.beschreibung);
+    // sie bei gleichem Seitenzustand jedes Mal dasselbe. Und ein GELESENER
+    // WERT gehoert hinein: vorher kam er nie beim Modell an, und es las
+    // dieselbe Ueberschrift ein zweites Mal (live 05.09.).
+    if (naechste.liestAls && typeof ergebnis.gelesen === "string") {
+      gelesen[naechste.liestAls] = ergebnis.gelesen;
+      verlauf.push(`${naechste.beschreibung} → »${ergebnis.gelesen.slice(0, 300)}«`);
+    } else {
+      verlauf.push(naechste.beschreibung);
+    }
   }
   return { ok: false, grund: `Maus hat nach ${maxSchritte} Schritten aufgehört (Obergrenze).`, gelesen };
 }

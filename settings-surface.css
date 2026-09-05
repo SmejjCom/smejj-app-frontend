@@ -501,3 +501,23 @@
   font-size: 1em;
   line-height: 1.6;
 }
+
+/* ---- Hell-Modus der Einstellungs-Navigation (2026-09-05) -------------------
+   AM GERAET GEMESSEN (iPhone 17 Pro, iOS 26.5): Wer das helle Farbschema
+   waehlt, sah die Navigationskacheln praktisch leer. Die Schrift war fuer
+   dunklen Grund gebaut und blieb es auch im Hellen:
+     .settings-nav-sub                       Kontrast 1,1
+     .settings-nav-button.is-active .name    Kontrast 1,0 (weiss auf hell)
+   Noetig sind 4,5 (WCAG AA). Die Kachel selbst hatte laengst eine Hell-Regel —
+   nur ihre SCHRIFT nicht. Genau diese Luecke schliesst der Block hier.
+   Der Vorgabewert ist seit demselben Tag "dark"; wer bewusst hell waehlt, darf
+   trotzdem nicht in einer unlesbaren Oberflaeche landen. */
+#settings.premium-view[data-settings-theme="light"] .settings-nav-name {
+  color: #151515;
+}
+#settings.premium-view[data-settings-theme="light"] .settings-nav-sub {
+  color: #4a4f52;
+}
+#settings.premium-view[data-settings-theme="light"] .settings-nav-button.is-active .settings-nav-name {
+  color: #0b0b0b;
+}

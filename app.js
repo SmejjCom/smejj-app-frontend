@@ -6,7 +6,7 @@ import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v
 import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=5";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
-import { holeSendepfad } from "./sendepfad-nachladen.js?v=6";
+import { holeSendepfad } from "./sendepfad-nachladen.js?v=7";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
 import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js";
@@ -65,7 +65,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
-const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=b47t").then((m) => (m.enhancePremiumSurfaces(), m)));
+const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=b47u").then((m) => (m.enhancePremiumSurfaces(), m)));
 // Google-Login gehoert zur Profilseite — laedt erst beim Verlassen von Start/Chat.
 const holeGoogleLogin = ladeBeiAnsicht(["start", "chat"], () => import("./google-login.js")
   .then((m) => m.initGoogleLogin({ $, state, writeOutput, refreshSessionStatus }))

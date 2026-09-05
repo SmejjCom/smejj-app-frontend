@@ -238,13 +238,18 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
       return data;
     }
     const error = String(data?.error || "");
-    if (error === "session_busy") return; // Aktion verworfen — naechste kommt durch.
+    if (error === "session_busy") return { ok: false, error, beschaeftigt: true }; // Aktion verworfen — naechste kommt durch.
     if (error === "session_unknown" || error === "session_expired" || !data) {
       openIds.delete(sessionId);
       queues.delete(sessionId);
       tab.sessionId = "";
       hooks?.onLost?.(tab);
+      return { ok: false, error: error || "keine_antwort", verloren: true };
     }
+    // DEN GRUND MITGEBEN. Vorher endete jeder Fehlschlag hier als undefined —
+    // die Maus sah nur "gestoppt bei", nie warum (live 05.09.: Sitzung vom
+    // Server verdraengt, gemeldet als leeres Nichts).
+    return data;
   }
 
   // Aktionen pro Session serialisieren: eine nach der anderen, begrenzte

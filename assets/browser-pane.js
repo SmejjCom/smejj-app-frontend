@@ -19,7 +19,7 @@ import {
   buildRemoteBrowserHtml
 } from "./browser-pane-render.js?v=browser-pane-20260905-5";
 export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260905-5";
-import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260822-1";
+import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260905-7";
 // Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
 import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260819-4";
@@ -28,7 +28,7 @@ import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicher
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
 import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260819-4";
 import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
-import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260905-3";
+import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260905-7";
 // Gefunden 2026-08-18 beim Livetest: dieser Import FEHLTE, obwohl init() die
 // Funktion benutzt. Folge war kein kleiner Schoenheitsfehler — browser-pane.js
 // warf beim Laden "baueNachrichtenEmpfang is not defined", das ganze Modul kam
@@ -110,8 +110,18 @@ const sessionHooks = {
   onNavigated: (tab) => { commitHistory(tab, tab.url, true); persistTabs(); render(); },
   onSuchErgebnis: (anzahl, index) => suche?.melde(anzahl, index),
   onLost: (tab) => {
-    showHint("Live-Browser-Session beendet — verbinde neu ...");
-    if (tab.url) navigate(tab, tab.url, { push: false });
+    showHint("Live-Browser-Sitzung beendet — verbinde neu ...");
+    if (!tab.url) return;
+    // Waehrend die Maus arbeitet, verbindet SIE neu (erneuere) — sonst bauen
+    // zwei Stellen gleichzeitig eine Sitzung auf.
+    if (mausLaeuft()) return;
+    // ERST der Live-Browser, DANN der eingebettete Rahmen. Vorher fiel der Tab
+    // sofort in die eingebettete Ansicht: darin sieht die Maus nichts, und der
+    // Nutzer bekam bei vielen Seiten nur "Inhalt blockiert" (live 05.09., als
+    // der ferne Browser die aelteste seiner vier Sitzungen verdraengte).
+    tryLiveBrowser(tab, tab.url, { push: false })
+      .then((ok) => { if (!ok) navigate(tab, tab.url, { push: false }); })
+      .catch(() => navigate(tab, tab.url, { push: false }));
   }
 };
 
@@ -313,7 +323,9 @@ function mountOnce() {
     knopf: refs.maus, activeTab, render, zeige: showHint,
     planeUrl: CLIENT_ROUTES.api.mausRun,
     holeToken: () => { try { return localStorage.getItem("smejj.auth.accessToken.v1") || sessionStorage.getItem("smejj.auth.accessToken.v1") || ""; } catch { return ""; } },
-    sende: (aktion) => sessionClient.actUndWarte(activeTab(), aktion, sessionHooks)
+    sende: (aktion) => sessionClient.actUndWarte(activeTab(), aktion, sessionHooks),
+    // Sitzung mitten im Lauf verloren? Die Maus baut sie hier neu auf.
+    erneuere: async () => { const t = activeTab(); if (!t?.url) return false; return tryLiveBrowser(t, t.url, { push: false }); }
   });
   refs.menu.addEventListener("click", backToMenu);
   refs.close.addEventListener("click", closePane);
