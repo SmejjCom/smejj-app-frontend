@@ -8,7 +8,8 @@
       "namespace": "android_app",
       "package_name": "com.smejj.app",
       "sha256_cert_fingerprints": [
-        "REPLACE_ANDROID_SIGNING_SHA256_FINGERPRINT"
+        "03:AC:EB:C6:B6:8F:9E:83:8C:DD:3B:97:F4:47:C4:66:10:36:B8:86:FF:C6:43:B8:AD:D5:75:DA:68:C7:6E:2B",
+        "E5:E9:14:A5:A0:74:C8:F7:AB:73:38:C8:1C:41:EB:B0:C5:C6:79:9B:D2:39:69:8C:4D:9E:33:2A:55:0A:75:D6"
       ]
     }
   }

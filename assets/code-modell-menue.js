@@ -510,7 +510,15 @@ export function baueKopfzeile(deps) {
     const gruss = document.getElementById("codeGruss");
     if (gruss) {
       const name = document.getElementById("profileDockName")?.textContent.trim();
-      gruss.textContent = name && name !== "Nutzer"
+      // Eine E-Mail-Adresse ist KEINE Anrede. Ohne hinterlegten Namen faellt das
+      // Profil-Dock auf die Anmelde-Adresse zurueck, und die stand am 2026-09-05
+      // gross in der Ueberschrift: "Was steht als Naechstes an, name@gmail.com?"
+      // — unschoen und fuer jeden lesbar, der auf den Schirm sieht. Im Dock
+      // selbst bleibt sie richtig (dort zeigt sie, mit welchem Konto man
+      // angemeldet ist); in der Begruessung wird dann neutral gegruesst, wie es
+      // ChatGPT und Claude ohne Namen auch tun.
+      const istMailAdresse = /\S+@\S+\.\S+/.test(name || "");
+      gruss.textContent = name && name !== "Nutzer" && !istMailAdresse
         ? `Was steht als Nächstes an, ${name.split(" ")[0]}?`
         : "Was steht als Nächstes an?";
     }
