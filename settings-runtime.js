@@ -20,8 +20,19 @@ const SAFE_VALUES = {
 // "medium" nur 8,6 s. Der Standard ist darum "medium" — wer mehr Tiefe will,
 // stellt sie in den Einstellungen ausdruecklich ein. So bleibt das gemessene
 // Tempo erhalten, statt es durch einen nie bewusst gewaehlten Wert zu verlieren.
+// GEMESSEN AM GERAET 2026-09-05 (iPhone 17 Pro, iOS 26.5, Systemmodus HELL):
+// Die Startseite blieb dunkel, alle anderen Bereiche kippten auf hell — denn
+// resolvedTheme() wird nur auf `.view:not(#start)` angewendet. Ergebnis war ein
+// zerrissenes Bild: dunkle Startseite, weisse Einstellungen mit hellgrauer
+// Schrift auf weissem Grund, die Unterzeilen ("Sprache, Start, Sicherheitsmodus")
+// praktisch unlesbar. Wer sein Telefon hell stellt, bekam eine kaputte App.
+// Aufgefallen ist es nie, weil der Betreiber-Mac dunkel laeuft.
+// Der Standard ist darum "dark": smejj.com IST ein dunkles Design (Design-Lock,
+// Startseite), und ein einheitliches Bild schlaegt ein halbes. Wer hell will,
+// stellt es unter Einstellungen -> Aussehen ausdruecklich ein — die Wahl bleibt
+// erhalten, nur der Vorgabewert folgt nicht mehr blind dem Geraet.
 const DEFAULTS = Object.freeze({
-  theme: "system", startView: "last", density: "comfortable", fontSize: "medium",
+  theme: "dark", startView: "last", density: "comfortable", fontSize: "medium",
   responseStyle: "balanced", reasoningEffort: "medium", confirmations: "balanced",
   personalization: "", autoContext: true, runChecks: true, browserPreview: true,
   networkAccess: false, notifyComplete: true, notifyApproval: true,

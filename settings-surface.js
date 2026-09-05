@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from "./config.js";
-import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=b39";
+import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=b40";
 // api-center-surface.js und provider-settings.js werden BEWUSST nicht statisch
 // importiert (Seitengewicht). Der Startreiter ist "general" — bis der Nutzer
 // dorthin wechselt, wird ihr Code nie gebraucht. Zusammen mit ihrem selbst
