@@ -399,7 +399,12 @@ export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, send
 // Deshalb bleibt der Plan-Modus fuer einfache Auftraege die bessere Wahl,
 // und dieser hier ist fuer das, was vorher gar nicht ging.
 
-export const FREI_MAX_SCHRITTE = 10;
+// 25 statt 10 (live con.ax 2026-09-06): bei einem Anmeldeformular mit sieben
+// Feldern gab das Modell nach vier Schritten auf — "Not enough allowed steps
+// remaining". Der Server erlaubt bis 25; die Grenze ist ein Notausgang gegen
+// Endlosschleifen, kein Arbeitsbudget. Ein Lauf endet ohnehin, sobald das
+// Modell "done" sagt oder zweimal scheitert.
+export const FREI_MAX_SCHRITTE = 25;
 export const VERWURF_GRENZE = 2;
 export const AUSSETZER_GRENZE = 3;
 // Wie oft eine Aktion scheitern darf, bevor der Lauf endet. Ein Fehlschlag
