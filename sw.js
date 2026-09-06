@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v777";
+const CACHE_NAME = "smejj-shell-v778";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -286,6 +286,13 @@ const SHELL = [
   // Sprachwelle LIVE (03.09.): statischer Import aus composer-tools.
   "/assets/voice-realtime.js",
   "/assets/composer-plus-menu.js",
+  // Drei Textauszieher, die composer-plus-menu.js per import() nachlaedt.
+  // Ohne sie liest smejj offline einen angehaengten PDF-, Office- oder
+  // Tonspur-Anhang nicht mehr — ohne Fehlermeldung, die Datei bleibt einfach
+  // stumm (2026-09-06).
+  "/assets/anhang-pdf-text.js",
+  "/assets/anhang-office-text.js",
+  "/assets/anhang-tonspur.js",
   "/assets/composer-anhang-chips.js",
   "/assets/composer-bild-anhang.js",
   "/assets/voice-typed-send.js",
@@ -354,6 +361,21 @@ const SHELL = [
   "/assets/arbeitsbereiche.js",
   "/assets/papierkorb.js",
   "/assets/chat-actions-menu.js",
+  // Sieben Module, die chat-actions-menu.js per import() nachlaedt und die
+  // bis 2026-09-06 hier fehlten. Online faellt das nie auf — der Browser holt
+  // sie einfach aus dem Netz. Offline lieferte der Fetch-Handler dafuer die
+  // index.html zurueck, der Browser bekam HTML statt JavaScript und brach das
+  // Modul ab: die Aktionsleiste unter jeder Antwort verlor stumm ihre
+  // Wortwahl, den Kompakt-Modus, den Klartext, die Composer-Zeile, die
+  // Verlaufs- und die Code-Feld-Unterkante, und die ersten Schritte blieben
+  // aus. Gefunden von tests/precache-dynamische-importe.test.mjs.
+  "/assets/kompakt.js",
+  "/assets/deutsch-klartext.js",
+  "/assets/erste-schritte.js",
+  "/assets/chat-actions-woerter.js",
+  "/assets/composer-zeile.js",
+  "/assets/verlauf-unten.js",
+  "/assets/code-feld-unten.js",
   "/assets/chat-code-copy.js",
   // Sieben Module, die index.html per <script> laedt und die bis 2026-08-22
   // hier fehlten. Offline lieferte der Fetch-Handler dafuer die index.html

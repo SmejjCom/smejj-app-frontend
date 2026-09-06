@@ -56,6 +56,13 @@ const API_PATHS = {
     modelStatus: "/api/models/kimi-k2-7/status",
     modelsStatus: "/api/models/status",
     storageStatus: "/api/storage/status",
+    // Fragen-Erfassung fuer das Training (nur mit bestaetigter Einwilligung).
+    // public/ai/frage-erfassung.js las CLIENT_ROUTES.api.trainingCapture, den
+    // Schluessel gab es hier aber nicht — der Zugriff ergab undefined und nur
+    // ein eingebauter Ersatzpfad rettete die Route. Beides zeigte auf
+    // dieselbe Adresse, es fiel also nie auf; bei einer Verlegung waere die
+    // Erfassung still auf den alten Pfad gelaufen (2026-09-06).
+    trainingCapture: "/api/training/capture",
     terminalRun: "/api/terminal/run"
 };
 
