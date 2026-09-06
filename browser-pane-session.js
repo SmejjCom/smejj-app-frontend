@@ -119,42 +119,52 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
       && endpointReady(api.browserSessionClose);
   }
 
-  async function sende(endpoint, body, token) {
+  async function sende(endpoint, body, token, signal = undefined) {
     return fetchImpl(endpoint, {
       method: "POST",
       headers: mitAnmeldung({ "content-type": "application/json" }, token),
       // Das Cookie mitschicken: dann geht es auch, wenn gar kein Token
       // vorliegt, der Nutzer aber angemeldet ist.
       credentials: "include",
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      ...(signal ? { signal } : {})
     });
   }
 
   // Einmal nachfassen, nie oefter: Ist der Nachweis abgelaufen, hilft ein
   // frischer. Hilft der auch nicht, ist der Nutzer wirklich nicht angemeldet
   // — dann waere jede Wiederholung nur Last ohne Aussicht.
-  async function post(endpoint, body) {
+  // `fristMs` (2026-09-06): Eine Anfrage ohne Frist wartet ewig — live stand
+  // das Hinsehen der Maus bis zu 85 s, und niemand konnte sagen, ob noch
+  // etwas kommt. Mit Frist kommt eine Antwort von UNS ({ frist: true }), und
+  // der Aufrufer darf es noch einmal versuchen. Nur wer eine Frist nennt,
+  // bekommt eine — die Handbedienung bleibt wie bisher.
+  async function post(endpoint, body, { fristMs = 0 } = {}) {
+    const signal = fristMs > 0 && typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(fristMs) : undefined;
     try {
       // Jeden bekannten Nachweis probieren, bevor aufgegeben wird. Vorher
       // wurde nur EINER versucht — und wenn das der abgelaufene war, fiel das
       // Panel wortlos auf das Standbild zurueck.
       let response = null;
       for (const token of tokenKandidaten()) {
-        response = await sende(endpoint, body, token);
+        response = await sende(endpoint, body, token, signal);
         if (response.status !== 401 && response.status !== 403) {
           gemerktesToken = token;
           break;
         }
       }
       // Kein Kandidat da oder alle abgewiesen: ohne Nachweis bzw. per Cookie.
-      if (!response) response = await sende(endpoint, body, "");
+      if (!response) response = await sende(endpoint, body, "", signal);
       if (response.status === 401 || response.status === 403) {
         const frisch = await frischesToken(herkunft, fetchImpl);
-        if (frisch) response = await sende(endpoint, body, frisch);
+        if (frisch) response = await sende(endpoint, body, frisch, signal);
       }
       const data = await response.json().catch(() => null);
       return data && typeof data === "object" ? data : null;
-    } catch {
+    } catch (fehler) {
+      if (fehler?.name === "TimeoutError" || fehler?.name === "AbortError") {
+        return { ok: false, error: `zeitueberschreitung_${Math.round(fristMs / 1000)}s`, frist: true };
+      }
       return null;
     }
   }
@@ -198,13 +208,29 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
     }
   }
 
-  async function runAct(tab, action, hooks) {
+  async function runAct(tab, aktionRoh, hooks) {
     const sessionId = tab.sessionId;
     if (!sessionId) return;
+    // Steuerfelder des Panels bleiben HIER: `fristMs` (Frist der Anfrage) und
+    // `maus` (die Maus handelt, nicht der Nutzer — dann bekommt die Buehne
+    // sichtbare Rueckmeldungen). Der Server kennt beide nicht.
+    const { fristMs = 0, maus = false, ...action } = aktionRoh || {};
     postToFrame(tab, { type: "smejj.browser.sessionState", busy: true });
-    const data = await post(api.browserSessionAct, { sessionId, action });
+    // SICHTBAR, BEVOR ES PASSIERT: Scrollen und Laden haben kein Zielelement,
+    // ihre Rueckmeldung kommt deshalb vor der Aktion (Betreiber 2026-09-06).
+    if (maus && action.type === "scroll") postToFrame(tab, { type: "smejj.browser.zeiger", art: "scroll", richtung: Number(action.deltaY) < 0 ? "hoch" : "runter" });
+    if (maus && action.type === "navigate") postToFrame(tab, { type: "smejj.browser.zeiger", art: "laden", url: String(action.url || "") });
+    const data = await post(api.browserSessionAct, { sessionId, action }, { fristMs });
     postToFrame(tab, { type: "smejj.browser.sessionState", busy: false });
     if (tab.sessionId !== sessionId) return; // Tab hat inzwischen neu verbunden.
+    // DER ZEIGER: Der Worker sagt, WO er getroffen hat (ziel). Die Buehne
+    // zeichnet Ring oder Feldrahmen dorthin — VOR dem neuen Bild, damit man
+    // die Stelle noch auf der alten Seite sieht.
+    if (maus && data?.ok && data.ziel) {
+      const art = action.type === "selectorType" ? "tippen" : action.type === "selectorText" ? "lesen" : "klick";
+      postToFrame(tab, { type: "smejj.browser.zeiger", art, ziel: data.ziel, viewport: data.viewport || tab.remoteViewport || null });
+    }
+    if (maus && data?.ok && action.type === "navigate") postToFrame(tab, { type: "smejj.browser.zeiger", art: "geladen" });
     // JS-DIALOG (2026-08-21). Zwei Gruende, warum das VOR der Bildpruefung
     // steht:
     // 1. Bei offenem Dialog kann der Worker kein neues Bild machen — Chromium
@@ -221,6 +247,9 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
       }
       return data;
     }
+    // Bildloses Hinsehen (observe mit ohneBild): die Antwort ist gesund, nur
+    // das Bild fehlt absichtlich — das alte ist noch richtig.
+    if (data?.ok && !data.screenshot && data.ohneBild === true) return data;
     if (data?.ok && data.screenshot) {
       postToFrame(tab, { type: "smejj.browser.sessionFrame", screenshot: data.screenshot, title: data.title || "" });
       // Die Suche liefert ihre Trefferzahl als Beifang der Aktion mit. Sie
@@ -239,6 +268,9 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
     }
     const error = String(data?.error || "");
     if (error === "session_busy") return { ok: false, error, beschaeftigt: true }; // Aktion verworfen — naechste kommt durch.
+    // Frist abgelaufen: KEINE verlorene Sitzung — der Worker arbeitet womoeglich
+    // noch. Der Aufrufer entscheidet ueber einen zweiten Versuch.
+    if (data?.frist === true) return data;
     if (error === "session_unknown" || error === "session_expired" || !data) {
       openIds.delete(sessionId);
       queues.delete(sessionId);

@@ -42,8 +42,8 @@
 // Dann zeigte activeTab() auf ein leeres Panel und starteMausLauf() meldete
 // ewig "Der Browser ist noch nicht bereit". Nichts waere kaputt zu sehen,
 // alles waere kaputt.
-const PANEL = "./browser-pane.js?v=browser-pane-20260906-3";
-const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260906-2";
+const PANEL = "./browser-pane.js?v=browser-pane-20260906-4";
+const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260906-4";
 
 async function holePanel() {
   const [pane, maus] = await Promise.all([import(PANEL), import(PANEL_MAUS)]);
@@ -495,9 +495,14 @@ async function sammleVorlagen() {
 // waeren aber nur Rauschen — die eine Wiederholung filtern wir.
 export function baueZeilenschreiber(ausgabe) {
   let letzte = "";
+  // Der Stamm einer Zeile: alles vor dem Sekundenzaehler " (7 s)". Zwei
+  // Zeilen mit gleichem Stamm sind DIESELBE Zeile zu verschiedenen Zeiten —
+  // sie wird ersetzt, nicht angehaengt (Sekundenzaehler der Maus, 06.09.).
+  const stamm = (z) => z.replace(/ \(\d+ s\)$/, "");
   return (text) => {
     const zeile = String(text || "").trim();
     if (!zeile || zeile === letzte) return;
+    const ersetzt = Boolean(letzte) && stamm(zeile) === stamm(letzte);
     letzte = zeile;
     if (!ausgabe) return;
     // addEntry() setzt fuer die leere Antwort die Denkpunkte als innerHTML.
@@ -505,6 +510,12 @@ export function baueZeilenschreiber(ausgabe) {
     if (ausgabe.dataset?.thinking) {
       ausgabe.textContent = "";
       delete ausgabe.dataset.thinking;
+    }
+    if (ersetzt && ausgabe.textContent) {
+      const zeilen = String(ausgabe.textContent).split("\n");
+      zeilen[zeilen.length - 1] = zeile;
+      ausgabe.textContent = zeilen.join("\n");
+      return;
     }
     ausgabe.textContent = ausgabe.textContent ? `${ausgabe.textContent}\n${zeile}` : zeile;
   };
