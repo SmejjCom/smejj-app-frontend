@@ -305,8 +305,13 @@ const ENDUNGEN = [
   "pl", "se", "dk", "no", "fi", "cz", "pt", "gr", "ru", "jp", "cn", "kr", "in", "br", "ca",
   "au", "mx", "tr", "shop", "app", "dev", "info", "news", "tv", "me", "online", "store", "blog"
 ].join("|");
+// JEDE Laenderendung zaehlt (Betreiber 2026-09-06, 22:21: "con.ax registrieren"
+// wurde nicht als Adresse erkannt — .ax ist Aland — und die Maus fragte "WO",
+// statt loszulegen). Zwei Buchstaben nach dem Punkt sind eine Endung, sofern
+// davor ein echtes Wort mit mindestens zwei Zeichen steht: so bleiben "z.B.",
+// "d.h." und "u.a." draussen, "con.ax" und "web.de" kommen durch.
 const ADRESSE = new RegExp(
-  `(https?://)?(www\\.)?([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+(${ENDUNGEN})(?![a-z])(/[^\\s"'<>]*)?`,
+  `(https?://)?(www\\.)?([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)*[a-z0-9][a-z0-9-]*[a-z0-9]\\.(${ENDUNGEN}|[a-z]{2})(?![a-z])(/[^\\s"'<>]*)?`,
   "i"
 );
 

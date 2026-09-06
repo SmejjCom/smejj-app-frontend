@@ -200,7 +200,7 @@ export async function zeigeBrueckenZustand() {
   let befund;
   try {
     const bruecke = await import("./maus-chrome.js?v=2");
-    const deutung = await import("./maus-absicht.js?v=31");
+    const deutung = await import("./maus-absicht.js?v=32");
     const installiert = bruecke.brueckeDa();
     const zustand = installiert ? await bruecke.frageZustand() : null;
     befund = deutung.deuteBrueckenZustand(zustand, { installiert });
