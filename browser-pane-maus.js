@@ -472,7 +472,10 @@ export function ersatzZiele(aktion, beobachtung) {
       for (const el of treffer.slice(0, 2)) {
         const css = cssFuer(el);
         if (css) nimm({ type: "selectorClick", strategy: "css", value: css });
-        else if (el.text) nimm({ type: "selectorClick", strategy: "text", value: String(el.text).slice(0, 80) });
+        // NUR DIE ERSTE ZEILE (live 06.09.): ein Vorschlag „Ada Lovelace\nenglische
+        // Mathematikerin (1815–1852)“ wurde als Text-Selektor mit Zeilenumbruch
+        // gebaut — und traf nichts. Die erste Zeile ist das, was man liest.
+        else if (el.text) nimm({ type: "selectorClick", strategy: "text", value: String(el.text).split("\n")[0].trim().slice(0, 80) });
       }
     }
   }
