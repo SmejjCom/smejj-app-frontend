@@ -37,7 +37,13 @@ export const VIEW_PATHS = Object.freeze({
   arbeitsbereiche: "/bereiche",
   ai: "/ai",
   cost: "/cost",
-  tools: "/status",
+  // /status gehoert der oeffentlichen Betriebsstatus-Seite (public/status.html).
+  // GitHub Pages liefert diese Datei mit HTTP 200 aus, der SPA-Fallback aus
+  // 404.html kommt also nie zum Zug: die App-Ansicht "Systemzustand" war unter
+  // /status weder per Direktaufruf noch nach einem Neuladen erreichbar — man
+  // landete immer auf der statischen Seite (live gemessen 2026-09-06). Die
+  // Ansicht hat deshalb eine eigene Adresse; /status bleibt der Statusseite.
+  tools: "/systemzustand",
   settings: "/settings",
   profile: "/profile",
   offline: "/offline",

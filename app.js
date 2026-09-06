@@ -3,7 +3,7 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=4";
-import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=5";
+import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=6";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
 import { holeSendepfad } from "./sendepfad-nachladen.js?v=10";
@@ -16,7 +16,7 @@ import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=b39u"
 import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
 import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=4";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
-import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b50";
+import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b51";
 import { applyViewTitle } from "./view-title.js";
 import { getJson, postJson } from "./shared/http-json.js";
 const $ = (selector) => document.querySelector(selector);

@@ -18,7 +18,7 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=b67";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=b68";
 // Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
 import { merkmaleVon } from "/assets/chat-merkmale.js?v=1";
 import { Icons } from "/assets/components.js?v=b48";

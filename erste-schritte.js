@@ -13,7 +13,7 @@ import { t } from "/assets/i18n/ui.js?v=3";
 // Derselbe Spezifizierer wie index.html und alle anderen Module (?v=b65): ein abweichender
 // Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js — 12,9 KB doppelt übertragen,
 // zweite IndexedDB-Verbindung, eigener Zustand (Web-Vitals-Befund 2026-09-03, Gewicht 324 KB).
-import { listChats } from "/assets/chat-store.js?v=b67";
+import { listChats } from "/assets/chat-store.js?v=b68";
 
 export const MERKER = "smejj.erste-schritte.v1";
 const STIL_ID = "erste-schritte-stil";

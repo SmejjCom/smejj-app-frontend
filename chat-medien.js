@@ -65,6 +65,21 @@ export function adresseFuer(basis, id) {
 // ein blob: steht. Siehe rehydriereMedien() weiter unten.
 export const ADRESSE_ATTRIBUT = "data-smejj-adresse";
 
+// Was ein Element zuletzt als blob: angezeigt hat — Element -> blob:-Adresse.
+//
+// WARUM (live gemessen 2026-09-06): Vor JEDEM Speichern dreht entwaessere()
+// die Anzeige auf die Serveradresse zurueck, danach holt rehydriereMedien()
+// sie wieder. Ohne Gedaechtnis war das je Speicherzyklus ein neuer fetch UND
+// ein neues createObjectURL — nach 47 Zyklen lagen 47 Blobs im Speicher, von
+// denen 46 nie wieder jemand ansah. Kein Ausloeser gab sie frei; ein langes
+// Gespraech mit Bildern wuchs damit unbegrenzt.
+//
+// WeakMap und nicht ein Attribut: was im DOM steht, landet in innerHTML und
+// damit im gespeicherten Chat — genau die Sorte Leiche, gegen die dieses
+// Modul gebaut wurde. Eine WeakMap hinterlaesst nichts und gibt ihren
+// Eintrag von selbst frei, sobald das Element verschwindet.
+const ANZEIGE_BLOB = new WeakMap();
+
 // Eine vollstaendige data:-URL fuer Bild oder Video. Bewusst dieselbe Form wie
 // die Serverpruefung in medienStore.js (ERLAUBTE_TYPEN) — was der Server nicht
 // annimmt, soll hier gar nicht erst als Treffer gelten.
@@ -90,7 +105,13 @@ export function entwaessere(knoten) {
   for (const el of knoten.querySelectorAll(`[${ADRESSE_ATTRIBUT}]`)) {
     const adresse = el.getAttribute(ADRESSE_ATTRIBUT);
     el.removeAttribute(ADRESSE_ATTRIBUT);
-    if (adresse) { el.setAttribute("src", adresse); zurueck += 1; }
+    if (!adresse) continue;
+    // Den angezeigten blob merken: gleich danach will rehydriereMedien ihn
+    // zurueck, und ein zweiter fetch fuer dieselben Bytes waere verschenkt.
+    const bisher = el.getAttribute("src") || "";
+    if (bisher.startsWith("blob:")) ANZEIGE_BLOB.set(el, { blob: bisher, adresse });
+    el.setAttribute("src", adresse);
+    zurueck += 1;
   }
   return zurueck;
 }
@@ -133,14 +154,37 @@ export async function rehydriereMedien(knoten, { holen = holeMedium } = {}) {
   }
   let geholt = 0;
   let gescheitert = 0;
+  // ERSTE RUNDE, ohne Netz und ohne await: was dieses Element eben noch
+  // anzeigte, kann es sofort wieder anzeigen. Das spart je Speicherzyklus
+  // einen fetch und einen Blob — und haelt das Fenster kurz, in dem eine
+  // Serveradresse im src steht, die die Sicherheitsrichtlinie ohnehin
+  // abweist (img-src laesst nur 'self', data: und blob: zu).
+  const uebrig = [];
   for (const el of offen) {
+    const adresse = el.getAttribute("src");
+    const gemerkt = ANZEIGE_BLOB.get(el);
+    if (gemerkt && gemerkt.adresse === adresse) {
+      el.setAttribute(ADRESSE_ATTRIBUT, adresse);
+      el.setAttribute("src", gemerkt.blob);
+      geholt += 1;
+      continue;
+    }
+    uebrig.push(el);
+  }
+  for (const el of uebrig) {
     const adresse = el.getAttribute("src");
     const daten = await holen(adresse);
     if (!daten) { gescheitert += 1; continue; }
     // Erst merken, dann umschalten: waere die Reihenfolge andersherum und
     // etwas ginge dazwischen schief, stuende ein blob: ohne Rueckweg da.
     el.setAttribute(ADRESSE_ATTRIBUT, adresse);
-    el.setAttribute("src", URL.createObjectURL(daten));
+    const blob = URL.createObjectURL(daten);
+    // Ein frueher gemerkter Blob dieses Elements zeigt jetzt ins Leere —
+    // freigeben, sonst bleibt er bis zum Schliessen des Tabs liegen.
+    const alt = ANZEIGE_BLOB.get(el);
+    if (alt && alt.blob !== blob) { try { URL.revokeObjectURL(alt.blob); } catch { /* egal */ } }
+    ANZEIGE_BLOB.set(el, { blob, adresse });
+    el.setAttribute("src", blob);
     geholt += 1;
   }
   return { geholt, gescheitert };

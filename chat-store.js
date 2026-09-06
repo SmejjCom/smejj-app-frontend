@@ -15,8 +15,8 @@
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=3";
-export { restoreChat, endgueltigLoeschen, listGeloeschteChats, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=3";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=4";
+export { restoreChat, endgueltigLoeschen, listGeloeschteChats, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=4";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und
 // Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
@@ -295,7 +295,7 @@ async function medienAuslagern() {
     const log = startLog();
     if (!log || stromLaeuft) return;
     const { lagereMedienAus, lagereMedienAusText, lagereMedienAusTextknoten } =
-      await import("./chat-medien.js?v=2");
+      await import("./chat-medien.js?v=3");
     for (const eintrag of log.querySelectorAll(":scope > .entry.assistant")) {
       // EINE Karte je Eintrag: dasselbe Medium steht unten in bis zu drei
       // Feldern, soll aber nur einmal hochgeladen werden.
@@ -322,7 +322,7 @@ async function medienAuslagern() {
 // wurde. Still und ohne Netz-Zwang — kommt nichts, bleibt die Adresse stehen.
 async function medienHolen(log) {
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=2");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=3");
     await rehydriereMedien(log);
   } catch { /* fail-safe: lieber ein leeres Bild als ein kaputter Verlauf */ }
 }
@@ -734,7 +734,7 @@ function init() {
         // ?v=2: Projekte-Sync (2026-08-13). Ohne den Bump haelt der
         // HTTP-Cache die alte Fassung fest — die Datei ist nicht im
         // Service-Worker-Buendel und erneuert sich sonst nie zuverlaessig.
-        import("/assets/chat-sync.js?v=12").catch(() => {});
+        import("/assets/chat-sync.js?v=13").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */
