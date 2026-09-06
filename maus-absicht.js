@@ -42,7 +42,7 @@
 // Dann zeigte activeTab() auf ein leeres Panel und starteMausLauf() meldete
 // ewig "Der Browser ist noch nicht bereit". Nichts waere kaputt zu sehen,
 // alles waere kaputt.
-const PANEL = "./browser-pane.js?v=browser-pane-20260906-5";
+const PANEL = "./browser-pane.js?v=browser-pane-20260906-6";
 const PANEL_MAUS = "./browser-pane-maus.js?v=browser-pane-20260906-5";
 
 async function holePanel() {
@@ -196,7 +196,7 @@ export function deuteBrueckenZustand(zustand, { installiert = true } = {}) {
 }
 
 /**
- * Oeffnet das Ziel — auch wenn das Panel seine sieben Taebe schon voll hat.
+ * Oeffnet das Ziel — auch wenn das Panel seinen Tab-Deckel (MAX_TABS) erreicht hat.
  *
  * WARUM ES DAS BRAUCHT (live gemessen 2026-08-18 im Browser des Betreibers):
  * openBrowserRequest() gibt false zurueck, wenn addTab() wegen MAX_TABS nichts

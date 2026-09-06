@@ -283,7 +283,7 @@ function escapeHtml(value) {
  * Zustand. Die Werte kommen als Argumente herein, damit hier nichts ueber die
  * Panel-Logik gewusst werden muss.
  */
-export function buildPaneShellHtml({ neuerTabTitel = "Neuer Tab", maxTabs = 7 } = {}) {
+export function buildPaneShellHtml({ neuerTabTitel = "Neuer Tab", maxTabs = 100 } = {}) {
   return `
     <div class="bp-tabstrip" role="tablist" aria-label="Browser Tabs">
       <div class="bp-tab-left">
@@ -334,7 +334,7 @@ export function buildPaneShellHtml({ neuerTabTitel = "Neuer Tab", maxTabs = 7 } 
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>
         </div>
         <strong>${neuerTabTitel}</strong>
-        <span>Suchen oder URL eingeben — bis zu ${maxTabs} Tabs.</span>
+        <span>Suchen oder URL eingeben — so viele Tabs, wie du brauchst.</span>
       </div>
     </div>`;
 }

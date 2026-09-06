@@ -1,6 +1,6 @@
 // smejj.com — Tab-Persistenz des Browser-Panels (Zeilen-Diaet 2026-08-25,
 // ausgelagert aus browser-pane.js; Verhalten unveraendert).
-import { MAX_PERSISTED_HISTORY, MAX_TABS, NEW_TAB_TITLE, TABS_STORAGE_KEY, state } from "./browser-pane.js?v=browser-pane-20260906-5";
+import { MAX_PERSISTED_HISTORY, MAX_TABS, NEW_TAB_TITLE, TABS_STORAGE_KEY, state } from "./browser-pane.js?v=browser-pane-20260906-6";
 
 // --- Persistenz ---------------------------------------------------------------
 

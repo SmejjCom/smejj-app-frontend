@@ -15,7 +15,7 @@ export function holeSendepfad() {
     import("./autonomous-intent.js"),
     import("./browser-context.js"),
     import("./medien-absicht.js?v=7"),
-    import("./maus-absicht.js?v=28"),
+    import("./maus-absicht.js?v=29"),
     import("./free-coding-fallback.js")
   ]).then((teile) => Object.assign({}, ...teile))
     .catch((fehler) => { sendepfadGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler); throw fehler; });

@@ -3,7 +3,7 @@
 // Remote-Session (klicken/tippen/scrollen wie in Chrome); Details in
 // browser-pane-session.js. Fallback bleibt die Standbild-Ansicht.
 // Split-View: links bleibt der Arbeitsbereich, rechts oeffnet sich der Browser.
-// Bis zu 7 Tabs, Zurueck/Vor/Neu laden, URL- und Suchleiste.
+// Tabs ohne Nutzer-Limit (Betreiber 2026-09-06), Zurueck/Vor/Neu laden, URL- und Suchleiste.
 // Rendering: direkt einbettbare Seiten laufen im Original-Iframe (volles JS),
 // blockierende Seiten (Google, GitHub, ...) kommen als sichere, serverseitig
 // umgeschriebene Ansicht ueber /api/browser/fetch. Fail-closed: ohne Server
@@ -12,13 +12,13 @@
 // abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
 // instanzen mit getrennten CLIENT_ROUTES.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260906-4";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260906-5";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
   buildRemoteBrowserHtml
-} from "./browser-pane-render.js?v=browser-pane-20260906-4";
-export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260906-4";
+} from "./browser-pane-render.js?v=browser-pane-20260906-5";
+export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260906-5";
 import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260906-4";
 // Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
@@ -36,7 +36,7 @@ import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser
 // gemeldet: alle pruefen den QUELLTEXT, keiner laesst das Modul laufen.
 import { baueNachrichtenEmpfang } from "./browser-pane-nachrichten.js?v=browser-pane-20260709-2";
 let suche = null;
-import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260906-4";
+import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260906-5";
 // Reine Helfer (2026-08-19 ausgelagert, 800-Zeilen-Regel). Sie werden hier
 // zugleich WEITER EXPORTIERT, damit tests/browser-pane.test.mjs und jeder
 // bisherige Aufrufer sie unveraendert von browser-pane.js bekommt.
@@ -52,7 +52,14 @@ export {
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl
 };
 
-const MAX_TABS = 7;
+// KEIN NUTZER-LIMIT MEHR (Betreiber 2026-09-06: "7 Webseiten Limit raus nehmen").
+// Chrome kennt keine Tab-Obergrenze; die alte Sieben war ein Rest aus der
+// Zeit, als jeder Tab einen Rahmen samt Bild im Speicher hielt. Die 100 ist
+// nur ein Deckel fuer localStorage und die Tableiste — kein Mensch oeffnet
+// so viele Tabs im Panel, und wer es tut, bekommt weiter den Hinweis statt
+// eines stillen Verlusts. Der ferne Browser haelt ohnehin nur 4 Sitzungen;
+// aeltere Live-Tabs verbinden beim Anklicken neu (onLost).
+const MAX_TABS = 100;
 const TABS_STORAGE_KEY = "smejj.browser.tabs.v1";
 // Die Mitte darf nicht verhungern. Bis 2026-08-22 nahm das Panel stur die halbe
 // Fensterbreite ("50vw"). Es liegt aber per position:fixed UEBER dem Chat, und
