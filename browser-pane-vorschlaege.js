@@ -192,6 +192,14 @@ export function verdrahtePanelVorschlaege(feld, liste, zustand, oeffne) {
   feld.addEventListener("blur", () => {
     const voll = zustand?.tabs?.find((t) => t.id === zustand.activeId)?.url || "";
     feld.value = anzeigeAdresse(voll);
+    // AN DEN ANFANG ROLLEN (Betreiber-Bild 2026-09-06): Nach Klick ins Feld
+    // (alles markiert, Cursor am Ende) blieb das Feld beim Verlassen ans ENDE
+    // gerollt — bei einer langen Google-Adresse stand dann nur eine Zahl wie
+    // "88709133371969" in der Leiste, der Host war unsichtbar. Chrome zeigt
+    // immer den Anfang. Der Wert wechselt zwar, die Rollposition aber nicht
+    // von selbst.
+    feld.scrollLeft = 0;
+    try { feld.setSelectionRange(0, 0); } catch { /* Feldtyp ohne Auswahl */ }
   });
   const aktuelleUrl = () => zustand?.tabs?.find((t) => t.id === zustand.activeId)?.url || "";
   return verdrahteVorschlaege({
