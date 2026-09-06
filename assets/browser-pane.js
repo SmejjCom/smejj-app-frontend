@@ -716,7 +716,15 @@ export function render() {
   refs.addTab.disabled = state.tabs.length >= MAX_TABS;
   refs.addTab.title = refs.addTab.disabled ? `Tab-Limit erreicht (${MAX_TABS})` : "Neuer Tab (⌘T)";
 
-  if (document.activeElement !== refs.address) refs.address.value = anzeigeAdresse(active?.url || "");
+  if (document.activeElement !== refs.address) {
+    refs.address.value = anzeigeAdresse(active?.url || "");
+    // ANFANG ZEIGEN. Chrome setzt beim Schreiben von .value den Cursor ans
+    // Ende und rollt das Feld dorthin — auch ohne Fokus (live gemessen
+    // 2026-09-06: scrollLeft 809 direkt nach der Navigation). Bei einer langen
+    // Google-Adresse stand dann nur "88709133371969" in der Leiste, der Host
+    // war unsichtbar. Chrome selbst zeigt immer den Anfang der Adresse.
+    refs.address.scrollLeft = 0;
+  }
   zeigeSicherheit(refs.addressForm, active?.url || "");
   zeigeNeuladen(refs.reload, active?.status === "loading");
   zeigeZoom(refs.addressForm, active?.zoom || 1, () => { const t = activeTab(); if (t) { t.zoom = 1; applyZoom(t); render(); schedulePersist(); } });
