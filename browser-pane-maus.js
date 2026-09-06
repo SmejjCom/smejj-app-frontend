@@ -627,6 +627,34 @@ export function baueFortschrittsUhr(zeige, { jetzt = () => Date.now(), setzeInte
   };
 }
 
+/**
+ * Sperr- und Fehlerseiten erkennen (live 06.09., duckduckgo.com: der ferne
+ * Browser bekam `static-pages/418.html` mit "Unexpected error. Please try
+ * again" — die Maus tippte und schickte zehnmal ab, bis der Not-Aus kam).
+ *
+ * Eine Seite, die den Browser aussperrt, laesst sich nicht durch Wiederholen
+ * ueberzeugen. Erkannt wird ueber Adresse, Titel und Textausschnitt der eigenen
+ * Beobachtung: Roboter-Pruefungen, Cloudflare-Wartehallen, 403/418/429, Google-
+ * "unusual traffic". Reine Funktion; gibt den Grund zurueck oder "".
+ */
+export const SPERRSEITEN_MUSTER = [
+  { muster: /\/static-pages\/418\.html|unexpected error\. please try again/i, grund: "Sperrseite von DuckDuckGo (Fehler 418)" },
+  { muster: /verify (that )?you('| a)re (a )?human|not a robot|are you a robot|captcha|hcaptcha|recaptcha/i, grund: "Roboter-Pruefung" },
+  { muster: /just a moment|checking your browser|attention required|cloudflare/i, grund: "Cloudflare-Pruefung" },
+  { muster: /unusual traffic|automated queries|automatisierte anfragen|ungewoehnlichen datenverkehr|ungewöhnlichen datenverkehr/i, grund: "Sperre wegen automatisierter Anfragen" },
+  { muster: /access denied|zugriff verweigert|\b403 forbidden\b|\b429\b.*too many requests|request blocked/i, grund: "Zugriff verweigert" }
+];
+
+export function erkenneSperrseite(beobachtung) {
+  if (!beobachtung || typeof beobachtung !== "object") return "";
+  const url = String(beobachtung.url || "");
+  const kopf = `${beobachtung.title || ""}\n${String(beobachtung.textExcerpt || beobachtung.text || "").slice(0, 600)}`;
+  for (const { muster, grund } of SPERRSEITEN_MUSTER) {
+    if (muster.test(url) || muster.test(kopf)) return grund;
+  }
+  return "";
+}
+
 /** Kurzform eines Ziels fuer die Fortschrittszeile. */
 function zielKurz(k) {
   return k.strategy === "role" ? `Rolle ${k.value}${k.name ? ` „${k.name}“` : ""}` : `${k.strategy} ${k.value}`;
@@ -706,6 +734,7 @@ export async function fuehreFreienLaufAus({
   // wie ein Schritt, weil nichts geschehen ist.
   let aussetzer = 0;
   let fehlschlaege = 0;
+  let sperren = 0;
   for (let n = 1; n <= maxSchritte; n += 1) {
     if (abbruch()) return fertig({ ok: false, grund: `Maus angehalten nach ${n - 1} Schritten.`, gelesen });
 
@@ -728,6 +757,20 @@ export async function fuehreFreienLaufAus({
         continue;
       }
       return fertig({ ok: false, grund: `Die Maus konnte die Seite nicht ansehen (${grund}) — bitte den Auftrag noch einmal senden.`, gelesen });
+    }
+
+    // 1b. AUSGESPERRT? Eine Sperrseite ist keine Aufgabe fuer Wiederholungen.
+    // Beim ersten Mal erfaehrt es das Modell (es darf einen anderen Weg
+    // waehlen), beim zweiten Mal endet der Lauf mit klarem Grund.
+    const sperre = erkenneSperrseite(blick.beobachtung);
+    if (sperre) {
+      sperren += 1;
+      const host = erlaubteHosts(blick.beobachtung.url || tab?.url)[0] || "die Seite";
+      if (sperren >= 2) {
+        return fertig({ ok: false, grund: `Maus gestoppt: ${host} sperrt den eingebauten Browser (${sperre}). Wiederholen hilft hier nicht — nimm die Maus-Brücke in deinem eigenen Chrome oder eine andere Seite.`, gelesen });
+      }
+      verlauf.push(`SPERRSEITE: ${host} zeigt „${sperre}“ — dieselbe Aktion NICHT wiederholen; wenn es keinen anderen Weg gibt, mit decision fail aufhoeren`);
+      zeige(`Maus ${n}/${maxSchritte}: ${host} zeigt eine Sperrseite (${sperre}) — sie versucht es noch einmal anders ...`);
     }
 
     // 2. ENTSCHEIDEN (auf dem Server: Modell + Pruefung)

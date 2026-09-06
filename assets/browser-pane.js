@@ -28,7 +28,7 @@ import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicher
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
 import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260819-4";
 import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
-import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260906-6";
+import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260906-7";
 // Gefunden 2026-08-18 beim Livetest: dieser Import FEHLTE, obwohl init() die
 // Funktion benutzt. Folge war kein kleiner Schoenheitsfehler — browser-pane.js
 // warf beim Laden "baueNachrichtenEmpfang is not defined", das ganze Modul kam
