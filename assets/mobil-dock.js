@@ -97,10 +97,12 @@ export const REGELN = "@media (max-width:600px){"
   //      (~52 pt) zu kurz — Rahmen (body::after, inset:0) und alles mit bottom:0 enden
   //      darueber, darunter nur Grundton. KEIN Tastatur-Fehler. misstVersatz() unten legt
   //      den Fehlbetrag als --vollbild-fehl an; hier wird er auf Rahmen und Flaechen gerechnet.
+  //      BEFUND Betreiber 22:32 nach dem Sprung: Rahmen jetzt bis zur Kante, aber das Dock
+  //      rutschte unter den Schirm. Also: 100dvh war schon die VOLLE Hoehe (852), nur der
+  //      Layout-Viewport fuer position:fixed ist kurz (800). Der Fehlbetrag gilt darum NUR
+  //      fuer fixe Elemente (Rahmen) — die dvh-Flaechen bleiben unangetastet.
   + "@media (display-mode:standalone) and (max-width:600px){"
   + "body::after{bottom:calc(-1 * var(--vollbild-fehl,0px))}"
-  + "body .workspace,body .view,body .home-feed{min-height:calc(100dvh + var(--vollbild-fehl,0px) - var(--sa-top,0px) - var(--sa-bottom,0px))}"
-  + "body #start.has-start-chat .home-feed.home-feed.home-feed,body #code.view.is-active.is-active.is-active{height:calc(100dvh + var(--vollbild-fehl,0px) - var(--sa-top,0px) - var(--sa-bottom,0px));max-height:calc(100dvh + var(--vollbild-fehl,0px) - var(--sa-top,0px) - var(--sa-bottom,0px))}"
   + "}";
 
 /** Der Fehlbetrag der Layout-Flaeche in der installierten App: Schirmhoehe minus innerHeight,
