@@ -50,6 +50,10 @@ export const REGELN = [
   + "body #start .prompt-glass .ghost-button.icon-button,body #start .prompt-glass .send-button,"
   + "body #code .codeleiste .icon-button,body #code .codeleiste .send-button{width:44px;height:44px}"
   + "body #code .codefeld #codeAufgabe{min-height:44px}"
+  // Nachmessung Tablet nach Runde 3: Senden-Knopf blieb 32 px (#code #codeSenden, zwei IDs)
+  // und der Modus-Chip "Auto" 39 px breit — Doppel-ID-Selektor und Mindestbreite.
+  + "body #code #codeSenden.send-button{width:44px;height:44px;min-height:44px}"
+  + "body #code .codeleiste .repochip{min-width:44px}"
   + "body #smejj-sitzung-abgelaufen a,body #smejj-sitzung-abgelaufen button{display:inline-flex;align-items:center}"
   + "}"
 ].join("");
