@@ -25,8 +25,32 @@
 // FAIL-SAFE: Jeder Fehler, jede leere Antwort und jedes Zeitlimit fuehren zur
 // unveraenderten Frage. Es kann also nur besser werden, nie schlechter.
 import { isWeatherTask, buildWeatherContext } from "../chat-bridge-weather.js";
-import { buildWebContext } from "../chat-bridge-websuche.js";
 import { API_ORIGIN } from "../config.js";
+
+// Die Websuche der Bruecke (chat-bridge-websuche.js) laesst sich hier NICHT
+// wiederverwenden: sie importiert chat-bridge-evolution.js, das nur im Node-
+// Umfeld laedt — im Browser bricht die ganze Kette (live gemessen 07.09.:
+// "Failed to fetch dynamically imported module"). Der Abruf selbst ist ein
+// Dutzend Zeilen, also steht er hier eigenstaendig. Format und Deckel bleiben
+// bewusst identisch, damit beide Wege dieselbe Antwortqualitaet liefern.
+const MAX_TREFFER = 6;
+
+async function holeWebTreffer(task) {
+  if (!API_ORIGIN) return "";
+  const url = `${API_ORIGIN}/api/search/web?q=${encodeURIComponent(task)}`;
+  const antwort = await fetch(url, { headers: { Accept: "application/json" } });
+  if (!antwort.ok) return "";
+  const nutzlast = await antwort.json();
+  const treffer = Array.isArray(nutzlast.results) ? nutzlast.results.slice(0, MAX_TREFFER) : [];
+  if (!treffer.length) return "";
+  const zeilen = treffer.map((eintrag, i) => {
+    const titel = String(eintrag.title || "").replace(/\s+/g, " ").slice(0, 160);
+    const auszug = String(eintrag.snippet || eintrag.text || "").replace(/\s+/g, " ").slice(0, 320);
+    const adresse = String(eintrag.url || eintrag.href || "").slice(0, 260);
+    return `${i + 1}. ${titel}\nURL: ${adresse}\nAuszug: ${auszug}`;
+  });
+  return `Live-Internet-Ergebnisse, Stand ${new Date().toISOString()}:\n${zeilen.join("\n\n")}`;
+}
 
 // Laenger darf das Nachschlagen nicht dauern — sonst wartet der Nutzer auf
 // Daten statt auf die Antwort. Wer ueberzieht, wird ohne Kontext beantwortet.
@@ -68,7 +92,7 @@ export async function holeLiveKontext(task) {
       const wetter = await buildWeatherContext(text);
       if (wetter) return wetter;
     }
-    return await buildWebContext(text, API_ORIGIN);
+    return await holeWebTreffer(text);
   } catch {
     return "";
   }
