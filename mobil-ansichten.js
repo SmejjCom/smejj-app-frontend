@@ -17,8 +17,8 @@
 //       kleiner Abstand, Statuskachel unter die Ueberschrift statt daneben.
 //   (3) Karten und Felder volle Breite mit 12 px Rand, Eingaben/Auswahl 44 px,
 //       Aktionsknoepfe untereinander volle Breite (Daumenzone).
-//   (4) Die Ausgabe-Konsole ("Bereit.") unter den Ansichten faellt am Handy weg
-//       — sie zeigt nur Rohtext fuer den Schreibtisch.
+//   (4) Die Ausgabe-Konsole ("Bereit.") wird kompakt — sie traegt Rueckmeldungen
+//       (Speichern, Pruefen) und bleibt deshalb sichtbar.
 //   (5) Tabellen und Statusraster scrollen in sich, nie die Seite.
 // Nur bis 600 px, nur Masse und Abstaende, keine Schriftgroessen unter 15 px
 // (grosse Schrift, Betreiber-Regel), keine Ziele unter 44 px. Stil aus dem
@@ -27,10 +27,10 @@ export const STIL_ID = "mobil-ansichten-stil";
 export const REGELN = "@media (max-width:600px){"
   // (1) Reiterzeilen wischbar
   + "body #settings .settings-nav.settings-nav,body #profile .account-nav.account-nav,body #chatHistory .ch-chips.ch-chips{"
-  + "display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:8px;padding:4px 12px 8px;margin:0 -4px;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;"
+  + "display:flex;flex-wrap:nowrap;align-items:center;overflow-x:auto;overflow-y:hidden;gap:8px;padding:4px 12px 8px;margin:0 -4px;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;"
   + "-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 20px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 20px),transparent 100%)}"
   + "body #settings .settings-nav::-webkit-scrollbar,body #profile .account-nav::-webkit-scrollbar,body #chatHistory .ch-chips::-webkit-scrollbar{display:none}"
-  + "body #settings .settings-nav-button.settings-nav-button,body #profile .account-nav button,body #chatHistory .ch-chips .ch-chip{flex:0 0 auto;min-height:44px;white-space:nowrap;scroll-snap-align:start;padding:0 14px}"
+  + "body #settings .settings-nav-button.settings-nav-button,body #profile .account-nav button,body #chatHistory .ch-chips .ch-chip{flex:0 0 auto;height:44px;min-height:44px;white-space:nowrap;scroll-snap-align:start;padding:0 14px;display:inline-flex;align-items:center}"
   // Reiter tragen am Schreibtisch Titel + Untertitel in zwei Zeilen — in der Zeile nur der Titel
   + "body #settings .settings-nav-button .settings-nav-sub,body #settings .settings-nav-button small,body #settings .settings-nav-button span+span{display:none}"
   // (2) Kopf kompakt
@@ -42,7 +42,10 @@ export const REGELN = "@media (max-width:600px){"
   // (3) Karten, Felder, Knoepfe
   + "body #settings .settings-shell.settings-shell,body #profile .account-layout.account-layout{gap:8px}"
   + "body #settings .settings-panel.settings-panel,body #profile .account-panel.account-panel,body #profile .account-card,body .view .panel{padding:12px;border-radius:12px}"
-  + "body #settings .settings-row.settings-row{flex-direction:column;align-items:stretch;gap:8px;padding:12px 0}"
+  // Zeilen: Beschriftung oben, Regler darunter volle Breite — ueber flex-wrap (das Buendel setzt es
+  // ab 900 px), NICHT ueber flex-direction:column (gemessen 07.09.: die Zeile wuchs auf 230 px Leere).
+  + "body #settings .settings-row.settings-row{flex-wrap:wrap;gap:8px 12px;padding:12px 0}"
+  + "body #settings .settings-row .settings-row-copy{flex:1 1 100%}"
   + "body #settings .settings-row select,body #settings .settings-row input:not([type=checkbox]):not([type=radio]),body #profile .account-grid input,body #profile .account-grid select,body #profile input:not([type=checkbox]):not([type=radio]):not([type=file]),body #profile select{width:100%;min-height:44px;box-sizing:border-box}"
   + "body #settings .settings-row input[type=checkbox],body #settings .settings-row input[type=radio]{width:24px;height:24px;margin:10px}"
   + "body #profile .account-actions.account-actions,body #settings .settings-action.settings-action,body .view .panel-actions{display:flex;flex-direction:column;gap:8px}"
@@ -50,8 +53,8 @@ export const REGELN = "@media (max-width:600px){"
   + "body #profile .account-picture.account-picture{flex-direction:column;align-items:flex-start;gap:10px}"
   + "body #profile .account-picture-actions.account-picture-actions{width:100%;display:flex;flex-direction:column;gap:8px}"
   + "body #profile .account-picture-actions button,body #profile .account-picture-choose{width:100%;min-height:44px;justify-content:center}"
-  // (4) Schreibtisch-Konsole weg
-  + "body .view.is-active > .output.output,body #homeOutput{display:none}"
+  // (4) Schreibtisch-Konsole kompakt (zeigt in Dateien/Konto Rueckmeldungen — bleibt, aber schlank)
+  + "body .view .output.output{min-height:44px;padding:10px 12px}"
   // (5) Raster und Tabellen scrollen in sich
   + "body .view .status-grid.status-grid{grid-template-columns:minmax(0,1fr)}"
   + "body .view table,body #profile .account-status{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}"
