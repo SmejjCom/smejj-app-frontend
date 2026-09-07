@@ -9,9 +9,8 @@
 // Rueckruf nach einer Modellwahl. So bleibt das Modul fuer sich pruefbar
 // und es entsteht kein Ringschluss zwischen den beiden Dateien.
 //
-// OHNE ?v — dieselbe Kennung wie app.js/code-flaeche.js ("./config.js"),
-// sonst entsteht eine zweite Modulinstanz (module-queries-Waechter).
-import { API_ORIGIN } from "./config.js";
+// Seit 2026-09-07 ohne Server-Abruf: das Menue hat fuenf feste Zeilen, der
+// Cline-Katalog wird hier nicht mehr geholt (Einstellungen -> KI-Provider).
 
 
 // ---- Modellwahl (Betreiber 2026-08-17: "warum kann ich bei Code nicht
@@ -21,7 +20,6 @@ import { API_ORIGIN } from "./config.js";
 // (runClineChat-Weiche) greift dann von selbst. Kein eigener Pfad.
 export const MODELL_KEY = "smejj.model.selected.v2";
 export const CLINE_MODEL_KEY = "smejj.cline.model.v1";
-const TOKEN_KEY = "smejj.apiToken.v1";
 
 // Wohin mit einem Menue, das links aus seiner Spalte laeuft? Reine Rechnung,
 // ohne DOM — damit sie sich pruefen laesst (siehe tests/code-modell-menue.test.mjs).
@@ -64,90 +62,76 @@ export function kurzName(id) {
     .trim();
 }
 
-// Reihenfolge = Betreiber-Freigabe 2026-08-17 ("smejj 1.0 zuerst, dann
-// nach Staerke/Beliebtheit"). Deepseek Flash zeigt BEWUSST die
-// Cline-Pass-Variante — die Gratis-ID ist per API gesperrt (403).
-const CLINE_KURZ = [
-  ["Opus 5", "anthropic/claude-opus-5"],
-  ["GPT 5.6", "openai/gpt-5.6-sol"],
-  ["GLM 5.3", "cline-pass/glm-5.3"],
-  ["Kimi K3", "moonshotai/kimi-k3"],
-  ["Deepseek V4 Pro", "cline-pass/deepseek-v4-pro"],
-  ["Qwen 3.8 Max", "cline-pass/qwen3.8-max"],
-  ["Kimi K2.7 Code", "cline-pass/kimi-k2.7-code"],
-  ["Minimax M3", "cline-pass/minimax-m3"],
-  ["Deepseek V4 Flash", "cline-pass/deepseek-v4-flash"],
-  ["GLM 5.2", "cline-pass/glm-5.2"],
-  ["Mimo V2.5 Pro", "cline-pass/mimo-v2.5-pro"],
-  ["Qwen 3.7 Plus", "cline-pass/qwen3.7-plus"],
-  ["Kimi K2.6", "cline-pass/kimi-k2.6"],
-  ["Mimo V2.5", "cline-pass/mimo-v2.5"]
-];
+// ---- Die FUENF Zeilen des Menues — Betreiber-Auftrag 2026-09-07, Wortlaut:
+//
+//   "Soll hier nur:
+//      smejj 1.3 — Spezialfälle
+//      smejj 1.2 — Komplex
+//      smejj 1.1 — Alltag
+//      smejj 1.0 — Standard
+//      Auto — Automatisch
+//    Genau so sein."
+//
+// Damit ist die Liste vom 2026-08-17/23 (Auto, smejj 1.0, dann die 14
+// Wunschmodelle und der ganze Cline-Katalog) ERSETZT — im Chat wie im Code,
+// es ist dasselbe Menue (modell-menue-start.js, Betreiber 2026-08-24). Die
+// schriftliche Bestaetigung, die der modell-menue-lock fuer diese Aenderung
+// verlangt, ist der Auftrag selbst; der Stempel kommt per Doppelklick.
+//
+// Die Reihenfolge ist die des Auftrags: vom schwersten Modell abwaerts,
+// Auto zuletzt. Sie loest die Anordnung vom 2026-08-18 ("Auto ganz oben")
+// ab — tests/modellmenue-reihenfolge.test.mjs wacht ueber die neue.
+//
+// WAS JEDE ZEILE HEUTE WIRKLICH TUT (Stand 07.09., nichts davon Attrappe):
+//   smejj 1.3 / 1.2  Die Wahl reist als body.model zur Bruecke. Dort gibt die
+//                    Schnellspur ab — Spezialfaelle und Komplexes laufen IMMER
+//                    ueber die tiefe Spur (chat-bridge.js, streamFastLane).
+//                    Welche eigene Version antwortet, sagt das Versionsregister
+//                    (Nr. 83); solange keine durch das Tor ist, antwortet das
+//                    Plattform-Modell (BRAND_ALIASES in modelRegistry.js).
+//   smejj 1.1        Alltag: Markenname wie 1.0, die Automatik der Bruecke
+//                    entscheidet zwischen schnell und tief.
+//   smejj 1.0        Standard: der bisherige Hausweg samt Stufe
+//                    (Schnell/Auto/Gruendlich, app.js applySelectedStufe).
+//   Auto             Der Router (ai/modellRouter.js): waehlt je Auftrag das
+//                    guenstigste passende Modell und wechselt bei Limit,
+//                    Fehler oder Ausfall zum naechsten. Ruft KEIN /select —
+//                    das Modell steht erst fest, wenn der Auftrag da ist.
+export const SMEJJ_VERSIONEN = Object.freeze([
+  Object.freeze({ modell: "smejj 1.3", rolle: "Spezialfälle", hinweis: "Schwierigste Aufgaben und Spezialfälle — immer die tiefe Spur" }),
+  Object.freeze({ modell: "smejj 1.2", rolle: "Komplex", hinweis: "Schwere, komplexe Aufgaben — immer die tiefe Spur" }),
+  Object.freeze({ modell: "smejj 1.1", rolle: "Alltag", hinweis: "Anspruchsvollere Alltagsaufgaben" }),
+  Object.freeze({ modell: "smejj 1.0", rolle: "Standard", hinweis: "Einfache bis normale Aufgaben" })
+]);
+export const AUTO_ROLLE = "Automatisch";
+export const AUTO_HINWEIS = "Wählt automatisch das passendste verfügbare Modell und wechselt bei Limit, Fehler oder Ausfall sofort zum nächsten";
 
-// ---- Gedaechtnis fuer Status und Katalog (Betreiber-Befund 2026-08-17:
-// "manchmal kommen komplette Modelle und manchmal nur 2, 3").
-//
-// Ursache, live reproduziert: der Server bremst bei 12 Anfragen pro Minute
-// je Nutzer (rateLimiter capacity 12, refill 0,2/s) — und /status und
-// /models teilen sich diese Bremse mit /chat. Wer ein paar Nachrichten
-// schickt und dann das Menue oeffnet, bekommt 429. Der alte Code machte
-// daraus `null` und zeigte deshalb KEINE Modellzeile (bzw. "Key verbinden",
-// obwohl der Key verbunden ist).
-//
-// Zwei Gegenmittel: die Antwort wird gemerkt (der Katalog aendert sich fast
-// nie), und ein 429 liefert das Gemerkte statt Leere. Nur wenn es nichts zu
-// merken gibt, sagt das Menue ehrlich, dass gebremst wird.
-const GEDAECHTNIS_MS = 10 * 60 * 1000;
-function baueGedaechtnis(pfad, speicherName) {
-  let gemerkt = null;
-  try {
-    const roh = sessionStorage.getItem(speicherName);
-    if (roh) gemerkt = JSON.parse(roh);
-  } catch { /* kaputter Eintrag ist wie keiner */ }
-  return {
-    async holen(kopfzeilen) {
-      const frisch = gemerkt && (Date.now() - gemerkt.zeit) < GEDAECHTNIS_MS;
-      if (frisch) return { wert: gemerkt.wert, gebremst: false };
-      try {
-        const antwort = await fetch(`${API_ORIGIN}/api/providers/cline/${pfad}`, { credentials: "include", headers: kopfzeilen });
-        if (antwort.status === 429) {
-          const nutzlast = await antwort.json().catch(() => ({}));
-          // Gemerktes schlaegt Leere — auch wenn es aelter als 10 Minuten ist.
-          return { wert: gemerkt?.wert || null, gebremst: true, wartenSek: Number(nutzlast.retryAfterSec) || 5 };
-        }
-        if (!antwort.ok) return { wert: gemerkt?.wert || null, gebremst: false };
-        const wert = await antwort.json();
-        gemerkt = { wert, zeit: Date.now() };
-        try { sessionStorage.setItem(speicherName, JSON.stringify(gemerkt)); } catch { /* voller Speicher: dann eben nur im Arbeitsspeicher */ }
-        return { wert, gebremst: false };
-      } catch {
-        return { wert: gemerkt?.wert || null, gebremst: false };
-      }
-    }
-  };
+/** Die Beschriftung einer Zeile, genau wie der Betreiber sie geschrieben hat. */
+export function zeilenText(modell, rolle) {
+  return `${modell} — ${rolle}`;
 }
-const merkeStatus = baueGedaechtnis("status", "smejj.cline.status.v1");
-const merkeKatalog = baueGedaechtnis("models", "smejj.cline.katalog.v1");
 
-// Blindgaenger-Verbot (Betreiber-Regel: keine toten Knoepfe). Live gemessen
-// 2026-08-17: beide antworten mit HTTP 200, aber 0 Zeichen Inhalt — nach 90 s
-// (Qwen 3.7 Max) bzw. 72-123 s (Grok 4.5). Sie stehen darum weder in der
-// Wunschliste oben noch werden sie aus dem Katalog nachgezogen.
-const CLINE_BLINDGAENGER = new Set(["cline-pass/qwen3.7-max", "x-ai/grok-4.5"]);
+/** Ist das ein Name der eigenen Familie (smejj 1.0 … 1.3)? */
+export function istSmejjVersion(name) {
+  return SMEJJ_VERSIONEN.some((v) => v.modell === String(name || "").trim());
+}
 
 // "Auto" ist keine Katalog-ID, sondern der Merkwert des Routers
-// (ai/modellRouter.js): Alltag guenstig ueber das Abo, harte Faelle ueber
-// Guthaben. Steht bewusst ganz oben — das ist die sparsame Voreinstellung.
+// (ai/modellRouter.js). Steht als letzte Zeile (Auftrag 2026-09-07).
 export const AUTO_MARKE = "auto";
 
 export function modellAnzeige(hausText) {
-  if (localStorage.getItem(MODELL_KEY) === "Cline") {
+  const wahl = localStorage.getItem(MODELL_KEY) || "";
+  if (wahl === "Cline") {
     const m = localStorage.getItem(CLINE_MODEL_KEY) || "";
     if (m === AUTO_MARKE) return "Auto";
-    const kurz = CLINE_KURZ.find(([, id]) => id === m)?.[0];
-    if (kurz) return kurz;
-    if (m) return kurzName(m); // auch unten huebsch: "Qwen 3.8 Max" statt roher ID
+    // Ein frueher gewaehltes Katalog-Modell (vor dem 07.09.) bleibt lesbar,
+    // bis der Nutzer neu waehlt: "Qwen 3.8 Max" statt roher ID.
+    if (m) return kurzName(m);
   }
+  // smejj 1.1 bis 1.3 zeigen ihren Namen; smejj 1.0 traegt weiter den
+  // Stufentext der Code-Flaeche (Schnell/Gruendlich), den hausText liefert.
+  if (istSmejjVersion(wahl) && wahl !== "smejj 1.0") return wahl;
   return hausText;
 }
 
@@ -174,9 +158,10 @@ export async function oeffneModellMenue(kontext = {}) {
   kopf.className = "code-menue-titel";
   kopf.textContent = "Modell";
   menue.append(kopf);
-  const istCline = localStorage.getItem(MODELL_KEY) === "Cline";
+  const wahl = localStorage.getItem(MODELL_KEY) || "";
+  const istCline = wahl === "Cline";
   const aktivesClineModell = localStorage.getItem(CLINE_MODEL_KEY) || "";
-  const zeile = ({ titel, klein, hinweis, aktiv, aktion }) => {
+  const zeile = ({ titel, hinweis, aktiv, aktion }) => {
     const k = document.createElement("button");
     k.type = "button";
     k.setAttribute("role", "menuitemradio");
@@ -187,56 +172,47 @@ export async function oeffneModellMenue(kontext = {}) {
     const b = document.createElement("b");
     b.textContent = titel;
     links.append(b);
-    if (klein) { const s = document.createElement("small"); s.textContent = klein; links.append(s); }
     const rechts = document.createElement("span");
     rechts.className = "modus-rechts";
     if (aktiv) { const h = document.createElement("span"); h.className = "modus-haken"; h.textContent = "✓"; rechts.append(h); }
     k.append(links, rechts);
-    // Der Knopf geht an die aktion — sie schreibt waehrend des Wartens "…" hinein.
     k.addEventListener("click", (e) => { e.stopPropagation(); aktion(k); });
     menue.append(k);
     return k;
   };
-  // REIHENFOLGE: Auto steht ganz oben (Betreiber-Auftrag 2026-08-18:
-  // "Auto soll ganz oben 1. sein, smejj 1.0 2. sein"). Der sparsame Weg
-  // ist die Voreinstellung, die der Betreiber sehen soll — nicht das
-  // Hausmodell.
-  // Auto: der sparsame Weg. Hier wird NICHT /select gerufen — das Modell
-  // steht erst fest, wenn der Auftrag da ist (ai/modellRouter.js waehlt dann
-  // und wartet das /select ab). Darum ist diese Zeile sofort fertig.
-  // Kein Untertitel: das Menue traegt NUR nackte Kurznamen (Betreiber-Regel
-  // 2026-08-17). Eine zweite Zeile wurde live auf halbem Weg abgeschnitten —
-  // die Erklaerung gehoert darum in den Tooltip, nicht in die Zeile.
+  // Wer noch einen Namen im Speicher hat, den es nicht mehr gibt (Ox Alpha
+  // seit 06.09., Katalog-Modelle seit 07.09. nur noch ueber Einstellungen),
+  // wird still auf smejj 1.0 gesetzt — sonst zeigte das Menue nichts als
+  // gewaehlt an und die Wahl zeigte ins Leere.
+  if (wahl && !istCline && !istSmejjVersion(wahl)) {
+    localStorage.setItem(MODELL_KEY, "smejj 1.0");
+  }
+  const gewaehlt = localStorage.getItem(MODELL_KEY) || "smejj 1.0";
+  // Vier eigene Versionen, vom schwersten Modell abwaerts.
+  for (const v of SMEJJ_VERSIONEN) {
+    zeile({
+      titel: zeilenText(v.modell, v.rolle),
+      hinweis: v.hinweis,
+      aktiv: !istCline && gewaehlt === v.modell,
+      aktion: () => {
+        localStorage.setItem(MODELL_KEY, v.modell);
+        window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: v.modell } }));
+        zu();
+        kontext.beiWahl?.();
+      }
+    });
+  }
+  // Auto: der sparsame Weg — zuletzt, wie im Auftrag. Hier wird NICHT /select
+  // gerufen (ai/modellRouter.js waehlt erst beim Auftrag). AUTO_MARKE.
   zeile({
-    titel: "Auto",
-    hinweis: "Guenstig: Alltag ueber das Abo, harte Faelle ueber Guthaben",
+    titel: zeilenText("Auto", AUTO_ROLLE),
+    hinweis: AUTO_HINWEIS,
     aktiv: istCline && aktivesClineModell === AUTO_MARKE,
     aktion: () => {
       localStorage.setItem(CLINE_MODEL_KEY, AUTO_MARKE);
       localStorage.setItem(MODELL_KEY, "Cline");
       document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: AUTO_MARKE } }));
       window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
-      zu();
-      kontext.beiWahl?.();
-    }
-  });
-  // Hausmodell: nutzt den bestehenden Stufen-Weg (Auto/Gruendlich/Schnell).
-  //
-  // Ox Alpha stand hier seit dem 26.08.2026 an dritter Stelle. Betreiber-Ansage
-  // 2026-09-06: das Modell ist abgeschafft und kommt nicht wieder — restlos
-  // entfernt, nicht nur ausgeblendet. Wer noch "Ox Alpha" im Speicher seines
-  // Browsers stehen hat, wird beim naechsten Oeffnen still auf smejj 1.0
-  // gesetzt; ohne diese Zeile bliebe seine Auswahl auf einen Namen zeigen, den
-  // es nicht mehr gibt, und das Menue zeigte gar nichts als ausgewaehlt an.
-  if (localStorage.getItem(MODELL_KEY) === "Ox Alpha") {
-    localStorage.setItem(MODELL_KEY, "smejj 1.0");
-  }
-  zeile({
-    titel: "smejj 1.0",
-    aktiv: !istCline,
-    aktion: () => {
-      localStorage.setItem(MODELL_KEY, "smejj 1.0");
-      window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "smejj 1.0" } }));
       zu();
       kontext.beiWahl?.();
     }
@@ -252,9 +228,8 @@ export async function oeffneModellMenue(kontext = {}) {
     menue.style.right = `${Math.max(0, Math.round(feldR.right - chipR.right))}px`;
     menue.style.bottom = `${Math.round(feldR.bottom - chipR.top + 6)}px`;
   } catch { /* Standardposition bleibt */ }
-  // Nie oben aus dem Fenster ragen: die Zeilen kommen ASYNCHRON aus dem
-  // Katalog nach und das bottom-verankerte Menue waechst nach OBEN — die
-  // Kappe muss darum nach JEDEM Fuellen laufen (live gemessen: top -112).
+  // Nie oben aus dem Fenster ragen (das bottom-verankerte Menue waechst nach
+  // oben; live gemessen: top -112).
   const imFensterHalten = () => {
     try {
       const oben = menue.getBoundingClientRect().top;
@@ -271,13 +246,10 @@ export async function oeffneModellMenue(kontext = {}) {
   //
   // Live gemessen 2026-08-22 bei 962 px Fensterbreite mit offenem Browser-Panel:
   // das Menue begann bei x=134, die Seitenleiste reichte bis x=195. Die ersten
-  // 61 Pixel JEDER Zeile lagen dahinter — auf dem Bildschirm stand "eek V4 Pro"
-  // statt "Deepseek V4 Pro" und "ax M3" statt "Minimax M3".
+  // 61 Pixel JEDER Zeile lagen dahinter.
   //
   // Erst schieben; ist die Spalte schmaler als das Menue, die Breite deckeln
-  // statt Text zu verstecken. Laeuft wie imFensterHalten nach JEDEM Fuellen,
-  // weil die Zeilen asynchron aus dem Katalog nachkommen und das Menue dabei
-  // nach oben UND nach links waechst.
+  // statt Text zu verstecken.
   const inDerSpalteHalten = () => {
     try {
       // Grenze ist der linke Rand der MITTE, nicht des Modellknopfes: `feld`
@@ -301,131 +273,6 @@ export async function oeffneModellMenue(kontext = {}) {
   };
   imFensterHalten();
   inDerSpalteHalten();
-  // Cline-Katalog LIVE nachladen — erst Status (Key da?), dann Modelle.
-  // Fail-safe: ohne Token/Key eine ehrliche Hinweis-Zeile statt Attrappe.
-  try {
-    // Gleiche Anmeldung wie provider-settings.js (live gemessen 2026-08-17:
-    // nur localStorage-apiToken gab 401 und das Menue log "Key verbinden",
-    // obwohl er verbunden war): Sitzungs-Token, dann Zugangs-Token, plus
-    // Cookies.
-    const token = sessionStorage.getItem(TOKEN_KEY)
-      || localStorage.getItem("smejj.auth.accessToken.v1") || "";
-    const kopfzeilen = token ? { Authorization: `Bearer ${token}` } : {};
-    const [statusAntwort, katalogAntwort] = await Promise.all([
-      merkeStatus.holen(kopfzeilen),
-      merkeKatalog.holen(kopfzeilen)
-    ]);
-    const status = statusAntwort.wert;
-    const katalog = katalogAntwort.wert;
-    if (!document.getElementById(menueId)) return; // inzwischen zu
-    // Gebremst (429) UND nichts gemerkt: ehrlich sagen, warum die Liste fehlt,
-    // statt still nur zwei Zeilen zu zeigen oder "Key verbinden" zu luegen.
-    // Betreiber-Befund 2026-08-17: "manchmal kommen komplette Modelle und
-    // manchmal nur 2, 3" — genau dieser Fall.
-    if (!katalog && katalogAntwort.gebremst) {
-      const sek = katalogAntwort.wartenSek || 5;
-      zeile({
-        titel: `Liste lädt gleich … (${sek} s)`,
-        hinweis: "Der Server bremst gerade zu viele Anfragen ab. Das Menü holt die Liste automatisch nach.",
-        aktiv: false,
-        aktion: () => { zu(); }
-      });
-      imFensterHalten();
-      inDerSpalteHalten();
-      // Automatisch nachladen, sobald die Bremse wieder auf ist.
-      setTimeout(() => {
-        if (!document.getElementById(menueId)) return;
-        zu();
-        oeffneModellMenue();
-      }, (sek + 1) * 1000);
-      return;
-    }
-    if (!(status?.hasKey ?? status?.configured)) {
-      zeile({
-        titel: "Cline-Key verbinden …",
-        aktiv: false,
-        aktion: () => { zu(); document.querySelector('.nav-button[data-view="settings"]')?.click(); }
-      });
-      imFensterHalten();
-      inDerSpalteHalten();
-      return;
-    }
-    // Betreiber-Nachtrag: ALLE Katalog-Modelle, aber im selben Stil —
-    // erst seine Wunschliste, dann der Rest; gleiche Namen nur einmal
-    // (kimi-k3 steht z. B. doppelt im Katalog).
-    const vorhanden = new Set((katalog?.models || []).map((m) => m.id));
-    const gezeigt = new Set();
-    const baueZeile = (kurz, id) => {
-      zeile({
-        titel: kurz,
-        aktiv: istCline && aktivesClineModell === id,
-        aktion: async (k) => {
-          localStorage.setItem(CLINE_MODEL_KEY, id);
-          localStorage.setItem(MODELL_KEY, "Cline");
-          // PFLICHT (live gemessen 2026-08-17): der Chat-Request traegt KEIN
-          // model-Feld — der Server nimmt sein gespeichertes selectedModel.
-          //
-          // Und es muss ABGEWARTET werden, nicht nur abgeschickt: der
-          // Datensatz liegt auf IDrive e2, das Schreiben dauert. Ein
-          // fire-and-forget /select liess den naechsten Auftrag noch mit
-          // dem ALTEN Modell laufen — gemessen 2026-08-17: Grok gewaehlt,
-          // Antwort kam von Qwen, das Modell hinkte jedes Mal genau eine
-          // Wahl hinterher. Der Knopf zeigt solange "…".
-          const knopfText = k.querySelector("b");
-          const vorher = knopfText?.textContent;
-          if (knopfText) knopfText.textContent = `${kurz} …`;
-          // Betreiber-Befund 2026-08-17 ("Knopf zeigte kurz Mimo V2.5"):
-          // der Modell-Knopf behielt waehrend des Wartens den ALTEN Namen
-          // und sah dadurch falsch aus. Er zeigt jetzt denselben
-          // Wartezustand wie die Menuezeile.
-          const chipVorher = chip.textContent;
-          chip.textContent = `${kurz} …`;
-          try {
-            const token = sessionStorage.getItem(TOKEN_KEY)
-              || localStorage.getItem("smejj.auth.accessToken.v1") || "";
-            const antwort = await fetch(`${API_ORIGIN}/api/providers/cline/select`, {
-              method: "POST",
-              credentials: "include",
-              headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-              body: JSON.stringify({ model: id })
-            });
-            if (!antwort.ok) throw new Error(`select_${antwort.status}`);
-          } catch (fehler) {
-            // Ehrlich scheitern statt still das falsche Modell benutzen.
-            if (knopfText && vorher) knopfText.textContent = vorher;
-            chip.textContent = chipVorher;
-            try {
-              const { showToast } = await import("/assets/components.js?v=b48");
-              showToast("Modellwechsel hat nicht geklappt — bitte erneut versuchen.", "warn");
-            } catch { /* still */ }
-            return;
-          }
-          document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: id } }));
-          window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
-          zu();
-          kontext.beiWahl?.();
-        }
-      });
-      gezeigt.add(kurz.toLowerCase());
-      gezeigt.add(id);
-    };
-    for (const [kurz, id] of CLINE_KURZ) {
-      if (vorhanden.has(id)) baueZeile(kurz, id);
-    }
-    for (const m of katalog?.models || []) {
-      if (gezeigt.has(m.id)) continue;
-      // Gratis-Gruppe NICHT anbieten: per API gesperrt ("only available
-      // via Cline product surfaces", 403 live gemessen) — tote Knoepfe.
-      if (m.category === "free") continue;
-      // Ebenso die zwei Blindgaenger: HTTP 200, aber leere Antwort.
-      if (CLINE_BLINDGAENGER.has(m.id)) continue;
-      const kurz = kurzName(m.id);
-      if (gezeigt.has(kurz.toLowerCase())) continue;
-      baueZeile(kurz, m.id);
-    }
-    imFensterHalten();
-    inDerSpalteHalten();
-  } catch { /* fail-safe: Menue zeigt dann nur das Hausmodell */ }
 }
 
 
