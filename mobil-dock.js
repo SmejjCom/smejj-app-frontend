@@ -94,8 +94,11 @@ export const REGELN = "@media (max-width:600px){"
 
 /** Der Fehlbetrag der Layout-Flaeche in der installierten App: Schirmhoehe minus innerHeight,
  *  nur ohne offene Tastatur, nur hochkant, nur plausibel (0 < fehl <= 120). Reine Funktion. */
-export function misstVersatz({ standalone, schirmHoehe, schirmBreite, innerHeight, tastaturOffen }) {
-  if (!standalone || tastaturOffen) return 0;
+export function misstVersatz({ standalone, apple, schirmHoehe, schirmBreite, innerHeight, tastaturOffen }) {
+  // NUR WebKit auf Apple: in der Android-App (TWA) ist screen.height - innerHeight die
+  // normale Status- und Navigationsleiste (Pixel 7: 915 - 839 = 76) — kein Fehler,
+  // dort darf nichts verschoben werden.
+  if (!standalone || !apple || tastaturOffen) return 0;
   if (!(schirmHoehe > schirmBreite)) return 0;
   const fehl = Math.round(Number(schirmHoehe) - Number(innerHeight));
   return fehl > 0 && fehl <= 120 ? fehl : 0;
@@ -105,7 +108,8 @@ function verdrahteVersatz(win = window, doc = document) {
   const standalone = () => { try { return matchMedia("(display-mode: standalone)").matches || win.navigator.standalone === true; } catch { return false; } };
   const tastatur = () => { const a = doc.activeElement; return Boolean(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.isContentEditable)); };
   const setze = () => {
-    const fehl = misstVersatz({ standalone: standalone(), schirmHoehe: win.screen?.height || 0, schirmBreite: win.screen?.width || 0, innerHeight: win.innerHeight, tastaturOffen: tastatur() });
+    const apple = /iPhone|iPad|iPod/.test(win.navigator?.userAgent || "") || /Apple/.test(win.navigator?.vendor || "");
+    const fehl = misstVersatz({ standalone: standalone(), apple, schirmHoehe: win.screen?.height || 0, schirmBreite: win.screen?.width || 0, innerHeight: win.innerHeight, tastaturOffen: tastatur() });
     if (fehl || !tastatur()) doc.documentElement.style.setProperty("--vollbild-fehl", `${fehl}px`);
   };
   setze();
