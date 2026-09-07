@@ -6,7 +6,7 @@
 import { showToast } from "./components.js?v=b48";
 import { bindBildAnhang, uebernehmeBildDatei } from "./composer-bild-anhang.js";
 import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=4";
-import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=1";
+import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=2";
 
 // Was als Text mitgeht: Textarten und die ueblichen Quell-/Daten-Endungen,
 // hoechstens 200 KB — mehr traegt keine Frage sinnvoll (Server kuerzt ohnehin).
@@ -77,7 +77,7 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
       if (input.id === "startMessage" && (/\.pdf$/i.test(file.name || "") || file.type === "application/pdf")) {
         try {
           showToast(`PDF wird gelesen: ${file.name}`);
-          const { liesPdfText } = await import("./anhang-pdf-text.js?v=2");
+          const { liesPdfText } = await import("./anhang-pdf-text.js?v=3");
           const r = await liesPdfText(file);
           if (r.ok && uebernehmeTextAnhang(file.name, r.text, input)) { showToast(`PDF gelesen: ${file.name} (${r.seiten} Seiten)`); continue; }
           showToast(r.grund === "verschluesselt" ? `PDF ist verschluesselt: ${file.name}` : `Kein lesbarer Text im PDF: ${file.name}`);

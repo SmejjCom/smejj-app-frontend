@@ -47,7 +47,15 @@ export function initSendetaste({ dokument = document } = {}) {
   // Fassung im Zwischenspeicher), bleibt der Knopf stumpf ein Senden-Knopf.
   const sprachKnopf = dokument.querySelector('[data-start-tool="audio"]');
 
-  const hatText = () => feld.value.trim().length > 0;
+  // EIN ANHANG ALLEIN IST AUCH EINE NACHRICHT (Betreiber-Pruefung 07.09.).
+  // PDF, Word/Excel/PowerPoint, Tonspur-Transkript und eingefuegter Langtext
+  // landen als CHIP ueber dem Feld, nicht IM Feld. Wer nur eine Datei anhaengte
+  // und auf Senden drueckte, traf darum auf den Sprachmodus — die Frage ging
+  // nie raus, und der Anhang blieb kleben. Nur der Enter-Weg funktionierte.
+  const hatText = () => {
+    if (feld.value.trim().length > 0) return true;
+    try { return window.smejjAnhangChips?.hatAnhaenge?.() === true; } catch { return false; }
+  };
 
   const zeichne = () => {
     const schreibt = hatText();
@@ -75,6 +83,8 @@ export function initSendetaste({ dokument = document } = {}) {
   }, true);
 
   feld.addEventListener("input", zeichne);
+  // Chips schreiben nicht ins Feld — ihr Ereignis loest das Neuzeichnen aus.
+  try { window.addEventListener("smejj:anhang-geaendert", zeichne); } catch { /* ohne Fenster egal */ }
   // Chips und Einfuegen setzen den Wert ohne input-Ereignis; ein zweiter
   // Anlass deckt das ab, ohne dass wir jeden Schreiber kennen muessen.
   feld.addEventListener("change", zeichne);

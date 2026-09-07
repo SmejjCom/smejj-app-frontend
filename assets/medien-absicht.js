@@ -14,7 +14,15 @@
 // nicht importierbar, darum diese schlanke Kopie). Fail-safe: bei false
 // laeuft alles unveraendert.
 
-const MEDIEN_VERB = /\b(zeichne|zeichnen|male|malen|erstelle|erstellen|erstell|generiere|generieren|generier|erzeuge|erzeugen|erzeug|mach|mache|machen|draw|paint|generate|create|make)\b/i;
+// WORTGLEICH mit dem Server (chat-bridge-bilder.js: BILDER_VERB + VIDEO_VERB,
+// hier vereinigt). Der Kommentar oben behauptete das schon, der Ausdruck hielt
+// es aber nicht: es fehlten zeig/zeige/zeigen, bau/bauen, kannst/kann,
+// moechte/möchte, will, produce sowie die Tippfehler-Formen zeichen/zeichene.
+// Folge (Betreiber-Pruefung 07.09.): "Zeige mir ein Video von ..." galt im
+// Browser nicht als Medienauftrag — bei gewaehltem Katalog-Modell antwortete
+// der Client mit Text, und die Bruecke sah den Auftrag nie.
+// tests/medien-absicht-gleichlauf.test.mjs haelt beide Seiten ab jetzt zusammen.
+const MEDIEN_VERB = /\b(zeichne|zeichnen|zeichen|zeichene|zeig|zeige|zeigen|male|malen|erstelle|erstellen|erstell|generiere|generieren|generier|erzeuge|erzeugen|erzeug|mach|mache|machen|bau|bauen|draw|paint|generate|create|make|produce|kannst|kann|moechte|möchte|will)\b/i;
 const BILD_MOTIV = /\b(bild(er|es)?|foto(s)?|grafik(en)?|illustration(en)?|zeichnung(en)?|logo(s)?|skizze(n)?|gem(ae|ä)lde|image(s)?|picture(s)?|photo(s)?|drawing(s)?|sketch(es)?)\b/i;
 const VIDEO_MOTIV = /\b(video(s)?|film(e|s)?|animation(en)?|clip(s)?|mp4|movie(s)?)\b/i;
 const MALVERB_ALLEIN = /(^|\s)(zeichne|zeichnest|zeichnen|male|malst|malen|skizziere|skizzier|draw|paint|sketch)\b/i;

@@ -114,7 +114,7 @@ function zeichne(input, notify) {
     weg.setAttribute("aria-label", `${a.name} entfernen`);
     weg.title = "Entfernen";
     weg.textContent = "×";
-    weg.addEventListener("click", () => { entferne(a.id); zeichne(input, notify); notify?.(input); input.focus(); });
+    weg.addEventListener("click", () => { entferne(a.id); zeichne(input, notify); notify?.(input); meldeAnhangWechsel(); input.focus(); });
     chip.append(vorschau, text, weg);
     row.append(chip);
   }
@@ -141,6 +141,7 @@ export function uebernehmeAnhang(file, input, notify) {
   anhaenge.push(eintrag);
   zeichne(input, notify);
   notify?.(input);
+  meldeAnhangWechsel();
   return eintrag;
 }
 
@@ -151,11 +152,23 @@ export function nimmVerweise() {
   for (const a of anhaenge) { try { if (a.url) URL.revokeObjectURL(a.url); } catch { /* egal */ } }
   anhaenge.length = 0;
   document.getElementById("anhangChipRow")?.remove();
+  meldeAnhangWechsel();
   return zeilen;
 }
 
 export function hatAnhaenge() { return anhaenge.length > 0; }
 
+/**
+ * Sagt der Oberflaeche Bescheid, dass sich der Anhang-Bestand geaendert hat.
+ * Noetig, weil Chips NICHT ins Schreibfeld schreiben — ohne dieses Ereignis
+ * merkt der Senden-Knopf nichts davon und zeigt weiter die Sprachwelle
+ * (Betreiber-Pruefung 07.09.: eine Nachricht mit NUR einem Anhang liess sich
+ * per Knopf nicht senden).
+ */
+export function meldeAnhangWechsel() {
+  try { window.dispatchEvent(new CustomEvent("smejj:anhang-geaendert")); } catch { /* ohne Fenster egal */ }
+}
+
 if (typeof window !== "undefined") {
-  window.smejjAnhangChips = { nimmVerweise, hatAnhaenge };
+  window.smejjAnhangChips = { nimmVerweise, hatAnhaenge, meldeAnhangWechsel };
 }

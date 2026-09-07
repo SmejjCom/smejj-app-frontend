@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v801";
+const CACHE_NAME = "smejj-shell-v803";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -205,6 +205,8 @@ const SHELL = [
   "/assets/panel-layout.js",
   "/assets/local-workspace-surface.js",
   "/assets/maus-panel.js",
+  // Wiedergabe der Maus-Laeufe (maus-panel.js bettet maus-replay.html ein).
+  "/assets/maus-replay.js",
   "/assets/view-routes.js",
   "/assets/ai/providers-catalog.js",
   "/assets/account-sessions.js",

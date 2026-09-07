@@ -613,6 +613,26 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
   return true;
 }
 
+
+/**
+ * Passt den Rumpf JEDES Ziels an. app.js reicht die Endpunkte als Liste herein
+ * (buildChatTargets), und jedes Ziel traegt seinen eigenen, bereits
+ * serialisierten Rumpf — wer nur `body` aendert, schickt trotzdem den alten los.
+ * @param {Array|string} url Ziele
+ * @param {(rumpf: object) => object} aendere
+ */
+function zieleAnpassen(url, aendere) {
+  if (!Array.isArray(url)) return url;
+  return url.map((ziel) => {
+    if (!ziel || typeof ziel !== "object" || typeof ziel.body !== "string") return ziel;
+    try {
+      const rumpf = JSON.parse(ziel.body);
+      if (!rumpf || typeof rumpf !== "object") return ziel;
+      return { ...ziel, body: JSON.stringify(aendere(rumpf)) };
+    } catch { return ziel; }
+  });
+}
+
 export async function streamChatAnswer(url, body, output, { renderMarkdown, offlineNotice = "" } = {}) {
   // Fragen-Erfassung (Trainingsplan smejj 1.1, Stufe 1): loest nur aus, wartet
   // nie, bricht nie — der Server entscheidet aus Ledger und Schalter. Dynamisch
@@ -635,16 +655,7 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // dieses Nachziehen geht der alte Rumpf ohne Live-Daten auf die Reise
   // (Betreiber-Gegenprobe 07.09.: "Wetter mit Nachdenken funktioniert nicht").
   const frageNachher = String(body?.task || "");
-  if (frageNachher !== frageVorher && Array.isArray(url)) {
-    url = url.map((ziel) => {
-      if (!ziel || typeof ziel !== "object" || typeof ziel.body !== "string") return ziel;
-      try {
-        const rumpf = JSON.parse(ziel.body);
-        if (!rumpf || typeof rumpf !== "object" || !("task" in rumpf)) return ziel;
-        return { ...ziel, body: JSON.stringify({ ...rumpf, task: frageNachher }) };
-      } catch { return ziel; }
-    });
-  }
+  if (frageNachher !== frageVorher) url = zieleAnpassen(url, (rumpf) => ({ ...rumpf, task: frageNachher }));
 
   // Ab dem Absenden sichtbar arbeiten — der Server meldet sich erst nach
   // gemessenen 5,75 s (siehe starteWartesignal).
@@ -663,6 +674,33 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
     haengeAktionsKnopf(output, "Erneut versuchen", letzteNutzerfrage(body));
     return;
   }
+  // TIEFE SPUR AUSGEFALLEN? Dann eine schnelle Antwort statt gar keiner.
+  //
+  // Live gemessen 2026-09-07: Mit "Nachdenken" gibt die Bruecke die Schnellspur
+  // ab (streamFastLane: `if (stufe === "gruendlich") return false`). Danach
+  // bleibt nur der Control-Router — und der meldet derzeit ALLE Modelle als
+  // "degraded" (runtimeAvailable=false). Faellt er durch, antwortet streamModel
+  // mit 503 "Model backend is not configured", weil die Bruecke kein eigenes
+  // Modell hat (modelConfigured=false). Der Nutzer sah nur einen Fehler.
+  //
+  // Ein EINZIGER Rueckfall auf die schnelle Spur bringt eine echte Antwort. Die
+  // Live-Daten bleiben dabei erhalten — sie stecken schon in der Frage.
+  if (response && !response.ok && (response.status === 502 || response.status === 503)
+      && String(body?.preferences?.stufe || "") === "gruendlich") {
+    const leichter = { ...body, preferences: { ...(body.preferences || {}), stufe: "auto" } };
+    const leichtereZiele = zieleAnpassen(url, (rumpf) => ({
+      ...rumpf,
+      preferences: { ...(rumpf.preferences || {}), stufe: "auto" }
+    }));
+    try {
+      response = await fetchStreamWithRetry(leichtereZiele, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() },
+        body: JSON.stringify(leichter)
+      });
+    } catch { /* faellt unten in die normale Fehlermeldung */ }
+  }
+
   // Abgelaufener kurzer Ausweis (401/403): LAUTLOS aus der gueltigen Sitzung
   // einen frischen holen und die Anfrage GENAU einmal wiederholen, statt den
   // Nutzer auszuloggen. Erst wenn auch das scheitert, kommt der Anmelde-Hinweis.

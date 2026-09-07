@@ -37,6 +37,13 @@ function laden() {
   // haengt seit 2026-08-24 nicht mehr als eigener <script>-Tag an index.html —
   // er kommt hier mit, sobald die Flaeche wirklich gebraucht wird.
   import("./projekt-ordner.js?v=1").catch(() => {});
+  // composer-tools.js verdrahtet den Datei-Wähler (#composerFileInput ->
+  // bindAttachInput). Bisher kam es NUR ueber den Plus-Knopf der Startseite
+  // (app.js ladeBeiKlick). Wer direkt in "Programmieren" ging und dort
+  // Plus -> "Dateien oder Fotos hinzufuegen" waehlte, bekam den Dateiwaehler —
+  // und danach passierte nichts, weil niemand auf die Auswahl hoerte
+  // (A-bis-Z-Pruefung 07.09.). Darum kommt es hier mit.
+  import("./composer-tools.js?v=werkzeuge-19").catch(() => {});
   return import("./code-flaeche.js?v=60")
     .then((modul) => { modul.initCodeFlaeche?.(); return modul; })
     .catch((fehler) => {

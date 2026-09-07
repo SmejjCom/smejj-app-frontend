@@ -61,7 +61,12 @@ const ZEITGRENZE_MS = 6000;
 // Web-Adressen. Im Zweifel NICHT suchen — eine unnoetige Suche kostet
 // Sekunden, ein unnoetiges Auslassen kostet nur den Kontext, den es vorher
 // auch nicht gab.
-const AKTUELL = /\b(aktuell|aktuelle[rsn]?|heute|jetzt|gerade|momentan|neueste[rsn]?|neuste[rsn]?|letzte[rsn]? (?:woche|monat|jahr)|news|nachrichten|schlagzeilen|kurs|preis|wechselkurs|boerse|wetter|temperatur|vorhersage|steht es|spielstand|ergebnis|stand von|seit wann|wann kommt|latest|current|today|right now)\b/i;
+// Enthaelt auch die SUCH-Woerter des Servers (chat-bridge.js shouldSearchWeb,
+// STAMM "recherch"): der Menuepunkt "Im Netz nachsehen" setzt die Vorlage
+// "Recherchiere fuer mich: ..." und verspricht anklickbare Quellen. Ohne diese
+// Woerter lieferte er bei Stufe "Nachdenken" eine quellenlose Antwort
+// (A-bis-Z-Pruefung 07.09.).
+const AKTUELL = /\b(aktuell|aktuelle[rsn]?|heute|jetzt|gerade|momentan|neueste[rsn]?|neuste[rsn]?|letzte[rsn]? (?:woche|monat|jahr)|news|nachrichten|schlagzeilen|kurs|preis|wechselkurs|boerse|wetter|temperatur|vorhersage|steht es|spielstand|ergebnis|stand von|seit wann|wann kommt|recherchiere|recherchier|recherche|such|suche|suchen|nachsehen|nachschauen|nachschlagen|google|finde heraus|herausfinden|quellen|latest|current|today|right now|search|look up)\b/i;
 const WEB_TLDS = "com|net|org|info|io|co|ai|dev|app|de|at|ch|eu|uk|fr|it|es|nl|pl|se|no|dk|fi|cz|ru|jp|cn|in|br|ca|us|me|tv|cloud|tech|online|site|shop|xyz";
 
 /** Nennt die Frage eine echte Web-Adresse? (gleiche Endungsliste wie die Bruecke) */
