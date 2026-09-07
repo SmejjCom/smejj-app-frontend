@@ -110,7 +110,11 @@ const BAR_SPECS = Object.freeze({
 const MENU_KOPF = Object.freeze({
   user: Object.freeze([
     { act: "copy", label: "Kopieren", icon: "copy" },
-    { act: "edit", label: "Bearbeiten", icon: "edit" }
+    { act: "edit", label: "Bearbeiten", icon: "edit" },
+    // Betreiber 2026-09-07: "meine Frage laut lesen lassen" — derselbe Vorleser wie
+    // bei Antworten (speakEntry in chat-actions.js liest rawOf(entry), rollenneutral);
+    // erneutes Antippen waehrend der Ansage stoppt sie.
+    { act: "speak", label: "Vorlesen", icon: "volume" }
   ]),
   assistant: Object.freeze([
     { act: "regen", label: "Neu generieren", icon: "regen" }
