@@ -116,12 +116,22 @@ export function istSmejjVersion(name) {
   return SMEJJ_VERSIONEN.some((v) => v.modell === String(name || "").trim());
 }
 
-// "Auto" ist keine Katalog-ID, sondern der Merkwert des Routers
-// (ai/modellRouter.js). Steht als letzte Zeile (Auftrag 2026-09-07).
+// "Auto" lief bis zum 07.09. ueber den FREMDEN Dienst Cline (MODELL_KEY
+// "Cline" + cline.model "auto"). Ohne Cline-Schluessel scheiterte jede
+// Auto-Anfrage mit "Automatische Modellwahl hat nicht geklappt" — live beim
+// Betreiber gemessen. Seitdem ist Auto ein EIGENER Live-Pfad: die Wahl reist
+// als model "Auto" zur Bruecke, der Server-Router (modelRegistry
+// resolveModelSelection, AUTO_MODEL_ID) waehlt das passendste freigegebene
+// Modell UND haelt die Ersatzkette bei Limit, Fehler oder Ausfall. Damit kann
+// Auto nicht mehr "nicht klappen": im schlechtesten Fall antwortet das
+// Standardmodell.
+export const AUTO_WAHL = "Auto";
+// Alter Merkwert im Cline-Speicher — nur noch fuer die Migration von Altwahlen.
 export const AUTO_MARKE = "auto";
 
 export function modellAnzeige(hausText) {
   const wahl = localStorage.getItem(MODELL_KEY) || "";
+  if (wahl === AUTO_WAHL) return "Auto";
   if (wahl === "Cline") {
     const m = localStorage.getItem(CLINE_MODEL_KEY) || "";
     if (m === AUTO_MARKE) return "Auto";
@@ -184,7 +194,11 @@ export async function oeffneModellMenue(kontext = {}) {
   // seit 06.09., Katalog-Modelle seit 07.09. nur noch ueber Einstellungen),
   // wird still auf smejj 1.0 gesetzt — sonst zeigte das Menue nichts als
   // gewaehlt an und die Wahl zeigte ins Leere.
-  if (wahl && !istCline && !istSmejjVersion(wahl)) {
+  // Altwahl "Auto ueber Cline" still auf den eigenen Auto-Pfad heben.
+  if (istCline && aktivesClineModell === AUTO_MARKE) {
+    localStorage.setItem(MODELL_KEY, AUTO_WAHL);
+    try { localStorage.removeItem(CLINE_MODEL_KEY); } catch { /* Storage gesperrt */ }
+  } else if (wahl && wahl !== AUTO_WAHL && !istCline && !istSmejjVersion(wahl)) {
     localStorage.setItem(MODELL_KEY, "smejj 1.0");
   }
   const gewaehlt = localStorage.getItem(MODELL_KEY) || "smejj 1.0";
@@ -207,12 +221,13 @@ export async function oeffneModellMenue(kontext = {}) {
   zeile({
     titel: zeilenText("Auto", AUTO_ROLLE),
     hinweis: AUTO_HINWEIS,
-    aktiv: istCline && aktivesClineModell === AUTO_MARKE,
+    aktiv: gewaehlt === AUTO_WAHL,
     aktion: () => {
-      localStorage.setItem(CLINE_MODEL_KEY, AUTO_MARKE);
-      localStorage.setItem(MODELL_KEY, "Cline");
-      document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model: AUTO_MARKE } }));
-      window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: "Cline" } }));
+      // KEIN /select und kein Fremd-Dienst mehr: die Wahl reist als model
+      // "Auto" mit der Anfrage, der Server-Router entscheidet pro Auftrag.
+      localStorage.setItem(MODELL_KEY, AUTO_WAHL);
+      try { localStorage.removeItem(CLINE_MODEL_KEY); } catch { /* Storage gesperrt */ }
+      window.dispatchEvent(new CustomEvent("smejj:model-selected", { detail: { model: AUTO_WAHL } }));
       zu();
       kontext.beiWahl?.();
     }
