@@ -55,7 +55,15 @@ export const REGELN = [
   + "body #code #codeSenden.send-button{width:44px;height:44px;min-height:44px}"
   + "body #code .codeleiste .repochip{min-width:44px}"
   + "body #smejj-sitzung-abgelaufen a,body #smejj-sitzung-abgelaufen button{display:inline-flex;align-items:center}"
-  + "}"
+  + "}",
+  // Mikrofon-Zustand sichtbar (Betreiber 07.09., 17:39: "ich merke nicht, ob das Mikrofon
+  // aktiv ist"): waehrend des Diktats leuchtet das Symbol in der LOGOFARBE #02fdfd (bisher
+  // Rot + Puls aus dem Buendel), mit weichem Schein; beim Beenden faellt die Klasse und es
+  // ist wieder grau. Gilt im Chat-Feld ([data-start-tool=voice]) und im Code-Feld
+  // (#codeDiktat, Klasse per Spiegel unten). Alle Breiten.
+  "body [data-start-tool=voice].is-recording,body #codeDiktat.is-recording{color:#02fdfd;text-shadow:0 0 12px rgba(2,253,253,.55);animation:none}"
+  + "body [data-start-tool=voice].is-recording svg,body #codeDiktat.is-recording svg{filter:drop-shadow(0 0 6px rgba(2,253,253,.6))}"
+  + "body [data-start-tool=voice][aria-pressed=true],body #codeDiktat[aria-pressed=true]{color:#02fdfd}"
 ].join("");
 
 export function sorgeFuerStil(doc = document) {
@@ -67,4 +75,20 @@ export function sorgeFuerStil(doc = document) {
   return true;
 }
 
-if (typeof document !== "undefined" && document.querySelector(".view")) sorgeFuerStil();
+// Der Code-Diktat-Knopf loest nur den Chat-Mikrofon-Knopf aus (code-flaeche.js) und
+// bekommt selbst keinen Zustand — der Spiegel traegt .is-recording hinueber.
+export function spiegleDiktat(doc = document, Beobachter = typeof MutationObserver !== "undefined" ? MutationObserver : null) {
+  const quelle = doc.querySelector('[data-start-tool="voice"]');
+  const ziel = doc.getElementById("codeDiktat");
+  if (!quelle || !ziel || !Beobachter) return false;
+  const uebertrage = () => {
+    const an = quelle.classList.contains("is-recording");
+    ziel.classList.toggle("is-recording", an);
+    ziel.setAttribute("aria-pressed", an ? "true" : "false");
+  };
+  new Beobachter(uebertrage).observe(quelle, { attributes: true, attributeFilter: ["class"] });
+  uebertrage();
+  return true;
+}
+
+if (typeof document !== "undefined" && document.querySelector(".view")) { sorgeFuerStil(); spiegleDiktat(); }

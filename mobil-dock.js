@@ -25,6 +25,7 @@
 //   (6) Kein waagerechter Ueberlauf der Seite: overflow-x:clip auf Huelle und body
 //       (clip statt hidden — erzeugt keinen Scroll-Container, sticky bleibt heil).
 //   (7) Rest-Ziele unter 44 px: Sitzungs-Banner, Profilbild-Knopf, Werkzeug-Zeilen.
+//   (8) Modell-Menue volle Breite, (9) Chat-Glas ohne Seitwaerts-Schieben, (10) Vollbild-Versatz.
 // Stil aus dem Modul, weil die Regeln sonst in start-styles.css (Start-Buendel,
 // gesperrt) muessten. Spezifitaet bewusst hoch (body + Mehrfachklasse), damit die
 // Buendel-Regeln und die aelteren Laufzeit-Module (kompakt.js, code-feld-unten.js)
@@ -59,7 +60,73 @@ export const REGELN = "@media (max-width:600px){"
   + "body #smejj-sitzung-abgelaufen a,body #smejj-sitzung-abgelaufen button{min-height:44px;display:inline-flex;align-items:center}"
   + "body .account-picture-choose.account-picture-choose{min-height:44px;display:inline-flex;align-items:center}"
   + "body .view .toolbar button{min-height:44px}"
+  // (8) Modell-Menue (Betreiber 17:38: "rechte Seite schneidet ab"): das Untermenue war
+  //     232-312 px breit mit nowrap und Ellipse — "smejj 1.3 — Sp…", Haken ueber dem Text.
+  //     Am Handy liegt es jetzt FEST ueber dem Dock, 16 px Rand links und rechts, Text darf
+  //     umbrechen, der Haken steht rechts in eigener Spalte.
+  + "body .model-picker .model-submenu.model-submenu{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 124px);width:auto;min-width:0;max-width:none;max-height:min(60vh,480px)}"
+  + "body .model-submenu button{white-space:normal;text-align:left;min-height:44px;display:flex;align-items:center;gap:10px}"
+  + "body .model-submenu .model-submenu-name{flex:1 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}"
+  + "body .model-submenu .model-submenu-check{flex:0 0 auto;width:20px;text-align:center}"
+  // (9) Chat wie ChatGPT/iPhone-Glas (Betreiber 17:36): kein Seitwaerts-Schieben — lange
+  //     Links und Tabellen brechen bzw. scrollen in sich; eigene Frage als Glasblase rechts
+  //     mit Blur, Antwort ohne Blase; Kopfzeile als Glasstreifen unter der Statusleiste,
+  //     damit "Arbeitsschritte" nicht mehr durch das Logo laeuft (Streifen siehe unten).
+  + "body #startLog .entry,body #codeLogHalter .entry{max-width:100%;overflow-wrap:anywhere;word-break:break-word}"
+  + "body #startLog .entry table,body #codeLogHalter .entry table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:normal}"
+  + "body #startLog .entry a{overflow-wrap:anywhere}"
+  + "body #startLog .entry.user.user{margin-left:14%;max-width:86%;border-radius:18px 18px 6px 18px;background:rgba(255,255,255,.09);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);padding:10px 14px}"
+  + "body #startLog .entry.assistant.assistant{background:transparent;border:0;padding-left:4px;padding-right:4px}"
+  + "body #start.has-start-chat #startLog.start-log{padding-top:calc(env(safe-area-inset-top,0px) + 56px);scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}"
+  + "body .mobil-kopfglas{position:fixed;top:0;left:0;right:0;height:calc(env(safe-area-inset-top,0px) + 52px);z-index:73;pointer-events:none;background:linear-gradient(180deg,rgba(7,10,14,.92) 0%,rgba(7,10,14,.72) 70%,rgba(7,10,14,0) 100%);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 70%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 70%,transparent 100%)}"
+  + "body:not(.mobil-chat-offen) .mobil-kopfglas{display:none}"
+  + "}"
+  // (10) Vollbild-Versatz der installierten App (Betreiber 17:32, iPhone, frisch installiert):
+  //      iOS legt die Layout-Flaeche oben an, rechnet sie aber um die Statusleistenhoehe
+  //      (~52 pt) zu kurz — Rahmen (body::after, inset:0) und alles mit bottom:0 enden
+  //      darueber, darunter nur Grundton. KEIN Tastatur-Fehler. misstVersatz() unten legt
+  //      den Fehlbetrag als --vollbild-fehl an; hier wird er auf Rahmen und Flaechen gerechnet.
+  + "@media (display-mode:standalone) and (max-width:600px){"
+  + "body::after{bottom:calc(-1 * var(--vollbild-fehl,0px))}"
+  + "body .workspace,body .view,body .home-feed{min-height:calc(100dvh + var(--vollbild-fehl,0px) - var(--sa-top,0px) - var(--sa-bottom,0px))}"
+  + "body #start.has-start-chat .home-feed.home-feed.home-feed,body #code.view.is-active.is-active.is-active{height:calc(100dvh + var(--vollbild-fehl,0px) - var(--sa-top,0px) - var(--sa-bottom,0px));max-height:calc(100dvh + var(--vollbild-fehl,0px) - var(--sa-top,0px) - var(--sa-bottom,0px))}"
   + "}";
+
+/** Der Fehlbetrag der Layout-Flaeche in der installierten App: Schirmhoehe minus innerHeight,
+ *  nur ohne offene Tastatur, nur hochkant, nur plausibel (0 < fehl <= 120). Reine Funktion. */
+export function misstVersatz({ standalone, schirmHoehe, schirmBreite, innerHeight, tastaturOffen }) {
+  if (!standalone || tastaturOffen) return 0;
+  if (!(schirmHoehe > schirmBreite)) return 0;
+  const fehl = Math.round(Number(schirmHoehe) - Number(innerHeight));
+  return fehl > 0 && fehl <= 120 ? fehl : 0;
+}
+
+function verdrahteVersatz(win = window, doc = document) {
+  const standalone = () => { try { return matchMedia("(display-mode: standalone)").matches || win.navigator.standalone === true; } catch { return false; } };
+  const tastatur = () => { const a = doc.activeElement; return Boolean(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.isContentEditable)); };
+  const setze = () => {
+    const fehl = misstVersatz({ standalone: standalone(), schirmHoehe: win.screen?.height || 0, schirmBreite: win.screen?.width || 0, innerHeight: win.innerHeight, tastaturOffen: tastatur() });
+    if (fehl || !tastatur()) doc.documentElement.style.setProperty("--vollbild-fehl", `${fehl}px`);
+  };
+  setze();
+  win.addEventListener("resize", () => setTimeout(setze, 120));
+  win.addEventListener("orientationchange", () => setTimeout(setze, 300));
+}
+
+/** Glasstreifen hinter Logo und Globus, nur im Chat-Zustand sichtbar (Klasse am body). */
+function verdrahteKopfglas(doc = document) {
+  if (doc.querySelector(".mobil-kopfglas")) return;
+  const streifen = doc.createElement("div");
+  streifen.className = "mobil-kopfglas";
+  streifen.setAttribute("aria-hidden", "true");
+  doc.body.appendChild(streifen);
+  const start = doc.getElementById("start");
+  const code = doc.getElementById("code");
+  const pruefe = () => doc.body.classList.toggle("mobil-chat-offen", Boolean(start?.classList.contains("has-start-chat") || code?.classList.contains("is-active")));
+  const b = new MutationObserver(pruefe);
+  for (const k of [start, code]) if (k) b.observe(k, { attributes: true, attributeFilter: ["class"] });
+  pruefe();
+}
 
 export function sorgeFuerStil(doc = document) {
   if (doc.getElementById(STIL_ID)) return false;
@@ -70,4 +137,10 @@ export function sorgeFuerStil(doc = document) {
   return true;
 }
 
-if (typeof document !== "undefined" && document.querySelector("#startMessage, #codeAufgabe")) sorgeFuerStil();
+if (typeof document !== "undefined" && document.querySelector("#startMessage, #codeAufgabe")) {
+  sorgeFuerStil();
+  verdrahteVersatz();
+  verdrahteKopfglas();
+  // Ansichten nach dem Login (Profil, Einstellungen, Verlauf, Dateien …) — eigenes Modul, ohne Marke.
+  import("/assets/mobil-ansichten.js").catch(() => {});
+}
