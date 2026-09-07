@@ -64,17 +64,21 @@ export const REGELN = "@media (max-width:600px){"
   //     232-312 px breit mit nowrap und Ellipse — "smejj 1.3 — Sp…", Haken ueber dem Text.
   //     Am Handy liegt es jetzt FEST ueber dem Dock, 16 px Rand links und rechts, Text darf
   //     umbrechen, der Haken steht rechts in eigener Spalte.
-  + "body .model-picker .model-submenu.model-submenu{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 124px);width:auto;min-width:0;max-width:none;max-height:min(60vh,480px)}"
-  + "body .model-submenu button{white-space:normal;text-align:left;min-height:44px;display:flex;align-items:center;gap:10px}"
-  + "body .model-submenu .model-submenu-name{flex:1 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}"
-  + "body .model-submenu .model-submenu-check{flex:0 0 auto;width:20px;text-align:center}"
-  //     GEMESSEN im Emulator 07.09. 19:10: das Fuenf-Zeilen-Menue der Startseite ist NICHT
-  //     .model-submenu, sondern #startModellMenue.code-modus-menue (code-modell-menue.js,
-  //     129 px breit, right/bottom als INLINE-Stil gesetzt) — darum hier mit !important.
-  + "body #startModellMenue.code-modus-menue,body #code .code-modus-menue.code-modus-menue{position:fixed!important;left:16px!important;right:16px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 124px)!important;top:auto!important;width:auto!important;min-width:0!important;max-width:none!important;max-height:min(60vh,480px);overflow-y:auto}"
-  + "body .code-modus-menue button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;white-space:normal;text-align:left}"
-  + "body .code-modus-menue .modus-links{flex:1 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}"
-  + "body .code-modus-menue .modus-rechts,body .code-modus-menue .modus-haken{flex:0 0 auto}"
+  //     GEMESSEN 07.09. 19:10 im Emulator: das Fuenf-Zeilen-Menue der Startseite ist
+  //     #startModellMenue.code-modus-menue (code-modell-menue.js): 129 px breit, Knoepfe in
+  //     zwei Spalten a 115 px, right/bottom als INLINE-Stil. position:fixed geht NICHT — der
+  //     backdrop-filter des Glases macht .prompt-glass zum Bezugsrahmen (das Menue landete bei
+  //     y=-125). Darum: der Picker wird static, das Menue liegt absolut ueber die GANZE
+  //     Glasbreite (6 px Rand), eine Spalte, Text darf umbrechen. Auf der leeren Startseite
+  //     (Glas in der Mitte) klappt es nach unten auf, im Chat (Glas unten) nach oben.
+  + "body #start .prompt-glass .model-picker.model-picker{position:static}"
+  + "body #startModellMenue.code-modus-menue,body #start .prompt-glass .model-submenu.model-submenu,body #start .prompt-glass .model-menu.model-menu{position:absolute!important;left:6px!important;right:6px!important;top:auto!important;bottom:calc(100% + 8px)!important;width:auto!important;min-width:0!important;max-width:none!important;max-height:min(50vh,420px);overflow-y:auto}"
+  + "body #startModellMenue.code-modus-menue{display:flex;flex-direction:column;flex-wrap:nowrap}"
+  + "body #start:not(.has-start-chat) #startModellMenue.code-modus-menue,body #start:not(.has-start-chat) .prompt-glass .model-menu.model-menu{top:calc(100% + 8px)!important;bottom:auto!important}"
+  + "body #startModellMenue.code-modus-menue button,body #code .code-modus-menue.code-modus-menue button,body .model-submenu button{display:flex;align-items:center;gap:10px;width:100%;flex:0 0 auto;min-height:44px;white-space:normal;text-align:left}"
+  + "body .code-modus-menue .modus-links,body .model-submenu .model-submenu-name{flex:1 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}"
+  + "body .code-modus-menue .modus-rechts,body .code-modus-menue .modus-haken,body .model-submenu .model-submenu-check{flex:0 0 auto}"
+  + "body #code .code-modus-menue.code-modus-menue{left:0!important;right:0!important;width:auto!important;min-width:0!important;display:flex;flex-direction:column;flex-wrap:nowrap}"
   // (9) Chat wie ChatGPT/iPhone-Glas (Betreiber 17:36): kein Seitwaerts-Schieben — lange
   //     Links und Tabellen brechen bzw. scrollen in sich; eigene Frage als Glasblase rechts
   //     mit Blur, Antwort ohne Blase; Kopfzeile als Glasstreifen unter der Statusleiste,
