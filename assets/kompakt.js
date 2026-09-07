@@ -40,6 +40,17 @@ export const REGELN = [
   "@media (min-width:601px) and (pointer:coarse){"
   + "body .sidebar .nav-button.nav-button,body .nav-start .nav-button.nav-button,body .sidebar .bottom-nav button,"
   + "body .browser-panel-nav button,body .spur-reiter button,body #profileDock button{min-height:44px}"
+  // Runde 3 (Rundgang Pixel Tablet 800 px nach Runde 2): Schreibfeld-Knoepfe trugen das
+  // Schreibtisch-Mass — Start-Dock 38 px (Plus, Mikrofon, Welle), Chips 34, Code-Leiste
+  // 30/32 px, Chips 19, Code-Feld 26 px, Sitzungs-Banner 21/42 px. Alles auf 44.
+  + "body #start .prompt-glass .ghost-button.icon-button,body #start .prompt-glass .send-button,"
+  + "body #start .prompt-glass .model-picker .text-chip,body #start .prompt-glass .fpille-nachdenken,"
+  + "body #code .codeleiste .icon-button,body #code .codeleiste .repochip,body #code .codeleiste .send-button,"
+  + "body #smejj-sitzung-abgelaufen a,body #smejj-sitzung-abgelaufen button{min-height:44px}"
+  + "body #start .prompt-glass .ghost-button.icon-button,body #start .prompt-glass .send-button,"
+  + "body #code .codeleiste .icon-button,body #code .codeleiste .send-button{width:44px;height:44px}"
+  + "body #code .codefeld #codeAufgabe{min-height:44px}"
+  + "body #smejj-sitzung-abgelaufen a,body #smejj-sitzung-abgelaufen button{display:inline-flex;align-items:center}"
   + "}"
 ].join("");
 
