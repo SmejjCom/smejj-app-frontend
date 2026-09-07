@@ -359,8 +359,6 @@ const SHELL = [
   "/assets/code-modell-menue.js",
   // Schlankes Dock am Handy (2026-09-07, Parallelsitzung), per import() aus chat-actions-menu.js.
   "/assets/mobil-dock.js",
-  // Ansichten nach dem Login am Handy (2026-09-07), per import() aus mobil-dock.js.
-  "/assets/mobil-ansichten.js",
   "/assets/kamera.js",
   "/assets/fuehrung.js",
   "/assets/willkommen-fokus.js",

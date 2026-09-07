@@ -685,12 +685,22 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   //
   // Ein EINZIGER Rueckfall auf die schnelle Spur bringt eine echte Antwort. Die
   // Live-Daten bleiben dabei erhalten — sie stecken schon in der Frage.
-  if (response && !response.ok && (response.status === 502 || response.status === 503)
+  // Jeder Server-Ausfall zaehlt (500/502/503/504) — nicht nur die zwei, die
+  // heute gemessen wurden. Der Rueckfall kostet eine Anfrage und kann nur
+  // helfen; bleibt auch er erfolglos, kommt unten die ehrliche Meldung.
+  if (response && !response.ok && response.status >= 500 && response.status <= 504
       && String(body?.preferences?.stufe || "") === "gruendlich") {
-    const leichter = { ...body, preferences: { ...(body.preferences || {}), stufe: "auto" } };
+    // "schnell", NICHT "auto" — das ist der Unterschied zwischen Antwort und
+    // Fehler. Die Bruecke versucht die Schnellspur nur, wenn
+    // `fastTask = stufe === "schnell" || (!coding && !shouldSearchWeb(task))`
+    // zutrifft. Bei einer Such- oder Nachrichtenfrage ist shouldSearchWeb wahr,
+    // mit "auto" bliebe fastTask also FALSCH und der Rueckfall liefe erneut in
+    // die tote tiefe Spur. "schnell" macht fastTask immer wahr, und
+    // streamFastLane gibt bei "schnell" nie ab.
+    const leichter = { ...body, preferences: { ...(body.preferences || {}), stufe: "schnell" } };
     const leichtereZiele = zieleAnpassen(url, (rumpf) => ({
       ...rumpf,
-      preferences: { ...(rumpf.preferences || {}), stufe: "auto" }
+      preferences: { ...(rumpf.preferences || {}), stufe: "schnell" }
     }));
     try {
       response = await fetchStreamWithRetry(leichtereZiele, {
