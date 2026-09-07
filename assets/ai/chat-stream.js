@@ -9,6 +9,7 @@
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
 import { fetchStreamWithRetry } from "./fetch-retry.js";
+import { API_ORIGIN } from "../config.js";
 import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js";
 import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js";
 
@@ -33,14 +34,66 @@ const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
  * @param {Storage} [storage]
  * @returns {Record<string, string>} leer, wenn keine Anmeldung vorliegt
  */
-export function bridgeAuthHeaders(storage = globalThis.localStorage) {
+export function bridgeAuthHeaders(storage) {
   try {
-    const token = storage?.getItem(AUTH_TOKEN_KEY) || "";
+    let token = "";
+    if (storage) {
+      token = storage.getItem(AUTH_TOKEN_KEY) || "";
+    } else {
+      // sessionStorage zuerst: dort liegt der frisch erneuerte kurze Ausweis
+      // (H1-Haertung, erneuereZugangsToken). localStorage haelt den durablen
+      // Login-Ausweis als Rueckfall.
+      const ss = typeof sessionStorage !== "undefined" ? sessionStorage : null;
+      const ls = typeof localStorage !== "undefined" ? localStorage : null;
+      token = (ss && ss.getItem(AUTH_TOKEN_KEY)) || (ls && ls.getItem(AUTH_TOKEN_KEY)) || "";
+    }
     return token ? { Authorization: `Bearer ${token}` } : {};
   } catch {
     // Storage gesperrt (Privatmodus): dann eben ohne Kopf.
     return {};
   }
+}
+
+// Stiller Refresh (Profi-Standard, Betreiber-Auftrag 2026-09-07): der kurze
+// Zugangs-Ausweis lebt nur 10 Minuten (ACCESS_TTL_MS), die Sitzung selbst bis
+// zu 180 Tage. Laeuft der Ausweis ab, war der Chat bisher tot ("Du bist nicht
+// mehr angemeldet"), obwohl die Sitzung noch gilt — gemessen: nur 19,7 % der
+// Anfragen kamen mit gueltigem Ausweis durch. Diese Funktion holt aus der noch
+// gueltigen Sitzung LAUTLOS einen frischen Ausweis, auf zwei Wegen:
+//   A) durabler Login-Ausweis (localStorage) -> /api/auth/me legt jeder
+//      gueltigen Antwort ein frisches Token bei (gleitende Verlaengerung),
+//   B) HttpOnly-Sitzungs-Cookie -> /api/auth/session-token.
+// Der frische Ausweis landet in sessionStorage; bridgeAuthHeaders nimmt ihn
+// dann zuerst. Gibt keine der beiden Quellen etwas her, ist der Nutzer wirklich
+// abgemeldet und bekommt den ehrlichen Anmelde-Hinweis.
+export async function erneuereZugangsToken() {
+  const merke = (token) => {
+    const wert = String(token || "");
+    if (!wert) return "";
+    try { sessionStorage.setItem(AUTH_TOKEN_KEY, wert); } catch { /* Storage gesperrt */ }
+    return wert;
+  };
+  // Weg A: durabler Ausweis aus dem Login gegen /api/auth/me.
+  try {
+    let durable = "";
+    try { durable = localStorage.getItem(AUTH_TOKEN_KEY) || ""; } catch { durable = ""; }
+    if (durable) {
+      const r = await fetch(`${API_ORIGIN}/api/auth/me`, { headers: { Authorization: `Bearer ${durable}` } });
+      if (r.ok) {
+        const d = await r.json().catch(() => ({}));
+        if (d && d.authenticated && d.accessToken) return merke(d.accessToken);
+      }
+    }
+  } catch { /* naechster Weg */ }
+  // Weg B: HttpOnly-Sitzungs-Cookie gegen /api/auth/session-token.
+  try {
+    const r = await fetch(`${API_ORIGIN}/api/auth/session-token`, { credentials: "include" });
+    if (r.ok) {
+      const d = await r.json().catch(() => ({}));
+      if (d && d.accessToken) return merke(d.accessToken);
+    }
+  } catch { /* aufgeben */ }
+  return "";
 }
 
 import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js";
@@ -584,6 +637,21 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
     output.textContent = "Verbindung zum Server unterbrochen.";
     haengeAktionsKnopf(output, "Erneut versuchen", letzteNutzerfrage(body));
     return;
+  }
+  // Abgelaufener kurzer Ausweis (401/403): LAUTLOS aus der gueltigen Sitzung
+  // einen frischen holen und die Anfrage GENAU einmal wiederholen, statt den
+  // Nutzer auszuloggen. Erst wenn auch das scheitert, kommt der Anmelde-Hinweis.
+  if (response && !response.ok && (response.status === 401 || response.status === 403)) {
+    const frisch = await erneuereZugangsToken();
+    if (frisch) {
+      try {
+        response = await fetchStreamWithRetry(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() },
+          body: JSON.stringify(body)
+        });
+      } catch { /* faellt unten in die normale Fehlermeldung */ }
+    }
   }
   if (!response.ok || !response.body) {
     stoppeWartesignal();

@@ -271,7 +271,7 @@ function handleClick(view, event) {
 // geraeumt), bleiben die uebrigen Einstellungen vollstaendig bedienbar.
 async function ladeModellBereiche(view) {
   try {
-    const cline = await import("./provider-settings.js?v=1");
+    const cline = await import("./provider-settings.js?v=2");
     cline.initClineProviderSurface(view);
   } catch {
     /* fail-safe: Einstellungen bleiben ohne diesen Bereich nutzbar */

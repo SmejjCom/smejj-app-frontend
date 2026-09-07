@@ -157,7 +157,8 @@ function installModelPickerEntry() {
 function activateClineSelection(model = localStorage.getItem(CLINE_MODEL_KEY) || "") {
   localStorage.setItem(STORAGE_KEYS.model, "Cline");
   const picker = document.querySelector("#modelPickerButton");
-  if (picker) picker.textContent = model ? `Cline · ${shortModel(model)}` : "Cline";
+  // Auto pur als "Auto" — nicht "Cline · Auto" (Betreiber-Screenshot 07.09.).
+  if (picker) picker.textContent = !model ? "Cline" : model === "auto" ? "Auto" : `Cline · ${shortModel(model)}`;
   document.dispatchEvent(new CustomEvent("smejj:cline-selected", { detail: { model } }));
 }
 

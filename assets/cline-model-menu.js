@@ -297,7 +297,8 @@ function restoreClineLabel() {
 
 function setPickerLabel(model) {
   const picker = document.querySelector("#modelPickerButton");
-  if (picker) picker.textContent = model ? `Cline · ${shortModel(model)}` : "Cline";
+  // Auto pur als "Auto" — nicht "Cline · Auto" (Betreiber-Screenshot 07.09.).
+  if (picker) picker.textContent = !model ? "Cline" : model === AUTO_MARKE ? "Auto" : `Cline · ${shortModel(model)}`;
 }
 
 function shortModel(model) {
