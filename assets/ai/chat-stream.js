@@ -627,7 +627,24 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // ab — der tiefe Weg bekam nie aktuelle Zahlen und antwortete "Ich habe
   // keinen Zugriff auf aktuelle Wetterdaten". Der Browser holt sie jetzt
   // selbst. Fail-safe: ohne Fund bleibt die Frage unveraendert.
+  const frageVorher = String(body?.task || "");
   body = await mitLiveDaten(body);
+  // UND DIE ZIELE NACHZIEHEN — sonst war die ganze Anreicherung umsonst:
+  // app.js reicht die Endpunkte als LISTE herein (buildChatTargets), und jedes
+  // Ziel traegt seinen eigenen, VOR dieser Zeile eingefrorenen Rumpf. Ohne
+  // dieses Nachziehen geht der alte Rumpf ohne Live-Daten auf die Reise
+  // (Betreiber-Gegenprobe 07.09.: "Wetter mit Nachdenken funktioniert nicht").
+  const frageNachher = String(body?.task || "");
+  if (frageNachher !== frageVorher && Array.isArray(url)) {
+    url = url.map((ziel) => {
+      if (!ziel || typeof ziel !== "object" || typeof ziel.body !== "string") return ziel;
+      try {
+        const rumpf = JSON.parse(ziel.body);
+        if (!rumpf || typeof rumpf !== "object" || !("task" in rumpf)) return ziel;
+        return { ...ziel, body: JSON.stringify({ ...rumpf, task: frageNachher }) };
+      } catch { return ziel; }
+    });
+  }
 
   // Ab dem Absenden sichtbar arbeiten — der Server meldet sich erst nach
   // gemessenen 5,75 s (siehe starteWartesignal).
