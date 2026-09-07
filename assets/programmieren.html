@@ -70,7 +70,12 @@
       .leiste nav { order: 3; width: 100%; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
       .leiste nav a { min-height: 44px; display: inline-flex; align-items: center; }
       .leiste .rechts { gap: 8px; }
-      .leiste .knopf { padding: 10px 12px; font-size: 14.5px; }
+      /* iPhone 17 Pro (402 pt, SF-Schrift, gemessen 2026-09-07 als Web-App): Logo +
+         zwei Knoepfe waren ~396 pt breit und brachen um. Roboto auf Android ist
+         schmaler (312 px) — darum fiel es dort nicht auf. Etwas kleiner, passt
+         ab 360 pt in eine Reihe. */
+      .leiste img { height: 22px; }
+      .leiste .knopf { padding: 9px 10px; font-size: 14px; }
     }
     .knopf {
       display: inline-block; padding: 10px 18px; border-radius: var(--r);
