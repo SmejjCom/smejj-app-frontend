@@ -9,6 +9,7 @@
 //     Kopfzeile, Feld und Chips
 // Ziel: halbe Abstände, gleiche Ordnung. Nur Ränder und Abstände — keine Größen von
 // Zielen (44 px bleiben), keine Schriftgrößen (große Schrift, Betreiber-Regel).
+// Einzige Ausnahme (07.09.): Touch-Ziele ÜBER 600 px werden auf 44 px angehoben, s. u.
 // Stil aus dem Modul: die Regeln liegen in start-styles.css (Start-Bündel, gesperrt).
 // Spezifität bewusst hoch (body + doppelte Klasse), damit die Bündel-Regeln verlieren.
 export const STIL_ID = "kompakt-stil";
@@ -28,7 +29,18 @@ export const REGELN = [
   "body #start .prompt-glass.prompt-glass{padding:6px 8px 6px 12px;margin-bottom:env(safe-area-inset-bottom,0px)}",
   // Die 20 px zwischen Kopfzeile, Feld und Chips sind der Raster-Abstand der Startfläche (gemessen 22:15 UTC).
   "body #start .home-feed.home-feed{gap:12px}",
-  "body #startLog.start-log{padding:4px 11px 6px}"
+  "body #startLog.start-log{padding:4px 11px 6px}",
+  // AUSNAHME von "keine Groessen von Zielen" (Betreiber 07.09., "Teste du selber, weiter";
+  // Rundgang Pixel Tablet 800 px und Handy quer 863 px): ueber 600 px gilt das
+  // Schreibtisch-Mass — Seitenleiste 36, Chat-Zeilen 28, Reiter Start/Code 42, rechte
+  // Leiste 36, Profil 42 px. Auf einem Touch-Geraet ist das zu klein (Regel 44 px).
+  // pointer:coarse trifft Tablets und gedrehte Handys, nie die Maus am Schreibtisch.
+  // Nur Mindesthoehen, keine Schrift, keine Breiten. Hier, weil dieses Modul ueberall
+  // laeuft und ohne Marke im Precache haengt (mobil-dock.js laedt nur bis 600 px).
+  "@media (min-width:601px) and (pointer:coarse){"
+  + "body .sidebar .nav-button.nav-button,body .nav-start .nav-button.nav-button,body .sidebar .bottom-nav button,"
+  + "body .browser-panel-nav button,body .spur-reiter button,body #profileDock button{min-height:44px}"
+  + "}"
 ].join("");
 
 export function sorgeFuerStil(doc = document) {

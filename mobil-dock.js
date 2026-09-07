@@ -24,6 +24,7 @@
 //       Code-Bloecke scrollen waagerecht in sich, nie die Seite.
 //   (6) Kein waagerechter Ueberlauf der Seite: overflow-x:clip auf Huelle und body
 //       (clip statt hidden — erzeugt keinen Scroll-Container, sticky bleibt heil).
+//   (7) Rest-Ziele unter 44 px: Sitzungs-Banner, Profilbild-Knopf, Werkzeug-Zeilen.
 // Stil aus dem Modul, weil die Regeln sonst in start-styles.css (Start-Buendel,
 // gesperrt) muessten. Spezifitaet bewusst hoch (body + Mehrfachklasse), damit die
 // Buendel-Regeln und die aelteren Laufzeit-Module (kompakt.js, code-feld-unten.js)
@@ -52,6 +53,12 @@ export const REGELN = "@media (max-width:600px){"
   // (5) Verlauf scrollt in sich, weich und ohne Durchreichen
   + "body #start.has-start-chat #startLog.start-log,body #code #codeLogHalter.code-log-halter{overflow-y:auto;overscroll-behavior:contain;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}"
   + "body .start-log .entry pre,body .code-log-halter pre,body .start-log .entry .chat-table-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}"
+  // (7) Rest-Ziele unter 44 px (Rundgang 07.09., Pixel 7): Sitzungs-Banner "Neu anmelden"/
+  //     "Spaeter" 42 px (auth-gate.js, Inline-Stil), Profilbild "Bild auswaehlen" 28x26,
+  //     Werkzeug-Zeilen in Systemzustand/Kosten 42 px.
+  + "body #smejj-sitzung-abgelaufen a,body #smejj-sitzung-abgelaufen button{min-height:44px;display:inline-flex;align-items:center}"
+  + "body .account-picture-choose.account-picture-choose{min-height:44px;display:inline-flex;align-items:center}"
+  + "body .view .toolbar button{min-height:44px}"
   + "}";
 
 export function sorgeFuerStil(doc = document) {
