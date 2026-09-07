@@ -68,6 +68,13 @@ export const REGELN = "@media (max-width:600px){"
   + "body .model-submenu button{white-space:normal;text-align:left;min-height:44px;display:flex;align-items:center;gap:10px}"
   + "body .model-submenu .model-submenu-name{flex:1 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}"
   + "body .model-submenu .model-submenu-check{flex:0 0 auto;width:20px;text-align:center}"
+  //     GEMESSEN im Emulator 07.09. 19:10: das Fuenf-Zeilen-Menue der Startseite ist NICHT
+  //     .model-submenu, sondern #startModellMenue.code-modus-menue (code-modell-menue.js,
+  //     129 px breit, right/bottom als INLINE-Stil gesetzt) — darum hier mit !important.
+  + "body #startModellMenue.code-modus-menue,body #code .code-modus-menue.code-modus-menue{position:fixed!important;left:16px!important;right:16px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 124px)!important;top:auto!important;width:auto!important;min-width:0!important;max-width:none!important;max-height:min(60vh,480px);overflow-y:auto}"
+  + "body .code-modus-menue button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;white-space:normal;text-align:left}"
+  + "body .code-modus-menue .modus-links{flex:1 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}"
+  + "body .code-modus-menue .modus-rechts,body .code-modus-menue .modus-haken{flex:0 0 auto}"
   // (9) Chat wie ChatGPT/iPhone-Glas (Betreiber 17:36): kein Seitwaerts-Schieben — lange
   //     Links und Tabellen brechen bzw. scrollen in sich; eigene Frage als Glasblase rechts
   //     mit Blur, Antwort ohne Blase; Kopfzeile als Glasstreifen unter der Statusleiste,
