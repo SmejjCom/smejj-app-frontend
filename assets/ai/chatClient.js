@@ -40,6 +40,11 @@ function holeZugriffsToken() {
   try {
     const eigenes = sessionStorage.getItem(API_TOKEN_KEY);
     if (eigenes) return eigenes;
+    // Frisch erneuerter kurzer Ausweis (stiller Refresh in chat-stream.js und
+    // modellRouter.js, 2026-09-07) — er liegt in sessionStorage und schlaegt
+    // den durablen Login-Ausweis, der nach 10 Minuten abgelaufen sein kann.
+    const frisch = sessionStorage.getItem(AUTH_TOKEN_KEY);
+    if (frisch) return frisch;
   } catch { /* Speicher gesperrt: unten weiterversuchen */ }
   try {
     return localStorage.getItem(AUTH_TOKEN_KEY) || "";
@@ -287,16 +292,28 @@ async function runClineChat({ task, output, offlineNotice, clearThinking = () =>
     if (autoAktiv()) {
       const wahl = await sorgeFuerModell(task, { dateien: contextFiles?.length || 0 });
       if (!wahl.ok) {
-        clearThinking();
-        output.textContent = "Automatische Modellwahl hat nicht geklappt — bitte ein Modell von Hand waehlen.";
-        return true;
+        // Betreiber 2026-09-07 (iPhone-Screenshots, fuenfmal "Automatische
+        // Modellwahl hat nicht geklappt — bitte ein Modell von Hand waehlen"):
+        // Auto darf nie in einer Sackgasse enden. Abgelaufene Anmeldung wird
+        // ehrlich gesagt; alles andere (kein Cline-Schluessel, Netz, fremdes
+        // Modell) geht lautlos den Server-Weg mit dem Haus-Modell —
+        // false heisst fuer runClientChat "nicht erledigt, Server uebernimmt".
+        if (wahl.fehler === "anmeldung") {
+          clearThinking();
+          output.textContent = nichtAngemeldetText();
+          return true;
+        }
+        return false;
       }
     }
+    // Nach der Modellwahl den Ausweis NEU lesen: sorgeFuerModell kann ihn
+    // gerade erneuert haben — der oben gelesene waere dann der abgelaufene.
+    const ausweis = holeZugriffsToken() || token;
     const response = await fetch(`${API_ORIGIN}/api/providers/cline/chat`, {
       method: "POST",
       credentials: "include",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${ausweis}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ messages: buildMessages(task, offlineNotice, contextFiles) })

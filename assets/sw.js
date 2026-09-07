@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v794";
+const CACHE_NAME = "smejj-shell-v795";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -376,6 +376,8 @@ const SHELL = [
   "/assets/composer-zeile.js",
   "/assets/verlauf-unten.js",
   "/assets/code-feld-unten.js",
+  // Schlankes Dock am Handy (2026-09-07), per import() aus chat-actions-menu.js.
+  "/assets/mobil-dock.js",
   "/assets/chat-code-copy.js",
   // Sieben Module, die index.html per <script> laedt und die bis 2026-08-22
   // hier fehlten. Offline lieferte der Fetch-Handler dafuer die index.html
