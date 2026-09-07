@@ -142,28 +142,99 @@ export async function sorgeFuerModell(auftrag, lage = {}) {
   // Steht dieses Modell serverseitig schon, spart der Auftrag den ganzen
   // Rundlauf — gemessen 1,07 s von 1,87 s bis zum ersten Wort.
   if (gemerktesModell() === wahl.modell) return { ok: true, ...wahl, uebersprungen: true };
-  const token = sessionStorage.getItem(TOKEN_KEY)
-    || localStorage.getItem("smejj.auth.accessToken.v1") || "";
+  const setze = (token) => fetch(`${API_ORIGIN}/api/providers/cline/select`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: JSON.stringify({ model: wahl.modell })
+  });
   try {
-    const antwort = await fetch(`${API_ORIGIN}/api/providers/cline/select`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      body: JSON.stringify({ model: wahl.modell })
-    });
+    let antwort = await setze(leseAusweis());
+    // Abgelaufener kurzer Ausweis (10 Minuten): GENAU einmal lautlos erneuern und
+    // wiederholen — derselbe Weg wie in chat-stream.js. Bis 2026-09-07 las diese
+    // Stelle nur den ALTEN Ausweis aus localStorage; der frische lag ungenutzt in
+    // sessionStorage, und jede Auto-Anfrage endete nach 10 Minuten mit
+    // "Automatische Modellwahl hat nicht geklappt" (Betreiber-Screenshots).
+    if (antwort.status === 401 || antwort.status === 403) {
+      const frisch = await erneuereAusweis();
+      if (frisch) antwort = await setze(frisch);
+    }
+    if (antwort.status === 401 || antwort.status === 403) {
+      merkeGesetztesModell("");
+      return { ok: false, ...wahl, fehler: "anmeldung" };
+    }
+    // 409 cline_not_configured: kein Cline-Schluessel hinterlegt. Kein Fall fuer
+    // "von Hand waehlen" — der Aufrufer geht den Server-Weg (Haus-Modell).
+    if (antwort.status === 409) {
+      merkeGesetztesModell("");
+      return { ok: false, ...wahl, fehler: "nicht-eingerichtet", ausweichen: true };
+    }
     if (!antwort.ok) throw new Error(`select_${antwort.status}`);
     const nutzlast = await antwort.json().catch(() => ({}));
     // Nicht der Absendung glauben, sondern dem, was der Server zurueckmeldet.
     if (nutzlast.selectedModel && nutzlast.selectedModel !== wahl.modell) {
       merkeGesetztesModell("");
-      return { ok: false, ...wahl, tatsaechlich: nutzlast.selectedModel };
+      return { ok: false, ...wahl, tatsaechlich: nutzlast.selectedModel, ausweichen: true };
     }
     merkeGesetztesModell(wahl.modell);
     return { ok: true, ...wahl };
   } catch {
-    // Fehlschlag ist NICHT still: der Aufrufer laesst den Auftrag dann mit dem
-    // zuletzt gesetzten Modell laufen und sagt es dem Nutzer.
+    // Fehlschlag ist NICHT still: der Aufrufer nimmt den Server-Weg, und der
+    // sagt dem Nutzer ehrlich, wenn auch der nicht antwortet.
     merkeGesetztesModell("");
-    return { ok: false, ...wahl };
+    return { ok: false, ...wahl, fehler: "netz", ausweichen: true };
   }
+}
+
+// Gleicher Schluessel wie in chat-stream.js, auth-gate.js, account-sessions.js —
+// bewusst dupliziert, damit dieses Modul kein anderes nur wegen einer
+// Zeichenkette laden muss (Markenkette, zweite Modulinstanz).
+const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
+
+/**
+ * Welcher Ausweis geht mit? Reihenfolge wie im Rest der App:
+ *   1. frisch erneuerter kurzer Ausweis (sessionStorage, stiller Refresh)
+ *   2. eigener API-Schluessel des Nutzers (sessionStorage)
+ *   3. durabler Login-Ausweis (localStorage)
+ */
+export function leseAusweis(ss = typeof sessionStorage !== "undefined" ? sessionStorage : null,
+  ls = typeof localStorage !== "undefined" ? localStorage : null) {
+  const lese = (speicher, schluessel) => { try { return (speicher && speicher.getItem(schluessel)) || ""; } catch { return ""; } };
+  return lese(ss, AUTH_TOKEN_KEY) || lese(ss, TOKEN_KEY) || lese(ls, AUTH_TOKEN_KEY) || "";
+}
+
+/**
+ * Stiller Refresh (Profi-Standard, Betreiber-Auftrag 2026-09-07): holt aus der
+ * noch gueltigen Sitzung einen frischen kurzen Ausweis — Weg A ueber den
+ * durablen Login-Ausweis gegen /api/auth/me (gleitende Verlaengerung), Weg B
+ * ueber das HttpOnly-Sitzungs-Cookie gegen /api/auth/session-token. Der
+ * frische Ausweis landet in sessionStorage, wo chat-stream.js UND chatClient.js
+ * ihn zuerst lesen. Leer = wirklich abgemeldet.
+ */
+export async function erneuereAusweis(fetchImpl = fetch) {
+  const merke = (token) => {
+    const wert = String(token || "");
+    if (!wert) return "";
+    try { sessionStorage.setItem(AUTH_TOKEN_KEY, wert); } catch { /* Speicher gesperrt */ }
+    return wert;
+  };
+  try {
+    let durable = "";
+    try { durable = localStorage.getItem(AUTH_TOKEN_KEY) || ""; } catch { durable = ""; }
+    if (durable) {
+      const r = await fetchImpl(`${API_ORIGIN}/api/auth/me`, { headers: { Authorization: `Bearer ${durable}` } });
+      if (r.ok) {
+        const d = await r.json().catch(() => ({}));
+        if (d && d.authenticated && d.accessToken) return merke(d.accessToken);
+      }
+    }
+  } catch { /* naechster Weg */ }
+  try {
+    const r = await fetchImpl(`${API_ORIGIN}/api/auth/session-token`, { credentials: "include" });
+    if (r.ok) {
+      const d = await r.json().catch(() => ({}));
+      if (d && d.accessToken) return merke(d.accessToken);
+    }
+  } catch { /* aufgeben */ }
+  return "";
 }

@@ -67,6 +67,7 @@
       color: var(--ink);
       font: 16.5px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
+      min-height: 100dvh; /* dvh: echte Flaeche ohne Adressleiste; vh bleibt als Rueckfall */
     }
     a { color: inherit; }
     .leiste {
@@ -143,7 +144,9 @@
       border: 0; cursor: pointer; width: 38px; height: 38px; border-radius: 999px;
       background: #f2f5f4; color: #0b1418; font-size: 17px; font-weight: 700;
     }
-    .probier-zeile { font-size: 14px; color: var(--ink-dim); margin-top: 10px; }
+    /* .held p (0,1,1) schlug die Klassenregel (0,1,0) und nahm der Zeile ihren Abstand —
+       im Pixel-7-Emulator (2026-09-07) klebte der Satz am Probier-Feld. */
+    .probier-zeile, .held .probier-zeile { font-size: 14px; color: var(--ink-dim); margin-top: 12px; }
     .held { max-width: 860px; margin: 0 auto; padding: 72px 22px 40px; text-align: center; }
     .held .vertrauen {
       display: inline-block; padding: 6px 14px; border-radius: 999px;

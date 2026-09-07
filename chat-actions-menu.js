@@ -37,6 +37,8 @@ if (typeof document !== "undefined") {
   // Woerter unter den Symbolen (UI/UX 02.09., Nr. 4) und Werkzeugzeile in einer Zeile (03.09.) — nur am Handy.
   beiHandy(() => import("/assets/chat-actions-woerter.js").catch(() => {}));
   beiHandy(() => import("/assets/composer-zeile.js").catch(() => {}));
+  // Schlankes Dock am Handy (Betreiber 07.09.: Safe-Area nur einmal, Code-Leiste eine Zeile, Felder bis 5 Zeilen) — nur am Handy.
+  beiHandy(() => import("/assets/mobil-dock.js").catch(() => {}));
   // Verlauf steht nach dem Oeffnen ganz unten (Betreiber-Befund 03.09.) — erst, wenn ein Chat im Log steht.
   beiKindern(document.getElementById("startLog"), () => import("/assets/verlauf-unten.js").catch(() => {}));
   // Code-Bereich: Schreibfeld am unteren Rand (Betreiber-Befund 03.09.) — erst im Code-Bereich.
