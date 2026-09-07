@@ -266,17 +266,17 @@
     // Alle Stile sind eingebettet (ein <style>-Element ist keine CSP-Frage).
     var zeigerStil = document.createElement("style");
     zeigerStil.textContent = [
-      ".bp-zeiger{position:absolute;left:0;top:0;width:22px;height:28px;pointer-events:none;z-index:6;opacity:0;transition:transform .4s cubic-bezier(.2,.7,.2,1),opacity .2s ease;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}",
+      ".bp-zeiger{position:absolute;left:0;top:0;width:26px;height:26px;pointer-events:none;z-index:6;opacity:0;transition:transform .4s cubic-bezier(.2,.7,.2,1),opacity .2s ease;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}",
       ".bp-zeiger.ist-da{opacity:1}",
-      ".bp-zeiger svg{display:block;width:22px;height:28px}",
-      ".bp-ring{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border:3px solid #1a73e8;border-radius:50%;pointer-events:none;z-index:5;opacity:0;transform:scale(.3)}",
+      ".bp-zeiger svg{display:block;width:26px;height:26px}",
+      ".bp-ring{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border:3px solid #02fdfd;border-radius:50%;pointer-events:none;z-index:5;opacity:0;transform:scale(.3)}",
       ".bp-ring.ist-an{animation:bpRing .55s ease-out 1}",
       "@keyframes bpRing{0%{opacity:.95;transform:scale(.3)}100%{opacity:0;transform:scale(1.15)}}",
-      ".bp-marke{position:absolute;box-sizing:border-box;pointer-events:none;z-index:4;opacity:0;transition:opacity .15s ease;border:2px solid #1a73e8;background:rgba(26,115,232,.12)}",
+      ".bp-marke{position:absolute;box-sizing:border-box;pointer-events:none;z-index:4;opacity:0;transition:opacity .15s ease;border:2px solid #02fdfd;background:rgba(2,253,253,.12)}",
       ".bp-marke.ist-an{opacity:1}",
       ".bp-marke.ist-tippen{animation:bpTippen 1s ease-in-out 2}",
-      ".bp-marke.ist-lesen{border-style:dashed;background:rgba(26,115,232,.06)}",
-      "@keyframes bpTippen{0%,100%{box-shadow:0 0 0 0 rgba(26,115,232,.5)}50%{box-shadow:0 0 0 6px rgba(26,115,232,0)}}",
+      ".bp-marke.ist-lesen{border-style:dashed;background:rgba(2,253,253,.06)}",
+      "@keyframes bpTippen{0%,100%{box-shadow:0 0 0 0 rgba(2,253,253,.55)}50%{box-shadow:0 0 0 6px rgba(2,253,253,0)}}",
       ".bp-hinweis{position:absolute;left:50%;top:10px;transform:translateX(-50%);padding:6px 12px;background:rgba(16,17,19,.86);color:#f6f3ee;font:600 13px/1.3 system-ui,-apple-system,sans-serif;pointer-events:none;z-index:7;opacity:0;transition:opacity .15s ease;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis}",
       ".bp-hinweis.ist-an{opacity:1}",
       ".bp-scrollpfeil{position:absolute;right:14px;top:50%;width:34px;height:34px;margin-top:-17px;background:rgba(16,17,19,.82);color:#f6f3ee;font:700 20px/34px system-ui,sans-serif;text-align:center;pointer-events:none;z-index:7;opacity:0;transition:opacity .15s ease}",
@@ -289,7 +289,10 @@
     var zeiger = document.createElement("div");
     zeiger.className = "bp-zeiger";
     zeiger.setAttribute("aria-hidden", "true");
-    zeiger.innerHTML = '<svg viewBox="0 0 22 28"><path d="M2 2l7 22 3.2-8.2L20 12.6z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+    // DER EINE ZEIGER (Betreiber 2026-09-07): dieselbe Form und Farbe wie unser
+    // Maus-Zeichen icons/maus-zeiger.svg — Logo-Tuerkis #02fdfd mit dunklem
+    // Rand, damit er auf hellen wie dunklen Seiten sichtbar bleibt.
+    zeiger.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 2.6 L18.4 12.9 L12.2 13.6 L15.1 20.1 L12.3 21.4 L9.4 14.9 L5 19.1 Z" fill="#02fdfd" stroke="#0b2b2b" stroke-width="1.2" stroke-linejoin="round"/></svg>';
     var ring = document.createElement("div");
     ring.className = "bp-ring";
     var marke = document.createElement("div");

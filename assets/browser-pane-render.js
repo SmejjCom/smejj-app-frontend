@@ -107,7 +107,7 @@ export function buildErrorPageHtml({ url = "", grund = "" } = {}) {
        Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
        hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
        unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
-  <script src="/assets/browser-stage.js?v=6"></script>
+  <script src="/assets/browser-stage.js?v=7"></script>
 </body>
 </html>`;
 }
@@ -179,7 +179,7 @@ export function buildRemoteBrowserHtml({ url, title, screenshot, reason = "", ca
        Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
        hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
        unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
-  <script src="/assets/browser-stage.js?v=6"></script>
+  <script src="/assets/browser-stage.js?v=7"></script>
 </body>
 </html>`;
 }
@@ -261,7 +261,7 @@ export function buildLiveBrowserHtml({ url, title, screenshot, viewport = {} } =
        Einbetters (script-src 'self', kein unsafe-inline) — Inline-Skripte
        hier sterben STUMM. Live gemessen 2026-08-19: Buehne/Worker/Fehlerseite
        unbedienbar. Nie wieder ein Skript-Element ohne src in diese Vorlagen. -->
-  <script src="/assets/browser-stage.js?v=6"></script>
+  <script src="/assets/browser-stage.js?v=7"></script>
 </body>
 </html>`;
 }
@@ -292,7 +292,7 @@ export function buildPaneShellHtml({ neuerTabTitel = "Neuer Tab", maxTabs = 100 
       <div class="bp-tabs"></div>
       <div class="bp-tab-right">
         <button class="bp-maus" type="button" title="Maus beauftragen — sie bedient diesen Browser" aria-label="Maus beauftragen">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l6.5 17 2.5-7 7-2.5z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="5"/><path d="M12 7v3"/></svg>
         </button>
         <span class="bp-tab-spacer" aria-hidden="true"></span>
       </div>

@@ -7,7 +7,7 @@
 // Zustand traegt (sessionClient, refs, Zeichnen, Speichern), kommt als
 // Baustein herein — dasselbe Muster wie browser-pane-tableiste.js. Dadurch
 // bleibt die Familie ohne DOM testbar.
-import { buildLiveBrowserHtml, buildRemoteBrowserHtml } from "./browser-pane-render.js?v=browser-pane-20260906-5";
+import { buildLiveBrowserHtml, buildRemoteBrowserHtml } from "./browser-pane-render.js?v=browser-pane-20260906-6";
 import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260820-2";
 
 export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbackFrame, commitHistory, showHint, persistTabs, render }) {
@@ -36,7 +36,7 @@ export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbac
     });
     tab.status = "ready";
     commitHistory(tab, tab.url, push);
-    showHint("Live-Browser verbunden — klicken, tippen und scrollen wie in Chrome.");
+    // KEIN Hinweis mehr (Betreiber 2026-09-07): die Seite steht da — das ist die Meldung.
     persistTabs();
     render();
     return true;
@@ -75,7 +75,7 @@ export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbac
     });
     tab.status = "ready";
     commitHistory(tab, tab.url, push);
-    showHint("Remote-Browser-Worker hat die Seite gerendert.");
+    // KEIN Hinweis mehr — Erfolg zeigt sich an der Seite selbst.
     persistTabs();
     render();
     return true;

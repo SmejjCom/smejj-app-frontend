@@ -12,13 +12,13 @@
 // abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
 // instanzen mit getrennten CLIENT_ROUTES.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260906-5";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260906-6";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
   buildRemoteBrowserHtml
-} from "./browser-pane-render.js?v=browser-pane-20260906-5";
-export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260906-5";
+} from "./browser-pane-render.js?v=browser-pane-20260906-6";
+export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260906-6";
 import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260906-4";
 // Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
@@ -36,7 +36,7 @@ import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser
 // gemeldet: alle pruefen den QUELLTEXT, keiner laesst das Modul laufen.
 import { baueNachrichtenEmpfang } from "./browser-pane-nachrichten.js?v=browser-pane-20260709-2";
 let suche = null;
-import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260906-5";
+import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260906-6";
 // Reine Helfer (2026-08-19 ausgelagert, 800-Zeilen-Regel). Sie werden hier
 // zugleich WEITER EXPORTIERT, damit tests/browser-pane.test.mjs und jeder
 // bisherige Aufrufer sie unveraendert von browser-pane.js bekommt.
@@ -740,10 +740,16 @@ export function render() {
   }
 }
 
+let hintUhr = 0;
 function showHint(text) {
   if (!refs.hint) return;
   refs.hint.textContent = text || "";
   refs.hint.hidden = !text;
+  // Von selbst wieder weg (Betreiber-Bild 2026-09-07): ein Hinweis ist eine
+  // Meldung, kein Dauerzustand. Wer laenger lesen will, hat sechs Sekunden;
+  // Maus-Fortschritt schreibt ohnehin jede Zeile neu.
+  clearTimeout(hintUhr);
+  if (text) hintUhr = setTimeout(() => { if (refs.hint.textContent === text) refs.hint.hidden = true; }, 6000);
 }
 
 // --- Persistenz ---------------------------------------------------------------

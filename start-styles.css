@@ -1510,6 +1510,13 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   background-position: center;
   background-size: 20px 20px;
 }
+/* WEG (Betreiber-Bild 2026-09-07, "drei Mauszeiger"): der Wiedergabe-Knopf
+   neben dem Globus sah aus wie ein zweiter Zeiger. Die Maus laeuft laengst im
+   Panel (Knopf in der Tableiste, Chat-Vorlage); die alte Wiedergabe braucht
+   keinen eigenen Knopf mehr. Der Zeiger gehoert allein der Maus. */
+#mausButton {
+  display: none !important;
+}
 #mausButton img {
   display: none;
 }
