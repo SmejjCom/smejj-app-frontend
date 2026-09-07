@@ -25,7 +25,7 @@
 //   (6) Kein waagerechter Ueberlauf der Seite: overflow-x:clip auf Huelle und body
 //       (clip statt hidden — erzeugt keinen Scroll-Container, sticky bleibt heil).
 //   (7) Rest-Ziele unter 44 px: Sitzungs-Banner, Profilbild-Knopf, Werkzeug-Zeilen.
-//   (8) Modell-Menue volle Breite, (9) Chat-Glas ohne Seitwaerts-Schieben, (10) Vollbild-Versatz.
+//   (8) Modell-Menue volle Breite, (9) Chat-Glas ohne Seitwaerts-Schieben, (10) Vollbild-Rahmen bis zur sichtbaren Unterkante.
 // Stil aus dem Modul, weil die Regeln sonst in start-styles.css (Start-Buendel,
 // gesperrt) muessten. Spezifitaet bewusst hoch (body + Mehrfachklasse), damit die
 // Buendel-Regeln und die aelteren Laufzeit-Module (kompakt.js, code-feld-unten.js)
@@ -101,31 +101,30 @@ export const REGELN = "@media (max-width:600px){"
   //      rutschte unter den Schirm. Also: 100dvh war schon die VOLLE Hoehe (852), nur der
   //      Layout-Viewport fuer position:fixed ist kurz (800). Der Fehlbetrag gilt darum NUR
   //      fuer fixe Elemente (Rahmen) — die dvh-Flaechen bleiben unangetastet.
+  //      BEFUND Betreiber 08.09. 01:49 (SW v807): nach Tastatur auf/zu war der Balken wieder da —
+  //      innerHeight ist in der iOS-App KEIN verlaesslicher Massstab (mal 800, mal 852, je nach
+  //      Tastatur-Historie). Verlaesslich ist die SICHTBARE Flaeche: visualViewport.offsetTop +
+  //      visualViewport.height. Der Rahmen bekommt darum eine feste Hoehe bis zur sichtbaren
+  //      Unterkante (--vv-unten) statt bottom:0 — bei offener Tastatur endet er an der Tastatur.
   + "@media (display-mode:standalone) and (max-width:600px){"
-  + "body::after{bottom:calc(-1 * var(--vollbild-fehl,0px))}"
+  + "body::after{top:0;bottom:auto;height:var(--vv-unten,100%)}"
   + "}";
 
-/** Der Fehlbetrag der Layout-Flaeche in der installierten App: Schirmhoehe minus innerHeight,
- *  nur ohne offene Tastatur, nur hochkant, nur plausibel (0 < fehl <= 120). Reine Funktion. */
-export function misstVersatz({ standalone, apple, schirmHoehe, schirmBreite, innerHeight, tastaturOffen }) {
-  // NUR WebKit auf Apple: in der Android-App (TWA) ist screen.height - innerHeight die
-  // normale Status- und Navigationsleiste (Pixel 7: 915 - 839 = 76) — kein Fehler,
-  // dort darf nichts verschoben werden.
-  if (!standalone || !apple || tastaturOffen) return 0;
-  if (!(schirmHoehe > schirmBreite)) return 0;
-  const fehl = Math.round(Number(schirmHoehe) - Number(innerHeight));
-  return fehl > 0 && fehl <= 120 ? fehl : 0;
+/** Sichtbare Unterkante in px vom oberen Rand (visualViewport), gerundet; 0 = unbekannt. Reine Funktion. */
+export function sichtbareUnterkante({ offsetTop, height }) {
+  const unten = Math.round(Number(offsetTop || 0) + Number(height || 0));
+  return unten > 0 && Number.isFinite(unten) ? unten : 0;
 }
 
 function verdrahteVersatz(win = window, doc = document) {
-  const standalone = () => { try { return matchMedia("(display-mode: standalone)").matches || win.navigator.standalone === true; } catch { return false; } };
-  const tastatur = () => { const a = doc.activeElement; return Boolean(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.isContentEditable)); };
+  const vv = win.visualViewport;
   const setze = () => {
-    const apple = /iPhone|iPad|iPod/.test(win.navigator?.userAgent || "") || /Apple/.test(win.navigator?.vendor || "");
-    const fehl = misstVersatz({ standalone: standalone(), apple, schirmHoehe: win.screen?.height || 0, schirmBreite: win.screen?.width || 0, innerHeight: win.innerHeight, tastaturOffen: tastatur() });
-    if (fehl || !tastatur()) doc.documentElement.style.setProperty("--vollbild-fehl", `${fehl}px`);
+    const unten = vv ? sichtbareUnterkante(vv) : 0;
+    if (unten) doc.documentElement.style.setProperty("--vv-unten", `${unten}px`);
+    else doc.documentElement.style.removeProperty("--vv-unten");
   };
   setze();
+  if (vv) { vv.addEventListener("resize", setze); vv.addEventListener("scroll", setze); }
   win.addEventListener("resize", () => setTimeout(setze, 120));
   win.addEventListener("orientationchange", () => setTimeout(setze, 300));
 }
