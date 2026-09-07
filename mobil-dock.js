@@ -25,7 +25,8 @@
 //   (6) Kein waagerechter Ueberlauf der Seite: overflow-x:clip auf Huelle und body
 //       (clip statt hidden — erzeugt keinen Scroll-Container, sticky bleibt heil).
 //   (7) Rest-Ziele unter 44 px: Sitzungs-Banner, Profilbild-Knopf, Werkzeug-Zeilen.
-//   (8) Modell-Menue volle Breite, (9) Chat-Glas ohne Seitwaerts-Schieben, (10) Vollbild-Rahmen bis zur sichtbaren Unterkante.
+//   (8) Modell-Menue volle Breite, (9) Chat-Glas ohne Seitwaerts-Schieben, (10) Vollbild-Rahmen bis zur sichtbaren Unterkante,
+//   (11) Feld buendig an der Tastatur (Sicherheitsrand nur ohne Tastatur).
 // Stil aus dem Modul, weil die Regeln sonst in start-styles.css (Start-Buendel,
 // gesperrt) muessten. Spezifitaet bewusst hoch (body + Mehrfachklasse), damit die
 // Buendel-Regeln und die aelteren Laufzeit-Module (kompakt.js, code-feld-unten.js)
@@ -108,7 +109,41 @@ export const REGELN = "@media (max-width:600px){"
   //      Unterkante (--vv-unten) statt bottom:0 — bei offener Tastatur endet er an der Tastatur.
   + "@media (display-mode:standalone) and (max-width:600px){"
   + "body::after{top:0;bottom:auto;height:var(--vv-unten,100%)}"
+  + "}"
+  // (11) Feld buendig an der Tastatur (Betreiber 08.09. 01:44, Punkt 7): bei offener Tastatur
+  //      blieb der untere Sicherheitsrand (34 pt Home-Balken) als Luecke zwischen Feld und
+  //      Tastatur stehen — die Tastatur verdeckt den Balken laengst. Solange ein Feld den
+  //      Fokus hat UND die sichtbare Flaeche kuerzer ist als der Schirm (echte Bildschirm-
+  //      tastatur, keine Hardware-Tastatur), traegt <html> die Klasse tastatur-offen: der
+  //      Rand faellt auf null, --sa-bottom ebenso (Flaechenhoehe in mobil-composer.css).
+  + "@media (max-width:600px){"
+  + "html.tastatur-offen{--sa-bottom:0px}"
+  + "html.tastatur-offen main.shell.shell{padding-bottom:0}"
+  + "html.tastatur-offen #start .prompt-glass.prompt-glass.prompt-glass,html.tastatur-offen #code .codeunten.codeunten.codeunten{margin-bottom:0;padding-bottom:0}"
   + "}";
+
+/** Ist die Bildschirmtastatur offen? Fokus in einem Feld UND sichtbare Flaeche deutlich kuerzer
+ *  als der Schirm (Hardware-Tastatur laesst die Flaeche voll). Reine Funktion. */
+export function tastaturOffen({ fokusImFeld, sichtbarUnten, schirmHoehe }) {
+  if (!fokusImFeld) return false;
+  const schirm = Number(schirmHoehe) || 0;
+  const unten = Number(sichtbarUnten) || 0;
+  if (!schirm || !unten) return Boolean(fokusImFeld);
+  return unten < schirm - 80;
+}
+
+function verdrahteTastatur(win = window, doc = document) {
+  const vv = win.visualViewport;
+  const imFeld = () => { const a = doc.activeElement; return Boolean(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.isContentEditable)); };
+  const setze = () => {
+    const offen = tastaturOffen({ fokusImFeld: imFeld(), sichtbarUnten: vv ? sichtbareUnterkante(vv) : 0, schirmHoehe: win.screen?.height || win.innerHeight });
+    doc.documentElement.classList.toggle("tastatur-offen", offen);
+  };
+  doc.addEventListener("focusin", () => setTimeout(setze, 60), true);
+  doc.addEventListener("focusout", () => setTimeout(setze, 120), true);
+  if (vv) vv.addEventListener("resize", setze);
+  setze();
+}
 
 /** Sichtbare Unterkante in px vom oberen Rand (visualViewport), gerundet; 0 = unbekannt. Reine Funktion. */
 export function sichtbareUnterkante({ offsetTop, height }) {
@@ -156,6 +191,7 @@ export function sorgeFuerStil(doc = document) {
 if (typeof document !== "undefined" && document.querySelector("#startMessage, #codeAufgabe")) {
   sorgeFuerStil();
   verdrahteVersatz();
+  verdrahteTastatur();
   verdrahteKopfglas();
   // Ansichten nach dem Login (Profil, Einstellungen, Verlauf, Dateien …) — eigenes Modul, ohne Marke.
   import("/assets/mobil-ansichten.js").catch(() => {});
