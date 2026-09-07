@@ -88,6 +88,13 @@
        440 px breit — "Herunterladen" und "Hilfe" hingen rechts aus dem Bild.
        Unter 640 px: Logo + Knöpfe in Reihe 1, die Bereichs-Links als eigene,
        umbrechende Reihe darunter. Nichts wird versteckt, nichts ragt hinaus. */
+    /* Tablet hoch (gemessen 2026-09-07: Pixel Tablet 800 px, iPad Pro 11 834 pt):
+       Logo + fuenf Links + zwei Knoepfe sind bis ~850 px zu breit fuer EINE Reihe,
+       die Knoepfe rutschten allein in eine zweite. Ab hier bekommen die Links
+       ihre eigene Reihe unter Logo und Knoepfen — wie auf dem Handy. */
+    @media (max-width: 900px) {
+      .leiste nav { order: 3; width: 100%; flex-wrap: wrap; gap: 6px 14px; }
+    }
     @media (max-width: 640px) {
       /* Anfänger-Handy: alle Ziele der Probier-Zeile mindestens 44 px (UI/UX-Programm 02.09.) */
       .probier { padding: 8px 10px; }

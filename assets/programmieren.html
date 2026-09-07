@@ -65,6 +65,13 @@
        war 439 px breit — "Hilfe" hing rechts aus dem Bild, "Für Programmierer"
        brach zweizeilig um. Dieselbe Regel wie auf willkommen.html: Logo + Knoepfe
        in Reihe 1, die Bereichs-Links als eigene, umbrechende Reihe darunter. */
+    /* Tablet hoch (gemessen 2026-09-07: Pixel Tablet 800 px, iPad Pro 11 834 pt):
+       Logo + fuenf Links + zwei Knoepfe sind bis ~850 px zu breit fuer EINE Reihe,
+       die Knoepfe rutschten allein in eine zweite. Ab hier bekommen die Links
+       ihre eigene Reihe unter Logo und Knoepfen — wie auf dem Handy. */
+    @media (max-width: 900px) {
+      .leiste nav { order: 3; width: 100%; flex-wrap: wrap; gap: 6px 14px; }
+    }
     @media (max-width: 640px) {
       .leiste { gap: 10px 12px; padding: calc(12px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-right, 0px)) 12px calc(16px + env(safe-area-inset-left, 0px)); }
       .leiste nav { order: 3; width: 100%; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
