@@ -12,7 +12,13 @@
 // Streams. Ausgeliefert wird weiterhin EINE Datei; das Buendeln uebernimmt
 // scripts/deploy/bundle_chat_bridge.mjs.
 
-const WEATHER_TIMEOUT_MS = Number(process.env.SMEJJ_WEATHER_TIMEOUT_MS || 2500);
+// Laeuft in ZWEI Welten: in der Bruecke (Node) und seit 2026-09-07 auch im
+// Browser (ai/live-daten.js holt die Live-Daten dort selbst). Im Browser gibt
+// es kein `process` — ein ungeschuetzter Zugriff wuerde das Modul beim Laden
+// sprengen. Serverseitig aendert sich nichts.
+const WEATHER_TIMEOUT_MS = Number(
+  (typeof process !== "undefined" && process.env && process.env.SMEJJ_WEATHER_TIMEOUT_MS) || 2500
+);
 
 export function isWeatherTask(task) {
   return /\b(wetter|weather|temperatur|vorhersage|forecast|regenwahrscheinlichkeit)\b/i.test(String(task || ""));

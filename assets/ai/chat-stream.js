@@ -10,6 +10,7 @@
 // (chat-history-context.js). Dieses Modul empfaengt nur.
 import { fetchStreamWithRetry } from "./fetch-retry.js";
 import { API_ORIGIN } from "../config.js";
+import { mitLiveDaten } from "./live-daten.js";
 import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js";
 import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js";
 
@@ -620,6 +621,13 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // Stufe 0 zuerst: was das Geraet des Nutzers selbst beantworten kann, kostet
   // niemanden etwas und ist meist schneller (gemessen 1,7-3,5 s gegen 2,9-6,6 s).
   if (await versucheLokaleAntwort(body, output, renderMarkdown)) return;
+
+  // Live-Daten bei "Nachdenken" (Betreiber 07.09.): die Bruecke haengt ihren
+  // Wetter-/Web-Kontext NUR an die Schnellspur und gibt die bei "gruendlich"
+  // ab — der tiefe Weg bekam nie aktuelle Zahlen und antwortete "Ich habe
+  // keinen Zugriff auf aktuelle Wetterdaten". Der Browser holt sie jetzt
+  // selbst. Fail-safe: ohne Fund bleibt die Frage unveraendert.
+  body = await mitLiveDaten(body);
 
   // Ab dem Absenden sichtbar arbeiten — der Server meldet sich erst nach
   // gemessenen 5,75 s (siehe starteWartesignal).
