@@ -1510,10 +1510,6 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   background-position: center;
   background-size: 20px 20px;
 }
-/* WEG (Betreiber-Bild 2026-09-07, "drei Mauszeiger"): der Wiedergabe-Knopf
-   neben dem Globus sah aus wie ein zweiter Zeiger. Die Maus laeuft laengst im
-   Panel (Knopf in der Tableiste, Chat-Vorlage); die alte Wiedergabe braucht
-   keinen eigenen Knopf mehr. Der Zeiger gehoert allein der Maus. */
 #mausButton {
   display: none !important;
 }
@@ -2313,12 +2309,19 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   100% { transform: translateX(320%); }
 }
 .bp-hint {
+  position: absolute;
+  top: calc(var(--bp-row-height) * 2 + 8px);
+  left: 8px;
+  right: 8px;
+  z-index: 6;
   padding: 7px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(159, 231, 212, 0.08);
-  color: rgba(246, 243, 238, 0.82);
+  border: 1px solid rgba(2, 253, 253, 0.35);
+  background: rgba(16, 17, 19, 0.92);
+  color: rgba(246, 243, 238, 0.92);
   font-size: 14.5px;
+  pointer-events: none;
 }
+.bp-hint[hidden] { display: none; }
 .bp-content {
   grid-row: 5;
   position: relative;
@@ -2415,6 +2418,9 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
   body.browser-pane-open .browser-panel {
     width: calc(100vw - 12px);
   }
+}
+.browser-pane {
+  position: relative;
 }
 
 /* ---- browser-pane-chrome.css ---- */
