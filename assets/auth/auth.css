@@ -56,6 +56,10 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* Als installierte App (display: standalone) liegt die Seite unter Statusleiste,
+     Dynamic Island und Home-Balken. Gemessen 2026-09-07 im iPhone-17-Pro-Simulator:
+     die Marke oben verschwand hinter der Uhrzeit. Im Browser sind die Werte 0. */
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
 }
 
 /* Marke oben links, wie in der App */
