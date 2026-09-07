@@ -71,7 +71,13 @@
     a { color: inherit; }
     .leiste {
       display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
-      padding: 14px 26px; border-bottom: 1px solid var(--hair);
+      /* Als installierte App (iOS/Android, display: standalone) reicht die Seite bis
+         unter die Statusleiste und die Dynamic Island. Gemessen 2026-09-07 im
+         iPhone-17-Pro-Simulator: Logo und Uhrzeit lagen uebereinander. Die
+         Sicherheitsraender (env(safe-area-inset-*)) sind im Browser 0 und kosten
+         dort nichts; in der App schieben sie die Leiste unter die Statusleiste. */
+      padding: calc(14px + env(safe-area-inset-top, 0px)) calc(26px + env(safe-area-inset-right, 0px)) 14px calc(26px + env(safe-area-inset-left, 0px));
+      border-bottom: 1px solid var(--hair);
     }
     .leiste img { height: 26px; width: auto; }
     .leiste nav { display: flex; gap: 18px; font-size: 15px; color: var(--ink-dim); }
@@ -90,7 +96,7 @@
       .leiste nav a, .fuss a, .fuss-links a, footer a { min-height: 44px; display: inline-flex; align-items: center; }
       .schwerpunkte a, .karten a { min-height: 44px; display: inline-flex; align-items: center; }
       .probier .chip, .schwerpunkte button { min-height: 44px; display: inline-flex; align-items: center; }
-      .leiste { gap: 10px 12px; padding: 12px 16px; }
+      .leiste { gap: 10px 12px; padding: calc(12px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-right, 0px)) 12px calc(16px + env(safe-area-inset-left, 0px)); }
       .leiste nav { order: 3; width: 100%; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
       .leiste nav a { padding: 12px 0; }
       .leiste .rechts { gap: 8px; }
@@ -159,7 +165,7 @@
     .hinweis { font-size: 14.5px; color: var(--ink-dim); margin-top: 14px; }
     footer {
       border-top: 1px solid var(--hair); margin-top: 40px;
-      padding: 22px 26px; font-size: 14px; color: var(--ink-dim);
+      padding: 22px 26px calc(22px + env(safe-area-inset-bottom, 0px)); font-size: 14px; color: var(--ink-dim);
       display: flex; gap: 18px; flex-wrap: wrap;
     }
     footer a { text-decoration: none; }
@@ -167,7 +173,7 @@
 </head>
 <body>
   <header class="leiste">
-    <a href="/willkommen.html" aria-label="smejj.com"><img src="/icons/smejj_full_logo_on_dark.svg" alt="smejj.com"></a>
+    <a href="/willkommen.html" aria-label="smejj.com"><img src="/icons/smejj_full_logo_on_dark.svg" alt="smejj.com" width="115" height="26"></a>
     <nav aria-label="Bereiche">
       <a href="#funktionen">Funktionen</a>
       <a href="/programmieren.html">Für Programmierer</a>
