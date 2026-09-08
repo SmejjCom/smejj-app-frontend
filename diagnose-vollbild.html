@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#101113">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="smejj.com Diagnose">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>smejj.com — Vollbild-Diagnose</title>
+<style>
+  html,body{margin:0;padding:0;background:#050608;color:#e6f7f7;font:600 15px/1.5 ui-monospace,Menlo,monospace}
+  /* Grund wie in der App: fest, 120 px Ueberstand nach allen Seiten */
+  body::before{content:"";position:fixed;top:-120px;right:-120px;bottom:-120px;left:-120px;z-index:-1;
+    background:linear-gradient(180deg,#0b1016 0%,#070a0e 62%,#050608 100%) #050608}
+  /* Rahmen A: wie body::after HEUTE — inset:0 */
+  .rahmenA{position:fixed;inset:0;z-index:90;pointer-events:none;box-shadow:inset 0 0 0 3px rgba(2,253,253,.85)}
+  /* Rahmen B: mit 120 px Ueberstand nach unten (die aktuelle App-Regel) */
+  .rahmenB{position:fixed;top:0;left:0;right:0;bottom:-120px;z-index:89;pointer-events:none;box-shadow:inset 0 0 0 9px rgba(255,64,64,.7)}
+  /* Messlatte: drei Streifen ganz unten, jeder 20 px hoch — was fehlt, sieht man sofort */
+  .latte{position:fixed;left:0;right:0;z-index:88}
+  .l1{bottom:0;height:20px;background:#ffd400}
+  .l2{bottom:20px;height:20px;background:#ff7a00}
+  .l3{bottom:40px;height:20px;background:#00ff88}
+  /* dieselbe Latte, aber an 100dvh statt an fixed-bottom */
+  .dvh{position:absolute;top:calc(100dvh - 20px);left:0;right:0;height:20px;background:#b14cff;z-index:87}
+  #werte{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:8px;right:8px;z-index:95;
+    background:rgba(0,0,0,.8);padding:8px;font-size:14px;word-break:break-all;text-align:left}
+  #werte b{color:#02fdfd}
+</style>
+</head>
+<body>
+<div class="rahmenA"></div><div class="rahmenB"></div>
+<div class="latte l3"></div><div class="latte l2"></div><div class="latte l1"></div>
+<div class="dvh"></div>
+<div id="werte">wird gemessen …</div>
+<script>
+function sa(name){var p=document.createElement("div");p.style.cssText="position:fixed;visibility:hidden;height:env("+name+",0px)";document.body.appendChild(p);var h=Math.round(p.getBoundingClientRect().height);p.remove();return h;}
+function zeige(){
+  var vv=window.visualViewport, modus="browser";
+  try{ if(matchMedia("(display-mode: standalone)").matches) modus="MQ-standalone"; }catch(e){}
+  if(navigator.standalone===true) modus += (modus==="browser"?" ":"+")+"nav-standalone";
+  var d=document.createElement("div"); d.style.cssText="position:fixed;inset:0;visibility:hidden"; document.body.appendChild(d);
+  var fixH=Math.round(d.getBoundingClientRect().height); d.remove();
+  var t=document.createElement("div"); t.style.cssText="position:absolute;top:0;height:100dvh;visibility:hidden"; document.body.appendChild(t);
+  var dvhH=Math.round(t.getBoundingClientRect().height); t.remove();
+  document.getElementById("werte").innerHTML =
+    "<b>Schirm</b> "+screen.width+"x"+screen.height+
+    " &nbsp;<b>Fenster</b> "+innerWidth+"x"+innerHeight+
+    " &nbsp;<b>fixed inset:0</b> "+fixH+
+    " &nbsp;<b>100dvh</b> "+dvhH+
+    "<br><b>visualViewport</b> "+(vv?Math.round(vv.width)+"x"+Math.round(vv.height)+" top"+Math.round(vv.offsetTop):"-")+
+    " &nbsp;<b>SA</b> oben "+sa("safe-area-inset-top")+" unten "+sa("safe-area-inset-bottom")+
+    "<br><b>Modus</b> "+modus+" &nbsp;<b>DPR</b> "+devicePixelRatio+
+    "<br><b>Fehlbetrag Schirm-Fenster</b> "+(Math.max(screen.width,screen.height)-innerHeight)+" pt";
+}
+zeige(); addEventListener("resize",zeige); if(window.visualViewport) visualViewport.addEventListener("resize",zeige);
+</script>
+</body>
+</html>
