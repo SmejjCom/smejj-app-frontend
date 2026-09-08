@@ -46,7 +46,7 @@
   }
 
   async function laden(ctx, still) {
-    const antwort = await A.hole("/api/admin/modelle");
+    const antwort = await A.hole("/api/admin/ops/modellbestand");
     if (!antwort.ok) {
       taktStoppen();
       // Ein stiller Nachlade-Fehler darf die schon sichtbare Liste nicht

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Randtest</title>
+<style>
+ html,body{margin:0;background:#050608;color:#fff;font:600 15px/1.4 ui-monospace,Menlo,monospace}
+ .s{position:fixed;left:0;right:0;height:22px;z-index:90}
+ .a{top:0;background:#00ff88}.b{top:22px;background:#b14cff}.c{top:44px;background:#ff00d0}
+ .x{bottom:0;background:#ffd400}.y{bottom:22px;background:#ff7a00}
+ #w{position:fixed;top:80px;left:8px;right:8px;background:rgba(0,0,0,.85);padding:8px;z-index:95;font-size:15px}
+ #w b{color:#02fdfd}
+</style></head><body>
+<div class="s a"></div><div class="s b"></div><div class="s c"></div><div class="s y"></div><div class="s x"></div>
+<div id="w">…</div>
+<script>
+var d=document.createElement("div");d.style.cssText="position:fixed;inset:0;visibility:hidden";document.body.appendChild(d);
+var r=d.getBoundingClientRect();d.remove();
+function sa(n){var p=document.createElement("div");p.style.cssText="position:fixed;visibility:hidden;height:env("+n+",0px)";document.body.appendChild(p);var h=Math.round(p.getBoundingClientRect().height);p.remove();return h;}
+document.getElementById("w").innerHTML="<b>Schirm</b> "+screen.width+"x"+screen.height+" <b>Fenster</b> "+innerWidth+"x"+innerHeight+
+"<br><b>fixed inset:0</b> top "+Math.round(r.top)+" hoch "+Math.round(r.height)+" <b>SA</b> "+sa("safe-area-inset-top")+"/"+sa("safe-area-inset-bottom");
+</script></body></html>
