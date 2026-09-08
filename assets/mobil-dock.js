@@ -47,7 +47,13 @@ export const REGELN = "@media (max-width:600px){"
   + "body #code .codefeld #codeAufgabe::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}"
   // (2) Code-Leiste in EINER Zeile
   + "body #code .codeleiste.codeleiste{flex-wrap:nowrap;gap:4px;margin-top:0;min-width:0}"
-  + "body #code .codeleiste .repochip.repochip{max-width:80px;min-width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:8px;padding-right:8px;flex:0 1 auto}"
+  // (12) Stufe-Chip "Automatisch" war beidseitig abgeschnitten ("\utomatiscl", Betreiber-Screenshot
+  //      08.09. 08:55): text-overflow:ellipsis greift NICHT auf einem inline-flex-Kasten — der
+  //      Text laeuft dort einfach unter der Kante durch. Darum inline-block mit fester Zeilenhoehe
+  //      (44 px Ziel) und mittiger Ausrichtung; jetzt kuerzt der Browser sauber mit "…".
+  + "body #code .codeleiste .repochip.repochip{display:inline-block;max-width:110px;min-width:44px;height:44px;line-height:44px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:8px;padding-right:8px;flex:0 1 auto}"
+  + "body #code .codeleiste .repochip.repochip>*{display:inline;line-height:inherit}"
+  + "body #code .codeleiste #codeModusChip.repochip{max-width:72px}"
   + "body #code .codeleiste .code-rechts.code-rechts{gap:4px;flex:0 0 auto;min-width:0}"
   + "body #code .codeleiste #codeTiefeAnzeige{display:none}"
   + "body #code .codeleiste .icon-button.icon-button,body #code .codeleiste .send-button.send-button{flex:0 0 44px;width:44px;min-width:44px;height:44px;min-height:44px}"
@@ -85,13 +91,25 @@ export const REGELN = "@media (max-width:600px){"
   //     mit Blur, Antwort ohne Blase; Kopfzeile als Glasstreifen unter der Statusleiste,
   //     damit "Arbeitsschritte" nicht mehr durch das Logo laeuft (Streifen siehe unten).
   + "body #startLog .entry,body #codeLogHalter .entry{max-width:100%;overflow-wrap:anywhere;word-break:break-word}"
-  + "body #startLog .entry table,body #codeLogHalter .entry table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:normal}"
+  // (13) Chat-Tabellen waren zerhackt (Betreiber-Screenshot 08.09. 08:54): fuenf Spalten wurden auf
+  //      Schirmbreite gequetscht, und das overflow-wrap:anywhere der Eintragsregel brach die Woerter
+  //      buchstabenweise um ("Ze/it", "M/or/ge/n"). Jetzt behaelt die Tabelle ihre natuerliche Breite
+  //      (max-content) und scrollt in SICH; die Zellen brechen gar nicht mehr. Lange Links ausserhalb
+  //      von Tabellen brechen weiter um (Regel darueber).
+  + "body #startLog .entry table,body #codeLogHalter .entry table{display:block;width:max-content;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:normal}"
+  + "body #startLog .entry table td,body #startLog .entry table th,body #codeLogHalter .entry table td,body #codeLogHalter .entry table th{overflow-wrap:normal;word-break:normal;white-space:nowrap;min-width:72px}"
   + "body #startLog .entry a{overflow-wrap:anywhere}"
   + "body #startLog .entry.user.user{margin-left:14%;max-width:86%;border-radius:18px 18px 6px 18px;background:rgba(255,255,255,.09);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);padding:10px 14px}"
   + "body #startLog .entry.assistant.assistant{background:transparent;border:0;padding-left:4px;padding-right:4px}"
   + "body #start.has-start-chat #startLog.start-log{padding-top:calc(env(safe-area-inset-top,0px) + 56px);scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}"
   + "body .mobil-kopfglas{position:fixed;top:0;left:0;right:0;height:calc(env(safe-area-inset-top,0px) + 52px);z-index:73;pointer-events:none;background:linear-gradient(180deg,rgba(7,10,14,.92) 0%,rgba(7,10,14,.72) 70%,rgba(7,10,14,0) 100%);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 70%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 70%,transparent 100%)}"
   + "body:not(.mobil-chat-offen) .mobil-kopfglas{display:none}"
+  // (14) Im Code-Bereich lag der Gruss "Was steht als Naechstes an, Alan?" UNTER dem Kopfglas
+  //      (Betreiber-Screenshot 08.09. 08:55) — das Glas ist fest, der Gruss beginnt bei 0.
+  //      Beide Zustaende bekommen darum dasselbe Polster wie das Start-Log: Gruss (leerer Bereich)
+  //      und Verlaufshalter (laufender Chat).
+  + "body.mobil-chat-offen #code .codegruss{padding-top:calc(env(safe-area-inset-top,0px) + 60px)}"
+  + "body #code #codeLogHalter.code-log-halter{padding-top:calc(env(safe-area-inset-top,0px) + 56px);scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}"
   + "}"
   // (10) Vollbild-Versatz der installierten App (Betreiber 17:32, iPhone, frisch installiert):
   //      iOS legt die Layout-Flaeche oben an, rechnet sie aber um die Statusleistenhoehe
@@ -107,8 +125,17 @@ export const REGELN = "@media (max-width:600px){"
   //      Tastatur-Historie). Verlaesslich ist die SICHTBARE Flaeche: visualViewport.offsetTop +
   //      visualViewport.height. Der Rahmen bekommt darum eine feste Hoehe bis zur sichtbaren
   //      Unterkante (--vv-unten) statt bottom:0 — bei offener Tastatur endet er an der Tastatur.
+  //      BEFUND Betreiber 08.09. 08:48-08:55 (SW v810/v813): der Balken war WIEDER da. Damit sind
+  //      DREI Messwege gescheitert (innerHeight, visualViewport, screen.height) — jede Messung des
+  //      Viewports ist in der iOS-App unzuverlaessig, weil iOS je nach Tastatur-Historie und
+  //      Statusleiste unterschiedliche Zahlen meldet. Darum jetzt der Weg, der seit 05.09. beim
+  //      GRUND (body::before) beweisbar haelt: BEDINGUNGSLOSER UEBERSTAND. Der Rahmen reicht 120 px
+  //      unter die Geraetekante, ganz ohne Messung. Preis: der untere Rahmenstrich ist unsichtbar
+  //      (vom Betreiber freigegeben) — dafuer kann kein Balken mehr entstehen, in keiner Lage und
+  //      nach keiner Tastatur. Oben bleibt der Strich, dort stimmt der Viewport.
+  //      dvh-Flaechen (Dock) bleiben unangetastet — sie waren nie das Problem (Befund 22:32).
   + "@media (display-mode:standalone) and (max-width:600px){"
-  + "body::after{top:0;bottom:auto;height:var(--vv-unten,100%)}"
+  + "body::after{top:0;bottom:-120px;height:auto}"
   + "}"
   // (11) Feld buendig an der Tastatur (Betreiber 08.09. 01:44, Punkt 7): bei offener Tastatur
   //      blieb der untere Sicherheitsrand (34 pt Home-Balken) als Luecke zwischen Feld und
