@@ -67,6 +67,10 @@
       --ink: #f2f5f4; --ink-dim: rgba(242,245,244,.74); --r: 8px;
     }
     * { box-sizing: border-box; margin: 0; }
+    /* Als installierte App faerbt iOS den Statusleistenbereich mit dem Hintergrund des
+       WURZELELEMENTS. Ohne diese Zeile blieb er weiss ueber der dunklen Seite (im
+       iPhone-Simulator gemessen, 08.09.) — der Verlauf steht auf body, html war leer. */
+    html { background: #141517; }
     body {
       background: linear-gradient(180deg, #141517 0%, #101113 58%, #0d0e10 100%);
       color: var(--ink);
