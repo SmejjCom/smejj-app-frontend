@@ -70,6 +70,15 @@ export const REGELN = "@media (max-width:600px){"
   // (17) Aktionen an Antworten wurden uebersehen: die Leiste steht auf 52 % Deckkraft und wird erst
   //      beim Zeigen heller — am Handy gibt es kein Zeigen. Darum hier dauerhaft gut lesbar.
   + "body #startLog .msg-actions .msg-act,body #codeLogHalter .msg-actions .msg-act{color:rgba(246,243,238,.82)}"
+  // (18) Die drei Punkte unter einer Antwort liessen sich nicht antippen (Betreiber 08.09. 16:13).
+  //      GEMESSEN: #startLog .msg-actions traegt pointer-events:none, und am Handy dazu overflow-x:auto —
+  //      die Leiste war 0 px hoch, ihre 44-px-Knoepfe ragten heraus und wurden vom Scroll-Container
+  //      ABGESCHNITTEN. Ein Treffertest fand statt des Knopfes das Log. Jetzt nimmt die Leiste selbst
+  //      Klicks an, faellt nicht mehr zusammen und schneidet nichts ab.
+  + "body #startLog .msg-actions,body #codeLogHalter .msg-actions{pointer-events:auto;min-height:44px;overflow:visible;margin-top:0}"
+  //      Dazu Platz unter dem letzten Eintrag: sonst liegt genau die letzte Leiste hinter dem Dock
+  //      (gemessen: Leiste 767..811, Glas ab 738 — der Fingerdruck traf das Glas).
+  + "body #start.has-start-chat #startLog.start-log,body #code #codeLogHalter.code-log-halter{padding-bottom:132px}"
   // (8) Modell-Menue (Betreiber 17:38: "rechte Seite schneidet ab"): das Untermenue war
   //     232-312 px breit mit nowrap und Ellipse — "smejj 1.3 — Sp…", Haken ueber dem Text.
   //     Am Handy liegt es jetzt FEST ueber dem Dock, 16 px Rand links und rechts, Text darf
@@ -157,9 +166,21 @@ export const REGELN = "@media (max-width:600px){"
   //      keine Sonderregel mehr — inset:0 aus dem Buendel ist wieder richtig, der untere Strich kommt zurueck.
   //      Dafuer werden safe-area-inset-* in diesem Modus 0: den Mindestabstand zum Home-Balken traegt jetzt
   //      die Regel unten (nie kleiner als der echte Wert, damit alte Installationen nichts verlieren).
+  //      RUNDE 8 (Betreiber 08.09. 16:13, zweimal: "oben ist immer noch schwarz, nicht Vollbild"):
+  //      Im Simulator alle Wege durchgemessen. Es gibt genau zwei Zustaende, keinen dritten:
+  //        black-translucent -> Flaeche top 0, hoch 812: VOLLBILD oben, 62 pt Schwarz unten
+  //        black / default   -> Flaeche hoch 874: kein Schwarz unten, dafuer Statusleistenbalken oben
+  //      Der Bereich unten gehoert nicht zur Seite (mit knallrotem Wurzelelement geprueft: er bleibt
+  //      schwarz). Also Vollbild oben — und der Streifen unten wird UNSICHTBAR gemacht, statt bekaempft:
+  //        (a) der Grund laeuft unten auf reines Schwarz aus, genau die Farbe dahinter,
+  //        (b) der Rahmen bekommt unten weder Strich noch Schein — nur er machte die Kante sichtbar,
+  //        (c) das Dock schliesst buendig ab (Sicherheitsrand 0): der Home-Balken liegt ohnehin in
+  //            den 62 pt darunter, ein Abstand wuerde nur Platz verschenken.
   + "@media (display-mode:standalone) and (max-width:600px){"
-  + "html{--sa-bottom:max(env(safe-area-inset-bottom,0px),18px)}"
-  + "html:not(.tastatur-offen) main.shell.shell{padding-bottom:max(env(safe-area-inset-bottom,0px),18px)}"
+  + "html{--sa-bottom:0px;background:#000}"
+  + "html:not(.tastatur-offen) main.shell.shell{padding-bottom:0}"
+  + "body::before{background:radial-gradient(820px 520px at 18% -12%,rgba(50,246,234,.13),transparent 62%),radial-gradient(700px 480px at 88% 108%,rgba(13,148,210,.10),transparent 64%),linear-gradient(180deg,#0b1016 0%,#070a0e 55%,#000 100%) #000}"
+  + "body::after{box-shadow:inset 0 1px 0 rgba(2,253,253,.3),inset 1px 0 0 rgba(2,253,253,.3),inset -1px 0 0 rgba(2,253,253,.3),inset 0 26px 40px -26px rgba(2,253,253,.18)}"
   + "}"
   // (11) Feld buendig an der Tastatur (Betreiber 08.09. 01:44, Punkt 7): bei offener Tastatur
   //      blieb der untere Sicherheitsrand (34 pt Home-Balken) als Luecke zwischen Feld und

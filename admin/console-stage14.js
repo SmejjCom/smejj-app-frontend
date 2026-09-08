@@ -58,30 +58,60 @@
     taktStarten(ctx);
   }
 
+  // Jede Schreibaktion braucht einen Grund — der Server weist ohne ihn ab, und
+  // im Audit-Log ist eine Änderung ohne Grund später nicht von einem Versehen
+  // zu unterscheiden. Der Dialog fragt ihn deshalb hier, nicht der Server.
   async function schalten(ctx, id, an) {
-    const antwort = await A.sende("/api/admin/modelle/schalten", { id: id, an: an });
+    const modell = finde(letzteDaten && letzteDaten.modelle, id);
+    const grund = await D.text({
+      titel: (an ? "Einschalten" : "Ausschalten") + " — " + (modell.name || id),
+      absaetze: an
+        ? ["Das Modell wird für Anfragen freigegeben. Der Motor übernimmt es beim nächsten"
+            + " Lebenszeichen — das dauert bis zu einer Minute."]
+        : ["Das Modell nimmt keine Anfragen mehr an. Die Datei bleibt in e2 liegen und ist"
+            + " jederzeit wieder einschaltbar.",
+          "Der Motor übernimmt es beim nächsten Lebenszeichen — das dauert bis zu einer Minute."],
+      platzhalter: an ? "Warum wird es gebraucht?" : "Warum wird es abgeschaltet?",
+      minLaenge: 10,
+      okText: an ? "Einschalten" : "Ausschalten"
+    });
+    if (!grund) return;
+    const antwort = await A.sende("/api/admin/modelle/schalten", { id: id, an: an, reason: grund });
     if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
-    ctx.meldung(an ? "Modell eingeschaltet." : "Modell ausgeschaltet.", false);
+    ctx.meldung(antwort.data && antwort.data.hinweis ? antwort.data.hinweis
+      : (an ? "Modell eingeschaltet." : "Modell ausgeschaltet."), false);
     laden(ctx);
   }
 
+  function finde(liste, id) {
+    return (liste || []).find(function (m) { return m.id === id; }) || {};
+  }
+
   async function loeschen(ctx, id) {
-    const modell = (letzteDaten && (letzteDaten.modelle || []).find(function (m) { return m.id === id; })) || {};
-    const ja = await D.bestaetige({
+    const modell = finde(letzteDaten && letzteDaten.modelle, id);
+    // Der Grund IST hier die Bestätigung: wer 20 Zeichen tippen muss, hat die
+    // Zahlen darüber gelesen. Ein bloßes »Wirklich?« klickt man weg.
+    const grund = await D.text({
       titel: "Modell endgültig löschen",
       absaetze: [
-        "»" + (modell.name || id) + "« wird aus iDrive e2 gelöscht: " + S.groesse(modell.groesseBytes) + ".",
-        "Das ist nicht rückgängig zu machen. Zum Wiederherstellen müsste die Datei neu geladen werden —"
-          + " über die aktuelle Leitung dauert das rund " + stunden(modell.groesseBytes) + ".",
+        "»" + (modell.name || id) + "« wird aus iDrive e2 gelöscht: " + S.groesse(modell.groesseBytes)
+          + (modell.dateien ? " in " + modell.dateien + " Datei(en)" : "") + ".",
+        "Das ist nicht rückgängig zu machen. Zum Wiederherstellen müsste alles neu geladen werden —"
+          + " über die gemessene Leitung dauert das rund " + stunden(modell.groesseBytes) + ".",
         "Nur ausschalten statt löschen? Dann bleibt die Datei liegen und kostet weiter Speichergebühr,"
           + " ist aber sofort wieder nutzbar."
       ],
+      platzhalter: "Warum soll das weg? (mindestens 20 Zeichen)",
+      minLaenge: 20,
       okText: "Endgültig löschen"
     });
-    if (!ja) return;
-    const antwort = await A.sende("/api/admin/modelle/loeschen", { id: id });
+    if (!grund) return;
+    const antwort = await A.sende("/api/admin/modelle/loeschen", { id: id, reason: grund });
     if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
-    ctx.meldung("Modell gelöscht.", false);
+    // Teilerfolg ist kein Erfolg: bleiben Reste liegen, sagt der Server das —
+    // und dann muss es hier auch stehen, nicht »gelöscht«.
+    const d = antwort.data || {};
+    ctx.meldung(d.hinweis || "Modell gelöscht.", d.uebrig > 0);
     laden(ctx);
   }
 
@@ -99,18 +129,29 @@
     const neu = await D.text({
       titel: "Schlüssel ersetzen — " + (zugang.name || zugangId),
       absaetze: [
-        "Der neue Schlüssel wird verschlüsselt abgelegt und sofort gegen den Anbieter geprüft.",
+        "Der neue Schlüssel wird verschlüsselt abgelegt. Geprüft wird er beim nächsten Aufruf"
+        + " des Anbieters, nicht sofort.",
         "Der alte Schlüssel wird dabei überschrieben. Es wird nie ein Schlüssel im Klartext angezeigt —"
           + " in der Liste stehen nur die letzten Zeichen."
       ],
       platzhalter: "Neuen Schlüssel einfügen",
       minLaenge: 8,
-      okText: "Ersetzen und prüfen"
+      okText: "Weiter"
     });
     if (!neu) return;
-    const antwort = await A.sende("/api/admin/modelle/schluessel", { zugangId: zugangId, schluessel: neu });
+    const grund = await D.text({
+      titel: "Grund für den Austausch",
+      absaetze: ["Steht dauerhaft im Audit-Log. Der Schlüssel selbst wird dort nie abgelegt —"
+        + " nur, dass einer gesetzt wurde."],
+      platzhalter: "z.B. abgelaufen, kompromittiert, Konto gewechselt",
+      minLaenge: 10,
+      okText: "Ersetzen"
+    });
+    if (!grund) return;
+    const antwort = await A.sende("/api/admin/modelle/schluessel",
+      { zugangId: zugangId, schluessel: neu, reason: grund });
     if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
-    ctx.meldung("Schlüssel ersetzt und geprüft.", false);
+    ctx.meldung(antwort.data && antwort.data.hinweis ? antwort.data.hinweis : "Schlüssel ersetzt.", false);
     laden(ctx);
   }
 
