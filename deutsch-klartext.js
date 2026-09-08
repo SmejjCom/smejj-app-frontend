@@ -92,7 +92,12 @@ export const WOERTER = Object.freeze({
   "local-only": "nur lokal",
   "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.": "Profil, Einstellungen und lokale Sitzungsdaten; niemals Ausweise oder Schlüssel.",
   "Limit fast erreicht": "Grenze fast erreicht",
-  "Exakte Diff-Freigabe": "Freigabe jeder einzelnen Änderung"
+  "Exakte Diff-Freigabe": "Freigabe jeder einzelnen Änderung",
+  "Standardmodell, BYOK und lokale Modelle.": "Standardmodell, eigene Schlüssel und lokale Modelle.",
+  "Wenn ein Diff oder externer Schritt wartet.": "Wenn eine Änderung oder ein externer Schritt wartet.",
+  "owner/editor/viewer/local-only vorbereitet": "Besitzer/Bearbeiter/Betrachter/nur lokal vorbereitet",
+  "Aufbauphase: ohne Limit.": "Aufbauphase: ohne Grenze.",
+  "Bitte zuerst bei smejj.com anmelden. Der API-Key wird keinem lokalen Profil zugeordnet.": "Bitte zuerst bei smejj.com anmelden. Der API-Schlüssel wird keinem lokalen Profil zugeordnet."
 });
 
 /** Reine Funktion: exakter Treffer (ohne Randleerraum) → deutsches Wort, sonst unverändert. */
