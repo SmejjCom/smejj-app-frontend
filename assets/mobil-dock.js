@@ -151,10 +151,26 @@ export function sichtbareUnterkante({ offsetTop, height }) {
   return unten > 0 && Number.isFinite(unten) ? unten : 0;
 }
 
+/** BEFUND Betreiber 08.09. 08:52 (SW v810): Balken wieder da — in der iOS-App meldet auch der
+ *  visualViewport zeitweise die um die Statusleiste verkuerzte Hoehe. Verlaesslich ist nur der
+ *  Bildschirm selbst: screen.height/width sind fest (iOS meldet sie immer hochkant; im
+ *  Querformat ist die sichtbare Hoehe die kuerzere Seite). Reine Funktion. */
+export function schirmUnterkante({ schirmHoehe, schirmBreite, innerWidth, innerHeight }) {
+  const h = Number(schirmHoehe) || 0, b = Number(schirmBreite) || 0;
+  if (!h || !b) return 0;
+  const quer = Number(innerWidth) > Number(innerHeight);
+  return quer ? Math.min(h, b) : Math.max(h, b);
+}
+
 function verdrahteVersatz(win = window, doc = document) {
   const vv = win.visualViewport;
+  const apple = /iPhone|iPad|iPod/.test(win.navigator?.userAgent || "") || /Apple/.test(win.navigator?.vendor || "");
+  const standalone = () => { try { return matchMedia("(display-mode: standalone)").matches || win.navigator.standalone === true; } catch { return false; } };
   const setze = () => {
-    const unten = vv ? sichtbareUnterkante(vv) : 0;
+    // Apple-App: Bildschirmkante (unabhaengig von Viewport-Launen); sonst sichtbare Flaeche.
+    const unten = (apple && standalone())
+      ? schirmUnterkante({ schirmHoehe: win.screen?.height, schirmBreite: win.screen?.width, innerWidth: win.innerWidth, innerHeight: win.innerHeight })
+      : (vv ? sichtbareUnterkante(vv) : 0);
     if (unten) doc.documentElement.style.setProperty("--vv-unten", `${unten}px`);
     else doc.documentElement.style.removeProperty("--vv-unten");
   };
