@@ -155,6 +155,9 @@ export function modellAnzeige(hausText) {
 }
 
 // ---- Modell-Menue (wie Claudes "Fable 5"-Menue, Betreiber 2026-08-17) ---
+// Der Loeser des zurzeit offenen Menues — damit sich keine Zuhoerer ansammeln.
+let aktiverLoeser = null;
+
 export function schliesseModellMenue() {
   // BEIDE Menues: der Code-Bereich nutzt "codeModellMenue", die Startseite "startModellMenue".
   // Bis 2026-09-08 stand hier nur das erste — das Menue der Startseite blieb offen liegen.
@@ -175,10 +178,18 @@ export function schliesseModellMenue() {
  */
 export function bewacheAussenklick(menueId, knopf) {
   const doc = document;
+  // Nur EIN Wachhund gleichzeitig: sonst sammeln sich bei jedem Oeffnen Zuhoerer an, die
+  // spaeter ins Leere greifen (beim Rollentest 08.09. aufgefallen).
+  aktiverLoeser?.();
   const zu = () => doc.getElementById(menueId)?.remove();
   const daneben = (e) => {
-    if (e.target?.closest?.(`#${menueId}`)) return;
-    if (knopf && e.target?.closest?.(`#${knopf.id}`)) return;
+    const ziel = e.target;
+    if (!ziel) return;
+    const menue = doc.getElementById(menueId);
+    if (!menue) { loese(); return; }
+    if (menue.contains(ziel)) return;
+    // contains statt id-Selektor: ein Knopf ohne id haette `#` ergeben — ungueltiger Selektor.
+    if (knopf?.contains?.(ziel)) return;
     zu();
     loese();
   };
@@ -187,11 +198,13 @@ export function bewacheAussenklick(menueId, knopf) {
     doc.removeEventListener("pointerdown", daneben, true);
     doc.removeEventListener("click", daneben, true);
     doc.removeEventListener("keydown", taste, true);
+    if (aktiverLoeser === loese) aktiverLoeser = null;
   };
   // pointerdown UND click: der Finger meldet pointerdown, die Maus am Schreibtisch beides.
   doc.addEventListener("pointerdown", daneben, true);
   doc.addEventListener("click", daneben, true);
   doc.addEventListener("keydown", taste, true);
+  aktiverLoeser = loese;
   return loese;
 }
 
