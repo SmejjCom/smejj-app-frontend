@@ -65,6 +65,11 @@ export const REGELN = "@media (max-width:600px){"
   + "body #settings .settings-row .settings-row-copy{flex:1 1 100%}"
   + "body #settings .settings-row select,body #settings .settings-row input:not([type=checkbox]):not([type=radio]),body #profile .account-grid input,body #profile .account-grid select,body #profile input:not([type=checkbox]):not([type=radio]):not([type=file]),body #profile select{width:100%;min-height:44px;box-sizing:border-box}"
   + "body #settings .settings-row input[type=checkbox],body #settings .settings-row input[type=radio]{width:24px;height:24px;margin:10px}"
+  // GEMESSEN 08.09.: der Kippschalter selbst (label.settings-switch) ist nur 46x26 — die Trefferflaeche
+  // ist das Label, nicht das Kaestchen. Es bekommt darum die volle Zielhoehe, ohne optisch zu wachsen.
+  + "body #settings .settings-switch,body #profile .settings-switch{min-height:44px;display:inline-flex;align-items:center}"
+  // Rechtslinks (Impressum, Datenschutz, AGB, Widerruf) standen als 16 px hohe Textzeilen untereinander.
+  + "body #settings .settings-links a,body .view .settings-links a{min-height:44px;display:inline-flex;align-items:center}"
   + "body #profile .account-actions.account-actions,body #settings .settings-action.settings-action,body .view .panel-actions{display:flex;flex-direction:column;gap:8px}"
   + "body #profile .account-actions button,body #settings .settings-action button,body .view .panel-actions button,body #files .toolbar button,body #projects .toolbar button{width:100%;min-height:44px}"
   + "body #profile .account-picture.account-picture{flex-direction:column;align-items:flex-start;gap:10px}"
