@@ -222,6 +222,56 @@ function verdrahteKopfglas(doc = document) {
   pruefe();
 }
 
+/** DIAGNOSE (08.09., nach dem vierten Balken-Befund des Betreibers): Der Screenshot zeigt, dass
+ *  auch der GRUND (body::before, seit 05.09. mit 120 px Ueberstand) unten aufhoert — seitlich fehlt
+ *  der Lichtsaum ebenfalls. CSS kann nicht ueber die WebView-Kante hinaus malen, also ist nicht das
+ *  Layout zu kurz, sondern die Flaeche, die iOS der App gibt. Um das nicht weiter zu raten, zeigt die
+ *  installierte App beim Start 15 Sekunden lang eine Messzeile: Schirm, Fenster, sichtbare Flaeche,
+ *  Safe-Areas, ob die Standalone-Medienfrage ueberhaupt trifft, und die Cache-Marke des
+ *  Service-Workers (damit ein alter Stand sofort auffaellt).
+ *  WIEDER AUSBAUEN, sobald der Balken geklaert ist. */
+export function messwerte(win = window, doc = document) {
+  const vv = win.visualViewport;
+  const stil = getComputedStyle(doc.documentElement);
+  const sa = (name) => {
+    const p = doc.createElement("div");
+    p.style.cssText = `position:fixed;visibility:hidden;height:env(${name},0px)`;
+    doc.body.appendChild(p);
+    const h = Math.round(p.getBoundingClientRect().height);
+    p.remove();
+    return h;
+  };
+  let modus = "browser";
+  try { if (matchMedia("(display-mode: standalone)").matches) modus = "MQ-standalone"; } catch { /* egal */ }
+  if (win.navigator?.standalone === true) modus += modus === "browser" ? " nav-standalone" : "+nav";
+  return {
+    schirm: `${win.screen?.width || 0}x${win.screen?.height || 0}`,
+    fenster: `${win.innerWidth}x${win.innerHeight}`,
+    sichtbar: vv ? `${Math.round(vv.width)}x${Math.round(vv.height)}+${Math.round(vv.offsetTop)}` : "-",
+    saOben: sa("safe-area-inset-top"),
+    saUnten: sa("safe-area-inset-bottom"),
+    modus,
+    dpr: win.devicePixelRatio,
+  };
+}
+
+function zeigeMesszeile(win = window, doc = document) {
+  const m = messwerte(win, doc);
+  const zeile = doc.createElement("div");
+  zeile.id = "smejj-messzeile";
+  zeile.style.cssText = "position:fixed;left:6px;right:6px;top:calc(env(safe-area-inset-top,0px) + 2px);"
+    + "z-index:2147483001;pointer-events:none;font:600 11px/1.35 ui-monospace,Menlo,monospace;"
+    + "color:#02fdfd;background:rgba(0,0,0,.72);padding:3px 6px;text-align:center;word-break:break-all";
+  const marke = doc.querySelector('script[src*="app.js"]')?.getAttribute("src") || "";
+  zeile.textContent = `S${m.schirm} F${m.fenster} V${m.sichtbar} SA${m.saOben}/${m.saUnten} ${m.modus} DPR${m.dpr}`;
+  doc.body.appendChild(zeile);
+  navigator.serviceWorker?.getRegistration?.().then(() => fetch("/sw.js", { cache: "no-store" }))
+    .then((r) => r.text())
+    .then((t) => { zeile.textContent += " " + (t.match(/smejj-shell-v\d+/)?.[0] || "sw?") + " " + marke.slice(-14); })
+    .catch(() => {});
+  setTimeout(() => zeile.remove(), 15000);
+}
+
 export function sorgeFuerStil(doc = document) {
   if (doc.getElementById(STIL_ID)) return false;
   const stil = doc.createElement("style");
@@ -236,6 +286,8 @@ if (typeof document !== "undefined" && document.querySelector("#startMessage, #c
   verdrahteVersatz();
   verdrahteTastatur();
   verdrahteKopfglas();
+  // Diagnose-Messzeile nur in der installierten App (siehe zeigeMesszeile) — wieder ausbauen.
+  try { if (matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) zeigeMesszeile(); } catch { /* egal */ }
   // Ansichten nach dem Login (Profil, Einstellungen, Verlauf, Dateien …) — eigenes Modul, ohne Marke.
   import("/assets/mobil-ansichten.js").catch(() => {});
 }
