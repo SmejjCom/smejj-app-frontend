@@ -91,12 +91,15 @@ export function refreshLocalWorkspaceStatus(deps) {
   const status = workspace.status();
   setText("#storageStatusChip", `Storage: ${status.storage}`);
   setText("#workspaceStatusChip", `Workspace: ${status.offline ? "offline" : status.syncStatus}`);
-  setText("#idriveStatusChip", "IDrive: presigned spaeter");
+  setText("#idriveStatusChip", "IDrive: wird geprüft");
   setText("#aiStatusChip", "KI: disabled");
   setText("#costStatusChip", "Kosten: 0 EUR Risiko");
   setText("#storageStatusText", status.storage);
   setText("#workspaceStatusText", status.offline ? "offline nutzbar" : "lokal bereit");
-  setText("#idriveStatusText", status.idriveStatus);
+  // Platzhalter bis /api/health bzw. /api/storage/status geantwortet haben
+  // (app.js refreshLiveSystemStatus). Vorher stand hier der interne Code
+  // "presigned-sync-not-configured" — irrefuehrend, der Speicher ist eingerichtet.
+  setText("#idriveStatusText", "wird geprüft …");
   setText("#aiModeText", status.aiMode);
   setText("#costStatusText", status.costStatus);
   setText("#syncStatusText", status.syncStatus);

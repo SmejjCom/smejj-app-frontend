@@ -558,7 +558,7 @@ function updateAiStatus(result) {
 }
 
 async function refreshLiveSystemStatus() {
-  refreshLocalWorkspaceStatus(projektAbhaengigkeiten()); try { const h = await getJson(CLIENT_ROUTES.api.health); if (h) { if (h.storage) setText("#storageStatusText", lesbarerStatus(h.storage)); if (h.idrive) setText("#idriveStatusText", lesbarerStatus(h.idrive)); if (h.aiMode) setText("#aiModeText", lesbarerStatus(h.aiMode)); if (h.cost) setText("#costStatusText", lesbarerStatus(h.cost)); } const s = await getJson(CLIENT_ROUTES.api.storageStatus); if (s?.configured) setText("#idriveStatusText", `IDrive e2 (${s.bucket || "smejj-app"}) OK`); } catch {}
+  refreshLocalWorkspaceStatus(projektAbhaengigkeiten()); try { const h = await getJson(CLIENT_ROUTES.api.health); if (h) { if (h.storage) setText("#storageStatusText", lesbarerStatus(h.storage)); if (h.idrive) setText("#idriveStatusText", lesbarerStatus(h.idrive)); if (h.aiMode) setText("#aiModeText", lesbarerStatus(h.aiMode)); if (h.cost) setText("#costStatusText", lesbarerStatus(h.cost)); } const s = await getJson(CLIENT_ROUTES.api.storageStatus); if (s?.configured) { setText("#idriveStatusText", `IDrive e2 (${s.bucket || "smejj-app"}) OK`); setText("#idriveStatusChip", "IDrive: e2 OK"); } else { setText("#idriveStatusText", "IDrive e2: nicht eingerichtet"); setText("#idriveStatusChip", "IDrive: nicht eingerichtet"); } } catch { setText("#idriveStatusText", "IDrive e2: Status nicht abrufbar"); setText("#idriveStatusChip", "IDrive: Status offen"); }
 }
 
 function bindTools() {

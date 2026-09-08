@@ -277,8 +277,13 @@ async function zeichnePlanzeile() {
   const zeile = document.createElement("span");
   zeile.id = "profileDockPlan";
   zeile.className = "profile-dock-plan";
-  zeile.textContent = "Frei";
+  // Bis die Antwort da ist, bleibt die Zeile leer: zahlende Kunden sahen sonst
+  // kurz "Frei" aufblitzen (gemessen 2026-09-08). Fail-closed bleibt: ohne
+  // Antwort oder ohne Sitzung steht am Ende "Frei".
+  zeile.textContent = "";
+  zeile.setAttribute("aria-busy", "true");
   dock.after(zeile);
+  let text = "Frei";
   try {
     // GEMESSEN 2026-08-19: der Abruf ging an smejj.com selbst — dort liegt
     // nur die statische Seite, also 404 bei JEDEM Seitenaufruf, und die
@@ -287,9 +292,11 @@ async function zeichnePlanzeile() {
     const antwort = await fetch(`${API_ORIGIN}/api/billing/status`, { credentials: "include" });
     if (antwort.ok) {
       const daten = await antwort.json();
-      if (daten?.plan && daten.plan !== "free") zeile.textContent = PLAN_NAMEN[daten.plan] || daten.plan;
+      if (daten?.plan && daten.plan !== "free") text = PLAN_NAMEN[daten.plan] || daten.plan;
     }
   } catch { /* "Frei" bleibt stehen */ }
+  zeile.textContent = text;
+  zeile.removeAttribute("aria-busy");
 }
 
 if (typeof document !== "undefined") {
