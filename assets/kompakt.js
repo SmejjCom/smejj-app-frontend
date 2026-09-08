@@ -55,6 +55,16 @@ export const REGELN = [
   + "body #code #codeSenden.send-button{width:44px;height:44px;min-height:44px}"
   + "body #code .codeleiste .repochip{min-width:44px}"
   + "body #smejj-sitzung-abgelaufen a,body #smejj-sitzung-abgelaufen button{display:inline-flex;align-items:center}"
+  // Runde 5 (Rundgang 08.09., Pixel quer 863 px und Tablet 800 px, jeweils pointer:coarse):
+  //   Kopfknoepfe der Ansichten (Zurueck, Schliessen) 32x32, Werkzeugzeilen 40 px,
+  //   Konto-Reiter 40 px, Konto-Knoepfe (Speichern, Anmelden, Entfernen) 40 px,
+  //   Eintraege im Plus-Menue 38 px (min-height stand auf 34).
+  //   Am Handy hochkant hingen die meisten schon an mobil-dock.js/mobil-ansichten.js — die
+  //   laufen aber nur bis 600 px. Hier gilt dasselbe Mass fuer jedes grobe Zeigegeraet.
+  + "body .view .view-chrome.view-chrome button{min-width:44px;min-height:44px}"
+  + "body .view .toolbar button,body .view .panel-actions button,body .plus-menu.plus-menu button,"
+  + "body #profile .account-nav button,body #profile .account-actions button,"
+  + "body #profile .account-picture-actions button,body #profile .account-picture-choose{min-height:44px}"
   + "}",
   // Mikrofon-Zustand sichtbar (Betreiber 07.09., 17:39: "ich merke nicht, ob das Mikrofon
   // aktiv ist"): waehrend des Diktats leuchtet das Symbol in der LOGOFARBE #02fdfd (bisher
