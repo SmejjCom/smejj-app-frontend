@@ -99,8 +99,11 @@
     } else if (m.zustand !== "unbrauchbar" && m.motorId) {
       teile.push('<span class="btn" data-mdAn="' + e(m.id) + '">An</span>');
     }
-    teile.push('<span class="btn" data-mdWeg="' + e(m.id) + '">Löschen</span>');
-    return teile.join(" ");
+    // Zeilen, die nur ein Motor gemeldet hat, haben keine Datei — da gibt es
+    // nichts zu löschen. Der Server weist es ohnehin ab; den Knopf trotzdem
+    // zu zeigen wäre ein Versprechen, das er nicht hält.
+    if (m.pfad) teile.push('<span class="btn" data-mdWeg="' + e(m.id) + '">Löschen</span>');
+    return teile.length ? teile.join(" ") : '<span class="s">nichts zu tun</span>';
   }
 
   function modellZeile(m, kannSchalten) {

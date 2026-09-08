@@ -132,6 +132,14 @@
 <script defer src="/admin/console-stage12.js"></script>
 <script defer src="/admin/views-stage13.js"></script>
 <script defer src="/admin/console-stage13.js"></script>
+<!-- Stufe 14 (Modelle): e2-Bestand, Motoren, Zugaenge. Muss VOR console.js
+     stehen, das die angemeldeten Seiten beim Start einsammelt.
+     DIESE DATEI ist die einzige Quelle: sync_admin_console_pages.mjs
+     kopiert sie in alle Seitenordner. Wer den Eintrag nur im
+     Frontend-Klon macht, verliert ihn bei der naechsten Spiegelung
+     (Befund 2026-09-08). -->
+<script defer src="/admin/views-stage14.js"></script>
+<script defer src="/admin/console-stage14.js"></script>
 <script defer src="/admin/console.js"></script>
 </body>
 </html>
