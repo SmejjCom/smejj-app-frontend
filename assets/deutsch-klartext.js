@@ -46,8 +46,101 @@ export function setzeKlartext(doc = document) {
   return n;
 }
 
+// ---------------------------------------------------------------------------
+// Durchgängig Deutsch in den Ansichten nach dem Login (Betreiber 08.09. "Einstellungen
+// durchgängig Deutsch machen, Go"). GEMESSEN im Emulator mit deutscher Oberfläche: die
+// Quelle ist Deutsch, aber in Einstellungen, Konto, Speicher und Kostenschutz stehen
+// Anglizismen — Reasoning, Sync, Coding, Key, Free-safe, BYOK, Session, Diff, Limit.
+// Die Quelldateien (settings-surface.js, provider-settings.js, account-privacy.js …)
+// hängen mit Marken an premium-surfaces.js (Start-Lock) und sind zugleich die
+// Übersetzungs-Schlüssel für 30 Sprachen — eine Änderung dort zieht 30 Wörterbücher
+// und die Markenkette mit. Darum ersetzt dieses Modul die Wörter zur Laufzeit, NUR bei
+// deutscher Oberfläche und nur bei exaktem Treffer (in anderen Sprachen steht dort
+// schon die Übersetzung, die trifft nicht). Ansichten rendern spät — ein Beobachter
+// auf der Hülle zieht nach.
+export const WOERTER = Object.freeze({
+  "Modelle und Reasoning": "Modelle und Nachdenken",
+  "Reasoning-Aufwand": "Gründlichkeit beim Nachdenken",
+  "Offline, Sync, Platz": "Offline, Abgleich, Platz",
+  "Free-safe": "Kostenfrei & sicher",
+  "BYOK vorbereitet": "Eigener Schlüssel vorbereitet",
+  "BYOK": "Eigener Schlüssel",
+  "Standards für Coding-Aufgaben und Verifikation.": "Vorgaben für Programmier-Aufgaben und Prüfung.",
+  "Coding-Arbeitsbereich": "Programmier-Arbeitsbereich",
+  "Coding öffnen": "Programmieren öffnen",
+  "Coding-Aufgaben": "Programmier-Aufgaben",
+  "Coding-Agent fertig": "Programmier-Agent fertig",
+  "Für Coding: über die rechte Seitenleiste der App verbunden.": "Fürs Programmieren: über die rechte Seitenleiste der App verbunden.",
+  "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.": "Unbegrenzte Nachrichten, Programmier-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.",
+  "App-Shell und lokale Arbeitsdaten offline halten.": "App-Hülle und lokale Arbeitsdaten offline halten.",
+  "Lokalen Speicher, IDrive e2 und Sync prüfen.": "Lokalen Speicher, IDrive e2 und Abgleich prüfen.",
+  "Sync": "Abgleich",
+  "API-Key": "API-Schlüssel",
+  "API-Keys": "API-Schlüssel",
+  "API-Key fehlt.": "API-Schlüssel fehlt.",
+  "KI-Modelle & API-Keys": "KI-Modelle & API-Schlüssel",
+  "Key sicher verbinden": "Schlüssel sicher verbinden",
+  "Cline API-Key einmalig eingeben": "Cline-API-Schlüssel einmalig eingeben",
+  "Eigener Cline-Key · AES-256-GCM verschlüsselt · niemals im Browser gespeichert.": "Eigener Cline-Schlüssel · AES-256-GCM verschlüsselt · niemals im Browser gespeichert.",
+  "Modelle geladen. Bitte Cline API-Key eingeben und sicher verbinden.": "Modelle geladen. Bitte Cline-API-Schlüssel eingeben und sicher verbinden.",
+  "Nutzer-Key separat": "Nutzer-Schlüssel separat",
+  "Free only": "Nur kostenfrei",
+  "Free — 0 €": "Kostenlos — 0 €",
+  "Free-Guard anzeigen": "Kostenschutz anzeigen",
+  "Free-Guard Hinweis": "Kostenschutz-Hinweis",
+  "Session": "Sitzung",
+  "local-only": "nur lokal",
+  "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.": "Profil, Einstellungen und lokale Sitzungsdaten; niemals Ausweise oder Schlüssel.",
+  "Limit fast erreicht": "Grenze fast erreicht",
+  "Exakte Diff-Freigabe": "Freigabe jeder einzelnen Änderung"
+});
+
+/** Reine Funktion: exakter Treffer (ohne Randleerraum) → deutsches Wort, sonst unverändert. */
+export function deutschesWort(text) {
+  const kern = String(text ?? "").trim();
+  if (!kern || !Object.prototype.hasOwnProperty.call(WOERTER, kern)) return text;
+  return String(text).replace(kern, WOERTER[kern]);
+}
+
+/** Ist die Oberfläche deutsch? Quelle ist Deutsch, andere Sprachen setzen <html lang>. */
+export function oberflaecheDeutsch(doc = document) {
+  const lang = String(doc.documentElement?.getAttribute("lang") || "de").toLowerCase();
+  return lang === "" || lang.startsWith("de");
+}
+
+const UEBERSPRINGEN = new Set(["SCRIPT", "STYLE", "TEXTAREA", "PRE", "CODE", "KBD"]);
+
+/** Ersetzt in einem Teilbaum Textknoten, Platzhalter und Optionen. Output: Zahl der Änderungen. */
+export function deutscheWoerter(wurzel, doc = document) {
+  if (!wurzel || !oberflaecheDeutsch(doc)) return 0;
+  let n = 0;
+  const lauf = doc.createTreeWalker(wurzel, 4 /* NodeFilter.SHOW_TEXT */);
+  const knoten = [];
+  for (let k = lauf.nextNode(); k; k = lauf.nextNode()) knoten.push(k);
+  for (const k of knoten) {
+    if (UEBERSPRINGEN.has(k.parentElement?.tagName)) continue;
+    const neu = deutschesWort(k.textContent);
+    if (neu !== k.textContent) { k.textContent = neu; n += 1; }
+  }
+  for (const el of wurzel.querySelectorAll("input[placeholder], textarea[placeholder]")) {
+    const neu = deutschesWort(el.placeholder);
+    if (neu !== el.placeholder) { el.placeholder = neu; n += 1; }
+  }
+  return n;
+}
+
+function beobachteAnsichten(doc = document) {
+  const huelle = doc.querySelector("main.shell") || doc.body;
+  if (!huelle) return;
+  let takt = 0;
+  const nachziehen = () => { clearTimeout(takt); takt = setTimeout(() => deutscheWoerter(huelle, doc), 120); };
+  new MutationObserver(nachziehen).observe(huelle, { childList: true, subtree: true });
+  nachziehen();
+}
+
 if (typeof document !== "undefined" && document.getElementById("startMessage")) {
   // Sofort und nach dem verzögerten App-Start (deferred-start baut Teile der Shell später).
   setzeKlartext();
   for (const ms of [1500, 4000]) setTimeout(() => setzeKlartext(), ms);
+  beobachteAnsichten();
 }
