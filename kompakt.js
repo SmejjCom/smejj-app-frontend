@@ -72,6 +72,9 @@ export const REGELN = [
   //   Suche 112x40, Automatisierung 42 px und mehrere Felder bei 43,5 px (Rundung auf 44).
   + "body .view input:not([type=checkbox]):not([type=radio]):not([type=file]),body .view select,"
   + "body .view textarea,body .view form button{min-height:44px}"
+  //   Das Start-Feld selbst blieb bei 43,5 px: die Bundel-Regel min-height:40px ist spezifischer
+  //   als "body .view textarea". Darum ausdruecklich ueber die Kennung (Rundgang quer 08.09.).
+  + "body #start .prompt-glass #startMessage,body #code .codefeld #codeAufgabe{min-height:44px}"
   + "}",
   // Mikrofon-Zustand sichtbar (Betreiber 07.09., 17:39: "ich merke nicht, ob das Mikrofon
   // aktiv ist"): waehrend des Diktats leuchtet das Symbol in der LOGOFARBE #02fdfd (bisher
