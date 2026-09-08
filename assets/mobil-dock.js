@@ -125,6 +125,13 @@ export const REGELN = "@media (max-width:600px){"
   + "body #start:not(.has-start-chat) .home-feed.home-feed{justify-content:flex-end;gap:10px}"
   + "body #start:not(.has-start-chat) .home-hero.home-hero{margin-bottom:2px}"
   + "body #start:not(.has-start-chat) .erste-schritte.erste-schritte{margin-top:2px}"
+  //      NACHGEBESSERT 08.09. (Betreiber: "ChatGPT hat es richtig kompakt ganz unten"): mit flex-end
+  //      allein sass zwar der BLOCK unten, das Eingabefeld aber in der Mitte (441 von 839) — darunter
+  //      lagen noch Werkzeugzeile und "Erste Schritte" mit zusammen 374 px. Gemeint war das FELD.
+  //      Die Reihenfolge dreht sich darum um: Gruss, Vorschlaege, Werkzeuge, Feld ganz unten (714..815).
+  + "body #start:not(.has-start-chat) .home-feed .erste-schritte{order:6}"
+  + "body #start:not(.has-start-chat) .home-feed .start-chips{order:7}"
+  + "body #start:not(.has-start-chat) .home-feed .prompt-glass{order:8}"
   // (16) Modell-Menue war nicht bedienbar (Betreiber-Screenshot 08.09. 14:29): die Werkzeug-Kacheln
   //      lagen UEBER dem offenen Menue, der Fingerdruck traf sie statt der Modellzeile.
   //      GEMESSEN: .prompt-glass traegt backdrop-filter und ist damit ein eigener Stapel-Kontext —
