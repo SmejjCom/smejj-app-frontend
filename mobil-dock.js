@@ -125,17 +125,19 @@ export const REGELN = "@media (max-width:600px){"
   //      Tastatur-Historie). Verlaesslich ist die SICHTBARE Flaeche: visualViewport.offsetTop +
   //      visualViewport.height. Der Rahmen bekommt darum eine feste Hoehe bis zur sichtbaren
   //      Unterkante (--vv-unten) statt bottom:0 — bei offener Tastatur endet er an der Tastatur.
-  //      BEFUND Betreiber 08.09. 08:48-08:55 (SW v810/v813): der Balken war WIEDER da. Damit sind
-  //      DREI Messwege gescheitert (innerHeight, visualViewport, screen.height) — jede Messung des
-  //      Viewports ist in der iOS-App unzuverlaessig, weil iOS je nach Tastatur-Historie und
-  //      Statusleiste unterschiedliche Zahlen meldet. Darum jetzt der Weg, der seit 05.09. beim
-  //      GRUND (body::before) beweisbar haelt: BEDINGUNGSLOSER UEBERSTAND. Der Rahmen reicht 120 px
-  //      unter die Geraetekante, ganz ohne Messung. Preis: der untere Rahmenstrich ist unsichtbar
-  //      (vom Betreiber freigegeben) — dafuer kann kein Balken mehr entstehen, in keiner Lage und
-  //      nach keiner Tastatur. Oben bleibt der Strich, dort stimmt der Viewport.
-  //      dvh-Flaechen (Dock) bleiben unangetastet — sie waren nie das Problem (Befund 22:32).
+  //      GELOEST 08.09. 12:26 — und zwar NICHT im Layout. In der installierten App im iPhone-Simulator
+  //      gemessen: Schirm 402x874, Fenster 402x812, fixed inset:0 = 812, 100dvh = 812. Es fehlten 62 pt,
+  //      genau safe-area-inset-top. Die fehlende Flaeche liegt AUSSERHALB des WebViews: ein Rahmen mit
+  //      bottom:-120px endete dort ebenso wie drei Messstreifen. Ursache war der Meta-Wert
+  //      apple-mobile-web-app-status-bar-style "black-translucent" — iOS schreibt daraus
+  //      UIWebClipStatusBarStyleLegacyBlackTranslucent in die Webclip-Datei und verkuerzt die Flaeche.
+  //      Mit "default" (index.html, seit 08.09.) reicht sie bis zur Unterkante. Damit braucht der Rahmen
+  //      keine Sonderregel mehr — inset:0 aus dem Buendel ist wieder richtig, der untere Strich kommt zurueck.
+  //      Dafuer werden safe-area-inset-* in diesem Modus 0: den Mindestabstand zum Home-Balken traegt jetzt
+  //      die Regel unten (nie kleiner als der echte Wert, damit alte Installationen nichts verlieren).
   + "@media (display-mode:standalone) and (max-width:600px){"
-  + "body::after{top:0;bottom:-120px;height:auto}"
+  + "html{--sa-bottom:max(env(safe-area-inset-bottom,0px),18px)}"
+  + "html:not(.tastatur-offen) main.shell.shell{padding-bottom:max(env(safe-area-inset-bottom,0px),18px)}"
   + "}"
   // (11) Feld buendig an der Tastatur (Betreiber 08.09. 01:44, Punkt 7): bei offener Tastatur
   //      blieb der untere Sicherheitsrand (34 pt Home-Balken) als Luecke zwischen Feld und
@@ -178,35 +180,6 @@ export function sichtbareUnterkante({ offsetTop, height }) {
   return unten > 0 && Number.isFinite(unten) ? unten : 0;
 }
 
-/** BEFUND Betreiber 08.09. 08:52 (SW v810): Balken wieder da — in der iOS-App meldet auch der
- *  visualViewport zeitweise die um die Statusleiste verkuerzte Hoehe. Verlaesslich ist nur der
- *  Bildschirm selbst: screen.height/width sind fest (iOS meldet sie immer hochkant; im
- *  Querformat ist die sichtbare Hoehe die kuerzere Seite). Reine Funktion. */
-export function schirmUnterkante({ schirmHoehe, schirmBreite, innerWidth, innerHeight }) {
-  const h = Number(schirmHoehe) || 0, b = Number(schirmBreite) || 0;
-  if (!h || !b) return 0;
-  const quer = Number(innerWidth) > Number(innerHeight);
-  return quer ? Math.min(h, b) : Math.max(h, b);
-}
-
-function verdrahteVersatz(win = window, doc = document) {
-  const vv = win.visualViewport;
-  const apple = /iPhone|iPad|iPod/.test(win.navigator?.userAgent || "") || /Apple/.test(win.navigator?.vendor || "");
-  const standalone = () => { try { return matchMedia("(display-mode: standalone)").matches || win.navigator.standalone === true; } catch { return false; } };
-  const setze = () => {
-    // Apple-App: Bildschirmkante (unabhaengig von Viewport-Launen); sonst sichtbare Flaeche.
-    const unten = (apple && standalone())
-      ? schirmUnterkante({ schirmHoehe: win.screen?.height, schirmBreite: win.screen?.width, innerWidth: win.innerWidth, innerHeight: win.innerHeight })
-      : (vv ? sichtbareUnterkante(vv) : 0);
-    if (unten) doc.documentElement.style.setProperty("--vv-unten", `${unten}px`);
-    else doc.documentElement.style.removeProperty("--vv-unten");
-  };
-  setze();
-  if (vv) { vv.addEventListener("resize", setze); vv.addEventListener("scroll", setze); }
-  win.addEventListener("resize", () => setTimeout(setze, 120));
-  win.addEventListener("orientationchange", () => setTimeout(setze, 300));
-}
-
 /** Glasstreifen hinter Logo und Globus, nur im Chat-Zustand sichtbar (Klasse am body). */
 function verdrahteKopfglas(doc = document) {
   if (doc.querySelector(".mobil-kopfglas")) return;
@@ -222,56 +195,6 @@ function verdrahteKopfglas(doc = document) {
   pruefe();
 }
 
-/** DIAGNOSE (08.09., nach dem vierten Balken-Befund des Betreibers): Der Screenshot zeigt, dass
- *  auch der GRUND (body::before, seit 05.09. mit 120 px Ueberstand) unten aufhoert — seitlich fehlt
- *  der Lichtsaum ebenfalls. CSS kann nicht ueber die WebView-Kante hinaus malen, also ist nicht das
- *  Layout zu kurz, sondern die Flaeche, die iOS der App gibt. Um das nicht weiter zu raten, zeigt die
- *  installierte App beim Start 15 Sekunden lang eine Messzeile: Schirm, Fenster, sichtbare Flaeche,
- *  Safe-Areas, ob die Standalone-Medienfrage ueberhaupt trifft, und die Cache-Marke des
- *  Service-Workers (damit ein alter Stand sofort auffaellt).
- *  WIEDER AUSBAUEN, sobald der Balken geklaert ist. */
-export function messwerte(win = window, doc = document) {
-  const vv = win.visualViewport;
-  const stil = getComputedStyle(doc.documentElement);
-  const sa = (name) => {
-    const p = doc.createElement("div");
-    p.style.cssText = `position:fixed;visibility:hidden;height:env(${name},0px)`;
-    doc.body.appendChild(p);
-    const h = Math.round(p.getBoundingClientRect().height);
-    p.remove();
-    return h;
-  };
-  let modus = "browser";
-  try { if (matchMedia("(display-mode: standalone)").matches) modus = "MQ-standalone"; } catch { /* egal */ }
-  if (win.navigator?.standalone === true) modus += modus === "browser" ? " nav-standalone" : "+nav";
-  return {
-    schirm: `${win.screen?.width || 0}x${win.screen?.height || 0}`,
-    fenster: `${win.innerWidth}x${win.innerHeight}`,
-    sichtbar: vv ? `${Math.round(vv.width)}x${Math.round(vv.height)}+${Math.round(vv.offsetTop)}` : "-",
-    saOben: sa("safe-area-inset-top"),
-    saUnten: sa("safe-area-inset-bottom"),
-    modus,
-    dpr: win.devicePixelRatio,
-  };
-}
-
-function zeigeMesszeile(win = window, doc = document) {
-  const m = messwerte(win, doc);
-  const zeile = doc.createElement("div");
-  zeile.id = "smejj-messzeile";
-  zeile.style.cssText = "position:fixed;left:6px;right:6px;top:calc(env(safe-area-inset-top,0px) + 2px);"
-    + "z-index:2147483001;pointer-events:none;font:600 11px/1.35 ui-monospace,Menlo,monospace;"
-    + "color:#02fdfd;background:rgba(0,0,0,.72);padding:3px 6px;text-align:center;word-break:break-all";
-  const marke = doc.querySelector('script[src*="app.js"]')?.getAttribute("src") || "";
-  zeile.textContent = `S${m.schirm} F${m.fenster} V${m.sichtbar} SA${m.saOben}/${m.saUnten} ${m.modus} DPR${m.dpr}`;
-  doc.body.appendChild(zeile);
-  navigator.serviceWorker?.getRegistration?.().then(() => fetch("/sw.js", { cache: "no-store" }))
-    .then((r) => r.text())
-    .then((t) => { zeile.textContent += " " + (t.match(/smejj-shell-v\d+/)?.[0] || "sw?") + " " + marke.slice(-14); })
-    .catch(() => {});
-  setTimeout(() => zeile.remove(), 15000);
-}
-
 export function sorgeFuerStil(doc = document) {
   if (doc.getElementById(STIL_ID)) return false;
   const stil = doc.createElement("style");
@@ -283,11 +206,8 @@ export function sorgeFuerStil(doc = document) {
 
 if (typeof document !== "undefined" && document.querySelector("#startMessage, #codeAufgabe")) {
   sorgeFuerStil();
-  verdrahteVersatz();
   verdrahteTastatur();
   verdrahteKopfglas();
-  // Diagnose-Messzeile nur in der installierten App (siehe zeigeMesszeile) — wieder ausbauen.
-  try { if (matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) zeigeMesszeile(); } catch { /* egal */ }
   // Ansichten nach dem Login (Profil, Einstellungen, Verlauf, Dateien …) — eigenes Modul, ohne Marke.
   import("/assets/mobil-ansichten.js").catch(() => {});
 }
