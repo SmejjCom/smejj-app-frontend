@@ -25,10 +25,16 @@
   let letzteDaten = null;
 
   function taktStoppen() {
-    if (takt) { clearInterval(takt); takt = null; }
+    if (takt && typeof clearInterval === "function") clearInterval(takt);
+    takt = null;
   }
 
   function taktStarten(ctx) {
+    // Der Konsolen-Pruefer laedt diese Datei ohne Browser-Umgebung; dort gibt
+    // es keine Zeitgeber. Ohne diese Schranke stirbt er mit
+    // "setInterval is not defined", bevor er eine einzige Adresse gesehen hat.
+    // Im Browser aendert die Zeile nichts.
+    if (typeof setInterval !== "function") return;
     taktStoppen();
     takt = setInterval(function () {
       // Nicht nachladen, wenn der Tab im Hintergrund liegt oder die Seite
