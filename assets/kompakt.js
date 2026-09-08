@@ -68,6 +68,10 @@ export const REGELN = [
   + "body .view .toolbar button,body .view .panel-actions button,body .plus-menu.plus-menu button,"
   + "body #profile .account-nav button,body #profile .account-actions button,"
   + "body #profile .account-picture-actions button,body #profile .account-picture-choose{min-height:44px}"
+  //   Formularfelder und Formularknoepfe der Ansichten standen auf dem Schreibtisch-Mass:
+  //   Suche 112x40, Automatisierung 42 px und mehrere Felder bei 43,5 px (Rundung auf 44).
+  + "body .view input:not([type=checkbox]):not([type=radio]):not([type=file]),body .view select,"
+  + "body .view textarea,body .view form button{min-height:44px}"
   + "}",
   // Mikrofon-Zustand sichtbar (Betreiber 07.09., 17:39: "ich merke nicht, ob das Mikrofon
   // aktiv ist"): waehrend des Diktats leuchtet das Symbol in der LOGOFARBE #02fdfd (bisher
