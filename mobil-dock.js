@@ -67,6 +67,9 @@ export const REGELN = "@media (max-width:600px){"
   + "body #smejj-sitzung-abgelaufen a,body #smejj-sitzung-abgelaufen button{min-height:44px;display:inline-flex;align-items:center}"
   + "body .account-picture-choose.account-picture-choose{min-height:44px;display:inline-flex;align-items:center}"
   + "body .view .toolbar button{min-height:44px}"
+  // (17) Aktionen an Antworten wurden uebersehen: die Leiste steht auf 52 % Deckkraft und wird erst
+  //      beim Zeigen heller — am Handy gibt es kein Zeigen. Darum hier dauerhaft gut lesbar.
+  + "body #startLog .msg-actions .msg-act,body #codeLogHalter .msg-actions .msg-act{color:rgba(246,243,238,.82)}"
   // (8) Modell-Menue (Betreiber 17:38: "rechte Seite schneidet ab"): das Untermenue war
   //     232-312 px breit mit nowrap und Ellipse — "smejj 1.3 — Sp…", Haken ueber dem Text.
   //     Am Handy liegt es jetzt FEST ueber dem Dock, 16 px Rand links und rechts, Text darf
@@ -81,7 +84,8 @@ export const REGELN = "@media (max-width:600px){"
   + "body #start .prompt-glass .model-picker.model-picker{position:static}"
   + "body #startModellMenue.code-modus-menue,body #start .prompt-glass .model-submenu.model-submenu,body #start .prompt-glass .model-menu.model-menu{position:absolute!important;left:6px!important;right:6px!important;top:auto!important;bottom:calc(100% + 8px)!important;width:auto!important;min-width:0!important;max-width:none!important;max-height:min(50vh,420px);overflow-y:auto}"
   + "body #startModellMenue.code-modus-menue{display:flex;flex-direction:column;flex-wrap:nowrap}"
-  + "body #start:not(.has-start-chat) #startModellMenue.code-modus-menue,body #start:not(.has-start-chat) .prompt-glass .model-menu.model-menu{top:calc(100% + 8px)!important;bottom:auto!important}"
+  // Das Menue klappt IMMER nach oben: seit (15) sitzt das Glas auch auf der leeren Startseite unten,
+  // nach unten waere es ueber den Werkzeug-Kacheln und am Schirmrand.
   + "body #startModellMenue.code-modus-menue button,body #code .code-modus-menue.code-modus-menue button,body .model-submenu button{display:flex;align-items:center;gap:10px;width:100%;flex:0 0 auto;min-height:44px;white-space:normal;text-align:left}"
   + "body .code-modus-menue .modus-links,body .model-submenu .model-submenu-name{flex:1 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}"
   + "body .code-modus-menue .modus-rechts,body .code-modus-menue .modus-haken,body .model-submenu .model-submenu-check{flex:0 0 auto}"
@@ -104,6 +108,21 @@ export const REGELN = "@media (max-width:600px){"
   + "body #start.has-start-chat #startLog.start-log{padding-top:calc(env(safe-area-inset-top,0px) + 56px);scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}"
   + "body .mobil-kopfglas{position:fixed;top:0;left:0;right:0;height:calc(env(safe-area-inset-top,0px) + 52px);z-index:73;pointer-events:none;background:linear-gradient(180deg,rgba(7,10,14,.92) 0%,rgba(7,10,14,.72) 70%,rgba(7,10,14,0) 100%);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 70%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 70%,transparent 100%)}"
   + "body:not(.mobil-chat-offen) .mobil-kopfglas{display:none}"
+  // (15) Startseite kompakt und UNTEN (Betreiber 08.09.: "unten noch mehr runterziehen und kompakt
+  //      machen, unten ist Platz frei, oben verlieren wir viel — ChatGPT hat es ganz unten").
+  //      GEMESSEN (Pixel 7, 412x839): .home-feed steht auf justify-content:center, der Block endete
+  //      bei 686 — 153 px blieben unten leer, waehrend oben der Gruss in der Luft hing.
+  //      Jetzt sammelt sich alles an der Unterkante, mit engeren Abstaenden.
+  + "body #start:not(.has-start-chat) .home-feed.home-feed{justify-content:flex-end;gap:10px}"
+  + "body #start:not(.has-start-chat) .home-hero.home-hero{margin-bottom:2px}"
+  + "body #start:not(.has-start-chat) .erste-schritte.erste-schritte{margin-top:2px}"
+  // (16) Modell-Menue war nicht bedienbar (Betreiber-Screenshot 08.09. 14:29): die Werkzeug-Kacheln
+  //      lagen UEBER dem offenen Menue, der Fingerdruck traf sie statt der Modellzeile.
+  //      GEMESSEN: .prompt-glass traegt backdrop-filter und ist damit ein eigener Stapel-Kontext —
+  //      das Menue mit z-index:60 steckt darin fest, waehrend .start-chips im DOM SPAETER kommt und
+  //      bei gleichem Stapelwert gewinnt. Also hebt sich das ganze Glas ueber die Kacheln.
+  + "body #start .prompt-glass.prompt-glass{position:relative;z-index:70}"
+  + "body #startModellMenue.code-modus-menue,body #start .prompt-glass .model-menu.model-menu{background:#0d1219;z-index:80!important}"
   // (14) Im Code-Bereich lag der Gruss "Was steht als Naechstes an, Alan?" UNTER dem Kopfglas
   //      (Betreiber-Screenshot 08.09. 08:55) — das Glas ist fest, der Gruss beginnt bei 0.
   //      Beide Zustaende bekommen darum dasselbe Polster wie das Start-Log: Gruss (leerer Bereich)

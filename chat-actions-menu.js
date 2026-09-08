@@ -116,7 +116,13 @@ const MENU_KOPF = Object.freeze({
     // erneutes Antippen waehrend der Ansage stoppt sie.
     { act: "speak", label: "Vorlesen", icon: "volume" }
   ]),
+  // Betreiber 2026-09-08: "Antworten kann ich nicht kopieren, vorlesen — muessen auch wie
+  // meine Anfragen genau sein." Kopieren und Vorlesen stehen bei Antworten zwar schon in der
+  // Leiste, aber wer sie bei der eigenen Frage im Drei-Punkte-Menue sucht, sucht sie dort auch
+  // bei der Antwort. Einheitliche Bedienung schlaegt die alte Regel "keine doppelten Wege".
   assistant: Object.freeze([
+    { act: "copy", label: "Kopieren", icon: "copy" },
+    { act: "speak", label: "Vorlesen", icon: "volume" },
     { act: "regen", label: "Neu generieren", icon: "regen" }
   ])
 });
