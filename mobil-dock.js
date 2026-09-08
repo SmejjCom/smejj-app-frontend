@@ -131,7 +131,10 @@ export const REGELN = "@media (max-width:600px){"
   //      bottom:-120px endete dort ebenso wie drei Messstreifen. Ursache war der Meta-Wert
   //      apple-mobile-web-app-status-bar-style "black-translucent" — iOS schreibt daraus
   //      UIWebClipStatusBarStyleLegacyBlackTranslucent in die Webclip-Datei und verkuerzt die Flaeche.
-  //      Mit "default" (index.html, seit 08.09.) reicht sie bis zur Unterkante. Damit braucht der Rahmen
+  //      Mit "black" (index.html, seit 08.09.) reicht sie bis zur Unterkante. Alle drei Modi im
+  //      Simulator gemessen (fixed inset:0 / 100dvh / safe-area unten): Legacy 812/812/34 mit Balken,
+  //      "default" 874/874/0 aber helle Statusleiste, "black" 874/874/34 und schwarze Leiste.
+  //      Damit braucht der Rahmen
   //      keine Sonderregel mehr — inset:0 aus dem Buendel ist wieder richtig, der untere Strich kommt zurueck.
   //      Dafuer werden safe-area-inset-* in diesem Modus 0: den Mindestabstand zum Home-Balken traegt jetzt
   //      die Regel unten (nie kleiner als der echte Wert, damit alte Installationen nichts verlieren).
