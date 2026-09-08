@@ -61,7 +61,10 @@ export const REGELN = [
   //   Eintraege im Plus-Menue 38 px (min-height stand auf 34).
   //   Am Handy hochkant hingen die meisten schon an mobil-dock.js/mobil-ansichten.js — die
   //   laufen aber nur bis 600 px. Hier gilt dasselbe Mass fuer jedes grobe Zeigegeraet.
-  + "body .view .view-chrome.view-chrome button{min-width:44px;min-height:44px}"
+  //   Die Kopfknoepfe tragen height:32px aus dem Buendel; min-height allein setzt sich dagegen
+  //   nicht durch (live im Tablet-Emulator geprueft: 32 px blieben). Darum Breite und Hoehe
+  //   ausdruecklich — genau wie die schon bestehende Regel bis 600 px es tut.
+  + "body .view .view-chrome button,body .premium-view .view-chrome button{width:44px!important;height:44px!important}"
   + "body .view .toolbar button,body .view .panel-actions button,body .plus-menu.plus-menu button,"
   + "body #profile .account-nav button,body #profile .account-actions button,"
   + "body #profile .account-picture-actions button,body #profile .account-picture-choose{min-height:44px}"
