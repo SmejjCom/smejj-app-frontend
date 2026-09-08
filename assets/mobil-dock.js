@@ -46,7 +46,7 @@ export const REGELN = "@media (max-width:600px){"
   // (19) Das Start-Feld selbst mass 43,5 px (min-height 40 + Polster) — der einzige Rest aus dem
   //      Rundgang. Ein halber Pixel ist unsichtbar, die 44-px-Regel gilt trotzdem.
   //      Betreiber-Freigabe 08.09. ("alle Rechte von A bis Z"), sonst Design-Lock.
-  + "body #start .prompt-glass #startMessage,body #start .prompt-glass textarea.textarea{min-height:44px}"
+  + "body #start .prompt-glass #startMessage,body #start .prompt-glass textarea.textarea{min-height:44px!important}"
   // (3) Platzhalter in einer Zeile
   + "body #code .codefeld #codeAufgabe::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}"
   // (2) Code-Leiste in EINER Zeile

@@ -74,7 +74,9 @@ export const REGELN = [
   + "body .view textarea,body .view form button{min-height:44px}"
   //   Das Start-Feld selbst blieb bei 43,5 px: die Bundel-Regel min-height:40px ist spezifischer
   //   als "body .view textarea". Darum ausdruecklich ueber die Kennung (Rundgang quer 08.09.).
-  + "body #start .prompt-glass #startMessage,body #code .codefeld #codeAufgabe{min-height:44px}"
+  //   Die Buendel-Regel "#start .prompt-glass textarea" traegt min-height:40px MIT !important —
+  //   dagegen hilft nur !important (der erlaubte Fall: gegen eine wichtige Fremdregel).
+  + "body #start .prompt-glass #startMessage,body #code .codefeld #codeAufgabe{min-height:44px!important}"
   + "}",
   // Mikrofon-Zustand sichtbar (Betreiber 07.09., 17:39: "ich merke nicht, ob das Mikrofon
   // aktiv ist"): waehrend des Diktats leuchtet das Symbol in der LOGOFARBE #02fdfd (bisher
