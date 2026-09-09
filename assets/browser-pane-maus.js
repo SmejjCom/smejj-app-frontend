@@ -9,9 +9,9 @@
 // nur noch der LAUF; die reinen Plan-Funktionen und der freie Modus liegen daneben. Alles
 // wird unveraendert weitergereicht — kein Aufrufer muss seinen Import aendern.
 import { kurz, erlaubteHosts, fuehreMausAuftragAus } from "./browser-pane-maus-plan.js?v=browser-pane-20260909-1";
-import { baueZeiger, fuehreFreienLaufAus } from "./browser-pane-maus-frei.js?v=browser-pane-20260909-1";
+import { baueZeiger, fuehreFreienLaufAus } from "./browser-pane-maus-frei.js?v=browser-pane-20260909-2";
 export * from "./browser-pane-maus-plan.js?v=browser-pane-20260909-1";
-export * from "./browser-pane-maus-frei.js?v=browser-pane-20260909-1";
+export * from "./browser-pane-maus-frei.js?v=browser-pane-20260909-2";
 
 //
 // Seit 2026-08-18 laesst sich die Maus auf ZWEI Wegen beauftragen: ueber den

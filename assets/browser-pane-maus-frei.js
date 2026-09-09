@@ -309,12 +309,42 @@ export function entscheidungAlsAktion(entscheidung) {
  *   auftrag, tab, schrittUrl, holeToken, sende(aktion), zeige(text), abbruch()
  *   maxSchritte  Obergrenze — ohne sie koennte die Maus ewig weitermachen
  */
+// NACHWEIS ERNEUERN, WENN DER SERVER IHN ABLEHNT.
+//
+// LIVE 09.09. 14:55: Nach gut zehn Minuten im Panel endete jeder Lauf sofort
+// mit "Maus konnte nicht entscheiden: authentication_required". Der im
+// Speicher liegende Ausweis war abgelaufen. Der Live-Browser-Client holt sich
+// in genau dem Fall laengst einen frischen (browser-pane-session.js) — die
+// Maus fragte nie danach und gab beim ersten 401 auf. Derselbe Weg wie dort:
+// /api/auth/session-token per Cookie, einmal wiederholen, den frischen
+// Ausweis dort ablegen, wo der alte lag.
+export async function frischerNachweis(schrittUrl, fetchImpl = fetch) {
+  try {
+    const origin = new URL(schrittUrl).origin;
+    const r = await fetchImpl(`${origin}/api/auth/session-token`, { credentials: "include" });
+    if (!r.ok) return "";
+    const d = await r.json().catch(() => null);
+    const t = String(d?.accessToken || "");
+    if (t) {
+      for (const speicher of [globalThis.localStorage, globalThis.sessionStorage]) {
+        try { if (speicher?.getItem("smejj.auth.accessToken.v1")) speicher.setItem("smejj.auth.accessToken.v1", t); } catch { /* gesperrt */ }
+      }
+    }
+    return t;
+  } catch {
+    return "";
+  }
+}
+
 export async function fuehreFreienLaufAus({
   auftrag, tab, schrittUrl, holeToken = () => "", sende, zeige = () => {},
   abbruch = () => false, maxSchritte = FREI_MAX_SCHRITTE, braucheSitzung = true,
   schrittFristMs = SCHRITT_FRIST_MS, erneuere = null, zeiger = null,
-  aktionFristMs = AKTION_FRIST_MS, uhrTakt = null
+  aktionFristMs = AKTION_FRIST_MS, uhrTakt = null, erneuereToken = frischerNachweis
 } = {}) {
+  // Ein frisch geholter Ausweis gilt fuer den ganzen Lauf — auch wenn der
+  // Speicher keinen traegt (Cookie-Anmeldung) und holeToken() leer bleibt.
+  let frischerAusweis = "";
   const hosts = erlaubteHosts(tab?.url);
   if (!hosts.length) return { ok: false, grund: "Erst eine Seite öffnen — die Maus arbeitet nur dort." };
   // Die Sitzungspflicht gilt nur fuer den FERNEN Browser. Arbeitet die Maus im
@@ -395,17 +425,17 @@ export async function fuehreFreienLaufAus({
     uhr.starte(`Maus ${n}/${maxSchritte}: überlegt ...`);
     let antwort;
     try {
-      const token = await holeToken();
+      const token = (await holeToken()) || frischerAusweis;
       // Frist je Entscheidung — siehe SCHRITT_FRIST_MS. Sie gilt auch fuer das
       // Lesen der Antwort: ein Server, der die Verbindung offen haelt und nie
       // zu Ende sendet, hinge sonst genauso.
       const frist = new AbortController();
       const frist_uhr = setTimeout(() => frist.abort(), schrittFristMs);
-      const r = await fetch(schrittUrl, {
+      const schicke = (ausweis) => fetch(schrittUrl, {
         method: "POST",
         credentials: "include",
         signal: frist.signal,
-        headers: { "content-type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        headers: { "content-type": "application/json", ...(ausweis ? { Authorization: `Bearer ${ausweis}` } : {}) },
         body: JSON.stringify({
           naechsterSchritt: true,
           task: String(auftrag || "").slice(0, 4000),
@@ -416,6 +446,11 @@ export async function fuehreFreienLaufAus({
           restSchritte: maxSchritte - n + 1
         })
       });
+      let r = await schicke(token);
+      if (r.status === 401 || r.status === 403) {
+        const frisch = await erneuereToken(schrittUrl);
+        if (frisch) { frischerAusweis = frisch; r = await schicke(frisch); }
+      }
       antwort = await r.json().catch(() => null);
       clearTimeout(frist_uhr);
       zeit.ueberlegen += uhr.stopp();
