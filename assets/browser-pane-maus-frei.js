@@ -5,7 +5,7 @@
 // Der Unterschied zum Plan-Modus ist kein technischer, sondern ein praktischer: Ein Plan
 // wird EINMAL gemacht und scheitert an allem, was dazwischenkommt. Hier schaut die Maus
 // nach JEDEM Schritt neu hin.
-import { alsSitzungsAktion, beschreibe, erlaubteHosts } from "./browser-pane-maus-plan.js?v=browser-pane-20260909-1";
+import { alsSitzungsAktion, beschreibe, erlaubteHosts } from "./browser-pane-maus-plan.js?v=browser-pane-20260909-2";
 
 //
 // Der Unterschied zum Plan-Modus ist kein technischer, sondern ein
@@ -394,7 +394,7 @@ export async function fuehreFreienLaufAus({
       // Auch das Hinsehen kann an einer verdraengten Sitzung scheitern (live
       // 06.09.: "konnte die Seite nicht ansehen" ohne Grund, Schritt 5). Dann
       // gilt dasselbe wie bei einer Aktion: einmal neu verbinden, Grund nennen.
-      const grund = blick?.error ? String(blick.error).slice(0, 120) : "keine Antwort";
+      const grund = blick?.error ? String(blick.error).slice(0, 220) : "keine Antwort";
       const verloren = blick?.verloren === true || (braucheSitzung && !tab?.sessionId);
       if (verloren && erneuere && !verlauf.some((z) => z.startsWith("UNTERBROCHEN"))) {
         zeige(`Maus ${n}/${maxSchritte}: Live-Browser-Sitzung verloren, sie verbindet neu ...`);
@@ -553,7 +553,7 @@ export async function fuehreFreienLaufAus({
     }
     zeit.handeln += uhr.stopp();
     if (!ergebnis || ergebnis.ok === false) {
-      const grund = ergebnis?.error ? String(ergebnis.error).slice(0, 120) : "keine Antwort";
+      const grund = ergebnis?.error ? String(ergebnis.error).slice(0, 220) : "keine Antwort";
       // SITZUNG VERLOREN (live 05.09.: der ferne Browser haelt vier Sitzungen,
       // die aelteste fliegt raus — mitten im Lauf). Nicht aufgeben, neu
       // verbinden und den Schritt noch einmal versuchen. Einmal.

@@ -83,7 +83,11 @@ export function selektorAus(step) {
   return {
     strategy: ziel.strategy,
     value: ziel.value,
-    ...(ziel.name !== undefined ? { name: ziel.name } : {})
+    ...(ziel.name !== undefined ? { name: ziel.name } : {}),
+    // "nth" ist die BENANNTE Wahl bei gleichnamigen Treffern (Schema seit
+    // 21.08.). Bis 09.09. fiel es hier weg — live stoppte deshalb ein Lauf an
+    // zwei gleichen Wikipedia-Links, obwohl das Modell haette waehlen koennen.
+    ...(Number.isInteger(ziel.nth) && ziel.nth >= 0 ? { nth: ziel.nth } : {})
   };
 }
 
