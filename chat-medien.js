@@ -90,6 +90,40 @@ export function istMedienAdresse(quelle) {
   return /\/api\/chat-medien\?id=/.test(String(quelle || ""));
 }
 
+// PARKEN STATT BLOCKIEREN (live 2026-09-09): Steht die Serveradresse direkt im
+// src eines <img>, versucht der Browser sie zu laden, BEVOR rehydriereMedien
+// sie gegen einen blob: tauschen kann — die Sicherheitsrichtlinie weist das
+// ab, und in der Konsole steht bei jedem Zeichnen ein Fehler ("img-src"), bei
+// zwei Bildern ein Dutzend Mal. Deshalb wird die Adresse VOR dem Einfuegen ins
+// Attribut geparkt und das src auf ein leeres SVG gesetzt. Bewusst SVG statt
+// GIF: die Auslagerung sucht nach data:…;base64 — ein 1-Pixel-GIF wuerde als
+// "neues Medium" hochgeladen, ein utf8-SVG nicht (und SVG nimmt der Server
+// ohnehin nicht an).
+export const LEERES_BILD = "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
+// Sichtbarer Ersatz, wenn das Medium nicht mehr zu holen ist (Server 404,
+// Netz weg): ein grauer Kasten mit Klartext statt des kaputten Bildsymbols.
+export const FEHLENDES_BILD = "data:image/svg+xml;utf8," + encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' width='320' height='120' viewBox='0 0 320 120'>"
+  + "<rect width='320' height='120' rx='8' fill='#2a2b2f'/>"
+  + "<text x='160' y='56' text-anchor='middle' font-family='system-ui,sans-serif' font-size='15' fill='#c9c6c0'>Bild nicht mehr verfügbar</text>"
+  + "<text x='160' y='80' text-anchor='middle' font-family='system-ui,sans-serif' font-size='12' fill='#8f8c86'>Das Medium liegt nicht mehr auf dem Server.</text>"
+  + "</svg>"
+);
+
+/**
+ * Parkt Serveradressen in gespeichertem HTML, bevor es in die Seite kommt.
+ * Reine Zeichenkettenarbeit, ohne DOM — direkt testbar.
+ */
+export function parkeMedienAdressen(html) {
+  const text = String(html || "");
+  if (!istMedienAdresse(text)) return text;
+  return text.replace(/<(img|video)\b([^>]*?)\ssrc=("|')([^"']*\/api\/chat-medien\?id=[^"']*)\3([^>]*)>/gi,
+    (ganz, tag, vor, q, adresse, nach) => {
+      if (/data-smejj-adresse=/.test(vor + nach)) return ganz;
+      return `<${tag}${vor} ${ADRESSE_ATTRIBUT}=${q}${adresse}${q} src=${q}${LEERES_BILD}${q}${nach}>`;
+    });
+}
+
 /**
  * Gibt jedem angezeigten Medium seine echte Adresse zurueck.
  *
@@ -150,7 +184,14 @@ export async function rehydriereMedien(knoten, { holen = holeMedium } = {}) {
   if (!knoten?.querySelectorAll) return { geholt: 0, gescheitert: 0 };
   const offen = [];
   for (const el of knoten.querySelectorAll("img, video")) {
-    if (istMedienAdresse(el.getAttribute("src"))) offen.push(el);
+    const src = el.getAttribute("src") || "";
+    if (istMedienAdresse(src)) { offen.push(el); continue; }
+    // Geparkt (parkeMedienAdressen): Adresse im Attribut, src noch leer.
+    if (istMedienAdresse(el.getAttribute(ADRESSE_ATTRIBUT)) && !src.startsWith("blob:")) {
+      el.setAttribute("src", el.getAttribute(ADRESSE_ATTRIBUT));
+      el.removeAttribute(ADRESSE_ATTRIBUT);
+      offen.push(el);
+    }
   }
   let geholt = 0;
   let gescheitert = 0;
@@ -174,7 +215,19 @@ export async function rehydriereMedien(knoten, { holen = holeMedium } = {}) {
   for (const el of uebrig) {
     const adresse = el.getAttribute("src");
     const daten = await holen(adresse);
-    if (!daten) { gescheitert += 1; continue; }
+    if (!daten) {
+      gescheitert += 1;
+      // Sichtbar sagen, was los ist — und die Adresse behalten, damit das
+      // Speichern (entwaessere) sie wieder ins src schreibt und ein spaeterer
+      // Versuch sie erneut holen kann. Vorher blieb hier die Serveradresse
+      // im src stehen: Sicherheitsrichtlinie greift, kaputtes Bildsymbol.
+      if (el.tagName === "IMG") {
+        el.setAttribute(ADRESSE_ATTRIBUT, adresse);
+        el.setAttribute("src", FEHLENDES_BILD);
+        if (!el.getAttribute("alt")) el.setAttribute("alt", "Bild nicht mehr verfügbar");
+      }
+      continue;
+    }
     // Erst merken, dann umschalten: waere die Reihenfolge andersherum und
     // etwas ginge dazwischen schief, stuende ein blob: ohne Rueckweg da.
     el.setAttribute(ADRESSE_ATTRIBUT, adresse);
