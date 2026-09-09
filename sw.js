@@ -259,6 +259,11 @@ const SHELL = [
   "/assets/chat-markdown.js",
   "/assets/frame-guard.js",
   "/assets/app.js",
+  // Herausgeloest aus app.js am 07.09. (812 Zeilen ueber der Hausgrenze). Ohne diese
+  // Zeile waere die App OFFLINE TOT, sobald app.js nachzieht: der Import liefe ins
+  // Leere und app.js braeche komplett ab. Datei wurde zuerst ausgeliefert (22339f2),
+  // denn cache.addAll bricht beim ersten 404 ab.
+  "/assets/app-helfer.js",
   "/assets/view-title.js",
   "/assets/left-menu-state.js",
   "/assets/panel-backdrop.js",
