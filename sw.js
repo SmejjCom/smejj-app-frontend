@@ -427,7 +427,6 @@ const SHELL = [
   "/assets/ai/chatClient.js",
   // chatClient.js importiert ihn fuer die Auto-Modellwahl — ohne Eintrag riss
   // er offline den ganzen Chat-Client mit (check:precache-imports 2026-08-22).
-  "/assets/ai/modellRouter.js",
   "/assets/shared/securityPolicy.js",
   "/assets/shared/http-json.js",
   "/assets/shared/auth-me-speicher.js",
