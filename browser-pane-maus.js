@@ -8,10 +8,10 @@
 // GETEILT 2026-09-09: die Datei war auf 951 Zeilen gewachsen (Hausgrenze 800). Hier steht
 // nur noch der LAUF; die reinen Plan-Funktionen und der freie Modus liegen daneben. Alles
 // wird unveraendert weitergereicht — kein Aufrufer muss seinen Import aendern.
-import { kurz, erlaubteHosts, fuehreMausAuftragAus } from "./browser-pane-maus-plan.js?v=browser-pane-20260909-2";
-import { baueZeiger, fuehreFreienLaufAus } from "./browser-pane-maus-frei.js?v=browser-pane-20260909-3";
-export * from "./browser-pane-maus-plan.js?v=browser-pane-20260909-2";
-export * from "./browser-pane-maus-frei.js?v=browser-pane-20260909-3";
+import { kurz, erlaubteHosts, fuehreMausAuftragAus } from "./browser-pane-maus-plan.js?v=browser-pane-20260909-3";
+import { baueZeiger, fuehreFreienLaufAus } from "./browser-pane-maus-frei.js?v=browser-pane-20260909-4";
+export * from "./browser-pane-maus-plan.js?v=browser-pane-20260909-3";
+export * from "./browser-pane-maus-frei.js?v=browser-pane-20260909-4";
 
 //
 // Seit 2026-08-18 laesst sich die Maus auf ZWEI Wegen beauftragen: ueber den

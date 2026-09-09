@@ -127,12 +127,18 @@ export function beschreibe(step) {
   const wo = sel?.name || sel?.value || roh.name || roh.value || "";
   switch (s.action) {
     case "navigate": return `Seite öffnen: ${kurz(s.url)}`;
-    case "click": case "openLink": return `Klicken: ${kurz(wo)}`;
-    case "type": case "fill": return `Tippen in ${kurz(wo)}`;
+    // Eine benannte Wahl (nth) steht sichtbar dabei — sonst saehe der Nutzer
+    // zweimal "Klicken: Ada Lovelace" und wuesste nicht, was anders war.
+    case "click": case "openLink": return `Klicken: ${kurz(wo)}${treffer(sel)}`;
+    case "type": case "fill": return `Tippen in ${kurz(wo)}${treffer(sel)}`;
     case "extract": case "assert": return `Lesen: ${kurz(s.name || wo)}`;
     case "scroll": return "Scrollen";
     default: return String(s.action || "Schritt");
   }
+}
+
+function treffer(sel) {
+  return Number.isInteger(sel?.nth) ? ` (Treffer ${sel.nth + 1})` : "";
 }
 
 export function kurz(text) {
