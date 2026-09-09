@@ -80,9 +80,18 @@ export const REGELN = "@media (max-width:600px){"
   //      ABGESCHNITTEN. Ein Treffertest fand statt des Knopfes das Log. Jetzt nimmt die Leiste selbst
   //      Klicks an, faellt nicht mehr zusammen und schneidet nichts ab.
   + "body #startLog .msg-actions,body #codeLogHalter .msg-actions{pointer-events:auto;min-height:44px;overflow:visible;margin-top:0}"
-  //      Dazu Platz unter dem letzten Eintrag: sonst liegt genau die letzte Leiste hinter dem Dock
-  //      (gemessen: Leiste 767..811, Glas ab 738 — der Fingerdruck traf das Glas).
-  + "body #start.has-start-chat #startLog.start-log,body #code #codeLogHalter.code-log-halter{padding-bottom:132px}"
+  //      Dazu ein NORMALER Abstand unter dem letzten Eintrag — nicht mehr.
+  //      KORREKTUR 09.09.: hier standen 132px, damit die letzte Aktionsleiste nicht hinter dem
+  //      Eingabefeld liegt. Diese Annahme war falsch. Live nachgemessen (375x812):
+  //        .home-feed  display:grid, grid-template-rows: minmax(0,1fr) auto
+  //          #startLog      -> 1fr, scrollt selbst
+  //          .prompt-glass  -> auto, position:relative
+  //      Das Feld ist ein GESCHWISTER im Raster, kein schwebendes Overlay. Es liegt nie ueber
+  //      dem Log, also ist unter dem Log nichts freizuhalten. Die 132px hielten darum keinen
+  //      Platz frei — sie verschenkten ihn: der letzte Eintrag stand 81px ueber dem Feld statt
+  //      16px. Gemessen nach der Korrektur: Abstand 16px, Feld weiterhin buendig an der
+  //      Unterkante (0px), alle fuenf Aktionsknoepfe per elementFromPoint erreichbar.
+  + "body #start.has-start-chat #startLog.start-log,body #code #codeLogHalter.code-log-halter{padding-bottom:14px}"
   // (8) Modell-Menue (Betreiber 17:38: "rechte Seite schneidet ab"): das Untermenue war
   //     232-312 px breit mit nowrap und Ellipse — "smejj 1.3 — Sp…", Haken ueber dem Text.
   //     Am Handy liegt es jetzt FEST ueber dem Dock, 16 px Rand links und rechts, Text darf
