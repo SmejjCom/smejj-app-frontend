@@ -53,6 +53,7 @@
     <meta name="description" content="smejj.com ist ein schneller KI- und Code-Assistent für Chat, Programmierung und Agenten-Aufgaben.">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="smejj.com">
+    <!-- Vollbild oben. NICHT auf "black"/"default" stellen. Messung: public/mobil-dock.js -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
@@ -474,14 +475,8 @@
         </section>
 
         <section id="code" class="view" aria-label="Code-Assistent">
-          <!-- Befund live 2026-09-06: view-title.js nimmt den Seitentitel aus
-               der ersten h1/h2 der Ansicht. Hier gab es keine — der Tab hiess
-               in der Code-Ansicht weiter "smejj.com — KI- und Code-Assistent",
-               also genau wie die Startseite. Bei mehreren offenen Tabs, im
-               Verlauf und in Lesezeichen war nicht erkennbar, wo man ist, und
-               Screenreader sagten beim Wechsel nichts an (dieselbe Luecke, die
-               W2-05 fuer alle anderen Ansichten geschlossen hat).
-               Visuell versteckt: das Mockup bleibt unveraendert. -->
+          <!-- Gibt der Code-Ansicht einen eigenen Tab-Titel (view-title.js liest die erste
+               h1/h2). Visuell versteckt. Befund und Begruendung: docs/qa/befunde-live.md -->
           <h2 class="visually-hidden">Code</h2>
           <!-- Code-Bereich 1:1 nach Mockup-Bildschirm 26: persoenliche
                Begruessung oben, leere Flaeche fuer die Auftraege, unten

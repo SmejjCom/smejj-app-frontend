@@ -28,7 +28,7 @@ import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicher
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
 import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260819-4";
 import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
-import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260906-7";
+import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260909-1";
 // Gefunden 2026-08-18 beim Livetest: dieser Import FEHLTE, obwohl init() die
 // Funktion benutzt. Folge war kein kleiner Schoenheitsfehler — browser-pane.js
 // warf beim Laden "baueNachrichtenEmpfang is not defined", das ganze Modul kam
@@ -578,22 +578,10 @@ async function navigate(tab, url, { push = true } = {}) {
 // Live-Browser zuerst: interaktive Remote-Session (klicken/tippen wie Chrome).
 
 /**
- * Oeffnet eine Adresse AUSDRUECKLICH im Live-Browser — der einzige Modus, in
- * dem die Maus etwas sehen und klicken kann.
- *
- * WARUM ES DAS BRAUCHT (live gemessen 2026-08-18, mehrfach im Kreis gelaufen):
- * navigate() waehlt den Modus nach der SEITE, nicht nach dem Zweck. Ist eine
- * Seite einbettbar — und das sind die meisten —, landet sie als gewoehnlicher
- * iframe im Panel. Das ist fuer einen Menschen genau richtig: volles
- * JavaScript, schnell, kein Serverumweg. Fuer die Maus ist es wertlos: ein
- * fremder iframe laesst sich nicht auslesen, es entsteht keine sessionId, und
- * der freie Lauf wartet auf eine Sitzung, die nie kommt.
- *
- * Solange /api/browser/fetch ausgefallen war (404), fiel alles auf den
- * Live-Browser zurueck und es sah aus, als funktioniere die Kette. Als der
- * Endpunkt zurueckkam, verschwand die Sitzung wieder — derselbe Fehler, neues
- * Gesicht. Deshalb fragt die Maus jetzt selbst danach, statt zu hoffen.
- *
+ * Oeffnet eine Adresse AUSDRUECKLICH im Live-Browser — der einzige Modus, in dem die Maus
+ * etwas sehen und klicken kann. navigate() waehlt den Modus nach der SEITE, nicht nach dem
+ * Zweck; ein gewoehnlicher iframe ist fuer die Maus wertlos (keine sessionId).
+ * Befund und Vorgeschichte: docs/qa/befunde-live.md
  * @returns {Promise<{ok: true}|{ok: false, grund: string}>}
  */
 export async function oeffneImLiveBrowser(url) {
