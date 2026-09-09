@@ -3,10 +3,10 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=4";
-import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=7";
+import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=6";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
-import { holeSendepfad } from "./sendepfad-nachladen.js?v=22";
+import { holeSendepfad } from "./sendepfad-nachladen.js?v=19";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";
 import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js";
@@ -19,6 +19,10 @@ import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "
 import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b51";
 import { applyViewTitle } from "./view-title.js";
 import { getJson, postJson } from "./shared/http-json.js";
+// Kleine DOM-, Speicher- und Anzeige-Helfer. Herausgeloest am 07.09., weil
+// app.js mit 812 Zeilen ueber der Hausgrenze von 800 lag und damit
+// `npm run check:all` bei der ersten Pruefung abbrach.
+import { addEntry, downloadText, hideTaskIndicator, loadJson, loadText, setText, showTaskIndicator, snippet, writeOutput } from "./app-helfer.js?v=1";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
@@ -35,13 +39,30 @@ const state = {
 const workspace = createLocalWorkspace();
 const aiRouter = createAiRouter();
 let taskIndicatorTimer;
-// Antwortstufen (Konkurrenz-Radar V3, Betreiber 2026-08-06): der Chip zeigt
-// normalen Nutzern "Schnell/Auto/Gruendlich" statt Modellnamen; die Stufe gilt
-// nur auf dem Live-Pfad ("smejj 1.0"/disabled) und reist als preferences.stufe
-// zur Bruecke (chat-bridge.js, leseStufe; unbekannt/fehlend = Fail-Safe).
+// Antwortstufen (Konkurrenz-Radar V3, Freigabe Betreiber 2026-08-06,
+// Container-Neustart 2026-08-08): der Chip zeigt normalen Nutzern nur noch
+// "Schnell/Auto/Gruendlich" statt Modellnamen. Modellnamen (GLM-5.2, Kimi K2.7,
+// Kimi K3) bleiben als "Modelle (erweitert)" im selben Menue erreichbar —
+// wer sie waehlt, verlaesst bewusst den Live-Pfad fuer BYOK/Vault-Betrieb; die
+// Stufe gilt nur auf dem normalen Live-Pfad ("smejj 1.0"/disabled) und wird an
+// die Bruecke als preferences.stufe gereicht (siehe public/chat-bridge.js,
+// leseStufe). Ein unbekannter Wert und fehlende Angabe verhalten sich dort
+// identisch zum bisherigen Zustand (Fail-Safe der Bruecke).
 const STUFE_KEY = "smejj.stufe.v1";
-const STUFE_LABEL = Object.freeze({ schnell: "smejj 1.0 (Schnell)", auto: "smejj 1.0", gruendlich: "smejj 1.0 (Gründlich)" });
+// STAFFEL smejj 1.0 bis 1.3 (Betreiber-Ansage 2026-09-07). Die drei Stufen
+// hiessen intern schon "smejj 1.0 (Schnell)" bis "(Gruendlich)" — jetzt tragen
+// sie eigene Versionsnummern, und "spezial" kam als vierte dazu. Der Chip zeigt
+// damit denselben Namen, den der Nutzer im Modell-Menue angeklickt hat; vorher
+// stand dort in Klammern etwas anderes als im Menue, und beide meinten dasselbe.
+const STUFE_LABEL = Object.freeze({
+  schnell: "smejj 1.0",
+  auto: "smejj 1.1",
+  gruendlich: "smejj 1.2",
+  spezial: "smejj 1.3"
+});
 function normalizeStufe(value) {
+  // Bewusst weiter "auto" als Rueckfall: ein unbekannter Wert darf niemanden in
+  // die teure tiefe Spur zwingen. Das entspricht dem Fail-Safe der Bruecke.
   return Object.hasOwn(STUFE_LABEL, value) ? value : "auto";
 }
 
@@ -51,9 +72,8 @@ const MODEL_MODES = Object.freeze({
   "smejj 1.0": AI_MODES.disabled, "smejj 1.1": AI_MODES.disabled, "smejj 1.2": AI_MODES.disabled, "smejj 1.3": AI_MODES.disabled, "Auto": AI_MODES.disabled, // 07.09.: Name reist als body.model; 1.2/1.3 tiefe Spur, "Auto" = Server-Router waehlt + Ersatzkette
   "GLM-5.2": AI_MODES.glm52Vault, "Kimi K2.7": AI_MODES.kimiK27Vault,
   // K3 hat keinen Modell-Vault (nur API) und laeuft ueber einen Anbieter-Key —
-  // darum byok wie Cline, nicht *Vault wie GLM-5.2 und K2.7.
-  "Kimi K3": AI_MODES.byok,
-  "Cline": AI_MODES.byok
+  // darum byok, nicht *Vault wie GLM-5.2 und K2.7.
+  "Kimi K3": AI_MODES.byok
 });
 
 if ("serviceWorker" in navigator) {
@@ -178,7 +198,10 @@ function bindModelPicker() {
   };
   const selectFromEvent = (event) => {
     const item = event.target.closest("[data-model], [data-stufe]");
-    if (!item || item.hasAttribute("data-submenu-trigger")) return; // Untermenue (cline-model-menu.js) uebernimmt Trigger.
+    // data-submenu-trigger hatte bis 2026-09-10 genau einen Traeger: den
+    // Cline-Eintrag mit eigenem Untermenue. Der ist entfernt; die Weiche bleibt
+    // stehen, damit ein kuenftiges Untermenue nicht sofort ausgewaehlt wird.
+    if (!item || item.hasAttribute("data-submenu-trigger")) return;
     event.stopPropagation();
     event.preventDefault();
     selectItem(item);
@@ -213,11 +236,6 @@ function applySelectedModel(model, { persist = true, quiet = false } = {}) {
   if (selectedModel === "smejj 1.0") {
     const stufe = state.settings.stufe || "auto";
     if (button) button.textContent = STUFE_LABEL[stufe] || "smejj 1.0";
-  } else if (selectedModel === "Cline") {
-    // "Auto" laeuft ueber den Cline-Router (cline.model=auto) -> Chip zeigt "Auto",
-    // nicht "Cline" (Betreiber-Screenshot 07.09.); Alt-Katalogmodell behaelt Namen.
-    const clineWahl = localStorage.getItem("smejj.cline.model.v1") || "";
-    if (button) button.textContent = clineWahl === "auto" ? "Auto" : selectedModel;
   } else {
     if (button) button.textContent = selectedModel;
   }
@@ -558,7 +576,7 @@ function updateAiStatus(result) {
 }
 
 async function refreshLiveSystemStatus() {
-  refreshLocalWorkspaceStatus(projektAbhaengigkeiten()); try { const h = await getJson(CLIENT_ROUTES.api.health); if (h) { if (h.storage) setText("#storageStatusText", lesbarerStatus(h.storage)); if (h.idrive) setText("#idriveStatusText", lesbarerStatus(h.idrive)); if (h.aiMode) setText("#aiModeText", lesbarerStatus(h.aiMode)); if (h.cost) setText("#costStatusText", lesbarerStatus(h.cost)); } const s = await getJson(CLIENT_ROUTES.api.storageStatus); if (s?.configured) setText("#idriveStatusText", `IDrive e2 (${s.bucket || "smejj-app"}) OK`); } catch {}
+  refreshLocalWorkspaceStatus(projektAbhaengigkeiten()); try { const h = await getJson(CLIENT_ROUTES.api.health); if (h) { if (h.storage) setText("#storageStatusText", lesbarerStatus(h.storage)); if (h.idrive) setText("#idriveStatusText", lesbarerStatus(h.idrive)); if (h.aiMode) setText("#aiModeText", lesbarerStatus(h.aiMode)); if (h.cost) setText("#costStatusText", lesbarerStatus(h.cost)); } const s = await getJson(CLIENT_ROUTES.api.storageStatus); if (s?.configured) { setText("#idriveStatusText", `IDrive e2 (${s.bucket || "smejj-app"}) OK`); setText("#idriveStatusChip", "IDrive: e2 OK"); } else { setText("#idriveStatusText", "IDrive e2: nicht eingerichtet"); setText("#idriveStatusChip", "IDrive: nicht eingerichtet"); } } catch { setText("#idriveStatusText", "IDrive e2: Status nicht abrufbar"); setText("#idriveStatusChip", "IDrive: Status offen"); }
 }
 
 function bindTools() {
@@ -725,76 +743,3 @@ async function showJson(target, url) {
   writeOutput(target, JSON.stringify(await getJson(url), null, 2));
 }
 
-function addEntry(text, role, target = "#startLog") {
-  const node = document.createElement("article");
-  node.className = `entry ${role}`;
-  if (!text && role === "assistant") {
-    node.dataset.thinking = "true";
-    node.innerHTML = '<span class="thinking-dots">smejj denkt nach<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>';
-  } else {
-    node.textContent = text;
-  }
-  const log = $(target) || $("#startLog");
-  if (!log) return node;
-  log.hidden = false;
-  if (log.id === "startLog" && role === "user") $("#start")?.classList.add("has-start-chat");
-  log.append(node);
-  node.scrollIntoView({ block: "end" });
-  return node;
-}
-
-function writeOutput(selector, text) {
-  const node = $(selector);
-  node.textContent = text || "";
-}
-
-function setText(selector, text) {
-  const node = $(selector);
-  if (node) node.textContent = text;
-}
-
-function showTaskIndicator(status = "active") {
-  clearTimeout(taskIndicatorTimer);
-  document.body.classList.remove("task-indicator-active", "task-indicator-done");
-  document.body.classList.add("task-indicator-active");
-  if (status === "done") {
-    document.body.classList.add("task-indicator-done");
-    taskIndicatorTimer = setTimeout(hideTaskIndicator, 1400);
-  }
-}
-
-function hideTaskIndicator() {
-  clearTimeout(taskIndicatorTimer);
-  document.body.classList.remove("task-indicator-active", "task-indicator-done");
-}
-
-function loadJson(key, fallback) {
-  try {
-    return JSON.parse(localStorage.getItem(key) || "") || fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function loadText(key) {
-  return localStorage.getItem(key) || "";
-}
-
-function snippet(text, query) {
-  const index = text.toLowerCase().indexOf(query);
-  const start = Math.max(0, index - 80);
-  const end = Math.min(text.length, index + query.length + 160);
-  return text.slice(start, end);
-}
-
-function downloadText(filename, text) {
-  const blob = new Blob([text || ""], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-}

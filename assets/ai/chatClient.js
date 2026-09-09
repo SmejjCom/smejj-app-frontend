@@ -8,7 +8,6 @@
 // Alle anderen Modi geben false zurueck — der bestehende fail-closed Server-Pfad
 // in app.js bleibt unveraendert zustaendig.
 import { validateByokConfig } from "./byok.js";
-import { autoAktiv, pruefeAntwortModell, sorgeFuerModell } from "./modellRouter.js";
 import { starteStilleWache, stilleText } from "./strom-stillstand.js";
 import { API_ORIGIN, STORAGE_KEYS } from "../config.js";
 
@@ -275,98 +274,11 @@ function meldeStrom(delta) {
   } catch { /* fail-safe: die Antwort laeuft auch ohne Signal */ }
 }
 
-async function runClineChat({ task, output, offlineNotice, clearThinking = () => {} }) {
-  const token = holeZugriffsToken();
-  if (!token) {
-    clearThinking();
-    output.textContent = nichtAngemeldetText();
-    return true;
-  }
-  meldeStrom(+1);
-  try {
-    const contextFiles = await resolveWorkspaceReferences(task);
-    // "Auto": vor dem Senden das guenstigste passende Modell setzen. Nur wenn
-    // der Betreiber Auto gewaehlt hat — eine feste Modellwahl bleibt unberuehrt.
-    // Das /select MUSS abgewartet werden (Datensatz auf IDrive e2), sonst
-    // laeuft der Auftrag noch mit dem vorherigen Modell.
-    if (autoAktiv()) {
-      const wahl = await sorgeFuerModell(task, { dateien: contextFiles?.length || 0 });
-      if (!wahl.ok) {
-        // Betreiber 2026-09-07 (iPhone-Screenshots, fuenfmal "Automatische
-        // Modellwahl hat nicht geklappt — bitte ein Modell von Hand waehlen"):
-        // Auto darf nie in einer Sackgasse enden. Abgelaufene Anmeldung wird
-        // ehrlich gesagt; alles andere (kein Cline-Schluessel, Netz, fremdes
-        // Modell) geht lautlos den Server-Weg mit dem Haus-Modell —
-        // false heisst fuer runClientChat "nicht erledigt, Server uebernimmt".
-        if (wahl.fehler === "anmeldung") {
-          clearThinking();
-          output.textContent = nichtAngemeldetText();
-          return true;
-        }
-        return false;
-      }
-    }
-    // Nach der Modellwahl den Ausweis NEU lesen: sorgeFuerModell kann ihn
-    // gerade erneuert haben — der oben gelesene waere dann der abgelaufene.
-    const ausweis = holeZugriffsToken() || token;
-    const response = await fetch(`${API_ORIGIN}/api/providers/cline/chat`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Authorization: `Bearer ${ausweis}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ messages: buildMessages(task, offlineNotice, contextFiles) })
-    });
-    // Meldet der Server ein anderes Modell als gemerkt (zweiter Tab), faellt
-    // der Merker — der naechste Auftrag setzt wieder ueber /select.
-    pruefeAntwortModell(response);
-    if (!response.ok || !response.body) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || error.error || `HTTP ${response.status}`);
-    }
-    const reader = response.body.getReader();
-  anbieterLeser.add(reader);
-    const decoder = new TextDecoder();
-    let buffer = "";
-    let answer = "";
-    // Stille-Wache: derselbe Schutz wie in chat-stream.js (strom-stillstand.js).
-    let stilleGemeldet = false;
-    const wache = starteStilleWache(reader, () => { stilleGemeldet = true; });
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done || stoppVerlangt) break;
-      wache.lebenszeichen();
-      buffer += decoder.decode(value, { stream: true });
-      const events = buffer.split("\n\n");
-      buffer = events.pop() || "";
-      for (const event of events) {
-        const line = event.split("\n").find((item) => item.startsWith("data:"));
-        const data = line?.replace(/^data:\s?/, "").trim() || "";
-        if (!data || data === "[DONE]") continue;
-        const payload = JSON.parse(data);
-        const choice = payload?.choices?.[0] || {};
-        if (choice.finish_reason === "error") throw new Error(choice.error?.message || "Cline stream error");
-        const delta = choice.delta?.content || choice.message?.content || "";
-        if (delta) {
-          if (!answer) clearThinking();
-          answer += delta;
-          output.textContent = answer;
-        }
-      }
-    }
-    wache.beenden();
-    anbieterLeser.delete(reader);
-    if (stilleGemeldet) { clearThinking(); output.textContent = stilleText(answer); return; }
-    if (!answer) { clearThinking(); output.textContent = "(leere Antwort)"; }
-  } catch (error) {
-    clearThinking();
-    output.textContent = `Cline-Fehler: ${String(error?.message || error).slice(0, 400)}`;
-  } finally {
-    meldeStrom(-1);
-  }
-  return true;
-}
+// runClineChat() stand hier bis 2026-09-10 (92 Zeilen): der eigene Chatweg zu
+// einem fremden Anbieter, inklusive Vorab-Modellwahl per /select. Er ist mit
+// dem Anbieter entfallen. Wer "Auto" waehlt, geht jetzt denselben Weg wie
+// jede Stufe — ueber den eigenen Server, der das Modell pro Auftrag aussucht
+// und bei Ausfall selbst nachrueckt.
 
 // Generischer BYOK-Anbieter (Multi-Provider, /api/keys). Aktiv, wenn im
 // Modell-Picker ein eigener Anbieter gewaehlt wurde (STORAGE_KEYS.model = "key:<id>").
@@ -573,11 +485,11 @@ export async function runClientChat({ task, model, output, offlineNotice = "" } 
   };
   let handled = false;
   const selected = localStorage.getItem(STORAGE_KEYS.model) || "";
-  // Betreiber-Freigabe 2026-08-23 (Nutzerreise): "smejj denkt nach …" bleibt im
-  // Cline-Pfad stehen, bis der erste Text kommt — gemessen waren es 3,6 s leere
-  // Blase mit Kopier-/Daumen-Leiste. Der Wartetext faellt erst beim ersten Delta.
-  if (selected === "Cline") { handled = await runClineChat({ task, output, offlineNotice, clearThinking }); }
-  if (!handled && selected.startsWith("key:")) {
+  // "Auto" und die smejj-Stufen werden hier NICHT bedient: sie gehen ueber den
+  // Server-Weg (app.js -> /api/agent), damit der Router dort das Modell waehlt
+  // und bei Ausfall nachrueckt. Dieser Client-Weg ist nur fuer eigene Schluessel
+  // des Nutzers (BYOK) und den lokalen Browser-Modus.
+  if (selected.startsWith("key:")) {
     const providerId = selected.slice(4);
     if (/^[a-z][a-z0-9-]{1,40}$/.test(providerId)) { clearThinking(); handled = await runProviderChat({ providerId, task, output, offlineNotice }); }
   }

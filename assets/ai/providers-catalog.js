@@ -62,14 +62,6 @@ export const PROVIDER_CATALOG = Object.freeze([
     keyUrl: "https://z.ai/manage-apikey/apikey-list",
     billingUrl: "https://z.ai/manage-apikey/apikey-list",
     protocol: "openai-chat-completions"
-  }),
-  Object.freeze({
-    id: "cline", name: "Cline", logo: "C",
-    baseUrl: "https://api.cline.bot/api/v1",
-    keyUrl: "https://app.cline.bot/dashboard/account?tab=credits",
-    billingUrl: "https://app.cline.bot/dashboard/account?tab=credits",
-    protocol: "cline",
-    free: true
   })
 ]);
 
@@ -79,8 +71,9 @@ export function catalogProvider(id) {
   return BY_ID[String(id || "").trim().toLowerCase()] || null;
 }
 
-// Für das "+ API-Key hinzufügen"-Dropdown: bekannte Anbieter (ohne Cline, der
-// einen eigenen, getesteten Fluss hat) plus der Eintrag "Eigener Anbieter".
+// Für das "+ API-Key hinzufügen"-Dropdown: alle bekannten Anbieter plus der
+// Eintrag "Eigener Anbieter". Cline hatte hier bis 2026-09-10 eine Ausnahme
+// (eigener Fluss) und ist mit dem Anbieter entfallen.
 export function selectableProviders() {
-  return PROVIDER_CATALOG.filter((entry) => entry.id !== "cline");
+  return PROVIDER_CATALOG;
 }

@@ -341,7 +341,6 @@
                     <p class="eyebrow model-menu-label" role="separator" aria-hidden="true">Erweiterte Modelle (BYOK)</p>
                     <button type="button" role="menuitem" data-model="GLM-5.2">Kraftvoll (GLM-5.2)</button>
                     <button type="button" role="menuitem" data-model="Kimi K3">Neuestes (Kimi K3)</button>
-                    <button type="button" role="menuitem" data-model="Cline" data-submenu-trigger="cline" aria-haspopup="menu" aria-expanded="false">Coding-Agent (Cline) <span class="model-submenu-arrow" aria-hidden="true">▸</span></button>
                     <button type="button" role="menuitem" data-model="Kimi K2.7">Coding-Profi (Kimi K2.7)</button>
                   </div>
                 </div>
@@ -575,8 +574,9 @@
                   <button type="button" class="ghost-button icon-button code-mini" id="codeDiktat" aria-label="Diktieren" title="Diktieren"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></button>
                   <div class="code-rechts">
                     <!-- Betreiber 2026-08-17: klickbar wie Claudes "Fable 5" —
-                         oeffnet das Modell-Menue (smejj 1.0 + echter
-                         Cline-Katalog, code-flaeche.js). -->
+                         oeffnet das Modell-Menue (code-modell-menue.js:
+                         unsere Staffel und Auto, seit 2026-09-10 ohne
+                         Fremdkatalog). -->
                     <button type="button" class="repochip" id="codeModellAnzeige" title="Modell wählen"><b>smejj 1.0</b></button>
                     <span id="codeTiefeAnzeige">Mittel</span>
                     <button type="button" class="send-button icon-button" id="codeSenden" aria-label="Auftrag senden" title="Auftrag senden">
@@ -994,25 +994,24 @@
     <script src="/assets/knopf-puffer.js?v=2"></script>
     <script src="/assets/arbeitsflaeche.js?v=3" type="module"></script>
     <script src="/assets/spur-schalter.js?v=9" type="module"></script>
-    <script src="/assets/spur-start.js?v=b51" type="module"></script>
+    <script src="/assets/spur-start.js?v=b50" type="module"></script>
     <!-- holt code-flaeche.js (27,1 KB) erst, wenn #code aufgeht — Begruendung im Modul -->
-    <script src="/assets/code-nachladen.js?v=20" type="module"></script>
+    <script src="/assets/code-nachladen.js?v=19" type="module"></script>
     <!-- Peripherie (Fuehrung, Papierkorb, Kamera, @-Erwaehnung, Codeblock-Werkzeuge)
          laedt erst bei ihrer Handlung — Betreiber-Freigabe 2026-08-24 "Startseite abspecken". -->
-    <script src="/assets/bedarf-nachladen.js?v=6" type="module"></script>
-    <script src="/assets/app.js?v=b163" type="module"></script>
-    <script src="/assets/pwa-schnellstart.js?v=9" type="module"></script>
-    <script src="/assets/cline-model-menu.js?v=cline2-submenu-20260825-6" type="module"></script>
+    <script src="/assets/bedarf-nachladen.js?v=5" type="module"></script>
+    <script src="/assets/app.js?v=b159" type="module"></script>
+    <script src="/assets/pwa-schnellstart.js?v=8" type="module"></script>
     <!-- Browser-Panel und Maus-Panel: erst wenn sie gebraucht werden.
          63,3 KB von 335,6 KB zahlte bisher jeder Seitenaufruf fuer zwei
          Flaechen, die beim ersten Bildaufbau niemand sieht (browser-nachladen.js). -->
-    <script src="/assets/browser-nachladen.js?v=20" type="module"></script>
+    <script src="/assets/browser-nachladen.js?v=17" type="module"></script>
     <script src="/assets/auth/passkey-ui.js" type="module"></script>
     <script src="/assets/view-chrome.js?v=view-chrome-20260716-2" type="module"></script>
     <script src="/assets/profile-dock.js?v=b49" type="module"></script>
-    <script src="/assets/chat-store.js?v=b69" type="module"></script>
-    <script src="/assets/chat-history-view.js?v=b63" type="module"></script>
-    <script src="/assets/chat-actions.js?v=b53" type="module"></script>
+    <script src="/assets/chat-store.js?v=b68" type="module"></script>
+    <script src="/assets/chat-history-view.js?v=b62" type="module"></script>
+    <script src="/assets/chat-actions.js?v=b52" type="module"></script>
     <script src="/assets/panel-status.js?v=1" type="module"></script>
     <script src="/assets/chat-stopp.js?v=11" type="module"></script>
     <script src="/assets/modell-menue-start.js?v=1" type="module"></script>

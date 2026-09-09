@@ -263,20 +263,10 @@ function handleClick(view, event) {
   } else if (jump) document.querySelector(`[data-view="${jump}"]`)?.click();
 }
 
-// Holt den Cline-Bereich beim ersten Wechsel auf den Reiter "models".
-// Kein eigener Zwischenspeicher noetig: der Browser liefert ein zweites
-// import() aus dem Modulspeicher, und die init-Funktion steigt von selbst
-// aus, wenn ihr Wurzelelement bereits steht (idempotent).
-// Fail-safe wie im ganzen Modul: schlaegt ein Import fehl (offline, Cache
-// geraeumt), bleiben die uebrigen Einstellungen vollstaendig bedienbar.
-async function ladeModellBereiche(view) {
-  try {
-    const cline = await import("./provider-settings.js?v=2");
-    cline.initClineProviderSurface(view);
-  } catch {
-    /* fail-safe: Einstellungen bleiben ohne diesen Bereich nutzbar */
-  }
-}
+// Der Reiter "models" hatte bis 2026-09-10 einen eigenen Bereich fuer den
+// Cline-Schluessel (provider-settings.js). Er ist mit dem Anbieter entfallen
+// (Betreiber: "Entferne Cline aus ... UI ... Konfiguration"). Eigene
+// API-Schluessel verwaltet weiterhin das API-Zentrum weiter unten.
 
 // Zentraler API-Bereich (Schluessel, Guthaben, Preise) erst beim Wechsel auf
 // "api" — gleiches Muster wie der Modell-Bereich: 0 KB, solange niemand
@@ -292,7 +282,6 @@ async function ladeApiZentrum(view) {
 
 function activate(view, id) {
   activeTab = id;
-  if (id === "models") void ladeModellBereiche(view);
   if (id === "api") void ladeApiZentrum(view);
   view.querySelectorAll("[data-settings-tab]").forEach((button) => {
     const active = button.dataset.settingsTab === id;
@@ -358,7 +347,7 @@ function applyValues(view, settings) {
 function loadStyles() {
   // Versionsmarke wie in account-privacy.js: GitHub Pages liefert Assets mit
   // max-age; ohne ?v= saehe ein offener Browser die neue Datei erst spaeter.
-  const href = "/assets/settings-surface.css?v=b50";
+  const href = "/assets/settings-surface.css?v=b49";
   if (document.querySelector('link[href^="/assets/settings-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
