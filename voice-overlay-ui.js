@@ -44,39 +44,17 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
     + '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path class="voice-mic-slash" d="M4 4l16 16"/></svg>'
     + '</button>';
   overlay.appendChild(bar);
-  // WIE HOCH IST DIE BEDIENZONE? — damit sich nichts darueberlegt.
+  // KEINE JS-MESSUNG DER BEDIENZONE MEHR.
   //
-  // Das Kamera-Overlay (kamera.js) ist ein eigenes Vollbild-Overlay mit
-  // demselben z-index und kommt spaeter ins Dokument. Es lag deshalb ueber
-  // allen sechs Bedienelementen hier unten, auch ueber dem X — die Sprachwelt
-  // liess sich nicht mehr schliessen, solange die Kamera lief (gemessen
-  // 2026-09-10). Statt eines z-index-Wettruestens sagt die Zone ihre Hoehe an;
-  // design-v11-flaechen.css rechnet sie ein. Gleiches Muster wie
-  // --hinweis-hoehe beim Streifen "Anmeldung abgelaufen".
-  const meldeZone = () => {
-    try {
-      const kasten = bar.getBoundingClientRect();
-      // Gemeldet wird der PLATZ VON UNTEN bis zur Oberkante der Zone — genau
-      // das, was ein Overlay unten freilassen muss.
-      //
-      // Der erste Anlauf rechnete Hoehe + Abstand zur Unterkante. Solange die
-      // Zone noch nicht unten sass, ergab das den ganzen Bildschirm (gemessen:
-      // 812px bei 812px Fensterhoehe). Das Kamera-Overlay bekam dadurch
-      // bottom: 820px und schrumpfte auf Hoehe 0 — schlimmer als vorher, denn
-      // dann lag das nackte video-Element ueber dem X.
-      const platz = Math.max(0, Math.round(window.innerHeight - kasten.top));
-      // Ein unplausibler Wert wird verworfen statt gesetzt: mehr als die halbe
-      // Bildschirmhoehe ist keine Bedienzone, sondern ein Messfehler.
-      if (platz > 0 && platz <= window.innerHeight * 0.5) {
-        document.documentElement.style.setProperty("--voice-bedienzone", `${platz}px`);
-      }
-    } catch { /* still: ohne Wert verhaelt sich alles wie vorher */ }
-  };
-  // Erst messen, wenn das Layout steht — sonst sitzt die Zone noch nicht unten.
-  try { requestAnimationFrame(() => requestAnimationFrame(meldeZone)); } catch { meldeZone(); }
-  // Die Zone waechst, wenn die Knopfzeile umbricht, und wandert bei einer
-  // Drehung. Ein einmal gemessener Wert waere dann falsch.
-  try { new window.ResizeObserver(meldeZone).observe(bar); } catch { /* Startwert bleibt */ }
+  // Zwei Anlaeufe, zwei Messfehler: erst meldete sie 812px bei 812px
+  // Fensterhoehe (Hoehe + Abstand, solange die Zone noch nicht unten sass),
+  // dann gar nichts mehr — gemessen wird beim AUFBAU, und da ist das Overlay
+  // noch hidden, also steht die Leiste bei top 0. Der Plausibilitaets-Deckel
+  // verwarf den Wert zu Recht, und nachgemessen hat danach niemand.
+  //
+  // Die Hoehe steht ohnehin im Stylesheet (48px Leiste + unteres Polster).
+  // composer-tools.css rechnet sie dort direkt aus. Keine Messung, kein
+  // Beobachter, kein Zeitpunkt, den man verpassen kann.
   // Bild-Einfuegen auch im Sprachmodus (Betreiber-Test 2026-08-14: ein in das
   // Sprachfeld eingefuegter Screenshot wurde stumm verschluckt — der
   // Paste-Weg hing nur am Start-Schreibfeld). Dieselbe Kette wie dort:

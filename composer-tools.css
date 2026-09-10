@@ -592,7 +592,13 @@
    nicht mehr schliessen, solange die Kamera lief. Die Hoehe der Zone meldet
    voice-overlay-ui.js als --voice-bedienzone. */
 body.voice-mode-open #kameraOverlay {
-     bottom: calc(var(--voice-bedienzone, 0px) + 8px);
+     /* 48px ist die Hoehe der Eingabezeile (.voice-mode-input-wrap min-height),
+        dazu das untere Polster des Overlays und 8px Luft. Fest statt gemessen:
+        zwei Anlaeufe mit JS-Messung gingen daneben, weil der einzige richtige
+        Messzeitpunkt (Overlay sichtbar UND gelayoutet) leicht zu verpassen ist.
+        Aendert sich die Hoehe der Zeile, aendert sich diese Zahl mit — beide
+        stehen in dieser Datei, wenige Zeilen auseinander. */
+     bottom: calc(48px + max(env(safe-area-inset-bottom, 0px), 8px) + 8px);
 }
 
 /* Und das X bleibt in JEDEM Fall erreichbar: ein Schliessen-Knopf, den eine

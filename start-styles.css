@@ -1810,7 +1810,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      line-height: 1.35;
 }
 body.voice-mode-open #kameraOverlay {
-     bottom: calc(var(--voice-bedienzone, 0px) + 8px);
+     bottom: calc(48px + max(env(safe-area-inset-bottom, 0px), 8px) + 8px);
 }
 body.voice-mode-open #voiceModeClose {
      z-index: 201;
