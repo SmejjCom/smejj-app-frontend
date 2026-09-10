@@ -1458,7 +1458,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      -webkit-backdrop-filter: blur(18px);
      color: rgba(246, 243, 238, 0.92);
      text-align: center;
-     padding: calc(env(safe-area-inset-top, 0px) + 16px) 24px 0;
+     padding: calc(env(safe-area-inset-top, 0px) + var(--hinweis-hoehe, 0px) + 16px) 24px 0;
      padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--tastatur-hoehe, 0px), 8px);
 }
 .voice-mode-overlay[hidden] {
@@ -1543,7 +1543,7 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 }
 .voice-mode-close {
      position: absolute;
-     top: calc(env(safe-area-inset-top, 0px) + 12px);
+     top: calc(env(safe-area-inset-top, 0px) + var(--hinweis-hoehe, 0px) + 12px);
      right: 16px;
      z-index: 2;
      display: grid;

@@ -165,11 +165,39 @@ export function zeigeAbgelaufenHinweis(win) {
   zu.type = "button";
   zu.textContent = "Später";
   zu.style.cssText = "background:none;border:1px solid #6b4d1d;color:#ffd9a0;padding:4px 10px;font:inherit;cursor:pointer";
-  zu.addEventListener("click", () => streifen.remove());
+  zu.addEventListener("click", () => { streifen.remove(); meldeHoehe(dok, 0); });
 
   streifen.append(text, link, zu);
   dok.body.appendChild(streifen);
+  // WIE HOCH BIN ICH? — die Frage muss beantwortbar sein, sonst deckt dieser
+  // Streifen andere Bedienelemente zu.
+  //
+  // GEMESSEN 2026-09-10 (375x812): der Streifen ist 105 px hoch, liegt fix am
+  // oberen Rand und traegt z-index 2147483000 — mehr als jedes Overlay der App.
+  // Sein "Spaeter"-Knopf lag damit genau auf dem X des Sprachmodus, das seit
+  // heute oben rechts sitzt: die Sprachwelt liess sich nicht mehr schliessen
+  // (Escape ging noch, sichtbar war sie blockiert).
+  //
+  // Kein z-index-Wettruesten: der Streifen SOLL oben liegen, er meldet etwas
+  // Wichtiges. Stattdessen sagt er seine Hoehe an, und wer darunter Platz
+  // braucht, rechnet sie ein (composer-tools.css: --hinweis-hoehe).
+  meldeHoehe(dok, Math.ceil(streifen.getBoundingClientRect().height) || 0);
+  // Der Streifen bricht je nach Breite unterschiedlich um — bei einer
+  // Drehung aendert sich seine Hoehe. Ohne diesen Beobachter bliebe der alte
+  // Wert stehen und das X rutschte im Querformat wieder darunter.
+  try {
+    const beobachter = new win.ResizeObserver(() => {
+      if (!dok.getElementById(HINWEIS_ID)) { beobachter.disconnect(); return; }
+      meldeHoehe(dok, Math.ceil(streifen.getBoundingClientRect().height) || 0);
+    });
+    beobachter.observe(streifen);
+  } catch { /* ohne ResizeObserver bleibt der Startwert — besser als nichts */ }
   return true;
+}
+
+/** Traegt die Hoehe des Hinweisstreifens als CSS-Variable ein (0 = kein Streifen). */
+function meldeHoehe(dok, hoehe) {
+  try { dok.documentElement.style.setProperty("--hinweis-hoehe", `${Math.max(0, Number(hoehe) || 0)}px`); } catch { /* still */ }
 }
 
 

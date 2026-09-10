@@ -101,7 +101,7 @@
         darf nicht unter die obere Bildschirmkante rutschen. Safe Area
         beruecksichtigen." In der installierten App liegt oben die Dynamic
         Island; ohne dieses Polster beginnt der Inhalt DARUNTER. */
-     padding: calc(env(safe-area-inset-top, 0px) + 16px) 24px 0;
+     padding: calc(env(safe-area-inset-top, 0px) + var(--hinweis-hoehe, 0px) + 16px) 24px 0;
      /* iOS-Tastatur: das Overlay ist fix ueber den ganzen Bildschirm — ohne
         dieses Polster verschwinde das Eingabefeld des Tipp-Fallbacks hinter
         der Tastatur. --tastatur-hoehe setzt mobil-tastatur.js (2026-08-30).
@@ -223,7 +223,11 @@
    dort 48 px Breite weg, genau da, wo der Nutzer schreibt und spricht. */
 .voice-mode-close {
      position: absolute;
-     top: calc(env(safe-area-inset-top, 0px) + 12px);
+     /* --hinweis-hoehe setzt auth-gate.js, wenn der Streifen "Deine Anmeldung
+        ist abgelaufen" oben liegt (z-index 2147483000, hoeher als jedes
+        Overlay). Ohne diesen Summanden lag sein "Spaeter"-Knopf genau auf
+        diesem X und die Sprachwelt liess sich nicht mehr schliessen. */
+     top: calc(env(safe-area-inset-top, 0px) + var(--hinweis-hoehe, 0px) + 12px);
      right: 16px;
      z-index: 2;
      display: grid;
