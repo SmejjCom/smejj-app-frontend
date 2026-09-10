@@ -60,11 +60,18 @@ function authHeaders(extra = {}) {
  * cancel(): Aufnahme verwerfen (Mute, Schliessen, Fallback).
  * isAlive(): Sitzungs-Sicherung — false, wenn KEINE der Adressen mehr traegt.
  *
- * MEHRERE ADRESSEN, weil eine zu wenig ist (live gemessen 2026-09-10):
- * Das Ohr lag allein auf der Chat-Bridge, und die antwortet auf jede Route mit
- * 404 — auch auf /api/chat. Beim Chat faellt das nicht auf, er hat einen
- * zweiten Weg und nimmt ihn still; das Ohr hatte keinen und schaltete sich bei
- * der ersten 404 fuer die ganze Sitzung ab. Uebrig blieb die Browser-Erkennung.
+ * MEHRERE ADRESSEN, weil eine zu wenig ist:
+ * Das Ohr lag allein auf der Chat-Bridge und schaltete sich bei der ersten 404
+ * fuer die GANZE Sitzung ab (alive = false). Uebrig blieb dann die
+ * Browser-Erkennung — ohne dass der Nutzer erfaehrt, warum sie ploetzlich
+ * schlechter versteht. Der Chat hat gegen genau diesen Fall seit jeher einen
+ * zweiten Weg (chatFallback); das Ohr hatte keinen.
+ *
+ * KORREKTUR ZUR ERSTEN DIAGNOSE (2026-09-10): Ich hatte die Bridge mit curl
+ * per GET gemessen, ueberall 404 bekommen und sie fuer tot gehalten. Sie nimmt
+ * POST — mit der Methode des Klienten antwortet sie sauber (Status 200,
+ * premiumVoice: true). Der zweite Weg bleibt trotzdem richtig, aber er
+ * repariert eine Redundanzluecke, keinen Ausfall.
  *
  * Eine tote Adresse wird gemerkt und in dieser Sitzung nicht noch einmal
  * gefragt — sonst kostet jeder Satz den vollen Zeitverlust erneut.
