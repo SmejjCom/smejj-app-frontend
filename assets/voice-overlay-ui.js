@@ -65,10 +65,17 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
       await uebernehmeBildDatei(bilder[0], eingabe, (el) => el.dispatchEvent(new Event("input", { bubbles: true })), { herkunft: "Einfuegen" });
     } catch { /* Bild-Kette nicht ladbar: Einfuegen verhaelt sich wie bisher */ }
   });
-  const close = overlay.querySelector("#voiceModeClose");
-  if (close) bar.appendChild(close);
+  // Das X bleibt, wo es im Markup steht: als erstes Kind des Overlays, per CSS
+  // oben rechts verankert. Bis 2026-09-10 wurde es hier in die untere Leiste
+  // GESCHOBEN (bar.appendChild) und nahm dort 48 px weg — genau in der Zone,
+  // in der geschrieben und gesprochen wird. Betreiber: "Das X zum Schliessen
+  // muss oben rechts sitzen. Dadurch bleibt unten maximaler Platz fuer die
+  // Interaktion."
   const hint = overlay.querySelector(".voice-mode-hint");
-  if (hint) hint.textContent = "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.";
+  // Kuerzer als vorher: der alte Satz nannte jeden Knopf einzeln und brauchte
+  // dafuer drei Zeilen (59 px gemessen) direkt ueber der Bedienzone. Was die
+  // Knoepfe tun, sagen ihre eigenen Beschriftungen (aria-label/title).
+  if (hint) hint.textContent = "Sprich einfach — beenden mit X oder Escape.";
 }
 
 // Fokusfuehrung des Sprachmodus (QA-Welle 2, Befund W2-03): Das Overlay meldet

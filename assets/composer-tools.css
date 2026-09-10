@@ -97,11 +97,19 @@
      -webkit-backdrop-filter: blur(18px);
      color: rgba(246, 243, 238, 0.92);
      text-align: center;
-     padding: 24px;
+     /* Betreiber 2026-09-10: "Das Logo darf niemals abgeschnitten werden. Es
+        darf nicht unter die obere Bildschirmkante rutschen. Safe Area
+        beruecksichtigen." In der installierten App liegt oben die Dynamic
+        Island; ohne dieses Polster beginnt der Inhalt DARUNTER. */
+     padding: calc(env(safe-area-inset-top, 0px) + 16px) 24px 0;
      /* iOS-Tastatur: das Overlay ist fix ueber den ganzen Bildschirm — ohne
         dieses Polster verschwinde das Eingabefeld des Tipp-Fallbacks hinter
-        der Tastatur. --tastatur-hoehe setzt mobil-tastatur.js (2026-08-30). */
-     padding-bottom: max(24px, var(--tastatur-hoehe, 0px));
+        der Tastatur. --tastatur-hoehe setzt mobil-tastatur.js (2026-08-30).
+        Ohne Tastatur reicht die Bedienzone bis an die untere Safe Area:
+        "Die UI soll auf dem Telefon bis zur unteren Safe Area reichen. Der
+        Home Indicator darf nicht verdeckt werden. Keine unnoetigen
+        Leerflaechen." */
+     padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--tastatur-hoehe, 0px), 8px);
 }
 
 .voice-mode-overlay[hidden] {
@@ -209,7 +217,15 @@
      display: none;
 }
 
+/* Betreiber 2026-09-10: "Das X zum Schliessen muss oben rechts sitzen.
+   Dadurch bleibt unten maximaler Platz fuer die Interaktion."
+   Bis dahin haengte voice-overlay-ui.js das X an die untere Leiste — es nahm
+   dort 48 px Breite weg, genau da, wo der Nutzer schreibt und spricht. */
 .voice-mode-close {
+     position: absolute;
+     top: calc(env(safe-area-inset-top, 0px) + 12px);
+     right: 16px;
+     z-index: 2;
      display: grid;
      place-items: center;
      flex: 0 0 auto;
@@ -426,11 +442,14 @@
      background: rgba(255, 255, 255, 0.05);
 }
 
+/* 44 px sind die Betreiber-Untergrenze fuer jedes Ziel ("keine Ziele unter
+   44 px"). Gemessen 2026-09-10 waren diese drei Knoepfe 36x42 — Anhaengen,
+   Kamera und Senden im Sprachmodus. */
 .voice-mode-input-wrap button {
      display: grid;
      place-items: center;
-     width: 36px;
-     height: 36px;
+     width: 44px;
+     height: 44px;
      border: none;
      border-radius: 50%;
      background: transparent;
@@ -550,13 +569,25 @@
      margin-top: auto;
 }
 
+/* Der Hinweis sitzt DIREKT ueber der Leiste, nicht mit 28 px Luft darunter.
+   Gemessen 2026-09-10 (375x812): Hinweis 646..704, Leiste 732..780, Unterkante
+   812 — 28 px zwischen beiden und 32 px darunter, zusammen 60 px verschenkt. */
 .voice-mode-overlay[data-upgraded="true"] .voice-mode-hint {
      position: static;
-     margin: auto 0 0;
+     margin: auto 0 6px;
+     font-size: 13.5px;
+     line-height: 1.35;
 }
 
 .voice-mode-overlay[data-upgraded="true"] .voice-mode-bar {
-     margin-bottom: 8px;
+     margin-bottom: 0;
+}
+
+/* Der Abstand zwischen den Bloecken gilt fuer die MITTE. Unten wuerde er die
+   Bedienzone wieder von der Kante wegschieben — dort setzt der Abstand des
+   jeweiligen Blocks. */
+.voice-mode-overlay[data-upgraded="true"] {
+     gap: 20px;
 }
 
 /* Code-Uebernahme aus Chat-Antworten in den Workspace. */
