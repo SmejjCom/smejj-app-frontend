@@ -87,7 +87,10 @@ export function selektorAus(step) {
     // "nth" ist die BENANNTE Wahl bei gleichnamigen Treffern (Schema seit
     // 21.08.). Bis 09.09. fiel es hier weg — live stoppte deshalb ein Lauf an
     // zwei gleichen Wikipedia-Links, obwohl das Modell haette waehlen koennen.
-    ...(Number.isInteger(ziel.nth) && ziel.nth >= 0 ? { nth: ziel.nth } : {})
+    ...(Number.isInteger(ziel.nth) && ziel.nth >= 0 ? { nth: ziel.nth } : {}),
+    // Die Nummer aus der Beobachtung (11.09.): sie zeigt auf GENAU das
+    // gesehene Element und erspart dem Modell das Raten eines Selektors.
+    ...(Number.isInteger(ziel.n) && ziel.n > 0 ? { n: ziel.n } : {})
   };
 }
 
