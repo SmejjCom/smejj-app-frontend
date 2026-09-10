@@ -27,6 +27,20 @@ const API_PATHS = {
   voiceStatus: "https://smejj-chat-bridge.zeabur.app/api/voice/status",
   voiceTts: "https://smejj-chat-bridge.zeabur.app/api/voice/tts",
   voiceTranscribe: "https://smejj-chat-bridge.zeabur.app/api/voice/transcribe",
+  // ZWEITER WEG fuer Ohr und Status (2026-09-10). Chat und Agent haben ihn seit
+  // jeher; der Sprachwelle fehlte er, und genau das war ihr Problem: die Bridge
+  // antwortet auf JEDE Route mit 404 — auch auf /api/chat. Beim Chat faellt es
+  // nicht auf, er nimmt still den zweiten Weg. Das Ohr schaltete sich bei der
+  // ersten 404 fuer die ganze Sitzung ab, und uebrig blieb die
+  // Browser-Erkennung. Der Control Server bedient beide Wege seit heute
+  // (control-server/src/routes/voiceOhrRoutes.js).
+  //
+  // KEIN zweiter Weg fuer voiceTts: die Premium-Stimme braucht einen eigenen
+  // Sprachworker, den es nicht gibt. Eine Adresse, die zuverlaessig 503
+  // antwortet, waere schlechter als keine — der Browser hielte es fuer einen
+  // voruebergehenden Ausfall und versuchte es bei jedem Satz erneut.
+  voiceStatusFallback: "https://api.smejj.com/api/voice/status",
+  voiceTranscribeFallback: "https://api.smejj.com/api/voice/transcribe",
   authConfig: "/api/auth/config",
   browserFetch: "/api/browser/fetch",
   browserRemote: "/api/browser/remote",

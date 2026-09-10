@@ -164,7 +164,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
 /**
  * verdrahteOhrSolo(host) — die komplette Anbindung an einen Sprach-Host
  * (composer-tools.js), damit dessen Datei unter der 800-Zeilen-Regel bleibt.
- * host liefert: createServerEar, url, state, setStatus, setTranskript,
+ * host liefert: createServerEar, urls (oder url), state, setStatus, setTranskript,
  * senden, fallback, stopInterrupt, stopBarge.
  * Rueckgabe: { hoeren, aktivieren, stop } —
  *   hoeren():     eine Solo-Hoer-Runde (Status setzen, Wachen stoppen, start)
@@ -172,7 +172,9 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
  *   stop():       laufende Runde beenden (Mute, Schliessen)
  */
 export function verdrahteOhrSolo(host) {
-  const ear = host.createServerEar({ url: host.url, budgetMs: 4000 });
+  // urls hat Vorrang: seit 2026-09-10 gibt es zwei Adressen fuer das Ohr
+  // (Bridge, dann Control Server). url bleibt fuer aeltere Aufrufer.
+  const ear = host.createServerEar({ urls: host.urls, url: host.url, budgetMs: 4000 });
   // Betreiber-Befund 2026-08-30 ("Sprachwelle am iPhone getestet — geht nicht"):
   // iOS-Home-Bildschirm-PWAs verweigern getUserMedia mit NotAllowedError, OHNE
   // je einen Dialog gezeigt zu haben. Der alte Einheits-Fehlertext ("Sprach-

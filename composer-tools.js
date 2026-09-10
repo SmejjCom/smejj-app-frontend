@@ -17,8 +17,8 @@ import { createBrowserTts } from "./voice-browser-tts.js";
 // Live-Vergleich 2026-08-03) — geteilte Naht mit den 14 Sprachseiten.
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
-import { createServerEar, createEarSend } from "./voice-ear.js";
-import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=6";
+import { createServerEar, createEarSend, ohrAdressen } from "./voice-ear.js";
+import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=7";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
@@ -88,7 +88,7 @@ const browserTts = createBrowserTts({ lang: SPEECH_LANG, base: SPEECH_BASE, supp
 // Doppel-Sende-Schutz (Stufe 3): dieselbe erkannte Frage nicht zweimal senden.
 const doppelschutz = createDoppelschutz();
 // Stufe 4: Server-Ohr (Groq Whisper ueber die Bridge) — fail-safe, siehe voice-ear.js.
-const serverEar = createServerEar({ url: CLIENT_ROUTES.api.voiceTranscribe });
+const serverEar = createServerEar({ urls: ohrAdressen(CLIENT_ROUTES.api) });
 const earSend = createEarSend({
       ear: serverEar,
       istAktiv: () => state.voiceModeActive && !state.voiceFallback,
@@ -99,11 +99,11 @@ const earSend = createEarSend({
       nachfragen: () => nachfragenStattSenden(),
       senden: (task) => voiceModeSend(task)
 });
-// Ohr-Solo (2026-08-25, voice-ohr-solo.js): taube Erkennung -> eigenes Ohr. LIVE (2026-09-03,
-// voice-realtime.js): Sprache-zu-Sprache ueber den Relay, zuerst versucht, still zurueck auf Ohr/Erkennung.
+// Ohr-Solo (voice-ohr-solo.js): taube Erkennung -> eigenes Ohr. LIVE (voice-realtime.js):
+// Sprache-zu-Sprache ueber den Relay, zuerst versucht, still zurueck auf Ohr/Erkennung.
 const liveWelle = verdrahteLive({ state, setStatus: setVoiceModeStatus, setTranskript: setVoiceModeTranscript, setReply: setVoiceModeReply });
 const ohrSolo = verdrahteOhrSolo({
-      createServerEar, url: CLIENT_ROUTES.api.voiceTranscribe, state,
+      createServerEar, urls: ohrAdressen(CLIENT_ROUTES.api), state,
       earAlive: () => serverEar.isAlive(),
       setStatus: setVoiceModeStatus, setTranskript: setVoiceModeTranscript,
       senden: voiceModeSend, fallback: enterVoiceFallback,
@@ -174,7 +174,7 @@ const dictation = createDictation({
       showToast,
       RecognitionCtor,
       // Eigenes Ohr fuers Diktat (2026-08-26): taube Web-Speech schreibt sonst nie.
-      serverOhr: createServerEar({ url: CLIENT_ROUTES.api.voiceTranscribe, budgetMs: 6000 }),
+      serverOhr: createServerEar({ urls: ohrAdressen(CLIENT_ROUTES.api), budgetMs: 6000 }),
       lang: SPEECH_LANG,
       speechSupported,
       setVisual: (active) => $('[data-start-tool="voice"]')?.classList.toggle("is-recording", active),

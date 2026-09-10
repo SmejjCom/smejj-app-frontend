@@ -52,16 +52,41 @@ function authHeaders(extra = {}) {
 }
 
 /**
- * createServerEar({ url, budgetMs }) -> { start, finish, cancel, isAlive }
+ * createServerEar({ url, urls, budgetMs }) -> { start, finish, cancel, isAlive }
  *
  * start():  Aufnahme beginnen (leise; jeder Fehler laesst das Ohr einfach aus).
  * finish(): Aufnahme beenden, hochladen, Transkript liefern — oder "" wenn das
- *           Budget reisst, die Route fehlt oder nichts Verwertbares kam.
+ *           Budget reisst, keine Route antwortet oder nichts Verwertbares kam.
  * cancel(): Aufnahme verwerfen (Mute, Schliessen, Fallback).
- * isAlive(): Sitzungs-Sicherung — false nach hartem Routen-Fehler (404/503).
+ * isAlive(): Sitzungs-Sicherung — false, wenn KEINE der Adressen mehr traegt.
+ *
+ * MEHRERE ADRESSEN, weil eine zu wenig ist (live gemessen 2026-09-10):
+ * Das Ohr lag allein auf der Chat-Bridge, und die antwortet auf jede Route mit
+ * 404 — auch auf /api/chat. Beim Chat faellt das nicht auf, er hat einen
+ * zweiten Weg und nimmt ihn still; das Ohr hatte keinen und schaltete sich bei
+ * der ersten 404 fuer die ganze Sitzung ab. Uebrig blieb die Browser-Erkennung.
+ *
+ * Eine tote Adresse wird gemerkt und in dieser Sitzung nicht noch einmal
+ * gefragt — sonst kostet jeder Satz den vollen Zeitverlust erneut.
  */
-export function createServerEar({ url, budgetMs = EAR_BUDGET_MS, fetchFn } = {}) {
-  let alive = Boolean(url);
+/**
+ * Die Adressen des Ohrs, in der Reihenfolge, in der sie versucht werden.
+ *
+ * Beide Wege bedienen dieselbe Schnittstelle; der zweite kam am 2026-09-10
+ * dazu (siehe createServerEar). Als Funktion statt als Konstante, damit
+ * composer-tools.js sie an drei Stellen aufrufen kann, ohne eine Zeile fuer
+ * eine Zwischenvariable zu verbrauchen — die Datei steht exakt auf der
+ * 800-Zeilen-Grenze des Hauses.
+ */
+export function ohrAdressen(api = {}) {
+  return [api.voiceTranscribe, api.voiceTranscribeFallback].filter(Boolean);
+}
+
+export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn } = {}) {
+  const adressen = (Array.isArray(urls) ? urls : [url]).map((a) => String(a || "").trim()).filter(Boolean);
+  const tot = new Set();
+  const lebende = () => adressen.filter((a) => !tot.has(a));
+  let alive = adressen.length > 0;
   let recorder = null;
   let stream = null;
   let stuecke = [];
@@ -134,21 +159,35 @@ export function createServerEar({ url, budgetMs = EAR_BUDGET_MS, fetchFn } = {})
       const abbruch = new AbortController();
       const budget = setTimeout(() => abbruch.abort(), budgetMs);
       try {
-        const antwort = await holen(url, {
-          method: "POST",
-          headers: authHeaders({ "Content-Type": mime }),
-          body: blob,
-          signal: abbruch.signal
-        });
-        if (antwort.status === 404 || antwort.status === 503) {
-          alive = false; // Route fehlt oder Ohr nicht konfiguriert — Sitzungs-Sicherung
-          return "";
+        for (const adresse of lebende()) {
+          let antwort;
+          try {
+            antwort = await holen(adresse, {
+              method: "POST",
+              headers: authHeaders({ "Content-Type": mime }),
+              body: blob,
+              signal: abbruch.signal
+            });
+          } catch {
+            // Netzfehler auf DIESER Adresse: die naechste darf es versuchen,
+            // aber die tote wird nicht gemerkt — ein Aussetzer ist kein Ausfall.
+            continue;
+          }
+          if (antwort.status === 404 || antwort.status === 503) {
+            // Route fehlt oder Ohr dort nicht konfiguriert: diese Adresse ist
+            // fuer die Sitzung erledigt, die naechste kommt dran.
+            tot.add(adresse);
+            continue;
+          }
+          if (!antwort.ok) return "";
+          const daten = await antwort.json();
+          return String(daten?.text || "").trim();
         }
-        if (!antwort.ok) return "";
-        const daten = await antwort.json();
-        return String(daten?.text || "").trim();
+        // Keine Adresse mehr uebrig — erst JETZT gibt das Ohr auf.
+        if (lebende().length === 0) alive = false;
+        return "";
       } catch {
-        return ""; // Budget gerissen oder Netzfehler — Web-Speech-Text gewinnt
+        return ""; // Budget gerissen — Web-Speech-Text gewinnt
       } finally {
         clearTimeout(budget);
       }
