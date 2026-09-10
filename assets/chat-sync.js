@@ -274,8 +274,18 @@ async function push() {
         body: JSON.stringify({ chat })
       });
       if (antwort.status === 503) { serverSagtNein = true; break; }
-      // 4xx betrifft GENAU DIESEN Chat und wird sich von selbst nie aendern —
-      // also melden und mit dem naechsten weitermachen, nicht abbrechen.
+      // 401/403 betrifft NICHT diesen Chat, sondern die SITZUNG — und dann ist
+      // jede weitere Anfrage dieses Laufs genauso vergeblich. Gemessen
+      // 2026-09-10: der Lauf schickte fuer JEDEN lokalen Chat eine Anfrage,
+      // die mit 401 zurueckkam, genau waehrend der Nutzer den Streifen "Deine
+      // Anmeldung ist abgelaufen" vor sich hatte.
+      //
+      // Bewusst OHNE Merker: der naechste planePush() versucht es wieder, dann
+      // mit der vielleicht frischen Anmeldung. Ein dauerhafter Merker wie
+      // serverSagtNein wuerde den Abgleich bis zum Neuladen abschalten.
+      if (antwort.status === 401 || antwort.status === 403) break;
+      // Die uebrigen 4xx betreffen GENAU DIESEN Chat und werden sich von
+      // selbst nie aendern — also melden und mit dem naechsten weitermachen.
       // 4xx UND das 500 des Body-Lesers: "Request too large" kommt roh
       // heraus, BEVOR die Chat-Pruefung laeuft (maxJsonBodyBytes = 1 MB).
       // Bis heute fiel genau das durch — sechs der zehn ungesicherten Chats
@@ -376,6 +386,8 @@ async function pushProjekte() {
       });
       if (antwort.status === 404) break; // Backend noch nicht da: aufhoeren, nicht merken
       if (antwort.status === 503) { serverSagtNeinProjekte = true; break; }
+      // Wie beim Chat-Push: 401/403 betrifft die Sitzung, nicht dieses Projekt.
+      if (antwort.status === 401 || antwort.status === 403) break;
       // Dieselbe Luecke wie beim Chat-Push: eine 4xx-Ablehnung war unsichtbar.
       // 404 ist oben schon abgefangen — das ist "noch nicht ausgerollt", kein Verlust.
       if (antwort.status >= 400 && antwort.status < 500) {
