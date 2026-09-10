@@ -28,29 +28,33 @@
  */
 export function ladeBeiKlick(ausloeser, laden) {
   let laeuft = null;
-  const gebunden = [];
+  // EIN Zuhoerer am Dokument statt einer Bindung je Knopf.
+  //
+  // GEMESSEN 2026-09-10: Vorher lief hier document.querySelectorAll(auswahl)
+  // EINMAL beim Start und band an die gefundenen Knoepfe. Alles, was spaeter
+  // entsteht, bekam nie einen Zuhoerer — zum Beispiel der Kamera-Knopf der
+  // Sprachwelle, den voice-overlay-ui.js erst beim Oeffnen des Overlays baut.
+  // Ein Klick darauf lud das Modul nie, rief nie getUserMedia und oeffnete
+  // kein Overlay. Der Knopf sah aus wie einer und war eine Attrappe; "nichts
+  // passiert" sieht aus wie "die Kamera darf nicht".
+  //
+  // Mit Delegation gilt die Regel fuer JEDEN Knopf, der das Merkmal traegt —
+  // auch fuer den, den es beim Start noch gar nicht gab.
   const wecker = (ereignis) => {
     if (laeuft) return;
+    const ziel = ereignis.target?.closest?.(ausloeser.join(", "));
+    if (!ziel) return;
     // Den ersten Klick anhalten, sonst liefe er ins Leere: die echten Handler
     // existieren ja noch nicht.
     ereignis.preventDefault();
     ereignis.stopPropagation();
-    const ziel = ereignis.currentTarget;
     laeuft = hole(laden).then(() => {
       loese();
       ziel.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
     }).catch(() => { laeuft = null; });
   };
-  const loese = () => {
-    for (const knopf of gebunden) knopf.removeEventListener("click", wecker, true);
-    gebunden.length = 0;
-  };
-  for (const auswahl of ausloeser) {
-    for (const knopf of document.querySelectorAll(auswahl)) {
-      knopf.addEventListener("click", wecker, true);
-      gebunden.push(knopf);
-    }
-  }
+  const loese = () => document.removeEventListener("click", wecker, true);
+  document.addEventListener("click", wecker, true);
   return () => {
     if (!laeuft) { loese(); laeuft = hole(laden).catch((fehler) => { laeuft = null; throw fehler; }); }
     return laeuft;

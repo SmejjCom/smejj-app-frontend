@@ -5,7 +5,7 @@ import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, set
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=4";
 import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=6";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
-import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=1";
+import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2";
 import { holeSendepfad } from "./sendepfad-nachladen.js?v=19";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20260803";

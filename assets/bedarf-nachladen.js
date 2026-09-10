@@ -11,7 +11,7 @@
 // Fail-safe wie ueberall: schlaegt ein Nachladen fehl, meldet nachladen.js
 // das in der Konsole (Fehler-Faenger sieht es), und der naechste Ausloeser
 // versucht es erneut. Nie bleibt ein Knopf stumm zurueck.
-import { ladeBeiKlick } from "./nachladen.js?v=1";
+import { ladeBeiKlick } from "./nachladen.js?v=2";
 
 // 1. Erste Fuehrung — zeigt sich nur Erstbesuchern (oder auf ?fuehrung=neu
 //    aus der Hilfe). Wiederkehrer brauchen das Modul nie.
