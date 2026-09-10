@@ -1809,6 +1809,12 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      font-size: 13.5px;
      line-height: 1.35;
 }
+body.voice-mode-open #kameraOverlay {
+     bottom: calc(var(--voice-bedienzone, 0px) + 8px);
+}
+body.voice-mode-open #voiceModeClose {
+     z-index: 201;
+}
 .voice-mode-overlay[data-upgraded="true"] .voice-mode-bar {
      margin-bottom: 0;
 }
@@ -5096,8 +5102,23 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
 }
 .profile-dock-gear { display: none !important; }
 .profile-avatar { border-radius: 999px; overflow: hidden; }
-/
-.
+.top-hilfe {
+  position: fixed;
+  top: 14px;
+  right: 132px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: #f2f5f4;
+  font-size: 14px;
+  text-decoration: none;
+}
+.top-hilfe:hover { background: rgba(255, 255, 255, 0.09); }
 @media (max-width: 1023px) {
   .top-hilfe { display: none; }
 }
@@ -5222,10 +5243,6 @@ body.spur-zu:not(.right-panel-open) #code .code-wchips button {
   font-weight: 700;
   box-shadow: inset 0 0 0 1px var(--v11-cy-line-on);
 }
-body.voice-mode-open #kameraOverlay {
-  bottom: calc(var(--voice-bedienzone, 0px) + 8px);
-}
-body.voice-mode-open #voiceModeClose { z-index: 201; }
 #kameraOverlay .kamera-leiste { display: flex; gap: 10px; }
 #kameraOverlay .kamera-leiste button {
   flex: 1;
