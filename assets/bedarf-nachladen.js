@@ -32,7 +32,11 @@ if (location.pathname.includes("papierkorb")) {
 // 3. Kamera — lebt hinter dem Plus-Menue; derselbe Ausloeser, mit dem app.js
 //    schon composer-tools nachlaedt. Das Modul bindet seinen Knopf selbst,
 //    sobald das Menue existiert.
-ladeBeiKlick(["#composerPlusButton", "[data-start-tool]"], () => import("./kamera.js?v=b35live2"));
+// [data-kamera-start] MUSS mit in die Liste (2026-09-10): die Sprachwelle baut
+// sich einen EIGENEN Kamera-Knopf mit diesem Merkmal (voice-overlay-ui.js).
+// Live gemessen: ein Klick darauf lud kamera.js nie und rief nie getUserMedia —
+// der Knopf war eine Attrappe.
+ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"], () => import("./kamera.js?v=b35live2"));
 
 // 4. "@"-Erwaehnung — erst wenn im Startfeld ein "@" getippt wird. Nach dem
 //    Laden bekommt das Feld ein synthetisches input-Ereignis, damit die
