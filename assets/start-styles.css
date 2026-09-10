@@ -1812,6 +1812,9 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
 body.voice-mode-open #kameraOverlay {
      bottom: calc(48px + max(env(safe-area-inset-bottom, 0px), 8px) + 8px);
 }
+body.voice-mode-open #kameraOverlay {
+     top: calc(env(safe-area-inset-top, 0px) + var(--hinweis-hoehe, 0px) + 68px);
+}
 body.voice-mode-open #voiceModeClose {
      z-index: 201;
 }

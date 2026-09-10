@@ -602,7 +602,22 @@ body.voice-mode-open #kameraOverlay {
 }
 
 /* Und das X bleibt in JEDEM Fall erreichbar: ein Schliessen-Knopf, den eine
-   Ueberlagerung schluckt, ist der Weg in die Sackgasse. */
+   Ueberlagerung schluckt, ist der Weg in die Sackgasse.
+
+   Der z-index allein reicht dafuer NICHT, und das ist der Kern der Sache:
+   .voice-mode-overlay traegt backdrop-filter und bildet damit einen eigenen
+   Stapel-Kontext. Ein Kind darin kann nie ueber ein Element AUSSERHALB liegen,
+   egal welche Zahl es bekommt — dieselbe Falle wie beim Modell-Menue am 08.09.
+   Gemessen: mit z-index 201 lieferte elementFromPoint auf die X-Mitte weiter
+   "kameraOverlay".
+
+   Das Kamera-Overlay laesst darum auch OBEN Platz. Das X sitzt bei
+   safe-area + --hinweis-hoehe + 12px und ist 48px hoch; 68px Abstand geben ihm
+   Luft und dem Video trotzdem fast die ganze Flaeche. */
+body.voice-mode-open #kameraOverlay {
+     top: calc(env(safe-area-inset-top, 0px) + var(--hinweis-hoehe, 0px) + 68px);
+}
+
 body.voice-mode-open #voiceModeClose {
      z-index: 201;
 }
