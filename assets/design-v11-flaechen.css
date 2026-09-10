@@ -296,29 +296,6 @@
   font-weight: 700;
   box-shadow: inset 0 0 0 1px var(--v11-cy-line-on);
 }
-/* IM SPRACHMODUS LAESST DIE KAMERA DIE BEDIENZONE FREI.
-   Betreiber 2026-09-10: "Video darf niemals wichtige Bedienelemente
-   verdecken."
-
-   GEMESSEN (375x812, Kamera im Sprachmodus gestartet): #kameraOverlay steht
-   auf position fixed, inset 0 und z-index 200 — genau wie .voice-mode-overlay,
-   und es kommt spaeter ins Dokument. Es lag damit ueber ALLEN sechs
-   Bedienelementen der Sprachwelt: Mikrofon, Eingabefeld, Senden, Anhaengen,
-   Kamera — und dem X. elementFromPoint auf jede Mitte lieferte
-   "kameraOverlay". Die Sprachwelt liess sich nicht mehr schliessen, solange
-   die Kamera lief.
-
-   Das Overlay endet darum ueber der Bedienzone. Ihre Hoehe meldet
-   voice-overlay-ui.js als --voice-bedienzone; ohne sie (Kamera von der
-   Startseite aus) bleibt alles wie vorher. */
-body.voice-mode-open #kameraOverlay {
-  bottom: calc(var(--voice-bedienzone, 0px) + 8px);
-}
-
-/* Und das X bleibt in JEDEM Fall erreichbar: ein Schliessen-Knopf, den eine
-   Ueberlagerung schluckt, ist der Weg in die Sackgasse. */
-body.voice-mode-open #voiceModeClose { z-index: 201; }
-
 #kameraOverlay .kamera-leiste { display: flex; gap: 10px; }
 #kameraOverlay .kamera-leiste button {
   flex: 1;
