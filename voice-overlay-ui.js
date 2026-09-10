@@ -55,12 +55,25 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
   // --hinweis-hoehe beim Streifen "Anmeldung abgelaufen".
   const meldeZone = () => {
     try {
-      const hoehe = Math.ceil(bar.getBoundingClientRect().height) || 0;
-      const rand = Math.max(0, Math.round(window.innerHeight - bar.getBoundingClientRect().bottom));
-      document.documentElement.style.setProperty("--voice-bedienzone", `${hoehe + rand}px`);
+      const kasten = bar.getBoundingClientRect();
+      // Gemeldet wird der PLATZ VON UNTEN bis zur Oberkante der Zone — genau
+      // das, was ein Overlay unten freilassen muss.
+      //
+      // Der erste Anlauf rechnete Hoehe + Abstand zur Unterkante. Solange die
+      // Zone noch nicht unten sass, ergab das den ganzen Bildschirm (gemessen:
+      // 812px bei 812px Fensterhoehe). Das Kamera-Overlay bekam dadurch
+      // bottom: 820px und schrumpfte auf Hoehe 0 — schlimmer als vorher, denn
+      // dann lag das nackte video-Element ueber dem X.
+      const platz = Math.max(0, Math.round(window.innerHeight - kasten.top));
+      // Ein unplausibler Wert wird verworfen statt gesetzt: mehr als die halbe
+      // Bildschirmhoehe ist keine Bedienzone, sondern ein Messfehler.
+      if (platz > 0 && platz <= window.innerHeight * 0.5) {
+        document.documentElement.style.setProperty("--voice-bedienzone", `${platz}px`);
+      }
     } catch { /* still: ohne Wert verhaelt sich alles wie vorher */ }
   };
-  meldeZone();
+  // Erst messen, wenn das Layout steht — sonst sitzt die Zone noch nicht unten.
+  try { requestAnimationFrame(() => requestAnimationFrame(meldeZone)); } catch { meldeZone(); }
   // Die Zone waechst, wenn die Knopfzeile umbricht, und wandert bei einer
   // Drehung. Ein einmal gemessener Wert waere dann falsch.
   try { new window.ResizeObserver(meldeZone).observe(bar); } catch { /* Startwert bleibt */ }
