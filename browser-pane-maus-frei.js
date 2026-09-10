@@ -501,7 +501,15 @@ export async function fuehreFreienLaufAus({
         // Ausnahme; wer dreimal schweigt, hat ein anderes Problem.
         if (r.status >= 500 && aussetzer < AUSSETZER_GRENZE) {
           aussetzer += 1;
-          zeige(`Maus ${n}/${maxSchritte}: Modell antwortet nicht (${r.status}), ${aussetzer === 1 ? "zweiter" : aussetzer === 2 ? "dritter" : "noch ein"} Versuch ...`);
+          // AM LIMIT heisst: warten hilft, wiederholen nicht (gemessen 10.09.,
+          // beide Gratis-Kontingente erschoepft). Das gehoert im Klartext hin,
+          // sonst sucht der Betreiber den Fehler bei sich.
+          const amLimit = String(antwort?.error || "").includes("planer_am_limit");
+          const sekunden = Math.round(Number(antwort?.wartezeitMs || 0) / 1000);
+          zeige(amLimit
+            ? `Maus ${n}/${maxSchritte}: alle Modelle sind gerade am Limit${sekunden ? ` — sie wartet ${sekunden} s` : ""} ...`
+            : `Maus ${n}/${maxSchritte}: Modell antwortet nicht (${r.status}), ${aussetzer === 1 ? "zweiter" : aussetzer === 2 ? "dritter" : "noch ein"} Versuch ...`);
+          if (amLimit && sekunden > 0 && sekunden <= 60) await new Promise((fertig) => setTimeout(fertig, sekunden * 1000));
           n -= 1; // dieser Schritt zaehlt nicht — es wurde ja nichts getan
           continue;
         }
