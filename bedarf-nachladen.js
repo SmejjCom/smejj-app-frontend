@@ -36,7 +36,7 @@ if (location.pathname.includes("papierkorb")) {
 // sich einen EIGENEN Kamera-Knopf mit diesem Merkmal (voice-overlay-ui.js).
 // Live gemessen: ein Klick darauf lud kamera.js nie und rief nie getUserMedia —
 // der Knopf war eine Attrappe.
-ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"], () => import("./kamera.js?v=b35live2"));
+ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"], () => import("./kamera.js?v=b35live3"));
 
 // 4. "@"-Erwaehnung — erst wenn im Startfeld ein "@" getippt wird. Nach dem
 //    Laden bekommt das Feld ein synthetisches input-Ereignis, damit die

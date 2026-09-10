@@ -105,13 +105,23 @@ async function oeffne(art) {
     if (!blob) return;
     // Durch den vorhandenen Bild-Anhang-Weg — exakt wie eine gewaehlte Datei.
     const datei = new File([blob], art === "bildschirm" ? "bildschirm.jpg" : "kamera.jpg", { type: "image/jpeg" });
+    // IN WELCHES FELD? Das haengt davon ab, wo der Nutzer gerade ist.
+    //
+    // Bis 2026-09-10 ging das Bild IMMER an #startMessage, das Feld der
+    // Startseite. Im Sprachmodus liegt darueber aber das Sprach-Overlay: die
+    // Aufnahme landete in einem Feld, das der Nutzer nicht sieht, und fuer ihn
+    // sah es aus, als sei nichts passiert. Der Sprachmodus hat ein eigenes
+    // Feld (#voiceModeInput) und holt seinen Anhang beim Senden ueber
+    // window.smejjBildAnhang ab (voice-conversation.js: buildAgentPayload) —
+    // derselbe Weg, nur das Ziel ist ein anderes.
+    const imSprachmodus = document.body.classList.contains("voice-mode-open");
+    const feld = document.getElementById(imSprachmodus ? "voiceModeInput" : "startMessage");
     const eingabe = document.getElementById("composerPhotoInput");
     if (!eingabe) return;
     const ablage = new DataTransfer();
     ablage.items.add(datei);
     eingabe.files = ablage.files;
     eingabe.dispatchEvent(new Event("change", { bubbles: true }));
-    const feld = document.getElementById("startMessage");
     if (feld && !feld.value.trim()) {
       feld.value = "Was ist auf diesem Bild zu sehen? ";
       feld.dispatchEvent(new Event("input", { bubbles: true }));

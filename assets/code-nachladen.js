@@ -43,7 +43,7 @@ function laden() {
   // Plus -> "Dateien oder Fotos hinzufuegen" waehlte, bekam den Dateiwaehler —
   // und danach passierte nichts, weil niemand auf die Auswahl hoerte
   // (A-bis-Z-Pruefung 07.09.). Darum kommt es hier mit.
-  import("./composer-tools.js?v=werkzeuge-20").catch(() => {});
+  import("./composer-tools.js?v=werkzeuge-21").catch(() => {});
   return import("./code-flaeche.js?v=61")
     .then((modul) => { modul.initCodeFlaeche?.(); return modul; })
     .catch((fehler) => {
