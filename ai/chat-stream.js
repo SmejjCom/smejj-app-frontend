@@ -741,6 +741,7 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   let buffer = "";
   // Ausgang der Werkzeugarbeit — gebraucht wird er erst ganz am Ende, fuer die
   // gefaltete Titelzeile und fuer die Frage, ob die Antwort auf nichts steht.
+  let frageGezeigt = false;
   let schritteFertig = 0;
   let schritteOhneFundZahl = 0;
   // Rettungsanker: die zuletzt verworfene Arbeitsnotiz. Bleibt am Ende gar
@@ -775,7 +776,7 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
         if (payload.smejj_frage) {
           // Eigener Fang: faellt die Karte, landet das rohe JSON sonst ueber
           // den catch unten als Text in der Antwort (Test 2026-08-23).
-          try { zeigeFrage(output, payload.smejj_frage); } catch { /* Karte ist Zugabe */ }
+          try { if (zeigeFrage(output, payload.smejj_frage)) frageGezeigt = true; } catch { /* Karte ist Zugabe */ }
           continue;
         }
         // Arbeitsschritt: gehoert in die Schrittliste, NICHT in die Antwort.
@@ -843,6 +844,10 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // Der Lauf endete ohne Schlussantwort (alle Runden gingen in Werkzeuge).
   // Dann ist die letzte Arbeitsnotiz besser als eine leere Blase.
   if (!output.textContent.trim() && letzteNotiz.trim()) output.textContent = letzteNotiz;
+  // Die Rueckfrage-Karte IST die Antwort. Der leere Antwort-Knoten davor blieb
+  // bis 2026-09-11 stehen — als Luecke mit voller Aktionsleiste (Kopieren,
+  // Vorlesen, Bewerten) fuer Text, den es nicht gibt. Live gemessen.
+  if (frageGezeigt && !output.textContent.trim()) { output.remove(); return; }
   output.textContent = entferneAbgerisseneMedien(output.textContent);
   // Die Anzeige-Marke MUSS hier fallen: sie blendet den Rohtext aus, und eine
   // fertige Antwort waere sonst unsichtbar.
