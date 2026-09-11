@@ -57,10 +57,19 @@ if (typeof document !== "undefined") {
 
 
 // Die Pille "Nachdenken" (Mockup Bildschirm 32): schaltet die echte
-// Gruendlich-Stufe um — denselben Weg, den das Modellmenue nimmt
-// ([data-stufe]), damit Chip-Beschriftung und Bruecken-Parameter ueberall
-// gleich laufen. Zustand kommt aus dem Speicher der Stufe selbst.
+// Gruendlich-Stufe um. Zustand kommt aus dem Speicher der Stufe selbst.
+//
+// SIE GING BIS 2026-09-11 UEBER DAS ALTE MENUE ([data-stufe]) — und das war ein
+// echter Schaden, live gemessen: dieser Weg setzt die Modellwahl zwangsweise
+// auf "smejj 1.0". Wer "Auto" gewaehlt hatte und einmal Nachdenken drueckte,
+// verlor die Automatik STILL; der Chip zeigte danach "smejj 1.2", der Haken im
+// Menue stand auf 1.0. Jetzt geht die Pille den benannten Weg
+// (window.smejjApplyStufe) und laesst "Auto" in Ruhe.
+//
+// Der Merker haelt die Stufe von VOR dem Einschalten: ein Umschalter muss beim
+// Ausschalten dorthin zurueck, wo er herkam — sonst landet jeder auf 1.1.
 const STUFE_SPEICHER = "smejj.stufe.v1";
+const VORHER_SPEICHER = "smejj.stufe.vor-nachdenken.v1";
 
 function zeichneNachdenken() {
   const pille = document.getElementById("stufeNachdenken");
@@ -75,7 +84,18 @@ if (typeof document !== "undefined") {
     const pille = ereignis.target.closest("#stufeNachdenken");
     if (!pille) return;
     const an = localStorage.getItem(STUFE_SPEICHER) === "gruendlich";
-    document.querySelector(`[data-stufe="${an ? "auto" : "gruendlich"}"]`)?.click();
+    let ziel;
+    if (an) {
+      ziel = localStorage.getItem(VORHER_SPEICHER) || "auto";
+      localStorage.removeItem(VORHER_SPEICHER);
+    } else {
+      localStorage.setItem(VORHER_SPEICHER, localStorage.getItem(STUFE_SPEICHER) || "auto");
+      ziel = "gruendlich";
+    }
+    // Rueckfall auf den alten Weg, falls app.js nicht geladen ist: dann ist die
+    // Pille wie vorher — eine Abkuerzung, die wirkt, statt keiner.
+    if (typeof window.smejjApplyStufe === "function") window.smejjApplyStufe(ziel);
+    else document.querySelector(`[data-stufe="${ziel}"]`)?.click();
     setTimeout(zeichneNachdenken, 80);
   });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", zeichneNachdenken, { once: true });

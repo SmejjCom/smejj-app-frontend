@@ -181,7 +181,13 @@ function bindModelPicker() {
   const menu = $("#modelPickerMenu");
   if (!button || !menu) return;
   state.settings = { ...state.settings, stufe: normalizeStufe(localStorage.getItem(STUFE_KEY) || state.settings.stufe) };
-  applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) || state.settings.model || "smejj 1.0", { persist: false, quiet: true }); window.addEventListener("smejj:model-selected", (event) => applySelectedModel(event.detail?.model));
+  applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) || state.settings.model || "smejj 1.0", { persist: false, quiet: true }); window.addEventListener("smejj:model-selected", (event) => {
+    // Das Menue schickt Modell UND Stufe. Die Stufe hier zu ignorieren war die
+    // Ursache dafuer, dass eine Wahl von "smejj 1.0" den Chip auf "smejj 1.1"
+    // stellte (live gemessen 2026-09-11): der Chip las die alte Stufe.
+    if (event.detail?.stufe) state.settings = { ...state.settings, stufe: normalizeStufe(event.detail.stufe) };
+    applySelectedModel(event.detail?.model);
+  });
   button.addEventListener("click", (event) => {
     event.stopPropagation();
     const open = menu.hidden;
@@ -233,12 +239,11 @@ function applySelectedModel(model, { persist = true, quiet = false } = {}) {
   const selectedModel = Object.hasOwn(MODEL_MODES, model) ? model : "smejj 1.0";
   const mode = MODEL_MODES[selectedModel] || AI_MODES.disabled;
   const button = $("#modelPickerButton");
-  if (selectedModel === "smejj 1.0") {
-    const stufe = state.settings.stufe || "auto";
-    if (button) button.textContent = STUFE_LABEL[stufe] || "smejj 1.0";
-  } else {
-    if (button) button.textContent = selectedModel;
-  }
+  // Der Chip zeigt die WAHL, nichts anderes. Bis 2026-09-11 stand hier ein
+  // Sonderfall aus der Zeit, als 1.1/1.2/1.3 blosse Stufen-Etiketten fuer
+  // "smejj 1.0" waren: er beschriftete den Chip aus der Stufe und widersprach
+  // damit dem Haken im Menue. Heute sind alle vier echte Eintraege.
+  if (button) button.textContent = selectedModel;
   state.settings = { ...state.settings, model: selectedModel };
   if (persist) localStorage.setItem(STORAGE_KEYS.model, selectedModel);
   const aiModeSelect = $("#aiModeSelect");
@@ -260,10 +265,12 @@ function applySelectedStufe(stufe) {
   const selected = normalizeStufe(stufe);
   state.settings = { ...state.settings, stufe: selected };
   localStorage.setItem(STUFE_KEY, selected);
-  applySelectedModel("smejj 1.0");
-  const button = $("#modelPickerButton");
-  if (button) button.textContent = STUFE_LABEL[selected] || "smejj 1.0";
+  // "Auto" ist eine Modellwahl, keine Stufe: den Traeger waehlt der Server pro
+  // Auftrag. Wer die Stufe umschaltet, darf sie nicht verlieren — bis
+  // 2026-09-11 loeschte ein Klick auf "Nachdenken" genau das (live gemessen).
+  applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) === "Auto" ? "Auto" : STUFE_LABEL[selected] || "smejj 1.0");
 }
+window.smejjApplyStufe = applySelectedStufe;
 
 function hydrateComponents() {
   for (const button of $$(".nav-button")) {
