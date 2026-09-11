@@ -48,6 +48,7 @@ import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } fr
 // die Datei doppelt (Vorfall 2026-07-29, siehe oben).
 import { createChatFrom, openChat } from "/assets/chat-store.js?v=b69";
 import { showToast } from "/assets/components.js?v=b48";
+import { wendeAn, entferneEndgueltig } from "./chat-neu-versuch.js?v=1";
 
 const SETTLE_MS = 900;
 const COPY_FEEDBACK_MS = 2000;
@@ -327,8 +328,7 @@ function resubmit(text) {
 // Die Entscheidung selbst liegt in chat-messages.js und ist dort geprueft.
 function applyResubmitPlan(plan) {
   pendingVersions = plan.stash;
-  for (const node of plan.entfernen) node.remove();
-  if (!resubmit(plan.text)) pendingVersions = null;
+  if (!wendeAn(plan, resubmit)) pendingVersions = null;
 }
 
 function regenerate(entry) {
@@ -734,7 +734,7 @@ function onSettled() {
   const plan = planSettle(Array.from(log()?.querySelectorAll(":scope > .entry") || []), busy);
   if (!plan.ok) return;
   metaOf(plan.ziel).versions = pendingVersions.slice();
-  pendingVersions = null;
+  pendingVersions = null; entferneEndgueltig();
   addVersion(plan.ziel, { raw: plan.raw, html: plan.ziel.innerHTML, editedAt: new Date().toISOString() });
   ensureBar(plan.ziel);
 }
