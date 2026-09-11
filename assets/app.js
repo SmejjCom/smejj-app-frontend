@@ -22,7 +22,7 @@ import { getJson, postJson } from "./shared/http-json.js";
 // Kleine DOM-, Speicher- und Anzeige-Helfer. Herausgeloest am 07.09., weil
 // app.js mit 812 Zeilen ueber der Hausgrenze von 800 lag und damit
 // `npm run check:all` bei der ersten Pruefung abbrach.
-import { addEntry, downloadText, hideTaskIndicator, loadJson, loadText, setText, showTaskIndicator, snippet, writeOutput } from "./app-helfer.js?v=2";
+import { addEntry, downloadText, hideTaskIndicator, loadJson, loadText, setText, showTaskIndicator, snippet, writeOutput } from "./app-helfer.js?v=3";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 

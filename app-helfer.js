@@ -29,10 +29,16 @@ export function addEntry(text, role, target = "#startLog") {
   if (log.id === "startLog" && role === "user") $("#start")?.classList.add("has-start-chat");
   log.append(node);
   // NICHT scrollIntoView: das richtet am FENSTER aus, nicht am Verlauf. Auf dem
-  // Handy landete die frische Nachricht dadurch UNTER der sichtbaren Kante von
-  // #startLog und damit hinter der Bedienzone — man sendet und sieht die eigene
-  // Nachricht nicht (live gemessen 2026-09-11: 47 px bei 375, 152 px bei 320;
-  // der Verlauf endete bei 698, die Nachricht lag bei 715..762).
+  // Handy landete die frische Nachricht dadurch unter der sichtbaren Kante von
+  // #startLog und damit hinter der Bedienzone (live gemessen 2026-09-11:
+  // 47 px bei 375, 152 px bei 320; der Verlauf endete bei 698, die Nachricht
+  // lag bei 715..762).
+  //
+  // EHRLICHE EINORDNUNG, nach dem Selbsttest der Messung: der alte Weg war
+  // nicht dauerhaft falsch, sondern die ersten Augenblicke lang — 250 ms
+  // spaeter blieben noch 3 px. Das faellt trotzdem ins Gewicht, weil man genau
+  // dann hinsieht: unmittelbar nachdem man gesendet hat. Und der Bezug war so
+  // oder so falsch.
   //
   // Derselbe geprueste Weg wie beim Oeffnen eines Chats: den CONTAINER ans Ende
   // scrollen. Ohne Marke importiert, genau wie in chat-actions-menu.js — eine
