@@ -144,8 +144,41 @@ function stoppeAlleStroeme() {
   // aus dem Modul-Zwischenspeicher — so haengt kein Stopp an einer Ladezeit.
   try { window.dispatchEvent(new CustomEvent("smejj:chat-stoppen")); } catch { /* still */ }
   import("/assets/ai/chat-stream.js")
-    .then((m) => m.stoppeChatStrom())
+    .then((m) => { m.stoppeChatStrom(); raeumeNachAbbruch(m); })
     .catch(() => { /* fail-safe: das Ereignis oben hat schon gewirkt */ });
+}
+
+/**
+ * Nach dem Abbruch aufraeumen.
+ *
+ * DER FALL, live gemessen 2026-09-11: Ein Klick auf "Antwort stoppen", bevor
+ * das erste Wort da war, beendete zwar den Strom — aber "smejj denkt nach ..."
+ * blieb als Antwort stehen, die Denk-Marke blieb gesetzt und der Ladebalken
+ * lief WEITER. Auch nach zehn Sekunden. Die App sah aus, als arbeite sie noch
+ * an etwas, das niemand mehr holt.
+ *
+ * Der Grund: den Wartetext raeumt bisher nur der Strom selbst (clearThinkingState
+ * beim ersten Ereignis) und den Balken nur app.js in seinem catch. Ein Abbruch
+ * geht an beiden vorbei.
+ *
+ * Eine TEILANTWORT bleibt bewusst stehen: sie ist nicht falsch, nur kurz. Der
+ * Selektor trifft ausschliesslich Knoten, in denen noch KEIN Wort steht — bei
+ * denen ist data-thinking noch gesetzt.
+ *
+ * @param {{clearThinkingState: Function, beendeDenken: Function}} strom
+ * @param {Document} [dok]
+ */
+function raeumeNachAbbruch(strom, dok = document) {
+  import("/assets/app-helfer.js?v=1")
+    .then((m) => m.hideTaskIndicator())
+    .catch(() => { /* der Balken ist Anzeige, kein Zustand */ });
+  for (const knoten of dok.querySelectorAll('.entry.assistant[data-thinking="true"]')) {
+    try { strom.beendeDenken(knoten); } catch { /* Denkzeile ist Zugabe */ }
+    strom.clearThinkingState(knoten);
+    // Sonst bliebe eine leere Blase — und "nichts da" liest sich wie ein
+    // Fehler, obwohl der Nutzer selbst gestoppt hat.
+    if (!knoten.textContent.trim()) knoten.textContent = "Gestoppt.";
+  }
 }
 
 const FORTSETZUNGS_AUFTRAG = "Deine letzte Antwort wurde gestoppt. Setze sie"
