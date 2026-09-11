@@ -20,9 +20,12 @@ import { firstSafeUrl } from "./autonomous-intent.js";
 
 // Modelle, bei denen die Bridge ihre werkzeuglose Schnellspur ueberspringt und
 // an den Control Server weiterreicht — dort laeuft echtes Tool-Calling.
-// Der Vertrag steht in chat-bridge.js: /glm|kimi|cline/ im angefragten Modell.
+// Der Vertrag steht in chat-bridge.js: /glm|kimi/ im angefragten Modell.
+// "cline" stand hier bis 2026-09-11 mit im Muster; der Anbieter ist entfernt
+// (A-bis-Z-Auftrag, Punkt 1), und ein toter Name im Muster erklaert kuenftigen
+// Lesern eine Spur, die es nicht gibt.
 const TIEFSPUR_MODELL = "GLM-5.2";
-const TIEFSPUR_ERKANNT = /glm|kimi|cline/i;
+const TIEFSPUR_ERKANNT = /glm|kimi/i;
 
 const MAX_CONTEXT_CHARS = 4000;
 const FETCH_TIMEOUT_MS = 8000;
