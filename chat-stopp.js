@@ -169,7 +169,7 @@ function stoppeAlleStroeme() {
  * @param {Document} [dok]
  */
 function raeumeNachAbbruch(strom, dok = document) {
-  import("/assets/app-helfer.js?v=1")
+  import("/assets/app-helfer.js?v=2")
     .then((m) => m.hideTaskIndicator())
     .catch(() => { /* der Balken ist Anzeige, kein Zustand */ });
   for (const knoten of dok.querySelectorAll('.entry.assistant[data-thinking="true"]')) {
