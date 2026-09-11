@@ -63,15 +63,22 @@ function sorgeFuerStil(doc) {
   const stil = doc.createElement("style");
   stil.id = STIL_ID;
   // Viereckig, wenig Farbe, 44-px-Ziele; unter 600 px eine Spalte.
+  //
+  // SCHRIFTGROESSEN: 14 px ist die kleine Schrift dieser App — 37-mal
+  // gemessen, gegen 4-mal 13 px genau hier (designsystem-einheit.mjs,
+  // 2026-09-11). Zwei Groessen fuer denselben Zweck sind kein Stil, sondern ein
+  // Versehen, und 13 px steht ausserdem gegen die Betreiber-Regel "GROSSE
+  // Schrift". Die 12 px der Ueberschrift bleiben: sie ist gesperrt und in
+  // Grossbuchstaben gesetzt, also eine eigene Rolle.
   stil.textContent = `.${KLASSE}{max-width:720px;margin:18px auto 0;padding:0 8px}`
     + `.${KLASSE} header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}`
     + `.${KLASSE} h3{margin:0;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.7}`
-    + `.${KLASSE} .es-weg{min-height:44px;padding:0 12px;border:0;border-radius:0;background:transparent;color:inherit;font:inherit;font-size:13px;opacity:.7;cursor:pointer}`
+    + `.${KLASSE} .es-weg{min-height:44px;padding:0 12px;border:0;border-radius:0;background:transparent;color:inherit;font:inherit;font-size:14px;opacity:.7;cursor:pointer}`
     + `.${KLASSE} .es-weg:hover,.${KLASSE} .es-karte:hover{opacity:1;border-color:rgba(127,127,127,.7)}`
     + `.${KLASSE} .es-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}`
     + `.${KLASSE} .es-karte{display:flex;flex-direction:column;gap:4px;min-height:44px;padding:14px;border:1px solid rgba(127,127,127,.4);border-radius:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}`
     + `.${KLASSE} .es-karte strong{font-size:15px;font-weight:600}`
-    + `.${KLASSE} .es-karte span{font-size:13px;line-height:1.35;opacity:.75}`
+    + `.${KLASSE} .es-karte span{font-size:14px;line-height:1.35;opacity:.75}`
     + `@media (max-width:600px){.${KLASSE} .es-raster{grid-template-columns:1fr}}`;
   doc.head.appendChild(stil);
 }
