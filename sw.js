@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v843";
+const CACHE_NAME = "smejj-shell-v844";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -331,6 +331,7 @@ const SHELL = [
   "/assets/chat-title-auto.js",
   "/assets/chat-messages.js",
   "/assets/chat-actions.js",
+  "/assets/chat-neu-versuch.js",
   // Beispiel-Chips der Startseite (2026-08-13). index.html laedt sie per
   // <script>; ohne Eintrag hier fehlen sie offline — check:precache-imports
   // hat genau das gemeldet.
