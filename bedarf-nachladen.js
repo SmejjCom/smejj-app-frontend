@@ -32,10 +32,15 @@ if (location.pathname.includes("papierkorb")) {
 // 3. Kamera — lebt hinter dem Plus-Menue; derselbe Ausloeser, mit dem app.js
 //    schon composer-tools nachlaedt. Das Modul bindet seinen Knopf selbst,
 //    sobald das Menue existiert.
-// [data-kamera-start] MUSS mit in die Liste (2026-09-10): die Sprachwelle baut
-// sich einen EIGENEN Kamera-Knopf mit diesem Merkmal (voice-overlay-ui.js).
-// Live gemessen: ein Klick darauf lud kamera.js nie und rief nie getUserMedia —
-// der Knopf war eine Attrappe.
+//
+//    [data-kamera-start] MUSS mit in die Liste (2026-09-10). Die Sprachwelle
+//    baut sich einen EIGENEN Kamera-Knopf mit genau diesem Merkmal
+//    (voice-overlay-ui.js: "Kamera — smejj sieht mit"), und der stand hier
+//    nicht drin. Live gemessen: ein Klick darauf lud kamera.js nie, rief nie
+//    getUserMedia und oeffnete kein Overlay — der Knopf war eine Attrappe.
+//    Aufgefallen ist es erst, weil danach GEMESSEN wurde, ob das Modul im
+//    Netzwerk auftaucht; sichtbar passiert bei einer Attrappe ja nichts, und
+//    "nichts passiert" sieht aus wie "die Kamera darf nicht".
 ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"], () => import("./kamera.js?v=b35live3"));
 
 // 4. "@"-Erwaehnung — erst wenn im Startfeld ein "@" getippt wird. Nach dem
@@ -83,6 +88,24 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
       beobachter.observe(log, { childList: true, subtree: true });
     }
   }
+}
+
+// 7. Verlauf-Ansicht — 35 KB, die beim Start NICHTS tun.
+//
+//    chat-history-view.js baut ausschliesslich die Ansicht #chatHistory und
+//    prueft das selbst: "if (isHistoryViewVisible() || location.pathname ===
+//    '/chat-history')". Auf der Startseite laeuft sie leer — und war trotzdem
+//    fest im index.html verdrahtet. Gemessen am 2026-09-12: 35,3 KB von 740 KB
+//    Startgewicht, waehrend das Budget bei 300 KB liegt.
+//
+//    BEIDE Wege muessen laden, sonst bleibt der Verlauf leer: der Klick in der
+//    Spur UND der Direkteinstieg ueber die Adresse. Genau daran waere es eine
+//    Attrappe geworden — wer /chat-history als Lesezeichen hat, saehe nichts.
+if (location.pathname.includes("chat-history") || location.pathname.includes("chatHistory")) {
+  import("./chat-history-view.js?v=b62");
+} else {
+  ladeBeiKlick(['[data-view="chatHistory"]', '[data-jump="chatHistory"]', '[data-view="chat-history"]'],
+    () => import("./chat-history-view.js?v=b62"));
 }
 
 // 6. Projects/Arbeitsbereiche — erst wenn die Ansicht aufgeht (Klick in der
