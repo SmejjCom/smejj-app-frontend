@@ -40,6 +40,8 @@ import { zieheAnhaengeAusFeld, nimmAnhaengeMit } from "./code-anhaenge.js?v=1";
 import {
   MODELL_KEY,
   AUTO_WAHL,
+  SMEJJ_STAFFEL,
+  nachVersionAbsteigend,
   baueKopfzeile,
   modellAnzeige as modellAnzeigeRoh,
   oeffneModellMenue as oeffneModellMenueRoh,
@@ -73,9 +75,24 @@ function oeffneModellMenue(kontext = {}) {
   return oeffneModellMenueRoh({ ...kontext, beiWahl: () => zeichne() });
 }
 
-const STUFEN = ["auto", "gruendlich", "schnell"];
-const STUFEN_TEXT = { auto: "Automatisch", gruendlich: "Gründlich", schnell: "Schnell" };
-const MODELL_TEXT = { auto: "smejj 1.0", gruendlich: "smejj gründlich", schnell: "smejj schnell" };
+// EINE Quelle fuer die Staffel: SMEJJ_STAFFEL aus code-modell-menue.js.
+//
+// Hier stand bis 2026-09-11 eine eigene, veraltete Tabelle — und sie log
+// gleich dreifach (live gemessen):
+//   * "spezial" fehlte in STUFEN. Wer smejj 1.3 gewaehlt hatte und den
+//     Code-Bereich betrat, sah "Automatisch": stufe() fiel auf den Rueckfall.
+//   * MODELL_TEXT nannte auto "smejj 1.0" (auto ist 1.1) und fuehrte Namen,
+//     die es im Menue nicht gibt. Der Chip widersprach dem Haken im Menue.
+//   * Der Stufen-Chip schaltete nur durch drei Stufen; 1.3 war ueber ihn
+//     nicht erreichbar.
+// Dieselbe Krankheit wie im Chat am selben Tag: zwei Quellen fuer eine Wahl.
+//
+// Aufsteigend, damit der Chip von schnell nach spezial durchschaltet — die
+// Staffel selbst ist absteigend sortiert (neueste oben im Menue).
+const STUFEN = nachVersionAbsteigend(SMEJJ_STAFFEL).map((eintrag) => eintrag.stufe).reverse();
+const MODELL_TEXT = Object.fromEntries(SMEJJ_STAFFEL.map((eintrag) => [eintrag.stufe, eintrag.titel]));
+// Nur die Anzeige-Namen sind hier zuhause; sie stehen nicht in der Staffel.
+const STUFEN_TEXT = { schnell: "Schnell", auto: "Automatisch", gruendlich: "Gründlich", spezial: "Spezialfälle" };
 const TIEFE_TEXT = { medium: "Mittel", high: "Hoch", max: "Maximal" };
 const STUFE_SPEICHER = "smejj.stufe.v1";
 
@@ -708,7 +725,11 @@ export function initCodeFlaeche() {
   });
   document.getElementById("codeStufeChip")?.addEventListener("click", () => {
     const naechste = STUFEN[(STUFEN.indexOf(stufe()) + 1) % STUFEN.length];
-    document.querySelector(`[data-stufe="${naechste}"]`)?.click();
+    // Der benannte Weg statt eines Klicks in das alte, nie geoeffnete Menue:
+    // dieser Klick zwang die Modellwahl frueher auf "smejj 1.0" und loeschte
+    // damit still eine Wahl von "Auto" (Fall vom 2026-09-11, Startseite).
+    if (typeof window.smejjApplyStufe === "function") window.smejjApplyStufe(naechste);
+    else document.querySelector(`[data-stufe="${naechste}"]`)?.click();
     setTimeout(zeichne, 80);
   });
   // Vorlagen-Chips fuellen das CODE-Feld (nicht das Start-Feld).
