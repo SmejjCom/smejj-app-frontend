@@ -98,14 +98,35 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 //    fest im index.html verdrahtet. Gemessen am 2026-09-12: 35,3 KB von 740 KB
 //    Startgewicht, waehrend das Budget bei 300 KB liegt.
 //
-//    BEIDE Wege muessen laden, sonst bleibt der Verlauf leer: der Klick in der
-//    Spur UND der Direkteinstieg ueber die Adresse. Genau daran waere es eine
-//    Attrappe geworden — wer /chat-history als Lesezeichen hat, saehe nichts.
-if (location.pathname.includes("chat-history") || location.pathname.includes("chatHistory")) {
-  import("./chat-history-view.js?v=b62");
-} else {
-  ladeBeiKlick(['[data-view="chatHistory"]', '[data-jump="chatHistory"]', '[data-view="chat-history"]'],
-    () => import("./chat-history-view.js?v=b62"));
+//    NICHT an der ADRESSE festmachen — daran ist der erste Entwurf
+//    gescheitert. `/chat-history` ist zwar die offizielle Route
+//    (view-routes.js), aber GitHub Pages liefert dafuer die 404-Seite, die
+//    ihrerseits in die App umleitet. Beim Laden dieses Moduls steht in
+//    location.pathname dann laengst etwas anderes, der Zweig greift nie, und
+//    der Verlauf bleibt leer: "Verlauf bereit." und sonst nichts. LIVE
+//    gemessen, bevor es jemand anders gemerkt haette.
+//
+//    Der verlaesslichste Ausloeser ist die ANSICHT selbst. Sie wird sichtbar,
+//    egal ob man klickt, ein Lesezeichen oeffnet oder zurueckgeht — und genau
+//    dann, und nur dann, wird das Modul gebraucht.
+{
+  const laden = () => import("./chat-history-view.js?v=b62");
+  const ansicht = document.getElementById("chatHistory");
+  const istOffen = () => ansicht?.classList.contains("is-active") || !!(ansicht?.offsetWidth || ansicht?.offsetHeight);
+  if (ansicht) {
+    if (istOffen()) laden();
+    else {
+      const wache = new MutationObserver(() => {
+        if (!istOffen()) return;
+        wache.disconnect();
+        laden().catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
+      });
+      wache.observe(ansicht, { attributes: true, attributeFilter: ["class", "hidden", "style"] });
+    }
+  }
+  // Der Klick bleibt als zweiter Weg: er laedt schon WAEHREND der
+  // Ansichtswechsel laeuft, nicht erst danach.
+  ladeBeiKlick(['[data-view="chatHistory"]', '[data-jump="chatHistory"]'], laden);
 }
 
 // 6. Projects/Arbeitsbereiche — erst wenn die Ansicht aufgeht (Klick in der
