@@ -302,7 +302,7 @@ async function oeffneProjektMenue() {
     ordner.type = "button";
     ordner.className = "code-projekt-ordner";
     ordner.textContent = "📁";
-    ordner.title = "Ordner für dieses Project wählen";
+    ordner.title = "Ordner für dieses Projekt wählen";
     window.smejjProjektOrdner?.ordnerName(p.id).then((n) => {
       if (n) { ordner.textContent = `📁 ${n}`; ordner.title = `Ordner: ${n} — klicken zum Wechseln`; }
     }).catch(() => {});
@@ -318,7 +318,7 @@ async function oeffneProjektMenue() {
     zeile.append(ordner);
     menue.append(zeile);
   }
-  menue.append(eintragKnopf("Neues Project anlegen …", () => {
+  menue.append(eintragKnopf("Neues Projekt anlegen …", () => {
     schliesseProjektMenue();
     document.querySelector('.nav-button[data-view="arbeitsbereiche"]')?.click();
   }));
@@ -439,7 +439,7 @@ export function initCodeFlaeche() {
     let name = "";
     try { name = projektId ? await window.smejjProjektOrdner?.ordnerName(projektId) || "" : ""; } catch { /* still */ }
     schalter?.setAttribute("aria-checked", name ? "true" : "false");
-    if (schalter) schalter.title = name ? `Verbunden: ${name} — klicken zum Trennen` : "Ordner mit dem Code-Project verbinden";
+    if (schalter) schalter.title = name ? `Verbunden: ${name} — klicken zum Trennen` : "Ordner mit dem Code-Projekt verbinden";
     konnektorenMenue.hidden = false;
     konnektorenKnopf?.setAttribute("aria-expanded", "true");
   }

@@ -154,9 +154,9 @@ function zeigeDateiKarte(wrap, pfad, text) {
   }
   const zeilen = String(text).split("\n").length;
   karte.dataset.datei = String(pfad);
-  karte.dataset.info = `Im Project-Ordner gespeichert · ${zeilen} Zeilen`;
+  karte.dataset.info = `Im Projekt-Ordner gespeichert · ${zeilen} Zeilen`;
   karte.setAttribute("role", "note");
-  karte.setAttribute("aria-label", `${pfad} — im Project-Ordner gespeichert, ${zeilen} Zeilen`);
+  karte.setAttribute("aria-label", `${pfad} — im Projekt-Ordner gespeichert, ${zeilen} Zeilen`);
 }
 
 function sweep(root) {

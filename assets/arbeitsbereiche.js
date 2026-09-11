@@ -57,14 +57,14 @@ async function zeichne() {
   const neu = document.createElement("button");
   neu.type = "button";
   neu.id = "bereichNeu";
-  neu.textContent = "Neues Project anlegen";
+  neu.textContent = "Neues Projekt anlegen";
   const formular = document.createElement("form");
   formular.id = "bereichNeuFormular";
   formular.className = "bereich-neu-formular";
   formular.hidden = !formularOffen;
   const eingabe = document.createElement("input");
   eingabe.type = "text";
-  eingabe.placeholder = "Wie soll das Project heißen?";
+  eingabe.placeholder = "Wie soll das Projekt heißen?";
   eingabe.maxLength = 60;
   eingabe.value = formularWert;
   eingabe.addEventListener("input", () => { formularWert = eingabe.value; });
@@ -105,7 +105,7 @@ async function zeichne() {
   if (!projekte.length) {
     const leer = document.createElement("p");
     leer.className = "bereiche-leer";
-    leer.textContent = "Noch kein Project. Ein Project bündelt Gespräche zu einem Thema — mit einer Dauer-Anweisung, die in jedem Gespräch des Bereichs gilt.";
+    leer.textContent = "Noch kein Projekt. Ein Projekt bündelt Gespräche zu einem Thema — mit einer Dauer-Anweisung, die in jedem Gespräch des Bereichs gilt.";
     stueck.append(leer);
   }
 

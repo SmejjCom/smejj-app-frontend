@@ -124,7 +124,7 @@ async function mitErlaubnis(handle, mode = "read") {
  */
 export async function verbindeOrdner(projektId) {
   if (typeof window.showDirectoryPicker !== "function") {
-    return { ok: false, fehler: "Die Ordnerwahl gibt es nur in Chrome/Edge. Dort einmal verbinden — dann bleibt der Ordner fest am Project." };
+    return { ok: false, fehler: "Die Ordnerwahl gibt es nur in Chrome/Edge. Dort einmal verbinden — dann bleibt der Ordner fest am Projekt." };
   }
   try {
     const handle = await window.showDirectoryPicker({ mode: "readwrite" });
@@ -179,7 +179,7 @@ export async function leseKontext(projektId, { maxDateien = 12, maxBytes = 60_00
  */
 export async function schreibeDatei(projektId, dateiname, inhalt) {
   const handle = await mitErlaubnis(await holeOrdner(projektId), "readwrite");
-  if (!handle) return { ok: false, fehler: "Kein Ordner verbunden oder Erlaubnis fehlt — im Project 'Ordner verbinden' klicken." };
+  if (!handle) return { ok: false, fehler: "Kein Ordner verbunden oder Erlaubnis fehlt — im Projekt 'Ordner verbinden' klicken." };
   try {
     const sicher = String(dateiname).replace(/[^\w./-]/g, "_").replace(/\.\./g, "_");
     const dateiHandle = await handle.getFileHandle(sicher, { create: true });
