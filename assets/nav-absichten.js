@@ -98,6 +98,11 @@ if (typeof document !== "undefined") {
     else document.querySelector(`[data-stufe="${ziel}"]`)?.click();
     setTimeout(zeichneNachdenken, 80);
   });
+  // Auch nach einer MODELLWAHL neu zeichnen: die Staffel-Zeilen setzen die
+  // Stufe mit (1.2 = gruendlich). Ohne dieses Ohr zeigte die Pille nach der
+  // Wahl von "smejj 1.2" weiter "aus", obwohl gruendlich lief — und der erste
+  // Klick darauf schaltete dann AUS statt an (live gemessen 2026-09-11).
+  window.addEventListener("smejj:model-selected", () => setTimeout(zeichneNachdenken, 0));
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", zeichneNachdenken, { once: true });
   else zeichneNachdenken();
 }
