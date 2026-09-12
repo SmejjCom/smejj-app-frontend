@@ -114,42 +114,6 @@ button:hover {
   color: #151515;
 }
 
-.side-block {
-  margin-top: 4px;
-  padding-top: 16px;
-  border-top: 1px solid #deded8;
-}
-
-.status-strip {
-  display: grid;
-  gap: 6px;
-  padding: 12px 8px;
-  border-top: 1px solid #deded8;
-  border-bottom: 1px solid #deded8;
-}
-
-.status-strip span {
-  overflow-wrap: anywhere;
-  border: 1px solid #d4d4cc;
-  border-radius: 8px;
-  background: #ffffff;
-  padding: 8px 10px;
-  color: #4a4a43;
-  font-size: 14.5px;
-  font-weight: 700;
-}
-
-.side-block button {
-  min-height: 38px;
-  border-color: #d4d4cc;
-  background: #ffffff;
-  color: #4a4a43;
-}
-
-.side-block button:hover {
-  background: #e8e8e1;
-}
-
 .workspace {
   min-width: 0;
   min-height: 100dvh;
@@ -537,12 +501,6 @@ textarea {
   stroke-linejoin: round;
 }
 
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-
 .surface,
 .empty-state {
   display: grid;
@@ -736,27 +694,6 @@ body.right-panel-open .workspace {
 
 .browser-button {
   right: env(safe-area-inset-right);
-}
-
-.split-icon {
-  position: relative;
-  display: block;
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid rgba(232, 232, 232, 0.72);
-  border-radius: 4px;
-}
-
-.split-icon span:first-child {
-  position: absolute;
-  inset: 2px auto 2px 5px;
-  width: 1.5px;
-  border-radius: 999px;
-  background: rgba(232, 232, 232, 0.58);
-}
-
-.split-icon span:last-child {
-  display: none;
 }
 
 body.task-indicator-active .split-icon span:last-child {
@@ -994,27 +931,6 @@ body.is-resizing-panel .panel-resizer::before {
   transform: translateX(0);
 }
 
-.browser-panel-header {
-  padding: 2px 8px 12px;
-}
-
-.browser-panel-header h2 {
-  margin: 0;
-  color: #f6f3ee;
-  font-size: 27px;
-  line-height: 1;
-  letter-spacing: 0;
-}
-
-.browser-panel-header p {
-  margin: 8px 0 0;
-  color: rgba(246, 243, 238, 0.58);
-  font-size: 14.5px;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
 .browser-panel-nav,
 .browser-panel-status {
   display: grid;
@@ -1047,22 +963,6 @@ body.is-resizing-panel .panel-resizer::before {
   border-color: transparent;
   background: rgba(255, 255, 255, 0.035);
   color: #ffffff;
-}
-
-.browser-panel-status {
-  align-content: end;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 12px 8px 0;
-}
-
-.browser-panel-status span {
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(246, 243, 238, 0.72);
-  padding: 8px 10px;
-  font-size: 14.5px;
-  font-weight: 700;
 }
 
 .brand {
@@ -1114,21 +1014,6 @@ body.is-resizing-panel .panel-resizer::before {
 
 .sidebar .nav-button.is-active {
   background: transparent;
-}
-
-.status-strip {
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-.status-strip span,
-.side-block button {
-  border-color: rgba(255, 255, 255, 0.11);
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(246, 243, 238, 0.72);
-}
-
-.side-block {
-  border-top-color: rgba(255, 255, 255, 0.12);
 }
 
 .profile-dock {

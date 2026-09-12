@@ -107,11 +107,6 @@ button:hover {
   background: #ffffff;
   color: #151515;
 }
-.
-.
-.
-.
-.
 .workspace {
   min-width: 0;
   min-height: 100dvh;
@@ -433,7 +428,6 @@ textarea {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.
 .surface,
 .empty-state {
   display: grid;
@@ -601,9 +595,6 @@ body.right-panel-open .workspace {
 .browser-button {
   right: env(safe-area-inset-right);
 }
-.
-.
-.
 body.task-indicator-active .split-icon span:last-child {
   position: absolute;
   top: -5px;
@@ -798,9 +789,6 @@ body.is-resizing-panel .panel-resizer::before {
 .browser-panel.is-open {
   transform: translateX(0);
 }
-.
-.
-.
 .browser-panel-nav,
 .browser-panel-status {
   display: grid;
@@ -831,8 +819,6 @@ body.is-resizing-panel .panel-resizer::before {
   background: rgba(255, 255, 255, 0.035);
   color: #ffffff;
 }
-.
-.
 .brand {
   padding: 2px 8px 14px;
 }
@@ -874,9 +860,6 @@ body.is-resizing-panel .panel-resizer::before {
 .sidebar .nav-button.is-active {
   background: transparent;
 }
-.
-.
-.
 .profile-dock {
   align-self: end;
   display: flex;
@@ -2026,7 +2009,6 @@ body.voice-mode-open #voiceModeClose {
   background: rgba(246, 243, 238, 0.1);
   color: #f6f3ee;
 }
-.
 .bp-tab.is-active .bp-tab-dot {
   background: rgba(159, 231, 212, 0.9);
 }

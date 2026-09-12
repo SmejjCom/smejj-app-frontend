@@ -228,14 +228,6 @@
   color: #f6f3ee;
 }
 
-.bp-tab-dot {
-  flex: none;
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: rgba(246, 243, 238, 0.35);
-}
-
 .bp-tab.is-active .bp-tab-dot {
   background: rgba(159, 231, 212, 0.9);
 }
@@ -537,7 +529,6 @@
     width: calc(100vw - 12px);
   }
 }
-
 
 /* Bezugsrahmen fuer den schwebenden Hinweis (.bp-hint). */
 .browser-pane {
