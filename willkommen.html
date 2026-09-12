@@ -49,6 +49,11 @@
        und ohne Kennung. Ohne diese Zahl ist "es kommt niemand" nicht von
        "niemand kann melden" zu unterscheiden. -->
   <script src="/assets/besucher-puls.js?v=p1" defer></script>
+  <!-- Offline-Rueckfall (12.09.): wer die App VOR der Anmeldung installiert,
+       bekam keinen Service Worker und sah offline die Fehlerseite des Browsers.
+       Registriert den schmalen Service Worker (~19 KB statt 2 MB) und zeigt
+       das Offline-Band der App nach einer echten Netzprobe. -->
+  <script src="/assets/willkommen-offline.js?v=1" type="module"></script>
   <style>
     .schwerpunkte { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
     .schwerpunkte button {
