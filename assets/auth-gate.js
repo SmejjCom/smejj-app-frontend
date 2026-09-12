@@ -126,6 +126,48 @@ export function enforceAuthGate(win) {
 //     auf einen Netzaufruf warten.
 const SESSION_CHECK_TIMEOUT_MS = 8000;
 const HINWEIS_ID = "smejj-sitzung-abgelaufen";
+const PLATZ_ID = "smejj-sitzung-abgelaufen-platz";
+
+/**
+ * Der Streifen macht sich Platz — sonst deckt er Knoepfe zu, die selbst oben kleben.
+ *
+ * GEMESSEN 2026-09-12 im Android-Emulator (Telefon QUER, 863x360): der
+ * Streifen verdeckte VIER Bedienelemente vollstaendig — den Spur-Knopf
+ * (#appMenuButton), den Browser-Knopf (#browserButton) und die beiden
+ * Umschalter "Start"/"Code" in der Spur. Nachgewiesen nicht per Rechteck-
+ * Vergleich, sondern mit elementFromPoint auf die Mitte jedes Knopfes: dort
+ * lag jedes Mal #smejj-sitzung-abgelaufen. Antippen war unmoeglich.
+ *
+ * Die Hoehe meldete der Streifen schon laenger als --hinweis-hoehe; nur
+ * gerechnet hat damit bis heute allein composer-tools.css (fuer das X des
+ * Sprachmodus). Alles andere, was `position: fixed; top: 0` traegt, blieb
+ * darunter liegen.
+ *
+ * WARUM HIER und nicht im Stylesheet: public/styles.css, branding.css und das
+ * Buendel start-styles.css stehen unter dem Start-Lock (100%-Schutz der
+ * Startseite) — sie duerfen ohne schriftliche Bestaetigung des Betreibers
+ * nicht angefasst werden. Diese Regel gehoert ohnehin zum Streifen: sie
+ * entsteht mit ihm und verschwindet mit ihm. Ohne Streifen aendert sich an der
+ * Startseite kein Pixel.
+ */
+function legePlatzAn(dok) {
+  if (dok.getElementById(PLATZ_ID)) return;
+  const stil = dok.createElement("style");
+  stil.id = PLATZ_ID;
+  // Keine festen Zahlen wiederholen: .sidebar klebt mit top:0 und bottom:0 am
+  // Rand — sie bekommt einfach einen neuen oberen Rand. Die beiden Kopfknoepfe
+  // und das Logo rechnen ihren vorhandenen Sicherheitsabstand weiter.
+  stil.textContent = [
+    ".glass-icon, .app-brand-logo { top: calc(env(safe-area-inset-top, 0px) + var(--hinweis-hoehe, 0px)); }",
+    ".sidebar { top: var(--hinweis-hoehe, 0px); }"
+  ].join("\n");
+  dok.head.appendChild(stil);
+}
+
+/** Nimmt die Platz-Regel wieder mit, wenn der Streifen geht. */
+function raeumePlatzWeg(dok) {
+  dok.getElementById(PLATZ_ID)?.remove();
+}
 
 
 /**
@@ -165,10 +207,11 @@ export function zeigeAbgelaufenHinweis(win) {
   zu.type = "button";
   zu.textContent = "Später";
   zu.style.cssText = "background:none;border:1px solid #6b4d1d;color:#ffd9a0;padding:4px 10px;font:inherit;cursor:pointer";
-  zu.addEventListener("click", () => { streifen.remove(); meldeHoehe(dok, 0); });
+  zu.addEventListener("click", () => { streifen.remove(); raeumePlatzWeg(dok); meldeHoehe(dok, 0); });
 
   streifen.append(text, link, zu);
   dok.body.appendChild(streifen);
+  legePlatzAn(dok);
   // WIE HOCH BIN ICH? — die Frage muss beantwortbar sein, sonst deckt dieser
   // Streifen andere Bedienelemente zu.
   //
