@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v858";
+const CACHE_NAME = "smejj-shell-v859";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -497,6 +497,15 @@ function isHtmlRequest(request, url) {
   return url.pathname === "/" || url.pathname.endsWith(".html") || url.pathname.endsWith("/");
 }
 
+// Die App-Routen (Spiegel von public/view-routes.js — siehe Begruendung unten
+// beim Navigations-Zweig). tests/sw-app-routen.test.mjs vergleicht beide Listen.
+const APP_ROUTEN = new Set([
+  "/search", "/smejj-claw", "/smejjBot", "/chat-history", "/browser", "/code",
+  "/projects", "/files", "/storage", "/memory", "/papierkorb", "/bereiche",
+  "/ai", "/cost", "/systemzustand", "/settings", "/profile", "/offline",
+  "/error", "/chat", "/automation", "/smejjbot"
+]);
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -543,5 +552,36 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
+  // APP-ROUTEN UEBERLEBEN EIN ECHTES NEULADEN (12.09.).
+  //
+  // GitHub Pages kennt nur Dateien: ein Aufruf von /projects liefert HTTP 404,
+  // und 404.html schickt den Nutzer mit `location.replace("/")` zurueck auf die
+  // Startseite. Das ist als Notnagel gedacht — auf dem Android-Geraet wurde
+  // daraus ein KREISEL: gemessen am 12.09. wanderte die App im Sekundentakt
+  // /smejjBot -> / -> /chat-history -> / -> /browser -> /, weil jede
+  // wiederhergestellte Route beim naechsten echten Laden erneut im 404 landete.
+  //
+  // Der Service Worker kann das an der Wurzel loesen: fuer eine NAVIGATION auf
+  // eine bekannte App-Route liefert er die Huelle (/) aus dem Zwischenspeicher.
+  // Damit wirkt ein Lesezeichen auf /projects wie ein Klick in der App — online
+  // wie offline. Unbekannte Pfade bleiben unangetastet und zeigen weiter ehrlich
+  // die 404-Seite.
+  //
+  // Die Liste stammt aus public/view-routes.js (VIEW_PATHS + PATH_VIEWS). Sie
+  // steht hier ein zweites Mal, weil ein Service Worker keine Module der App
+  // laden kann — tests/sw-app-routen.test.mjs haelt beide Seiten deckungsgleich,
+  // damit aus zwei Orten nicht zwei Wahrheiten werden.
+  if (url.origin === self.location.origin && request.mode === "navigate" && APP_ROUTEN.has(url.pathname.replace(/\/$/, ""))) {
+    event.respondWith(
+      fetch(request)
+        .then((antwort) => (antwort && antwort.ok ? antwort : huelleAusCache(antwort)))
+        .catch(() => huelleAusCache(null))
+    );
+    return;
+  }
   event.respondWith(fetch(request).catch(() => caches.match(request).then((cached) => cached || caches.match("/"))));
 });
+
+function huelleAusCache(rueckfall) {
+  return caches.match("/", { ignoreSearch: true }).then((huelle) => huelle || rueckfall || fetch("/"));
+}
