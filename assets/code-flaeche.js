@@ -81,8 +81,9 @@ function oeffneModellMenue(kontext = {}) {
 // gleich dreifach (live gemessen):
 //   * "spezial" fehlte in STUFEN. Wer smejj 1.3 gewaehlt hatte und den
 //     Code-Bereich betrat, sah "Automatisch": stufe() fiel auf den Rueckfall.
-//   * MODELL_TEXT nannte auto "smejj 1.0" (auto ist 1.1) und fuehrte Namen,
-//     die es im Menue nicht gibt. Der Chip widersprach dem Haken im Menue.
+//   * MODELL_TEXT nannte auto "smejj 1.0" (auto ist 1.1) und fuehrte
+//     "smejj gruendlich"/"smejj schnell" — Namen, die es im Menue nicht gibt.
+//     Der Chip zeigte "smejj gründlich", der Haken im Menue stand auf 1.2.
 //   * Der Stufen-Chip schaltete nur durch drei Stufen; 1.3 war ueber ihn
 //     nicht erreichbar.
 // Dieselbe Krankheit wie im Chat am selben Tag: zwei Quellen fuer eine Wahl.

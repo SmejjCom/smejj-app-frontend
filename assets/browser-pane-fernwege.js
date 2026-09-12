@@ -7,6 +7,9 @@
 // Zustand traegt (sessionClient, refs, Zeichnen, Speichern), kommt als
 // Baustein herein — dasselbe Muster wie browser-pane-tableiste.js. Dadurch
 // bleibt die Familie ohne DOM testbar.
+// Dieselbe Kennung wie in browser-pane.js: zwei Spezifizierer laden dasselbe
+// Modul ZWEIMAL, jede Haelfte mit eigenem Zustand (Befund vom 2026-09-06,
+// tests/module-queries.test.mjs).
 import { buildLiveBrowserHtml, buildRemoteBrowserHtml } from "./browser-pane-render.js?v=browser-pane-20260906-6";
 import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260820-2";
 
