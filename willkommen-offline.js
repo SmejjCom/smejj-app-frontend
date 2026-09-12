@@ -66,16 +66,30 @@ export async function netzDa(fetchImpl = globalThis.fetch) {
  * zuverlaessig feuert, loest diese Seite sie nach einer echten Netzprobe selbst
  * aus. Solange offline, fragt sie alle zehn Sekunden nach — online hoert das auf.
  */
-export async function beobachteNetz({ win = globalThis.window, pruefe = netzDa, takt = NACHFRAGEN_MS } = {}) {
+export async function beobachteNetz({ win = globalThis.window, doc = globalThis.document, pruefe = netzDa, takt = NACHFRAGEN_MS } = {}) {
   if (!win) return;
   initOfflineBanner();
-  if (await pruefe()) return;
-  win.dispatchEvent(new Event("offline"));
-  const uhr = win.setInterval(async () => {
-    if (!(await pruefe())) return;
-    win.clearInterval(uhr);
-    win.dispatchEvent(new Event("online"));
-  }, takt);
+  let uhr = null;
+  const pruefeJetzt = async () => {
+    if (uhr !== null) return;          // laeuft schon: die Uhr meldet die Rueckkehr
+    if (await pruefe()) return;
+    win.dispatchEvent(new Event("offline"));
+    uhr = win.setInterval(async () => {
+      if (!(await pruefe())) return;
+      win.clearInterval(uhr);
+      uhr = null;
+      win.dispatchEvent(new Event("online"));
+    }, takt);
+  };
+  // WIEDER NACH VORN GEHOLT (live gemessen am 12.09., v860): die Seite pruefte
+  // nur beim Start. Faellt das Netz weg, WAEHREND sie offen ist, feuert iOS kein
+  // "offline" — das Band erschien nie. Der typische Fall ist genau dieser: App
+  // im Hintergrund, Netz weg (U-Bahn), App wieder nach vorn. Eine HEAD-Anfrage
+  // je Vordergrundwechsel kostet nichts.
+  doc?.addEventListener?.("visibilitychange", () => {
+    if (doc.visibilityState === "visible") pruefeJetzt();
+  });
+  await pruefeJetzt();
 }
 
 if (typeof window !== "undefined" && typeof document !== "undefined") {
