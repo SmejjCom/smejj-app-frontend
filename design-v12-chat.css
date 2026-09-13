@@ -139,6 +139,32 @@
   }
   #start.has-start-chat .start-chips.start-chipreihe { order: 2; }
   #start.has-start-chat .prompt-glass { order: 3; }
+  /* Betreiber-Screenshot iPhone 13.09. 23:15: die Zeile war 40 px hoch bei 52 px
+     Inhalt (oben abgeschnitten) und ragte rechts hinaus (seitliches Scrollen).
+     Jetzt: 4×2-Raster wie auf der leeren Startseite — alles sichtbar, nichts
+     ragt hinaus, auf jeder Breite. */
+  #start.has-start-chat .start-chips.start-chipreihe {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    height: auto;
+    max-height: none;
+    padding: 4px 10px 6px;
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  #start.has-start-chat .start-chips.start-chipreihe button {
+    min-width: 0;
+    min-height: 36px;
+    padding: 0 6px;
+    font-size: 13px;
+    white-space: normal;
+    line-height: 1.1;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    overflow-wrap: anywhere;
+  }
   #startLog .entry { font-size: 18px; }
   #start .prompt-glass textarea { font-size: 18px; }
 }

@@ -34,7 +34,42 @@ html:root body { background: #101113; }
 @media (max-width: 600px) {
   /* V11: #start:not(.has-start-chat) .home-feed { padding: 24px 16px } (1,2,0) */
   #start:not(.has-start-chat) .home-feed,
-  #start.has-start-chat .home-feed { padding-bottom: 8px; }
+  #start.has-start-chat .home-feed { padding-bottom: 0; }
+  /* Betreiber-Screenshot iPhone 13.09. 23:15: unter dem Feld blieben Safe-Area (34)
+     plus Polster als leerer Streifen. Jetzt traegt das FELD den unteren Inset
+     (wie ChatGPT): sein Glas reicht bis zur Unterkante, die Knoepfe bleiben
+     ueber dem Home-Balken. Huelle und Grund geben den Inset ab; die Flaechen
+     rechnen nur noch den oberen Inset heraus. Bei offener Tastatur setzt
+     mobil-dock.js --sa-bottom auf 0 — dann ist das Polster 8 px. */
+  body { padding-bottom: 0; }
+  body main.shell.shell { padding-bottom: 0; }
+  .workspace, .view, .home-feed { min-height: calc(100dvh - var(--sa-top)); }
+  #start.has-start-chat .home-feed.home-feed,
+  #code.view.is-active.is-active {
+    min-height: 0;
+    height: calc(100dvh - var(--sa-top));
+    max-height: calc(100dvh - var(--sa-top));
+  }
+  /* Spezifität (1,4,2): mobil-dock.js haengt seine Regel (body #start
+     .prompt-glass x3 = 1,4,1) NACH dem Buendel in den Kopf; V11 gab dem Feld
+     im Chat margin-bottom 10px und width 100% - 20px. Die Tastatur-Regel
+     (html.tastatur-offen …, 1,5,1) bleibt staerker — Feld buendig an der Tastatur. */
+  html body #start .prompt-glass.prompt-glass.prompt-glass {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 8px 10px calc(8px + var(--sa-bottom)) 12px;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+  html body #code .codeunten.codeunten.codeunten {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding-bottom: calc(8px + var(--sa-bottom));
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
 }
 
 /* ---- Alte Installationen (LegacyBlackTranslucent): Fehlbetrag ausgleichen -- */
@@ -44,13 +79,13 @@ html.vollbild-fehl body { overflow: hidden; }
   html.vollbild-fehl .workspace,
   html.vollbild-fehl .view,
   html.vollbild-fehl .home-feed {
-    min-height: calc(100dvh - var(--sa-top) - var(--sa-bottom) + var(--vollbild-fehl, 0px));
+    min-height: calc(100dvh - var(--sa-top) + var(--vollbild-fehl, 0px));
   }
   html.vollbild-fehl #start.has-start-chat .home-feed.home-feed,
   html.vollbild-fehl #code.view.is-active.is-active {
     min-height: 0;
-    height: calc(100dvh - var(--sa-top) - var(--sa-bottom) + var(--vollbild-fehl, 0px));
-    max-height: calc(100dvh - var(--sa-top) - var(--sa-bottom) + var(--vollbild-fehl, 0px));
+    height: calc(100dvh - var(--sa-top) + var(--vollbild-fehl, 0px));
+    max-height: calc(100dvh - var(--sa-top) + var(--vollbild-fehl, 0px));
   }
 }
 

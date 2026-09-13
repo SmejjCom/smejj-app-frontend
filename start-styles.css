@@ -6077,6 +6077,28 @@ body.spur-start-aktiv .nav-start {
   }
   #start.has-start-chat .start-chips.start-chipreihe { order: 2; }
   #start.has-start-chat .prompt-glass { order: 3; }
+  #start.has-start-chat .start-chips.start-chipreihe {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    height: auto;
+    max-height: none;
+    padding: 4px 10px 6px;
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  #start.has-start-chat .start-chips.start-chipreihe button {
+    min-width: 0;
+    min-height: 36px;
+    padding: 0 6px;
+    font-size: 13px;
+    white-space: normal;
+    line-height: 1.1;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    overflow-wrap: anywhere;
+  }
   #startLog .entry { font-size: 18px; }
   #start .prompt-glass textarea { font-size: 18px; }
 }
@@ -6118,7 +6140,32 @@ html:root body { background: #101113; }
 .home-feed { background: transparent; }
 @media (max-width: 600px) {
   #start:not(.has-start-chat) .home-feed,
-  #start.has-start-chat .home-feed { padding-bottom: 8px; }
+  #start.has-start-chat .home-feed { padding-bottom: 0; }
+  body { padding-bottom: 0; }
+  body main.shell.shell { padding-bottom: 0; }
+  .workspace, .view, .home-feed { min-height: calc(100dvh - var(--sa-top)); }
+  #start.has-start-chat .home-feed.home-feed,
+  #code.view.is-active.is-active {
+    min-height: 0;
+    height: calc(100dvh - var(--sa-top));
+    max-height: calc(100dvh - var(--sa-top));
+  }
+  html body #start .prompt-glass.prompt-glass.prompt-glass {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 8px 10px calc(8px + var(--sa-bottom)) 12px;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+  html body #code .codeunten.codeunten.codeunten {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding-bottom: calc(8px + var(--sa-bottom));
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
 }
 html.vollbild-fehl,
 html.vollbild-fehl body { overflow: hidden; }
@@ -6126,13 +6173,13 @@ html.vollbild-fehl body { overflow: hidden; }
   html.vollbild-fehl .workspace,
   html.vollbild-fehl .view,
   html.vollbild-fehl .home-feed {
-    min-height: calc(100dvh - var(--sa-top) - var(--sa-bottom) + var(--vollbild-fehl, 0px));
+    min-height: calc(100dvh - var(--sa-top) + var(--vollbild-fehl, 0px));
   }
   html.vollbild-fehl #start.has-start-chat .home-feed.home-feed,
   html.vollbild-fehl #code.view.is-active.is-active {
     min-height: 0;
-    height: calc(100dvh - var(--sa-top) - var(--sa-bottom) + var(--vollbild-fehl, 0px));
-    max-height: calc(100dvh - var(--sa-top) - var(--sa-bottom) + var(--vollbild-fehl, 0px));
+    height: calc(100dvh - var(--sa-top) + var(--vollbild-fehl, 0px));
+    max-height: calc(100dvh - var(--sa-top) + var(--vollbild-fehl, 0px));
   }
 }
 @media (max-width: 1000px) and (orientation: landscape) and (max-height: 520px) {
