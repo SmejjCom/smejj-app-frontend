@@ -1,0 +1,36 @@
+/* smejj.com — Design V12, Teil 3: der Code-Bereich (Betreiber-OK 2026-09-13,
+ * Mockup Bild 8). Gleiche Schrift wie im Chat (19 px im Feld, 19 px im
+ * Verlauf — der Verlauf ist derselbe #startLog, siehe design-v12-chat.css),
+ * und die vier Code-Vorlagen (Fehler suchen · Funktion einbauen · Tests
+ * schreiben · Code erklären) stehen sichtbar unter dem Feld — V11 blendete
+ * sie aus ("nichts suchen müssen"). Das rechte Browser-Fenster bleibt
+ * unangetastet (Betreiber: tagelange Arbeit, kompakt — nicht anfassen). */
+#code .codefeld textarea {
+  font-size: 19px;
+  line-height: 1.4;
+}
+#code .codegruss { font-size: clamp(24px, 3vw, 30px); font-weight: 700; letter-spacing: -0.03em; }
+#code .code-wchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-start;
+  max-width: none;
+  padding: 6px 0 0;
+}
+#code .code-wchips button {
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+@media (max-width: 600px) {
+  #code .codefeld textarea { font-size: 18px; }
+  #code .code-wchips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  #code .code-wchips::-webkit-scrollbar { display: none; }
+  #code .code-wchips button { flex: 0 0 auto; }
+}

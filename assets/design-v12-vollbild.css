@@ -1,0 +1,80 @@
+/* smejj.com — Design V12, Teil 4: echtes Vollbild (Edge-to-Edge).
+ *
+ * Betreiber-Ansage 2026-09-13: "gesamten Bildschirm von ganz oben bis ganz
+ * unten nutzen; Uhrzeit, WLAN, Akku sichtbar, aber sauber integriert; keine
+ * schwarzen Balken, keine freien Flächen; Safe Areas, Notch, Dynamic Island,
+ * Android-Gestenbereich; Hoch- und Querformat."
+ *
+ * IM iPHONE-SIMULATOR GEMESSEN (iPhone 17 Pro, 402x874 pt, Test-Kopie ohne
+ * Anmelde-Schranke, Diagnose-Overlay, Seitengrund grün gefärbt):
+ *   black-translucent (LegacyBlackTranslucent): Layout 402x812 ab y=0,
+ *     safe-area 62/34. Die unteren 62 pt liegen NICHT ausserhalb des WebViews
+ *     (Annahme vom 08.09. widerlegt): sie zeigen den <html>-Grund — und der
+ *     war #000. DAS war der schwarze Balken.
+ *   black (LegacyBlack): Layout 402x812 ab y=62, safe-area 0/34, Unterkante
+ *     bei 874. Der Statusleisten-Streifen zeigt ebenfalls den <html>-Grund.
+ * Folgerung: (1) Der <html>-Grund ist überall die App-Farbe (#101113 = die
+ * theme-color) — kein Balken mehr, egal welcher Modus. (2) Der Modus bleibt
+ * black-translucent: beim Kaltstart lieferte derselbe Webclip spaeter 874 pt
+ * (Vollbild, Inhalt unter der Statusleiste, Insets 62/34); der 812-Zustand ist
+ * ein Erst-/Tastatur-Zustand. (3) Sicherheitsnetz: mobil-dock.js misst den
+ * Fehlbetrag (screen.height − innerHeight, gedeckelt auf safe-area-inset-top)
+ * als --vollbild-fehl und setzt html.vollbild-fehl — die Flächen wachsen um
+ * diesen Betrag nach unten, die Seite selbst scrollt nicht.
+ */
+
+/* ---- Ein Grund für alles: Statusleiste, Flächen, Home-Balken ------------ */
+/* html:root (0,1,1): design-v11 setzt unter 600 px html:root{background:#050608} — nur
+   gleiche Spezifität später in der Kaskade gewinnt. */
+html:root { background: #101113; }
+html:root body { background: #101113; }
+.home-feed { background: transparent; }
+
+/* ---- Handy: kein Polster unter dem Feld (24 px "freie Fläche") ------------ */
+@media (max-width: 600px) {
+  /* V11: #start:not(.has-start-chat) .home-feed { padding: 24px 16px } (1,2,0) */
+  #start:not(.has-start-chat) .home-feed,
+  #start.has-start-chat .home-feed { padding-bottom: 8px; }
+}
+
+/* ---- Alte Installationen (LegacyBlackTranslucent): Fehlbetrag ausgleichen -- */
+html.vollbild-fehl,
+html.vollbild-fehl body { overflow: hidden; }
+@media (max-width: 600px) {
+  html.vollbild-fehl .workspace,
+  html.vollbild-fehl .view,
+  html.vollbild-fehl .home-feed {
+    min-height: calc(100dvh - var(--sa-top) - var(--sa-bottom) + var(--vollbild-fehl, 0px));
+  }
+  html.vollbild-fehl #start.has-start-chat .home-feed.home-feed,
+  html.vollbild-fehl #code.view.is-active.is-active {
+    min-height: 0;
+    height: calc(100dvh - var(--sa-top) - var(--sa-bottom) + var(--vollbild-fehl, 0px));
+    max-height: calc(100dvh - var(--sa-top) - var(--sa-bottom) + var(--vollbild-fehl, 0px));
+  }
+}
+
+/* ---- Querformat am Handy: wenig Höhe, Kerben links/rechts ----------------- */
+@media (max-width: 1000px) and (orientation: landscape) and (max-height: 520px) {
+  #start.has-start-chat #startLog {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 44px);
+    scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 44px);
+  }
+  #start .home-hero { padding-top: 12px; padding-bottom: 6px; }
+  #start .home-hero h2 { font-size: 24px; }
+  #start:not(.has-start-chat) .start-chips.start-chipreihe {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    grid-template-columns: none;
+  }
+  #start:not(.has-start-chat) .start-chips.start-chipreihe button {
+    flex-direction: row;
+    min-height: 40px;
+    padding: 0 12px;
+  }
+  #start .prompt-glass textarea { min-height: 36px; height: 36px; }
+  /* Der "Erste Schritte"-Kasten (Onboarding) braucht 300 px — im flachen
+     Querformat (Android-Emulator 863x304 gemessen: Seite 486 hoch) weicht er. */
+  #start .erste-schritte { display: none; }
+}

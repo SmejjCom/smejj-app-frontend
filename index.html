@@ -23,7 +23,7 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-VlE1d5xGlwIC45bSDwQ4QJLlWTgImI8lmE9DYAk8JMQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.smejj.com; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com wss://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
     <!-- Kaltstart (Freigabe 25.08.): Stylesheet sofort anstossen — vorher
          startete es erst NACH dem Tor-Skript, eine volle Runde spaeter. -->
-    <link rel="preload" href="/assets/start-styles.css?v=mobil107-20260912" as="style">
+    <link rel="preload" href="/assets/start-styles.css?v=v12d-20260913" as="style">
     <!-- Fruehes Tor (Betreiber-Freigabe 2026-08-23): Anonyme sofort zur Landeseite,
          statt 3,7 s (Desktop) / 15 s (iPhone) die App-Huelle zu sehen. Kein Modul,
          kein Import — laeuft vor dem ersten Pixel. Regeln bleiben in auth-gate.js. -->
@@ -53,7 +53,9 @@
     <meta name="description" content="smejj.com ist ein schneller KI- und Code-Assistent für Chat, Programmierung und Agenten-Aufgaben.">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="smejj.com">
-    <!-- Vollbild oben. NICHT auf "black"/"default" stellen. Messung: public/mobil-dock.js -->
+    <!-- Vollbild oben (V12, 13.09. gemessen): Inhalt unter der Statusleiste, Insets 62/34; der
+         812-pt-Erstzustand zeigt den <html>-Grund (App-Farbe), Ausgleich in mobil-dock.js.
+         Begruendung und Messung: design-v12-vollbild.css. -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
@@ -94,7 +96,7 @@
          1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
-    <link rel="stylesheet" href="/assets/start-styles.css?v=mobil107-20260912">
+    <link rel="stylesheet" href="/assets/start-styles.css?v=v12d-20260913">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -377,7 +379,7 @@
               <button type="button" data-chip="Generiere ein Bild von:" title="Bild" aria-label="Bild"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></svg><span class="chip-label">Bild</span></button>
               <button type="button" data-chip="Generiere ein Video von:" title="Video" aria-label="Video"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg><span class="chip-label">Video</span></button>
               <button type="button" data-chip="Was ist auf diesem Bild zu sehen?" data-composer-action="attach-photo" title="Bild verstehen" aria-label="Bild verstehen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span class="chip-label">Bild verstehen</span></button>
-              <button type="button" data-chip="Verbessere diesen Text:" title="Schreiben oder bearbeiten" aria-label="Schreiben oder bearbeiten"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/><path d="m14 7 3 3"/></svg><span class="chip-label">Schreiben oder bearbeiten</span></button>
+              <button type="button" data-chip="Verbessere diesen Text:" title="Schreiben oder bearbeiten" aria-label="Schreiben oder bearbeiten"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/><path d="m14 7 3 3"/></svg><span class="chip-label">Schreiben</span></button>
               <button type="button" data-chip="Schreibe Code für:" title="Programmieren" aria-label="Programmieren"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg><span class="chip-label">Programmieren</span></button>
               <button type="button" data-chip="Erledige mit der Maus im Browser:" title="Maus — arbeitet für dich" aria-label="Maus — arbeitet für dich"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 3 15 7-7 2-2 7z"/></svg><span class="chip-label">Browser</span></button>
               <button type="button" data-composer-action="attach-file" title="Datei" aria-label="Datei"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v5h5"/></svg><span class="chip-label">Datei</span></button>
@@ -994,7 +996,7 @@
     <script src="/assets/knopf-puffer.js?v=2"></script>
     <script src="/assets/arbeitsflaeche.js?v=3" type="module"></script>
     <script src="/assets/spur-schalter.js?v=9" type="module"></script>
-    <script src="/assets/spur-start.js?v=b51" type="module"></script>
+    <script src="/assets/spur-start.js?v=b52" type="module"></script>
     <!-- holt code-flaeche.js (27,1 KB) erst, wenn #code aufgeht — Begruendung im Modul -->
     <script src="/assets/code-nachladen.js?v=20" type="module"></script>
     <!-- Peripherie (Fuehrung, Papierkorb, Kamera, @-Erwaehnung, Codeblock-Werkzeuge)

@@ -1,0 +1,134 @@
+/* smejj.com — Design V12, Teil 2: Startseite und Chat nach ChatGPT-Vorbild.
+ *
+ * Betreiber-OK 2026-09-13 (Mockup docs/mockups/start-chat-2026-09-13,
+ * Bilder 1, 3, 4, 9, 10). Drei Ansagen: (1) "Schrift ist klein, nicht gut zu
+ * lesen" → Verlauf und Feld 19 px statt 16/17; (2) "kompakter, man soll mehr
+ * vom Gespräch sehen" → weniger Polster, Feld ganz unten; (3) "nichts suchen
+ * müssen" → die acht Werkzeuge tragen Symbol UND Wort und bleiben auch im
+ * laufenden Chat sichtbar. Der Sendeknopf bleibt EIN Knopf (leer = Welle,
+ * getippt = Pfeil, composer-sendetaste.js). Icon-Plätze bleiben wie heute:
+ * + links, Nachdenken · Modell · Mikrofon · Senden rechts.
+ *
+ * Steht nach design-v11.css und design-v12-spur.css — Kaskaden-Ende. Kein
+ * neuer Farbton, keine feste Pixelhöhe für Flächen (Höhen kommen aus dem
+ * Raster der .home-feed und dem dynamischen Viewport, mobil-composer.css).
+ */
+
+/* ---- Schrift: Verlauf 19 px, Feld 19 px, Knopf-Wörter 14,5 px -------------- */
+#startLog .entry {
+  font-size: 19px;
+  line-height: 1.55;
+}
+#startLog .entry.user { padding: 10px 40px 10px 14px; }
+#startLog .entry.assistant { padding: 6px 0; }
+#start .prompt-glass textarea {
+  font-size: 19px;
+  line-height: 1.4;
+}
+.msg-act { font-size: 14.5px; }
+#start .home-hero h2 { font-size: clamp(28px, 4vw, 38px); font-weight: 700; letter-spacing: -0.03em; }
+
+/* ---- Schreibfeld in ZWEI Zeilen wie ChatGPT: Text oben, Knöpfe unten -------
+   .prompt-actions ist display:contents (V11) — die Knöpfe sind direkte
+   Flex-Kinder des Glases. Das Textfeld nimmt die volle erste Zeile, der
+   Rest bricht in die zweite: [+] … [Nachdenken] [Modell] [Mikrofon] [Senden].
+   Reihenfolge = heutige order-Werte, der Spacer (order 2) schiebt die rechte
+   Gruppe nach rechts — auch unter 600 px, wo V11 ihn ausblendete. */
+#start .prompt-glass {
+  flex-wrap: wrap;
+  row-gap: 4px;
+  padding: 8px 10px 8px 12px;
+}
+#start .prompt-glass textarea {
+  order: 0;
+  flex: 1 1 100%;
+  width: 100%;
+}
+#start .prompt-glass .prompt-actions .prompt-spacer {
+  display: block;
+  flex: 1 1 auto;
+  order: 2;
+}
+
+/* ---- Werkzeuge: Symbol UND Wort (heute nur Symbol, Wort erst beim Zeigen) --- */
+#start .start-chips.start-chipreihe { gap: 8px; }
+#start .start-chips.start-chipreihe button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  height: auto;
+  min-height: 44px;
+  padding: 0 14px;
+  font-size: 15.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+#start .start-chipreihe .chip-label { display: inline; }
+
+/* Leere Startseite am Rechner: dieselben Pillen (Symbol + Wort), zentriert.
+   GEMESSEN 2026-09-13 (1024x768 mit Hinweisstreifen): 76-px-Kacheln wie im
+   Mockup ragten 18 px unter die Kante — flach bleibt alles im Bild. */
+#start:not(.has-start-chat) .start-chips.start-chipreihe {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Im laufenden Chat bleiben die Werkzeuge sichtbar — eine schmale Zeile
+   direkt unter dem Feld (Bild 4, 10); V11 blendete sie aus. */
+#start.has-start-chat .start-chips.start-chipreihe {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  padding: 6px 12px 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+#start.has-start-chat .start-chips.start-chipreihe::-webkit-scrollbar { display: none; }
+#start.has-start-chat .start-chips.start-chipreihe button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  font-size: 14.5px;
+}
+
+/* ---- Handy: Feld ganz unten, Werkzeuge als 4×2-Raster darüber (Bild 9) ----- */
+@media (max-width: 600px) {
+  #start:not(.has-start-chat) .home-feed {
+    grid-template-rows: minmax(0, 1fr) auto auto;
+  }
+  #start:not(.has-start-chat) .home-hero { order: 1; }
+  #start:not(.has-start-chat) .start-chips.start-chipreihe {
+    order: 2;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    padding: 4px 12px 10px;
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  #start:not(.has-start-chat) .start-chips.start-chipreihe button {
+    flex-direction: column;
+    min-width: 0;
+    min-height: 72px;
+    padding: 8px 4px;
+    font-size: 13.5px;
+    white-space: normal;
+    line-height: 1.15;
+    /* iPhone 17e (390 px) gemessen: "Programmieren" passt nicht in 78 px —
+       Trennung statt Abschneiden (lang="de" steht am <html>). */
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    overflow-wrap: anywhere;
+  }
+  #start:not(.has-start-chat) .prompt-glass { order: 3; }
+  #startLog .entry { font-size: 18px; }
+  #start .prompt-glass textarea { font-size: 18px; }
+}

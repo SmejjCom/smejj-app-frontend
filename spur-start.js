@@ -94,12 +94,6 @@ async function zeichneStartSpur(halter) {
   const veraltet = () => lauf !== zeichenLauf;
 
   // Start/Code-Reiter (Bildschirm 24: "beim Umschalten aendert sich alles").
-  const reiter = document.createElement("div");
-  reiter.className = "spur-reiter";
-  const REITER_ICON = {
-    start: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 11 8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>',
-    code: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg>'
-  };
   // Beim DIREKTEN Seitenaufruf von /code zeichnet die Spur, BEVOR der
   // Router die is-active-Klasse setzt (#start traegt sie STATISCH im
   // Markup) — dann zeigte sie die Start-Punkte und markierte "Start"
@@ -108,15 +102,15 @@ async function zeichneStartSpur(halter) {
   // initSpurStart ohnehin nach.
   const codeAktiv = document.querySelector("#code")?.classList.contains("is-active")
     || location.pathname === "/code";
-  for (const [view, name] of [["start", "Start"], ["code", "Code"]]) {
-    const r = document.createElement("button");
-    r.type = "button";
-    r.innerHTML = `${REITER_ICON[view]}<span>${name}</span>`;
-    r.className = (view === "code" ? codeAktiv : !codeAktiv) ? "an" : "";
-    r.addEventListener("click", () => geheZu(view));
-    reiter.append(r);
-  }
+  const reiter = baueReiter({ startAn: !codeAktiv, codeAn: codeAktiv });
   halter.append(reiter);
+  // Design V12 (Betreiber-OK 2026-09-13): der Reiter steht im FESTEN Kopf der
+  // Spur, alles darunter scrollt in einer eigenen Liste — so kann "Start/Code"
+  // nie mehr wegscrollen (Betreiber-Befund: "wenn Code offen ist, verschwinden
+  // Start und Code"). Layout in design-v12-spur.css; hier nur der Halter.
+  const liste = document.createElement("div");
+  liste.className = "spur-liste";
+  halter.append(liste);
 
   if (codeAktiv) {
     // Bildschirm 18: die Code-Spur hat EIGENE Punkte. "Neuer Auftrag"
@@ -124,7 +118,7 @@ async function zeichneStartSpur(halter) {
     // er wohnt unter Auftraege. Ohne erfundene Abzeichen und Uhrzeiten.
     // Claude nennt den Punkt kurz "Neu" — unser "Neuer Auftrag" wurde in der
     // schmalen Spur abgeschnitten ("Neuer Auf…", Betreiber-Chrome 2026-08-16).
-    halter.append(punkt({ icon: "plus", text: t("Neu"), kuerzel: "⌘K", aktiv: true, aktion: () => {
+    liste.append(punkt({ icon: "plus", text: t("Neu"), kuerzel: "⌘K", aktiv: true, aktion: () => {
       // Betreiber-Befund 2026-08-16 ("Warum schreibst du unter alte Chat?"):
       // nur das Feld zu leeren liess den offenen Chat WEITERLAUFEN — die
       // naechste Aufgabe landete im alten Gespraech. Erst newChat() trennt.
@@ -132,10 +126,10 @@ async function zeichneStartSpur(halter) {
       const feld = document.getElementById("codeAufgabe");
       if (feld) { feld.value = ""; feld.focus(); }
     } }));
-    halter.append(punkt({ icon: "projects", text: t("Meine Projekte"), aktion: () => geheZu("projects") }));
-    halter.append(punkt({ icon: "automation", text: t("Nach Zeitplan"), aktion: () => geheZu("automation") }));
-    halter.append(punkt({ icon: "sliders", text: t("Regeln"), aktion: () => geheZu("settings") }));
-    halter.append(punkt({ icon: "chevron", text: t("Mehr"), aktion: () => geheZu("settings") }));
+    liste.append(punkt({ icon: "projects", text: t("Meine Projekte"), aktion: () => geheZu("projects") }));
+    liste.append(punkt({ icon: "automation", text: t("Nach Zeitplan"), aktion: () => geheZu("automation") }));
+    liste.append(punkt({ icon: "sliders", text: t("Regeln"), aktion: () => geheZu("settings") }));
+    liste.append(punkt({ icon: "chevron", text: t("Mehr"), aktion: () => geheZu("settings") }));
     let chats = [];
     try { chats = await listChats(); } catch { /* Spur bleibt nutzbar */ }
     if (veraltet()) return;
@@ -152,7 +146,7 @@ async function zeichneStartSpur(halter) {
       kopf.className = "nav-gruppe";
       kopf.setAttribute("aria-hidden", "true");
       kopf.textContent = "Zuletzt verwendet";
-      halter.append(kopf);
+      liste.append(kopf);
       // Betreiber 2026-08-16 ("warum sehe ich aktuellen Chat links nicht?"):
       // das LAUFENDE Gespraech wird wie bei Claude markiert — sonst sieht
       // jeder Eintrag gleich aus und der eigene ist nicht zu finden.
@@ -169,23 +163,23 @@ async function zeichneStartSpur(halter) {
           // code-flaeche adoptiert den Log in die Code-Flaeche.
           setTimeout(() => window.smejjCodeZeig?.(), 200);
         });
-        halter.append(eintrag);
+        liste.append(eintrag);
       }
       const alle = document.createElement("button");
       alle.type = "button";
       alle.className = "nav-button spur-alle";
       alle.textContent = alleGespraeche(chats.length);
       alle.addEventListener("click", () => geheZu("chatHistory"));
-      halter.append(alle);
+      liste.append(alle);
     }
     return;
   }
 
   const startAktiv = document.querySelector("#start")?.classList.contains("is-active");
-  halter.append(punkt({ icon: "plus", text: t("Neuer Chat"), kuerzel: "⌘K", aktiv: startAktiv, aktion: () => { newChat(); geheZu("start"); } }));
-  halter.append(punkt({ icon: "search", text: t("Suchen"), aktion: () => geheZu("search") }));
-  halter.append(punkt({ icon: "projects", text: "smejjCloud", aktion: () => geheZu("projects") }));
-  halter.append(punkt({ icon: "automation", text: "smejjBot", aktion: () => geheZu("automation") }));
+  liste.append(punkt({ icon: "plus", text: t("Neuer Chat"), kuerzel: "⌘K", aktiv: startAktiv, aktion: () => { newChat(); geheZu("start"); } }));
+  liste.append(punkt({ icon: "search", text: t("Suchen"), aktion: () => geheZu("search") }));
+  liste.append(punkt({ icon: "projects", text: "smejjCloud", aktion: () => geheZu("projects") }));
+  liste.append(punkt({ icon: "automation", text: "smejjBot", aktion: () => geheZu("automation") }));
 
   // Letzte Gespraeche — echt, aus dem Verlauf. Kein Eintrag, keine Gruppe.
   let chats = [];
@@ -204,7 +198,7 @@ async function zeichneStartSpur(halter) {
       kopf.className = "nav-gruppe";
       kopf.setAttribute("aria-hidden", "true");
       kopf.textContent = gruppe;
-      halter.append(kopf);
+      liste.append(kopf);
       letzteGruppe = gruppe;
     }
     const eintrag = document.createElement("button");
@@ -215,7 +209,7 @@ async function zeichneStartSpur(halter) {
     eintrag.title = chat.title || "Unterhaltung";
     eintrag.textContent = chat.title || "Unterhaltung";
     eintrag.addEventListener("click", () => { openChat(chat.id); geheZu("start"); });
-    halter.append(eintrag);
+    liste.append(eintrag);
   }
   if (chats.length) {
     const alle = document.createElement("button");
@@ -223,8 +217,30 @@ async function zeichneStartSpur(halter) {
     alle.className = "nav-button spur-alle";
     alle.textContent = alleGespraeche(chats.length);
     alle.addEventListener("click", () => geheZu("chatHistory"));
-    halter.append(alle);
+    liste.append(alle);
   }
+}
+
+// Der Start/Code-Reiter als Helfer — er steht in BEIDEN Spuren (Design V12,
+// Betreiber-Ansage 2026-09-13: "Start und Code muessen IMMER sichtbar und
+// erreichbar bleiben"). In der Vier-Gruppen-Spur (Dateien, Einstellungen,
+// Speicher …) ist keiner der beiden markiert.
+const REITER_ICON = {
+  start: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 11 8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>',
+  code: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg>'
+};
+function baueReiter({ startAn = false, codeAn = false } = {}) {
+  const reiter = document.createElement("div");
+  reiter.className = "spur-reiter";
+  for (const [view, name, an] of [["start", "Start", startAn], ["code", "Code", codeAn]]) {
+    const r = document.createElement("button");
+    r.type = "button";
+    r.innerHTML = `${REITER_ICON[view]}<span>${name}</span>`;
+    r.className = an ? "an" : "";
+    r.addEventListener("click", () => geheZu(view));
+    reiter.append(r);
+  }
+  return reiter;
 }
 
 function schalte() {
@@ -239,6 +255,13 @@ export function initSpurStart() {
   const vier = document.querySelector('.nav[aria-label="Arbeitsbereiche"]');
   if (!vier || document.querySelector(".nav-start")) return false;
   vier.classList.add("nav-vier");
+  // Design V12: auch die Vier-Gruppen-Spur bekommt Kopf (Reiter) und
+  // scrollende Liste — sonst wanderte der Reiter dort genauso weg.
+  const vierListe = document.createElement("div");
+  vierListe.className = "spur-liste";
+  vierListe.append(...vier.childNodes);
+  vier.append(vierListe);
+  vier.prepend(baueReiter());
   const halter = document.createElement("nav");
   halter.className = "nav nav-start";
   halter.setAttribute("aria-label", t("Start und letzte Gespräche"));

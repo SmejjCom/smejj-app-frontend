@@ -196,10 +196,13 @@ export const REGELN = "@media (max-width:600px){"
   //        (b) der Rahmen bekommt unten weder Strich noch Schein — nur er machte die Kante sichtbar,
   //        (c) das Dock schliesst buendig ab (Sicherheitsrand 0): der Home-Balken liegt ohnehin in
   //            den 62 pt darunter, ein Abstand wuerde nur Platz verschenken.
+  //      KORREKTUR 13.09. (Design V12, im Simulator mit gruen gefaerbtem Grund gemessen):
+  //      die 62 pt liegen INNERHALB des WebViews und zeigen den <html>-Grund. Der Grund ist
+  //      jetzt die App-Farbe (design-v12-vollbild.css), index.html steht auf "black"
+  //      (Layout bis zur Unterkante, safe-area unten 34 = Home-Balken bleibt frei). Fuer
+  //      alte Translucent-Installationen legt misstVollbildFehl() den Fehlbetrag an.
   + "@media (display-mode:standalone) and (max-width:600px){"
-  + "html{--sa-bottom:0px;background:#000}"
-  + "html:not(.tastatur-offen) main.shell.shell{padding-bottom:0}"
-  + "body::before{background:radial-gradient(820px 520px at 18% -12%,rgba(50,246,234,.13),transparent 62%),radial-gradient(700px 480px at 88% 108%,rgba(13,148,210,.10),transparent 64%),linear-gradient(180deg,#0b1016 0%,#070a0e 55%,#000 100%) #000}"
+  + "body::before{background:radial-gradient(820px 520px at 18% -12%,rgba(50,246,234,.13),transparent 62%),radial-gradient(700px 480px at 88% 108%,rgba(13,148,210,.10),transparent 64%),linear-gradient(180deg,#0b1016 0%,#0c0f13 55%,#101113 100%) #101113}"
   + "body::after{box-shadow:inset 0 1px 0 rgba(2,253,253,.3),inset 1px 0 0 rgba(2,253,253,.3),inset -1px 0 0 rgba(2,253,253,.3),inset 0 26px 40px -26px rgba(2,253,253,.18)}"
   + "}"
   // (11) Feld buendig an der Tastatur (Betreiber 08.09. 01:44, Punkt 7): bei offener Tastatur
@@ -224,12 +227,36 @@ export function tastaturOffen({ fokusImFeld, sichtbarUnten, schirmHoehe }) {
   return unten < schirm - 80;
 }
 
+/** Fehlbetrag alter Webclips (LegacyBlackTranslucent): der Layout-Viewport ist um die
+ *  Statusleistenhoehe kuerzer als der Schirm (gemessen 874 - 812 = 62 = safe-area-inset-top).
+ *  Im "black"-Modus ist safe-area-inset-top 0 — dann ist der Fehlbetrag 0. Reine Funktion. */
+export function vollbildFehl({ standalone, tastaturOffen, schirmHoehe, innerHeight, saTop }) {
+  if (!standalone || tastaturOffen) return 0;
+  const fehl = Math.round(Number(schirmHoehe || 0) - Number(innerHeight || 0));
+  const deckel = Math.round(Number(saTop || 0));
+  if (fehl < 20 || deckel < 20) return 0;
+  return Math.min(fehl, deckel, 120);
+}
+function misstVollbildFehl(win, doc, offen) {
+  const root = doc.documentElement;
+  try {
+    const saTop = parseFloat(win.getComputedStyle(root).getPropertyValue("--sa-top")) || 0;
+    const standalone = Boolean((win.matchMedia && win.matchMedia("(display-mode: standalone)").matches) || (win.navigator && win.navigator.standalone === true));
+    const fehl = vollbildFehl({ standalone, tastaturOffen: offen, schirmHoehe: win.screen ? win.screen.height : 0, innerHeight: win.innerHeight, saTop });
+    root.style.setProperty("--vollbild-fehl", `${fehl}px`);
+    root.classList.toggle("vollbild-fehl", fehl > 0);
+  } catch (fehler) {
+    root.dataset.vollbildFehler = String(fehler && fehler.message || fehler);
+  }
+}
+
 function verdrahteTastatur(win = window, doc = document) {
   const vv = win.visualViewport;
   const imFeld = () => { const a = doc.activeElement; return Boolean(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.isContentEditable)); };
   const setze = () => {
     const offen = tastaturOffen({ fokusImFeld: imFeld(), sichtbarUnten: vv ? sichtbareUnterkante(vv) : 0, schirmHoehe: win.screen?.height || win.innerHeight });
     doc.documentElement.classList.toggle("tastatur-offen", offen);
+    misstVollbildFehl(win, doc, offen);
   };
   doc.addEventListener("focusin", () => setTimeout(setze, 60), true);
   doc.addEventListener("focusout", () => setTimeout(setze, 120), true);

@@ -1,0 +1,95 @@
+/* smejj.com — Design V12, Teil 1: die Spur in DREI Zonen.
+ *
+ * Betreiber-OK 2026-09-13 (Mockup docs/mockups/start-chat-2026-09-13, Bild 12).
+ * Befund: "Wenn Code geöffnet wird, verschwinden Start und Code teilweise" —
+ * der Start/Code-Reiter hing IM scrollenden .nav-start-Block und wanderte bei
+ * vielen Gesprächen aus dem Bild. Jetzt: Kopf (Reiter) steht, die Mitte
+ * (.spur-liste, gebaut in spur-start.js) scrollt, der Fuß (.bottom-nav mit
+ * Konto und Zahnrad) steht. Dazu die größere Schrift aus dem Mockup
+ * (Betreiber: "unsere Schriftart ist klein, nicht gut zu lesen").
+ *
+ * Steht ABSICHTLICH am Ende des Bündels (nach design-v11.css): V12 baut auf
+ * V11 auf und überschreibt nur, was das Mockup ändert. Keine neuen Farben —
+ * die eine Cyan-Quelle bleibt var(--v11-cy). Icon-Plätze bleiben wie heute.
+ */
+
+/* ---- Die Spur selbst: Hoehe aus top+bottom, NICHT 100dvh -----------------
+   LIVE GEMESSEN 2026-09-13 (1024x768, Hinweisstreifen "Neu anmelden" 63 px):
+   styles.css gibt .sidebar min-height:100dvh, design-v11 setzt top auf
+   var(--hinweis-hoehe). Ergebnis: 63 + 768 = 831 px auf einem 768er Schirm —
+   der Fuss mit Konto und Zahnrad lag 43 px UNTER der Kante (Betreiber:
+   "Benutzername/Account unten korrekt positionieren"). position:fixed mit
+   top UND bottom bestimmt die Hoehe selbst; das Minimum muss weg. */
+.sidebar {
+  min-height: 0;
+  height: auto;
+}
+
+/* ---- Zone A: der Block selbst — Kopf fest, Mitte scrollt --------------- */
+body.spur-start-aktiv .nav-start {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.nav-vier {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.nav-start .spur-reiter,
+.nav-vier .spur-reiter {
+  margin: 2px 4px 8px;
+}
+.nav-start .spur-liste,
+.nav-vier .spur-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
+  scrollbar-width: thin;
+}
+
+/* ---- Größere Schrift, Zeilen mindestens 38 px (Mockup Bild 2) ----------- */
+.spur-reiter button {
+  padding: 9px 0;
+  font-size: 16px;
+}
+.spur-reiter button svg { width: 18px; height: 18px; }
+.nav-start .nav-button,
+.sidebar .nav-vier .nav-button {
+  min-height: 38px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 16.5px;
+}
+.nav-start .spur-chat { font-size: 15.5px; }
+.nav-start .spur-alle { font-size: 15.5px; }
+.nav-start .side-block { font-size: 12.5px; }
+.nav-kuerzel { font-size: 12px; }
+.profile-dock-name { font-size: 15px; }
+.profile-dock-plan { font-size: 13.5px; }
+
+/* ---- Handy-Schublade: Safe-Areas gehören zum Layout ---------------------
+   Oben die Statusleiste (iPhone 59 px), unten der Home-Balken (34 px) — beide
+   in der Hintergrundfarbe, nie als Balken. env() ist am Rechner 0. */
+@media (max-width: 767px) {
+  .sidebar {
+    padding-top: calc(32px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    /* GEMESSEN im Android-Emulator 2026-09-13 (412x839): Spur UND Schreibfeld
+       standen beide auf z-index 70 — das spaetere Glas deckte den Fuss der
+       offenen Spur zu (Betreiber: "keine Ueberlagerungen mit Chat oder
+       Eingabefeld"). 74 liegt ueber Glas (70) und Kopfglas (73), aber unter
+       dem Logo-Knopf (75), der die Spur wieder schliesst. */
+    z-index: 74;
+  }
+}
