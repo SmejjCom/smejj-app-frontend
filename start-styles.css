@@ -6072,6 +6072,11 @@ body.spur-start-aktiv .nav-start {
     overflow-wrap: anywhere;
   }
   #start:not(.has-start-chat) .prompt-glass { order: 3; }
+  #start.has-start-chat .home-feed.home-feed {
+    grid-template-rows: minmax(0, 1fr) auto auto;
+  }
+  #start.has-start-chat .start-chips.start-chipreihe { order: 2; }
+  #start.has-start-chat .prompt-glass { order: 3; }
   #startLog .entry { font-size: 18px; }
   #start .prompt-glass textarea { font-size: 18px; }
 }

@@ -129,6 +129,16 @@
     overflow-wrap: anywhere;
   }
   #start:not(.has-start-chat) .prompt-glass { order: 3; }
+  /* Laufender Chat am Handy (LIVE am iPhone gesehen, 13.09. abends): die Fläche ist
+     fest hoch (mobil-composer.css) und das Raster hat nur zwei Zeilen — die
+     Werkzeug-Zeile fiel als dritte Zeile hinten raus und war unsichtbar.
+     Drei Zeilen, Werkzeuge ÜBER dem Feld (Mockup Bild 10). Spezifität wie
+     mobil-composer (#start.has-start-chat .home-feed.home-feed), später gewinnt. */
+  #start.has-start-chat .home-feed.home-feed {
+    grid-template-rows: minmax(0, 1fr) auto auto;
+  }
+  #start.has-start-chat .start-chips.start-chipreihe { order: 2; }
+  #start.has-start-chat .prompt-glass { order: 3; }
   #startLog .entry { font-size: 18px; }
   #start .prompt-glass textarea { font-size: 18px; }
 }
