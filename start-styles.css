@@ -6154,15 +6154,21 @@ html:root body { background: #101113; }
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 8px 10px calc(8px + var(--sa-bottom)) 12px;
+    padding: 4px 10px 0 12px;
+    row-gap: 2px;
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
+  }
+  html body #start .prompt-glass.prompt-glass.prompt-glass textarea {
+    min-height: 36px;
+    height: 36px;
+    padding: 6px 4px;
   }
   html body #code .codeunten.codeunten.codeunten {
     width: 100%;
     max-width: none;
     margin: 0;
-    padding-bottom: calc(8px + var(--sa-bottom));
+    padding-bottom: 0;
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
   }

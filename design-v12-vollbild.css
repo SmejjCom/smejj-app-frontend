@@ -54,19 +54,28 @@ html:root body { background: #101113; }
      .prompt-glass x3 = 1,4,1) NACH dem Buendel in den Kopf; V11 gab dem Feld
      im Chat margin-bottom 10px und width 100% - 20px. Die Tastatur-Regel
      (html.tastatur-offen …, 1,5,1) bleibt staerker — Feld buendig an der Tastatur. */
+  /* Betreiber 14.09. 00:13 (Screenshot): "die unteren Knoepfe sollen die unterste
+     Kante treffen" — KEIN Abstand darunter, auch nicht fuer den Home-Balken; das
+     Feld kompakt (Textzeile 36 px, Knopfzeile 44 px, Polster 4/0). */
   html body #start .prompt-glass.prompt-glass.prompt-glass {
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 8px 10px calc(8px + var(--sa-bottom)) 12px;
+    padding: 4px 10px 0 12px;
+    row-gap: 2px;
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
+  }
+  html body #start .prompt-glass.prompt-glass.prompt-glass textarea {
+    min-height: 36px;
+    height: 36px;
+    padding: 6px 4px;
   }
   html body #code .codeunten.codeunten.codeunten {
     width: 100%;
     max-width: none;
     margin: 0;
-    padding-bottom: calc(8px + var(--sa-bottom));
+    padding-bottom: 0;
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
   }
