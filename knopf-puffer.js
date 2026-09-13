@@ -31,6 +31,12 @@
     if (erledigt || gemerkt) return;
     if (!event.target || !event.target.closest) return;
     if (!event.target.closest("#browserButton")) return;
+    // GEMESSEN 2026-09-14: War das Panel VOR dem Klick schon offen (per
+    // Wiederherstellung oder "Rechts oeffnen"), ist der Klick ein SCHLIESSEN —
+    // 60 ms spaeter "nicht offen" zu sehen ist dann die Wirkung, kein verlorener
+    // Klick. Der Puffer klickte trotzdem nach und riss das Panel wieder auf.
+    // Ein Knopf, der schliessen kann, ist verdrahtet: wir halten uns raus.
+    if (panelOffen()) { erledigt = true; return; }
     // Wirkt der Klick schon? Dann ist app.js verdrahtet und wir halten uns raus.
     setTimeout(function () {
       if (panelOffen()) { erledigt = true; return; }

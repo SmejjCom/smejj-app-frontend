@@ -244,7 +244,13 @@ async function push() {
   if (!vorfahrt.darfSenden()) return;
   laeuft = true;
   try {
-    const alle = await s.listChats(); // Stufe 2: nur eigene
+    // Stufe 2: nur eigene — aber MIT Papierkorb: ein weich geloeschter Chat
+    // muss als "deletedAt gesetzt" zum Server, sonst lebt er auf jedem anderen
+    // Geraet weiter (gemessen 2026-09-14). Aeltere chat-store-Fassungen ohne
+    // die Funktion senden wie bisher nur die sichtbaren.
+    const alle = typeof s.listEigeneChatsMitGeloeschten === "function"
+      ? await s.listEigeneChatsMitGeloeschten()
+      : await s.listChats();
     // ERST FRAGEN, DANN SENDEN — gemessen 2026-08-23: eine einzige Chat-Frage
     // loeste ueber 100 PUTs aus (einzelne mit 188 KB), waehrend das Modell
     // schon geantwortet hatte. Die Antwort erschien nach 43 s statt nach 2.

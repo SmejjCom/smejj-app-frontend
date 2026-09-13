@@ -7,7 +7,7 @@
 //
 // WICHTIG: derselbe chat-store-Spezifizierer wie in search.js und
 // chat-history-view.js — ein abweichender Pfad erzeugt eine ZWEITE Modulinstanz.
-import { listChats } from "/assets/chat-store.js?v=b70";
+import { listChats } from "/assets/chat-store.js?v=b71";
 import {
   anzeigeTitel,
   anzeigeVorschau,
@@ -46,6 +46,15 @@ export function initSearchOverlay(context) {
   });
   els.overlay.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
+    event.preventDefault();
+    closeSearchOverlay();
+  });
+  // Escape muss auch wirken, wenn der Fokus NICHT im Overlay liegt (gemessen
+  // 2026-09-14: Fokus auf body nach Klick auf "Suchen" — Escape tat nichts).
+  // Der Hinweis unten im Overlay verspricht "Esc schliessen", ohne Bedingung.
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !els || els.overlay.hidden) return;
+    if (els.overlay.contains(event.target)) return; // der Lauscher oben ist zustaendig
     event.preventDefault();
     closeSearchOverlay();
   });

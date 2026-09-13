@@ -7,15 +7,42 @@ import {
   geraeteBesitzer, getChat, importChat, listChats, neueProjektId, newChat, notifyChanged,
   notifyProjekteChanged, openChat, persistActive, renameChat, rohEigenerChat,
   sauberProjektName, scheduleSave, tx
-} from "./chat-store.js?v=b70";
+} from "./chat-store.js?v=b71";
+
+// GEMESSEN 2026-09-14 (A-bis-Z, angemeldet): der Papierkorb war IMMER leer.
+// listGeloeschteChats() warf "PAPIERKORB_TAGE is not defined" — die Konstante
+// stand seit der Zeilen-Diaet (25.08.) nur noch in chat-store.js, ohne Export;
+// papierkorb.js faengt den Fehler und zeigt "Der Papierkorb ist leer". Kein
+// geloeschtes Gespraech liess sich je zurueckholen. Eine Zahl, an EINEM Ort:
+export const PAPIERKORB_TAGE = 30;
 
 export async function restoreChat(id) {
   const chat = await rohEigenerChat(id);
   if (!chat || !chat.deletedAt) return false;
   delete chat.deletedAt;
+  // updatedAt steigt, damit der Verlauf-Sync die Wiederherstellung auch zum
+  // Server traegt (Abgleich vergleicht nur updatedAt — Befund 2026-09-14).
+  chat.updatedAt = new Date().toISOString();
   await tx(STORE, "readwrite", (store) => store.put(chat));
   notifyChanged();
   return true;
+}
+
+/**
+ * Eigene Chats INKLUSIVE der weich geloeschten — fuer den Verlauf-Sync.
+ * listChats() blendet den Papierkorb aus (richtig fuer jede Ansicht), aber ein
+ * Loeschen, das nie zum Server kommt, taucht auf dem naechsten Geraet wieder
+ * auf (gemessen 2026-09-14: Server fuehrte den geloeschten Chat weiter als aktiv).
+ */
+export async function listEigeneChatsMitGeloeschten() {
+  const alle = await tx(STORE, "readonly", (store) => new Promise((resolve, reject) => {
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  })).catch(() => []);
+  const userId = aktuellerNutzer();
+  const alt = geraeteBesitzer();
+  return alle.filter((chat) => eigen(chat, userId, alt));
 }
 
 export async function endgueltigLoeschen(id) {

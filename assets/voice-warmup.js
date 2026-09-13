@@ -14,8 +14,11 @@ export function warmUpAgentConnection() {
   if (now - lastWarmupAt < WARMUP_INTERVAL_MS) return;
   lastWarmupAt = now;
   try {
+    // Die Bruecke hat kein /api/health (live 404, gemessen 2026-09-14) — der
+    // Sprach-Status ist ihre echte, leichte Route; die Verbindung waermt sie
+    // genauso auf, ohne einen Fehler im Netzprotokoll zu hinterlassen.
     const origin = new URL(CLIENT_ROUTES.api.agent).origin;
-    fetch(`${origin}/api/health`, { cache: "no-store" }).catch(() => {
+    fetch(`${origin}/api/voice/status`, { cache: "no-store" }).catch(() => {
       // Warm-up ist optional — ein Fehler darf den Sprachmodus nie stoeren.
     });
   } catch {

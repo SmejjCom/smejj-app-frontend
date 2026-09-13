@@ -177,7 +177,7 @@ const dictation = createDictation({
       serverOhr: createServerEar({ urls: ohrAdressen(CLIENT_ROUTES.api), budgetMs: 6000 }),
       lang: SPEECH_LANG,
       speechSupported,
-      setVisual: (active) => $('[data-start-tool="voice"]')?.classList.toggle("is-recording", active),
+      setVisual: (active) => { const knopf = $('[data-start-tool="voice"]'); knopf?.classList.toggle("is-recording", active); knopf?.setAttribute("aria-pressed", active ? "true" : "false"); }, // aria-pressed: a11y-Befund 2026-09-14
       onBeforeToggle: () => { if (state.voiceModeActive) closeVoiceMode(); }
 });
 
