@@ -97,6 +97,32 @@ export const SMEJJ_STAFFEL = [
   { titel: "smejj 1.0", stufe: "schnell", hinweis: "Standard — schnellste Antwort" }
 ];
 
+// DAS EIGENE MODELL — bewusst NICHT Teil der Staffel.
+//
+// Die vier Staffel-Zeilen sind Antwortstufen, die alle ueber fremde Modelle
+// laufen (Groq-Schnellspur oder GLM in der tiefen Spur). "smejj 1" ist etwas
+// anderes: Qwen3-4B auf dem eigenen Hausmodell-Dienst, ohne fremden Anbieter.
+// Seit dem 13.09. ist es auf dem Server "ready" — vorher stand es bereit, und
+// im Chat gab es keinen Knopf, der es aufrief.
+//
+// Warum eine eigene Zeile statt einer Staffel-Stufe (Betreiber 13.09.): das
+// Modell rechnet auf 2 Prozessorkernen, rund 5 Woerter je Sekunde, beim ersten
+// Aufruf zusaetzlich rund 30 Sekunden Ladezeit. Haette es eine Stufe ersetzt,
+// waere ausgerechnet diese Stufe langsam geworden. Als eigene Zeile waehlt es
+// nur, wer es will — und der Hinweis sagt vorher, dass es dauert.
+//
+// Stufe "gruendlich" ist KEINE Denktiefe, sondern der Weg: die Bruecke gibt
+// damit die Groq-Schnellspur ab (chat-bridge.js, streamFastLane) und reicht die
+// Frage an den Server-Router — und NUR der kennt das eigene Modell
+// (src/shared/modelRegistry.js: Name "smejj 1" -> smejj-1 -> Hausmodell).
+// Ohne diese Stufe haette Groq geantwortet, unter dem Namen "smejj 1".
+export const EIGENES_MODELL = Object.freeze({
+  titel: "smejj 1",
+  klein: "eigenes Modell · langsamer",
+  stufe: "gruendlich",
+  hinweis: "Laeuft auf unserem eigenen Server statt bei einem fremden Anbieter. Antwortet langsamer, beim ersten Aufruf rund 30 Sekunden."
+});
+
 /**
  * Sortiert die Staffel absteigend nach Versionsnummer — 1.10 kommt nach 1.9,
  * nicht davor (Zeichenvergleich wuerde genau das falsch machen).
@@ -116,7 +142,10 @@ export function nachVersionAbsteigend(liste) {
 
 export function modellAnzeige(hausText) {
   migriereAlteWahl();
-  if (localStorage.getItem(MODELL_KEY) === AUTO_WAHL) return "Auto";
+  const wahl = localStorage.getItem(MODELL_KEY);
+  if (wahl === AUTO_WAHL) return "Auto";
+  // Sonst zeigte der Chip die Stufe ("smejj 1.2") statt der Wahl.
+  if (wahl === EIGENES_MODELL.titel) return EIGENES_MODELL.titel;
   return hausText;
 }
 
@@ -253,6 +282,23 @@ export async function oeffneModellMenue(kontext = {}) {
     }
   });
   for (const eintrag of nachVersionAbsteigend(SMEJJ_STAFFEL)) stufenZeile(eintrag);
+  // Unter "Unsere Modelle", nicht in einem eigenen Bereich: der Betreiber hat
+  // am 10.09. genau zwei Bereiche festgelegt (Unsere Modelle / Auto).
+  zeile({
+    titel: EIGENES_MODELL.titel,
+    klein: EIGENES_MODELL.klein,
+    hinweis: EIGENES_MODELL.hinweis,
+    aktiv: !istAuto && gewaehlt === EIGENES_MODELL.titel,
+    aktion: () => {
+      localStorage.setItem(MODELL_KEY, EIGENES_MODELL.titel);
+      localStorage.setItem(STUFE_KEY, EIGENES_MODELL.stufe);
+      window.dispatchEvent(new CustomEvent("smejj:model-selected", {
+        detail: { model: EIGENES_MODELL.titel, stufe: EIGENES_MODELL.stufe }
+      }));
+      zu();
+      kontext.beiWahl?.();
+    }
+  });
 
   // Auto ganz unten — der zweite und letzte Bereich (Betreiber 2026-09-10).
   //
