@@ -15,8 +15,8 @@
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=6";
-export { restoreChat, endgueltigLoeschen, listGeloeschteChats, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=6";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=7";
+export { restoreChat, endgueltigLoeschen, listGeloeschteChats, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=7";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und
 // Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
@@ -395,7 +395,9 @@ export async function persistActive() {
 
 function safeModelName() {
   try {
-    const model = localStorage.getItem("smejj.model.v1") || localStorage.getItem("smejj.model.selected.v2") || "smejj 1.0";
+    // Die aktuelle Wahl zuerst — "smejj.model.v1" schreibt seit Langem niemand
+    // mehr; ein Altwert dort haette die echte Wahl ueberstimmt.
+    const model = localStorage.getItem("smejj.model.selected.v2") || localStorage.getItem("smejj.model.v1") || "smejj 1.0";
     return (model === "auto" || model === "Auto") ? "smejj 1.0" : model;
   } catch {
     return "smejj 1.0";
@@ -647,7 +649,11 @@ export function newChat() {
   setActiveChatId(newId());
   notifyChanged();
   if (typeof window.smejjApplyModel === "function") {
-    const currentModel = localStorage.getItem("smejj.model.v1") || "smejj 1.0";
+    // Bis 13.09. las diese Zeile NUR "smejj.model.v1" — einen Schluessel, den
+    // niemand mehr schreibt. Jeder "Neue Chat" stellte die Wahl darum still auf
+    // "smejj 1.0" zurueck, egal ob 1.3, Auto oder smejj 1 gewaehlt war (live
+    // gesehen: Chip "smejj 1.0", Speicher "smejj 1").
+    const currentModel = localStorage.getItem("smejj.model.selected.v2") || localStorage.getItem("smejj.model.v1") || "smejj 1.0";
     window.smejjApplyModel(currentModel, { persist: false, quiet: true });
   }
 }
