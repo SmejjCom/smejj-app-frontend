@@ -57,9 +57,13 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
     }
     // Textdateien gehen MIT INHALT mit (Abnahme 2026-08-23: vorher nur ein
     // toter Verweis, das Modell sah keine Datei). Der Chip-Weg gehoert zum
-    // Start-Feld (composePastedTask in app.js); im Code-Feld bleibt der
-    // Verweis, dort wird er als Arbeitsdatei gelesen.
-    const textdateien = input.id === "startMessage" ? andere.filter(istTextdatei) : [];
+    // Start-Feld (composePastedTask in app.js).
+    // E2E-Test 14.09.2026 (smejj.com live): im Code-Feld ging bisher nur der
+    // VERWEIS mit ("Der Verweis geht mit") — eine Datei vom eigenen Rechner liegt
+    // aber in keinem Arbeitsbereich, das Modell antwortete "kann die Datei nicht
+    // auslesen". Der Code-Bereich sendet ueber denselben Weg (#startSend ->
+    // composePastedTask), der Inhalts-Chip reist also auch von dort mit.
+    const textdateien = andere.filter(istTextdatei);
     for (const file of textdateien) {
       try {
         const text = (await file.text()).slice(0, TEXT_ANHANG_MAX_ZEICHEN);

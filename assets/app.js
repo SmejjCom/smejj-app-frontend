@@ -353,7 +353,7 @@ function bindStartComposer() {
   bindPasteAttach({ getInput: () => input });
   // window.smejjLadeComposerTools (E2E-Test 14.09.2026): die Chips "Bild verstehen"/"Datei"
   // oeffnen die Dateiwahl DIREKT — ohne dieses Laden hoerte niemand auf die Auswahl.
-  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=werkzeuge-25").then((m) => m.initComposerTools()));
+  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=werkzeuge-26").then((m) => m.initComposerTools()));
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {
