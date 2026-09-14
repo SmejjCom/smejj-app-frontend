@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from "./config.js";
-import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=b40";
+import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=b41";
 // api-center-surface.js und provider-settings.js werden BEWUSST nicht statisch
 // importiert (Seitengewicht). Der Startreiter ist "general" — bis der Nutzer
 // dorthin wechselt, wird ihr Code nie gebraucht. Zusammen mit ihrem selbst
@@ -166,7 +166,13 @@ function markup() {
       ${panel("appearance", "Aussehen & Schriftgröße", "Gilt nur außerhalb der geschützten Startseite.", [
         select("Schriftgröße", "settingsFontSize", [["small", "Normal · 16 px"], ["medium", "Groß · 19 px"], ["large", "Sehr groß · 23 px"]]),
         `<p class="settings-schriftprobe" aria-live="polite">${t("So sieht dein Text dann überall aus. Auch Knöpfe und Menüs wachsen mit — nicht nur der Fließtext.")}</p>`,
-        select("Helligkeit", "settingsTheme", [["dark", "Dunkel"], ["light", "Hell"], ["system", "So wie mein Gerät"]]),
+        // F20 (A-bis-Z-Pruefung 14.09., Betreiber-Freigabe "OK – F18, F20 und F14 umsetzen"):
+        // "Hell" faerbte nur die Einstellungen um — Verlauf und Code blieben heller
+        // Text auf hellem Grund, Spur und Panel dunkel. Bis ein helles Thema fuer ALLE
+        // Ansichten existiert, bleiben beide Optionen sichtbar, aber gesperrt; die
+        // Laufzeit (settings-runtime.js) loest jede Wahl auf "dark" auf.
+        select("Helligkeit", "settingsTheme", [["dark", "Dunkel"], ["light", "Hell", true], ["system", "So wie mein Gerät", true]]),
+        `<p class="settings-schriftprobe settings-hinweis-hell">${t("Das helle Thema ist noch nicht für alle Ansichten fertig — Verlauf und Code wären unlesbar. Bis dahin bleibt smejj.com dunkel.")}</p>`,
         select("Oberflächendichte", "settingsDensity", [["comfortable", "Komfortabel"], ["compact", "Kompakt"]])])}
       ${panel("behavior", "Wie smejj antwortet", "Lege fest, wie selbstständig smejj.com arbeiten darf.", [
         select("Bestätigungen", "settingsConfirmations", [["strict", "Immer bestätigen"], ["balanced", "Bei wichtigen Aktionen"], ["trusted", "Nur externe Auswirkungen"]]),
@@ -222,7 +228,7 @@ function panel(id, title, description, rows) {
 
 // translateOptions=false laesst Optionstexte unangetastet (z. B. native Sprachnamen).
 function select(label, id, options, translateOptions = true) {
-  return `<div class="settings-row"><div class="settings-row-copy"><strong>${t(label)}</strong></div><select id="${id}" aria-label="${t(label)}">${options.map(([value, text]) => `<option value="${value}">${translateOptions ? t(text) : text}</option>`).join("")}</select></div>`;
+  return `<div class="settings-row"><div class="settings-row-copy"><strong>${t(label)}</strong></div><select id="${id}" aria-label="${t(label)}">${options.map(([value, text, gesperrt]) => `<option value="${value}"${gesperrt ? " disabled" : ""}>${translateOptions ? t(text) : text}</option>`).join("")}</select></div>`;
 }
 
 function toggle(label, id, hint) {

@@ -93,3 +93,18 @@ body.spur-start-aktiv .nav-start {
     z-index: 74;
   }
 }
+
+/* ---- F14 (A-bis-Z-Pruefung 14.09.): Finger brauchen 44 px ---------------
+   GEMESSEN 2026-09-14 (375x812, pointer coarse): die 38-px-Zeile oben ueberschrieb
+   die 44-px-Zusage aus design-v11 (max-width 600) — 4 Eintraege der Startseite
+   und 12 bei offener Spur lagen unter dem Ziel. Am Rechner bleiben 38 px
+   (Mockup Bild 2); bei grobem Zeiger oder Handy-Breite gilt wieder 44.
+   Betreiber-Freigabe 14.09.: "OK – F18, F20 und F14 umsetzen". */
+@media (pointer: coarse), (max-width: 600px) {
+  .nav-start .nav-button,
+  .sidebar .nav-vier .nav-button {
+    min-height: 44px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}

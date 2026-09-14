@@ -168,3 +168,42 @@
   #startLog .entry { font-size: 18px; }
   #start .prompt-glass textarea { font-size: 18px; }
 }
+
+/* ---- F18 (A-bis-Z-Pruefung 14.09.): schmale Handys, zwei Spalten -----------
+   GEMESSEN 2026-09-14 (iPhone 402x874, angemeldet): im 4-Spalten-Raster sind die
+   Kacheln 91 px breit — "Schrei-ben", "Pro-gram-mieren", "Bild verste-hen",
+   "Brow-ser". Unter 430 px darum 2 Spalten (4 Zeilen à 2), Symbol neben dem
+   Wort, keine Silbentrennung: jedes Wort steht in einer Zeile.
+   Betreiber-Freigabe 14.09.: "OK – F18, F20 und F14 umsetzen". */
+@media (max-width: 430px) {
+  #start:not(.has-start-chat) .start-chips.start-chipreihe,
+  #start.has-start-chat .start-chips.start-chipreihe {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #start:not(.has-start-chat) .start-chips.start-chipreihe button {
+    flex-direction: row;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 10px;
+    font-size: 14.5px;
+    line-height: 1.2;
+    white-space: nowrap;
+    hyphens: manual;
+    -webkit-hyphens: manual;
+    overflow-wrap: normal;
+  }
+  /* Im laufenden Chat: 44 px je Zeile (Touch-Regel, Waechter measure_touch_targets_app) —
+     im 4×2-Raster waren die Zeilen nur durch die Silbentrennung hoch genug. */
+  #start.has-start-chat .start-chips.start-chipreihe {
+    gap: 6px;
+    padding: 4px 10px 6px;
+  }
+  #start.has-start-chat .start-chips.start-chipreihe button {
+    min-height: 44px;
+    padding: 0 8px;
+    white-space: nowrap;
+    hyphens: manual;
+    -webkit-hyphens: manual;
+    overflow-wrap: normal;
+  }
+}

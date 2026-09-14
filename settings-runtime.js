@@ -198,7 +198,14 @@ function normalize(input = {}) {
   return settings;
 }
 
-function resolvedTheme(theme) {
+// F20 (A-bis-Z-Pruefung 14.09.): das helle Thema deckt nur die Einstellungen ab —
+// Verlauf und Code wurden mit "light" unlesbar (heller Text auf hellem Grund),
+// Spur und Panel blieben dunkel. Solange HELLES_THEMA_FERTIG false ist, loest
+// jede gespeicherte Wahl auf "dark" auf; die Wahl selbst bleibt gespeichert.
+export const HELLES_THEMA_FERTIG = false;
+
+export function resolvedTheme(theme) {
+  if (!HELLES_THEMA_FERTIG) return "dark";
   if (theme !== "system") return theme;
   return globalThis.matchMedia?.("(prefers-color-scheme: light)")?.matches ? "light" : "dark";
 }

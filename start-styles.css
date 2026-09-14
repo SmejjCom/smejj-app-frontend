@@ -5976,6 +5976,14 @@ body.spur-start-aktiv .nav-start {
     z-index: 74;
   }
 }
+@media (pointer: coarse), (max-width: 600px) {
+  .nav-start .nav-button,
+  .sidebar .nav-vier .nav-button {
+    min-height: 44px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
 
 /* ---- design-v12-chat.css ---- */
 #startLog .entry {
@@ -6101,6 +6109,36 @@ body.spur-start-aktiv .nav-start {
   }
   #startLog .entry { font-size: 18px; }
   #start .prompt-glass textarea { font-size: 18px; }
+}
+@media (max-width: 430px) {
+  #start:not(.has-start-chat) .start-chips.start-chipreihe,
+  #start.has-start-chat .start-chips.start-chipreihe {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #start:not(.has-start-chat) .start-chips.start-chipreihe button {
+    flex-direction: row;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 10px;
+    font-size: 14.5px;
+    line-height: 1.2;
+    white-space: nowrap;
+    hyphens: manual;
+    -webkit-hyphens: manual;
+    overflow-wrap: normal;
+  }
+  #start.has-start-chat .start-chips.start-chipreihe {
+    gap: 6px;
+    padding: 4px 10px 6px;
+  }
+  #start.has-start-chat .start-chips.start-chipreihe button {
+    min-height: 44px;
+    padding: 0 8px;
+    white-space: nowrap;
+    hyphens: manual;
+    -webkit-hyphens: manual;
+    overflow-wrap: normal;
+  }
 }
 
 /* ---- design-v12-code.css ---- */
