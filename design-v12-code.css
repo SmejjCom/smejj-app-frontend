@@ -47,3 +47,15 @@
     padding-bottom: 10px;
   }
 }
+
+/* E2E-Test 14.09.2026 (smejj.com live, 320 x 568): In der Code-Eingabeleiste
+   brauchten die Knoepfe 310 px, verfuegbar waren 280 — der Senden-Pfeil ragte
+   6 px aus dem Bild, rechts abgeschnitten. Nur auf sehr schmalen Geraeten darf
+   der Abstand rechts enger werden und die Modellanzeige ("smejj 1.1") bis auf
+   44 px schrumpfen und abkuerzen; alle Tippziele bleiben mindestens 44 px. */
+@media (max-width: 340px) {
+  /* Spezifischer als die Inline-Regel in index.html (body #code .codeleiste .code-rechts.code-rechts { flex: 0 0 auto }). */
+  html body #code .codeleiste.codeleiste { gap: 2px; }
+  html body #code .codeleiste .code-rechts.code-rechts { flex-shrink: 1; min-width: 0; gap: 4px; }
+  #code .codeleiste #codeModellAnzeige { min-width: 44px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}

@@ -6206,6 +6206,11 @@ body.spur-start-aktiv .nav-start {
     padding-bottom: 10px;
   }
 }
+@media (max-width: 340px) {
+  html body #code .codeleiste.codeleiste { gap: 2px; }
+  html body #code .codeleiste .code-rechts.code-rechts { flex-shrink: 1; min-width: 0; gap: 4px; }
+  #code .codeleiste #codeModellAnzeige { min-width: 44px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
 
 /* ---- design-v12-vollbild.css ---- */
 html:root { background: #101113; }
