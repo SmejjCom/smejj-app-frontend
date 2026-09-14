@@ -633,7 +633,29 @@ function zieleAnpassen(url, aendere) {
   });
 }
 
-export async function streamChatAnswer(url, body, output, { renderMarkdown, offlineNotice = "" } = {}) {
+/**
+ * Warte-Anker (E2E-Test 14.09.2026): der Lauf zaehlt ab dem Absenden als
+ * "laeuft" — nicht erst ab dem ersten Byte. GEMESSEN: der Versuch auf dem
+ * Geraet meldete laufen 1 -> 0, danach wartete die Server-Anfrage ~6,5 s ohne
+ * Signal; chat-stopp.js nahm den Vorlauf zurueck, der Senden-Knopf zeigte
+ * "Sprachmodus starten" statt "Antwort stoppen", und ein Klick oeffnete
+ * mitten in der Anfrage den Sprachmodus. Der Anker haelt die Zaehlung bis
+ * zum Ende; ein Stopp davor wird gemerkt und die spaete Antwort verworfen.
+ */
+export async function streamChatAnswer(url, body, output, optionen = {}) {
+  const lauf = { gestoppt: false };
+  const anker = { cancel: () => { lauf.gestoppt = true; } };
+  aktiveLeser.add(anker);
+  meldeStromstand();
+  try {
+    return await streamChatAnswerInnen(url, body, output, optionen, lauf);
+  } finally {
+    aktiveLeser.delete(anker);
+    meldeStromstand();
+  }
+}
+
+async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlineNotice = "" } = {}, lauf = { gestoppt: false }) {
   // Fragen-Erfassung (Trainingsplan smejj 1.1, Stufe 1): loest nur aus, wartet
   // nie, bricht nie — der Server entscheidet aus Ledger und Schalter. Dynamisch
   // nachgeladen, damit ein fehlendes Modul den Chat nicht beruehrt.
@@ -641,6 +663,7 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
   // Stufe 0 zuerst: was das Geraet des Nutzers selbst beantworten kann, kostet
   // niemanden etwas und ist meist schneller (gemessen 1,7-3,5 s gegen 2,9-6,6 s).
   if (await versucheLokaleAntwort(body, output, renderMarkdown)) return;
+  if (lauf.gestoppt) return; // vor der Server-Anfrage gestoppt: nichts mehr senden
 
   // Live-Daten bei "Nachdenken" (Betreiber 07.09.): die Bruecke haengt ihren
   // Wetter-/Web-Kontext NUR an die Schnellspur und gibt die bei "gruendlich"
@@ -725,6 +748,13 @@ export async function streamChatAnswer(url, body, output, { renderMarkdown, offl
         });
       } catch { /* faellt unten in die normale Fehlermeldung */ }
     }
+  }
+  if (lauf.gestoppt) {
+    // Waehrend des Wartens gestoppt: die spaete Antwort nicht mehr anzeigen.
+    try { response?.body?.cancel(); } catch { /* schon zu */ }
+    stoppeWartesignal();
+    clearThinkingState(output);
+    return;
   }
   if (!response.ok || !response.body) {
     stoppeWartesignal();

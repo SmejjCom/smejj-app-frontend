@@ -6162,6 +6162,12 @@ body.spur-start-aktiv .nav-start {
     overflow-wrap: normal;
   }
 }
+@media (min-width: 601px) {
+  #start.has-start-chat #startLog {
+    padding-top: 52px;
+    scroll-padding-top: 52px;
+  }
+}
 
 /* ---- design-v12-code.css ---- */
 #code .codefeld textarea {

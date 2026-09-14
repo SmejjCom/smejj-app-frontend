@@ -77,14 +77,27 @@ function zeige() {
     </div>`;
   document.body.append(blase);
   // Unter dem Ziel platzieren; laeuft sie rechts aus dem Bild, nach links ruecken.
-  const breite = 300;
-  let links = Math.max(10, Math.min(kasten.left + kasten.width / 2 - breite / 2, innerWidth - breite - 10));
+  // E2E-Test 14.09.2026 (Handy 402 px): die Hoehe war mit 180 px GERATEN — die
+  // echte Blase ist mit Beispielzeile ~260 px hoch. Ueber dem Eingabefeld
+  // platziert, lag sie deshalb AUF dem Feld, und der Pfeil zeigte weiter nach
+  // oben auf die Werkzeug-Kacheln statt auf das Feld. Jetzt: echte Hoehe messen,
+  // und steht die Blase ueber dem Ziel, zeigt der Pfeil nach unten.
+  const breite = Math.min(300, innerWidth - 20);
+  const hoehe = blase.offsetHeight || 190;
+  const links = Math.max(10, Math.min(kasten.left + kasten.width / 2 - breite / 2, innerWidth - breite - 10));
   let oben = kasten.bottom + 12;
-  if (oben + 180 > innerHeight) oben = Math.max(10, kasten.top - 190);
+  const darueber = oben + hoehe > innerHeight - 8;
+  if (darueber) oben = Math.max(10, kasten.top - hoehe - 12);
   blase.style.left = `${Math.round(links)}px`;
   blase.style.top = `${Math.round(oben)}px`;
   const pfeil = blase.querySelector(".fuehrung-pfeil");
   pfeil.style.left = `${Math.round(Math.min(Math.max(kasten.left + kasten.width / 2 - links - 7, 14), breite - 28))}px`;
+  if (darueber) {
+    // Pfeil an die Unterkante, um 180 Grad gedreht (die Randlinien zeigen dann nach unten).
+    pfeil.style.top = "auto";
+    pfeil.style.bottom = "-7px";
+    pfeil.style.transform = "rotate(225deg)";
+  }
 
   blase.addEventListener("click", (e) => {
     const aktion = e.target.closest("[data-fuehrung]")?.dataset.fuehrung;

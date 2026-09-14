@@ -249,3 +249,15 @@
     overflow-wrap: normal;
   }
 }
+
+/* ---- E2E-Test 14.09.2026: Chatverlauf am Rechner unter den festen Knoepfen beginnen ----
+   GEMESSEN (1280 und 1024 px): #startLog begann bei y=0 mit 4 px Polster; der
+   Aktionen-Knopf der ersten Nutzernachricht (26x26 bei x=1237, y=20) lag
+   vollstaendig unter dem festen Browser-Knopf (44x44 oben rechts) und war nicht
+   anklickbar. Am Handy gilt schon 52 px (mobil-composer.css). */
+@media (min-width: 601px) {
+  #start.has-start-chat #startLog {
+    padding-top: 52px;
+    scroll-padding-top: 52px;
+  }
+}

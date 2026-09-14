@@ -267,6 +267,42 @@ function meldeHoehe(dok, hoehe) {
 // in BEIDE Faecher. Kein zusaetzlicher Netzaufruf fuer den Regelfall.
 const API_TOKEN_KEY = "smejj.apiToken.v1";
 
+/**
+ * Traegt die Browser-Sitzung nach, wenn der Server das Token bestaetigt hat,
+ * die Sitzungsangabe (smejj.session.v1) aber fehlt.
+ *
+ * BEFUND E2E-Test 14.09.2026: mit gueltigem Token, aber ohne diese Angabe
+ * antwortete der Chat normal — gespeichert wurde NICHTS. Der Chat-Speicher
+ * liest die Konto-ID nur aus smejj.session.v1 (chat-owner.js); ohne sie gab es
+ * keinen Besitzer, IndexedDB blieb leer, der Abgleich lief nicht, und nach
+ * einem Neuladen war das Gespraech weg. Die Anmeldewege schreiben die Angabe,
+ * ein halb geleerter Speicher (Browser-Aufraeumen, alte Version) aber nicht.
+ * Dieselbe Form wie auth/auth-page.js — damit alte Chats denselben Besitzer
+ * behalten. Eine vorhandene Sitzung wird NIE ueberschrieben.
+ * @returns {boolean} true = nachgetragen
+ */
+export function trageSitzungNach(win, user) {
+  try {
+    const vorhanden = JSON.parse(win.localStorage.getItem("smejj.session.v1") || "null");
+    if (vorhanden && vorhanden.authenticated === true && vorhanden.userId) return false;
+    const email = String(user?.email || "").trim().toLowerCase();
+    const userId = email ? `user_${email.replace(/[^a-z0-9]+/g, "_")}` : String(user?.userId || "").trim();
+    if (!userId) return false;
+    win.localStorage.setItem("smejj.session.v1", JSON.stringify({
+      authenticated: true,
+      mode: "token-session",
+      userId,
+      email: email || undefined,
+      method: String(user?.method || "token"),
+      permanent: true,
+      startedAt: new Date().toISOString()
+    }));
+    return true;
+  } catch {
+    return false; // Storage gesperrt: nichts erzwingen.
+  }
+}
+
 // Legt das Token im Fach der Chat-Seite ab. Output: true = abgelegt.
 function legeApiTokenAb(win, token) {
   if (!token) return false;
@@ -351,6 +387,8 @@ export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, api
       // Dasselbe Token gehoert in das Fach, aus dem der Chat liest.
       legeApiTokenAb(win, payload.accessToken);
     }
+    // Ohne Sitzungsangabe speichert der Chat nichts (E2E-Test 14.09.2026).
+    if (urteil === true && payload?.user) trageSitzungNach(win, payload.user);
   } catch {
     return "unklar"; // offline oder Zeitueberschreitung: nichts tun.
   }

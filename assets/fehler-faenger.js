@@ -46,11 +46,19 @@ function sende(daten) {
   if (!MELDE_URL || gesendet >= MAX_MELDUNGEN_JE_SEITE || !istAngemeldet()) return;
   gesendet += 1;
   try {
+    // Bearer UND Cookie (E2E-Test 14.09.2026): wer mit Token angemeldet ist, aber
+    // kein Sitzungscookie hat (abgelaufen, anderer Anmeldeweg, Safari-Schutz),
+    // bekam bei JEDEM Seitenaufruf 401 plus Konsolenfehler — und die Ampel sah
+    // von diesem Browser kein Lebenszeichen. Der Server liest den Bearer zuerst.
+    let token = "";
+    try { token = globalThis.localStorage?.getItem(AUTH_TOKEN_KEY) || ""; } catch { token = ""; }
+    const headers = { "content-type": "application/json" };
+    if (token) headers.Authorization = `Bearer ${token}`;
     fetch(MELDE_URL, {
       method: "POST",
       credentials: "include",
       keepalive: true,
-      headers: { "content-type": "application/json" },
+      headers,
       body: JSON.stringify(daten)
     }).catch(() => {});
   } catch {
