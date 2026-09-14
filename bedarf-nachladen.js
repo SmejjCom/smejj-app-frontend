@@ -18,8 +18,8 @@ import { ladeBeiKlick } from "./nachladen.js?v=2";
 try {
   const neuStart = new URLSearchParams(location.search).get("fuehrung") === "neu";
   const gesehen = localStorage.getItem("smejj.fuehrung.v1") === "gesehen";
-  if (neuStart || !gesehen) import("./fuehrung.js?v=3");
-} catch { import("./fuehrung.js?v=3"); }
+  if (neuStart || !gesehen) import("./fuehrung.js?v=4");
+} catch { import("./fuehrung.js?v=4"); }
 
 // 2. Papierkorb — erst wenn die Ansicht wirklich aufgeht (Klick oder
 //    Direkteinstieg ueber die URL).

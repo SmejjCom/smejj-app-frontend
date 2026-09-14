@@ -26,14 +26,9 @@ if (feld) {
     if (knopf.dataset.jump) return;
     knopf.addEventListener("click", () => {
       const aktion = knopf.dataset.composerAction;
-      // E2E-Test 14.09.2026 (smejj.com live, echte Dateiwahl): "Bild verstehen" und
-      // "Datei" oeffneten den Dialog, aber die Handler fuer die Auswahl stecken in
-      // composer-tools.js — das lud erst beim Plus-Knopf. Die gewaehlte Datei wurde
-      // still verworfen, das Modell sah nie ein Bild. Jetzt startet das Laden im
-      // selben Klick (bis die Auswahl zurueckkommt, sind die Handler gebunden).
+      // E24 (14.09.): Datei-Handler leben in composer-tools.js — im selben Klick laden.
       if (aktion) { try { window.smejjLadeComposerTools?.()?.catch?.(() => {}); } catch { /* Laden ist Beiwerk */ } }
-      // Ohne data-chip hat der Knopf keine Satzvorlage — "Datei" landete sonst als
-      // Wort im Eingabefeld (gleicher Test).
+      // E25: ohne data-chip keine Vorlage (sonst stand "Datei" im Feld).
       if (aktion && !knopf.dataset.chip) {
         feld.focus();
         if (aktion === "attach-file") document.getElementById("composerFileInput")?.click();

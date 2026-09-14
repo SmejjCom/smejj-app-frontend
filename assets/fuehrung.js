@@ -77,11 +77,7 @@ function zeige() {
     </div>`;
   document.body.append(blase);
   // Unter dem Ziel platzieren; laeuft sie rechts aus dem Bild, nach links ruecken.
-  // E2E-Test 14.09.2026 (Handy 402 px): die Hoehe war mit 180 px GERATEN — die
-  // echte Blase ist mit Beispielzeile ~260 px hoch. Ueber dem Eingabefeld
-  // platziert, lag sie deshalb AUF dem Feld, und der Pfeil zeigte weiter nach
-  // oben auf die Werkzeug-Kacheln statt auf das Feld. Jetzt: echte Hoehe messen,
-  // und steht die Blase ueber dem Ziel, zeigt der Pfeil nach unten.
+  // E3 (14.09.): echte Hoehe messen; ueber dem Ziel zeigt der Pfeil nach unten.
   const breite = Math.min(300, innerWidth - 20);
   const hoehe = blase.offsetHeight || 190;
   const links = Math.max(10, Math.min(kasten.left + kasten.width / 2 - breite / 2, innerWidth - breite - 10));

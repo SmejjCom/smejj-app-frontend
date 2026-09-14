@@ -23,7 +23,7 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'sha256-VlE1d5xGlwIC45bSDwQ4QJLlWTgImI8lmE9DYAk8JMQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.smejj.com; font-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com wss://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
     <!-- Kaltstart (Freigabe 25.08.): Stylesheet sofort anstossen — vorher
          startete es erst NACH dem Tor-Skript, eine volle Runde spaeter. -->
-    <link rel="preload" href="/assets/start-styles.css?v=v12l-20260914" as="style">
+    <link rel="preload" href="/assets/start-styles.css?v=v12m-20260914" as="style">
     <!-- Fruehes Tor (Betreiber-Freigabe 2026-08-23): Anonyme sofort zur Landeseite,
          statt 3,7 s (Desktop) / 15 s (iPhone) die App-Huelle zu sehen. Kein Modul,
          kein Import — laeuft vor dem ersten Pixel. Regeln bleiben in auth-gate.js. -->
@@ -96,7 +96,7 @@
          1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
          Erzeugt aus den unveraenderten Quelldateien:
          node scripts/build/bundle-start-styles.mjs -->
-    <link rel="stylesheet" href="/assets/start-styles.css?v=v12l-20260914">
+    <link rel="stylesheet" href="/assets/start-styles.css?v=v12m-20260914">
     <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
          sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
          Fragen stehen auf den Landingpages, nicht hier. -->
@@ -989,7 +989,7 @@
     </div>
     <script src="/assets/fehler-faenger.js" type="module"></script>
     <script src="/assets/frame-guard.js?v=1" type="module"></script>
-    <script src="/assets/start-chips.js?v=b32b-2" type="module"></script>
+    <script src="/assets/start-chips.js?v=b32b-3" type="module"></script>
     <script src="/assets/composer-sendetaste.js?v=v12-20260907" type="module"></script>
     <script src="/assets/nav-absichten.js?v=b34" type="module"></script>
     <script src="/assets/topbar-krume.js?v=b33f" type="module"></script>
@@ -1001,20 +1001,20 @@
     <script src="/assets/code-nachladen.js?v=28" type="module"></script>
     <!-- Peripherie (Fuehrung, Papierkorb, Kamera, @-Erwaehnung, Codeblock-Werkzeuge)
          laedt erst bei ihrer Handlung — Betreiber-Freigabe 2026-08-24 "Startseite abspecken". -->
-    <script src="/assets/bedarf-nachladen.js?v=17" type="module"></script>
-    <script src="/assets/app.js?v=b176" type="module"></script>
-    <script src="/assets/pwa-schnellstart.js?v=14" type="module"></script>
+    <script src="/assets/bedarf-nachladen.js?v=18" type="module"></script>
+    <script src="/assets/app.js?v=b177" type="module"></script>
+    <script src="/assets/pwa-schnellstart.js?v=15" type="module"></script>
     <!-- Browser-Panel und Maus-Panel: erst wenn sie gebraucht werden.
          63,3 KB von 335,6 KB zahlte bisher jeder Seitenaufruf fuer zwei
          Flaechen, die beim ersten Bildaufbau niemand sieht (browser-nachladen.js). -->
     <script src="/assets/browser-nachladen.js?v=21" type="module"></script>
     <script src="/assets/auth/passkey-ui.js" type="module"></script>
     <script src="/assets/view-chrome.js?v=view-chrome-20260716-2" type="module"></script>
-    <script src="/assets/profile-dock.js?v=b55" type="module"></script>
+    <script src="/assets/profile-dock.js?v=b56" type="module"></script>
     <script src="/assets/chat-store.js?v=b74" type="module"></script>
     <script src="/assets/chat-actions.js?v=b60" type="module"></script>
     <script src="/assets/panel-status.js?v=1" type="module"></script>
-    <script src="/assets/chat-stopp.js?v=17" type="module"></script>
+    <script src="/assets/chat-stopp.js?v=18" type="module"></script>
     <script src="/assets/modell-menue-start.js?v=1" type="module"></script>
   </body>
 </html>

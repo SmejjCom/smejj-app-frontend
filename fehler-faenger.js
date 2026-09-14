@@ -46,10 +46,7 @@ function sende(daten) {
   if (!MELDE_URL || gesendet >= MAX_MELDUNGEN_JE_SEITE || !istAngemeldet()) return;
   gesendet += 1;
   try {
-    // Bearer UND Cookie (E2E-Test 14.09.2026): wer mit Token angemeldet ist, aber
-    // kein Sitzungscookie hat (abgelaufen, anderer Anmeldeweg, Safari-Schutz),
-    // bekam bei JEDEM Seitenaufruf 401 plus Konsolenfehler — und die Ampel sah
-    // von diesem Browser kein Lebenszeichen. Der Server liest den Bearer zuerst.
+    // E1 (14.09.): Bearer mitsenden — ohne Sitzungscookie gab es sonst 401.
     let token = "";
     try { token = globalThis.localStorage?.getItem(AUTH_TOKEN_KEY) || ""; } catch { token = ""; }
     const headers = { "content-type": "application/json" };

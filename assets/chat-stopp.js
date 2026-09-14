@@ -397,12 +397,7 @@ function ruesteSendeknopf(bereich, viereck, handeln) {
     if (String(feld?.value || "").trim()) return;
     e.preventDefault();
     e.stopImmediatePropagation();
-    // DOPPELKLICK-SPERRE (E2E-Test 14.09.2026, smejj.com live): seit das
-    // Stopp-Quadrat schon in der Wartezeit vor dem ersten Byte steht, traf der
-    // zweite Klick eines Doppelklicks (gemessen: 120 ms Abstand) den Stopp —
-    // Nachricht gesendet und im selben Augenblick abgebrochen, keine Antwort.
-    // Ein Stopp so kurz nach dem Absenden ist praktisch nie gewollt; der Klick
-    // wird geschluckt (sonst oeffnete er bei leerem Feld den Sprachmodus).
+    // Doppelklick-Sperre (E10, 14.09.): 2. Klick direkt nach dem Senden stoppte sofort.
     if (Date.now() - stoppSeit < DOPPELKLICK_SPERRE_MS) return;
     handeln();
   }, true);

@@ -271,14 +271,8 @@ const API_TOKEN_KEY = "smejj.apiToken.v1";
  * Traegt die Browser-Sitzung nach, wenn der Server das Token bestaetigt hat,
  * die Sitzungsangabe (smejj.session.v1) aber fehlt.
  *
- * BEFUND E2E-Test 14.09.2026: mit gueltigem Token, aber ohne diese Angabe
- * antwortete der Chat normal — gespeichert wurde NICHTS. Der Chat-Speicher
- * liest die Konto-ID nur aus smejj.session.v1 (chat-owner.js); ohne sie gab es
- * keinen Besitzer, IndexedDB blieb leer, der Abgleich lief nicht, und nach
- * einem Neuladen war das Gespraech weg. Die Anmeldewege schreiben die Angabe,
- * ein halb geleerter Speicher (Browser-Aufraeumen, alte Version) aber nicht.
- * Dieselbe Form wie auth/auth-page.js — damit alte Chats denselben Besitzer
- * behalten. Eine vorhandene Sitzung wird NIE ueberschrieben.
+ * E5 (14.09.): ohne diese Angabe hatte der Chat keinen Besitzer (chat-owner.js)
+ * und speicherte nichts. Form wie auth/auth-page.js; nie ueberschreiben.
  * @returns {boolean} true = nachgetragen
  */
 export function trageSitzungNach(win, user) {

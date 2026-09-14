@@ -134,12 +134,7 @@ if (willNeu || willSprechen) {
 // der Reload einfach beim naechsten App-Start.
 if ("serviceWorker" in navigator) {
   let schonNeuGeladen = false;
-  // ERSTBESUCH (E2E-Test 14.09.2026, smejj.com live gemessen): ohne Steuerung beim
-  // Laden kam JEDES Modul frisch aus dem Netz — es gibt nichts Veraltetes. Trotzdem
-  // lud die Seite ~13 s spaeter neu, sobald der frisch installierte Worker die
-  // Kontrolle uebernahm: Klicks, Dialoge und Eingaben ausserhalb des Chatfelds
-  // (Projekte, Code, Einstellungen) gingen verloren. Neu laden nur bei einem
-  // echten WECHSEL von einem alten auf einen neuen Worker.
+  // E21 (14.09.): Erstbesuch nicht neu laden (alles frisch), nur bei Worker-Wechsel.
   const hatteSteuerung = Boolean(navigator.serviceWorker.controller);
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (schonNeuGeladen || !navigator.serviceWorker.controller || !hatteSteuerung) return;
