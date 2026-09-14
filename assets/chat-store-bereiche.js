@@ -7,7 +7,7 @@ import {
   geraeteBesitzer, getChat, importChat, listChats, neueProjektId, newChat, notifyChanged,
   notifyProjekteChanged, openChat, persistActive, renameChat, rohEigenerChat,
   sauberProjektName, scheduleSave, tx
-} from "./chat-store.js?v=b71";
+} from "./chat-store.js?v=b72";
 
 // GEMESSEN 2026-09-14 (A-bis-Z, angemeldet): der Papierkorb war IMMER leer.
 // listGeloeschteChats() warf "PAPIERKORB_TAGE is not defined" — die Konstante
@@ -229,6 +229,6 @@ export async function importProjekt(projekt) {
 }
 
 window.smejjChatStore = {
-  listChats, getChat, openChat, newChat, renameChat, deleteChat, activeChatId, importChat,
+  listChats, listEigeneChatsMitGeloeschten, getChat, openChat, newChat, renameChat, deleteChat, activeChatId, importChat,
   listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt, importProjekt
 };
