@@ -15,8 +15,8 @@
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=9";
-export { restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=9";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=10";
+export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=10";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und
 // Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
@@ -504,8 +504,8 @@ export async function renameChat(id, title) {
 // "Loeschen" ist ab jetzt WEICH: der Chat bekommt ein Loeschdatum und
 // verschwindet aus allen Listen, bleibt aber 30 Tage wiederherstellbar.
 // Erst das endgueltige Loeschen (aus dem Papierkorb oder durch die
-// 30-Tage-Raeumung) entfernt den Datensatz und meldet es dem Konto.
-const PAPIERKORB_TAGE = 30;
+// Raeumung nach PAPIERKORB_TAGE, chat-store-bereiche.js) entfernt den
+// Datensatz und meldet es dem Konto. Die Zahl lebt NUR dort (14.09.).
 
 export async function deleteChat(id) {
   // Nur eigene Chats (Stufe 2). getChat liefert fuer fremde null — aber auch
@@ -752,7 +752,7 @@ function init() {
         // ?v=2: Projekte-Sync (2026-08-13). Ohne den Bump haelt der
         // HTTP-Cache die alte Fassung fest — die Datei ist nicht im
         // Service-Worker-Buendel und erneuert sich sonst nie zuverlaessig.
-        import("/assets/chat-sync.js?v=16").catch(() => {});
+        import("/assets/chat-sync.js?v=17").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */

@@ -14,11 +14,12 @@ export function warmUpAgentConnection() {
   if (now - lastWarmupAt < WARMUP_INTERVAL_MS) return;
   lastWarmupAt = now;
   try {
-    // Die Bruecke hat kein /api/health (live 404, gemessen 2026-09-14) — der
-    // Sprach-Status ist ihre echte, leichte Route; die Verbindung waermt sie
-    // genauso auf, ohne einen Fehler im Netzprotokoll zu hinterlassen.
+    // Die Bruecke beantwortet jedes GET unter /api/* mit 404 (chat-bridge.js:
+    // Methodenwache vor dem Routing; /api/health und /api/voice/status beide
+    // gemessen 404 am 14.09.). Ihre einzige GET-Route ist /health — nur die
+    // waermt DNS, TLS und HTTP/2 auf, ohne einen Fehler im Netzprotokoll.
     const origin = new URL(CLIENT_ROUTES.api.agent).origin;
-    fetch(`${origin}/api/voice/status`, { cache: "no-store" }).catch(() => {
+    fetch(`${origin}/health`, { cache: "no-store" }).catch(() => {
       // Warm-up ist optional — ein Fehler darf den Sprachmodus nie stoeren.
     });
   } catch {

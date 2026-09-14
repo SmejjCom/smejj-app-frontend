@@ -274,12 +274,19 @@ async function push() {
       if (!vorfahrt.darfSenden()) break;
       const chat = await s.getChat(kurz.id);
       if (!chat) continue;
+      // Weich geloeschte Chats gehen nur hoch, wenn der Server sie schon kennt:
+      // ein offline erstellter und gleich verworfener Chat braucht nie hoch —
+      // sein Grabstein (endgueltiges Loeschen) reicht spaeter (Review 14.09.).
+      if (chat.deletedAt && karte && !karte.has(String(chat.id))) continue;
       const antwort = await fetch(`${API_ORIGIN}/api/chats`, {
         method: "PUT",
         headers: kopf,
         body: JSON.stringify({ chat })
       });
       if (antwort.status === 503) { serverSagtNein = true; break; }
+      // Ein weggeworfener Chat wird weder gerettet noch gemeldet — ein 4xx heisst
+      // hier nur, dass der Server ihn nicht mehr will; der Papierkorb bleibt lokal.
+      if (chat.deletedAt && antwort.status >= 400 && antwort.status !== 401 && antwort.status !== 403) continue;
       // 401/403 betrifft NICHT diesen Chat, sondern die SITZUNG — und dann ist
       // jede weitere Anfrage dieses Laufs genauso vergeblich. Gemessen
       // 2026-09-10: der Lauf schickte fuer JEDEN lokalen Chat eine Anfrage,

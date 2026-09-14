@@ -24,9 +24,9 @@ try {
 // 2. Papierkorb — erst wenn die Ansicht wirklich aufgeht (Klick oder
 //    Direkteinstieg ueber die URL).
 if (location.pathname.includes("papierkorb")) {
-  import("./papierkorb.js?v=20");
+  import("./papierkorb.js?v=21");
 } else {
-  ladeBeiKlick(['[data-view="papierkorb"]', '[data-jump="papierkorb"]'], () => import("./papierkorb.js?v=20"));
+  ladeBeiKlick(['[data-view="papierkorb"]', '[data-jump="papierkorb"]'], () => import("./papierkorb.js?v=21"));
 }
 
 // 3. Kamera — lebt hinter dem Plus-Menue; derselbe Ausloeser, mit dem app.js
@@ -52,7 +52,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
     const wecker = () => {
       if (!/(^|\s)@/.test(String(feld.value || ""))) return;
       feld.removeEventListener("input", wecker);
-      import("./erwaehnung.js?v=10").then(() => feld.dispatchEvent(new Event("input", { bubbles: true })))
+      import("./erwaehnung.js?v=11").then(() => feld.dispatchEvent(new Event("input", { bubbles: true })))
         .catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
     };
     feld.addEventListener("input", wecker);
@@ -110,7 +110,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 //    egal ob man klickt, ein Lesezeichen oeffnet oder zurueckgeht — und genau
 //    dann, und nur dann, wird das Modul gebraucht.
 {
-  const laden = () => import("./chat-history-view.js?v=b65");
+  const laden = () => import("./chat-history-view.js?v=b66");
   const ansicht = document.getElementById("chatHistory");
   const istOffen = () => ansicht?.classList.contains("is-active") || !!(ansicht?.offsetWidth || ansicht?.offsetHeight);
   if (ansicht) {
@@ -132,7 +132,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 // 6. Projects/Arbeitsbereiche — erst wenn die Ansicht aufgeht (Klick in der
 //    Spur oder Direkteinstieg ueber die URL).
 if (location.pathname.includes("arbeitsbereiche") || location.pathname.includes("projects")) {
-  import("./arbeitsbereiche.js?v=27");
+  import("./arbeitsbereiche.js?v=28");
 } else {
-  ladeBeiKlick(['[data-view="arbeitsbereiche"]', '[data-jump="arbeitsbereiche"]'], () => import("./arbeitsbereiche.js?v=27"));
+  ladeBeiKlick(['[data-view="arbeitsbereiche"]', '[data-jump="arbeitsbereiche"]'], () => import("./arbeitsbereiche.js?v=28"));
 }

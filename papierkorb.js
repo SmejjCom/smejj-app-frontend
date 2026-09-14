@@ -10,7 +10,7 @@
 // fragt nie nach. Nur das ENDGUELTIGE Loeschen verlangt einen zweiten Klick
 // auf denselben Knopf — der Knopf selbst wird zur Rueckfrage.
 
-import { listGeloeschteChats, restoreChat, endgueltigLoeschen } from "/assets/chat-store.js?v=b72";
+import { listGeloeschteChats, restoreChat, endgueltigLoeschen, PAPIERKORB_TAGE } from "/assets/chat-store.js?v=b73";
 
 function zeitHer(iso) {
   const tage = Math.round((Date.now() - new Date(iso).getTime()) / 86400000);
@@ -20,7 +20,7 @@ function zeitHer(iso) {
 }
 
 function restTage(iso) {
-  const rest = 30 - Math.round((Date.now() - new Date(iso).getTime()) / 86400000);
+  const rest = PAPIERKORB_TAGE - Math.round((Date.now() - new Date(iso).getTime()) / 86400000);
   return Math.max(1, rest);
 }
 
@@ -33,7 +33,7 @@ async function zeichne() {
     ziel.replaceChildren();
     const leer = document.createElement("p");
     leer.className = "papierkorb-leer";
-    leer.textContent = "Der Papierkorb ist leer. Gelöschte Gespräche landen hier und bleiben 30 Tage wiederherstellbar.";
+    leer.textContent = `Der Papierkorb ist leer. Gelöschte Gespräche landen hier und bleiben ${PAPIERKORB_TAGE} Tage wiederherstellbar.`;
     ziel.append(leer);
     return;
   }

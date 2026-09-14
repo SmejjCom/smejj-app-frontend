@@ -7,7 +7,7 @@ import {
   geraeteBesitzer, getChat, importChat, listChats, neueProjektId, newChat, notifyChanged,
   notifyProjekteChanged, openChat, persistActive, renameChat, rohEigenerChat,
   sauberProjektName, scheduleSave, tx
-} from "./chat-store.js?v=b72";
+} from "./chat-store.js?v=b73";
 
 // GEMESSEN 2026-09-14 (A-bis-Z, angemeldet): der Papierkorb war IMMER leer.
 // listGeloeschteChats() warf "PAPIERKORB_TAGE is not defined" — die Konstante
@@ -69,8 +69,22 @@ export async function listGeloeschteChats() {
   const grenze = Date.now() - PAPIERKORB_TAGE * 86400000;
   const frisch = [];
   for (const chat of eigene) {
-    if (new Date(chat.deletedAt).getTime() < grenze) await endgueltigLoeschen(chat.id).catch(() => {});
-    else frisch.push(chat);
+    if (new Date(chat.deletedAt).getTime() < grenze) {
+      // Altlast (Loeschungen vor dem 14.09., ohne updatedAt-Bump): der Server hat
+      // sie nie gesehen, auf anderen Geraeten laufen diese Chats bis heute als
+      // aktiv. Ein sofortiger Grabstein wuerde dort gewinnen — darum bekommen sie
+      // erst den Sync als weich geloescht (Frist beginnt neu) und die Raeumung
+      // 30 Tage spaeter. Review-Befund der Abschlusspruefung 14.09.
+      if (String(chat.updatedAt || "") < String(chat.deletedAt)) {
+        chat.deletedAt = new Date().toISOString();
+        chat.updatedAt = chat.deletedAt;
+        await tx(STORE, "readwrite", (store) => store.put(chat)).catch(() => {});
+        notifyChanged();
+        frisch.push(chat);
+        continue;
+      }
+      await endgueltigLoeschen(chat.id).catch(() => {});
+    } else frisch.push(chat);
   }
   return frisch.sort((a, b) => String(b.deletedAt).localeCompare(String(a.deletedAt)));
 }

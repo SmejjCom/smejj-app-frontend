@@ -7,7 +7,7 @@
 //
 // WICHTIG: derselbe chat-store-Spezifizierer wie in search.js und
 // chat-history-view.js — ein abweichender Pfad erzeugt eine ZWEITE Modulinstanz.
-import { listChats } from "/assets/chat-store.js?v=b72";
+import { listChats } from "/assets/chat-store.js?v=b73";
 import {
   anzeigeTitel,
   anzeigeVorschau,
@@ -56,8 +56,11 @@ export function initSearchOverlay(context) {
     if (event.key !== "Escape" || !els || els.overlay.hidden) return;
     if (els.overlay.contains(event.target)) return; // der Lauscher oben ist zustaendig
     event.preventDefault();
+    // Genau EINES schliessen: ohne stopPropagation reagieren view-chrome.js und
+    // panel-backdrop.js auf denselben Tastendruck (Review-Befund 14.09.).
+    event.stopPropagation();
     closeSearchOverlay();
-  });
+  }, true);
   els.overlay.addEventListener("click", (event) => {
     if (event.target.closest("[data-search-close]")) closeSearchOverlay();
   });
