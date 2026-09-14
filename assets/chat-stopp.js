@@ -346,11 +346,14 @@ const STOPP_QUADRAT = '<svg viewBox="0 0 24 24" aria-hidden="true" class="stopp-
  * Rein additiv: composer-sendetaste.js bleibt die Wahrheit fuer Pfeil/Welle
  * und zeichnet auf "smejj:composer-changed" neu.
  */
+const DOPPELKLICK_SPERRE_MS = 700;
 function ruesteSendeknopf(bereich, viereck, handeln) {
   const knopf = document.getElementById(bereich.senden);
   if (!knopf || knopf.dataset.stoppKnopf === "an") return;
   knopf.dataset.stoppKnopf = "an";
   let merkmal = null;
+  // Wann der Knopf zum Stopp-Quadrat wurde (Doppelklick-Sperre, siehe unten).
+  let stoppSeit = 0;
   const zeichne = () => {
     const laeuft = viereck.classList.contains("an") && !viereck.classList.contains("gestoppt");
     const zeigt = knopf.classList.contains("ist-stopp");
@@ -358,6 +361,7 @@ function ruesteSendeknopf(bereich, viereck, handeln) {
     if (laeuft) {
       merkmal = { html: knopf.innerHTML, label: knopf.getAttribute("aria-label"), title: knopf.getAttribute("title") };
       knopf.classList.add("ist-stopp");
+      stoppSeit = Date.now();
       knopf.innerHTML = STOPP_QUADRAT;
       knopf.setAttribute("aria-label", "Antwort stoppen");
       knopf.setAttribute("title", "Stoppen");
@@ -393,6 +397,13 @@ function ruesteSendeknopf(bereich, viereck, handeln) {
     if (String(feld?.value || "").trim()) return;
     e.preventDefault();
     e.stopImmediatePropagation();
+    // DOPPELKLICK-SPERRE (E2E-Test 14.09.2026, smejj.com live): seit das
+    // Stopp-Quadrat schon in der Wartezeit vor dem ersten Byte steht, traf der
+    // zweite Klick eines Doppelklicks (gemessen: 120 ms Abstand) den Stopp —
+    // Nachricht gesendet und im selben Augenblick abgebrochen, keine Antwort.
+    // Ein Stopp so kurz nach dem Absenden ist praktisch nie gewollt; der Klick
+    // wird geschluckt (sonst oeffnete er bei leerem Feld den Sprachmodus).
+    if (Date.now() - stoppSeit < DOPPELKLICK_SPERRE_MS) return;
     handeln();
   }, true);
   new MutationObserver(zeichne).observe(viereck, { attributes: true, attributeFilter: ["class"] });
