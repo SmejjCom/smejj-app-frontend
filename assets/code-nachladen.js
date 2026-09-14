@@ -44,7 +44,7 @@ function laden() {
   // und danach passierte nichts, weil niemand auf die Auswahl hoerte
   // (A-bis-Z-Pruefung 07.09.). Darum kommt es hier mit.
   import("./composer-tools.js?v=werkzeuge-25").catch(() => {});
-  return import("./code-flaeche.js?v=68")
+  return import("./code-flaeche.js?v=69")
     .then((modul) => { modul.initCodeFlaeche?.(); return modul; })
     .catch((fehler) => {
       console.error("[smejj.com] Code-Flaeche konnte nicht nachgeladen werden:", fehler);

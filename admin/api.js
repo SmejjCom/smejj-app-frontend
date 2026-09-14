@@ -61,7 +61,7 @@
   }
 
   function wechselHost() {
-    apiBasis = (apiBasis === CONTROL_ORIGIN) ? ZWEIT_ORIGIN : CONTROL_ORIGIN;
+    apiBasis = (apiBasis === CONTROL_ORIGIN) ? ALT_ORIGIN : CONTROL_ORIGIN; // E2E-Pruefung 14.09.2026: hiess ZWEIT_ORIGIN (nie definiert)
     try { sessionStorage.setItem(AKTIV_KEY, apiBasis); } catch { /* egal */ }
   }
 

@@ -31,7 +31,7 @@ import { catalogProvider, selectableProviders } from "./ai/providers-catalog.js?
 import { t } from "./i18n/ui.js?v=3";
 import { api, baseAnbieterId, cssEscape, datum, escapeAttr, escapeHtml, fehlerText, kurz, kurzZahl, statusStufe, usd, zahl } from "./api-center-helfer.js?v=1";
 // Die vier Listen-Aktionen liegen in einem eigenen Modul (800-Zeilen-Regel).
-import { entferne, loescheEndgueltig, schalteUm, umbenenne, zeigeAktivitaet } from "./api-center-aktionen.js?v=1";
+import { entferne, loescheEndgueltig, schalteUm, umbenenne, zeigeAktivitaet } from "./api-center-aktionen.js?v=2";
 
 const MODELL_KEY = "smejj.model.selected.v2";
 const AKTIVER_ANBIETER_KEY = "smejj.activeProvider.v1";
@@ -252,7 +252,7 @@ async function devLaden() {
 // Umgebung fuer die ausgelagerten Aktionen (api-center-aktionen.js): dieselben drei
 // Helfer wie zuvor, nur ausdruecklich uebergeben statt im Modul mitgelesen.
 function hof() {
-  return { alleEintraege, laden, melde };
+  return { alleEintraege, laden, melde, schliessePopovers };
 }
 
 function alleEintraege(zustand) {

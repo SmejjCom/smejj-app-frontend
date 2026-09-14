@@ -6,6 +6,9 @@
 
 import { STORAGE_KEYS } from "./config.js";
 import { PROJECT_ROLES } from "/assets/storage/index.js";
+// E2E-Test 14.09.2026: fehlte — "Exportieren" brach mit "downloadText is not defined" ab.
+// Gleiche Adresse wie app.js (?v=4), sonst laedt der Browser das Modul ein zweites Mal.
+import { downloadText } from "./app-helfer.js?v=4";
 
 export function bindProjects(deps) {
   const { $, state, workspace, showToast, writeOutput, ensureProject, refreshLocalWorkspaceStatus, renderProjectCards, renderEmptyState } = deps;

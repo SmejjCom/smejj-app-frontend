@@ -4,6 +4,10 @@
 // Code zeilengleich uebernommen, kein Verhaltenswechsel. Die Grenzen liegen
 // bewusst hier bei der einzigen Stelle, die sie durchsetzt.
 
+// E2E-Pruefung 14.09.2026: fehlte — "Liste herunterladen" warf "downloadText is not defined".
+// Gleiche Adresse wie app.js (?v=4), sonst laedt der Browser das Modul ein zweites Mal.
+import { downloadText } from "./app-helfer.js?v=4";
+
 const UPLOAD_LIMITS = Object.freeze({
   maxBytes: 1_000_000,
   maxCount: 8,

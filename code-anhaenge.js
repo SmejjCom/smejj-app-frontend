@@ -51,6 +51,11 @@ export function zieheAnhaengeAusFeld(feld) {
 }
 
 /** Fuer den Sendepfad: liefert die Chips und leert sie (inkl. Neuzeichnen). */
+/** Wie viele Anhaenge gerade am Feld haengen (fuer "Anhang allein ist sendbar"). */
+export function anhaengeZahl() {
+  return anhaenge.length;
+}
+
 export function nimmAnhaengeMit() {
   const mit = anhaenge;
   anhaenge = [];

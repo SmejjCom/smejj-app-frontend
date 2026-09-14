@@ -45,6 +45,8 @@ import {
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl, shortHost
 } from "./browser-pane-adressen.js?v=browser-pane-20260820-2";
 import { applyZoom, baueZoomHaken } from "./browser-pane-zoom.js?v=1";
+// E2E-Pruefung 14.09.2026: fehlte — Rechtsklick auf Zurueck/Vor warf ReferenceError.
+import { zeigeVerlaufMenue } from "./browser-pane-menue.js?v=browser-pane-20260709-2";
 // Der Zoom lebt in browser-pane-zoom.js; hier nur seine drei Anschluesse.
 const zoomHaken = baueZoomHaken({ activeTab: () => activeTab(), schedulePersist: () => schedulePersist(), zeigeHinweis: (t) => showHint(t) });
 export {

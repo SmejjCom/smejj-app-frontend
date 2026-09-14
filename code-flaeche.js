@@ -36,7 +36,7 @@ import { API_ORIGIN } from "./config.js";
 // Modul (800-Zeilen-Regel des Master-Prompts). OHNE ?v — gleiche Kennung
 // ueberall, sonst zweite Modulinstanz (module-queries-Waechter).
 // Anhang-Chips (Datei anhaengen) — eigenes Modul seit der Zeilen-Diaet.
-import { zieheAnhaengeAusFeld, nimmAnhaengeMit } from "./code-anhaenge.js?v=1";
+import { zieheAnhaengeAusFeld, nimmAnhaengeMit, anhaengeZahl } from "./code-anhaenge.js?v=2";
 import {
   MODELL_KEY,
   AUTO_WAHL,
@@ -217,7 +217,9 @@ async function senden() {
   const start = document.getElementById("startMessage");
   const text = feld?.value.trim();
   // Ein Anhang allein ist sendbar — wie bei Claude.
-  if ((!text && !anhaenge.length) || !start || !feld) return;
+  // E2E-Pruefung 14.09.2026: hier stand `anhaenge` (lebt in code-anhaenge.js) —
+  // leeres Feld plus Anhang warf ReferenceError statt zu senden.
+  if ((!text && !anhaengeZahl()) || !start || !feld) return;
   feld.value = "";
   // Elastische Hoehe zuruecksetzen — sonst bleibt das geleerte Feld hoch.
   feld.dispatchEvent(new Event("input", { bubbles: true }));

@@ -7,6 +7,14 @@
 import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js";
 import { postJson } from "./shared/http-json.js";
 
+// E2E-Pruefung 14.09.2026: hier stand `state.currentProjectId` — `state` gibt es in
+// diesem Modul nicht, der Rueckfall warf ReferenceError genau dann, wenn er
+// gebraucht wurde (Strom ausgefallen). app.js schreibt dieselbe Projekt-ID nach
+// STORAGE_KEYS.currentProject.
+function aktuellesProjekt() {
+  try { return localStorage.getItem(STORAGE_KEYS.currentProject) || "project_smejj"; } catch { return "project_smejj"; }
+}
+
 export function isFreeCodingFallbackTask(task) {
   const text = String(task || "").toLowerCase();
   if (/\b(wetter|heute|aktuell|nachricht|news|preis|kurs|boerse|börse|internet|web|quelle|oeffnungszeit|öffnungszeit)\b/i.test(text)) return false;
@@ -30,7 +38,7 @@ export async function runFreeExecutorIfAppTask(task) {
   if (!/\b(app|projekt|project|todo|website|seite|programm|erstell|baue|build)\b/i.test(text) || /\b(function|funktion|klasse|class|snippet|nur code|add\(a,b\)|add\(a, b\))\b/i.test(text)) return null;
   const payload = {
     task,
-    projectId: state.currentProjectId || "project_smejj",
+    projectId: aktuellesProjekt(),
     workerMode: "planner-vault",
     startWorker: false,
     budgetApproved: false,
@@ -64,7 +72,7 @@ export function formatFreeExecutorResult(executor) {
 export async function createFreeCodingJob(task) {
   const payload = {
     task,
-    projectId: state.currentProjectId || "project_smejj",
+    projectId: aktuellesProjekt(),
     workerMode: "planner-vault",
     startWorker: false,
     budgetApproved: false,

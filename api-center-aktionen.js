@@ -4,7 +4,17 @@
 // Zeilen gewachsen. Verhalten unveraendert; die Funktionen bekommen ihre Umgebung als
 // "hof" (alleEintraege, laden, melde) uebergeben, statt sie aus dem Modul zu ziehen.
 import { t } from "./i18n/ui.js?v=3";
-import { api, escapeHtml } from "./api-center-helfer.js?v=1";
+import { api, cssEscape, escapeHtml, fehlerText, zahl } from "./api-center-helfer.js?v=1";
+import { API_ORIGIN } from "./config.js";
+
+// E2E-Pruefung 14.09.2026 (statische Suche nach undefinierten Namen, dann live):
+// Bei der Auslagerung blieben sieben Namen in api-center-surface.js zurueck —
+// Loeschen, Entfernen, Umbenennen, Aktivieren/Deaktivieren und "Aktivitaet"
+// warfen darum JEDES MAL "ReferenceError" statt zu wirken. Die Konstanten sind
+// hier wortgleich zur Flaeche; schliessePopovers kommt ueber den "hof".
+const MODELL_KEY = "smejj.model.selected.v2";
+const BYOK_PREFIX = `${API_ORIGIN}/api/keys`;
+const DEV_PREFIX = `${API_ORIGIN}/api/developer/keys`;
 
 export async function loescheEndgueltig(root, zustand, id, hof) {
   const eintrag = hof.alleEintraege(zustand).find((e) => e.id === id);
@@ -34,7 +44,7 @@ export async function entferne(root, zustand, id, hof) {
 }
 
 export async function umbenenne(root, zustand, id, hof) {
-  schliessePopovers(root);
+  hof.schliessePopovers(root);
   const eintrag = hof.alleEintraege(zustand).find((e) => e.id === id);
   if (!eintrag) return;
   const name = prompt(t("Neuer Name für den Schlüssel"), eintrag.name);
@@ -50,7 +60,7 @@ export async function umbenenne(root, zustand, id, hof) {
 }
 
 export async function schalteUm(root, zustand, id, hof) {
-  schliessePopovers(root);
+  hof.schliessePopovers(root);
   const eintrag = hof.alleEintraege(zustand).find((e) => e.id === id);
   if (!eintrag) return;
   const aktiv = !!eintrag.inaktiv;
@@ -64,7 +74,7 @@ export async function schalteUm(root, zustand, id, hof) {
 }
 
 export function zeigeAktivitaet(root, zustand, id, hof) {
-  schliessePopovers(root);
+  hof.schliessePopovers(root);
   const eintrag = hof.alleEintraege(zustand).find((e) => e.id === id);
   if (!eintrag) return;
   const zeilen = [
