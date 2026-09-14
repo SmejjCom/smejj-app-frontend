@@ -15,8 +15,8 @@
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=10";
-export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=10";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=11";
+export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=11";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und
 // Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
@@ -382,6 +382,10 @@ export async function persistActive() {
     // titleAuto (siehe oben): fehlt die Zeile, wirft jeder Tastendruck den
     // Chat lautlos aus seinem Projekt.
     projectId: existing?.projectId || verbraucheBereichVormerkung(),
+    // Abgleichsmarke (Befund R7, 14.09.): welcher Stand zuletzt beim Server
+    // war. Dieselbe Feldlisten-Falle wie oben — ohne diese Zeile verloere
+    // jeder Tastendruck die Marke, und der Sync saehe nie einen Konflikt.
+    syncedAt: existing?.syncedAt || "",
     createdAt: existing && existing.createdAt ? existing.createdAt : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     model: safeModelName(),
@@ -573,8 +577,27 @@ export async function createChatFrom(messages) {
 // Konsole fuellt sich bei jedem Zeichnen — medienHolen() tauscht ohnehin gegen
 // blob:. Nachgeladen statt statisch importiert, weil der Store auch ohne seine
 // Nachbarn laufen koennen muss (Selbstheilungs-Tests kopieren ihn allein).
+//
+// ERST BEI BEDARF (Startgewicht, gemessen 2026-09-14): bis dahin holte diese
+// Stelle chat-medien.js bei JEDEM Start — 7,5 KB auf der Leitung, auch fuer
+// Besucher ohne ein einziges gespeichertes Medium. Das war der groesste
+// Posten, der die Web-Vitals-Messung auf 302 KB (Budget 300) hob. Jetzt wird
+// der Parker nur geholt, wenn ein Chat, der gleich gezeichnet wird, wirklich
+// eine Serveradresse traegt; die Wiederherstellung wartet darauf (openChat und
+// restoreOnBoot sind ohnehin asynchron), damit kein ungeparktes <img> in die
+// Seite kommt. Ohne Medium bleibt alles wie zuvor: Durchreichen.
 let parkeMedien = (html) => html;
-import("./chat-medien.js?v=5").then((m) => { if (typeof m.parkeMedienAdressen === "function") parkeMedien = m.parkeMedienAdressen; }).catch(() => {});
+let parkerLaedt = null;
+const MEDIEN_ADRESSE = /\/api\/chat-medien\?id=/;
+async function parkerBereit(messages) {
+  if (parkerLaedt) return parkerLaedt;
+  const braucht = (Array.isArray(messages) ? messages : []).some((m) => MEDIEN_ADRESSE.test(String(m?.html || "")));
+  if (!braucht) return null;
+  parkerLaedt = import("./chat-medien.js?v=5")
+    .then((m) => { if (typeof m.parkeMedienAdressen === "function") parkeMedien = m.parkeMedienAdressen; })
+    .catch(() => { parkerLaedt = null; });
+  return parkerLaedt;
+}
 
 function renderEntriesInto(log, messages) {
   restoring = true;
@@ -625,6 +648,7 @@ export async function openChat(id) {
   const log = startLog();
   if (!chat || !log) return false;
   setActiveChatId(chat.id);
+  await parkerBereit(chat.messages);
   renderEntriesInto(log, chat.messages || []);
   // Bereichs-Anweisung in den Sitzungsspeicher — diese Zeile stand bis
   // 2026-08-16 NACH dem return und lief darum nie (toter Code): die
@@ -686,6 +710,7 @@ async function restoreOnBoot() {
   if (!id) return;
   const chat = await getChat(id);
   if (!chat || !Array.isArray(chat.messages) || !chat.messages.length) return;
+  await parkerBereit(chat.messages);
   renderEntriesInto(log, chat.messages);
 }
 
@@ -752,7 +777,7 @@ function init() {
         // ?v=2: Projekte-Sync (2026-08-13). Ohne den Bump haelt der
         // HTTP-Cache die alte Fassung fest — die Datei ist nicht im
         // Service-Worker-Buendel und erneuert sich sonst nie zuverlaessig.
-        import("/assets/chat-sync.js?v=17").catch(() => {});
+        import("/assets/chat-sync.js?v=18").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */
@@ -790,7 +815,10 @@ export async function importChat(chat) {
     notifyChanged();
     return true;
   }
-  await tx(STORE, "readwrite", (store) => store.put({ ...chat, ownerId: userId }));
+  // Die Abgleichsmarke (syncedAt) setzt NICHT diese Funktion: importChat ist auch
+  // der Speicherweg der Medien-Rettung, und dort hat der Server den Stand noch
+  // nicht. Der Pull (chat-sync.js) gibt syncedAt mit, der Spread behaelt es.
+await tx(STORE, "readwrite", (store) => store.put({ ...chat, ownerId: userId }));
   notifyChanged();
   return true;
 }

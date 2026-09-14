@@ -10,6 +10,8 @@
 // wird unveraendert weitergereicht — kein Aufrufer muss seinen Import aendern.
 import { kurz, erlaubteHosts, fuehreMausAuftragAus } from "./browser-pane-maus-plan.js?v=browser-pane-20260909-4";
 import { baueZeiger, fuehreFreienLaufAus } from "./browser-pane-maus-frei.js?v=browser-pane-20260909-6";
+// Dieselbe Uebersetzung wie die Kachel "Browser" auf der Startseite (start-chips.js).
+import { t } from "./i18n/ui.js?v=3";
 export * from "./browser-pane-maus-plan.js?v=browser-pane-20260909-4";
 export * from "./browser-pane-maus-frei.js?v=browser-pane-20260909-6";
 
@@ -129,6 +131,41 @@ export async function starteMausLaufMitSender({ auftrag, sende, seitenUrl, schri
   }
 }
 
+/** Die Vorlage, die auch die Kachel "Browser" der Startseite ins Feld schreibt (index.html data-chip). */
+export const MAUS_VORLAGE = "Erledige mit der Maus im Browser:";
+
+/**
+ * Belegt das Chat-Feld mit der Maus-Vorlage vor und stellt den Fokus hinein —
+ * genau wie die Kachel in start-chips.js. Gesendet wird erst vom Nutzer; den
+ * Auftrag deutet dann maus-absicht.js, und die offene Seite im Panel gilt als
+ * Arbeitsort ("Steht keine Adresse im Auftrag, gilt die Seite, die schon offen ist").
+ *
+ * BEFUND F13 (A-bis-Z 14.09.2026, live gemessen): der Knopf oeffnete einen
+ * nativen prompt()-Dialog. Im eingebetteten oder automatisierten Chrome wird
+ * der Dialog unterdrueckt (Klick ohne jede Wirkung) oder mit Escape
+ * weggedrueckt — und dieses Escape trifft den Dokument-Lauscher in
+ * panel-backdrop.js, der Panel UND Spur schliesst (gemessen: ein Escape nimmt
+ * body.right-panel-open und body.browser-pane-open weg). Ein Knopf, dessen
+ * Dialog so verschwindet, ist ein Attrappen-Knopf.
+ *
+ * @param {{dokument?: Document, uebersetze?: Function}} o
+ * @returns {boolean} false, wenn es kein sichtbares Chat-Feld gibt.
+ */
+export function belegeStartfeldMitMausVorlage({ dokument = globalThis.document, uebersetze = t } = {}) {
+  const feld = dokument?.getElementById?.("startMessage");
+  if (!feld) return false;
+  // Ein verstecktes Feld (z. B. Code-Ansicht) laesst sich nicht fokussieren —
+  // dann lieber ehrlich "nein" als eine Vorlage, die niemand sieht.
+  if (typeof feld.getClientRects === "function" && feld.getClientRects().length === 0) return false;
+  const satz = uebersetze(MAUS_VORLAGE);
+  // Wie in start-chips.js: nach dem vollbreiten Doppelpunkt (CJK) kein Leerzeichen.
+  feld.value = satz.endsWith("：") ? satz : `${satz} `;
+  // input-Ereignis, damit die Autogroesse des Feldes mitzieht.
+  feld.dispatchEvent?.(new Event("input", { bubbles: true }));
+  feld.focus?.();
+  return true;
+}
+
 /**
  * Verdrahtet den Maus-Knopf der Kopfleiste.
  * Nimmt die Panel-Bausteine — so bleibt in browser-pane.js eine Zeile stehen.
@@ -145,6 +182,14 @@ export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, send
     // Not-Aus, egal ob der Lauf hier oder im Chat begonnen hat.
     if (haltMausAn()) { zeige("Maus wird angehalten ..."); return; }
 
+    // Erster Weg (Befund F13): die Vorlage ins Chat-Feld, der Nutzer schreibt
+    // den Auftrag dahinter und schickt ihn ab — derselbe Weg wie die Kachel.
+    if (belegeStartfeldMitMausVorlage()) {
+      zeige("Schreib ins Chat-Feld, was die Maus hier tun soll, und schick es ab.");
+      return;
+    }
+
+    // Rueckfall nur ohne sichtbares Chat-Feld: der bisherige Dialog.
     const auftrag = globalThis.prompt?.(
       "Was soll die Maus auf dieser Seite tun?\n\n" +
       "Sie arbeitet NUR auf " + (erlaubteHosts(activeTab()?.url)[0] || "dieser Seite") +

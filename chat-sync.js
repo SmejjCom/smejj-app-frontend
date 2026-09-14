@@ -15,7 +15,10 @@
 // - Jeder Fehler ist still: Sync ist Komfort, der Chat laeuft immer weiter.
 import { API_ORIGIN } from "/assets/config.js";
 import { OWNER_KEY, gehoertNutzer, kontoAliase, merkeKontoKennung, sessionUserId } from "/assets/chat-owner.js?v=3";
-import { abgleichsKarte, teileAuf, erzeugeVorfahrt, erzeugeAbgleichsSpeicher } from "./chat-sync-auswahl.js?v=3";
+import {
+  abgleichsKarte, teileAuf, erzeugeVorfahrt, erzeugeAbgleichsSpeicher,
+  istUeberschreibKonflikt, konfliktKopie, geraeteKurzname, neueKonfliktId, ohneAbgleichsmarke, nachzutragen
+} from "./chat-sync-auswahl.js?v=4";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
@@ -58,6 +61,34 @@ async function meldeAbweisung(kennung, status, grund) {
     // auffindbar sein — eine stille Ablehnung ist das, was hier abgestellt wird.
     console.warn(`smejj Verlauf-Sync: Chat ${kennung} abgewiesen (${status}${grund ? ` ${grund}` : ""})`);
   }
+}
+
+/**
+ * Konflikt-Hinweis (Befund R7): der Nutzer soll wissen, dass eine Kopie im
+ * Verlauf liegt — sonst wundert er sich ueber den doppelten Chat.
+ */
+async function meldeKonflikte(anzahl) {
+  if (!anzahl) return;
+  const text = anzahl === 1
+    ? "Ein Chat wurde auf einem anderen Geraet geaendert — deine Fassung bleibt als Kopie \"(Konflikt vom Geraet …)\" im Verlauf."
+    : `${anzahl} Chats wurden auf einem anderen Geraet geaendert — deine Fassungen bleiben als Kopien "(Konflikt vom Geraet …)" im Verlauf.`;
+  try {
+    const { showToast } = await import("/assets/components.js?v=b48");
+    showToast(text, "warn");
+  } catch {
+    console.warn(`smejj Verlauf-Sync: ${text}`);
+  }
+}
+
+/**
+ * Abgleichsmarke setzen, wenn der Server den Stand wirklich uebernommen hat.
+ * 200 mit `uebersprungen` heisst "server_ist_neuer" — dann stimmt nichts ueberein.
+ */
+async function markiereWennAngenommen(s, chat, antwort) {
+  if (!antwort?.ok || !chat?.id) return;
+  const daten = await antwort.clone().json().catch(() => null);
+  if (daten?.uebersprungen) return;
+  await s.markiereAbgeglichen?.(chat.id, chat.updatedAt);
 }
 
 /** Grund aus der Antwort holen, ohne dass ein kaputter Rumpf etwas kaputt macht. */
@@ -133,6 +164,7 @@ async function pull() {
   let besitzer = "";
   try { besitzer = localStorage.getItem(OWNER_KEY) || ""; } catch { besitzer = ""; }
   let fremd = 0;
+  let konflikte = 0;
   for (const fern of daten.chats || []) {
     try {
       const lokal = await s.getChat(fern.id);
@@ -158,9 +190,24 @@ async function pull() {
       // ausgeloest von einem Performance-Fix. Lieber diesen einen Chat
       // ueberspringen und es beim naechsten Abgleich erneut versuchen.
       if (!voll || !Array.isArray(voll.messages)) continue;
-      await s.importChat?.(voll);
+      // KEIN STILLES LAST-WRITE-WINS MEHR (Befund R7, 2026-09-14): wurde der
+      // Chat hier seit dem letzten Abgleich geaendert und ist der Server
+      // trotzdem juenger, wuerde der Import die lokale Arbeit verwerfen.
+      // Die lokale Fassung bleibt als eigener Chat erhalten — ERST die Kopie,
+      // DANN der Import; nichts wird geloescht. Der naechste Push traegt die
+      // Kopie hoch, damit sie auch auf den anderen Geraeten auftaucht.
+      if (istUeberschreibKonflikt(lokal, voll.updatedAt)) {
+        const kopie = konfliktKopie(lokal, { neueId: neueKonfliktId(), geraet: geraeteKurzname(navigator.userAgent) });
+        if (await s.importChat?.(kopie)) konflikte += 1;
+      }
+      // Was vom Server kommt, stimmt in diesem Moment mit ihm ueberein: die
+      // Abgleichsmarke ist sein updatedAt. Sie wird HIER gesetzt, nicht in
+      // importChat — das ist auch der Speicherweg der Medien-Rettung, und dort
+      // hat der Server den Stand noch nicht.
+      await s.importChat?.({ ...voll, syncedAt: String(voll.updatedAt || "") });
     } catch { /* einzelner Chat darf den Rest nicht stoppen */ }
   }
+  await meldeKonflikte(konflikte);
   // Nicht still: wer Chats auf dem Server hat, die er lokal nie sieht, soll den
   // Grund im Protokoll finden koennen. Eine Zeile je Abgleich, keine Meldung an
   // den Nutzer — es ist kein Fehler, den er beheben kann.
@@ -267,6 +314,12 @@ async function push() {
     }
     const { senden: chats, gespart } = teileAuf(alle, karte);
     if (gespart > 0) console.info(`smejj Verlauf-Sync: ${gespart} von ${alle.length} Chats sind schon aktuell.`);
+    // Abgleichsmarke fuer den Bestand (Befund R7): was Server und Geraet
+    // gleich haben, gilt als abgeglichen — sonst bliebe die Konfliktpruefung
+    // fuer jeden Chat blind, der vor dem 14.09. zuletzt gesendet wurde.
+    for (const c of nachzutragen(alle, karte)) {
+      await s.markiereAbgeglichen?.(c.id, c.updatedAt);
+    }
     for (const kurz of chats) {
       // Faengt WAEHREND des Laufs eine Antwort an, hat sie Vorfahrt: der Rest
       // wird nachgeholt, sobald sie durch ist. Beim Start ist genau das der
@@ -281,9 +334,12 @@ async function push() {
       const antwort = await fetch(`${API_ORIGIN}/api/chats`, {
         method: "PUT",
         headers: kopf,
-        body: JSON.stringify({ chat })
+        body: JSON.stringify({ chat: ohneAbgleichsmarke(chat) })
       });
       if (antwort.status === 503) { serverSagtNein = true; break; }
+      // Angenommen: ab jetzt gilt dieser Stand als mit dem Server abgeglichen
+      // (Befund R7) — die Grundlage der Konfliktpruefung im Pull.
+      if (antwort.ok) { await markiereWennAngenommen(s, chat, antwort); continue; }
       // Ein weggeworfener Chat wird weder gerettet noch gemeldet — ein 4xx heisst
       // hier nur, dass der Server ihn nicht mehr will; der Papierkorb bleibt lokal.
       if (chat.deletedAt && antwort.status >= 400 && antwort.status !== 401 && antwort.status !== 403) continue;
@@ -322,8 +378,9 @@ async function push() {
           const zweiter = gerettet && await fetch(`${API_ORIGIN}/api/chats`, {
             method: "PUT",
             headers: kopf,
-            body: JSON.stringify({ chat: gerettet })
+            body: JSON.stringify({ chat: ohneAbgleichsmarke(gerettet) })
           });
+          if (zweiter?.ok) await markiereWennAngenommen(s, gerettet, zweiter);
           if (zweiter?.ok) continue;
           await meldeAbweisung(chat.id, zweiter?.status || antwort.status, await grundAus(zweiter || antwort));
         } else {

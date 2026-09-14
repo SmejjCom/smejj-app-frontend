@@ -29,7 +29,7 @@
 import {
   listChats, openChat, renameChat, deleteChat, restoreChat, activeChatId, togglePinChat, newChat,
   listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
-} from "/assets/chat-store.js?v=b73";
+} from "/assets/chat-store.js?v=b74";
 // Verlaufs-Text (Titel, Vorschau, Themen, Export), Karten-Bausteine und die
 // Titel-Automatik aus der Bruecke kommen ERST, wenn der Verlauf sichtbar wird
 // (2026-09-03, Web-Vitals: Gewicht > 300 KB — die drei Module wogen 19 KB am Start,
@@ -40,6 +40,9 @@ import {
 let anzeigeTitel, anzeigeVorschau, gruppeVon, volltext, themaVon, merkmaleVon, sichereAlsMarkdown, projektGruppen;
 let entdoppeln, bausteinLeer, bausteinGruppe, bausteinNeuKnopf, schmalerSchirm, bausteinKopf, bausteinChips, bausteinKarte, bausteinProjektGruppe;
 let oeffneProjektMenu, zeigeProjektPicker;
+// Menue-Eintrag mit Strichsymbol (Befund F8, 14.09.) — wohnt bei den Karten-
+// Bausteinen, weil beide Menues (Chat und Projekt) ihn brauchen.
+let menuEintrag;
 let bausteineBereit = null;
 
 /** Laedt Text-Helfer, Karten-Bausteine und Titel-Automatik einmal und bindet sie an DIESE Ansicht. */
@@ -47,10 +50,11 @@ function ladeBausteine() {
   if (bausteineBereit) return bausteineBereit;
   bausteineBereit = Promise.all([
     import("/assets/chat-history-text.js?v=b47c"),
-    import("/assets/chat-history-cards.js?v=b67"),
+    import("/assets/chat-history-cards.js?v=b68"),
     import("/assets/chat-title-auto.js")
   ]).then(([text, karten]) => {
     ({ anzeigeTitel, anzeigeVorschau, gruppeVon, volltext, themaVon, merkmaleVon, sichereAlsMarkdown, projektGruppen } = text);
+    ({ menuEintrag } = karten);
     // Projekt-Menues zuerst: ihr oeffneProjektMenu wandert in den ctx der Karten-Bausteine.
     ({ oeffneProjektMenu, zeigeProjektPicker } = karten.createProjektAktionen({
       menuSchliessen, render,
@@ -182,8 +186,15 @@ function injectStyles() {
     .ch-menu { position: absolute; right: 9px; top: calc(50% + 20px); z-index: 40; min-width: 196px;
       background: #161d1f; border: 1px solid rgba(255,255,255,.16); border-radius: 12px; padding: 5px;
       box-shadow: 0 18px 48px rgba(0,0,0,.6); }
-    #chatHistory .ch-menu button { display: block; width: 100%; font: inherit; font-size: 14px; color: inherit;
-      background: none; border: 0; padding: 9px 11px; border-radius: 8px; cursor: pointer; text-align: left; }
+    #chatHistory .ch-menu button { display: flex; align-items: center; gap: 10px; width: 100%; font: inherit;
+      font-size: 14px; color: inherit; background: none; border: 0; padding: 9px 11px; border-radius: 8px;
+      cursor: pointer; text-align: left; }
+    /* Befund F8 (14.09.): Strichsymbole statt Emoji — dieselbe Zeichnung wie in
+       der Antwort-Leiste (.msg-menu-icon): 18 px, currentColor, keine Fuellung.
+       Ein leerer Platzhalter haelt die Texte buendig ("Kein Projekt"). */
+    .ch-menu-icon { display: inline-flex; flex: 0 0 18px; width: 18px; height: 18px; opacity: .72; }
+    .ch-menu-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7;
+      stroke-linecap: round; stroke-linejoin: round; }
     #chatHistory .ch-menu button:hover { background: rgba(255,255,255,.09); }
     #chatHistory .ch-menu button.is-danger { color: #ff8a8a; }
     #chatHistory .ch-menu button.is-danger:hover { background: rgba(255,120,120,.13); }
@@ -578,40 +589,34 @@ function oeffneMenu(karte, chat) {
   menu.dataset.chatId = chat.id;
   menu.addEventListener("click", (event) => event.stopPropagation());
 
-  const eintrag = (text, aktion, gefaehrlich) => {
-    const knopf = document.createElement("button");
-    knopf.type = "button";
-    knopf.textContent = text;
-    if (gefaehrlich) knopf.classList.add("is-danger");
-    knopf.addEventListener("click", aktion);
-    return knopf;
-  };
-
-  menu.append(eintrag("↗ Öffnen", () => { menuSchliessen(); openChat(chat.id).catch(() => {}); }));
-  menu.append(eintrag(chat.pinned === true ? "📌 Nicht mehr anheften" : "📌 Oben anheften", async () => {
+  // Eintraege: Strichsymbol + Text (menuEintrag aus chat-history-cards.js,
+  // Befund F8). Der Text ist der zugaengliche Name, das Symbol aria-hidden.
+  menu.append(menuEintrag("Öffnen", "oeffnen", () => { menuSchliessen(); openChat(chat.id).catch(() => {}); }));
+  const angeheftet = chat.pinned === true;
+  menu.append(menuEintrag(angeheftet ? "Nicht mehr anheften" : "Oben anheften", angeheftet ? "abheften" : "anheften", async () => {
     menuSchliessen();
     await togglePinChat(chat.id).catch(() => {});
     render();
   }));
-  menu.append(eintrag("✎ Umbenennen", () => { menuSchliessen(); zeigeUmbenennen(karte, chat); }));
+  menu.append(menuEintrag("Umbenennen", "umbenennen", () => { menuSchliessen(); zeigeUmbenennen(karte, chat); }));
   // Projekte (2026-08-13): Zuordnung ueber einen kleinen Picker an der Karte.
   const istZugeordnet = Boolean(chat.projectId) && alleProjekte.some((projekt) => projekt.id === chat.projectId);
-  menu.append(eintrag(istZugeordnet ? "📁 Projekt ändern…" : "📁 Zu Projekt…", () => {
+  menu.append(menuEintrag(istZugeordnet ? "Projekt ändern…" : "Zu Projekt…", "projekt", () => {
     menuSchliessen();
     zeigeProjektPicker(karte, chat);
   }));
-  menu.append(eintrag("⤓ Als Markdown sichern", () => { menuSchliessen(); sichereAlsMarkdown(chat); }));
+  menu.append(menuEintrag("Als Markdown sichern", "sichern", () => { menuSchliessen(); sichereAlsMarkdown(chat); }));
   menu.append(document.createElement("hr"));
 
   // UI/UX-Programm 02.09., Nr. 10: Rueckgaengig statt Bestaetigung. Loeschen ist
   // weich (Papierkorb, 30 Tage) — also sofort tun und 8 s lang zuruecknehmbar
   // machen, statt "Wirklich loeschen?" zu fragen. Kein Fehler ist endgueltig.
-  const loeschen = eintrag("🗑 Löschen", async () => {
+  const loeschen = menuEintrag("Löschen", "loeschen", async () => {
     menuSchliessen();
     const ok = await deleteChat(chat.id).catch(() => false);
     render();
     if (ok) zeigeRueckgaengig(chat);
-  }, true);
+  }, "is-danger");
   menu.append(loeschen);
 
   karte.append(menu);

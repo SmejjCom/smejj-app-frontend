@@ -24,12 +24,14 @@
 // und auch nicht verstecken darf (fail-closed: echte Fehlermeldung, kein
 // erfundener Erfolg).
 
-import { openPane, activeTab, addTab, setFrame, commitHistory, persistTabs, render, refs, state } from "./browser-pane.js?v=browser-pane-20260906-16";
+import { openPane, activeTab, addTab, setFrame, commitHistory, persistTabs, render, refs, state } from "./browser-pane.js?v=browser-pane-20260906-17";
 
 const MAUS_MODE = "maus-replay";
 
 function init() {
   vergessenerMausTabAufraeumen();
+  // Danach, nie davor: geleerte Maus-Tabs sind jetzt leere Tabs und fliegen mit.
+  verwaisteTabsAufraeumen();
   window.addEventListener("smejj:maus-replay-request", (event) => openMausReplay(event.detail || {}));
   // Ein gestarteter Lauf zieht die Wiedergabe von selbst nach vorn und schaltet
   // sie live. Vorher musste der Betreiber capsuleRef und planId von Hand
@@ -87,6 +89,117 @@ function leereWennMaus(tab) {
   tab.history = [];
   tab.historyIndex = -1;
   return true;
+}
+
+// --- Verwaiste Tabs beim Start (Befund F12, A-bis-Z 14.09.2026) --------------
+//
+// GEMESSEN: das Panel oeffnete mit ~20 Tabs, fast alle nur als Anfangsbuchstabe
+// sichtbar (browser-pane-tableiste.js zeichnet schmale Tabs ohne Titel). Woher
+// sie kamen: jeder Maus-Auftrag aus dem Chat mit einer anderen Adresse als der
+// des AKTIVEN Tabs legt einen neuen Tab an (oeffneImLiveBrowser und
+// openBrowserRequest in browser-pane.js), niemand schliesst ihn, und
+// restoreTabs() holt beim naechsten Laden bis zu MAX_TABS = 100 zurueck. Im
+// Pruef-Chrome lagen nach wenigen Laeufen sechs Tabs, dreimal dasselbe Impressum.
+//
+// Regel: angepinnte Tabs bleiben immer; der aktive bleibt; leere Tabs
+// ("Neuer Tab") fliegen; dieselbe Adresse bleibt nur einmal (die juengste);
+// Anmelde-Sackgassen fliegen (die Google-Anmeldung gelingt im Fernbrowser
+// nie — Google sperrt automatisierte Browser, der Tab zeigte bei jedem Start
+// nur diesen Fehler); vom Rest bleiben die juengsten, bis hoechstens
+// TABS_BEIM_START uebrig sind. Reihenfolge und Array-Instanz bleiben erhalten.
+export const TABS_BEIM_START = 8;
+const ANMELDE_SACKGASSEN = [/^accounts\.google\.com$/i];
+
+function hostVon(url) {
+  try { return new URL(String(url || "")).hostname; } catch { return ""; }
+}
+
+function istSackgasse(url) {
+  const host = hostVon(url);
+  return Boolean(host) && ANMELDE_SACKGASSEN.some((muster) => muster.test(host));
+}
+
+/**
+ * Reine Funktion, ohne DOM — direkt testbar.
+ * @param {Array<{id:string,url:string,angepinnt?:boolean}>} tabs
+ * @param {string} activeId
+ * @param {number} max
+ * @returns {{tabs: Array, activeId: string, entfernt: number}}
+ */
+export function bereinigeTabListe(tabs, activeId, max = TABS_BEIM_START) {
+  const liste = (Array.isArray(tabs) ? tabs : []).filter((tab) => tab && typeof tab === "object");
+  const aktiver = liste.find((tab) => tab.id === activeId && !istSackgasse(tab.url)) || null;
+  const gesehen = new Set(aktiver?.url ? [String(aktiver.url)] : []);
+  const pflicht = [];
+  const rest = [];
+  // Von hinten: die juengsten Tabs stehen am Ende der Liste (addTab haengt an).
+  for (let i = liste.length - 1; i >= 0; i -= 1) {
+    const tab = liste[i];
+    const url = String(tab.url || "");
+    if (tab === aktiver) { pflicht.push(tab); continue; }
+    if (istSackgasse(url)) continue;
+    if (tab.angepinnt) { pflicht.push(tab); if (url) gesehen.add(url); continue; }
+    if (!url || gesehen.has(url)) continue;
+    gesehen.add(url);
+    rest.push(tab);
+  }
+  const platz = Math.max(0, max - pflicht.length);
+  const auswahl = new Set([...pflicht, ...rest.slice(0, platz)]);
+  const uebrig = liste.filter((tab) => auswahl.has(tab));
+  return {
+    tabs: uebrig,
+    activeId: aktiver ? aktiver.id : (uebrig[uebrig.length - 1]?.id || ""),
+    entfernt: liste.length - uebrig.length
+  };
+}
+
+/** Wendet die Regel auf den Panel-Zustand an und speichert. Meldet, wie viele Tabs gingen. */
+/**
+ * Raeumt die GESPEICHERTE Tab-Liste auf — reine Funktion ueber einem
+ * Speicher mit getItem/setItem, direkt testbar.
+ *
+ * WARUM NICHT NUR state.tabs: dieses Modul startet beim Nachladen, das Panel
+ * ist dann noch NICHT aufgebaut — restoreTabs() laeuft erst in mountOnce()
+ * beim ersten openPane(). state.tabs ist beim Modul-Start also LEER; wer nur
+ * dort aufraeumt, raeumt nichts, und beim Oeffnen kommen alle Tabs aus
+ * localStorage zurueck (Simulation 14.09.: 20 gespeichert, 20 wiederhergestellt).
+ * Dasselbe Muster wie vergessenerMausTabAufraeumen: Speicher UND localStorage.
+ *
+ * @param {{getItem:Function, setItem:Function}} speicher
+ * @returns {number} entfernte Tabs
+ */
+export function bereinigeGespeicherteTabs(speicher = globalThis.localStorage) {
+  try {
+    const gespeichert = JSON.parse(speicher?.getItem?.(TABS_STORAGE_KEY) || "null");
+    if (!gespeichert?.tabs?.length) return 0;
+    const ergebnis = bereinigeTabListe(gespeichert.tabs, gespeichert.activeId);
+    if (!ergebnis.entfernt) return 0;
+    speicher.setItem(TABS_STORAGE_KEY, JSON.stringify({ ...gespeichert, tabs: ergebnis.tabs, activeId: ergebnis.activeId }));
+    return ergebnis.entfernt;
+  } catch {
+    // Kaputter oder gesperrter Speicher darf das Panel nie blockieren.
+    return 0;
+  }
+}
+
+/** Wendet die Regel auf Panel-Zustand UND localStorage an. Meldet, wie viele Tabs gingen. */
+function verwaisteTabsAufraeumen() {
+  let entfernt = 0;
+  const ergebnis = bereinigeTabListe(state?.tabs, state?.activeId);
+  if (ergebnis.entfernt) {
+    // Rahmen der entfernten Tabs mitnehmen — wie closeTab() in browser-pane.js.
+    const bleibt = new Set(ergebnis.tabs);
+    for (const tab of state.tabs) if (!bleibt.has(tab)) tab.frame?.remove?.();
+    // splice statt Neuzuweisung: andere Module halten dieselbe Array-Instanz.
+    state.tabs.splice(0, state.tabs.length, ...ergebnis.tabs);
+    state.activeId = ergebnis.activeId;
+    persistTabs();
+    if (state.mounted) render();
+    entfernt += ergebnis.entfernt;
+  }
+  // Der eigentliche Fall beim Start: das Panel ist noch nicht aufgebaut.
+  entfernt += bereinigeGespeicherteTabs();
+  return entfernt;
 }
 
 // Start ganz am Ende, NICHT oben: init() liest die const-Werte dieser Datei.
@@ -200,7 +313,7 @@ export async function zeigeBrueckenZustand() {
   let befund;
   try {
     const bruecke = await import("./maus-chrome.js?v=2");
-    const deutung = await import("./maus-absicht.js?v=40");
+    const deutung = await import("./maus-absicht.js?v=41");
     const installiert = bruecke.brueckeDa();
     const zustand = installiert ? await bruecke.frageZustand() : null;
     befund = deutung.deuteBrueckenZustand(zustand, { installiert });

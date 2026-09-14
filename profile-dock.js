@@ -50,7 +50,18 @@ export function initProfileDock() {
     window.removeEventListener("smejj:chats-changed", quellenEinmal);
     import("./quellen-panel.js?v=1").catch((f) => console.error("[smejj.com] Nachladen fehlgeschlagen:", f));
   });
-  document.addEventListener("pointerdown", () => import("./icon-nutzung.js?v=1").catch(() => {}), { once: true, capture: true });
+  // Icon-Zaehler erst beim ersten Druck auf ein BEDIENELEMENT (Startgewicht,
+  // gemessen 2026-09-14): er zaehlt nur Knoepfe und Links aus seiner
+  // Positivliste. Ein Klick ins Schreibfeld holte ihn trotzdem — 3,9 KB, die die
+  // Web-Vitals-Messung (Klick ins Feld, zwei Tasten) jedes Mal mitwog. Der
+  // Textcursor im Feld ist kein Bedienelement; der erste Knopfdruck laedt wie
+  // zuvor, und das Modul selbst bleibt unveraendert.
+  const zaehlerHolen = (event) => {
+    if (!event.target?.closest?.("button, a, [role='button'], [data-jump], [data-composer-action], [data-start-tool], [data-browser-oeffnen]")) return;
+    document.removeEventListener("pointerdown", zaehlerHolen, { capture: true });
+    import("./icon-nutzung.js?v=1").catch(() => {});
+  };
+  document.addEventListener("pointerdown", zaehlerHolen, { capture: true });
   render();
   window.addEventListener(PROFILE_PICTURE_EVENT, render);
   window.addEventListener("storage", (event) => {

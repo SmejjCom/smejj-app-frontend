@@ -15,11 +15,65 @@
 
 import {
   newChat, openChat, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
-} from "/assets/chat-store.js?v=b73";
+} from "/assets/chat-store.js?v=b74";
 // Seit der Zusammenfuehrung der beiden Aufteilungen (2026-08-10) wohnen die
 // reinen Anzeige-Helfer in chat-history-text.js — format.js war deren
 // Teilmenge und ist entfallen.
 import { zeitText, mitHervorhebung, trefferAusschnitt } from "/assets/chat-history-text.js?v=b47c";
+// Geteilte Icon-Bibliothek (Spur, Navigation): Papierkorb, Ordner, Plus kommen
+// von dort — derselbe Spezifizierer wie in spur-start.js, sonst gaebe es eine
+// zweite Modulinstanz.
+import { Icons } from "/assets/components.js?v=b48";
+
+// Befund F8 (A-bis-Z 2026-09-14): Die Aktions-Menues des Verlaufs zeigten Emoji
+// (↗ 📌 ✎ 📁 ⤓ 🗑), der Rest des Systems zeichnet Strichsymbole (Antwort-Leiste
+// chat-actions-menu.js, Spur spur-start.js). Jetzt dieselben Zeichen: SVG,
+// stroke currentColor, 18 px (CSS .ch-menu-icon in chat-history-view.js).
+// Was die geteilte Bibliothek hat, wird von dort genommen; die uebrigen vier
+// Zeichen gibt es nur hier — wie SPUR_ICONS in spur-start.js.
+export const VERLAUF_ICONS = Object.freeze({
+  oeffnen: '<svg viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M9 7h8v8"/></svg>',
+  anheften: '<svg viewBox="0 0 24 24"><path d="M9 4h6"/><path d="M10 4v5l-3 3v2h10v-2l-3-3V4"/><path d="M12 14v6"/></svg>',
+  abheften: '<svg viewBox="0 0 24 24"><path d="M9 4h6"/><path d="M10 4v5l-3 3v2h10v-2l-3-3V4"/><path d="M12 14v6"/><path d="m5 5 14 14"/></svg>',
+  umbenennen: '<svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16Z"/><path d="m14 6 4 4"/></svg>',
+  sichern: '<svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m8 11 4 4 4-4"/><path d="M5 19h14"/></svg>',
+  gewaehlt: '<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>',
+  projekt: Icons.projects,
+  neu: Icons.plus,
+  loeschen: Icons.trash
+});
+
+/**
+ * Ein Eintrag im Aktions-Menue: Strichsymbol plus Text. Der Text bleibt der
+ * zugaengliche Name des Knopfs (textContent), das Symbol ist aria-hidden.
+ * Ein unbekannter oder leerer Schluessel ergibt einen leeren Platzhalter,
+ * damit die Texte untereinander buendig bleiben.
+ * @param {string} text
+ * @param {string} icon Schluessel aus VERLAUF_ICONS
+ * @param {(event: MouseEvent) => void} aktion
+ * @param {string} [klasse] z. B. "is-danger" oder "is-gewaehlt"
+ */
+export function menuEintrag(text, icon, aktion, klasse) {
+  const knopf = document.createElement("button");
+  knopf.type = "button";
+  const zeichen = document.createElement("span");
+  zeichen.className = "ch-menu-icon";
+  zeichen.setAttribute("aria-hidden", "true");
+  zeichen.innerHTML = VERLAUF_ICONS[icon] || "";
+  const label = document.createElement("span");
+  label.className = "ch-menu-text";
+  label.textContent = text;
+  knopf.append(zeichen, label);
+  if (klasse) knopf.classList.add(klasse);
+  knopf.addEventListener("click", aktion);
+  return knopf;
+}
+
+/** Text eines Menue-Eintrags austauschen (z. B. Rueckfrage), das Symbol bleibt. */
+export function setzeMenuText(knopf, text) {
+  const label = knopf.querySelector(".ch-menu-text");
+  if (label) label.textContent = text;
+}
 
 // Auf 375 px passt "Donnerstag, 09:13 · 30 Nachrichten" nicht in eine Zeile —
 // gemessen brach der Text mitten im Wort ab ("30 Nachrich"). CSS kann hier
@@ -285,31 +339,22 @@ export function createProjektAktionen(ctx) {
     menu.dataset.projektId = projekt.id;
     menu.addEventListener("click", (event) => event.stopPropagation());
 
-    const eintrag = (text, aktion, gefaehrlich) => {
-      const knopf = document.createElement("button");
-      knopf.type = "button";
-      knopf.textContent = text;
-      if (gefaehrlich) knopf.classList.add("is-danger");
-      knopf.addEventListener("click", aktion);
-      return knopf;
-    };
-
-    menu.append(eintrag("✎ Umbenennen", () => { ctx.menuSchliessen(); zeigeProjektUmbenennen(kopf, projekt); }));
+    menu.append(menuEintrag("Umbenennen", "umbenennen", () => { ctx.menuSchliessen(); zeigeProjektUmbenennen(kopf, projekt); }));
     menu.append(document.createElement("hr"));
 
     // Zweistufig wie beim Chat — mit dem Hinweis, dass die Chats NICHT
     // mitgeloescht werden (sie rutschen in die Datumsgruppen zurueck).
-    const loeschen = eintrag("🗑 Löschen…", async () => {
+    const loeschen = menuEintrag("Löschen…", "loeschen", async () => {
       if (confirmingProjektId !== projekt.id) {
         confirmingProjektId = projekt.id;
-        loeschen.textContent = "🗑 Wirklich? Chats bleiben erhalten";
+        setzeMenuText(loeschen, "Wirklich? Chats bleiben erhalten");
         ctx.armConfirmTimer(() => { ctx.menuSchliessen(); }, 4000);
         return;
       }
       ctx.menuSchliessen();
       await loescheProjekt(projekt.id).catch(() => {});
       ctx.render();
-    }, true);
+    }, "is-danger");
     menu.append(loeschen);
 
     kopf.append(menu);
@@ -360,15 +405,6 @@ export function createProjektAktionen(ctx) {
     menu.dataset.chatId = chat.id;
     menu.addEventListener("click", (event) => event.stopPropagation());
 
-    const eintrag = (text, aktion, aktivGewaehlt) => {
-      const knopf = document.createElement("button");
-      knopf.type = "button";
-      knopf.textContent = text;
-      if (aktivGewaehlt) knopf.classList.add("is-gewaehlt");
-      knopf.addEventListener("click", aktion);
-      return knopf;
-    };
-
     const zuordnen = async (projektId) => {
       ctx.menuSchliessen();
       await setzeChatProjekt(chat.id, projektId).catch(() => {});
@@ -378,14 +414,15 @@ export function createProjektAktionen(ctx) {
     const alleProjekte = ctx.getAlleProjekte();
     for (const projekt of alleProjekte) {
       const gewaehlt = chat.projectId === projekt.id;
-      menu.append(eintrag(`${gewaehlt ? "✓ " : ""}📁 ${projekt.name}`, () => zuordnen(gewaehlt ? "" : projekt.id), gewaehlt));
+      // Das gewaehlte Projekt traegt das Haekchen statt des Ordners.
+      menu.append(menuEintrag(projekt.name, gewaehlt ? "gewaehlt" : "projekt", () => zuordnen(gewaehlt ? "" : projekt.id), gewaehlt ? "is-gewaehlt" : ""));
     }
     if (chat.projectId && alleProjekte.some((projekt) => projekt.id === chat.projectId)) {
-      menu.append(eintrag("Kein Projekt", () => zuordnen("")));
+      menu.append(menuEintrag("Kein Projekt", "", () => zuordnen("")));
     }
     if (alleProjekte.length) menu.append(document.createElement("hr"));
 
-    const neu = eintrag("＋ Neues Projekt…", () => {
+    const neu = menuEintrag("Neues Projekt…", "neu", () => {
       // Menue-Inhalt gegen die Eingabezeile tauschen — kein zweites Overlay.
       menu.replaceChildren();
       const zeile = document.createElement("div");

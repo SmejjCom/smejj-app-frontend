@@ -383,3 +383,29 @@
 .view.premium-view .ac-state-blocked { color: var(--v11-bad); }
 .view.premium-view .ac-state-active { color: var(--v11-cy-ink); }
 .view.premium-view .ac-progress span { background: var(--v11-ok); }
+
+/* ===================================================================
+ * 8. Der Hinweisstreifen "Deine Anmeldung ist abgelaufen" macht sich Platz
+ * ===================================================================
+ * GEMESSEN 2026-09-14 im Android-Emulator (412x839, Anmeldung abgelaufen,
+ * Ansicht /papierkorb): der Streifen liegt fix am oberen Rand und deckte die
+ * Ueberschrift "Papierkorb" samt Augenbraue zu. auth-gate.js meldet seine
+ * Hoehe als --hinweis-hoehe (Wurzel-Variable, 0 ohne Streifen); Spur,
+ * Kopfknoepfe und Startseite rechnen damit — die uebrigen Ansichten nicht.
+ *
+ * WARUM margin-top und nicht padding-top: das obere Polster einer Ansicht
+ * ist an fuenf Stellen verschieden (72 px Grund, 56 px unter 760 px, 52/46/58
+ * px mit Zurueck-Leiste, #settings eigene) — jede Zahl hier zu wiederholen
+ * hiesse, sie an zwei Orten zu pflegen. Der Versatz schiebt die ganze Ansicht
+ * mitsamt ihrer absolut sitzenden Zurueck/Schliessen-Leiste unter den
+ * Streifen, genau wie die Kopfknoepfe (.glass-icon), die auth-gate.js
+ * verschiebt. Ohne Streifen ist der Wert 0px — kein Pixel aendert sich.
+ *
+ * WARUM HIER: styles.css, app-surfaces.css und das Buendel stehen unter dem
+ * Start-Lock. Diese Datei ist das Kaskaden-Ende fuer alle Ansichten ausser
+ * #start (siehe Kopf) — und #start braucht den Versatz nicht, dort sorgt die
+ * Spur-Regel in auth-gate.js schon fuer Platz.
+ */
+.view.premium-view {
+  margin-top: var(--hinweis-hoehe, 0px);
+}

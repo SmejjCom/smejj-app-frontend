@@ -116,6 +116,9 @@ export function bindBildAnhang(selector, getInput, notifyInputChanged) {
 
 // Globaler Abhol-Haken fuer app.js (start-locked, deshalb dort nur ein Spread):
 // take() liefert das anstehende Bild GENAU EINMAL und leert den Zwischenspeicher.
+// peek() liest es NUR — fuer die Miniatur in der eigenen Nachricht (app-helfer.js
+// addEntry, Befund F23 2026-09-14): app.js legt die Nachricht an, BEVOR take()
+// das Bild an die Bruecke mitgibt; die Vorschau darf den Anhang nicht verbrauchen.
 if (typeof window !== "undefined") {
   window.smejjBildAnhang = {
     take() {
@@ -123,6 +126,10 @@ if (typeof window !== "undefined") {
       const { dataUrl } = pending;
       pending = null;
       return { bildDataUrl: dataUrl };
+    },
+    peek() {
+      if (!pending) return null;
+      return { bildDataUrl: pending.dataUrl, name: pending.name };
     }
   };
 }

@@ -7,7 +7,7 @@ import {
   geraeteBesitzer, getChat, importChat, listChats, neueProjektId, newChat, notifyChanged,
   notifyProjekteChanged, openChat, persistActive, renameChat, rohEigenerChat,
   sauberProjektName, scheduleSave, tx
-} from "./chat-store.js?v=b73";
+} from "./chat-store.js?v=b74";
 
 // GEMESSEN 2026-09-14 (A-bis-Z, angemeldet): der Papierkorb war IMMER leer.
 // listGeloeschteChats() warf "PAPIERKORB_TAGE is not defined" — die Konstante
@@ -43,6 +43,32 @@ export async function listEigeneChatsMitGeloeschten() {
   const userId = aktuellerNutzer();
   const alt = geraeteBesitzer();
   return alle.filter((chat) => eigen(chat, userId, alt));
+}
+
+/**
+ * Abgleichsmarke setzen (Befund R7, 14.09.): `syncedAt` = updatedAt der
+ * Fassung, die der Server nachweislich angenommen hat. Lesen und Schreiben
+ * in EINER Transaktion — persistActive darf dazwischen nichts verlieren.
+ * KEIN notifyChanged: sonst stiesse jede Bestaetigung den naechsten Push an.
+ * Nur die Marke wird geschrieben; Inhalt und updatedAt bleiben unangetastet.
+ */
+export async function markiereAbgeglichen(id, stand) {
+  const marke = String(stand || "");
+  if (!id || !marke) return false;
+  const userId = aktuellerNutzer();
+  const alt = geraeteBesitzer();
+  return tx(STORE, "readwrite", (store) => new Promise((resolve, reject) => {
+    const request = store.get(String(id));
+    request.onsuccess = () => {
+      const chat = request.result;
+      if (!chat || !eigen(chat, userId, alt) || chat.syncedAt === marke) { resolve(false); return; }
+      chat.syncedAt = marke;
+      const put = store.put(chat);
+      put.onsuccess = () => resolve(true);
+      put.onerror = () => reject(put.error);
+    };
+    request.onerror = () => reject(request.error);
+  })).catch(() => false);
 }
 
 export async function endgueltigLoeschen(id) {
@@ -243,6 +269,6 @@ export async function importProjekt(projekt) {
 }
 
 window.smejjChatStore = {
-  listChats, listEigeneChatsMitGeloeschten, getChat, openChat, newChat, renameChat, deleteChat, activeChatId, importChat,
+  listChats, listEigeneChatsMitGeloeschten, getChat, openChat, newChat, renameChat, deleteChat, activeChatId, importChat, markiereAbgeglichen,
   listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt, importProjekt
 };

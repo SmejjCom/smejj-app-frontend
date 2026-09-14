@@ -13,6 +13,34 @@ import { scrolleAnsEnde } from "/assets/verlauf-unten.js";
 
 const $ = (selector) => document.querySelector(selector);
 
+/**
+ * Miniatur des angehaengten Bildes in der eigenen Nachricht (Befund F23,
+ * 2026-09-14): bis dahin stand dort nur "[Bild angehaengt: name.png]" — ChatGPT
+ * und Claude zeigen eine Vorschau. Das Bild liegt in diesem Moment ohnehin als
+ * data:-URL im Zwischenspeicher von composer-bild-anhang.js und geht so an die
+ * Bruecke; peek() liest es, ohne es zu verbrauchen — take() in app.js holt es
+ * gleich danach wie bisher ab.
+ *
+ * NUR zur Laufzeit: chat-store.js speichert eigene Nachrichten als textContent
+ * (html: ""), und ein <img> hat keinen Text — der Verlauf in IndexedDB waechst
+ * nicht. Nach einem Neuladen bleibt die Textzeile, wie bisher.
+ *
+ * Stil per element.style statt Stylesheet: start-styles.css liegt unter dem
+ * Start-Lock, und die CSP sperrt element.style nicht. Viereckig (Radius 0),
+ * 160 px Kachel, object-fit cover — kein neuer Farbton.
+ */
+function haengeBildVorschauAn(node) {
+  const anhang = window.smejjBildAnhang?.peek?.();
+  if (!anhang?.bildDataUrl) return;
+  const bild = document.createElement("img");
+  bild.className = "entry-bild-vorschau";
+  bild.src = anhang.bildDataUrl;
+  bild.alt = anhang.name || "Angehaengtes Bild";
+  bild.decoding = "async";
+  Object.assign(bild.style, { display: "block", width: "160px", height: "160px", maxWidth: "100%", objectFit: "cover", borderRadius: "0", marginTop: "8px" });
+  node.append(bild);
+}
+
 /** Haengt einen Eintrag an. Leerer Text + "assistant" = Wartezustand (drei Punkte, `data-thinking`). */
 export function addEntry(text, role, target = "#startLog") {
   const node = document.createElement("article");
@@ -23,6 +51,7 @@ export function addEntry(text, role, target = "#startLog") {
   } else {
     node.textContent = text;
   }
+  if (role === "user") haengeBildVorschauAn(node);
   const log = $(target) || $("#startLog");
   if (!log) return node;
   log.hidden = false;

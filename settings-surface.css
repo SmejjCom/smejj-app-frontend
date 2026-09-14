@@ -24,11 +24,28 @@
 
 #settings .settings-header {
   display: flex;
+  /* F16 (A-bis-Z 14.09.): bei offenem Browser-Panel (1094 px, Panel 514 px)
+     bleiben der Kopfzeile 293 px. Der Textblock schrumpfte auf das Wort
+     "Einstellungen" (231 px), die Marke "Lokal gespeichert" (134 px, nowrap)
+     ragte 93 px ueber den Rand und verschwand unter dem Panel — gemessen
+     headless. Darum darf die Zeile umbrechen: der Textblock verlangt 320 px
+     (Regel darunter), reicht daneben der Platz fuer Marke + 24 px nicht,
+     rutscht die Marke UNTER die Unterzeile statt neben die Ueberschrift.
+     Fester Abstand: 24 px waagerecht, 12 px senkrecht. */
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
+  gap: 12px 24px;
   padding-bottom: 18px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+/* Der Textblock (Ueberschrift + Unterzeile) waechst, verlangt aber 320 px.
+   NICHT "> div": die Statusmarke ist ebenfalls ein div und bliebe sonst nicht
+   auf flex: none. */
+#settings .settings-header > div:first-child {
+  flex: 1 1 320px;
+  min-width: 0;
 }
 
 #settings .settings-header h2 {

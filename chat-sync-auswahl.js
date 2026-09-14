@@ -145,3 +145,96 @@ export function erzeugeAbgleichsSpeicher({ frist = 5000, uhr = () => Date.now() 
     verwerfen() { karte = null; zeitpunkt = 0; }
   };
 }
+
+/* ------------------------------------------------------------------ *
+ *  Ueberschreib-Konflikt beim Pull (Befund R7, 2026-09-14).
+ *
+ *  Bisher war der Abgleich Last-Write-Wins OHNE Hinweis: Geraet A aendert
+ *  einen Chat (offline oder vor dem naechsten Push), Geraet B laedt spaeter
+ *  eine juengere Fassung hoch — beim naechsten Pull ersetzt importChat den
+ *  ganzen Datensatz, die Aenderung von A ist still weg.
+ *
+ *  Der Store fuehrt dafuer je Chat `syncedAt`: das updatedAt der Fassung,
+ *  die zuletzt NACHWEISLICH mit dem Server uebereinstimmte (gesetzt beim
+ *  Import und nach jedem angenommenen PUT, chat-store*.js). Ein Konflikt ist
+ *  damit messbar statt geraten: lokal seit dem letzten Abgleich geaendert
+ *  UND der Server ist juenger als das Geraet.
+ *
+ *  Ohne syncedAt (Bestand, nie abgeglichen) gibt es KEINEN Konflikt — dann
+ *  gilt die alte Regel, statt jeden alten Chat einmal zu verdoppeln. Der
+ *  Push traegt die Marke fuer den Bestand nach (nachzutragen).
+ * ------------------------------------------------------------------ */
+
+/**
+ * Wuerde der Import der Server-Fassung eine lokale Aenderung verwerfen?
+ * @param {object|null} lokal        Chat aus dem lokalen Store
+ * @param {string} fernUpdatedAt     updatedAt der Server-Fassung
+ */
+export function istUeberschreibKonflikt(lokal, fernUpdatedAt) {
+  if (!lokal || typeof lokal !== "object") return false;
+  // Weich geloescht heisst "weg gewollt": eine juengere Server-Fassung holt
+  // ihn wie bisher zurueck, eine Kopie davon will niemand im Papierkorb.
+  if (lokal.deletedAt) return false;
+  const abgeglichen = Date.parse(String(lokal.syncedAt || "")) || 0;
+  if (!abgeglichen) return false; // nie abgeglichen: unbekannt, also wie bisher
+  const lokalStand = Date.parse(String(lokal.updatedAt || "")) || 0;
+  const fernStand = Date.parse(String(fernUpdatedAt || "")) || 0;
+  return lokalStand > abgeglichen && fernStand > lokalStand;
+}
+
+/** Kurzer Geraetename aus dem User-Agent — nur fuer den Titel der Kopie. */
+export function geraeteKurzname(userAgent = "") {
+  const ua = String(userAgent || "");
+  if (/iPhone/.test(ua)) return "iPhone";
+  if (/iPad/.test(ua)) return "iPad";
+  if (/Android/.test(ua)) return "Android";
+  if (/Macintosh/.test(ua)) return "Mac";
+  if (/Windows/.test(ua)) return "Windows";
+  if (/Linux/.test(ua)) return "Linux";
+  return "diesem Geraet";
+}
+
+/** Der Server braucht die lokale Abgleichsmarke nicht — sie bleibt im Geraet. */
+export function ohneAbgleichsmarke(chat) {
+  if (!chat || typeof chat !== "object") return chat;
+  const kopie = { ...chat };
+  delete kopie.syncedAt;
+  return kopie;
+}
+
+/** Wortgleich mit newId() in chat-store.js — der Server prueft ^[A-Za-z0-9_-]{1,64}$. */
+export function neueKonfliktId(jetztMs = Date.now()) {
+  return `chat_${jetztMs}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+/**
+ * Die lokale Fassung als eigener Chat: neue Kennung, Titel mit Herkunft,
+ * ohne Abgleichsmarke — der naechste Push traegt sie hoch, auf alle Geraete.
+ * Inhalt, Projekt und Anheftung bleiben wortgleich; nichts wird geloescht.
+ */
+export function konfliktKopie(lokal, { neueId, geraet = "diesem Geraet", jetzt = new Date() } = {}) {
+  const tag = `${String(jetzt.getDate()).padStart(2, "0")}.${String(jetzt.getMonth() + 1).padStart(2, "0")}.`;
+  const titel = String(lokal?.title || "Chat").replace(/ \(Konflikt vom Geraet [^)]*\)$/, "");
+  return {
+    ...ohneAbgleichsmarke(lokal),
+    id: String(neueId || ""),
+    title: `${titel} (Konflikt vom Geraet ${geraet}, ${tag})`,
+    titleEdited: true, // die Bruecke soll die Herkunft nicht wegbenennen
+    updatedAt: jetzt.toISOString()
+  };
+}
+
+/**
+ * Bestand nachtragen: welche Chats haben Server und Geraet GLEICH, tragen
+ * aber noch keine (passende) Abgleichsmarke? Nur bei Gleichstand — ist der
+ * Server juenger, ist das gerade der Fall, den istUeberschreibKonflikt sehen muss.
+ */
+export function nachzutragen(chats, karte) {
+  if (!karte || !Array.isArray(chats)) return [];
+  return chats.filter((c) => {
+    const id = String(c?.id || "");
+    if (!id || !karte.has(id)) return false;
+    if (c.syncedAt === c.updatedAt) return false;
+    return konfliktSieger(c.updatedAt, karte.get(id)) === "gleich";
+  });
+}
