@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v872";
+const CACHE_NAME = "smejj-shell-v873";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -430,6 +430,7 @@ const SHELL = [
   "/assets/shared/securityPolicy.js",
   "/assets/shared/http-json.js",
   "/assets/shared/auth-me-speicher.js",
+  "/assets/shared/billing-status-speicher.js",
   "/manifest.webmanifest",
   "/favicon.ico?v=112",
   "/apple-touch-icon.png",

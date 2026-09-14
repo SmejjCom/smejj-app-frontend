@@ -6013,6 +6013,28 @@ body.spur-start-aktiv .nav-start {
   flex: 1 1 auto;
   order: 2;
 }
+#start .prompt-glass {
+  container-type: inline-size;
+  container-name: schreibfeld;
+}
+@container schreibfeld (max-width: 400px) {
+  #start .prompt-actions .fpille-nachdenken .chip-label { display: none; }
+  #start .prompt-glass .fpille-nachdenken {
+    width: 38px;
+    min-width: 38px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+@container schreibfeld (max-width: 300px) {
+  #start .prompt-actions .model-picker button {
+    min-width: 0;
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
 #start .start-chips.start-chipreihe { gap: 8px; }
 #start .start-chips.start-chipreihe button {
   display: inline-flex;
@@ -6170,6 +6192,13 @@ body.spur-start-aktiv .nav-start {
   }
   #code .code-wchips::-webkit-scrollbar { display: none; }
   #code .code-wchips button { flex: 0 0 auto; }
+}
+@media (pointer: coarse), (max-width: 600px) {
+  #code .code-wchips button {
+    min-height: 44px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
 }
 
 /* ---- design-v12-vollbild.css ---- */

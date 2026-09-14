@@ -34,3 +34,16 @@
   #code .code-wchips::-webkit-scrollbar { display: none; }
   #code .code-wchips button { flex: 0 0 auto; }
 }
+
+/* ---- F27 (A-bis-Z-Pruefung 14.09.): Code-Vorlagen mit dem Finger treffbar ----
+   GEMESSEN 2026-09-14 (375x812, pointer coarse): "Fehler suchen", "Funktion
+   einbauen", "Tests schreiben", "Code erklaeren" waren 38 px hoch (design-v11
+   padding 9px 15px bei 15 px Schrift). Bei grobem Zeiger oder Handy-Breite 44 px —
+   dieselbe Grenze wie F14 fuer die Spur. Betreiber-Freigabe 14.09. ("alle Rechte"). */
+@media (pointer: coarse), (max-width: 600px) {
+  #code .code-wchips button {
+    min-height: 44px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}

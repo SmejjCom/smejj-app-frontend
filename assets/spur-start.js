@@ -22,8 +22,10 @@ import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.j
 // Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
 import { merkmaleVon } from "/assets/chat-merkmale.js?v=1";
 import { Icons } from "/assets/components.js?v=b48";
-// OHNE ?v — dieselbe Kennung wie app.js/code-flaeche.js, sonst zweite Instanz.
-import { API_ORIGIN } from "./config.js";
+// Abo-Stand ueber den gemeinsamen Speicher (F6, 2026-09-14): EINE Anfrage je
+// Laden fuer Planzeile, Onboarding-Karte und Abo-Panel — dieselbe Kennung wie
+// in account-sessions.js, sonst zweite Instanz und wieder zwei Anfragen.
+import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=1";
 // Nutzerreise USA 2026-08-23: die Spur blieb auf Englisch deutsch ("Neuer
 // Chat", "Heute", "Gestern", "Alle 127 Gespräche"). t() liefert fail-safe den
 // deutschen Quelltext, solange kein Wörterbuch geladen ist.
@@ -312,11 +314,12 @@ async function zeichnePlanzeile() {
     // nur die statische Seite, also 404 bei JEDEM Seitenaufruf, und die
     // Planzeile blieb auch fuer zahlende Kunden auf "Frei". Der Endpunkt
     // gehoert dem Control-Server (dort: 401 ohne Sitzung, also da).
-    const antwort = await fetch(`${API_ORIGIN}/api/billing/status`, { credentials: "include" });
-    if (antwort.ok) {
-      const daten = await antwort.json();
-      if (daten?.plan && daten.plan !== "free") text = PLAN_NAMEN[daten.plan] || daten.plan;
-    }
+    // GEBUENDELT 2026-09-14 (F6): dieselbe Frage stellten account-privacy.js
+    // und onboarding-welcome.js gleich noch zweimal — Netz-Mitschnitt: 3x
+    // /api/billing/status je Laden. Jetzt EINE Anfrage fuer alle drei; der
+    // Cookie-Weg von hier bleibt darin als Rueckfall erhalten.
+    const daten = await holeBillingStatus();
+    if (daten?.plan && daten.plan !== "free") text = PLAN_NAMEN[daten.plan] || daten.plan;
   } catch { /* "Frei" bleibt stehen */ }
   zeile.textContent = text;
   zeile.removeAttribute("aria-busy");

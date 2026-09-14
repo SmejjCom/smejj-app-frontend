@@ -2,6 +2,12 @@
 // serverseitige Session-Liste, Widerruf, Passwortwechsel, Export, Löschung).
 // Ergänzt die Account-Oberfläche aus account-privacy.js; keine Secrets im UI.
 import { API_ORIGIN } from "./config.js";
+// F6 (2026-09-14): /api/auth/me und /api/billing/status liefen je DREIMAL je
+// Laden. Beide Speicher buendeln gleichzeitige Fragen und halten die Antwort
+// wenige Sekunden — gleiche Kennung wie auth-gate.js/spur-start.js, sonst
+// zweite Instanz.
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=1";
+import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=1";
 
 // Cross-Origin: smejj.com und Control-Server sind verschiedene Sites. Auth laeuft
 // per Bearer-Token (localStorage), nicht per Cookie (SameSite=Lax geht cross-site
@@ -41,8 +47,15 @@ export async function fetchAuthenticatedUser() {
   // versuchen (recoverSessionToken). getToken liest das dort abgelegte Token dann.
   if (!getToken()) { if (!(await recoverSessionToken())) return null; }
   try {
-    const response = await fetch(API.me, { headers: authHeaders() });
-    const data = await response.json();
+    // GEBUENDELT 2026-09-14 (F6): auth-gate.js stellt dieselbe Frage beim
+    // Start (Bearer aus localStorage), autonomous-coding.js gleich danach —
+    // gemessen 3x /api/auth/me je Laden. Ueber den gemeinsamen Speicher
+    // bekommen alle EINE Antwort; die eigene Anfrage laeuft nur, wenn keine
+    // frische vorliegt (Frist 5 s, Fehlschlaege werden nicht gemerkt).
+    const data = await authMeSpeicher.hole(async () => {
+      const response = await fetch(API.me, { headers: authHeaders() });
+      return response.json();
+    });
     // Gleitende Verlaengerung (Freigabe C, 2026-08-05): der Server legt jeder
     // gueltigen Antwort ein frisches Token bei. H1: dieses (bei aktivem Flag
     // kurzlebige) Token wird in sessionStorage gecacht statt neu in localStorage
@@ -84,9 +97,12 @@ const API = {
 // Buchung dem Konto zuordnen kann. Keine Kartendaten, keine Secrets im UI.
 export async function fetchBillingStatus() {
   if (!getToken()) return null;
+  // GEBUENDELT 2026-09-14 (F6): onboarding-welcome.js und hydrateBillingStatus
+  // fragen hier beide, spur-start.js ein drittes Mal — gemessen 3x
+  // /api/billing/status je Laden. Der gemeinsame Speicher stellt EINE Frage:
+  // Bearer zuerst (wie bisher hier), Cookie nur als Rueckfall.
   try {
-    const response = await fetch(API.billingStatus, { headers: authHeaders() });
-    const data = await response.json();
+    const data = await holeBillingStatus();
     return data && data.ok ? data : null;
   } catch { return null; }
 }

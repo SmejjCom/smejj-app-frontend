@@ -50,6 +50,48 @@
   order: 2;
 }
 
+/* ---- F11 (A-bis-Z-Pruefung 14.09.): Schreibfeld neben dem Browser-Panel -----
+   GEMESSEN 2026-09-14 (Chrome headless, Fenster 1094 px, Spur 200 px, Panel
+   514 px): dem Chat bleiben 380 px, das Glas ist 324 px (leer) bzw. 360 px
+   (laufender Chat) breit. Die Knopfzeile braucht 401 px — [+] 38, Modell 88,
+   Nachdenken 127, Mikrofon 38, Senden 38, fuenf Luecken a 10, Polster 22 — und
+   brach in eine dritte Zeile (Mikrofon + Senden bzw. Senden allein). Dasselbe
+   bei 1280 px (Glas 384/420).
+   Die Breite des Glases entscheidet, nicht die des Fensters: Spur auf/zu,
+   Panel-Breite aus browser-pane.js, Menue rechts — darum eine Container-
+   Abfrage am Glas statt einer Fensterregel. Unter 400 px verliert die
+   Nachdenken-Pille ihr Wort (wie mobil-composer.css unter 360 px) und wird ein
+   38-px-Viereck wie Mikrofon und Senden — .text-chip hat min-width 88 px, das
+   allein hielt sie bei 88 px. Bedarf dann 312 px: eine Zeile ab 324 px Glas.
+   Unter 300 px (Fenster < ~850 px mit offener Spur, Panel auf seinem Minimum
+   320 px) zusaetzlich das Modellwort mit Auslassungspunkten (min-width 0,
+   sonst gewinnt die 88-px-Mindestbreite ueber max-width).
+   Das Glas ist durch backdrop-filter schon Stapelkontext und Bezugsrahmen
+   fuer fixed-Kinder (gemessen: vor und nach dem Fix gleich) — container-type
+   aendert daran nichts. Browser ohne @container ignorieren den Block. */
+#start .prompt-glass {
+  container-type: inline-size;
+  container-name: schreibfeld;
+}
+@container schreibfeld (max-width: 400px) {
+  #start .prompt-actions .fpille-nachdenken .chip-label { display: none; }
+  #start .prompt-glass .fpille-nachdenken {
+    width: 38px;
+    min-width: 38px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+@container schreibfeld (max-width: 300px) {
+  #start .prompt-actions .model-picker button {
+    min-width: 0;
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 /* ---- Werkzeuge: Symbol UND Wort (heute nur Symbol, Wort erst beim Zeigen) --- */
 #start .start-chips.start-chipreihe { gap: 8px; }
 #start .start-chips.start-chipreihe button {

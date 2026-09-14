@@ -1,5 +1,7 @@
 import { API_ORIGIN, CLIENT_ROUTES } from "./config.js";
 import { afterFirstPaint } from "./deferred-start.js";
+// F6 (2026-09-14): gleiche Kennung wie auth-gate.js, sonst zweite Instanz.
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=1";
 
 const API_TOKEN_KEY = "smejj.apiToken.v1";
 const ACTIVE_STATUSES = new Set(["open", "queued", "planning", "fast_path", "starting_worker", "running", "verifying"]);
@@ -128,7 +130,10 @@ function bindSurface(surface) {
 
 async function refreshSession() {
   try {
-    const current = await api(`${API_ORIGIN}/api/auth/me`);
+    // GEBUENDELT 2026-09-14 (F6): auth-gate.js und account-sessions.js fragen
+    // /api/auth/me beim selben Laden — gemessen 3x. Der gemeinsame Speicher
+    // liefert die Antwort von eben; api() laeuft nur, wenn keine frische da ist.
+    const current = await authMeSpeicher.hole(() => api(`${API_ORIGIN}/api/auth/me`));
     if (current.authenticated !== true) {
       sessionStorage.removeItem(API_TOKEN_KEY);
       setAuthState(false);
