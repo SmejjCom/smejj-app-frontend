@@ -199,6 +199,9 @@
   // ---- P · Betrieb & Deploy ----------------------------------------------------
 
   function deploy(d) {
+    // Zeabur baut aus Git: kein Artefakt, also keine Release-Tabellen voller
+    // Striche, sondern der laufende Commit (Befund Live-Audit 15.09.).
+    if (d.bewertung === "zeabur-git") return deployAusGit(d);
     const soll = d.soll || {};
     const ist = d.ist || {};
     const abweichend = d.bewertung === "abweichend";
@@ -249,6 +252,29 @@
       + "</div>";
   }
 
+  function deployAusGit(d) {
+    const git = d.git || {};
+    const stand = V.tabelleBlock(["", "Wert"], [
+      "<tr><td><b>Commit</b></td><td><span class=\"mono\">" + e(git.commit || "—") + "</span></td></tr>",
+      "<tr><td><b>Quelle</b></td><td>Zeabur-Git-Bau (" + e(git.quelle || "ZEABUR_GIT_COMMIT_SHA") + ")</td></tr>",
+      "<tr><td><b>Prozess gestartet</b></td><td>" + e(A.zeit(d.gestartetAm)) + "</td></tr>",
+      "<tr><td><b>Laufzeit</b></td><td>" + e(d.laufzeitMs === null ? "—" : dauerKurz(d.laufzeitMs)) + "</td></tr>",
+      "<tr><td><b>Release-Artefakt</b></td><td>keins — beim Git-Bau entsteht kein separates Artefakt, "
+      + "daher auch keine Bauzeit und keine Prüfsummen</td></tr>"
+    ]);
+    return V.kopfBlock("P", "Deploy", "Betrieb & Deploy", "Welcher Stand läuft gerade wirklich.")
+      + '<div class="kpis">'
+      + V.kachelBlock("Commit", git.commitKurz || "—", "Zeabur-Git-Bau")
+      + V.kachelBlock("Laufzeit", d.laufzeitMs === null ? "—" : dauerKurz(d.laufzeitMs), "seit dem Start")
+      + V.kachelBlock("Node", e(d.knoten || "—"), "Laufzeitumgebung")
+      + "</div>"
+      + '<div class="stack"><div class="note glass"><div class="nx">◆</div><div>'
+      + '<div class="nt">' + e(urteilText(d.bewertung)) + "</div>"
+      + '<div class="ns">' + e(d.hinweis || "") + "</div></div></div>"
+      + V.panelBlock("Laufender Stand", "gemessen im Container", stand)
+      + "</div>";
+  }
+
   function urteilKurz(bewertung) {
     if (bewertung === "deckungsgleich") return "deckt sich";
     if (bewertung === "abweichend") return "weicht ab";
@@ -259,6 +285,7 @@
   function urteilText(bewertung) {
     if (bewertung === "deckungsgleich") return "Der laufende Stand entspricht dem gesetzten Release";
     if (bewertung === "lokal") return "Kein Release-Artefakt — der Server läuft aus dem Arbeitsverzeichnis";
+    if (bewertung === "zeabur-git") return "Der Server läuft aus einem Zeabur-Git-Bau";
     return "Nicht beide Seiten bekannt — es wird nichts behauptet";
   }
 

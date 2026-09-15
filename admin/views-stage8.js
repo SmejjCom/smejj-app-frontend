@@ -427,7 +427,11 @@
     const alter = !Number.isFinite(s)
       ? "Alter unbekannt"
       : s < 90 ? s + " s alt" : Math.round(s / 60) + " min alt";
-    return "Tagesprojektion " + alter + (p.wirdAufgefrischt ? ", wird gerade erneuert" : "");
+    // Scheiterte der letzte Neubau, steht der Grund hier — sonst bleibt ein
+    // alter Stand ohne Erklaerung stehen (Befund 15.09.: zehn Tage lang).
+    const fehler = p.neubauFehler && p.neubauFehler.grund
+      ? ", letzter Neubau gescheitert (" + p.neubauFehler.grund + ")" : "";
+    return "Tagesprojektion " + alter + (p.wirdAufgefrischt ? ", wird gerade erneuert" : "") + fehler;
   }
 
   function zeile(name, wert) {

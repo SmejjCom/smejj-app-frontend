@@ -4,7 +4,7 @@
 // lagen, stehen hier zum Durchklicken — je Vorschlag Ja / Nein / Später.
 //
 // Bewusst OHNE Server-Endpunkt: Die Berichte kommen als statische Datei
-// von derselben Herkunft (zwei Auslieferungswege, siehe QUELLEN weiter unten);
+// von derselben Herkunft (zwei Auslieferungswege, siehe quellen() weiter unten);
 // die Konsole braucht dafuer
 // keinen laufenden Control-Server und keine neue API. Die Entscheidungen
 // bleiben im Browser (localStorage) und werden als Klartext ausgegeben —
@@ -115,17 +115,25 @@
   // unter /radar/berichte.json, der Control-Server liefert sie hinter der
   // Admin-Anmeldung unter /admin/radar-berichte.json aus. Ein einzelner Pfad
   // waere auf genau einem der beiden Wege tot — deshalb der Reihe nach beide.
-  // Reihenfolge mit Absicht: der Admin-Pfad zuerst. Er ist die bessere erste
-  // Wahl — hinter der Anmeldung, mit richtigem Inhaltstyp, aus der einen
-  // Quelle im Repo ausgeliefert. Auf GitHub Pages gibt es ihn nicht (404),
-  // dann greift der zweite. Beide Wege funktionieren, nur die Reihenfolge
-  // aendert sich; und der Pruefstand sieht jetzt eine Adresse, die wirklich
-  // bei einem Handler ankommt.
-  const QUELLEN = ["/admin/radar-berichte.json", "/radar/berichte.json"];
+  // REIHENFOLGE JE HERKUNFT (15.09.): Auf smejj.com (GitHub Pages) zuerst die
+  // statische Datei — die Admin-Adresse gibt es dort nicht, und sie zuerst zu
+  // rufen erzeugte bei JEDEM Öffnen einen echten 404 in der Browser-Konsole.
+  // Auf dem Control-Weg zuerst die Admin-Datei: hinter der Anmeldung, mit
+  // richtigem Inhaltstyp, aus der einen Quelle im Repo. Der jeweils andere Pfad
+  // bleibt Rückfall. Der Prüfstand kennt die Pages-Datei als statisch
+  // (scripts/lib/pages-statisch.mjs) und meldet sie nicht mehr als herrenlos.
+  const ADMIN_QUELLE = "/admin/radar-berichte.json";
+  const PAGES_QUELLE = "/radar/berichte.json";
+  const PAGES_HOSTS = ["smejj.com", "www.smejj.com"];
+
+  function quellen() {
+    const host = typeof location !== "undefined" && location ? String(location.hostname || "") : "";
+    return PAGES_HOSTS.indexOf(host) >= 0 ? [PAGES_QUELLE, ADMIN_QUELLE] : [ADMIN_QUELLE, PAGES_QUELLE];
+  }
 
   async function holeBerichte() {
     let letzterStatus = 0;
-    for (const quelle of QUELLEN) {
+    for (const quelle of quellen()) {
       try {
         const antwort = await fetch(quelle, { headers: { Accept: "application/json" } });
         if (antwort.ok) return { ok: true, daten: await antwort.json() };
