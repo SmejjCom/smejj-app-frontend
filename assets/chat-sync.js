@@ -17,8 +17,8 @@ import { API_ORIGIN } from "/assets/config.js";
 import { OWNER_KEY, gehoertNutzer, kontoAliase, merkeKontoKennung, sessionUserId } from "/assets/chat-owner.js?v=3";
 import {
   abgleichsKarte, teileAuf, erzeugeVorfahrt, erzeugeAbgleichsSpeicher,
-  istUeberschreibKonflikt, konfliktKopie, geraeteKurzname, neueKonfliktId, ohneAbgleichsmarke, nachzutragen
-} from "./chat-sync-auswahl.js?v=4";
+  istUeberschreibKonflikt, konfliktKopie, geraeteKurzname, neueKonfliktId, ohneAbgleichsmarke, nachzutragen, grabsteinWeg
+} from "./chat-sync-auswahl.js?v=5";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
@@ -183,6 +183,9 @@ async function pull() {
       // Geprueft wird mit DERSELBEN Funktion, die auch importiert — deshalb
       // kann hier nichts uebersprungen werden, was sonst angekommen waere.
       if (!gehoertNutzer(fern, nutzer, besitzer, aliase)) { fremd += 1; continue; }
+      const grabstein = grabsteinWeg(fern, lokal);
+      if (grabstein === "ueberspringen") continue;
+      if (grabstein === "entfernen") { await s.importChat?.({ id: fern.id, ownerId: fern.ownerId, geloescht: true, updatedAt: fern.updatedAt, messages: [] }); continue; }
 
       const voll = Array.isArray(fern.messages) ? fern : await holeVollstaendig(fern.id, kopf);
       // OHNE Nachrichten wird NICHTS importiert. Ein Eintrag ohne `messages`

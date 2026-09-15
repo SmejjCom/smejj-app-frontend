@@ -257,3 +257,15 @@
     scroll-padding-top: 52px;
   }
 }
+
+/* 320-px-Handys (iPhone SE 1. Gen., E2E-Test 14./15.09.2026 gemessen): im 2-Spalten-
+   Raster ist eine Kachel 144 px breit, "Programmieren" mit Symbol braucht ~150 px und
+   wurde rechts abgeschnitten. Nur hier: etwas weniger Innenabstand und Schrift,
+   das Wort steht wieder ganz. Betreiber 15.09.: "alle Rechte von A bis Z". */
+@media (max-width: 360px) {
+  #start:not(.has-start-chat) .start-chips.start-chipreihe button {
+    padding: 0 6px;
+    font-size: 13.5px;
+    gap: 4px;
+  }
+}

@@ -3,7 +3,7 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=4";
-import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=12";
+import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=13";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2";
 import { holeSendepfad } from "./sendepfad-nachladen.js?v=23";
@@ -661,7 +661,7 @@ function bindProfile() {
   $("#logoutLocal").addEventListener("click", () => {
     state.session = { authenticated: false, mode: PROJECT_ROLES.localOnly };
     localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));
-    state.profile = { ...state.profile, email: "" }; localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify({ name: state.profile.name || "" })); $("#profileEmail").value = ""; // Freigabe 1h
+    state.profile = { ...state.profile, email: "" }; localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify({ name: state.profile.name || "" })); $("#profileEmail").value = ""; try { localStorage.removeItem("smejj.entwurf.v1"); } catch {} // Freigabe 1h + Entwurf
     refreshSessionStatus();
     writeOutput("#profileOutput", "Logout abgeschlossen. Lokale Projekte wurden nicht geloescht.");
   });

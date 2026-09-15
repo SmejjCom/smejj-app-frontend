@@ -6168,6 +6168,13 @@ body.spur-start-aktiv .nav-start {
     scroll-padding-top: 52px;
   }
 }
+@media (max-width: 360px) {
+  #start:not(.has-start-chat) .start-chips.start-chipreihe button {
+    padding: 0 6px;
+    font-size: 13.5px;
+    gap: 4px;
+  }
+}
 
 /* ---- design-v12-code.css ---- */
 #code .codefeld textarea {

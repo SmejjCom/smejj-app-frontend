@@ -15,8 +15,8 @@
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=12";
-export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=12";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=13";
+export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=13";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und
 // Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
@@ -777,7 +777,7 @@ function init() {
         // ?v=2: Projekte-Sync (2026-08-13). Ohne den Bump haelt der
         // HTTP-Cache die alte Fassung fest — die Datei ist nicht im
         // Service-Worker-Buendel und erneuert sich sonst nie zuverlaessig.
-        import("/assets/chat-sync.js?v=18").catch(() => {});
+        import("/assets/chat-sync.js?v=19").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */

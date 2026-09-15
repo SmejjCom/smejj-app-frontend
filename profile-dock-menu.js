@@ -132,6 +132,7 @@ async function logout() {
     /* Speicher nicht verfuegbar: Reload stellt den Zustand ohnehin neu her */
   }
   vergissProfilEmail();
+  try { localStorage.removeItem("smejj.entwurf.v1"); } catch { /* Entwurf nie nach dem Abmelden stehen lassen */ }
   location.assign("/");
 }
 

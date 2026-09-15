@@ -238,3 +238,18 @@ export function nachzutragen(chats, karte) {
     return konfliktSieger(c.updatedAt, karte.get(id)) === "gleich";
   });
 }
+
+/**
+ * Grabstein ohne Abruf (E2E-Pruefung 15.09.2026): Serverseitig geloeschte Chats kamen
+ * bei JEDEM Laden erneut einzeln vom Server (20-40 Abrufe samt CORS-Vorabfrage) —
+ * importChat entfernt sie lokal hart, beim naechsten Abgleich "fehlten" sie also
+ * wieder. Meldet die Abgleichsliste `geloescht: true`, entscheidet diese Funktion
+ * ohne Netz: "ueberspringen" (lokal schon weg), "entfernen" (lokal noch da — gleiche
+ * Wirkung wie der bisherige Import des vollen Grabsteins) oder "holen" (normaler Weg;
+ * auch fuer aeltere Server ohne das Feld).
+ * @returns {"holen"|"ueberspringen"|"entfernen"}
+ */
+export function grabsteinWeg(fern, lokal) {
+  if (!fern || fern.geloescht !== true) return "holen";
+  return lokal ? "entfernen" : "ueberspringen";
+}
