@@ -6175,6 +6175,13 @@ body.spur-start-aktiv .nav-start {
     gap: 4px;
   }
 }
+@media (pointer: coarse) {
+  #start .prompt-glass textarea { min-height: 44px !important; }
+  .legal-links a { min-height: 44px; }
+  @container schreibfeld (max-width: 400px) {
+    #start .prompt-glass .fpille-nachdenken { width: 44px; min-width: 44px; }
+  }
+}
 
 /* ---- design-v12-code.css ---- */
 #code .codefeld textarea {
@@ -6293,4 +6300,6 @@ html.vollbild-fehl body { overflow: hidden; }
   }
   #start .prompt-glass textarea { min-height: 36px; height: 36px; }
   #start .erste-schritte { display: none; }
+  #start.has-start-chat .start-chips.start-chipreihe { flex-shrink: 0; gap: 4px; padding-top: 2px; padding-bottom: 2px; }
+  #start.has-start-chat .start-chips.start-chipreihe button { padding: 0 6px; }
 }

@@ -1,40 +1,5 @@
-// smejj.com — Das leuchtende Viereck IST der Knopf (Betreiber 2026-08-18:
-// "soll nur das Beleuchtende Viereck bleiben, das untere raus nehmen").
-//
-// Bis hierher lagen ZWEI Dinge uebereinander: das kleine Arbeits-Viereck
-// rechts oben im Feld und ein runder weisser Stopp-Knopf unten. Der runde
-// ist weg; das Viereck uebernimmt seine Aufgabe und kennt drei Zustaende:
-//
-//   frei      -> gedaempfter Umriss, kein Klickziel
-//   arbeitet  -> gefuellt und pulsend; ein Klick STOPPT die Antwort
-//   gestoppt  -> bleibt hell, zeigt aber ein Play-Dreieck; ein Klick
-//                schickt denselben Auftrag erneut los
-//
-// FORTSETZEN statt neu schicken (Betreiber 2026-08-19: "wo hat gestoppt
-// soll da wieder starten"): Play schickt eine Fortsetzungs-Anfrage mit dem
-// vollen Verlauf INKLUSIVE der Teilantwort und streamt in DIESELBE Blase
-// weiter — so machen es ChatGPT ("Continue generating") und Claude. Der
-// alte Weg (denselben Text neu schicken) bleibt nur als Rueckfall, wenn
-// es noch gar keine Teilantwort gibt.
-//
-// Rein additiv: der Sendeweg selbst wird nicht angefasst (wir klicken nur
-// denselben Knopf, den auch ein Mensch klickt), und das Stoppen laeuft
-// ueber die vorhandene stoppeChatStrom() aus chat-stream.js.
-// KEINE statischen Importe — und das ist der ganze Zweck dieser Zeilen.
-//
-// GEMESSEN am 2026-08-20 auf einem emulierten Handy (375 px): das Viereck war
-// nach 2.061 ms sichtbar, aber erst nach 4.087 ms bedienbar. Zwei Sekunden
-// lang sah man einen Stopp-Knopf, der nichts tat. Grund war MEIN eigener
-// Ausbau: fuer das Fortsetzen kamen drei Importe oben dazu
-// (chat-history-context, components -> chat-markdown, config), und ein Modul
-// fuehrt seinen Rumpf erst aus, wenn die GANZE Kette geladen ist. Das
-// Verdrahten braucht davon nichts.
-//
-// Darum wird jetzt zuerst verdrahtet und erst beim Tippen nachgeladen. Zum
-// Zeitpunkt eines Klicks liegen die Module ohnehin im Modul-Zwischenspeicher
-// (app.js laedt sie statisch), der Nachladeschritt kostet dann nichts mehr.
-// Die Kennungen sind absichtlich dieselben wie in app.js — eine abweichende
-// erzeugt eine ZWEITE Modulinstanz (module-queries-Waechter).
+// smejj.com — Das leuchtende Viereck IST der Knopf (Betreiber 2026-08-18: "soll nur das
+// Beleuchtende Viereck bleiben, das untere raus nehmen").
 
 // Die beiden Bereiche unterscheiden sich nur in drei Kennungen — alles
 // andere ist identisch, darum eine Tabelle statt zweier Kopien.
@@ -55,18 +20,6 @@ if (typeof window !== "undefined") {
 }
 
 // ---- Arbeits-Anzeige (.an) — HIER, nicht nur in code-flaeche.js.
-//
-// LIVE GEMESSEN 2026-08-23 (Abnahme): code-flaeche.js wird seit dem 20.08.
-// erst nachgeladen, wenn /code aufgeht (code-nachladen.js, Seitengewicht).
-// Auf der Startseite setzte darum NIEMAND mehr die Klasse .an: das Viereck
-// leuchtete nie, das Stopp-Quadrat im Senden-Knopf erschien nie (ein Klick
-// auf den Knopf oeffnete mitten in der Antwort den Sprachmodus), und
-// handeln() oben hielt den Strom nach dem 3-s-Gnadenfenster fuer "frei" —
-// ein Klick bei 26 s: 6.916 -> 7.816 Zeichen, nichts gestoppt.
-//
-// Dieselbe Logik wie in code-flaeche.js (Vorlauf ab dem Absenden ODER Strom
-// laeuft), nur in dem Modul, das auf JEDER Seite geladen ist. code-flaeche.js
-// erkennt die Flagge und haengt seine Kopie nicht noch einmal ein.
 const VORLAUF_GRENZE_MS = 90_000;
 function ruesteArbeitsanzeige() {
   if (typeof window === "undefined" || window.smejjArbeitsanzeige) return;
@@ -105,9 +58,8 @@ function merke(bereich) {
   const text = String(feld?.value || "").trim();
   if (!text) return;
   letzterAuftrag.set(bereich.viereck, text);
-  // Wer selbst abschickt, will arbeiten: ein frueherer Abbruch ist damit
-  // erledigt, sonst wuerde die Nachzuegler-Bremse unten den neuen Lauf
-  // gleich wieder abwuergen.
+  // Wer selbst abschickt, will arbeiten: ein frueherer Abbruch ist damit erledigt, sonst wuerde
+  // die Nachzuegler-Bremse unten den neuen Lauf gleich wieder abwuergen.
   loescheAbbruch();
 }
 
@@ -124,24 +76,15 @@ function istAbgebrochen() {
   return BEREICHE.some((b) => document.getElementById(b.viereck)?.classList.contains("gestoppt"));
 }
 
-// Der Auftrag an das Modell. Er enthaelt mit Absicht das Wort "genau":
-// lokalesModell.js (STARKE_SPUR_WOERTER) laesst solche Anfragen NIE lokal
-// beantworten — der lokale Weg wuerde die Teilantwort in der Blase sonst
-// ueberschreiben statt anhaengen.
-// Dieselbe Wahl, die das Modell-Menue schreibt (code-modell-menue.js).
+// Der Auftrag an das Modell.
 const MODELL_SCHLUESSEL = "smejj.model.selected.v2";
 
 /**
- * Beendet ALLE laufenden Antworten. Es gibt zwei Stromfamilien: die
- * Hausmodelle lesen in chat-stream.js (stoppeChatStrom), die Anbieter-Wege
- * (Cline/BYOK/Provider) lesen in chatClient.js — sie hoeren auf das
- * Ereignis "smejj:chat-stoppen". Genau diese Luecke war der Betreiber-
- * Befund vom 2026-08-19: "ich klicke Stop, aber macht trotzdem weiter".
+ * Beendet ALLE laufenden Antworten.
  */
 function stoppeAlleStroeme() {
-  // Das Ereignis zuerst und OHNE Nachladen: es erreicht die Anbieter-Leser in
-  // chatClient.js sofort. stoppeChatStrom() kommt einen Wimpernschlag spaeter
-  // aus dem Modul-Zwischenspeicher — so haengt kein Stopp an einer Ladezeit.
+  // Das Ereignis zuerst und OHNE Nachladen: es erreicht die Anbieter-Leser in chatClient.js
+  // sofort.
   try { window.dispatchEvent(new CustomEvent("smejj:chat-stoppen")); } catch { /* still */ }
   import("/assets/ai/chat-stream.js")
     .then((m) => { m.stoppeChatStrom(); raeumeNachAbbruch(m); })
@@ -150,21 +93,6 @@ function stoppeAlleStroeme() {
 
 /**
  * Nach dem Abbruch aufraeumen.
- *
- * DER FALL, live gemessen 2026-09-11: Ein Klick auf "Antwort stoppen", bevor
- * das erste Wort da war, beendete zwar den Strom — aber "smejj denkt nach ..."
- * blieb als Antwort stehen, die Denk-Marke blieb gesetzt und der Ladebalken
- * lief WEITER. Auch nach zehn Sekunden. Die App sah aus, als arbeite sie noch
- * an etwas, das niemand mehr holt.
- *
- * Der Grund: den Wartetext raeumt bisher nur der Strom selbst (clearThinkingState
- * beim ersten Ereignis) und den Balken nur app.js in seinem catch. Ein Abbruch
- * geht an beiden vorbei.
- *
- * Eine TEILANTWORT bleibt bewusst stehen: sie ist nicht falsch, nur kurz. Der
- * Selektor trifft ausschliesslich Knoten, in denen noch KEIN Wort steht — bei
- * denen ist data-thinking noch gesetzt.
- *
  * @param {{clearThinkingState: Function, beendeDenken: Function}} strom
  * @param {Document} [dok]
  */
@@ -179,7 +107,28 @@ function raeumeNachAbbruch(strom, dok = document) {
     // Fehler, obwohl der Nutzer selbst gestoppt hat.
     if (!knoten.textContent.trim()) knoten.textContent = "Gestoppt.";
   }
+  markiereGestoppteLeere(dok.getElementById?.("startLog"));
 }
+
+/**
+ * Stopp in der Wartezeit (Livetest 15.09.2026): wer VOR dem ersten Wort stoppte, hatte nach dem
+ * Neuladen eine Frage ohne Antwort.
+ * @param {Element|null|undefined} log  #startLog
+ * @returns {boolean} true, wenn eine leere Antwort markiert wurde
+ */
+export function markiereGestoppteLeere(log) {
+  if (!log?.querySelectorAll) return false;
+  const eintraege = [...log.querySelectorAll(":scope > .entry")];
+  const letzte = eintraege[eintraege.length - 1];
+  if (!letzte || letzte.classList.contains("user") || letzte.classList.contains("chat-frage") || letzte.classList.contains("chat-schritte")) return false;
+  const wartet = letzte.dataset?.thinking === "true";
+  if (!wartet && String(letzte.textContent || "").trim()) return false;
+  if (wartet) { letzte.innerHTML = ""; delete letzte.dataset.thinking; }
+  letzte.textContent = GESTOPPT_TEXT;
+  letzte.dataset.gestopptLeer = "an";
+  return true;
+}
+const GESTOPPT_TEXT = "Gestoppt.";
 
 const FORTSETZUNGS_AUFTRAG = "Deine letzte Antwort wurde gestoppt. Setze sie"
   + " genau an der Abbruchstelle fort: nichts wiederholen, keine Einleitung,"
@@ -187,18 +136,13 @@ const FORTSETZUNGS_AUFTRAG = "Deine letzte Antwort wurde gestoppt. Setze sie"
 
 /**
  * Setzt die gestoppte Antwort in DERSELBEN Blase fort.
- *
- * Der Verlauf traegt die Teilantwort als juengste Assistenten-Nachricht
- * (buildRequestHistory liest sie aus dem Log); streamChatAnswer haengt die
- * neuen Zeichen an textContent an — es entsteht kein zweiter Anfang.
- *
  * @param {{viereck: string, feld: string, senden: string}} bereich Kennungen.
  * @returns {Promise<boolean>} true, wenn fortgesetzt wurde.
  */
 async function setzeFort(bereich) {
   const blasen = document.querySelectorAll("#startLog .entry.assistant:not(.chat-frage):not(.chat-schritte)");
   const output = blasen[blasen.length - 1];
-  if (!output || !output.textContent.trim()) {
+  if (!output || !output.textContent.trim() || output.dataset.gestopptLeer === "an") {
     // Nichts zum Fortsetzen (gestoppt vor dem ersten Zeichen): der alte
     // Weg — denselben Auftrag noch einmal ueber den normalen Sendepfad.
     const text = letzterAuftrag.get(bereich.viereck);
@@ -224,13 +168,8 @@ async function setzeFort(bereich) {
     preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}) },
     history: buildRequestHistory(FORTSETZUNGS_AUFTRAG)
   };
-  // Denkzeit sichtbar machen (Betreiber 2026-08-19: nach Play blieb das
-  // Viereck dunkel, bis das erste Byte kam — gemessen 5+ s). Der normale
-  // Sendeweg hat dafuer den Vorlauf in code-flaeche.js; der haengt aber am
-  // Klick auf den Senden-Knopf, den es beim Fortsetzen nicht gibt. Darum
-  // meldet die Fortsetzung ihren Lauf selbst — ehrlich: an beim Start,
-  // aus nach dem Ende (streamChatAnswer loest sich IMMER auf, auch im
-  // Fehlerfall; dazwischen uebernehmen die echten Strom-Ereignisse).
+  // Denkzeit sichtbar machen (Betreiber 2026-08-19: nach Play blieb das Viereck dunkel, bis das
+  // erste Byte kam — gemessen 5+ s).
   const melde = (laufen) => {
     try { window.dispatchEvent(new CustomEvent("smejj:chat-strom", { detail: { laufen } })); } catch { /* still */ }
   };
@@ -243,20 +182,15 @@ async function setzeFort(bereich) {
   } finally {
     melde(0);
   }
-  // Fehlerwege in streamChatAnswer ERSETZEN den Blaseninhalt (kurze
-  // Meldung). Die Teilantwort ist dann weg — zurueckholen und die Meldung
-  // dahinter setzen; Fortsetzungen machen den Text nie kuerzer.
+  // Fehlerwege in streamChatAnswer ERSETZEN den Blaseninhalt (kurze Meldung).
   if (output.textContent.length < vorher.length) {
     const meldung = output.textContent.trim();
     output.textContent = meldung ? `${vorher}\n\n${meldung}` : vorher;
     renderChatMarkdown?.(output);
     return true;
   }
-  // Naht glaetten: Modelle wiederholen trotz Auftrag gern die letzten Worte
-  // vor der Abbruchstelle ("…Schilf oder" + "Schilf oder Baumstaemmen…",
-  // live gemessen 2026-08-19). Die laengste Ueberlappung zwischen Ende der
-  // Teilantwort und Anfang der Fortsetzung wird herausgeschnitten —
-  // mindestens 8 Zeichen, sonst schneiden zufaellige Treffer echte Worte.
+  // Naht glaetten: Modelle wiederholen trotz Auftrag gern die letzten Worte vor der
+  // Abbruchstelle ("…Schilf oder" + "Schilf oder Baumstaemmen…", live gemessen 2026-08-19).
   const roh = output.textContent.slice(vorher.length);
   const fort = roh.replace(/^\s+/, "");
   const deckel = Math.min(vorher.length, fort.length, 300);
@@ -306,13 +240,8 @@ export function ruesteViereck(bereich) {
       void setzeFort(bereich);
       return;
     }
-    // "Laeuft gerade etwas?" nicht NUR an der an-Klasse festmachen: die
-    // speist sich aus smejj:chat-strom, und ZWEI Zaehler senden dieses
-    // Ereignis (chat-stream.js zaehlt seine Leser, chatClient.js seine
-    // Anbieter-Laeufe). Faellt einer kurz auf 0, ist die Klasse fuer
-    // einen Moment weg — ein Klick genau dann verpuffte (Betreiber
-    // 2026-08-19: "stoppen funktioniert nicht"). Das Gnadenfenster
-    // zaehlt jede Aktivitaet der letzten 3 s als "laeuft".
+    // "Laeuft gerade etwas?" nicht NUR an der an-Klasse festmachen: die speist sich aus
+    // smejj:chat-strom, und ZWEI Zaehler senden dieses Ereignis (chat-stream.js zaehlt seine …
     const aktiv = viereck.classList.contains("an")
       || (Date.now() - letzteAktivitaet) < 3000;
     if (!aktiv) return; // wirklich frei: nichts zu tun
@@ -330,21 +259,14 @@ export function ruesteViereck(bereich) {
   return true;
 }
 
-// Das Stopp-Quadrat im Senden-Knopf (Betreiber 2026-08-23, Vorbild
-// Antigravity: "der rote Punkt ... nicht rot, sondern unsere Logo-Farbe").
-// Bei Antigravity wird der Senden-Knopf waehrend der Antwort zum Stopp-Knopf
-// (rotes Quadrat im Kreis). Bei uns: Quadrat in Logo-Cyan #02fdfd auf
-// dunklem, VIERECKIGEM Feld — die Form ist Betreiber-Regel, die Farbe kommt
-// aus icons/smejj_full_logo_on_dark.svg.
+// Das Stopp-Quadrat im Senden-Knopf (Betreiber 2026-08-23, Vorbild Antigravity: "der rote Punkt
+// ...
 const STOPP_QUADRAT = '<svg viewBox="0 0 24 24" aria-hidden="true" class="stopp-quadrat">'
   + '<rect x="6" y="6" width="12" height="12" fill="currentColor" stroke="none"/></svg>';
 
 /**
- * Spiegelt den Arbeitszustand des Vierecks auf den Senden-Knopf: leuchtet
- * das Viereck (.an), zeigt der Knopf das Stopp-Quadrat und ein Klick stoppt;
- * erlischt es, gibt der Knopf sein vorheriges Gesicht (Pfeil/Welle) zurueck.
- * Rein additiv: composer-sendetaste.js bleibt die Wahrheit fuer Pfeil/Welle
- * und zeichnet auf "smejj:composer-changed" neu.
+ * Spiegelt den Arbeitszustand des Vierecks auf den Senden-Knopf: leuchtet das Viereck (.an),
+ * zeigt der Knopf das Stopp-Quadrat und ein Klick stoppt; erlischt es, gibt der …
  */
 const DOPPELKLICK_SPERRE_MS = 700;
 function ruesteSendeknopf(bereich, viereck, handeln) {
@@ -376,23 +298,13 @@ function ruesteSendeknopf(bereich, viereck, handeln) {
     // Die Sendetaste entscheidet selbst, ob jetzt Pfeil oder Welle passt.
     try { document.dispatchEvent(new CustomEvent("smejj:composer-changed")); } catch { /* still */ }
   };
-  // Im Stopp-Zustand faengt der Klick VOR allen anderen — am DOKUMENT in der
-  // Capture-Phase, nicht am Knopf: composer-sendetaste.js haengt frueher am
-  // Knopf selbst (capture) und ruft bei leerem Feld stopImmediatePropagation
-  // — ein Klick auf das Stopp-Quadrat oeffnete so den Sprachmodus statt zu
-  // stoppen (lokal gemessen 2026-08-23). Die Capture-Phase laeuft von oben
-  // nach unten; das Dokument kommt immer vor dem Knopf dran.
+  // Im Stopp-Zustand faengt der Klick VOR allen anderen — am DOKUMENT in der Capture-Phase,
+  // nicht am Knopf: composer-sendetaste.js haengt frueher am Knopf selbst (capture) …
   document.addEventListener("click", (e) => {
     if (!knopf.classList.contains("ist-stopp")) return;
     if (!(e.target instanceof Node) || !knopf.contains(e.target)) return;
-    // Betreiber 2026-08-24 (Code-Bereich: "Ich frage was und kommt nichts"):
-    // code-flaeche.js sendet ueber einen programmatischen Klick auf
-    // #startSend — NACHDEM der Vorlauf beide Vierecke auf "an" gestellt hat.
-    // Mit Projektordner (await davor) stand der Knopf da schon auf Stopp, und
-    // dieser Fang schluckte den Sendeklick: Feld geleert, Quadrat an, nichts
-    // geschickt. Regel: steht TEXT im Feld, will der Nutzer SENDEN — der
-    // Klick geht unveraendert an den Sendeweg. Nur der Klick bei leerem Feld
-    // ist ein Stopp.
+    // Betreiber 2026-08-24 (Code-Bereich: "Ich frage was und kommt nichts"): code-flaeche.js
+    // sendet ueber einen programmatischen Klick auf #startSend — NACHDEM der Vorlauf …
     const feld = document.getElementById(bereich.feld);
     if (String(feld?.value || "").trim()) return;
     e.preventDefault();
@@ -409,15 +321,15 @@ export function initChatStopp() {
   let gesetzt = 0;
   ruesteArbeitsanzeige();
   for (const bereich of BEREICHE) if (ruesteViereck(bereich)) gesetzt += 1;
-  // NACHZUEGLER-BREMSE. Gemessen am 2026-08-18 im Code-Bereich: ein
-  // stoppeChatStrom() beendet nur den LAUFENDEN Leser — vier Sekunden
-  // spaeter startete chatClient.js den naechsten Anbieter (Rueckfall) und
-  // der Text lief weiter, obwohl der Nutzer gestoppt hatte (+530 Zeichen
-  // gemessen). Solange also ein Viereck auf "gestoppt" steht, wird jeder
-  // neu anlaufende Strom sofort wieder beendet. Aufgehoben wird das nur
-  // durch eine echte Nutzergeste: Play oder ein neues Absenden (merke()).
+  // NACHZUEGLER-BREMSE. Gemessen am 2026-08-18 im Code-Bereich: ein stoppeChatStrom() beendet
+  // nur den LAUFENDEN Leser — vier Sekunden spaeter startete chatClient.js den …
   window.addEventListener("smejj:chat-strom", (event) => {
-    if ((Number(event.detail?.laufen) || 0) <= 0) return;
+    if ((Number(event.detail?.laufen) || 0) <= 0) {
+      // Ein gestoppter Strom raeumt seine Blase erst NACH dieser Meldung auf
+      // (chat-stream.js: finally, dann clearThinkingState) — kurz danach pruefen.
+      if (istAbgebrochen()) setTimeout(() => markiereGestoppteLeere(document.getElementById("startLog")), 120);
+      return;
+    }
     if (istAbgebrochen()) stoppeAlleStroeme();
   });
   return gesetzt > 0;

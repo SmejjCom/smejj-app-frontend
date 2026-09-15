@@ -269,3 +269,17 @@
     gap: 4px;
   }
 }
+
+/* ---- Touch-Ziele ab dem ersten Bild (A-bis-Z-Livetest 15.09.2026) ---------------
+   mobil-dock.js hebt Feld und Knoepfe am Handy auf 44 px — aber erst NACH dem
+   Nachladen. Auf langsamer Leitung mass der Waechter davor: Eingabefeld 40 px hoch,
+   "Nachdenken" 38 px breit, Fusslinks der Einstellungen 24 px. Dieselben Masse
+   stehen jetzt im Start-Buendel, nur fuer den Finger (pointer: coarse) — die Maus
+   behaelt ihre Masse, und nichts wird kleiner. */
+@media (pointer: coarse) {
+  #start .prompt-glass textarea { min-height: 44px !important; }
+  .legal-links a { min-height: 44px; }
+  @container schreibfeld (max-width: 400px) {
+    #start .prompt-glass .fpille-nachdenken { width: 44px; min-width: 44px; }
+  }
+}

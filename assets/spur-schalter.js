@@ -15,6 +15,11 @@ function desktop() {
   return window.matchMedia("(min-width: 768px)").matches;
 }
 
+export const FLACHES_QUERFORMAT = "(max-width: 1000px) and (orientation: landscape) and (max-height: 520px)"; // wie design-v12-vollbild.css
+function flachesQuerformat() {
+  try { return window.matchMedia(FLACHES_QUERFORMAT); } catch { return null; }
+}
+
 // Nach dem Zuklappen (oder Wieder-Oeffnen) auf die normale Breite zurueck —
 // sonst klebt die is-compact-Schmalspur aus dem Kleinziehen an der Spur
 // (gemessen: 283 px breit, aber nur Icons ohne Beschriftung).
@@ -75,6 +80,18 @@ export function initSpurSchalter() {
   if (!knopf || knopf.dataset.spurSchalter) return false;
   knopf.dataset.spurSchalter = "an";
   if (desktop()) bindeGriffe();
+  // Handy-Querformat (Livetest 15.09.2026, Android 863x304): ab 768 px Breite galt
+  // die Desktop-Spur — dauerhaft offen, 200 px der knappen Breite weg, die
+  // Werkzeugleiste ragte hinaus. Flach und quer startet die Spur darum ZU; der
+  // Knopf oeffnet sie wie am Desktop. Dreht jemand ins Flache, klappt sie zu.
+  const flach = flachesQuerformat();
+  const klappeZuWennFlach = () => {
+    if (!desktop() || !flach?.matches || document.body.classList.contains("spur-zu")) return;
+    document.body.classList.add("spur-zu");
+    knopf.setAttribute("aria-expanded", "false");
+  };
+  klappeZuWennFlach();
+  flach?.addEventListener?.("change", klappeZuWennFlach);
   knopf.addEventListener("click", (ereignis) => {
     if (!desktop()) return; // Handy: app.js uebernimmt
     ereignis.stopImmediatePropagation();

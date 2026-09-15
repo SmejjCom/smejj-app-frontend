@@ -29,7 +29,7 @@
 import {
   listChats, openChat, renameChat, deleteChat, restoreChat, activeChatId, togglePinChat, newChat,
   listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
-} from "/assets/chat-store.js?v=b76";
+} from "/assets/chat-store.js?v=b77";
 // Verlaufs-Text (Titel, Vorschau, Themen, Export), Karten-Bausteine und die
 // Titel-Automatik aus der Bruecke kommen ERST, wenn der Verlauf sichtbar wird
 // (2026-09-03, Web-Vitals: Gewicht > 300 KB — die drei Module wogen 19 KB am Start,
@@ -50,7 +50,7 @@ function ladeBausteine() {
   if (bausteineBereit) return bausteineBereit;
   bausteineBereit = Promise.all([
     import("/assets/chat-history-text.js?v=b47c"),
-    import("/assets/chat-history-cards.js?v=b70"),
+    import("/assets/chat-history-cards.js?v=b71"),
     import("/assets/chat-title-auto.js")
   ]).then(([text, karten]) => {
     ({ anzeigeTitel, anzeigeVorschau, gruppeVon, volltext, themaVon, merkmaleVon, sichereAlsMarkdown, projektGruppen } = text);
@@ -309,7 +309,28 @@ function injectStyles() {
 let alleChats = [];
 let alleProjekte = [];
 
-async function render() {
+// Zusammenfassen (Livetest 15.09., M2): jeder importierte Chat meldet
+// "smejj:chats-changed" — beim Abgleich eines neuen Geraets 368 Mal, und jedes
+// Mal las render() ALLE Chats neu. Laeuft schon ein Lauf, wird genau EIN
+// weiterer vorgemerkt statt hunderte parallel zu starten.
+let renderLauf = null;
+let renderNochmal = false;
+function render() {
+  if (renderLauf) { renderNochmal = true; return renderLauf; }
+  renderLauf = (async () => {
+    try {
+      do {
+        renderNochmal = false;
+        await renderEinmal();
+      } while (renderNochmal);
+    } finally {
+      renderLauf = null;
+    }
+  })();
+  return renderLauf;
+}
+
+async function renderEinmal() {
   await ladeBausteine();
   const target = host();
   if (!target) return;

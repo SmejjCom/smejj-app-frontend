@@ -28,7 +28,7 @@ import { initUsageCapture } from "./usage-meter.js?v=1";
 let menueGeladen = null;
 let letzterMenueStand = ["", "", false];
 function holeMenue() {
-  menueGeladen ||= import("./profile-dock-menu.js?v=b49").catch((f) => { menueGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", f); throw f; });
+  menueGeladen ||= import("./profile-dock-menu.js?v=b50").catch((f) => { menueGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", f); throw f; });
   return menueGeladen;
 }
 

@@ -19,25 +19,63 @@
 // geoeffnet. Faellt dieses Modul aus, ist der Knopf wie frueher — nichts wird
 // schlechter als der Ausgangszustand.
 
-export function initModellMenueStart({ dokument = document, lade = () => import("./code-modell-menue.js") } = {}) {
+// Livetest 15.09.2026 (M5): der erste Klick setzte aria-expanded="true", das Menue
+// kam aber erst nach 0,8–5,1 s — code-modell-menue.js wurde erst beim Klick geholt.
+// Jetzt: vorladen, sobald der Knopf in Reichweite ist (Zeigen, Fokus, Fingerdruck,
+// ruhige Minute nach dem Laden); waehrend des Ladens aria-busy statt eines falschen
+// aria-expanded; aria-expanded folgt dem ECHTEN Menue (auch beim Schliessen).
+export function initModellMenueStart({ dokument = document, lade = () => import("./code-modell-menue.js"), leerlauf = globalThis.requestIdleCallback } = {}) {
   const knopf = dokument.getElementById("modelPickerButton");
   if (!knopf || knopf.dataset.modellZentral === "an") return false;
   knopf.dataset.modellZentral = "an";
+  let modul = null;
+  const vorladen = () => {
+    if (!modul) modul = Promise.resolve().then(lade).catch((fehler) => { modul = null; throw fehler; });
+    return modul;
+  };
+  for (const art of ["pointerenter", "focus", "pointerdown", "touchstart"]) {
+    knopf.addEventListener(art, () => { vorladen().catch(() => {}); }, { passive: true });
+  }
+  if (typeof leerlauf === "function") leerlauf(() => { vorladen().catch(() => {}); }, { timeout: 4000 });
+  const offen = () => Boolean(dokument.getElementById("startModellMenue"));
+  let laedt = false;
   knopf.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopImmediatePropagation();
     const alt = dokument.getElementById("modelPickerMenu");
     if (alt) alt.hidden = true;
-    knopf.setAttribute("aria-expanded", "true");
-    lade()
+    if (laedt) return; // Doppelklick waehrend des Ladens: nicht auf- und gleich wieder zuklappen
+    laedt = true;
+    knopf.setAttribute("aria-busy", "true");
+    vorladen()
       .then((m) => m.oeffneModellMenue({
         menueId: "startModellMenue",
         chip: knopf,
         halter: knopf.offsetParent || knopf.parentElement
       }))
-      .catch(() => { /* Menue ist Zugabe — der Chat bleibt bedienbar */ });
+      .catch(() => { /* Menue ist Zugabe — der Chat bleibt bedienbar */ })
+      .finally(() => {
+        laedt = false;
+        knopf.removeAttribute("aria-busy");
+        knopf.setAttribute("aria-expanded", String(offen()));
+        beobachteSchliessen(dokument, knopf, offen);
+      });
   }, { capture: true });
   return true;
+}
+
+// Das Menue schliesst sich auch ohne diesen Knopf (Tipp daneben, Escape, Wahl) —
+// dann darf aria-expanded nicht auf "true" stehen bleiben.
+function beobachteSchliessen(dokument, knopf, offen) {
+  const menue = dokument.getElementById("startModellMenue");
+  const halter = menue?.parentNode;
+  if (!halter || typeof MutationObserver === "undefined") return;
+  const wache = new MutationObserver(() => {
+    if (offen()) return;
+    knopf.setAttribute("aria-expanded", "false");
+    wache.disconnect();
+  });
+  wache.observe(halter, { childList: true });
 }
 
 if (typeof document !== "undefined") {

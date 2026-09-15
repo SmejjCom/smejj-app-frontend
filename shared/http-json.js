@@ -11,29 +11,6 @@ import { API_ORIGIN, UI_COPY } from "../config.js";
 
 const inflightGetJson = new Map();
 
-// Anmeldung mitschicken (2026-08-14). Vorher gingen diese beiden Helfer IMMER
-// unangemeldet los. Das zwang jede Route, die sie aufrufen, dauerhaft offen zu
-// bleiben — /api/capabilities, /api/storage/status und /api/models/status
-// gaben deshalb jedem Fremden Auskunft ueber Anbieter, Bucket-Namen und
-// fehlende Umgebungsvariablen, also ueber die Angriffsflaeche.
-//
-// Der Kopf wird nur GESETZT, wenn ein Token da ist. Er kann nichts kaputt
-// machen: oeffentliche Routen ignorieren ihn, und der Control-Server erlaubt
-// "Authorization" ausdruecklich im Preflight (control-server/src/http/cors.js).
-// Gleicher Schluessel wie account-sessions.js und admin/api.js — bewusst
-// dupliziert, damit dieser Helfer ohne Auth-Modul startfaehig bleibt.
-const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
-
-function authKopf(extra) {
-  try {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (token) return { ...extra, Authorization: `Bearer ${token}` };
-  } catch {
-    // Storage gesperrt (Privatmodus): ohne Kopf weiter, der Server entscheidet.
-  }
-  return { ...extra };
-}
-
 function resolveUrl(url) {
   if (typeof url === "string" && url.startsWith("/api/")) {
     return `${API_ORIGIN}${url}`;
@@ -41,18 +18,33 @@ function resolveUrl(url) {
   return url;
 }
 
-export async function getJson(url) {
+// { mitAusweis: true } (Livetest 15.09.2026): /api/storage/status kam ohne Ausweis
+// mit 401 zurueck. Mit Ausweis wie jeder andere API-Aufruf; ein 401 wird zu einem
+// lesbaren "nur angemeldet" statt einem rohen Fehler.
+const TOKEN_KEY = "smejj.auth.accessToken.v1";
+export function ausweisKopf(speicher = globalThis) {
+  try {
+    const token = speicher.localStorage?.getItem(TOKEN_KEY) || speicher.sessionStorage?.getItem(TOKEN_KEY) || "";
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch { return {}; }
+}
+export const NUR_ANGEMELDET = "Nur für angemeldete Nutzer sichtbar — bitte anmelden.";
+
+export async function getJson(url, { mitAusweis = false } = {}) {
   const fullUrl = resolveUrl(url);
-  const pending = inflightGetJson.get(fullUrl);
+  const schluessel = mitAusweis ? `ausweis:${fullUrl}` : fullUrl;
+  const pending = inflightGetJson.get(schluessel);
   if (pending) return pending;
-  const promise = rawGetJson(fullUrl).finally(() => inflightGetJson.delete(fullUrl));
-  inflightGetJson.set(fullUrl, promise);
+  const promise = rawGetJson(fullUrl, mitAusweis).finally(() => inflightGetJson.delete(schluessel));
+  inflightGetJson.set(schluessel, promise);
   return promise;
 }
 
-async function rawGetJson(url) {
+async function rawGetJson(url, mitAusweis = false) {
   try {
-    const response = await fetch(resolveUrl(url), { headers: authKopf() });
+    const kopf = mitAusweis ? ausweisKopf() : {};
+    const response = await fetch(resolveUrl(url), Object.keys(kopf).length ? { headers: kopf } : undefined);
+    if (mitAusweis && response.status === 401) return { ok: false, status: 401, nurAngemeldet: true, hinweis: NUR_ANGEMELDET };
     const text = await response.text();
     try {
       return JSON.parse(text);
@@ -68,7 +60,7 @@ export async function postJson(url, body) {
   try {
     const response = await fetch(resolveUrl(url), {
       method: "POST",
-      headers: authKopf({ "Content-Type": "application/json" }),
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
     });
     const text = await response.text();

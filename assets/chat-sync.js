@@ -17,11 +17,20 @@ import { API_ORIGIN } from "/assets/config.js";
 import { OWNER_KEY, gehoertNutzer, kontoAliase, merkeKontoKennung, sessionUserId } from "/assets/chat-owner.js?v=3";
 import {
   abgleichsKarte, teileAuf, erzeugeVorfahrt, erzeugeAbgleichsSpeicher,
-  istUeberschreibKonflikt, konfliktKopie, geraeteKurzname, neueKonfliktId, ohneAbgleichsmarke, nachzutragen, grabsteinWeg
-} from "./chat-sync-auswahl.js?v=5";
+  istUeberschreibKonflikt, konfliktKopie, geraeteKurzname, neueKonfliktId, ohneAbgleichsmarke, nachzutragen, grabsteinWeg,
+  abarbeitenMitGrenze
+} from "./chat-sync-auswahl.js?v=7";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
+// Neues Geraet (Livetest 15.09., M2): 368 Chats kamen EINZELN und nacheinander,
+// nach 40 s waren 30 da, dann Stillstand. Es gibt serverseitig keine Sammel-Route
+// (chatSyncRoutes.js kennt nur ?id= und die volle Liste mit allen Nachrichten) —
+// darum hier: vier Abrufe gleichzeitig, jeder mit Zeitgrenze, eine zweite Runde
+// fuer die Fehlschlaege. Noetig waere serverseitig GET /api/chats?ids=a,b,c
+// (hoechstens 25 Kennungen, Antwort { ok, chats: [...] } in derselben Form wie ?id=).
+const EINZELABRUF_GRENZE = 4;
+const EINZELABRUF_ZEITGRENZE_MS = 20_000;
 let serverSagtNein = false;
 let pushTimer = null;
 let laeuft = false;
@@ -120,7 +129,10 @@ function store() {
  */
 async function holeVollstaendig(id, kopf) {
   try {
-    const antwort = await fetch(`${API_ORIGIN}/api/chats?id=${encodeURIComponent(id)}`, { headers: kopf });
+    // Zeitgrenze (Livetest 15.09., M2): ein haengender Abruf hielt vorher den
+    // ganzen Abgleich fest — nach 30 von 368 Chats kam nichts mehr.
+    const signal = typeof AbortSignal !== "undefined" && AbortSignal.timeout ? AbortSignal.timeout(EINZELABRUF_ZEITGRENZE_MS) : undefined;
+    const antwort = await fetch(`${API_ORIGIN}/api/chats?id=${encodeURIComponent(id)}`, { headers: kopf, signal });
     if (!antwort.ok) return null;
     const daten = await antwort.json();
     return daten?.chat || null;
@@ -165,6 +177,8 @@ async function pull() {
   try { besitzer = localStorage.getItem(OWNER_KEY) || ""; } catch { besitzer = ""; }
   let fremd = 0;
   let konflikte = 0;
+  // Erst entscheiden (lokal, schnell), dann holen (Netz, nebenlaeufig mit Grenze).
+  const abrufe = [];
   for (const fern of daten.chats || []) {
     try {
       const lokal = await s.getChat(fern.id);
@@ -187,29 +201,36 @@ async function pull() {
       if (grabstein === "ueberspringen") continue;
       if (grabstein === "entfernen") { await s.importChat?.({ id: fern.id, ownerId: fern.ownerId, geloescht: true, updatedAt: fern.updatedAt, messages: [] }); continue; }
 
-      const voll = Array.isArray(fern.messages) ? fern : await holeVollstaendig(fern.id, kopf);
-      // OHNE Nachrichten wird NICHTS importiert. Ein Eintrag ohne `messages`
-      // wuerde einen vorhandenen Verlauf leer ueberschreiben — ein Datenverlust,
-      // ausgeloest von einem Performance-Fix. Lieber diesen einen Chat
-      // ueberspringen und es beim naechsten Abgleich erneut versuchen.
-      if (!voll || !Array.isArray(voll.messages)) continue;
-      // KEIN STILLES LAST-WRITE-WINS MEHR (Befund R7, 2026-09-14): wurde der
-      // Chat hier seit dem letzten Abgleich geaendert und ist der Server
-      // trotzdem juenger, wuerde der Import die lokale Arbeit verwerfen.
-      // Die lokale Fassung bleibt als eigener Chat erhalten — ERST die Kopie,
-      // DANN der Import; nichts wird geloescht. Der naechste Push traegt die
-      // Kopie hoch, damit sie auch auf den anderen Geraeten auftaucht.
-      if (istUeberschreibKonflikt(lokal, voll.updatedAt)) {
-        const kopie = konfliktKopie(lokal, { neueId: neueKonfliktId(), geraet: geraeteKurzname(navigator.userAgent) });
-        if (await s.importChat?.(kopie)) konflikte += 1;
-      }
-      // Was vom Server kommt, stimmt in diesem Moment mit ihm ueberein: die
-      // Abgleichsmarke ist sein updatedAt. Sie wird HIER gesetzt, nicht in
-      // importChat — das ist auch der Speicherweg der Medien-Rettung, und dort
-      // hat der Server den Stand noch nicht.
-      await s.importChat?.({ ...voll, syncedAt: String(voll.updatedAt || "") });
+      abrufe.push(async () => {
+        const voll = Array.isArray(fern.messages) ? fern : await holeVollstaendig(fern.id, kopf);
+        // Abruf gescheitert (Netz, Zeitgrenze): false = in der zweiten Runde nochmal.
+        if (!voll) return false;
+        // OHNE Nachrichten wird NICHTS importiert. Ein Eintrag ohne `messages`
+        // wuerde einen vorhandenen Verlauf leer ueberschreiben — ein Datenverlust,
+        // ausgeloest von einem Performance-Fix. Lieber diesen einen Chat
+        // ueberspringen und es beim naechsten Abgleich erneut versuchen.
+        if (!Array.isArray(voll.messages)) return true;
+        // KEIN STILLES LAST-WRITE-WINS MEHR (Befund R7, 2026-09-14): wurde der
+        // Chat hier seit dem letzten Abgleich geaendert und ist der Server
+        // trotzdem juenger, wuerde der Import die lokale Arbeit verwerfen.
+        // Die lokale Fassung bleibt als eigener Chat erhalten — ERST die Kopie,
+        // DANN der Import; nichts wird geloescht. Der naechste Push traegt die
+        // Kopie hoch, damit sie auch auf den anderen Geraeten auftaucht.
+        if (istUeberschreibKonflikt(lokal, voll.updatedAt)) {
+          const kopie = konfliktKopie(lokal, { neueId: neueKonfliktId(), geraet: geraeteKurzname(navigator.userAgent) });
+          if (await s.importChat?.(kopie)) konflikte += 1;
+        }
+        // Was vom Server kommt, stimmt in diesem Moment mit ihm ueberein: die
+        // Abgleichsmarke ist sein updatedAt. Sie wird HIER gesetzt, nicht in
+        // importChat — das ist auch der Speicherweg der Medien-Rettung, und dort
+        // hat der Server den Stand noch nicht.
+        await s.importChat?.({ ...voll, syncedAt: String(voll.updatedAt || "") });
+        return true;
+      });
     } catch { /* einzelner Chat darf den Rest nicht stoppen */ }
   }
+  // Ein haengender oder fehlschlagender Abruf blockiert nie die anderen.
+  await abarbeitenMitGrenze(abrufe, { grenze: EINZELABRUF_GRENZE, runden: 2 });
   await meldeKonflikte(konflikte);
   // Nicht still: wer Chats auf dem Server hat, die er lokal nie sieht, soll den
   // Grund im Protokoll finden koennen. Eine Zeile je Abgleich, keine Meldung an

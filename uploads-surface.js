@@ -113,9 +113,9 @@ export function bindUploads({ $, state, writeOutput }) {
   // lokal und fail-safe: Fehler landen lesbar in der Ausgabe.
   $("#storageAgain").addEventListener("click", async () => {
     try {
-      const { CLIENT_ROUTES } = await import("./config.js");
-      const antwort = await fetch(CLIENT_ROUTES.api.storageStatus);
-      writeOutput("#fileOutput", JSON.stringify(await antwort.json(), null, 2));
+      const [{ CLIENT_ROUTES }, { getJson }] = await Promise.all([import("./config.js"), import("./shared/http-json.js")]);
+      const daten = await getJson(CLIENT_ROUTES.api.storageStatus, { mitAusweis: true });
+      writeOutput("#fileOutput", daten?.nurAngemeldet ? daten.hinweis : JSON.stringify(daten, null, 2));
     } catch (fehler) {
       writeOutput("#fileOutput", `IDrive-Pruefung fehlgeschlagen: ${fehler.message}`);
     }

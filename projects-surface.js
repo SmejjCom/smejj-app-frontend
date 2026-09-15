@@ -12,9 +12,11 @@ import { downloadText } from "./app-helfer.js?v=4";
 
 export function bindProjects(deps) {
   const { $, state, workspace, showToast, writeOutput, ensureProject, refreshLocalWorkspaceStatus, renderProjectCards, renderEmptyState } = deps;
-  $("#projectCreate").addEventListener("click", async () => {
+  // Livetest 15.09.2026: ein Doppelklick legte ZWEI Projekte an — der zweite Klick
+  // wartete hinter dem Dialog und lief danach durch. Sperre bis zum Ende.
+  const anlegen = sperreWaehrendDesLaufs(async () => {
     // W2-09: Klick legte vorher sofort ein Projekt an; Abbrechen legt nichts an.
-    const eingabe = window.prompt("Wie soll das Projekt heissen?", "Mein Projekt");
+    const eingabe = window.prompt("Wie soll das Projekt heißen?", "Mein Projekt");
     if (eingabe === null) return;
     const { project } = await workspace.createProject({
       name: eingabe.trim().slice(0, 80) || "smejj.com Projekt",
@@ -26,7 +28,8 @@ export function bindProjects(deps) {
     await refreshProjectList(deps);
     writeOutput("#projectOutput", `Projekt „${project.name}" angelegt (${project.id}).`); // W2-07: kein Roh-JSON
     showToast("Projekt angelegt.");
-  });
+  }, $("#projectCreate"));
+  $("#projectCreate").addEventListener("click", () => { anlegen().catch((error) => writeOutput("#projectOutput", JSON.stringify({ ok: false, error: error.message }, null, 2))); });
 
   // Nutzertest 2026-08-17: refreshProjectList stand DIREKT als Handler —
   // damit kam das Klick-EREIGNIS als deps an (workspace undefined), jeder
@@ -112,7 +115,7 @@ export function bindProjects(deps) {
   $("#projectDelete").addEventListener("click", async () => {
     try {
       const projectId = selectedProjectId($, state);
-      const confirmed = window.confirm(`Projekt ${projectId} wirklich lokal loeschen? Immutable Objects bleiben erhalten.`);
+      const confirmed = window.confirm(`Projekt ${projectId} wirklich lokal löschen? Unveränderliche Objekte bleiben erhalten.`);
       const result = await workspace.deleteProject(projectId, { confirmed, localOnly: true });
       if (state.currentProjectId === projectId) {
         state.currentProjectId = "";
@@ -121,7 +124,7 @@ export function bindProjects(deps) {
       await refreshProjectList(deps);
       refreshLocalWorkspaceStatus();
       writeOutput("#projectOutput", JSON.stringify(result, null, 2));
-      showToast("Projekt geloescht.");
+      showToast("Projekt gelöscht.");
     } catch (error) {
       writeOutput("#projectOutput", JSON.stringify({ ok: false, error: error.message }, null, 2));
     }
@@ -155,6 +158,28 @@ export async function refreshProjectList(deps) {
 
 export function selectedProjectId($, state = {}) {
   const selected = $("#projectSelect")?.value || state?.currentProjectId;
-  if (!selected) throw new Error("Kein Projekt ausgewaehlt.");
+  if (!selected) throw new Error("Kein Projekt ausgewählt.");
   return selected;
+}
+
+/**
+ * Laesst eine Aktion nicht doppelt laufen: solange sie arbeitet, verpufft jeder
+ * weitere Aufruf, und der Knopf (falls gegeben) ist gesperrt.
+ * @param {() => Promise<unknown>} aktion
+ * @param {{disabled?: boolean}|null} [knopf]
+ * @returns {() => Promise<unknown>}
+ */
+export function sperreWaehrendDesLaufs(aktion, knopf = null) {
+  let laeuft = false;
+  return async () => {
+    if (laeuft) return undefined;
+    laeuft = true;
+    if (knopf) knopf.disabled = true;
+    try {
+      return await aktion();
+    } finally {
+      laeuft = false;
+      if (knopf) knopf.disabled = false;
+    }
+  };
 }

@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v883";
+const CACHE_NAME = "smejj-shell-v884";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -588,10 +588,11 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(Response.redirect(new URL("/", url.origin).href, 302));
     return;
   }
-  if (url.pathname.startsWith("/api/")) {
-    event.respondWith(fetch(request));
-    return;
-  }
+  // /api/ laeuft am Service Worker VORBEI (Livetest 15.09., Firefox /papierkorb):
+  // mit respondWith(fetch(request)) wurde jede beim Ansichtswechsel abgebrochene
+  // Anfrage zu "ServiceWorker fing die Anfrage ab … unerwarteter Fehler". Ohne
+  // respondWith holt der Browser selbst — ein Abbruch ist dann nur ein Abbruch.
+  if (url.pathname.startsWith("/api/")) return;
   // MESSDATEN SIND KEINE ASSETS: netz-zuerst, Cache nur als Rueckfall.
   //
   // Befund 2026-08-04: /verlauf-messwerte.json lag cache-first im Precache. Die
@@ -661,9 +662,15 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(antwort.catch(() => caches.match(request).then((cached) => cached || rueckfallFuer(request))));
 });
 
+// Angemeldete App-Routen zeigen NIE die Landeseite, solange das Netz die Huelle
+// liefern kann (Livetest 15.09., M4): bis der volle Service Worker aktiv war,
+// hatte der schmale Speicher kein "/" — /chat-history bekam willkommen.html.
+// Reihenfolge: Huelle aus dem Speicher, sonst "/" aus dem Netz, und NUR wenn
+// auch das scheitert (offline im schmalen Eingang) die Landeseite.
 function huelleAusCache(rueckfall) {
   return caches.match("/", { ignoreSearch: true })
-    .then((huelle) => huelle || caches.match("/willkommen.html"))
+    .then((huelle) => huelle || fetch("/").then((netz) => (netz && netz.ok ? netz : undefined)).catch(() => undefined))
+    .then((seite) => seite || caches.match("/willkommen.html"))
     .then((seite) => seite || rueckfall || fetch("/"));
 }
 

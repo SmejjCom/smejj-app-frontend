@@ -253,3 +253,37 @@ export function grabsteinWeg(fern, lokal) {
   if (!fern || fern.geloescht !== true) return "holen";
   return lokal ? "entfernen" : "ueberspringen";
 }
+
+/**
+ * Abrufe nebenlaeufig mit Grenze abarbeiten (A-bis-Z-Livetest 15.09.2026, M2):
+ * Auf einem neuen Geraet holte pull() jeden Chat einzeln NACHEINANDER — ein
+ * haengender Abruf hielt alle folgenden fest (nach 40 s 30 von 368, dann nichts).
+ * Hier laufen hoechstens `grenze` Aufgaben gleichzeitig; haengt oder scheitert
+ * eine, arbeiten die anderen weiter. Was false liefert oder wirft, kommt in die
+ * naechste Runde (hoechstens `runden` insgesamt).
+ * @param {Array<() => Promise<boolean>>} aufgaben  true = erledigt
+ * @param {{grenze?: number, runden?: number}} [optionen]
+ * @returns {Promise<{erledigt: number, offen: number}>}
+ */
+export async function abarbeitenMitGrenze(aufgaben, { grenze = 4, runden = 2 } = {}) {
+  let offen = Array.isArray(aufgaben) ? [...aufgaben] : [];
+  let erledigt = 0;
+  for (let runde = 0; runde < runden && offen.length; runde += 1) {
+    const liste = offen;
+    const fehlgeschlagen = [];
+    let naechste = 0;
+    const arbeiter = async () => {
+      while (naechste < liste.length) {
+        const aufgabe = liste[naechste];
+        naechste += 1;
+        let ok = false;
+        try { ok = (await aufgabe()) === true; } catch { ok = false; }
+        if (ok) erledigt += 1;
+        else fehlgeschlagen.push(aufgabe);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.max(1, Math.min(grenze, liste.length)) }, arbeiter));
+    offen = fehlgeschlagen;
+  }
+  return { erledigt, offen: offen.length };
+}

@@ -123,7 +123,7 @@ function showSignedIn(user, deps) {
     await postJson(CLIENT_ROUTES.api.authLogout, {});
     try { localStorage.removeItem("smejj.auth.accessToken.v1"); } catch {}
     state.session = { authenticated: false, mode: PROJECT_ROLES.localOnly };
-    localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));
+    try { localStorage.removeItem(STORAGE_KEYS.session); } catch {} // Livetest 15.09.: abgemeldet = Eintrag weg
     refreshSessionStatus();
     $("#googleSignIn").textContent = "Abgemeldet. Seite neu laden für Google Login.";
     writeOutput("#profileOutput", "Google Session beendet.");

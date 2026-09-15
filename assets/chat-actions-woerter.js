@@ -45,6 +45,11 @@ function sorgeFuerStil(doc = document) {
     + ".msg-actions .msg-act.hat-wort{flex-direction:column;justify-content:center;gap:2px;height:auto;min-height:54px;padding:4px 2px}"
     + ".msg-actions:has(.msg-act.hat-wort){gap:6px}"
     + ".msg-actions .msg-act-wort{display:block;font-size:10px;line-height:1;letter-spacing:.01em;opacity:.85;white-space:nowrap}"
+    // Livetest 15.09.2026 (390 px): nach "Neu generieren" kamen die Versionspfeile
+    // dazu — 5 x 44 + 4 x 6 + Uhrzeit 33 + Waehler 89 = 390 px in 368 px Leiste,
+    // "Naechste Version" ragte 22 px hinaus. Mit Waehler weicht die Uhrzeit (reine
+    // Anzeige, kein Ziel): 351 px, alles in einer Zeile, alle Ziele 44 px.
+    + ".msg-actions:has(.msg-versions) .msg-zeit{display:none}"
     + "}";
   doc.head.appendChild(stil);
 }

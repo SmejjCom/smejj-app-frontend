@@ -113,6 +113,20 @@ function fuelleWerte() {
 function goTo(path) {
   history.pushState({}, "", path);
   window.dispatchEvent(new PopStateEvent("popstate"));
+  schliesseSpurAmHandy();
+}
+
+// Livetest 15.09.2026 (iPhone): "Einstellungen" im Profil-Menue oeffnete die
+// Ansicht, die Spur blieb aber offen und verdeckte sie. Derselbe Weg wie
+// "Alle Gespraeche": die offene Handy-Spur schliesst. Am Desktop traegt die
+// Spur kein .is-open (spur-schalter.js) — dort passiert nichts.
+export function schliesseSpurAmHandy(dok = document) {
+  const spur = dok.querySelector(".sidebar");
+  if (!spur?.classList.contains("is-open")) return false;
+  const abdunkler = dok.getElementById("sidebarBackdrop");
+  if (!abdunkler) return false;
+  abdunkler.click();
+  return true;
 }
 
 // Abmelden: Server-Session beenden (falls vorhanden), lokale Session verwerfen,
@@ -126,13 +140,15 @@ async function logout() {
   } catch {
     /* fail-safe: auch ohne Server-Antwort lokal abmelden */
   }
+  // Livetest 15.09.2026: nach dem Abmelden stand smejj.session.v1 weiter im
+  // Browser (als {authenticated:false}). Abgemeldet heisst: der Eintrag ist WEG.
   try {
-    localStorage.setItem(STORAGE_KEYS.session, JSON.stringify({ authenticated: false, mode: "local-only" }));
+    localStorage.removeItem(STORAGE_KEYS.session);
   } catch {
     /* Speicher nicht verfuegbar: Reload stellt den Zustand ohnehin neu her */
   }
-  vergissProfilEmail();
   try { localStorage.removeItem("smejj.entwurf.v1"); } catch { /* Entwurf nie nach dem Abmelden stehen lassen */ }
+  vergissProfilEmail();
   location.assign("/");
 }
 

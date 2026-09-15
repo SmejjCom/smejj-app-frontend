@@ -1,26 +1,14 @@
 // smejj.com — Chat-Verlauf-Speicher (Welle 1, 2026-07-21).
-//
-// Zweck: Unterhaltungen des Start-Chats dauerhaft speichern (IndexedDB), nach
-// einem Reload wiederherstellen und fuer die Verlauf-Ansicht bereitstellen.
-// Bewusst OHNE Aenderung an app.js: dieses Modul beobachtet #startLog per
-// MutationObserver, speichert Snapshots und baut sie beim Start wieder auf.
-//
-// Sicherheit/Robustheit: komplett fail-safe — jeder Fehler (z. B. IndexedDB
-// gesperrt, Privatmodus) fuehrt nur dazu, dass nichts gespeichert wird; die
-// bestehende Chat-Funktion bleibt unveraendert (Non-Regression-Pflicht).
-// Es werden keine Secrets gespeichert, nur sichtbarer Chat-Inhalt lokal im
-// Browser des Nutzers (Free-only: kein Server, keine Kosten).
 
 // Versionierter Pfad wie in components.js (QA-Welle 1, Befund F-07) — sonst laedt
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=13";
-export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=13";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=14";
+export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=14";
 
-// Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und
-// Bewertung je Nachricht. Ohne diese Angaben koennte ein wiederhergestellter
-// Verlauf kein Markdown kopieren und keinen Zeitstempel zeigen.
+// Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und Bewertung je
+// Nachricht.
 import { clampVersionIndex, metaOf, ohneToteAktion, seedMeta } from "/assets/chat-messages.js?v=3";
 // Besitzer-Logik separat und Node-testbar (tests/chat-owner.test.mjs).
 import { OWNER_KEY, gehoertNutzer, kontoAliase, ownerDecision, sessionUserId } from "/assets/chat-owner.js?v=3";
@@ -33,9 +21,8 @@ export function eigen(objekt, userId, geraeteBesitzer) {
 const DB_NAME = "smejj-chats";
 const DB_VERSION = 1;
 export const STORE = "chats";
-// Projekte (2026-08-13): benannte Sammlungen, jeder Chat kann zu genau einem
-// Projekt gehoeren (chat.projectId). Eigener Object-Store in DERSELBEN
-// Datenbank — ein zweites DB-Handle waere nur ein zweiter Fehlerort.
+// Projekte (2026-08-13): benannte Sammlungen, jeder Chat kann zu genau einem Projekt gehoeren
+// (chat.projectId).
 export const PROJEKT_STORE = "projekte";
 const ACTIVE_KEY_SESSION = "smejj.chat.activeId.v1";
 const ACTIVE_KEY_LAST = "smejj.chat.lastActiveId.v1";
@@ -44,9 +31,6 @@ export const MAX_PROJEKTE = 50;
 const MAX_TITLE = 60;
 const SAVE_DEBOUNCE_MS = 600;
 // Obergrenze fuer gespeicherte Antwort-Fassungen je Nachricht (2026-07-28).
-// Jede Fassung traegt Rohtext UND gerendertes HTML; ohne Grenze waechst der
-// lokale Speicher bei haeufigem "Neu generieren" unbegrenzt. Acht Fassungen
-// deckt jede realistische Nutzung ab; aeltere fallen der Reihe nach weg.
 const MAX_VERSIONS = 8;
 
 let dbPromise = null;
@@ -66,10 +50,8 @@ function ensureStore(db) {
   }
 }
 
-// Ohne `version` wird der vorhandene Stand geoeffnet (und die Datenbank beim
-// allerersten Mal auf Version 1 angelegt). Eine feste Version waere hier falsch:
-// nach einer Selbstheilung steht die Datenbank hoeher, und ein Oeffnen mit der
-// kleineren Zahl wuerde dauerhaft mit VersionError scheitern.
+// Ohne `version` wird der vorhandene Stand geoeffnet (und die Datenbank beim allerersten Mal
+// auf Version 1 angelegt).
 function openAt(version) {
   return new Promise((resolve, reject) => {
     try {
@@ -86,25 +68,16 @@ function openAt(version) {
 
 function openDb() {
   if (dbPromise) return dbPromise;
-  // Selbstheilung (2026-08-03, live nachgestellt): Bricht der allererste Aufbau
-  // ab — Tab zu waehrend onupgradeneeded, Speicher-Raeumung, Quota-Fehler —,
-  // bleibt die Datenbank auf ihrer Version stehen, aber OHNE den Objektspeicher.
-  // onupgradeneeded feuert dann nie wieder, jede Transaktion wirft NotFoundError,
-  // und weil alle Aufrufer fail-safe abfangen, ist der Verlauf in diesem Browser
-  // dauerhaft und lautlos tot. Darum: fehlt der Speicher, einmal eine Version
-  // hoeher nachziehen und ihn dabei anlegen.
-  // Derselbe Weg ist auch die MIGRATION fuer Projekte (2026-08-13): eine
-  // Bestands-Datenbank hat den "projekte"-Store noch nicht — dann einmal eine
-  // Version hoeher nachziehen, ensureStore legt ihn dabei an.
+  // Selbstheilung (2026-08-03, live nachgestellt): Bricht der allererste Aufbau ab — Tab zu
+  // waehrend onupgradeneeded, Speicher-Raeumung, Quota-Fehler —, bleibt die Datenbank …
   dbPromise = openAt(null).then((db) => {
     if (db.objectStoreNames.contains(STORE) && db.objectStoreNames.contains(PROJEKT_STORE)) return db;
     const next = Math.max(db.version, DB_VERSION) + 1;
     db.close();
     return openAt(next);
   }).catch((error) => {
-    // Den fehlgeschlagenen Versuch nicht festhalten: sonst bliebe der Verlauf
-    // auch nach einer nur voruebergehenden Stoerung (Datenbank kurz gesperrt)
-    // fuer den Rest der Sitzung tot.
+    // Den fehlgeschlagenen Versuch nicht festhalten: sonst bliebe der Verlauf auch nach einer
+    // nur voruebergehenden Stoerung (Datenbank kurz gesperrt) fuer den Rest der Sitzung …
     dbPromise = null;
     throw error;
   });
@@ -143,13 +116,8 @@ function setActiveChatId(id) {
   }
 }
 
-// ---- Verlauf gehoert einem Konto (Stufe 1, docs/verlauf-pro-konto-plan.md) ----
-// Live-Befund 2026-08-12: Der Verlauf haengt am GERAET — ein zweites Konto am
-// selben Browser sah die Chats des ersten. Ein Besitzer-Merker haelt fest,
-// wessen Verlauf hier liegt; meldet sich ein ANDERES Konto an, wird der fremde
-// Verlauf geleert. Bestandsgeraete ohne Merker: der Verlauf gehoert dem gerade
-// angemeldeten Nutzer, nichts wird geloescht (Migration).
-// Wer ist gerade angemeldet? Kurzform fuer die vielen Aufrufstellen.
+// ---- Verlauf gehoert einem Konto (Stufe 1, docs/verlauf-pro-konto-plan.md) ---- Live-Befund
+// 2026-08-12: Der Verlauf haengt am GERAET — ein zweites Konto am selben …
 export function aktuellerNutzer() {
   return sessionUserId(localStorage);
 }
@@ -159,15 +127,6 @@ export function geraeteBesitzer() {
 }
 
 // Stufe 2 (2026-08-13): Kontowechsel LOESCHT NICHTS MEHR.
-//
-// Stufe 1 leerte beim Wechsel die ganze Datenbank — sicher, aber teuer: Wer sich
-// abwechselnd mit zwei Konten anmeldet, verlor jedes Mal alles. Jetzt bekommt
-// jeder Chat einen `ownerId`; beim ersten Start unter Stufe 2 wird der Altbestand
-// EINMAL auf den Geraete-Besitzer aus Stufe 1 beschriftet. Danach filtert die
-// Liste, statt zu loeschen.
-//
-// Output: false = die Beschriftung war noetig, schlug aber fehl → dann lieber
-// nichts wiederherstellen, als fremde Chats zu zeigen (fail-closed).
 async function enforceChatOwner() {
   const userId = aktuellerNutzer();
   if (!userId) return true; // abgemeldet: nichts anfassen, nichts anzeigen
@@ -188,16 +147,8 @@ async function enforceChatOwner() {
   } catch {
     return false;
   }
-  // Beim Kontowechsel den Zeiger auf den zuletzt offenen Chat fallen lassen —
-  // er zeigt auf einen Chat des anderen Kontos.
-  //
-  // UND das Sichtbare mit abraeumen. Live-Befund 2026-08-13 (in genau diesem
-  // Modul entstanden): Nach dem Wechsel stand die Unterhaltung des VORIGEN
-  // Kontos noch im Fenster. Der Beobachter speicherte sie beim naechsten
-  // Tastendruck brav ab — unter dem NEUEN Konto. So wanderten 30 fremde
-  // Nachrichten in einen fremden Verlauf, obwohl Liste und Zugriff sauber
-  // gefiltert waren. Wer den Besitzer wechselt, muss auch den Bildschirm
-  // leeren, sonst ist die Trennung nur halb.
+  // Beim Kontowechsel den Zeiger auf den zuletzt offenen Chat fallen lassen — er zeigt auf
+  // einen Chat des anderen Kontos.
   if (wechsel) {
     try {
       sessionStorage.removeItem(ACTIVE_KEY_SESSION);
@@ -256,35 +207,6 @@ function titleFrom(messages) {
 }
 
 // Medien auslagern, BEVOR der Schnappschuss gezogen wird (Befund 2026-08-14).
-//
-// readEntries() speichert `node.innerHTML`. Ein erzeugtes Bild steht dort als
-// ~585-KB-data:-URL — damit sprengt JEDER Chat mit Bild den Server-Deckel von
-// 512 KB, und der ganze Chat wird abgewiesen (chat-sync.js prueft nur auf 503,
-// der 400 fiel still durch). Ein Video steht dort sogar nur noch als
-// blob:-Zeiger, der mit dem Tab stirbt — vier solcher Leichen lagen im Konto.
-//
-// chat-medien.js legt das Medium einmal serverseitig ab und ersetzt die Quelle
-// durch eine kurze Adresse. Danach ist der Schnappschuss klein und das Medium
-// ueberlebt Neuladen und Geraetewechsel.
-//
-// DREI ORTE, nicht einer (gemessen 2026-08-22 an 113 echten Gespraechen):
-// Zehn lagen ueber MAX_CHAT_BYTES und wurden deshalb NIE gesichert. Der Median
-// aller Chats ist 7 KB — es war nie zu viel Text, immer ein Medium. Dasselbe
-// Medium steckt in `html` (innerHTML), `text` (textContent) UND `raw` (die
-// Modell-Antwort in den Metadaten); gemessen 4 / 7 / 10 Vorkommen. Der reine
-// DOM-Weg erreichte davon drei. Darum unten drei Schritte statt einem.
-//
-// Dynamischer Import und stiller Fehlschlag mit Absicht: ist das Modul nicht
-// ladbar oder die Ablage aus, wird gespeichert wie bisher — nie schlechter.
-// LIVE GEMESSEN 2026-08-23 (Abnahme, Bild-Auftrag): der Bild-Strom lief von
-// 1,6 s bis 64,9 s. Bei 59,0 s wurde der Datenberg HALB hochgeladen — der
-// Beobachter unten speichert 600 ms nach jeder Ruhe, und mitten in der base64
-// gab es eine Luecke. Der halbe data:-URL wurde durch die kurze Adresse
-// ersetzt, der Rest der base64 haengte sich hinten an die Adresse; am Ende
-// stand "!Erstelltes Bild" als Link statt ein Bild, und der Chat-Upload
-// danach bekam 400. Darum: solange ein Strom laeuft, wird NICHT ausgelagert —
-// gespeichert wird wie zuvor, ausgelagert beim naechsten Speichern nach dem
-// Stromende (das loest der Renderer selbst aus).
 let stromLaeuft = false;
 if (typeof window !== "undefined") {
   window.addEventListener("smejj:chat-strom", (e) => { stromLaeuft = (Number(e.detail?.laufen) || 0) > 0; });
@@ -330,16 +252,7 @@ async function medienHolen(log) {
 export async function persistActive() {
   await medienAuslagern();
   const messages = readEntries();
-  // ERST der Schnappschuss, DANN die Anzeige. Genau in dieser Reihenfolge:
-  // readEntries() speichert innerHTML, also muss dort die kurze Adresse stehen.
-  // Wuerde hier schon auf blob: umgeschaltet, landete der blob im Gespeicherten —
-  // und daran sind die vier Videos im Konto gestorben.
-  //
-  // Ohne diesen Aufruf sieht der Nutzer ein frisch erzeugtes Bild oder Video
-  // erst nach einem Neuladen: die Sicherheitsrichtlinie der Seite laesst kein
-  // Medium vom Control-Server zu (live gemessen — "MEDIA_ELEMENT_ERROR: Media
-  // load rejected" direkt nach dem Auslagern). Ohne await, das Speichern soll
-  // nicht auf das Netz warten.
+  // ERST der Schnappschuss, DANN die Anzeige.
   medienHolen(startLog());
   if (!messages.length) return null;
   let id = activeChatId();
@@ -349,10 +262,7 @@ export async function persistActive() {
   }
   let existing = await getChat(id);
   if (!existing) {
-    // Entweder neu — oder der Zeiger steht auf einem Chat, der einem anderen
-    // Konto gehoert. Dann NICHT ueberschreiben, sondern eine eigene Kennung
-    // nehmen: sonst koennte man fremde Unterhaltungen ueberschreiben, ohne sie
-    // je zu sehen. Unterschieden wird das am rohen Datenbank-Treffer.
+    // Entweder neu — oder der Zeiger steht auf einem Chat, der einem anderen Konto gehoert.
     const roh = await tx(STORE, "readonly", (store) => store.get(id)).catch(() => null);
     if (roh) {
       id = newId();
@@ -360,16 +270,11 @@ export async function persistActive() {
     }
     existing = null;
   }
-  // Dieses Objekt ERSETZT den gespeicherten Chat vollstaendig — was hier nicht
-  // steht, ist danach weg. Bis 2026-08-09 fehlten `pinned` und (neu) `titleAuto`:
-  // wer einen angehefteten Chat oeffnete und weiterschrieb, verlor beim naechsten
-  // Speichern die Anheftung, und ein von der Bruecke geholter Titel wurde wieder
-  // durch die erste Frage ersetzt.
+  // Dieses Objekt ERSETZT den gespeicherten Chat vollstaendig — was hier nicht steht, ist
+  // danach weg.
   const chat = {
     id,
-    // Stufe 2: Besitzer mitschreiben. Ein bereits gesetzter Besitzer bleibt
-    // stehen — sonst wuerde ein fremder Chat durch blosses Weiterschreiben den
-    // Eigentuemer wechseln.
+    // Stufe 2: Besitzer mitschreiben.
     ownerId: String(existing?.ownerId || aktuellerNutzer() || ""),
     title: existing && (existing.titleEdited || existing.titleAuto) ? existing.title : titleFrom(messages),
     titleEdited: Boolean(existing && existing.titleEdited),
@@ -378,13 +283,10 @@ export async function persistActive() {
     // Papierkorb (Bildschirm 48): das Loeschdatum uebersteht das Speichern —
     // dieselbe Feldlisten-Falle wie bei pinned und titleAuto.
     deletedAt: existing?.deletedAt || "",
-    // Projekt-Zugehoerigkeit uebernehmen — dieselbe Falle wie bei pinned und
-    // titleAuto (siehe oben): fehlt die Zeile, wirft jeder Tastendruck den
-    // Chat lautlos aus seinem Projekt.
+    // Projekt-Zugehoerigkeit uebernehmen — dieselbe Falle wie bei pinned und titleAuto (siehe
+    // oben): fehlt die Zeile, wirft jeder Tastendruck den Chat lautlos aus seinem …
     projectId: existing?.projectId || verbraucheBereichVormerkung(),
-    // Abgleichsmarke (Befund R7, 14.09.): welcher Stand zuletzt beim Server
-    // war. Dieselbe Feldlisten-Falle wie oben — ohne diese Zeile verloere
-    // jeder Tastendruck die Marke, und der Sync saehe nie einen Konflikt.
+    // Abgleichsmarke (Befund R7, 14.09.): welcher Stand zuletzt beim Server war.
     syncedAt: existing?.syncedAt || "",
     createdAt: existing && existing.createdAt ? existing.createdAt : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -409,15 +311,11 @@ function safeModelName() {
 }
 
 // Aufraeumen zaehlt seit Stufe 2 PRO KONTO: listChats liefert nur die eigenen.
-// Fremde Chats fallen der Grenze also nie zum Opfer — auf einem Geraet mit zwei
-// Konten liegen im Extremfall 2 x MAX_CHATS Unterhaltungen. Das ist gewollt:
-// Lieber etwas mehr lokaler Speicher als der Verlust fremder Verlaeufe.
 async function pruneOld() {
   const chats = await listChats();
   if (chats.length <= MAX_CHATS) return;
-  // Angepinnte Chats sind von der Aufraeumung ausgenommen — wer pinnt, sagt
-  // ausdruecklich "behalten". Durch die Sortierung (Pins zuerst) stehen sie
-  // ohnehin vor der Kappungsgrenze; der Filter sichert den Extremfall ab.
+  // Angepinnte Chats sind von der Aufraeumung ausgenommen — wer pinnt, sagt ausdruecklich
+  // "behalten".
   const surplus = chats.slice(MAX_CHATS).filter((chat) => chat.pinned !== true);
   for (const chat of surplus) {
     await tx(STORE, "readwrite", (store) => store.delete(chat.id)).catch(() => {});
@@ -441,9 +339,7 @@ export async function listChats() {
   return sichtbar.sort((a, b) => ((b.pinned === true) - (a.pinned === true)) || String(b.updatedAt).localeCompare(String(a.updatedAt)));
 }
 
-// Anpinnen/Loesen (Konkurrenz-Radar V4, 2026-08-06). updatedAt bleibt bewusst
-// unveraendert: Anpinnen ist keine inhaltliche Aenderung, und ein frisches
-// updatedAt wuerde den Chat nach dem Loesen faelschlich nach oben sortieren.
+// Anpinnen/Loesen (Konkurrenz-Radar V4, 2026-08-06).
 export async function togglePinChat(id) {
   const chat = await getChat(id);
   if (!chat) return false;
@@ -453,9 +349,7 @@ export async function togglePinChat(id) {
   return chat.pinned;
 }
 
-// Stufe 2: Ein Chat, der einem anderen Konto gehoert, wird behandelt, als gaebe
-// es ihn nicht. Das deckt AUCH den Weg ueber eine geratene oder gemerkte Kennung
-// ab — die Liste zu filtern allein waere nur eine Sichtblende.
+// Stufe 2: Ein Chat, der einem anderen Konto gehoert, wird behandelt, als gaebe es ihn nicht.
 export function getChat(id) {
   return tx(STORE, "readonly", (store) => new Promise((resolve, reject) => {
     const request = store.get(String(id || ""));
@@ -467,16 +361,6 @@ export function getChat(id) {
 
 /**
  * Titel setzen, den die Bruecke erzeugt hat (chat-title-auto.js).
- *
- * Bewusst NICHT renameChat: das setzt `titleEdited` und wuerde damit behaupten,
- * der Nutzer haette den Titel selbst vergeben — danach wuerde ihn nie wieder
- * etwas anfassen. Hier wird stattdessen `titleAuto` gesetzt; ein von Hand
- * vergebener Titel (`titleEdited`) bleibt immer unangetastet und gewinnt.
- *
- * `updatedAt` bleibt wie beim Anpinnen unveraendert: eine Umbenennung ist keine
- * inhaltliche Aenderung, und ein frisches Datum wuerde den Chat faelschlich
- * nach oben sortieren.
- *
  * @param {string} id
  * @param {string} title
  * @returns {Promise<boolean>} false, wenn der Chat fehlt oder von Hand benannt ist
@@ -505,11 +389,6 @@ export async function renameChat(id, title) {
 }
 
 // Papierkorb (Bildschirm 48: "30 Tage lang ist nichts verloren").
-// "Loeschen" ist ab jetzt WEICH: der Chat bekommt ein Loeschdatum und
-// verschwindet aus allen Listen, bleibt aber 30 Tage wiederherstellbar.
-// Erst das endgueltige Loeschen (aus dem Papierkorb oder durch die
-// Raeumung nach PAPIERKORB_TAGE, chat-store-bereiche.js) entfernt den
-// Datensatz und meldet es dem Konto. Die Zahl lebt NUR dort (14.09.).
 
 export async function deleteChat(id) {
   // Nur eigene Chats (Stufe 2). getChat liefert fuer fremde null — aber auch
@@ -517,9 +396,8 @@ export async function deleteChat(id) {
   const chat = await getChat(id) || await rohEigenerChat(id);
   if (!chat) return false;
   chat.deletedAt = new Date().toISOString();
-  // updatedAt steigt mit: der Verlauf-Sync sendet nur, was neuer ist als der
-  // Server-Stand (Abgleichskarte) — ohne diese Zeile blieb jedes Loeschen
-  // lokal, der Server fuehrte den Chat weiter als aktiv (Befund 2026-09-14).
+  // updatedAt steigt mit: der Verlauf-Sync sendet nur, was neuer ist als der Server-Stand
+  // (Abgleichskarte) — ohne diese Zeile blieb jedes Loeschen lokal, der Server fuehrte …
   chat.updatedAt = chat.deletedAt;
   await tx(STORE, "readwrite", (store) => store.put(chat));
   if (activeChatId() === id) {
@@ -541,8 +419,6 @@ export async function rohEigenerChat(id) {
 
 /**
  * Neuen Chat aus vorgegebenen Nachrichten anlegen ("Ab hier neuen Chat starten").
- * Der bisherige Chat bleibt unveraendert erhalten — es wird nichts geloescht und
- * nichts ueberschrieben; der neue Chat bekommt eine eigene Kennung.
  * @param {Array<{role: string, text: string}>} messages
  * @returns {Promise<string>} Kennung des neuen Chats, leer bei Misserfolg
  */
@@ -558,9 +434,8 @@ export async function createChatFrom(messages) {
     ownerId: aktuellerNutzer(),
     title: titleFrom(list),
     titleEdited: false,
-    // Der Abzweig beginnt bewusst OHNE Projekt: "Ab hier neuen Chat" ist ein
-    // Neuanfang, keine Fortsetzung — die einfachste Regel, die niemanden
-    // ueberrascht.
+    // Der Abzweig beginnt bewusst OHNE Projekt: "Ab hier neuen Chat" ist ein Neuanfang, keine
+    // Fortsetzung — die einfachste Regel, die niemanden ueberrascht.
     projectId: "",
     createdAt: now,
     updatedAt: now,
@@ -572,20 +447,8 @@ export async function createChatFrom(messages) {
   return id;
 }
 
-// Serveradressen der Medien VOR dem Einfuegen parken (chat-medien.js): sonst
-// laedt der Browser sie sofort, die Sicherheitsrichtlinie weist sie ab, und die
-// Konsole fuellt sich bei jedem Zeichnen — medienHolen() tauscht ohnehin gegen
-// blob:. Nachgeladen statt statisch importiert, weil der Store auch ohne seine
-// Nachbarn laufen koennen muss (Selbstheilungs-Tests kopieren ihn allein).
-//
-// ERST BEI BEDARF (Startgewicht, gemessen 2026-09-14): bis dahin holte diese
-// Stelle chat-medien.js bei JEDEM Start — 7,5 KB auf der Leitung, auch fuer
-// Besucher ohne ein einziges gespeichertes Medium. Das war der groesste
-// Posten, der die Web-Vitals-Messung auf 302 KB (Budget 300) hob. Jetzt wird
-// der Parker nur geholt, wenn ein Chat, der gleich gezeichnet wird, wirklich
-// eine Serveradresse traegt; die Wiederherstellung wartet darauf (openChat und
-// restoreOnBoot sind ohnehin asynchron), damit kein ungeparktes <img> in die
-// Seite kommt. Ohne Medium bleibt alles wie zuvor: Durchreichen.
+// Serveradressen der Medien VOR dem Einfuegen parken (chat-medien.js): sonst laedt der Browser
+// sie sofort, die Sicherheitsrichtlinie weist sie ab, und die Konsole fuellt …
 let parkeMedien = (html) => html;
 let parkerLaedt = null;
 const MEDIEN_ADRESSE = /\/api\/chat-medien\?id=/;
@@ -631,12 +494,7 @@ function renderEntriesInto(log, messages) {
     document.querySelector("#start")?.classList.toggle("has-start-chat", messages.length > 0);
     const last = log.lastElementChild;
     if (last) last.scrollIntoView({ block: "end" });
-    // Ausgelagerte Medien holen. Im gespeicherten html steht nur die kurze
-    // Serveradresse; die kann ein <img> nicht selbst laden — die
-    // Sicherheitsrichtlinie der Seite laesst nur 'self', data: und blob: zu,
-    // und den Anmelde-Schluessel koennte ein <img> ohnehin nicht mitschicken.
-    // Darum holt chat-medien.js das Medium per fetch und zeigt es als blob:.
-    // Ohne await: das Wiederherstellen soll nicht auf das Netz warten.
+    // Ausgelagerte Medien holen.
     medienHolen(log);
   } finally {
     setTimeout(() => { restoring = false; }, 50);
@@ -650,18 +508,16 @@ export async function openChat(id) {
   setActiveChatId(chat.id);
   await parkerBereit(chat.messages);
   renderEntriesInto(log, chat.messages || []);
-  // Bereichs-Anweisung in den Sitzungsspeicher — diese Zeile stand bis
-  // 2026-08-16 NACH dem return und lief darum nie (toter Code): die
-  // Dauer-Anweisung eines Projects fehlte beim Oeffnen seiner Gespraeche.
+  // Bereichs-Anweisung in den Sitzungsspeicher — diese Zeile stand bis 2026-08-16 NACH dem
+  // return und lief darum nie (toter Code): die Dauer-Anweisung eines Projects fehlte …
   aktualisiereBereichsAnweisung(chat.projectId).catch(() => {});
   goToStart();
   return true;
 }
 
 export function newChat() {
-  // Vorgemerkter Bereich ("Neues Gespraech hier"): die Dauer-Anweisung
-  // SOFORT in den Sitzungsspeicher — sie muss schon fuer die erste
-  // Nachricht im Systemprompt stehen, nicht erst nach dem Speichern.
+  // Vorgemerkter Bereich ("Neues Gespraech hier"): die Dauer-Anweisung SOFORT in den
+  // Sitzungsspeicher — sie muss schon fuer die erste Nachricht im Systemprompt stehen, nicht …
   try {
     const vormerkung = sessionStorage.getItem(BEREICH_NEU_KEY);
     if (vormerkung) aktualisiereBereichsAnweisung(vormerkung).catch(() => {});
@@ -677,10 +533,8 @@ export function newChat() {
   setActiveChatId(newId());
   notifyChanged();
   if (typeof window.smejjApplyModel === "function") {
-    // Bis 13.09. las diese Zeile NUR "smejj.model.v1" — einen Schluessel, den
-    // niemand mehr schreibt. Jeder "Neue Chat" stellte die Wahl darum still auf
-    // "smejj 1.0" zurueck, egal ob 1.3, Auto oder smejj 1 gewaehlt war (live
-    // gesehen: Chip "smejj 1.0", Speicher "smejj 1").
+    // Bis 13.09. las diese Zeile NUR "smejj.model.v1" — einen Schluessel, den niemand mehr
+    // schreibt.
     const currentModel = localStorage.getItem("smejj.model.selected.v2") || localStorage.getItem("smejj.model.v1") || "Auto"; // Freigabe 3: Standard = Auto
     window.smejjApplyModel(currentModel, { persist: false, quiet: true });
   }
@@ -716,15 +570,12 @@ async function restoreOnBoot() {
 
 function bindNewChatButton() {
   document.addEventListener("click", (event) => {
-    // Seit der Vier-Gruppen-Spur (Mockup V11, Bildschirm 19) heisst der Knopf
-    // "Chat" und traegt das Chat-Symbol; das Plus-Icon bleibt als Altform
-    // erkannt, falls eine zwischengespeicherte Huelle noch die alte Leiste hat.
+    // Seit der Vier-Gruppen-Spur (Mockup V11, Bildschirm 19) heisst der Knopf "Chat" und traegt
+    // das Chat-Symbol; das Plus-Icon bleibt als Altform erkannt, falls eine …
     const button = event.target.closest('.nav-button[data-view="start"][data-icon="chat"], .nav-button[data-view="start"][data-icon="plus"]');
     if (!button) return;
-    // Betreiber-Befund 2026-08-16 ("mein Chat verschwindet"): der Knopf
-    // warf das LAUFENDE Gespraech weg. Jetzt wechselt er ZUM Gespraech;
-    // ein neues startet er nur, wenn gerade keines sichtbar ist. Der
-    // ausdrueckliche Weg bleibt "Neuer Chat" (Start-Spur, Cmd+K).
+    // Betreiber-Befund 2026-08-16 ("mein Chat verschwindet"): der Knopf warf das LAUFENDE
+    // Gespraech weg.
     const log = startLog();
     if (log && log.children.length > 0) return; // bindNav wechselt nur die Ansicht
     newChat();
@@ -772,12 +623,8 @@ function init() {
       .then((restoreErlaubt) => {
         bindObserver();
         if (restoreErlaubt !== false) restoreOnBoot().catch(() => {});
-        // Stufe 3: Sync nachladen — dynamisch und fail-safe. Fehlt die Datei
-        // (offline, alter Cache), laeuft der Verlauf einfach lokal weiter.
-        // ?v=2: Projekte-Sync (2026-08-13). Ohne den Bump haelt der
-        // HTTP-Cache die alte Fassung fest — die Datei ist nicht im
-        // Service-Worker-Buendel und erneuert sich sonst nie zuverlaessig.
-        import("/assets/chat-sync.js?v=19").catch(() => {});
+        // Stufe 3: Sync nachladen — dynamisch und fail-safe.
+        import("/assets/chat-sync.js?v=21").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */
@@ -792,14 +639,6 @@ if (document.readyState === "loading") {
 
 /**
  * Chat von einem anderen Geraet uebernehmen (Stufe 3, chat-sync.js).
- * Schreibt NUR, wenn der Chat dem angemeldeten Konto gehoert — der Server
- * filtert zwar schon per Sitzung, aber lokal gilt dieselbe Regel nochmal
- * (nie fremdes Material in die eigene Datenbank uebernehmen).
- * KEIN notifyChanged-Ausloesen des Sync-Push: importierte Chats sind gerade vom
- * Server gekommen; sie sofort zurueckzuschicken waere ein Kreisverkehr. Die
- * Verlauf-Ansicht wird trotzdem informiert (eigenes, stilles Ereignis reicht
- * nicht — sie hoert auf smejj:chats-changed; der Push entprellt und der Server
- * ueberspringt Gleichstaende, damit bleibt der Kreis einmalig).
  * @param {object} chat  kompletter Chat-Datensatz vom Server
  * @returns {Promise<boolean>}
  */
@@ -807,31 +646,24 @@ export async function importChat(chat) {
   const userId = aktuellerNutzer();
   if (!userId || !chat || typeof chat !== "object" || !chat.id) return false;
   if (!eigen(chat, userId, geraeteBesitzer())) return false;
-  // Grabstein vom Server (Stufe 3): Der Chat wurde auf einem anderen Geraet
-  // geloescht — hier ebenfalls entfernen. Direkt in der Datenbank, NICHT ueber
-  // deleteChat: das wuerde die Loeschung erneut zum Server melden (Kreis).
+  // Grabstein vom Server (Stufe 3): Der Chat wurde auf einem anderen Geraet geloescht — hier
+  // ebenfalls entfernen.
   if (chat.geloescht === true) {
     await tx(STORE, "readwrite", (store) => store.delete(String(chat.id)));
     notifyChanged();
     return true;
   }
-  // Die Abgleichsmarke (syncedAt) setzt NICHT diese Funktion: importChat ist auch
-  // der Speicherweg der Medien-Rettung, und dort hat der Server den Stand noch
-  // nicht. Der Pull (chat-sync.js) gibt syncedAt mit, der Spread behaelt es.
+  // Die Abgleichsmarke (syncedAt) setzt NICHT diese Funktion: importChat ist auch der
+  // Speicherweg der Medien-Rettung, und dort hat der Server den Stand noch nicht.
 await tx(STORE, "readwrite", (store) => store.put({ ...chat, ownerId: userId }));
   notifyChanged();
   return true;
 }
 
-/* ------------------------------------------------------------------ *
- *  Projekte (2026-08-13): benannte Sammlungen fuer Chats.
- *
- *  Dieselben Grundsaetze wie bei den Chats: fail-safe (jeder Fehler laesst
- *  die App unveraendert weiter laufen), Besitzerprüfung ueber gehoertNutzer,
- *  Loeschung wandert als Ereignis zum Sync (Grabstein auf dem Server).
- *  Ein geloeschtes Projekt fasst seine Chats NICHT an — die Ansicht behandelt
- *  eine projectId ohne lebendes Projekt als "kein Projekt".
- * ------------------------------------------------------------------ */
+/**
+ * ------------------------------------------------------------------ * Projekte (2026-08-13):
+ * benannte Sammlungen fuer Chats.
+ */
 
 export function neueProjektId() {
   return `proj_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;

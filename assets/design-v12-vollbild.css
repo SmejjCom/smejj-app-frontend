@@ -121,4 +121,9 @@ html.vollbild-fehl body { overflow: hidden; }
   /* Der "Erste Schritte"-Kasten (Onboarding) braucht 300 px — im flachen
      Querformat (Android-Emulator 863x304 gemessen: Seite 486 hoch) weicht er. */
   #start .erste-schritte { display: none; }
+  /* Livetest 15.09.2026 (Android 863x304): im laufenden Chat ragte die Werkzeugzeile
+     5 px unter die Unterkante und rechts hinaus ("Maus"/"Datei" nicht antippbar).
+     Die Spur startet hier zu (spur-schalter.js); die Zeile rueckt enger zusammen. */
+  #start.has-start-chat .start-chips.start-chipreihe { flex-shrink: 0; gap: 4px; padding-top: 2px; padding-bottom: 2px; }
+  #start.has-start-chat .start-chips.start-chipreihe button { padding: 0 6px; }
 }
