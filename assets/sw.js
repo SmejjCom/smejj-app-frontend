@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v880";
+const CACHE_NAME = "smejj-shell-v881";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -515,8 +515,35 @@ const INSTALL_LISTE = SCHMAL ? WILLKOMMEN_SHELL : SHELL;
 // loescht umgekehrt nie einen vollen, der noch gebraucht wird.
 const AKTIVER_CACHE = SCHMAL ? CACHE_NAME.replace("smejj-shell-", "smejj-willkommen-") : CACHE_NAME;
 
+// ZEITGRENZEN (Betreiber-Freigabe 1g, 15.09.2026: "Zeitgrenze fuer durchgereichte
+// Netzabrufe, damit Updates nicht an haengenden Anfragen haengen bleiben").
+// Ohne Grenze wartet ein Abruf so lange, wie das Netz schweigt: beim Installieren
+// hielt EINE haengende Datei das ganze Update fest (addAll ist alles oder nichts),
+// bei einer Navigation blieb die Seite weiss, obwohl die Huelle im Speicher lag.
+// Installation: nach 30 s Abbruch — der alte Worker bleibt aktiv, der Browser
+// versucht das Update spaeter erneut. Navigation: nach 8 s die gespeicherte Seite,
+// der Netzabruf darf im Hintergrund fertig werden. /api/ und Stroeme: KEINE Grenze.
+const INSTALL_ZEITGRENZE_MS = 30000;
+const NAVIGATION_ZEITGRENZE_MS = 8000;
+function installSignal() {
+  return typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(INSTALL_ZEITGRENZE_MS) : undefined;
+}
+// Liefert das Netz bis `ms` nichts, gewinnt `ersatz()` — sofern es etwas findet.
+function mitZeitgrenze(netz, ersatz, ms = NAVIGATION_ZEITGRENZE_MS) {
+  return new Promise((resolve, reject) => {
+    let fertig = false;
+    const uhr = setTimeout(() => {
+      Promise.resolve().then(ersatz).then((treffer) => { if (treffer && !fertig) { fertig = true; resolve(treffer); } }).catch(() => {});
+    }, ms);
+    netz.then(
+      (antwort) => { clearTimeout(uhr); if (!fertig) { fertig = true; resolve(antwort); } },
+      (fehler) => { clearTimeout(uhr); if (!fertig) { fertig = true; reject(fehler); } }
+    );
+  });
+}
+
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(AKTIVER_CACHE).then((cache) => cache.addAll(INSTALL_LISTE.map((url) => new Request(url, { cache: "reload" })))));
+  event.waitUntil(caches.open(AKTIVER_CACHE).then((cache) => cache.addAll(INSTALL_LISTE.map((url) => new Request(url, { cache: "reload", signal: installSignal() })))));
   self.skipWaiting();
 });
 
@@ -619,13 +646,18 @@ self.addEventListener("fetch", (event) => {
   // damit aus zwei Orten nicht zwei Wahrheiten werden.
   if (url.origin === self.location.origin && request.mode === "navigate" && APP_ROUTEN.has(url.pathname.replace(/\/$/, ""))) {
     event.respondWith(
-      fetch(request)
-        .then((antwort) => (antwort && antwort.ok ? antwort : huelleAusCache(antwort)))
-        .catch(() => huelleAusCache(null))
+      mitZeitgrenze(
+        fetch(request).then((antwort) => (antwort && antwort.ok ? antwort : huelleAusCache(antwort))),
+        () => caches.match("/", { ignoreSearch: true })
+      ).catch(() => huelleAusCache(null))
     );
     return;
   }
-  event.respondWith(fetch(request).catch(() => caches.match(request).then((cached) => cached || rueckfallFuer(request))));
+  const netz = fetch(request);
+  // Nur Seiten gleicher Herkunft bekommen die Zeitgrenze (Freigabe 1g) — fremde
+  // API-Abrufe und Stroeme laufen unbegrenzt wie bisher.
+  const antwort = url.origin === self.location.origin && isHtmlRequest(request, url) ? mitZeitgrenze(netz, () => caches.match(request)) : netz;
+  event.respondWith(antwort.catch(() => caches.match(request).then((cached) => cached || rueckfallFuer(request))));
 });
 
 function huelleAusCache(rueckfall) {

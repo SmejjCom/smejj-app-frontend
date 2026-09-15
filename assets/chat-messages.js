@@ -73,7 +73,7 @@ export function isRawCandidate(entry) {
 
 function readModelName() {
   try {
-    return localStorage.getItem(MODEL_KEY) || "smejj 1.0";
+    return localStorage.getItem(MODEL_KEY) || "Auto"; // Freigabe 3 (15.09.): Standard = Auto
   } catch {
     return "smejj 1.0";
   }

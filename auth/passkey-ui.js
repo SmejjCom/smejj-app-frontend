@@ -15,6 +15,29 @@ function ready(fn) {
   else fn();
 }
 
+// Betreiber-Freigabe 1e (15.09.2026): "Passkey-Fehlermeldung auf der Anmeldeseite
+// verstaendlich auf Deutsch anzeigen". Gemessen im E2E-Test 14.09.: ohne gespeicherten
+// Passkey stand dort roh "The operation either timed out or was not allowed. See:
+// https://www.w3.org/TR/webauthn-2/#…". Browser liefern WebAuthn-Fehler englisch und
+// nur mit einem Namen (DOMException.name) — der Name ist verlaesslich, der Text nicht.
+export function passkeyFehlerText(error, vorgang = "anmelden") {
+  const name = String(error?.name || "");
+  if (name === "NotAllowedError" || name === "AbortError") {
+    return vorgang === "einrichten"
+      ? "Passkey wurde nicht eingerichtet — der Vorgang wurde abgebrochen oder ist abgelaufen. Du kannst es gleich noch einmal versuchen."
+      : "Kein Passkey gefunden oder Vorgang abgebrochen. Versuche es noch einmal oder melde dich mit Google, GitHub oder E-Mail an.";
+  }
+  if (name === "InvalidStateError") return "Auf diesem Gerät ist für dieses Konto schon ein Passkey eingerichtet. Du kannst dich direkt damit anmelden.";
+  if (name === "NotSupportedError") return "Dieser Browser oder dieses Gerät unterstützt keine Passkeys. Melde dich mit Google, GitHub oder E-Mail an.";
+  if (name === "SecurityError") return "Passkeys funktionieren nur direkt auf smejj.com über eine sichere Verbindung.";
+  const text = String(error?.message || error || "").trim();
+  // Serverseitige Meldungen sind schon deutsch; nur rohe Browser-/Netztexte ersetzen.
+  if (!text || /^[\x00-\x7F]*$/.test(text) && /\b(the|failed|error|operation|network|fetch)\b/i.test(text)) {
+    return vorgang === "einrichten" ? "Passkey konnte nicht eingerichtet werden. Bitte versuche es noch einmal." : "Anmeldung mit Passkey hat nicht geklappt. Bitte versuche es noch einmal.";
+  }
+  return vorgang === "einrichten" ? `Passkey einrichten fehlgeschlagen: ${text}` : `Passkey-Anmeldung fehlgeschlagen: ${text}`;
+}
+
 function writeOutput(message) {
   const out = document.getElementById("profileOutput");
   if (out) out.textContent = message;
@@ -66,7 +89,7 @@ ready(async () => {
       setSessionStatus(`angemeldet (Passkey) — ${result.user?.email || result.user?.name || ""}`.trim());
       writeOutput("Passkey eingerichtet und angemeldet. Kein Passwort wurde gespeichert oder gesendet.");
     } catch (error) {
-      writeOutput(`Passkey einrichten fehlgeschlagen: ${error?.message || error}`);
+      writeOutput(passkeyFehlerText(error, "einrichten"));
     } finally {
       registerBtn.disabled = false;
     }
@@ -82,7 +105,7 @@ ready(async () => {
       setSessionStatus(`angemeldet (Passkey) — ${result.user?.email || result.user?.name || ""}`.trim());
       writeOutput("Mit Passkey angemeldet. Kein Passwort wurde gespeichert oder gesendet.");
     } catch (error) {
-      writeOutput(`Passkey-Anmeldung fehlgeschlagen: ${error?.message || error}`);
+      writeOutput(passkeyFehlerText(error, "anmelden"));
     } finally {
       loginBtn.disabled = false;
     }

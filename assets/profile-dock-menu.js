@@ -131,7 +131,26 @@ async function logout() {
   } catch {
     /* Speicher nicht verfuegbar: Reload stellt den Zustand ohnehin neu her */
   }
+  vergissProfilEmail();
   location.assign("/");
+}
+
+// Betreiber-Freigabe 1h (15.09.2026): "Beim Abmelden die gespeicherte Profil-E-Mail
+// aus dem Browser entfernen (Chats und Profilbild bleiben)". Gemessen im E2E-Test
+// 14.09.: nach dem Abmelden stand die E-Mail weiter in smejj.profile.v1 — auf einem
+// geteilten Geraet fuer die naechste Person lesbar. Name, Bild, Chats bleiben.
+export function vergissProfilEmail(speicher = globalThis.localStorage) {
+  try {
+    const roh = speicher?.getItem(STORAGE_KEYS.profile);
+    if (!roh) return false;
+    const profil = JSON.parse(roh);
+    if (!profil || typeof profil !== "object" || !("email" in profil)) return false;
+    delete profil.email;
+    speicher.setItem(STORAGE_KEYS.profile, JSON.stringify(profil));
+    return true;
+  } catch {
+    return false; /* unlesbar oder gesperrt: nichts anfassen */
+  }
 }
 
 // Setzt die uebersetzten Beschriftungen. Die Schluessel existieren bereits aus der

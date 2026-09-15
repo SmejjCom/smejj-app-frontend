@@ -13,7 +13,7 @@ import { t } from "/assets/i18n/ui.js?v=3";
 // Derselbe Spezifizierer wie index.html und alle anderen Module (?v=b65): ein abweichender
 // Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js — 12,9 KB doppelt übertragen,
 // zweite IndexedDB-Verbindung, eigener Zustand (Web-Vitals-Befund 2026-09-03, Gewicht 324 KB).
-import { listChats } from "/assets/chat-store.js?v=b74";
+import { listChats } from "/assets/chat-store.js?v=b75";
 
 export const MERKER = "smejj.erste-schritte.v1";
 const STIL_ID = "erste-schritte-stil";
@@ -79,7 +79,13 @@ function sorgeFuerStil(doc) {
     + `.${KLASSE} .es-karte{display:flex;flex-direction:column;gap:4px;min-height:44px;padding:14px;border:1px solid rgba(127,127,127,.4);border-radius:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}`
     + `.${KLASSE} .es-karte strong{font-size:15px;font-weight:600}`
     + `.${KLASSE} .es-karte span{font-size:14px;line-height:1.35;opacity:.75}`
-    + `@media (max-width:600px){.${KLASSE} .es-raster{grid-template-columns:1fr}}`;
+    + `@media (max-width:600px){.${KLASSE} .es-raster{grid-template-columns:1fr}}`
+    // Betreiber-Freigabe 1c (15.09.2026): "nur bei Bildschirmhoehe unter 600 px die
+    // Erste-Schritte-Karten verkleinern, damit das Eingabefeld sichtbar ist".
+    // Gemessen im E2E-Test 14.09. bei 320x568: Kasten 304 px hoch, Eingabefeld bei
+    // 645-689 px — unter dem Rand. Kompakt: nur die Titel, nebeneinander, Tippziel 44 px.
+    + `@media (max-height:600px){.${KLASSE}{margin-top:8px}.${KLASSE} header{margin:0 0 4px}.${KLASSE} .es-raster{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}`
+    + `.${KLASSE} .es-karte{padding:4px 8px;justify-content:center;text-align:center}.${KLASSE} .es-karte strong{font-size:14px;line-height:1.2}.${KLASSE} .es-karte span{display:none}}`;
   doc.head.appendChild(stil);
 }
 

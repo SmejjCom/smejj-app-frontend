@@ -219,7 +219,7 @@ async function setzeFort(bereich) {
   const vorher = output.textContent;
   const anfrage = {
     task: FORTSETZUNGS_AUFTRAG,
-    model: localStorage.getItem(MODELL_SCHLUESSEL) || "smejj 1.0",
+    model: localStorage.getItem(MODELL_SCHLUESSEL) || "Auto", // Freigabe 3: Standard = Auto
     files: [],
     preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}) },
     history: buildRequestHistory(FORTSETZUNGS_AUFTRAG)

@@ -3,7 +3,7 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=b48";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=4";
-import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=11";
+import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=12";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2";
 import { holeSendepfad } from "./sendepfad-nachladen.js?v=23";
@@ -181,7 +181,7 @@ function bindModelPicker() {
   const menu = $("#modelPickerMenu");
   if (!button || !menu) return;
   state.settings = { ...state.settings, stufe: normalizeStufe(localStorage.getItem(STUFE_KEY) || state.settings.stufe) };
-  applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) || state.settings.model || "smejj 1.0", { persist: false, quiet: true }); window.addEventListener("smejj:model-selected", (event) => {
+  applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) || state.settings.model || "Auto", { persist: false, quiet: true }); window.addEventListener("smejj:model-selected", (event) => {
     // Das Menue schickt Modell UND Stufe. Die Stufe hier zu ignorieren war die
     // Ursache dafuer, dass eine Wahl von "smejj 1.0" den Chip auf "smejj 1.1"
     // stellte (live gemessen 2026-09-11): der Chip las die alte Stufe.
@@ -236,7 +236,7 @@ function bindModelPicker() {
 }
 
 function applySelectedModel(model, { persist = true, quiet = false } = {}) {
-  const selectedModel = Object.hasOwn(MODEL_MODES, model) ? model : "smejj 1.0";
+  const selectedModel = Object.hasOwn(MODEL_MODES, model) ? model : "Auto"; // Freigabe 3 (15.09.): Standard = Auto
   const mode = MODEL_MODES[selectedModel] || AI_MODES.disabled;
   const button = $("#modelPickerButton");
   // Der Chip zeigt die WAHL, nichts anderes. Bis 2026-09-11 stand hier ein
@@ -661,6 +661,7 @@ function bindProfile() {
   $("#logoutLocal").addEventListener("click", () => {
     state.session = { authenticated: false, mode: PROJECT_ROLES.localOnly };
     localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));
+    state.profile = { ...state.profile, email: "" }; localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify({ name: state.profile.name || "" })); $("#profileEmail").value = ""; // Freigabe 1h
     refreshSessionStatus();
     writeOutput("#profileOutput", "Logout abgeschlossen. Lokale Projekte wurden nicht geloescht.");
   });

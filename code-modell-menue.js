@@ -94,7 +94,7 @@ export const SMEJJ_STAFFEL = [
   { titel: "smejj 1.3", stufe: "spezial", hinweis: "Spezialfaelle — tiefste Denkstufe, keine Schnellspur" },
   { titel: "smejj 1.2", stufe: "gruendlich", hinweis: "Komplex — immer die tiefe Spur" },
   { titel: "smejj 1.1", stufe: "auto", hinweis: "Alltag — die Automatik entscheidet" },
-  { titel: "smejj 1.0", stufe: "schnell", hinweis: "Standard — schnellste Antwort" }
+  { titel: "smejj 1.0", stufe: "schnell", hinweis: "Schnellste Antwort" }
 ];
 
 // DAS EIGENE MODELL — bewusst NICHT Teil der Staffel.
@@ -140,9 +140,12 @@ export function nachVersionAbsteigend(liste) {
   });
 }
 
+// Betreiber-Freigabe 3 (15.09.2026): "Standard soll ehrlich ‚Auto' anzeigen und Auto
+// senden." Ohne gespeicherte Wahl zeigte der Chip "smejj 1.0 ✓", gesendet wurde aber
+// Stufe "auto" (live gemessen 14.09.). Keine Wahl heisst jetzt ueberall: Auto.
 export function modellAnzeige(hausText) {
   migriereAlteWahl();
-  const wahl = localStorage.getItem(MODELL_KEY);
+  const wahl = localStorage.getItem(MODELL_KEY) || AUTO_WAHL;
   if (wahl === AUTO_WAHL) return "Auto";
   // Sonst zeigte der Chip die Stufe ("smejj 1.2") statt der Wahl.
   if (wahl === EIGENES_MODELL.titel) return EIGENES_MODELL.titel;
@@ -225,7 +228,7 @@ export async function oeffneModellMenue(kontext = {}) {
   kopf.textContent = "Unsere Modelle";
   menue.append(kopf);
   migriereAlteWahl();
-  const istAuto = localStorage.getItem(MODELL_KEY) === AUTO_WAHL;
+  const istAuto = (localStorage.getItem(MODELL_KEY) || AUTO_WAHL) === AUTO_WAHL; // Freigabe 3: keine Wahl = Auto
   const zeile = ({ titel, klein, hinweis, aktiv, aktion }) => {
     const k = document.createElement("button");
     k.type = "button";
@@ -313,7 +316,7 @@ export async function oeffneModellMenue(kontext = {}) {
   menue.append(TRENNER);
   zeile({
     titel: "Auto",
-    hinweis: "Waehlt pro Auftrag das passendste verfuegbare Modell — kostenlose, eigene und lokale — und wechselt bei Limit oder Ausfall",
+    hinweis: "Standard — waehlt pro Auftrag das passendste verfuegbare Modell — kostenlose, eigene und lokale — und wechselt bei Limit oder Ausfall",
     aktiv: istAuto,
     aktion: () => {
       localStorage.setItem(MODELL_KEY, AUTO_WAHL);
