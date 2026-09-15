@@ -251,12 +251,18 @@
   }
 
   function registerLeiste(alle, aktivId) {
+    // Gleiche Zaehlung wie das Control Center (A-bis-Z-Livetest 15.09.2026, Befund 7):
+    // dort stand "Aktiv 71 + Nur Test 12", hier "Läuft 83" — beide Zahlen stimmten,
+    // aber keine Seite erklaerte die andere. Jetzt: "Läuft 83 · davon 12 nur Baustein".
+    const baustein = alle.filter(function (a) { return a.ampel === "gruen" && a.wirkung === "baustein"; }).length;
     return '<div class="ap-register">' + REGISTER.map(function (r) {
       const anzahl = alle.filter(r.passt).length;
       const dringend = r.id === "achtung" && anzahl > 0;
       return '<span class="ap-reg' + (r.id === aktivId ? " on" : "") + (dringend ? " warn" : "")
         + '" data-apReg="' + e(r.id) + '">' + e(r.name)
-        + '<b class="n">' + anzahl + "</b></span>";
+        + '<b class="n">' + anzahl + "</b>"
+        + (r.id === "arbeit" && baustein ? '<span class="s"> · davon ' + baustein + " nur Baustein</span>" : "")
+        + "</span>";
     }).join("") + "</div>";
   }
 

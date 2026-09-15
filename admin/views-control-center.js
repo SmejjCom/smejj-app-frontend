@@ -38,11 +38,16 @@
   }
 
   function kacheln(z) {
+    // Live-Test 15.09.: "Aktiv 71" + "Nur Test 12" hier, "Läuft 83" auf der Autopiloten-Seite —
+    // niemand sah, dass es dieselben 83 sind. Die erste Kachel nennt jetzt dieselbe Summe wie
+    // dort und die Aufteilung gleich dazu. Ältere Server ohne z.laeuft: Summe aus aktiv + test.
+    const laeuft = Number.isFinite(z.laeuft) ? z.laeuft : (z.aktiv || 0) + (z.test || 0);
+    const baustein = Number.isFinite(z.laeuftBaustein) ? z.laeuftBaustein : (z.test || 0);
     return '<div class="kpis">'
-      + V.kachelBlock("Aktiv", String(z.aktiv || 0), "arbeiten am echten System oder mit engem Blick", "up")
+      + V.kachelBlock("Läuft", String(laeuft), "davon " + (laeuft - baustein) + " aktiv am System, " + baustein + " nur Baustein — wie „Läuft“ auf der Autopiloten-Seite", "up")
       + V.kachelBlock("Fehler", String(z.fehler || 0), (z.fehler || 0) ? "brauchen dich — Liste unten" : "keiner", (z.fehler || 0) ? "wr" : "up")
       + V.kachelBlock("Wartet · blockiert", String((z.wartet || 0) + (z.blockiert || 0)), "verspätet, ohne Messung oder in Wartung", (z.wartet || 0) ? "wr" : "")
-      + V.kachelBlock("Nur Test", String(z.test || 0), "Bausteine ohne Live-Wirkung", "")
+      + V.kachelBlock("Nur Test", String(z.test || 0), "Bausteine ohne Live-Wirkung — in „Läuft " + laeuft + "“ mitgezählt", "")
       + "</div>";
   }
 

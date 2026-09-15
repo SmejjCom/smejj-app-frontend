@@ -46,13 +46,12 @@
   var SESSION_KEY = "smejj.session.v1";
   var LOGIN_URL = "/auth/login/";
 
-  // HINWEIS zum Rueckfallweg <control-server>/admin: dort steht diese Datei
-  // NICHT in der Ausliefer-Liste (DATEIEN in adminUiRoutes.js), der Aufruf
-  // endet also mit 404. Das ist ungefaehrlich und bewusst so gelassen:
-  // console.js faellt dann auf eine untaetige Attrappe zurueck, und die
-  // Berechtigung prueft dort ohnehin der Server, BEVOR er die erste Datei
-  // herausgibt. adminUiRoutes.js steht unter dem admin-lock und wird nicht
-  // ohne schriftliche Freigabe des Betreibers angefasst.
+  // HINWEIS zum Rueckfallweg <control-server>/admin: bis 15.09.2026 stand
+  // diese Datei dort NICHT in der Ausliefer-Liste (DATEIEN in adminUiRoutes.js)
+  // und endete mit 404 samt MIME-Fehler in der Browser-Konsole (A-bis-Z-
+  // Livetest, Befund 4, mit Betreiber-Freigabe "Alle beheben" behoben). Jetzt
+  // wird sie ausgeliefert und legt dort nur die untaetige Attrappe an (unten);
+  // die Berechtigung prueft der Server, BEVOR er die erste Datei herausgibt.
   //
   // Auf dem Control-Server traegt der Browser ein Sitzungs-Cookie und KEIN
   // Token im localStorage — dort pruefte adminUiRoutes.js schon vor dem
@@ -82,6 +81,13 @@
   //      die Regel dazu kommt aus dem Browser selbst. Es greift also auch
   //      dann, wenn console.css gar nicht erst geladen wurde.
   var KLASSE = "smejj-gate-zu";
+  // Zustand "nur der Ladehinweis": <html> sichtbar, von <body> aber NUR der
+  // Hinweiskasten (Regel in console.css). Befund 5 des A-bis-Z-Livetests
+  // 15.09.2026: zeigeLaedt() rief frueher zeigen() — nach 1,5 s stand die
+  // ganze Huelle samt Menue da, BEVOR der Server die Anmeldung bestaetigt
+  // hatte. Genau das sollte das Gate verhindern.
+  var KLASSE_LAEDT = "smejj-gate-laedt";
+  var MARKE_VERBORGEN = "data-gate-verborgen";
 
   function verbergen() {
     try { wurzel.classList.add(KLASSE); } catch (e) { /* Rueckfall unten */ }
@@ -90,7 +96,37 @@
 
   function zeigen() {
     try { wurzel.classList.remove(KLASSE); } catch (e) { /* weiter */ }
+    try { wurzel.classList.remove(KLASSE_LAEDT); } catch (e) { /* weiter */ }
     try { wurzel.hidden = false; } catch (e) { /* nichts zu retten */ }
+  }
+
+  /**
+   * Nur den Hinweiskasten zeigen, die Huelle bleibt weg. ZWEI Wege wie beim
+   * Verbergen: die Klasse (Regel in console.css, greift auch fuer spaeter
+   * angehaengte Elemente) und das hidden-ATTRIBUT an jedem vorhandenen
+   * Body-Kind (greift, falls console.css noch nicht geladen ist).
+   */
+  function zeigeNurHinweis(kasten) {
+    try { wurzel.classList.add(KLASSE_LAEDT); } catch (e) { /* Rueckfall unten */ }
+    var kinder = document.body.children;
+    for (var i = 0; i < kinder.length; i++) {
+      if (kinder[i] === kasten || kinder[i].hidden) continue;
+      kinder[i].setAttribute(MARKE_VERBORGEN, "1");
+      kinder[i].hidden = true;
+    }
+    try { wurzel.classList.remove(KLASSE); } catch (e) { /* weiter */ }
+    try { wurzel.hidden = false; } catch (e) { /* nichts zu retten */ }
+  }
+
+  /** Was zeigeNurHinweis verborgen hat, wieder hervorholen — nur das. */
+  function hinweisZuruecknehmen() {
+    try {
+      var verborgen = document.querySelectorAll("[" + MARKE_VERBORGEN + "]");
+      for (var i = 0; i < verborgen.length; i++) {
+        verborgen[i].hidden = false;
+        verborgen[i].removeAttribute(MARKE_VERBORGEN);
+      }
+    } catch (e) { /* weiter */ }
   }
 
   /**
@@ -156,7 +192,8 @@
    *
    * Stufe 1 nach 1,5 s: eine ruhige Zeile "wird geladen". Vorher war die Seite
    * bis zu 15 Sekunden SCHWARZ — man sah nicht, ob es laeuft oder haengt. Der
-   * Kasten verraet nichts ueber den Aufbau der Konsole, die Huelle bleibt weg.
+   * Kasten verraet nichts ueber den Aufbau der Konsole, die Huelle bleibt weg
+   * (seit 15.09.2026 wirklich: zeigeNurHinweis statt zeigen, siehe oben).
    *
    * Stufe 2 nach 30 s: der Abbruch. Und zwar mit der Ursache, die wirklich
    * zutrifft — dafuer wird nachgesehen, ob console.js ueberhaupt angekommen
@@ -206,7 +243,7 @@
       kasten.appendChild(titel);
       kasten.appendChild(text);
       document.body.appendChild(kasten);
-      zeigen();
+      zeigeNurHinweis(kasten);
     } catch (e) { /* verborgen lassen ist das sichere Ende */ }
   }
 
@@ -215,6 +252,7 @@
     clearTimeout(hinweisNetz);
     var laedt = document.getElementById("gateLaedt");
     if (laedt && laedt.parentNode) laedt.parentNode.removeChild(laedt);
+    hinweisZuruecknehmen();
     zeigen();
   }
 

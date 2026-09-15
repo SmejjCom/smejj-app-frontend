@@ -311,8 +311,12 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
 .sw.on::after{left:auto;right:2px;background:var(--sm-accent);}
 
 /* Hinweisstreifen */
-.note{display:grid;grid-template-columns:auto 1fr;gap:14px;padding:16px 18px;align-items:start;
+/* minmax(0,1fr) statt 1fr und anywhere an .mono (A-bis-Z-Livetest 15.09.2026,
+   Befund 3): "control_umgebung_wiederherstellen.mjs" hat keine Trennstelle; die
+   Textspalte wuchs auf 390 px um 48 px ueber den Bildschirm hinaus. */
+.note{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;padding:16px 18px;align-items:start;
   border-left:3px solid var(--sm-accent);}
+.note .ns .mono,.note .nt .mono{overflow-wrap:anywhere;}
 .note.warn{border-left-color:var(--sm-warn);}
 .note.bad{border-left-color:var(--sm-danger);}
 .note .nt{font-size:15px;font-weight:600;}
@@ -352,6 +356,9 @@ tbody tr:hover td{background:rgba(255,255,255,.03);}
   font-family:ui-monospace,Menlo,monospace;}
 
 .laedt{padding:26px;font-size:15px;color:var(--sm-ink-faint);}
+/* Nach 15 s ohne Antwort (console.js laedt): lesbar statt blass, mit Knopf. */
+.laedt-langsam-text{margin:10px 0 14px;font-size:15px;line-height:1.55;color:var(--sm-ink-dim);}
+.laedt .btn{min-height:44px;padding:0 18px;}
 .fehler{border-left:3px solid var(--sm-danger);}
 .leer{padding:26px 18px;font-size:15px;color:var(--sm-ink-faint);}
 .track i{transition:width .25s ease;}
@@ -553,6 +560,9 @@ select.dlg-feld{cursor:pointer;}
    weist jedes Setzen von element.style ab (live gemessen 2026-08-14 — der
    erste Fix sah richtig aus und wirkte nicht). */
 html.smejj-gate-zu{visibility:hidden!important;}
+/* Waehrend der Anmeldepruefung nur der Ladehinweis — nie die Huelle mit Menue
+   (A-bis-Z-Livetest 15.09.2026, Befund 5; gate.js zeigeNurHinweis). */
+html.smejj-gate-laedt body>*:not(#gateLaedt){display:none!important;}
 
 /* ---- AP · Liste als Tabelle nach Bereichen (Design-Vorschlag, 2026-08-23) ----
    Viereckig, grosse Schrift, eine Akzentfarbe: die Struktur kommt aus dem

@@ -45,7 +45,9 @@
     if ((d.nichtErreichbar || 0) > 0) {
       const tote = d.dienste.filter(function (x) { return x.zustand === "nicht-erreichbar"; }).map(function (x) { return x.name; });
       return '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + tote.length + " nicht erreichbar</div>"
-        + '<div class="ns">' + e(tote.join(", ")) + " antwortet nicht. Zuerst ansehen.</div></div></div>";
+        // Seit 15.09. zählt auch 404 auf /health hierher (kein Gesundheitspfad = nichts bewiesen) —
+        // "antwortet nicht" wäre dann falsch; der genaue Grund steht in der Zeile.
+        + '<div class="ns">' + e(tote.join(", ")) + " — keine gesunde Antwort (Ausfall, Fehlercode oder kein /health). Grund in der Zeile, zuerst ansehen.</div></div></div>";
     }
     if ((d.sperrenVeraendert || 0) > 0) {
       return '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + d.sperrenVeraendert + " Sperre(n) verändert</div>"

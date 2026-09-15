@@ -157,6 +157,19 @@
     return (location.hash || ("#" + STARTSEITE)).replace(/^#/, "");
   }
 
+  /**
+   * Welche Seite die Schiene markiert, BEVOR route() laeuft — dieselbe
+   * Aufloesung wie dort. Befund 6 des A-bis-Z-Livetests 15.09.2026: waehrend
+   * der Anmeldepruefung stand "Cockpit" markiert, obwohl z. B.
+   * /admin/autopiloten/ aufgerufen war.
+   */
+  function navZiel() {
+    let ziel = aktuellerPfad();
+    if (AUFGELOEST[ziel]) ziel = AUFGELOEST[ziel];
+    if (ziel.indexOf("akte/") === 0) return "nutzer";
+    return SEITEN.some(function (s) { return s.pfad === ziel; }) ? ziel : STARTSEITE;
+  }
+
   function schreibeNav(aktiv) {
     let gruppe = null;
     nav.innerHTML = SEITEN.map(function (s) {
@@ -179,8 +192,28 @@
     }).join("");
   }
 
-  function laedt(text) {
+  // LANGSAME ANTWORT (A-bis-Z-Livetest 15.09.2026, Befund M1): die Autopiloten-
+  // Seite brauchte am Handy ueber 30 s, und bis dahin stand nur "wird geladen".
+  // Nach 15 s sagt die Seite deshalb, dass es dauert, und bietet "Erneut
+  // versuchen" an. Die laufende Anfrage wird NICHT abgebrochen: kommt sie doch
+  // noch, zeichnet sie ganz normal ueber den Hinweis.
+  const GEDULD_SEITE_MS = 15000;
+
+  function laedt(text, erneut) {
     seite.innerHTML = '<div class="laedt glass">' + A.escapeHtml(text || "wird geladen …") + '</div>';
+    const kasten = seite.firstChild;
+    setTimeout(function () {
+      // Nur wenn noch GENAU dieser Ladekasten steht — sonst ist die Seite da.
+      if (!kasten || kasten.parentNode !== seite) return;
+      kasten.innerHTML = '<div class="laedt-langsam">' + A.escapeHtml(text || "wird geladen …") + '</div>'
+        + '<p class="laedt-langsam-text">Die Antwort dauert ungewöhnlich lange (über 15 Sekunden). '
+        + 'Bei langsamer Verbindung kann das vorkommen — die Anfrage läuft weiter.</p>'
+        + '<button type="button" class="btn" data-laedtErneut="1">Erneut versuchen</button>';
+      const knopf = kasten.querySelector("[data-laedtErneut]");
+      if (knopf) knopf.addEventListener("click", function () {
+        if (typeof erneut === "function") erneut(); else route();
+      });
+    }, GEDULD_SEITE_MS);
   }
 
   function setzeKopf(name) {
@@ -583,10 +616,10 @@
     return ANGEMELDET[STARTSEITE].laden(seitenKontext(STARTSEITE));
   }
 
-  // Spiegel zu public/admin/console.js. Hier liegt gate.js NICHT daneben:
+  // Spiegel zu public/admin/console.js. Auf dem Control-Server liegt gate.js
+  // seit 15.09.2026 daneben, legt dort aber nur eine untaetige Attrappe an:
   // adminUiRoutes.js prueft schon vor dem Ausliefern und gibt ohne Adminrolle
-  // keine Datei heraus. Der Fallback macht die Zeilen damit wirkungslos — sie
-  // stehen trotzdem hier, damit die beiden Kopien nicht auseinanderlaufen.
+  // keine Datei heraus. Der Fallback hier bleibt fuer Tests ohne gate.js.
   const GATE = window.smejjAdminGate || { freigeben: function () {}, abweisen: function () {} };
   const KEIN_ADMIN = ["admin_role_required", "admin_account_not_active"];
 
@@ -633,8 +666,8 @@
     // hidden-Attribut: die Pillen starten versteckt.
     versteckeStand();
     bindeMarke();
-    schreibeNav(STARTSEITE);
-    laedt("Anmeldung wird geprüft …");
+    schreibeNav(navZiel());
+    laedt("Anmeldung wird geprüft …", function () { location.reload(); });
     const antwort = await A.ich();
     if (!antwort.ok) {
       // Der Server hat nicht JA gesagt — also bleibt die Huelle weg. Sie
