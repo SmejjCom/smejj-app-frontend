@@ -699,3 +699,7 @@ body.rail-zieht{cursor:col-resize;user-select:none;-webkit-user-select:none;}
   body .rail-user{grid-template-columns:32px;}
   .rail-griff{display:none;}
 }
+
+/* Radar-Export (Master-Audit 2026-09-15, Runde 3): das vorformatierte Export-Feld trug
+   white-space:pre und zog bei 390 px die ganze Hauptspalte auf 556 px (234 px Ueberlauf). */
+pre.radar-export{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;}
