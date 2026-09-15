@@ -13,7 +13,12 @@ import { sanitizeHistory } from "../src/agent/conversationHistory.js";
 // Gueltigkeitsbereich, GROQ_API_KEY & Co. gehoeren dort chat-bridge.js.
 const VISION_API_KEY = process.env.SMEJJ_LLM_GROQ_API_KEY || "";
 const VISION_BASE_URL = String(process.env.SMEJJ_LLM_GROQ_BASE_URL || "https://api.groq.com/openai/v1").replace(/\/+$/, "");
-const VISION_MODEL = process.env.SMEJJ_LLM_GROQ_VISION_MODEL || "qwen/qwen3.6-27b";
+// MODELL-LISTE statt EIN Modell (15.09.2026, live gemessen): Groq hat qwen/qwen3.6-27b
+// abgeschaltet (404 model_not_found). Die Spur gab darauf still "false" zurueck, der
+// Text-Weg antwortete "Bitte laden Sie das Bild hoch" — Bild-Verstehen war tot, ohne
+// Fehlermeldung. Jetzt: Env-Wahl zuerst, dann der Nachfolger qwen3.8-27b, dann der alte
+// Name; bei 404/400 (Modell weg oder kann keine Bilder) geht es zum naechsten.
+export const VISION_MODELLE = [...new Set([process.env.SMEJJ_LLM_GROQ_VISION_MODEL, "qwen/qwen3.8-27b", "qwen/qwen3.6-27b"].filter(Boolean))];
 
 // Nur JPEG/PNG/WebP als base64-data:-URL, Deckel = Body-Deckel der Bruecke.
 // Alles andere (fremde URLs, andere MIME-Typen, Muell) ergibt "" — kein Fehler
@@ -46,32 +51,35 @@ export async function streamVisionLane(res, body, task, deps) {
       ]
     }
   ];
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), deps.timeoutMs);
-  let upstream;
-  try {
-    upstream = await fetch(`${VISION_BASE_URL}/chat/completions`, {
-      method: "POST",
-      signal: controller.signal,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "text/event-stream",
-        Authorization: `Bearer ${VISION_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: VISION_MODEL,
-        messages,
-        stream: true,
-        temperature: 0.3,
-        max_tokens: 1024
-      })
-    });
-  } catch {
+  let upstream = null;
+  let modell = "";
+  for (const kandidat of VISION_MODELLE) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), deps.timeoutMs);
+    try {
+      upstream = await fetch(`${VISION_BASE_URL}/chat/completions`, {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+          Authorization: `Bearer ${VISION_API_KEY}`
+        },
+        body: JSON.stringify({ model: kandidat, messages, stream: true, temperature: 0.3, max_tokens: 1024 })
+      });
+    } catch {
+      clearTimeout(timer);
+      return false;
+    }
     clearTimeout(timer);
-    return false;
+    if (upstream.ok && upstream.body) { modell = kandidat; break; }
+    // Nur "Modell gibt es nicht / kann das nicht" rechtfertigt den naechsten Kandidaten;
+    // 429/5xx sind Anbieter-Lage und gehen wie bisher an den Text-Weg.
+    if (upstream.status !== 404 && upstream.status !== 400) return false;
+    await upstream.text().catch(() => "");
+    upstream = null;
   }
-  clearTimeout(timer);
-  if (!upstream.ok || !upstream.body) return false;
+  if (!upstream || !modell) return false;
   res.writeHead(200, {
     ...deps.securityHeaders(),
     ...deps.corsHeaders("https://smejj.com"),
@@ -80,8 +88,8 @@ export async function streamVisionLane(res, body, task, deps) {
     Connection: "keep-alive",
     "x-smejj-bridge": "chat-vision",
     "x-smejj-profile": "vision",
-    "x-smejj-model-backend": `groq:${VISION_MODEL}`,
-    "x-smejj-model-id": VISION_MODEL,
+    "x-smejj-model-backend": `groq:${modell}`,
+    "x-smejj-model-id": modell,
     "x-smejj-requested-model": String(body?.model || ""),
     "x-smejj-model-fallback": "false"
   });

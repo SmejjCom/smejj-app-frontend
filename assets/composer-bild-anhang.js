@@ -112,6 +112,10 @@ export function bindBildAnhang(selector, getInput, notifyInputChanged) {
       notifyInputChanged(input);
     }
   });
+  // Nachzuegler (15.09.2026, live gemessen): das Modul wird erst im Chip-Klick nachgeladen.
+  // Waehlt jemand die Datei, BEVOR dieser Listener haengt, war das change-Ereignis weg und
+  // das Bild kam nie am Feld an. Liegt beim Anbinden schon eine Wahl vor: jetzt uebernehmen.
+  if (fileInput.files?.length) fileInput.dispatchEvent(new Event("change"));
 }
 
 // Globaler Abhol-Haken fuer app.js (start-locked, deshalb dort nur ein Spread):
