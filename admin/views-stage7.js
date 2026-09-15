@@ -146,7 +146,9 @@
       zeile("Höchstbetrag je Lauf", g.maxUsdProJob === null ? "nicht gesetzt" : g.maxUsdProJob + " USD"),
       zeile("Höchstlaufzeit", g.maxLaufzeitMinuten === null ? "nicht gesetzt" : g.maxLaufzeitMinuten + " Min"),
       zeile("Gleichzeitige Worker", String(g.maxGleichzeitigeWorker || "—")),
-      zeile("Neuer Lauf gerade zulässig", g.naechsterStartErlaubt ? "ja" : "nein"),
+      // Befund 15.09.: "ja" stand neben "Reservierungs-Obergrenze erreicht" — die Reservierung zählt mit.
+      zeile("Neuer Lauf gerade zulässig", !g.naechsterStartErlaubt ? "nein"
+        : (r.erreichbar && Number(r.reserviertUsd) >= Number(r.obergrenzeUsd) && Number(r.obergrenzeUsd) > 0) ? "nein — die Reservierungs-Obergrenze ist erreicht" : "ja"),
       zeile("Verhalten ohne Konfiguration", g.failClosed ? "fail-closed — es startet nichts" : "unbekannt")
     ]);
 

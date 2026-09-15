@@ -672,3 +672,30 @@ body.rail-zieht{cursor:col-resize;user-select:none;-webkit-user-select:none;}
 
 /* Das hidden-Attribut darf keine display-Regel verlieren (2026-08-23: Stand-Pillen) */
 [hidden]{display:none!important;}
+
+/* ---------- Schmale Bildschirme (Master-Audit 2026-09-15) ----------
+   Befund live bei 390 px: die Schiene blieb 284 px breit, der Inhalt bekam
+   190 px und lief 84 px über den Rand. Unter 640 px faellt die Schiene darum
+   auf die eingeklappte Icon-Spur (dieselbe Form wie body.rail-zu, freigegeben
+   2026-09-04); die Nummern bleiben tippbar. Gilt auf body, damit eine gemerkte
+   Breite am Wurzelelement (schiene.js) sie nicht ueberschreibt. */
+@media (max-width:640px){
+  body{--rail:68px;}
+  body .rail-brand{padding:18px 0 14px;}
+  body .rail-brand .mark{justify-content:center;gap:0;}
+  body .rail-brand b,
+  body .rail-brand .sub,
+  body .rail-env #umgebung,
+  body .rail-item .rail-name,
+  body .rail-item .rail-kuerzel,
+  body .rail-group .grp-nr,
+  body .rail-user > div:last-child,
+  body .rail-foot .pill{display:none;}
+  body .rail-group{margin:12px 14px 8px;padding:0;height:1px;overflow:hidden;font-size:0;line-height:0;color:transparent;background:var(--sm-border);}
+  body .rail-env{justify-content:center;padding:10px 0;}
+  body .rail-nav{padding:8px 0 14px;}
+  body .rail-item{grid-template-columns:1fr;justify-items:center;gap:0;padding:7px 0;min-height:44px;}
+  body .rail-foot{padding:12px 0;justify-items:center;}
+  body .rail-user{grid-template-columns:32px;}
+  .rail-griff{display:none;}
+}

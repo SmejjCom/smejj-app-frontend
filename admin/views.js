@@ -141,7 +141,7 @@
       + kachel("Zahlend", abos.erreichbar === false ? "—" : String(abos.zahlend || 0), konten.gesamt ? Math.round(((abos.zahlend || 0) / konten.gesamt) * 1000) / 10 + " % der Konten" : "", "up")
       // Ehrlich: Google/GitHub/Passkey-Sitzungen hinterlassen keine Spur im
       // Datensatz — nur E-Mail-Konten sind hier zaehlbar, und das steht dran.
-      + kachel("Heute aktiv", String(konten.heuteAktiv || 0), "nur messbar für " + (index.zuletztMessbarKonten || 0) + " E-Mail-Konto" + ((index.zuletztMessbarKonten || 0) === 1 ? "" : "en") + " — Google/GitHub hinterlassen keine Spur", (index.zuletztMessbarKonten || 0) ? "" : "wr")
+      + kachel("Heute aktiv", String(konten.heuteAktiv || 0), "nur messbar für " + (index.zuletztMessbarKonten || 0) + ((index.zuletztMessbarKonten || 0) === 1 ? " E-Mail-Konto" : " E-Mail-Konten") + " — Google/GitHub hinterlassen keine Spur", (index.zuletztMessbarKonten || 0) ? "" : "wr")
       + kachel("Zwei Adressen", abos.erreichbar === false ? "—" : String((abos.zweiAdressen || 0) + (abos.nichtZugeordnet || 0)), (abos.nichtZugeordnet || 0) > 0 ? abos.nichtZugeordnet + " ohne Konto — anschreiben" : "bezahlt ≠ angemeldet", (abos.nichtZugeordnet || 0) > 0 ? "dn" : "")
       + "</div>"
       + suche
@@ -244,6 +244,13 @@
 
   // ---- O · Audit --------------------------------------------------------------
 
+  /** Ziel eines Audit-Eintrags lesbar — manche Einträge tragen ein Objekt (Befund 15.09.: "[object Object]"). */
+  function zielText(ziel) {
+    if (ziel === null || ziel === undefined) return "";
+    if (typeof ziel !== "object") return String(ziel);
+    return Object.keys(ziel).map(function (k) { return k + "=" + (typeof ziel[k] === "object" ? JSON.stringify(ziel[k]) : String(ziel[k])); }).join(" · ");
+  }
+
   function audit(d) {
     const kette = d.chain || {};
     const zeilen = (d.entries || []).map((eintrag) =>
@@ -251,7 +258,7 @@
       + '<td><b>' + e(eintrag.actorEmail) + '</b><br>' + pille(eintrag.actorRole, "acc")
       + (eintrag.actorRoleSource === "bootstrap" ? " " + pille("bootstrap", "warn") : "") + '</td>'
       + '<td><span class="mono">' + e(eintrag.action) + '</span></td>'
-      + '<td><span class="mono">' + e(eintrag.target) + '</span></td>'
+      + '<td><span class="mono">' + e(zielText(eintrag.target)) + '</span></td>'
       + '<td>' + e(eintrag.reason) + '</td>'
       + '<td><span class="mono">' + e(eintrag.ip) + '</span></td></tr>');
 

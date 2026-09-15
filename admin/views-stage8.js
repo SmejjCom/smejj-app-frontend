@@ -208,7 +208,8 @@
     if (!a.faelligAm) return "—";
     const rest = a.restfristTage;
     const datum = e(A.datum(a.faelligAm));
-    if (rest === null) return datum;
+    // Erledigt oder verworfen: keine Frist mehr, also auch kein rotes "über" (Befund 15.09.).
+    if (rest === null || a.status === "erledigt" || a.status === "verworfen") return datum;
     if (rest < 0) return pille(Math.abs(rest) + " T über", "bad") + '<br><span class="s">' + datum + "</span>";
     if (rest <= 3) return pille(rest + " T", "warn") + '<br><span class="s">' + datum + "</span>";
     return datum + '<br><span class="s">in ' + rest + " T</span>";

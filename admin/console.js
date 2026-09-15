@@ -32,6 +32,7 @@
     (window.adminStage8 || {}).seiten || {},
     (window.adminStage9 || {}).seiten || {},
     (window.adminStageCockpit || {}).seiten || {},
+    (window.adminStageControlCenter || {}).seiten || {},
     (window.adminStage10 || {}).seiten || {},
     (window.adminStage11 || {}).seiten || {},
     (window.adminStage12 || {}).seiten || {},
@@ -71,7 +72,7 @@
     "Betrieb": "5", "Produkt": "6", "Recht": "7", "Verwaltung": "8"
   });
   const SEITEN_NUMMERN = Object.freeze({
-    cockpit: "1.1", regeln: "1.2", tagesmappe: "1.3",
+    cockpit: "1.1", regeln: "1.2", tagesmappe: "1.3", "control-center": "1.4",
     nutzer: "2.1", rollen: "2.2", support: "2.3",
     moderation: "3.1", schluessel: "3.2", ereignisse: "3.3",
     abrechnung: "4.1", kosten: "4.2", api: "4.3",
