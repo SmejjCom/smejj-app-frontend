@@ -46,7 +46,7 @@ function laden() {
   // E2E-Test 14.09.2026: der blosse Import band NICHTS (initComposerTools lief nie) —
   // derselbe Lader wie auf der Startseite, der auch bindet; Rueckfall wie bisher.
   (window.smejjLadeComposerTools?.() || import("./composer-tools.js?v=werkzeuge-27")).catch(() => {});
-  return import("./code-flaeche.js?v=74")
+  return import("./code-flaeche.js?v=75")
     .then((modul) => { modul.initCodeFlaeche?.(); return modul; })
     .catch((fehler) => {
       console.error("[smejj.com] Code-Flaeche konnte nicht nachgeladen werden:", fehler);

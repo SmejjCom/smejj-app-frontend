@@ -19,7 +19,7 @@ import {
   abgleichsKarte, teileAuf, erzeugeVorfahrt, erzeugeAbgleichsSpeicher,
   istUeberschreibKonflikt, konfliktKopie, geraeteKurzname, neueKonfliktId, ohneAbgleichsmarke, nachzutragen, grabsteinWeg,
   abarbeitenMitGrenze, neuesteZuerst
-} from "./chat-sync-auswahl.js?v=8";
+} from "./chat-sync-auswahl.js?v=9";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
@@ -204,7 +204,7 @@ async function pull() {
       if (grabstein === "ueberspringen") continue;
       if (grabstein === "entfernen") { await s.importChat?.({ id: fern.id, ownerId: fern.ownerId, geloescht: true, updatedAt: fern.updatedAt, messages: [] }); continue; }
 
-      abrufe.push({ stand: fernStand, aufgabe: async () => {
+      abrufe.push({ stand: fernStand, papierkorb: Boolean(fern.deletedAt), aufgabe: async () => {
         const voll = Array.isArray(fern.messages) ? fern : await holeVollstaendig(fern.id, kopf);
         // Abruf gescheitert (Netz, Zeitgrenze): false = in der zweiten Runde nochmal.
         if (!voll) return false;

@@ -289,14 +289,17 @@ export async function abarbeitenMitGrenze(aufgaben, { grenze = 4, runden = 2 } =
 }
 
 /**
- * Reihenfolge der Nachhol-Abrufe: juengster Server-Stand zuerst (Live-Nachtest
- * 15.09.2026, M2). Nimmt [{stand, aufgabe}] und gibt die Aufgaben zurueck;
- * gleiche Staende behalten ihre Reihenfolge (stabil).
+ * Reihenfolge der Nachhol-Abrufe (Live-Nachtest 15.09.2026, M2): erst was die
+ * Verlaufsliste zeigt, dann der Papierkorb — je juengster Server-Stand zuerst.
+ * Zweiter Nachtest: die 200 juengsten Chats des Testkontos lagen im Papierkorb,
+ * "nur neueste zuerst" liess die Liste 90 s leer. Nimmt [{stand, papierkorb,
+ * aufgabe}] und gibt die Aufgaben zurueck; Gleichstand behaelt die Reihenfolge.
  */
 export function neuesteZuerst(eintraege) {
   return (Array.isArray(eintraege) ? eintraege : [])
     .map((e, i) => ({ e, i }))
-    .sort((x, y) => (Number(y.e?.stand) || 0) - (Number(x.e?.stand) || 0) || x.i - y.i)
+    .sort((x, y) => (Boolean(x.e?.papierkorb) - Boolean(y.e?.papierkorb))
+      || (Number(y.e?.stand) || 0) - (Number(x.e?.stand) || 0) || x.i - y.i)
     .map(({ e }) => e.aufgabe)
     .filter((f) => typeof f === "function");
 }
