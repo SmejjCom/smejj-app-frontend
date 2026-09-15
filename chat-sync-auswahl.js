@@ -287,3 +287,16 @@ export async function abarbeitenMitGrenze(aufgaben, { grenze = 4, runden = 2 } =
   }
   return { erledigt, offen: offen.length };
 }
+
+/**
+ * Reihenfolge der Nachhol-Abrufe: juengster Server-Stand zuerst (Live-Nachtest
+ * 15.09.2026, M2). Nimmt [{stand, aufgabe}] und gibt die Aufgaben zurueck;
+ * gleiche Staende behalten ihre Reihenfolge (stabil).
+ */
+export function neuesteZuerst(eintraege) {
+  return (Array.isArray(eintraege) ? eintraege : [])
+    .map((e, i) => ({ e, i }))
+    .sort((x, y) => (Number(y.e?.stand) || 0) - (Number(x.e?.stand) || 0) || x.i - y.i)
+    .map(({ e }) => e.aufgabe)
+    .filter((f) => typeof f === "function");
+}

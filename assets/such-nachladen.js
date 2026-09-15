@@ -14,7 +14,7 @@ let geladen = null;
 let einrichtung = null;
 
 export function holeSuche() {
-  geladen ||= import("./search.js?v=b65")
+  geladen ||= import("./search.js?v=b66")
     .then((m) => {
       if (einrichtung) m.initGlobalSearch(einrichtung);
       return m;

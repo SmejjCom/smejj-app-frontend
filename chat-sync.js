@@ -18,8 +18,8 @@ import { OWNER_KEY, gehoertNutzer, kontoAliase, merkeKontoKennung, sessionUserId
 import {
   abgleichsKarte, teileAuf, erzeugeVorfahrt, erzeugeAbgleichsSpeicher,
   istUeberschreibKonflikt, konfliktKopie, geraeteKurzname, neueKonfliktId, ohneAbgleichsmarke, nachzutragen, grabsteinWeg,
-  abarbeitenMitGrenze
-} from "./chat-sync-auswahl.js?v=7";
+  abarbeitenMitGrenze, neuesteZuerst
+} from "./chat-sync-auswahl.js?v=8";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
@@ -178,6 +178,9 @@ async function pull() {
   let fremd = 0;
   let konflikte = 0;
   // Erst entscheiden (lokal, schnell), dann holen (Netz, nebenlaeufig mit Grenze).
+  // NEUESTE ZUERST (Live-Nachtest 15.09., M2): der Server listet in Ablage-Reihenfolge;
+  // auf einem neuen Geraet kamen 180 alte Chats vor den sichtbaren, und die Liste
+  // zeigte 40 s lang einen Eintrag. Wer den Verlauf oeffnet, sucht die letzten Chats.
   const abrufe = [];
   for (const fern of daten.chats || []) {
     try {
@@ -201,7 +204,7 @@ async function pull() {
       if (grabstein === "ueberspringen") continue;
       if (grabstein === "entfernen") { await s.importChat?.({ id: fern.id, ownerId: fern.ownerId, geloescht: true, updatedAt: fern.updatedAt, messages: [] }); continue; }
 
-      abrufe.push(async () => {
+      abrufe.push({ stand: fernStand, aufgabe: async () => {
         const voll = Array.isArray(fern.messages) ? fern : await holeVollstaendig(fern.id, kopf);
         // Abruf gescheitert (Netz, Zeitgrenze): false = in der zweiten Runde nochmal.
         if (!voll) return false;
@@ -226,11 +229,11 @@ async function pull() {
         // hat der Server den Stand noch nicht.
         await s.importChat?.({ ...voll, syncedAt: String(voll.updatedAt || "") });
         return true;
-      });
+      } });
     } catch { /* einzelner Chat darf den Rest nicht stoppen */ }
   }
   // Ein haengender oder fehlschlagender Abruf blockiert nie die anderen.
-  await abarbeitenMitGrenze(abrufe, { grenze: EINZELABRUF_GRENZE, runden: 2 });
+  await abarbeitenMitGrenze(neuesteZuerst(abrufe), { grenze: EINZELABRUF_GRENZE, runden: 2 });
   await meldeKonflikte(konflikte);
   // Nicht still: wer Chats auf dem Server hat, die er lokal nie sieht, soll den
   // Grund im Protokoll finden koennen. Eine Zeile je Abgleich, keine Meldung an

@@ -13,7 +13,7 @@ import { t } from "/assets/i18n/ui.js?v=3";
 // Derselbe Spezifizierer wie index.html und alle anderen Module (?v=b65): ein abweichender
 // Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js — 12,9 KB doppelt übertragen,
 // zweite IndexedDB-Verbindung, eigener Zustand (Web-Vitals-Befund 2026-09-03, Gewicht 324 KB).
-import { listChats } from "/assets/chat-store.js?v=b78";
+import { listChats } from "/assets/chat-store.js?v=b79";
 
 export const MERKER = "smejj.erste-schritte.v1";
 const STIL_ID = "erste-schritte-stil";
@@ -122,6 +122,36 @@ export function baueKarten(doc = document, { uebersetze = t, aktion = fuehreAus,
   return block;
 }
 
+/**
+ * KEIN SPRUNG DES EINGABEFELDS (Live-Nachtest 15.09.2026, M5): Die Startflaeche am
+ * Rechner zentriert Ueberschrift, Feld und Werkzeugzeile senkrecht. Kamen die Karten
+ * 0,7-2 s nach dem Laden dazu, wurde der Block um ihre Hoehe groesser und alles rutschte
+ * um die HALBE Hoehe nach oben — gemessen 95 px (Modell-Knopf y 423 -> 328). Ein Klick
+ * in diesem Moment traf die leere Flaeche: 2 von 10 fruehen Klicks oeffneten kein Menue.
+ * Die Karten nehmen darum an der Zentrierung nicht teil (negativer Aussenabstand unten
+ * in genau ihrer Hoehe samt Luecke); sie haengen unter der Werkzeugzeile, das Feld steht
+ * dort, wo es fuer jeden Nutzer steht. Nur, wenn der Halter wirklich senkrecht zentriert
+ * (am Handy steht das Feld unten, dort bleibt alles wie bisher).
+ * @returns {number} gesetzter Ausgleich in px (0 = nicht noetig)
+ */
+export function halteEingabeRuhig(block, doc = document, fenster = doc.defaultView) {
+  const rechne = () => {
+    const halter = block?.parentElement;
+    if (!halter || !block.isConnected || !fenster?.getComputedStyle) return 0;
+    const h = fenster.getComputedStyle(halter);
+    const zentriert = h.display === "flex" && h.flexDirection === "column" && h.justifyContent === "center";
+    if (!zentriert) { block.style.marginBottom = ""; return 0; }
+    const b = fenster.getComputedStyle(block);
+    const luecke = parseFloat(h.rowGap) || 0;
+    const ausgleich = Math.round(block.offsetHeight + (parseFloat(b.marginTop) || 0) + luecke);
+    block.style.marginBottom = ausgleich > 0 ? `-${ausgleich}px` : "";
+    return ausgleich;
+  };
+  const erster = rechne();
+  if (typeof fenster?.ResizeObserver === "function") new fenster.ResizeObserver(() => rechne()).observe(block);
+  return erster;
+}
+
 /** Hängt die Karten unter die Werkzeugzeile, wenn sollZeigen(); räumt sie beim ersten Gespräch weg. */
 export async function starteErsteSchritte(doc = document, { ladeChats = listChats } = {}) {
   const anker = doc.querySelector("#start .start-chipreihe");
@@ -131,6 +161,7 @@ export async function starteErsteSchritte(doc = document, { ladeChats = listChat
   sorgeFuerStil(doc);
   const block = baueKarten(doc);
   anker.insertAdjacentElement("afterend", block);
+  halteEingabeRuhig(block, doc);
   const log = doc.getElementById("startLog");
   if (log && typeof MutationObserver !== "undefined") {
     const wache = new MutationObserver(() => {

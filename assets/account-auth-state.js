@@ -60,6 +60,33 @@ export function applyAuthState(view, user) {
   toggle(view, LOGOUT_CONTROLS, authenticated);
   // Server-Sitzungsverwaltung ergibt nur fuer E-Mail-Konten Sinn.
   toggle(view, [EMAIL_ONLY_BLOCK], authenticated && method === "email");
+  bindeAbmeldeAufraeumen(view);
+}
+
+// Live-Nachtest 15.09.2026: "Ausloggen" auf der Kontoseite loeschte nur den Token —
+// smejj.session.v1 blieb mit authenticated:true stehen, auch nach dem Neuladen.
+// Der Profil-Menue-Weg (profile-dock-menu.js logout) raeumte schon auf; dieser Weg
+// laeuft ueber account-privacy.js (ABO-LOCK, byte-genau eingefroren) und haengt
+// sich darum hier an denselben Klick. Gleiches Aufraeumen wie im Profil-Menue:
+// Sitzungsangabe, Entwurf, gespeicherte Profil-E-Mail (Freigabe 1h). Chats bleiben.
+export function bindeAbmeldeAufraeumen(view, speicher = globalThis.localStorage) {
+  if (!view || typeof view.addEventListener !== "function" || !view.dataset || view.dataset.abmeldeAufraeumen === "1") return;
+  view.dataset.abmeldeAufraeumen = "1";
+  view.addEventListener("click", (event) => {
+    if (event.target?.closest?.("#logoutLocal")) raeumeNachAbmeldenAuf(speicher);
+  });
+}
+
+export function raeumeNachAbmeldenAuf(speicher = globalThis.localStorage) {
+  try { speicher.removeItem("smejj.session.v1"); } catch { /* Speicher gesperrt: Neuladen stellt den Zustand neu her */ }
+  try { speicher.removeItem("smejj.entwurf.v1"); } catch { /* Entwurf nie nach dem Abmelden stehen lassen */ }
+  try {
+    const profil = JSON.parse(speicher.getItem("smejj.profile.v1") || "null");
+    if (profil && typeof profil === "object" && "email" in profil) {
+      delete profil.email;
+      speicher.setItem("smejj.profile.v1", JSON.stringify(profil));
+    }
+  } catch { /* unlesbar: nichts anfassen */ }
 }
 
 function toggle(view, selectors, visible) {
