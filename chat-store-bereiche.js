@@ -7,7 +7,7 @@ import {
   geraeteBesitzer, getChat, importChat, listChats, neueProjektId, newChat, notifyChanged,
   notifyProjekteChanged, openChat, persistActive, renameChat, rohEigenerChat,
   sauberProjektName, scheduleSave, tx
-} from "./chat-store.js?v=b77";
+} from "./chat-store.js?v=b78";
 
 // GEMESSEN 2026-09-14 (A-bis-Z, angemeldet): der Papierkorb war IMMER leer.
 // listGeloeschteChats() warf "PAPIERKORB_TAGE is not defined" — die Konstante
@@ -76,8 +76,13 @@ export async function endgueltigLoeschen(id) {
   await tx(STORE, "readwrite", (store) => store.delete(String(id || "")));
   // Stufe 3: das Loeschen dem Konto melden (chat-sync.js reicht es zum Server
   // weiter). Eigenes Ereignis statt Import — der Store kennt den Sync nicht.
-  try { window.dispatchEvent(new CustomEvent("smejj:chat-geloescht", { detail: { id: String(id || "") } })); } catch { /* still */ }
+  // `warten` (15.09., "Alles endgueltig loeschen"): der Sync legt sein Versprechen
+  // hinein, damit eine Massenloeschung erst weitergeht, wenn der Server den Chat
+  // hat — sonst schrieben 200 Anfragen gleichzeitig denselben Konto-Index.
+  const detail = { id: String(id || ""), warten: [] };
+  try { window.dispatchEvent(new CustomEvent("smejj:chat-geloescht", { detail })); } catch { /* still */ }
   notifyChanged();
+  await Promise.all(detail.warten).catch(() => {});
   return true;
 }
 

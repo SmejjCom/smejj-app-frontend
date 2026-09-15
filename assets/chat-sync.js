@@ -425,11 +425,14 @@ function planePush() {
 
 // Loeschen soll dem Konto folgen, nicht nur dem Geraet: chat-store meldet die
 // Kennung, wir reichen sie weiter. Fehler still — lokal ist der Chat schon weg.
+let loeschKette = Promise.resolve();
+
 async function loescheAufServer(chatId) {
   const kopf = kopfzeilen();
   if (!kopf || serverSagtNein) return;
   try {
-    await fetch(`${API_ORIGIN}/api/chats?id=${encodeURIComponent(chatId)}`, { method: "DELETE", headers: kopf });
+    // Frist: eine haengende Anfrage darf die Warteschlange nicht fuer immer anhalten.
+    await fetch(`${API_ORIGIN}/api/chats?id=${encodeURIComponent(chatId)}`, { method: "DELETE", headers: kopf, signal: AbortSignal.timeout(15000) });
   } catch { /* still */ }
 }
 
@@ -510,7 +513,11 @@ function init() {
   window.addEventListener("smejj:chats-changed", planePush);
   window.addEventListener("smejj:chat-geloescht", (ereignis) => {
     const id = ereignis?.detail?.id;
-    if (id) loescheAufServer(id);
+    if (!id) return;
+    // Eine nach der anderen: jede Loeschung schreibt serverseitig den Konto-Index
+    // (lesen, aendern, schreiben) — parallel ueberschrieben sie sich gegenseitig.
+    loeschKette = loeschKette.then(() => loescheAufServer(id));
+    ereignis.detail.warten?.push?.(loeschKette);
   });
   window.addEventListener("smejj:projekte-geaendert", planeProjektePush);
   window.addEventListener("smejj:projekt-geloescht", (ereignis) => {
