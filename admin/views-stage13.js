@@ -90,9 +90,11 @@
           ? V.tabelleBlock(["Art", "Fall"], warten.map(wartenZeile))
           : '<div class="pb"><span class="s">Kein Kunde wartet, keine dringende Aufgabe offen.</span></div>')
       + V.panelBlock("4 · Offene Punkte", "brauchen eine Betreiber-Entscheidung — stehen hier, bis sie fallen",
-        '<div class="pb al-lehren">' + punkte.map(function (p) {
-          return '<div class="al-lehre"><b>Offen</b><span>' + e(p) + "</span></div>";
-        }).join("") + "</div>")
+        punkte.length
+          ? '<div class="pb al-lehren">' + punkte.map(function (p) {
+            return '<div class="al-lehre"><b>Offen</b><span>' + e(p) + "</span></div>";
+          }).join("") + "</div>"
+          : '<div class="pb"><span class="s">Kein offener Punkt — jede bekannte Baustelle ist entschieden.</span></div>')
       + "</div>";
   }
 
