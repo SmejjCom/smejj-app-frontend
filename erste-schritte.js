@@ -139,7 +139,11 @@ export function halteEingabeRuhig(block, doc = document, fenster = doc.defaultVi
     const halter = block?.parentElement;
     if (!halter || !block.isConnected || !fenster?.getComputedStyle) return 0;
     const h = fenster.getComputedStyle(halter);
-    const zentriert = h.display === "flex" && h.flexDirection === "column" && h.justifyContent === "center";
+    // Nur am breiten Bildschirm (ab 601 px): am Handy ordnet mobil-dock.js die Zeilen um
+    // (order), dort ueberdeckten die Karten mit Ausgleich die Werkzeugzeile (Sichtpruefung
+    // 390x844 nach v887). Die Karten-Regeln schalten ebenfalls bei 600 px um.
+    const breit = typeof fenster.matchMedia === "function" ? fenster.matchMedia("(min-width: 601px)").matches : true;
+    const zentriert = breit && h.display === "flex" && h.flexDirection === "column" && h.justifyContent === "center";
     if (!zentriert) { block.style.marginBottom = ""; return 0; }
     const b = fenster.getComputedStyle(block);
     const luecke = parseFloat(h.rowGap) || 0;
