@@ -1,113 +1,107 @@
-// smejj.com Operations Console — Bedienung der Stufe 10 (Konkurrenz-Radar).
+// smejj.com Operations Console — Bedienung der Stufe 10 ("Deine Entscheidungen").
 //
-// Zweck: Die Radar-Berichte, die bisher nur als Markdown-Datei im Arbeits-Repo
-// lagen, stehen hier zum Durchklicken — je Vorschlag Ja / Nein / Später.
+// Zweck: EIN Ort, an dem der Betreiber Ja oder Nein sagt — zu Funktionsluecken
+// gegenueber der Konkurrenz und zu frischen Radar-Treffern.
 //
-// Bewusst OHNE Server-Endpunkt: Die Berichte kommen als statische Datei
-// von derselben Herkunft (zwei Auslieferungswege, siehe quellen() weiter unten);
-// die Konsole braucht dafuer
-// keinen laufenden Control-Server und keine neue API. Die Entscheidungen
-// bleiben im Browser (localStorage) und werden als Klartext ausgegeben —
-// der Betreiber gibt diesen Text weiter, danach wird gebaut. Ein Klick hier
-// aendert also NIE etwas an der Live-App; er haelt nur die Entscheidung fest.
+// WAS SICH AM 16.09.2026 GEAENDERT HAT (Betreiber-Befund "ich sehe keine
+// Freigaben von meiner Seite"): Vorher lagen die Entscheidungen nur im
+// localStorage dieses Browsers und mussten als Text weitergegeben werden. Ein
+// Klick aenderte also nie etwas; wer den Browser wechselte, hatte nichts mehr.
+// Jetzt geht jede Entscheidung an den Server (/api/admin/entscheidungen):
+//   Ja      -> legt sofort eine Aufgabe MIT PLAN an (sichtbar unter /admin/aufgaben/)
+//   Nein    -> braucht einen Grund und bleibt mit Datum stehen
+//   Später  -> bleibt oben in der offenen Liste
+// Jede Entscheidung landet im Audit-Log; der Server weist sie ohne Recht ab.
+//
+// Das Bericht-Archiv (radar/berichte.json) bleibt darunter stehen: es ist ohne
+// Control-Server lesbar und damit der Rueckfall, wenn der Server schweigt.
 (function () {
   "use strict";
+  const A = window.adminApi;
+  const D = window.adminDialog;
   const S = window.adminViewsStage10;
-  const KEY = "smejj.radar.entscheidungen.v1";
 
-  let daten = null;
+  let berichte = null;
+  let live = null;
 
-  function lesen() {
-    try {
-      const roh = JSON.parse(localStorage.getItem(KEY) || "{}");
-      return roh && typeof roh === "object" ? roh : {};
-    } catch (fehler) {
-      return {};
-    }
+  // ---- Server: lebende Vorschlaege ------------------------------------------
+
+  async function holeLive() {
+    const antwort = await A.hole("/api/admin/entscheidungen");
+    return antwort.ok ? antwort.data : { ok: false, fehler: antwort.fehler };
   }
 
-  function schreiben(entscheidungen) {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(entscheidungen));
-    } catch (fehler) {
-      // Speicher gesperrt: die Anzeige stimmt trotzdem bis zum Neuladen.
-    }
+  function findeVorschlag(id) {
+    const alle = [].concat((live && live.offen) || [], (live && live.entschieden) || []);
+    return alle.find(function (v) { return v.id === id; }) || { id: id, titel: id };
   }
 
-  // Der Text, den der Betreiber weitergibt — bewusst dasselbe Format wie die
-  // Freigaben, die bisher von Hand geschrieben wurden.
-  function exportText(entscheidungen) {
-    const bericht = daten && daten.berichte && daten.berichte[daten.berichte.length - 1];
-    if (!bericht) return "";
-    const wort = { freigegeben: "JA — bitte umsetzen", abgelehnt: "NEIN — nicht umsetzen", spaeter: "SPÄTER" };
-    const zeilen = ["FREIGABEN Konkurrenz-Radar — " + bericht.titel + " (Stand " + bericht.datum + ")", ""];
-    let entschieden = 0;
-    (bericht.vorschlaege || []).forEach(function (v) {
-      if (v.status === "umgesetzt") return;
-      const wahl = entscheidungen[v.id];
-      if (!wahl) return;
-      entschieden += 1;
-      zeilen.push(v.id + " — " + v.titel);
-      zeilen.push("   " + (wort[wahl] || wahl));
-      zeilen.push("");
-    });
-    if (!entschieden) return "Noch nichts entschieden. Oben je Vorschlag Ja, Nein oder Später wählen.";
-    zeilen.push("(Entschieden in der Operations Console, Stufe 10.)");
-    return zeilen.join("\n");
+  async function entscheiden(ctx, id, wahl, notiz) {
+    const antwort = await A.sende("/api/admin/entscheidungen/entscheiden",
+      { vorschlagId: id, wahl: wahl, notiz: notiz || "" });
+    if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
+    const d = antwort.data || {};
+    ctx.meldung(d.hinweis || "Entscheidung festgehalten.", false);
+    live = null;
+    laden(ctx);
   }
 
-  function exportZeigen(entscheidungen) {
-    const feld = document.getElementById("radarExport");
-    if (feld) feld.textContent = exportText(entscheidungen);
+  async function ja(ctx, id) {
+    const v = findeVorschlag(id);
+    // Der Plan steht VOR dem Klick da, nicht danach: ein "Ja" zu etwas, dessen
+    // Test man nicht gelesen hat, ist eine Aufgabe, die keiner abnehmen kann.
+    const okay = await D.bestaetige({
+      titel: "Ja — bauen: " + v.titel,
+      absaetze: [
+        "Es entsteht sofort eine Aufgabe mit Plan (Bereich Produkt, zuständig Werkstatt).",
+        "Geplant: " + (v.aenderung || "—"),
+        "Fertig ist es erst mit Nachweis: " + (v.aufwand || "—")
+      ],
+      okText: "Aufgabe anlegen"
+    });
+    if (!okay) return;
+    await entscheiden(ctx, id, "ja", "");
   }
 
-  function zeichne(ctx) {
-    const entscheidungen = lesen();
-    ctx.zeichne(S.radar(daten, entscheidungen));
-    exportZeigen(entscheidungen);
-
-    const setzen = function (id, wahl) {
-      const stand = lesen();
-      if (stand[id] === wahl) delete stand[id]; // nochmal klicken = Entscheidung zuruecknehmen
-      else stand[id] = wahl;
-      schreiben(stand);
-      zeichne(ctx);
-    };
-
-    document.querySelectorAll("[data-radar-ja]").forEach(function (el) {
-      el.addEventListener("click", function () { setzen(el.getAttribute("data-radar-ja"), "freigegeben"); });
+  async function nein(ctx, id) {
+    const v = findeVorschlag(id);
+    const grund = await D.text({
+      titel: "Nein: " + v.titel,
+      absaetze: [
+        "Der Vorschlag bleibt mit Grund und Datum stehen — sonst schlägt er beim nächsten Scan wieder als neu auf.",
+        "Rückgängig geht jederzeit: einfach später Ja sagen."
+      ],
+      platzhalter: "Warum nicht? (mindestens 5 Zeichen)",
+      minLaenge: 5,
+      okText: "Nein festhalten"
     });
-    document.querySelectorAll("[data-radar-nein]").forEach(function (el) {
-      el.addEventListener("click", function () { setzen(el.getAttribute("data-radar-nein"), "abgelehnt"); });
-    });
-    document.querySelectorAll("[data-radar-spaeter]").forEach(function (el) {
-      el.addEventListener("click", function () { setzen(el.getAttribute("data-radar-spaeter"), "spaeter"); });
-    });
+    if (!grund) return;
+    await entscheiden(ctx, id, "nein", grund);
+  }
 
-    const kopieren = document.getElementById("radarKopieren");
-    if (kopieren) {
-      kopieren.addEventListener("click", function () {
-        const text = exportText(lesen());
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(function () {
-            kopieren.textContent = "Kopiert";
-            setTimeout(function () { kopieren.textContent = "Text kopieren"; }, 1500);
-          }).catch(function () { kopieren.textContent = "Bitte von Hand markieren"; });
-        } else {
-          kopieren.textContent = "Bitte von Hand markieren";
-        }
+  function binde(ctx) {
+    document.querySelectorAll("[data-ent-ja]").forEach(function (el) {
+      el.addEventListener("click", function () { ja(ctx, el.getAttribute("data-ent-ja")); });
+    });
+    document.querySelectorAll("[data-ent-nein]").forEach(function (el) {
+      el.addEventListener("click", function () { nein(ctx, el.getAttribute("data-ent-nein")); });
+    });
+    document.querySelectorAll("[data-ent-spaeter]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        entscheiden(ctx, el.getAttribute("data-ent-spaeter"), "spaeter", "");
       });
-    }
-
-    const zuruecksetzen = document.getElementById("radarZuruecksetzen");
-    if (zuruecksetzen) {
-      zuruecksetzen.addEventListener("click", function () {
-        try { localStorage.removeItem(KEY); } catch (fehler) { /* egal */ }
-        zeichne(ctx);
+    });
+    document.querySelectorAll("[data-ent-neu]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        el.textContent = "liest …";
+        live = null;
+        laden(ctx);
       });
-    }
+    });
   }
 
+  // ---- Archiv: statische Berichte -------------------------------------------
+  //
   // ZWEI HERKUENFTE, und das ist kein Versehen. Die Konsole wird von zwei
   // Stellen ausgeliefert: von GitHub Pages unter smejj.com/admin/ (das ist der
   // Weg, den der Betreiber benutzt) und vom Control-Server unter
@@ -132,35 +126,32 @@
   }
 
   async function holeBerichte() {
-    let letzterStatus = 0;
     for (const quelle of quellen()) {
       try {
         const antwort = await fetch(quelle, { headers: { Accept: "application/json" } });
-        if (antwort.ok) return { ok: true, daten: await antwort.json() };
-        letzterStatus = antwort.status;
+        if (antwort.ok) return await antwort.json();
       } catch (fehler) {
         // Netzfehler auf dem einen Weg heisst nicht, dass der andere tot ist.
       }
     }
-    return { ok: false, status: letzterStatus };
+    // Das Archiv ist Beigabe. Fehlt es, bleibt die Seite trotzdem bedienbar —
+    // vorher machte genau das die ganze Seite unbrauchbar.
+    return null;
   }
 
   async function laden(ctx) {
-    if (!daten) {
-      const ergebnis = await holeBerichte();
-      if (!ergebnis.ok) {
-        return ctx.fehler(ergebnis.status
-          ? "Radar-Berichte nicht gefunden (HTTP " + ergebnis.status + ")."
-          : "Radar-Berichte konnten nicht geladen werden.");
-      }
-      daten = ergebnis.daten;
-    }
-    zeichne(ctx);
+    if (!live) live = await holeLive();
+    if (berichte === null) berichte = await holeBerichte();
+
+    // Der Server ist die Hauptquelle. Antwortet er nicht, sagt die Seite das —
+    // und zeigt darunter, was ohne ihn lesbar ist.
+    ctx.zeichne(S.entscheidungen(live) + S.radar(berichte));
+    binde(ctx);
   }
 
   window.adminStage10 = {
     seiten: {
-      radar: { id: "KR", gruppe: "Produkt", name: "Konkurrenz-Radar", laden: laden }
+      radar: { id: "KR", gruppe: "Produkt", name: "Deine Entscheidungen", laden: laden }
     }
   };
 })();
