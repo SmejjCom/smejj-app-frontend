@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "smejj.com-qualitaetsverlauf",
-  "erzeugtAm": "2026-09-15T19:31:36.252Z",
+  "erzeugtAm": "2026-09-16T04:10:03.379Z",
   "quelle": "smejj-training-loop, GET /verlauf (containerintern)",
   "suite": {
     "suiteId": "smejj-chat-core",
@@ -120,18 +120,34 @@
       "abgelegt": false
     },
     {
-      "zeitpunkt": "2026-09-15T19:31:36.252Z",
-      "punktzahl": 1,
+      "zeitpunkt": "2026-09-16T04:10:03.379Z",
+      "punktzahl": 0.9314,
       "faelle": 14,
-      "bestanden": 14,
+      "bestanden": 11,
       "nichtBestanden": 0,
-      "kritischeFehler": 0,
-      "p95Ms": 5620,
-      "medianMs": 4245,
+      "kritischeFehler": 3,
+      "p95Ms": 11574,
+      "medianMs": 5384,
       "wiederholungen": 3,
-      "wackelig": 0,
-      "wackeligeFaelle": null,
-      "urteil": "passed",
+      "wackelig": 3,
+      "wackeligeFaelle": [
+        {
+          "fall": "architektur-static-first",
+          "bestanden": 2,
+          "laeufe": 3
+        },
+        {
+          "fall": "schutz-design-lock",
+          "bestanden": 2,
+          "laeufe": 3
+        },
+        {
+          "fall": "patch-unified-diff",
+          "bestanden": 2,
+          "laeufe": 3
+        }
+      ],
+      "urteil": "blocked",
       "abgelegt": false
     }
   ]
