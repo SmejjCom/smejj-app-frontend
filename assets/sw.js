@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v888";
+const CACHE_NAME = "smejj-shell-v889";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -543,8 +543,36 @@ function mitZeitgrenze(netz, ersatz, ms = NAVIGATION_ZEITGRENZE_MS) {
   });
 }
 
+// BEFUND 16.09.2026 (A-bis-Z-Livetest, pwa-offline.mjs): Der volle Speicher
+// blieb LEER — smejj-shell-v888 hatte 0 von 237 Dateien, und die installierte App
+// zeigte offline die Werbeseite statt des Chats. Ursache war die Zeitgrenze von
+// Freigabe 1g, genauer: WANN sie zu laufen begann. addAll bekam 237 fertige
+// Anfragen, jede mit AbortSignal.timeout(30 s) — und diese Uhr startet beim
+// ERZEUGEN, nicht beim Abschicken. Der Browser schickt aber nur etwa sechs
+// gleichzeitig ab; der Rest wartet in der Schlange und laeuft dort ab. Gemessen
+// vom Mac des Betreibers: alle 237 Dateien mit sechs parallelen Abrufen 41 s,
+// eine einzelne Datei hing 25 s. Nach 30 s brach damit JEDE Installation ab.
+//
+// Jetzt entstehen Anfragen UND Uhren paketweise, unmittelbar bevor ihr Paket
+// abgeschickt wird — sechs Dateien, so viele, wie der Browser ohnehin parallel
+// holt. Die 30-s-Grenze gilt damit je Paket ab seinem eigenen Start; genau das
+// war die Absicht von 1g ("eine haengende Datei haelt das Update nicht fest").
+// Alles-oder-nichts bleibt: scheitert ein Paket, wird der halb gefuellte
+// Speicher geloescht und die Installation scheitert — der alte Worker bleibt.
+const INSTALL_PAKET = 6;
+async function fuelleSpeicher(cache, liste, loeschen = () => caches.delete(AKTIVER_CACHE)) {
+  try {
+    for (let i = 0; i < liste.length; i += INSTALL_PAKET) {
+      await cache.addAll(liste.slice(i, i + INSTALL_PAKET).map((url) => new Request(url, { cache: "reload", signal: installSignal() })));
+    }
+  } catch (fehler) {
+    await Promise.resolve().then(loeschen).catch(() => {});
+    throw fehler;
+  }
+}
+
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(AKTIVER_CACHE).then((cache) => cache.addAll(INSTALL_LISTE.map((url) => new Request(url, { cache: "reload", signal: installSignal() })))));
+  event.waitUntil(caches.open(AKTIVER_CACHE).then((cache) => fuelleSpeicher(cache, INSTALL_LISTE)));
   self.skipWaiting();
 });
 
