@@ -47,7 +47,11 @@ function laden() {
   // derselbe Lader wie auf der Startseite, der auch bindet; Rueckfall wie bisher.
   (window.smejjLadeComposerTools?.() || import("./composer-tools.js?v=werkzeuge-27")).catch(() => {});
   return import("./code-flaeche.js?v=75")
-    .then((modul) => { modul.initCodeFlaeche?.(); return modul; })
+    .then((modul) => {
+      modul.initCodeFlaeche?.();
+      import("./code-kompakt-menue.js?v=3").then((m) => m.initCodeKompaktMenue()).catch(() => {});
+      return modul;
+    })
     .catch((fehler) => {
       console.error("[smejj.com] Code-Flaeche konnte nicht nachgeladen werden:", fehler);
       throw fehler;

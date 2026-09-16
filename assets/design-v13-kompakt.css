@@ -1,0 +1,183 @@
+/* smejj.com — Design V13: kompakter Chat- und Code-Bereich.
+ *
+ * Betreiber-Auftrag 16.09.2026 (schriftlich im Chat): "Chat- und Code-Bereich
+ * deutlich kompakter und sauberer machen" — Logo und Browser-Icon so weit wie
+ * moeglich nach oben; ueber dem Schreibfeld keine Icon- und Textflut; EIN
+ * Menue-Icon, das nach oben aufgeht; das Feld in Ruhe EINE Zeile wie bei
+ * ChatGPT, beim Tippen waechst es nach oben.
+ *
+ * Steht als LETZTE Datei im Buendel. Die Regeln davor (V11/V12, auch die
+ * getesteten) bleiben unangetastet — diese Schicht legt sich darueber. Die
+ * Spezifitaet (html body #… plus Mehrfachklassen) schlaegt die Stilbloecke,
+ * die mobil-dock.js, composer-zeile.js und kompakt.js NACH dem Buendel in den
+ * Kopf haengen (hoechstens 1,4,2).
+ */
+
+/* ---- Kopf: Logo und Browser-Icon bis an die Statusleiste --------------------
+   Der Knopf ist 44 px hoch (Touch-Regel), das Symbol darin ~24 px. Um 10 px
+   angehoben beginnt das SYMBOL genau an der Safe-Area-Kante; nur der
+   unsichtbare Rand des Knopfes reicht in die Statusleiste. Ohne Safe Area
+   (Browser-Tab, Rechner) bleibt es bei 0 — nichts wird abgeschnitten. */
+html body .glass-icon.glass-icon.glass-icon {
+  top: max(0px, calc(env(safe-area-inset-top, 0px) - 10px));
+}
+
+/* ---- Chat: keine Kachelreihe ueber dem Feld ----------------------------------
+   Alle acht Werkzeuge stehen im Plus-Menue (index.html, #composerPlusMenu). */
+html body #start .start-chips.start-chipreihe.start-chipreihe {
+  display: none !important;
+}
+
+/* Leere Startseite am Handy: ohne Kachelreihe zentrierte die Spalte das Feld
+   in die Bildmitte (gemessen 375x812: Feld bei y 544, 220 px Leere darunter).
+   Zwei auto-Raender teilen den Freiraum — Gruss mittig, Feld an der Unterkante
+   wie im laufenden Chat und bei ChatGPT. */
+@media (max-width: 600px) {
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .home-hero,
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .prompt-glass.prompt-glass {
+    margin-top: auto;
+  }
+}
+
+/* ---- Chat: EINE Zeile  [+] [Feld …] [Modell] [Mikrofon] [Senden] ------------
+   flex-wrap bleibt an, damit die Anhang-Chips (.paste-attach-row, volle Breite)
+   ueber der Zeile stehen koennen; das Feld hat Basis 0 und bricht darum nie um.
+   flex-end haelt die Knoepfe unten, wenn das Feld beim Tippen nach oben waechst
+   (Hoehe setzt app.js, Deckel mobil-dock.js). */
+html body #start.view .prompt-glass.prompt-glass.prompt-glass {
+  flex-wrap: wrap;
+  align-items: flex-end;
+  column-gap: 4px;
+  row-gap: 4px;
+}
+html body #start.view .prompt-glass.prompt-glass.prompt-glass .prompt-actions {
+  display: contents;
+}
+html body #start.view .prompt-glass.prompt-glass.prompt-glass .paste-attach-row {
+  order: 0;
+  flex: 1 0 100%;
+}
+html body #start.view .prompt-glass.prompt-glass.prompt-glass .plus-picker { order: 1; flex: 0 0 auto; }
+html body #start.view .prompt-glass.prompt-glass.prompt-glass textarea {
+  order: 2;
+  flex: 1 1 0%;
+  width: auto;
+  min-width: 0;
+}
+/* Das Diktier-Mikrofon bleibt IN der Zeile, rechts neben dem Modell (Betreiber 16.09.). */
+html body #start.view .prompt-glass.prompt-glass.prompt-glass .model-picker { order: 3; flex: 0 0 auto; }
+html body #start.view .prompt-glass.prompt-glass.prompt-glass [data-start-tool="voice"] { order: 4; flex: 0 0 auto; }
+/* Der Modell-Chip trug 88 px Mindestbreite (.text-chip) fuer das Wort "Auto" —
+   gemessen 375 px: dem Feld blieben 133 px. So breit wie sein Wort, hoechstens
+   ein Viertel der Zeile (laengere Namen mit Auslassungspunkten). */
+html body #start.view .prompt-glass.prompt-glass.prompt-glass #modelPickerButton {
+  width: auto;
+  min-width: 44px;
+  max-width: 25vw;
+  padding: 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body #start.view .prompt-glass.prompt-glass.prompt-glass .send-button { order: 5; flex: 0 0 auto; }
+html body #start.view .prompt-glass.prompt-glass.prompt-glass .prompt-spacer { display: none; }
+
+/* Das Plus-Menue geht IMMER nach oben auf. V11 liess es auf der leeren Seite
+   nach unten aufklappen (#start:has(#startLog[hidden]) .plus-menu, top 100%) —
+   damals stand das Feld in der Mitte. Unten am Rand lag es damit komplett
+   unter der Bildkante (gemessen 375x812: Menue ab y 822). Die Hoehe bleibt im
+   Bild; laengere Listen scrollen im Menue. !important, weil die alte Regel
+   ueber :has(#startLog…) ZWEI Kennungen zaehlt (2,2,0) und jede Klassenkette
+   schlaegt. Nur am Handy (auch quer): am Rechner steht das leere Feld in der
+   Bildmitte (gemessen 1280x800: y 399), dort passt die Liste nur nach unten. */
+@media (max-width: 600px), (max-height: 520px) {
+  html body #start .prompt-glass .plus-picker .plus-menu.plus-menu {
+    top: auto !important;
+    bottom: calc(100% + 8px) !important;
+    max-height: min(70vh, calc(100dvh - 160px));
+  }
+}
+/* Rechner, leere Seite: das Menue klappt unter dem mittigen Feld auf und ragte
+   mit 70vh unten hinaus (gemessen 1280x800: 461 bis 1021). Hoechstens die
+   halbe Hoehe abzueglich Feld und Rand — laengere Listen scrollen. */
+@media (min-width: 601px) and (min-height: 521px) {
+  html body #start:has(#startLog[hidden]) .prompt-glass .plus-picker .plus-menu.plus-menu {
+    max-height: calc(50dvh - 80px);
+  }
+}
+html body #start .prompt-glass .plus-picker .plus-menu.plus-menu {
+  overflow-y: auto;
+  /* Fast deckend: das Glas darunter traegt selbst backdrop-filter, darum
+     verwischt Chrome den Chat hinter dem Menue nicht — der Text schien durch. */
+  background: rgba(13, 18, 25, 0.97);
+}
+/* Die drei Sprach-Knoepfe standen frueher in der Zeile und tragen von dort
+   order-Werte (4 und 5, V11/V12). Im Raster des Menues wuerden sie damit ans
+   Ende springen — hier stehen sie in Markup-Reihenfolge. */
+html body #start .prompt-glass .plus-menu.plus-menu [data-start-tool] {
+  order: 0;
+}
+
+/* Vorlesen laeuft, das Menue ist zu: das Plus traegt den Zustand (Logofarbe wie
+   beim Mikrofon, kompakt.js). Das Mikrofon zeigt seinen Zustand selbst. */
+#start .prompt-glass:has([data-start-tool="speaker"].is-speaking) #composerPlusButton {
+  color: #02fdfd;
+  box-shadow: inset 0 0 0 1px rgba(2, 253, 253, 0.55);
+}
+
+/* ---- Code: EINE Zeile  [+] [Feld …] [Modell] [Mikrofon] [Senden] ------------
+   Modus, Antwortstufe, Projekt und die Vorlagen stehen im Plus-Menue
+   (code-kompakt-menue.js klickt die ausgeblendeten Original-Knoepfe). Deren
+   Menues ankern am .codefeld und oeffnen darum weiter an derselben Stelle. */
+html body #code .codefeld.codefeld.codefeld {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  column-gap: 4px;
+}
+html body #code .codefeld.codefeld.codefeld > .code-anhaenge { order: 0; flex: 1 0 100%; }
+html body #code .codefeld.codefeld.codefeld .codeleiste.codeleiste { display: contents; }
+html body #code .codefeld.codefeld.codefeld #codeAnhang { order: 1; flex: 0 0 auto; }
+html body #code .codefeld.codefeld.codefeld #codeAufgabe {
+  order: 2;
+  flex: 1 1 0%;
+  width: auto;
+  min-width: 0;
+}
+/* .code-rechts buendelte Modell und Senden — aufgeloest, damit das Mikrofon dazwischen passt. */
+html body #code .codefeld.codefeld.codefeld .code-rechts.code-rechts { display: contents; }
+html body #code .codefeld.codefeld.codefeld #codeModellAnzeige { order: 3; flex: 0 0 auto; }
+html body #code .codefeld.codefeld.codefeld #codeDiktat { order: 4; flex: 0 0 auto; }
+html body #code .codefeld.codefeld.codefeld #codeSenden { order: 5; flex: 0 0 auto; }
+html body #code .codefeld.codefeld.codefeld :is(#codeModusChip, #codeStufeChip, #codeProjektChip, #codeTiefeAnzeige) {
+  display: none !important;
+}
+html body #code .code-wchips.code-wchips.code-wchips {
+  display: none !important;
+}
+
+/* Handy: die Code-Flaeche war fest "Bildschirm minus 130 px" hoch (mobil-composer.css)
+   — Platz fuer die Vorlagen-Zeile. Ohne sie blieben unter dem Feld 126 px leer
+   (gemessen 375x812). Jetzt fuellt die Flaeche die Ansicht, das Feld sitzt unten. */
+@media (max-width: 600px) {
+  html body #code .codeflaeche.codeflaeche.codeflaeche {
+    height: 100%;
+    max-height: none;
+  }
+  /* 44 px Feld, eine Zeile ~25 px: das Polster setzt sie mittig neben die Knoepfe. */
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass textarea,
+  html body #code .codefeld.codefeld.codefeld #codeAufgabe {
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+}
+
+/* Platzhalter bleibt EINE Zeile (sonst brach "Beschreibe eine Aufgabe …" im
+   schmalen Feld um und die zweite Zeile war halb abgeschnitten). Getippter Text
+   bricht weiter normal um — ::placeholder ist ein eigenes Pseudo-Element. */
+#startMessage::placeholder,
+#codeAufgabe::placeholder {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
