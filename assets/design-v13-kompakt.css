@@ -175,8 +175,11 @@ html body #code .code-wchips.code-wchips.code-wchips {
 /* Platzhalter bleibt EINE Zeile (sonst brach "Beschreibe eine Aufgabe …" im
    schmalen Feld um und die zweite Zeile war halb abgeschnitten). Getippter Text
    bricht weiter normal um — ::placeholder ist ein eigenes Pseudo-Element. */
+/* Farbe: 0.78 Deckkraft ergab auf dem Glas nur 4,26:1 (WCAG AA verlangt 4,5:1,
+   Endabnahme 17.09.) — 0.9 ergibt 5,21:1, gleicher Farbton. */
 #startMessage::placeholder,
 #codeAufgabe::placeholder {
+  color: rgba(151, 158, 171, 0.9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -321,6 +324,15 @@ html body:has(#voiceModeOverlay:not([hidden])) #start.view .prompt-glass.prompt-
     margin-left: 34px;
     margin-right: 34px;
   }
+  /* Und ihre Aktionsleiste ebenso: bei einer kurzen ersten Frage lag der Menue-Knopf
+     (y 16..60, x 313..357) UNTER dem Browser-Icon — der Tipp traf das Icon
+     (Endabnahme 17.09.: elementFromPoint = #browserButton). */
+  html body #startLog.start-log > .entry.user:first-child + .msg-actions {
+    margin-right: 34px;
+  }
+  html body #startLog.start-log > .entry.assistant:first-child + .msg-actions {
+    margin-left: 34px;
+  }
   html body .glass-icon.glass-icon.glass-icon {
     background: rgba(10, 13, 16, 0.66);
     -webkit-backdrop-filter: blur(10px);
@@ -362,6 +374,15 @@ html body:has(#voiceModeOverlay:not([hidden])) #start.view .prompt-glass.prompt-
     width: 20px;
     height: 20px;
   }
+}
+
+/* ---- Nachrichten-Menue: nie hoeher als das Bild (alle Breiten) --------------------
+   Endabnahme 17.09.: Handy quer (844x390) — das Menue war 513 px hoch und ragte unten
+   hinaus; die Begrenzung galt nur bis 600 px Breite. Laengere Listen scrollen innen. */
+html body .msg-menu.msg-menu {
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* ---- Nachrichten-Menue: Kachelreihe (alle Breiten) ------------------------------- */

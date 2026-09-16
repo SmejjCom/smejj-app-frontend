@@ -148,7 +148,11 @@ function karteAn(entry) {
   karte.innerHTML = `<strong></strong><span>${art} · ${zeilen} Zeilen</span><em>Rechts öffnen</em>`;
   karte.querySelector("strong").textContent = titelVon(entry);
   karte.addEventListener("click", () => oeffneRechts(entry));
-  entry.after(karte);
+  // Hinter die Aktionsleiste, nie zwischen Antwort und Leiste: chat-actions.js findet die
+  // Leiste als NAECHSTES Geschwister — stand die Karte dazwischen, baute es eine zweite
+  // Leiste (Endabnahme 17.09.: zwei Aktionszeilen unter jeder Code-/Tabellen-Antwort).
+  const leiste = entry.nextElementSibling?.classList?.contains("msg-actions") ? entry.nextElementSibling : null;
+  (leiste || entry).after(karte);
 }
 
 export function initArbeitsflaeche() {

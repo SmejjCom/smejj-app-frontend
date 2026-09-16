@@ -6411,6 +6411,7 @@ html body #code .code-wchips.code-wchips.code-wchips {
 }
 #startMessage::placeholder,
 #codeAufgabe::placeholder {
+  color: rgba(151, 158, 171, 0.9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -6512,6 +6513,12 @@ html body:has(#voiceModeOverlay:not([hidden])) #start.view .prompt-glass.prompt-
     margin-left: 34px;
     margin-right: 34px;
   }
+  html body #startLog.start-log > .entry.user:first-child + .msg-actions {
+    margin-right: 34px;
+  }
+  html body #startLog.start-log > .entry.assistant:first-child + .msg-actions {
+    margin-left: 34px;
+  }
   html body .glass-icon.glass-icon.glass-icon {
     background: rgba(10, 13, 16, 0.66);
     -webkit-backdrop-filter: blur(10px);
@@ -6545,6 +6552,11 @@ html body:has(#voiceModeOverlay:not([hidden])) #start.view .prompt-glass.prompt-
     width: 20px;
     height: 20px;
   }
+}
+html body .msg-menu.msg-menu {
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .msg-menu .msg-menu-kacheln {
   display: grid;
