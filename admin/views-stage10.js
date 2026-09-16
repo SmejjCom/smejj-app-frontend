@@ -75,10 +75,16 @@
   // ---- 1. Lebende Vorschlaege ------------------------------------------------
 
   function knoepfe(v, wirkung) {
+    // Zuruecknehmen steht nur da, wo es etwas zurueckzunehmen gibt — ein Knopf,
+    // der nichts tut, sieht aus wie "darf nicht" (Lehre Attrappen-Knopf 10.09.).
+    const zurueck = wirkung === "offen"
+      ? ""
+      : '<button type="button" class="btn adm-gross" data-ent-zurueck="' + e(v.id) + '">Zurücknehmen</button>';
     return '<div class="pb adm-zeile-aktion">'
       + '<button type="button" class="btn adm-gross' + (wirkung === "freigegeben" ? " on" : "") + '" data-ent-ja="' + e(v.id) + '">Ja — bauen</button>'
       + '<button type="button" class="btn adm-gross' + (wirkung === "abgelehnt" ? " on" : "") + '" data-ent-nein="' + e(v.id) + '">Nein</button>'
       + '<button type="button" class="btn adm-gross' + (wirkung === "spaeter" ? " on" : "") + '" data-ent-spaeter="' + e(v.id) + '">Später</button>'
+      + zurueck
       + "</div>";
   }
 
@@ -99,10 +105,10 @@
     return '<div class="pb"><p class="dim">' + e(text) + "</p></div>";
   }
 
-  function lebenderVorschlag(v, mitKnoepfen) {
+  function lebenderVorschlag(v) {
     const wirkung = WAHL_STATUS[v.entscheidung] || "offen";
     return V.panelBlock(v.titel, v.quelle + " · " + (v.quelleKurz || ""),
-      vierFelder(v) + beleg(v) + spur(v) + (mitKnoepfen ? knoepfe(v, wirkung) : ""),
+      vierFelder(v) + beleg(v) + spur(v) + knoepfe(v, wirkung),
       statusPille(wirkung));
   }
 
@@ -112,6 +118,7 @@
       ["Wartet auf dich", "<b>" + e(String(z.offen)) + "</b>"],
       ["Zurückgestellt (Später)", e(String(z.spaeter))],
       ["Ja gesagt", e(String(z.ja))],
+      ["Zurückgenommen", e(String(z.zurueckgenommen || 0))],
       ["Nein gesagt", e(String(z.nein))]
     ]);
   }
@@ -145,7 +152,7 @@
 
     const offene = daten.offen || [];
     const offenBlock = offene.length
-      ? offene.map(function (v) { return lebenderVorschlag(v, true); }).join("")
+      ? offene.map(lebenderVorschlag).join("")
       : V.panelBlock("Wartet auf dein Ja oder Nein", "nichts offen",
         absatz("Der nächste Radar-Lauf und der nächste Funktions-Abgleich legen neue Vorschläge hier ab."));
 
@@ -153,7 +160,7 @@
     const fertigBlock = fertig.length
       ? V.panelBlock("Schon entschieden", fertig.length + " Stück",
         absatz("Bleibt stehen, damit derselbe Vorschlag nicht beim nächsten Scan wieder als neu erscheint."))
-        + fertig.map(function (v) { return lebenderVorschlag(v, false); }).join("")
+        + fertig.map(lebenderVorschlag).join("")
       : "";
 
     return kopf + '<div class="stack">' + stumm + ablage + stand

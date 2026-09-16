@@ -79,6 +79,25 @@
     await entscheiden(ctx, id, "nein", grund);
   }
 
+  // Zuruecknehmen: der Vorschlag wandert zurueck in die offene Liste. Eine
+  // bereits angelegte Aufgabe bleibt bestehen — das sagt der Dialog auch, sonst
+  // glaubt man, sie sei mit weg (geloescht wird im Adminbereich nirgends etwas).
+  async function zurueck(ctx, id) {
+    const v = findeVorschlag(id);
+    const okay = await D.bestaetige({
+      titel: "Entscheidung zurücknehmen: " + v.titel,
+      absaetze: [
+        "Der Vorschlag steht danach wieder oben und wartet auf dein Ja oder Nein.",
+        v.aufgabeId
+          ? "Die Aufgabe " + v.aufgabeId + " bleibt bestehen. Sie wird auf der Aufgaben-Seite verworfen, wenn sie nicht mehr gebraucht wird."
+          : "Es hängt keine Aufgabe daran."
+      ],
+      okText: "Zurücknehmen"
+    });
+    if (!okay) return;
+    await entscheiden(ctx, id, "offen", "");
+  }
+
   function binde(ctx) {
     document.querySelectorAll("[data-ent-ja]").forEach(function (el) {
       el.addEventListener("click", function () { ja(ctx, el.getAttribute("data-ent-ja")); });
@@ -90,6 +109,9 @@
       el.addEventListener("click", function () {
         entscheiden(ctx, el.getAttribute("data-ent-spaeter"), "spaeter", "");
       });
+    });
+    document.querySelectorAll("[data-ent-zurueck]").forEach(function (el) {
+      el.addEventListener("click", function () { zurueck(ctx, el.getAttribute("data-ent-zurueck")); });
     });
     document.querySelectorAll("[data-ent-neu]").forEach(function (el) {
       el.addEventListener("click", function () {
