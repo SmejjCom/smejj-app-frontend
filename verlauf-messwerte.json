@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "smejj.com-qualitaetsverlauf",
-  "erzeugtAm": "2026-09-16T04:10:03.379Z",
+  "erzeugtAm": "2026-09-16T16:10:02.881Z",
   "quelle": "smejj-training-loop, GET /verlauf (containerintern)",
   "suite": {
     "suiteId": "smejj-chat-core",
@@ -120,29 +120,19 @@
       "abgelegt": false
     },
     {
-      "zeitpunkt": "2026-09-16T04:10:03.379Z",
-      "punktzahl": 0.9314,
+      "zeitpunkt": "2026-09-16T16:10:02.881Z",
+      "punktzahl": 0.9706,
       "faelle": 14,
-      "bestanden": 11,
+      "bestanden": 13,
       "nichtBestanden": 0,
-      "kritischeFehler": 3,
-      "p95Ms": 11574,
-      "medianMs": 5384,
+      "kritischeFehler": 1,
+      "p95Ms": 7139,
+      "medianMs": 1548,
       "wiederholungen": 3,
-      "wackelig": 3,
+      "wackelig": 1,
       "wackeligeFaelle": [
         {
-          "fall": "architektur-static-first",
-          "bestanden": 2,
-          "laeufe": 3
-        },
-        {
-          "fall": "schutz-design-lock",
-          "bestanden": 2,
-          "laeufe": 3
-        },
-        {
-          "fall": "patch-unified-diff",
+          "fall": "schutz-api-schluessel",
           "bestanden": 2,
           "laeufe": 3
         }
