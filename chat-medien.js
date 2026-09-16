@@ -65,7 +65,8 @@ export function adresseFuer(basis, id) {
 // ein blob: steht. Siehe rehydriereMedien() weiter unten.
 export const ADRESSE_ATTRIBUT = "data-smejj-adresse";
 
-// Was ein Element zuletzt als blob: angezeigt hat — Element -> blob:-Adresse.
+// Was ein Element zuletzt angezeigt hat — Element -> {quelle (blob: oder
+// Anzeige-Adresse), adresse, bis (Ablauf der Anzeige-Adresse, 0 = unbegrenzt)}.
 //
 // WARUM (live gemessen 2026-09-06): Vor JEDEM Speichern dreht entwaessere()
 // die Anzeige auf die Serveradresse zurueck, danach holt rehydriereMedien()
@@ -113,15 +114,43 @@ export const FEHLENDES_BILD = "data:image/svg+xml;utf8," + encodeURIComponent(
 /**
  * Parkt Serveradressen in gespeichertem HTML, bevor es in die Seite kommt.
  * Reine Zeichenkettenarbeit, ohne DOM — direkt testbar.
+ *
+ * Seit dem Medien-System (2026-09-17) steht im gespeicherten HTML oft schon
+ * `data-smejj-adresse` NEBEN einer kurzlebigen Anzeige-Adresse (…/medium/…)
+ * oder einem toten blob:. Beides ist nach dem Neuladen wertlos — also wird
+ * auch dort das src geparkt, und rehydriereMedien holt eine frische Adresse.
+ * Ein <video> bekommt KEIN leeres SVG (media-src laesst data: nicht zu),
+ * sondern gar kein src.
  */
 export function parkeMedienAdressen(html) {
   const text = String(html || "");
   if (!istMedienAdresse(text)) return text;
-  return text.replace(/<(img|video)\b([^>]*?)\ssrc=("|')([^"']*\/api\/chat-medien\?id=[^"']*)\3([^>]*)>/gi,
-    (ganz, tag, vor, q, adresse, nach) => {
-      if (/data-smejj-adresse=/.test(vor + nach)) return ganz;
-      return `<${tag}${vor} ${ADRESSE_ATTRIBUT}=${q}${adresse}${q} src=${q}${LEERES_BILD}${q}${nach}>`;
+  return text
+    .replace(/<(img|video)\b([^>]*?)\ssrc=("|')([^"']*\/api\/chat-medien\?id=[^"']*)\3([^>]*)>/gi,
+      (ganz, tag, vor, q, adresse, nach) => {
+        if (/data-smejj-adresse=/.test(vor + nach)) return ganz;
+        const leer = tag.toLowerCase() === "video" ? "" : ` src=${q}${LEERES_BILD}${q}`;
+        return `<${tag}${vor} ${ADRESSE_ATTRIBUT}=${q}${adresse}${q}${leer}${nach}>`;
+      })
+    .replace(/<(img|video)\b([^>]*)>/gi, (ganz, tag, attribute) => {
+      if (!/data-smejj-adresse=("|')[^"']*\/api\/chat-medien\?id=/.test(attribute)) return ganz;
+      const src = (attribute.match(/\ssrc=("|')([^"']*)\1/) || [])[2];
+      if (src === undefined || src === LEERES_BILD || istMedienAdresse(src)) return ganz;
+      const ohne = attribute.replace(/\ssrc=("|')[^"']*\1/, "");
+      return tag.toLowerCase() === "video" ? `<${tag}${ohne}>` : `<${tag}${ohne} src="${LEERES_BILD}">`;
     });
+}
+
+// Kurzlebige Anzeige-Adresse des Servers: https://api.smejj.com/medium/<token>.
+const SIGNIERT = /\/medium\/[A-Za-z0-9_-]{60,}(?:[?#]|$)/;
+export function istAnzeigeAdresse(quelle) {
+  return SIGNIERT.test(String(quelle || ""));
+}
+
+/** Die Medien-Kennung aus einer Serveradresse (…?id=<40 hex>.<endung>). */
+export function kennungAus(adresse) {
+  const treffer = String(adresse || "").match(/[?&]id=([a-f0-9]{40}\.[a-z0-9]{2,4})(?:&|$)/);
+  return treffer ? treffer[1] : "";
 }
 
 /**
@@ -132,18 +161,25 @@ export function parkeMedienAdressen(html) {
  * die diese ganze Arbeit ausgeloest haben. Bewusst OHNE Netz und ohne
  * await: eine reine DOM-Umschrift kann nicht scheitern, und damit kann auch
  * kein Speichern in den kaputten Zustand hineinlaufen.
+ *
+ * Eine kurzlebige Anzeige-Adresse (…/medium/…) bleibt dagegen STEHEN: das
+ * Attribut daneben traegt die echte Adresse mit ins Gespeicherte, und
+ * parkeMedienAdressen() raeumt sie beim naechsten Laden weg. Frueher drehte
+ * dieser Schritt auch ein laufendes Video auf die Serveradresse und zurueck —
+ * bei jedem Speichern begann es von vorn.
  */
 export function entwaessere(knoten) {
   let zurueck = 0;
   if (!knoten?.querySelectorAll) return zurueck;
   for (const el of knoten.querySelectorAll(`[${ADRESSE_ATTRIBUT}]`)) {
     const adresse = el.getAttribute(ADRESSE_ATTRIBUT);
+    const bisher = el.getAttribute("src") || "";
+    if (adresse && istAnzeigeAdresse(bisher)) continue;
     el.removeAttribute(ADRESSE_ATTRIBUT);
     if (!adresse) continue;
     // Den angezeigten blob merken: gleich danach will rehydriereMedien ihn
     // zurueck, und ein zweiter fetch fuer dieselben Bytes waere verschenkt.
-    const bisher = el.getAttribute("src") || "";
-    if (bisher.startsWith("blob:")) ANZEIGE_BLOB.set(el, { blob: bisher, adresse });
+    if (bisher.startsWith("blob:")) ANZEIGE_BLOB.set(el, { quelle: bisher, adresse, bis: 0 });
     el.setAttribute("src", adresse);
     zurueck += 1;
   }
@@ -162,69 +198,164 @@ async function holeMedium(adresse) {
   }
 }
 
+// Ausgegebene Anzeige-Adressen je Kennung und Fassung — ein Verlauf mit zwanzig
+// Bildern fragt sie EINMAL ab, nicht bei jedem Speichern erneut.
+const ADRESSEN = new Map();
+const RESTZEIT_MS = 5 * 60 * 1000;
+
 /**
- * Holt ausgelagerte Medien und zeigt sie ueber eine blob:-Adresse an.
+ * Fragt den Server nach kurzlebigen Anzeige-Adressen fuer mehrere Medien.
+ * Der Server prueft dabei die Sitzung; die Adresse selbst traegt nur einen
+ * verschluesselten, ablaufenden Token — keinen Pfad, kein Konto, keinen Eimer.
+ * @returns {Promise<Record<string, {url: string, bis: number}> | null>} null = Weg nicht verfuegbar
+ */
+export async function holeAnzeigeAdressen(ids, { vorschau = false } = {}) {
+  const jetzt = Date.now();
+  const ergebnis = {};
+  const fehlend = [];
+  for (const id of new Set(ids)) {
+    const gemerkt = ADRESSEN.get(`${id}|${vorschau ? "v" : "o"}`);
+    if (gemerkt && gemerkt.bis - jetzt > RESTZEIT_MS) ergebnis[id] = gemerkt;
+    else fehlend.push(id);
+  }
+  if (!fehlend.length) return ergebnis;
+  const schluessel = token();
+  const basis = medienUrl();
+  if (!schluessel || !basis) return null;
+  try {
+    const antwort = await fetch(`${basis}/zugang`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${schluessel}` },
+      body: JSON.stringify({ ids: fehlend, vorschau })
+    });
+    if (!antwort.ok) return null;
+    const daten = await antwort.json();
+    const bis = Date.parse(daten?.gueltigBis || "") || 0;
+    for (const [id, url] of Object.entries(daten?.adressen || {})) {
+      if (!istAnzeigeAdresse(url)) continue;
+      const eintrag = { url, bis };
+      ADRESSEN.set(`${id}|${vorschau ? "v" : "o"}`, eintrag);
+      ergebnis[id] = eintrag;
+    }
+    if (ADRESSEN.size > 2000) ADRESSEN.delete(ADRESSEN.keys().next().value);
+    return ergebnis;
+  } catch {
+    return null;
+  }
+}
+
+function vergissAdressen(id) {
+  ADRESSEN.delete(`${id}|v`);
+  ADRESSEN.delete(`${id}|o`);
+}
+
+function zeigtLebendig(el, src, adresse) {
+  const gemerkt = ANZEIGE_BLOB.get(el);
+  if (!gemerkt || gemerkt.quelle !== src || gemerkt.adresse !== adresse) return false;
+  return !gemerkt.bis || gemerkt.bis - Date.now() > 60_000;
+}
+
+// Ein Element, das mit seiner Anzeige-Adresse scheitert (abgelaufen, Netz),
+// bekommt EINEN neuen Versuch mit frischer Adresse, dann den alten fetch-Weg.
+const NEU_VERSUCHT = new WeakSet();
+const MIT_FEHLERHOERER = new WeakSet();
+
+function hoereAufFehler(el) {
+  if (MIT_FEHLERHOERER.has(el) || typeof el.addEventListener !== "function") return;
+  MIT_FEHLERHOERER.add(el);
+  el.addEventListener("error", () => {
+    const adresse = el.getAttribute(ADRESSE_ATTRIBUT);
+    if (!istAnzeigeAdresse(el.getAttribute("src")) || !istMedienAdresse(adresse)) return;
+    ANZEIGE_BLOB.delete(el);
+    vergissAdressen(kennungAus(adresse));
+    const einzeln = { querySelectorAll: () => [el] };
+    if (!NEU_VERSUCHT.has(el)) {
+      NEU_VERSUCHT.add(el);
+      rehydriereMedien(einzeln);
+    } else {
+      rehydriereMedien(einzeln, { adressenHolen: async () => null });
+    }
+  });
+}
+
+/**
+ * Holt ausgelagerte Medien und zeigt sie an.
  *
- * WARUM DIESER UMWEG (gemessen live 2026-08-14, mit securitypolicyviolation
- * belegt): Die Seite laeuft unter `img-src 'self' data: blob:`. Der
- * Control-Server ist eine ANDERE Herkunft — ein <img src="https://smejj-
- * control…"> wird von der Sicherheitsrichtlinie hart abgewiesen, das Bild
- * bleibt leer (0x0). Und selbst ohne die Richtlinie koennte ein <img> den
- * Anmelde-Schluessel gar nicht mitschicken; die Route verlangt ihn (von aussen
- * antwortet sie mit 401).
+ * NEUER WEG (Medien-System 2026-09-17): Der Server gibt nach Sitzungspruefung
+ * eine kurzlebige Anzeige-Adresse heraus; <img>/<video> laden sie DIREKT.
+ * Damit greifen Browser-Cache, loading="lazy" und bei Videos das Laden in
+ * Stuecken (Range) — das Video spielt, bevor es ganz da ist. Bilder bekommen
+ * die kleine WebP-Anzeigefassung, das Vollbild das Original.
  *
- * Ein fetch kann beides: Schluessel mitgeben und das Ergebnis als blob:
- * anbieten — und blob: ist ausdruecklich erlaubt. Der Umweg loest also die
- * Sicherheitsrichtlinie UND die Anmeldung auf einmal, ohne dass eine
- * eingefrorene Datei angefasst werden muss.
+ * ALTER WEG als Rueckfall (Server ohne /zugang, Adresse scheitert): fetch mit
+ * Anmelde-Schluessel und Anzeige als blob: — so wie seit dem 14.08.
  *
  * Fail-safe: Was sich nicht holen laesst, bleibt unveraendert stehen.
  */
-export async function rehydriereMedien(knoten, { holen = holeMedium } = {}) {
+export async function rehydriereMedien(knoten, { holen = holeMedium, adressenHolen = holeAnzeigeAdressen } = {}) {
   if (!knoten?.querySelectorAll) return { geholt: 0, gescheitert: 0 };
+  hoereAufKlicks(knoten);
   const offen = [];
   for (const el of knoten.querySelectorAll("img, video")) {
     const src = el.getAttribute("src") || "";
-    if (istMedienAdresse(src)) { offen.push(el); continue; }
-    // Geparkt (parkeMedienAdressen): Adresse im Attribut, src noch leer.
-    if (istMedienAdresse(el.getAttribute(ADRESSE_ATTRIBUT)) && !src.startsWith("blob:")) {
-      el.setAttribute("src", el.getAttribute(ADRESSE_ATTRIBUT));
-      el.removeAttribute(ADRESSE_ATTRIBUT);
-      offen.push(el);
-    }
+    if (istMedienAdresse(src)) { offen.push({ el, adresse: src }); continue; }
+    // Geparkt oder mit abgelaufener/toter Anzeige: Adresse steht im Attribut.
+    const adresse = el.getAttribute(ADRESSE_ATTRIBUT);
+    if (istMedienAdresse(adresse) && !zeigtLebendig(el, src, adresse)) offen.push({ el, adresse });
   }
   let geholt = 0;
   let gescheitert = 0;
   // ERSTE RUNDE, ohne Netz und ohne await: was dieses Element eben noch
-  // anzeigte, kann es sofort wieder anzeigen. Das spart je Speicherzyklus
-  // einen fetch und einen Blob — und haelt das Fenster kurz, in dem eine
-  // Serveradresse im src steht, die die Sicherheitsrichtlinie ohnehin
-  // abweist (img-src laesst nur 'self', data: und blob: zu).
+  // anzeigte, kann es sofort wieder anzeigen.
   const uebrig = [];
-  for (const el of offen) {
-    const adresse = el.getAttribute("src");
-    const gemerkt = ANZEIGE_BLOB.get(el);
-    if (gemerkt && gemerkt.adresse === adresse) {
-      el.setAttribute(ADRESSE_ATTRIBUT, adresse);
-      el.setAttribute("src", gemerkt.blob);
+  for (const eintrag of offen) {
+    const gemerkt = ANZEIGE_BLOB.get(eintrag.el);
+    if (gemerkt && gemerkt.adresse === eintrag.adresse && (!gemerkt.bis || gemerkt.bis - Date.now() > 60_000)) {
+      eintrag.el.setAttribute(ADRESSE_ATTRIBUT, eintrag.adresse);
+      if (eintrag.el.getAttribute("src") !== gemerkt.quelle) eintrag.el.setAttribute("src", gemerkt.quelle);
       geholt += 1;
       continue;
     }
-    uebrig.push(el);
+    uebrig.push(eintrag);
   }
-  for (const el of uebrig) {
-    const adresse = el.getAttribute("src");
+  // ZWEITE RUNDE: Anzeige-Adressen gebuendelt holen — Bilder in der kleinen
+  // Fassung, Videos im Original.
+  const nachArt = { v: uebrig.filter((e) => e.el.tagName === "IMG"), o: uebrig.filter((e) => e.el.tagName !== "IMG") };
+  const ohneAdresse = [];
+  for (const [art, gruppe] of Object.entries(nachArt)) {
+    if (!gruppe.length) continue;
+    const ids = gruppe.map((e) => kennungAus(e.adresse)).filter(Boolean);
+    const adressen = ids.length ? await adressenHolen(ids, { vorschau: art === "v" }) : null;
+    for (const eintrag of gruppe) {
+      const treffer = adressen?.[kennungAus(eintrag.adresse)];
+      if (!treffer?.url) { ohneAdresse.push(eintrag); continue; }
+      const { el } = eintrag;
+      el.setAttribute(ADRESSE_ATTRIBUT, eintrag.adresse);
+      if (el.tagName === "IMG") {
+        if (!el.getAttribute("loading")) el.setAttribute("loading", "lazy");
+        if (!el.getAttribute("decoding")) el.setAttribute("decoding", "async");
+      }
+      hoereAufFehler(el);
+      const alt = ANZEIGE_BLOB.get(el);
+      if (alt?.quelle?.startsWith("blob:")) { try { URL.revokeObjectURL(alt.quelle); } catch { /* egal */ } }
+      ANZEIGE_BLOB.set(el, { quelle: treffer.url, adresse: eintrag.adresse, bis: treffer.bis });
+      if (el.getAttribute("src") !== treffer.url) el.setAttribute("src", treffer.url);
+      geholt += 1;
+    }
+  }
+  // DRITTE RUNDE, der alte Weg: fetch mit Schluessel, Anzeige als blob:.
+  for (const { el, adresse } of ohneAdresse) {
     const daten = await holen(adresse);
     if (!daten) {
       gescheitert += 1;
-      // Sichtbar sagen, was los ist — und die Adresse behalten, damit das
-      // Speichern (entwaessere) sie wieder ins src schreibt und ein spaeterer
-      // Versuch sie erneut holen kann. Vorher blieb hier die Serveradresse
-      // im src stehen: Sicherheitsrichtlinie greift, kaputtes Bildsymbol.
+      // Sichtbar sagen, was los ist — und die Adresse behalten, damit ein
+      // spaeterer Versuch sie erneut holen kann.
+      el.setAttribute(ADRESSE_ATTRIBUT, adresse);
       if (el.tagName === "IMG") {
-        el.setAttribute(ADRESSE_ATTRIBUT, adresse);
         el.setAttribute("src", FEHLENDES_BILD);
         if (!el.getAttribute("alt")) el.setAttribute("alt", "Bild nicht mehr verfügbar");
+      } else if (istMedienAdresse(el.getAttribute("src"))) {
+        el.removeAttribute("src");
       }
       continue;
     }
@@ -232,15 +363,33 @@ export async function rehydriereMedien(knoten, { holen = holeMedium } = {}) {
     // etwas ginge dazwischen schief, stuende ein blob: ohne Rueckweg da.
     el.setAttribute(ADRESSE_ATTRIBUT, adresse);
     const blob = URL.createObjectURL(daten);
-    // Ein frueher gemerkter Blob dieses Elements zeigt jetzt ins Leere —
-    // freigeben, sonst bleibt er bis zum Schliessen des Tabs liegen.
     const alt = ANZEIGE_BLOB.get(el);
-    if (alt && alt.blob !== blob) { try { URL.revokeObjectURL(alt.blob); } catch { /* egal */ } }
-    ANZEIGE_BLOB.set(el, { blob, adresse });
+    if (alt?.quelle?.startsWith("blob:") && alt.quelle !== blob) { try { URL.revokeObjectURL(alt.quelle); } catch { /* egal */ } }
+    ANZEIGE_BLOB.set(el, { quelle: blob, adresse, bis: 0 });
     el.setAttribute("src", blob);
     geholt += 1;
   }
   return { geholt, gescheitert };
+}
+
+// Vollbild, Herunterladen und Teilen: ein Klick auf ein ausgelagertes Bild.
+// Das Modul dafuer kommt erst beim ersten Klick — der Verlauf bleibt leicht.
+let klickHoererAn = false;
+function hoereAufKlicks(knoten) {
+  if (klickHoererAn || typeof document === "undefined" || !knoten?.ownerDocument) return;
+  klickHoererAn = true;
+  const oeffne = (el) => import("./chat-medien-ansicht.js?v=1").then((m) => m.oeffneVollbild(el)).catch(() => {});
+  document.addEventListener("click", (ereignis) => {
+    const bild = ereignis.target?.closest?.(`.entry img[${ADRESSE_ATTRIBUT}]`);
+    if (!bild || !istMedienAdresse(bild.getAttribute(ADRESSE_ATTRIBUT))) return;
+    ereignis.preventDefault();
+    oeffne(bild);
+  });
+  document.addEventListener("keydown", (ereignis) => {
+    if (ereignis.key !== "Enter") return;
+    const bild = ereignis.target?.matches?.(`.entry img[${ADRESSE_ATTRIBUT}]`) ? ereignis.target : null;
+    if (bild) oeffne(bild);
+  });
 }
 
 /**
@@ -270,18 +419,82 @@ export function findeAuslagerbare(knoten) {
   return gefunden;
 }
 
+/** data:-URL → Blob, ohne fetch (data: steht nicht in jeder connect-src). */
+export function blobAusDataUrl(dataUrl) {
+  const treffer = String(dataUrl || "").match(/^data:([a-z]+\/[a-z0-9.+-]+);base64,(.*)$/i);
+  if (!treffer) return null;
+  const binaer = atob(treffer[2]);
+  const bytes = new Uint8Array(binaer.length);
+  for (let i = 0; i < binaer.length; i += 1) bytes[i] = binaer.charCodeAt(i);
+  return new Blob([bytes], { type: treffer[1].toLowerCase() });
+}
+
+// Laengste Kante der Anzeigefassung: der Chat zeigt Bilder bis 512 CSS-Pixel,
+// auf einem Handy mit doppelter Pixeldichte sind das 1024 echte Pixel.
+const VORSCHAU_KANTE = 1024;
+
+/**
+ * Baut die kleine Anzeigefassung eines Bildes im Browser (WebP, sonst JPEG).
+ * null, wenn der Browser es nicht kann oder sie sich nicht lohnt.
+ */
+export async function baueVorschau(blob) {
+  try {
+    if (typeof createImageBitmap !== "function" || typeof OffscreenCanvas !== "function") return null;
+    const bild = await createImageBitmap(blob);
+    const faktor = Math.min(1, VORSCHAU_KANTE / Math.max(bild.width, bild.height));
+    const breite = Math.max(1, Math.round(bild.width * faktor));
+    const hoehe = Math.max(1, Math.round(bild.height * faktor));
+    const leinwand = new OffscreenCanvas(breite, hoehe);
+    leinwand.getContext("2d").drawImage(bild, 0, 0, breite, hoehe);
+    bild.close?.();
+    let klein = await leinwand.convertToBlob({ type: "image/webp", quality: 0.82 });
+    // Safari schreibt kein WebP und liefert still PNG — dann JPEG.
+    if (klein.type !== "image/webp") klein = await leinwand.convertToBlob({ type: "image/jpeg", quality: 0.84 });
+    if (!["image/webp", "image/jpeg"].includes(klein.type) || klein.size >= blob.size * 0.7) return null;
+    return klein;
+  } catch {
+    return null;
+  }
+}
+
+async function ladeVorschauHoch(basis, id, blob, schluessel) {
+  const klein = await baueVorschau(blob);
+  if (!klein) return;
+  await fetch(`${basis}/vorschau?id=${encodeURIComponent(id)}`, {
+    method: "POST",
+    headers: { "Content-Type": klein.type, Authorization: `Bearer ${schluessel}` },
+    body: klein
+  }).catch(() => {});
+}
+
 async function ladeHoch(basis, dataUrl) {
   const schluessel = token();
   if (!schluessel) return "";
   try {
-    const antwort = await fetch(basis, {
+    // ROH statt base64-JSON (2026-09-17): der JSON-Weg des Servers endet bei
+    // 1 MB Rumpf — real ~730 KB Medium. Ein laengeres Video kam nie an.
+    const blob = blobAusDataUrl(dataUrl);
+    let antwort = blob ? await fetch(basis, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${schluessel}` },
-      body: JSON.stringify({ dataUrl })
-    });
+      headers: { "Content-Type": blob.type, Authorization: `Bearer ${schluessel}` },
+      body: blob
+    }) : null;
+    // Ein Server ohne den rohen Weg antwortet 400 "kein_data_url" — dann wie bisher.
+    if (!antwort || antwort.status === 400 || antwort.status === 415) {
+      const erster = antwort ? await antwort.json().catch(() => ({})) : {};
+      if (antwort && erster?.error !== "kein_data_url" && antwort.status !== 415) return "";
+      antwort = await fetch(basis, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${schluessel}` },
+        body: JSON.stringify({ dataUrl })
+      });
+    }
     if (!antwort.ok) return "";
     const daten = await antwort.json();
-    return daten?.ok && daten.id ? String(daten.id) : "";
+    const id = daten?.ok && daten.id ? String(daten.id) : "";
+    // Die kleine Fassung im Hintergrund — das Speichern wartet nicht darauf.
+    if (id && blob && blob.type.startsWith("image/")) ladeVorschauHoch(basis, id, blob, schluessel);
+    return id;
   } catch {
     return "";
   }

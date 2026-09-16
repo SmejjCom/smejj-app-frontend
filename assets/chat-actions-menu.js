@@ -165,6 +165,23 @@ export function versionLabel(index, total) {
   return `Version ${index + 1} von ${total}`;
 }
 
+// Interne Medien-Adressen: Serveradresse, kurzlebige Anzeige-Adresse, data:-Berg.
+const MEDIEN_INTERN = /(?:https?:\/\/[^\s)"']*(?:\/api\/chat-medien\?id=|\/medium\/)[^\s)"']*|data:(?:image|video|audio)\/[^\s)"']+)/;
+
+/**
+ * Medien-System 2026-09-17: interne Medien-Adressen verlassen den Chat nie als
+ * Text. Kopieren, Teilen, Zitieren und Weiterleiten zeigen stattdessen
+ * [Bild]/[Video] — das Medium selbst teilt man bewusst ueber "Teilen" (als
+ * Datei oder mit eigenem, widerrufbarem Link).
+ * @param {string} raw
+ * @returns {string}
+ */
+export function ohneMedienAdressen(raw) {
+  return String(raw || "")
+    .replace(new RegExp(`!\\[([^\\]]*)\\]\\(${MEDIEN_INTERN.source}\\)`, "g"), (_m, alt) => (/video/i.test(alt) ? "[Video]" : "[Bild]"))
+    .replace(new RegExp(MEDIEN_INTERN.source, "g"), "[Medium]");
+}
+
 /**
  * Markdown-Auszeichnung fuer "Ohne Formatierung kopieren" abbauen.
  * Reihenfolge wie in chat-markdown.js, nur rueckwaerts: Codebloecke zuerst,
@@ -173,7 +190,7 @@ export function versionLabel(index, total) {
  * @returns {string}
  */
 export function toPlainText(raw) {
-  return String(raw || "")
+  return ohneMedienAdressen(raw)
     .replace(/```[a-z0-9+-]*\n?([\s\S]*?)```/gi, (_match, code) => code.replace(/\n$/, ""))
     .replace(/`([^`\n]+)`/g, "$1")
     .replace(/\*\*([^*\n]+)\*\*/g, "$1")

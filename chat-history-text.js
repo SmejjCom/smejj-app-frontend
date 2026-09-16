@@ -353,7 +353,8 @@ function sichereAlsMarkdown(chat) {
     const messages = Array.isArray(chat.messages) ? chat.messages : [];
     const kopf = `# ${anzeigeTitel(chat)}\n\n_${new Date(chat.updatedAt).toLocaleString("de-DE")} · ${messages.length} Nachrichten_\n\n`;
     const koerper = messages
-      .map((message) => `## ${message?.role === "user" ? "Frage" : "Antwort"}\n\n${String(message?.raw || message?.text || "").trim()}\n`)
+      // Interne Medien-Adressen gehoeren nicht in eine Datei, die weitergegeben werden kann.
+      .map((message) => `## ${message?.role === "user" ? "Frage" : "Antwort"}\n\n${String(message?.raw || message?.text || "").replace(/!\[([^\]]*)\]\((?:https?:\/\/[^\s)]*(?:\/api\/chat-medien\?id=|\/medium\/)[^\s)]*|data:[^\s)]+)\)/g, (_m, alt) => (/video/i.test(alt) ? "[Video]" : "[Bild]")).trim()}\n`)
       .join("\n");
     const datei = new Blob([kopf + koerper], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(datei);

@@ -26,7 +26,7 @@
 // fail-safe: scheitert der Versand, bleibt die Bewertung lokal sichtbar.
 
 import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=3";
-import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=10";
+import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=11";
 // OHNE ?v=-Kennung — app.js importiert "./browser-context.js" (also
 // /assets/browser-context.js). Ein anderer Spezifizierer erzeugt eine ZWEITE
 // Modulinstanz mit eigenem Quellen-Gedaechtnis; der Menuepunkt "Quellen
@@ -46,7 +46,7 @@ import { barSpecFor, buildMenu, buildSourcePanel, toPlainText, versionLabel } fr
 // sanitizeForSpeech erst beim Vorlese-Klick laden (2026-08-24 "Startseite
 // abspecken") — derselbe Spezifizierer wie ueberall, sonst laedt der Browser
 // die Datei doppelt (Vorfall 2026-07-29, siehe oben).
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=b80";
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=b81";
 import { showToast } from "/assets/components.js?v=b48";
 import { wendeAn, entferneEndgueltig } from "./chat-neu-versuch.js?v=1";
 
@@ -281,7 +281,7 @@ function absaetzeAusText(text) {
 function htmlOf(entry, raw) {
   const klon = entry?.cloneNode?.(true);
   if (!klon) return "";
-  for (const chrome of klon.querySelectorAll(".msg-actions, .msg-menu, .msg-meta, .chat-code-actions, button")) chrome.remove();
+  for (const chrome of klon.querySelectorAll(".msg-actions, .msg-menu, .msg-meta, .chat-code-actions, button, img[data-smejj-adresse], video, img[src*=\"/api/chat-medien\"]")) chrome.remove();
   const html = String(klon.innerHTML || "").trim();
   // Nur DOM-HTML verwenden, wenn es echte Bloecke traegt — sonst aus dem
   // Rohtext bauen, damit die Absatzstruktur nie verloren geht.
@@ -633,7 +633,7 @@ function sendeDaumenSignal(entry, richtung) {
 
 const HANDLERS = {
   sources: (entry) => toggleSources(entry),
-  copy: (entry, button) => copyText(rawOf(entry), button, htmlOf(entry, rawOf(entry))),
+  copy: (entry, button) => copyText(ohneMedienAdressen(rawOf(entry)), button, htmlOf(entry, ohneMedienAdressen(rawOf(entry)))),
   "copy-plain": (entry) => copyText(toPlainText(rawOf(entry))),
   edit: (entry) => startEdit(entry),
   regen: (entry) => regenerate(entry),
