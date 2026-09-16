@@ -6519,6 +6519,9 @@ html body:has(#voiceModeOverlay:not([hidden])) #start.view .prompt-glass.prompt-
   html body #startLog.start-log > .entry.assistant:first-child + .msg-actions {
     margin-left: 34px;
   }
+  html body:not(:has(#code.is-active)) .mobil-kopfglas.mobil-kopfglas {
+    display: none;
+  }
   html body .glass-icon.glass-icon.glass-icon {
     background: rgba(10, 13, 16, 0.66);
     -webkit-backdrop-filter: blur(10px);
