@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v890";
+const CACHE_NAME = "smejj-shell-v891";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -377,6 +377,8 @@ const SHELL = [
   "/assets/arbeitsbereiche.js",
   "/assets/papierkorb.js",
   "/assets/chat-actions-menu.js",
+  // Erweitertes Nachrichten-Menue (16.09.2026), per import() aus chat-actions-menu.js.
+  "/assets/chat-menue-mehr.js",
   // Sieben Module, die chat-actions-menu.js per import() nachlaedt und die
   // bis 2026-09-06 hier fehlten. Online faellt das nie auf — der Browser holt
   // sie einfach aus dem Netz. Offline lieferte der Fetch-Handler dafuer die

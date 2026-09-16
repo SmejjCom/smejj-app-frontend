@@ -39,6 +39,9 @@ if (typeof document !== "undefined") {
   beiHandy(() => import("/assets/composer-zeile.js").catch(() => {}));
   // Schlankes Dock am Handy (Betreiber 07.09.: Safe-Area nur einmal, Code-Leiste eine Zeile, Felder bis 5 Zeilen) — nur am Handy.
   beiHandy(() => import("/assets/mobil-dock.js").catch(() => {}));
+  // Erweitertes Nachrichten-Menue (Betreiber 16.09.: Teilen, Antworten, Zitieren, Weiterleiten,
+  // Text auswaehlen, Uebersetzen, Anpinnen) — die Handler leben dort, chat-actions.js steht bei 799 Zeilen.
+  import("/assets/chat-menue-mehr.js").catch(() => {});
   // Verlauf steht nach dem Oeffnen ganz unten (Betreiber-Befund 03.09.) — erst, wenn ein Chat im Log steht.
   beiKindern(document.getElementById("startLog"), () => import("/assets/verlauf-unten.js").catch(() => {}));
   // Code-Bereich: Schreibfeld am unteren Rand (Betreiber-Befund 03.09.) — erst im Code-Bereich.
@@ -73,16 +76,37 @@ const ITEMS = Object.freeze({
   remove: { act: "remove", label: "Ab hier löschen", icon: "trash", danger: true }
 });
 
+// Betreiber 16.09.2026: "Teilen fehlt und soll unbedingt hinzugefuegt werden … umfangreicher,
+// professioneller, uebersichtlich". Vier Kacheln oben (die haeufigsten Griffe, Symbol UND Wort),
+// darunter eine Liste; die Handler der neuen Punkte liegen in chat-menue-mehr.js.
+const KACHELN = Object.freeze([
+  { act: "copy", label: "Kopieren", icon: "copy", kachel: true },
+  { act: "share", label: "Teilen", icon: "share", kachel: true },
+  { act: "speak", label: "Vorlesen", icon: "volume", kachel: true },
+  { act: "pin", label: "Anpinnen", icon: "pin", kachel: true }
+]);
+const MEHR = Object.freeze({
+  reply: { act: "reply", label: "Antworten", icon: "reply" },
+  quote: { act: "quote", label: "Zitieren", icon: "quote" },
+  forward: { act: "forward", label: "Weiterleiten", icon: "forward" },
+  translate: { act: "translate", label: "Übersetzen", icon: "translate" },
+  select: { act: "select-text", label: "Text auswählen", icon: "select" }
+});
+
 /**
  * Welche Menuepunkte gehoeren zu dieser Rolle?
  * @param {"user"|"assistant"} role
  * @param {boolean} [hatQuellen] - nur dann erscheint "Quellen anzeigen"
- * @returns {Array<{act: string, label: string, icon: string, danger?: boolean}>}
+ * @param {boolean} [angepinnt] - dann heisst die Kachel "Lösen"
+ * @returns {Array<{act: string, label: string, icon: string, danger?: boolean, kachel?: boolean}>}
  */
-export function menuItemsFor(role, hatQuellen = false) {
-  if (role === "user") return [...MENU_KOPF.user, ITEMS.fork, ITEMS.remove];
-  const punkte = [...MENU_KOPF.assistant, ITEMS.plain, ITEMS.fork, ITEMS.remove];
-  return hatQuellen ? [ITEMS.sources, ...punkte] : punkte;
+export function menuItemsFor(role, hatQuellen = false, angepinnt = false) {
+  const kacheln = KACHELN.map((k) => (k.act === "pin" && angepinnt ? { ...k, label: "Lösen" } : k));
+  if (role === "user") {
+    return [...kacheln, ...MENU_KOPF.user, MEHR.quote, MEHR.forward, MEHR.translate, MEHR.select, ITEMS.fork, ITEMS.remove];
+  }
+  const liste = [MEHR.reply, MEHR.quote, MEHR.forward, MEHR.translate, MEHR.select, ...MENU_KOPF.assistant, ITEMS.plain];
+  return [...kacheln, ...(hatQuellen ? [ITEMS.sources] : []), ...liste, ITEMS.fork, ITEMS.remove];
 }
 
 // Belegung der sichtbaren Leiste. Betreiber-Entscheid 2026-08-16 (Runde 2,
@@ -107,22 +131,16 @@ const BAR_SPECS = Object.freeze({
 // Menuekopf: nur, was NICHT schon sichtbar in der Leiste steht —
 // doppelte Wege verwirren (Kopieren/Daumen sitzen seit dem ZCode-Abgleich
 // wieder in der Leiste der Antwort).
+// Kopieren und Vorlesen stehen seit 16.09. als Kacheln oben im Menue (fuer beide Rollen).
 const MENU_KOPF = Object.freeze({
   user: Object.freeze([
-    { act: "copy", label: "Kopieren", icon: "copy" },
-    { act: "edit", label: "Bearbeiten", icon: "edit" },
-    // Betreiber 2026-09-07: "meine Frage laut lesen lassen" — derselbe Vorleser wie
-    // bei Antworten (speakEntry in chat-actions.js liest rawOf(entry), rollenneutral);
-    // erneutes Antippen waehrend der Ansage stoppt sie.
-    { act: "speak", label: "Vorlesen", icon: "volume" }
+    { act: "edit", label: "Bearbeiten", icon: "edit" }
   ]),
   // Betreiber 2026-09-08: "Antworten kann ich nicht kopieren, vorlesen — muessen auch wie
   // meine Anfragen genau sein." Kopieren und Vorlesen stehen bei Antworten zwar schon in der
   // Leiste, aber wer sie bei der eigenen Frage im Drei-Punkte-Menue sucht, sucht sie dort auch
   // bei der Antwort. Einheitliche Bedienung schlaegt die alte Regel "keine doppelten Wege".
   assistant: Object.freeze([
-    { act: "copy", label: "Kopieren", icon: "copy" },
-    { act: "speak", label: "Vorlesen", icon: "volume" },
     { act: "regen", label: "Neu generieren", icon: "regen" }
   ])
 });
@@ -202,7 +220,17 @@ const ICONS = Object.freeze({
   text: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14"/><path d="M5 12h14"/><path d="M5 18h9"/></svg>',
   volume: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10H4Z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>',
   fork: '<svg viewBox="0 0 24 24"><path d="M7 4v7a4 4 0 0 0 4 4h6"/><path d="m14 12 3 3-3 3"/><circle cx="7" cy="4" r="1.6"/></svg>',
-  trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M6 7l1 12h10l1-12"/></svg>'
+  trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M6 7l1 12h10l1-12"/></svg>',
+  copy: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>',
+  share: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l-1 6 3 3H7l3-3Z"/><path d="M12 13v8"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16Z"/><path d="m14 6 4 4"/></svg>',
+  regen: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v6h-6"/></svg>',
+  reply: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v5"/></svg>',
+  quote: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h4v6H4v-5a6 6 0 0 1 3-5"/><path d="M15 11h4v6h-5v-5a6 6 0 0 1 3-5"/></svg>',
+  forward: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0-6 6v5"/></svg>',
+  translate: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h9"/><path d="M8.5 3v2"/><path d="M11 5c-1 4-3.5 7-7 9"/><path d="M6 9c1.5 2.5 3.5 4 6 5"/><path d="m13 21 4-9 4 9"/><path d="M14.5 18h5"/></svg>',
+  select: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H5v3"/><path d="M16 4h3v3"/><path d="M8 20H5v-3"/><path d="M16 20h3v-3"/><path d="M9 10h6"/><path d="M9 14h4"/></svg>'
 });
 
 /**
@@ -304,15 +332,19 @@ export function buildMenu(doc, meta, now = new Date()) {
     head.textContent = header;
     menu.append(head);
   }
-  for (const item of menuItemsFor(meta?.role, (meta?.sources?.length || 0) > 0)) {
-    if (item.danger) {
+  let kachelReihe = null;
+  let vorherKachel = false;
+  for (const item of menuItemsFor(meta?.role, (meta?.sources?.length || 0) > 0, meta?.angepinnt === true)) {
+    // Trennlinie nach den Kacheln und vor der Gruppe "neuer Chat / Loeschen".
+    if (item.act === "fork" || (vorherKachel && !item.kachel)) {
       const line = doc.createElement("div");
       line.className = "msg-menu-line";
       menu.append(line);
     }
+    vorherKachel = Boolean(item.kachel);
     const button = doc.createElement("button");
     button.type = "button";
-    button.className = item.danger ? "msg-menu-item is-danger" : "msg-menu-item";
+    button.className = item.danger ? "msg-menu-item is-danger" : item.kachel ? "msg-menu-item is-kachel" : "msg-menu-item";
     button.setAttribute("role", "menuitem");
     button.dataset.act = item.act;
     const icon = doc.createElement("span");
@@ -322,7 +354,16 @@ export function buildMenu(doc, meta, now = new Date()) {
     const label = doc.createElement("span");
     label.textContent = item.label;
     button.append(icon, label);
-    menu.append(button);
+    if (item.kachel) {
+      if (!kachelReihe) {
+        kachelReihe = doc.createElement("div");
+        kachelReihe.className = "msg-menu-kacheln";
+        menu.append(kachelReihe);
+      }
+      kachelReihe.append(button);
+    } else {
+      menu.append(button);
+    }
   }
   return menu;
 }

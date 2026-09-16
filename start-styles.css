@@ -6415,3 +6415,234 @@ html body #code .code-wchips.code-wchips.code-wchips {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+@media (max-width: 600px) {
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .prompt-glass.prompt-glass {
+    width: calc(100% + 32px);
+    max-width: none;
+    margin-left: -16px;
+    margin-right: -16px;
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass {
+    padding: 4px 4px 0;
+    column-gap: 2px;
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass #modelPickerButton {
+    min-width: 44px;
+    max-width: 22vw;
+    padding: 0 6px;
+    font-size: 15px;
+    color: rgba(242, 245, 244, 0.86);
+    background: transparent;
+    box-shadow: none;
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass #startMessage {
+    max-height: min(40dvh, 320px);
+    padding-left: 6px;
+    padding-right: 6px;
+    font-size: 18px;
+    line-height: 1.4;
+    scroll-padding-bottom: 8px;
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass :where(#composerPlusButton, [data-start-tool="voice"], #startSend) {
+    color: rgba(242, 245, 244, 0.9);
+    background: transparent;
+    box-shadow: none;
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass :is(#composerPlusButton, [data-start-tool="voice"], #startSend) svg {
+    width: 24px;
+    height: 24px;
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass #startSend:not(.ist-sprache) {
+    color: #ffffff;
+  }
+  html body #start.has-start-chat #startLog.start-log {
+    padding-top: 48px;
+    scroll-padding-top: 48px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  html body #startLog .entry.user {
+    padding: 10px 14px;
+  }
+  html body #startLog .msg-actions.msg-actions .msg-act svg {
+    width: 20px;
+    height: 20px;
+  }
+  html body #startLog .msg-actions.msg-actions .msg-act-wort {
+    font-size: 12px;
+    opacity: 1;
+  }
+  html body #startLog .msg-actions.msg-actions .msg-act {
+    color: rgba(246, 243, 238, 0.86);
+  }
+  html body #startLog .msg-actions.msg-actions .msg-act.hat-wort {
+    width: auto;
+    min-width: 44px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  html body #startLog .msg-actions.msg-actions:has(.msg-act.hat-wort) {
+    gap: 4px;
+  }
+  html body #startLog .msg-actions.msg-actions .msg-zeit {
+    font-size: 13px;
+    color: rgba(246, 243, 238, 0.62);
+  }
+}
+@media (max-width: 360px) {
+  html body #startLog .msg-actions.msg-actions .msg-zeit { display: none; }
+}
+html body #start.view .prompt-glass.prompt-glass.prompt-glass [data-start-tool="voice"]:is(.is-recording, [aria-pressed="true"]),
+html body:has(#voiceModeOverlay:not([hidden])) #start.view .prompt-glass.prompt-glass.prompt-glass #startSend.ist-sprache {
+  color: #02fdfd;
+  background: rgba(2, 253, 253, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(2, 253, 253, 0.55);
+  animation: none;
+}
+@media (max-width: 600px) {
+  html body #start.has-start-chat #startLog.start-log {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 6px);
+    scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 6px);
+    padding-bottom: 6px;
+  }
+  html body #startLog.start-log > .entry.user:first-child {
+    margin-right: 34px;
+  }
+  html body #startLog.start-log > .entry.assistant:first-child {
+    margin-left: 34px;
+    margin-right: 34px;
+  }
+  html body .glass-icon.glass-icon.glass-icon {
+    background: rgba(10, 13, 16, 0.66);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass.feld-breit:has(#startMessage:not(:placeholder-shown)) #startMessage {
+    order: 0;
+    flex: 1 0 100%;
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    max-height: min(38dvh, 300px);
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass.feld-breit:has(#startMessage:not(:placeholder-shown)) .model-picker {
+    margin-left: auto;
+  }
+  html body .msg-menu.msg-menu {
+    width: min(320px, calc(100vw - 16px));
+    max-height: calc(100dvh - 16px);
+    overflow-y: auto;
+    padding: 6px;
+    border-radius: 12px;
+  }
+  html body .msg-menu .msg-menu-item {
+    min-height: 44px;
+    font-size: 16px;
+    gap: 12px;
+  }
+  html body .msg-menu .msg-menu-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+.msg-menu .msg-menu-kacheln {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 2px 0 4px;
+}
+.msg-menu .msg-menu-item.is-kachel {
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  min-height: 62px;
+  padding: 8px 2px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12.5px;
+  line-height: 1.15;
+  text-align: center;
+  color: rgba(246, 243, 238, 0.92);
+}
+.msg-menu .msg-menu-item.is-kachel .msg-menu-icon {
+  color: rgba(246, 243, 238, 0.9);
+}
+.msg-menu .msg-menu-item.is-kachel .msg-menu-icon svg {
+  width: 22px;
+  height: 22px;
+}
+@media (max-width: 600px) {
+  html body .msg-menu .msg-menu-item.is-kachel {
+    min-height: 64px;
+    font-size: 13px;
+  }
+}
+#startLog > .entry.ist-angepinnt {
+  box-shadow: inset 3px 0 0 #02fdfd;
+}
+#startLog > .entry.assistant.ist-angepinnt {
+  padding-left: 12px;
+}
+.text-auswahl {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+.text-auswahl-kasten {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(720px, 100%);
+  max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 24px);
+  padding: 12px 14px calc(env(safe-area-inset-bottom, 0px) + 12px);
+  border-radius: 12px 12px 0 0;
+  background: #15181c;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5);
+}
+.text-auswahl-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 17px;
+  color: #f2f5f4;
+}
+.text-auswahl-zu,
+.text-auswahl-kopieren {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+.text-auswahl-zu {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f2f5f4;
+}
+.text-auswahl-kopieren {
+  background: #ffffff;
+  color: #0a0f16;
+  font-weight: 700;
+}
+.text-auswahl-inhalt {
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f2f5f4;
+  font-size: 18px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.text-auswahl-hinweis {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(242, 245, 244, 0.66);
+}

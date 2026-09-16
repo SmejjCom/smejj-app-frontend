@@ -181,3 +181,291 @@ html body #code .code-wchips.code-wchips.code-wchips {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ==== Handy: Chat- und Eingabebereich (Betreiber-Auftrag 16.09.2026, zweite Runde) ====
+   "+ ganz links, Modelle → Mikrofon → Sprachwelle/Senden ganz rechts, dazwischen
+   das Schreibfeld mit so viel Platz wie moeglich; eine kompakte Zeile, die beim
+   Schreiben nach oben waechst; aktives Mikrofon/Welle in der Logofarbe; alles gross
+   und gut lesbar, ohne leere Flaechen."
+   GEMESSEN VORHER (375x812, Test-Kopie wie GitHub Pages): Feld 160 px (leere Seite
+   mit 16 px Rand), Deckel 148 px, Aktions-Symbole 15 px, Woerter 10 px, Uhrzeit
+   11,5 px bei 40 % Deckkraft, vier verschiedene Grautoene in der Zeile, Verlauf
+   beginnt 56 px unter der Oberkante. Die Stil-Bloecke aus mobil-dock.js,
+   composer-zeile.js und chat-actions-woerter.js haengen NACH dem Buendel im Kopf —
+   darum Spezifitaet ueber html body #… und Mehrfachklassen. */
+@media (max-width: 600px) {
+  /* Leiste bis an beide Raender, auch auf der leeren Seite (dort polsterte .home-feed 16 px). */
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .prompt-glass.prompt-glass {
+    width: calc(100% + 32px);
+    max-width: none;
+    margin-left: -16px;
+    margin-right: -16px;
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass {
+    padding: 4px 4px 0;
+    column-gap: 2px;
+  }
+  /* Modell als schlanker Text-Knopf: 44 px hoch, so breit wie sein Wort. */
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass #modelPickerButton {
+    min-width: 44px;
+    max-width: 22vw;
+    padding: 0 6px;
+    font-size: 15px;
+    color: rgba(242, 245, 244, 0.86);
+    background: transparent;
+    box-shadow: none;
+  }
+  /* Schreibfeld: waechst beim Tippen nach oben, bis 40 % der Hoehe (hoechstens
+     320 px) — erst dann scrollt es innen. Vorher 148 px (mobil-dock.js). */
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass #startMessage {
+    max-height: min(40dvh, 320px);
+    padding-left: 6px;
+    padding-right: 6px;
+    font-size: 18px;
+    line-height: 1.4;
+    scroll-padding-bottom: 8px;
+  }
+  /* EIN Grundton fuer alle Symbole der Zeile, Symbole 24 px. :where statt :is — :is erbt
+     das Gewicht der Kennung (#startSend) und schlug damit die Aktiv-Regel unten
+     (gemessen: Mikrofon .is-recording blieb grau). */
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass :where(#composerPlusButton, [data-start-tool="voice"], #startSend) {
+    color: rgba(242, 245, 244, 0.9);
+    background: transparent;
+    box-shadow: none;
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass :is(#composerPlusButton, [data-start-tool="voice"], #startSend) svg {
+    width: 24px;
+    height: 24px;
+  }
+  /* Senden (getippt): der Knopf bleibt transparent (V11-Vorgabe "ohne Hintergrund",
+     dort mit !important) — der Pfeil wird reinweiss und ist damit das hellste Symbol. */
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass #startSend:not(.ist-sprache) {
+    color: #ffffff;
+  }
+
+  /* Verlauf beginnt direkt unter der Kopfzeile (44-px-Knoepfe + 4 px Luft). */
+  html body #start.has-start-chat #startLog.start-log {
+    padding-top: 48px;
+    scroll-padding-top: 48px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  html body #startLog .entry.user {
+    padding: 10px 14px;
+  }
+
+  /* Aktionsleiste unter der Antwort: Symbole 20 px, Woerter 12 px, Uhrzeit 13 px —
+     vorher 15 / 10 / 11,5 px bei 40 % Deckkraft, fuer schwaecher Sehende kaum lesbar.
+     Ziele bleiben 44 px breit; die Zeile passt weiter in 351 px (5 x 44 + 4 x 6 + Uhrzeit). */
+  html body #startLog .msg-actions.msg-actions .msg-act svg {
+    width: 20px;
+    height: 20px;
+  }
+  html body #startLog .msg-actions.msg-actions .msg-act-wort {
+    font-size: 12px;
+    opacity: 1;
+  }
+  /* Der Knopf waechst mit seinem Wort (12 px "Vorlesen" braucht ~50 px) — sonst
+     beruehren sich die Woerter ("KopierenVorlesen", gemessen 375 px). 5 Knoepfe
+     ~ 280 px + Uhrzeit passen in 351 px; unter 360 px weicht die Uhrzeit. */
+  html body #startLog .msg-actions.msg-actions .msg-act {
+    color: rgba(246, 243, 238, 0.86);
+  }
+  html body #startLog .msg-actions.msg-actions .msg-act.hat-wort {
+    width: auto;
+    min-width: 44px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  html body #startLog .msg-actions.msg-actions:has(.msg-act.hat-wort) {
+    gap: 4px;
+  }
+  html body #startLog .msg-actions.msg-actions .msg-zeit {
+    font-size: 13px;
+    color: rgba(246, 243, 238, 0.62);
+  }
+}
+@media (max-width: 360px) {
+  html body #startLog .msg-actions.msg-actions .msg-zeit { display: none; }
+}
+
+/* ---- Aktiv = Logofarbe, beendet = Grundton (alle Breiten) ----------------------
+   Mikrofon: kompakt.js faerbt [data-start-tool=voice].is-recording schon #02fdfd;
+   hier dieselbe Farbe mit hoeherer Spezifitaet, weil die Zeilen-Regel oben den
+   Grundton setzt. Sprachwelle: der Sprachmodus hat keine Koerper-Klasse, nur das
+   eingeblendete #voiceModeOverlay — daran haengt der Zustand. */
+html body #start.view .prompt-glass.prompt-glass.prompt-glass [data-start-tool="voice"]:is(.is-recording, [aria-pressed="true"]),
+html body:has(#voiceModeOverlay:not([hidden])) #start.view .prompt-glass.prompt-glass.prompt-glass #startSend.ist-sprache {
+  color: #02fdfd;
+  background: rgba(2, 253, 253, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(2, 253, 253, 0.55);
+  animation: none;
+}
+
+/* ==== Handy, dritte Runde (Betreiber-Auftrag 16.09.2026) ==========================
+   "Der Chat-/Textbereich soll nicht erst unterhalb von Logo und Browser-Icon beginnen …
+   Im Schreibfeld soll der Text von ganz links bis ganz rechts die Breite nutzen." */
+@media (max-width: 600px) {
+  /* Verlauf ab der oberen Kante (nur die Safe Area bleibt frei). Der Text laeuft unter
+     Logo und Browser-Icon hindurch — die bekommen dafuer einen ruhigen Glas-Grund. */
+  html body #start.has-start-chat #startLog.start-log {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 6px);
+    scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 6px);
+    padding-bottom: 6px;
+  }
+  /* Die ERSTE Nachricht steht zwischen den beiden Icons, nicht darunter. */
+  html body #startLog.start-log > .entry.user:first-child {
+    margin-right: 34px;
+  }
+  html body #startLog.start-log > .entry.assistant:first-child {
+    margin-left: 34px;
+    margin-right: 34px;
+  }
+  html body .glass-icon.glass-icon.glass-icon {
+    background: rgba(10, 13, 16, 0.66);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+  }
+
+  /* Schreibfeld ueber die volle Breite, sobald der Text nicht mehr in EINE Zeile passt
+     (kompakt.js setzt .feld-breit). Die Symbole ruecken in eine 44-px-Zeile darunter:
+     [+] links, [Modell][Mikrofon][Senden] rechts. Kurzer Text bleibt einzeilig dazwischen. */
+  /* :has(:not(:placeholder-shown)): leer ist nie breit — auch wenn ein Skript das Feld ohne
+     input-Ereignis leert (gemessen: leeres Feld blieb zweizeilig). */
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass.feld-breit:has(#startMessage:not(:placeholder-shown)) #startMessage {
+    order: 0;
+    flex: 1 0 100%;
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    max-height: min(38dvh, 300px);
+  }
+  html body #start.view .prompt-glass.prompt-glass.prompt-glass.feld-breit:has(#startMessage:not(:placeholder-shown)) .model-picker {
+    margin-left: auto;
+  }
+
+  /* Nachrichten-Menue: so breit wie das Handy erlaubt, Zeilen 44 px, Schrift 16 px. */
+  html body .msg-menu.msg-menu {
+    width: min(320px, calc(100vw - 16px));
+    max-height: calc(100dvh - 16px);
+    overflow-y: auto;
+    padding: 6px;
+    border-radius: 12px;
+  }
+  html body .msg-menu .msg-menu-item {
+    min-height: 44px;
+    font-size: 16px;
+    gap: 12px;
+  }
+  html body .msg-menu .msg-menu-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ---- Nachrichten-Menue: Kachelreihe (alle Breiten) ------------------------------- */
+.msg-menu .msg-menu-kacheln {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 2px 0 4px;
+}
+.msg-menu .msg-menu-item.is-kachel {
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  min-height: 62px;
+  padding: 8px 2px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12.5px;
+  line-height: 1.15;
+  text-align: center;
+  color: rgba(246, 243, 238, 0.92);
+}
+.msg-menu .msg-menu-item.is-kachel .msg-menu-icon {
+  color: rgba(246, 243, 238, 0.9);
+}
+.msg-menu .msg-menu-item.is-kachel .msg-menu-icon svg {
+  width: 22px;
+  height: 22px;
+}
+@media (max-width: 600px) {
+  html body .msg-menu .msg-menu-item.is-kachel {
+    min-height: 64px;
+    font-size: 13px;
+  }
+}
+
+/* ---- Angepinnte Nachricht: Logofarbe am Rand, ein Wort als Marke -------------------- */
+#startLog > .entry.ist-angepinnt {
+  box-shadow: inset 3px 0 0 #02fdfd;
+}
+#startLog > .entry.assistant.ist-angepinnt {
+  padding-left: 12px;
+}
+
+/* ---- Text auswaehlen: Blatt von unten, markierbarer Text ---------------------------- */
+.text-auswahl {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+.text-auswahl-kasten {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(720px, 100%);
+  max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 24px);
+  padding: 12px 14px calc(env(safe-area-inset-bottom, 0px) + 12px);
+  border-radius: 12px 12px 0 0;
+  background: #15181c;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5);
+}
+.text-auswahl-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 17px;
+  color: #f2f5f4;
+}
+.text-auswahl-zu,
+.text-auswahl-kopieren {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+.text-auswahl-zu {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f2f5f4;
+}
+.text-auswahl-kopieren {
+  background: #ffffff;
+  color: #0a0f16;
+  font-weight: 700;
+}
+.text-auswahl-inhalt {
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f2f5f4;
+  font-size: 18px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.text-auswahl-hinweis {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(242, 245, 244, 0.66);
+}
