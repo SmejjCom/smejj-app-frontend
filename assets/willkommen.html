@@ -31,6 +31,21 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.smejj.com">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="theme-color" content="#070b11">
+  <!-- Als App installierbar — MIT durchsichtiger Statusleiste (Betreiber-Befund 18.09.2026).
+       GEMESSEN im iPhone-17-Pro-Simulator: Wer smejj.com zum Home-Bildschirm hinzufuegt, ist
+       dabei fast immer ABGEMELDET und sieht deshalb DIESE Seite — das fruehe Tor in index.html
+       schickt jeden ohne Konto hierher. Safari liest die Statusleisten-Angabe der gerade
+       ANGEZEIGTEN Seite. Hier fehlte sie, also schrieb iOS den Standard
+       UIWebClipStatusBarStyleLegacyBlack in die Webclip-Datei — und die installierte App begann
+       erst UNTER einem schwarzen Balken, egal was index.html spaeter sagt (der Wert ist beim
+       Installieren eingebrannt). Genau der Balken aus den Betreiber-Screenshots.
+       Mit "black-translucent" liegt die Statusleiste durchsichtig ueber der Seite; die
+       Kopfleiste rechnet env(safe-area-inset-top) bereits heraus, und html traegt #141517,
+       damit die Uhrzeit lesbar bleibt. Siehe docs/qa/vollbild-chat-ios-2026-09-17.md. -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="smejj.com">
+  <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" href="/favicon.ico?v=112" sizes="any">
   <link rel="icon" href="/icons/smejj_favicon.svg?v=112" type="image/svg+xml">
   <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">

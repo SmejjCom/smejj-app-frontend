@@ -3,6 +3,14 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <!-- Als App installierbar MIT durchsichtiger Statusleiste (Betreiber-Befund 18.09.2026):
+         Safari brennt beim "Zum Home-Bildschirm" die Angabe der GERADE ANGEZEIGTEN Seite in die
+         Webclip-Datei. Fehlt sie, nimmt iOS UIWebClipStatusBarStyleLegacyBlack — die App startet
+         dann unter einem schwarzen Balken. auth.css polstert bereits alle env(safe-area-inset-*). -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="smejj.com">
+    <meta name="mobile-web-app-capable" content="yes">
     <!-- Schutz wie auf der Startseite. Bis 2026-08-04 fehlte er hier: ausgerechnet
          die Seite, ueber die E-Mail, Passwort, OAuth-Rueckkehr und der
          Passkey-Ablauf laufen, hatte weder CSP noch Referrer-Regel.
