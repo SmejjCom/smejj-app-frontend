@@ -198,7 +198,8 @@
     const m = d.morgen || null;
     // Der rote Balken ist Absicht: man muss auf einen Blick sehen, dass man
     // nicht im normalen Konto ist — sonst passieren Fehler in fremden Daten.
-    return '<div class="ck-adminbalken">ADMINBEREICH · smejj.com/admin — hier arbeitest nur du</div>'
+    // Der Name steht in eigener Klammer: der Balken ist uppercase, smejj.com darf es nie sein.
+    return '<div class="ck-adminbalken">ADMINBEREICH · <span class="ck-marke">smejj.com/admin</span> — hier arbeitest nur du</div>'
       + V.kopfBlock("CK", "Überblick", "Die eine Seite, die du morgens ansiehst",
         "Vier Zahlen oben, Dienste links, Protokoll rechts. Alles hier ist gemessen — was nicht gemessen ist, steht unten mit Begründung.")
       + (m ? morgenKacheln(m) : "")

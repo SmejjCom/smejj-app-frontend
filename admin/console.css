@@ -605,6 +605,7 @@ span.mono.warn{color:var(--sm-warn);}
 /* ---- CK · "Die eine Seite, die du morgens ansiehst" (2026-08-23) ---- */
 .ck-adminbalken{margin:-6px 0 14px;padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
   color:#fff;background:rgba(255,77,79,.55);border-left:4px solid var(--sm-danger);}
+.ck-adminbalken .ck-marke{text-transform:none;letter-spacing:.02em}
 .ck-zwei{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:14px;align-items:start;}
 @media (max-width:1500px){.ck-zwei{grid-template-columns:1fr;}}
 /* ---- RG · Regeln fuer den Adminbereich ---- */
