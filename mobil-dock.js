@@ -300,4 +300,6 @@ if (typeof document !== "undefined" && document.querySelector("#startMessage, #c
   verdrahteKopfglas();
   // Ansichten nach dem Login (Profil, Einstellungen, Verlauf, Dateien …) — eigenes Modul, ohne Marke.
   import("/assets/mobil-ansichten.js").catch(() => {});
+  // Vollbild-Chat (17.09.2026): misst das schwebende Feld (--feld-hoehe), design-v14-vollbild-chat.css.
+  import("/assets/vollbild-chat.js").catch(() => {});
 }

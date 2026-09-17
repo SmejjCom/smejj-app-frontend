@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v896";
+const CACHE_NAME = "smejj-shell-v897";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -369,6 +369,8 @@ const SHELL = [
   "/assets/mobil-dock.js",
   // Ansichten nach dem Login am Handy (2026-09-07, Parallelsitzung), per import() aus mobil-dock.js.
   "/assets/mobil-ansichten.js",
+  // Vollbild-Chat am Handy (17.09.2026), per import() aus mobil-dock.js.
+  "/assets/vollbild-chat.js",
   "/assets/kamera.js",
   "/assets/fuehrung.js",
   "/assets/willkommen-fokus.js",

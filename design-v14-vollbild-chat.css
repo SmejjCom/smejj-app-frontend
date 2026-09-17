@@ -1,0 +1,150 @@
+/* smejj.com — Design V14: Chat am Handy als echtes Vollbild, wie ChatGPT.
+ *
+ * Betreiber-Auftrag 17.09.2026 (schriftlich, mit iPhone-Screenshots der aus
+ * Chrome installierten PWA): (1) die ganze Displayflaeche von ganz oben bis
+ * ganz unten nutzen, die iPhone-Statusleiste liegt TRANSPARENT ueber dem
+ * Chat, der Text scrollt bis hinter Uhrzeit, Netz und Akku; (2) Logo und
+ * Browser-Icon fast auf Hoehe der Statusleiste, oberer Bereich maximal
+ * kompakt; (3) das Schreibfeld schwebt dauerhaft ueber dem Verlauf, der Chat
+ * scrollt bis ganz unten hinter das Feld, keine grosse feste Flaeche darunter;
+ * (5) Text gross, ruhig, sehr gut lesbar.
+ *
+ * Steht als LETZTE Datei im Buendel (nach V13). Die Regeln davor bleiben
+ * unangetastet; diese Schicht legt sich mit hoeherer Spezifitaet darueber
+ * (html body #… plus Mehrfachklassen schlaegt auch die Stilbloecke, die
+ * mobil-dock.js und kompakt.js NACH dem Buendel in den Kopf haengen).
+ *
+ * WIE ES GEHT: main.shell trug oben und unten die Safe-Area als Polster
+ * (mobil-composer.css) — der Verlauf begann darum erst UNTER der Statusleiste
+ * und konnte nie dahinter scrollen. Jetzt ist die Huelle im Chat randlos, der
+ * Verlauf ist 100dvh hoch und traegt die Statusleiste als INNERES Polster
+ * (scrollt also darunter durch); ein weicher Glasstreifen (.mobil-kopfglas
+ * aus mobil-dock.js, nur in der installierten App) haelt Uhrzeit und Akku
+ * lesbar. Das Schreibfeld ist absolut ueber dem Verlauf; seine Hoehe misst
+ * vollbild-chat.js (--feld-hoehe) und wird unten als Polster eingerechnet.
+ *
+ * ABGELOEST (bewusst): V12-Regel "Knoepfe AN der Unterkante, Feld buendig"
+ * vom 14.09. — der Betreiber will jetzt das schwebende Feld wie bei ChatGPT.
+ * Die Eckig-Regel (eckig.css) bleibt: kein Radius, auch nicht am Feld.
+ *
+ * WICHTIG fuer alte Installationen: der Statusleisten-Modus steht in der
+ * Webclip-Datei des iPhones und stammt aus dem Zeitpunkt der Installation.
+ * Ein Webclip aus der Zeit mit "black" (08.–13.09.) zeigt eine SCHWARZE
+ * Statusleiste, egal was die Seite tut — nur Loeschen und neu "Zum
+ * Home-Bildschirm" hilft. index.html steht seit dem 13.09. auf
+ * black-translucent (Messung: design-v12-vollbild.css).
+ */
+
+@media (max-width: 600px) {
+  /* ---- 1. Huelle ohne Rand: die Startseite reicht bis an beide Kanten ------- */
+  html body:has(#start.view.is-active) main.shell.shell {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  html body:has(#start.view.is-active) .workspace,
+  html body #start.view.is-active,
+  html body #start .home-feed.home-feed {
+    min-height: 100dvh;
+  }
+  html body #start.has-start-chat .home-feed.home-feed.home-feed {
+    position: relative;
+    min-height: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    /* Nur der Verlauf steht im Raster — das Feld schwebt (absolut). */
+    grid-template-rows: minmax(0, 1fr);
+  }
+  /* Alte Translucent-Installationen im 812-pt-Erstzustand (mobil-dock.js misst
+     den Fehlbetrag): die Flaeche waechst um ihn nach unten. */
+  html.vollbild-fehl body #start.has-start-chat .home-feed.home-feed.home-feed {
+    height: calc(100dvh + var(--vollbild-fehl, 0px));
+    max-height: calc(100dvh + var(--vollbild-fehl, 0px));
+  }
+
+  /* ---- 2. Verlauf: von ganz oben bis ganz unten ----------------------------- */
+  /* Oben: die Statusleiste als inneres Polster — der Text laeuft beim Scrollen
+     darunter durch. Unten: das schwebende Feld plus Home-Balken; --feld-hoehe
+     setzt vollbild-chat.js (Rueckfall 64 px = eine Zeile). */
+  html body #start.has-start-chat #startLog.start-log.start-log {
+    padding-top: calc(var(--sa-top) + 10px);
+    scroll-padding-top: calc(var(--sa-top) + 10px);
+    padding-bottom: calc(var(--feld-hoehe, 64px) + var(--sa-bottom) + 20px);
+    scroll-padding-bottom: calc(var(--feld-hoehe, 64px) + var(--sa-bottom) + 20px);
+  }
+  /* Lesbarkeit (5): 19 px wie am Rechner (V12 gab dem Handy 18 px), ruhige Zeilen. */
+  html body #startLog.start-log .entry {
+    font-size: 19px;
+    line-height: 1.5;
+  }
+
+  /* ---- 3. Schreibfeld schwebt ueber dem Verlauf ------------------------------ */
+  html body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: calc(var(--sa-bottom) + 6px);
+    z-index: 70;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 4px 4px 4px;
+    /* V11-Ausnahme "leichter Knick" (14 px, dokumentiert in design-v11.css) gilt
+       jetzt an allen vier Ecken — V12 hatte unten 0 fuer das buendige Feld erzwungen. */
+    border-radius: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(18, 22, 27, 0.8);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    backdrop-filter: blur(22px) saturate(140%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 10px 32px rgba(0, 0, 0, 0.45);
+  }
+  /* Leere Startseite: dasselbe Feld, gleicher Abstand zu Rand und Home-Balken
+     (V13 zog es auf volle Breite; die Huelle traegt unten keinen Rand mehr). */
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .prompt-glass.prompt-glass {
+    width: calc(100% + 16px);
+    max-width: none;
+    margin-left: -8px;
+    margin-right: -8px;
+    margin-bottom: calc(var(--sa-bottom) + 6px);
+    padding: 4px 4px 4px;
+    border-radius: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(18, 22, 27, 0.8);
+  }
+  /* Bildschirmtastatur offen (html.tastatur-offen, mobil-dock.js setzt
+     --sa-bottom auf 0): das Feld sitzt 6 px ueber der Tastaturkante. */
+  html.tastatur-offen body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass {
+    bottom: 6px;
+  }
+
+  /* ---- 4. Logo und Browser-Icon fast auf Statusleisten-Hoehe ----------------- */
+  /* Der Knopf ist 44 px, sein Symbol 24 px. Mit 24 px Anhebung beginnt das
+     SYMBOL 14 px ueber der Safe-Area-Kante — auf dem iPhone 17 Pro (Inset 62)
+     bei 48 pt, direkt unter Uhrzeit und Akku (die enden bei ~42 pt), seitlich
+     davon (Logo x 18–42, Uhrzeit ab 52; Globus ab 368, Akku bis 365).
+     Ohne Safe Area (Browser-Tab, Rechner) bleibt es bei 0. */
+  html body .glass-icon.glass-icon.glass-icon.glass-icon {
+    top: max(0px, calc(var(--sa-top) - 24px));
+  }
+}
+
+/* ---- 5. Statusleiste lesbar: weicher Glasstreifen nur in der installierten App --
+   .mobil-kopfglas legt mobil-dock.js an (nur mit laufendem Chat, body.mobil-chat-offen).
+   V13 blendete ihn im Chat aus, weil er 52 px unter die Safe Area reichte und die
+   erste Zeile verdeckte. Hier ist er so hoch wie die Statusleiste plus 10 px
+   (genau das Polster des Verlaufs) und laeuft weich aus: Uhrzeit, Netz und Akku
+   bleiben sauber lesbar, der Text darunter schimmert durch — wie bei ChatGPT.
+   Im Browser-Tab gibt es keine Safe Area und eine eigene Leiste: dort bleibt er weg. */
+@media (max-width: 600px) and (display-mode: standalone) {
+  html body:not(:has(#code.is-active)) .mobil-kopfglas.mobil-kopfglas.mobil-kopfglas {
+    display: block;
+    height: calc(var(--sa-top) + 10px);
+    z-index: 44;
+    background: linear-gradient(180deg, rgba(16, 17, 19, 0.78) 0%, rgba(16, 17, 19, 0.6) 55%, rgba(16, 17, 19, 0) 100%);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+  }
+}

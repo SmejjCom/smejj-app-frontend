@@ -6661,3 +6661,85 @@ html body .msg-menu.msg-menu {
   font-size: 14px;
   color: rgba(242, 245, 244, 0.66);
 }
+
+/* ---- design-v14-vollbild-chat.css ---- */
+@media (max-width: 600px) {
+  html body:has(#start.view.is-active) main.shell.shell {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  html body:has(#start.view.is-active) .workspace,
+  html body #start.view.is-active,
+  html body #start .home-feed.home-feed {
+    min-height: 100dvh;
+  }
+  html body #start.has-start-chat .home-feed.home-feed.home-feed {
+    position: relative;
+    min-height: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  html.vollbild-fehl body #start.has-start-chat .home-feed.home-feed.home-feed {
+    height: calc(100dvh + var(--vollbild-fehl, 0px));
+    max-height: calc(100dvh + var(--vollbild-fehl, 0px));
+  }
+  html body #start.has-start-chat #startLog.start-log.start-log {
+    padding-top: calc(var(--sa-top) + 10px);
+    scroll-padding-top: calc(var(--sa-top) + 10px);
+    padding-bottom: calc(var(--feld-hoehe, 64px) + var(--sa-bottom) + 20px);
+    scroll-padding-bottom: calc(var(--feld-hoehe, 64px) + var(--sa-bottom) + 20px);
+  }
+  html body #startLog.start-log .entry {
+    font-size: 19px;
+    line-height: 1.5;
+  }
+  html body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: calc(var(--sa-bottom) + 6px);
+    z-index: 70;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 4px 4px 4px;
+    border-radius: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(18, 22, 27, 0.8);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    backdrop-filter: blur(22px) saturate(140%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 10px 32px rgba(0, 0, 0, 0.45);
+  }
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .prompt-glass.prompt-glass {
+    width: calc(100% + 16px);
+    max-width: none;
+    margin-left: -8px;
+    margin-right: -8px;
+    margin-bottom: calc(var(--sa-bottom) + 6px);
+    padding: 4px 4px 4px;
+    border-radius: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(18, 22, 27, 0.8);
+  }
+  html.tastatur-offen body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass {
+    bottom: 6px;
+  }
+  html body .glass-icon.glass-icon.glass-icon.glass-icon {
+    top: max(0px, calc(var(--sa-top) - 24px));
+  }
+}
+@media (max-width: 600px) and (display-mode: standalone) {
+  html body:not(:has(#code.is-active)) .mobil-kopfglas.mobil-kopfglas.mobil-kopfglas {
+    display: block;
+    height: calc(var(--sa-top) + 10px);
+    z-index: 44;
+    background: linear-gradient(180deg, rgba(16, 17, 19, 0.78) 0%, rgba(16, 17, 19, 0.6) 55%, rgba(16, 17, 19, 0) 100%);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+  }
+}
