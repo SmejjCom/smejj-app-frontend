@@ -378,7 +378,7 @@ let klickHoererAn = false;
 function hoereAufKlicks(knoten) {
   if (klickHoererAn || typeof document === "undefined" || !knoten?.ownerDocument) return;
   klickHoererAn = true;
-  const oeffne = (el) => import("./chat-medien-ansicht.js?v=1").then((m) => m.oeffneVollbild(el)).catch(() => {});
+  const oeffne = (el) => import("./chat-medien-ansicht.js?v=2").then((m) => m.oeffneVollbild(el)).catch(() => {});
   document.addEventListener("click", (ereignis) => {
     const bild = ereignis.target?.closest?.(`.entry img[${ADRESSE_ATTRIBUT}]`);
     if (!bild || !istMedienAdresse(bild.getAttribute(ADRESSE_ATTRIBUT))) return;

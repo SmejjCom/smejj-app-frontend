@@ -7,7 +7,7 @@ import {
   geraeteBesitzer, getChat, importChat, listChats, neueProjektId, newChat, notifyChanged,
   notifyProjekteChanged, openChat, persistActive, renameChat, rohEigenerChat,
   sauberProjektName, scheduleSave, tx
-} from "./chat-store.js?v=b81";
+} from "./chat-store.js?v=b82";
 
 // GEMESSEN 2026-09-14 (A-bis-Z, angemeldet): der Papierkorb war IMMER leer.
 // listGeloeschteChats() warf "PAPIERKORB_TAGE is not defined" — die Konstante

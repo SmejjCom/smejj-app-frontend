@@ -14,7 +14,7 @@
 // Dieses Modul laedt erst beim ersten Klick auf ein Bild (chat-medien.js).
 // Design-Regeln des Betreibers: viereckig, wenig Farbe, grosse Schrift.
 import { API_ORIGIN } from "./config.js";
-import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=6";
+import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=7";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const STIL_ID = "smejj-medien-ansicht-stil";
@@ -48,7 +48,7 @@ function stil() {
   el.id = STIL_ID;
   el.textContent = `
 .entry img[data-smejj-adresse]{cursor:zoom-in}
-.smejj-vollbild{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;background:rgba(0,0,0,.94);color:#f6f3ee;font:17px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+.smejj-vollbild{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;background:#000;color:#f6f3ee;font:17px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
 .smejj-vollbild *{border-radius:0!important;box-sizing:border-box}
 .smejj-vollbild-leiste{display:flex;gap:8px;justify-content:flex-end;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 8px}
 .smejj-vollbild-leiste .smejj-vb-titel{margin-right:auto;font-size:17px;opacity:.8}
@@ -59,15 +59,16 @@ function stil() {
 .smejj-vollbild-buehne img,.smejj-vollbild-buehne video{max-width:100%;max-height:100%;object-fit:contain;background:#111}
 .smejj-teilen{position:fixed;inset:0;z-index:2147483001;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55);font:17px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;color:#f6f3ee}
 .smejj-teilen *{border-radius:0!important;box-sizing:border-box}
+.smejj-teilen p,.smejj-teilen h2,.smejj-teilen h3,.smejj-teilen li{color:inherit}
 .smejj-teilen-blatt{width:min(560px,100%);max-height:88vh;overflow:auto;background:#17181b;border:1px solid rgba(255,255,255,.18);padding:18px 18px calc(env(safe-area-inset-bottom,0px) + 18px)}
 @media (min-width:700px){.smejj-teilen{align-items:center}}
 .smejj-teilen h2{margin:0 0 6px;font-size:21px;font-weight:600}
 .smejj-teilen h3{margin:18px 0 8px;font-size:17px;font-weight:600}
 .smejj-teilen p{margin:0 0 10px;color:rgba(246,243,238,.72)}
 .smejj-teilen .reihe{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
-.smejj-teilen label{display:flex;gap:8px;align-items:center;min-height:44px}
-.smejj-teilen input[type=checkbox]{width:22px;height:22px}
-.smejj-teilen select{background:#0e0f11}
+.smejj-teilen label{display:flex;gap:8px;align-items:center;min-height:44px;color:#f6f3ee;font-size:17px;font-weight:400}
+.smejj-teilen input[type=checkbox]{width:22px;height:22px;min-height:0;padding:0;accent-color:#f6f3ee}
+.smejj-teilen select{width:auto;background:#0e0f11;color:#f6f3ee}
 .smejj-teilen .haupt{background:#f6f3ee;color:#111;border-color:#f6f3ee}
 .smejj-teilen .haupt:hover{background:#fff}
 .smejj-teilen .link{width:100%;min-height:44px;padding:8px 10px;font:15px ui-monospace,Menlo,monospace;color:inherit;background:#0e0f11;border:1px solid rgba(255,255,255,.22)}
