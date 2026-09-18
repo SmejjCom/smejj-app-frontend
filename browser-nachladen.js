@@ -99,7 +99,13 @@ export function haengeBrowserNachladerEin(dokument = document, fenster = window,
     if (fertig) return;
     const knopf = ereignis.target?.closest?.("[data-browser-oeffnen]");
     if (!knopf) return;
+    // GANZ anhalten, nicht nur preventDefault (Live-Nachtest v903, 19.09.): der Seiten-
+    // Router sah den Klick sonst trotzdem, kannte fuer den Knopf keine Ansicht und
+    // zeigte "Das geht gerade nicht" — der Browser ging auf, die Mitte stand auf der
+    // Fehlerseite. browser-pane.js haelt seinen Klick aus demselben Grund dreifach an.
     ereignis.preventDefault();
+    ereignis.stopPropagation();
+    ereignis.stopImmediatePropagation?.();
     void einmal().then(() => { if (fertig) { try { knopf.click(); } catch { /* still */ } } });
   }, true);
 

@@ -1534,14 +1534,18 @@ body:has(#browserPanel:not(.is-open)) #mausButton {
      flex: 0 0 auto;
      width: 48px;
      height: 48px;
-     border: 1px solid rgba(246, 243, 238, 0.92);
+     border: 0;
      border-radius: 50%;
-     background: rgba(246, 243, 238, 0.92);
-     color: #101114;
+     background: transparent;
+     color: #f6f3ee;
      cursor: pointer;
 }
 .voice-mode-close:hover {
-     background: #ffffff;
+     background: rgba(246, 243, 238, 0.12);
+}
+.voice-mode-close:focus-visible {
+     outline: 2px solid rgba(159, 231, 212, 0.9);
+     outline-offset: 2px;
 }
 .voice-mode-close svg {
      width: 18px;
