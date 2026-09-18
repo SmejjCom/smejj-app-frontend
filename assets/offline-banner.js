@@ -120,5 +120,15 @@ export function initOfflineBanner() {
     hideBanner();
     taktStoppen();
   });
+  // WIEDER NACH VORN GEHOLT (live gemessen 18.09. im Hintergrund-Tab): Browser
+  // drosseln setInterval in versteckten Tabs auf Minutentakt. Das Band blieb
+  // deshalb nach der Rueckkehr noch sichtbar, obwohl das Netz laengst zurueck
+  // war. Beim Wechsel nach vorn wird darum sofort neu geprueft — dieselbe
+  // Vorsichtsmassnahme, die willkommen-offline.js schon trifft.
+  if (typeof document !== "undefined") {
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && sollSichtbar) pruefeNetz();
+    });
+  }
   if (typeof navigator !== "undefined" && navigator.onLine === false) pruefeNetz();
 }
