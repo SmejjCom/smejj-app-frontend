@@ -30,7 +30,7 @@ let tastenHaken = null;
 export function schliesseMenue() {
   document.querySelector(".bp-tabmenue")?.remove();
   if (tastenHaken) {
-    document.removeEventListener("keydown", tastenHaken);
+    document.removeEventListener("keydown", tastenHaken, true);
     tastenHaken = null;
   }
 }
@@ -84,8 +84,16 @@ export function zeigeMenue(x, y, eintraege, aufWahl) {
   setTimeout(() => {
     document.addEventListener("click", schliesseMenue, { once: true });
     if (!menue.isConnected) return; // schon wieder geschlossen — keinen Haken zuruecklassen
-    tastenHaken = (e) => { if (e.key === "Escape") schliesseMenue(); };
-    document.addEventListener("keydown", tastenHaken);
+    // IN DER EINFANGPHASE und mit Stopp (Live-Test 18.09.): panel-backdrop.js
+    // schliesst bei Escape das ganze rechte Fenster. Solange ein Menue offen ist,
+    // gehoert Escape dem MENUE — sonst war mit einem Tastendruck der Browser weg.
+    tastenHaken = (e) => {
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      schliesseMenue();
+    };
+    document.addEventListener("keydown", tastenHaken, true);
   }, 0);
   return menue;
 }

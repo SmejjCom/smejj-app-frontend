@@ -13,7 +13,7 @@
 //   * das Kreuz erscheint bei schmalen Tabs nur am aktiven und beim Hover
 //   * Tabs lassen sich mit der Maus umsortieren
 //
-import { zeigeMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-1";
+import { zeigeMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-2";
 
 // SRP: browser-pane.js steht bei 795 von 800 Zeilen und darf nicht wachsen.
 // Dieses Modul bekommt alles hineingereicht (Zustand, Aktionen) und kennt

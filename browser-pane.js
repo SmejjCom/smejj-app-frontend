@@ -12,7 +12,7 @@
 // abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
 // instanzen mit getrennten CLIENT_ROUTES.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-2";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-3";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
@@ -22,11 +22,11 @@ export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot }
 import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260918-1";
 // Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
-import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260918-1";
+import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260918-2";
 import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-3";
 import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
-import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260918-1";
+import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260918-2";
 import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
 import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260909-7";
 // Gefunden 2026-08-18 beim Livetest: dieser Import FEHLTE, obwohl init() die
@@ -34,7 +34,7 @@ import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser
 // warf beim Laden "baueNachrichtenEmpfang is not defined", das ganze Modul kam
 // nie hoch, und damit war der eingebaute Browser stumm tot. Kein Test hat das
 // gemeldet: alle pruefen den QUELLTEXT, keiner laesst das Modul laufen.
-import { baueNachrichtenEmpfang } from "./browser-pane-nachrichten.js?v=browser-pane-20260918-1";
+import { baueNachrichtenEmpfang } from "./browser-pane-nachrichten.js?v=browser-pane-20260918-2";
 let suche = null;
 import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260906-6";
 // Reine Helfer (2026-08-19 ausgelagert, 800-Zeilen-Regel). Sie werden hier
@@ -43,11 +43,11 @@ import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js
 import {
   clampZoom, clampViewport, normalizeAddress, normalizeAgentBrowserUrl,
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl, shortHost
-} from "./browser-pane-adressen.js?v=browser-pane-20260820-3";
-import { applyZoom, baueZoomHaken } from "./browser-pane-zoom.js?v=2";
-import { verdrahteHauptmenue } from "./browser-pane-hauptmenue.js?v=2";
+} from "./browser-pane-adressen.js?v=browser-pane-20260820-4";
+import { applyZoom, baueZoomHaken } from "./browser-pane-zoom.js?v=3";
+import { verdrahteHauptmenue } from "./browser-pane-hauptmenue.js?v=3";
 // E2E-Pruefung 14.09.2026: fehlte — Rechtsklick auf Zurueck/Vor warf ReferenceError.
-import { zeigeVerlaufMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-1";
+import { zeigeVerlaufMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-2";
 // Der Zoom lebt in browser-pane-zoom.js; hier nur seine drei Anschluesse.
 const zoomHaken = baueZoomHaken({ activeTab: () => activeTab(), schedulePersist: () => schedulePersist(), zeigeHinweis: (t) => showHint(t) });
 export {
@@ -548,7 +548,7 @@ async function navigate(tab, url, { push = true } = {}) {
     return;
   }
 
-  if (data?.ok && data.html && shouldOpenInRealBrowser(data.html, finalUrl)) {
+  if (data?.ok && data.html && shouldOpenInRealBrowser(data.html, finalUrl, data.status)) {
     if (await echterBrowserWeg(tab, finalUrl, "external-required", push)) return;
   } else if (data?.ok && data.html && !data.embeddable) {
     setFrame(tab, { srcdoc: data.html, mode: "proxy" });

@@ -11,7 +11,7 @@
 // Modul ZWEIMAL, jede Haelfte mit eigenem Zustand (Befund vom 2026-09-06,
 // tests/module-queries.test.mjs).
 import { buildLiveBrowserHtml, buildRemoteBrowserHtml } from "./browser-pane-render.js?v=browser-pane-20260906-6";
-import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260820-3";
+import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260820-4";
 
 export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbackFrame, commitHistory, showHint, persistTabs, render }) {
   function remoteBrowserViewport() {

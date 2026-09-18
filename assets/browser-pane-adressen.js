@@ -101,9 +101,16 @@ export function istLeereHuelle(html) {
   return sichtbar.length < LEERE_HUELLE_BIS && !/<(img|video|canvas|iframe)\b/i.test(roh);
 }
 
-export function shouldOpenInRealBrowser(html, url = "") {
+export function shouldOpenInRealBrowser(html, url = "", status = 0) {
   const text = String(html || "").slice(0, 120000);
   if (!text) return false;
+  // DER SERVER HAT DIE SEITE GAR NICHT GESEHEN (Live-Test 18.09., de.wikipedia.org):
+  // Wikimedia wies unseren Server mit 403 ab ("Wikimedia Error"), die Antwort trug
+  // trotzdem embeddable:true (fail-open) — und Wikipedia zeigt in JEDEM fremden
+  // Rahmen nur Weiss (gemessen auch ohne Sandbox). Wer eine Fehlerseite bekommen
+  // hat, kann ueber die echte Seite nichts sagen: dann entscheidet der echte Browser
+  // (gemessen: laedt Wikipedia in 2,8 s).
+  if (Number(status) >= 400) return true;
   if (istLeereHuelle(html)) return true;
   // Anmeldefelder werden im GANZEN Dokument gesucht, nicht nur in den ersten
   // 120 000 Zeichen: die Google-Anmeldung ist 990 KB gross und traegt ihr
