@@ -35,14 +35,18 @@
 // einem toten Knopf nicht zu unterscheiden (Memory: "Modul laedt nie, kein
 // Test merkt es") — darum meldet der Fehlschlag sich im Protokoll.
 
-const MAUS_EREIGNISSE = ["smejj:maus-replay-request", "smejj:maus-lauf-gestartet", "smejj:maus-auftrag-starten"];
+// "smejj:browser-request" (A-bis-Z-Test 19.09.): der Chat bittet damit den Browser,
+// eine Adresse zu oeffnen. Vor dem ersten Oeffnen des Fensters hoerte niemand zu —
+// das Ereignis verpuffte wortlos. Es geht denselben Weg wie die Maus-Ereignisse:
+// laden, dann nachreichen.
+const MAUS_EREIGNISSE = ["smejj:maus-replay-request", "smejj:maus-lauf-gestartet", "smejj:maus-auftrag-starten", "smejj:browser-request"];
 
 /** Die Module in der Reihenfolge, in der die Skript-Tags sie geladen haben. */
 function laden() {
   return Promise.all([
-    import("./browser-pane.js?v=browser-pane-20260918-3"),
+    import("./browser-pane.js?v=browser-pane-20260918-4"),
     import("./browser-pane-backdrop.js?v=2"),
-    import("./maus-panel.js?v=39")
+    import("./maus-panel.js?v=40")
   ]).catch((fehler) => {
     console.error("[smejj.com] Browser-/Maus-Panel konnte nicht nachgeladen werden:", fehler);
     throw fehler;
@@ -83,6 +87,21 @@ export function haengeBrowserNachladerEin(dokument = document, fenster = window,
   dokument.addEventListener("click", (ereignis) => {
     if (ereignis.target?.closest?.("#mausButton")) void einmal();
   });
+
+  // 4. JEDER Browser-Knopf ([data-browser-oeffnen]) — GEFUNDEN 19.09. im A-bis-Z-Test,
+  //    live in Chrome: nach frischem Laden tat ein Klick auf "Browser bedienen" in
+  //    der Seitenleiste NICHTS. Den Klick faengt browser-pane.js ab (init, Einfang-
+  //    phase) — aber das Modul war noch gar nicht da, und dieser Nachlader kannte
+  //    nur den Globus (Weg 1). Ein toter Knopf genau dort, wo die Seitenleiste den
+  //    Browser anbietet. Jetzt: laden, dann denselben Klick noch einmal ausloesen —
+  //    diesmal hoert browser-pane.js zu und oeffnet das Fenster.
+  dokument.addEventListener("click", (ereignis) => {
+    if (fertig) return;
+    const knopf = ereignis.target?.closest?.("[data-browser-oeffnen]");
+    if (!knopf) return;
+    ereignis.preventDefault();
+    void einmal().then(() => { if (fertig) { try { knopf.click(); } catch { /* still */ } } });
+  }, true);
 
   // 3. Maus-Auftraege aus dem Chat: laden UND das Ereignis nachreichen,
   //    sonst kommt es beim frisch geladenen Modul nie an.

@@ -45,7 +45,7 @@ import {
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl, shortHost
 } from "./browser-pane-adressen.js?v=browser-pane-20260820-4";
 import { applyZoom, baueZoomHaken } from "./browser-pane-zoom.js?v=3";
-import { verdrahteHauptmenue } from "./browser-pane-hauptmenue.js?v=3";
+import { verdrahteHauptmenue } from "./browser-pane-hauptmenue.js?v=4";
 // E2E-Pruefung 14.09.2026: fehlte — Rechtsklick auf Zurueck/Vor warf ReferenceError.
 import { zeigeVerlaufMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-2";
 // Der Zoom lebt in browser-pane-zoom.js; hier nur seine drei Anschluesse.
@@ -339,7 +339,7 @@ function mountOnce() {
     // Sitzung mitten im Lauf verloren? Die Maus baut sie hier neu auf.
     erneuere: async () => { const t = activeTab(); if (!t?.url) return false; return tryLiveBrowser(t, t.url, { push: false }); }
   });
-  verdrahteHauptmenue({ knopf: refs.menu, flaeche: document.getElementById("browserPanel"), activeTab, addTab, oeffneSuche: () => suche?.oeffne(), zurUebersicht: backToMenu, nachZoom: () => { render(); schedulePersist(); }, zeigeHinweis: showHint });
+  verdrahteHauptmenue({ knopf: refs.menu, flaeche: document.getElementById("browserPanel"), activeTab, addTab, oeffneSuche: () => suche?.oeffne(), zurUebersicht: backToMenu, nachZoom: () => { render(); schedulePersist(); }, zeigeHinweis: showHint, vor: () => stepHistory(1) });
   refs.close.addEventListener("click", closePane);
 
   // Zoom wie in Chrome: Strg/Cmd mit +, - oder 0 (50–200 %).

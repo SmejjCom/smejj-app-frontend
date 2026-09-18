@@ -2493,6 +2493,32 @@ body.browser-pane-open #mausButton {
   visibility: hidden;
   pointer-events: none;
 }
+@media (max-width: 680px) and (pointer: coarse) {
+  .browser-pane {
+    --bp-row-height: 48px;
+    --bp-control-size: 44px;
+    --bp-control-gap: 2px;
+    --bp-side-width: calc((var(--bp-control-size) * 2) + var(--bp-control-gap));
+  }
+  .bp-toolbar .bp-nav-forward,
+  .bp-toolbar .bp-open-external {
+    display: none;
+  }
+  .bp-toolbar .bp-address {
+    font-size: 16px;
+  }
+  .bp-tab-close {
+    width: 36px !important;
+    height: 44px !important;
+    opacity: 1;
+  }
+  .bp-toolbar .bp-stern::after,
+  .bp-toolbar .bp-sicherheit::after {
+    content: "";
+    position: absolute;
+    inset: -12px -8px;
+  }
+}
 
 /* ---- view-chrome.css ---- */
 .view.has-view-chrome {

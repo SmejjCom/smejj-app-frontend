@@ -25,10 +25,13 @@ import { clampZoom } from "./browser-pane-adressen.js?v=browser-pane-20260820-4"
  * Reine Liste — ohne DOM pruefbar.
  * @param {{hatSeite?: boolean, zoom?: number, vollbild?: boolean, vollbildMoeglich?: boolean}} lage
  */
-export function hauptmenueEintraege({ hatSeite = false, zoom = 1, vollbild = false, vollbildMoeglich = true } = {}) {
+export function hauptmenueEintraege({ hatSeite = false, zoom = 1, vollbild = false, vollbildMoeglich = true, kannVor = false } = {}) {
   const prozent = Math.round(clampZoom(zoom) * 100);
   return [
     { id: "neuerTab", text: "Neuer Tab" },
+    // Am Handy weicht der Vorwaerts-Pfeil den 44-px-Knoepfen (browser-pane-chrome.css) —
+    // hier bleibt er erreichbar, wie in Chrome fuer Android.
+    { id: "vor", text: "Vorwärts", aktiv: kannVor },
     { id: "suche", text: "In Seite suchen …", aktiv: hatSeite },
     { id: "zoomPlus", text: `Vergrößern (${prozent} %)`, aktiv: hatSeite && prozent < 200 },
     { id: "zoomMinus", text: "Verkleinern", aktiv: hatSeite && prozent > 50 },
@@ -66,9 +69,9 @@ export async function schalteVollbild(element, dokument = document) {
 
 /**
  * @param {{knopf: HTMLElement, flaeche: HTMLElement, activeTab: Function, addTab: Function,
- *   oeffneSuche: Function, zurUebersicht: Function, nachZoom: Function, zeigeHinweis: Function}} hof
+ *   oeffneSuche: Function, zurUebersicht: Function, nachZoom: Function, zeigeHinweis: Function, vor: Function}} hof
  */
-export function verdrahteHauptmenue({ knopf, flaeche, activeTab, addTab, oeffneSuche, zurUebersicht, nachZoom, zeigeHinweis }) {
+export function verdrahteHauptmenue({ knopf, flaeche, activeTab, addTab, oeffneSuche, zurUebersicht, nachZoom, zeigeHinweis, vor }) {
   if (!knopf) return;
   knopf.setAttribute("aria-haspopup", "menu");
   knopf.addEventListener("click", (event) => {
@@ -80,11 +83,13 @@ export function verdrahteHauptmenue({ knopf, flaeche, activeTab, addTab, oeffneS
       hatSeite: Boolean(tab?.url),
       zoom: tab?.zoom || 1,
       vollbild: Boolean(document.fullscreenElement),
-      vollbildMoeglich: typeof flaeche?.requestFullscreen === "function"
+      vollbildMoeglich: typeof flaeche?.requestFullscreen === "function",
+      kannVor: (tab?.historyIndex ?? -1) < (tab?.history?.length ?? 0) - 1
     });
     zeigeMenue(kasten.right - 8, kasten.bottom + 4, eintraege, (wahl) => {
       const aktiv = activeTab();
       if (wahl === "neuerTab") addTab({ focusAddress: true });
+      else if (wahl === "vor") vor?.();
       else if (wahl === "suche") oeffneSuche();
       else if (wahl === "vollbild") {
         // Lehnt der Browser ab (live gesehen: "not granted", wenn Chrome ferngesteuert

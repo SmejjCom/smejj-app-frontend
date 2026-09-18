@@ -347,3 +347,46 @@ body.browser-pane-open #mausButton {
   visibility: hidden;
   pointer-events: none;
 }
+
+/* TREFFERFLAECHEN AM HANDY (A-bis-Z-Test 19.09., Pixel-Emulator 412 px, live gemessen):
+   alle sieben Kopfknoepfe des Browsers massen 22x22 px — die Hausregel verlangt 44
+   (scripts/testing/measure_touch_targets_app.mjs, MIN_ZIEL). Mit dem Finger traf man
+   regelmaessig den Nachbarn. Betreiber 19.09. schriftlich: "Ich gebe dir alle Rechte
+   von A bis Z 100 %. Mach komplett 100 % fertig, lass nichts offen."
+   NUR fuer Finger (pointer: coarse): ein schmales Desktop-Fenster mit Maus behaelt die
+   kompakte 26-px-Leiste. Damit die Adresse bei 44-px-Knoepfen lesbar bleibt, ziehen
+   "Vorwaerts" und "extern oeffnen" ins Menue um (dort stehen beide) — wie in Chrome
+   fuer Android. 16 px Schrift im Adressfeld: darunter zoomt iOS beim Antippen hinein. */
+@media (max-width: 680px) and (pointer: coarse) {
+  .browser-pane {
+    --bp-row-height: 48px;
+    --bp-control-size: 44px;
+    --bp-control-gap: 2px;
+    --bp-side-width: calc((var(--bp-control-size) * 2) + var(--bp-control-gap));
+  }
+
+  .bp-toolbar .bp-nav-forward,
+  .bp-toolbar .bp-open-external {
+    display: none;
+  }
+
+  .bp-toolbar .bp-address {
+    font-size: 16px;
+  }
+
+  /* !important: browser-pane-tableiste.js setzt dem Kreuz 16 px als Inline-Stil
+     (gemessen 19.09. am Pixel-Emulator — ohne den Zusatz blieb es bei 16x16). */
+  .bp-tab-close {
+    width: 36px !important;
+    height: 44px !important;
+    opacity: 1;
+  }
+
+  /* Stern und Schloss bleiben optisch klein, bekommen aber eine Fingerflaeche. */
+  .bp-toolbar .bp-stern::after,
+  .bp-toolbar .bp-sicherheit::after {
+    content: "";
+    position: absolute;
+    inset: -12px -8px;
+  }
+}
