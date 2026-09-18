@@ -177,7 +177,13 @@
 /* Rechtsklick-Menue der Tabs */
 .bp-tabmenue {
   position: fixed;
-  z-index: 60;
+  /* 60 -> 90 (Live-Test 18.09., Chrome): das Menue haengt am body, das Fenster
+     (.browser-panel) liegt auf 75 — das Menue stand also DAHINTER. Gemessen:
+     Rechtsklick auf einen Tab erzeugte das Menue (210x220 px), elementFromPoint
+     an seiner Stelle lieferte aber .bp-address. Tab-Menue, Verlaufs-Menue der
+     Pfeile und Seiten-Menue waren live alle unsichtbar. 90 liegt ueber Fenster
+     (75) und Globus (80). */
+  z-index: 90;
   display: flex;
   flex-direction: column;
   min-width: 210px;
@@ -325,4 +331,19 @@
   background: rgba(159, 231, 212, 0.18);
   color: #9fe7d4;
   animation: bp-pulse 1.4s ease-in-out infinite;
+}
+
+/* DER GLOBUS RAEUMT DEN KOPF, SOLANGE DER BROWSER OFFEN IST (Live-Test 18.09.).
+   Er liegt fest oben rechts (44x44, z-index 80) — genau ueber dem rechten Ende
+   von Tableiste und Werkzeugleiste. Gemessen in Chrome bei 1072 px:
+   elementFromPoint in der Mitte von "Maus beauftragen", "Browser anpassen" und
+   "Browser schliessen" lieferte jedes Mal #browserButton. Ein Klick auf einen
+   der drei Knoepfe traf den Globus und klappte das ganze Fenster zu.
+   Der Browser hat sein eigenes Schliessen-Kreuz; im Menue des rechten Fensters
+   (ohne browser-pane-open) bleibt der Globus, wie panel-backdrop.css es will.
+   visibility statt display: aria-expanded und Fokus-Reihenfolge bleiben heil. */
+body.browser-pane-open #browserButton,
+body.browser-pane-open #mausButton {
+  visibility: hidden;
+  pointer-events: none;
 }

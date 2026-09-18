@@ -11,7 +11,7 @@
 // Modul ZWEIMAL, jede Haelfte mit eigenem Zustand (Befund vom 2026-09-06,
 // tests/module-queries.test.mjs).
 import { buildLiveBrowserHtml, buildRemoteBrowserHtml } from "./browser-pane-render.js?v=browser-pane-20260906-6";
-import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260820-2";
+import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260820-3";
 
 export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbackFrame, commitHistory, showHint, persistTabs, render }) {
   function remoteBrowserViewport() {
@@ -40,6 +40,56 @@ export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbac
     tab.status = "ready";
     commitHistory(tab, tab.url, push);
     // KEIN Hinweis mehr (Betreiber 2026-09-07): die Seite steht da — das ist die Meldung.
+    persistTabs();
+    render();
+    return true;
+  }
+
+  // IN DERSELBEN SITZUNG WEITER (Live-Messung 18.09., Chrome, api.smejj.com):
+  // Zurueck, Vorwaerts, Neu laden und jede neue Adresse schlossen bisher die
+  // laufende Sitzung und bauten eine neue auf — also jedes Mal ein frischer
+  // Chrome auf dem Server. Gemessen: neue Sitzung 8,3–9,7 s (amazon.com),
+  // dieselbe Navigation INNERHALB der Sitzung 2,8 s, Neu laden 1,7 s. Ein
+  // Browser, der fuer "Zurueck" zehn Sekunden braucht, fuehlt sich kaputt an.
+  // Nebenbei bleiben Cookies und Anmeldung der Sitzung erhalten — wie in Chrome.
+  //
+  // false heisst "nicht uebernommen": der Aufrufer geht dann den alten Weg
+  // (Sitzung schliessen, neu entscheiden). Das gilt auch fuer eine verlorene
+  // oder beschaeftigte Sitzung — der Schnellweg darf nie der EINZIGE Weg sein.
+  // Die Pruefung der Adresse bleibt beim Server (parseBrowserTarget im Tor,
+  // isAllowedTarget + DNS im Worker); hier wird nichts gelockert.
+  async function navigiereInSitzung(tab, url, { push = true } = {}) {
+    if (!tab) return false;
+    // Jede Navigation zaehlt hoch — auch die, die hier gleich wieder aussteigt.
+    // Am Zaehler erkennt der Schnellweg nach dem Warten, ob inzwischen eine
+    // NEUERE Navigation laeuft. Ein Vergleich der Adresse taugt dafuer nicht:
+    // runAct traegt bei einer Weiterleitung selbst die Zieladresse ein.
+    const marke = (tab.navMarke = (tab.navMarke || 0) + 1);
+    if (!tab.sessionId || tab.mode !== "live-browser" || !tab.frame || !sessionClient.ready()) return false;
+    const sessionId = tab.sessionId;
+    const neuLaden = !push && url === tab.url;
+    tab.status = "loading";
+    tab.url = url;
+    render();
+    // OHNE onNavigated: der Haken schriebe bei einer Weiterleitung selbst in
+    // den Verlauf, und commitHistory unten kaeme ein zweites Mal dazu.
+    const data = await sessionClient.actUndWarte(
+      tab,
+      neuLaden ? { type: "reload", fristMs: 35_000 } : { type: "navigate", url, fristMs: 35_000 },
+      {}
+    );
+    // Eine neuere Navigation hat uebernommen: nichts anfassen, sie schliesst selbst ab.
+    if (tab.navMarke !== marke) return true;
+    // Sitzung verloren oder ersetzt: der alte Weg baut sauber neu auf.
+    if (tab.sessionId !== sessionId) { tab.status = "ready"; return false; }
+    if (!data?.ok || (!data.screenshot && !data.dialog)) {
+      tab.status = "ready";
+      return false;
+    }
+    tab.url = (typeof data.finalUrl === "string" && data.finalUrl) || url;
+    tab.title = data.title || shortHost(tab.url);
+    tab.status = "ready";
+    commitHistory(tab, tab.url, push);
     persistTabs();
     render();
     return true;
@@ -98,5 +148,5 @@ export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbac
     return false;
   }
 
-  return { tryLiveBrowser, tryRemoteBrowser, echterBrowserWeg, remoteBrowserViewport };
+  return { tryLiveBrowser, navigiereInSitzung, tryRemoteBrowser, echterBrowserWeg, remoteBrowserViewport };
 }

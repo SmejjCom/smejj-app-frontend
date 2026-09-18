@@ -6,7 +6,7 @@
 // Dingen aus der Flaeche (activeTab, schedulePersist, showHint) und sonst nur
 // an clampZoom aus browser-pane-adressen.js. Verhalten unveraendert; die
 // Abhaengigkeiten werden ausdruecklich uebergeben statt im Modul mitgelesen.
-import { clampZoom } from "./browser-pane-adressen.js?v=browser-pane-20260820-2";
+import { clampZoom } from "./browser-pane-adressen.js?v=browser-pane-20260820-3";
 
 export const ZOOM_STEP = 0.1;
 

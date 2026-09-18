@@ -303,6 +303,50 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
     for (const sessionId of [...openIds]) close(sessionId);
   }
 
+  // AUFRAEUMEN NACH DEM SCHLIESSEN DES FENSTERS (Befund 18.09.): closePane()
+  // nahm nur CSS-Klassen weg. Jede Live-Sitzung lief auf dem Server weiter —
+  // ein echter Chrome je Tab, bis zu 30 Minuten ohne Zuschauer, bei nur vier
+  // Plaetzen fuer ALLE Nutzer. Sofort schliessen waere aber falsch: wer das
+  // Fenster kurz zuklappt, um den Chat zu lesen, will danach nicht 9 s auf
+  // einen neuen Chrome warten. Deshalb eine Schonfrist; wer vorher wieder
+  // oeffnet, verwirft sie (verwerfeEnde) und findet alles wie verlassen.
+  // Der Rahmen geht mit: ohne Sitzung ist die Buehne ein totes Bild, und
+  // openPane()/selectTab() laden einen Tab ohne Rahmen von selbst neu.
+  let endeUhr = 0;
+  function verwerfeEnde() {
+    clearTimeout(endeUhr);
+    endeUhr = 0;
+  }
+  function planeEnde(holeTabs, nachMs = 120_000) {
+    verwerfeEnde();
+    endeUhr = setTimeout(() => {
+      endeUhr = 0;
+      for (const tab of holeTabs?.() || []) {
+        if (!tab?.sessionId) continue;
+        close(tab.sessionId);
+        tab.sessionId = "";
+        tab.frame?.remove?.();
+        tab.frame = null;
+      }
+    }, nachMs);
+  }
+
+  // Beobachtet die Body-Klasse statt einzelner Knoepfe: das Fenster schliesst
+  // auf vier Wegen (Kreuz, Menue-Knopf, Globus, Escape/Backdrop-Waechter), und
+  // nur die Klasse ist allen gemeinsam. Ein Haken je Knopf haette den naechsten
+  // neuen Weg wieder vergessen.
+  function bewacheFenster(holeTabs) {
+    if (typeof MutationObserver !== "function" || typeof document === "undefined" || !document.body) return;
+    let offen = document.body.classList.contains("browser-pane-open");
+    new MutationObserver(() => {
+      const jetzt = document.body.classList.contains("browser-pane-open");
+      if (jetzt === offen) return;
+      offen = jetzt;
+      if (offen) verwerfeEnde();
+      else planeEnde(holeTabs);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  }
+
   // Offene Sessions beim Verlassen der Seite freigeben (Best-Effort; der
   // Worker beendet Reste ohnehin ueber das Idle-Timeout).
   if (typeof window !== "undefined") {
@@ -321,5 +365,5 @@ export function createBrowserSessionClient({ routes = {}, fetchImpl = fetch, api
     return runAct(tab, action, hooks);
   }
 
-  return { ready, open, close, closeAll, handleAct, actUndWarte };
+  return { ready, open, close, closeAll, handleAct, actUndWarte, planeEnde, verwerfeEnde, bewacheFenster };
 }

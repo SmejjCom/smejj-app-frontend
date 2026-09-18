@@ -2381,7 +2381,7 @@ body.voice-mode-open #voiceModeClose {
 .bp-toolbar .bp-zoom:hover { background: rgba(246, 243, 238, 0.16); color: #f6f3ee; }
 .bp-tabmenue {
   position: fixed;
-  z-index: 60;
+  z-index: 90;
   display: flex;
   flex-direction: column;
   min-width: 210px;
@@ -2487,6 +2487,11 @@ body.voice-mode-open #voiceModeClose {
   background: rgba(159, 231, 212, 0.18);
   color: #9fe7d4;
   animation: bp-pulse 1.4s ease-in-out infinite;
+}
+body.browser-pane-open #browserButton,
+body.browser-pane-open #mausButton {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* ---- view-chrome.css ---- */

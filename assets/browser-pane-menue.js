@@ -20,9 +20,19 @@ export function menuePosition(x, y, breite, hoehe, fensterBreite, fensterHoehe, 
   return { links, oben };
 }
 
+// Der Escape-Haken des offenen Menues. Bis 2026-09-18 hing er mit
+// { once: true } am Dokument — und verschwand damit nach IRGENDEINEM
+// Tastendruck, nicht erst nach Escape: wer im offenen Menue eine Pfeiltaste
+// drueckte, konnte es danach nicht mehr mit Escape schliessen.
+let tastenHaken = null;
+
 /** Schliesst ein offenes Menue, falls eines steht. */
 export function schliesseMenue() {
   document.querySelector(".bp-tabmenue")?.remove();
+  if (tastenHaken) {
+    document.removeEventListener("keydown", tastenHaken);
+    tastenHaken = null;
+  }
 }
 
 /**
@@ -57,7 +67,9 @@ export function zeigeMenue(x, y, eintraege, aufWahl) {
     });
     menue.appendChild(knopf);
   }
-  document.body.appendChild(menue);
+  // Im Vollbild zeichnet der Browser NUR den Vollbild-Teilbaum: ein Menue am
+  // body waere dort unsichtbar, obwohl es da ist.
+  (document.fullscreenElement || document.body).appendChild(menue);
 
   const { links, oben } = menuePosition(
     x, y, menue.offsetWidth, menue.offsetHeight,
@@ -71,7 +83,9 @@ export function zeigeMenue(x, y, eintraege, aufWahl) {
   // bleibt, verdeckt genau das, was man als Naechstes anklicken will.
   setTimeout(() => {
     document.addEventListener("click", schliesseMenue, { once: true });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") schliesseMenue(); }, { once: true });
+    if (!menue.isConnected) return; // schon wieder geschlossen — keinen Haken zuruecklassen
+    tastenHaken = (e) => { if (e.key === "Escape") schliesseMenue(); };
+    document.addEventListener("keydown", tastenHaken);
   }, 0);
   return menue;
 }

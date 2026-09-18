@@ -14,7 +14,7 @@
 // ein Umzug soll nichts umschreiben, sonst zieht er Fehler mit ein. (Ein
 // erster Versuch mit blinder Textersetzung hat prompt eine Kurzschreibweise
 // zerlegt: aus `{ stepHistory }` wurde `{ p.stepHistory }`.)
-import { behandleRechtsklick } from "./browser-pane-menue.js?v=browser-pane-20260709-2";
+import { behandleRechtsklick } from "./browser-pane-menue.js?v=browser-pane-20260918-1";
 
 export function baueNachrichtenEmpfang(bausteine) {
   const {

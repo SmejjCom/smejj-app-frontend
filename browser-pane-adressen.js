@@ -76,9 +76,35 @@ export function hatAnmeldeFeld(html) {
   return /<input[^>]+type\s*=\s*["']?password/i.test(String(html || ""));
 }
 
+// LEERE HUELLE (Live-Test 18.09., con.ax/en/register): Seiten, die sich erst per
+// Skript aufbauen, kommen aus dem Proxy als leeres Blatt — der Proxy entfernt
+// Skripte, uebrig blieben dort 15 Zeichen sichtbarer Text ("Skip to content") auf
+// dunklem Grund. Der Tab sah aus wie abgestuerzt. Solche Seiten gehoeren in den
+// echten Browser. Die Schwelle liegt bewusst tief: example.com hat 130 Zeichen
+// und soll NICHT den teuren Weg gehen.
+// Und nur GROSSE Dokumente zaehlen: viel Quelltext, der nichts zeigt, ist das
+// Merkmal der Huelle (con.ax: 16 KB fuer 15 Zeichen). Eine winzige Seite mit
+// einem Satz ist einfach eine winzige Seite — sie bleibt auf dem schnellen Weg.
+const LEERE_HUELLE_BIS = 60;
+const LEERE_HUELLE_AB_BYTES = 2000;
+export function istLeereHuelle(html) {
+  const roh = String(html || "");
+  if (roh.length < LEERE_HUELLE_AB_BYTES) return false;
+  const ab = roh.search(/<body[\s>]/i);
+  const sichtbar = (ab >= 0 ? roh.slice(ab) : roh).slice(0, 400000)
+    .replace(/<(script|style|noscript|svg|template)\b[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&[a-z#0-9]+;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  // Bilder zaehlen als Inhalt: eine reine Bildseite ist nicht leer.
+  return sichtbar.length < LEERE_HUELLE_BIS && !/<(img|video|canvas|iframe)\b/i.test(roh);
+}
+
 export function shouldOpenInRealBrowser(html, url = "") {
   const text = String(html || "").slice(0, 120000);
   if (!text) return false;
+  if (istLeereHuelle(html)) return true;
   // Anmeldefelder werden im GANZEN Dokument gesucht, nicht nur in den ersten
   // 120 000 Zeichen: die Google-Anmeldung ist 990 KB gross und traegt ihr
   // Passwortfeld an Position 918 843 (live gemessen 2026-08-20). Mit dem
