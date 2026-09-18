@@ -55,12 +55,70 @@ function hideBanner() {
   if (bannerEl) bannerEl.style.transform = "translateY(100%)";
 }
 
+// navigator.onLine === false ist NICHT verlaesslich (Livetest iOS 18.09.): im
+// iOS-WebKit meldete es false, waehrend das Netz nachweislich lief — der rote
+// Balken klebte dann unter einer voll funktionierenden App. Deshalb gilt der
+// Browser-Hinweis nur noch als Verdacht; gezeigt wird erst nach einer echten
+// Anfrage. HEAD laeuft am Service Worker vorbei (der behandelt nur GET), die
+// Antwort kommt also nie aus dem Cache — auch ein 404 beweist "Netz da".
+const NETZTEST_PFAD = "/manifest.webmanifest";
+const NETZTEST_TAKT_MS = 15000;
+let netzTimer = null;
+// Zaehlt bei jedem Zustandswechsel hoch: eine Pruefung, die waehrenddessen
+// ueberholt wurde, darf ihr Ergebnis nicht mehr anwenden.
+let pruefLauf = 0;
+
+async function netzErreichbar() {
+  try {
+    const abbruch = new AbortController();
+    const frist = setTimeout(() => abbruch.abort(), 4000);
+    try {
+      await fetch(`${NETZTEST_PFAD}?netztest=${Date.now()}`, {
+        method: "HEAD",
+        cache: "no-store",
+        signal: abbruch.signal,
+      });
+      return true;
+    } finally {
+      clearTimeout(frist);
+    }
+  } catch {
+    return false;
+  }
+}
+
+function taktStarten() {
+  if (netzTimer) return;
+  netzTimer = setInterval(pruefeNetz, NETZTEST_TAKT_MS);
+}
+
+function taktStoppen() {
+  if (!netzTimer) return;
+  clearInterval(netzTimer);
+  netzTimer = null;
+}
+
+async function pruefeNetz() {
+  const lauf = ++pruefLauf;
+  const da = await netzErreichbar();
+  if (lauf !== pruefLauf) return;
+  if (da) {
+    hideBanner();
+    taktStoppen();
+  } else {
+    showBanner();
+    taktStarten();
+  }
+}
+
 export function initOfflineBanner() {
   if (typeof window === "undefined" || window.__smejjOfflineBanner) return;
   window.__smejjOfflineBanner = true;
-  window.addEventListener("offline", showBanner);
-  window.addEventListener("online", hideBanner);
-  // Beim Start bereits offline? Dann sofort zeigen (navigator.onLine ist nur ein
-  // Hinweis, kein Beweis — false ist aber verlaesslich "kein Netz").
-  if (typeof navigator !== "undefined" && navigator.onLine === false) showBanner();
+  window.addEventListener("offline", pruefeNetz);
+  window.addEventListener("online", () => {
+    pruefLauf += 1;
+    hideBanner();
+    taktStoppen();
+  });
+  if (typeof navigator !== "undefined" && navigator.onLine === false) pruefeNetz();
 }
