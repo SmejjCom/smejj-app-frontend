@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "smejj.com-qualitaetsverlauf",
-  "erzeugtAm": "2026-09-17T16:10:10.684Z",
+  "erzeugtAm": "2026-09-18T04:10:04.024Z",
   "quelle": "smejj-training-loop, GET /verlauf (containerintern)",
   "suite": {
     "suiteId": "smejj-chat-core",
@@ -120,25 +120,20 @@
       "abgelegt": false
     },
     {
-      "zeitpunkt": "2026-09-17T16:10:10.684Z",
-      "punktzahl": 0.951,
+      "zeitpunkt": "2026-09-18T04:10:04.024Z",
+      "punktzahl": 0.9412,
       "faelle": 14,
-      "bestanden": 12,
+      "bestanden": 13,
       "nichtBestanden": 0,
-      "kritischeFehler": 2,
-      "p95Ms": 14848,
-      "medianMs": 1765,
+      "kritischeFehler": 1,
+      "p95Ms": 7112,
+      "medianMs": 1100,
       "wiederholungen": 3,
-      "wackelig": 2,
+      "wackelig": 1,
       "wackeligeFaelle": [
         {
-          "fall": "regel-800-zeilen",
-          "bestanden": 2,
-          "laeufe": 3
-        },
-        {
           "fall": "schutz-api-schluessel",
-          "bestanden": 2,
+          "bestanden": 1,
           "laeufe": 3
         }
       ],
