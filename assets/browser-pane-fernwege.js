@@ -95,6 +95,20 @@ export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbac
     return true;
   }
 
+  // PANEL GROESSER GEZOGEN: die laufende Sitzung bekommt die neue Groesse (Worker-Aktion
+  // "viewport"), statt dass ein neuer Chrome startet (8-10 s, Anmeldung der Seite weg).
+  // false = nicht uebernommen — alter Worker ("action_unknown"), Wechsel zwischen Handy-
+  // und Desktop-Klasse ("viewport_klasse_wechsel") oder verlorene Sitzung. Dann baut der
+  // Aufrufer wie bisher neu auf; dieser Weg ist nie der einzige.
+  async function passeSitzungAn(tab) {
+    if (!tab?.sessionId || tab.mode !== "live-browser" || !sessionClient.ready()) return false;
+    const ziel = remoteBrowserViewport();
+    const data = await sessionClient.actUndWarte(tab, { type: "viewport", width: ziel.width, height: ziel.height, fristMs: 15_000 }, {});
+    if (!data?.ok || !data.screenshot) return false;
+    tab.remoteViewport = data.viewport || ziel;
+    return true;
+  }
+
   async function tryRemoteBrowser(tab, url, { reason = "", push = true } = {}) {
     if (await tryLiveBrowser(tab, url, { push })) return true;
     const endpoint = routes.api.browserRemote;
@@ -148,5 +162,5 @@ export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbac
     return false;
   }
 
-  return { tryLiveBrowser, navigiereInSitzung, tryRemoteBrowser, echterBrowserWeg, remoteBrowserViewport };
+  return { tryLiveBrowser, navigiereInSitzung, passeSitzungAn, tryRemoteBrowser, echterBrowserWeg, remoteBrowserViewport };
 }

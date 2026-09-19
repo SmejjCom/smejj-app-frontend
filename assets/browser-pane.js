@@ -12,7 +12,7 @@
 // abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
 // instanzen mit getrennten CLIENT_ROUTES.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-3";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-4";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
@@ -140,7 +140,7 @@ const sessionHooks = {
 // Fern-Browser-Wege (Live-Session, Remote-Worker, "echter Browser"-Karte)
 // liegen seit 2026-08-19 in browser-pane-fernwege.js — mit ihnen stand diese
 // Datei ueber der 800-Zeilen-Grenze. Zustandsnahes kommt als Baustein hinein.
-const { tryLiveBrowser, navigiereInSitzung, tryRemoteBrowser, echterBrowserWeg, remoteBrowserViewport } = baueFernwege({
+const { tryLiveBrowser, navigiereInSitzung, passeSitzungAn, tryRemoteBrowser, echterBrowserWeg, remoteBrowserViewport } = baueFernwege({
   sessionClient,
   refs,
   routes: CLIENT_ROUTES,
@@ -400,7 +400,7 @@ function scheduleRemoteRefit() {
       return;
     }
     state.lastRemoteRefitAt = now;
-    if (tab.mode === "live-browser") { oeffneImLiveBrowser(tab.url).catch(() => {}); return; }
+    if (tab.mode === "live-browser") { passeSitzungAn(tab).then((ok) => { if (!ok) return oeffneImLiveBrowser(tab.url); }).catch(() => {}); return; }
     navigate(tab, tab.url, { push: false });
   }, REMOTE_REFIT_DEBOUNCE_MS);
 }
