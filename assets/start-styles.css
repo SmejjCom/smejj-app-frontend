@@ -6778,3 +6778,60 @@ html body .msg-menu.msg-menu {
     mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
   }
 }
+
+/* ---- design-v15-transparent-chat.css ---- */
+@media (max-width: 600px) {
+  html body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass,
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .prompt-glass.prompt-glass {
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass {
+    bottom: var(--sa-bottom, 0px);
+    padding-bottom: 4px;
+  }
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .prompt-glass.prompt-glass {
+    margin-bottom: var(--sa-bottom, 0px);
+    padding-bottom: 4px;
+  }
+  html body #start .prompt-glass .prompt-input,
+  html body #start .prompt-glass textarea,
+  html body #start .prompt-glass .prompt-actions {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+  }
+  html body #start .prompt-glass .prompt-actions svg,
+  html body #start .prompt-glass .ghost-button.icon-button svg,
+  html body #start .prompt-glass .send-button svg {
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+  }
+  html body #start .prompt-glass .prompt-actions .ghost-button.icon-button {
+    background: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+  html body .mobil-kopfglas.mobil-kopfglas.mobil-kopfglas {
+    display: none !important;
+  }
+  html body .glass-icon.glass-icon.glass-icon.glass-icon {
+    background: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html body .glass-icon.glass-icon svg {
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+  }
+  html body:has(#start.view.is-active) main.shell.shell,
+  html body:has(#start.view.is-active) .workspace,
+  html body #start.view.is-active,
+  html body #start .home-feed.home-feed {
+    background: none;
+  }
+  html body #start.has-start-chat #startLog.start-log.start-log {
+    background: none;
+  }
+}
