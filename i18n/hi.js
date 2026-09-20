@@ -1,5 +1,15 @@
 // smejj.com — UI-Uebersetzung हिन्दी (Quellsprache Deutsch als Schluessel).
 export default {
+  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
+  "Ich höre zu …": "मैं सुन रहा हूँ …",
+  "Ich spreche …": "मैं बोल रहा हूँ …",
+  "Mikrofon stumm": "माइक्रोफ़ोन म्यूट",
+  "Sprich einfach — beenden mit X oder Escape.": "बस बोलिए — X या Escape से बंद करें।",
+  "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.": "बस बोलिए — माइक्रोफ़ोन बटन से म्यूट करें, X या Escape से बंद करें।",
+  "Frage schreiben …": "प्रश्न लिखें …",
+  "Stummschalten": "म्यूट करें",
+  "Stummschaltung aufheben": "म्यूट हटाएँ",
+  "Mikrofon stummschalten": "माइक्रोफ़ोन म्यूट करें",
   "Einstellungen": "सेटिंग्स",
   "Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.": "smejj.com को अपने काम करने के तरीके के अनुसार ढालें। बदलाव इस डिवाइस पर सुरक्षित रहते हैं।",
   "Lokal gespeichert": "स्थानीय रूप से सहेजा गया",
@@ -455,7 +465,11 @@ export default {
   "Anmeldelink wird gesendet …": "Anmeldelink wird gesendet …",
   "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).": "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).",
   "Anmeldelink ist momentan nicht erreichbar.": "Anmeldelink ist momentan nicht erreichbar.",
-  "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.": "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.",
+  "Apple Login wird gestartet …": "Apple से साइन-इन शुरू हो रहा है …",
+  "Apple Login konnte nicht gestartet werden.": "Apple से साइन-इन शुरू नहीं हो सका।",
+  "Anmeldung mit Apple abgebrochen.": "Apple से साइन-इन रद्द किया गया।",
+  "Anmeldung mit Apple fehlgeschlagen. Bitte versuche es erneut.": "Apple से साइन-इन विफल रहा। कृपया फिर से कोशिश करें।",
+  "Die Anmeldung ist abgelaufen. Bitte versuche es erneut.": "साइन-इन की अवधि समाप्त हो गई। कृपया फिर से कोशिश करें।",
   "Neuer Chat": "Neuer Chat",
   "Suchen": "Suchen",
   "Heute": "Heute",

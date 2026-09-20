@@ -1,5 +1,15 @@
 // smejj.com — UI-Uebersetzung Русский (Quellsprache Deutsch als Schluessel).
 export default {
+  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
+  "Ich höre zu …": "Слушаю …",
+  "Ich spreche …": "Говорю …",
+  "Mikrofon stumm": "Микрофон выключен",
+  "Sprich einfach — beenden mit X oder Escape.": "Просто говорите — закрыть через X или Escape.",
+  "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.": "Просто говорите — отключить микрофон кнопкой микрофона, закрыть через X или Escape.",
+  "Frage schreiben …": "Написать вопрос …",
+  "Stummschalten": "Выключить звук",
+  "Stummschaltung aufheben": "Включить звук",
+  "Mikrofon stummschalten": "Выключить микрофон",
   "Einstellungen": "Настройки",
   "Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.": "Настройте smejj.com под свой стиль работы. Изменения надёжно сохраняются на этом устройстве.",
   "Lokal gespeichert": "Сохранено локально",
@@ -455,7 +465,11 @@ export default {
   "Anmeldelink wird gesendet …": "Anmeldelink wird gesendet …",
   "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).": "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).",
   "Anmeldelink ist momentan nicht erreichbar.": "Anmeldelink ist momentan nicht erreichbar.",
-  "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.": "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.",
+  "Apple Login wird gestartet …": "Запуск входа через Apple …",
+  "Apple Login konnte nicht gestartet werden.": "Не удалось начать вход через Apple.",
+  "Anmeldung mit Apple abgebrochen.": "Вход через Apple отменён.",
+  "Anmeldung mit Apple fehlgeschlagen. Bitte versuche es erneut.": "Не удалось войти через Apple. Попробуйте ещё раз.",
+  "Die Anmeldung ist abgelaufen. Bitte versuche es erneut.": "Срок входа истёк. Попробуйте ещё раз.",
   "Neuer Chat": "Neuer Chat",
   "Suchen": "Suchen",
   "Heute": "Heute",

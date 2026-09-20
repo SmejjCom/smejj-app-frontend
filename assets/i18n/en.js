@@ -1,5 +1,15 @@
 // smejj.com — UI-Uebersetzung English (Quellsprache Deutsch als Schluessel).
 export default {
+  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
+  "Ich höre zu …": "I'm listening …",
+  "Ich spreche …": "I'm speaking …",
+  "Mikrofon stumm": "Microphone muted",
+  "Sprich einfach — beenden mit X oder Escape.": "Just speak — close with X or Escape.",
+  "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.": "Just speak — mute with the microphone button, close with X or Escape.",
+  "Frage schreiben …": "Type a question …",
+  "Stummschalten": "Mute",
+  "Stummschaltung aufheben": "Unmute",
+  "Mikrofon stummschalten": "Mute microphone",
   "Einstellungen": "Settings",
   "Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.": "Tailor smejj.com to the way you work. Changes stay safely on this device.",
   "Lokal gespeichert": "Saved locally",
@@ -453,7 +463,11 @@ export default {
   "Anmeldelink wird gesendet …": "Sending sign-in link …",
   "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).": "We have emailed you a sign-in link (valid for 15 minutes).",
   "Anmeldelink ist momentan nicht erreichbar.": "The sign-in link service is currently unavailable.",
-  "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.": "Apple sign-in will be enabled once the Apple OAuth configuration and domain verification are in place.",
+  "Apple Login wird gestartet …": "Starting Apple sign-in …",
+  "Apple Login konnte nicht gestartet werden.": "Apple sign-in could not be started.",
+  "Anmeldung mit Apple abgebrochen.": "Sign-in with Apple was cancelled.",
+  "Anmeldung mit Apple fehlgeschlagen. Bitte versuche es erneut.": "Sign-in with Apple failed. Please try again.",
+  "Die Anmeldung ist abgelaufen. Bitte versuche es erneut.": "The sign-in has expired. Please try again.",
   "Neuer Chat": "New chat",
   "Suchen": "Search",
   "Heute": "Today",

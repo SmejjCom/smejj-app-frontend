@@ -1,5 +1,15 @@
 // smejj.com — UI-Uebersetzung العربية (Quellsprache Deutsch als Schluessel, RTL).
 export default {
+  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
+  "Ich höre zu …": "أستمع إليك …",
+  "Ich spreche …": "أتحدث …",
+  "Mikrofon stumm": "الميكروفون صامت",
+  "Sprich einfach — beenden mit X oder Escape.": "تحدّث ببساطة — أغلق بالزر X أو Escape.",
+  "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.": "تحدّث ببساطة — اكتم الصوت بزر الميكروفون، وأغلق بالزر X أو Escape.",
+  "Frage schreiben …": "اكتب سؤالاً …",
+  "Stummschalten": "كتم الصوت",
+  "Stummschaltung aufheben": "إلغاء كتم الصوت",
+  "Mikrofon stummschalten": "كتم الميكروفون",
   "Einstellungen": "الإعدادات",
   "Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.": "خصّص smejj.com بما يناسب طريقة عملك. تبقى التغييرات محفوظة بأمان على هذا الجهاز.",
   "Lokal gespeichert": "محفوظ محليًا",
@@ -455,7 +465,11 @@ export default {
   "Anmeldelink wird gesendet …": "Anmeldelink wird gesendet …",
   "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).": "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).",
   "Anmeldelink ist momentan nicht erreichbar.": "Anmeldelink ist momentan nicht erreichbar.",
-  "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.": "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.",
+  "Apple Login wird gestartet …": "جارٍ بدء تسجيل الدخول عبر Apple …",
+  "Apple Login konnte nicht gestartet werden.": "تعذّر بدء تسجيل الدخول عبر Apple.",
+  "Anmeldung mit Apple abgebrochen.": "تم إلغاء تسجيل الدخول عبر Apple.",
+  "Anmeldung mit Apple fehlgeschlagen. Bitte versuche es erneut.": "فشل تسجيل الدخول عبر Apple. حاول مرة أخرى.",
+  "Die Anmeldung ist abgelaufen. Bitte versuche es erneut.": "انتهت صلاحية تسجيل الدخول. حاول مرة أخرى.",
   "Neuer Chat": "Neuer Chat",
   "Suchen": "Suchen",
   "Heute": "Heute",

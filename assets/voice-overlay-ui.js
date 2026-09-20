@@ -1,4 +1,13 @@
 // smejj.com — Gestalt und Fokusfuehrung des Sprachmodus-Overlays.
+//
+// SPRACHE (Befund 20.09.2026, iPhone-Simulator mit englischer Oberflaeche):
+// Der Sprachmodus war die EINZIGE Ansicht, die auch auf Englisch deutsch
+// blieb — "Ich hoere zu ...", "Sprich einfach ...", "Frage schreiben ...".
+// Grund: seine Texte standen als feste Zeichenketten im Code, waehrend der
+// Rest der App ueber t() aus i18n/ui.js laeuft (Quellsprache Deutsch als
+// Schluessel). Alle sichtbaren Texte dieses Dialogs gehen jetzt durch
+// stimmText(); fehlt eine Uebersetzung, bleibt fail-safe der deutsche
+// Quelltext stehen — genau wie ueberall sonst.
 // Ausgelagert aus composer-tools.js (800-Zeilen-Regel), Verhalten unveraendert.
 //
 // Bewusst getrennt vom Sprach-Zustandsautomaten: Hier steht nur, WIE der Dialog
@@ -10,6 +19,22 @@
 // untere Leiste mit Eingabefeld, Mikrofon-Stummschalter und Beenden-Button).
 // Das index.html-Markup bleibt unveraendert — das Upgrade passiert rein im Browser.
 // sendIcon: das gemeinsame Pfeil-Symbol aus voice-typed-send.js (SEND_ICON_SVG).
+import { t } from "./i18n/ui.js?v=3";
+
+// Die Statuszeilen kommen aus drei Modulen und schreiben mal "..." und mal
+// "…". Fuer die Uebersetzung wird darum zuerst vereinheitlicht, sonst
+// verfehlt derselbe Satz je nach Aufrufer seinen Schluessel.
+export function stimmText(roh) {
+  const text = String(roh || "").replace(/\.\.\./g, "\u2026");
+  return t(text);
+}
+
+/** Hinweiszeile unter der Welle — auch composer-tools.js schreibt hierher. */
+export function setVoiceModeHint(text) {
+  const hint = document.querySelector("#voiceModeOverlay .voice-mode-hint");
+  if (hint) hint.textContent = stimmText(text);
+}
+
 export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
   const overlay = document.querySelector("#voiceModeOverlay");
   if (!overlay || overlay.dataset.upgraded === "true") return;
@@ -37,10 +62,10 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
     + '<button type="button" data-kamera-start="kamera" aria-label="Kamera — smejj sieht mit" title="Kamera — smejj sieht mit">'
     + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>'
     + '</button>'
-    + '<input id="voiceModeInput" type="text" placeholder="Frage schreiben ..." autocomplete="off">'
+    + '<input id="voiceModeInput" type="text" placeholder="' + stimmText('Frage schreiben …') + '" autocomplete="off">'
     + `<button id="voiceModeSend" type="button" aria-label="Senden" title="Senden" disabled>${sendIcon}</button>`
     + '</div>'
-    + '<button id="voiceModeMic" class="voice-mode-mic" type="button" aria-label="Mikrofon stummschalten" aria-pressed="false" title="Stummschalten">'
+    + '<button id="voiceModeMic" class="voice-mode-mic" type="button" aria-label="' + stimmText("Mikrofon stummschalten") + '" aria-pressed="false" title="' + stimmText("Stummschalten") + '">'
     + '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path class="voice-mic-slash" d="M4 4l16 16"/></svg>'
     + '</button>';
   overlay.appendChild(bar);
@@ -86,7 +111,7 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
   // Kuerzer als vorher: der alte Satz nannte jeden Knopf einzeln und brauchte
   // dafuer drei Zeilen (59 px gemessen) direkt ueber der Bedienzone. Was die
   // Knoepfe tun, sagen ihre eigenen Beschriftungen (aria-label/title).
-  if (hint) hint.textContent = "Sprich einfach — beenden mit X oder Escape.";
+  if (hint) hint.textContent = stimmText("Sprich einfach — beenden mit X oder Escape.");
 }
 
 // Fokusfuehrung des Sprachmodus (QA-Welle 2, Befund W2-03): Das Overlay meldet
@@ -142,7 +167,7 @@ export function setVoiceModeStatus(mode, text) {
   const overlay = document.querySelector("#voiceModeOverlay");
   const status = document.querySelector("#voiceModeStatus");
   if (overlay) overlay.dataset.mode = mode;
-  if (status) status.textContent = text;
+  if (status) status.textContent = stimmText(text);
 }
 
 /** Was der Mensch gerade gesagt hat. */
@@ -192,6 +217,6 @@ export function zeigeMikrofonZustand(stumm) {
   if (mic) {
     mic.classList.toggle("is-muted", stumm);
     mic.setAttribute("aria-pressed", String(stumm));
-    mic.title = stumm ? "Stummschaltung aufheben" : "Stummschalten";
+    mic.title = stumm ? stimmText("Stummschaltung aufheben") : stimmText("Stummschalten");
   }
 }

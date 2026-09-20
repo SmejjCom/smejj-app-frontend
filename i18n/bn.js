@@ -1,5 +1,15 @@
 // smejj.com — UI-Uebersetzung বাংলা (Quellsprache Deutsch als Schluessel).
 export default {
+  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
+  "Ich höre zu …": "আমি শুনছি …",
+  "Ich spreche …": "আমি বলছি …",
+  "Mikrofon stumm": "মাইক্রোফোন মিউট",
+  "Sprich einfach — beenden mit X oder Escape.": "শুধু বলুন — X বা Escape দিয়ে বন্ধ করুন।",
+  "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.": "শুধু বলুন — মাইক্রোফোন বোতাম দিয়ে মিউট করুন, X বা Escape দিয়ে বন্ধ করুন।",
+  "Frage schreiben …": "প্রশ্ন লিখুন …",
+  "Stummschalten": "মিউট",
+  "Stummschaltung aufheben": "মিউট বন্ধ",
+  "Mikrofon stummschalten": "মাইক্রোফোন মিউট",
   "Einstellungen": "সেটিংস",
   "Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.": "smejj.com-কে আপনার কাজের ধরনের সঙ্গে মানিয়ে নিন। পরিবর্তনগুলো এই ডিভাইসে নিরাপদে থাকে।",
   "Lokal gespeichert": "স্থানীয়ভাবে সংরক্ষিত",
@@ -455,7 +465,11 @@ export default {
   "Anmeldelink wird gesendet …": "Anmeldelink wird gesendet …",
   "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).": "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).",
   "Anmeldelink ist momentan nicht erreichbar.": "Anmeldelink ist momentan nicht erreichbar.",
-  "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.": "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.",
+  "Apple Login wird gestartet …": "Apple দিয়ে সাইন-ইন শুরু হচ্ছে …",
+  "Apple Login konnte nicht gestartet werden.": "Apple দিয়ে সাইন-ইন শুরু করা যায়নি।",
+  "Anmeldung mit Apple abgebrochen.": "Apple দিয়ে সাইন-ইন বাতিল করা হয়েছে।",
+  "Anmeldung mit Apple fehlgeschlagen. Bitte versuche es erneut.": "Apple দিয়ে সাইন-ইন ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
+  "Die Anmeldung ist abgelaufen. Bitte versuche es erneut.": "সাইন-ইনের মেয়াদ শেষ হয়ে গেছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
   "Neuer Chat": "Neuer Chat",
   "Suchen": "Suchen",
   "Heute": "Heute",

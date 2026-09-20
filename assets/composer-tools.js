@@ -9,7 +9,8 @@ import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send
 // Overlay-Gestalt und Fokusfuehrung — ausgelagert (800-Zeilen-Regel).
 import {
   upgradeVoiceOverlay, createVoiceFocusTrap,
-  setVoiceModeStatus, setVoiceModeTranscript, setVoiceModeReply, zeigeMikrofonZustand
+  setVoiceModeStatus, setVoiceModeTranscript, setVoiceModeReply, zeigeMikrofonZustand,
+  setVoiceModeHint, stimmText,
 } from "./voice-overlay-ui.js";
 // Browser-Sprachausgabe (Stimmwahl, Safari-resume, iOS-Unlock) — ausgelagert (800-Zeilen-Regel).
 import { createBrowserTts } from "./voice-browser-tts.js";
@@ -728,10 +729,9 @@ function openVoiceMode() {
       premiumVoice.isAvailable().then((up) => {
               if (state.voiceModeActive) premiumVoiceOn = up === true;
       }).catch(() => {});
-      const hint = overlay.querySelector(".voice-mode-hint");
-      if (hint) hint.textContent = "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.";
+      setVoiceModeHint("Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.");
       const mic = $("#voiceModeMic");
-      if (mic) mic.title = "Stummschalten";
+      if (mic) mic.title = stimmText("Stummschalten");
       const typedInput = $("#voiceModeInput");
       if (typedInput) {
               typedInput.value = "";

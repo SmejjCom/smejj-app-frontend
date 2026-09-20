@@ -1,5 +1,15 @@
 // smejj.com — UI-Uebersetzung Türkçe (Quellsprache Deutsch als Schluessel).
 export default {
+  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
+  "Ich höre zu …": "Dinliyorum …",
+  "Ich spreche …": "Konuşuyorum …",
+  "Mikrofon stumm": "Mikrofon sessiz",
+  "Sprich einfach — beenden mit X oder Escape.": "Konuşman yeterli — X veya Escape ile kapat.",
+  "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.": "Konuşman yeterli — mikrofon düğmesiyle sesi kapat, X veya Escape ile kapat.",
+  "Frage schreiben …": "Soru yaz …",
+  "Stummschalten": "Sesi kapat",
+  "Stummschaltung aufheben": "Sesi aç",
+  "Mikrofon stummschalten": "Mikrofonu kapat",
   "Einstellungen": "Ayarlar",
   "Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.": "smejj.com'u çalışma tarzına göre uyarla. Değişiklikler bu cihazda güvenle saklanır.",
   "Lokal gespeichert": "Yerel olarak kaydedildi",
@@ -455,7 +465,11 @@ export default {
   "Anmeldelink wird gesendet …": "Anmeldelink wird gesendet …",
   "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).": "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).",
   "Anmeldelink ist momentan nicht erreichbar.": "Anmeldelink ist momentan nicht erreichbar.",
-  "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.": "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.",
+  "Apple Login wird gestartet …": "Apple ile giriş başlatılıyor …",
+  "Apple Login konnte nicht gestartet werden.": "Apple ile giriş başlatılamadı.",
+  "Anmeldung mit Apple abgebrochen.": "Apple ile giriş iptal edildi.",
+  "Anmeldung mit Apple fehlgeschlagen. Bitte versuche es erneut.": "Apple ile giriş başarısız oldu. Lütfen tekrar dene.",
+  "Die Anmeldung ist abgelaufen. Bitte versuche es erneut.": "Oturum açma süresi doldu. Lütfen tekrar dene.",
   "Neuer Chat": "Neuer Chat",
   "Suchen": "Suchen",
   "Heute": "Heute",

@@ -1,5 +1,15 @@
 // smejj.com — UI-Uebersetzung Bahasa Indonesia (Quellsprache Deutsch als Schluessel).
 export default {
+  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
+  "Ich höre zu …": "Saya mendengarkan …",
+  "Ich spreche …": "Saya sedang berbicara …",
+  "Mikrofon stumm": "Mikrofon dibisukan",
+  "Sprich einfach — beenden mit X oder Escape.": "Bicara saja — tutup dengan X atau Escape.",
+  "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.": "Bicara saja — bisukan dengan tombol mikrofon, tutup dengan X atau Escape.",
+  "Frage schreiben …": "Tulis pertanyaan …",
+  "Stummschalten": "Bisukan",
+  "Stummschaltung aufheben": "Bunyikan",
+  "Mikrofon stummschalten": "Bisukan mikrofon",
   "Einstellungen": "Pengaturan",
   "Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.": "Sesuaikan smejj.com dengan cara kerja Anda. Perubahan tersimpan aman di perangkat ini.",
   "Lokal gespeichert": "Tersimpan secara lokal",
@@ -455,7 +465,11 @@ export default {
   "Anmeldelink wird gesendet …": "Anmeldelink wird gesendet …",
   "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).": "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).",
   "Anmeldelink ist momentan nicht erreichbar.": "Anmeldelink ist momentan nicht erreichbar.",
-  "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.": "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.",
+  "Apple Login wird gestartet …": "Memulai masuk dengan Apple …",
+  "Apple Login konnte nicht gestartet werden.": "Masuk dengan Apple tidak dapat dimulai.",
+  "Anmeldung mit Apple abgebrochen.": "Masuk dengan Apple dibatalkan.",
+  "Anmeldung mit Apple fehlgeschlagen. Bitte versuche es erneut.": "Masuk dengan Apple gagal. Silakan coba lagi.",
+  "Die Anmeldung ist abgelaufen. Bitte versuche es erneut.": "Sesi masuk telah kedaluwarsa. Silakan coba lagi.",
   "Neuer Chat": "Neuer Chat",
   "Suchen": "Suchen",
   "Heute": "Heute",

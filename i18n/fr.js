@@ -1,5 +1,15 @@
 // smejj.com — UI-Uebersetzung Français (Quellsprache Deutsch als Schluessel).
 export default {
+  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
+  "Ich höre zu …": "J'écoute …",
+  "Ich spreche …": "Je parle …",
+  "Mikrofon stumm": "Micro coupé",
+  "Sprich einfach — beenden mit X oder Escape.": "Parlez simplement — fermez avec X ou Échap.",
+  "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.": "Parlez simplement — coupez le micro avec le bouton du micro, fermez avec X ou Échap.",
+  "Frage schreiben …": "Écrire une question …",
+  "Stummschalten": "Couper le micro",
+  "Stummschaltung aufheben": "Réactiver le micro",
+  "Mikrofon stummschalten": "Couper le microphone",
   "Einstellungen": "Paramètres",
   "Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.": "Adaptez smejj.com à votre façon de travailler. Les modifications restent en sécurité sur cet appareil.",
   "Lokal gespeichert": "Enregistré localement",
@@ -455,7 +465,11 @@ export default {
   "Anmeldelink wird gesendet …": "Anmeldelink wird gesendet …",
   "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).": "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).",
   "Anmeldelink ist momentan nicht erreichbar.": "Anmeldelink ist momentan nicht erreichbar.",
-  "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.": "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.",
+  "Apple Login wird gestartet …": "Connexion avec Apple en cours …",
+  "Apple Login konnte nicht gestartet werden.": "Impossible de démarrer la connexion avec Apple.",
+  "Anmeldung mit Apple abgebrochen.": "Connexion avec Apple annulée.",
+  "Anmeldung mit Apple fehlgeschlagen. Bitte versuche es erneut.": "Échec de la connexion avec Apple. Veuillez réessayer.",
+  "Die Anmeldung ist abgelaufen. Bitte versuche es erneut.": "La connexion a expiré. Veuillez réessayer.",
   "Neuer Chat": "Neuer Chat",
   "Suchen": "Suchen",
   "Heute": "Heute",

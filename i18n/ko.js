@@ -1,5 +1,15 @@
 // smejj.com — UI-Uebersetzung 한국어 (Quellsprache Deutsch als Schluessel).
 export default {
+  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
+  "Ich höre zu …": "듣고 있어요 …",
+  "Ich spreche …": "말하고 있어요 …",
+  "Mikrofon stumm": "마이크 음소거됨",
+  "Sprich einfach — beenden mit X oder Escape.": "그냥 말하세요 — X 또는 Escape로 종료합니다.",
+  "Sprich einfach — Mikrofon stummschalten mit dem Mikrofon-Button, beenden mit X oder Escape.": "그냥 말하세요 — 마이크 버튼으로 음소거하고, X 또는 Escape로 종료합니다.",
+  "Frage schreiben …": "질문 쓰기 …",
+  "Stummschalten": "음소거",
+  "Stummschaltung aufheben": "음소거 해제",
+  "Mikrofon stummschalten": "마이크 음소거",
   "Einstellungen": "설정",
   "Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.": "smejj.com을 나의 작업 방식에 맞게 조정하세요. 변경 사항은 이 기기에 안전하게 저장됩니다.",
   "Lokal gespeichert": "로컬에 저장됨",
@@ -455,7 +465,11 @@ export default {
   "Anmeldelink wird gesendet …": "Anmeldelink wird gesendet …",
   "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).": "Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig).",
   "Anmeldelink ist momentan nicht erreichbar.": "Anmeldelink ist momentan nicht erreichbar.",
-  "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.": "Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen.",
+  "Apple Login wird gestartet …": "Apple 로그인을 시작하는 중 …",
+  "Apple Login konnte nicht gestartet werden.": "Apple 로그인을 시작할 수 없습니다.",
+  "Anmeldung mit Apple abgebrochen.": "Apple 로그인이 취소되었습니다.",
+  "Anmeldung mit Apple fehlgeschlagen. Bitte versuche es erneut.": "Apple 로그인에 실패했습니다. 다시 시도해 주세요.",
+  "Die Anmeldung ist abgelaufen. Bitte versuche es erneut.": "로그인이 만료되었습니다. 다시 시도해 주세요.",
   "Neuer Chat": "Neuer Chat",
   "Suchen": "Suchen",
   "Heute": "Heute",
