@@ -170,12 +170,27 @@ export function vergissProfilEmail(speicher = globalThis.localStorage) {
   }
 }
 
-// Setzt die uebersetzten Beschriftungen. Die Schluessel existieren bereits aus der
-// Kontoseite ("Konto", "Einstellungen", "Ausloggen") — keine neuen i18n-Texte noetig.
+// Setzt die uebersetzten Beschriftungen.
+//
+// VORHER (bis 20.09.2026) wurden nur DREI Eintraege uebersetzt, und zwar ueber
+// querySelector je data-dock-action — also jeweils nur der ERSTE. Sichtbar im
+// iPhone-Simulator mit englischer Oberflaeche: "Account", "Settings" und
+// "Sign out" waren englisch, daneben standen "Sprache", "Mein Plan",
+// "Verbrauch", "Papierkorb", "Systemzustand" und "Hilfe & Rueckmeldung" weiter
+// deutsch. Zweiter, stiller Fehler: textContent ersetzt ALLE Kinder — der
+// Wert rechts in der Zeile (<span class="dock-wert">, z. B. der Plan) fiel
+// dabei heraus.
+//
+// JETZT laeuft jeder Menuepunkt ueber t(), und zwar nur sein fuehrender
+// Textknoten: der Wert-Span bleibt stehen. Quelltext der Schluessel ist das
+// deutsche Markup in index.html; fehlt eine Uebersetzung, bleibt fail-safe der
+// deutsche Text.
 function applyLabels(menu) {
-  const labels = { account: t("Konto"), settings: t("Einstellungen"), logout: t("Ausloggen") };
-  for (const [action, label] of Object.entries(labels)) {
-    const item = menu.querySelector(`[data-dock-action="${action}"]`);
-    if (item) item.textContent = label;
+  for (const item of menu.querySelectorAll("[role=\"menuitem\"]")) {
+    const knoten = [...item.childNodes].find((k) => k.nodeType === 3 && k.textContent.trim());
+    if (!knoten) continue;
+    const quelle = knoten.textContent.trim();
+    const uebersetzt = t(quelle);
+    if (uebersetzt && uebersetzt !== quelle) knoten.textContent = uebersetzt;
   }
 }

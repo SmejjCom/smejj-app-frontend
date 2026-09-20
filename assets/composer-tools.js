@@ -601,7 +601,7 @@ function waitForAssistantReply(knownEntries) {
                                     return;
                         }
                         if (state.voiceMuted) {
-                                    setVoiceModeStatus("muted", "Mikrofon aus");
+                                    setVoiceModeStatus("muted", stimmText("Mikrofon aus"));
                                     return;
                         }
                         // Kurze Sperrfrist gegen Echo: das Ende der eigenen Sprachausgabe darf
@@ -630,7 +630,7 @@ function waitForAssistantReply(knownEntries) {
                                     return;
                         }
                         if (state.voiceMuted) {
-                                    setVoiceModeStatus("muted", "Mikrofon aus");
+                                    setVoiceModeStatus("muted", stimmText("Mikrofon aus"));
                                     return;
                         }
                         setVoiceModeStatus("listening", "Keine Antwort erhalten — ich höre weiter zu.");
@@ -685,7 +685,7 @@ function toggleVoiceMute() {
               } catch {
                         // Recognition war bereits gestoppt.
               }
-              setVoiceModeStatus("muted", "Mikrofon aus");
+              setVoiceModeStatus("muted", stimmText("Mikrofon aus"));
               return;
       }
       const overlay = $("#voiceModeOverlay");

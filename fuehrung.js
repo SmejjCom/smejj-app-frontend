@@ -8,31 +8,35 @@
 // Kein Overlay-Gefaengnis: jede Blase hat Weiter und Ueberspringen,
 // Escape beendet sofort, und ein Klick irgendwo anders auch.
 
+// SPRACHE (20.09.2026): Die vier Blasen standen fest auf Deutsch und
+// begruessten damit auch englische Nutzer auf Deutsch.
+import { t } from "./i18n/ui.js?v=3";
+
 const GESEHEN_KEY = "smejj.fuehrung.v1";
 
 const SCHRITTE = [
   {
     ziel: "#startMessage",
-    titel: "1 von 4 · Hier tippst du",
-    text: "Schreib in ganzen Sätzen, wie zu einem Menschen. Du musst keine Befehle lernen.",
+    titel: t("1 von 4 · Hier tippst du"),
+    text: t("Schreib in ganzen Sätzen, wie zu einem Menschen. Du musst keine Befehle lernen."),
     beispiel: "Zum Beispiel: Schreib mir eine freundliche Absage auf diese Bewerbung."
   },
   {
     ziel: "#composerPlusButton",
-    titel: "2 von 4 · Hier sind die Werkzeuge",
-    text: "Datei, Bild, Kamera, Websuche, Sprache — alle hinter dem Pluszeichen, alle beschriftet.",
+    titel: t("2 von 4 · Hier sind die Werkzeuge"),
+    text: t("Datei, Bild, Kamera, Websuche, Sprache — alle hinter dem Pluszeichen, alle beschriftet."),
     beispiel: ""
   },
   {
     ziel: '.nav-start .nav-button, .nav-vier .nav-button[data-view="chatHistory"]',
-    titel: "3 von 4 · Hier liegen deine Sachen",
-    text: "Alte Gespräche, Dateien, Papierkorb — alles in der Spur links.",
+    titel: t("3 von 4 · Hier liegen deine Sachen"),
+    text: t("Alte Gespräche, Dateien, Papierkorb — alles in der Spur links."),
     beispiel: ""
   },
   {
     ziel: "#profileDockButton",
-    titel: "4 von 4 · Hier ist alles über dich",
-    text: "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.",
+    titel: t("4 von 4 · Hier ist alles über dich"),
+    text: t("Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf."),
     beispiel: ""
   }
 ];
@@ -72,8 +76,8 @@ function zeige() {
     <p>${s.text}</p>
     ${s.beispiel ? `<p class="fuehrung-beispiel">${s.beispiel}</p>` : ""}
     <div class="fuehrung-knoepfe">
-      <button type="button" data-fuehrung="weiter">${schritt === SCHRITTE.length - 1 ? "Fertig" : "Weiter"}</button>
-      <button type="button" data-fuehrung="aus">Überspringen</button>
+      <button type="button" data-fuehrung="weiter">${schritt === SCHRITTE.length - 1 ? t("Fertig") : t("Weiter")}</button>
+      <button type="button" data-fuehrung="aus">${t("Überspringen")}</button>
     </div>`;
   document.body.append(blase);
   // Unter dem Ziel platzieren; laeuft sie rechts aus dem Bild, nach links ruecken.

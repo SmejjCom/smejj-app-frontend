@@ -12,6 +12,10 @@
 // Die Schnell-Knoepfe (Kuerzer / Foermlicher / Lockerer) fuellen das
 // Schreibfeld — gesendet wird vom Nutzer, wie bei den Chips.
 
+// SPRACHE (20.09.2026): Die Karte stand fest auf Deutsch ("… Zeilen",
+// "Rechts oeffnen") und erschien so auch in der englischen Oberflaeche.
+import { t } from "./i18n/ui.js?v=3";
+
 const MIN_ZEILEN = 20;
 
 // Welche Antwort zeigt die Flaeche gerade? Gebraucht, damit sie ihrem
@@ -144,8 +148,8 @@ function karteAn(entry) {
   karte.type = "button";
   karte.className = "af-karte";
   const zeilen = (entry.innerText.match(/\n/g) || []).length + 1;
-  const art = entry.querySelector("table") ? "Tabelle" : entry.querySelector("pre") ? "Code" : "Text";
-  karte.innerHTML = `<strong></strong><span>${art} · ${zeilen} Zeilen</span><em>Rechts öffnen</em>`;
+  const art = entry.querySelector("table") ? t("Tabelle") : entry.querySelector("pre") ? t("Code") : t("Text");
+  karte.innerHTML = `<strong></strong><span>${art} · ${zeilen} ${t("Zeilen")}</span><em>${t("Rechts öffnen")}</em>`;
   karte.querySelector("strong").textContent = titelVon(entry);
   karte.addEventListener("click", () => oeffneRechts(entry));
   // Hinter die Aktionsleiste, nie zwischen Antwort und Leiste: chat-actions.js findet die

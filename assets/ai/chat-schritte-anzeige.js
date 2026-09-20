@@ -1,4 +1,9 @@
 // smejj.com — Sichtbarer Arbeitsfortschritt des Chat-Stroms: Schrittzeilen,
+//
+// SPRACHE (Befund 20.09.2026): Diese Zeilen standen fest auf Deutsch und
+// erschienen darum auch in der englischen Oberflaeche ("Arbeitsschritte: 1
+// Suche"). Sie laufen jetzt ueber t() aus ../i18n/ui.js; fehlt eine
+// Uebersetzung, bleibt fail-safe der deutsche Quelltext.
 // Schrittgruppen, Zusammenfalten, Quellen-Hinweis und Wartesignal.
 // Ausgelagert aus chat-stream.js am 2026-08-25 (Zeilen-Diaet, Buendel-Projekt
 // Stufe 3) — Verhalten und Wortlaute unveraendert; chat-stream.js importiert
@@ -23,6 +28,8 @@
 // innerHTML des Antwort-Knotens — eine Liste darin waere weg. Ausserdem liest
 // er `node.textContent`, die Schritte wuerden also in die Antwort einfliessen.
 // ---------------------------------------------------------------------------
+
+import { t } from "../i18n/ui.js?v=3";
 
 const SCHRITT_SYMBOL = { suche: "🔍", seite: "📄" };
 
@@ -55,7 +62,7 @@ function sichereSchrittUrl(text) {
  * zusammengeklebt, damit Modellausgabe niemals Markup werden kann.
  */
 function beschrifteZeile(zeile, schritt) {
-  const art = schritt.art === "suche" ? "Suche" : schritt.art === "seite" ? "Lese" : schritt.art;
+  const art = schritt.art === "suche" ? t("Suche") : schritt.art === "seite" ? t("Lese") : schritt.art;
   zeile.textContent = `${SCHRITT_SYMBOL[schritt.art] || "•"} ${art}: `;
   const ziel = sichereSchrittUrl(schritt.text);
   const teil = document.createElement(ziel ? "a" : "span");
@@ -103,7 +110,7 @@ export function schrittListe(output) {
   liste.className = "entry assistant chat-schritte";
   liste.dataset.smejjSchritte = "true";
   liste.setAttribute("aria-live", "polite");
-  liste.setAttribute("aria-label", "Arbeitsschritte");
+  liste.setAttribute("aria-label", t("Arbeitsschritte"));
   output.parentElement.insertBefore(liste, output);
   return liste;
 }
@@ -117,16 +124,16 @@ export function schrittListe(output) {
 // Liste erwarten, finden sie ueber alleZeilen().
 
 const GRUPPEN_WORT = {
-  suche: ["Suche", "Suchen"],
-  seite: ["Seite gelesen", "Seiten gelesen"],
-  bild: ["Bild gemalt", "Bilder gemalt"]
+  suche: [t("Suche"), t("Suchen")],
+  seite: [t("Seite gelesen"), t("Seiten gelesen")],
+  bild: [t("Bild gemalt"), t("Bilder gemalt")]
 };
 
 function gruppenTitel(art, gesamt, fertig) {
-  const [eins, viele] = GRUPPEN_WORT[art] || ["Schritt", "Schritte"];
+  const [eins, viele] = GRUPPEN_WORT[art] || [t("Schritt"), t("Schritte")];
   const symbol = SCHRITT_SYMBOL[art] || "•";
   if (fertig >= gesamt) return `${symbol} ${gesamt} ${gesamt === 1 ? eins : viele} ✓`;
-  const laeuft = art === "suche" ? "Suche" : art === "seite" ? "Lese" : eins;
+  const laeuft = art === "suche" ? t("Suche") : art === "seite" ? t("Lese") : eins;
   return `${symbol} ${laeuft} … ${fertig} von ${gesamt}`;
 }
 
@@ -269,13 +276,13 @@ function faltTitel(arten, ohneFund) {
   const suchen = arten.filter((a) => a === "suche").length;
   const seiten = arten.filter((a) => a === "seite").length;
   const rest = arten.length - suchen - seiten;
-  if (suchen) teile.push(`${suchen} ${suchen === 1 ? "Suche" : "Suchen"}`);
-  if (seiten) teile.push(`${seiten} ${seiten === 1 ? "Seite" : "Seiten"} gelesen`);
-  if (rest) teile.push(`${rest} ${rest === 1 ? "Schritt" : "Schritte"}`);
+  if (suchen) teile.push(`${suchen} ${suchen === 1 ? t("Suche") : t("Suchen")}`);
+  if (seiten) teile.push(`${seiten} ${seiten === 1 ? t("Seite") : t("Seiten")} ${t("gelesen")}`);
+  if (rest) teile.push(`${rest} ${rest === 1 ? t("Schritt") : t("Schritte")}`);
   // Die Null-Meldung MUSS in die zugeklappte Zeile: sonst versteckt das Falten
   // genau die Information, dass die Antwort auf nichts steht.
-  const fund = ohneFund && ohneFund === arten.length ? " — ohne Fund" : "";
-  return `Arbeitsschritte: ${teile.join(", ") || arten.length}${fund}`;
+  const fund = ohneFund && ohneFund === arten.length ? ` — ${t("ohne Fund")}` : "";
+  return `${t("Arbeitsschritte")}: ${teile.join(", ") || arten.length}${fund}`;
 }
 
 /**
