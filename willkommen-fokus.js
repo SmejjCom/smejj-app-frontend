@@ -18,6 +18,11 @@
       e.preventDefault();
       var frage = (document.getElementById("probierFeld") || {}).value || "";
       try { if (frage.trim()) sessionStorage.setItem("smejj.probierFrage.v1", frage.trim()); } catch (fehler) { /* ohne Speicher geht es trotzdem zur Anmeldung */ }
+      // Seit dem 21.09.2026 (Betreiber-Freigabe, Apple-Ablehnung 2.1): die
+      // erste Frage wird HIER beantwortet, ohne Konto. gast-frage.js faellt
+      // bei jedem Fehler auf den alten Weg zurueck — die Anmeldung bleibt der
+      // Rueckfallweg, nie eine Sackgasse.
+      if (frage.trim() && typeof window.smejjGastFrage === "function") { window.smejjGastFrage(frage.trim(), probier); return; }
       location.href = "/auth/register/";
     });
   }

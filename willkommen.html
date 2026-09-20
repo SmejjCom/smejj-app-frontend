@@ -53,8 +53,11 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>smejj.com — Frag alles. Kostenlos.</title>
-  <script src="/assets/willkommen-sprache.js?v=1" defer></script>
-  <script src="/assets/willkommen-fokus.js?v=w3" defer></script>
+  <script src="/assets/willkommen-sprache.js?v=2" defer></script>
+  <!-- Die erste Frage OHNE Konto (21.09.2026). Laedt VOR dem Fokus-Skript,
+       damit window.smejjGastFrage beim ersten Absenden schon steht. -->
+  <script src="/assets/gast-frage.js?v=1" defer></script>
+  <script src="/assets/willkommen-fokus.js?v=w4" defer></script>
   <!-- Vollbild-Heilung fuer die installierte App (2026-09-07): dieselbe Datei wie in
        index.html (gleiche Marke, eine Instanz). Als Web-App oeffnet "/" abgemeldet
        diese Seite; die Tastatur des Probier-Felds loest denselben WebKit-Fehler aus
@@ -240,10 +243,11 @@
       <a class="knopf weiss gross" href="/auth/register/">Kostenlos starten</a>
       <a class="knopf gross" href="#preise">Preise ansehen</a>
     </div>
-    <!-- Mockup 1: das Probier-Feld. EHRLICH: "die ersten drei Fragen gehen
-         ohne Konto" gibt es serverseitig nicht (Login-Pflicht, Kostenschutz) —
-         darum nimmt das Feld die Frage MIT zur kostenlosen Anmeldung, und die
-         Zeile darunter sagt genau das. Keine Attrappe: der Weg funktioniert. -->
+    <!-- Mockup 1: das Probier-Feld. Seit dem 21.09.2026 (Betreiber-Freigabe
+         nach Apples Ablehnung 2.1) wird die erste Frage HIER beantwortet —
+         ohne Konto. Gemessen am selben Tag: /api/chat antwortet abgemeldet.
+         Die Anmeldung ist nur noch der Rueckfallweg, wenn etwas schiefgeht
+         (gast-frage.js), und der Weg zu Verlauf und Geraete-Abgleich. -->
     <!-- Das Feld hat bewusst KEIN name-Attribut: die Frage darf nie in der
          Adresszeile landen. willkommen-fokus.js legt sie in sessionStorage,
          die App holt sie nach der Anmeldung ins Schreibfeld. -->
@@ -252,7 +256,7 @@
       <span class="chip">Nachdenken</span>
       <button class="los" type="submit" aria-label="Frage stellen">↑</button>
     </form>
-    <p class="probier-zeile">Probier es hier — nach der kostenlosen Anmeldung geht deine Frage sofort los.</p>
+    <p class="probier-zeile">Probier es hier — die erste Frage geht sofort, ganz ohne Konto.</p>
   </div>
 
   <section id="funktionen">
