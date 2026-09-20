@@ -27,18 +27,18 @@ const DEFAULTS = {
 // Bereichs, nicht den Beispieltext des Mockups: eine Zeile, die Schalter
 // verspricht, die es nicht gibt, waere eine Luege.
 const GROUPS = [
-  ["general", "Allgemein", "Sprache, Start, Sicherheitsmodus"],
-  ["appearance", "Aussehen & Schriftgröße", "Größe, Farbschema, Dichte"],
-  ["behavior", "Wie smejj antwortet", "Länge, Gründlichkeit, Stil"],
-  ["models", "KI-Modelle & Anbieter", "Modelle und Reasoning"],
-  ["api", "API", "Schlüssel, Guthaben, Preise"],
-  ["personalization", "Persönliches", "Deine Anweisungen an smejj"],
-  ["coding", "Programmieren", "Prüfungen, Vorschau, Zugriff"],
-  ["permissions", "Sicherheit", "Bestätigungen und Grenzen"],
-  ["notifications", "Benachrichtigungen", "Wenn ein Auftrag fertig ist"],
-  ["storage", "Dateien & Speicher", "Offline, Sync, Platz"],
-  ["privacy", "Datenschutz & Training", "Was gesammelt wird, dein Ja"],
-  ["advanced", "Erweitert", "Diagnose und Zurücksetzen"]
+  ["general", "Allgemein", t("Sprache, Start, Sicherheitsmodus")],
+  ["appearance", t("Aussehen & Schriftgröße"), t("Größe, Farbschema, Dichte")],
+  ["behavior", "Wie smejj antwortet", t("Länge, Gründlichkeit, Stil")],
+  ["models", "KI-Modelle & Anbieter", t("Modelle und Reasoning")],
+  ["api", "API", t("Schlüssel, Guthaben, Preise")],
+  ["personalization", t("Persönliches"), "Deine Anweisungen an smejj"],
+  ["coding", "Programmieren", t("Prüfungen, Vorschau, Zugriff")],
+  ["permissions", "Sicherheit", t("Bestätigungen und Grenzen")],
+  ["notifications", "Benachrichtigungen", t("Wenn ein Auftrag fertig ist")],
+  ["storage", t("Dateien & Speicher"), "Offline, Sync, Platz"],
+  ["privacy", "Datenschutz & Training", t("Was gesammelt wird, dein Ja")],
+  ["advanced", "Erweitert", t("Diagnose und Zurücksetzen")]
 ];
 
 const FIELDS = {
@@ -159,53 +159,53 @@ function markup() {
   // "Einstellungen" stand direkt ueber der grossen "Einstellungen".
   return `<header class="settings-header"><div><h2>${t("Einstellungen")}</h2><p class="subhead">${t("Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.")}</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">${t("Lokal gespeichert")}</div></header>
     <div class="settings-shell"><nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${suche}${nav}</nav><div class="settings-content">
-      ${panel("general", "Allgemein", "Grundlegendes Verhalten der App.", [
-        select("Sprache", "settingsLanguage", LANGUAGE_OPTIONS, false),
-        select("Beim Öffnen anzeigen", "settingsStartView", [["start", "Startseite"], ["last", "Letzte Ansicht"], ["projects", "smejjCloud"]]),
+      ${panel("general", "Allgemein", t("Grundlegendes Verhalten der App."), [
+        select(t("Sprache"), "settingsLanguage", LANGUAGE_OPTIONS, false),
+        select(t("Beim Öffnen anzeigen"), "settingsStartView", [["start", "Startseite"], ["last", "Letzte Ansicht"], ["projects", "smejjCloud"]]),
         select("Sicherheitsmodus", "settingsMode", [["safe", "Free-safe"], ["byok", "BYOK vorbereitet"], ["local", "Lokal"]])])}
-      ${panel("appearance", "Aussehen & Schriftgröße", "Gilt nur außerhalb der geschützten Startseite.", [
-        select("Schriftgröße", "settingsFontSize", [["small", "Normal · 16 px"], ["medium", "Groß · 19 px"], ["large", "Sehr groß · 23 px"]]),
+      ${panel("appearance", t("Aussehen & Schriftgröße"), t("Gilt nur außerhalb der geschützten Startseite."), [
+        select(t("Schriftgröße"), "settingsFontSize", [["small", "Normal · 16 px"], ["medium", t("Groß · 19 px")], ["large", t("Sehr groß · 23 px")]]),
         `<p class="settings-schriftprobe" aria-live="polite">${t("So sieht dein Text dann überall aus. Auch Knöpfe und Menüs wachsen mit — nicht nur der Fließtext.")}</p>`,
         // F20 (A-bis-Z-Pruefung 14.09., Betreiber-Freigabe "OK – F18, F20 und F14 umsetzen"):
         // "Hell" faerbte nur die Einstellungen um — Verlauf und Code blieben heller
         // Text auf hellem Grund, Spur und Panel dunkel. Bis ein helles Thema fuer ALLE
         // Ansichten existiert, bleiben beide Optionen sichtbar, aber gesperrt; die
         // Laufzeit (settings-runtime.js) loest jede Wahl auf "dark" auf.
-        select("Helligkeit", "settingsTheme", [["dark", "Dunkel"], ["light", "Hell", true], ["system", "So wie mein Gerät", true]]),
+        select("Helligkeit", "settingsTheme", [["dark", "Dunkel"], ["light", "Hell", true], ["system", t("So wie mein Gerät"), true]]),
         `<p class="settings-schriftprobe settings-hinweis-hell">${t("Das helle Thema ist noch nicht für alle Ansichten fertig — Verlauf und Code wären unlesbar. Bis dahin bleibt smejj.com dunkel.")}</p>`,
-        select("Oberflächendichte", "settingsDensity", [["comfortable", "Komfortabel"], ["compact", "Kompakt"]])])}
-      ${panel("behavior", "Wie smejj antwortet", "Lege fest, wie selbstständig smejj.com arbeiten darf.", [
-        select("Bestätigungen", "settingsConfirmations", [["strict", "Immer bestätigen"], ["balanced", "Bei wichtigen Aktionen"], ["trusted", "Nur externe Auswirkungen"]]),
-        select("Wie ausführlich?", "settingsResponseStyle", [["concise", "Kurz"], ["balanced", "Ausgewogen"], ["detailed", "Ausführlich"]]),
-        toggle("Projektkontext automatisch berücksichtigen", "settingsAutoContext", "Relevante Projektdateien und Anweisungen einbeziehen.")])}
-      ${panel("models", "KI-Modelle & Anbieter", "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.", [
+        select(t("Oberflächendichte"), "settingsDensity", [["comfortable", "Komfortabel"], ["compact", "Kompakt"]])])}
+      ${panel("behavior", "Wie smejj antwortet", t("Lege fest, wie selbstständig smejj.com arbeiten darf."), [
+        select(t("Bestätigungen"), "settingsConfirmations", [["strict", t("Immer bestätigen")], ["balanced", "Bei wichtigen Aktionen"], ["trusted", "Nur externe Auswirkungen"]]),
+        select(t("Wie ausführlich?"), "settingsResponseStyle", [["concise", "Kurz"], ["balanced", "Ausgewogen"], ["detailed", t("Ausführlich")]]),
+        toggle(t("Projektkontext automatisch berücksichtigen"), "settingsAutoContext", t("Relevante Projektdateien und Anweisungen einbeziehen."))])}
+      ${panel("models", "KI-Modelle & Anbieter", t("GLM-5.2 bleibt das Qualitätsfundament von smejj.com."), [
         select("Reasoning-Aufwand", "settingsReasoningEffort", [["medium", "Mittel"], ["high", "Hoch"], ["max", "Maximal"]]),
-        action("Modellverwaltung", "Standardmodell, BYOK und lokale Modelle.", "KI-Modelle öffnen", "ai")])}
+        action("Modellverwaltung", t("Standardmodell, BYOK und lokale Modelle."), t("KI-Modelle öffnen"), "ai")])}
       ${/* OpenRouter-Look: kein Panel-Kopf, die Flaeche bringt "API-Keys" selbst mit */ `<section id="settings-api" class="settings-panel" data-settings-panel="api"><div class="settings-list"><div id="apiCenterSurface" data-api-center></div></div></section>`}
-      ${panel("personalization", "Persönliches", "Dauerhafte Hinweise für Antworten und Zusammenarbeit.", [
+      ${panel("personalization", t("Persönliches"), t("Dauerhafte Hinweise für Antworten und Zusammenarbeit."), [
         `<div class="settings-row settings-row-stack"><div class="settings-row-copy"><strong id="settingsPersonalizationLabel">${t("Persönliche Anweisungen")}</strong></div><textarea id="settingsPersonalization" aria-labelledby="settingsPersonalizationLabel" maxlength="4000" placeholder="${t("Zum Beispiel: Antworte auf Deutsch und erkläre Entscheidungen kurz.")}"></textarea></div>`])}
-      ${panel("coding", "Programmieren", "Standards für Coding-Aufgaben und Verifikation.", [
-        toggle("Prüfungen automatisch ausführen", "settingsRunChecks", "Build, Typecheck, Lint und Tests vor Abschluss."),
-        toggle("Browser-Vorschau bei UI-Aufgaben", "settingsBrowserPreview", "Visuelle Prüfung und Screenshots."),
-        action("Coding-Arbeitsbereich", "Jobs, Diffs, Tests und Freigaben.", "Coding öffnen", "smejjClaw")])}
-      ${panel("permissions", "Sicherheit", "Sichere Standardwerte für Werkzeuge und externe Zugriffe.", [
-        toggle("Netzwerkzugriff für Aufgaben", "settingsNetworkAccess", "Standardmäßig aus; externe Zugriffe bleiben fail-closed."),
-        info("Dateien und Terminal", "Schreibaktionen und nicht erlaubte Befehle benötigen weiterhin eine sichere Freigabe.")])}
-      ${panel("notifications", "Benachrichtigungen", "Wähle, wann smejj.com dich informiert.", [
+      ${panel("coding", "Programmieren", t("Standards für Coding-Aufgaben und Verifikation."), [
+        toggle(t("Prüfungen automatisch ausführen"), "settingsRunChecks", t("Build, Typecheck, Lint und Tests vor Abschluss.")),
+        toggle("Browser-Vorschau bei UI-Aufgaben", "settingsBrowserPreview", t("Visuelle Prüfung und Screenshots.")),
+        action("Coding-Arbeitsbereich", t("Jobs, Diffs, Tests und Freigaben."), t("Coding öffnen"), "smejjClaw")])}
+      ${panel("permissions", "Sicherheit", t("Sichere Standardwerte für Werkzeuge und externe Zugriffe."), [
+        toggle(t("Netzwerkzugriff für Aufgaben"), "settingsNetworkAccess", t("Standardmäßig aus; externe Zugriffe bleiben fail-closed.")),
+        info(t("Dateien und Terminal"), t("Schreibaktionen und nicht erlaubte Befehle benötigen weiterhin eine sichere Freigabe."))])}
+      ${panel("notifications", "Benachrichtigungen", t("Wähle, wann smejj.com dich informiert."), [
         toggle("Aufgabe abgeschlossen", "settingsNotifyComplete", "Nach erfolgreicher Verifikation."),
-        toggle("Freigabe erforderlich", "settingsNotifyApproval", "Wenn ein Diff oder externer Schritt wartet."),
-        toggle("Fehler und Abbruch", "settingsNotifyError", "Bei fehlgeschlagenen oder gestoppten Aufgaben.")])}
-      ${panel("storage", "Dateien & Speicher", "Lokale Daten und IDrive-e2 Object Brain.", [
-        toggle("Offline-Cache verwenden", "settingsOfflineCache", "App-Shell und lokale Arbeitsdaten offline halten."),
-        action("Speicherstatus", "Lokalen Speicher, IDrive e2 und Sync prüfen.", "Speicher öffnen", "storageView"),
-        action("Lokale Einstellungsdaten", "Standardeinstellungen wiederherstellen.", "Zurücksetzen", "reset")])}
-      ${panel("privacy", "Datenschutz & Training", "In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst.", [
-        info("Was gesammelt wird", "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus."),
-        info("Wofür", "Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert."),
-        action("Modelltraining erlauben", "Der Schalter liegt in deinem Konto unter Meine Daten.", "Zum Schalter", "kontoDaten")])}
-      ${panel("advanced", "Erweitert", "Diagnose und rechtliche Informationen.", [
+        toggle("Freigabe erforderlich", "settingsNotifyApproval", t("Wenn ein Diff oder externer Schritt wartet.")),
+        toggle(t("Fehler und Abbruch"), "settingsNotifyError", t("Bei fehlgeschlagenen oder gestoppten Aufgaben."))])}
+      ${panel("storage", t("Dateien & Speicher"), t("Lokale Daten und IDrive-e2 Object Brain."), [
+        toggle("Offline-Cache verwenden", "settingsOfflineCache", t("App-Shell und lokale Arbeitsdaten offline halten.")),
+        action("Speicherstatus", t("Lokalen Speicher, IDrive e2 und Sync prüfen."), t("Speicher öffnen"), "storageView"),
+        action("Lokale Einstellungsdaten", "Standardeinstellungen wiederherstellen.", t("Zurücksetzen"), "reset")])}
+      ${panel("privacy", "Datenschutz & Training", t("In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst."), [
+        info(t("Was gesammelt wird"), "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus."),
+        info("Wofür", t("Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.")),
+        action("Modelltraining erlauben", t("Der Schalter liegt in deinem Konto unter Meine Daten."), "Zum Schalter", "kontoDaten")])}
+      ${panel("advanced", "Erweitert", t("Diagnose und rechtliche Informationen."), [
         toggle("Diagnoseinformationen anzeigen", "settingsDiagnostics", "Technische Statusdetails in Nicht-Start-Bereichen."),
-        action("Systemstatus", "Verbindungen, Modelle und Betrieb prüfen.", "Status öffnen", "tools"),
+        action("Systemstatus", t("Verbindungen, Modelle und Betrieb prüfen."), t("Status öffnen"), "tools"),
         // AGB und Widerruf standen bis 2026-08-22 zwar live (agb.html,
         // widerruf.html), waren aus der App heraus aber nirgends erreichbar.
         // Sobald ein Abo verkauft wird, muessen sie es sein — beide gehoeren

@@ -1,3 +1,5 @@
+// Oberflaechentexte ueber die Sprachdateien (Stufe 4, 20.09.2026).
+import { t } from "./i18n/ui.js?v=3";
 import { CLIENT_ROUTES } from "./config.js";
 // Chats kommen aus dem Speicher, nicht aus dem DOM (QA-Welle 2, Befund W2-01).
 // WICHTIG: derselbe Pfad wie in chat-history-view.js — ein abweichender
@@ -23,40 +25,40 @@ export function oeffneSuchOverlay() {
 // Wahrheit; wer dort umbenennt, zieht hier nach (der Untertitel macht die
 // Zeile auffindbar: "schrift" findet Aussehen & Schriftgroesse).
 const EINSTELLUNGS_BEREICHE = Object.freeze([
-  ["general", "Allgemein", "Sprache, Start, Sicherheitsmodus"],
-  ["appearance", "Aussehen & Schriftgröße", "Größe, Farbschema, Dichte"],
-  ["behavior", "Wie smejj antwortet", "Länge, Gründlichkeit, Stil"],
-  ["models", "KI-Modelle & Anbieter", "Modelle und eigene Schlüssel"],
-  ["personalization", "Persönliches", "Deine Anweisungen an smejj"],
-  ["coding", "Programmieren", "Prüfungen, Vorschau, Zugriff"],
-  ["permissions", "Sicherheit", "Bestätigungen und Grenzen"],
-  ["notifications", "Benachrichtigungen", "Wenn ein Auftrag fertig ist"],
-  ["storage", "Dateien & Speicher", "Offline, Sync, Platz"],
-  ["advanced", "Erweitert", "Diagnose und Zurücksetzen"]
+  ["general", "Allgemein", t("Sprache, Start, Sicherheitsmodus")],
+  ["appearance", t("Aussehen & Schriftgröße"), t("Größe, Farbschema, Dichte")],
+  ["behavior", "Wie smejj antwortet", t("Länge, Gründlichkeit, Stil")],
+  ["models", "KI-Modelle & Anbieter", t("Modelle und eigene Schlüssel")],
+  ["personalization", t("Persönliches"), "Deine Anweisungen an smejj"],
+  ["coding", "Programmieren", t("Prüfungen, Vorschau, Zugriff")],
+  ["permissions", "Sicherheit", t("Bestätigungen und Grenzen")],
+  ["notifications", "Benachrichtigungen", t("Wenn ein Auftrag fertig ist")],
+  ["storage", t("Dateien & Speicher"), "Offline, Sync, Platz"],
+  ["advanced", "Erweitert", t("Diagnose und Zurücksetzen")]
 ]);
 
 const STATIC_RESULTS = Object.freeze([
   ...EINSTELLUNGS_BEREICHE.map(([tab, name, sub]) =>
-    ["Einstellungen", name, `Einstellungen › ${name}`, "settings", `${name} ${sub} einstellungen`, undefined, undefined, undefined, tab]),
-  ["Hilfe", "Hilfe & Anleitung", "Erste Schritte, Bereiche, was tun wenn etwas nicht geht", "hilfe", "hilfe anleitung faq frage antwort erste schritte", undefined, undefined, undefined, undefined, "/hilfe.html"],
+    [t("Einstellungen"), name, `Einstellungen › ${name}`, "settings", `${name} ${sub} einstellungen`, undefined, undefined, undefined, tab]),
+  ["Hilfe", "Hilfe & Anleitung", t("Erste Schritte, Bereiche, was tun wenn etwas nicht geht"), "hilfe", "hilfe anleitung faq frage antwort erste schritte", undefined, undefined, undefined, undefined, "/hilfe.html"],
 
-  ["Arbeitsbereiche", "Neu", "Neuer Chat oder neue Aufgabe starten", "start", "neu chat aufgabe start"],
-  ["Arbeitsbereiche", "Coding", "Code schreiben, prüfen und umbauen", "smejjClaw", "coding code programmieren terminal"],
+  ["Arbeitsbereiche", "Neu", t("Neuer Chat oder neue Aufgabe starten"), "start", "neu chat aufgabe start"],
+  ["Arbeitsbereiche", "Coding", t("Code schreiben, prüfen und umbauen"), "smejjClaw", "coding code programmieren terminal"],
   // "Arbeitsbereich" statt "Projekte" (2026-08-13): "Projekte" heisst seit dem
   // Verlauf-Ausbau die Chat-Sammlung. Die alten Suchwoerter bleiben stehen —
   // wer "projekt" tippt, soll diese Flaeche weiterhin finden.
-  ["Arbeitsbereiche", "Arbeitsbereich", "Lokale Dateien und Snapshots öffnen", "projects", "arbeitsbereich workspace projekt projekte projects dateien"],
-  ["Arbeitsbereiche", "Dateien", "Projektdateien und Uploads finden", "files", "dateien files uploads quellen"],
-  ["Arbeitsbereiche", "Verlauf", "Alte Chats und Aufgaben finden", "chatHistory", "verlauf history chat task"],
-  ["Einstellungen", "Einstellungen", "Konto, Modelle, API-Keys und Sprache", "settings", "settings einstellungen konto modell api key"],
-  ["Einstellungen", "Kosten & Limits", "Kostenstatus und Limits prüfen", "cost", "kosten limits budget"],
-  ["Einstellungen", "Nutzer", "Lokalen Nutzer und Login prüfen", "profile", "nutzer login konto profil"],
-  ["Werkzeuge", "Browser", "Seiten öffnen und bedienen", "browser", "browser websites web"],
-  ["Werkzeuge", "Quellen", "Referenzen und Projektdateien", "files", "quellen referenzen links dokumente"],
-  ["Werkzeuge", "GitHub", "Repository, Branch und Commit-Status", "settings", "github repo branch commit pr"],
-  ["Werkzeuge", "Vorschau", "App oder Website Preview", "browser", "vorschau preview app website"],
-  ["Werkzeuge", "Status", "Tests, Build, Deploy und Fehler", "tools", "status tests build deploy fehler"],
-  ["Werkzeuge", "smejjBot", "Wiederholbare Ablaufe und Agenten", "automation", "smejjbot automatisierung automation auftraege agenten"]
+  ["Arbeitsbereiche", "Arbeitsbereich", t("Lokale Dateien und Snapshots öffnen"), "projects", "arbeitsbereich workspace projekt projekte projects dateien"],
+  ["Arbeitsbereiche", t("Dateien"), t("Projektdateien und Uploads finden"), "files", "dateien files uploads quellen"],
+  ["Arbeitsbereiche", t("Verlauf"), t("Alte Chats und Aufgaben finden"), "chatHistory", "verlauf history chat task"],
+  [t("Einstellungen"), t("Einstellungen"), t("Konto, Modelle, API-Keys und Sprache"), "settings", "settings einstellungen konto modell api key"],
+  [t("Einstellungen"), "Kosten & Limits", t("Kostenstatus und Limits prüfen"), "cost", "kosten limits budget"],
+  [t("Einstellungen"), "Nutzer", t("Lokalen Nutzer und Login prüfen"), "profile", "nutzer login konto profil"],
+  ["Werkzeuge", "Browser", t("Seiten öffnen und bedienen"), "browser", "browser websites web"],
+  ["Werkzeuge", "Quellen", t("Referenzen und Projektdateien"), "files", "quellen referenzen links dokumente"],
+  ["Werkzeuge", "GitHub", t("Repository, Branch und Commit-Status"), "settings", "github repo branch commit pr"],
+  ["Werkzeuge", "Vorschau", t("App oder Website Preview"), "browser", "vorschau preview app website"],
+  ["Werkzeuge", "Status", t("Tests, Build, Deploy und Fehler"), "tools", "status tests build deploy fehler"],
+  ["Werkzeuge", "smejjBot", t("Wiederholbare Ablaufe und Agenten"), "automation", "smejjbot automatisierung automation auftraege agenten"]
 ]);
 
 export function initGlobalSearch({ $, goToView, showTaskIndicator, showToast, state, workspace }) {
@@ -145,8 +147,8 @@ async function findResults(query, state, workspace) {
     ...fileRows,
     ...jobRows.map((job) => ["Aufgaben", job.task || job.id, `${job.status} - ${job.id}`, "automation", `${job.id} ${job.task} ${job.status}`, job.id]),
     ...chatRows,
-    ["Memory", "Memory/RAG", "Lokale Memory- und RAG-Notizen", "memory", `${state.memory || ""} ${state.rag || ""}`],
-    ...state.uploads.map((file) => ["Dateien", file.name, "Lokaler Upload", "files", `${file.name} ${file.type} ${file.preview || ""}`])
+    ["Memory", "Memory/RAG", t("Lokale Memory- und RAG-Notizen"), "memory", `${state.memory || ""} ${state.rag || ""}`],
+    ...state.uploads.map((file) => [t("Dateien"), file.name, "Lokaler Upload", "files", `${file.name} ${file.type} ${file.preview || ""}`])
   ];
   return [...STATIC_RESULTS, ...dynamic]
     .filter(([, label, detail,, text]) => `${label} ${detail} ${text}`.toLowerCase().includes(needle))
@@ -177,7 +179,7 @@ async function loadProjectFileRows(workspace, projectRows) {
       const pfad = String(file?.path || "").trim();
       if (!pfad) continue;
       const name = pfad.split("/").pop() || pfad;
-      rows.push(["Projekt-Dateien", name, `${projektName} · ${pfad}`, "files", `${pfad} ${projektName} ${file.contentType || ""}`]);
+      rows.push([t("Projekt-Dateien"), name, `${projektName} · ${pfad}`, "files", `${pfad} ${projektName} ${file.contentType || ""}`]);
     }
   }
   fileRowsCache = rows;
@@ -201,8 +203,8 @@ async function loadJobRows() {
 
 function renderResults(log, results, query) {
   log.replaceChildren();
-  if (!query.trim()) return log.append(empty("Suche über Chats, Projekte, Projekt-Dateien, Uploads und Verlauf. Enter öffnet den besten Treffer."));
-  if (!results.length) return log.append(empty("Keine lokalen Treffer. Nutze Browser/Quellen für die Websuche."));
+  if (!query.trim()) return log.append(empty(t("Suche über Chats, Projekte, Projekt-Dateien, Uploads und Verlauf. Enter öffnet den besten Treffer.")));
+  if (!results.length) return log.append(empty(t("Keine lokalen Treffer. Nutze Browser/Quellen für die Websuche.")));
   const groups = results.reduce((map, item) => map.set(item.group, [...(map.get(item.group) || []), item]), new Map());
   for (const [group, items] of groups.entries()) {
     const section = document.createElement("section");
