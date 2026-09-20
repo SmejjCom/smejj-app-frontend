@@ -9,7 +9,7 @@
 // Gruenden und Versand ist ein eigener Belang und ohne DOM pruefbar (GRUENDE, meldungsNutzlast).
 // Der Menuepunkt selbst steht in chat-actions-menu.js (act "report").
 import { metaOf, rawOf } from "/assets/chat-messages.js?v=3";
-import { toPlainText } from "/assets/chat-actions-menu.js?v=15";
+import { toPlainText } from "/assets/chat-actions-menu.js?v=16";
 import { showToast } from "/assets/components.js?v=b48";
 // :hover-Regeln im Stil unten (iPhone-Test 20.09.): styles.css faerbt jeden button bei :hover weiss, am Handy klebt
 // :hover an der zuletzt beruehrten Stelle — dort lag eben noch der Menuepunkt, die Grund-Zeile stand weiss und unlesbar da.
@@ -210,6 +210,56 @@ export async function nachsendeOffeneMeldungen() {
   return offen.length - rest.length;
 }
 
+// Auch im VOLLBILD melden koennen. Google hat am 20.09.2026 als Beleg genau diese Ansicht
+// mitgeschickt (IN_APP_EXPERIENCE-4924.png, viertes Bild): ein KI-Bild gross, daneben nur
+// "Herunterladen", "Teilen" und "Schliessen" — kein Weg, es zu melden. Google schreibt dazu:
+// "Dieses Problem tritt moeglicherweise auch an anderen Stellen auf."
+//
+// Der Knopf wird von HIER aus eingehaengt, nicht in chat-medien-ansicht.js: jene Datei liegt tief
+// im Importbaum (chat-medien -> chat-store -> chat-sync ...), und eine Aenderung dort zoege die
+// Marke jedes ladenden Moduls hoch — eine Kaskade ueber 30 Dateien fuer einen Knopf. Dieses Modul
+// ist ein Blatt, das niemand laedt: hier aendert sich sonst nichts.
+const VOLLBILD_KNOPF = "smejj-vollbild-melden";
+
+// Welcher Chat-Eintrag zuletzt angetippt wurde. Das Vollbild kennt seinen Ursprung nicht mehr
+// (es traegt nur eine Kopie des Bildes), und ueber das alt-Attribut zurueckzusuchen waere bei
+// zwei gleich betitelten Bildern falsch. Der Klick, der das Vollbild oeffnet, kommt in der
+// Erfassungsphase hier vorbei — das ist der verlaessliche Moment.
+let letzterEintrag = null;
+
+function ergaenzeVollbild(huelle) {
+  const leiste = huelle.querySelector(".smejj-vollbild-leiste");
+  if (!leiste || leiste.querySelector("." + VOLLBILD_KNOPF)) return;
+  const eintrag = letzterEintrag;
+  if (!eintrag?.isConnected) return;
+  const knopf = document.createElement("button");
+  knopf.type = "button";
+  knopf.className = VOLLBILD_KNOPF;
+  knopf.textContent = t("Melden");
+  knopf.title = t("Inhalt melden");
+  // Reihenfolge Herunterladen / Teilen / Melden / X. Das Kreuz ist der letzte Knopf der Leiste;
+  // ueber SEINEN Klick wird auch geschlossen, denn nur er raeumt Fokusfalle und Ueberlauf-Stil
+  // wieder auf — schliessen() in chat-medien-ansicht.js ist von aussen nicht erreichbar.
+  const zu = [...leiste.querySelectorAll("button")].pop();
+  leiste.insertBefore(knopf, zu || null);
+  knopf.addEventListener("click", () => {
+    zu?.click();
+    oeffneMeldeBlatt(eintrag);
+  });
+}
+
+function beobachteVollbild() {
+  if (typeof MutationObserver !== "function") return;
+  document.addEventListener("click", (ereignis) => {
+    const eintrag = ereignis.target?.closest?.("#startLog > .entry");
+    if (eintrag) letzterEintrag = eintrag;
+  }, true);
+  new MutationObserver(() => {
+    const huelle = document.querySelector(".smejj-vollbild");
+    if (huelle) ergaenzeVollbild(huelle);
+  }).observe(document.body, { childList: true });
+}
+
 export function initInhaltMelden() {
   if (document.documentElement.dataset.inhaltMelden === "an") return false;
   document.documentElement.dataset.inhaltMelden = "an";
@@ -222,6 +272,7 @@ export function initInhaltMelden() {
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     if (eintrag) oeffneMeldeBlatt(eintrag);
   });
+  beobachteVollbild();
   nachsendeOffeneMeldungen().catch(() => {});
   return true;
 }

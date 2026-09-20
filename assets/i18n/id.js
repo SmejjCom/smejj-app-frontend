@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "Lanjut bekerja offline",
   "Das geht gerade nicht": "Ini sedang tidak bisa digunakan",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "Membantu",
+  "Nicht hilfreich": "Tidak membantu",
   "Teilen": "Bagikan",
   "Anpinnen": "Sematkan",
   "Lösen": "Lepas sematan",

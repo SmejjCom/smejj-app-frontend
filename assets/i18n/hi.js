@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "ऑफ़लाइन काम जारी रखें",
   "Das geht gerade nicht": "यह अभी काम नहीं कर रहा",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "सहायक",
+  "Nicht hilfreich": "सहायक नहीं",
   "Teilen": "साझा करें",
   "Anpinnen": "पिन करें",
   "Lösen": "अनपिन करें",

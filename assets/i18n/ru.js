@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "Продолжить работу офлайн",
   "Das geht gerade nicht": "Сейчас это не работает",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "Полезно",
+  "Nicht hilfreich": "Бесполезно",
   "Teilen": "Поделиться",
   "Anpinnen": "Закрепить",
   "Lösen": "Открепить",

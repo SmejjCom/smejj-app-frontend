@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "Continua a lavorare offline",
   "Das geht gerade nicht": "Al momento non funziona",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "Utile",
+  "Nicht hilfreich": "Non utile",
   "Teilen": "Condividi",
   "Anpinnen": "Fissa",
   "Lösen": "Rimuovi",

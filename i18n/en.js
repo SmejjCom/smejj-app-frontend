@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "Keep working offline",
   "Das geht gerade nicht": "That doesn’t work right now",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "Helpful",
+  "Nicht hilfreich": "Not helpful",
   "Teilen": "Share",
   "Anpinnen": "Pin",
   "Lösen": "Unpin",

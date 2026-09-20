@@ -380,7 +380,11 @@ export function buildMenu(doc, meta, now = new Date()) {
     icon.setAttribute("aria-hidden", "true");
     icon.innerHTML = ICONS[item.icon] || "";
     const label = doc.createElement("span");
-    label.textContent = item.label;
+    // Durch t(), nicht roh: die Labels der ITEMS-Tabelle sind teils schon uebersetzt, teils nicht.
+    // "Inhalt melden" stand dadurch auch in einer englischen App auf Deutsch — und genau dieses
+    // Menue oeffnet der Google-Pruefer (Beleg IN_APP_EXPERIENCE-4924.png, Ablehnung 20.09.2026).
+    // t() gibt unbekannte Texte unveraendert zurueck, doppelt uebersetzen schadet also nicht.
+    label.textContent = t(item.label);
     button.append(icon, label);
     if (item.kachel) {
       if (!kachelReihe) {

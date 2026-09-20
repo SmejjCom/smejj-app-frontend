@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "오프라인으로 계속 작업",
   "Das geht gerade nicht": "지금은 사용할 수 없습니다",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "도움이 됨",
+  "Nicht hilfreich": "도움이 안 됨",
   "Teilen": "공유",
   "Anpinnen": "고정",
   "Lösen": "고정 해제",

@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "离线继续工作",
   "Das geht gerade nicht": "暂时无法使用",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "有帮助",
+  "Nicht hilfreich": "没有帮助",
   "Teilen": "分享",
   "Anpinnen": "置顶",
   "Lösen": "取消置顶",

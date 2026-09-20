@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "オフラインで作業を続ける",
   "Das geht gerade nicht": "現在ご利用いただけません",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "役に立った",
+  "Nicht hilfreich": "役に立たなかった",
   "Teilen": "共有",
   "Anpinnen": "ピン留め",
   "Lösen": "ピン留めを解除",

@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "Çevrimdışı çalışmaya devam et",
   "Das geht gerade nicht": "Bu şu anda çalışmıyor",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "Yararlı",
+  "Nicht hilfreich": "Yararsız",
   "Teilen": "Paylaş",
   "Anpinnen": "Sabitle",
   "Lösen": "Sabitlemeyi kaldır",

@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "مواصلة العمل دون اتصال",
   "Das geht gerade nicht": "هذا لا يعمل حاليًا",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "مفيد",
+  "Nicht hilfreich": "غير مفيد",
   "Teilen": "مشاركة",
   "Anpinnen": "تثبيت",
   "Lösen": "إلغاء التثبيت",

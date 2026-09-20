@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "অফলাইনে কাজ চালিয়ে যান",
   "Das geht gerade nicht": "এটি এখন কাজ করছে না",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "সহায়ক",
+  "Nicht hilfreich": "সহায়ক নয়",
   "Teilen": "শেয়ার করুন",
   "Anpinnen": "পিন করুন",
   "Lösen": "আনপিন করুন",

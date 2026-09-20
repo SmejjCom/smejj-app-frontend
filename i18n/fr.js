@@ -189,6 +189,8 @@ export default {
   "Offline weiterarbeiten": "Continuer à travailler hors ligne",
   "Das geht gerade nicht": "Cela ne fonctionne pas pour le moment",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
+  "Hilfreich": "Utile",
+  "Nicht hilfreich": "Pas utile",
   "Teilen": "Partager",
   "Anpinnen": "Épingler",
   "Lösen": "Désépingler",
