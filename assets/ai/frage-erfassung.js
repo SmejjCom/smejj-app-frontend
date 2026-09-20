@@ -19,6 +19,21 @@ import { bridgeAuthHeaders } from "/assets/ai/chat-stream.js";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";      // wie account-privacy.js
 const ERFASSUNGS_PFAD = CLIENT_ROUTES?.api?.trainingCapture || "/api/training/capture";
+
+/**
+ * Die Adresse der Erfassung — EINMAL mit Herkunft, nie doppelt.
+ *
+ * BEFUND 2026-09-20 (A-bis-Z-Test, live in Chrome): der Browser meldete einen Verstoss gegen
+ * connect-src fuer "https://api.smejj.comhttps//api.smejj.com/api/trai…". Seit dem 06.09. steht
+ * trainingCapture in config.js — und CLIENT_ROUTES macht JEDE Route dort bereits absolut. Hier
+ * wurde API_ORIGIN trotzdem noch einmal davorgesetzt. Die Adresse war damit ungueltig, der Aufruf
+ * wurde blockiert, und weil dieser Pfad Fehler bewusst verschluckt ("fehler_stumm"), fiel es
+ * zwei Wochen lang niemandem auf: die freiwillige Frage-Erfassung (nur mit bestaetigter
+ * Einwilligung) war seitdem wirkungslos. An Einwilligung und Inhalt aendert sich nichts.
+ */
+export function erfassungsAdresse(pfad = ERFASSUNGS_PFAD, herkunft = API_ORIGIN) {
+  return /^https?:\/\//i.test(String(pfad)) ? String(pfad) : `${herkunft}${pfad}`;
+}
 const ZEITBUDGET_MS = 6000;
 const MAX_ZEICHEN = 4000;
 const zuletzt = new Set();
@@ -67,7 +82,7 @@ export async function erfasseFrageFuersTraining(body, { fetchImpl = globalThis.f
     const abbruch = new AbortController();
     const wecker = setTimeout(() => abbruch.abort(), ZEITBUDGET_MS);
     try {
-      await fetchImpl(`${API_ORIGIN}${ERFASSUNGS_PFAD}`, {
+      await fetchImpl(erfassungsAdresse(), {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json", ...bridgeAuthHeaders(storage) },

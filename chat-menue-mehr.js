@@ -9,7 +9,7 @@
 // Anpinnen: im Browser pro Chat gemerkt (smejj.angepinnt.v1), nicht im Verlaufs-Speicher —
 // so bleiben chat-store.js und chat-messages.js mit ihren Cache-Marken unberuehrt.
 import { metaOf, rawOf } from "/assets/chat-messages.js?v=3";
-import { toPlainText } from "/assets/chat-actions-menu.js?v=11";
+import { toPlainText } from "/assets/chat-actions-menu.js?v=13";
 import { activeChatId, newChat } from "/assets/chat-store.js?v=b82";
 import { showToast } from "/assets/components.js?v=b48";
 
