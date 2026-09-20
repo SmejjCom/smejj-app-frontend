@@ -27,7 +27,7 @@ import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorsch
 import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-3";
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
 import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260918-4";
-import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
+import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-3";
 import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260909-9";
 // Gefunden 2026-08-18 beim Livetest: dieser Import FEHLTE, obwohl init() die
 // Funktion benutzt. Folge war kein kleiner Schoenheitsfehler — browser-pane.js

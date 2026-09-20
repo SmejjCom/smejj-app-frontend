@@ -2,6 +2,14 @@
 import zusatz from "./fr-2.js?v=1";
 
 export default {
+  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
+  "Auf der Seite suchen": "Rechercher dans la page",
+  "Vorheriger Treffer": "Résultat précédent",
+  "Nächster Treffer": "Résultat suivant",
+  "Suche schliessen": "Fermer la recherche",
+  "wird geprüft …": "vérification …",
+  "Google Login aktiv für": "Connexion Google active pour",
+  "von": "sur",
   // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "Espaces de travail",
   "Kostenschutz an": "Protection des coûts activée",

@@ -147,7 +147,7 @@ function gruppenTitel(art, gesamt, fertig) {
   const symbol = SCHRITT_SYMBOL[art] || "•";
   if (fertig >= gesamt) return `${symbol} ${gesamt} ${gesamt === 1 ? eins : viele} ✓`;
   const laeuft = art === "suche" ? t("Suche") : art === "seite" ? t("Lese") : eins;
-  return `${symbol} ${laeuft} … ${fertig} von ${gesamt}`;
+  return `${symbol} ${laeuft} … ${fertig} ${t("von")} ${gesamt}`;
 }
 
 /** Alle Schrittzeilen der Liste, ob in Gruppen oder (alt) direkt darin. */

@@ -2,6 +2,14 @@
 import zusatz from "./hi-2.js?v=1";
 
 export default {
+  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
+  "Auf der Seite suchen": "पेज पर खोजें",
+  "Vorheriger Treffer": "पिछला मिलान",
+  "Nächster Treffer": "अगला मिलान",
+  "Suche schliessen": "खोज बंद करें",
+  "wird geprüft …": "जाँच जारी …",
+  "Google Login aktiv für": "Google लॉगिन सक्रिय:",
+  "von": "में से",
   // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "कार्यक्षेत्र",
   "Kostenschutz an": "लागत सुरक्षा चालू",

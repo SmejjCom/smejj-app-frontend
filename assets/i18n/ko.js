@@ -2,6 +2,14 @@
 import zusatz from "./ko-2.js?v=1";
 
 export default {
+  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
+  "Auf der Seite suchen": "페이지에서 검색",
+  "Vorheriger Treffer": "이전 일치",
+  "Nächster Treffer": "다음 일치",
+  "Suche schliessen": "검색 닫기",
+  "wird geprüft …": "확인 중 …",
+  "Google Login aktiv für": "Google 로그인 활성:",
+  "von": "/",
   // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "작업 공간",
   "Kostenschutz an": "비용 보호 켜짐",

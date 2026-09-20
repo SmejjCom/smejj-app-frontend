@@ -2,6 +2,14 @@
 import zusatz from "./bn-2.js?v=1";
 
 export default {
+  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
+  "Auf der Seite suchen": "পৃষ্ঠায় খুঁজুন",
+  "Vorheriger Treffer": "আগের মিল",
+  "Nächster Treffer": "পরের মিল",
+  "Suche schliessen": "অনুসন্ধান বন্ধ করুন",
+  "wird geprüft …": "যাচাই চলছে …",
+  "Google Login aktiv für": "Google লগইন সক্রিয়:",
+  "von": "এর মধ্যে",
   // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "কর্মক্ষেত্র",
   "Kostenschutz an": "খরচ সুরক্ষা চালু",

@@ -1,3 +1,10 @@
+import { t } from "./i18n/ui.js?v=3";
+
+// Beschriftungen in HTML-Attributen IMMER escapen: Uebersetzungen tragen
+// Apostrophe und Anfuehrungszeichen (20.09.2026 live gemessen, als t("…") in
+// der Adressleiste woertlich stand).
+const a = (text) => String(t(text)).replace(/"/g, "&quot;");
+
 // smejj.com — Suche in der Seite (Cmd+F), wie Chromes Suchleiste.
 //
 // WARUM DAS NICHT TRIVIAL IST: Der Seiteninhalt liegt in einem abgeschotteten
@@ -60,11 +67,11 @@ export function baueSuchleiste(wurzel) {
   leiste.className = "bp-suche";
   leiste.hidden = true;
   leiste.innerHTML = `
-    <input class="bp-suche-feld" type="text" placeholder="Auf der Seite suchen" aria-label="Auf der Seite suchen">
+    <input class="bp-suche-feld" type="text" placeholder="${a("Auf der Seite suchen")}" aria-label="${a("Auf der Seite suchen")}">
     <span class="bp-suche-zahl" aria-live="polite">0/0</span>
-    <button class="bp-suche-hoch" type="button" title="Vorheriger Treffer" aria-label="Vorheriger Treffer">‹</button>
-    <button class="bp-suche-runter" type="button" title="Nächster Treffer" aria-label="Nächster Treffer">›</button>
-    <button class="bp-suche-zu" type="button" title="Suche schliessen" aria-label="Suche schliessen">×</button>`;
+    <button class="bp-suche-hoch" type="button" title="${a("Vorheriger Treffer")}" aria-label="${a("Vorheriger Treffer")}">‹</button>
+    <button class="bp-suche-runter" type="button" title="${a("Nächster Treffer")}" aria-label="${a("Nächster Treffer")}">›</button>
+    <button class="bp-suche-zu" type="button" title="${a("Suche schliessen")}" aria-label="${a("Suche schliessen")}">×</button>`;
   wurzel.appendChild(leiste);
   return leiste;
 }

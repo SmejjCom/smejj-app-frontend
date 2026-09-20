@@ -2,6 +2,14 @@
 import zusatz from "./ja-2.js?v=1";
 
 export default {
+  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
+  "Auf der Seite suchen": "ページ内を検索",
+  "Vorheriger Treffer": "前の一致",
+  "Nächster Treffer": "次の一致",
+  "Suche schliessen": "検索を閉じる",
+  "wird geprüft …": "確認中 …",
+  "Google Login aktiv für": "Google ログイン有効:",
+  "von": "／",
   // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "ワークスペース",
   "Kostenschutz an": "コスト保護オン",

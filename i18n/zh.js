@@ -2,6 +2,14 @@
 import zusatz from "./zh-2.js?v=1";
 
 export default {
+  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
+  "Auf der Seite suchen": "在页面中查找",
+  "Vorheriger Treffer": "上一个匹配",
+  "Nächster Treffer": "下一个匹配",
+  "Suche schliessen": "关闭搜索",
+  "wird geprüft …": "检查中 …",
+  "Google Login aktiv für": "Google 登录已启用:",
+  "von": "/",
   // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "工作区",
   "Kostenschutz an": "费用保护已开启",

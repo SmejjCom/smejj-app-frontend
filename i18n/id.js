@@ -2,6 +2,14 @@
 import zusatz from "./id-2.js?v=1";
 
 export default {
+  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
+  "Auf der Seite suchen": "Cari di halaman",
+  "Vorheriger Treffer": "Hasil sebelumnya",
+  "Nächster Treffer": "Hasil berikutnya",
+  "Suche schliessen": "Tutup pencarian",
+  "wird geprüft …": "memeriksa …",
+  "Google Login aktiv für": "Masuk dengan Google aktif untuk",
+  "von": "dari",
   // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "Ruang kerja",
   "Kostenschutz an": "Perlindungan biaya aktif",

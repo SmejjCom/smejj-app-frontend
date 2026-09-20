@@ -100,7 +100,7 @@ export function refreshLocalWorkspaceStatus(deps) {
   // Platzhalter bis /api/health bzw. /api/storage/status geantwortet haben
   // (app.js refreshLiveSystemStatus). Vorher stand hier der interne Code
   // "presigned-sync-not-configured" — irrefuehrend, der Speicher ist eingerichtet.
-  setText("#idriveStatusText", "wird geprüft …");
+  setText("#idriveStatusText", t("wird geprüft …"));
   setText("#aiModeText", status.aiMode);
   setText("#costStatusText", status.costStatus);
   setText("#syncStatusText", status.syncStatus);

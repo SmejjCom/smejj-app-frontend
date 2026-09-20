@@ -14,6 +14,7 @@ import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js";
 import { PROJECT_ROLES } from "/assets/storage/index.js";
 import { getJson, postJson } from "./shared/http-json.js";
 import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=1";
+import { t } from "./i18n/ui.js?v=3";
 
 export async function initGoogleLogin(deps) {
   const { $, state, writeOutput, refreshSessionStatus } = deps;
@@ -140,7 +141,7 @@ function showSignedIn(user, deps) {
   };
   localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));
   refreshSessionStatus();
-  writeOutput("#profileOutput", `Google Login aktiv für ${user.email}.`);
+  writeOutput("#profileOutput", `${t("Google Login aktiv für")} ${user.email}.`);
 }
 
 function loadGoogleIdentity() {

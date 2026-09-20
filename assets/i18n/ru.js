@@ -2,6 +2,14 @@
 import zusatz from "./ru-2.js?v=1";
 
 export default {
+  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
+  "Auf der Seite suchen": "Искать на странице",
+  "Vorheriger Treffer": "Предыдущее совпадение",
+  "Nächster Treffer": "Следующее совпадение",
+  "Suche schliessen": "Закрыть поиск",
+  "wird geprüft …": "проверяется …",
+  "Google Login aktiv für": "Вход через Google активен для",
+  "von": "из",
   // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "Рабочие пространства",
   "Kostenschutz an": "Защита от расходов включена",

@@ -2,6 +2,14 @@
 import zusatz from "./tr-2.js?v=1";
 
 export default {
+  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
+  "Auf der Seite suchen": "Sayfada ara",
+  "Vorheriger Treffer": "Önceki sonuç",
+  "Nächster Treffer": "Sonraki sonuç",
+  "Suche schliessen": "Aramayı kapat",
+  "wird geprüft …": "denetleniyor …",
+  "Google Login aktiv für": "Google oturumu etkin:",
+  "von": "/",
   // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "Çalışma alanları",
   "Kostenschutz an": "Maliyet koruması açık",

@@ -2,6 +2,14 @@
 import zusatz from "./ar-2.js?v=1";
 
 export default {
+  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
+  "Auf der Seite suchen": "البحث في الصفحة",
+  "Vorheriger Treffer": "النتيجة السابقة",
+  "Nächster Treffer": "النتيجة التالية",
+  "Suche schliessen": "إغلاق البحث",
+  "wird geprüft …": "جارٍ الفحص …",
+  "Google Login aktiv für": "تسجيل الدخول عبر Google مفعّل لـ",
+  "von": "من",
   // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "مساحات العمل",
   "Kostenschutz an": "الحماية من التكاليف مفعّلة",
