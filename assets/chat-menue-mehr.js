@@ -203,6 +203,10 @@ export function uebersetzeMenue(menu, uebersetze = t) {
   if (!menu || menu.dataset.sprache === "an") return 0;
   menu.dataset.sprache = "an";
   let zahl = 0;
+  // Kopfzeile "Heute, 17:36 · Auto": nur das fuehrende Wort ist Sprache, der Rest Uhrzeit und Modell.
+  const kopf = menu.querySelector(".msg-menu-head");
+  const tag = /^(Heute|Gestern)\b/.exec(kopf?.textContent || "")?.[1];
+  if (tag) kopf.textContent = uebersetze(tag) + kopf.textContent.slice(tag.length);
   const hilfe = menu.getAttribute("aria-label");
   if (hilfe) menu.setAttribute("aria-label", uebersetze(hilfe));
   for (const knopf of menu.querySelectorAll("[data-act]")) {
