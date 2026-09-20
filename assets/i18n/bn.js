@@ -2,6 +2,9 @@
 import zusatz from "./bn-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "লোড করা থামান",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "খুঁজুন বা ঠিকানা লিখুন — যত ট্যাব দরকার তত।",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "ডাউনলোড",
   "Bild im Vollbild": "পূর্ণ পর্দায় ছবি",

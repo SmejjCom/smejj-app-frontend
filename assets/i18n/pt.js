@@ -2,6 +2,9 @@
 import zusatz from "./pt-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "Parar o carregamento",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Pesquisa ou escreve um endereço — tantos separadores quantos precisares.",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "Transferir",
   "Bild im Vollbild": "Imagem em ecrã inteiro",

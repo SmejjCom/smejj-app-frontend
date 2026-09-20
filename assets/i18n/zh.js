@@ -2,6 +2,9 @@
 import zusatz from "./zh-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "停止加载",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "搜索或输入网址 — 标签页想开多少就开多少。",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "下载",
   "Bild im Vollbild": "全屏图片",

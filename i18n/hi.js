@@ -2,6 +2,9 @@
 import zusatz from "./hi-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "लोड करना रोकें",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "खोजें या पता दर्ज करें — जितने टैब चाहिए उतने।",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "डाउनलोड",
   "Bild im Vollbild": "पूर्ण स्क्रीन में छवि",

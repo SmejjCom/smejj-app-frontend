@@ -2,6 +2,9 @@
 import zusatz from "./it-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "Interrompi il caricamento",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Cerca o inserisci un indirizzo: tutte le schede che ti servono.",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "Scarica",
   "Bild im Vollbild": "Immagine a schermo intero",

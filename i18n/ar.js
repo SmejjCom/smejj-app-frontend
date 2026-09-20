@@ -2,6 +2,9 @@
 import zusatz from "./ar-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "إيقاف التحميل",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "ابحث أو أدخل عنواناً — بقدر ما تحتاج من علامات التبويب.",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "تنزيل",
   "Bild im Vollbild": "صورة بملء الشاشة",

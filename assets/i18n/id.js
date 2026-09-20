@@ -2,6 +2,9 @@
 import zusatz from "./id-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "Hentikan pemuatan",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Cari atau masukkan alamat — sebanyak tab yang kamu perlukan.",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "Unduh",
   "Bild im Vollbild": "Gambar layar penuh",

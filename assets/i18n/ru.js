@@ -2,6 +2,9 @@
 import zusatz from "./ru-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "Остановить загрузку",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Поиск или адрес — столько вкладок, сколько нужно.",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "Скачать",
   "Bild im Vollbild": "Изображение во весь экран",

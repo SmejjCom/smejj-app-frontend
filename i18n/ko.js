@@ -2,6 +2,9 @@
 import zusatz from "./ko-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "불러오기 중지",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "검색하거나 주소를 입력하세요 — 탭은 필요한 만큼.",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "내려받기",
   "Bild im Vollbild": "전체 화면 이미지",

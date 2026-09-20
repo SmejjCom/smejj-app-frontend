@@ -2,6 +2,9 @@
 import zusatz from "./en-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "Stop loading",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Search or enter an address — as many tabs as you need.",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "Download",
   "Bild im Vollbild": "Image in full screen",

@@ -2,6 +2,9 @@
 import zusatz from "./ja-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "読み込みを中止",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "検索するかアドレスを入力 — 必要なだけタブを開けます。",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "ダウンロード",
   "Bild im Vollbild": "全画面の画像",

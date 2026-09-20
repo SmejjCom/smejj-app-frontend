@@ -65,6 +65,23 @@ function writeCache(language, bundle) {
   } catch { /* fail-safe: Cache ist optional */ }
 }
 
+// Sagt der Oberflaeche Bescheid, dass ab JETZT uebersetzt wird.
+//
+// WARUM (gemessen 20.09.2026 mit leerem Speicher): Beim ERSTEN Besuch in einer
+// neuen Sprache gibt es keinen Cache. t() liefert dann so lange den deutschen
+// Quelltext, bis die Sprachdatei nachgeladen ist — bewusst, weil ein
+// Top-Level-Await die ganze Seite anhalten wuerde. Wer in diesem Fenster schon
+// gerendert hat, steht aber fuer immer auf Deutsch. Dieses Ereignis ist der
+// billige Ausweg: wer es hoert, zeichnet seine Beschriftungen einmal nach.
+// Fail-safe: ohne document passiert nichts, ein Fehler im Zuhoerer darf den
+// Sprachwechsel nicht kippen.
+function meldeSprache(sprache) {
+  try {
+    if (typeof document === "undefined") return;
+    document.dispatchEvent(new CustomEvent("smejj:sprache", { detail: { sprache } }));
+  } catch { /* fail-safe: das Ereignis ist eine Zugabe, keine Bedingung */ }
+}
+
 // Laedt die Sprachdatei der gewuenschten Sprache; fail-safe auf Deutsch.
 export async function loadUiLanguage(language) {
   const next = SUPPORTED.has(language) ? language : SOURCE_LANGUAGE;
@@ -72,6 +89,7 @@ export async function loadUiLanguage(language) {
     currentLanguage = SOURCE_LANGUAGE;
     messages = null;
     writeCache(SOURCE_LANGUAGE, null);
+    meldeSprache(currentLanguage);
     return currentLanguage;
   }
   try {
@@ -83,6 +101,7 @@ export async function loadUiLanguage(language) {
     messages = null;
     currentLanguage = SOURCE_LANGUAGE;
   }
+  meldeSprache(currentLanguage);
   return currentLanguage;
 }
 

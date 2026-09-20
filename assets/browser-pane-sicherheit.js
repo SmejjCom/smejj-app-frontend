@@ -1,3 +1,4 @@
+import { t } from "./i18n/ui.js?v=3";
 // smejj.com — Sicherheitsanzeige der Adressleiste, wie Chromes Schloss.
 //
 // WARUM DAS MEHR IST ALS EIN SYMBOL: Seit die Adresse gekuerzt angezeigt wird
@@ -163,7 +164,7 @@ export function zeigeNeuladen(knopf, laedt) {
   if (!knopf) return;
   // Chrome nennt im Tooltip das Kuerzel. Genannt wird nur, was es hier
   // wirklich gibt: Cmd+R ist verdrahtet, fuer den Abbruch gibt es keins.
-  const text = laedt ? "Laden abbrechen" : "Diese Seite neu laden (⌘R)";
+  const text = laedt ? t("Laden abbrechen") : t("Diese Seite neu laden (⌘R)");
   knopf.title = text;
   knopf.setAttribute("aria-label", text);
   knopf.innerHTML = laedt

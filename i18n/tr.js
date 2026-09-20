@@ -2,6 +2,9 @@
 import zusatz from "./tr-2.js?v=1";
 
 export default {
+  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
+  "Laden abbrechen": "Yüklemeyi durdur",
+  "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Ara ya da bir adres gir — ihtiyacın kadar sekme.",
   // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "İndir",
   "Bild im Vollbild": "Tam ekran görsel",

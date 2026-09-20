@@ -16,7 +16,7 @@
 // die KI schreibt — Chatverlauf, Schrittzeilen, Code-Editor, Eingabefelder.
 // Dort stünde eine "Übersetzung" gegen den Inhalt. Die Sperrliste unten ist
 // deshalb die wichtigste Zeile dieser Datei.
-import { t, uiLanguage } from "./i18n/ui.js?v=3";
+import { t, savedUiLanguage } from "./i18n/ui.js?v=3";
 
 /** Teilbäume mit Nutzer- oder Modell-Inhalt: nie anfassen. */
 const GESPERRT = [
@@ -74,7 +74,12 @@ export function uebersetzeHuelle(wurzel = document.body, doc = document) {
  * rendern spät, deferred-start baut Teile der Hülle erst nach dem ersten Bild).
  */
 export function beobachteHuelle(doc = document) {
-  if (String(uiLanguage() || "de").toLowerCase().startsWith("de")) return null;
+  // GEMESSEN 20.09.2026 mit leerem Speicher: Beim ERSTEN Besuch in einer neuen
+  // Sprache steht uiLanguage() noch auf "de" — die Sprachdatei laedt erst im
+  // Hintergrund. Wer hier uiLanguage() fragt, steigt genau bei den Nutzern aus,
+  // fuer die dieses Modul gebaut ist, und haengt nie die Wache ein: die Huelle
+  // bliebe die ganze Sitzung deutsch. Die GESPEICHERTE Wahl ist die Wahrheit.
+  if (String(savedUiLanguage() || "de").toLowerCase().startsWith("de")) return null;
   const huelle = doc.querySelector("main.shell") || doc.body;
   if (!huelle) return null;
   let takt = 0;
@@ -88,4 +93,10 @@ export function beobachteHuelle(doc = document) {
 if (typeof document !== "undefined" && document.getElementById("startMessage")) {
   beobachteHuelle();
   for (const ms of [1500, 4000]) setTimeout(() => uebersetzeHuelle(document.querySelector("main.shell") || document.body), ms);
+  // Sobald die Sprachdatei wirklich da ist, einmal nachziehen: was vor dem
+  // Nachladen gezeichnet wurde, traegt sonst bis zum naechsten Neuladen den
+  // deutschen Quelltext. Kostet einen Durchlauf, spart einen Fehlbericht.
+  document.addEventListener("smejj:sprache", () => {
+    uebersetzeHuelle(document.querySelector("main.shell") || document.body);
+  });
 }
