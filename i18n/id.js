@@ -2,6 +2,11 @@
 import zusatz from "./id-2.js?v=1";
 
 export default {
+  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
+  "Treffer": "hasil",
+  "nichts gefunden": "tidak ada hasil",
+  "läuft …": "berjalan …",
+  "Integrierter Browser": "Peramban bawaan",
   // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "Tutup (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "Serahkan ke tetikus — ia yang mengoperasikan peramban ini",

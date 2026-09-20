@@ -2,6 +2,11 @@
 import zusatz from "./bn-2.js?v=1";
 
 export default {
+  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
+  "Treffer": "ফলাফল",
+  "nichts gefunden": "কিছু পাওয়া যায়নি",
+  "läuft …": "চলছে …",
+  "Integrierter Browser": "অন্তর্নির্মিত ব্রাউজার",
   // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "বন্ধ করুন (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "মাউসকে দায়িত্ব দিন — এটি এই ব্রাউজার চালায়",

@@ -2,6 +2,11 @@
 import zusatz from "./ja-2.js?v=1";
 
 export default {
+  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
+  "Treffer": "件",
+  "nichts gefunden": "見つかりません",
+  "läuft …": "実行中 …",
+  "Integrierter Browser": "内蔵ブラウザー",
   // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "閉じる (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "マウスに任せる — このブラウザーを操作します",

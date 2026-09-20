@@ -2,6 +2,11 @@
 import zusatz from "./ru-2.js?v=1";
 
 export default {
+  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
+  "Treffer": "совпадений",
+  "nichts gefunden": "ничего не найдено",
+  "läuft …": "выполняется …",
+  "Integrierter Browser": "Встроенный браузер",
   // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "Закрыть (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "Поручите мыши — она управляет этим браузером",

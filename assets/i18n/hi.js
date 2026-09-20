@@ -2,6 +2,11 @@
 import zusatz from "./hi-2.js?v=1";
 
 export default {
+  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
+  "Treffer": "परिणाम",
+  "nichts gefunden": "कुछ नहीं मिला",
+  "läuft …": "चल रहा है …",
+  "Integrierter Browser": "अंतर्निहित ब्राउज़र",
   // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "बंद करें (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "माउस को सौंपें — यह इस ब्राउज़र को चलाता है",

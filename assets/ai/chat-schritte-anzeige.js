@@ -62,7 +62,11 @@ function sichereSchrittUrl(text) {
  * zusammengeklebt, damit Modellausgabe niemals Markup werden kann.
  */
 function beschrifteZeile(zeile, schritt) {
-  const art = schritt.art === "suche" ? t("Suche") : schritt.art === "seite" ? t("Lese") : schritt.art;
+  // "bild" fiel bis zum 20.09.2026 ROH durch und stand als "• bild:" in einer
+  // englischen Oberflaeche. Unbekannte Arten bleiben absichtlich roh: das ist
+  // dann ein Maschinenwort des Servers, kein Oberflaechentext.
+  const artWort = { suche: t("Suche"), seite: t("Lese"), bild: t("Bild") };
+  const art = artWort[schritt.art] || schritt.art;
   zeile.textContent = `${SCHRITT_SYMBOL[schritt.art] || "•"} ${art}: `;
   const ziel = sichereSchrittUrl(schritt.text);
   const teil = document.createElement(ziel ? "a" : "span");
@@ -232,13 +236,15 @@ export function zeigeSchritt(output, schritt) {
   // Treffer, sie ist gelesen oder nicht — bis 2026-09-04 stand hinter einer
   // erfolgreich gelesenen Seite "nichts gefunden" (Zaehlung kannte die Art
   // nicht, siehe zaehleTreffer im Control-Server).
+  // `schritt.stand` kommt vom Server und bleibt, wie er kommt — alles andere
+  // schreibt die Oberflaeche und geht darum durch t().
   anhang.textContent = fertig
     ? (schritt.stand
         ? ` ✓ ${schritt.stand}`
         : schritt.treffer > 0
-          ? (schritt.art === "seite" ? " ✓ gelesen" : ` ✓ ${schritt.treffer} Treffer`)
-          : " ✓ nichts gefunden")
-    : ` ${schritt.stand || "läuft …"}`;
+          ? (schritt.art === "seite" ? ` ✓ ${t("gelesen")}` : ` ✓ ${schritt.treffer} ${t("Treffer")}`)
+          : ` ✓ ${t("nichts gefunden")}`)
+    : ` ${schritt.stand || t("läuft …")}`;
   zeile.append(anhang);
   if (zeile.parentElement?.dataset?.gruppe === "true") aktualisiereGruppe(zeile.parentElement);
   // Bild-Platzhalter: waehrend der Bild-Maler arbeitet, schimmert eine leere

@@ -2,6 +2,11 @@
 import zusatz from "./ko-2.js?v=1";
 
 export default {
+  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
+  "Treffer": "건",
+  "nichts gefunden": "찾지 못함",
+  "läuft …": "진행 중 …",
+  "Integrierter Browser": "내장 브라우저",
   // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "닫기 (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "마우스에게 맡기기 — 이 브라우저를 대신 조작합니다",

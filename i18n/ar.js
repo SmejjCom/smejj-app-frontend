@@ -2,6 +2,11 @@
 import zusatz from "./ar-2.js?v=1";
 
 export default {
+  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
+  "Treffer": "نتيجة",
+  "nichts gefunden": "لم يُعثر على شيء",
+  "läuft …": "قيد التنفيذ …",
+  "Integrierter Browser": "المتصفح المدمج",
   // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "إغلاق (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "كلّف الفأرة — فهي تتولى تشغيل هذا المتصفح",

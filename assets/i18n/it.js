@@ -2,6 +2,11 @@
 import zusatz from "./it-2.js?v=1";
 
 export default {
+  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
+  "Treffer": "risultati",
+  "nichts gefunden": "nessun risultato",
+  "läuft …": "in corso …",
+  "Integrierter Browser": "Browser integrato",
   // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "Chiudi (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "Incarica il mouse: usa lui questo browser",

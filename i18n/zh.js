@@ -2,6 +2,11 @@
 import zusatz from "./zh-2.js?v=1";
 
 export default {
+  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
+  "Treffer": "条结果",
+  "nichts gefunden": "未找到",
+  "läuft …": "进行中 …",
+  "Integrierter Browser": "内置浏览器",
   // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "关闭 (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "交给鼠标 — 由它操作这个浏览器",

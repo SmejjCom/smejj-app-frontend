@@ -2,6 +2,11 @@
 import zusatz from "./tr-2.js?v=1";
 
 export default {
+  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
+  "Treffer": "sonuç",
+  "nichts gefunden": "bir şey bulunamadı",
+  "läuft …": "çalışıyor …",
+  "Integrierter Browser": "Yerleşik tarayıcı",
   // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "Kapat (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "Fareyi görevlendir — bu tarayıcıyı o kullanır",
