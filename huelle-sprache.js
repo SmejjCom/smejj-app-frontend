@@ -1,0 +1,91 @@
+// smejj.com — die App-Hülle spricht die Sprache des Nutzers.
+//
+// WARUM ES DIESES MODUL GIBT (Inventur 20.09.2026): Die Beschriftungen der
+// Hülle — Spur, Werkzeugleiste, Browser-Fenster, Modell-Menü, Vorlese- und
+// Titel-Texte — stehen fest auf Deutsch in index.html. Die Datei liegt unter
+// dem Start-Lock; jede Änderung am Markup braucht eine schriftliche Freigabe
+// und einen neuen Stempel. Darum übersetzt dieses Modul zur Laufzeit, genau
+// wie es profile-dock-menu.js für das Profilmenü tut: Quelle bleibt das
+// deutsche Markup, Schlüssel ist der deutsche Text, Ziel ist t().
+//
+// FAIL-SAFE: Ersetzt wird nur, wenn es für den deutschen Text wirklich eine
+// Übersetzung gibt (t() liefert sonst den Quelltext zurück). Eine fehlende
+// Übersetzung lässt den deutschen Text stehen — nie eine leere Beschriftung.
+//
+// WAS ES BEWUSST NICHT ANFASST: alles, was der Nutzer selbst erzeugt oder was
+// die KI schreibt — Chatverlauf, Schrittzeilen, Code-Editor, Eingabefelder.
+// Dort stünde eine "Übersetzung" gegen den Inhalt. Die Sperrliste unten ist
+// deshalb die wichtigste Zeile dieser Datei.
+import { t, uiLanguage } from "./i18n/ui.js?v=3";
+
+/** Teilbäume mit Nutzer- oder Modell-Inhalt: nie anfassen. */
+const GESPERRT = [
+  "#startLog", ".start-log", ".chat-log", "[data-smejj-schritte]", ".chat-schritte",
+  "#codeEditor", ".code-flaeche", "#voiceModeTranscript", "#voiceModeReply",
+  "[data-keine-uebersetzung]"
+];
+const GESPERRTE_TAGS = new Set(["SCRIPT", "STYLE", "TEXTAREA", "PRE", "CODE", "KBD", "SVG", "PATH"]);
+const ATTRIBUTE = ["aria-label", "title", "placeholder"];
+
+function gesperrt(el) {
+  return GESPERRT.some((wahl) => el.closest?.(wahl));
+}
+
+/** Nur kurze, wortartige Beschriftungen — keine URLs, kein Code, keine Zahlen. */
+function beschriftung(text) {
+  const kern = String(text || "").trim();
+  if (kern.length < 2 || kern.length > 120) return "";
+  if (/^https?:|^[/.]|^[{<[]/.test(kern)) return "";
+  if (!/[A-Za-zÄÖÜäöüß]{2}/.test(kern)) return "";
+  return kern;
+}
+
+/**
+ * Übersetzt die sichtbaren Beschriftungen eines Teilbaums.
+ * Output: Zahl der Änderungen — damit Tests und Diagnose etwas zu messen haben.
+ */
+export function uebersetzeHuelle(wurzel = document.body, doc = document) {
+  if (!wurzel) return 0;
+  let n = 0;
+  for (const el of [wurzel, ...wurzel.querySelectorAll("*")]) {
+    if (!el.tagName || GESPERRTE_TAGS.has(el.tagName) || gesperrt(el)) continue;
+    for (const name of ATTRIBUTE) {
+      const wert = beschriftung(el.getAttribute?.(name));
+      if (!wert) continue;
+      const neu = t(wert);
+      if (neu && neu !== wert) { el.setAttribute(name, neu); n += 1; }
+    }
+    // Nur der erste eigene Textknoten: so bleibt ein Wert-Span daneben stehen
+    // (dieselbe Falle wie im Profilmenü, wo textContent den Plan gelöscht hat).
+    for (const knoten of el.childNodes) {
+      if (knoten.nodeType !== 3) continue;
+      const wert = beschriftung(knoten.textContent);
+      if (!wert) continue;
+      const neu = t(wert);
+      if (neu && neu !== wert) { knoten.textContent = knoten.textContent.replace(wert, neu); n += 1; }
+      break;
+    }
+  }
+  return n;
+}
+
+/**
+ * Hängt sich an die Hülle: einmal sofort, danach bei jeder Änderung (Ansichten
+ * rendern spät, deferred-start baut Teile der Hülle erst nach dem ersten Bild).
+ */
+export function beobachteHuelle(doc = document) {
+  if (String(uiLanguage() || "de").toLowerCase().startsWith("de")) return null;
+  const huelle = doc.querySelector("main.shell") || doc.body;
+  if (!huelle) return null;
+  let takt = 0;
+  const nachziehen = () => { clearTimeout(takt); takt = setTimeout(() => uebersetzeHuelle(huelle, doc), 120); };
+  const wache = new MutationObserver(nachziehen);
+  wache.observe(huelle, { childList: true, subtree: true });
+  uebersetzeHuelle(huelle, doc);
+  return wache;
+}
+
+if (typeof document !== "undefined" && document.getElementById("startMessage")) {
+  beobachteHuelle();
+  for (const ms of [1500, 4000]) setTimeout(() => uebersetzeHuelle(document.querySelector("main.shell") || document.body), ms);
+}

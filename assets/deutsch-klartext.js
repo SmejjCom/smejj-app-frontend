@@ -5,6 +5,8 @@
 // dieses Startmodul dieselben Texte zur Laufzeit — genau wie start-chips.js die Chips
 // übersetzt. Läuft das Skript, findet das Modul nichts mehr zu tun (idempotent).
 // Nur Texte und Tooltips: keine ids, keine data-Attribute, keine Verdrahtung.
+import { uiLanguage } from "./i18n/ui.js?v=3";
+
 export const TEXTE = [
   // Nr. 7 — Deutsch durchgängig
   { wahl: '[data-view="arbeitsbereiche"]', text: "Projekte", title: "Projekte", nur: "Projects" },
@@ -27,6 +29,10 @@ export const TEXTE = [
 
 /** Setzt die Texte; ändert nur, was noch den alten Wortlaut trägt. Output: Zahl der Änderungen. */
 export function setzeKlartext(doc = document) {
+  // Dieselbe Sperre wie bei deutscheWoerter: die Tabelle ersetzt englische
+  // Beschriftungen durch deutsche und darf darum nur laufen, wenn die
+  // Oberfläche wirklich deutsch ist (Befund 20.09.2026).
+  if (!oberflaecheDeutsch(doc)) return 0;
   let n = 0;
   for (const e of TEXTE) {
     let ziel = doc.querySelector(e.wahl);
@@ -104,8 +110,25 @@ export function deutschesWort(text) {
   return String(text).replace(kern, WOERTER[kern]);
 }
 
-/** Ist die Oberfläche deutsch? Quelle ist Deutsch, andere Sprachen setzen <html lang>. */
+/**
+ * Ist die Oberfläche deutsch?
+ *
+ * BIS ZUM 20.09.2026 wurde dafür <html lang> gelesen — und genau das war der
+ * Fehler: i18n/ui.js setzt lang und dir AUSDRÜCKLICH NUR auf Oberflächen-Ebene,
+ * niemals global, damit die start-gelockte Startseite unberührt bleibt. <html>
+ * steht also immer auf "de". Dieses Modul hielt darum JEDE Sprache für Deutsch
+ * und germanisierte die englische Oberfläche wieder zurück ("Projects" →
+ * "Projekte", "Capabilities" → "Fähigkeiten", das ganze Modell-Menü).
+ * Gemessen im iPhone-Simulator mit englischer Oberfläche.
+ *
+ * Jetzt entscheidet die Sprach-Laufzeit; <html lang> bleibt nur Rückfallebene,
+ * falls das Modul ohne sie geladen wird (Tests reichen ein eigenes Dokument).
+ */
 export function oberflaecheDeutsch(doc = document) {
+  try {
+    const gewaehlt = String(uiLanguage() || "").toLowerCase();
+    if (gewaehlt) return gewaehlt.startsWith("de");
+  } catch { /* ohne Laufzeit: unten weiter */ }
   const lang = String(doc.documentElement?.getAttribute("lang") || "de").toLowerCase();
   return lang === "" || lang.startsWith("de");
 }

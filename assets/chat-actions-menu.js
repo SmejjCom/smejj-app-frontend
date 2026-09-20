@@ -34,6 +34,9 @@ if (typeof document !== "undefined") {
   import("/assets/kompakt.js").catch(() => {});
   // Deutsch durchgaengig + Modell-Chips erklaert (UI/UX 02.09., Nr. 7+8) — nur auf der Startseite.
   if (start) import("/assets/deutsch-klartext.js").catch(() => {});
+  // Huelle in der Sprache des Nutzers (Inventur 20.09.2026): index.html liegt unter
+  // dem Start-Lock, darum uebersetzt huelle-sprache.js die Beschriftungen zur Laufzeit.
+  if (start) import("/assets/huelle-sprache.js?v=1").catch(() => {});
   // Erste-Schritte-Karten (UI/UX 02.09., Nr. 9) — nur Startseite und nur, solange nicht weggeklickt.
   if (start && !kartenWeg) import("/assets/erste-schritte.js").catch(() => {});
   // Woerter unter den Symbolen (UI/UX 02.09., Nr. 4) und Werkzeugzeile in einer Zeile (03.09.) — nur am Handy.

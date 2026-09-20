@@ -9,7 +9,7 @@
 // Gruenden und Versand ist ein eigener Belang und ohne DOM pruefbar (GRUENDE, meldungsNutzlast).
 // Der Menuepunkt selbst steht in chat-actions-menu.js (act "report").
 import { metaOf, rawOf } from "/assets/chat-messages.js?v=3";
-import { toPlainText } from "/assets/chat-actions-menu.js?v=14";
+import { toPlainText } from "/assets/chat-actions-menu.js?v=15";
 import { showToast } from "/assets/components.js?v=b48";
 // :hover-Regeln im Stil unten (iPhone-Test 20.09.): styles.css faerbt jeden button bei :hover weiss, am Handy klebt
 // :hover an der zuletzt beruehrten Stelle — dort lag eben noch der Menuepunkt, die Grund-Zeile stand weiss und unlesbar da.
