@@ -1,5 +1,18 @@
 // smejj.com — UI-Uebersetzung 한국어 (Quellsprache Deutsch als Schluessel).
 export default {
+  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
+  "smejj.com — KI- und Code-Assistent": "smejj.com — AI 및 코드 어시스턴트",
+  "Agenten-Arbeitsbereich": "에이전트 작업 공간",
+  "Verlauf": "기록",
+  "Lokaler Browser": "로컬 브라우저",
+  "Dateien": "파일",
+  "Wo deine Sachen liegen": "내 자료가 저장되는 곳",
+  "Was smejj sich merkt": "smejj가 기억하는 것",
+  "Kostenschutz": "비용 보호",
+  "Wo deine Einstellungen liegen": "설정이 있는 곳",
+  "Projekte": "프로젝트",
+  "Offline weiterarbeiten": "오프라인으로 계속 작업",
+  "Das geht gerade nicht": "지금은 사용할 수 없습니다",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Teilen": "공유",
   "Anpinnen": "고정",

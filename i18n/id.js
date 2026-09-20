@@ -1,5 +1,18 @@
 // smejj.com — UI-Uebersetzung Bahasa Indonesia (Quellsprache Deutsch als Schluessel).
 export default {
+  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
+  "smejj.com — KI- und Code-Assistent": "smejj.com — Asisten AI dan kode",
+  "Agenten-Arbeitsbereich": "Ruang kerja agen",
+  "Verlauf": "Riwayat",
+  "Lokaler Browser": "Browser lokal",
+  "Dateien": "File",
+  "Wo deine Sachen liegen": "Di mana data Anda disimpan",
+  "Was smejj sich merkt": "Yang diingat smejj",
+  "Kostenschutz": "Perlindungan biaya",
+  "Wo deine Einstellungen liegen": "Di mana pengaturan Anda berada",
+  "Projekte": "Proyek",
+  "Offline weiterarbeiten": "Lanjut bekerja offline",
+  "Das geht gerade nicht": "Ini sedang tidak bisa digunakan",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Teilen": "Bagikan",
   "Anpinnen": "Sematkan",

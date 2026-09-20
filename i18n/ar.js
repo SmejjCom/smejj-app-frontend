@@ -1,5 +1,18 @@
 // smejj.com — UI-Uebersetzung العربية (Quellsprache Deutsch als Schluessel, RTL).
 export default {
+  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
+  "smejj.com — KI- und Code-Assistent": "smejj.com — مساعد الذكاء الاصطناعي والبرمجة",
+  "Agenten-Arbeitsbereich": "مساحة عمل الوكلاء",
+  "Verlauf": "السجل",
+  "Lokaler Browser": "المتصفح المحلي",
+  "Dateien": "الملفات",
+  "Wo deine Sachen liegen": "أين تُحفظ أشياؤك",
+  "Was smejj sich merkt": "ما يتذكره smejj",
+  "Kostenschutz": "حماية التكاليف",
+  "Wo deine Einstellungen liegen": "أين توجد إعداداتك",
+  "Projekte": "المشاريع",
+  "Offline weiterarbeiten": "مواصلة العمل دون اتصال",
+  "Das geht gerade nicht": "هذا لا يعمل حاليًا",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Teilen": "مشاركة",
   "Anpinnen": "تثبيت",

@@ -1,5 +1,18 @@
 // smejj.com — UI-Uebersetzung Türkçe (Quellsprache Deutsch als Schluessel).
 export default {
+  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
+  "smejj.com — KI- und Code-Assistent": "smejj.com — Yapay zekâ ve kod asistanı",
+  "Agenten-Arbeitsbereich": "Ajan çalışma alanı",
+  "Verlauf": "Geçmiş",
+  "Lokaler Browser": "Yerel tarayıcı",
+  "Dateien": "Dosyalar",
+  "Wo deine Sachen liegen": "Verilerinizin bulunduğu yer",
+  "Was smejj sich merkt": "smejj’in hatırladıkları",
+  "Kostenschutz": "Maliyet koruması",
+  "Wo deine Einstellungen liegen": "Ayarlarınızın bulunduğu yer",
+  "Projekte": "Projeler",
+  "Offline weiterarbeiten": "Çevrimdışı çalışmaya devam et",
+  "Das geht gerade nicht": "Bu şu anda çalışmıyor",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Teilen": "Paylaş",
   "Anpinnen": "Sabitle",

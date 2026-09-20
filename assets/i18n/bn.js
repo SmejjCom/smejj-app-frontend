@@ -1,5 +1,18 @@
 // smejj.com — UI-Uebersetzung বাংলা (Quellsprache Deutsch als Schluessel).
 export default {
+  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
+  "smejj.com — KI- und Code-Assistent": "smejj.com — এআই ও কোড সহকারী",
+  "Agenten-Arbeitsbereich": "এজেন্ট কর্মক্ষেত্র",
+  "Verlauf": "ইতিহাস",
+  "Lokaler Browser": "লোকাল ব্রাউজার",
+  "Dateien": "ফাইল",
+  "Wo deine Sachen liegen": "আপনার জিনিস কোথায় রাখা আছে",
+  "Was smejj sich merkt": "smejj যা মনে রাখে",
+  "Kostenschutz": "খরচ সুরক্ষা",
+  "Wo deine Einstellungen liegen": "আপনার সেটিংস কোথায় আছে",
+  "Projekte": "প্রকল্প",
+  "Offline weiterarbeiten": "অফলাইনে কাজ চালিয়ে যান",
+  "Das geht gerade nicht": "এটি এখন কাজ করছে না",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Teilen": "শেয়ার করুন",
   "Anpinnen": "পিন করুন",

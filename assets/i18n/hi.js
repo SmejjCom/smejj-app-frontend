@@ -1,5 +1,18 @@
 // smejj.com — UI-Uebersetzung हिन्दी (Quellsprache Deutsch als Schluessel).
 export default {
+  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
+  "smejj.com — KI- und Code-Assistent": "smejj.com — एआई और कोड सहायक",
+  "Agenten-Arbeitsbereich": "एजेंट कार्यक्षेत्र",
+  "Verlauf": "इतिहास",
+  "Lokaler Browser": "स्थानीय ब्राउज़र",
+  "Dateien": "फ़ाइलें",
+  "Wo deine Sachen liegen": "आपकी चीज़ें कहाँ रखी हैं",
+  "Was smejj sich merkt": "smejj क्या याद रखता है",
+  "Kostenschutz": "लागत सुरक्षा",
+  "Wo deine Einstellungen liegen": "आपकी सेटिंग्स कहाँ हैं",
+  "Projekte": "प्रोजेक्ट",
+  "Offline weiterarbeiten": "ऑफ़लाइन काम जारी रखें",
+  "Das geht gerade nicht": "यह अभी काम नहीं कर रहा",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Teilen": "साझा करें",
   "Anpinnen": "पिन करें",

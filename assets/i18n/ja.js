@@ -1,5 +1,18 @@
 // smejj.com — UI-Uebersetzung 日本語 (Quellsprache Deutsch als Schluessel).
 export default {
+  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
+  "smejj.com — KI- und Code-Assistent": "smejj.com — AI・コードアシスタント",
+  "Agenten-Arbeitsbereich": "エージェントのワークスペース",
+  "Verlauf": "履歴",
+  "Lokaler Browser": "ローカルブラウザ",
+  "Dateien": "ファイル",
+  "Wo deine Sachen liegen": "データの保存場所",
+  "Was smejj sich merkt": "smejj が覚えていること",
+  "Kostenschutz": "コスト保護",
+  "Wo deine Einstellungen liegen": "設定の場所",
+  "Projekte": "プロジェクト",
+  "Offline weiterarbeiten": "オフラインで作業を続ける",
+  "Das geht gerade nicht": "現在ご利用いただけません",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Teilen": "共有",
   "Anpinnen": "ピン留め",

@@ -1,5 +1,18 @@
 // smejj.com — UI-Uebersetzung English (Quellsprache Deutsch als Schluessel).
 export default {
+  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
+  "smejj.com — KI- und Code-Assistent": "smejj.com — AI and Code Assistant",
+  "Agenten-Arbeitsbereich": "Agent workspace",
+  "Verlauf": "History",
+  "Lokaler Browser": "Local browser",
+  "Dateien": "Files",
+  "Wo deine Sachen liegen": "Where your things are stored",
+  "Was smejj sich merkt": "What smejj remembers",
+  "Kostenschutz": "Cost protection",
+  "Wo deine Einstellungen liegen": "Where your settings are",
+  "Projekte": "Projects",
+  "Offline weiterarbeiten": "Keep working offline",
+  "Das geht gerade nicht": "That doesn’t work right now",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Teilen": "Share",
   "Anpinnen": "Pin",

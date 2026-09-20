@@ -1,5 +1,18 @@
 // smejj.com — UI-Uebersetzung 中文 (Quellsprache Deutsch als Schluessel).
 export default {
+  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
+  "smejj.com — KI- und Code-Assistent": "smejj.com — AI 与代码助手",
+  "Agenten-Arbeitsbereich": "智能体工作区",
+  "Verlauf": "历史记录",
+  "Lokaler Browser": "本地浏览器",
+  "Dateien": "文件",
+  "Wo deine Sachen liegen": "你的内容存放在哪里",
+  "Was smejj sich merkt": "smejj 记住的内容",
+  "Kostenschutz": "费用保护",
+  "Wo deine Einstellungen liegen": "你的设置在哪里",
+  "Projekte": "项目",
+  "Offline weiterarbeiten": "离线继续工作",
+  "Das geht gerade nicht": "暂时无法使用",
   // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Teilen": "分享",
   "Anpinnen": "置顶",
