@@ -12,7 +12,7 @@
 // abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
 // instanzen mit getrennten CLIENT_ROUTES.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-6";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-7";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
@@ -550,7 +550,7 @@ async function navigate(tab, url, { push = true } = {}) {
 
   if (data?.ok && data.html && shouldOpenInRealBrowser(data.html, finalUrl, data.status)) {
     if (await echterBrowserWeg(tab, finalUrl, "external-required", push)) return;
-  } else if (data?.ok && data.html && !data.embeddable) {
+  } else if (data?.ok && (data.html ? !data.embeddable : data.html === null)) { // kein HTML (Bild, Text, PDF, ZIP): Dateiansicht
     setFrame(tab, proxyRahmen(finalUrl, data.html));
   } else {
     // OHNE Server-Antwort zuerst den Live-Browser fragen, statt sofort direkt

@@ -120,7 +120,8 @@ export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbac
   function proxyRahmen(url, html) {
     const seite = routes.api.browserPage || String(routes.api.browserFetch || "").replace(/\/fetch$/, "/page");
     if (typeof seite === "string" && seite.startsWith("https://")) return { src: `${seite}?url=${encodeURIComponent(url)}`, mode: "proxy" };
-    return { srcdoc: html, mode: "proxy" };
+    // Ohne Route UND ohne HTML (Datei): bleibt nur der alte Direkt-Rahmen.
+    return html ? { srcdoc: html, mode: "proxy" } : { src: url, mode: "direct" };
   }
 
   async function tryRemoteBrowser(tab, url, { reason = "", push = true } = {}) {
