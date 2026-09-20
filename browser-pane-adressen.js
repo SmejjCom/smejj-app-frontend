@@ -35,12 +35,21 @@ export function clampZoom(value) {
 export function normalizeAddress(input) {
   const text = String(input || "").trim();
   if (!text) return "";
-  if (/^https?:\/\//i.test(text)) return text;
+  // HTTPS ZUERST (Live-Test 20.09.): "http://example.com" landete als http-Rahmen im Panel —
+  // unsere Regel erlaubt nur https-Rahmen, die Flaeche blieb grau. Chrome hebt http heute von
+  // sich aus auf https; hier gilt das ohne Ausnahme. Wer kein https kann, bekommt die
+  // Fehlerseite — unverschluesselt laedt dieser Browser nichts.
+  if (/^http:\/\//i.test(text)) return `https://${text.slice(7)}`;
+  if (/^https:\/\//i.test(text)) return text;
   if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(\/|\?|#|$)/i.test(text)) return `https://${text}`;
   return `https://duckduckgo.com/html/?q=${encodeURIComponent(text)}`;
 }
 
 export function normalizeAgentBrowserUrl(input) {
+  // Der AGENT bekommt kein stilles Anheben: nennt ein Auftrag ausdruecklich http, wird er
+  // abgelehnt wie bisher (tests/browser-pane.test.mjs) — nur der Mensch an der Adressleiste
+  // profitiert von "https zuerst".
+  if (/^http:\/\//i.test(String(input || "").trim())) return "";
   const target = normalizeAddress(input);
   try {
     const url = new URL(target);

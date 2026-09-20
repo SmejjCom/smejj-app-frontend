@@ -24,7 +24,7 @@
 // und auch nicht verstecken darf (fail-closed: echte Fehlermeldung, kein
 // erfundener Erfolg).
 
-import { openPane, activeTab, addTab, setFrame, commitHistory, persistTabs, render, refs, state } from "./browser-pane.js?v=browser-pane-20260918-5";
+import { openPane, activeTab, addTab, setFrame, commitHistory, persistTabs, render, refs, state } from "./browser-pane.js?v=browser-pane-20260918-7";
 
 const MAUS_MODE = "maus-replay";
 
@@ -313,7 +313,7 @@ export async function zeigeBrueckenZustand() {
   let befund;
   try {
     const bruecke = await import("./maus-chrome.js?v=2");
-    const deutung = await import("./maus-absicht.js?v=47");
+    const deutung = await import("./maus-absicht.js?v=49");
     const installiert = bruecke.brueckeDa();
     const zustand = installiert ? await bruecke.frageZustand() : null;
     befund = deutung.deuteBrueckenZustand(zustand, { installiert });

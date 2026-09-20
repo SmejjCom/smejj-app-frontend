@@ -12,7 +12,7 @@
 // abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
 // instanzen mit getrennten CLIENT_ROUTES.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-4";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-6";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
@@ -43,9 +43,9 @@ import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js
 import {
   clampZoom, clampViewport, normalizeAddress, normalizeAgentBrowserUrl,
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl, shortHost
-} from "./browser-pane-adressen.js?v=browser-pane-20260820-4";
-import { applyZoom, baueZoomHaken } from "./browser-pane-zoom.js?v=3";
-import { verdrahteHauptmenue } from "./browser-pane-hauptmenue.js?v=4";
+} from "./browser-pane-adressen.js?v=browser-pane-20260820-5";
+import { applyZoom, baueZoomHaken } from "./browser-pane-zoom.js?v=4";
+import { verdrahteHauptmenue } from "./browser-pane-hauptmenue.js?v=5";
 // E2E-Pruefung 14.09.2026: fehlte — Rechtsklick auf Zurueck/Vor warf ReferenceError.
 import { zeigeVerlaufMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-2";
 // Der Zoom lebt in browser-pane-zoom.js; hier nur seine drei Anschluesse.
@@ -140,7 +140,7 @@ const sessionHooks = {
 // Fern-Browser-Wege (Live-Session, Remote-Worker, "echter Browser"-Karte)
 // liegen seit 2026-08-19 in browser-pane-fernwege.js — mit ihnen stand diese
 // Datei ueber der 800-Zeilen-Grenze. Zustandsnahes kommt als Baustein hinein.
-const { tryLiveBrowser, navigiereInSitzung, passeSitzungAn, tryRemoteBrowser, echterBrowserWeg, remoteBrowserViewport } = baueFernwege({
+const { tryLiveBrowser, navigiereInSitzung, passeSitzungAn, proxyRahmen, tryRemoteBrowser, echterBrowserWeg, remoteBrowserViewport } = baueFernwege({
   sessionClient,
   refs,
   routes: CLIENT_ROUTES,
@@ -551,7 +551,7 @@ async function navigate(tab, url, { push = true } = {}) {
   if (data?.ok && data.html && shouldOpenInRealBrowser(data.html, finalUrl, data.status)) {
     if (await echterBrowserWeg(tab, finalUrl, "external-required", push)) return;
   } else if (data?.ok && data.html && !data.embeddable) {
-    setFrame(tab, { srcdoc: data.html, mode: "proxy" });
+    setFrame(tab, proxyRahmen(finalUrl, data.html));
   } else {
     // OHNE Server-Antwort zuerst den Live-Browser fragen, statt sofort direkt
     // einzubetten.
@@ -635,11 +635,11 @@ export function setFrame(tab, { src = "", srcdoc = "", mode }) {
   frame.className = "bp-frame";
   frame.setAttribute("title", tab.title || "Browser Tab");
   frame.setAttribute("referrerpolicy", "no-referrer");
-  const usesSrcdoc = Boolean(srcdoc);
+  const usesSrcdoc = Boolean(srcdoc) || mode === "proxy"; // Proxy-Dokument: gleiche strenge Sandbox wie srcdoc
   if (usesSrcdoc) {
     // Ohne allow-same-origin: umgeschriebene Seite laeuft in eigener Origin.
     frame.setAttribute("sandbox", "allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox");
-    frame.srcdoc = srcdoc;
+    if (srcdoc) frame.srcdoc = srcdoc; else frame.src = src;
   } else {
     frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox");
     frame.src = src;

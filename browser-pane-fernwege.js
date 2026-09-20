@@ -11,7 +11,7 @@
 // Modul ZWEIMAL, jede Haelfte mit eigenem Zustand (Befund vom 2026-09-06,
 // tests/module-queries.test.mjs).
 import { buildLiveBrowserHtml, buildRemoteBrowserHtml } from "./browser-pane-render.js?v=browser-pane-20260906-6";
-import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260820-4";
+import { clampViewport, shortHost } from "./browser-pane-adressen.js?v=browser-pane-20260820-5";
 
 export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbackFrame, commitHistory, showHint, persistTabs, render }) {
   function remoteBrowserViewport() {
@@ -109,6 +109,20 @@ export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbac
     return true;
   }
 
+  // PROXY-SEITE ALS EIGENES DOKUMENT (Live-Test 20.09., v907): als srcdoc erbte sie unsere
+  // Sicherheitsregel — github.com erschien als nackte Linkliste, die Suchtreffer ohne Stil, und
+  // das Navigationsskript lief nie (Links, Scroll-Merken, Seitensuche tot; gemessen: keine einzige
+  // Nachricht aus dem Rahmen). Von /api/browser/page kommt dieselbe Seite mit EIGENER Regel.
+  // Ohne diese Route (alter Server, lokaler Betrieb) bleibt es beim srcdoc — schlechter, aber da.
+  // Die Adresse wird aus der vorhandenen Abruf-Route abgeleitet (…/fetch → …/page): config.js
+  // bleibt so unberuehrt — dort liegt seit dem 19.09. eine noch nicht ausgelieferte Aenderung
+  // einer anderen Arbeit, die mit dieser Lieferung nicht mitgehen darf.
+  function proxyRahmen(url, html) {
+    const seite = routes.api.browserPage || String(routes.api.browserFetch || "").replace(/\/fetch$/, "/page");
+    if (typeof seite === "string" && seite.startsWith("https://")) return { src: `${seite}?url=${encodeURIComponent(url)}`, mode: "proxy" };
+    return { srcdoc: html, mode: "proxy" };
+  }
+
   async function tryRemoteBrowser(tab, url, { reason = "", push = true } = {}) {
     if (await tryLiveBrowser(tab, url, { push })) return true;
     const endpoint = routes.api.browserRemote;
@@ -162,5 +176,5 @@ export function baueFernwege({ sessionClient, refs, routes, setFrame, setFallbac
     return false;
   }
 
-  return { tryLiveBrowser, navigiereInSitzung, passeSitzungAn, tryRemoteBrowser, echterBrowserWeg, remoteBrowserViewport };
+  return { tryLiveBrowser, navigiereInSitzung, passeSitzungAn, proxyRahmen, tryRemoteBrowser, echterBrowserWeg, remoteBrowserViewport };
 }
