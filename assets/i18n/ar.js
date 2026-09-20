@@ -2,6 +2,13 @@
 import zusatz from "./ar-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "إغلاق (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "كلّف الفأرة — فهي تتولى تشغيل هذا المتصفح",
+  "Maus beauftragen": "تكليف الفأرة",
+  "Adressleiste und Suchleiste": "شريط العنوان والبحث",
+  "Browser anpassen und einstellen": "تخصيص المتصفح وضبطه",
+  "Browser schließen": "إغلاق المتصفح",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "إيقاف التحميل",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "ابحث أو أدخل عنواناً — بقدر ما تحتاج من علامات التبويب.",

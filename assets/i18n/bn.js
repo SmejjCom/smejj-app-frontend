@@ -2,6 +2,13 @@
 import zusatz from "./bn-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "বন্ধ করুন (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "মাউসকে দায়িত্ব দিন — এটি এই ব্রাউজার চালায়",
+  "Maus beauftragen": "মাউসকে দায়িত্ব দিন",
+  "Adressleiste und Suchleiste": "ঠিকানা ও অনুসন্ধান বার",
+  "Browser anpassen und einstellen": "ব্রাউজার কাস্টমাইজ ও কনফিগার করুন",
+  "Browser schließen": "ব্রাউজার বন্ধ করুন",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "লোড করা থামান",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "খুঁজুন বা ঠিকানা লিখুন — যত ট্যাব দরকার তত।",

@@ -2,6 +2,13 @@
 import zusatz from "./id-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "Tutup (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "Serahkan ke tetikus — ia yang mengoperasikan peramban ini",
+  "Maus beauftragen": "Serahkan ke tetikus",
+  "Adressleiste und Suchleiste": "Bilah alamat dan pencarian",
+  "Browser anpassen und einstellen": "Sesuaikan dan atur peramban",
+  "Browser schließen": "Tutup peramban",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Hentikan pemuatan",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Cari atau masukkan alamat — sebanyak tab yang kamu perlukan.",

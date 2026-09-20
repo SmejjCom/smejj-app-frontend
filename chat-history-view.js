@@ -246,7 +246,7 @@ function injectStyles() {
       /* Auch hier gilt: gegen ".premium-view button" gewinnt nur ein Selektor
          mit #chatHistory. Ohne das blieb der Knopf live 249 px breit. */
       #chatHistory .ch-neu { font-size: 0; padding: 12px 15px; }
-      #chatHistory .ch-neu::after { content: "＋ Neu"; font-size: 14px; }
+      #chatHistory .ch-neu::after { content: "＋ ${t("Neu").replace(/"/g, '\\"')}"; font-size: 14px; }
       /* Im leeren Verlauf steht der Knopf allein — dort ist Platz fuer die
          volle Beschriftung, und sie ist dort auch noetiger. */
       #chatHistory .ch-leer-aktion .ch-neu { font-size: 14px; padding: 12px 17px; }
@@ -290,6 +290,18 @@ function injectStyles() {
     }
   `;
   document.head.append(style);
+}
+
+// Der schmale Neu-Knopf traegt seine Beschriftung in einer CSS-Regel
+// (content:) — die kann huelle-sprache.js nicht erreichen. Der Block wird
+// EINMAL eingespritzt; faellt das in den Moment, in dem die Sprachdatei noch
+// laedt, stuende dort bis zum Neuladen Deutsch. Darum: bei gemeldetem
+// Sprachwechsel den Block wegwerfen, der naechste Aufbau schreibt ihn neu.
+if (typeof document !== "undefined") {
+  document.addEventListener("smejj:sprache", () => {
+    document.getElementById(STYLE_ID)?.remove();
+    injectStyles();
+  });
 }
 
 /* ------------------------------------------------------------------ *

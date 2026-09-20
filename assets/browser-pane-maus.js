@@ -87,7 +87,7 @@ export async function starteMausLauf({ auftrag, zeige } = {}) {
   } finally {
     laeuft = false;
     knopf?.classList.remove("laeuft");
-    if (knopf) knopf.title = "Maus beauftragen — sie bedient diesen Browser";
+    if (knopf) knopf.title = t("Maus beauftragen — sie bedient diesen Browser");
     render?.();
   }
 }

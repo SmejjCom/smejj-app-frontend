@@ -2,6 +2,13 @@
 import zusatz from "./ko-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "닫기 (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "마우스에게 맡기기 — 이 브라우저를 대신 조작합니다",
+  "Maus beauftragen": "마우스에게 맡기기",
+  "Adressleiste und Suchleiste": "주소 및 검색 표시줄",
+  "Browser anpassen und einstellen": "브라우저 맞춤 설정",
+  "Browser schließen": "브라우저 닫기",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "불러오기 중지",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "검색하거나 주소를 입력하세요 — 탭은 필요한 만큼.",

@@ -2,6 +2,13 @@
 import zusatz from "./ru-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "Закрыть (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "Поручите мыши — она управляет этим браузером",
+  "Maus beauftragen": "Поручить мыши",
+  "Adressleiste und Suchleiste": "Адресная и поисковая строка",
+  "Browser anpassen und einstellen": "Настроить браузер",
+  "Browser schließen": "Закрыть браузер",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Остановить загрузку",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Поиск или адрес — столько вкладок, сколько нужно.",

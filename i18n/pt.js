@@ -2,6 +2,13 @@
 import zusatz from "./pt-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "Fechar (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "Encarrega o rato — ele usa este navegador",
+  "Maus beauftragen": "Encarregar o rato",
+  "Adressleiste und Suchleiste": "Barra de endereço e pesquisa",
+  "Browser anpassen und einstellen": "Personalizar e configurar o navegador",
+  "Browser schließen": "Fechar o navegador",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Parar o carregamento",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Pesquisa ou escreve um endereço — tantos separadores quantos precisares.",

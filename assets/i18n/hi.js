@@ -2,6 +2,13 @@
 import zusatz from "./hi-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "बंद करें (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "माउस को सौंपें — यह इस ब्राउज़र को चलाता है",
+  "Maus beauftragen": "माउस को सौंपें",
+  "Adressleiste und Suchleiste": "पता और खोज बार",
+  "Browser anpassen und einstellen": "ब्राउज़र को अनुकूलित और कॉन्फ़िगर करें",
+  "Browser schließen": "ब्राउज़र बंद करें",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "लोड करना रोकें",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "खोजें या पता दर्ज करें — जितने टैब चाहिए उतने।",

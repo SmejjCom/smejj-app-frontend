@@ -2,6 +2,13 @@
 import zusatz from "./en-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "Close (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "Send the mouse — it operates this browser",
+  "Maus beauftragen": "Send the mouse",
+  "Adressleiste und Suchleiste": "Address and search bar",
+  "Browser anpassen und einstellen": "Customize and configure the browser",
+  "Browser schließen": "Close browser",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Stop loading",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Search or enter an address — as many tabs as you need.",

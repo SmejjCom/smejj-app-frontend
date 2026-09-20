@@ -123,14 +123,23 @@ export function schrittListe(output) {
 // Ende klappt falteSchritte sie zu. Alte Clients/Tests, die Zeilen direkt in der
 // Liste erwarten, finden sie ueber alleZeilen().
 
-const GRUPPEN_WORT = {
-  suche: [t("Suche"), t("Suchen")],
-  seite: [t("Seite gelesen"), t("Seiten gelesen")],
-  bild: [t("Bild gemalt"), t("Bilder gemalt")]
-};
+// ERST BEIM AUFRUF uebersetzen, nicht beim Laden des Moduls.
+//
+// GEMESSEN 20.09.2026: Beim ersten Besuch in einer neuen Sprache ist das
+// Woerterbuch noch nicht da (ui.js laedt es im Hintergrund). Ein t() auf
+// Modulebene friert in diesem Moment den deutschen Quelltext in eine
+// Konstante — und zwar fuer die ganze Sitzung, auch lange nachdem die
+// Sprachdatei angekommen ist. Eine Funktion fragt jedes Mal neu.
+function gruppenWort(art) {
+  return {
+    suche: [t("Suche"), t("Suchen")],
+    seite: [t("Seite gelesen"), t("Seiten gelesen")],
+    bild: [t("Bild gemalt"), t("Bilder gemalt")]
+  }[art];
+}
 
 function gruppenTitel(art, gesamt, fertig) {
-  const [eins, viele] = GRUPPEN_WORT[art] || [t("Schritt"), t("Schritte")];
+  const [eins, viele] = gruppenWort(art) || [t("Schritt"), t("Schritte")];
   const symbol = SCHRITT_SYMBOL[art] || "•";
   if (fertig >= gesamt) return `${symbol} ${gesamt} ${gesamt === 1 ? eins : viele} ✓`;
   const laeuft = art === "suche" ? t("Suche") : art === "seite" ? t("Lese") : eins;

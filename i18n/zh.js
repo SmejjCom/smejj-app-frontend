@@ -2,6 +2,13 @@
 import zusatz from "./zh-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "关闭 (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "交给鼠标 — 由它操作这个浏览器",
+  "Maus beauftragen": "交给鼠标",
+  "Adressleiste und Suchleiste": "地址栏与搜索栏",
+  "Browser anpassen und einstellen": "自定义并设置浏览器",
+  "Browser schließen": "关闭浏览器",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "停止加载",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "搜索或输入网址 — 标签页想开多少就开多少。",

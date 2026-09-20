@@ -296,7 +296,7 @@ export function buildPaneShellHtml({ neuerTabTitel = t("Neuer Tab"), maxTabs = 1
       </div>
       <div class="bp-tabs"></div>
       <div class="bp-tab-right">
-        <button class="bp-maus" type="button" title="Maus beauftragen — sie bedient diesen Browser" aria-label="Maus beauftragen">
+        <button class="bp-maus" type="button" title="${escapeHtml(t("Maus beauftragen — sie bedient diesen Browser"))}" aria-label="${escapeHtml(t("Maus beauftragen"))}">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="5"/><path d="M12 7v3"/></svg>
         </button>
         <span class="bp-tab-spacer" aria-hidden="true"></span>
@@ -316,17 +316,17 @@ export function buildPaneShellHtml({ neuerTabTitel = t("Neuer Tab"), maxTabs = 1
       </div>
       <form class="bp-address-form">
         <input class="bp-address" type="text" inputmode="url" autocomplete="off" spellcheck="false"
-          placeholder="${escapeHtml(t("Suchen oder URL eingeben"))}" aria-label="Adressleiste und Suchleiste">
+          placeholder="${escapeHtml(t("Suchen oder URL eingeben"))}" aria-label="${escapeHtml(t("Adressleiste und Suchleiste"))}">
         <div class="bp-vorschlaege" hidden></div>
       </form>
       <div class="bp-toolbar-right">
         <button class="bp-open-external" type="button" title="In neuem Tab öffnen" aria-label="In neuem Tab öffnen">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 13v6H5V6h6"/></svg>
         </button>
-        <button class="bp-menu" type="button" title="Browser anpassen und einstellen" aria-label="Browser anpassen und einstellen">
+        <button class="bp-menu" type="button" title="${escapeHtml(t("Browser anpassen und einstellen"))}" aria-label="${escapeHtml(t("Browser anpassen und einstellen"))}">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
-        <button class="bp-close" type="button" title="Browser schließen" aria-label="Browser schließen">
+        <button class="bp-close" type="button" title="${escapeHtml(t("Browser schließen"))}" aria-label="${escapeHtml(t("Browser schließen"))}">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
         </button>
       </div>

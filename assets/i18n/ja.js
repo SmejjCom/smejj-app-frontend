@@ -2,6 +2,13 @@
 import zusatz from "./ja-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "閉じる (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "マウスに任せる — このブラウザーを操作します",
+  "Maus beauftragen": "マウスに任せる",
+  "Adressleiste und Suchleiste": "アドレスバー兼検索バー",
+  "Browser anpassen und einstellen": "ブラウザーをカスタマイズして設定",
+  "Browser schließen": "ブラウザーを閉じる",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "読み込みを中止",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "検索するかアドレスを入力 — 必要なだけタブを開けます。",

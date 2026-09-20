@@ -2,6 +2,13 @@
 import zusatz from "./tr-2.js?v=1";
 
 export default {
+  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
+  "Schließen (⌘W)": "Kapat (⌘W)",
+  "Maus beauftragen — sie bedient diesen Browser": "Fareyi görevlendir — bu tarayıcıyı o kullanır",
+  "Maus beauftragen": "Fareyi görevlendir",
+  "Adressleiste und Suchleiste": "Adres ve arama çubuğu",
+  "Browser anpassen und einstellen": "Tarayıcıyı özelleştir ve ayarla",
+  "Browser schließen": "Tarayıcıyı kapat",
   // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Yüklemeyi durdur",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Ara ya da bir adres gir — ihtiyacın kadar sekme.",
