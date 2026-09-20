@@ -1,3 +1,5 @@
+import { t } from "./i18n/ui.js?v=3";
+
 // smejj.com — Quellen-Panel (Konkurrenz-Radar V5, 2026-08-06).
 //
 // Befund aus Radar-Bericht 01: Der Knopf "Quellen" (Kettenglied) im rechten
@@ -77,7 +79,7 @@ function listenBehaelter() {
     block = document.createElement("section");
     block.id = LISTE_ID;
     block.className = "quellen-panel";
-    block.setAttribute("aria-label", "Quellen der Antworten");
+    block.setAttribute("aria-label", t("Quellen der Antworten"));
     const kopf = ansicht.querySelector(".view-header");
     if (kopf) kopf.after(block); else ansicht.prepend(block);
   }
@@ -118,8 +120,8 @@ function zeichnen() {
   const hinweis = document.createElement("p");
   hinweis.className = "quellen-hinweis";
   hinweis.textContent = quellen.length
-    ? "Belege aus den Antworten dieser Unterhaltung."
-    : "Sobald eine Antwort Webseiten verlinkt, stehen sie hier.";
+    ? t("Belege aus den Antworten dieser Unterhaltung.")
+    : t("Sobald eine Antwort Webseiten verlinkt, stehen sie hier.");
   block.append(hinweis);
 
   if (!quellen.length) return;

@@ -1,3 +1,5 @@
+import { t } from "./i18n/ui.js?v=3";
+
 // view-chrome.js — smejj.com View-Navigation: Zurueck-Pfeil + Schliessen-X.
 // Zweck: Jede App-View ausser der Startseite (#start) erhaelt zur Laufzeit oben
 // links einen Zurueck-Button (Browser-History) und oben rechts einen X-Button,
@@ -80,8 +82,8 @@ function injectViewChrome() {
     view.classList.add("has-view-chrome");
     const bar = document.createElement("div");
     bar.className = "view-chrome";
-    const back = buildButton("view-chrome-back", "Zurueck", BACK_ICON);
-    const close = buildButton("view-chrome-close", "Schliessen und zur Startseite", CLOSE_ICON);
+    const back = buildButton("view-chrome-back", t("Zurueck"), BACK_ICON);
+    const close = buildButton("view-chrome-close", t("Schliessen und zur Startseite"), CLOSE_ICON);
     back.addEventListener("click", goBack);
     close.addEventListener("click", goToStart);
     bar.append(back, close);

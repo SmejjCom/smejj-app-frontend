@@ -19,7 +19,7 @@ import {
 // Seit der Zusammenfuehrung der beiden Aufteilungen (2026-08-10) wohnen die
 // reinen Anzeige-Helfer in chat-history-text.js — format.js war deren
 // Teilmenge und ist entfallen.
-import { zeitText, mitHervorhebung, trefferAusschnitt } from "/assets/chat-history-text.js?v=b47c2";
+import { zeitText, mitHervorhebung, trefferAusschnitt } from "/assets/chat-history-text.js?v=b47c3";
 import { t } from "./i18n/ui.js?v=3";
 // Geteilte Icon-Bibliothek (Spur, Navigation): Papierkorb, Ordner, Plus kommen
 // von dort — derselbe Spezifizierer wie in spur-start.js, sonst gaebe es eine
@@ -134,7 +134,7 @@ export function bausteinNeuKnopf() {
   neuKnopf.type = "button";
   neuKnopf.className = "ch-neu";
   neuKnopf.textContent = `＋ ${t("Neuer Chat")}`;
-  neuKnopf.title = "Neue Unterhaltung beginnen";
+  neuKnopf.title = t("Neue Unterhaltung beginnen");
   neuKnopf.addEventListener("click", () => { try { newChat(); } catch { /* fail-safe */ } });
   return neuKnopf;
 }
@@ -248,8 +248,8 @@ export function createCardBuilders(ctx) {
     mehr.type = "button";
     mehr.className = "ch-proj-mehr";
     mehr.textContent = "⋯";
-    mehr.title = "Projekt-Aktionen";
-    mehr.setAttribute("aria-label", `Aktionen für Projekt ${projekt.name || ""}`);
+    mehr.title = t("Projekt-Aktionen");
+    mehr.setAttribute("aria-label", `${t("Aktionen für Projekt")} ${projekt.name || ""}`);
     mehr.addEventListener("click", (event) => {
       event.stopPropagation();
       const offen = ctx.getOffenesMenu();

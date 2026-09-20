@@ -1,8 +1,9 @@
 import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js";
+import { t } from "./i18n/ui.js?v=3";
 import { applyServerAiStatus } from "/assets/storage/index.js";
 import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=7";
 import { initSettingsSurface } from "./settings-surface.js?v=b68";
-import { initAccountPrivacySurface } from "./account-privacy.js?v=b49";
+import { initAccountPrivacySurface } from "./account-privacy.js?v=4";
 import { afterFirstPaint } from "./deferred-start.js";
 
 export function enhancePremiumSurfaces() {
@@ -43,17 +44,17 @@ function enhanceModelRegistry() {
   if (!grid || document.querySelector("#systemModelSelect")) return;
   const field = document.createElement("label");
   field.className = "system-model-field";
-  field.textContent = "Coding-Modell";
+  field.textContent = t("Coding-Modell");
   const select = document.createElement("select");
   select.id = "systemModelSelect";
-  select.setAttribute("aria-label", "Coding-Modell");
+  select.setAttribute("aria-label", t("Coding-Modell"));
   field.append(select);
   grid.prepend(field);
 
   const registry = document.createElement("div");
   registry.id = "modelRegistryPanel";
   registry.className = "model-registry-panel";
-  registry.setAttribute("aria-label", "Verfuegbare KI-Modelle");
+  registry.setAttribute("aria-label", t("Verfuegbare KI-Modelle"));
   grid.after(registry);
 
   select.addEventListener("change", () => {

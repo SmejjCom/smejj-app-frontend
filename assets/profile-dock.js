@@ -48,7 +48,7 @@ export function initProfileDock() {
   ladeBeiKlick(["#profileDockButton"], () => holeMenue().then((m) => { m.initProfileDockMenu(); m.renderProfileDockMenu(...letzterMenueStand); return m; }));
   window.addEventListener("smejj:chats-changed", function quellenEinmal() {
     window.removeEventListener("smejj:chats-changed", quellenEinmal);
-    import("./quellen-panel.js?v=1").catch((f) => console.error("[smejj.com] Nachladen fehlgeschlagen:", f));
+    import("./quellen-panel.js?v=2").catch((f) => console.error("[smejj.com] Nachladen fehlgeschlagen:", f));
   });
   // Icon-Zaehler erst beim ersten Druck auf ein BEDIENELEMENT (Startgewicht,
   // gemessen 2026-09-14): er zaehlt nur Knoepfe und Links aus seiner

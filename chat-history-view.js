@@ -51,8 +51,8 @@ let bausteineBereit = null;
 function ladeBausteine() {
   if (bausteineBereit) return bausteineBereit;
   bausteineBereit = Promise.all([
-    import("/assets/chat-history-text.js?v=b47c2"),
-    import("/assets/chat-history-cards.js?v=b78"),
+    import("/assets/chat-history-text.js?v=b47c3"),
+    import("/assets/chat-history-cards.js?v=b79"),
     import("/assets/chat-title-auto.js")
   ]).then(([text, karten]) => {
     ({ anzeigeTitel, anzeigeVorschau, gruppeVon, volltext, themaVon, merkmaleVon, sichereAlsMarkdown, projektGruppen } = text);

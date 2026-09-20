@@ -5,6 +5,7 @@
 // kommen ausdruecklich als `deps` herein.
 
 import { STORAGE_KEYS } from "./config.js";
+import { t } from "./i18n/ui.js?v=3";
 
 export function bindLocalWorkspace(deps) {
   const { $, state, workspace, showToast, writeOutput, setText, renderEmptyState } = deps;
@@ -95,7 +96,7 @@ export function refreshLocalWorkspaceStatus(deps) {
   setText("#aiStatusChip", "KI: disabled");
   setText("#costStatusChip", "Kosten: 0 EUR Risiko");
   setText("#storageStatusText", status.storage);
-  setText("#workspaceStatusText", status.offline ? "offline nutzbar" : "lokal bereit");
+  setText("#workspaceStatusText", status.offline ? t("offline nutzbar") : t("lokal bereit"));
   // Platzhalter bis /api/health bzw. /api/storage/status geantwortet haben
   // (app.js refreshLiveSystemStatus). Vorher stand hier der interne Code
   // "presigned-sync-not-configured" — irrefuehrend, der Speicher ist eingerichtet.
@@ -103,13 +104,13 @@ export function refreshLocalWorkspaceStatus(deps) {
   setText("#aiModeText", status.aiMode);
   setText("#costStatusText", status.costStatus);
   setText("#syncStatusText", status.syncStatus);
-  setText("#homeWorkspaceSummary", status.offline ? "offline nutzbar" : "lokal bereit");
+  setText("#homeWorkspaceSummary", status.offline ? t("offline nutzbar") : t("lokal bereit"));
   setText("#homeAiSummary", status.aiMode);
   setText("#homeCostSummary", status.costStatus);
   setText("#homeStorageSummary", "IDrive e2 Hauptspeicher / lokal gecached");
   setText("#costAiMode", status.aiMode);
   if (!state.currentProjectId) {
-    renderEmptyState("#projectOutput", "Noch kein Projekt", "Erstelle ein lokales Projekt, um Manifest, Dateien und Snapshots zu testen.");
+    renderEmptyState("#projectOutput", t("Noch kein Projekt"), t("Erstelle ein lokales Projekt, um Manifest, Dateien und Snapshots zu testen."));
   }
   refreshSessionStatus();
 }

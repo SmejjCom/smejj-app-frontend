@@ -12,7 +12,7 @@
 // docs/frontend/SW_VERSIONSVERLAUF_2026-08-ARCHIV-B.md (v237 bis v246).
 
 import { merkmaleVon, volltext } from "./chat-merkmale.js?v=1";
-import { t } from "./i18n/ui.js?v=3";
+import { t, uiLanguage } from "./i18n/ui.js?v=3";
 
 const MAX_TITEL = 62;
 const MAX_VORSCHAU = 130;
@@ -255,15 +255,20 @@ function tageHer(iso) {
   return Math.round((heute - tag) / 86400000);
 }
 
+// Wochentag und Datum sind KEINE Uebersetzungsschluessel, sondern Formatierung:
+// "Freitag, 14:05" muss in englischer Oberflaeche "Friday, 2:05 PM" heissen.
+// Darum entscheidet hier die UI-Sprache ueber das Gebietsschema — gemessen am
+// 20.09.2026 im Android-Chrome, wo der Verlauf deutsche Wochentage zeigte.
 function zeitText(iso) {
   const datum = new Date(iso);
   if (!Number.isFinite(datum.getTime())) return "";
   const tage = tageHer(iso);
-  const uhr = datum.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+  const ort = uiLanguage() || "de";
+  const uhr = datum.toLocaleTimeString(ort, { hour: "2-digit", minute: "2-digit" });
   if (tage <= 0) return uhr;
-  if (tage === 1) return `Gestern, ${uhr}`;
-  if (tage < 7) return `${datum.toLocaleDateString("de-DE", { weekday: "long" })}, ${uhr}`;
-  return datum.toLocaleDateString("de-DE", { day: "2-digit", month: "short", year: "numeric" });
+  if (tage === 1) return `${t("Gestern")}, ${uhr}`;
+  if (tage < 7) return `${datum.toLocaleDateString(ort, { weekday: "long" })}, ${uhr}`;
+  return datum.toLocaleDateString(ort, { day: "2-digit", month: "short", year: "numeric" });
 }
 
 function gruppeVon(iso) {
