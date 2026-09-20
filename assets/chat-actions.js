@@ -26,7 +26,7 @@
 // fail-safe: scheitert der Versand, bleibt die Bewertung lokal sichtbar.
 import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=3";
 import { t } from "./i18n/ui.js?v=3";
-import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=17";
+import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=18";
 // OHNE ?v=-Kennung — app.js importiert "./browser-context.js" (also
 // /assets/browser-context.js). Ein anderer Spezifizierer erzeugt eine ZWEITE
 // Modulinstanz mit eigenem Quellen-Gedaechtnis; der Menuepunkt "Quellen
@@ -252,43 +252,6 @@ function flashCopied(button) {
     button.classList.remove("is-done");
     delete button.dataset.flashing;
   }, COPY_FEEDBACK_MS);
-}
-
-/* Beim Einfuegen in Google Docs standen riesige Luecken zwischen den
-   Absaetzen (Betreiber-Befund 2026-08-13): der Chat kopierte nur rohes
-   Markdown, dessen Leerzeilen in Docs zu leeren Absaetzen werden — plus
-   Docs' eigenem Absatzabstand. Profis legen deshalb ZWEI Fassungen in die
-   Zwischenablage: HTML fuer Docs/Word/Mail (echte Absaetze, Fett, Listen —
-   kompakt, keine Leerzeilen) und Text fuer alles andere. Das Ziel sucht
-   sich die passende selbst aus. */
-function escapeHtml(text) {
-  return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-/* Absaetze aus dem Rohtext bauen: Leerzeile trennt Absaetze, einfacher
-   Umbruch wird <br>. Noetig fuer Antworten OHNE Markdown-Zeichen —
-   chat-markdown laesst die als Rohtext stehen (MARKERS-Fruehausstieg), und
-   rohe Zeilenumbrueche fallen in HTML zu Leerzeichen zusammen. Genau das war
-   der "Textsalat" beim zweiten Docs-Versuch des Betreibers: erst zu viel
-   Abstand, dann gar keiner.  */
-function absaetzeAusText(text) {
-  return String(text || "")
-    .split(/\n{2,}/)
-    .map((absatz) => absatz.trim())
-    .filter(Boolean)
-    .map((absatz) => `<p>${escapeHtml(absatz).replace(/\n/g, "<br>")}</p>`)
-    .join("");
-}
-
-function htmlOf(entry, raw) {
-  const klon = entry?.cloneNode?.(true);
-  if (!klon) return "";
-  for (const chrome of klon.querySelectorAll(".msg-actions, .msg-menu, .msg-meta, .chat-code-actions, button, img[data-smejj-adresse], video, img[src*=\"/api/chat-medien\"]")) chrome.remove();
-  const html = String(klon.innerHTML || "").trim();
-  // Nur DOM-HTML verwenden, wenn es echte Bloecke traegt — sonst aus dem
-  // Rohtext bauen, damit die Absatzstruktur nie verloren geht.
-  if (/<(p|ul|ol|pre|h\d|table|blockquote)\b/i.test(html)) return html;
-  return absaetzeAusText(raw ?? klon.textContent);
 }
 
 async function copyText(text, button, html = "") {
@@ -635,7 +598,15 @@ function sendeDaumenSignal(entry, richtung) {
 
 const HANDLERS = {
   sources: (entry) => toggleSources(entry),
-  copy: (entry, button) => copyText(ohneMedienAdressen(rawOf(entry)), button, htmlOf(entry, ohneMedienAdressen(rawOf(entry)))),
+  // htmlOf() wird ERST beim Kopieren geladen (20.09.2026): das Modul traegt
+  // rund 1,5 KB, die sonst jeder Erstbesuch mitschleppt, obwohl die wenigsten
+  // eine Antwort kopieren. Faellt der Nachladeweg aus, geht nur die
+  // HTML-Fassung verloren — der Text landet trotzdem in der Zwischenablage.
+  copy: async (entry, button) => {
+    const roh = ohneMedienAdressen(rawOf(entry));
+    const { htmlOf } = await import("/assets/chat-actions-text.js?v=1").catch(() => ({ htmlOf: () => "" }));
+    return copyText(roh, button, htmlOf(entry, roh));
+  },
   "copy-plain": (entry) => copyText(toPlainText(rawOf(entry))),
   edit: (entry) => startEdit(entry),
   regen: (entry) => regenerate(entry),

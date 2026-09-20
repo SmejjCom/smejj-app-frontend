@@ -48,13 +48,20 @@ export function uebersetzeHuelle(wurzel = document.body, doc = document) {
   if (!wurzel) return 0;
   let n = 0;
   for (const el of [wurzel, ...wurzel.querySelectorAll("*")]) {
-    if (!el.tagName || GESPERRTE_TAGS.has(el.tagName) || gesperrt(el)) continue;
+    if (!el.tagName || gesperrt(el)) continue;
+    // Ein gesperrtes Tag schützt seinen INHALT, nicht seine Beschriftung.
+    // Bis zum 20.09.2026 sprang die Schleife über das ganze Element — damit
+    // blieb der Platzhalter JEDES Eingabefeldes deutsch, auch das große
+    // „Frag mich alles" auf der Startseite. Attribute sind Beschriftung und
+    // werden übersetzt; der Textknoten eines TEXTAREA/PRE/CODE nie.
+    const nurBeschriftung = GESPERRTE_TAGS.has(el.tagName);
     for (const name of ATTRIBUTE) {
       const wert = beschriftung(el.getAttribute?.(name));
       if (!wert) continue;
       const neu = t(wert);
       if (neu && neu !== wert) { el.setAttribute(name, neu); n += 1; }
     }
+    if (nurBeschriftung) continue;
     // Nur der erste eigene Textknoten: so bleibt ein Wert-Span daneben stehen
     // (dieselbe Falle wie im Profilmenü, wo textContent den Plan gelöscht hat).
     for (const knoten of el.childNodes) {
