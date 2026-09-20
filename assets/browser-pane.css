@@ -530,6 +530,17 @@
   }
 }
 
+/* iPHONE-APP (Geraetetest 20.09.2026, v922): die installierte App laeuft im Vollbild (viewport-fit=cover). Das Fenster
+   beginnt bei top:0 und hat im Browser-Modus padding:0 — Tableiste und Adressleiste lagen UNTER der Statusleiste
+   (Uhrzeit ueber "+", Akku ueber dem X). Der obere Sicherheitsrand kommt dazu; im Browser und am Rechner ist er 0 px.
+   Die schmale Spur (.is-compact) ruecksichtigt den Rand schon selbst ueber top (styles.css) — sie bleibt ausgenommen. */
+.browser-panel.is-browser-mode:not(.is-compact) {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.browser-panel:not(.is-browser-mode):not(.is-compact) {
+  padding-top: calc(32px + env(safe-area-inset-top, 0px));
+}
+
 /* Bezugsrahmen fuer den schwebenden Hinweis (.bp-hint). */
 .browser-pane {
   position: relative;

@@ -202,7 +202,7 @@ function syncVersions(bar, meta) {
     picker.className = "msg-versions";
     picker.innerHTML = `<button type="button" class="msg-act msg-version-step" data-act="version-prev" aria-label="Vorherige Version"><span class="msg-act-icon" aria-hidden="true">${iconMarkup("left")}</span></button>`
       + '<span class="msg-version-label"></span>'
-      + `<button type="button" class="msg-act msg-version-step" data-act="version-next" aria-label=t("Nächste Version")><span class="msg-act-icon" aria-hidden="true">${iconMarkup("right")}</span></button>`;
+      + `<button type="button" class="msg-act msg-version-step" data-act="version-next" aria-label="${t("Nächste Version").replace(/"/g, "&quot;")}"><span class="msg-act-icon" aria-hidden="true">${iconMarkup("right")}</span></button>`;
     bar.append(picker);
   }
   // Mockup-Bildschirm 26, der Zusatz: es steht dabei, WANN geaendert wurde —

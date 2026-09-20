@@ -285,11 +285,14 @@ function escapeHtml(value) {
  * Zustand. Die Werte kommen als Argumente herein, damit hier nichts ueber die
  * Panel-Logik gewusst werden muss.
  */
+// ACHTUNG (Live-Fehler v921-v923, am Geraet gefunden): in diesem Template stand t("Zurück") OHNE ${…} als nackter TEXT im Attribut —
+// die Adressleiste zeigte allen Nutzern `t("Suchen`. Uebersetzungen gehoeren als ="${escapeHtml(t("…"))}" hinein:
+// mit Anfuehrungszeichen UND Escaping (fr "d’ici", en "doesn’t"). Waechter: tests/i18n-attribut-waechter.test.mjs.
 export function buildPaneShellHtml({ neuerTabTitel = t("Neuer Tab"), maxTabs = 100 } = {}) {
   return `
     <div class="bp-tabstrip" role="tablist" aria-label="Browser Tabs">
       <div class="bp-tab-left">
-        <button class="bp-tab-add" type="button" title=t("Neuer Tab (⌘T)") aria-label=t("Neuer Tab")>+</button>
+        <button class="bp-tab-add" type="button" title="${escapeHtml(t("Neuer Tab (⌘T)"))}" aria-label="${escapeHtml(t("Neuer Tab"))}">+</button>
       </div>
       <div class="bp-tabs"></div>
       <div class="bp-tab-right">
@@ -301,19 +304,19 @@ export function buildPaneShellHtml({ neuerTabTitel = t("Neuer Tab"), maxTabs = 1
     </div>
     <div class="bp-toolbar">
       <div class="bp-toolbar-left">
-        <button class="bp-nav-back" type="button" title=t("Zurück") aria-label=t("Zurück") disabled>
+        <button class="bp-nav-back" type="button" title="${escapeHtml(t("Zurück"))}" aria-label="${escapeHtml(t("Zurück"))}" disabled>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
         </button>
-        <button class="bp-nav-forward" type="button" title=t("Vorwärts") aria-label=t("Vorwärts") disabled>
+        <button class="bp-nav-forward" type="button" title="${escapeHtml(t("Vorwärts"))}" aria-label="${escapeHtml(t("Vorwärts"))}" disabled>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
         </button>
-        <button class="bp-nav-reload" type="button" title=t("Diese Seite neu laden (⌘R)") aria-label=t("Diese Seite neu laden")>
+        <button class="bp-nav-reload" type="button" title="${escapeHtml(t("Diese Seite neu laden (⌘R)"))}" aria-label="${escapeHtml(t("Diese Seite neu laden"))}">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>
         </button>
       </div>
       <form class="bp-address-form">
         <input class="bp-address" type="text" inputmode="url" autocomplete="off" spellcheck="false"
-          placeholder=t("Suchen oder URL eingeben") aria-label="Adressleiste und Suchleiste">
+          placeholder="${escapeHtml(t("Suchen oder URL eingeben"))}" aria-label="Adressleiste und Suchleiste">
         <div class="bp-vorschlaege" hidden></div>
       </form>
       <div class="bp-toolbar-right">

@@ -2262,6 +2262,12 @@ body.voice-mode-open #voiceModeClose {
     width: calc(100vw - 12px);
   }
 }
+.browser-panel.is-browser-mode:not(.is-compact) {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.browser-panel:not(.is-browser-mode):not(.is-compact) {
+  padding-top: calc(32px + env(safe-area-inset-top, 0px));
+}
 .browser-pane {
   position: relative;
 }
