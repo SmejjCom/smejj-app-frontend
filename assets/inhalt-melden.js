@@ -11,6 +11,8 @@
 import { metaOf, rawOf } from "/assets/chat-messages.js?v=3";
 import { toPlainText } from "/assets/chat-actions-menu.js?v=13";
 import { showToast } from "/assets/components.js?v=b48";
+// Texte laufen ueber t() (Geraetetest 20.09.): der Dialog blieb in englischer App deutsch.
+import { t } from "/assets/i18n/ui.js?v=3";
 
 // Dieselben Kennungen wie in chat-actions.js (Daumen-Signal) — ein Schluesselwechsel
 // soll alle Stellen gemeinsam finden.
@@ -93,21 +95,21 @@ export function oeffneMeldeBlatt(eintrag) {
   blatt.className = "melden-blatt";
   blatt.setAttribute("role", "dialog");
   blatt.setAttribute("aria-modal", "true");
-  blatt.setAttribute("aria-label", "Inhalt melden");
+  blatt.setAttribute("aria-label", t("Inhalt melden"));
 
   const kasten = document.createElement("div");
   kasten.className = "melden-kasten";
   const titel = document.createElement("strong");
   titel.className = "melden-titel";
-  titel.textContent = "Inhalt melden";
+  titel.textContent = t("Inhalt melden");
   const hinweis = document.createElement("p");
   hinweis.className = "melden-hinweis";
-  hinweis.textContent = "Was stimmt mit dieser Antwort nicht? Wir prüfen jede Meldung.";
+  hinweis.textContent = t("Was stimmt mit dieser Antwort nicht? Wir prüfen jede Meldung.");
 
   const liste = document.createElement("div");
   liste.className = "melden-gruende";
   liste.setAttribute("role", "radiogroup");
-  liste.setAttribute("aria-label", "Grund");
+  liste.setAttribute("aria-label", t("Grund"));
   let gewaehlt = "";
   for (const grund of GRUENDE) {
     const knopf = document.createElement("button");
@@ -116,7 +118,7 @@ export function oeffneMeldeBlatt(eintrag) {
     knopf.dataset.grund = grund.wert;
     knopf.setAttribute("role", "radio");
     knopf.setAttribute("aria-checked", "false");
-    knopf.textContent = grund.text;
+    knopf.textContent = t(grund.text);
     knopf.addEventListener("click", () => {
       gewaehlt = grund.wert;
       for (const k of liste.querySelectorAll(".melden-grund")) {
@@ -133,19 +135,19 @@ export function oeffneMeldeBlatt(eintrag) {
   notiz.className = "melden-notiz";
   notiz.rows = 2;
   notiz.maxLength = 500;
-  notiz.placeholder = "Optional: kurz beschreiben (nicht nötig)";
-  notiz.setAttribute("aria-label", "Zusätzliche Beschreibung");
+  notiz.placeholder = t("Optional: kurz beschreiben (nicht nötig)");
+  notiz.setAttribute("aria-label", t("Zusätzliche Beschreibung"));
 
   const reihe = document.createElement("div");
   reihe.className = "melden-reihe";
   const abbrechen = document.createElement("button");
   abbrechen.type = "button";
   abbrechen.className = "melden-knopf";
-  abbrechen.textContent = "Abbrechen";
+  abbrechen.textContent = t("Abbrechen");
   const senden = document.createElement("button");
   senden.type = "button";
   senden.className = "melden-knopf ist-primaer";
-  senden.textContent = "Melden";
+  senden.textContent = t("Melden");
   senden.disabled = true;
   reihe.append(abbrechen, senden);
 
@@ -161,19 +163,19 @@ export function oeffneMeldeBlatt(eintrag) {
 
   senden.addEventListener("click", async () => {
     senden.disabled = true;
-    senden.textContent = "Wird gesendet …";
+    senden.textContent = t("Wird gesendet …");
     try {
       await sende(nutzlastAusEintrag(eintrag, gewaehlt, notiz.value));
       schliessen();
-      showToast("Danke — die Meldung ist angekommen und wird geprüft.", "ok");
+      showToast(t("Danke — die Meldung ist angekommen und wird geprüft."), "ok");
     } catch (fehler) {
       // Auch ohne Netz darf die Meldung nicht verpuffen: sie wird lokal gemerkt und
       // beim naechsten Start erneut versucht (nachsendeOffeneMeldungen).
       merkeOffline(nutzlastAusEintrag(eintrag, gewaehlt, notiz.value));
       schliessen();
       showToast(String(fehler?.message) === "401"
-        ? "Zum Melden bitte anmelden — die Meldung wird danach gesendet."
-        : "Kein Netz — die Meldung wird später gesendet.", "warn");
+        ? t("Zum Melden bitte anmelden — die Meldung wird danach gesendet.")
+        : t("Kein Netz — die Meldung wird später gesendet."), "warn");
     }
   });
   liste.querySelector(".melden-grund")?.focus({ preventScroll: true });

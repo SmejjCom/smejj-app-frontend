@@ -12,6 +12,7 @@ import { metaOf, rawOf } from "/assets/chat-messages.js?v=3";
 import { toPlainText } from "/assets/chat-actions-menu.js?v=13";
 import { activeChatId, newChat } from "/assets/chat-store.js?v=b82";
 import { showToast } from "/assets/components.js?v=b48";
+import { t } from "/assets/i18n/ui.js?v=3";
 
 export const PIN_KEY = "smejj.angepinnt.v1";
 const MAX_ZITAT = 1200;
@@ -192,6 +193,28 @@ export function fuehreAus(act, eintrag) {
   return undefined;
 }
 
+/**
+ * Uebersetzt ein frisch gebautes Nachrichten-Menue (Geraetetest 20.09., iPhone + Android mit
+ * englischer Oberflaeche): die Leiste hiess "Copy / More", das Menue dahinter blieb DEUTSCH —
+ * samt "Inhalt melden", das ein englischer Play-Pruefer finden muss. buildMenu bleibt rein und
+ * deutsch (Quellsprache = Schluessel); uebersetzt wird hier, wo t() ohnehin geladen ist.
+ */
+export function uebersetzeMenue(menu, uebersetze = t) {
+  if (!menu || menu.dataset.sprache === "an") return 0;
+  menu.dataset.sprache = "an";
+  let zahl = 0;
+  const hilfe = menu.getAttribute("aria-label");
+  if (hilfe) menu.setAttribute("aria-label", uebersetze(hilfe));
+  for (const knopf of menu.querySelectorAll("[data-act]")) {
+    const wort = knopf.querySelector("span:last-of-type");
+    const quelle = wort?.textContent;
+    if (!quelle) continue;
+    const neu = uebersetze(quelle);
+    if (neu && neu !== quelle) { wort.textContent = neu; zahl += 1; }
+  }
+  return zahl;
+}
+
 export function initChatMenueMehr() {
   if (document.documentElement.dataset.menueMehr === "an") return false;
   document.documentElement.dataset.menueMehr = "an";
@@ -207,6 +230,12 @@ export function initChatMenueMehr() {
     new MutationObserver((aenderungen) => {
       if (aenderungen.some((a) => a.type === "childList")) wendePinsAn();
     }).observe(log, { childList: true });
+  }
+  // Das Menue haengt direkt am BODY (chat-actions.js toggleMenu) — nur dessen Kinder beobachten.
+  if (typeof MutationObserver === "function") {
+    new MutationObserver((aenderungen) => {
+      for (const a of aenderungen) for (const k of a.addedNodes) if (k.classList?.contains("msg-menu")) uebersetzeMenue(k);
+    }).observe(document.body, { childList: true });
   }
   wendePinsAn();
   return true;
