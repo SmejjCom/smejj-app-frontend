@@ -2,6 +2,12 @@
 import zusatz from "./ru-2.js?v=1";
 
 export default {
+  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
+  "Herunterladen": "Скачать",
+  "Bild im Vollbild": "Изображение во весь экран",
+  "Nur Text teilen": "Поделиться только текстом",
+  "Vorherige Version": "Предыдущая версия",
+  "Nachricht bearbeiten": "Изменить сообщение",
   // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "Добавить материалы",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, таблица или текст. smejj прочитает, а вы зададите вопросы.",

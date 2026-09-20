@@ -46,7 +46,7 @@ import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainTex
 // sanitizeForSpeech erst beim Vorlese-Klick laden (2026-08-24 "Startseite
 // abspecken") — derselbe Spezifizierer wie ueberall, sonst laedt der Browser
 // die Datei doppelt (Vorfall 2026-07-29, siehe oben).
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=b83";
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=verlauf-20260722";
 import { showToast } from "/assets/components.js?v=b48";
 import { wendeAn, entferneEndgueltig } from "./chat-neu-versuch.js?v=1";
 
@@ -86,8 +86,10 @@ function makeButton(doc, spec) {
   button.type = "button";
   button.className = "msg-act";
   button.dataset.act = spec.act;
-  button.setAttribute("aria-label", spec.label);
-  button.title = spec.label;
+  // Der Screenreader las die deutschen Beschriftungen vor, auch wenn daneben
+  // englische Woerter standen (Geraetemessung 20.09.2026, Play-Beleg).
+  button.setAttribute("aria-label", t(spec.label));
+  button.title = t(spec.label);
   button.innerHTML = `<span class="msg-act-icon" aria-hidden="true">${iconMarkup(spec.icon)}</span>`;
   return button;
 }
@@ -200,7 +202,7 @@ function syncVersions(bar, meta) {
   if (!picker) {
     picker = document.createElement("span");
     picker.className = "msg-versions";
-    picker.innerHTML = `<button type="button" class="msg-act msg-version-step" data-act="version-prev" aria-label="Vorherige Version"><span class="msg-act-icon" aria-hidden="true">${iconMarkup("left")}</span></button>`
+    picker.innerHTML = `<button type="button" class="msg-act msg-version-step" data-act="version-prev" aria-label="${t("Vorherige Version").replace(/"/g, "&quot;")}"><span class="msg-act-icon" aria-hidden="true">${iconMarkup("left")}</span></button>`
       + '<span class="msg-version-label"></span>'
       + `<button type="button" class="msg-act msg-version-step" data-act="version-next" aria-label="${t("Nächste Version").replace(/"/g, "&quot;")}"><span class="msg-act-icon" aria-hidden="true">${iconMarkup("right")}</span></button>`;
     bar.append(picker);
@@ -346,7 +348,7 @@ function startEdit(entry) {
   const editor = document.createElement("div");
   editor.className = "msg-editor";
   editor.dataset.for = meta.id;
-  editor.innerHTML = '<textarea class="msg-editor-field" aria-label="Nachricht bearbeiten" rows="2"></textarea>'
+  editor.innerHTML = `<textarea class="msg-editor-field" aria-label="${t("Nachricht bearbeiten").replace(/"/g, "&quot;")}" rows="2"></textarea>`
     + '<div class="msg-editor-row">'
     + '<span class="msg-editor-note">Erzeugt eine neue Version. Die alte bleibt erreichbar.</span>'
     + '<span class="msg-editor-buttons">'

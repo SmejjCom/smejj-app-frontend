@@ -2,6 +2,12 @@
 import zusatz from "./id-2.js?v=1";
 
 export default {
+  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
+  "Herunterladen": "Unduh",
+  "Bild im Vollbild": "Gambar layar penuh",
+  "Nur Text teilen": "Bagikan teks saja",
+  "Vorherige Version": "Versi sebelumnya",
+  "Nachricht bearbeiten": "Sunting pesan",
   // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "Tambahkan sesuatu",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, lembar kerja, atau teks. smejj membacanya dan kamu bertanya.",

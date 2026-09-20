@@ -2,6 +2,12 @@
 import zusatz from "./zh-2.js?v=1";
 
 export default {
+  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
+  "Herunterladen": "下载",
+  "Bild im Vollbild": "全屏图片",
+  "Nur Text teilen": "仅分享文本",
+  "Vorherige Version": "上一版本",
+  "Nachricht bearbeiten": "编辑消息",
   // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "添加内容",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF、Word、表格或文本。smejj 读完，你来提问。",

@@ -2,6 +2,12 @@
 import zusatz from "./ar-2.js?v=1";
 
 export default {
+  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
+  "Herunterladen": "تنزيل",
+  "Bild im Vollbild": "صورة بملء الشاشة",
+  "Nur Text teilen": "مشاركة النص فقط",
+  "Vorherige Version": "النسخة السابقة",
+  "Nachricht bearbeiten": "تحرير الرسالة",
   // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "إضافة أشياء",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF أو Word أو جدول أو نص. يقرأها smejj وتسأل أنت عنها.",

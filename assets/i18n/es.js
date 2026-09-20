@@ -2,6 +2,12 @@
 import zusatz from "./es-2.js?v=1";
 
 export default {
+  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
+  "Herunterladen": "Descargar",
+  "Bild im Vollbild": "Imagen a pantalla completa",
+  "Nur Text teilen": "Compartir solo el texto",
+  "Vorherige Version": "Versión anterior",
+  "Nachricht bearbeiten": "Editar mensaje",
   // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "Añadir cosas",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, hoja de cálculo o texto. smejj lo lee y tú preguntas sobre ello.",

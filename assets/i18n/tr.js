@@ -2,6 +2,12 @@
 import zusatz from "./tr-2.js?v=1";
 
 export default {
+  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
+  "Herunterladen": "İndir",
+  "Bild im Vollbild": "Tam ekran görsel",
+  "Nur Text teilen": "Yalnızca metni paylaş",
+  "Vorherige Version": "Önceki sürüm",
+  "Nachricht bearbeiten": "İletiyi düzenle",
   // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "Bir şeyler ekle",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, tablo ya da metin. smejj okur, sen sorarsın.",

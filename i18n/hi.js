@@ -2,6 +2,12 @@
 import zusatz from "./hi-2.js?v=1";
 
 export default {
+  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
+  "Herunterladen": "डाउनलोड",
+  "Bild im Vollbild": "पूर्ण स्क्रीन में छवि",
+  "Nur Text teilen": "केवल टेक्स्ट साझा करें",
+  "Vorherige Version": "पिछला संस्करण",
+  "Nachricht bearbeiten": "संदेश संपादित करें",
   // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "चीज़ें जोड़ें",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, स्प्रेडशीट या टेक्स्ट। smejj उन्हें पढ़ता है और आप सवाल पूछते हैं।",

@@ -2,6 +2,12 @@
 import zusatz from "./ja-2.js?v=1";
 
 export default {
+  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
+  "Herunterladen": "ダウンロード",
+  "Bild im Vollbild": "全画面の画像",
+  "Nur Text teilen": "テキストのみ共有",
+  "Vorherige Version": "前のバージョン",
+  "Nachricht bearbeiten": "メッセージを編集",
   // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "ものを追加",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF、Word、表計算、テキスト。smejj が読み、あなたが質問します。",

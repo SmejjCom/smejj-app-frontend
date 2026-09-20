@@ -2,6 +2,12 @@
 import zusatz from "./ko-2.js?v=1";
 
 export default {
+  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
+  "Herunterladen": "내려받기",
+  "Bild im Vollbild": "전체 화면 이미지",
+  "Nur Text teilen": "텍스트만 공유",
+  "Vorherige Version": "이전 버전",
+  "Nachricht bearbeiten": "메시지 편집",
   // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "항목 추가",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, 스프레드시트 또는 텍스트. smejj가 읽고 당신이 질문합니다.",

@@ -15,7 +15,7 @@
 // Design-Regeln des Betreibers: viereckig, wenig Farbe, grosse Schrift.
 import { API_ORIGIN } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
-import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=8";
+import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=9";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const STIL_ID = "smejj-medien-ansicht-stil";
@@ -171,14 +171,14 @@ export async function oeffneVollbild(el) {
   huelle.className = "smejj-vollbild";
   huelle.setAttribute("role", "dialog");
   huelle.setAttribute("aria-modal", "true");
-  huelle.setAttribute("aria-label", "Bild im Vollbild");
+  huelle.setAttribute("aria-label", t("Bild im Vollbild"));
   const leiste = document.createElement("div");
   leiste.className = "smejj-vollbild-leiste";
   const titel = document.createElement("span");
   titel.className = "smejj-vb-titel";
-  titel.textContent = el.getAttribute("alt") || "Bild";
-  const laden = knopf("Herunterladen");
-  const teilen = knopf("Teilen");
+  titel.textContent = el.getAttribute("alt") || t("Bild");
+  const laden = knopf(t("Herunterladen"));
+  const teilen = knopf(t("Teilen"));
   const zu = knopf("✕", { titel: t("Schließen") });
   leiste.append(titel, laden, teilen, zu);
   const buehne = document.createElement("div");
@@ -305,10 +305,10 @@ export async function oeffneTeilenBlatt(el, { text = "" } = {}) {
 
   const dateiReihe = blatt.querySelector('[data-rolle="datei"]');
   const alsDatei = knopf(t("Als Datei teilen …"), { klasse: "haupt" });
-  const laden = knopf("Herunterladen");
+  const laden = knopf(t("Herunterladen"));
   dateiReihe.append(alsDatei, laden);
   if (text) {
-    const nurText = knopf("Nur Text teilen");
+    const nurText = knopf(t("Nur Text teilen"));
     nurText.addEventListener("click", () => {
       if (navigator.share) navigator.share({ text }).catch(() => {});
       else kopiere(text);

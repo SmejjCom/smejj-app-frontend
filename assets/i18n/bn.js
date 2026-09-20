@@ -2,6 +2,12 @@
 import zusatz from "./bn-2.js?v=1";
 
 export default {
+  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
+  "Herunterladen": "ডাউনলোড",
+  "Bild im Vollbild": "পূর্ণ পর্দায় ছবি",
+  "Nur Text teilen": "শুধু লেখা শেয়ার করুন",
+  "Vorherige Version": "আগের সংস্করণ",
+  "Nachricht bearbeiten": "বার্তা সম্পাদনা করুন",
   // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "জিনিস যোগ করুন",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, স্প্রেডশিট বা টেক্সট। smejj সেগুলো পড়ে আর আপনি প্রশ্ন করেন।",
