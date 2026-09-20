@@ -26,6 +26,8 @@
 
 // Versionierter Pfad wie in index.html (QA-Welle 1, Befund F-07): Ein abweichender
 // Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js mit eigenem Zustand.
+// Oberflaechentexte laufen ueber die Sprachdateien (Inventur 20.09.2026).
+import { t } from "./i18n/ui.js?v=3";
 import {
   listChats, openChat, renameChat, deleteChat, restoreChat, activeChatId, togglePinChat, newChat,
   listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
@@ -273,7 +275,7 @@ function injectStyles() {
       #chatHistory .ch-menu button { min-height: 44px; padding: 11px 13px; }
       /* Umbenennen stand auf dem Handy in EINER Zeile: Eingabefeld, Speichern
          und Abbrechen brauchen zusammen 426 px, die Karte bietet 265 px. Der
-         "Abbrechen"-Knopf lag dadurch bei 375 px Fensterbreite komplett
+         t("Abbrechen")-Knopf lag dadurch bei 375 px Fensterbreite komplett
          ausserhalb der Karte (Messung: rechte Kante 463 px) und war nicht mehr
          erreichbar. Jetzt bekommt das Feld eine eigene Zeile, die beiden
          Knoepfe teilen sich die naechste. */
@@ -366,7 +368,7 @@ function zeichne(target) {
     // Ein Suchfeld waere bei null Chats sinnlos, der Knopf ist es nicht.
     beobachterAus();
     const leer = document.createDocumentFragment();
-    leer.append(bausteinLeer("Noch keine gespeicherten Unterhaltungen. Neue Chats werden hier automatisch abgelegt."));
+    leer.append(bausteinLeer(t("Noch keine gespeicherten Unterhaltungen. Neue Chats werden hier automatisch abgelegt.")));
     const platz = document.createElement("div");
     platz.className = "ch-leer-aktion";
     platz.append(bausteinNeuKnopf());
@@ -612,7 +614,7 @@ function oeffneMenu(karte, chat) {
 
   // Eintraege: Strichsymbol + Text (menuEintrag aus chat-history-cards.js,
   // Befund F8). Der Text ist der zugaengliche Name, das Symbol aria-hidden.
-  menu.append(menuEintrag("Öffnen", "oeffnen", () => { menuSchliessen(); openChat(chat.id).catch(() => {}); }));
+  menu.append(menuEintrag(t("Öffnen"), "oeffnen", () => { menuSchliessen(); openChat(chat.id).catch(() => {}); }));
   const angeheftet = chat.pinned === true;
   menu.append(menuEintrag(angeheftet ? "Nicht mehr anheften" : "Oben anheften", angeheftet ? "abheften" : "anheften", async () => {
     menuSchliessen();
@@ -622,7 +624,7 @@ function oeffneMenu(karte, chat) {
   menu.append(menuEintrag("Umbenennen", "umbenennen", () => { menuSchliessen(); zeigeUmbenennen(karte, chat); }));
   // Projekte (2026-08-13): Zuordnung ueber einen kleinen Picker an der Karte.
   const istZugeordnet = Boolean(chat.projectId) && alleProjekte.some((projekt) => projekt.id === chat.projectId);
-  menu.append(menuEintrag(istZugeordnet ? "Projekt ändern…" : "Zu Projekt…", "projekt", () => {
+  menu.append(menuEintrag(istZugeordnet ? t("Projekt ändern…") : "Zu Projekt…", "projekt", () => {
     menuSchliessen();
     zeigeProjektPicker(karte, chat);
   }));
@@ -632,7 +634,7 @@ function oeffneMenu(karte, chat) {
   // UI/UX-Programm 02.09., Nr. 10: Rueckgaengig statt Bestaetigung. Loeschen ist
   // weich (Papierkorb, 30 Tage) — also sofort tun und 8 s lang zuruecknehmbar
   // machen, statt "Wirklich loeschen?" zu fragen. Kein Fehler ist endgueltig.
-  const loeschen = menuEintrag("Löschen", "loeschen", async () => {
+  const loeschen = menuEintrag(t("Löschen"), "loeschen", async () => {
     menuSchliessen();
     const ok = await deleteChat(chat.id).catch(() => false);
     render();
@@ -660,11 +662,11 @@ export function zeigeRueckgaengig(chat, { container = view(), restore = restoreC
   leiste.className = "msg-undo ch-undo";
   leiste.setAttribute("role", "status");
   const text = document.createElement("span");
-  text.textContent = `„${(chat.titel || chat.title || "Gespräch").slice(0, 40)}“ in den Papierkorb verschoben — 30 Tage wiederherstellbar.`;
+  text.textContent = `„${(chat.titel || chat.title || t("Gespräch")).slice(0, 40)}“ in den Papierkorb verschoben — 30 Tage wiederherstellbar.`;
   const knopf = document.createElement("button");
   knopf.type = "button";
   knopf.className = "msg-undo-button";
-  knopf.textContent = "Rückgängig";
+  knopf.textContent = t("Rückgängig");
   knopf.addEventListener("click", async () => {
     knopf.disabled = true;
     await Promise.resolve(restore(chat.id)).catch(() => {});
@@ -695,7 +697,7 @@ function zeigeUmbenennen(karte, chat) {
   speichern.textContent = "Speichern";
   const abbrechen = document.createElement("button");
   abbrechen.type = "button";
-  abbrechen.textContent = "Abbrechen";
+  abbrechen.textContent = t("Abbrechen");
 
   const senden = async () => {
     await renameChat(chat.id, eingabe.value).catch(() => {});

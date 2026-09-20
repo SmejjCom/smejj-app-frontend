@@ -13,6 +13,8 @@
 //
 // Kein Upload in Stufe 1: 60-MB-Videos wuerden das Body-Limit der Bruecke sprengen und
 // haetten keinen Empfaenger. Die Datei bleibt lokal; der Verweis traegt Name, Art, Groesse.
+// Oberflaechentexte ueber die Sprachdateien (Inventur 20.09.2026).
+import { t } from "./i18n/ui.js?v=3";
 const anhaenge = [];
 let seq = 0;
 const VORSCHAU_MAX_BYTES = 200 * 1024 * 1024;
@@ -39,13 +41,13 @@ export function dateiArt(file) {
 
 const WORT = Object.freeze({ video: "Video", bild: "Bild", audio: "Audio", pdf: "PDF", archiv: "Archiv", dokument: "Dokument", datei: "Datei" });
 const HINWEIS = Object.freeze({
-  video: "smejj kann Videos noch nicht ansehen — der Verweis geht mit.",
-  audio: "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.",
-  pdf: "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.",
-  archiv: "Archive werden nicht geoeffnet — der Verweis geht mit.",
-  dokument: "Inhalt wird noch nicht gelesen — der Verweis geht mit.",
-  bild: "Weiteres Bild — nur das erste Bild wird angesehen.",
-  datei: "Der Verweis geht mit."
+  video: t("smejj kann Videos noch nicht ansehen — der Verweis geht mit."),
+  audio: t("Tonspur wird noch nicht ausgewertet — der Verweis geht mit."),
+  pdf: t("PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit."),
+  archiv: t("Archive werden nicht geoeffnet — der Verweis geht mit."),
+  dokument: t("Inhalt wird noch nicht gelesen — der Verweis geht mit."),
+  bild: t("Weiteres Bild — nur das erste Bild wird angesehen."),
+  datei: t("Der Verweis geht mit.")
 });
 
 /** Verweis-Zeile fuer die Aufgabe — pur und testbar. */
@@ -72,7 +74,7 @@ function reihe(input) {
     row = document.createElement("div");
     row.id = "anhangChipRow";
     row.className = "paste-attach-row anhang-chip-row";
-    row.setAttribute("aria-label", "Anhänge");
+    row.setAttribute("aria-label", t("Anhänge"));
     input.parentElement.insertBefore(row, input);
   }
   return row;

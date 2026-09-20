@@ -9,6 +9,7 @@
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
 import { fetchStreamWithRetry } from "./fetch-retry.js";
+import { t } from "../i18n/ui.js?v=3";
 import { API_ORIGIN } from "../config.js";
 import { mitLiveDaten } from "./live-daten.js";
 import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js";
@@ -172,7 +173,7 @@ export function beendeDenken(output, jetzt = () => Date.now()) {
 // ist die Karte beantwortet (Knoepfe aus, gewaehlte Option markiert) —
 // wie "Skipped" bei Antigravity. Viereckig, ohne Farbe ausser dem Akzent.
 
-const FRAGE_UEBERSPRINGEN_TEXT = "Übersprungen — entscheide selbst und mach weiter.";
+const FRAGE_UEBERSPRINGEN_TEXT = t("Übersprungen — entscheide selbst und mach weiter.");
 
 function sendeAlsNutzer(text) {
   const feld = document.getElementById("startMessage");
@@ -299,7 +300,7 @@ export function zeigeFrage(output, frage, { senden = sendeAlsNutzer } = {}) {
   karte.className = "entry assistant chat-frage";
   karte.dataset.smejjFrage = "true";
   karte.setAttribute("role", "group");
-  karte.setAttribute("aria-label", "Rückfrage");
+  karte.setAttribute("aria-label", t("Rückfrage"));
   const titel = document.createElement("p");
   titel.className = "chat-frage-titel";
   titel.textContent = text;
@@ -316,7 +317,7 @@ export function zeigeFrage(output, frage, { senden = sendeAlsNutzer } = {}) {
       k.setAttribute("disabled", "");
       if (k === gewaehlt) k.classList.add("gewaehlt");
     }
-    stand.textContent = gewaehlt ? `Gewählt: ${gewaehlt.dataset.option}` : "Übersprungen";
+    stand.textContent = gewaehlt ? `Gewählt: ${gewaehlt.dataset.option}` : t("Übersprungen");
   };
   wahl.forEach((option, i) => {
     const knopf = document.createElement("button");
@@ -367,11 +368,11 @@ export function clearThinkingState(output) {
  */
 export function verstaendlicheMeldung(status, roh) {
   const code = String(roh || "").trim();
-  if (status === 401 || /authentication_required|session_revoked_or_expired/.test(code)) return "Du bist nicht mehr angemeldet. Nach der Anmeldung geht es hier weiter.";
-  if (status === 403) return "Dafür fehlt die Berechtigung in deinem Konto.";
-  if (status === 429 || /rate_limit/.test(code)) return "Gerade zu viele Anfragen auf einmal. In 20 Sekunden kannst du es noch einmal schicken.";
-  if (status === 402) return "Dein Guthaben ist aufgebraucht. Unter Einstellungen → API kannst du es aufladen.";
-  if (status >= 500 || /backends failed|model_unavailable/i.test(code)) return "Die Modelle antworten gerade nicht. Das ist unser Fehler, nicht deiner.";
+  if (status === 401 || /authentication_required|session_revoked_or_expired/.test(code)) return t("Du bist nicht mehr angemeldet. Nach der Anmeldung geht es hier weiter.");
+  if (status === 403) return t("Dafür fehlt die Berechtigung in deinem Konto.");
+  if (status === 429 || /rate_limit/.test(code)) return t("Gerade zu viele Anfragen auf einmal. In 20 Sekunden kannst du es noch einmal schicken.");
+  if (status === 402) return t("Dein Guthaben ist aufgebraucht. Unter Einstellungen → API kannst du es aufladen.");
+  if (status >= 500 || /backends failed|model_unavailable/i.test(code)) return t("Die Modelle antworten gerade nicht. Das ist unser Fehler, nicht deiner.");
   return code;
 }
 
@@ -384,7 +385,7 @@ export function fehlerAktion(output, status, frage, { senden = sendeAlsNutzer, g
     const knopf = haengeAktionsKnopf(output, "Anmelden", "anmelden", { senden: () => gehZu("/auth/login/?zurueck=" + encodeURIComponent(location.pathname)) });
     return knopf;
   }
-  if (status === 402) return haengeAktionsKnopf(output, "Zu den Einstellungen", "einstellungen", { senden: () => gehZu("/settings") });
+  if (status === 402) return haengeAktionsKnopf(output, t("Zu den Einstellungen"), "einstellungen", { senden: () => gehZu("/settings") });
   if (!frage) return null;
   const knopf = haengeAktionsKnopf(output, status === 429 ? "In 20 s erneut versuchen" : "Erneut versuchen", frage, { senden });
   if (knopf && status === 429) {
@@ -609,7 +610,7 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
   // Der EINE Renderaufruf dieses Pfads (tests/chat-markdown.test.mjs zaehlt).
   if (typeof renderMarkdown === "function") renderMarkdown(output);
   // Nach dem Rendern, damit der Knopf kein Markdown ist: ein Klick statt »genauer« tippen.
-  haengeAktionsKnopf(output, "Gründlicher antworten", `genauer: ${letzteNutzerfrage(body)}`);
+  haengeAktionsKnopf(output, t("Gründlicher antworten"), `genauer: ${letzteNutzerfrage(body)}`);
   return true;
 }
 

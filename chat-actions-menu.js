@@ -4,6 +4,8 @@
 // chat-store.js doppelt) laedt jeder Haken erst, wenn er gebraucht wird — Handy-Stile nur am
 // Handy, Verlaufs- und Code-Helfer erst mit offenem Chat bzw. Code-Bereich. Jeder Haken behaelt
 // die Form import("/assets/…").catch(() => {}) — die Modultests pruefen genau diese Zeile.
+// Oberflaechentexte laufen ueber die Sprachdateien (Inventur 20.09.2026).
+import { t } from "./i18n/ui.js?v=3";
 if (typeof document !== "undefined") {
   const beiHandy = (lade) => {
     try {
@@ -75,7 +77,7 @@ const ITEMS = Object.freeze({
   plain: { act: "copy-plain", label: "Ohne Formatierung kopieren", icon: "text" },
   speak: { act: "speak", label: "Vorlesen", icon: "volume" },
   fork: { act: "fork", label: "Ab hier neuen Chat starten", icon: "fork" },
-  remove: { act: "remove", label: "Ab hier löschen", icon: "trash", danger: true }
+  remove: { act: "remove", label: t("Ab hier löschen"), icon: "trash", danger: true }
 });
 
 // Betreiber 16.09.2026: "Teilen fehlt und soll unbedingt hinzugefuegt werden … umfangreicher,
@@ -91,8 +93,8 @@ const MEHR = Object.freeze({
   reply: { act: "reply", label: "Antworten", icon: "reply" },
   quote: { act: "quote", label: "Zitieren", icon: "quote" },
   forward: { act: "forward", label: "Weiterleiten", icon: "forward" },
-  translate: { act: "translate", label: "Übersetzen", icon: "translate" },
-  select: { act: "select-text", label: "Text auswählen", icon: "select" },
+  translate: { act: "translate", label: t("Übersetzen"), icon: "translate" },
+  select: { act: "select-text", label: t("Text auswählen"), icon: "select" },
   // Google-Play-Pflicht fuer KI-Inhalte (Ablehnung 20.09.2026): melden ohne die App zu
   // verlassen. Nur bei Antworten — die eigene Frage hat keine KI erzeugt.
   melden: { act: "report", label: "Inhalt melden", icon: "flag", danger: true }
@@ -296,7 +298,7 @@ export function buildSourcePanel(doc, sources, now = new Date()) {
   // 2026-07-28: "Verbindung zum Server unterbrochen"), waere "Quelle dieser
   // Antwort" eine Behauptung, die nicht stimmt — die Seite wurde geladen, die
   // Antwort beruht aber nicht darauf.
-  panel.setAttribute("aria-label", "Für diese Frage geladene Seiten");
+  panel.setAttribute("aria-label", t("Für diese Frage geladene Seiten"));
 
   const kopf = doc.createElement("div");
   kopf.className = "msg-sources-head";

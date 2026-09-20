@@ -14,6 +14,7 @@
 // Dieses Modul laedt erst beim ersten Klick auf ein Bild (chat-medien.js).
 // Design-Regeln des Betreibers: viereckig, wenig Farbe, grosse Schrift.
 import { API_ORIGIN } from "./config.js";
+import { t } from "./i18n/ui.js?v=3";
 import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=7";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
@@ -155,7 +156,7 @@ export async function herunterladen(el) {
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   } catch {
-    meldung("Herunterladen gerade nicht möglich. Bitte gleich noch einmal versuchen.", "warn");
+    meldung(t("Herunterladen gerade nicht möglich. Bitte gleich noch einmal versuchen."), "warn");
   }
 }
 
@@ -178,7 +179,7 @@ export async function oeffneVollbild(el) {
   titel.textContent = el.getAttribute("alt") || "Bild";
   const laden = knopf("Herunterladen");
   const teilen = knopf("Teilen");
-  const zu = knopf("✕", { titel: "Schließen" });
+  const zu = knopf("✕", { titel: t("Schließen") });
   leiste.append(titel, laden, teilen, zu);
   const buehne = document.createElement("div");
   buehne.className = "smejj-vollbild-buehne";
@@ -218,7 +219,7 @@ const ABLAUF = [["1", "24 Stunden"], ["7", "7 Tage"], ["30", "30 Tage"], ["0", "
 const STATUS_TEXT = { aktiv: "Aktiv", widerrufen: "Widerrufen", abgelaufen: "Abgelaufen", aufgebraucht: "Bereits genutzt" };
 
 async function kopiere(text) {
-  try { await navigator.clipboard.writeText(text); meldung("Link kopiert."); } catch { meldung("Kopieren nicht möglich — Link bitte markieren.", "warn"); }
+  try { await navigator.clipboard.writeText(text); meldung("Link kopiert."); } catch { meldung(t("Kopieren nicht möglich — Link bitte markieren."), "warn"); }
 }
 
 function linkZeile(link, { beiWiderruf }) {
@@ -249,11 +250,11 @@ function linkZeile(link, { beiWiderruf }) {
       weg.disabled = true;
       try {
         await anfrage(`/teilen?token=${encodeURIComponent(link.token)}`, { method: "DELETE" });
-        meldung("Link widerrufen — er funktioniert ab sofort nicht mehr.");
+        meldung(t("Link widerrufen — er funktioniert ab sofort nicht mehr."));
         beiWiderruf();
       } catch {
         weg.disabled = false;
-        meldung("Widerrufen gerade nicht möglich.", "warn");
+        meldung(t("Widerrufen gerade nicht möglich."), "warn");
       }
     });
     reihe.append(weg);
@@ -303,7 +304,7 @@ export async function oeffneTeilenBlatt(el, { text = "" } = {}) {
   }
 
   const dateiReihe = blatt.querySelector('[data-rolle="datei"]');
-  const alsDatei = knopf("Als Datei teilen …", { klasse: "haupt" });
+  const alsDatei = knopf(t("Als Datei teilen …"), { klasse: "haupt" });
   const laden = knopf("Herunterladen");
   dateiReihe.append(alsDatei, laden);
   if (text) {
@@ -320,9 +321,9 @@ export async function oeffneTeilenBlatt(el, { text = "" } = {}) {
     try {
       const datei = await holeDatei(el);
       if (kannDateiTeilen(datei)) await navigator.share({ files: [datei], ...(text ? { text } : {}) }).catch(() => {});
-      else { meldung("Dieser Browser kann keine Dateien teilen — die Datei wird heruntergeladen."); await herunterladen(el); }
+      else { meldung(t("Dieser Browser kann keine Dateien teilen — die Datei wird heruntergeladen.")); await herunterladen(el); }
     } catch {
-      meldung("Teilen gerade nicht möglich.", "warn");
+      meldung(t("Teilen gerade nicht möglich."), "warn");
     } finally {
       alsDatei.disabled = false;
     }
@@ -336,7 +337,7 @@ export async function oeffneTeilenBlatt(el, { text = "" } = {}) {
       if (!links.length) {
         const leer = document.createElement("li");
         leer.className = "klein";
-        leer.textContent = "Noch kein Link — dieses Medium ist nur für dich sichtbar.";
+        leer.textContent = t("Noch kein Link — dieses Medium ist nur für dich sichtbar.");
         liste.append(leer);
       }
       for (const link of links) liste.append(linkZeile(link, { beiWiderruf: ladeListe }));
@@ -345,7 +346,7 @@ export async function oeffneTeilenBlatt(el, { text = "" } = {}) {
     }
   }
 
-  const erstellen = knopf("Link erstellen", { klasse: "haupt" });
+  const erstellen = knopf(t("Link erstellen"), { klasse: "haupt" });
   blatt.querySelector('[data-rolle="erstellen"]').append(erstellen);
   erstellen.addEventListener("click", async () => {
     erstellen.disabled = true;
@@ -355,13 +356,13 @@ export async function oeffneTeilenBlatt(el, { text = "" } = {}) {
       await kopiere(link.url);
       await ladeListe();
     } catch {
-      meldung("Link konnte nicht erstellt werden.", "warn");
+      meldung(t("Link konnte nicht erstellt werden."), "warn");
     } finally {
       erstellen.disabled = false;
     }
   });
 
-  const zu = knopf("Schließen");
+  const zu = knopf(t("Schließen"));
   zu.addEventListener("click", schliessen);
   blatt.querySelector('[data-rolle="fuss"]').append(zu);
   alsDatei.focus({ preventScroll: true });

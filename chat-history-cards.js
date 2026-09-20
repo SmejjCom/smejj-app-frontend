@@ -20,6 +20,7 @@ import {
 // reinen Anzeige-Helfer in chat-history-text.js — format.js war deren
 // Teilmenge und ist entfallen.
 import { zeitText, mitHervorhebung, trefferAusschnitt } from "/assets/chat-history-text.js?v=b47c1";
+import { t } from "./i18n/ui.js?v=3";
 // Geteilte Icon-Bibliothek (Spur, Navigation): Papierkorb, Ordner, Plus kommen
 // von dort — derselbe Spezifizierer wie in spur-start.js, sonst gaebe es eine
 // zweite Modulinstanz.
@@ -120,7 +121,7 @@ export function bausteinGruppe(titel, anzahl) {
     // Mockup Bildschirm 47: rechts am Gruppenkopf steht, wie viele es sind.
     const n = document.createElement("span");
     n.className = "ch-gruppe-n";
-    n.textContent = `${anzahl} ${anzahl === 1 ? "Gespräch" : "Gespräche"}`;
+    n.textContent = `${anzahl} ${anzahl === 1 ? t("Gespräch") : t("Gespräche")}`;
     kopf.append(n);
   }
   return kopf;
@@ -154,7 +155,7 @@ export function createCardBuilders(ctx) {
     eingabe.type = "search";
     eingabe.autocomplete = "off";
     eingabe.value = ctx.getSuchbegriff();
-    eingabe.setAttribute("aria-label", "Verlauf durchsuchen");
+    eingabe.setAttribute("aria-label", t("Verlauf durchsuchen"));
     // Auf dem Handy passt "18 Unterhaltungen durchsuchen…" nicht ins Feld und
     // wird abgeschnitten ("… durchs"). Dort die kurze Fassung.
     // Mockup Bildschirm 47: das Feld sagt, dass auch der ANTWORTTEXT
@@ -216,7 +217,7 @@ export function createCardBuilders(ctx) {
 
     leiste.append(machChip("", "Alle", aufbereitet.length));
     if (zaehl.angeheftet) leiste.append(machChip("angeheftet", "📌 Angeheftet", zaehl.angeheftet));
-    if (zaehl.datei) leiste.append(machChip("datei", "Mit Datei", zaehl.datei));
+    if (zaehl.datei) leiste.append(machChip("datei", t("Mit Datei"), zaehl.datei));
     if (zaehl.bild) leiste.append(machChip("bild", "Mit Bild", zaehl.bild));
     if (zaehl.code) leiste.append(machChip("code", "Mit Code", zaehl.code));
     return leiste;
@@ -265,7 +266,7 @@ export function createCardBuilders(ctx) {
     const karte = document.createElement("div");
     karte.className = `ch-karte${chat.id === aktiv ? " is-active" : ""}`;
     karte.dataset.chatId = chat.id;
-    karte.title = "Unterhaltung öffnen";
+    karte.title = t("Unterhaltung öffnen");
 
     const titel = document.createElement("div");
     titel.className = "ch-titel";
@@ -344,7 +345,7 @@ export function createProjektAktionen(ctx) {
 
     // Zweistufig wie beim Chat — mit dem Hinweis, dass die Chats NICHT
     // mitgeloescht werden (sie rutschen in die Datumsgruppen zurueck).
-    const loeschen = menuEintrag("Löschen…", "loeschen", async () => {
+    const loeschen = menuEintrag(t("Löschen…"), "loeschen", async () => {
       if (confirmingProjektId !== projekt.id) {
         confirmingProjektId = projekt.id;
         setzeMenuText(loeschen, "Wirklich? Chats bleiben erhalten");
@@ -378,7 +379,7 @@ export function createProjektAktionen(ctx) {
     speichern.textContent = "Speichern";
     const abbrechen = document.createElement("button");
     abbrechen.type = "button";
-    abbrechen.textContent = "Abbrechen";
+    abbrechen.textContent = t("Abbrechen");
 
     const senden = async () => {
       await benenneProjektUm(projekt.id, eingabe.value).catch(() => {});

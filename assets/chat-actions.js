@@ -24,8 +24,8 @@
 // 2026-08-13 dokumentierten Ausnahme: ein gesetzter Daumen schickt ein
 // Qualitaets-Signal an den Control-Server (Daten-Schwungrad). Auch das
 // fail-safe: scheitert der Versand, bleibt die Bewertung lokal sichtbar.
-
 import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=3";
+import { t } from "./i18n/ui.js?v=3";
 import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=13";
 // OHNE ?v=-Kennung — app.js importiert "./browser-context.js" (also
 // /assets/browser-context.js). Ein anderer Spezifizierer erzeugt eine ZWEITE
@@ -132,7 +132,7 @@ function ensureBar(entry) {
     bar = document.createElement("div");
     bar.className = `msg-actions is-${meta.role}`;
     bar.setAttribute("role", "group");
-    bar.setAttribute("aria-label", meta.role === "user" ? "Aktionen für deine Nachricht" : "Aktionen für diese Antwort");
+    bar.setAttribute("aria-label", meta.role === "user" ? t("Aktionen für deine Nachricht") : t("Aktionen für diese Antwort"));
     for (const spec of barSpecFor(meta.role)) bar.append(makeButton(document, spec));
     entry.after(bar);
   }
@@ -202,7 +202,7 @@ function syncVersions(bar, meta) {
     picker.className = "msg-versions";
     picker.innerHTML = `<button type="button" class="msg-act msg-version-step" data-act="version-prev" aria-label="Vorherige Version"><span class="msg-act-icon" aria-hidden="true">${iconMarkup("left")}</span></button>`
       + '<span class="msg-version-label"></span>'
-      + `<button type="button" class="msg-act msg-version-step" data-act="version-next" aria-label="Nächste Version"><span class="msg-act-icon" aria-hidden="true">${iconMarkup("right")}</span></button>`;
+      + `<button type="button" class="msg-act msg-version-step" data-act="version-next" aria-label=t("Nächste Version")><span class="msg-act-icon" aria-hidden="true">${iconMarkup("right")}</span></button>`;
     bar.append(picker);
   }
   // Mockup-Bildschirm 26, der Zusatz: es steht dabei, WANN geaendert wurde —
@@ -334,7 +334,7 @@ function applyResubmitPlan(plan) {
 function regenerate(entry) {
   const plan = planRegenerate(entry);
   if (!plan.ok) {
-    showToast("Zu dieser Antwort gibt es keine Frage im Verlauf.", "warn");
+    showToast(t("Zu dieser Antwort gibt es keine Frage im Verlauf."), "warn");
     return;
   }
   applyResubmitPlan(plan);
@@ -392,7 +392,7 @@ let vorleseUtterance = null;
 async function speakEntry(entry) {
   const synthesis = window.speechSynthesis;
   if (!synthesis) {
-    showToast("Sprachausgabe wird von diesem Browser nicht unterstützt.", "warn");
+    showToast(t("Sprachausgabe wird von diesem Browser nicht unterstützt."), "warn");
     return;
   }
   // VOR cancel() lesen (danach immer false); nur ein Klick WAEHREND einer
@@ -409,7 +409,7 @@ async function speakEntry(entry) {
     ({ sanitizeForSpeech } = await import("/assets/voice-speech-queue.js?v=emojifrei-20260825"));
   } catch (fehler) {
     console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler);
-    showToast("Vorlesen gerade nicht möglich — bitte noch einmal versuchen.", "warn");
+    showToast(t("Vorlesen gerade nicht möglich — bitte noch einmal versuchen."), "warn");
     return;
   }
   const text = sanitizeForSpeech(rawOf(entry), { lang: "de" });
@@ -447,9 +447,9 @@ async function forkFrom(entry) {
     const id = await createChatFrom(messages);
     if (!id) throw new Error("fork_failed");
     await openChat(id);
-    showToast("Neuer Chat ab dieser Nachricht angelegt.");
+    showToast(t("Neuer Chat ab dieser Nachricht angelegt."));
   } catch {
-    showToast("Abzweigen hat nicht geklappt.", "warn");
+    showToast(t("Abzweigen hat nicht geklappt."), "warn");
   }
 }
 
@@ -469,7 +469,7 @@ function removeFrom(entry) {
   const bar = document.createElement("div");
   bar.className = "msg-undo";
   bar.setAttribute("role", "status");
-  bar.innerHTML = `<span>${plan.anzahl === 1 ? "1 Nachricht gelöscht" : `${plan.anzahl} Nachrichten gelöscht`}</span>`
+  bar.innerHTML = `<span>${plan.anzahl === 1 ? t("1 Nachricht gelöscht") : `${plan.anzahl} Nachrichten gelöscht`}</span>`
     + '<button type="button" class="msg-undo-button" data-act="undo">Rückgängig</button>';
   container.append(bar);
   undoState = { bar, nodes: plan.nodes, anchor: plan.anker, timer: setTimeout(clearUndo, UNDO_MS) };
