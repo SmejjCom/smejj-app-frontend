@@ -1,3 +1,5 @@
+import { t } from "./i18n/ui.js?v=3";
+
 // smejj.com — ein Kontextmenue fuer alles im Panel.
 //
 // Es gab schon eines fuer die Tabs. Statt fuer den Rechtsklick auf die Seite
@@ -107,11 +109,11 @@ export function zeigeMenue(x, y, eintraege, aufWahl) {
  */
 export function seitenEintraege({ kannZurueck = false, kannVor = false, hatAdresse = false } = {}) {
   return [
-    { id: "zurueck", text: "Zurück", aktiv: kannZurueck },
+    { id: "zurueck", text: t("Zurück"), aktiv: kannZurueck },
     { id: "vor", text: "Vorwärts", aktiv: kannVor },
-    { id: "neuLaden", text: "Neu laden", aktiv: hatAdresse },
+    { id: "neuLaden", text: t("Neu laden"), aktiv: hatAdresse },
     { id: "adresseKopieren", text: "Adresse kopieren", aktiv: hatAdresse },
-    { id: "externOeffnen", text: "In neuem Tab öffnen", aktiv: hatAdresse }
+    { id: "externOeffnen", text: t("In neuem Tab öffnen"), aktiv: hatAdresse }
   ];
 }
 

@@ -1,6 +1,6 @@
 // smejj.com — Tab-Persistenz des Browser-Panels (Zeilen-Diaet 2026-08-25,
 // ausgelagert aus browser-pane.js; Verhalten unveraendert).
-import { MAX_PERSISTED_HISTORY, MAX_TABS, NEW_TAB_TITLE, TABS_STORAGE_KEY, state } from "./browser-pane.js?v=browser-pane-20260918-8";
+import { MAX_PERSISTED_HISTORY, MAX_TABS, NEW_TAB_TITLE, TABS_STORAGE_KEY, state } from "./browser-pane.js?v=browser-pane-20260918-9";
 // E2E-Pruefung 14.09.2026: clampZoom fehlte (heute ungenutzte Kopie, browser-pane.js hat eigene) — nachgetragen, damit sie beim Einhaengen nicht wirft.
 import { clampZoom } from "./browser-pane-adressen.js?v=browser-pane-20260820-5";
 

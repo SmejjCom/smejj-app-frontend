@@ -51,8 +51,8 @@ let bausteineBereit = null;
 function ladeBausteine() {
   if (bausteineBereit) return bausteineBereit;
   bausteineBereit = Promise.all([
-    import("/assets/chat-history-text.js?v=b47c1"),
-    import("/assets/chat-history-cards.js?v=b77"),
+    import("/assets/chat-history-text.js?v=b47c2"),
+    import("/assets/chat-history-cards.js?v=b78"),
     import("/assets/chat-title-auto.js")
   ]).then(([text, karten]) => {
     ({ anzeigeTitel, anzeigeVorschau, gruppeVon, volltext, themaVon, merkmaleVon, sichereAlsMarkdown, projektGruppen } = text);
@@ -426,7 +426,7 @@ function zeichne(target) {
   const rest = nadel ? treffer : treffer.filter((eintrag) => eintrag.chat.pinned !== true);
 
   if (angeheftet.length) {
-    stueck.append(bausteinGruppe("📌 Angeheftet"));
+    stueck.append(bausteinGruppe(`📌 ${t("Angeheftet")}`));
     for (const eintrag of angeheftet) stueck.append(bausteinKarte(eintrag, aktiv, nadel));
   }
 

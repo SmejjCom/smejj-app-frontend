@@ -14,7 +14,8 @@
 // ein Umzug soll nichts umschreiben, sonst zieht er Fehler mit ein. (Ein
 // erster Versuch mit blinder Textersetzung hat prompt eine Kurzschreibweise
 // zerlegt: aus `{ stepHistory }` wurde `{ p.stepHistory }`.)
-import { behandleRechtsklick } from "./browser-pane-menue.js?v=browser-pane-20260918-2";
+import { behandleRechtsklick } from "./browser-pane-menue.js?v=browser-pane-20260918-3";
+import { t } from "./i18n/ui.js?v=3";
 
 export function baueNachrichtenEmpfang(bausteine) {
   const {
@@ -37,7 +38,7 @@ export function baueNachrichtenEmpfang(bausteine) {
       return;
     }
     if (message.type === "smejj.browser.reload" && tab.url) {
-      navigate(tab, tab.url, { push: false }); // "Erneut laden" der Fehlerseite
+      navigate(tab, tab.url, { push: false }); // t("Erneut laden") der Fehlerseite
       return;
     }
     if (message.type === "smejj.browser.navigate" && typeof message.url === "string") {

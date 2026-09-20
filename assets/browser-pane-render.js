@@ -3,10 +3,12 @@
 // Sicherheitsregeln: alles wird escaped, Screenshots nur als data:image-URL,
 // Links nur http(s) — die Shell laeuft sandboxed ohne allow-same-origin.
 
+// Oberflaechentexte ueber die Sprachdateien (Stufe 3, 20.09.2026).
+import { t } from "./i18n/ui.js?v=3";
 export function buildExternalFallbackHtml({ url, title, message }) {
   const safeUrl = escapeHtml(url || "");
   const safeTitle = escapeHtml(title || "Echter Browser erforderlich");
-  const safeMessage = escapeHtml(message || "Diese Webseite muss extern geoeffnet werden.");
+  const safeMessage = escapeHtml(message || t("Diese Webseite muss extern geoeffnet werden."));
   return `<!doctype html>
 <html lang="de">
 <head>
@@ -42,20 +44,20 @@ export function buildExternalFallbackHtml({ url, title, message }) {
 // sandboxed ohne allow-same-origin, kann also nichts direkt aufrufen.
 const FEHLER_TEXTE = Object.freeze({
   dns: {
-    titel: "Diese Website ist nicht erreichbar",
-    hinweis: "Die Adresse konnte nicht gefunden werden. Prüfe, ob sie richtig geschrieben ist."
+    titel: t("Diese Website ist nicht erreichbar"),
+    hinweis: t("Die Adresse konnte nicht gefunden werden. Prüfe, ob sie richtig geschrieben ist.")
   },
   netz: {
     titel: "Keine Verbindung",
-    hinweis: "Die Seite hat nicht geantwortet. Prüfe deine Internetverbindung und versuch es noch einmal."
+    hinweis: t("Die Seite hat nicht geantwortet. Prüfe deine Internetverbindung und versuch es noch einmal.")
   },
   zeit: {
-    titel: "Die Seite braucht zu lange",
-    hinweis: "Der Server hat nicht rechtzeitig geantwortet."
+    titel: t("Die Seite braucht zu lange"),
+    hinweis: t("Der Server hat nicht rechtzeitig geantwortet.")
   },
   allgemein: {
-    titel: "Die Seite konnte nicht geladen werden",
-    hinweis: "Etwas ist dazwischengekommen. Ein erneuter Versuch hilft oft."
+    titel: t("Die Seite konnte nicht geladen werden"),
+    hinweis: t("Etwas ist dazwischengekommen. Ein erneuter Versuch hilft oft.")
   }
 });
 
@@ -283,11 +285,11 @@ function escapeHtml(value) {
  * Zustand. Die Werte kommen als Argumente herein, damit hier nichts ueber die
  * Panel-Logik gewusst werden muss.
  */
-export function buildPaneShellHtml({ neuerTabTitel = "Neuer Tab", maxTabs = 100 } = {}) {
+export function buildPaneShellHtml({ neuerTabTitel = t("Neuer Tab"), maxTabs = 100 } = {}) {
   return `
     <div class="bp-tabstrip" role="tablist" aria-label="Browser Tabs">
       <div class="bp-tab-left">
-        <button class="bp-tab-add" type="button" title="Neuer Tab (⌘T)" aria-label="Neuer Tab">+</button>
+        <button class="bp-tab-add" type="button" title=t("Neuer Tab (⌘T)") aria-label=t("Neuer Tab")>+</button>
       </div>
       <div class="bp-tabs"></div>
       <div class="bp-tab-right">
@@ -299,19 +301,19 @@ export function buildPaneShellHtml({ neuerTabTitel = "Neuer Tab", maxTabs = 100 
     </div>
     <div class="bp-toolbar">
       <div class="bp-toolbar-left">
-        <button class="bp-nav-back" type="button" title="Zurück" aria-label="Zurück" disabled>
+        <button class="bp-nav-back" type="button" title=t("Zurück") aria-label=t("Zurück") disabled>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
         </button>
-        <button class="bp-nav-forward" type="button" title="Vorwärts" aria-label="Vorwärts" disabled>
+        <button class="bp-nav-forward" type="button" title=t("Vorwärts") aria-label=t("Vorwärts") disabled>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
         </button>
-        <button class="bp-nav-reload" type="button" title="Diese Seite neu laden (⌘R)" aria-label="Diese Seite neu laden">
+        <button class="bp-nav-reload" type="button" title=t("Diese Seite neu laden (⌘R)") aria-label=t("Diese Seite neu laden")>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v4h-4"/></svg>
         </button>
       </div>
       <form class="bp-address-form">
         <input class="bp-address" type="text" inputmode="url" autocomplete="off" spellcheck="false"
-          placeholder="Suchen oder URL eingeben" aria-label="Adressleiste und Suchleiste">
+          placeholder=t("Suchen oder URL eingeben") aria-label="Adressleiste und Suchleiste">
         <div class="bp-vorschlaege" hidden></div>
       </form>
       <div class="bp-toolbar-right">

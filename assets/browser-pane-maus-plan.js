@@ -1,3 +1,5 @@
+import { t } from "./i18n/ui.js?v=3";
+
 // smejj.com — Maus-Plan uebersetzen und Ziele pruefen (reine Funktionen).
 //
 // HERAUSGELOEST 2026-09-09 aus browser-pane-maus.js. Die Datei war auf 951 Zeilen
@@ -218,7 +220,7 @@ export async function fuehreMausAuftragAus({
   auftrag, tab, planeUrl, holeToken = () => "", sende, zeige = () => {}, abbruch = () => false
 } = {}) {
   const hosts = erlaubteHosts(tab?.url);
-  if (!hosts.length) return { ok: false, grund: "Erst eine Seite öffnen — die Maus arbeitet nur dort." };
+  if (!hosts.length) return { ok: false, grund: t("Erst eine Seite öffnen — die Maus arbeitet nur dort.") };
   if (!tab?.sessionId) return { ok: false, grund: "Die Maus braucht den Live-Browser. Diese Ansicht hat keinen." };
 
   zeige("Maus denkt nach ...");
@@ -238,11 +240,11 @@ export async function fuehreMausAuftragAus({
     });
     const daten = await antwort.json().catch(() => null);
     if (!antwort.ok || !daten?.ok) {
-      return { ok: false, grund: daten?.error ? `Maus konnte nicht planen: ${daten.error}` : "Maus konnte nicht planen." };
+      return { ok: false, grund: daten?.error ? `Maus konnte nicht planen: ${daten.error}` : t("Maus konnte nicht planen.") };
     }
     plan = daten.plan;
   } catch {
-    return { ok: false, grund: "Maus nicht erreichbar." };
+    return { ok: false, grund: t("Maus nicht erreichbar.") };
   }
 
   const auftraege = planAlsAuftraege(plan);
@@ -250,7 +252,7 @@ export async function fuehreMausAuftragAus({
   if (auftraege.fehler?.length) {
     return { ok: false, grund: `Maus hat den Plan nicht ganz verstanden (${auftraege.fehler.join("; ")}) — nichts ausgeführt.` };
   }
-  if (!auftraege.length) return { ok: false, grund: "Aus dem Plan ergab sich kein Schritt für diese Ansicht." };
+  if (!auftraege.length) return { ok: false, grund: t("Aus dem Plan ergab sich kein Schritt für diese Ansicht.") };
 
   const ergebnis = await fahreAuftraege({
     auftraege,

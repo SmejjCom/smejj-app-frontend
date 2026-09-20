@@ -13,7 +13,8 @@
 //   * das Kreuz erscheint bei schmalen Tabs nur am aktiven und beim Hover
 //   * Tabs lassen sich mit der Maus umsortieren
 //
-import { zeigeMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-2";
+import { zeigeMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-3";
+import { t } from "./i18n/ui.js?v=3";
 
 // SRP: browser-pane.js steht bei 795 von 800 Zeilen und darf nicht wachsen.
 // Dieses Modul bekommt alles hineingereicht (Zustand, Aktionen) und kennt
@@ -156,7 +157,7 @@ export function menueEintraege(tabs, tabId) {
     { id: "duplizieren", text: "Tab duplizieren", aktiv: true },
     // Ein angepinnter Tab laesst sich nicht schliessen, ohne ihn vorher zu
     // loesen — das ist der ganze Sinn des Anpinnens. Chrome macht es genauso.
-    { id: "schliessen", text: "Tab schließen", aktiv: !angepinnt },
+    { id: "schliessen", text: t("Tab schließen"), aktiv: !angepinnt },
     { id: "andereSchliessen", text: "Andere Tabs schließen", aktiv: andere > 0 },
     { id: "rechteSchliessen", text: "Tabs rechts schließen", aktiv: rechts > 0 }
   ];
@@ -182,7 +183,7 @@ export function zeichneTableiste(behaelter, {
   sortieren = null,
   oeffnen = null,
   pinnen = null,
-  neuerTabTitel = "Neuer Tab"
+  neuerTabTitel = t("Neuer Tab")
 } = {}) {
   if (!behaelter) return;
   behaelter.innerHTML = "";
@@ -333,7 +334,7 @@ function kreuzElement(tab, schliessen) {
   const kreuz = document.createElement("span");
   kreuz.className = "bp-tab-close";
   kreuz.setAttribute("role", "button");
-  kreuz.setAttribute("aria-label", `Tab schließen: ${tab.title || hostVon(tab.url) || "Neuer Tab"}`);
+  kreuz.setAttribute("aria-label", `Tab schließen: ${tab.title || hostVon(tab.url) || t("Neuer Tab")}`);
   // Angepinnte Tabs zeigen kein Kreuz (CSS), deshalb stimmt das Kuerzel hier
   // immer — Cmd+W schliesst bewusst keinen angepinnten Tab.
   kreuz.title = "Schließen (⌘W)";

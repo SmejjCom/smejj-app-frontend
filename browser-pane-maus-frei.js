@@ -5,7 +5,8 @@
 // Der Unterschied zum Plan-Modus ist kein technischer, sondern ein praktischer: Ein Plan
 // wird EINMAL gemacht und scheitert an allem, was dazwischenkommt. Hier schaut die Maus
 // nach JEDEM Schritt neu hin.
-import { alsSitzungsAktion, beschreibe, erlaubteHosts } from "./browser-pane-maus-plan.js?v=browser-pane-20260909-4";
+import { alsSitzungsAktion, beschreibe, erlaubteHosts } from "./browser-pane-maus-plan.js?v=browser-pane-20260909-5";
+import { t } from "./i18n/ui.js?v=3";
 
 //
 // Der Unterschied zum Plan-Modus ist kein technischer, sondern ein
@@ -346,7 +347,7 @@ export async function fuehreFreienLaufAus({
   // Speicher keinen traegt (Cookie-Anmeldung) und holeToken() leer bleibt.
   let frischerAusweis = "";
   const hosts = erlaubteHosts(tab?.url);
-  if (!hosts.length) return { ok: false, grund: "Erst eine Seite öffnen — die Maus arbeitet nur dort." };
+  if (!hosts.length) return { ok: false, grund: t("Erst eine Seite öffnen — die Maus arbeitet nur dort.") };
   // Die Sitzungspflicht gilt nur fuer den FERNEN Browser. Arbeitet die Maus im
   // eigenen Chrome des Nutzers (Bruecken-Erweiterung), gibt es keine Sitzung,
   // die hochkommen muesste — die Seite ist ja schon offen. Genau daran ist der
@@ -520,7 +521,7 @@ export async function fuehreFreienLaufAus({
       if (fehler?.name === "AbortError") {
         return fertig({ ok: false, grund: `Die Maus hat ${Math.round(schrittFristMs / 1000)} s auf eine Entscheidung gewartet und aufgehört — bitte den Auftrag noch einmal senden.`, gelesen });
       }
-      return fertig({ ok: false, grund: "Maus nicht erreichbar.", gelesen });
+      return fertig({ ok: false, grund: t("Maus nicht erreichbar."), gelesen });
     }
 
     // 3. HANDELN
@@ -530,7 +531,7 @@ export async function fuehreFreienLaufAus({
       // war aber der beste Fall: die Antwort stand schon auf der Seite, kein
       // Klick nötig. Das sagen wir so — und zählen richtig, nicht „1 Schritten“.
       const getan = n - 1;
-      const wie = getan === 0 ? "Maus fertig, kein Klick nötig" : getan === 1 ? "Maus fertig nach 1 Schritt" : `Maus fertig nach ${getan} Schritten`;
+      const wie = getan === 0 ? t("Maus fertig, kein Klick nötig") : getan === 1 ? "Maus fertig nach 1 Schritt" : `Maus fertig nach ${getan} Schritten`;
       return fertig({ ok: true, grund: `${wie}: ${naechste.grund}`, gelesen });
     }
     if (naechste.fehler) return fertig({ ok: false, grund: `Maus gestoppt: ${naechste.fehler}`, gelesen });

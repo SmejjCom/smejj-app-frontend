@@ -17,7 +17,8 @@
 //
 // SRP: kennt Eintraege und ihre Reihenfolge. WAS ein Eintrag ausloest, kommt
 // als Befehl herein — dadurch bleibt alles ohne DOM pruefbar.
-import { zeigeMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-2";
+import { zeigeMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-3";
+import { t } from "./i18n/ui.js?v=3";
 import { applyZoom, ZOOM_STEP } from "./browser-pane-zoom.js?v=4";
 import { clampZoom } from "./browser-pane-adressen.js?v=browser-pane-20260820-5";
 
@@ -28,18 +29,18 @@ import { clampZoom } from "./browser-pane-adressen.js?v=browser-pane-20260820-5"
 export function hauptmenueEintraege({ hatSeite = false, zoom = 1, vollbild = false, vollbildMoeglich = true, kannVor = false } = {}) {
   const prozent = Math.round(clampZoom(zoom) * 100);
   return [
-    { id: "neuerTab", text: "Neuer Tab" },
+    { id: "neuerTab", text: t("Neuer Tab") },
     // Am Handy weicht der Vorwaerts-Pfeil den 44-px-Knoepfen (browser-pane-chrome.css) —
     // hier bleibt er erreichbar, wie in Chrome fuer Android.
     { id: "vor", text: "Vorwärts", aktiv: kannVor },
     { id: "suche", text: "In Seite suchen …", aktiv: hatSeite },
     { id: "zoomPlus", text: `Vergrößern (${prozent} %)`, aktiv: hatSeite && prozent < 200 },
     { id: "zoomMinus", text: "Verkleinern", aktiv: hatSeite && prozent > 50 },
-    { id: "zoomNull", text: "Zoom zurücksetzen", aktiv: hatSeite && prozent !== 100 },
+    { id: "zoomNull", text: t("Zoom zurücksetzen"), aktiv: hatSeite && prozent !== 100 },
     { id: "vollbild", text: vollbild ? "Vollbild beenden" : "Vollbild", aktiv: vollbildMoeglich },
     { id: "adresseKopieren", text: "Adresse kopieren", aktiv: hatSeite },
-    { id: "extern", text: "Im System-Browser öffnen", aktiv: hatSeite },
-    { id: "uebersicht", text: "Zur Übersicht (Quellen, GitHub, Status)" }
+    { id: "extern", text: t("Im System-Browser öffnen"), aktiv: hatSeite },
+    { id: "uebersicht", text: t("Zur Übersicht (Quellen, GitHub, Status)") }
   ];
 }
 
@@ -95,7 +96,7 @@ export function verdrahteHauptmenue({ knopf, flaeche, activeTab, addTab, oeffneS
         // Lehnt der Browser ab (live gesehen: "not granted", wenn Chrome ferngesteuert
         // wird), soll der Klick nicht wortlos verpuffen.
         const wollteAn = !document.fullscreenElement;
-        schalteVollbild(flaeche).then((an) => { if (wollteAn && !an) zeigeHinweis("Vollbild hat der Browser gerade nicht erlaubt."); });
+        schalteVollbild(flaeche).then((an) => { if (wollteAn && !an) zeigeHinweis(t("Vollbild hat der Browser gerade nicht erlaubt.")); });
       }
       else if (wahl === "uebersicht") {
         if (document.fullscreenElement) document.exitFullscreen().catch(() => {});

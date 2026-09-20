@@ -94,7 +94,7 @@ export function initGlobalSearch({ $, goToView, showTaskIndicator, showToast, st
     openResult({ view: button.dataset.searchView, label: button.dataset.searchLabel, jobId: button.dataset.searchJobId, chatId: button.dataset.searchChatId }, goToView, showTaskIndicator, showToast);
   });
   overlayLader = () => {
-    overlayGeladen ||= import("./search-overlay.js?v=b77").then((m) => {
+    overlayGeladen ||= import("./search-overlay.js?v=b78").then((m) => {
       m.initSearchOverlay({
         findResults: (query) => findResults(query, state, workspace),
         openResult: (result) => openResult(result, goToView, showTaskIndicator, showToast)

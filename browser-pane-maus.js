@@ -8,12 +8,12 @@
 // GETEILT 2026-09-09: die Datei war auf 951 Zeilen gewachsen (Hausgrenze 800). Hier steht
 // nur noch der LAUF; die reinen Plan-Funktionen und der freie Modus liegen daneben. Alles
 // wird unveraendert weitergereicht — kein Aufrufer muss seinen Import aendern.
-import { kurz, erlaubteHosts, fuehreMausAuftragAus } from "./browser-pane-maus-plan.js?v=browser-pane-20260909-4";
-import { baueZeiger, fuehreFreienLaufAus } from "./browser-pane-maus-frei.js?v=browser-pane-20260909-6";
+import { kurz, erlaubteHosts, fuehreMausAuftragAus } from "./browser-pane-maus-plan.js?v=browser-pane-20260909-5";
+import { baueZeiger, fuehreFreienLaufAus } from "./browser-pane-maus-frei.js?v=browser-pane-20260909-7";
 // Dieselbe Uebersetzung wie die Kachel "Browser" auf der Startseite (start-chips.js).
 import { t } from "./i18n/ui.js?v=3";
-export * from "./browser-pane-maus-plan.js?v=browser-pane-20260909-4";
-export * from "./browser-pane-maus-frei.js?v=browser-pane-20260909-6";
+export * from "./browser-pane-maus-plan.js?v=browser-pane-20260909-5";
+export * from "./browser-pane-maus-frei.js?v=browser-pane-20260909-7";
 
 //
 // Seit 2026-08-18 laesst sich die Maus auf ZWEI Wegen beauftragen: ueber den
@@ -53,9 +53,9 @@ export function haltMausAn() {
  */
 export async function starteMausLauf({ auftrag, zeige } = {}) {
   const text = String(auftrag || "").trim();
-  if (!text) return { ok: false, grund: "Es fehlt die Aufgabe." };
-  if (!bausteine) return { ok: false, grund: "Der Browser ist noch nicht bereit — bitte kurz warten." };
-  if (laeuft) return { ok: false, grund: "Die Maus arbeitet schon an einem Auftrag." };
+  if (!text) return { ok: false, grund: t("Es fehlt die Aufgabe.") };
+  if (!bausteine) return { ok: false, grund: t("Der Browser ist noch nicht bereit — bitte kurz warten.") };
+  if (laeuft) return { ok: false, grund: t("Die Maus arbeitet schon an einem Auftrag.") };
 
   const melde = zeige || bausteine.zeige || (() => {});
   const { knopf, activeTab, planeUrl, holeToken, sende, render, erneuere } = bausteine;
@@ -106,8 +106,8 @@ export async function starteMausLauf({ auftrag, zeige } = {}) {
  */
 export async function starteMausLaufMitSender({ auftrag, sende, seitenUrl, schrittUrl, holeToken, zeige } = {}) {
   const text = String(auftrag || "").trim();
-  if (!text) return { ok: false, grund: "Es fehlt die Aufgabe." };
-  if (laeuft) return { ok: false, grund: "Die Maus arbeitet schon an einem Auftrag." };
+  if (!text) return { ok: false, grund: t("Es fehlt die Aufgabe.") };
+  if (laeuft) return { ok: false, grund: t("Die Maus arbeitet schon an einem Auftrag.") };
 
   laeuft = true;
   anhalten = false;
@@ -180,12 +180,12 @@ export function verdrahteMausKnopf({ knopf, activeTab, planeUrl, holeToken, send
   knopf.addEventListener("click", async () => {
     // Zweiter Klick waehrend eines Laufs haelt an — der Knopf ist dann der
     // Not-Aus, egal ob der Lauf hier oder im Chat begonnen hat.
-    if (haltMausAn()) { zeige("Maus wird angehalten ..."); return; }
+    if (haltMausAn()) { zeige(t("Maus wird angehalten ...")); return; }
 
     // Erster Weg (Befund F13): die Vorlage ins Chat-Feld, der Nutzer schreibt
     // den Auftrag dahinter und schickt ihn ab — derselbe Weg wie die Kachel.
     if (belegeStartfeldMitMausVorlage()) {
-      zeige("Schreib ins Chat-Feld, was die Maus hier tun soll, und schick es ab.");
+      zeige(t("Schreib ins Chat-Feld, was die Maus hier tun soll, und schick es ab."));
       return;
     }
 

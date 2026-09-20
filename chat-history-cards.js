@@ -19,7 +19,7 @@ import {
 // Seit der Zusammenfuehrung der beiden Aufteilungen (2026-08-10) wohnen die
 // reinen Anzeige-Helfer in chat-history-text.js — format.js war deren
 // Teilmenge und ist entfallen.
-import { zeitText, mitHervorhebung, trefferAusschnitt } from "/assets/chat-history-text.js?v=b47c1";
+import { zeitText, mitHervorhebung, trefferAusschnitt } from "/assets/chat-history-text.js?v=b47c2";
 import { t } from "./i18n/ui.js?v=3";
 // Geteilte Icon-Bibliothek (Spur, Navigation): Papierkorb, Ordner, Plus kommen
 // von dort — derselbe Spezifizierer wie in spur-start.js, sonst gaebe es eine
@@ -116,7 +116,7 @@ export function bausteinLeer(text) {
 export function bausteinGruppe(titel, anzahl) {
   const kopf = document.createElement("div");
   kopf.className = "ch-gruppe";
-  kopf.textContent = titel;
+  kopf.textContent = t(titel);
   if (Number.isFinite(anzahl)) {
     // Mockup Bildschirm 47: rechts am Gruppenkopf steht, wie viele es sind.
     const n = document.createElement("span");
@@ -133,7 +133,7 @@ export function bausteinNeuKnopf() {
   const neuKnopf = document.createElement("button");
   neuKnopf.type = "button";
   neuKnopf.className = "ch-neu";
-  neuKnopf.textContent = "＋ Neuer Chat";
+  neuKnopf.textContent = `＋ ${t("Neuer Chat")}`;
   neuKnopf.title = "Neue Unterhaltung beginnen";
   neuKnopf.addEventListener("click", () => { try { newChat(); } catch { /* fail-safe */ } });
   return neuKnopf;
@@ -161,7 +161,7 @@ export function createCardBuilders(ctx) {
     // Mockup Bildschirm 47: das Feld sagt, dass auch der ANTWORTTEXT
     // durchsucht wird — genau das koennen viele nicht erwarten.
     eingabe.placeholder = gefunden === gesamt
-      ? (schmalerSchirm() ? "Durchsuchen…" : `In allen ${gesamt} Gesprächen suchen — auch im Text der Antworten`)
+      ? (schmalerSchirm() ? t("Durchsuchen…") : `In allen ${gesamt} Gesprächen suchen — auch im Text der Antworten`)
       : `${gefunden} von ${gesamt}${schmalerSchirm() ? "" : " Gesprächen"}`;
     eingabe.addEventListener("input", () => {
       ctx.setSuchbegriff(eingabe.value);
@@ -215,11 +215,11 @@ export function createCardBuilders(ctx) {
       return chip;
     };
 
-    leiste.append(machChip("", "Alle", aufbereitet.length));
-    if (zaehl.angeheftet) leiste.append(machChip("angeheftet", "📌 Angeheftet", zaehl.angeheftet));
+    leiste.append(machChip("", t("Alle"), aufbereitet.length));
+    if (zaehl.angeheftet) leiste.append(machChip("angeheftet", `📌 ${t("Angeheftet")}`, zaehl.angeheftet));
     if (zaehl.datei) leiste.append(machChip("datei", t("Mit Datei"), zaehl.datei));
-    if (zaehl.bild) leiste.append(machChip("bild", "Mit Bild", zaehl.bild));
-    if (zaehl.code) leiste.append(machChip("code", "Mit Code", zaehl.code));
+    if (zaehl.bild) leiste.append(machChip("bild", t("Mit Bild"), zaehl.bild));
+    if (zaehl.code) leiste.append(machChip("code", t("Mit Code"), zaehl.code));
     return leiste;
   }
 
@@ -288,10 +288,10 @@ export function createCardBuilders(ctx) {
     meta.className = "ch-meta";
     const tag = document.createElement("span");
     tag.className = "ch-tag";
-    tag.textContent = eintrag.thema;
+    tag.textContent = t(eintrag.thema);
     const anzahl = Array.isArray(chat.messages) ? chat.messages.length : 0;
     const rest = document.createElement("span");
-    rest.textContent = `${zeitText(chat.updatedAt)} · ${anzahl} ${schmalerSchirm() ? "Nachr." : "Nachrichten"}`;
+    rest.textContent = `${zeitText(chat.updatedAt)} · ${anzahl} ${schmalerSchirm() ? t("Nachr.") : t("Nachrichten")}`;
     meta.append(tag, rest);
 
     const mehr = document.createElement("button");

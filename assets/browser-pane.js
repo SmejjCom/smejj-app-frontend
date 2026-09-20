@@ -12,31 +12,31 @@
 // abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
 // instanzen mit getrennten CLIENT_ROUTES.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-7";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-8";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
   buildRemoteBrowserHtml
-} from "./browser-pane-render.js?v=browser-pane-20260906-6";
-export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260906-6";
+} from "./browser-pane-render.js?v=browser-pane-20260906-7";
+export { buildExternalFallbackHtml, buildRemoteBrowserHtml, isRemoteScreenshot } from "./browser-pane-render.js?v=browser-pane-20260906-7";
 import { createBrowserSessionClient } from "./browser-pane-session.js?v=browser-pane-20260918-1";
 // Chrome-Abgleich (2026-08-17): Tableiste, Adressvorschlaege und Fehlerseite
 // liegen in eigenen Modulen — diese Datei steht bei 795 von 800 Zeilen.
-import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260918-2";
+import { zeichneTableiste } from "./browser-pane-tableiste.js?v=browser-pane-20260918-3";
 import { anzeigeAdresse, verdrahtePanelVorschlaege } from "./browser-pane-vorschlaege.js?v=browser-pane-20260709-3";
 import { zeigeSicherheit, zeigeZoom, zeigeNeuladen } from "./browser-pane-sicherheit.js?v=browser-pane-20260709-2";
 import { zeigeLesezeichen } from "./browser-pane-lesezeichen.js?v=browser-pane-20260709-2";
-import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260918-2";
+import { verdrahtePanelTasten, merkeGeschlossen } from "./browser-pane-tasten.js?v=browser-pane-20260918-3";
 import { verdrahtePanelSuche } from "./browser-pane-suche.js?v=browser-pane-20260709-2";
-import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260909-7";
+import { verdrahteMausKnopf, mausLaeuft } from "./browser-pane-maus.js?v=browser-pane-20260909-8";
 // Gefunden 2026-08-18 beim Livetest: dieser Import FEHLTE, obwohl init() die
 // Funktion benutzt. Folge war kein kleiner Schoenheitsfehler — browser-pane.js
 // warf beim Laden "baueNachrichtenEmpfang is not defined", das ganze Modul kam
 // nie hoch, und damit war der eingebaute Browser stumm tot. Kein Test hat das
 // gemeldet: alle pruefen den QUELLTEXT, keiner laesst das Modul laufen.
-import { baueNachrichtenEmpfang } from "./browser-pane-nachrichten.js?v=browser-pane-20260918-2";
+import { baueNachrichtenEmpfang } from "./browser-pane-nachrichten.js?v=browser-pane-20260918-3";
 let suche = null;
-import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260906-6";
+import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js?v=browser-pane-20260906-7";
 // Reine Helfer (2026-08-19 ausgelagert, 800-Zeilen-Regel). Sie werden hier
 // zugleich WEITER EXPORTIERT, damit tests/browser-pane.test.mjs und jeder
 // bisherige Aufrufer sie unveraendert von browser-pane.js bekommt.
@@ -45,9 +45,9 @@ import {
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl, shortHost
 } from "./browser-pane-adressen.js?v=browser-pane-20260820-5";
 import { applyZoom, baueZoomHaken } from "./browser-pane-zoom.js?v=4";
-import { verdrahteHauptmenue } from "./browser-pane-hauptmenue.js?v=5";
+import { verdrahteHauptmenue } from "./browser-pane-hauptmenue.js?v=6";
 // E2E-Pruefung 14.09.2026: fehlte — Rechtsklick auf Zurueck/Vor warf ReferenceError.
-import { zeigeVerlaufMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-2";
+import { zeigeVerlaufMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-3";
 // Der Zoom lebt in browser-pane-zoom.js; hier nur seine drei Anschluesse.
 const zoomHaken = baueZoomHaken({ activeTab: () => activeTab(), schedulePersist: () => schedulePersist(), zeigeHinweis: (t) => showHint(t) });
 export {
