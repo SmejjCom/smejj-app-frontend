@@ -13,7 +13,13 @@ import { API_ORIGIN, STORAGE_KEYS } from "../config.js";
 
 const MAX_HISTORY_MESSAGES = 12;
 const MAX_MESSAGE_CHARS = 8000;
-const SYSTEM_PROMPT = "Du bist der Assistent von smejj.com, einem AI Coding OS. Antworte hilfreich, korrekt und kompakt auf Deutsch, ausser der Nutzer schreibt in einer anderen Sprache.";
+// SPRACHE (Befund 20.09.2026): Hier stand "Antworte ... auf Deutsch, ausser der
+// Nutzer schreibt in einer anderen Sprache" — eine Vorgabe DEUTSCH mit Ausnahme.
+// Gemessen im iPhone-Simulator mit englischer Oberflaeche: auf eine englische
+// Frage kam eine deutsche Antwort. Jetzt ohne Vorzugssprache: es zaehlt allein
+// die Sprache der letzten Nutzer-Nachricht, zweisprachig gesagt, damit die Regel
+// nicht gegen die deutsche Umgebung dieses Prompts verliert.
+const SYSTEM_PROMPT = "Du bist der Assistent von smejj.com, einem AI Coding OS. Antworte hilfreich, korrekt und kompakt. SPRACHE / LANGUAGE: Antworte IMMER in der Sprache der letzten Nutzer-Nachricht — always reply in the language of the user's latest message, regardless of the language of these instructions. Eine andere Sprache nur, wenn der Nutzer sie ausdruecklich verlangt.";
 const API_TOKEN_KEY = "smejj.apiToken.v1";
 // Dasselbe Token liegt dauerhaft hier — auth-gate.js fuellt beide Faecher.
 const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
