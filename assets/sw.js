@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v893";
+const CACHE_NAME = "smejj-shell-v948";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -253,6 +253,7 @@ const SHELL = [
   "/assets/browser-pane-maus-frei.js",
   "/assets/browser-pane-nachrichten.js",
   "/assets/browser-pane-menue.js",
+  "/assets/browser-pane-hauptmenue.js",
   "/assets/auth/passkey.js",
   "/assets/auth/passkey-ui.js",
   "/assets/config.js",
@@ -354,6 +355,7 @@ const SHELL = [
   "/assets/chat-sync.js",
   "/assets/chat-sync-auswahl.js",
   "/assets/chat-medien.js",
+  "/assets/chat-medien-ansicht.js",
   "/assets/chat-medien-rettung.js",
   "/assets/nav-absichten.js",
   "/assets/topbar-krume.js",
@@ -368,17 +370,23 @@ const SHELL = [
   "/assets/mobil-dock.js",
   // Ansichten nach dem Login am Handy (2026-09-07, Parallelsitzung), per import() aus mobil-dock.js.
   "/assets/mobil-ansichten.js",
+  // Vollbild-Chat am Handy (17.09.2026), per import() aus mobil-dock.js.
+  "/assets/vollbild-chat.js",
   "/assets/kamera.js",
   "/assets/fuehrung.js",
   "/assets/willkommen-fokus.js",
+  "/assets/gast-frage.js",
   "/assets/arbeitsflaeche.js",
   "/assets/knopf-puffer.js",
   "/assets/spur-schalter.js",
   "/assets/arbeitsbereiche.js",
   "/assets/papierkorb.js",
   "/assets/chat-actions-menu.js",
+  "/assets/chat-actions-text.js",
   // Erweitertes Nachrichten-Menue (16.09.2026), per import() aus chat-actions-menu.js.
   "/assets/chat-menue-mehr.js",
+  // "Inhalt melden" (20.09.2026, Google-Play-Pflicht fuer KI-Inhalte), per import() ebendort.
+  "/assets/inhalt-melden.js",
   // Sieben Module, die chat-actions-menu.js per import() nachlaedt und die
   // bis 2026-09-06 hier fehlten. Online faellt das nie auf — der Browser holt
   // sie einfach aus dem Netz. Offline lieferte der Fetch-Handler dafuer die
@@ -389,6 +397,7 @@ const SHELL = [
   // aus. Gefunden von tests/precache-dynamische-importe.test.mjs.
   "/assets/kompakt.js",
   "/assets/deutsch-klartext.js",
+  "/assets/huelle-sprache.js",
   "/assets/erste-schritte.js",
   "/assets/chat-actions-woerter.js",
   "/assets/composer-zeile.js",
@@ -463,6 +472,7 @@ const SHELL = [
   "/datenschutz.html",
   "/en/legal-notice.html",
   "/en/privacy.html",
+  "/en/support.html",
   "/assets/browser-pane-adressen.js",
   "/assets/browser-pane-zoom.js",
   "/assets/browser-pane-fernwege.js",
@@ -478,6 +488,7 @@ const SHELL = [
   // Dateien der Seite (willkommen-fokus, pwa-schnellstart, Logo, Manifest,
   // pwa-192) stehen oben bereits.
   "/willkommen.html",
+  "/assets/ios-preise-aus.js",
   "/assets/willkommen-sprache.js",
   "/assets/besucher-puls.js",
   "/assets/willkommen-offline.js",
@@ -502,8 +513,10 @@ const EINGANG = new URL(self.location.href).searchParams.get("eingang") || "";
 const SCHMAL = EINGANG === "willkommen";
 const WILLKOMMEN_SHELL = [
   "/willkommen.html",
+  "/assets/ios-preise-aus.js",
   "/assets/willkommen-sprache.js",
   "/assets/willkommen-fokus.js",
+  "/assets/gast-frage.js",
   "/assets/pwa-schnellstart.js",
   "/assets/besucher-puls.js",
   "/assets/willkommen-offline.js",

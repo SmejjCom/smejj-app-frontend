@@ -50,6 +50,7 @@ const API_PATHS = {
   browserSessionClose: "/api/browser/session/close",
     authGoogle: "/api/auth/google",
     authGithub: "/api/auth/github",
+    authApple: "/api/auth/apple",
     authMagicLinkRequest: "/api/auth/magic-link/request",
     authMagicLinkVerify: "/api/auth/magic-link/verify",
     authMe: "/api/auth/me",

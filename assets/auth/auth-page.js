@@ -488,6 +488,36 @@ async function startGithubLogin() {
   }
 }
 
+// Apple: derselbe Ablauf wie bei GitHub (One-Time-Handoff, dann Weiterleitung).
+// Apple antwortet spaeter per POST-Formular auf den Server, der Server leitet
+// mit ?handoff=… zurueck (Erfolg) oder ?fehler=… (Abbruch/Fehler).
+async function startAppleLogin() {
+  const button = document.querySelector("#appleLogin");
+  if (button) button.disabled = true;
+  status(t("Apple Login wird gestartet …"));
+  try {
+    await raeumeAlteIdentitaet();
+    const { id, origin } = await startHandoffQuery();
+    const query = id ? `?handoff=${encodeURIComponent(id)}&returnOrigin=${encodeURIComponent(origin)}` : "";
+    window.location.assign(`${CLIENT_ROUTES.api.authApple}${query}`);
+  } catch {
+    status(t("Apple Login konnte nicht gestartet werden."), "error");
+    if (button) button.disabled = false;
+  }
+}
+
+// Rueckkehr mit Grund: der Server schickt bei Abbruch/Fehler auf die Anmeldeseite.
+function zeigeRueckkehrFehler() {
+  const grund = new URLSearchParams(window.location.search).get("fehler");
+  if (!grund) return;
+  const texte = {
+    apple_abgebrochen: "Anmeldung mit Apple abgebrochen.",
+    apple_fehlgeschlagen: "Anmeldung mit Apple fehlgeschlagen. Bitte versuche es erneut.",
+    anmeldung_abgelaufen: "Die Anmeldung ist abgelaufen. Bitte versuche es erneut."
+  };
+  if (texte[grund]) status(t(texte[grund]), "error");
+}
+
 async function requestMagicLink() {
   const { email } = emailFormValues();
   if (!email) { revealEmailForm(); return status(t("Bitte zuerst deine E-Mail-Adresse eingeben."), "error"); }
@@ -569,11 +599,11 @@ document.querySelector("#passwordResetLink")?.addEventListener("click", (event) 
 document.querySelector("#emailPassword")?.addEventListener("keydown", (event) => {
   if (event.key === "Enter") (mode === "register" ? submitEmailRegister() : submitEmailLogin());
 });
-// Apple Login bleibt extern blockiert: Aktivierung erst mit vorhandener, kostenloser
-// Apple-OAuth-Konfiguration und Domain-Prüfung (keine Developer-Mitgliedschaft kaufen).
-document.querySelector("#appleLogin")?.addEventListener("click", () => status(t("Apple Login wird aktiviert, sobald die Apple-OAuth-Konfiguration und die Domain-Prüfung vorliegen."), "error"));
+// Der Knopf erscheint nur, wenn der Server Apple konfiguriert hat (applyAvailableMethods).
+document.querySelector("#appleLogin")?.addEventListener("click", startAppleLogin);
 document.querySelector("#homeLink")?.addEventListener("click", () => { window.location.href = "/"; });
 // Google-Rueckkehr zuerst: Wenn ein Handoff-Token vorliegt, wird direkt angemeldet.
+zeigeRueckkehrFehler();
 completeGoogleHandoff().then((handled) => {
   if (handled) return;
   refreshSession();
