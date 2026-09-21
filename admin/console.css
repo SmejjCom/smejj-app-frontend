@@ -714,3 +714,16 @@ body.rail-zieht{cursor:col-resize;user-select:none;-webkit-user-select:none;}
 /* Radar-Export (Master-Audit 2026-09-15, Runde 3): das vorformatierte Export-Feld trug
    white-space:pre und zog bei 390 px die ganze Hauptspalte auf 556 px (234 px Ueberlauf). */
 pre.radar-export{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;}
+
+/* smejj ai radar (Nr. 86, 2026-09-21) — Zeile mit Eingabefeldern, aufklappbare
+   Erkenntnis und Quellenliste. Bewusst wenige Regeln: alles andere kommt aus
+   den vorhandenen Bausteinen (panel, kpi, pill, btn, table). */
+.formzeile{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 16px;}
+.formzeile .inp{flex:1 1 180px;min-height:40px;padding:0 12px;font-size:15px;color:var(--sm-ink);
+  background:var(--sm-field);border:1px solid var(--sm-border);border-radius:8px;}
+.formzeile .inp:focus{outline:2px solid var(--sm-accent-border);outline-offset:1px;}
+.erk{margin:0 18px 10px;padding:10px 12px;border:1px solid var(--sm-border);border-radius:9px;background:var(--sm-field);}
+.erk summary{cursor:pointer;line-height:1.5;}
+.erk-inhalt{padding-top:8px;}
+.quellen{margin:8px 0 0;padding-left:18px;}
+.quellen li{margin:4px 0;line-height:1.5;}

@@ -37,7 +37,9 @@
     (window.adminStage11 || {}).seiten || {},
     (window.adminStage12 || {}).seiten || {},
     (window.adminStage13 || {}).seiten || {},
-    (window.adminStage14 || {}).seiten || {}
+    (window.adminStage14 || {}).seiten || {},
+    // smejj ai radar (Nr. 86, 21.09.2026): die zweite Schiene.
+    (window.adminStageAiRadar || {}).seiten || {}
   );
   Object.keys(ANGEMELDET).forEach(function (pfad) {
     SEITEN.push({ id: ANGEMELDET[pfad].id, pfad: pfad, gruppe: ANGEMELDET[pfad].gruppe, name: ANGEMELDET[pfad].name });
@@ -80,7 +82,7 @@
     autopiloten: "5.6", evolution: "5.7", auslieferung: "5.8",
     ankuendigungen: "6.1", flags: "6.2", wissen: "6.3", sprachen: "6.4",
     experimente: "6.5", email: "6.6", analytik: "6.7", aufgaben: "6.8",
-    radar: "6.9",
+    radar: "6.9", "ai-radar": "6.10",
     audit: "7.1", compliance: "7.2", dsgvo: "7.3",
     freigaben: "8.1", adminverwaltung: "8.2"
   });
