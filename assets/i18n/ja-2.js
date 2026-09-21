@@ -359,4 +359,8 @@ export default {
   "Dein Plan ist aktiv.": "プランは有効です。",
   // Anfangstext des Ausgabefeldes — stand bis 21.09.2026 in CSS
   "Bereit.": "準備完了。",
+  // Plan-Namen mit Preis (nur ausserhalb der iOS-Huelle sichtbar)
+  "smejj Plus — 9 € / Monat": "smejj Plus — 月額 9 ユーロ",
+  "smejj Pro — 19 € / Monat": "smejj Pro — 月額 19 ユーロ",
+  "smejj Max — 39 € / Monat": "smejj Max — 月額 39 ユーロ",
 };

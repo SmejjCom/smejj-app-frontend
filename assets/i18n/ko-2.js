@@ -359,4 +359,8 @@ export default {
   "Dein Plan ist aktiv.": "플랜이 활성 상태입니다.",
   // Anfangstext des Ausgabefeldes — stand bis 21.09.2026 in CSS
   "Bereit.": "준비됨.",
+  // Plan-Namen mit Preis (nur ausserhalb der iOS-Huelle sichtbar)
+  "smejj Plus — 9 € / Monat": "smejj Plus — 월 9유로",
+  "smejj Pro — 19 € / Monat": "smejj Pro — 월 19유로",
+  "smejj Max — 39 € / Monat": "smejj Max — 월 39유로",
 };

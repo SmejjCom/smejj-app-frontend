@@ -359,4 +359,8 @@ export default {
   "Dein Plan ist aktiv.": "आपकी योजना सक्रिय है।",
   // Anfangstext des Ausgabefeldes — stand bis 21.09.2026 in CSS
   "Bereit.": "तैयार।",
+  // Plan-Namen mit Preis (nur ausserhalb der iOS-Huelle sichtbar)
+  "smejj Plus — 9 € / Monat": "smejj Plus — 9 € / माह",
+  "smejj Pro — 19 € / Monat": "smejj Pro — 19 € / माह",
+  "smejj Max — 39 € / Monat": "smejj Max — 39 € / माह",
 };

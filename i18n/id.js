@@ -1,5 +1,5 @@
 // smejj.com — UI-Uebersetzung Bahasa Indonesia (Quellsprache Deutsch als Schluessel).
-import zusatz from "./id-2.js?v=6";
+import zusatz from "./id-2.js?v=7";
 
 export default {
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)

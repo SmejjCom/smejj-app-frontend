@@ -57,8 +57,9 @@ function planNameAnzeige(plan) {
   const label = PLAN_LABELS[plan];
   if (!label) return null;
   // "smejj Plus — 9 € / Monat" -> "smejj Plus". Der Plan-NAME darf bleiben;
-  // der Nutzer muss sehen, was er hat.
-  return iosHuelle() ? label.split(" — ")[0] : label;
+  // der Nutzer muss sehen, was er hat. Ausserhalb der Huelle durch t():
+  // "/ Monat" stand sonst auch in der englischen App (Geraetetest 21.09.2026).
+  return iosHuelle() ? label.split(" — ")[0] : t(label);
 }
 
 function planLink(plan) {
