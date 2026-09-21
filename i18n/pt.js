@@ -2,6 +2,8 @@
 import zusatz from "./pt-2.js?v=7";
 
 export default {
+  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "Respondido no seu dispositivo — sem servidor, sem custo.",
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "Pesquisar na página",
   "Vorheriger Treffer": "Resultado anterior",

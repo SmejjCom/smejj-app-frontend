@@ -2,6 +2,8 @@
 import zusatz from "./fr-2.js?v=7";
 
 export default {
+  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "Répondu sur votre appareil — sans serveur, sans frais.",
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "Rechercher dans la page",
   "Vorheriger Treffer": "Résultat précédent",

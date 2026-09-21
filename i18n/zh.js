@@ -2,6 +2,8 @@
 import zusatz from "./zh-2.js?v=7";
 
 export default {
+  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "已在你的设备上作答 — 无需服务器，零成本。",
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "在页面中查找",
   "Vorheriger Treffer": "上一个匹配",

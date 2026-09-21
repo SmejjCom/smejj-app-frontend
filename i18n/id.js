@@ -2,6 +2,8 @@
 import zusatz from "./id-2.js?v=7";
 
 export default {
+  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "Dijawab di perangkat Anda — tanpa server, tanpa biaya.",
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "Cari di halaman",
   "Vorheriger Treffer": "Hasil sebelumnya",

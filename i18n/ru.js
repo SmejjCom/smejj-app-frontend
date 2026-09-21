@@ -2,6 +2,8 @@
 import zusatz from "./ru-2.js?v=7";
 
 export default {
+  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "Ответ получен на вашем устройстве — без сервера и без затрат.",
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "Искать на странице",
   "Vorheriger Treffer": "Предыдущее совпадение",

@@ -2,6 +2,8 @@
 import zusatz from "./ko-2.js?v=7";
 
 export default {
+  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "기기에서 바로 답변했습니다 — 서버 없이, 비용 없이.",
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "페이지에서 검색",
   "Vorheriger Treffer": "이전 일치",

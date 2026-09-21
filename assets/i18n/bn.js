@@ -2,6 +2,8 @@
 import zusatz from "./bn-2.js?v=7";
 
 export default {
+  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "আপনার ডিভাইসেই উত্তর দেওয়া হয়েছে — সার্ভার ছাড়া, খরচ ছাড়া।",
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "পৃষ্ঠায় খুঁজুন",
   "Vorheriger Treffer": "আগের মিল",

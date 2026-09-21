@@ -2,6 +2,8 @@
 import zusatz from "./hi-2.js?v=7";
 
 export default {
+  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "आपके डिवाइस पर ही उत्तर दिया गया — न सर्वर, न कोई लागत।",
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "पेज पर खोजें",
   "Vorheriger Treffer": "पिछला मिलान",

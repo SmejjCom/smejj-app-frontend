@@ -572,7 +572,7 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
     ergebnis = await frageLokal(lage.frage, {
       // Sprachmodus (25.08.): auch das Geraetemodell muss "sprechbar" antworten
       // — sonst kamen Emojis und Listen, die die Stimme stoerten.
-      system: "Du bist der Assistent von smejj.com. Antworte kurz, korrekt und in der Sprache des Nutzers."
+      system: "LANGUAGE / SPRACHE: Always answer in the language of the user's LAST message, regardless of the language of these instructions. Antworte IMMER in der Sprache der LETZTEN Nutzer-Nachricht. Du bist der Assistent von smejj.com. Antworte kurz und korrekt." // Sprachregel ZUERST (Desktop-Test 21.09.: EN-Frage bekam DE-Antwort, Wurzel wie v912)
         + (body?.preferences?.voiceMode === true
           ? " Der Nutzer HOERT deine Antwort als Sprachausgabe: 1-3 Saetze, gespraechig, keine Listen, kein Markdown, keine URLs, keine Emojis."
           : ""),
@@ -602,7 +602,7 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
     output.textContent = "";
     return false;
   }
-  const hinweis = "\n\nAuf deinem Gerät beantwortet — ohne Server, ohne Kosten.";
+  const hinweis = `\n\n${t("Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.")}`;
   // Ueber textContent, nicht als zweites Argument: renderChatMarkdown(node)
   // liest den Knoten — ein zweites Argument wurde still verworfen (live
   // 2026-08-23: der Hinweis fehlte in jeder lokalen Antwort).
