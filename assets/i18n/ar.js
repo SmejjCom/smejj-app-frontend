@@ -1,5 +1,5 @@
 // smejj.com — UI-Uebersetzung العربية (Quellsprache Deutsch als Schluessel, RTL).
-import zusatz from "./ar-2.js?v=2";
+import zusatz from "./ar-2.js?v=3";
 
 export default {
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)

@@ -1,6 +1,6 @@
 import { STORAGE_KEYS } from "./config.js";
 import { initServerSessionControls, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
-  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=b48";
+  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=b50";
 import { languageOptionsMarkup } from "./language-options.js?v=1";
 import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=1";
@@ -241,7 +241,7 @@ function markup() {
     ${panel("apps", "Verbundene Apps", `<div class="account-list">${dataAction("KI-Modelle & API-Keys", "GLM-5.2 aktiv · eigene Schlüssel und Modellwahl liegen in den Einstellungen.", "modelsSettingsOpen", "Einstellungen öffnen")}${statusRow("GitHub", "Für Coding: über die rechte Seitenleiste der App verbunden.", "In der App", true)}${statusRow("Google Drive", "Dateien direkt in den Chat holen.", "Bald verfügbar")}${statusRow("Google Kalender", "Termine ansehen und vorlesen lassen — nur lesend.", "Bald verfügbar")}${statusRow("Slack", "Zusammenfassungen aus Kanälen holen.", "Bald verfügbar")}</div><p class="account-note">${t("Apps sehen nur, was du ausdrücklich freigibst — Zugriff jederzeit widerrufbar.")}</p>`)}
     ${panel("notifications", "Benachrichtigungen", `<div class="account-list">${toggle("Coding-Agent fertig", "notifyAgentDone", "Meldung, wenn eine lange Aufgabe abgeschlossen ist.")}${toggle("Antwort fertig", "notifyReplyDone", "Wenn du die App verlassen hast, während smejj noch arbeitet.")}${toggle("Limit fast erreicht", "notifyLimit80", "Hinweis bei 80 % — Limits starten erst mit den Plänen.")}${statusRow("Sicherheitswarnungen", "Neue Anmeldung, neues Gerät — immer per E-Mail.", "Immer an", true)}${statusRow("Rechnungen & Zahlungen", "Kommt mit den Bezahl-Plänen.", "Immer an", true)}</div><p class="account-note">${t("Diese Auswahl gilt auf diesem Gerät.")}</p>`)}
     ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
-    ${panel("billing", "Mein Plan", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">Free — 0 €</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div><p class="account-note">${t("Alle Preise sind Gesamtpreise pro Monat inkl. gesetzlicher Umsatzsteuer. Das kostenpflichtige Abo hat eine Laufzeit von einem Monat und verlängert sich automatisch um jeweils einen weiteren Monat, bis du kündigst. Jederzeit zum Ende des bezahlten Monats kündbar.")}</p><div class="account-list">${dataAction("Plus — 9 € / Monat", "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.", "planPlusOpen", "Zahlungspflichtig abonnieren")}${dataAction("Pro — 19 € / Monat", "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.", "planProOpen", "Zahlungspflichtig abonnieren")}${dataAction("Max — 39 € / Monat", "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.", "planMaxOpen", "Zahlungspflichtig abonnieren")}</div><p class="account-note">${t("Mit „Zahlungspflichtig abonnieren“ wirst du zum Zahlungsdienstleister Stripe weitergeleitet und schließt dort ein kostenpflichtiges Abo ab. Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Nach der Zahlung bekommst du eine Bestätigung per E-Mail. Es gelten unsere")} <a href="/agb.html">${t("AGB")}</a> ${t("und die")} <a href="/widerruf.html">${t("Widerrufsbelehrung")}</a>.</p><div class="account-actions"><button id="planManageOpen" type="button" hidden>${t("Abo verwalten — Rechnungen, Plan & Kündigung")}</button><button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}
+    ${panel("billing", "Mein Plan", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">Free — 0 €</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div>${planKaufTeil()}<div class="account-actions">${iosHuelle() ? "" : `<button id="planManageOpen" type="button" hidden>${t("Abo verwalten — Rechnungen, Plan & Kündigung")}</button>`}<button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}
     ${panel("usage", "Nutzung & Limits", `<div class="account-list">${usageRow("Nachrichten", "Aufbauphase: ohne Limit.", "usageMessages")}${usageRow("Sprachminuten (Premium-Stimme)", "Zählt erst, wenn die Premium-Stimme aktiv ist.", "usageVoice")}${usageRow("Coding-Aufgaben", "Nur erfolgreich gestartete Läufe zählen.", "usageCoding")}</div><p class="account-note" id="usagePeriodNote">${t("Zähler laufen nur auf diesem Gerät und setzen sich jeden Monat automatisch zurück. Mit den Plänen bekommt jede Zeile einen Balken: verbraucht und noch offen.")}</p>`)}
     ${panel("data", "Meine Daten", `<div class="daten-fragen">
       <div class="daten-karte"><h5>${t("Wo liegen sie?")}</h5><p>${t("In deinem eigenen Bereich bei IDrive e2, verschlüsselt — nicht in einem gemeinsamen Topf mit anderen Nutzern.")}</p></div>
@@ -530,6 +530,47 @@ function output(view, text) { view.querySelector("#profileOutput").textContent =
 // Tab-Muster nach WAI-ARIA: nur der aktive Tab ist per Tab-Taste erreichbar
 // (roving tabindex), zwischen den Tabs wird mit den Pfeiltasten gewechselt.
 function nav(id, label) { return `<button type="button" role="tab" id="account-tab-${id}" aria-controls="account-panel-${id}" aria-selected="false" tabindex="-1" data-account-tab="${id}">${t(label)}</button>`; }
+// ---------------------------------------------------------------------------
+// Apple-Richtlinie 3.1.1 (In-App Purchase)
+//
+// Eine iOS-App darf weder Preise fuer digitale Inhalte nennen noch auf einen
+// Bezahlweg ausserhalb von Apples In-App-Kauf verweisen — auch nicht ueber
+// einen Link. Unser Plan-Bereich tat genau das: drei Abos mit Preis und
+// "Zahlungspflichtig abonnieren" mit Weiterleitung zu Stripe. Dazu kam ein
+// Widerspruch zu den Anmerkungen fuer die App-Pruefung ("no in-app purchases,
+// no subscriptions"), den ein Pruefer als Falschangabe werten kann.
+//
+// Betreiber 21.09.2026 schriftlich: in der iOS-Huelle ausblenden, im Web
+// unveraendert lassen.
+//
+// FAIL-CLOSED: Erkannt wird die Capacitor-Bruecke — und zusaetzlich JEDES
+// iOS-Geraet. Ein WKWebView ohne Bruecke ist von Safari kaum zu unterscheiden;
+// wer hier zu genau sein will, riskiert, dass der Pruefer die Preise doch
+// sieht. Das kostet Tage. Auf iOS im Browser fehlen die Preise dadurch
+// ebenfalls — gewollt, solange die Unterscheidung nicht am Geraet gemessen ist.
+function iosHuelle() {
+  try {
+    if (window.Capacitor) return true;
+    const ua = String(navigator.userAgent || "");
+    // iPadOS meldet sich seit 13 als "Macintosh" — der Touchpunkt entlarvt es.
+    return /iPad|iPhone|iPod/.test(navigator.platform || ua)
+      || (ua.includes("Macintosh") && "ontouchend" in document);
+  } catch {
+    return true; // im Zweifel verstecken
+  }
+}
+
+// Der Kauf-Teil des Plan-Bereichs. Ausserhalb von iOS unveraendert; in der
+// iOS-Huelle bleibt der Plan-Status stehen, aber ohne Preis, ohne Kaufknopf
+// und ohne jeden Hinweis auf einen anderen Bezahlweg (auch kein "buche auf
+// unserer Website" — das waere nach 3.1.1 wieder eine Handlungsaufforderung).
+function planKaufTeil() {
+  if (iosHuelle()) {
+    return `<p class="account-note">${t("Dieses Konto nutzt smejj.com kostenlos. Es ist kein Abo aktiv und in dieser App wird nichts verkauft.")}</p>`;
+  }
+  return `<p class="account-note">${t("Alle Preise sind Gesamtpreise pro Monat inkl. gesetzlicher Umsatzsteuer. Das kostenpflichtige Abo hat eine Laufzeit von einem Monat und verlängert sich automatisch um jeweils einen weiteren Monat, bis du kündigst. Jederzeit zum Ende des bezahlten Monats kündbar.")}</p><div class="account-list">${dataAction("Plus — 9 € / Monat", "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.", "planPlusOpen", "Zahlungspflichtig abonnieren")}${dataAction("Pro — 19 € / Monat", "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.", "planProOpen", "Zahlungspflichtig abonnieren")}${dataAction("Max — 39 € / Monat", "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.", "planMaxOpen", "Zahlungspflichtig abonnieren")}</div><p class="account-note">${t("Mit „Zahlungspflichtig abonnieren“ wirst du zum Zahlungsdienstleister Stripe weitergeleitet und schließt dort ein kostenpflichtiges Abo ab. Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Nach der Zahlung bekommst du eine Bestätigung per E-Mail. Es gelten unsere")} <a href="/agb.html">${t("AGB")}</a> ${t("und die")} <a href="/widerruf.html">${t("Widerrufsbelehrung")}</a>.</p>`;
+}
+
 function panel(id, title, body) { return `<section class="account-panel" role="tabpanel" id="account-panel-${id}" aria-labelledby="account-tab-${id}" tabindex="0" data-account-panel="${id}"><h3>${t(title)}</h3>${body}</section>`; }
 function toggle(label, id, hint) { return `<label class="account-row"><span><strong>${t(label)}</strong><small>${t(hint)}</small></span><input id="${id}" type="checkbox"></label>`; }
 function permission(label, status) { return `<div class="account-row"><span><strong>${t(label)}</strong><small>${t(status)}</small></span><span class="permission-state">${t("Geschützt")}</span></div>`; }

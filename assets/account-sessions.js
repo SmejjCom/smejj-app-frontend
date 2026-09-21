@@ -136,24 +136,24 @@ export function initServerSessionControls(view, output) {
            unberuehrt, es geht nur um die Anmeldung. -->
       <div class="sicherheit-panik">
         <div>
-          <strong>Kommt dir etwas komisch vor?</strong>
-          <span>Wirft alle Geräte raus außer diesem. Deine Gespräche und Dateien bleiben unberührt — es geht nur um die Anmeldung.</span>
+          <strong>${t("Kommt dir etwas komisch vor?")}</strong>
+          <span>${t("Wirft alle Geräte raus außer diesem. Deine Gespräche und Dateien bleiben unberührt — es geht nur um die Anmeldung.")}</span>
         </div>
-        <button id="serverSessionsRevokeOthers" type="button" class="sicherheit-panik-knopf">Überall abmelden</button>
+        <button id="serverSessionsRevokeOthers" type="button" class="sicherheit-panik-knopf">${t("Überall abmelden")}</button>
       </div>
-      <h4>Server-Sitzungen</h4>
+      <h4>${t("Server-Sitzungen")}</h4>
       <div class="account-actions">
-        <button id="serverSessionsLoad" type="button">Aktive Sitzungen anzeigen</button>
-        <button id="serverPasswordChange" type="button">Passwort ändern</button>
-        <button id="serverLogout" type="button">Serverseitig abmelden</button>
+        <button id="serverSessionsLoad" type="button">${t("Aktive Sitzungen anzeigen")}</button>
+        <button id="serverPasswordChange" type="button">${t("Passwort ändern")}</button>
+        <button id="serverLogout" type="button">${t("Serverseitig abmelden")}</button>
       </div>
       <div id="serverSessionsList" class="account-list" aria-live="polite"></div>
-      <p class="account-note">Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten (serverseitige Registry). Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Logout auf dem Gerät.</p>
+      <p class="account-note">${t("Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.")}</p>
     </div>`);
 
   data?.insertAdjacentHTML("beforeend", `
     <div class="account-list" id="serverAccountBlock">
-      <div class="account-row"><span><strong>Server-Datenexport</strong><small>Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.</small></span><button id="serverAccountExport" type="button">Server-Export</button></div>
+      <div class="account-row"><span><strong>${t("Server-Datenexport")}</strong><small>${t("Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.")}</small></span><button id="serverAccountExport" type="button">${t("Server-Export")}</button></div>
       <div class="account-row"><span><strong>${t("Konto löschen")}</strong><small>${t("Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.")}</small></span><button id="serverAccountDelete" class="danger-action" type="button">${t("Konto löschen")}</button></div>
     </div>`);
 
@@ -179,25 +179,25 @@ function postJson(url, body) {
 async function loadSessions(view, output) {
   const list = view.querySelector("#serverSessionsList");
   const { ok, status, payload } = await api(API.sessions);
-  if (status === 401) return output("Bitte zuerst anmelden (E-Mail, Google oder Passkey).");
-  if (!ok) return output(`Sitzungen konnten nicht geladen werden (${payload.error || status}).`);
+  if (status === 401) return output(t("Bitte zuerst anmelden (E-Mail, Google oder Passkey)."));
+  if (!ok) return output(`${t("Sitzungen konnten nicht geladen werden")} (${payload.error || status}).`);
   const sessions = payload.sessions || [];
-  list.innerHTML = sessions.length === 0 ? '<p class="account-note">Keine aktiven Server-Sitzungen.</p>' : sessions.map((session) => `
-    <div class="account-row"><span><strong>${escapeHtml(session.device || "Browser")}${session.current ? " · diese Sitzung" : ""}</strong>
-    <small>Angemeldet: ${formatDate(session.createdAt)} · Zuletzt aktiv: ${formatDate(session.lastSeenAt)} · Ablauf: ${formatDate(session.expiresAt)}</small></span>
-    ${session.sid && !session.current ? `<button type="button" data-revoke-sid="${escapeHtml(session.sid)}">Beenden</button>` : '<span class="permission-state">Aktiv</span>'}</div>`).join("");
+  list.innerHTML = sessions.length === 0 ? `<p class="account-note">${t("Keine aktiven Server-Sitzungen.")}</p>` : sessions.map((session) => `
+    <div class="account-row"><span><strong>${escapeHtml(session.device || "Browser")}${session.current ? ` · ${t("diese Sitzung")}` : ""}</strong>
+    <small>${t("Angemeldet")}: ${formatDate(session.createdAt)} · ${t("Zuletzt aktiv")}: ${formatDate(session.lastSeenAt)} · ${t("Ablauf")}: ${formatDate(session.expiresAt)}</small></span>
+    ${session.sid && !session.current ? `<button type="button" data-revoke-sid="${escapeHtml(session.sid)}">${t("Beenden")}</button>` : `<span class="permission-state">${t("Aktiv")}</span>`}</div>`).join("");
   list.querySelectorAll("[data-revoke-sid]").forEach((button) => button.addEventListener("click", async () => {
     const result = await postJson(API.sessionsRevoke, { sid: button.dataset.revokeSid });
-    output(result.ok ? "Sitzung beendet." : `Widerruf fehlgeschlagen (${result.payload.error || result.status}).`);
+    output(result.ok ? t("Sitzung beendet.") : `${t("Widerruf fehlgeschlagen")} (${result.payload.error || result.status}).`);
     if (result.ok) loadSessions(view, output);
   }));
-  output(`${sessions.length} aktive Server-Sitzung(en) geladen.`);
+  output(`${sessions.length} · ${t("aktive Server-Sitzung(en) geladen.")}`);
 }
 
 async function revokeOthers(view, output) {
   const result = await postJson(API.sessionsRevoke, { others: true });
-  if (result.status === 401) return output("Bitte zuerst anmelden.");
-  output(result.ok ? `Alle anderen Sitzungen beendet (${result.payload.revoked ?? 0}).` : `Aktion fehlgeschlagen (${result.payload.error || result.status}).`);
+  if (result.status === 401) return output(t("Bitte zuerst anmelden."));
+  output(result.ok ? `${t("Alle anderen Sitzungen beendet")} (${result.payload.revoked ?? 0}).` : `${t("Aktion fehlgeschlagen")} (${result.payload.error || result.status}).`);
   if (result.ok) loadSessions(view, output);
 }
 
@@ -224,18 +224,19 @@ function toggleForm(id, block) {
 // den Quelltext: der teuerste Fehler waere ein Serveraufruf trotz falscher Eingabe.
 export function changePasswordForm(block, output) {
   if (!toggleForm("passwordChangeForm", block)) return;
+  output(""); // wie beim Löschen: keine alte Meldung unter einem frischen Formular
   block.insertAdjacentHTML("beforeend", `
     <form id="passwordChangeForm" class="account-inline-form" autocomplete="on">
-      <label for="pwCurrent">Aktuelles Passwort<input id="pwCurrent" type="password" autocomplete="current-password" required></label>
-      <label for="pwNew">Neues Passwort<input id="pwNew" type="password" autocomplete="new-password" minlength="10" placeholder="Mindestens 10 Zeichen" required></label>
-      <label for="pwRepeat">Neues Passwort wiederholen<input id="pwRepeat" type="password" autocomplete="new-password" required></label>
+      <label for="pwCurrent">${t("Aktuelles Passwort")}<input id="pwCurrent" type="password" autocomplete="current-password" required></label>
+      <label for="pwNew">${t("Neues Passwort")}<input id="pwNew" type="password" autocomplete="new-password" minlength="10" placeholder="${t("Mindestens 10 Zeichen")}" required></label>
+      <label for="pwRepeat">${t("Neues Passwort wiederholen")}<input id="pwRepeat" type="password" autocomplete="new-password" required></label>
       <div class="account-actions">
-        <button id="pwSubmit" type="submit">Passwort ändern</button>
-        <button id="pwCancel" type="button">Abbrechen</button>
+        <button id="pwSubmit" type="submit">${t("Passwort ändern")}</button>
+        <button id="pwCancel" type="button">${t("Abbrechen")}</button>
       </div>
     </form>`);
   const form = block.querySelector("#passwordChangeForm");
-  form.querySelector("#pwCancel").addEventListener("click", () => { form.remove(); output("Passwortänderung abgebrochen."); });
+  form.querySelector("#pwCancel").addEventListener("click", () => { form.remove(); output(t("Passwortänderung abgebrochen.")); });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const currentPassword = form.querySelector("#pwCurrent").value;
@@ -243,36 +244,36 @@ export function changePasswordForm(block, output) {
     const repeat = form.querySelector("#pwRepeat").value;
     // Beide Prüfungen laufen VOR dem Serveraufruf: ein Tippfehler darf keinen
     // Fehlversuch auf dem Konto erzeugen (der Server zählt Fehlversuche).
-    if (!currentPassword || !newPassword) return output("Bitte alle Felder ausfüllen.");
-    if (newPassword !== repeat) return output("Die beiden neuen Passwörter stimmen nicht überein.");
+    if (!currentPassword || !newPassword) return output(t("Bitte alle Felder ausfüllen."));
+    if (newPassword !== repeat) return output(t("Die beiden neuen Passwörter stimmen nicht überein."));
     const knopf = form.querySelector("#pwSubmit");
     knopf.disabled = true;
     const result = await postJson(API.passwordChange, { currentPassword, newPassword });
     knopf.disabled = false;
-    if (result.status === 401) return output("Bitte zuerst mit E-Mail und Passwort anmelden.");
-    if (!result.ok) return output(`Passwortänderung fehlgeschlagen (${result.payload.error || result.status}).`);
+    if (result.status === 401) return output(t("Bitte zuerst mit E-Mail und Passwort anmelden."));
+    if (!result.ok) return output(`${t("Passwortänderung fehlgeschlagen")} (${result.payload.error || result.status}).`);
     form.remove();
-    output("Passwort geändert. Alle anderen Sitzungen wurden beendet.");
+    output(t("Passwort geändert. Alle anderen Sitzungen wurden beendet."));
   });
 }
 
 async function serverLogout(output) {
   const result = await postJson(API.logout, {});
   clearToken(); // lokalen Bearer-Token entfernen: auch clientseitig abgemeldet
-  output(result.ok ? "Serverseitig abgemeldet. Die Sitzung wurde beendet." : "Abgemeldet (lokaler Token entfernt).");
+  output(result.ok ? t("Serverseitig abgemeldet. Die Sitzung wurde beendet.") : t("Abgemeldet (lokaler Token entfernt)."));
 }
 
 async function exportAccount(output) {
   const { ok, status, payload } = await api(API.accountExport);
-  if (status === 401) return output("Bitte zuerst anmelden.");
-  if (!ok) return output(`Export fehlgeschlagen (${payload.error || status}).`);
+  if (status === 401) return output(t("Bitte zuerst anmelden."));
+  if (!ok) return output(`${t("Export fehlgeschlagen")} (${payload.error || status}).`);
   const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: "application/json" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = "smejj.com-account-export.json";
   link.click();
   setTimeout(() => URL.revokeObjectURL(link.href), 0);
-  output("Server-Datenexport erstellt. Secrets sind ausgeschlossen.");
+  output(t("Server-Datenexport erstellt. Secrets sind ausgeschlossen."));
 }
 
 // --- Konto löschen ------------------------------------------------------------
@@ -299,8 +300,18 @@ function loeschWort() {
   return uiLanguage() === "de" ? "KONTO LÖSCHEN" : "DELETE ACCOUNT";
 }
 
+// Deutsche Gaensefuesschen um ein englisches Wort sahen live falsch aus
+// (gemessen 21.09.2026 an der ausgelieferten Seite).
+function inAnfuehrung(text) {
+  return uiLanguage() === "de" ? `\u201e${text}\u201c` : `\u201c${text}\u201d`;
+}
+
 export async function deleteAccountForm(block, output) {
   if (!toggleForm("accountDeleteForm", block)) return output(t("Löschung abgebrochen. Keine Daten wurden verändert."));
+  // Gerätetest 21.09.2026: wer abbrach und das Formular erneut öffnete, sah die
+  // alte Meldung ("Deletion cancelled…") weiter darunter stehen — sie las sich
+  // wie das Ergebnis des NEUEN Versuchs. Die Zeile wird beim Öffnen geleert.
+  output("");
   // Der Anmeldeweg entscheidet nur über das Passwortfeld in der Maske; die
   // verbindliche Prüfung macht der Server am Sitzungstoken, nicht hier.
   const user = await fetchAuthenticatedUser();
@@ -312,7 +323,7 @@ export async function deleteAccountForm(block, output) {
       <!-- Beschriftung als EIN Textstueck. Das Label ist eine Flex-Spalte: jedes
            weitere Element darin wuerde eine eigene Zeile — live gesehen, als hier
            noch ein <code>-Element stand ("Zur Bestätigung" / Wort / "eingeben"). -->
-      <label for="delConfirm">${t("Zur Bestätigung eingeben:")} „${wort}“<input id="delConfirm" type="text" autocomplete="off" spellcheck="false" required></label>
+      <label for="delConfirm">${t("Zur Bestätigung eingeben:")} ${inAnfuehrung(wort)}<input id="delConfirm" type="text" autocomplete="off" spellcheck="false" required></label>
       ${mitPasswort ? `<label for="delPassword">${t("Aktuelles Passwort")}<input id="delPassword" type="password" autocomplete="current-password" required></label>` : ""}
       <div class="account-actions">
         <button id="delSubmit" class="danger-action" type="submit">${t("Konto endgültig löschen")}</button>
@@ -325,7 +336,7 @@ export async function deleteAccountForm(block, output) {
     event.preventDefault();
     const confirmText = form.querySelector("#delConfirm").value.trim();
     const password = mitPasswort ? form.querySelector("#delPassword").value : "";
-    if (confirmText.toLocaleUpperCase("de-DE") !== wort) return output(`${t("Bitte exakt dieses Wort eingeben:")} „${wort}“. ${t("Es wurde nichts gelöscht.")}`);
+    if (confirmText.toLocaleUpperCase("de-DE") !== wort) return output(`${t("Bitte exakt dieses Wort eingeben:")} ${inAnfuehrung(wort)}. ${t("Es wurde nichts gelöscht.")}`);
     if (mitPasswort && !password) return output(t("Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht."));
     const knopf = form.querySelector("#delSubmit");
     knopf.disabled = true;
