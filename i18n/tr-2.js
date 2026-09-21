@@ -357,4 +357,6 @@ export default {
   // Apple 3.1.1, Runde 2 (21.09.2026)
   "In dieser App wird nichts verkauft.": "Bu uygulamada hiçbir şey satılmıyor.",
   "Dein Plan ist aktiv.": "Planın etkin.",
+  // Anfangstext des Ausgabefeldes — stand bis 21.09.2026 in CSS
+  "Bereit.": "Hazır.",
 };

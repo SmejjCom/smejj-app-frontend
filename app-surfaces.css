@@ -238,8 +238,12 @@
   line-height: 1.5;
 }
 
-.premium-view .output:empty::before {
-  content: "Bereit.";
+/* KEIN Text mehr aus CSS: `content:` erreicht keine Uebersetzung, und genau
+   dieses "Bereit." stand am 21.09.2026 in der englischen App im Konto-Bereich
+   (Geraetetest). Wer hier wieder einen Text einsetzt, baut denselben Fehler.
+   Der Anfangstext gehoert ins Markup — account-privacy.js setzt ihn ueber
+   t(). Die Regel bleibt fuer die Farbe eines leeren Feldes. */
+.premium-view .output:empty {
   color: var(--premium-soft);
 }
 

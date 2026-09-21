@@ -10,6 +10,12 @@ import { afterFirstPaint } from "./deferred-start.js";
 // wuerde erzwingen, dass diese ABO-GESPERRTE Datei bei jeder Stil-Aenderung
 // wieder angefasst wird — genau das soll die Auslagerung verhindern.
 import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js";
+// Gleicher Schluessel wie in profile-dock-menu.js — bewusst dupliziert statt
+// importiert (wie TOKEN_KEY in auth-gate.js): profile-dock-menu.js liegt im
+// Startbuendel, diese Datei wird nachgeladen. Ein Import zoege das Startmodul
+// unter einer zweiten Marke herein — genau die Falle, vor der die Markenkette
+// warnt (zwei Kopien mit getrenntem Zustand).
+const KONTO_REITER_SCHLUESSEL = "smejj.konto.reiter.v1";
 import { usageSummary } from "./usage-meter.js?v=1";
 import { initOnboardingWelcome } from "./onboarding-welcome.js?v=1";
 
@@ -264,15 +270,21 @@ function markup() {
       <div class="daten-karte"><h5>${t("Wer liest mit?")}</h5><p>${t("Zum Training werden deine Texte nur mit deinem ausdrücklichen Ja benutzt — die Einwilligung ist standardmäßig aus.")}</p></div>
       <div class="daten-karte"><h5>${t("Wie komme ich raus?")}</h5><p>${t("Ein Klick unter Daten verwalten — der Export kommt sofort, ohne Nachfrage und ohne Wartezeit.")}</p></div>
     </div><h4 class="account-subhead">${t("Datenschutz")}</h4><div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Modelltraining erlauben", "privacyTraining", "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.")}</p><h4 class="account-subhead">${t("Berechtigungen")}</h4><div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div><h4 class="account-subhead">${t("Daten verwalten")}</h4><div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">${t("Datenschutzerklärung öffnen")}</button></div>`)}
-  </div></div><div id="profileOutput" class="output" role="status" aria-live="polite"></div>`;
+  </div></div><div id="profileOutput" class="output" role="status" aria-live="polite">${t("Bereit.")}</div>`;
 }
 
 function bind(view) {
-  // Der Aufrufer darf den Reiter mitgeben (#billing aus dem Profilmenue). Ohne
-  // das landete "Mein Plan" im Profil-Reiter, und am Handy musste man die
-  // Reiterleiste erst bis ans Ende schieben (Geraetetest 21.09.2026).
-  const gewuenscht = String(location.hash || "").replace("#", "");
-  const bekannt = view.querySelector(`[data-account-tab="${gewuenscht}"]`) ? gewuenscht : "identity";
+  // Der Aufrufer darf den Reiter mitgeben ("Mein Plan" im Profilmenue). Das
+  // lief zuerst ueber den Hash — und der gehoert dem Router, der ihn als
+  // ANSICHTSNAMEN liest: beide Menuepunkte landeten auf der Fehlerseite.
+  // Jetzt eine Merknotiz, die nach dem Lesen sofort verfaellt; ein zweiter
+  // Besuch soll wieder im Profil beginnen.
+  let gewuenscht = "";
+  try {
+    gewuenscht = sessionStorage.getItem(KONTO_REITER_SCHLUESSEL) || "";
+    sessionStorage.removeItem(KONTO_REITER_SCHLUESSEL);
+  } catch { /* Storage gesperrt: Standard-Reiter */ }
+  const bekannt = gewuenscht && view.querySelector(`[data-account-tab="${gewuenscht}"]`) ? gewuenscht : "identity";
   activate(view, bekannt);
   bindTabKeys(view);
   view.addEventListener("click", (event) => {

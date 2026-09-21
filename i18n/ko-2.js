@@ -357,4 +357,6 @@ export default {
   // Apple 3.1.1, Runde 2 (21.09.2026)
   "In dieser App wird nichts verkauft.": "이 앱에서는 아무것도 판매하지 않습니다.",
   "Dein Plan ist aktiv.": "플랜이 활성 상태입니다.",
+  // Anfangstext des Ausgabefeldes — stand bis 21.09.2026 in CSS
+  "Bereit.": "준비됨.",
 };

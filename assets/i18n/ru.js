@@ -1,5 +1,5 @@
 // smejj.com — UI-Uebersetzung Русский (Quellsprache Deutsch als Schluessel).
-import zusatz from "./ru-2.js?v=5";
+import zusatz from "./ru-2.js?v=6";
 
 export default {
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)

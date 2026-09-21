@@ -357,4 +357,6 @@ export default {
   // Apple 3.1.1, Runde 2 (21.09.2026)
   "In dieser App wird nichts verkauft.": "In questa app non si vende nulla.",
   "Dein Plan ist aktiv.": "Il tuo piano è attivo.",
+  // Anfangstext des Ausgabefeldes — stand bis 21.09.2026 in CSS
+  "Bereit.": "Pronto.",
 };

@@ -39,7 +39,7 @@ export function initProfileDockMenu() {
     const item = event.target.closest("[data-dock-action]");
     if (!item) return;
     setOpen(button, menu, false);
-    runAction(item.dataset.dockAction);
+    runAction(item.dataset.dockAction, item.dataset.dockReiter);
   });
   menu.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
@@ -84,11 +84,24 @@ function placeAboveButton(button, menu) {
 }
 
 // Fuehrt eine Menue-Aktion aus. Input: action-Name. Output: void.
-function runAction(action) {
+function runAction(action, reiter) {
   // Geraetetest 21.09.2026: "Mein Plan" landete im Reiter "Profil" — am Handy
-  // muss man die Reiterleiste dann erst bis ans Ende schieben. Der Hash sagt
-  // der Kontoseite, welcher Reiter gemeint ist.
-  if (action === "account") return goTo("/profile#billing");
+  // muss man die Reiterleiste dann erst bis ans Ende schieben.
+  //
+  // NICHT ueber den Hash! Der erste Versuch schickte "/profile#billing" — und
+  // der Router liest den Hash als ANSICHTSNAMEN (view-routes.js:
+  // `if (location.hash) return location.hash.replace(...)`). "billing" ist
+  // keine Ansicht, also landeten BEIDE Menuepunkte auf der Fehlerseite, und
+  // damit war auch der Weg zur Konto-Loeschung zu. Live gemessen und in v940
+  // behoben. Der Reiter geht jetzt als Merknotiz nebenher; die Adresse bleibt
+  // sauber "/profile".
+  if (action === "account") {
+    try {
+      if (reiter) sessionStorage.setItem(KONTO_REITER_SCHLUESSEL, reiter);
+      else sessionStorage.removeItem(KONTO_REITER_SCHLUESSEL);
+    } catch { /* Storage gesperrt: dann eben der Standard-Reiter */ }
+    return goTo("/profile");
+  }
   if (action === "settings") return goTo("/settings");
   if (action === "hilfe") { location.href = "/hilfe.html"; return; }
   if (action === "logout") return logout();
@@ -124,6 +137,10 @@ function fuelleWerte() {
 }
 
 // Navigation ohne Reload: app.js hoert auf popstate und stellt die View wieder her.
+// Gemeinsamer Schluessel mit account-privacy.js. Absichtlich sessionStorage:
+// der Wunsch gilt fuer DIESEN Sprung, nicht fuer alle kuenftigen Besuche.
+export const KONTO_REITER_SCHLUESSEL = "smejj.konto.reiter.v1";
+
 function goTo(path) {
   history.pushState({}, "", path);
   window.dispatchEvent(new PopStateEvent("popstate"));

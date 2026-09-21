@@ -1,5 +1,5 @@
 // smejj.com — UI-Uebersetzung বাংলা (Quellsprache Deutsch als Schluessel).
-import zusatz from "./bn-2.js?v=5";
+import zusatz from "./bn-2.js?v=6";
 
 export default {
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)

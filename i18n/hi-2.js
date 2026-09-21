@@ -357,4 +357,6 @@ export default {
   // Apple 3.1.1, Runde 2 (21.09.2026)
   "In dieser App wird nichts verkauft.": "इस ऐप में कुछ भी नहीं बेचा जाता।",
   "Dein Plan ist aktiv.": "आपकी योजना सक्रिय है।",
+  // Anfangstext des Ausgabefeldes — stand bis 21.09.2026 in CSS
+  "Bereit.": "तैयार।",
 };
