@@ -347,7 +347,6 @@ export default {
   "Export fehlgeschlagen": "Dışa aktarma başarısız",
   "Server-Datenexport erstellt. Secrets sind ausgeschlossen.": "Sunucu veri dışa aktarımı oluşturuldu. Gizli bilgiler hariç tutuldu.",
   // Apple 3.1.1: kein Kauf-Hinweis in der iOS-Huelle (21.09.2026)
-  "Dieses Konto nutzt smejj.com kostenlos. Es ist kein Abo aktiv und in dieser App wird nichts verkauft.": "Bu hesap smejj.com’u ücretsiz kullanıyor. Etkin bir abonelik yok ve bu uygulamada hiçbir şey satılmıyor.",
   // Letzte Reste des Konto-Bereichs (21.09.2026)
   "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.": "1000 mesaj, premium ses, daha hızlı yanıtlar. Toplam fiyat ayda 9 € (KDV dâhil).",
   "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.": "Sınırsız mesaj, kod ajanı ve projeler. Toplam fiyat ayda 19 € (KDV dâhil).",
@@ -355,4 +354,7 @@ export default {
   "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj sunucusu üzerinden doğal ses — ayarlardan açılır.",
   "Sprachminuten (Premium-Stimme)": "Ses dakikaları (premium ses)",
   "Zählt erst, wenn die Premium-Stimme aktiv ist.": "Yalnızca premium ses etkinken sayılır.",
+  // Apple 3.1.1, Runde 2 (21.09.2026)
+  "In dieser App wird nichts verkauft.": "Bu uygulamada hiçbir şey satılmıyor.",
+  "Dein Plan ist aktiv.": "Planın etkin.",
 };

@@ -347,7 +347,6 @@ export default {
   "Export fehlgeschlagen": "내보내기에 실패했습니다",
   "Server-Datenexport erstellt. Secrets sind ausgeschlossen.": "서버 데이터 내보내기를 만들었습니다. 비밀 정보는 제외됩니다.",
   // Apple 3.1.1: kein Kauf-Hinweis in der iOS-Huelle (21.09.2026)
-  "Dieses Konto nutzt smejj.com kostenlos. Es ist kein Abo aktiv und in dieser App wird nichts verkauft.": "이 계정은 smejj.com을 무료로 사용합니다. 활성 구독이 없으며 이 앱에서는 아무것도 판매하지 않습니다.",
   // Letzte Reste des Konto-Bereichs (21.09.2026)
   "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.": "메시지 1,000개, 프리미엄 음성, 더 빠른 응답. 총액 월 9유로(부가세 포함).",
   "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.": "무제한 메시지, 코딩 에이전트와 프로젝트. 총액 월 19유로(부가세 포함).",
@@ -355,4 +354,7 @@ export default {
   "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj 서버를 통한 자연스러운 음성 — 설정에서 켭니다.",
   "Sprachminuten (Premium-Stimme)": "음성 사용 시간(프리미엄 음성)",
   "Zählt erst, wenn die Premium-Stimme aktiv ist.": "프리미엄 음성이 켜져 있을 때만 집계됩니다.",
+  // Apple 3.1.1, Runde 2 (21.09.2026)
+  "In dieser App wird nichts verkauft.": "이 앱에서는 아무것도 판매하지 않습니다.",
+  "Dein Plan ist aktiv.": "플랜이 활성 상태입니다.",
 };

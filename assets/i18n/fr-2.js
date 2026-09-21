@@ -347,7 +347,6 @@ export default {
   "Export fehlgeschlagen": "Échec de l’export",
   "Server-Datenexport erstellt. Secrets sind ausgeschlossen.": "Export des données du serveur créé. Les secrets sont exclus.",
   // Apple 3.1.1: kein Kauf-Hinweis in der iOS-Huelle (21.09.2026)
-  "Dieses Konto nutzt smejj.com kostenlos. Es ist kein Abo aktiv und in dieser App wird nichts verkauft.": "Ce compte utilise smejj.com gratuitement. Aucun abonnement n’est actif et rien n’est vendu dans cette application.",
   // Letzte Reste des Konto-Bereichs (21.09.2026)
   "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.": "1 000 messages, voix premium, réponses plus rapides. Prix total 9 € par mois TTC.",
   "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.": "Messages illimités, agent de code et projets. Prix total 19 € par mois TTC.",
@@ -355,4 +354,7 @@ export default {
   "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "Son naturel via le serveur smejj — s’active dans les réglages.",
   "Sprachminuten (Premium-Stimme)": "Minutes vocales (voix premium)",
   "Zählt erst, wenn die Premium-Stimme aktiv ist.": "Ne compte qu’une fois la voix premium activée.",
+  // Apple 3.1.1, Runde 2 (21.09.2026)
+  "In dieser App wird nichts verkauft.": "Rien n’est vendu dans cette application.",
+  "Dein Plan ist aktiv.": "Ton forfait est actif.",
 };

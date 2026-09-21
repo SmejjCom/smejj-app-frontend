@@ -43,6 +43,18 @@ const PLAN_LABELS = {
   pro: "smejj Pro — 19 € / Monat",
   max: "smejj Max — 39 € / Monat"
 };
+// Apple 3.1.1 gilt auch fuer die Plan-KARTE, nicht nur fuer die Kaufliste
+// darunter. Geraetetest 21.09.2026 in der installierten App: dort stand weiter
+// "smejj Plus — 9 € / Monat … renews on October 14, 2026". Ein Preis bleibt ein
+// Preis, auch wenn nichts daneben zu kaufen ist.
+function planNameAnzeige(plan) {
+  const label = PLAN_LABELS[plan];
+  if (!label) return null;
+  // "smejj Plus — 9 € / Monat" -> "smejj Plus". Der Plan-NAME darf bleiben;
+  // der Nutzer muss sehen, was er hat.
+  return iosHuelle() ? label.split(" — ")[0] : label;
+}
+
 function planLink(plan) {
   const base = STRIPE_PLAN_LINKS[plan];
   return billingCheckoutRef ? `${base}?client_reference_id=${billingCheckoutRef}` : base;
@@ -151,7 +163,7 @@ function renderBillingState(view, billing) {
   // /api/billing/status (nur fuer den Kontoinhaber). Bestandsabos von vor dem
   // Feld haben es nicht — dann erscheint die Zeile nicht.
   renderZugang(panel, billing);
-  const label = PLAN_LABELS[billing.plan];
+  const label = planNameAnzeige(billing.plan);
   const aktiv = Boolean(label);
   const planName = panel.querySelector(".plan-name");
   const planHint = panel.querySelector(".account-plan small");
@@ -179,6 +191,10 @@ function renderBillingState(view, billing) {
         : t("Gekündigt — läuft zum Periodenende aus.");
     } else if (billing.status === "past_due") {
       planHint.textContent = t("Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.");
+    } else if (iosHuelle()) {
+      // Kein Verlaengerungsdatum und kein Zahlungsdienstleister in der Huelle:
+      // beides beschreibt eine wiederkehrende Zahlung ausserhalb von Apple.
+      planHint.textContent = t("Dein Plan ist aktiv.");
     } else {
       planHint.textContent = datum
         ? t("Aktiv — verlängert sich am {datum}.").replace("{datum}", datum)
@@ -241,7 +257,7 @@ function markup() {
     ${panel("apps", "Verbundene Apps", `<div class="account-list">${dataAction("KI-Modelle & API-Keys", "GLM-5.2 aktiv · eigene Schlüssel und Modellwahl liegen in den Einstellungen.", "modelsSettingsOpen", "Einstellungen öffnen")}${statusRow("GitHub", "Für Coding: über die rechte Seitenleiste der App verbunden.", "In der App", true)}${statusRow("Google Drive", "Dateien direkt in den Chat holen.", "Bald verfügbar")}${statusRow("Google Kalender", "Termine ansehen und vorlesen lassen — nur lesend.", "Bald verfügbar")}${statusRow("Slack", "Zusammenfassungen aus Kanälen holen.", "Bald verfügbar")}</div><p class="account-note">${t("Apps sehen nur, was du ausdrücklich freigibst — Zugriff jederzeit widerrufbar.")}</p>`)}
     ${panel("notifications", "Benachrichtigungen", `<div class="account-list">${toggle("Coding-Agent fertig", "notifyAgentDone", "Meldung, wenn eine lange Aufgabe abgeschlossen ist.")}${toggle("Antwort fertig", "notifyReplyDone", "Wenn du die App verlassen hast, während smejj noch arbeitet.")}${toggle("Limit fast erreicht", "notifyLimit80", "Hinweis bei 80 % — Limits starten erst mit den Plänen.")}${statusRow("Sicherheitswarnungen", "Neue Anmeldung, neues Gerät — immer per E-Mail.", "Immer an", true)}${statusRow("Rechnungen & Zahlungen", "Kommt mit den Bezahl-Plänen.", "Immer an", true)}</div><p class="account-note">${t("Diese Auswahl gilt auf diesem Gerät.")}</p>`)}
     ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
-    ${panel("billing", "Mein Plan", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">Free — 0 €</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div>${planKaufTeil()}<div class="account-actions">${iosHuelle() ? "" : `<button id="planManageOpen" type="button" hidden>${t("Abo verwalten — Rechnungen, Plan & Kündigung")}</button>`}<button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}
+    ${panel("billing", "Mein Plan", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">${iosHuelle() ? "Free" : "Free — 0 €"}</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div>${planKaufTeil()}<div class="account-actions">${iosHuelle() ? "" : `<button id="planManageOpen" type="button" hidden>${t("Abo verwalten — Rechnungen, Plan & Kündigung")}</button>`}<button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}
     ${panel("usage", "Nutzung & Limits", `<div class="account-list">${usageRow("Nachrichten", "Aufbauphase: ohne Limit.", "usageMessages")}${usageRow("Sprachminuten (Premium-Stimme)", "Zählt erst, wenn die Premium-Stimme aktiv ist.", "usageVoice")}${usageRow("Coding-Aufgaben", "Nur erfolgreich gestartete Läufe zählen.", "usageCoding")}</div><p class="account-note" id="usagePeriodNote">${t("Zähler laufen nur auf diesem Gerät und setzen sich jeden Monat automatisch zurück. Mit den Plänen bekommt jede Zeile einen Balken: verbraucht und noch offen.")}</p>`)}
     ${panel("data", "Meine Daten", `<div class="daten-fragen">
       <div class="daten-karte"><h5>${t("Wo liegen sie?")}</h5><p>${t("In deinem eigenen Bereich bei IDrive e2, verschlüsselt — nicht in einem gemeinsamen Topf mit anderen Nutzern.")}</p></div>
@@ -252,7 +268,12 @@ function markup() {
 }
 
 function bind(view) {
-  activate(view, "identity");
+  // Der Aufrufer darf den Reiter mitgeben (#billing aus dem Profilmenue). Ohne
+  // das landete "Mein Plan" im Profil-Reiter, und am Handy musste man die
+  // Reiterleiste erst bis ans Ende schieben (Geraetetest 21.09.2026).
+  const gewuenscht = String(location.hash || "").replace("#", "");
+  const bekannt = view.querySelector(`[data-account-tab="${gewuenscht}"]`) ? gewuenscht : "identity";
+  activate(view, bekannt);
   bindTabKeys(view);
   view.addEventListener("click", (event) => {
     const tab = event.target.closest("[data-account-tab]");
@@ -397,10 +418,16 @@ async function saveConsent(view) {
 // vorbereitete Kuendigungs-E-Mail, aus der Vertrag und Kuendigungswunsch klar
 // hervorgehen. Fail-safe: darf die Kontoseite nie blockieren.
 function handleCancelSubscription(view) {
-  // Mit aktivem Abo geht es direkt in die eigene Portal-Sitzung (ohne
-  // erneute Stripe-Anmeldung); sonst ueber den oeffentlichen Login-Link.
-  if (PLAN_LABELS[billingAktuell?.plan]) return openBillingPortal(view);
-  if (STRIPE_BILLING_PORTAL_URL) {
+  // In der iOS-Huelle fuehrt KEIN Weg ins Stripe-Portal: dort stehen Preise und
+  // Zahlungsmittel, und Apple wertet das nach 3.1.1 als fremden Bezahlweg. Die
+  // Kuendigung bleibt trotzdem moeglich — ueber die vorbereitete E-Mail unten.
+  // Apple stoert sich am Kauf, nicht am Beenden.
+  if (!iosHuelle()) {
+    // Mit aktivem Abo geht es direkt in die eigene Portal-Sitzung (ohne
+    // erneute Stripe-Anmeldung); sonst ueber den oeffentlichen Login-Link.
+    if (PLAN_LABELS[billingAktuell?.plan]) return openBillingPortal(view);
+  }
+  if (!iosHuelle() && STRIPE_BILLING_PORTAL_URL) {
     window.open(STRIPE_BILLING_PORTAL_URL, "_blank", "noopener");
     output(view, t("Kündigung: Im Stripe-Kundenportal kannst du dein Abo sofort kündigen."));
     return;
@@ -566,7 +593,7 @@ function iosHuelle() {
 // unserer Website" — das waere nach 3.1.1 wieder eine Handlungsaufforderung).
 function planKaufTeil() {
   if (iosHuelle()) {
-    return `<p class="account-note">${t("Dieses Konto nutzt smejj.com kostenlos. Es ist kein Abo aktiv und in dieser App wird nichts verkauft.")}</p>`;
+    return `<p class="account-note">${t("In dieser App wird nichts verkauft.")}</p>`;
   }
   return `<p class="account-note">${t("Alle Preise sind Gesamtpreise pro Monat inkl. gesetzlicher Umsatzsteuer. Das kostenpflichtige Abo hat eine Laufzeit von einem Monat und verlängert sich automatisch um jeweils einen weiteren Monat, bis du kündigst. Jederzeit zum Ende des bezahlten Monats kündbar.")}</p><div class="account-list">${dataAction("Plus — 9 € / Monat", "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.", "planPlusOpen", "Zahlungspflichtig abonnieren")}${dataAction("Pro — 19 € / Monat", "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.", "planProOpen", "Zahlungspflichtig abonnieren")}${dataAction("Max — 39 € / Monat", "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.", "planMaxOpen", "Zahlungspflichtig abonnieren")}</div><p class="account-note">${t("Mit „Zahlungspflichtig abonnieren“ wirst du zum Zahlungsdienstleister Stripe weitergeleitet und schließt dort ein kostenpflichtiges Abo ab. Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Nach der Zahlung bekommst du eine Bestätigung per E-Mail. Es gelten unsere")} <a href="/agb.html">${t("AGB")}</a> ${t("und die")} <a href="/widerruf.html">${t("Widerrufsbelehrung")}</a>.</p>`;
 }

@@ -1,5 +1,5 @@
 // smejj.com — UI-Uebersetzung 日本語 (Quellsprache Deutsch als Schluessel).
-import zusatz from "./ja-2.js?v=4";
+import zusatz from "./ja-2.js?v=5";
 
 export default {
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
