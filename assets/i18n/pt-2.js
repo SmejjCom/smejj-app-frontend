@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "Diga o que o programa deve fazer.",
   "Ausblenden": "Ocultar",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Explique em três frases o que você pode fazer por mim.",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "Excluir conta",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "Vale para todas as formas de login. Exige a confirmação literal — em contas de e-mail, também a senha. Encerra todas as sessões; a exclusão é registrada no servidor.",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "Exclusão cancelada. Nenhum dado foi alterado.",
+  "Das lässt sich nicht rückgängig machen.": "Isso não pode ser desfeito.",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "Todas as sessões são encerradas e o login é desativado definitivamente.",
+  "Zur Bestätigung eingeben:": "Digite para confirmar:",
+  "Aktuelles Passwort": "Senha atual",
+  "Konto endgültig löschen": "Excluir a conta definitivamente",
+  "Bitte exakt dieses Wort eingeben:": "Digite exatamente esta palavra:",
+  "Es wurde nichts gelöscht.": "Nada foi excluído.",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "Digite sua senha atual. Nada foi excluído.",
+  "Löschung fehlgeschlagen": "Falha na exclusão",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "Conta excluída: login desativado, todas as sessões encerradas. A exclusão foi registrada no servidor.",
 };

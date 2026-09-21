@@ -294,4 +294,18 @@ export default {
   "Sag, was das Programm tun soll.": "Say what the program should do.",
   "Ausblenden": "Hide",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Explain in three sentences what you can do for me.",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "Delete account",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "Applies to every sign-in method. Requires the literal confirmation — for e-mail accounts the password as well. Ends all sessions; the deletion is logged on the server.",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "Deletion cancelled. No data was changed.",
+  "Das lässt sich nicht rückgängig machen.": "This cannot be undone.",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "All sessions end and sign-in is permanently disabled.",
+  "Zur Bestätigung eingeben:": "Type to confirm:",
+  "Aktuelles Passwort": "Current password",
+  "Konto endgültig löschen": "Delete account permanently",
+  "Bitte exakt dieses Wort eingeben:": "Please type exactly this word:",
+  "Es wurde nichts gelöscht.": "Nothing was deleted.",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "Please enter your current password. Nothing was deleted.",
+  "Löschung fehlgeschlagen": "Deletion failed",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "Account deleted: sign-in disabled, all sessions ended. The deletion was logged on the server.",
 };

@@ -8,6 +8,8 @@ import { API_ORIGIN } from "./config.js";
 // zweite Instanz.
 import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=1";
 import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=1";
+// Der Loeschweg spricht die Sprache der Huelle (Apple prueft auf Englisch).
+import { t, uiLanguage } from "./i18n/ui.js?v=3";
 
 // Cross-Origin: smejj.com und Control-Server sind verschiedene Sites. Auth laeuft
 // per Bearer-Token (localStorage), nicht per Cookie (SameSite=Lax geht cross-site
@@ -152,7 +154,7 @@ export function initServerSessionControls(view, output) {
   data?.insertAdjacentHTML("beforeend", `
     <div class="account-list" id="serverAccountBlock">
       <div class="account-row"><span><strong>Server-Datenexport</strong><small>Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.</small></span><button id="serverAccountExport" type="button">Server-Export</button></div>
-      <div class="account-row"><span><strong>Konto löschen</strong><small>Nur E-Mail-Konten. Erfordert Passwort und die wörtliche Bestätigung „KONTO LÖSCHEN“. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.</small></span><button id="serverAccountDelete" class="danger-action" type="button">Konto löschen</button></div>
+      <div class="account-row"><span><strong>${t("Konto löschen")}</strong><small>${t("Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.")}</small></span><button id="serverAccountDelete" class="danger-action" type="button">${t("Konto löschen")}</button></div>
     </div>`);
 
   security.querySelector("#serverSessionsLoad").addEventListener("click", () => loadSessions(view, output));
@@ -160,7 +162,7 @@ export function initServerSessionControls(view, output) {
   security.querySelector("#serverPasswordChange").addEventListener("click", () => changePasswordForm(security.querySelector("#serverSessionsBlock"), output));
   security.querySelector("#serverLogout").addEventListener("click", () => serverLogout(output));
   data?.querySelector("#serverAccountExport").addEventListener("click", () => exportAccount(output));
-  data?.querySelector("#serverAccountDelete").addEventListener("click", () => deleteAccountForm(data.querySelector("#serverAccountBlock"), output));
+  data?.querySelector("#serverAccountDelete").addEventListener("click", () => { void deleteAccountForm(data.querySelector("#serverAccountBlock"), output); });
 }
 
 async function api(url, options = {}) {
@@ -282,43 +284,58 @@ async function exportAccount(output) {
 // einer Aktion, die scheinbar nichts tat.
 //
 // Die Zwei-Stufen-Bremse bleibt und wird sogar strenger: Der wörtliche
-// Bestätigungstext wird jetzt SCHON IM BROWSER geprüft (der Server verlangt
-// exakt "KONTO LÖSCHEN", emailAuthService.js:201). Vorher ging jede Eingabe ans
-// Netz — auch ein leeres Feld, wenn jemand den Dialog wegklickte.
-const LOESCH_WORT = "KONTO LÖSCHEN";
+// Bestätigungstext wird jetzt SCHON IM BROWSER geprüft. Vorher ging jede
+// Eingabe ans Netz — auch ein leeres Feld, wenn jemand den Dialog wegklickte.
+//
+// 2026-09-21 (Apple 5.1.1(v)): Der Weg gilt jetzt für JEDEN Anmeldeweg. Bei
+// Google, GitHub und Passkey gibt es kein Passwort, das man eingeben könnte —
+// vorher endete die Löschung dort mit `account_delete_requires_email_login`
+// und lief nur über den Support. Apple verlangt, dass sie in der App startet.
 
-export function deleteAccountForm(block, output) {
-  if (!toggleForm("accountDeleteForm", block)) return output("Löschung abgebrochen. Keine Daten wurden verändert.");
+// KEINE Modulkonstante: t()/uiLanguage() stehen beim Erstbesuch noch auf
+// Deutsch (Falle vom 20.09.2026), das Wort würde in englischer Hülle deutsch
+// einfrieren. Der Server nimmt beide Fassungen an (emailAuthService.js).
+function loeschWort() {
+  return uiLanguage() === "de" ? "KONTO LÖSCHEN" : "DELETE ACCOUNT";
+}
+
+export async function deleteAccountForm(block, output) {
+  if (!toggleForm("accountDeleteForm", block)) return output(t("Löschung abgebrochen. Keine Daten wurden verändert."));
+  // Der Anmeldeweg entscheidet nur über das Passwortfeld in der Maske; die
+  // verbindliche Prüfung macht der Server am Sitzungstoken, nicht hier.
+  const user = await fetchAuthenticatedUser();
+  const mitPasswort = String(user?.method || "email") === "email";
+  const wort = loeschWort();
   block.insertAdjacentHTML("beforeend", `
     <form id="accountDeleteForm" class="account-inline-form" autocomplete="on">
-      <p class="account-note"><strong>Das lässt sich nicht rückgängig machen.</strong> Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.</p>
+      <p class="account-note"><strong>${t("Das lässt sich nicht rückgängig machen.")}</strong> ${t("Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.")}</p>
       <!-- Beschriftung als EIN Textstueck. Das Label ist eine Flex-Spalte: jedes
            weitere Element darin wuerde eine eigene Zeile — live gesehen, als hier
            noch ein <code>-Element stand ("Zur Bestätigung" / Wort / "eingeben"). -->
-      <label for="delConfirm">Zur Bestätigung „${LOESCH_WORT}“ eingeben<input id="delConfirm" type="text" autocomplete="off" spellcheck="false" required></label>
-      <label for="delPassword">Aktuelles Passwort<input id="delPassword" type="password" autocomplete="current-password" required></label>
+      <label for="delConfirm">${t("Zur Bestätigung eingeben:")} „${wort}“<input id="delConfirm" type="text" autocomplete="off" spellcheck="false" required></label>
+      ${mitPasswort ? `<label for="delPassword">${t("Aktuelles Passwort")}<input id="delPassword" type="password" autocomplete="current-password" required></label>` : ""}
       <div class="account-actions">
-        <button id="delSubmit" class="danger-action" type="submit">Konto endgültig löschen</button>
-        <button id="delCancel" type="button">Abbrechen</button>
+        <button id="delSubmit" class="danger-action" type="submit">${t("Konto endgültig löschen")}</button>
+        <button id="delCancel" type="button">${t("Abbrechen")}</button>
       </div>
     </form>`);
   const form = block.querySelector("#accountDeleteForm");
-  form.querySelector("#delCancel").addEventListener("click", () => { form.remove(); output("Löschung abgebrochen. Keine Daten wurden verändert."); });
+  form.querySelector("#delCancel").addEventListener("click", () => { form.remove(); output(t("Löschung abgebrochen. Keine Daten wurden verändert.")); });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const confirmText = form.querySelector("#delConfirm").value.trim();
-    const password = form.querySelector("#delPassword").value;
-    if (confirmText !== LOESCH_WORT) return output(`Bitte exakt „${LOESCH_WORT}“ eingeben. Es wurde nichts gelöscht.`);
-    if (!password) return output("Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.");
+    const password = mitPasswort ? form.querySelector("#delPassword").value : "";
+    if (confirmText.toLocaleUpperCase("de-DE") !== wort) return output(`${t("Bitte exakt dieses Wort eingeben:")} „${wort}“. ${t("Es wurde nichts gelöscht.")}`);
+    if (mitPasswort && !password) return output(t("Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht."));
     const knopf = form.querySelector("#delSubmit");
     knopf.disabled = true;
     const result = await postJson(API.accountDelete, { confirmText, password });
     knopf.disabled = false;
-    if (result.status === 401) return output("Bitte zuerst mit E-Mail und Passwort anmelden.");
-    if (!result.ok) return output(`Löschung fehlgeschlagen (${result.payload.error || result.status}).`);
+    if (result.status === 401) return output(t("Bitte zuerst anmelden."));
+    if (!result.ok) return output(`${t("Löschung fehlgeschlagen")} (${result.payload.error || result.status}).`);
     clearToken();
     form.remove();
-    output("Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.");
+    output(t("Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert."));
   });
 }
 

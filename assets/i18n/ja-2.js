@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "プログラムに何をさせたいか伝えてください。",
   "Ausblenden": "非表示",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "あなたが私のためにできることを三文で説明して。",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "アカウントを削除",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "すべてのログイン方法に適用されます。文字どおりの確認が必要で、メールアカウントではパスワードも必要です。すべてのセッションを終了し、削除はサーバー側に記録されます。",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "削除を中止しました。データは変更されていません。",
+  "Das lässt sich nicht rückgängig machen.": "この操作は取り消せません。",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "すべてのセッションが終了し、ログインは永久に無効になります。",
+  "Zur Bestätigung eingeben:": "確認のため入力してください:",
+  "Aktuelles Passwort": "現在のパスワード",
+  "Konto endgültig löschen": "アカウントを完全に削除",
+  "Bitte exakt dieses Wort eingeben:": "次の語句を正確に入力してください:",
+  "Es wurde nichts gelöscht.": "何も削除されていません。",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "現在のパスワードを入力してください。何も削除されていません。",
+  "Löschung fehlgeschlagen": "削除に失敗しました",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "アカウントを削除しました: ログインは無効、すべてのセッションは終了しました。削除はサーバー側に記録されています。",
 };

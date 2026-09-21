@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "Di qué debe hacer el programa.",
   "Ausblenden": "Ocultar",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Explícame en tres frases qué puedes hacer por mí.",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "Eliminar la cuenta",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "Se aplica a todos los métodos de inicio de sesión. Requiere la confirmación literal y, en las cuentas de correo, también la contraseña. Finaliza todas las sesiones; la eliminación queda registrada en el servidor.",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "Eliminación cancelada. No se modificó ningún dato.",
+  "Das lässt sich nicht rückgängig machen.": "Esto no se puede deshacer.",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "Todas las sesiones finalizan y el inicio de sesión se desactiva definitivamente.",
+  "Zur Bestätigung eingeben:": "Escribe para confirmar:",
+  "Aktuelles Passwort": "Contraseña actual",
+  "Konto endgültig löschen": "Eliminar la cuenta definitivamente",
+  "Bitte exakt dieses Wort eingeben:": "Escribe exactamente esta palabra:",
+  "Es wurde nichts gelöscht.": "No se eliminó nada.",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "Introduce tu contraseña actual. No se eliminó nada.",
+  "Löschung fehlgeschlagen": "La eliminación falló",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "Cuenta eliminada: inicio de sesión desactivado, todas las sesiones finalizadas. La eliminación quedó registrada en el servidor.",
 };

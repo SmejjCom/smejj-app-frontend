@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "قل ما يجب أن يفعله البرنامج.",
   "Ausblenden": "إخفاء",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "اشرح لي في ثلاث جمل ما يمكنك فعله من أجلي.",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "حذف الحساب",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "ينطبق على كل طرق تسجيل الدخول. يتطلب التأكيد الحرفي — ومع حسابات البريد كلمة المرور أيضاً. يُنهي جميع الجلسات، ويُسجَّل الحذف على الخادم.",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "أُلغي الحذف. لم يتغيّر أي بيانات.",
+  "Das lässt sich nicht rückgängig machen.": "لا يمكن التراجع عن هذا.",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "تنتهي جميع الجلسات ويُعطَّل تسجيل الدخول نهائياً.",
+  "Zur Bestätigung eingeben:": "اكتب للتأكيد:",
+  "Aktuelles Passwort": "كلمة المرور الحالية",
+  "Konto endgültig löschen": "حذف الحساب نهائياً",
+  "Bitte exakt dieses Wort eingeben:": "اكتب هذه الكلمة تماماً:",
+  "Es wurde nichts gelöscht.": "لم يُحذف أي شيء.",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "أدخل كلمة المرور الحالية. لم يُحذف أي شيء.",
+  "Löschung fehlgeschlagen": "فشل الحذف",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "حُذف الحساب: تسجيل الدخول معطَّل وجميع الجلسات منتهية. سُجِّل الحذف على الخادم.",
 };

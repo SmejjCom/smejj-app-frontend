@@ -135,7 +135,7 @@ export function schliesseSpurAmHandy(dok = document) {
 // kein Sitzungsdatum, und "Lokale Daten loeschen" bleibt der Weg dafuer.
 async function logout() {
   try {
-    const module = await import("./account-sessions.js?v=b47");
+    const module = await import("./account-sessions.js?v=b48");
     await module.logoutCurrentSession();
   } catch {
     /* fail-safe: auch ohne Server-Antwort lokal abmelden */

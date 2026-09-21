@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "Programın ne yapması gerektiğini söyle.",
   "Ausblenden": "Gizle",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Benim için neler yapabileceğini üç cümleyle açıkla.",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "Hesabı sil",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "Her oturum açma yöntemi için geçerlidir. Birebir onay gerektirir — e-posta hesaplarında ayrıca parola. Tüm oturumları sonlandırır; silme işlemi sunucuda kaydedilir.",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "Silme iptal edildi. Hiçbir veri değiştirilmedi.",
+  "Das lässt sich nicht rückgängig machen.": "Bu işlem geri alınamaz.",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "Tüm oturumlar sonlanır ve giriş kalıcı olarak devre dışı bırakılır.",
+  "Zur Bestätigung eingeben:": "Onaylamak için yaz:",
+  "Aktuelles Passwort": "Mevcut parola",
+  "Konto endgültig löschen": "Hesabı kalıcı olarak sil",
+  "Bitte exakt dieses Wort eingeben:": "Lütfen tam olarak şu kelimeyi yaz:",
+  "Es wurde nichts gelöscht.": "Hiçbir şey silinmedi.",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "Lütfen mevcut parolanı gir. Hiçbir şey silinmedi.",
+  "Löschung fehlgeschlagen": "Silme başarısız",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "Hesap silindi: giriş devre dışı, tüm oturumlar sonlandı. Silme işlemi sunucuda kaydedildi.",
 };

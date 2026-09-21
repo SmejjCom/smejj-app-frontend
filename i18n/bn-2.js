@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "বলুন প্রোগ্রামটি কী করবে।",
   "Ausblenden": "লুকান",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "তিন বাক্যে বোঝাও তুমি আমার জন্য কী করতে পারো।",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "অ্যাকাউন্ট মুছুন",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "প্রতিটি সাইন-ইন পদ্ধতির ক্ষেত্রে প্রযোজ্য। হুবহু নিশ্চিতকরণ প্রয়োজন — ই-মেইল অ্যাকাউন্টের ক্ষেত্রে পাসওয়ার্ডও। সব সেশন শেষ হয়ে যায়; মুছে ফেলার কাজটি সার্ভারে নথিভুক্ত হয়।",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "মুছে ফেলা বাতিল হয়েছে। কোনো তথ্য বদলায়নি।",
+  "Das lässt sich nicht rückgängig machen.": "এটি আর ফেরানো যাবে না।",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "সব সেশন শেষ হবে এবং সাইন-ইন স্থায়ীভাবে বন্ধ হবে।",
+  "Zur Bestätigung eingeben:": "নিশ্চিত করতে লিখুন:",
+  "Aktuelles Passwort": "বর্তমান পাসওয়ার্ড",
+  "Konto endgültig löschen": "অ্যাকাউন্ট স্থায়ীভাবে মুছুন",
+  "Bitte exakt dieses Wort eingeben:": "অনুগ্রহ করে হুবহু এই শব্দটি লিখুন:",
+  "Es wurde nichts gelöscht.": "কিছুই মোছা হয়নি।",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "আপনার বর্তমান পাসওয়ার্ড দিন। কিছুই মোছা হয়নি।",
+  "Löschung fehlgeschlagen": "মোছা যায়নি",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "অ্যাকাউন্ট মোছা হয়েছে: সাইন-ইন বন্ধ, সব সেশন শেষ। মুছে ফেলার কাজটি সার্ভারে নথিভুক্ত হয়েছে।",
 };

@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "프로그램이 무엇을 해야 하는지 말해 주세요.",
   "Ausblenden": "숨기기",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "네가 나를 위해 할 수 있는 일을 세 문장으로 설명해 줘.",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "계정 삭제",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "모든 로그인 방식에 적용됩니다. 문구를 그대로 입력해야 하며, 이메일 계정은 비밀번호도 필요합니다. 모든 세션이 종료되고 삭제는 서버에 기록됩니다.",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "삭제를 취소했습니다. 변경된 데이터는 없습니다.",
+  "Das lässt sich nicht rückgängig machen.": "이 작업은 되돌릴 수 없습니다.",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "모든 세션이 종료되고 로그인이 영구히 비활성화됩니다.",
+  "Zur Bestätigung eingeben:": "확인을 위해 입력하세요:",
+  "Aktuelles Passwort": "현재 비밀번호",
+  "Konto endgültig löschen": "계정 영구 삭제",
+  "Bitte exakt dieses Wort eingeben:": "다음 단어를 정확히 입력하세요:",
+  "Es wurde nichts gelöscht.": "삭제된 것은 없습니다.",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "현재 비밀번호를 입력하세요. 삭제된 것은 없습니다.",
+  "Löschung fehlgeschlagen": "삭제 실패",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "계정을 삭제했습니다: 로그인 비활성화, 모든 세션 종료. 삭제는 서버에 기록되었습니다.",
 };

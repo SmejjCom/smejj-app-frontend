@@ -1,5 +1,5 @@
 // smejj.com — UI-Uebersetzung Türkçe (Quellsprache Deutsch als Schluessel).
-import zusatz from "./tr-2.js?v=1";
+import zusatz from "./tr-2.js?v=2";
 
 export default {
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)

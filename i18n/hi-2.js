@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "बताएँ कि प्रोग्राम को क्या करना है।",
   "Ausblenden": "छिपाएँ",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "तीन वाक्यों में समझाओ कि तुम मेरे लिए क्या कर सकते हो।",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "खाता हटाएँ",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "यह हर साइन-इन तरीके पर लागू होता है। शब्दशः पुष्टि ज़रूरी है — ई-मेल खातों के लिए पासवर्ड भी। सभी सत्र समाप्त हो जाते हैं; हटाने की कार्रवाई सर्वर पर दर्ज होती है।",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "हटाना रद्द किया गया। कोई डेटा नहीं बदला गया।",
+  "Das lässt sich nicht rückgängig machen.": "इसे वापस नहीं लिया जा सकता।",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "सभी सत्र समाप्त हो जाएँगे और साइन-इन स्थायी रूप से बंद हो जाएगा।",
+  "Zur Bestätigung eingeben:": "पुष्टि के लिए टाइप करें:",
+  "Aktuelles Passwort": "मौजूदा पासवर्ड",
+  "Konto endgültig löschen": "खाता स्थायी रूप से हटाएँ",
+  "Bitte exakt dieses Wort eingeben:": "कृपया ठीक यही शब्द टाइप करें:",
+  "Es wurde nichts gelöscht.": "कुछ भी नहीं हटाया गया।",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "कृपया अपना मौजूदा पासवर्ड दर्ज करें। कुछ भी नहीं हटाया गया।",
+  "Löschung fehlgeschlagen": "हटाना विफल रहा",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "खाता हटा दिया गया: साइन-इन बंद, सभी सत्र समाप्त। हटाने की कार्रवाई सर्वर पर दर्ज हो गई।",
 };

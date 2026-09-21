@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "Скажи, что должна делать программа.",
   "Ausblenden": "Скрыть",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Объясни в трёх предложениях, что ты можешь для меня сделать.",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "Удалить аккаунт",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "Действует для любого способа входа. Требуется дословное подтверждение — для почтовых аккаунтов ещё и пароль. Завершает все сеансы; удаление фиксируется на сервере.",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "Удаление отменено. Данные не изменялись.",
+  "Das lässt sich nicht rückgängig machen.": "Это действие необратимо.",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "Все сеансы завершаются, вход отключается навсегда.",
+  "Zur Bestätigung eingeben:": "Введите для подтверждения:",
+  "Aktuelles Passwort": "Текущий пароль",
+  "Konto endgültig löschen": "Удалить аккаунт навсегда",
+  "Bitte exakt dieses Wort eingeben:": "Введите в точности это слово:",
+  "Es wurde nichts gelöscht.": "Ничего не удалено.",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "Введите текущий пароль. Ничего не удалено.",
+  "Löschung fehlgeschlagen": "Не удалось удалить",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "Аккаунт удалён: вход отключён, все сеансы завершены. Удаление зафиксировано на сервере.",
 };

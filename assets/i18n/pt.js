@@ -1,5 +1,5 @@
 // smejj.com — UI-Uebersetzung Português (Quellsprache Deutsch als Schluessel).
-import zusatz from "./pt-2.js?v=1";
+import zusatz from "./pt-2.js?v=2";
 
 export default {
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)

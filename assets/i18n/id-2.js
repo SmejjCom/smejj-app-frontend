@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "Katakan apa yang harus dilakukan program.",
   "Ausblenden": "Sembunyikan",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Jelaskan dalam tiga kalimat apa yang bisa kamu lakukan untukku.",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "Hapus akun",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "Berlaku untuk semua cara masuk. Memerlukan konfirmasi harfiah — untuk akun e-mail juga kata sandi. Mengakhiri semua sesi; penghapusan dicatat di server.",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "Penghapusan dibatalkan. Tidak ada data yang diubah.",
+  "Das lässt sich nicht rückgängig machen.": "Tindakan ini tidak dapat dibatalkan.",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "Semua sesi berakhir dan proses masuk dinonaktifkan secara permanen.",
+  "Zur Bestätigung eingeben:": "Ketik untuk mengonfirmasi:",
+  "Aktuelles Passwort": "Kata sandi saat ini",
+  "Konto endgültig löschen": "Hapus akun secara permanen",
+  "Bitte exakt dieses Wort eingeben:": "Ketik persis kata ini:",
+  "Es wurde nichts gelöscht.": "Tidak ada yang dihapus.",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "Masukkan kata sandi Anda saat ini. Tidak ada yang dihapus.",
+  "Löschung fehlgeschlagen": "Penghapusan gagal",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "Akun dihapus: masuk dinonaktifkan, semua sesi berakhir. Penghapusan dicatat di server.",
 };

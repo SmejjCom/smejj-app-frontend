@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "说说程序应该做什么。",
   "Ausblenden": "隐藏",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "用三句话说明你能为我做什么。",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "删除账户",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "适用于所有登录方式。需要逐字确认，邮箱账户还需要密码。会结束所有会话；删除操作会记录在服务器上。",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "已取消删除。没有更改任何数据。",
+  "Das lässt sich nicht rückgängig machen.": "此操作无法撤销。",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "所有会话将结束，登录将被永久停用。",
+  "Zur Bestätigung eingeben:": "请输入以确认：",
+  "Aktuelles Passwort": "当前密码",
+  "Konto endgültig löschen": "永久删除账户",
+  "Bitte exakt dieses Wort eingeben:": "请准确输入这个词：",
+  "Es wurde nichts gelöscht.": "未删除任何内容。",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "请输入当前密码。未删除任何内容。",
+  "Löschung fehlgeschlagen": "删除失败",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "账户已删除：登录已停用，所有会话已结束。删除已记录在服务器上。",
 };

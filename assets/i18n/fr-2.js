@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "Dis ce que le programme doit faire.",
   "Ausblenden": "Masquer",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Explique-moi en trois phrases ce que tu peux faire pour moi.",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "Supprimer le compte",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "Vaut pour toutes les méthodes de connexion. Exige la confirmation littérale — et le mot de passe pour les comptes e-mail. Met fin à toutes les sessions ; la suppression est journalisée sur le serveur.",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "Suppression annulée. Aucune donnée n’a été modifiée.",
+  "Das lässt sich nicht rückgängig machen.": "Cette action est irréversible.",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "Toutes les sessions prennent fin et la connexion est définitivement désactivée.",
+  "Zur Bestätigung eingeben:": "Saisir pour confirmer :",
+  "Aktuelles Passwort": "Mot de passe actuel",
+  "Konto endgültig löschen": "Supprimer définitivement le compte",
+  "Bitte exakt dieses Wort eingeben:": "Saisis exactement ce mot :",
+  "Es wurde nichts gelöscht.": "Rien n’a été supprimé.",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "Saisis ton mot de passe actuel. Rien n’a été supprimé.",
+  "Löschung fehlgeschlagen": "Échec de la suppression",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "Compte supprimé : connexion désactivée, toutes les sessions terminées. La suppression a été journalisée sur le serveur.",
 };

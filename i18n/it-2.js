@@ -296,4 +296,18 @@ export default {
   "Sag, was das Programm tun soll.": "Di' cosa deve fare il programma.",
   "Ausblenden": "Nascondi",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Spiegami in tre frasi cosa puoi fare per me.",
+  // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
+  "Konto löschen": "Elimina account",
+  "Gilt für jeden Anmeldeweg. Verlangt die wörtliche Bestätigung — bei E-Mail-Konten zusätzlich das Passwort. Beendet alle Sitzungen; die Löschung wird serverseitig protokolliert.": "Vale per ogni metodo di accesso. Richiede la conferma letterale — per gli account e-mail anche la password. Termina tutte le sessioni; l’eliminazione viene registrata sul server.",
+  "Löschung abgebrochen. Keine Daten wurden verändert.": "Eliminazione annullata. Nessun dato è stato modificato.",
+  "Das lässt sich nicht rückgängig machen.": "L’operazione non è reversibile.",
+  "Alle Sitzungen werden beendet und der Login dauerhaft deaktiviert.": "Tutte le sessioni terminano e l’accesso viene disattivato definitivamente.",
+  "Zur Bestätigung eingeben:": "Digita per confermare:",
+  "Aktuelles Passwort": "Password attuale",
+  "Konto endgültig löschen": "Elimina definitivamente l’account",
+  "Bitte exakt dieses Wort eingeben:": "Digita esattamente questa parola:",
+  "Es wurde nichts gelöscht.": "Non è stato eliminato nulla.",
+  "Bitte das aktuelle Passwort eingeben. Es wurde nichts gelöscht.": "Inserisci la password attuale. Non è stato eliminato nulla.",
+  "Löschung fehlgeschlagen": "Eliminazione non riuscita",
+  "Konto gelöscht: Login deaktiviert, alle Sitzungen beendet. Die Löschung wurde serverseitig protokolliert.": "Account eliminato: accesso disattivato, tutte le sessioni terminate. L’eliminazione è stata registrata sul server.",
 };
