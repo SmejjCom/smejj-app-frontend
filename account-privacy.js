@@ -526,6 +526,12 @@ function activate(view, id, { focusTab = false } = {}) {
     node.setAttribute("aria-selected", String(active));
     node.tabIndex = active ? 0 : -1;
     if (active && focusTab) node.focus();
+    // Am Handy ist die Reiterleiste schmaler als ihre neun Reiter. Wer aus dem
+    // Profilmenue direkt auf "Mein Plan" springt, sah ihn zwar geoeffnet, aber
+    // die Leiste stand weiter am Anfang — der aktive Reiter war ausserhalb des
+    // Bildes (Geraetetest 21.09.2026). `nearest` scrollt nur die Leiste selbst
+    // und nur so weit wie noetig; die Seite bleibt, wo sie ist.
+    if (active) { try { node.scrollIntoView({ block: "nearest", inline: "nearest" }); } catch { /* alte Browser */ } }
   });
   view.querySelectorAll("[data-account-panel]").forEach((node) => { node.hidden = node.dataset.accountPanel !== id; });
 }
