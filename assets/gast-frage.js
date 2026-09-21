@@ -99,10 +99,28 @@
     return rest;
   }
 
+  // Nach dem Absenden aufraeumen — beides am Geraet gemessen (21.09.2026):
+  //  * Die alte Frage blieb im Feld stehen. Die Fusszeile sagt „Weiterfragen
+  //    geht sofort", man musste aber erst von Hand loeschen.
+  //  * Am iPhone blieb die Tastatur offen und verdeckte die untere Haelfte der
+  //    Antwortkarte samt „Sign up free". Auf Zeigegeraeten mit grobem Zeiger
+  //    (Touch) gibt das Feld darum den Fokus ab; am Schreibtisch bleibt er,
+  //    weil dort nichts verdeckt wird und Weitertippen bequemer ist.
+  function feldAufraeumen() {
+    var feld = document.getElementById("probierFeld");
+    if (!feld) return;
+    feld.value = "";
+    try {
+      if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) feld.blur();
+      else feld.focus();
+    } catch (fehler) { /* ohne matchMedia bleibt es, wie es ist */ }
+  }
+
   window.smejjGastFrage = async function (frage, form) {
     var ziel = form || document.getElementById("probierForm");
     if (!ziel || !frage) return false;
     var text = kasten(ziel, frage);
+    feldAufraeumen();
     var antwort = "";
     var steuerung = new AbortController();
     var uhr = setTimeout(function () { steuerung.abort(); }, ZEITGRENZE_MS);
@@ -127,7 +145,11 @@
       }
       clearTimeout(uhr);
       if (!antwort.trim()) throw new Error("leere Antwort");
-      fuss(document.getElementById("gastAntwort"));
+      var karte = document.getElementById("gastAntwort");
+      fuss(karte);
+      // Die Karte waechst beim Schreiben; am Ende einmal in den Blick holen,
+      // damit auch der Knopf darunter sichtbar ist.
+      try { karte.scrollIntoView({ block: "nearest" }); } catch (fehler) { /* aelterer Browser */ }
       return true;
     } catch (fehler) {
       clearTimeout(uhr);
