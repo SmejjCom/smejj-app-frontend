@@ -274,18 +274,17 @@ function markup() {
 }
 
 function bind(view) {
-  // Der Aufrufer darf den Reiter mitgeben ("Mein Plan" im Profilmenue). Das
-  // lief zuerst ueber den Hash — und der gehoert dem Router, der ihn als
-  // ANSICHTSNAMEN liest: beide Menuepunkte landeten auf der Fehlerseite.
-  // Jetzt eine Merknotiz, die nach dem Lesen sofort verfaellt; ein zweiter
-  // Besuch soll wieder im Profil beginnen.
-  let gewuenscht = "";
-  try {
-    gewuenscht = sessionStorage.getItem(KONTO_REITER_SCHLUESSEL) || "";
-    sessionStorage.removeItem(KONTO_REITER_SCHLUESSEL);
-  } catch { /* Storage gesperrt: Standard-Reiter */ }
-  const bekannt = gewuenscht && view.querySelector(`[data-account-tab="${gewuenscht}"]`) ? gewuenscht : "identity";
-  activate(view, bekannt);
+  activate(view, "identity");
+  // Der Aufrufer darf den Reiter mitgeben ("Mein Plan" im Profilmenue) — als
+  // Merknotiz, NICHT im Hash: der gehoert dem Router, der ihn als
+  // ANSICHTSNAMEN liest (mit "#billing" landete das ganze Konto auf der
+  // Fehlerseite, 21.09.2026 live).
+  //
+  // Am popstate und nicht nur hier: dieser Aufbau laeuft EINMAL
+  // (dataset.accountPrivacyReady). Beim zweiten Besuch kam die Auswertung gar
+  // nicht mehr zum Zug — gemessen am selben Tag, der Reiter blieb auf "Profil".
+  reiterAusNotiz(view);
+  window.addEventListener("popstate", () => reiterAusNotiz(view));
   bindTabKeys(view);
   view.addEventListener("click", (event) => {
     const tab = event.target.closest("[data-account-tab]");
@@ -496,6 +495,24 @@ function exportLocalData(view) {
   link.href = URL.createObjectURL(blob); link.download = "smejj.com-local-data-export.json"; link.click();
   setTimeout(() => URL.revokeObjectURL(link.href), 0);
   output(view, t("Sicherer lokaler Export erstellt. Tokens, Passkeys und API-Schlüssel sind ausgeschlossen."));
+}
+
+/**
+ * Den gewuenschten Reiter aus der Merknotiz holen — und die Notiz verbrauchen.
+ *
+ * Verbrauchen heisst: ein spaeterer Besuch ohne Wunsch beginnt wieder im
+ * Profil. Ein unbekannter Name wird stillschweigend ignoriert, damit ein alter
+ * Eintrag die Seite nicht leer laesst.
+ */
+function reiterAusNotiz(view) {
+  let wunsch = "";
+  try {
+    wunsch = sessionStorage.getItem(KONTO_REITER_SCHLUESSEL) || "";
+    if (wunsch) sessionStorage.removeItem(KONTO_REITER_SCHLUESSEL);
+  } catch { return; /* Storage gesperrt: Standard-Reiter */ }
+  if (!wunsch) return;
+  if (!view.querySelector(`[data-account-tab="${wunsch}"]`)) return;
+  activate(view, wunsch);
 }
 
 function activate(view, id, { focusTab = false } = {}) {

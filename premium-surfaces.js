@@ -3,7 +3,7 @@ import { t } from "./i18n/ui.js?v=3";
 import { applyServerAiStatus } from "/assets/storage/index.js";
 import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=7";
 import { initSettingsSurface } from "./settings-surface.js?v=b68";
-import { initAccountPrivacySurface } from "./account-privacy.js?v=11";
+import { initAccountPrivacySurface } from "./account-privacy.js?v=12";
 import { afterFirstPaint } from "./deferred-start.js";
 
 export function enhancePremiumSurfaces() {
