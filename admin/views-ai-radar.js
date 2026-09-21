@@ -143,7 +143,15 @@
       + V.kachelBlock("Suchanfragen", String(b.anfragen), "heute verbraucht")
       + V.kachelBlock("Quellen geprueft", String(b.quellenGeprueft), "bewertet, nicht nur gefunden")
       + V.kachelBlock("Neu / aktualisiert", String((b.neu || []).length) + " / " + String((b.aktualisiert || []).length), "gespeicherte Erkenntnisse")
-      + '</div>' 
+      + V.kachelBlock("Rechenzeit", (Math.round((b.dauerMsGesamt || 0) / 100) / 10) + " s", "heute fuer Recherche gebraucht")
+      + V.kachelBlock("Dem Nutzer gewichen", String(b.verschoben || 0), "Laeufe verschoben, weil jemand im Chat war")
+      + '</div>'
+      + ((b.themenErgaenzt || []).length
+        ? '<div class="ph"><h4>Neue Themen aus erkannten Wissensluecken</h4></div>'
+          + V.tabelleBlock(["Thema", "Herkunft"], [(b.themenErgaenzt || []).map(function (t) {
+            return "<tr><td><b>" + e(t.titel || t.id) + "</b></td><td>" + e(t.herkunft || "") + "</td></tr>";
+          }).join("")])
+        : "") 
       + (themenZeilen
         ? V.tabelleBlock(["Thema (und warum)", "Anfragen", "Funde", "geprueft", "gespeichert", "verworfen"], [themenZeilen])
         : '<div class="pb flush"><div class="leer">heute kein Thema recherchiert</div></div>')
