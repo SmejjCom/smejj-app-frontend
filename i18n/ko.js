@@ -1,5 +1,5 @@
 // smejj.com — UI-Uebersetzung 한국어 (Quellsprache Deutsch als Schluessel).
-import zusatz from "./ko-2.js?v=3";
+import zusatz from "./ko-2.js?v=4";
 
 export default {
   // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)

@@ -33,7 +33,11 @@
   <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
   <title>smejj Code — eine eigene Tür, kein eigener Preis</title>
+  <!-- Apple 3.1.1: siehe willkommen.html. Synchron, damit der Preis-Link nicht
+       fuer einen Moment aufblitzt. -->
+  <script src="/assets/ios-preise-aus.js?v=1"></script>
   <style>
+    html[data-huelle="ios"] [data-nur-web] { display: none !important; }
     :root {
       --cy: #32f6ea; --cy-ink: #7ee8da; --cy-fill: rgba(50,246,234,.12);
       --cy-line: rgba(50,246,234,.30);
@@ -130,7 +134,7 @@
     <nav aria-label="Bereiche">
       <a href="/willkommen.html#funktionen">Funktionen</a>
       <a href="/programmieren.html">Für Programmierer</a>
-      <a href="/willkommen.html#preise">Preise</a>
+      <a href="/willkommen.html#preise" data-nur-web>Preise</a>
       <a href="/willkommen.html#herunterladen">Herunterladen</a>
       <a href="/hilfe.html">Hilfe</a>
     </nav>

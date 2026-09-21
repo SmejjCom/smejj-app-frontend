@@ -348,4 +348,11 @@ export default {
   "Server-Datenexport erstellt. Secrets sind ausgeschlossen.": "সার্ভার ডেটা রপ্তানি তৈরি হয়েছে। গোপন তথ্য বাদ দেওয়া হয়েছে।",
   // Apple 3.1.1: kein Kauf-Hinweis in der iOS-Huelle (21.09.2026)
   "Dieses Konto nutzt smejj.com kostenlos. Es ist kein Abo aktiv und in dieser App wird nichts verkauft.": "এই অ্যাকাউন্ট smejj.com বিনামূল্যে ব্যবহার করে। কোনো সাবস্ক্রিপশন সক্রিয় নেই এবং এই অ্যাপে কিছুই বিক্রি হয় না।",
+  // Letzte Reste des Konto-Bereichs (21.09.2026)
+  "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.": "১,০০০ বার্তা, প্রিমিয়াম কণ্ঠ, দ্রুত উত্তর। মোট দাম মাসে ৯ €, ভ্যাটসহ।",
+  "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.": "সীমাহীন বার্তা, কোডিং এজেন্ট ও প্রকল্প। মোট দাম মাসে ১৯ €, ভ্যাটসহ।",
+  "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.": "৫× সীমা, নতুন সুবিধায় আগেভাগে প্রবেশ, সরাসরি সহায়তা। মোট দাম মাসে ৩৯ €, ভ্যাটসহ।",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj সার্ভারের মাধ্যমে স্বাভাবিক শব্দ — সেটিংসে চালু করা হয়।",
+  "Sprachminuten (Premium-Stimme)": "কণ্ঠের মিনিট (প্রিমিয়াম কণ্ঠ)",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "প্রিমিয়াম কণ্ঠ চালু থাকলেই কেবল গোনা হয়।",
 };

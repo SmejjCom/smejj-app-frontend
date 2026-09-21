@@ -53,6 +53,10 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>smejj.com — Frag alles. Kostenlos.</title>
+  <!-- Apple 3.1.1: Preise duerfen in der iOS-Huelle nicht erscheinen. SYNCHRON
+       und als erstes, damit sie nicht fuer einen Moment sichtbar sind — mit
+       defer stuenden sie im Video des Pruefers. -->
+  <script src="/assets/ios-preise-aus.js?v=1"></script>
   <script src="/assets/willkommen-sprache.js?v=2" defer></script>
   <!-- Die erste Frage OHNE Konto (21.09.2026). Laedt VOR dem Fokus-Skript,
        damit window.smejjGastFrage beim ersten Absenden schon steht. -->
@@ -73,6 +77,9 @@
        das Offline-Band der App nach einer echten Netzprobe. -->
   <script src="/assets/willkommen-offline.js?v=2" type="module"></script>
   <style>
+    /* Apple 3.1.1: alles mit data-nur-web verschwindet in der iOS-Huelle
+       (ios-preise-aus.js setzt das Attribut am <html>). */
+    html[data-huelle="ios"] [data-nur-web] { display: none !important; }
     .schwerpunkte { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
     .schwerpunkte button {
       padding: 9px 15px; border: 0; border-radius: 999px; cursor: pointer;
@@ -225,7 +232,7 @@
     <nav aria-label="Bereiche">
       <a href="#funktionen">Funktionen</a>
       <a href="/programmieren.html">Für Programmierer</a>
-      <a href="#preise">Preise</a>
+      <a href="#preise" data-nur-web>Preise</a>
       <a href="#herunterladen">Herunterladen</a>
       <a href="/hilfe.html">Hilfe</a>
     </nav>
@@ -241,7 +248,7 @@
     <p>Schreiben, recherchieren, Bilder und Videos erstellen, programmieren — in einem Fenster. Ohne Kreditkarte, ohne Testphase.</p>
     <div class="knoepfe">
       <a class="knopf weiss gross" href="/auth/register/">Kostenlos starten</a>
-      <a class="knopf gross" href="#preise">Preise ansehen</a>
+      <a class="knopf gross" href="#preise" data-nur-web>Preise ansehen</a>
     </div>
     <!-- Mockup 1: das Probier-Feld. Seit dem 21.09.2026 (Betreiber-Freigabe
          nach Apples Ablehnung 2.1) wird die erste Frage HIER beantwortet —
@@ -282,7 +289,7 @@
     </div>
   </section>
 
-  <section id="preise">
+  <section id="preise" data-nur-web>
     <h2>Preise</h2>
     <!-- Bildschirm 3, ehrliche Fassung: der Schwerpunkt-Umschalter des
          Mockups halbiert Punktpreise — ein Punktesystem gibt es nicht.

@@ -348,4 +348,11 @@ export default {
   "Server-Datenexport erstellt. Secrets sind ausgeschlossen.": "Ekspor data server dibuat. Rahasia tidak disertakan.",
   // Apple 3.1.1: kein Kauf-Hinweis in der iOS-Huelle (21.09.2026)
   "Dieses Konto nutzt smejj.com kostenlos. Es ist kein Abo aktiv und in dieser App wird nichts verkauft.": "Akun ini memakai smejj.com secara gratis. Tidak ada langganan aktif, dan tidak ada yang dijual di aplikasi ini.",
+  // Letzte Reste des Konto-Bereichs (21.09.2026)
+  "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.": "1.000 pesan, suara premium, jawaban lebih cepat. Harga total €9 per bulan termasuk PPN.",
+  "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.": "Pesan tanpa batas, agen kode & proyek. Harga total €19 per bulan termasuk PPN.",
+  "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.": "Batas 5×, akses awal ke fitur baru, dukungan langsung. Harga total €39 per bulan termasuk PPN.",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "Suara alami lewat server smejj — diaktifkan di pengaturan.",
+  "Sprachminuten (Premium-Stimme)": "Menit suara (suara premium)",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "Baru dihitung saat suara premium aktif.",
 };

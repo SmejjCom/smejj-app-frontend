@@ -348,4 +348,11 @@ export default {
   "Server-Datenexport erstellt. Secrets sind ausgeschlossen.": "أُنشئ تصدير بيانات الخادم. الأسرار مستثناة.",
   // Apple 3.1.1: kein Kauf-Hinweis in der iOS-Huelle (21.09.2026)
   "Dieses Konto nutzt smejj.com kostenlos. Es ist kein Abo aktiv und in dieser App wird nichts verkauft.": "يستخدم هذا الحساب smejj.com مجاناً. لا يوجد اشتراك نشط، ولا يُباع أي شيء داخل هذا التطبيق.",
+  // Letzte Reste des Konto-Bereichs (21.09.2026)
+  "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.": "1000 رسالة وصوت مميّز وردود أسرع. السعر الإجمالي 9 يورو شهرياً شامل الضريبة.",
+  "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.": "رسائل بلا حدود ووكيل برمجة ومشاريع. السعر الإجمالي 19 يورو شهرياً شامل الضريبة.",
+  "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.": "حدود أكبر بخمسة أضعاف ووصول مبكر للجديد ودعم مباشر. السعر الإجمالي 39 يورو شهرياً شامل الضريبة.",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "صوت طبيعي عبر خادم smejj — يُفعَّل من الإعدادات.",
+  "Sprachminuten (Premium-Stimme)": "دقائق الصوت (الصوت المميّز)",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "لا تُحتسب إلا عندما يكون الصوت المميّز مفعّلاً.",
 };

@@ -348,4 +348,11 @@ export default {
   "Server-Datenexport erstellt. Secrets sind ausgeschlossen.": "サーバーのデータ書き出しを作成しました。秘密情報は含まれません。",
   // Apple 3.1.1: kein Kauf-Hinweis in der iOS-Huelle (21.09.2026)
   "Dieses Konto nutzt smejj.com kostenlos. Es ist kein Abo aktiv und in dieser App wird nichts verkauft.": "このアカウントは smejj.com を無料で利用しています。有効なサブスクリプションはなく、このアプリでは何も販売していません。",
+  // Letzte Reste des Konto-Bereichs (21.09.2026)
+  "1 000 Nachrichten, Premium-Stimme, schnellere Antworten. Gesamtpreis 9 € pro Monat inkl. USt.": "1,000 メッセージ、プレミアム音声、より速い応答。税込 月額 9 ユーロ。",
+  "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.": "メッセージ無制限、コーディングエージェントとプロジェクト。税込 月額 19 ユーロ。",
+  "5× Limits, früher Zugriff auf Neues, direkter Support. Gesamtpreis 39 € pro Monat inkl. USt.": "上限 5 倍、新機能への先行アクセス、直接サポート。税込 月額 39 ユーロ。",
+  "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.": "smejj サーバー経由の自然な音声 — 設定で有効にします。",
+  "Sprachminuten (Premium-Stimme)": "音声の利用分数（プレミアム音声）",
+  "Zählt erst, wenn die Premium-Stimme aktiv ist.": "プレミアム音声が有効なときだけ数えます。",
 };
