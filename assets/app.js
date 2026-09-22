@@ -352,7 +352,7 @@ function bindStartComposer() {
   send.addEventListener("click", submit);
   bindPasteAttach({ getInput: () => input });
   // E24: auch fuer die Datei-Chips (start-chips.js).
-  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=werkzeuge-32").then((m) => m.initComposerTools()));
+  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=werkzeuge-33").then((m) => m.initComposerTools()));
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {

@@ -38,15 +38,15 @@ import { CLIENT_ROUTES } from "./config.js";
 import { bindPlusMenu } from "./composer-plus-menu.js?v=werkzeuge-14";
 // Mikrofon-Diktat — ausgelagert (800-Zeilen-Regel), Verhalten unveraendert.
 import { createDictation } from "./composer-dictation.js";
-import { t } from "./i18n/ui.js?v=3"; // Sprachmodus-Texte (Geraetetest 22.09.2026: blieben in jeder Sprache deutsch)
+import { t, savedUiLanguage } from "./i18n/ui.js?v=3"; // Sprachmodus-Texte + gespeicherte Sprache (Geraetetest 22.09.2026)
 const $ = (selector) => document.querySelector(selector);
-// Sprache bei JEDEM Aufruf aus dem lang-Attribut (huelle-sprache.js zieht es an die Oberflaechensprache; Geraetetest 22.09.2026: statisch beim Laden = immer de-DE).
+// Sprache bei JEDEM Aufruf: zuerst die GESPEICHERTE Oberflaechensprache, sonst das lang-Attribut (huelle-sprache.js setzt es erst nach dem Nachladen — v956 gemessen: Luecke von Sekunden).
 const LANG_MAP = {
       de: "de-DE", en: "en-US", fr: "fr-FR", es: "es-ES", it: "it-IT",
       pt: "pt-PT", ru: "ru-RU", tr: "tr-TR", ja: "ja-JP", ko: "ko-KR",
       zh: "zh-CN", hi: "hi-IN", ar: "ar-SA", id: "id-ID", bn: "bn-BD"
 };
-const pageLang = () => (typeof document !== "undefined" ? (document.documentElement.lang || "de") : "de");
+const pageLang = () => { let s = ""; try { s = savedUiLanguage() || ""; } catch { s = ""; } return s || (typeof document !== "undefined" ? document.documentElement.lang : "") || "de"; };
 const speechLang = () => { const p = pageLang(); return p.includes("-") ? p : (LANG_MAP[p.toLowerCase()] || "de-DE"); };
 const speechBase = () => speechLang().split("-")[0];
 const RecognitionCtor = typeof window !== "undefined"
