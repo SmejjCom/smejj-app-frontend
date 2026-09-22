@@ -368,4 +368,5 @@ export default {
   "Zurück zur smejj-App": "Kembali ke aplikasi smejj",
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "Sudah masuk. Kembali ke aplikasi smejj — proses masuk diterapkan di sana secara otomatis.",
   "Angemeldet. Wechsle zurück zur smejj-App.": "Sudah masuk. Kembali ke aplikasi smejj.",
+  "Stattdessen hier im Browser anmelden": "Masuk di sini lewat peramban saja",
 };

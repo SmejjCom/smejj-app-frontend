@@ -1,5 +1,5 @@
 // smejj.com — UI-Uebersetzung 한국어 (Quellsprache Deutsch als Schluessel).
-import zusatz from "./ko-2.js?v=8";
+import zusatz from "./ko-2.js?v=9";
 
 export default {
   // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort

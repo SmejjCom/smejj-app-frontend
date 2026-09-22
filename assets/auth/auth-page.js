@@ -277,6 +277,23 @@ function zeigeRueckwegZurApp(handoffId) {
     knopf.textContent = t("Zurück zur smejj-App");
   }
   if (note) note.textContent = t("Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.");
+  // Zweiter Weg (22.09.2026, mit den uebrigen Anmeldewegen dazugekommen): Wer
+  // die App gerade nicht zur Hand hat — beim Anmeldelink kann die E-Mail auf
+  // einem anderen Geraet liegen —, darf sich hier anmelden statt in einer
+  // Sackgasse zu stehen. Dann wird das Ticket eben hier eingeloest.
+  if (box && !box.querySelector("#imBrowserAnmelden")) {
+    const zweitweg = document.createElement("button");
+    zweitweg.type = "button";
+    zweitweg.id = "imBrowserAnmelden";
+    zweitweg.className = "auth-button secondary";
+    zweitweg.textContent = t("Stattdessen hier im Browser anmelden");
+    zweitweg.addEventListener("click", () => {
+      zweitweg.disabled = true;
+      status(t("Anmeldung läuft …"));
+      holeHandoff(handoffId);
+    });
+    box.append(zweitweg);
+  }
   if (box) box.hidden = false;
   // Die Statuszeile bleibt nur Rueckfallebene: steht der Block, sagte sie live
   // (Simulator 22.09.2026) denselben Satz ein zweites Mal direkt darunter.
@@ -319,29 +336,10 @@ async function startGoogleLogin() {
     await raeumeAlteIdentitaet();
     // One-Time-Handoff starten, damit der Token nach der Google-Anmeldung auf
     // smejj.com landet (gleiches Bearer-Prinzip wie beim E-Mail-Login).
-    const origin = window.location.origin;
-    let query = "";
-    try {
-      const start = await fetch(`${API_ORIGIN}/api/auth/session-handoff/start`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnOrigin: origin })
-      });
-      const handoff = await start.json();
-      if (handoff?.id) {
-        query = `&handoff=${encodeURIComponent(handoff.id)}&returnOrigin=${encodeURIComponent(origin)}`;
-        // Aus der App-Huelle geht es gleich nach draussen in den Browser. Die
-        // Ticketnummer bleibt hier liegen, damit diese Seite die Anmeldung
-        // abholen kann, sobald die App wieder vorne ist. `native=1` sagt dem
-        // Server, dass der Rueckweg im Browser landet und das Ticket dort
-        // nicht angefasst werden darf.
-        if (istAppHuelle()) {
-          merkeHandoff(handoff.id);
-          query += "&native=1";
-          wartAufAnmeldungAusDemBrowser();
-        }
-      }
-    } catch { /* ohne Handoff faellt der Server auf die Control-Domain-Anmeldung zurueck */ }
+    // Seit 2026-09-22 ueber dieselbe Stelle wie GitHub, Apple und der
+    // Anmeldelink — vorher stand dieser Block hier ein zweites Mal.
+    const { id, origin, nativeTeil } = await startHandoffQuery();
+    const query = id ? `&handoff=${encodeURIComponent(id)}&returnOrigin=${encodeURIComponent(origin)}${nativeTeil}` : "";
     window.location.assign(`${API_ORIGIN}/api/auth/google?mode=redirect${query}`);
   } catch {
     status(t("Google Login konnte nicht gestartet werden."), "error");
@@ -591,6 +589,10 @@ function zweitesPasswortfeld(feld) {
 // Startet einen One-Time-Handoff, damit der Token nach externem Login/Klick auf
 // smejj.com landet (gleiches Bearer-Prinzip wie bei Google). Ohne Handoff faellt
 // der Server auf die Control-Domain-Anmeldung zurueck.
+// GEAENDERT 2026-09-22: Hier sitzt der Rueckweg in die App-Huelle fuer JEDEN
+// Weg, der das Geraet verlaesst — Google, GitHub, Apple und der Anmeldelink.
+// Aus der Huelle heraus wird die Ticketnummer gemerkt, die Wache gestartet und
+// `native=1` mitgegeben; alles Weitere steht bei istAppHuelle().
 async function startHandoffQuery() {
   const origin = window.location.origin;
   try {
@@ -600,9 +602,14 @@ async function startHandoffQuery() {
       body: JSON.stringify({ returnOrigin: origin })
     });
     const handoff = await start.json();
-    if (handoff?.id) return { id: handoff.id, origin };
+    if (handoff?.id) {
+      if (!istAppHuelle()) return { id: handoff.id, origin, native: false, nativeTeil: "" };
+      merkeHandoff(handoff.id);
+      wartAufAnmeldungAusDemBrowser();
+      return { id: handoff.id, origin, native: true, nativeTeil: "&native=1" };
+    }
   } catch { /* ohne Handoff: Fallback auf Control-Domain */ }
-  return { id: "", origin };
+  return { id: "", origin, native: false, nativeTeil: "" };
 }
 
 async function startGithubLogin() {
@@ -611,8 +618,8 @@ async function startGithubLogin() {
   status(t("GitHub Login wird gestartet …"));
   try {
     await raeumeAlteIdentitaet();
-    const { id, origin } = await startHandoffQuery();
-    const query = id ? `?handoff=${encodeURIComponent(id)}&returnOrigin=${encodeURIComponent(origin)}` : "";
+    const { id, origin, nativeTeil } = await startHandoffQuery();
+    const query = id ? `?handoff=${encodeURIComponent(id)}&returnOrigin=${encodeURIComponent(origin)}${nativeTeil}` : "";
     window.location.assign(`${CLIENT_ROUTES.api.authGithub}${query}`);
   } catch {
     status(t("GitHub Login konnte nicht gestartet werden."), "error");
@@ -629,8 +636,8 @@ async function startAppleLogin() {
   status(t("Apple Login wird gestartet …"));
   try {
     await raeumeAlteIdentitaet();
-    const { id, origin } = await startHandoffQuery();
-    const query = id ? `?handoff=${encodeURIComponent(id)}&returnOrigin=${encodeURIComponent(origin)}` : "";
+    const { id, origin, nativeTeil } = await startHandoffQuery();
+    const query = id ? `?handoff=${encodeURIComponent(id)}&returnOrigin=${encodeURIComponent(origin)}${nativeTeil}` : "";
     window.location.assign(`${CLIENT_ROUTES.api.authApple}${query}`);
   } catch {
     status(t("Apple Login konnte nicht gestartet werden."), "error");
@@ -659,8 +666,8 @@ async function requestMagicLink() {
   status(t("Anmeldelink wird gesendet …"));
   try {
     await raeumeAlteIdentitaet();
-    const { id, origin } = await startHandoffQuery();
-    const { ok, payload } = await postJson(CLIENT_ROUTES.api.authMagicLinkRequest, { email, handoff: id, returnOrigin: origin });
+    const { id, origin, native } = await startHandoffQuery();
+    const { ok, payload } = await postJson(CLIENT_ROUTES.api.authMagicLinkRequest, { email, handoff: id, returnOrigin: origin, native });
     if (!ok) return status(errorText(payload, "Anmeldelink konnte nicht gesendet werden."), "error");
     status(t("Wir haben dir einen Anmeldelink per E-Mail geschickt (15 Minuten gültig)."), "success");
   } catch {

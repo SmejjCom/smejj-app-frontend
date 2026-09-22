@@ -368,4 +368,5 @@ export default {
   "Zurück zur smejj-App": "Torna all’app smejj",
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "Accesso eseguito. Torna all’app smejj: l’accesso verrà applicato lì automaticamente.",
   "Angemeldet. Wechsle zurück zur smejj-App.": "Accesso eseguito. Torna all’app smejj.",
+  "Stattdessen hier im Browser anmelden": "Accedi qui nel browser",
 };

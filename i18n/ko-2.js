@@ -368,4 +368,5 @@ export default {
   "Zurück zur smejj-App": "smejj 앱으로 돌아가기",
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "로그인되었습니다. smejj 앱으로 돌아가세요 — 로그인이 자동으로 적용됩니다.",
   "Angemeldet. Wechsle zurück zur smejj-App.": "로그인되었습니다. smejj 앱으로 돌아가세요.",
+  "Stattdessen hier im Browser anmelden": "대신 브라우저에서 로그인하기",
 };

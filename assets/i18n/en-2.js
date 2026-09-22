@@ -366,4 +366,5 @@ export default {
   "Zurück zur smejj-App": "Back to the smejj app",
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "Signed in. Switch back to the smejj app — your sign-in is picked up there automatically.",
   "Angemeldet. Wechsle zurück zur smejj-App.": "Signed in. Switch back to the smejj app.",
+  "Stattdessen hier im Browser anmelden": "Sign in here in the browser instead",
 };

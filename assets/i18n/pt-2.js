@@ -368,4 +368,5 @@ export default {
   "Zurück zur smejj-App": "Voltar ao app smejj",
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "Sessão iniciada. Volta ao app smejj — o início de sessão é aplicado lá automaticamente.",
   "Angemeldet. Wechsle zurück zur smejj-App.": "Sessão iniciada. Volta ao app smejj.",
+  "Stattdessen hier im Browser anmelden": "Iniciar sessão aqui no navegador",
 };

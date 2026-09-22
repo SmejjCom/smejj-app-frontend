@@ -368,4 +368,5 @@ export default {
   "Zurück zur smejj-App": "smejj ऐप पर वापस",
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "साइन इन हो गया। smejj ऐप पर वापस जाएँ — साइन-इन वहाँ अपने आप लागू हो जाएगा।",
   "Angemeldet. Wechsle zurück zur smejj-App.": "साइन इन हो गया। smejj ऐप पर वापस जाएँ।",
+  "Stattdessen hier im Browser anmelden": "इसके बजाय यहीं ब्राउज़र में साइन इन करें",
 };
