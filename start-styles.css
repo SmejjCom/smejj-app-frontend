@@ -6860,3 +6860,18 @@ html body .msg-menu.msg-menu {
     scroll-padding-bottom: calc(var(--feld-hoehe, 64px) + 12px);
   }
 }
+@media (max-width: 600px) {
+  html body #start .prompt-glass.prompt-glass .prompt-actions .ghost-button.icon-button,
+  html body #start .prompt-glass.prompt-glass .prompt-actions .ghost-button.text-chip,
+  html body #start .prompt-glass.prompt-glass .prompt-actions .send-button,
+  html body #start .prompt-glass.prompt-glass .prompt-actions .model-picker > button {
+    align-items: end;
+    align-content: end;
+    padding-bottom: 0;
+  }
+  html body #start .prompt-glass.prompt-glass .prompt-actions .ghost-button.icon-button svg,
+  html body #start .prompt-glass.prompt-glass .prompt-actions .send-button svg {
+    display: block;
+    align-self: end;
+  }
+}

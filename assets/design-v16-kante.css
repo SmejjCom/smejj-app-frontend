@@ -43,3 +43,29 @@
     scroll-padding-bottom: calc(var(--feld-hoehe, 64px) + 12px);
   }
 }
+
+/* ---- V16b (22.09.2026, Nachfrage des Betreibers: "Ja, Symbole auch auf die
+   Kante setzen") ------------------------------------------------------------
+   GEMESSEN (375 px, ausgelieferte Seite v958; iPhone-17-Pro-Max-Simulator):
+   der Kasten liegt auf der Kante (0 px), aber die Knoepfe sind 44 px hohe
+   Grid-Zellen mit align-items: center — das 24-px-Symbol endet darum 10 px
+   ueber dem Knopfrand (am Simulator: 14 pt ueber der Bildschirmkante). Jetzt
+   richten die Knoepfe ihren Inhalt am unteren Rand aus: Symbol- und
+   Textunterkante = Knopfunterkante = Feldunterkante = Bildschirmkante. Das
+   Tippziel bleibt 44 px hoch (Betreiber-Regel: keine Ziele unter 44 px),
+   nur der Inhalt wandert nach unten. Der Senden-Knopf trug 1 px Polster. */
+@media (max-width: 600px) {
+  html body #start .prompt-glass.prompt-glass .prompt-actions .ghost-button.icon-button,
+  html body #start .prompt-glass.prompt-glass .prompt-actions .ghost-button.text-chip,
+  html body #start .prompt-glass.prompt-glass .prompt-actions .send-button,
+  html body #start .prompt-glass.prompt-glass .prompt-actions .model-picker > button {
+    align-items: end;
+    align-content: end;
+    padding-bottom: 0;
+  }
+  html body #start .prompt-glass.prompt-glass .prompt-actions .ghost-button.icon-button svg,
+  html body #start .prompt-glass.prompt-glass .prompt-actions .send-button svg {
+    display: block;
+    align-self: end;
+  }
+}
