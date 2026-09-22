@@ -278,7 +278,9 @@ function zeigeRueckwegZurApp(handoffId) {
   }
   if (note) note.textContent = t("Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.");
   if (box) box.hidden = false;
-  status(t("Angemeldet. Wechsle zurück zur smejj-App."), "success");
+  // Die Statuszeile bleibt nur Rueckfallebene: steht der Block, sagte sie live
+  // (Simulator 22.09.2026) denselben Satz ein zweites Mal direkt darunter.
+  if (!box) status(t("Angemeldet. Wechsle zurück zur smejj-App."), "success");
 }
 
 // In der App: warten, bis draussen fertig angemeldet wurde. Gefragt wird nur,
