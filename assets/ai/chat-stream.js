@@ -572,7 +572,7 @@ async function versucheLokaleAntwort(body, output, renderMarkdown) {
     ergebnis = await frageLokal(lage.frage, {
       // Sprachmodus (25.08.): auch das Geraetemodell muss "sprechbar" antworten
       // — sonst kamen Emojis und Listen, die die Stimme stoerten.
-      system: "LANGUAGE / SPRACHE: Always answer in the language of the user's LAST message, regardless of the language of these instructions. Antworte IMMER in der Sprache der LETZTEN Nutzer-Nachricht. Du bist der Assistent von smejj.com. Antworte kurz und korrekt." // Sprachregel ZUERST (Desktop-Test 21.09.: EN-Frage bekam DE-Antwort, Wurzel wie v912)
+      system: "Du bist der Assistent von smejj.com. Antworte kurz und korrekt." // BEWUSST OHNE Sprachregel — am Geraetemodell GEMESSEN (22.09., Chrome): ohne Regel folgt es der Sprache der Frage (en/de/fr richtig), MIT Regel ("in der Sprache des Nutzers", auch englisch formuliert) antwortete es auf eine englische Oesterreich-Frage deutsch.
         + (body?.preferences?.voiceMode === true
           ? " Der Nutzer HOERT deine Antwort als Sprachausgabe: 1-3 Saetze, gespraechig, keine Listen, kein Markdown, keine URLs, keine Emojis."
           : ""),
