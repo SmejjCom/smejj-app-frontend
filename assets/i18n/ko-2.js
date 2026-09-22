@@ -363,4 +363,9 @@ export default {
   "smejj Plus — 9 € / Monat": "smejj Plus — 월 9유로",
   "smejj Pro — 19 € / Monat": "smejj Pro — 월 19유로",
   "smejj Max — 39 € / Monat": "smejj Max — 월 39유로",
+  // Rueckweg aus dem Browser in die App-Huelle (Befund 2026-09-22):
+  // der Google-Login verlaesst die App und endete bisher im Browser.
+  "Zurück zur smejj-App": "smejj 앱으로 돌아가기",
+  "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "로그인되었습니다. smejj 앱으로 돌아가세요 — 로그인이 자동으로 적용됩니다.",
+  "Angemeldet. Wechsle zurück zur smejj-App.": "로그인되었습니다. smejj 앱으로 돌아가세요.",
 };

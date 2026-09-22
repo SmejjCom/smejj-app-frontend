@@ -363,4 +363,9 @@ export default {
   "smejj Plus — 9 € / Monat": "smejj Plus — €9 / bulan",
   "smejj Pro — 19 € / Monat": "smejj Pro — €19 / bulan",
   "smejj Max — 39 € / Monat": "smejj Max — €39 / bulan",
+  // Rueckweg aus dem Browser in die App-Huelle (Befund 2026-09-22):
+  // der Google-Login verlaesst die App und endete bisher im Browser.
+  "Zurück zur smejj-App": "Kembali ke aplikasi smejj",
+  "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "Sudah masuk. Kembali ke aplikasi smejj — proses masuk diterapkan di sana secara otomatis.",
+  "Angemeldet. Wechsle zurück zur smejj-App.": "Sudah masuk. Kembali ke aplikasi smejj.",
 };

@@ -363,4 +363,9 @@ export default {
   "smejj Plus — 9 € / Monat": "smejj Plus — 月額 9 ユーロ",
   "smejj Pro — 19 € / Monat": "smejj Pro — 月額 19 ユーロ",
   "smejj Max — 39 € / Monat": "smejj Max — 月額 39 ユーロ",
+  // Rueckweg aus dem Browser in die App-Huelle (Befund 2026-09-22):
+  // der Google-Login verlaesst die App und endete bisher im Browser.
+  "Zurück zur smejj-App": "smejj アプリに戻る",
+  "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "ログインしました。smejj アプリに戻ってください — ログインは自動的に引き継がれます。",
+  "Angemeldet. Wechsle zurück zur smejj-App.": "ログインしました。smejj アプリに戻ってください。",
 };

@@ -199,6 +199,109 @@ async function refreshSession() {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Rueckweg aus dem Browser zurueck in die App-Huelle.
+//
+// BEFUND Betreiber 2026-09-22 (TestFlight, echtes iPhone): "Google Login, ich
+// bleibe immer im Browser, dann geht er nicht wieder zurueck zum App."
+// Am Simulator nachgemessen: Die iPhone-App ist eine Huelle um smejj.com. Der
+// Anmeldeweg fuehrt ueber api.smejj.com zu accounts.google.com — zwei fremde
+// Adressen, die die Huelle nach draussen in den echten Browser gibt (Google
+// verweigert die Anmeldung in einer eingebetteten Ansicht, "disallowed_user
+// agent"). Dort endete die Anmeldung auch: im Browser angemeldet, die App
+// blieb leer, und es fuehrte kein Weg zurueck.
+//
+// Der Rueckweg hat zwei Haelften, beide noetig:
+//  1. IM BROWSER: das Ticket NICHT einloesen — es ist einmalig, wer es abholt,
+//     nimmt es der App weg. Stattdessen liegen lassen und den Weg zurueck zeigen.
+//  2. IN DER APP: die Huelle merkt sich die Ticketnummer VOR dem Absprung. Ihr
+//     Fenster bleibt auf dieser Seite stehen, waehrend draussen angemeldet wird.
+//     Sobald es wieder sichtbar ist, fragt sie den Server, bis der Token da ist.
+//     Das Ticket gilt 10 Minuten (control-server/src/auth/sessionHandoff.js).
+const HANDOFF_KEY = "smejj.auth.handoff.v1";
+const APP_SCHEMA = "smejj://auth/login";
+const HANDOFF_TTL_MS = 10 * 60 * 1000;
+
+// Laeuft die Seite in einer App-Huelle statt in einem sichtbaren Browser?
+// Bewusst mehrere Signale: faellt die Erkennung faelschlich auf "nein", bleibt
+// alles beim alten Verhalten; faellt sie faelschlich auf "ja", loest dieselbe
+// Seite das Ticket wie bisher selbst ein. Kein Zweig kann etwas kaputtmachen.
+function istAppHuelle() {
+  try {
+    if (window.Capacitor?.isNativePlatform?.() === true) return true;
+    if (window.webkit?.messageHandlers?.bridge) return true;
+    const ua = String(navigator.userAgent || "");
+    // WKWebView ohne Browser-Oberflaeche: iOS-Kennung, aber kein "Safari/".
+    if (/iPhone|iPad|iPod/.test(ua) && !/Safari\//.test(ua)) return true;
+    if (/;\s*wv\)/.test(ua)) return true; // Android WebView
+    // Installierte PWA (iOS-Webclip): dieselbe Falle, der Login geht extern auf.
+    if (window.navigator.standalone === true) return true;
+    return window.matchMedia?.("(display-mode: standalone)")?.matches === true;
+  } catch {
+    return false;
+  }
+}
+
+function merkeHandoff(id) {
+  try { localStorage.setItem(HANDOFF_KEY, JSON.stringify({ id: String(id), seit: Date.now() })); } catch { /* Storage gesperrt */ }
+}
+function vergissHandoff() {
+  try { localStorage.removeItem(HANDOFF_KEY); } catch { /* Storage gesperrt */ }
+}
+function gemerkterHandoff() {
+  try {
+    const roh = JSON.parse(localStorage.getItem(HANDOFF_KEY) || "null");
+    if (!roh?.id) return "";
+    if (Date.now() - Number(roh.seit || 0) > HANDOFF_TTL_MS) { vergissHandoff(); return ""; }
+    return String(roh.id);
+  } catch { return ""; }
+}
+
+function schlaf(ms) {
+  return new Promise((fertig) => setTimeout(fertig, ms));
+}
+
+// Im BROWSER gelandet, obwohl die Anmeldung aus der App kam: Ticket liegen
+// lassen, Anmeldewege wegnehmen (sie wuerden hier nur ein zweites Mal
+// anmelden) und den Weg zurueck anbieten. Der Knopf versucht das App-Schema;
+// unabhaengig davon holt die App die Anmeldung selbst ab, sobald sie wieder
+// vorne ist — darum steht der Satz auch so da.
+function zeigeRueckwegZurApp(handoffId) {
+  const box = document.querySelector("#signedInBox");
+  const note = document.querySelector("#signedInNote");
+  const knopf = document.querySelector("#continueToApp");
+  document.querySelector("#authProviders")?.setAttribute("hidden", "");
+  document.querySelector("#emailForm")?.setAttribute("hidden", "");
+  if (knopf) {
+    knopf.setAttribute("href", `${APP_SCHEMA}?handoff=${encodeURIComponent(handoffId)}`);
+    knopf.textContent = t("Zurück zur smejj-App");
+  }
+  if (note) note.textContent = t("Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.");
+  if (box) box.hidden = false;
+  status(t("Angemeldet. Wechsle zurück zur smejj-App."), "success");
+}
+
+// In der App: warten, bis draussen fertig angemeldet wurde. Gefragt wird nur,
+// wenn das App-Fenster wirklich vorne ist — im Hintergrund drosselt iOS die
+// Timer ohnehin, und jede Anfrage waere dort verschenkt.
+let wacheLaeuft = false;
+async function wartAufAnmeldungAusDemBrowser() {
+  const id = gemerkterHandoff();
+  if (!id || !istAppHuelle() || wacheLaeuft) return false;
+  wacheLaeuft = true;
+  const ende = Date.now() + HANDOFF_TTL_MS;
+  while (Date.now() < ende) {
+    if (document.visibilityState === "visible") {
+      if (await holeHandoff(id, { still: true })) return true;
+      status(t("Anmeldung läuft …"));
+    }
+    await schlaf(1500);
+  }
+  wacheLaeuft = false;
+  vergissHandoff();
+  return false;
+}
+
 async function startGoogleLogin() {
   const button = document.querySelector("#googleLogin");
   if (button) button.disabled = true;
@@ -223,7 +326,19 @@ async function startGoogleLogin() {
         body: JSON.stringify({ returnOrigin: origin })
       });
       const handoff = await start.json();
-      if (handoff?.id) query = `&handoff=${encodeURIComponent(handoff.id)}&returnOrigin=${encodeURIComponent(origin)}`;
+      if (handoff?.id) {
+        query = `&handoff=${encodeURIComponent(handoff.id)}&returnOrigin=${encodeURIComponent(origin)}`;
+        // Aus der App-Huelle geht es gleich nach draussen in den Browser. Die
+        // Ticketnummer bleibt hier liegen, damit diese Seite die Anmeldung
+        // abholen kann, sobald die App wieder vorne ist. `native=1` sagt dem
+        // Server, dass der Rueckweg im Browser landet und das Ticket dort
+        // nicht angefasst werden darf.
+        if (istAppHuelle()) {
+          merkeHandoff(handoff.id);
+          query += "&native=1";
+          wartAufAnmeldungAusDemBrowser();
+        }
+      }
     } catch { /* ohne Handoff faellt der Server auf die Control-Domain-Anmeldung zurueck */ }
     window.location.assign(`${API_ORIGIN}/api/auth/google?mode=redirect${query}`);
   } catch {
@@ -238,13 +353,28 @@ async function completeGoogleHandoff() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("handoff");
   if (!id) return false;
+  // Rueckweg aus der App-Huelle, gelandet im Browser: das Ticket ist einmalig
+  // und gehoert der App. Wer es hier einloest, nimmt es ihr weg — genau das
+  // liess die App nach der Anmeldung leer zurueck.
+  if (params.get("native") === "1" && !istAppHuelle()) {
+    zeigeRueckwegZurApp(id);
+    return true;
+  }
   // Neutraler Text: der Handoff traegt Google-, GitHub- UND Magic-Link-Logins
   // (Live-Befund 2026-07-25: "Google fehlgeschlagen" nach Magic-Link verwirrte).
   status(t("Anmeldung läuft …"));
+  return holeHandoff(id);
+}
+
+// Ein Versuch, das Ticket einzuloesen. `still` ist der Wartemodus der App:
+// ein noch nicht fertiges Ticket (Server antwortet "pending") ist dort der
+// Normalfall und darf nicht als Fehlschlag auf dem Schirm stehen.
+async function holeHandoff(id, { still = false } = {}) {
   try {
     const response = await fetch(`${API_ORIGIN}/api/auth/session-handoff/${encodeURIComponent(id)}`);
     const data = await response.json();
     if (data.state === "completed" && data.accessToken) {
+      vergissHandoff();
       setToken(data.accessToken);
       try {
         const user = data.user || {};
@@ -264,9 +394,9 @@ async function completeGoogleHandoff() {
       gotoAfterLogin();
       return true;
     }
-    status(t("Anmeldung fehlgeschlagen."), "error");
+    if (!still) status(t("Anmeldung fehlgeschlagen."), "error");
   } catch {
-    status(t("Anmeldung fehlgeschlagen."), "error");
+    if (!still) status(t("Anmeldung fehlgeschlagen."), "error");
   }
   return false;
 }
@@ -608,4 +738,13 @@ completeGoogleHandoff().then((handled) => {
   if (handled) return;
   refreshSession();
   handleUrlTokens();
+  // Die Huelle kommt ohne Adresszeile zurueck: sie steht noch auf derselben
+  // Seite, waehrend draussen angemeldet wird. Liegt hier ein Ticket vom
+  // letzten Anmeldeversuch, wird es jetzt abgeholt.
+  wartAufAnmeldungAusDemBrowser();
+});
+// Nach dem Wechsel zurueck in die App darf nicht erst die naechste Runde der
+// Schleife greifen — sichtbar heisst: sofort nachfragen.
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") wartAufAnmeldungAusDemBrowser();
 });

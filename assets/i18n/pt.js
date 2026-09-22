@@ -1,5 +1,5 @@
 // smejj.com — UI-Uebersetzung Português (Quellsprache Deutsch als Schluessel).
-import zusatz from "./pt-2.js?v=7";
+import zusatz from "./pt-2.js?v=8";
 
 export default {
   // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
