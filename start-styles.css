@@ -6841,3 +6841,22 @@ html body .msg-menu.msg-menu {
     background: none;
   }
 }
+
+/* ---- design-v16-kante.css ---- */
+@media (max-width: 600px) {
+  html body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass {
+    bottom: 0;
+    padding-bottom: 0;
+  }
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .prompt-glass.prompt-glass {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  html.tastatur-offen body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass {
+    bottom: 0;
+  }
+  html body #start.has-start-chat #startLog.start-log.start-log {
+    padding-bottom: calc(var(--feld-hoehe, 64px) + 12px);
+    scroll-padding-bottom: calc(var(--feld-hoehe, 64px) + 12px);
+  }
+}

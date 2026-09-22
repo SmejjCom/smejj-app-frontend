@@ -1,0 +1,45 @@
+/* smejj.com — Design V16: das Schreibfeld trifft die Unterkante (Betreiber-Auftrag 22.09.2026).
+ *
+ * WORTLAUT DES AUFTRAGS (Chat, 22.09.2026): "Soll Schreibfeld (mit gesamte Icons:
+ * + Modele, Diktieren, Sprachwelle/Senden) ganz unten sein, mit ganz untere
+ * kante treffen."
+ *
+ * GEMESSEN VORHER (echtes iPhone 17 Pro Max, TestFlight Build 3, Aufnahme fuer
+ * die App-Pruefung): die Symbolzeile des Feldes endete rund 46 pt ueber der
+ * Bildschirmkante — V15 liess den Home-Balken frei (bottom: var(--sa-bottom))
+ * und trug darunter noch 4 px Polster; mobil-dock.js gibt dem Feld weitere 4 px.
+ *
+ * WAS SICH AENDERT: nur der Abstand nach unten. Das Feld bleibt transparent
+ * (V15), schwebt absolut ueber dem Verlauf (V14) und behaelt Breite, Schatten
+ * und Symbole. Es rueckt bis an die Kante: bottom 0, kein Polster darunter —
+ * auch auf der leeren Startseite (margin-bottom 0) und bei offener Tastatur
+ * (buendig an der Tastaturkante statt 6 px darueber). Der Verlauf braucht unten
+ * entsprechend weniger Polster (Feldhoehe + 12 px statt + Home-Balken + 20 px).
+ *
+ * Eigene Datei, letztes Kaskaden-Ende nach V15 (100-%-Schutz: kein Rueckbau
+ * der Schichten davor). Selektoren wie in V15, damit die Reihenfolge im Buendel
+ * entscheidet; gegen mobil-dock.js (body #start .prompt-glass x3) gewinnt die
+ * hoehere Spezifitaet (html body #start.has-start-chat ...).
+ */
+
+@media (max-width: 600px) {
+  /* Laufender Chat: absolut an der Unterkante der Huelle. */
+  html body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass {
+    bottom: 0;
+    padding-bottom: 0;
+  }
+  /* Leere Startseite: dasselbe Feld im Fluss, ohne Rand nach unten. */
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .prompt-glass.prompt-glass {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  /* Bildschirmtastatur offen: buendig an der Tastaturkante. */
+  html.tastatur-offen body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass {
+    bottom: 0;
+  }
+  /* Verlauf: das Polster unten misst nur noch das Feld selbst. */
+  html body #start.has-start-chat #startLog.start-log.start-log {
+    padding-bottom: calc(var(--feld-hoehe, 64px) + 12px);
+    scroll-padding-bottom: calc(var(--feld-hoehe, 64px) + 12px);
+  }
+}
