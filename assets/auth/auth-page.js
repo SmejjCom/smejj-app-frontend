@@ -303,21 +303,26 @@ function zeigeRueckwegZurApp(handoffId) {
 // In der App: warten, bis draussen fertig angemeldet wurde. Gefragt wird nur,
 // wenn das App-Fenster wirklich vorne ist — im Hintergrund drosselt iOS die
 // Timer ohnehin, und jede Anfrage waere dort verschenkt.
-let wacheLaeuft = false;
+// GEMESSEN 2026-09-22 am Simulator: Beim Sprung in den Browser friert iOS die
+// Ansicht ein, und ob diese Schleife danach weiterlaeuft, ist NICHT garantiert
+// — beim Apple-Weg lief sie nach der Rueckkehr nicht weiter. Eine Sperre
+// "laeuft schon" haette den Neustart dann fuer immer blockiert. Deshalb zaehlt
+// stattdessen eine Laufnummer: jede neue Wache verdraengt die alte, und beim
+// Zurueckkommen wird immer frisch angefangen.
+let wacheNr = 0;
 async function wartAufAnmeldungAusDemBrowser() {
   const id = gemerkterHandoff();
-  if (!id || !istAppHuelle() || wacheLaeuft) return false;
-  wacheLaeuft = true;
+  if (!id || !istAppHuelle()) return false;
+  const meine = ++wacheNr;
   const ende = Date.now() + HANDOFF_TTL_MS;
-  while (Date.now() < ende) {
+  while (Date.now() < ende && meine === wacheNr) {
     if (document.visibilityState === "visible") {
       if (await holeHandoff(id, { still: true })) return true;
       status(t("Anmeldung läuft …"));
     }
     await schlaf(1500);
   }
-  wacheLaeuft = false;
-  vergissHandoff();
+  if (meine === wacheNr && gemerkterHandoff()) vergissHandoff();
   return false;
 }
 
@@ -752,8 +757,11 @@ completeGoogleHandoff().then((handled) => {
   // letzten Anmeldeversuch, wird es jetzt abgeholt.
   wartAufAnmeldungAusDemBrowser();
 });
-// Nach dem Wechsel zurueck in die App darf nicht erst die naechste Runde der
-// Schleife greifen — sichtbar heisst: sofort nachfragen.
+// Zurueck in der App: sofort nachfragen, nicht erst in der naechsten Runde.
+// `pageshow` kommt dazu, weil iOS die Seite auch aus dem Vor-/Zurueck-Speicher
+// holen kann, ohne dass `visibilitychange` feuert.
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") wartAufAnmeldungAusDemBrowser();
 });
+window.addEventListener("pageshow", () => wartAufAnmeldungAusDemBrowser());
+window.addEventListener("focus", () => wartAufAnmeldungAusDemBrowser());
