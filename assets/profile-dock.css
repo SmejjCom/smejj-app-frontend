@@ -179,6 +179,12 @@
 }
 
 .profile-dock-menu [role="menuitem"] {
+  /* Geraetetest 22.09.2026 (iPhone): Bedienflaeche, kein Text — kein Tipp-Verzug,
+     keine Auswahl beim laengeren Halten, kein Tipp-Blitz. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
   padding: 8px 10px;
   border: 0;
   border-radius: 8px;

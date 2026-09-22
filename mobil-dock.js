@@ -285,6 +285,31 @@ function verdrahteKopfglas(doc = document) {
   pruefe();
 }
 
+/** Geraetetest 22.09.2026 (iPhone): die iOS-Auswahlleiste ("Korrekturlesen |
+ *  Umformulieren") blieb nach einer Wischgeste minutenlang ueber allem liegen —
+ *  ueber Menues, Konto-Seite, Ansichtswechsel. Sie haengt an der Textauswahl,
+ *  und die ueberlebt in einer Ein-Seiten-App jeden Wechsel. Hier wird die Auswahl
+ *  bei jedem Ansichtswechsel (popstate), beim Schliessen der Spur und bei jedem
+ *  Menuepunkt des Profil-Docks aufgehoben. Reine Funktion + Verdrahtung. */
+export function raeumeAuswahlAuf(win = globalThis) {
+  try {
+    const sel = win.getSelection && win.getSelection();
+    if (sel && sel.rangeCount > 0 && !sel.isCollapsed) { sel.removeAllRanges(); return true; }
+  } catch { /* keine Selection-API */ }
+  return false;
+}
+export function verdrahteAuswahl(doc = document, win = window) {
+  if (doc.documentElement.dataset.auswahlWache === "an") return false;
+  doc.documentElement.dataset.auswahlWache = "an";
+  win.addEventListener("popstate", () => raeumeAuswahlAuf(win));
+  doc.addEventListener("click", (event) => {
+    const ziel = event.target;
+    if (!ziel || typeof ziel.closest !== "function") return;
+    if (ziel.closest("#sidebarBackdrop, [data-dock-action], [data-jump], .nav-button")) raeumeAuswahlAuf(win);
+  }, true);
+  return true;
+}
+
 export function sorgeFuerStil(doc = document) {
   if (doc.getElementById(STIL_ID)) return false;
   const stil = doc.createElement("style");
@@ -298,6 +323,7 @@ if (typeof document !== "undefined" && document.querySelector("#startMessage, #c
   sorgeFuerStil();
   verdrahteTastatur();
   verdrahteKopfglas();
+  verdrahteAuswahl();
   // Ansichten nach dem Login (Profil, Einstellungen, Verlauf, Dateien …) — eigenes Modul, ohne Marke.
   import("/assets/mobil-ansichten.js").catch(() => {});
   // Vollbild-Chat (17.09.2026): misst das schwebende Feld (--feld-hoehe), design-v14-vollbild-chat.css.

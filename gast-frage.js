@@ -22,6 +22,15 @@
 (function () {
   var API = "https://api.smejj.com/api/chat";
   var ZEITGRENZE_MS = 45000;
+  // Geraetetest 22.09.2026 (echtes iPhone, WLAN): "Einen Moment …" stand ueber
+  // drei Minuten, ohne Antwort und ohne Rueckfall — der Server antwortete per
+  // curl in 6 s, ueber 5G kam die Antwort in 6 s. Zwei Luecken: (1) waehrend der
+  // Wartezeit gab es keinen Hinweis und keinen Ausweg, (2) die Zeitgrenze haengt
+  // an setTimeout, und iOS haelt Timer an, sobald die App in den Hintergrund
+  // geht (Spiegelung, Sperrbildschirm) — die Uhr blieb stehen, die Karte auch.
+  // Jetzt: nach HINWEIS_MS ein Satz mit dem Ausweg zur Anmeldung, und eine Wache
+  // an der Uhrzeit (nicht am Timer), die beim Sichtbarwerden nachrechnet.
+  var HINWEIS_MS = 15000;
 
   function T(text) {
     var f = window.smejjWillkommenT;
@@ -106,6 +115,25 @@
   //    Antwortkarte samt „Sign up free". Auf Zeigegeraeten mit grobem Zeiger
   //    (Touch) gibt das Feld darum den Fokus ab; am Schreibtisch bleibt er,
   //    weil dort nichts verdeckt wird und Weitertippen bequemer ist.
+  // Nach HINWEIS_MS ohne erstes Wort: sagen, dass es laenger dauert, und den
+  // Ausweg zeigen — die Anmeldung nimmt die Frage mit (sessionStorage, siehe
+  // willkommen-fokus.js). Nur einmal, nur solange nichts angekommen ist.
+  function zeigeHinweis(text) {
+    if (!text || document.getElementById("gastHinweis")) return;
+    var p = document.createElement("p");
+    p.className = "gast-fuss";
+    p.id = "gastHinweis";
+    var satz = document.createElement("span");
+    satz.textContent = T("Das dauert gerade länger als gewohnt. Du kannst weiter warten oder dich kostenlos anmelden — die Frage nimmst du mit.");
+    var knopf = document.createElement("a");
+    knopf.className = "knopf weiss";
+    knopf.href = "/auth/register/";
+    knopf.textContent = T("Kostenlos anmelden");
+    p.appendChild(satz);
+    p.appendChild(knopf);
+    text.parentNode.appendChild(p);
+  }
+
   function feldAufraeumen() {
     var feld = document.getElementById("probierFeld");
     if (!feld) return;
@@ -123,12 +151,22 @@
     feldAufraeumen();
     var antwort = "";
     var steuerung = new AbortController();
+    var start = Date.now();
     var uhr = setTimeout(function () { steuerung.abort(); }, ZEITGRENZE_MS);
+    var hinweis = setTimeout(function () { if (!antwort) zeigeHinweis(text); }, HINWEIS_MS);
+    var wache = function () {
+      if (document.visibilityState !== "visible") return;
+      var alter = Date.now() - start;
+      if (alter >= ZEITGRENZE_MS) steuerung.abort();
+      else if (alter >= HINWEIS_MS && !antwort) zeigeHinweis(text);
+    };
+    document.addEventListener("visibilitychange", wache);
     try {
       var res = await fetch(API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: steuerung.signal,
+        cache: "no-store",
         body: JSON.stringify({ model: "smejj-1", stream: true, messages: [{ role: "user", content: frage }] })
       });
       if (!res.ok || !res.body) throw new Error("kein Strom");
@@ -143,7 +181,7 @@
           text.textContent = antwort;
         });
       }
-      clearTimeout(uhr);
+      clearTimeout(uhr); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
       if (!antwort.trim()) throw new Error("leere Antwort");
       var karte = document.getElementById("gastAntwort");
       fuss(karte);
@@ -152,7 +190,7 @@
       try { karte.scrollIntoView({ block: "nearest" }); } catch (fehler) { /* aelterer Browser */ }
       return true;
     } catch (fehler) {
-      clearTimeout(uhr);
+      clearTimeout(uhr); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
       // Zurueck auf den alten, bewaehrten Weg — mit der Frage im Gepaeck.
       location.href = "/auth/register/";
       return false;

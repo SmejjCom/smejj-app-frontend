@@ -68,6 +68,10 @@ export function renderProfileDockMenu(displayName, email, signedIn = true) {
 
 function setOpen(button, menu, open) {
   fuelleWerte();
+  // Geraetetest 22.09.2026: eine stehende Textauswahl (iOS-Leiste "Korrekturlesen |
+  // Umformulieren") blieb ueber Menue und Ansichtswechsel liegen. Beim Oeffnen
+  // des Menues wird sie aufgehoben — das Menue ist eine Bedienflaeche, kein Text.
+  if (open) raeumeTextauswahlAuf();
   menu.hidden = !open;
   button.setAttribute("aria-expanded", String(open));
   if (open) placeAboveButton(button, menu);
@@ -75,12 +79,45 @@ function setOpen(button, menu, open) {
 
 // Setzt das Menue ueber den Avatar und haelt es im sichtbaren Bereich.
 // Input: button, menu. Output: void.
+//
+// Geraetetest 22.09.2026 (echtes iPhone 17 Pro Max, TestFlight Build 3, Aufnahme
+// fuer die App-Pruefung): der Tipp auf "Mein Konto" ging in ~10 von 12 Faellen
+// DURCH das Menue auf die Chatliste dahinter und oeffnete ein altes Gespraech;
+// erst nach Oeffnen/Schliessen des Verlaufs traf er. Ursache: das Menue ist
+// position:fixed und wurde ueber `bottom: innerHeight - anchor.top` gesetzt —
+// innerHeight ist in der iOS-App aber KEIN verlaesslicher Massstab (mobil-dock.js,
+// 08.09.: mal 800, mal 852, je nach Tastatur-Historie). Stimmt innerHeight nicht
+// mit dem Layout-Viewport ueberein, liegt das Menue fuer die Trefferpruefung an
+// einer anderen Stelle als fuer das Auge. Jetzt wird die OBERKANTE gesetzt —
+// aus demselben Koordinatensystem wie der Anker (getBoundingClientRect), ohne
+// innerHeight. Reine Rechnung in lageUeberKnopf(), damit der Test sie festnagelt.
+export function lageUeberKnopf({ ankerOben, ankerUnten, ankerLinks, menueBreite, menueHoehe, fensterBreite, fensterHoehe, saOben = 0 }) {
+  const rand = 8;
+  const maxLinks = Math.max(rand, fensterBreite - menueBreite - rand);
+  const links = Math.round(Math.min(Math.max(rand, ankerLinks), maxLinks));
+  const minOben = rand + Math.max(0, saOben);
+  let oben = Math.round(ankerOben - menueHoehe - rand);
+  if (oben < minOben) {
+    // Kein Platz darueber: unter den Knopf, aber nie unter die Fensterkante.
+    const unter = Math.round(ankerUnten + rand);
+    const tiefste = Math.max(minOben, Math.round(fensterHoehe - menueHoehe - rand));
+    oben = Math.min(unter, tiefste);
+  }
+  return { links, oben };
+}
+
 function placeAboveButton(button, menu) {
   const anchor = button.getBoundingClientRect();
-  const width = menu.offsetWidth;
-  const maxLeft = Math.max(8, window.innerWidth - width - 8);
-  menu.style.left = `${Math.round(Math.min(Math.max(8, anchor.left), maxLeft))}px`;
-  menu.style.bottom = `${Math.round(Math.max(8, window.innerHeight - anchor.top + 8))}px`;
+  let saOben = 0;
+  try { saOben = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sa-top")) || 0; } catch { saOben = 0; }
+  const lage = lageUeberKnopf({
+    ankerOben: anchor.top, ankerUnten: anchor.bottom, ankerLinks: anchor.left,
+    menueBreite: menu.offsetWidth, menueHoehe: menu.offsetHeight,
+    fensterBreite: window.innerWidth, fensterHoehe: window.innerHeight, saOben
+  });
+  menu.style.bottom = "auto";
+  menu.style.left = `${lage.links}px`;
+  menu.style.top = `${lage.oben}px`;
 }
 
 // Fuehrt eine Menue-Aktion aus. Input: action-Name. Output: void.
@@ -141,7 +178,17 @@ function fuelleWerte() {
 // der Wunsch gilt fuer DIESEN Sprung, nicht fuer alle kuenftigen Besuche.
 export const KONTO_REITER_SCHLUESSEL = "smejj.konto.reiter.v1";
 
+/** Stehende Textauswahl aufheben (iOS-Auswahlleiste verschwindet mit ihr). Fail-safe. */
+export function raeumeTextauswahlAuf(win = globalThis) {
+  try {
+    const sel = win.getSelection && win.getSelection();
+    if (sel && sel.rangeCount > 0 && !sel.isCollapsed) { sel.removeAllRanges(); return true; }
+  } catch { /* ohne Selection-API nichts zu tun */ }
+  return false;
+}
+
 function goTo(path) {
+  raeumeTextauswahlAuf();
   history.pushState({}, "", path);
   window.dispatchEvent(new PopStateEvent("popstate"));
   schliesseSpurAmHandy();

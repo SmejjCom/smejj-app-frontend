@@ -24,6 +24,7 @@
     "Nachdenken": "Think",
     "Probier es hier — die erste Frage geht sofort, ganz ohne Konto.": "Try it here — your first question runs right away, no account needed.",
     "Einen Moment …": "One moment …",
+    "Das dauert gerade länger als gewohnt. Du kannst weiter warten oder dich kostenlos anmelden — die Frage nimmst du mit.": "This is taking longer than usual. You can keep waiting or sign up for free — your question comes with you.",
     "Weiterfragen geht sofort. Mit einem kostenlosen Konto bleibt dein Verlauf erhalten und ist auf allen Geräten da.": "Keep asking right away. With a free account your history is kept and is there on all your devices.",
     "Kostenlos anmelden": "Sign up free",
     "Was smejj kann": "What smejj can do",
