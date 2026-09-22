@@ -52,6 +52,8 @@ function authHeaders(extra = {}) {
 // speak(text, { onstart, onend }) spielt einen Satz; wirft bei Fehler VOR dem
 // ersten Ton (Host faellt dann auf die Browser-Stimme zurueck).
 export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args) => globalThis.fetch(...args) } = {}) {
+  // lang darf eine Funktion sein: Sprache zum Zeitpunkt der Anfrage (Oberflaechensprache, 22.09.2026).
+  const langNow = () => (typeof lang === "function" ? lang() : lang);
   let availability = { at: 0, value: false };
   let context = null;
   let active = null; // { abort, sources, cancelled }
@@ -72,7 +74,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
         headers: authHeaders({ "Content-Type": "application/json" }),
         // Sprache mitgeben: der Server bedient ggf. nur bestimmte Sprachen
         // (CPU-Stimme mit fester Stimme) — sonst bleibt die Browser-Stimme.
-        body: JSON.stringify({ language: lang })
+        body: JSON.stringify({ language: langNow() })
       });
       const payload = await response.json();
       value = payload?.premiumVoice === true;
@@ -133,7 +135,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
       response = await fetchFn(ttsUrl, {
         method: "POST",
         headers: authHeaders({ "Content-Type": "application/json" }),
-        body: JSON.stringify({ text, language: lang }),
+        body: JSON.stringify({ text, language: langNow() }),
         signal: controller.signal
       });
     } catch (error) {

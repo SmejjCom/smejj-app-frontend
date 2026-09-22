@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung Türkçe (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./tr-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Konuşma tanıma kullanılamıyor — sorunuzu aşağıya yazın.",
+  "Spracherkennung nicht verfügbar": "Konuşma tanıma kullanılamıyor",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Sorunuzu aşağıya yazın — yanıt sesli okunacak. X veya Escape ile kapatın.",
+  "Ich höre zu ...": "Dinliyorum ...",
+  "Ich spreche ...": "Konuşuyorum ...",
+  "Einen Moment ...": "Bir saniye ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "Mikrofona izin verilmedi — sorunuzu aşağıya yazın.",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "Konuşma tanıma bu cihazda başlamıyor — sorunuzu aşağıya yazın.",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "Sorunuzu aşağıya yazın — yanıt sesli okunacak.",
+  "Keine Antwort erhalten — Frage unten eintippen.": "Yanıt alınamadı — sorunuzu aşağıya yazın.",
+  "Keine Antwort erhalten — ich höre weiter zu.": "Yanıt alınamadı — dinlemeye devam ediyorum.",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "Konuşma tanıma bu cihazda kullanılamıyor — lütfen metin alanını kullanın.",
+  "Verbinde …": "Bağlanıyor …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "Konuşma tanıma bu cihazda kullanılamıyor — sorunuzu aşağıya yazın.",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "Cihazınızda yanıtlandı — sunucu yok, maliyet yok.",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "Sayfada ara",
   "Vorheriger Treffer": "Önceki sonuç",
   "Nächster Treffer": "Sonraki sonuç",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "denetleniyor …",
   "Google Login aktiv für": "Google oturumu etkin:",
   "von": "/",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "Çalışma alanları",
   "Kostenschutz an": "Maliyet koruması açık",
   "Profilmenue": "Profil menüsü",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "Çevrimdışı kipi",
   "Fehlerseite": "Hata sayfası",
   "Fehler": "Hata",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "sonuç",
   "nichts gefunden": "bir şey bulunamadı",
   "läuft …": "çalışıyor …",
   "Integrierter Browser": "Yerleşik tarayıcı",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "Kapat (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "Fareyi görevlendir — bu tarayıcıyı o kullanır",
   "Maus beauftragen": "Fareyi görevlendir",
   "Adressleiste und Suchleiste": "Adres ve arama çubuğu",
   "Browser anpassen und einstellen": "Tarayıcıyı özelleştir ve ayarla",
   "Browser schließen": "Tarayıcıyı kapat",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Yüklemeyi durdur",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Ara ya da bir adres gir — ihtiyacın kadar sekme.",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "İndir",
   "Bild im Vollbild": "Tam ekran görsel",
   "Nur Text teilen": "Yalnızca metni paylaş",
   "Vorherige Version": "Önceki sürüm",
   "Nachricht bearbeiten": "İletiyi düzenle",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "Bir şeyler ekle",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, tablo ya da metin. smejj okur, sen sorarsın.",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "“Bu sözleşmede fesih hakkında ne yazıyor?”",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "Hiçbir sunucu işlemi varmış gibi gösterilmez. Yerel çalışma mümkün kalır.",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "Bir şeyin para tutup tutmadığı ya da bir erişimin geçerli olup olmadığı belirsizse, smejj.com durmayı yeğler. Eşyaların olduğu gibi kalır.",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "Gizli maliyet yok, sessiz geri dönüş yok, güvensiz depolama yok.",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "Geri",
   "Schliessen und zur Startseite": "Kapat ve ana sayfaya dön",
   "Neue Unterhaltung beginnen": "Yeni bir sohbet başlat",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "Dosyaları aç",
   "Speicher prüfen": "Depolamayı denetle",
   "Browser-Bereich bereit.": "Tarayıcı alanı hazır.",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "Eski sohbetleri ve görevleri bul",
   "App oder Website Preview": "Uygulama veya web sitesi önizlemesi",
   "Bestätigungen und Grenzen": "Onaylar ve sınırlar",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "Testler, derleme, dağıtım ve hatalar",
   "Wenn ein Auftrag fertig ist": "Bir görev bittiğinde",
   "Wiederholbare Ablaufe und Agenten": "Tekrarlanabilir akışlar ve ajanlar",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "Fotoğraf veya video çek",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "Kamerayı doğrudan açar — telefonda, tablette veya bilgisayarda — ve kaydı ekler.",
   "Aufnehmen, fertig — smejj schaut es sich an.": "Çek, bitti — smejj bir bakar.",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "Görevi çalıştır",
   "Nutzer und Einstellungen": "Kullanıcı ve ayarlar",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "Sabitlenmiş",
   "Mit Bild": "Görselli",
   "Mit Code": "Kodlu",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "Fareye ulaşılamıyor.",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "Plandan bu görünüm için adım çıkmadı.",
   "Maus fertig, kein Klick nötig": "Fare hazır, tıklama gerekmiyor",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "Konuş",
   "Chat": "Sohbet",
   "Sprechen": "Sesli konuş",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "Hata ara",
   "Tests schreiben": "Test yaz",
   "Funktion einbauen": "Özellik ekle",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — Yapay zekâ ve kod asistanı",
   "Agenten-Arbeitsbereich": "Ajan çalışma alanı",
   "Verlauf": "Geçmiş",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "Projeler",
   "Offline weiterarbeiten": "Çevrimdışı çalışmaya devam et",
   "Das geht gerade nicht": "Bu şu anda çalışmıyor",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "Yararlı",
   "Nicht hilfreich": "Yararsız",
   "Teilen": "Paylaş",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "Teşekkürler — bildiriminiz alındı ve incelenecek.",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "Bildirmek için lütfen giriş yapın — bildirim sonrasında gönderilecek.",
   "Kein Netz — die Meldung wird später gesendet.": "Bağlantı yok — bildirim daha sonra gönderilecek.",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj henüz video izleyemiyor — bağlantı yine de gönderilir.",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "Ses izi henüz değerlendirilmiyor — bağlantı yine de gönderilir.",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "PDF içeriği henüz okunmuyor — bağlantı yine de gönderilir.",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "Bağlantı oluştur",
   "Link konnte nicht erstellt werden.": "Bağlantı oluşturulamadı.",
   "Schließen": "Kapat",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "Mesajın için işlemler",
   "Aktionen für diese Antwort": "Bu yanıt için işlemler",
   "Nächste Version": "Sonraki sürüm",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "Aç",
   "Projekt ändern…": "Projeyi değiştir…",
   "Rückgängig": "Geri al",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "arama",
   "Lese": "Okuyor",
   "Seite gelesen": "sayfa okundu",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "Sistem durumu",
   "Hilfe & Rückmeldung": "Yardım ve geri bildirim",
   "Abmelden": "Çıkış yap",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "Dinliyorum …",
   "Ich spreche …": "Konuşuyorum …",
   "Mikrofon stumm": "Mikrofon sessiz",

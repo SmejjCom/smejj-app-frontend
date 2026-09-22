@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung العربية (Quellsprache Deutsch als Schluessel, RTL).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./ar-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "التعرّف على الكلام غير متاح — اكتب سؤالك أدناه.",
+  "Spracherkennung nicht verfügbar": "التعرّف على الكلام غير متاح",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "اكتب سؤالك أدناه — سيُقرأ الجواب بصوت عالٍ. للإنهاء اضغط X أو Escape.",
+  "Ich höre zu ...": "أنا أستمع ...",
+  "Ich spreche ...": "أتحدّث ...",
+  "Einen Moment ...": "لحظة ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "الميكروفون غير مسموح — اكتب سؤالك أدناه.",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "لا يبدأ التعرّف على الكلام على هذا الجهاز — اكتب سؤالك أدناه.",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "اكتب سؤالك أدناه — سيُقرأ الجواب بصوت عالٍ.",
+  "Keine Antwort erhalten — Frage unten eintippen.": "لم يصل أي جواب — اكتب سؤالك أدناه.",
+  "Keine Antwort erhalten — ich höre weiter zu.": "لم يصل أي جواب — ما زلت أستمع.",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "التعرّف على الكلام غير متاح على هذا الجهاز — يرجى استخدام حقل الإدخال.",
+  "Verbinde …": "جارٍ الاتصال …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "التعرّف على الكلام غير متاح على هذا الجهاز — اكتب سؤالك أدناه.",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "تمت الإجابة على جهازك — بلا خادم وبلا تكلفة.",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "البحث في الصفحة",
   "Vorheriger Treffer": "النتيجة السابقة",
   "Nächster Treffer": "النتيجة التالية",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "جارٍ الفحص …",
   "Google Login aktiv für": "تسجيل الدخول عبر Google مفعّل لـ",
   "von": "من",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "مساحات العمل",
   "Kostenschutz an": "الحماية من التكاليف مفعّلة",
   "Profilmenue": "قائمة الملف الشخصي",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "وضع دون اتصال",
   "Fehlerseite": "صفحة الخطأ",
   "Fehler": "خطأ",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "نتيجة",
   "nichts gefunden": "لم يُعثر على شيء",
   "läuft …": "قيد التنفيذ …",
   "Integrierter Browser": "المتصفح المدمج",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "إغلاق (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "كلّف الفأرة — فهي تتولى تشغيل هذا المتصفح",
   "Maus beauftragen": "تكليف الفأرة",
   "Adressleiste und Suchleiste": "شريط العنوان والبحث",
   "Browser anpassen und einstellen": "تخصيص المتصفح وضبطه",
   "Browser schließen": "إغلاق المتصفح",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "إيقاف التحميل",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "ابحث أو أدخل عنواناً — بقدر ما تحتاج من علامات التبويب.",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "تنزيل",
   "Bild im Vollbild": "صورة بملء الشاشة",
   "Nur Text teilen": "مشاركة النص فقط",
   "Vorherige Version": "النسخة السابقة",
   "Nachricht bearbeiten": "تحرير الرسالة",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "إضافة أشياء",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF أو Word أو جدول أو نص. يقرأها smejj وتسأل أنت عنها.",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "«ماذا يقول هذا العقد عن الإلغاء؟»",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "لا يُصطنع أي إجراء من الخادم. ويبقى العمل المحلي ممكناً.",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "عندما لا يكون واضحاً إن كان شيء ما يكلّف مالاً أو إن كان الوصول صحيحاً، يفضّل smejj.com التوقف. وتبقى أشياؤك كما هي.",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "لا تكاليف خفية، ولا بدائل صامتة، ولا تخزين غير آمن.",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "رجوع",
   "Schliessen und zur Startseite": "إغلاق والعودة إلى الصفحة الرئيسية",
   "Neue Unterhaltung beginnen": "بدء محادثة جديدة",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "فتح الملفات",
   "Speicher prüfen": "فحص التخزين",
   "Browser-Bereich bereit.": "مساحة المتصفح جاهزة.",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "العثور على محادثات ومهام قديمة",
   "App oder Website Preview": "معاينة تطبيق أو موقع",
   "Bestätigungen und Grenzen": "التأكيدات والحدود",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "الاختبارات والبناء والنشر والأخطاء",
   "Wenn ein Auftrag fertig ist": "عند انتهاء المهمة",
   "Wiederholbare Ablaufe und Agenten": "إجراءات قابلة للتكرار ووكلاء",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "التقاط صورة أو فيديو",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "يفتح الكاميرا مباشرة — على الهاتف أو اللوحي أو الحاسوب — ويرفق التسجيل.",
   "Aufnehmen, fertig — smejj schaut es sich an.": "صوّر فقط — وسينظر smejj فيه.",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "تشغيل مهمة",
   "Nutzer und Einstellungen": "المستخدم والإعدادات",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "مثبّت",
   "Mit Bild": "مع صورة",
   "Mit Code": "مع كود",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "تعذّر الوصول إلى الفأرة.",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "لم تنتج الخطة أي خطوة لهذه الشاشة.",
   "Maus fertig, kein Klick nötig": "انتهت الفأرة، لا حاجة إلى نقرة",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "التحدث",
   "Chat": "الدردشة",
   "Sprechen": "التحدث بصوت",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "البحث عن الأخطاء",
   "Tests schreiben": "كتابة الاختبارات",
   "Funktion einbauen": "إضافة وظيفة",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — مساعد الذكاء الاصطناعي والبرمجة",
   "Agenten-Arbeitsbereich": "مساحة عمل الوكلاء",
   "Verlauf": "السجل",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "المشاريع",
   "Offline weiterarbeiten": "مواصلة العمل دون اتصال",
   "Das geht gerade nicht": "هذا لا يعمل حاليًا",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "مفيد",
   "Nicht hilfreich": "غير مفيد",
   "Teilen": "مشاركة",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "شكرًا — تم استلام البلاغ وستتم مراجعته.",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "يرجى تسجيل الدخول للإبلاغ — سيتم إرسال البلاغ بعد ذلك.",
   "Kein Netz — die Meldung wird später gesendet.": "لا يوجد اتصال — سيتم إرسال البلاغ لاحقًا.",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "لا يستطيع smejj مشاهدة الفيديو بعد — يُرسَل الرابط فقط.",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "لا يُحلَّل المسار الصوتي بعد — يُرسَل الرابط فقط.",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "لا يُقرأ محتوى PDF بعد — يُرسَل الرابط فقط.",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "إنشاء رابط",
   "Link konnte nicht erstellt werden.": "تعذّر إنشاء الرابط.",
   "Schließen": "إغلاق",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "إجراءات رسالتك",
   "Aktionen für diese Antwort": "إجراءات هذه الإجابة",
   "Nächste Version": "النسخة التالية",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "فتح",
   "Projekt ändern…": "تغيير المشروع…",
   "Rückgängig": "تراجع",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "بحث",
   "Lese": "جارٍ القراءة",
   "Seite gelesen": "صفحة مقروءة",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "حالة النظام",
   "Hilfe & Rückmeldung": "المساعدة والملاحظات",
   "Abmelden": "تسجيل الخروج",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "أستمع إليك …",
   "Ich spreche …": "أتحدث …",
   "Mikrofon stumm": "الميكروفون صامت",

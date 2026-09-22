@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung Русский (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./ru-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Распознавание речи недоступно — введите вопрос ниже.",
+  "Spracherkennung nicht verfügbar": "Распознавание речи недоступно",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Введите вопрос ниже — ответ будет прочитан вслух. Закрыть: X или Escape.",
+  "Ich höre zu ...": "Слушаю ...",
+  "Ich spreche ...": "Говорю ...",
+  "Einen Moment ...": "Секунду ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "Микрофон не разрешён — введите вопрос ниже.",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "Распознавание речи не запускается на этом устройстве — введите вопрос ниже.",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "Введите вопрос ниже — ответ будет прочитан вслух.",
+  "Keine Antwort erhalten — Frage unten eintippen.": "Ответ не получен — введите вопрос ниже.",
+  "Keine Antwort erhalten — ich höre weiter zu.": "Ответ не получен — продолжаю слушать.",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "Распознавание речи недоступно на этом устройстве — воспользуйтесь полем ввода.",
+  "Verbinde …": "Подключение …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "Распознавание речи недоступно на этом устройстве — введите вопрос ниже.",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "Ответ получен на вашем устройстве — без сервера и без затрат.",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "Искать на странице",
   "Vorheriger Treffer": "Предыдущее совпадение",
   "Nächster Treffer": "Следующее совпадение",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "проверяется …",
   "Google Login aktiv für": "Вход через Google активен для",
   "von": "из",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "Рабочие пространства",
   "Kostenschutz an": "Защита от расходов включена",
   "Profilmenue": "Меню профиля",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "Офлайн-режим",
   "Fehlerseite": "Страница ошибки",
   "Fehler": "Ошибка",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "совпадений",
   "nichts gefunden": "ничего не найдено",
   "läuft …": "выполняется …",
   "Integrierter Browser": "Встроенный браузер",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "Закрыть (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "Поручите мыши — она управляет этим браузером",
   "Maus beauftragen": "Поручить мыши",
   "Adressleiste und Suchleiste": "Адресная и поисковая строка",
   "Browser anpassen und einstellen": "Настроить браузер",
   "Browser schließen": "Закрыть браузер",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Остановить загрузку",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Поиск или адрес — столько вкладок, сколько нужно.",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "Скачать",
   "Bild im Vollbild": "Изображение во весь экран",
   "Nur Text teilen": "Поделиться только текстом",
   "Vorherige Version": "Предыдущая версия",
   "Nachricht bearbeiten": "Изменить сообщение",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "Добавить материалы",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, таблица или текст. smejj прочитает, а вы зададите вопросы.",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "«Что в этом договоре сказано о расторжении?»",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "Никакие действия сервера не имитируются. Локальная работа остаётся возможной.",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "Если неясно, стоит ли что-то денег и верен ли доступ, smejj.com лучше остановится. Ваши данные останутся нетронутыми.",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "Никаких скрытых расходов, никаких тихих запасных вариантов, никакого небезопасного хранения.",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "Назад",
   "Schliessen und zur Startseite": "Закрыть и перейти на главную",
   "Neue Unterhaltung beginnen": "Начать новый разговор",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "Открыть файлы",
   "Speicher prüfen": "Проверить хранилище",
   "Browser-Bereich bereit.": "Область браузера готова.",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "Найти старые чаты и задачи",
   "App oder Website Preview": "Предпросмотр приложения или сайта",
   "Bestätigungen und Grenzen": "Подтверждения и границы",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "Тесты, сборка, развёртывание и ошибки",
   "Wenn ein Auftrag fertig ist": "Когда задача завершена",
   "Wiederholbare Ablaufe und Agenten": "Повторяемые процессы и агенты",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "Снять фото или видео",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "Открывает камеру напрямую — на телефоне, планшете или компьютере — и прикладывает запись.",
   "Aufnehmen, fertig — smejj schaut es sich an.": "Снял — и всё, smejj посмотрит.",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "Запустить задание",
   "Nutzer und Einstellungen": "Пользователь и настройки",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "Закреплено",
   "Mit Bild": "С изображением",
   "Mit Code": "С кодом",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "Мышь недоступна.",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "План не дал ни одного шага для этого вида.",
   "Maus fertig, kein Klick nötig": "Мышь закончила, клик не нужен",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "Говорить",
   "Chat": "Чат",
   "Sprechen": "Говорить вслух",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "Найти ошибки",
   "Tests schreiben": "Написать тесты",
   "Funktion einbauen": "Добавить функцию",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — ИИ-ассистент и помощник по коду",
   "Agenten-Arbeitsbereich": "Рабочая область агентов",
   "Verlauf": "История",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "Проекты",
   "Offline weiterarbeiten": "Продолжить работу офлайн",
   "Das geht gerade nicht": "Сейчас это не работает",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "Полезно",
   "Nicht hilfreich": "Бесполезно",
   "Teilen": "Поделиться",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "Спасибо — жалоба получена и будет рассмотрена.",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "Войдите, чтобы пожаловаться — жалоба будет отправлена после входа.",
   "Kein Netz — die Meldung wird später gesendet.": "Нет сети — жалоба будет отправлена позже.",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj пока не умеет смотреть видео — ссылка будет передана.",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "Звуковая дорожка пока не анализируется — ссылка будет передана.",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "Содержимое PDF пока не читается — ссылка будет передана.",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "Создать ссылку",
   "Link konnte nicht erstellt werden.": "Не удалось создать ссылку.",
   "Schließen": "Закрыть",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "Действия для вашего сообщения",
   "Aktionen für diese Antwort": "Действия для этого ответа",
   "Nächste Version": "Следующая версия",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "Открыть",
   "Projekt ändern…": "Сменить проект…",
   "Rückgängig": "Отменить действие",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "поиск",
   "Lese": "Читаю",
   "Seite gelesen": "страница прочитана",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "Состояние системы",
   "Hilfe & Rückmeldung": "Помощь и отзывы",
   "Abmelden": "Выйти",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "Слушаю …",
   "Ich spreche …": "Говорю …",
   "Mikrofon stumm": "Микрофон выключен",

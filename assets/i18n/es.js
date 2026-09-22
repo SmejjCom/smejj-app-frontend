@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung Español (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./es-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Reconocimiento de voz no disponible — escribe tu pregunta abajo.",
+  "Spracherkennung nicht verfügbar": "Reconocimiento de voz no disponible",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Escribe tu pregunta abajo — la respuesta se leerá en voz alta. Cierra con X o Escape.",
+  "Ich höre zu ...": "Te escucho ...",
+  "Ich spreche ...": "Hablando ...",
+  "Einen Moment ...": "Un momento ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "Micrófono no permitido — escribe tu pregunta abajo.",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "El reconocimiento de voz no arranca en este dispositivo — escribe tu pregunta abajo.",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "Escribe tu pregunta abajo — la respuesta se leerá en voz alta.",
+  "Keine Antwort erhalten — Frage unten eintippen.": "No se recibió respuesta — escribe tu pregunta abajo.",
+  "Keine Antwort erhalten — ich höre weiter zu.": "No se recibió respuesta — sigo escuchando.",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "El reconocimiento de voz no está disponible en este dispositivo — usa el campo de texto.",
+  "Verbinde …": "Conectando …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "El reconocimiento de voz no está disponible en este dispositivo — escribe tu pregunta abajo.",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "Respondido en tu dispositivo — sin servidor, sin coste.",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "Buscar en la página",
   "Vorheriger Treffer": "Resultado anterior",
   "Nächster Treffer": "Resultado siguiente",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "comprobando …",
   "Google Login aktiv für": "Inicio de sesión con Google activo para",
   "von": "de",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "Espacios de trabajo",
   "Kostenschutz an": "Protección de costes activada",
   "Profilmenue": "Menú de perfil",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "Modo sin conexión",
   "Fehlerseite": "Página de error",
   "Fehler": "Error",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "resultados",
   "nichts gefunden": "nada encontrado",
   "läuft …": "en curso …",
   "Integrierter Browser": "Navegador integrado",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "Cerrar (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "Encarga al ratón: maneja este navegador",
   "Maus beauftragen": "Encargar al ratón",
   "Adressleiste und Suchleiste": "Barra de direcciones y búsqueda",
   "Browser anpassen und einstellen": "Personalizar y configurar el navegador",
   "Browser schließen": "Cerrar el navegador",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Detener la carga",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Busca o escribe una dirección: tantas pestañas como necesites.",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "Descargar",
   "Bild im Vollbild": "Imagen a pantalla completa",
   "Nur Text teilen": "Compartir solo el texto",
   "Vorherige Version": "Versión anterior",
   "Nachricht bearbeiten": "Editar mensaje",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "Añadir cosas",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, hoja de cálculo o texto. smejj lo lee y tú preguntas sobre ello.",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "«¿Qué dice este contrato sobre la cancelación?»",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "No se finge ninguna acción del servidor. El trabajo local sigue siendo posible.",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "Cuando no está claro si algo cuesta dinero o si un acceso es válido, smejj.com prefiere detenerse. Tus cosas quedan intactas.",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "Sin costes ocultos, sin recursos silenciosos, sin almacenamiento inseguro.",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "Atrás",
   "Schliessen und zur Startseite": "Cerrar e ir al inicio",
   "Neue Unterhaltung beginnen": "Iniciar una conversación nueva",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "Abrir archivos",
   "Speicher prüfen": "Comprobar almacenamiento",
   "Browser-Bereich bereit.": "Área del navegador lista.",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "Encontrar chats y tareas antiguos",
   "App oder Website Preview": "Vista previa de app o sitio web",
   "Bestätigungen und Grenzen": "Confirmaciones y límites",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "Pruebas, compilación, despliegue y errores",
   "Wenn ein Auftrag fertig ist": "Cuando una tarea termina",
   "Wiederholbare Ablaufe und Agenten": "Flujos repetibles y agentes",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "Hacer foto o vídeo",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "Abre la cámara directamente —en el móvil, la tableta o el ordenador— y adjunta la grabación.",
   "Aufnehmen, fertig — smejj schaut es sich an.": "Grabar y listo: smejj lo mira.",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "Ejecutar una tarea",
   "Nutzer und Einstellungen": "Usuario y ajustes",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "Fijado",
   "Mit Bild": "Con imagen",
   "Mit Code": "Con código",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "Ratón no accesible.",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "El plan no dio ningún paso para esta vista.",
   "Maus fertig, kein Klick nötig": "Ratón listo, no hace falta clic",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "Hablar",
   "Chat": "Chat",
   "Sprechen": "Hablar en voz alta",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "Buscar errores",
   "Tests schreiben": "Escribir pruebas",
   "Funktion einbauen": "Añadir una función",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — Asistente de IA y código",
   "Agenten-Arbeitsbereich": "Espacio de trabajo de agentes",
   "Verlauf": "Historial",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "Proyectos",
   "Offline weiterarbeiten": "Seguir trabajando sin conexión",
   "Das geht gerade nicht": "Esto no funciona ahora mismo",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "Útil",
   "Nicht hilfreich": "No útil",
   "Teilen": "Compartir",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "Gracias — hemos recibido tu denuncia y la revisaremos.",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "Inicia sesión para denunciar — la denuncia se enviará después.",
   "Kein Netz — die Meldung wird später gesendet.": "Sin conexión — la denuncia se enviará más tarde.",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj aún no puede ver vídeos: se envía la referencia.",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "La pista de audio aún no se analiza: se envía la referencia.",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "El contenido del PDF aún no se lee: se envía la referencia.",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "Crear enlace",
   "Link konnte nicht erstellt werden.": "No se pudo crear el enlace.",
   "Schließen": "Cerrar",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "Acciones para tu mensaje",
   "Aktionen für diese Antwort": "Acciones para esta respuesta",
   "Nächste Version": "Versión siguiente",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "Abrir",
   "Projekt ändern…": "Cambiar de proyecto…",
   "Rückgängig": "Deshacer",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "búsqueda",
   "Lese": "Leyendo",
   "Seite gelesen": "página leída",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "Estado del sistema",
   "Hilfe & Rückmeldung": "Ayuda y comentarios",
   "Abmelden": "Cerrar sesión",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "Te escucho …",
   "Ich spreche …": "Estoy hablando …",
   "Mikrofon stumm": "Micrófono silenciado",

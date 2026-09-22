@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung English (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./en-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Speech recognition unavailable — type your question below.",
+  "Spracherkennung nicht verfügbar": "Speech recognition unavailable",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Type your question below — the answer will be read aloud. Close with X or Escape.",
+  "Ich höre zu ...": "I'm listening ...",
+  "Ich spreche ...": "Speaking ...",
+  "Einen Moment ...": "One moment ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "Microphone not allowed — type your question below.",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "Speech recognition won't start on this device — type your question below.",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "Type your question below — the answer will be read aloud.",
+  "Keine Antwort erhalten — Frage unten eintippen.": "No answer received — type your question below.",
+  "Keine Antwort erhalten — ich höre weiter zu.": "No answer received — still listening.",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "Speech recognition isn't available on this device — please use the input field.",
+  "Verbinde …": "Connecting …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "Speech recognition isn't available on this device — type your question below.",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "Answered on your device — no server, no cost.",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "Search on the page",
   "Vorheriger Treffer": "Previous match",
   "Nächster Treffer": "Next match",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "checking …",
   "Google Login aktiv für": "Google sign-in active for",
   "von": "of",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "Workspaces",
   "Kostenschutz an": "Cost protection on",
   "Profilmenue": "Profile menu",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "Offline mode",
   "Fehlerseite": "Error page",
   "Fehler": "Error",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "hits",
   "nichts gefunden": "nothing found",
   "läuft …": "running …",
   "Integrierter Browser": "Built-in browser",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "Close (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "Send the mouse — it operates this browser",
   "Maus beauftragen": "Send the mouse",
   "Adressleiste und Suchleiste": "Address and search bar",
   "Browser anpassen und einstellen": "Customize and configure the browser",
   "Browser schließen": "Close browser",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Stop loading",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Search or enter an address — as many tabs as you need.",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "Download",
   "Bild im Vollbild": "Image in full screen",
   "Nur Text teilen": "Share text only",
   "Vorherige Version": "Previous version",
   "Nachricht bearbeiten": "Edit message",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "Add things",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, spreadsheet or text. smejj reads it and you ask about it.",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "“What does this contract say about cancelling?”",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "No server action is faked. Local work remains possible.",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "When it is unclear whether something costs money or whether an access is valid, smejj.com would rather stop. Your things stay untouched.",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "No hidden costs, no silent fallbacks, no unsafe storage.",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "Back",
   "Schliessen und zur Startseite": "Close and go to home",
   "Neue Unterhaltung beginnen": "Start a new conversation",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "Open files",
   "Speicher prüfen": "Check storage",
   "Browser-Bereich bereit.": "Browser area ready.",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "Find old chats and tasks",
   "App oder Website Preview": "App or website preview",
   "Bestätigungen und Grenzen": "Confirmations and limits",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "Tests, build, deploy and errors",
   "Wenn ein Auftrag fertig ist": "When a task is finished",
   "Wiederholbare Ablaufe und Agenten": "Repeatable workflows and agents",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "Take a photo or video",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "Opens the camera directly — on phone, tablet or computer — and attaches the recording.",
   "Aufnehmen, fertig — smejj schaut es sich an.": "Record, done — smejj takes a look.",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "Run a task",
   "Nutzer und Einstellungen": "User and settings",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "Pinned",
   "Mit Bild": "With image",
   "Mit Code": "With code",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "Mouse not reachable.",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "The plan produced no step for this view.",
   "Maus fertig, kein Klick nötig": "Mouse done, no click needed",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "Talk",
   "Chat": "Chat",
   "Sprechen": "Speak",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "Find bugs",
   "Tests schreiben": "Write tests",
   "Funktion einbauen": "Add a feature",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — AI and Code Assistant",
   "Agenten-Arbeitsbereich": "Agent workspace",
   "Verlauf": "History",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "Projects",
   "Offline weiterarbeiten": "Keep working offline",
   "Das geht gerade nicht": "That doesn’t work right now",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "Helpful",
   "Nicht hilfreich": "Not helpful",
   "Teilen": "Share",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "Thank you — your report was received and will be reviewed.",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "Please sign in to report — the report will be sent afterwards.",
   "Kein Netz — die Meldung wird später gesendet.": "No connection — the report will be sent later.",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj can't watch videos yet — the reference is sent along.",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "The audio track is not analysed yet — the reference is sent along.",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "PDF content is not read yet — the reference is sent along.",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "Create link",
   "Link konnte nicht erstellt werden.": "The link could not be created.",
   "Schließen": "Close",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "Actions for your message",
   "Aktionen für diese Antwort": "Actions for this answer",
   "Nächste Version": "Next version",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "Open",
   "Projekt ändern…": "Change project…",
   "Rückgängig": "Undo",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "Search",
   "Lese": "Reading",
   "Seite gelesen": "page read",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "System status",
   "Hilfe & Rückmeldung": "Help & feedback",
   "Abmelden": "Sign out",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "I'm listening …",
   "Ich spreche …": "I'm speaking …",
   "Mikrofon stumm": "Microphone muted",

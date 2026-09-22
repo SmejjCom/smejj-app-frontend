@@ -38,17 +38,17 @@ import { CLIENT_ROUTES } from "./config.js";
 import { bindPlusMenu } from "./composer-plus-menu.js?v=werkzeuge-14";
 // Mikrofon-Diktat — ausgelagert (800-Zeilen-Regel), Verhalten unveraendert.
 import { createDictation } from "./composer-dictation.js";
-
+import { t } from "./i18n/ui.js?v=3"; // Sprachmodus-Texte (Geraetetest 22.09.2026: blieben in jeder Sprache deutsch)
 const $ = (selector) => document.querySelector(selector);
-// Sprache dynamisch aus dem lang-Attribut der Seite (Fallback de-DE).
+// Sprache bei JEDEM Aufruf aus dem lang-Attribut (huelle-sprache.js zieht es an die Oberflaechensprache; Geraetetest 22.09.2026: statisch beim Laden = immer de-DE).
 const LANG_MAP = {
       de: "de-DE", en: "en-US", fr: "fr-FR", es: "es-ES", it: "it-IT",
       pt: "pt-PT", ru: "ru-RU", tr: "tr-TR", ja: "ja-JP", ko: "ko-KR",
       zh: "zh-CN", hi: "hi-IN", ar: "ar-SA", id: "id-ID", bn: "bn-BD"
 };
-const PAGE_LANG = typeof document !== "undefined" ? (document.documentElement.lang || "de") : "de";
-const SPEECH_LANG = PAGE_LANG.includes("-") ? PAGE_LANG : (LANG_MAP[PAGE_LANG.toLowerCase()] || "de-DE");
-const SPEECH_BASE = SPEECH_LANG.split("-")[0];
+const pageLang = () => (typeof document !== "undefined" ? (document.documentElement.lang || "de") : "de");
+const speechLang = () => { const p = pageLang(); return p.includes("-") ? p : (LANG_MAP[p.toLowerCase()] || "de-DE"); };
+const speechBase = () => speechLang().split("-")[0];
 const RecognitionCtor = typeof window !== "undefined"
   ? (window.SpeechRecognition || window.webkitSpeechRecognition || null)
       : null;
@@ -85,7 +85,7 @@ function synthesisSupported() {
 }
 
 // Browser-Stimme (Stimmwahl, Safari-resume, iOS-Unlock) — voice-browser-tts.js.
-const browserTts = createBrowserTts({ lang: SPEECH_LANG, base: SPEECH_BASE, supported: synthesisSupported });
+const browserTts = createBrowserTts({ lang: speechLang, base: speechBase, supported: synthesisSupported });
 // Doppel-Sende-Schutz (Stufe 3): dieselbe erkannte Frage nicht zweimal senden.
 const doppelschutz = createDoppelschutz();
 // Stufe 4: Server-Ohr (Groq Whisper ueber die Bridge) — fail-safe, siehe voice-ear.js.
@@ -117,7 +117,7 @@ const ohrSolo = verdrahteOhrSolo({
 const premiumVoice = createPremiumVoice({
       statusUrl: CLIENT_ROUTES.api.voiceStatus,
       ttsUrl: CLIENT_ROUTES.api.voiceTts,
-      lang: SPEECH_BASE
+      lang: speechBase
 });
 let premiumVoiceOn = false;
 
@@ -176,7 +176,7 @@ const dictation = createDictation({
       RecognitionCtor,
       // Eigenes Ohr fuers Diktat (2026-08-26): taube Web-Speech schreibt sonst nie.
       serverOhr: createServerEar({ urls: ohrAdressen(CLIENT_ROUTES.api), budgetMs: 6000 }),
-      lang: SPEECH_LANG,
+      lang: speechLang,
       speechSupported,
       setVisual: (active) => { const knopf = $('[data-start-tool="voice"]'); knopf?.classList.toggle("is-recording", active); knopf?.setAttribute("aria-pressed", active ? "true" : "false"); }, // aria-pressed: a11y-Befund 2026-09-14
       onBeforeToggle: () => { if (state.voiceModeActive) closeVoiceMode(); }
@@ -246,10 +246,10 @@ function enterVoiceFallback(message) {
       const mic = $("#voiceModeMic");
       if (mic) {
               mic.classList.add("is-muted");
-              mic.title = "Spracherkennung nicht verfügbar";
+              mic.title = t("Spracherkennung nicht verfügbar");
       }
       const hint = document.querySelector("#voiceModeOverlay .voice-mode-hint");
-      if (hint) hint.textContent = "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.";
+      if (hint) hint.textContent = t("Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.");
       $("#voiceModeInput")?.focus();
 }
 
@@ -292,7 +292,7 @@ function startBargeListener(spokenText, failStreak = 0) {
       if (!RecognitionCtor || !state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
       stopBargeListener();
       const recognition = new RecognitionCtor();
-      recognition.lang = SPEECH_LANG;
+      recognition.lang = speechLang();
       recognition.continuous = true;
       recognition.interimResults = true;
       state.bargeRecognition = recognition;
@@ -390,7 +390,7 @@ function nachfragenStattSenden() {
               // Recognition war bereits gestoppt.
       }
       setVoiceModeStatus("speaking", "Ich spreche ...");
-      speak(clarifyLine(SPEECH_BASE), {
+      speak(clarifyLine(speechBase()), {
               onend: () => {
                         if (state.voiceModeActive && !state.voiceMuted && !state.voiceFallback) voiceModeListen();
               }
@@ -406,7 +406,7 @@ function voiceModeListen() {
       setVoiceModeStatus("listening", "Ich höre zu ...");
       setVoiceModeTranscript("");
       const recognition = new RecognitionCtor();
-      recognition.lang = SPEECH_LANG;
+      recognition.lang = speechLang();
       recognition.continuous = false;
       recognition.interimResults = true;
       state.voiceRecognition = recognition;
@@ -668,7 +668,7 @@ function waitForAssistantReply(knownEntries) {
 function toggleVoiceMute() {
       if (!state.voiceModeActive) return;
       if (state.voiceFallback) {
-              showToast("Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.");
+              showToast(t("Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen."));
               return;
       }
       state.voiceMuted = !state.voiceMuted;

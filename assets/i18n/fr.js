@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung Français (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./fr-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Reconnaissance vocale indisponible — saisissez votre question ci-dessous.",
+  "Spracherkennung nicht verfügbar": "Reconnaissance vocale indisponible",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Saisissez votre question ci-dessous — la réponse sera lue à voix haute. Quitter avec X ou Échap.",
+  "Ich höre zu ...": "Je vous écoute ...",
+  "Ich spreche ...": "Je parle ...",
+  "Einen Moment ...": "Un instant ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "Micro non autorisé — saisissez votre question ci-dessous.",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "La reconnaissance vocale ne démarre pas sur cet appareil — saisissez votre question ci-dessous.",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "Saisissez votre question ci-dessous — la réponse sera lue à voix haute.",
+  "Keine Antwort erhalten — Frage unten eintippen.": "Aucune réponse reçue — saisissez votre question ci-dessous.",
+  "Keine Antwort erhalten — ich höre weiter zu.": "Aucune réponse reçue — je continue d'écouter.",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "La reconnaissance vocale n'est pas disponible sur cet appareil — utilisez le champ de saisie.",
+  "Verbinde …": "Connexion …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "La reconnaissance vocale n'est pas disponible sur cet appareil — saisissez votre question ci-dessous.",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "Répondu sur votre appareil — sans serveur, sans frais.",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "Rechercher dans la page",
   "Vorheriger Treffer": "Résultat précédent",
   "Nächster Treffer": "Résultat suivant",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "vérification …",
   "Google Login aktiv für": "Connexion Google active pour",
   "von": "sur",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "Espaces de travail",
   "Kostenschutz an": "Protection des coûts activée",
   "Profilmenue": "Menu du profil",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "Mode hors ligne",
   "Fehlerseite": "Page d'erreur",
   "Fehler": "Erreur",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "résultats",
   "nichts gefunden": "rien trouvé",
   "läuft …": "en cours …",
   "Integrierter Browser": "Navigateur intégré",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "Fermer (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "Confie la tâche à la souris — elle pilote ce navigateur",
   "Maus beauftragen": "Confier à la souris",
   "Adressleiste und Suchleiste": "Barre d'adresse et de recherche",
   "Browser anpassen und einstellen": "Personnaliser et configurer le navigateur",
   "Browser schließen": "Fermer le navigateur",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Arrêter le chargement",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Recherche ou saisis une adresse — autant d'onglets que tu veux.",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "Télécharger",
   "Bild im Vollbild": "Image en plein écran",
   "Nur Text teilen": "Partager seulement le texte",
   "Vorherige Version": "Version précédente",
   "Nachricht bearbeiten": "Modifier le message",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "Ajouter des éléments",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, tableur ou texte. smejj les lit et tu poses tes questions.",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "« Que dit ce contrat sur la résiliation ? »",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "Aucune action serveur n'est simulée. Le travail local reste possible.",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "Quand on ne sait pas si quelque chose coûte de l'argent ou si un accès est valable, smejj.com préfère s'arrêter. Tes affaires restent intactes.",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "Pas de coûts cachés, pas de replis silencieux, pas de stockage non sécurisé.",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "Retour",
   "Schliessen und zur Startseite": "Fermer et revenir à l'accueil",
   "Neue Unterhaltung beginnen": "Démarrer une nouvelle conversation",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "Ouvrir les fichiers",
   "Speicher prüfen": "Vérifier le stockage",
   "Browser-Bereich bereit.": "Espace navigateur prêt.",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "Retrouver d'anciennes discussions et tâches",
   "App oder Website Preview": "Aperçu d'app ou de site web",
   "Bestätigungen und Grenzen": "Confirmations et limites",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "Tests, build, déploiement et erreurs",
   "Wenn ein Auftrag fertig ist": "Quand une tâche est terminée",
   "Wiederholbare Ablaufe und Agenten": "Procédures répétables et agents",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "Prendre une photo ou une vidéo",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "Ouvre directement la caméra — sur téléphone, tablette ou ordinateur — et joint l'enregistrement.",
   "Aufnehmen, fertig — smejj schaut es sich an.": "Enregistrez, c'est tout — smejj y jette un œil.",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "Lancer une tâche",
   "Nutzer und Einstellungen": "Utilisateur et réglages",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "Épinglé",
   "Mit Bild": "Avec image",
   "Mit Code": "Avec code",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "Souris injoignable.",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "Le plan n'a donné aucune étape pour cette vue.",
   "Maus fertig, kein Klick nötig": "Souris terminée, aucun clic nécessaire",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "Parler",
   "Chat": "Chat",
   "Sprechen": "Parler à voix haute",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "Chercher des bugs",
   "Tests schreiben": "Écrire des tests",
   "Funktion einbauen": "Ajouter une fonction",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — Assistant IA et code",
   "Agenten-Arbeitsbereich": "Espace de travail des agents",
   "Verlauf": "Historique",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "Projets",
   "Offline weiterarbeiten": "Continuer à travailler hors ligne",
   "Das geht gerade nicht": "Cela ne fonctionne pas pour le moment",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "Utile",
   "Nicht hilfreich": "Pas utile",
   "Teilen": "Partager",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "Merci — votre signalement a bien été reçu et sera examiné.",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "Connectez-vous pour signaler — le signalement sera envoyé ensuite.",
   "Kein Netz — die Meldung wird später gesendet.": "Pas de connexion — le signalement sera envoyé plus tard.",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj ne peut pas encore regarder de vidéos — la référence est transmise.",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "La piste audio n'est pas encore analysée — la référence est transmise.",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "Le contenu du PDF n'est pas encore lu — la référence est transmise.",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "Créer un lien",
   "Link konnte nicht erstellt werden.": "Le lien n'a pas pu être créé.",
   "Schließen": "Fermer",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "Actions pour votre message",
   "Aktionen für diese Antwort": "Actions pour cette réponse",
   "Nächste Version": "Version suivante",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "Ouvrir",
   "Projekt ändern…": "Changer de projet…",
   "Rückgängig": "Restaurer",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "recherche",
   "Lese": "Lecture",
   "Seite gelesen": "page lue",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "État du système",
   "Hilfe & Rückmeldung": "Aide et commentaires",
   "Abmelden": "Se déconnecter",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "J'écoute …",
   "Ich spreche …": "Je parle …",
   "Mikrofon stumm": "Micro coupé",

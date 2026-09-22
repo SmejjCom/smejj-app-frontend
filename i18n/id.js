@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung Bahasa Indonesia (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./id-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Pengenalan suara tidak tersedia — ketik pertanyaan Anda di bawah.",
+  "Spracherkennung nicht verfügbar": "Pengenalan suara tidak tersedia",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Ketik pertanyaan Anda di bawah — jawaban akan dibacakan. Tutup dengan X atau Escape.",
+  "Ich höre zu ...": "Saya mendengarkan ...",
+  "Ich spreche ...": "Sedang berbicara ...",
+  "Einen Moment ...": "Sebentar ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "Mikrofon tidak diizinkan — ketik pertanyaan Anda di bawah.",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "Pengenalan suara tidak dapat dimulai di perangkat ini — ketik pertanyaan Anda di bawah.",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "Ketik pertanyaan Anda di bawah — jawaban akan dibacakan.",
+  "Keine Antwort erhalten — Frage unten eintippen.": "Tidak ada jawaban diterima — ketik pertanyaan Anda di bawah.",
+  "Keine Antwort erhalten — ich höre weiter zu.": "Tidak ada jawaban diterima — saya tetap mendengarkan.",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "Pengenalan suara tidak tersedia di perangkat ini — gunakan kolom input.",
+  "Verbinde …": "Menghubungkan …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "Pengenalan suara tidak tersedia di perangkat ini — ketik pertanyaan Anda di bawah.",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "Dijawab di perangkat Anda — tanpa server, tanpa biaya.",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "Cari di halaman",
   "Vorheriger Treffer": "Hasil sebelumnya",
   "Nächster Treffer": "Hasil berikutnya",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "memeriksa …",
   "Google Login aktiv für": "Masuk dengan Google aktif untuk",
   "von": "dari",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "Ruang kerja",
   "Kostenschutz an": "Perlindungan biaya aktif",
   "Profilmenue": "Menu profil",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "Mode luring",
   "Fehlerseite": "Halaman galat",
   "Fehler": "Galat",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "hasil",
   "nichts gefunden": "tidak ada hasil",
   "läuft …": "berjalan …",
   "Integrierter Browser": "Peramban bawaan",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "Tutup (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "Serahkan ke tetikus — ia yang mengoperasikan peramban ini",
   "Maus beauftragen": "Serahkan ke tetikus",
   "Adressleiste und Suchleiste": "Bilah alamat dan pencarian",
   "Browser anpassen und einstellen": "Sesuaikan dan atur peramban",
   "Browser schließen": "Tutup peramban",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "Hentikan pemuatan",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "Cari atau masukkan alamat — sebanyak tab yang kamu perlukan.",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "Unduh",
   "Bild im Vollbild": "Gambar layar penuh",
   "Nur Text teilen": "Bagikan teks saja",
   "Vorherige Version": "Versi sebelumnya",
   "Nachricht bearbeiten": "Sunting pesan",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "Tambahkan sesuatu",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, lembar kerja, atau teks. smejj membacanya dan kamu bertanya.",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "“Apa isi kontrak ini soal pembatalan?”",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "Tidak ada tindakan server yang dipura-purakan. Pekerjaan lokal tetap mungkin.",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "Kalau belum jelas apakah sesuatu berbiaya atau apakah suatu akses sah, smejj.com lebih baik berhenti. Barangmu tetap utuh.",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "Tanpa biaya tersembunyi, tanpa cadangan diam-diam, tanpa penyimpanan yang tidak aman.",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "Kembali",
   "Schliessen und zur Startseite": "Tutup dan ke halaman awal",
   "Neue Unterhaltung beginnen": "Mulai percakapan baru",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "Buka berkas",
   "Speicher prüfen": "Periksa penyimpanan",
   "Browser-Bereich bereit.": "Area peramban siap.",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "Temukan obrolan dan tugas lama",
   "App oder Website Preview": "Pratinjau aplikasi atau situs web",
   "Bestätigungen und Grenzen": "Konfirmasi dan batasan",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "Tes, build, deploy, dan kesalahan",
   "Wenn ein Auftrag fertig ist": "Saat tugas selesai",
   "Wiederholbare Ablaufe und Agenten": "Alur yang dapat diulang dan agen",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "Ambil foto atau video",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "Membuka kamera langsung — di ponsel, tablet, atau komputer — dan melampirkan hasilnya.",
   "Aufnehmen, fertig — smejj schaut es sich an.": "Rekam saja — smejj yang melihatnya.",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "Jalankan tugas",
   "Nutzer und Einstellungen": "Pengguna dan pengaturan",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "Disematkan",
   "Mit Bild": "Dengan gambar",
   "Mit Code": "Dengan kode",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "Tetikus tidak terjangkau.",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "Rencana tidak menghasilkan langkah untuk tampilan ini.",
   "Maus fertig, kein Klick nötig": "Tetikus selesai, tidak perlu klik",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "Bicara",
   "Chat": "Obrolan",
   "Sprechen": "Berbicara lantang",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "Cari kesalahan",
   "Tests schreiben": "Tulis tes",
   "Funktion einbauen": "Tambah fitur",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — Asisten AI dan kode",
   "Agenten-Arbeitsbereich": "Ruang kerja agen",
   "Verlauf": "Riwayat",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "Proyek",
   "Offline weiterarbeiten": "Lanjut bekerja offline",
   "Das geht gerade nicht": "Ini sedang tidak bisa digunakan",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "Membantu",
   "Nicht hilfreich": "Tidak membantu",
   "Teilen": "Bagikan",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "Terima kasih — laporan Anda telah diterima dan akan ditinjau.",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "Silakan masuk untuk melaporkan — laporan akan dikirim setelahnya.",
   "Kein Netz — die Meldung wird später gesendet.": "Tidak ada koneksi — laporan akan dikirim nanti.",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj belum bisa menonton video — rujukannya tetap dikirim.",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "Jalur audio belum dianalisis — rujukannya tetap dikirim.",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "Isi PDF belum dibaca — rujukannya tetap dikirim.",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "Buat tautan",
   "Link konnte nicht erstellt werden.": "Tautan tidak dapat dibuat.",
   "Schließen": "Tutup",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "Tindakan untuk pesanmu",
   "Aktionen für diese Antwort": "Tindakan untuk jawaban ini",
   "Nächste Version": "Versi berikutnya",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "Buka",
   "Projekt ändern…": "Ubah proyek…",
   "Rückgängig": "Urungkan",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "pencarian",
   "Lese": "Membaca",
   "Seite gelesen": "halaman dibaca",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "Status sistem",
   "Hilfe & Rückmeldung": "Bantuan & masukan",
   "Abmelden": "Keluar",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "Saya mendengarkan …",
   "Ich spreche …": "Saya sedang berbicara …",
   "Mikrofon stumm": "Mikrofon dibisukan",

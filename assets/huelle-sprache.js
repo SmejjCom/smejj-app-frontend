@@ -97,13 +97,30 @@ export function beobachteHuelle(doc = document) {
   return wache;
 }
 
+/**
+ * Zieht das lang-Attribut der Seite an die Oberflaechensprache. index.html traegt
+ * (Start-Lock) fest lang="de"; Diktat, Vorlesen und Sprachmodus lesen ihre Sprache
+ * aber genau daraus — Geraetetest 22.09.2026: die englische App hoerte auf Deutsch.
+ * Nur zweistellige Codes, alles andere bleibt unangetastet (fail-safe).
+ */
+export function setzeSeitenSprache(sprache, doc = document) {
+  try {
+    const code = String(sprache || "").toLowerCase().split("-")[0];
+    if (!/^[a-z]{2}$/.test(code) || !doc?.documentElement) return null;
+    doc.documentElement.lang = code;
+    return code;
+  } catch { return null; }
+}
+
 if (typeof document !== "undefined" && document.getElementById("startMessage")) {
+  setzeSeitenSprache(savedUiLanguage() || "de");
   beobachteHuelle();
   for (const ms of [1500, 4000]) setTimeout(() => uebersetzeHuelle(document.querySelector("main.shell") || document.body), ms);
   // Sobald die Sprachdatei wirklich da ist, einmal nachziehen: was vor dem
   // Nachladen gezeichnet wurde, traegt sonst bis zum naechsten Neuladen den
   // deutschen Quelltext. Kostet einen Durchlauf, spart einen Fehlbericht.
-  document.addEventListener("smejj:sprache", () => {
+  document.addEventListener("smejj:sprache", (e) => {
+    setzeSeitenSprache(e?.detail?.sprache);
     uebersetzeHuelle(document.querySelector("main.shell") || document.body);
   });
 }

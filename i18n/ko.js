@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung 한국어 (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./ko-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "음성 인식을 사용할 수 없습니다 — 아래에 질문을 입력하세요.",
+  "Spracherkennung nicht verfügbar": "음성 인식을 사용할 수 없습니다",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "아래에 질문을 입력하세요 — 답변을 소리 내어 읽어 드립니다. X 또는 Esc로 종료.",
+  "Ich höre zu ...": "듣고 있어요 ...",
+  "Ich spreche ...": "말하는 중 ...",
+  "Einen Moment ...": "잠시만요 ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "마이크가 허용되지 않았습니다 — 아래에 질문을 입력하세요.",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "이 기기에서는 음성 인식을 시작할 수 없습니다 — 아래에 질문을 입력하세요.",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "아래에 질문을 입력하세요 — 답변을 소리 내어 읽어 드립니다.",
+  "Keine Antwort erhalten — Frage unten eintippen.": "답변을 받지 못했습니다 — 아래에 질문을 입력하세요.",
+  "Keine Antwort erhalten — ich höre weiter zu.": "답변을 받지 못했습니다 — 계속 듣고 있어요.",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "이 기기에서는 음성 인식을 사용할 수 없습니다 — 입력란을 이용해 주세요.",
+  "Verbinde …": "연결 중 …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "이 기기에서는 음성 인식을 사용할 수 없습니다 — 아래에 질문을 입력하세요.",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "기기에서 바로 답변했습니다 — 서버 없이, 비용 없이.",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "페이지에서 검색",
   "Vorheriger Treffer": "이전 일치",
   "Nächster Treffer": "다음 일치",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "확인 중 …",
   "Google Login aktiv für": "Google 로그인 활성:",
   "von": "/",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "작업 공간",
   "Kostenschutz an": "비용 보호 켜짐",
   "Profilmenue": "프로필 메뉴",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "오프라인 모드",
   "Fehlerseite": "오류 페이지",
   "Fehler": "오류",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "건",
   "nichts gefunden": "찾지 못함",
   "läuft …": "진행 중 …",
   "Integrierter Browser": "내장 브라우저",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "닫기 (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "마우스에게 맡기기 — 이 브라우저를 대신 조작합니다",
   "Maus beauftragen": "마우스에게 맡기기",
   "Adressleiste und Suchleiste": "주소 및 검색 표시줄",
   "Browser anpassen und einstellen": "브라우저 맞춤 설정",
   "Browser schließen": "브라우저 닫기",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "불러오기 중지",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "검색하거나 주소를 입력하세요 — 탭은 필요한 만큼.",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "내려받기",
   "Bild im Vollbild": "전체 화면 이미지",
   "Nur Text teilen": "텍스트만 공유",
   "Vorherige Version": "이전 버전",
   "Nachricht bearbeiten": "메시지 편집",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "항목 추가",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, 스프레드시트 또는 텍스트. smejj가 읽고 당신이 질문합니다.",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "“이 계약서에 해지에 관해 뭐라고 되어 있나요?”",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "서버 동작을 꾸며내지 않습니다. 로컬 작업은 계속 가능합니다.",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "돈이 드는지, 접근이 올바른지 불분명하면 smejj.com은 멈추는 쪽을 택합니다. 당신의 자료는 그대로 남습니다.",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "숨은 비용 없음, 조용한 대체 없음, 안전하지 않은 저장 없음.",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "뒤로",
   "Schliessen und zur Startseite": "닫고 시작 화면으로",
   "Neue Unterhaltung beginnen": "새 대화 시작",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "파일 열기",
   "Speicher prüfen": "저장소 점검",
   "Browser-Bereich bereit.": "브라우저 영역 준비 완료.",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "예전 대화와 작업 찾기",
   "App oder Website Preview": "앱 또는 웹사이트 미리보기",
   "Bestätigungen und Grenzen": "확인과 한도",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "테스트, 빌드, 배포, 오류",
   "Wenn ein Auftrag fertig ist": "작업이 끝났을 때",
   "Wiederholbare Ablaufe und Agenten": "반복 가능한 절차와 에이전트",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "사진 또는 동영상 촬영",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "휴대폰·태블릿·컴퓨터의 카메라를 바로 열고 촬영한 것을 첨부합니다.",
   "Aufnehmen, fertig — smejj schaut es sich an.": "찍기만 하세요 — smejj가 살펴봅니다.",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "작업 실행",
   "Nutzer und Einstellungen": "사용자 및 설정",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "고정됨",
   "Mit Bild": "이미지 포함",
   "Mit Code": "코드 포함",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "마우스에 연결할 수 없습니다.",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "이 화면에 대한 단계가 계획에서 나오지 않았습니다.",
   "Maus fertig, kein Klick nötig": "마우스 완료, 클릭이 필요 없습니다",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "말하기",
   "Chat": "채팅",
   "Sprechen": "소리내어 말하기",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "버그 찾기",
   "Tests schreiben": "테스트 작성",
   "Funktion einbauen": "기능 추가",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — AI 및 코드 어시스턴트",
   "Agenten-Arbeitsbereich": "에이전트 작업 공간",
   "Verlauf": "기록",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "프로젝트",
   "Offline weiterarbeiten": "오프라인으로 계속 작업",
   "Das geht gerade nicht": "지금은 사용할 수 없습니다",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "도움이 됨",
   "Nicht hilfreich": "도움이 안 됨",
   "Teilen": "공유",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "감사합니다 — 신고가 접수되었으며 검토될 예정입니다.",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "신고하려면 로그인해 주세요 — 신고는 이후에 전송됩니다.",
   "Kein Netz — die Meldung wird später gesendet.": "연결 없음 — 신고는 나중에 전송됩니다.",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj는 아직 동영상을 볼 수 없습니다 — 링크만 함께 전달됩니다.",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "오디오 트랙은 아직 분석하지 않습니다 — 링크만 함께 전달됩니다.",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "PDF 내용은 아직 읽지 않습니다 — 링크만 함께 전달됩니다.",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "링크 만들기",
   "Link konnte nicht erstellt werden.": "링크를 만들지 못했습니다.",
   "Schließen": "닫기",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "내 메시지 작업",
   "Aktionen für diese Antwort": "이 답변 작업",
   "Nächste Version": "다음 버전",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "열기",
   "Projekt ändern…": "프로젝트 변경…",
   "Rückgängig": "실행 취소",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "검색",
   "Lese": "읽는 중",
   "Seite gelesen": "페이지 읽음",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "시스템 상태",
   "Hilfe & Rückmeldung": "도움말 및 피드백",
   "Abmelden": "로그아웃",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "듣고 있어요 …",
   "Ich spreche …": "말하고 있어요 …",
   "Mikrofon stumm": "마이크 음소거됨",

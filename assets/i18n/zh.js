@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung 中文 (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./zh-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "语音识别不可用 — 请在下方输入问题。",
+  "Spracherkennung nicht verfügbar": "语音识别不可用",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "请在下方输入问题 — 回答将被朗读。按 X 或 Esc 结束。",
+  "Ich höre zu ...": "我在听 ...",
+  "Ich spreche ...": "正在朗读 ...",
+  "Einen Moment ...": "请稍候 ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "麦克风未获授权 — 请在下方输入问题。",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "此设备无法启动语音识别 — 请在下方输入问题。",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "请在下方输入问题 — 回答将被朗读。",
+  "Keine Antwort erhalten — Frage unten eintippen.": "未收到回答 — 请在下方输入问题。",
+  "Keine Antwort erhalten — ich höre weiter zu.": "未收到回答 — 我继续听。",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "此设备不支持语音识别 — 请使用输入框。",
+  "Verbinde …": "正在连接 …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "此设备不支持语音识别 — 请在下方输入问题。",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "已在你的设备上作答 — 无需服务器，零成本。",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "在页面中查找",
   "Vorheriger Treffer": "上一个匹配",
   "Nächster Treffer": "下一个匹配",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "检查中 …",
   "Google Login aktiv für": "Google 登录已启用:",
   "von": "/",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "工作区",
   "Kostenschutz an": "费用保护已开启",
   "Profilmenue": "个人资料菜单",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "离线模式",
   "Fehlerseite": "错误页面",
   "Fehler": "错误",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "条结果",
   "nichts gefunden": "未找到",
   "läuft …": "进行中 …",
   "Integrierter Browser": "内置浏览器",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "关闭 (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "交给鼠标 — 由它操作这个浏览器",
   "Maus beauftragen": "交给鼠标",
   "Adressleiste und Suchleiste": "地址栏与搜索栏",
   "Browser anpassen und einstellen": "自定义并设置浏览器",
   "Browser schließen": "关闭浏览器",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "停止加载",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "搜索或输入网址 — 标签页想开多少就开多少。",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "下载",
   "Bild im Vollbild": "全屏图片",
   "Nur Text teilen": "仅分享文本",
   "Vorherige Version": "上一版本",
   "Nachricht bearbeiten": "编辑消息",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "添加内容",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF、Word、表格或文本。smejj 读完，你来提问。",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "“这份合同对解约是怎么写的？”",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "不会伪装任何服务器操作。本地工作依然可行。",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "当不清楚某件事是否花钱、某个访问是否有效时，smejj.com 宁可停下。你的内容保持原样。",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "没有隐藏费用，没有静默回退，没有不安全的存储。",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "返回",
   "Schliessen und zur Startseite": "关闭并回到首页",
   "Neue Unterhaltung beginnen": "开始新对话",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "打开文件",
   "Speicher prüfen": "检查存储",
   "Browser-Bereich bereit.": "浏览器区域已就绪。",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "查找旧对话和任务",
   "App oder Website Preview": "应用或网站预览",
   "Bestätigungen und Grenzen": "确认与上限",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "测试、构建、部署与错误",
   "Wenn ein Auftrag fertig ist": "任务完成时",
   "Wiederholbare Ablaufe und Agenten": "可重复的流程与智能体",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "拍照或录像",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "直接打开相机 —— 手机、平板或电脑 —— 并附上拍摄内容。",
   "Aufnehmen, fertig — smejj schaut es sich an.": "拍完就行 —— smejj 会看一看。",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "运行任务",
   "Nutzer und Einstellungen": "用户与设置",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "已置顶",
   "Mit Bild": "含图片",
   "Mit Code": "含代码",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "无法连接鼠标。",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "计划中没有适用于此视图的步骤。",
   "Maus fertig, kein Klick nötig": "鼠标完成，无需点击",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "说话",
   "Chat": "聊天",
   "Sprechen": "朗读交流",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "查找错误",
   "Tests schreiben": "编写测试",
   "Funktion einbauen": "添加功能",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — AI 与代码助手",
   "Agenten-Arbeitsbereich": "智能体工作区",
   "Verlauf": "历史记录",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "项目",
   "Offline weiterarbeiten": "离线继续工作",
   "Das geht gerade nicht": "暂时无法使用",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "有帮助",
   "Nicht hilfreich": "没有帮助",
   "Teilen": "分享",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "谢谢 — 举报已收到，我们会进行审核。",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "请先登录再举报 — 登录后举报将自动发送。",
   "Kein Netz — die Meldung wird später gesendet.": "无网络 — 举报将稍后发送。",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj 还不能观看视频 —— 只会带上链接。",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "音轨还不能分析 —— 只会带上链接。",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "PDF 内容还不能读取 —— 只会带上链接。",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "创建链接",
   "Link konnte nicht erstellt werden.": "无法创建链接。",
   "Schließen": "关闭",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "你的消息操作",
   "Aktionen für diese Antwort": "此回答的操作",
   "Nächste Version": "下一个版本",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "打开",
   "Projekt ändern…": "更改项目…",
   "Rückgängig": "撤销",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "搜索",
   "Lese": "正在阅读",
   "Seite gelesen": "已读页面",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "系统状态",
   "Hilfe & Rückmeldung": "帮助与反馈",
   "Abmelden": "退出登录",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "正在聆听 …",
   "Ich spreche …": "正在说话 …",
   "Mikrofon stumm": "麦克风已静音",

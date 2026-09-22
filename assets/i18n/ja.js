@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung 日本語 (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./ja-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "音声認識を利用できません — 下に質問を入力してください。",
+  "Spracherkennung nicht verfügbar": "音声認識を利用できません",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "下に質問を入力してください — 回答を読み上げます。X または Escape で終了。",
+  "Ich höre zu ...": "聞いています ...",
+  "Ich spreche ...": "話しています ...",
+  "Einen Moment ...": "少々お待ちください ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "マイクが許可されていません — 下に質問を入力してください。",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "この端末では音声認識を開始できません — 下に質問を入力してください。",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "下に質問を入力してください — 回答を読み上げます。",
+  "Keine Antwort erhalten — Frage unten eintippen.": "回答を受け取れませんでした — 下に質問を入力してください。",
+  "Keine Antwort erhalten — ich höre weiter zu.": "回答を受け取れませんでした — 引き続き聞いています。",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "この端末では音声認識を利用できません — 入力欄をご利用ください。",
+  "Verbinde …": "接続中 …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "この端末では音声認識を利用できません — 下に質問を入力してください。",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "お使いのデバイス上で回答しました — サーバーなし、費用なし。",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "ページ内を検索",
   "Vorheriger Treffer": "前の一致",
   "Nächster Treffer": "次の一致",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "確認中 …",
   "Google Login aktiv für": "Google ログイン有効:",
   "von": "／",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "ワークスペース",
   "Kostenschutz an": "コスト保護オン",
   "Profilmenue": "プロフィールメニュー",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "オフラインモード",
   "Fehlerseite": "エラーページ",
   "Fehler": "エラー",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "件",
   "nichts gefunden": "見つかりません",
   "läuft …": "実行中 …",
   "Integrierter Browser": "内蔵ブラウザー",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "閉じる (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "マウスに任せる — このブラウザーを操作します",
   "Maus beauftragen": "マウスに任せる",
   "Adressleiste und Suchleiste": "アドレスバー兼検索バー",
   "Browser anpassen und einstellen": "ブラウザーをカスタマイズして設定",
   "Browser schließen": "ブラウザーを閉じる",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "読み込みを中止",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "検索するかアドレスを入力 — 必要なだけタブを開けます。",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "ダウンロード",
   "Bild im Vollbild": "全画面の画像",
   "Nur Text teilen": "テキストのみ共有",
   "Vorherige Version": "前のバージョン",
   "Nachricht bearbeiten": "メッセージを編集",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "ものを追加",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF、Word、表計算、テキスト。smejj が読み、あなたが質問します。",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "「この契約の解約について何と書いてありますか？」",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "サーバーの動作を装うことはありません。ローカルの作業は引き続き可能です。",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "費用がかかるかどうか、アクセスが正しいかどうかが不明なとき、smejj.com は止まる方を選びます。あなたのものはそのままです。",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "隠れた費用なし、黙ったフォールバックなし、危険な保存なし。",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "戻る",
   "Schliessen und zur Startseite": "閉じてホームへ",
   "Neue Unterhaltung beginnen": "新しい会話を始める",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "ファイルを開く",
   "Speicher prüfen": "ストレージを確認",
   "Browser-Bereich bereit.": "ブラウザ領域の準備完了。",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "古いチャットやタスクを探す",
   "App oder Website Preview": "アプリやウェブサイトのプレビュー",
   "Bestätigungen und Grenzen": "確認と上限",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "テスト・ビルド・デプロイ・エラー",
   "Wenn ein Auftrag fertig ist": "タスクが終わったとき",
   "Wiederholbare Ablaufe und Agenten": "繰り返せる手順とエージェント",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "写真や動画を撮る",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "スマホ・タブレット・パソコンのカメラを直接開き、撮ったものを添付します。",
   "Aufnehmen, fertig — smejj schaut es sich an.": "撮るだけ — あとは smejj が見ます。",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "タスクを実行",
   "Nutzer und Einstellungen": "ユーザーと設定",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "ピン留め",
   "Mit Bild": "画像あり",
   "Mit Code": "コードあり",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "マウスに接続できません。",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "この画面に対する手順が計画から得られませんでした。",
   "Maus fertig, kein Klick nötig": "マウス完了、クリックは不要です",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "話す",
   "Chat": "チャット",
   "Sprechen": "声で話す",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "バグを探す",
   "Tests schreiben": "テストを書く",
   "Funktion einbauen": "機能を追加",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — AI・コードアシスタント",
   "Agenten-Arbeitsbereich": "エージェントのワークスペース",
   "Verlauf": "履歴",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "プロジェクト",
   "Offline weiterarbeiten": "オフラインで作業を続ける",
   "Das geht gerade nicht": "現在ご利用いただけません",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "役に立った",
   "Nicht hilfreich": "役に立たなかった",
   "Teilen": "共有",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "ありがとうございます。報告を受け付けました。確認いたします。",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "報告するにはログインしてください。報告はその後に送信されます。",
   "Kein Netz — die Meldung wird später gesendet.": "接続がありません。報告は後で送信されます。",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj はまだ動画を見られません — 参照だけを渡します。",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "音声トラックはまだ解析できません — 参照だけを渡します。",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "PDF の中身はまだ読めません — 参照だけを渡します。",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "リンクを作成",
   "Link konnte nicht erstellt werden.": "リンクを作成できませんでした。",
   "Schließen": "閉じる",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "あなたのメッセージの操作",
   "Aktionen für diese Antwort": "この回答の操作",
   "Nächste Version": "次のバージョン",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "開く",
   "Projekt ändern…": "プロジェクトを変更…",
   "Rückgängig": "元に戻す",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "検索",
   "Lese": "読み込み中",
   "Seite gelesen": "ページを読みました",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "システムの状態",
   "Hilfe & Rückmeldung": "ヘルプとフィードバック",
   "Abmelden": "ログアウト",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "聞いています …",
   "Ich spreche …": "話しています …",
   "Mikrofon stumm": "マイクはミュート中",

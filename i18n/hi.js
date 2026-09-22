@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung हिन्दी (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./hi-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "वाक् पहचान उपलब्ध नहीं — अपना प्रश्न नीचे लिखें।",
+  "Spracherkennung nicht verfügbar": "वाक् पहचान उपलब्ध नहीं",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "अपना प्रश्न नीचे लिखें — उत्तर ज़ोर से पढ़ा जाएगा। X या Escape से बंद करें।",
+  "Ich höre zu ...": "मैं सुन रहा हूँ ...",
+  "Ich spreche ...": "बोल रहा हूँ ...",
+  "Einen Moment ...": "एक क्षण ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "माइक्रोफ़ोन की अनुमति नहीं — अपना प्रश्न नीचे लिखें।",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "इस डिवाइस पर वाक् पहचान शुरू नहीं होती — अपना प्रश्न नीचे लिखें।",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "अपना प्रश्न नीचे लिखें — उत्तर ज़ोर से पढ़ा जाएगा।",
+  "Keine Antwort erhalten — Frage unten eintippen.": "कोई उत्तर नहीं मिला — अपना प्रश्न नीचे लिखें।",
+  "Keine Antwort erhalten — ich höre weiter zu.": "कोई उत्तर नहीं मिला — मैं सुनता रहूँगा।",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "इस डिवाइस पर वाक् पहचान उपलब्ध नहीं — कृपया इनपुट फ़ील्ड का उपयोग करें।",
+  "Verbinde …": "कनेक्ट हो रहा है …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "इस डिवाइस पर वाक् पहचान उपलब्ध नहीं — अपना प्रश्न नीचे लिखें।",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "आपके डिवाइस पर ही उत्तर दिया गया — न सर्वर, न कोई लागत।",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "पेज पर खोजें",
   "Vorheriger Treffer": "पिछला मिलान",
   "Nächster Treffer": "अगला मिलान",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "जाँच जारी …",
   "Google Login aktiv für": "Google लॉगिन सक्रिय:",
   "von": "में से",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "कार्यक्षेत्र",
   "Kostenschutz an": "लागत सुरक्षा चालू",
   "Profilmenue": "प्रोफ़ाइल मेन्यू",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "ऑफ़लाइन मोड",
   "Fehlerseite": "त्रुटि पृष्ठ",
   "Fehler": "त्रुटि",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "परिणाम",
   "nichts gefunden": "कुछ नहीं मिला",
   "läuft …": "चल रहा है …",
   "Integrierter Browser": "अंतर्निहित ब्राउज़र",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "बंद करें (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "माउस को सौंपें — यह इस ब्राउज़र को चलाता है",
   "Maus beauftragen": "माउस को सौंपें",
   "Adressleiste und Suchleiste": "पता और खोज बार",
   "Browser anpassen und einstellen": "ब्राउज़र को अनुकूलित और कॉन्फ़िगर करें",
   "Browser schließen": "ब्राउज़र बंद करें",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "लोड करना रोकें",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "खोजें या पता दर्ज करें — जितने टैब चाहिए उतने।",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "डाउनलोड",
   "Bild im Vollbild": "पूर्ण स्क्रीन में छवि",
   "Nur Text teilen": "केवल टेक्स्ट साझा करें",
   "Vorherige Version": "पिछला संस्करण",
   "Nachricht bearbeiten": "संदेश संपादित करें",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "चीज़ें जोड़ें",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, स्प्रेडशीट या टेक्स्ट। smejj उन्हें पढ़ता है और आप सवाल पूछते हैं।",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "“इस अनुबंध में रद्द करने के बारे में क्या लिखा है?”",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "किसी सर्वर कार्रवाई का दिखावा नहीं किया जाता। स्थानीय काम संभव रहता है।",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "जब यह स्पष्ट न हो कि किसी चीज़ में पैसा लगता है या कोई पहुँच सही है, तो smejj.com रुकना पसंद करता है। आपकी चीज़ें अछूती रहती हैं।",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "कोई छिपी लागत नहीं, कोई चुपचाप विकल्प नहीं, कोई असुरक्षित संग्रहण नहीं।",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "वापस",
   "Schliessen und zur Startseite": "बंद करें और होम पर जाएँ",
   "Neue Unterhaltung beginnen": "नई बातचीत शुरू करें",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "फ़ाइलें खोलें",
   "Speicher prüfen": "संग्रहण जाँचें",
   "Browser-Bereich bereit.": "ब्राउज़र क्षेत्र तैयार।",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "पुरानी बातचीत और कार्य ढूँढें",
   "App oder Website Preview": "ऐप या वेबसाइट का पूर्वावलोकन",
   "Bestätigungen und Grenzen": "पुष्टियाँ और सीमाएँ",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "टेस्ट, बिल्ड, डिप्लॉय और त्रुटियाँ",
   "Wenn ein Auftrag fertig ist": "जब कोई कार्य पूरा हो",
   "Wiederholbare Ablaufe und Agenten": "दोहराए जाने योग्य प्रवाह और एजेंट",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "फ़ोटो या वीडियो लें",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "कैमरा सीधे खोलता है — फ़ोन, टैबलेट या कंप्यूटर पर — और रिकॉर्डिंग जोड़ देता है।",
   "Aufnehmen, fertig — smejj schaut es sich an.": "बस रिकॉर्ड करें — smejj देख लेगा।",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "कार्य चलाएँ",
   "Nutzer und Einstellungen": "उपयोगकर्ता और सेटिंग्स",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "पिन किया",
   "Mit Bild": "छवि सहित",
   "Mit Code": "कोड सहित",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "माउस उपलब्ध नहीं।",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "इस दृश्य के लिए योजना से कोई चरण नहीं निकला।",
   "Maus fertig, kein Klick nötig": "माउस तैयार, क्लिक की ज़रूरत नहीं",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "बोलना",
   "Chat": "चैट",
   "Sprechen": "आवाज़ में बात",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "बग खोजें",
   "Tests schreiben": "टेस्ट लिखें",
   "Funktion einbauen": "फ़ीचर जोड़ें",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — एआई और कोड सहायक",
   "Agenten-Arbeitsbereich": "एजेंट कार्यक्षेत्र",
   "Verlauf": "इतिहास",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "प्रोजेक्ट",
   "Offline weiterarbeiten": "ऑफ़लाइन काम जारी रखें",
   "Das geht gerade nicht": "यह अभी काम नहीं कर रहा",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "सहायक",
   "Nicht hilfreich": "सहायक नहीं",
   "Teilen": "साझा करें",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "धन्यवाद — आपकी रिपोर्ट मिल गई है और उसकी समीक्षा की जाएगी।",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "रिपोर्ट करने के लिए कृपया साइन इन करें — रिपोर्ट उसके बाद भेजी जाएगी।",
   "Kein Netz — die Meldung wird später gesendet.": "कनेक्शन नहीं है — रिपोर्ट बाद में भेजी जाएगी।",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj अभी वीडियो नहीं देख सकता — संदर्भ साथ भेजा जाता है।",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "ऑडियो ट्रैक अभी नहीं पढ़ा जाता — संदर्भ साथ भेजा जाता है।",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "PDF की सामग्री अभी नहीं पढ़ी जाती — संदर्भ साथ भेजा जाता है।",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "लिंक बनाएँ",
   "Link konnte nicht erstellt werden.": "लिंक नहीं बनाया जा सका।",
   "Schließen": "बंद करें",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "आपके संदेश की क्रियाएँ",
   "Aktionen für diese Antwort": "इस उत्तर की क्रियाएँ",
   "Nächste Version": "अगला संस्करण",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "खोलें",
   "Projekt ändern…": "प्रोजेक्ट बदलें…",
   "Rückgängig": "पूर्ववत करें",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "खोज",
   "Lese": "पढ़ रहे हैं",
   "Seite gelesen": "पेज पढ़ा",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "सिस्टम स्थिति",
   "Hilfe & Rückmeldung": "मदद और प्रतिक्रिया",
   "Abmelden": "साइन आउट",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "मैं सुन रहा हूँ …",
   "Ich spreche …": "मैं बोल रहा हूँ …",
   "Mikrofon stumm": "माइक्रोफ़ोन म्यूट",

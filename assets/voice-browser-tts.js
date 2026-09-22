@@ -8,10 +8,14 @@
 
 export function createBrowserTts({ lang, base, supported } = {}) {
   let unlocked = false;
+  // lang/base duerfen Funktionen sein: die Oberflaechensprache steht erst zur Laufzeit fest
+  // (Geraetetest 22.09.2026: fest beim Laden = immer de-DE, auch in der englischen App).
+  const langNow = () => (typeof lang === "function" ? lang() : lang);
+  const baseNow = () => (typeof base === "function" ? base() : (base || String(langNow() || "").split("-")[0]));
 
   const pickVoice = () => {
     const voices = window.speechSynthesis.getVoices() || [];
-    const matching = voices.filter((v) => v.lang === lang || (v.lang || "").startsWith(base));
+    const matching = voices.filter((v) => v.lang === langNow() || (v.lang || "").startsWith(baseNow()));
     if (matching.length === 0) return null;
     // Bevorzuge natürliche/neuronale Premium-Stimmen (Natural, Neural, Enhanced, Google) für menschlichen Klang:
     const natural = matching.find((v) => /\b(natural|neural|premium|enhanced|google)\b/i.test(v.name));
@@ -28,7 +32,7 @@ export function createBrowserTts({ lang, base, supported } = {}) {
       }
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
+      utterance.lang = langNow();
       const voice = pickVoice();
       if (voice) utterance.voice = voice;
       utterance.onstart = () => onstart?.();

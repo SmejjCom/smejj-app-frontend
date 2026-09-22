@@ -1,10 +1,23 @@
 // smejj.com — UI-Uebersetzung বাংলা (Quellsprache Deutsch als Schluessel).
+// Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel; die Datei stand bei 808) — die Herkunft jedes Schluessels steht im Git-Verlauf. Naechster Nachtrag: Datei VORHER aufteilen.
 import zusatz from "./bn-2.js?v=9";
 
 export default {
-  // Geraetemodell-Hinweis (Desktop-Test 21.09.2026): stand fest deutsch unter jeder lokalen Antwort
+  "Spracherkennung nicht verfügbar — Frage unten eintippen.": "কণ্ঠস্বর শনাক্তকরণ উপলব্ধ নয় — নিচে আপনার প্রশ্ন লিখুন।",
+  "Spracherkennung nicht verfügbar": "কণ্ঠস্বর শনাক্তকরণ উপলব্ধ নয়",
+  "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "নিচে আপনার প্রশ্ন লিখুন — উত্তর জোরে পড়ে শোনানো হবে। X বা Escape দিয়ে বন্ধ করুন।",
+  "Ich höre zu ...": "আমি শুনছি ...",
+  "Ich spreche ...": "বলছি ...",
+  "Einen Moment ...": "এক মুহূর্ত ...",
+  "Mikrofon nicht erlaubt — Frage unten eintippen.": "মাইক্রোফোনের অনুমতি নেই — নিচে আপনার প্রশ্ন লিখুন।",
+  "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "এই ডিভাইসে কণ্ঠস্বর শনাক্তকরণ চালু হচ্ছে না — নিচে আপনার প্রশ্ন লিখুন।",
+  "Frage unten eintippen — die Antwort wird vorgelesen.": "নিচে আপনার প্রশ্ন লিখুন — উত্তর জোরে পড়ে শোনানো হবে।",
+  "Keine Antwort erhalten — Frage unten eintippen.": "কোনো উত্তর পাওয়া যায়নি — নিচে আপনার প্রশ্ন লিখুন।",
+  "Keine Antwort erhalten — ich höre weiter zu.": "কোনো উত্তর পাওয়া যায়নি — আমি শুনতে থাকছি।",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — bitte das Eingabefeld nutzen.": "এই ডিভাইসে কণ্ঠস্বর শনাক্তকরণ উপলব্ধ নয় — অনুগ্রহ করে ইনপুট ঘর ব্যবহার করুন।",
+  "Verbinde …": "সংযোগ হচ্ছে …",
+  "Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.": "এই ডিভাইসে কণ্ঠস্বর শনাক্তকরণ উপলব্ধ নয় — নিচে আপনার প্রশ্ন লিখুন।",
   "Auf deinem Gerät beantwortet — ohne Server, ohne Kosten.": "আপনার ডিভাইসেই উত্তর দেওয়া হয়েছে — সার্ভার ছাড়া, খরচ ছাড়া।",
-  // Browser-Suche, Speicherstatus, Google-Anmeldung (21.09.2026)
   "Auf der Seite suchen": "পৃষ্ঠায় খুঁজুন",
   "Vorheriger Treffer": "আগের মিল",
   "Nächster Treffer": "পরের মিল",
@@ -12,7 +25,6 @@ export default {
   "wird geprüft …": "যাচাই চলছে …",
   "Google Login aktiv für": "Google লগইন সক্রিয়:",
   "von": "এর মধ্যে",
-  // Huelle: letzte Runde der A-bis-Z-Pruefung (20.09.2026)
   "Arbeitsbereiche": "কর্মক্ষেত্র",
   "Kostenschutz an": "খরচ সুরক্ষা চালু",
   "Profilmenue": "প্রোফাইল মেনু",
@@ -69,28 +81,23 @@ export default {
   "Offline-Modus": "অফলাইন মোড",
   "Fehlerseite": "ত্রুটির পৃষ্ঠা",
   "Fehler": "ত্রুটি",
-  // Schrittzeilen und Browser-Fenster (Stufe 5f, 20.09.2026)
   "Treffer": "ফলাফল",
   "nichts gefunden": "কিছু পাওয়া যায়নি",
   "läuft …": "চলছে …",
   "Integrierter Browser": "অন্তর্নির্মিত ব্রাউজার",
-  // Browser-Fenster: Tooltips und aria (Stufe 5e, 20.09.2026)
   "Schließen (⌘W)": "বন্ধ করুন (⌘W)",
   "Maus beauftragen — sie bedient diesen Browser": "মাউসকে দায়িত্ব দিন — এটি এই ব্রাউজার চালায়",
   "Maus beauftragen": "মাউসকে দায়িত্ব দিন",
   "Adressleiste und Suchleiste": "ঠিকানা ও অনুসন্ধান বার",
   "Browser anpassen und einstellen": "ব্রাউজার কাস্টমাইজ ও কনফিগার করুন",
   "Browser schließen": "ব্রাউজার বন্ধ করুন",
-  // Browser-Fenster, Reste (Stufe 5d, 20.09.2026)
   "Laden abbrechen": "লোড করা থামান",
   "Suchen oder URL eingeben — so viele Tabs, wie du brauchst.": "খুঁজুন বা ঠিকানা লিখুন — যত ট্যাব দরকার তত।",
-  // Vollbild-Bild und Antwortleiste (Stufe 5c, 20.09.2026)
   "Herunterladen": "ডাউনলোড",
   "Bild im Vollbild": "পূর্ণ পর্দায় ছবি",
   "Nur Text teilen": "শুধু লেখা শেয়ার করুন",
   "Vorherige Version": "আগের সংস্করণ",
   "Nachricht bearbeiten": "বার্তা সম্পাদনা করুন",
-  // Huelle und Ansichten, Rest (Stufe 5b, 20.09.2026)
   "Sachen hinzufügen": "জিনিস যোগ করুন",
   "PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.": "PDF, Word, স্প্রেডশিট বা টেক্সট। smejj সেগুলো পড়ে আর আপনি প্রশ্ন করেন।",
   "„Was steht in diesem Vertrag zum Kündigen?\"": "“এই চুক্তিতে বাতিল করা নিয়ে কী লেখা আছে?”",
@@ -136,7 +143,6 @@ export default {
   "Keine Server-Aktion wird vorgetäuscht. Lokale Arbeit bleibt möglich.": "কোনো সার্ভার ক্রিয়ার ভান করা হয় না। স্থানীয় কাজ সম্ভব থাকে।",
   "Wenn unklar ist, ob etwas Geld kostet oder ob ein Zugang stimmt, hält smejj.com lieber an. Deine Sachen bleiben unberührt.": "কোনো কিছুতে খরচ হবে কি না বা কোনো প্রবেশাধিকার ঠিক কি না অস্পষ্ট হলে smejj.com থেমে যাওয়াই বেছে নেয়। আপনার জিনিস অক্ষত থাকে।",
   "Keine versteckten Kosten, keine stillen Fallbacks, keine unsichere Speicherung.": "কোনো লুকানো খরচ নেই, কোনো নীরব বিকল্প নেই, কোনো অনিরাপদ সংরক্ষণ নেই।",
-  // Ansichts-Inhalte (Stufe 5, 20.09.2026)
   "Zurueck": "ফিরে যান",
   "Schliessen und zur Startseite": "বন্ধ করে হোমে যান",
   "Neue Unterhaltung beginnen": "নতুন কথোপকথন শুরু করুন",
@@ -208,7 +214,6 @@ export default {
   "Dateien öffnen": "ফাইল খুলুন",
   "Speicher prüfen": "সংরক্ষণ যাচাই করুন",
   "Browser-Bereich bereit.": "ব্রাউজার এলাকা প্রস্তুত।",
-  // Einstellungen und Suche (Stufe 4, 20.09.2026)
   "Alte Chats und Aufgaben finden": "পুরোনো কথোপকথন ও কাজ খুঁজুন",
   "App oder Website Preview": "অ্যাপ বা ওয়েবসাইটের প্রিভিউ",
   "Bestätigungen und Grenzen": "নিশ্চিতকরণ ও সীমা",
@@ -239,7 +244,6 @@ export default {
   "Tests, Build, Deploy und Fehler": "টেস্ট, বিল্ড, ডিপ্লয় ও ত্রুটি",
   "Wenn ein Auftrag fertig ist": "যখন কোনো কাজ শেষ হয়",
   "Wiederholbare Ablaufe und Agenten": "পুনরাবৃত্তিযোগ্য প্রবাহ ও এজেন্ট",
-  // Werkzeugmenue der Huelle (Hinweis der Parallelsitzung, 20.09.2026)
   "Foto oder Video aufnehmen": "ছবি বা ভিডিও তুলুন",
   "Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.": "ক্যামেরা সরাসরি খোলে — ফোন, ট্যাবলেট বা কম্পিউটারে — এবং রেকর্ডিং যুক্ত করে।",
   "Aufnehmen, fertig — smejj schaut es sich an.": "শুধু তুলুন — smejj দেখে নেবে।",
@@ -268,7 +272,6 @@ export default {
   "Auftrag laufen lassen": "কাজ চালান",
   "Nutzer und Einstellungen": "ব্যবহারকারী ও সেটিংস",
   ...zusatz,
-  // Verlauf, Browser-Fenster und Maus (Stufe 3, 20.09.2026)
   "Angeheftet": "পিন করা",
   "Mit Bild": "ছবিসহ",
   "Mit Code": "কোডসহ",
@@ -325,7 +328,6 @@ export default {
   "Maus nicht erreichbar.": "মাউসে পৌঁছানো যাচ্ছে না।",
   "Aus dem Plan ergab sich kein Schritt für diese Ansicht.": "এই দৃশ্যের জন্য পরিকল্পনায় কোনো ধাপ পাওয়া যায়নি।",
   "Maus fertig, kein Klick nötig": "মাউস শেষ, ক্লিকের দরকার নেই",
-  // App-Huelle (Stufe 2, 20.09.2026)
   "Reden": "কথা বলা",
   "Chat": "চ্যাট",
   "Sprechen": "সশব্দে বলা",
@@ -381,7 +383,6 @@ export default {
   "Fehler suchen": "ত্রুটি খুঁজুন",
   "Tests schreiben": "টেস্ট লিখুন",
   "Funktion einbauen": "ফিচার যোগ করুন",
-  // Seitentitel und Ueberschriften der Ansichten (20.09.2026): blieben in jeder Sprache deutsch.
   "smejj.com — KI- und Code-Assistent": "smejj.com — এআই ও কোড সহকারী",
   "Agenten-Arbeitsbereich": "এজেন্ট কর্মক্ষেত্র",
   "Verlauf": "ইতিহাস",
@@ -394,7 +395,6 @@ export default {
   "Projekte": "প্রকল্প",
   "Offline weiterarbeiten": "অফলাইনে কাজ চালিয়ে যান",
   "Das geht gerade nicht": "এটি এখন কাজ করছে না",
-  // Nachrichten-Menue und "Inhalt melden" (Geraetetest 20.09.2026): blieben in jeder Sprache deutsch.
   "Hilfreich": "সহায়ক",
   "Nicht hilfreich": "সহায়ক নয়",
   "Teilen": "শেয়ার করুন",
@@ -426,7 +426,6 @@ export default {
   "Danke — die Meldung ist angekommen und wird geprüft.": "ধন্যবাদ — আপনার রিপোর্ট পাওয়া গেছে এবং পর্যালোচনা করা হবে।",
   "Zum Melden bitte anmelden — die Meldung wird danach gesendet.": "রিপোর্ট করতে অনুগ্রহ করে সাইন ইন করুন — রিপোর্ট পরে পাঠানো হবে।",
   "Kein Netz — die Meldung wird später gesendet.": "সংযোগ নেই — রিপোর্ট পরে পাঠানো হবে।",
-  // Chat-Oberflaeche (Stufe 1b, 20.09.2026)
   "smejj kann Videos noch nicht ansehen — der Verweis geht mit.": "smejj এখনও ভিডিও দেখতে পারে না — কেবল রেফারেন্স পাঠানো হয়।",
   "Tonspur wird noch nicht ausgewertet — der Verweis geht mit.": "অডিও ট্র্যাক এখনও বিশ্লেষণ করা হয় না — কেবল রেফারেন্স পাঠানো হয়।",
   "PDF-Inhalt wird noch nicht gelesen — der Verweis geht mit.": "PDF-এর বিষয়বস্তু এখনও পড়া হয় না — কেবল রেফারেন্স পাঠানো হয়।",
@@ -456,7 +455,6 @@ export default {
   "Link erstellen": "লিংক তৈরি করুন",
   "Link konnte nicht erstellt werden.": "লিংক তৈরি করা যায়নি।",
   "Schließen": "বন্ধ করুন",
-  // Chat-Oberflaeche (Stufe 1, 20.09.2026)
   "Aktionen für deine Nachricht": "আপনার বার্তার ক্রিয়া",
   "Aktionen für diese Antwort": "এই উত্তরের ক্রিয়া",
   "Nächste Version": "পরবর্তী সংস্করণ",
@@ -477,8 +475,6 @@ export default {
   "Öffnen": "খুলুন",
   "Projekt ändern…": "প্রকল্প পরিবর্তন…",
   "Rückgängig": "পূর্বাবস্থায় ফিরুন",
-  // Oberflaechen-Reste (20.09.2026): Schrittzeile, Arbeitsflaechen-Karte,
-  // Erste Fuehrung und Profilmenue liefen bis dahin fest auf Deutsch.
   "Suche": "অনুসন্ধান",
   "Lese": "পড়া হচ্ছে",
   "Seite gelesen": "পৃষ্ঠা পড়া হয়েছে",
@@ -513,7 +509,6 @@ export default {
   "Systemzustand": "সিস্টেমের অবস্থা",
   "Hilfe & Rückmeldung": "সাহায্য ও মতামত",
   "Abmelden": "সাইন আউট",
-  // Sprachmodus (20.09.2026): die Texte des Overlays laufen jetzt ueber t().
   "Ich höre zu …": "আমি শুনছি …",
   "Ich spreche …": "আমি বলছি …",
   "Mikrofon stumm": "মাইক্রোফোন মিউট",

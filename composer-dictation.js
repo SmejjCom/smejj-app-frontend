@@ -80,7 +80,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
   function starteErkennung(s) {
     if (!s.aktiv || sitzung !== s) return;
     const rec = new RecognitionCtor();
-    rec.lang = lang;
+    rec.lang = typeof lang === "function" ? lang() : lang; // Funktion = Sprache JETZT (Oberflaechensprache kann wechseln)
     rec.continuous = true;
     rec.interimResults = true;
     rec.maxAlternatives = 1;
