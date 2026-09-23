@@ -4,6 +4,14 @@
 import zusatz from "./ko-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "smejj 개선에 도움 주기",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "켜기 전까지는 꺼져 있습니다. 켜면 좋아요를 누른 질문과 답변이 이름 없이 자체 모델 smejj 1 학습에 사용될 수 있습니다. 언제든지 다시 끌 수 있습니다.",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "끄면 새로운 것은 추가되지 않으며, 이전에 표시한 답변도 더 이상 학습에 사용되지 않습니다.",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "고마워요! smejj가 이런 답변에서 배워도 될까요?",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "동의한 경우에만: 질문과 답변이 이름 없이 저장되어 자체 모델 smejj 1 개선에 쓰입니다. 언제든지 끌 수 있습니다.",
+  "Einstellung öffnen": "설정 열기",
+  "Nein danke": "괜찮아요",
   ...zusatz,
   "Angeheftet": "고정됨",
   "Mit Bild": "이미지 포함",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "이메일 계정에는 개별 원격 해지가 가능한 서버 측 세션 목록이 있습니다(아래). 상태 없는 Google/패스키 세션은 만료되거나 기기에서 로그아웃하면 종료됩니다.",
   "Memory aus verifizierten Ergebnissen": "검증된 결과만 메모리에 저장",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "성공적으로 검증된 솔루션만. 학습 허용 없음.",
-  "Modelltraining erlauben": "모델 학습 허용",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "기본적으로 꺼짐. 로컬 선택은 서버 측 서명된 동의를 대체하지 않습니다.",
   "Diagnosedaten lokal aufbewahren": "진단 데이터를 로컬에 보관",
   "Keine automatische Übertragung.": "자동 전송 없음.",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "인증, 최신 개인정보 처리방침, 서명된 IDrive e2 동의 원장이 완전히 갖춰질 때까지 학습은 fail-closed로 유지됩니다.",
   "Dateien lesen": "파일 읽기",
   "Projektbezogen": "프로젝트 범위 내",
   "Dateien schreiben": "파일 쓰기",

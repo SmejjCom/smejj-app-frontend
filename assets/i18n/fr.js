@@ -4,6 +4,14 @@
 import zusatz from "./fr-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "Aider à améliorer smejj",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Désactivé tant que tu ne l’actives pas. Ensuite, les questions et réponses que tu marques d’un pouce levé pourront servir, sans ton nom, à entraîner notre propre modèle smejj 1. Tu peux le désactiver à tout moment.",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "Si tu le désactives, plus rien de nouveau n’est ajouté et les réponses marquées auparavant ne servent plus à aucun entraînement.",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "Merci ! smejj peut-il apprendre de réponses comme celle-ci ?",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Uniquement avec ton accord : la question et la réponse sont enregistrées sans ton nom et aident à améliorer notre propre modèle smejj 1. Désactivable à tout moment.",
+  "Einstellung öffnen": "Ouvrir le réglage",
+  "Nein danke": "Non merci",
   ...zusatz,
   "Angeheftet": "Épinglé",
   "Mit Bild": "Avec image",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "Les comptes e-mail disposent d'une liste de sessions côté serveur avec révocation individuelle à distance (ci-dessous). Les sessions sans état Google/passkey se terminent à expiration ou à la déconnexion de l'appareil.",
   "Memory aus verifizierten Ergebnissen": "Mémoire issue de résultats vérifiés",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "Uniquement des solutions vérifiées avec succès ; aucune autorisation d'entraînement.",
-  "Modelltraining erlauben": "Autoriser l'entraînement du modèle",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "Désactivé par défaut. Un choix local ne remplace pas un consentement signé côté serveur.",
   "Diagnosedaten lokal aufbewahren": "Conserver les données de diagnostic localement",
   "Keine automatische Übertragung.": "Aucune transmission automatique.",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "L'entraînement reste fail-closed tant que l'authentification, la politique de confidentialité en vigueur et le registre de consentement signé sur IDrive e2 ne sont pas entièrement disponibles.",
   "Dateien lesen": "Lire les fichiers",
   "Projektbezogen": "Limité au projet",
   "Dateien schreiben": "Écrire les fichiers",

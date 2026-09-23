@@ -4,6 +4,14 @@
 import zusatz from "./en-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "Help improve smejj",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Off until you turn it on. Then questions and answers you mark with a thumbs up may be used, without your name, to train our own model smejj 1. You can turn it off again at any time.",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "If you turn it off, nothing new is added, and the answers you marked before are no longer used for any training.",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "Thanks! May smejj learn from answers like this?",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Only with your yes: the question and answer are stored without your name and help improve our own model smejj 1. You can turn it off at any time.",
+  "Einstellung öffnen": "Open setting",
+  "Nein danke": "No thanks",
   ...zusatz,
   "Angeheftet": "Pinned",
   "Mit Bild": "With image",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "Email accounts have a server-side session list with individual remote revocation (below). Stateless Google/passkey sessions end on expiry or device sign-out.",
   "Memory aus verifizierten Ergebnissen": "Memory from verified results",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "Only successfully verified solutions; no training consent.",
-  "Modelltraining erlauben": "Allow model training",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "Off by default. A local choice does not replace server-side, signed consent.",
   "Diagnosedaten lokal aufbewahren": "Keep diagnostic data locally",
   "Keine automatische Übertragung.": "No automatic transmission.",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "Training stays fail-closed until auth, the current privacy policy, and a signed IDrive e2 consent ledger are fully in place.",
   "Dateien lesen": "Read files",
   "Projektbezogen": "Project-scoped",
   "Dateien schreiben": "Write files",

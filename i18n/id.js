@@ -4,6 +4,14 @@
 import zusatz from "./id-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "Bantu tingkatkan smejj",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Mati sampai kamu menyalakannya. Setelah itu, pertanyaan dan jawaban yang kamu beri jempol boleh dipakai, tanpa namamu, untuk melatih model milik kami sendiri, smejj 1. Bisa dimatikan lagi kapan saja.",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "Kalau kamu mematikannya, tidak ada yang baru ditambahkan, dan jawaban yang sudah kamu tandai tidak lagi dipakai untuk pelatihan apa pun.",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "Terima kasih! Bolehkah smejj belajar dari jawaban seperti ini?",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Hanya dengan persetujuanmu: pertanyaan dan jawaban disimpan tanpa namamu dan membantu meningkatkan model milik kami, smejj 1. Bisa dimatikan kapan saja.",
+  "Einstellung öffnen": "Buka pengaturan",
+  "Nein danke": "Tidak, terima kasih",
   ...zusatz,
   "Angeheftet": "Disematkan",
   "Mit Bild": "Dengan gambar",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "Akun email memiliki daftar sesi di sisi server dengan pencabutan jarak jauh satu per satu (di bawah). Sesi Google/passkey tanpa status berakhir saat kedaluwarsa atau keluar di perangkat.",
   "Memory aus verifizierten Ergebnissen": "Memori hanya dari hasil terverifikasi",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "Hanya solusi yang berhasil diverifikasi; tanpa izin pelatihan.",
-  "Modelltraining erlauben": "Izinkan pelatihan model",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "Nonaktif secara bawaan. Pilihan lokal tidak menggantikan persetujuan bertanda tangan di sisi server.",
   "Diagnosedaten lokal aufbewahren": "Simpan data diagnostik secara lokal",
   "Keine automatische Übertragung.": "Tidak ada pengiriman otomatis.",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "Pelatihan tetap fail-closed sampai autentikasi, kebijakan privasi terkini, dan buku persetujuan bertanda tangan di IDrive e2 tersedia sepenuhnya.",
   "Dateien lesen": "Baca berkas",
   "Projektbezogen": "Terbatas pada proyek",
   "Dateien schreiben": "Tulis berkas",

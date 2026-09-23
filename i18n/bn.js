@@ -4,6 +4,14 @@
 import zusatz from "./bn-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "smejj উন্নত করতে সাহায্য করুন",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "আপনি চালু না করা পর্যন্ত বন্ধ থাকে। চালু করলে, যে প্রশ্ন ও উত্তরে আপনি থাম্বস আপ দেন সেগুলো আপনার নাম ছাড়া আমাদের নিজস্ব মডেল smejj 1 প্রশিক্ষণে ব্যবহার হতে পারে। যেকোনো সময় আবার বন্ধ করা যায়।",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "বন্ধ করলে নতুন কিছু যোগ হয় না, আর আগে চিহ্নিত উত্তরগুলোও আর কোনো প্রশিক্ষণে ব্যবহার হয় না।",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "ধন্যবাদ! smejj কি এমন উত্তর থেকে শিখতে পারে?",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "শুধু আপনার সম্মতিতে: প্রশ্ন ও উত্তর আপনার নাম ছাড়া সংরক্ষিত হয় এবং আমাদের নিজস্ব মডেল smejj 1 উন্নত করতে সাহায্য করে। যেকোনো সময় বন্ধ করা যায়।",
+  "Einstellung öffnen": "সেটিং খুলুন",
+  "Nein danke": "না, ধন্যবাদ",
   ...zusatz,
   "Angeheftet": "পিন করা",
   "Mit Bild": "ছবিসহ",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "ইমেইল অ্যাকাউন্টে সার্ভার-সাইড সেশন তালিকা থাকে, যেখানে আলাদাভাবে দূর থেকে বাতিল করা যায় (নিচে)। স্টেটলেস Google/পাসকি সেশন মেয়াদ শেষ বা ডিভাইসে লগআউটে শেষ হয়।",
   "Memory aus verifizierten Ergebnissen": "শুধুমাত্র যাচাইকৃত ফলাফল থেকে মেমরি",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "শুধুমাত্র সফলভাবে যাচাইকৃত সমাধান; প্রশিক্ষণের অনুমতি নেই।",
-  "Modelltraining erlauben": "মডেল প্রশিক্ষণের অনুমতি দিন",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "ডিফল্টে বন্ধ। স্থানীয় পছন্দ সার্ভার-সাইড স্বাক্ষরিত সম্মতির বিকল্প নয়।",
   "Diagnosedaten lokal aufbewahren": "ডায়াগনস্টিক ডেটা স্থানীয়ভাবে রাখুন",
   "Keine automatische Übertragung.": "কোনো স্বয়ংক্রিয় স্থানান্তর নেই।",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "প্রমাণীকরণ, বর্তমান গোপনীয়তা নীতি ও স্বাক্ষরিত IDrive e2 সম্মতি-খাতা সম্পূর্ণ প্রস্তুত না হওয়া পর্যন্ত প্রশিক্ষণ fail-closed থাকে।",
   "Dateien lesen": "ফাইল পড়া",
   "Projektbezogen": "প্রকল্পের মধ্যে সীমাবদ্ধ",
   "Dateien schreiben": "ফাইল লেখা",

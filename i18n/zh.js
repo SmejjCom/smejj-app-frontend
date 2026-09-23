@@ -4,6 +4,14 @@
 import zusatz from "./zh-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "帮助改进 smejj",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "在你开启之前保持关闭。开启后，你点赞的问题和回答可能会在不含你姓名的情况下用于训练我们自己的模型 smejj 1。你可以随时关闭。",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "关闭后不会再添加新内容，你之前标记的回答也不再用于任何训练。",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "谢谢！smejj 可以从这样的回答中学习吗？",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "仅在你同意时：问题和回答会在不含你姓名的情况下保存，用于改进我们自己的模型 smejj 1。可随时关闭。",
+  "Einstellung öffnen": "打开设置",
+  "Nein danke": "不用了，谢谢",
   ...zusatz,
   "Angeheftet": "已置顶",
   "Mit Bild": "含图片",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "邮箱账户拥有服务器端会话列表,可逐个远程撤销(见下方)。无状态的 Google/通行密钥会话在过期或设备退出登录后结束。",
   "Memory aus verifizierten Ergebnissen": "仅从已验证结果学习",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "仅限验证成功的解决方案;不授权训练。",
-  "Modelltraining erlauben": "允许模型训练",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "默认关闭。本地选择不能替代服务器端签署的同意书。",
   "Diagnosedaten lokal aufbewahren": "本地保留诊断数据",
   "Keine automatische Übertragung.": "不会自动传输。",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "在认证、最新隐私政策和签署的 IDrive e2 同意账本完全就绪之前,训练保持 fail-closed。",
   "Dateien lesen": "读取文件",
   "Projektbezogen": "限于项目范围",
   "Dateien schreiben": "写入文件",

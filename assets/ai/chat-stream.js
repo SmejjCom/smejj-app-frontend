@@ -765,6 +765,10 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
     return;
   }
 
+  // Welches Modell antwortet? Die Bruecke nennt es in x-smejj-model-id. Der
+  // Daumen hoch schickt es mit, damit ein Lernpaar seine Herkunft traegt —
+  // Anbieterrechte entscheiden, ob es smejj 1 je trainieren darf (23.09.2026).
+  try { output.dataset.antwortModell = String(response.headers.get("x-smejj-model-id") || "").slice(0, 80); } catch { /* ohne Kopf: Herkunft unbekannt */ }
   const reader = response.body.getReader();
   aktiveLeser.add(reader);
   meldeStromstand();

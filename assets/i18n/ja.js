@@ -4,6 +4,14 @@
 import zusatz from "./ja-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "smejj の改善に協力する",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "オンにするまでオフです。オンにすると、👍を付けた質問と回答が、名前なしで自社モデル smejj 1 の学習に使われることがあります。いつでもオフに戻せます。",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "オフにすると新しいものは追加されず、これまでに付けた回答も今後の学習には使われません。",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "ありがとうございます！smejj がこのような回答から学んでもよいですか？",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "同意した場合のみ：質問と回答は名前なしで保存され、自社モデル smejj 1 の改善に役立ちます。いつでもオフにできます。",
+  "Einstellung öffnen": "設定を開く",
+  "Nein danke": "結構です",
   ...zusatz,
   "Angeheftet": "ピン留め",
   "Mit Bild": "画像あり",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "メールアカウントには、個別にリモート失効できるサーバー側セッション一覧があります(下記)。ステートレスな Google/パスキーのセッションは、有効期限切れまたはデバイスでのログアウトで終了します。",
   "Memory aus verifizierten Ergebnissen": "検証済みの結果のみをメモリに保存",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "検証に成功したソリューションのみ。トレーニングの許可はありません。",
-  "Modelltraining erlauben": "モデルのトレーニングを許可",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "既定でオフ。ローカルの選択は、サーバー側の署名済み同意の代わりにはなりません。",
   "Diagnosedaten lokal aufbewahren": "診断データをローカルに保持",
   "Keine automatische Übertragung.": "自動送信はありません。",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "認証、最新のプライバシーポリシー、署名済みの IDrive e2 同意台帳が完全に整うまで、トレーニングは fail-closed のままです。",
   "Dateien lesen": "ファイルの読み取り",
   "Projektbezogen": "プロジェクト範囲内",
   "Dateien schreiben": "ファイルの書き込み",

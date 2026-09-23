@@ -4,6 +4,14 @@
 import zusatz from "./ar-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "المساعدة في تحسين smejj",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "مُعطَّل حتى تُفعّله. بعد ذلك يمكن استخدام الأسئلة والإجابات التي تمنحها إعجابًا، من دون اسمك، لتدريب نموذجنا الخاص smejj 1. يمكنك إيقافه في أي وقت.",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "إذا أوقفته فلن يُضاف شيء جديد، ولن تُستخدم الإجابات التي علّمتها سابقًا في أي تدريب بعد ذلك.",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "شكرًا! هل يمكن لـ smejj أن يتعلّم من إجابات كهذه؟",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "فقط بموافقتك: يُحفظ السؤال والإجابة من دون اسمك ويساعدان في تحسين نموذجنا الخاص smejj 1. يمكنك الإيقاف في أي وقت.",
+  "Einstellung öffnen": "فتح الإعداد",
+  "Nein danke": "لا، شكرًا",
   ...zusatz,
   "Angeheftet": "مثبّت",
   "Mit Bild": "مع صورة",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "تمتلك حسابات البريد الإلكتروني قائمة جلسات على الخادم مع إمكانية إلغاء فردي عن بُعد (أدناه). تنتهي جلسات Google/مفتاح المرور عديمة الحالة بانتهاء الصلاحية أو تسجيل الخروج من الجهاز.",
   "Memory aus verifizierten Ergebnissen": "الذاكرة من النتائج المتحقق منها فقط",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "الحلول المتحقق منها بنجاح فقط؛ لا إذن للتدريب.",
-  "Modelltraining erlauben": "السماح بتدريب النموذج",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "معطّل افتراضيًا. الاختيار المحلي لا يحل محل موافقة موقّعة على الخادم.",
   "Diagnosedaten lokal aufbewahren": "الاحتفاظ ببيانات التشخيص محليًا",
   "Keine automatische Übertragung.": "لا نقل تلقائي.",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "يبقى التدريب fail-closed حتى تتوفر المصادقة وسياسة الخصوصية الحالية وسجل الموافقة الموقّع على IDrive e2 بالكامل.",
   "Dateien lesen": "قراءة الملفات",
   "Projektbezogen": "ضمن نطاق المشروع",
   "Dateien schreiben": "كتابة الملفات",

@@ -4,6 +4,14 @@
 import zusatz from "./hi-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "smejj को बेहतर बनाने में मदद करें",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "जब तक आप चालू न करें, बंद रहता है। चालू करने पर, जिन सवाल-जवाबों पर आप अंगूठा ऊपर देते हैं, वे आपके नाम के बिना हमारे अपने मॉडल smejj 1 को प्रशिक्षित करने में इस्तेमाल हो सकते हैं। कभी भी फिर से बंद कर सकते हैं।",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "बंद करने पर कुछ नया नहीं जुड़ता, और पहले चिह्नित जवाब आगे किसी प्रशिक्षण में इस्तेमाल नहीं होते।",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "धन्यवाद! क्या smejj ऐसे जवाबों से सीख सकता है?",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "सिर्फ़ आपकी हाँ पर: सवाल और जवाब आपके नाम के बिना सहेजे जाते हैं और हमारे अपने मॉडल smejj 1 को बेहतर बनाने में मदद करते हैं। कभी भी बंद कर सकते हैं।",
+  "Einstellung öffnen": "सेटिंग खोलें",
+  "Nein danke": "नहीं, धन्यवाद",
   ...zusatz,
   "Angeheftet": "पिन किया",
   "Mit Bild": "छवि सहित",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "ईमेल खातों में सर्वर-साइड सत्र सूची होती है, जिसमें अलग-अलग दूरस्थ निरस्तीकरण संभव है (नीचे)। स्टेटलेस Google/पासकी सत्र समाप्ति या डिवाइस पर लॉगआउट से खत्म होते हैं।",
   "Memory aus verifizierten Ergebnissen": "केवल सत्यापित परिणामों से मेमोरी",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "केवल सफलतापूर्वक सत्यापित समाधान; प्रशिक्षण की अनुमति नहीं।",
-  "Modelltraining erlauben": "मॉडल प्रशिक्षण की अनुमति दें",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "डिफ़ॉल्ट रूप से बंद। स्थानीय चयन सर्वर-साइड हस्ताक्षरित सहमति का स्थान नहीं लेता।",
   "Diagnosedaten lokal aufbewahren": "निदान डेटा स्थानीय रूप से रखें",
   "Keine automatische Übertragung.": "कोई स्वचालित स्थानांतरण नहीं।",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "जब तक प्रमाणीकरण, वर्तमान गोपनीयता नीति और हस्ताक्षरित IDrive e2 सहमति-बही पूरी तरह उपलब्ध न हों, प्रशिक्षण fail-closed रहता है।",
   "Dateien lesen": "फ़ाइलें पढ़ना",
   "Projektbezogen": "प्रोजेक्ट तक सीमित",
   "Dateien schreiben": "फ़ाइलें लिखना",

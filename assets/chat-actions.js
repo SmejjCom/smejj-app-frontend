@@ -588,8 +588,13 @@ function sendeDaumenSignal(entry, richtung) {
       body: JSON.stringify({
         signalType: richtung === "up" ? "thumbs_up" : "thumbs_down",
         prompt: toPlainText(frage ? rawOf(frage) : "").slice(0, 2000),
-        antwort: toPlainText(rawOf(entry)).slice(0, 4000)
+        antwort: toPlainText(rawOf(entry)).slice(0, 4000),
+        modell: entry.dataset?.antwortModell || ""
       })
+    }).then((r) => r.json()).then((a) => {
+      // Daumen hoch OHNE Trainings-Einwilligung: einmal je Sitzung ein leiser
+      // Hinweis unter der Antwort (23.09.2026). Nachgeladen, nie blockierend.
+      if (a?.lernpaar?.grund === "einwilligung_fehlt_oder_veraltet") import("./lern-hinweis.js?v=1").then((m) => m.zeigeLernHinweis(entry)).catch(() => {});
     }).catch(() => {});
   } catch { /* Fail-safe: die Bewertung bleibt lokal sichtbar, der Chat laeuft */ }
 }

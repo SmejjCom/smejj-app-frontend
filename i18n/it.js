@@ -4,6 +4,14 @@
 import zusatz from "./it-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "Aiuta a migliorare smejj",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Disattivato finché non lo attivi. Poi le domande e le risposte che segni con il pollice in su potranno essere usate, senza il tuo nome, per addestrare il nostro modello smejj 1. Puoi disattivarlo in qualsiasi momento.",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "Se lo disattivi, non si aggiunge nulla di nuovo e le risposte segnate finora non vengono più usate per alcun addestramento.",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "Grazie! smejj può imparare da risposte come questa?",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Solo con il tuo sì: domanda e risposta vengono salvate senza il tuo nome e aiutano a migliorare il nostro modello smejj 1. Puoi disattivarlo in qualsiasi momento.",
+  "Einstellung öffnen": "Apri impostazione",
+  "Nein danke": "No, grazie",
   ...zusatz,
   "Angeheftet": "Fissato",
   "Mit Bild": "Con immagine",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "Gli account e-mail hanno un elenco di sessioni lato server con revoca remota individuale (sotto). Le sessioni stateless Google/passkey terminano alla scadenza o al logout sul dispositivo.",
   "Memory aus verifizierten Ergebnissen": "Memoria solo da risultati verificati",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "Solo soluzioni verificate con successo; nessuna autorizzazione all'addestramento.",
-  "Modelltraining erlauben": "Consenti l'addestramento del modello",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "Disattivato per impostazione predefinita. Una scelta locale non sostituisce un consenso firmato lato server.",
   "Diagnosedaten lokal aufbewahren": "Conserva i dati di diagnostica in locale",
   "Keine automatische Übertragung.": "Nessuna trasmissione automatica.",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "L'addestramento resta fail-closed finché autenticazione, informativa privacy vigente e registro dei consensi firmato su IDrive e2 non sono completamente disponibili.",
   "Dateien lesen": "Lettura file",
   "Projektbezogen": "Limitato al progetto",
   "Dateien schreiben": "Scrittura file",

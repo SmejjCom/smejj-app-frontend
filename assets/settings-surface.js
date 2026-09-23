@@ -202,7 +202,7 @@ function markup() {
       ${panel("privacy", "Datenschutz & Training", t("In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst."), [
         info(t("Was gesammelt wird"), "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus."),
         info("Wofür", t("Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.")),
-        action("Modelltraining erlauben", t("Der Schalter liegt in deinem Konto unter Meine Daten."), "Zum Schalter", "kontoDaten")])}
+        action("Beim Verbessern von smejj helfen", t("Der Schalter liegt in deinem Konto unter Meine Daten."), "Zum Schalter", "kontoDaten")])}
       ${panel("advanced", "Erweitert", t("Diagnose und rechtliche Informationen."), [
         toggle("Diagnoseinformationen anzeigen", "settingsDiagnostics", "Technische Statusdetails in Nicht-Start-Bereichen."),
         action("Systemstatus", t("Verbindungen, Modelle und Betrieb prüfen."), t("Status öffnen"), "tools"),

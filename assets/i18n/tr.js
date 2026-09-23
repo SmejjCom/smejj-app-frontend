@@ -4,6 +4,14 @@
 import zusatz from "./tr-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "smejj'i geliştirmeye yardım et",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Sen açana kadar kapalı. Açınca, beğendiğin (başparmak yukarı) soru ve yanıtlar adın olmadan kendi modelimiz smejj 1'i eğitmek için kullanılabilir. İstediğin zaman yeniden kapatabilirsin.",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "Kapatırsan yeni bir şey eklenmez ve daha önce işaretlediğin yanıtlar artık hiçbir eğitimde kullanılmaz.",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "Teşekkürler! smejj bunun gibi yanıtlardan öğrenebilir mi?",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Yalnızca onay verirsen: soru ve yanıt adın olmadan kaydedilir ve kendi modelimiz smejj 1'i geliştirmeye yardım eder. İstediğin zaman kapatabilirsin.",
+  "Einstellung öffnen": "Ayarı aç",
+  "Nein danke": "Hayır, teşekkürler",
   ...zusatz,
   "Angeheftet": "Sabitlenmiş",
   "Mit Bild": "Görselli",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "E-posta hesaplarının sunucu tarafında, tek tek uzaktan iptal edilebilen bir oturum listesi vardır (aşağıda). Durumsuz Google/geçiş anahtarı oturumları süre dolunca veya cihazda çıkış yapılınca sona erer.",
   "Memory aus verifizierten Ergebnissen": "Yalnızca doğrulanmış sonuçlardan bellek",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "Yalnızca başarıyla doğrulanmış çözümler; eğitim izni yok.",
-  "Modelltraining erlauben": "Model eğitimine izin ver",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "Varsayılan olarak kapalı. Yerel bir seçim, sunucu tarafında imzalanmış onayın yerini tutmaz.",
   "Diagnosedaten lokal aufbewahren": "Tanılama verilerini yerelde sakla",
   "Keine automatische Übertragung.": "Otomatik aktarım yok.",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "Kimlik doğrulama, güncel gizlilik politikası ve imzalı IDrive e2 onay defteri tamamen hazır olana kadar eğitim fail-closed kalır.",
   "Dateien lesen": "Dosyaları oku",
   "Projektbezogen": "Projeyle sınırlı",
   "Dateien schreiben": "Dosyalara yaz",

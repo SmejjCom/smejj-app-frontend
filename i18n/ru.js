@@ -4,6 +4,14 @@
 import zusatz from "./ru-2.js?v=10";
 
 export default {
+  // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
+  "Beim Verbessern von smejj helfen": "Помогать улучшать smejj",
+  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Выключено, пока ты не включишь. Тогда вопросы и ответы, отмеченные «палец вверх», могут без твоего имени использоваться для обучения нашей собственной модели smejj 1. Выключить можно в любой момент.",
+  "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "Если выключить, ничего нового не добавляется, а ранее отмеченные ответы больше не используются ни в каком обучении.",
+  "Danke! Darf smejj aus solchen Antworten lernen?": "Спасибо! Можно smejj учиться на таких ответах?",
+  "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Только с твоего согласия: вопрос и ответ сохраняются без твоего имени и помогают улучшать нашу модель smejj 1. Выключить можно в любой момент.",
+  "Einstellung öffnen": "Открыть настройку",
+  "Nein danke": "Нет, спасибо",
   ...zusatz,
   "Angeheftet": "Закреплено",
   "Mit Bild": "С изображением",
@@ -384,11 +392,8 @@ export default {
   "E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.": "У почтовых аккаунтов есть серверный список сессий с индивидуальным удалённым отзывом (ниже). Сессии Google/passkey без состояния завершаются по истечении срока или при выходе на устройстве.",
   "Memory aus verifizierten Ergebnissen": "Память только из проверенных результатов",
   "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.": "Только успешно проверенные решения; без разрешения на обучение.",
-  "Modelltraining erlauben": "Разрешить обучение модели",
-  "Standardmäßig aus. Beim Einschalten wird eine serverseitig signierte Einwilligung erteilt — jederzeit widerrufbar.": "По умолчанию выключено. Локальный выбор не заменяет подписанное серверное согласие.",
   "Diagnosedaten lokal aufbewahren": "Хранить диагностические данные локально",
   "Keine automatische Übertragung.": "Без автоматической передачи.",
-  "Training bleibt fail-closed, bis Auth, aktuelle Datenschutzerklärung und signiertes IDrive-e2-Consent-Ledger vollständig verfügbar sind.": "Обучение остаётся fail-closed, пока аутентификация, актуальная политика конфиденциальности и подписанный реестр согласий на IDrive e2 не будут полностью готовы.",
   "Dateien lesen": "Чтение файлов",
   "Projektbezogen": "В рамках проекта",
   "Dateien schreiben": "Запись файлов",
