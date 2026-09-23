@@ -796,6 +796,14 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
     const events = buffer.split("\n\n");
     buffer = events.pop() || "";
     for (const event of events) {
+      // Kommt die Antwort langsamer als 3,5 s, schickt die Bruecke den Kopf vorab
+      // (ohne Modell) und nennt das Modell spaeter als Kommentarzeile
+      // ": smejj-modell ... id=<modell>". Ohne diese Zeile blieb die Herkunft
+      // leer — gemessen 23.09.2026 bei 14 von 20 Fragen — und das Lernpaar war
+      // fuers Training gesperrt. Die Zeile gewinnt, weil sie das Modell nennt,
+      // das WIRKLICH geantwortet hat (auch nach einem Ausweichen).
+      const modellZeile = event.match(/^: smejj-modell .*\bid=(\S+)/m);
+      if (modellZeile) { try { output.dataset.antwortModell = modellZeile[1].slice(0, 80); } catch { /* ohne dataset: egal */ } }
       const text = event.split("\n")
         .filter((line) => line.startsWith("data: "))
         .map((line) => line.slice(6))
