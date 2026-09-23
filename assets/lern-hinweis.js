@@ -80,7 +80,11 @@ export function zeigeLernHinweis(entry) {
   nein.addEventListener("click", weg);
   knoepfe.append(ja, nein);
   zeile.append(text, knoepfe);
-  entry.after(zeile);
+  // HINTER die Aktionsleiste, nicht zwischen Antwort und Leiste: chat-actions.js
+  // findet die Leiste als naechstes Geschwister der Antwort (barOf) und baute
+  // sonst eine zweite (live gesehen 23.09.2026, v963).
+  const leiste = entry.nextElementSibling?.classList?.contains("msg-actions") ? entry.nextElementSibling : null;
+  (leiste || entry).after(zeile);
   const timer = setTimeout(weg, SELBST_ZU_MS);
   return true;
 }

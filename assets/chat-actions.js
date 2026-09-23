@@ -594,7 +594,7 @@ function sendeDaumenSignal(entry, richtung) {
     }).then((r) => r.json()).then((a) => {
       // Daumen hoch OHNE Trainings-Einwilligung: einmal je Sitzung ein leiser
       // Hinweis unter der Antwort (23.09.2026). Nachgeladen, nie blockierend.
-      if (a?.lernpaar?.grund === "einwilligung_fehlt_oder_veraltet") import("./lern-hinweis.js?v=1").then((m) => m.zeigeLernHinweis(entry)).catch(() => {});
+      if (a?.lernpaar?.grund === "einwilligung_fehlt_oder_veraltet") import("./lern-hinweis.js?v=2").then((m) => m.zeigeLernHinweis(entry)).catch(() => {});
     }).catch(() => {});
   } catch { /* Fail-safe: die Bewertung bleibt lokal sichtbar, der Chat laeuft */ }
 }
