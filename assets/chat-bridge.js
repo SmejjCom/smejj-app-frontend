@@ -1,5 +1,5 @@
 // ERZEUGTE DATEI — nicht von Hand bearbeiten.
-// Gebuendelt aus public/chat-bridge-weather.js, public/chat-bridge-strom.js, public/chat-bridge-lebenszeichen.js, src/agent/conversationHistory.js, public/chat-bridge-vision.js, control-server/src/autopilots/antwortTuevAutopilot.js, control-server/src/evolution/qualitaetsEngine.js, public/chat-bridge-evolution.js, public/chat-bridge-bildsprachen.js, public/chat-bridge-bilder.js, public/chat-bridge-rechner.js, public/chat-bridge-websuche.js, public/chat-bridge-auth.js, public/chat-bridge-sicherheit.js, control-server/src/rag/bm25Index.js, control-server/src/rag/ragRanking.js, control-server/src/rag/infrastrukturFrage.js, control-server/src/rag/regelfragen.js, control-server/src/rag/fremdinhaltFilter.js, control-server/src/rag/ragContextBlock.js, public/chat-bridge-rag.js, public/chat-bridge-voice-ear.js, public/chat-bridge-voice-tts.js, public/chat-bridge.js
+// Gebuendelt aus public/chat-bridge-weather.js, public/chat-bridge-strom.js, public/chat-bridge-lebenszeichen.js, src/agent/conversationHistory.js, public/chat-bridge-vision.js, control-server/src/autopilots/antwortTuevAutopilot.js, control-server/src/evolution/qualitaetsEngine.js, public/chat-bridge-evolution.js, public/chat-bridge-bildsprachen.js, public/chat-bridge-bilder.js, public/chat-bridge-rechner.js, public/chat-bridge-websuche.js, public/chat-bridge-auth.js, public/chat-bridge-radar.js, public/chat-bridge-sicherheit.js, control-server/src/rag/bm25Index.js, control-server/src/rag/ragRanking.js, control-server/src/rag/infrastrukturFrage.js, control-server/src/rag/regelfragen.js, control-server/src/rag/fremdinhaltFilter.js, control-server/src/rag/ragContextBlock.js, public/chat-bridge-rag.js, public/chat-bridge-voice-ear.js, public/chat-bridge-voice-tts.js, public/chat-bridge.js
 // Wissensartefakt: 911 Abschnitte, sha256 2f17f29b67940fe117e8da0db86858f2c77bb9a04a52b17c042044b7159ed56d
 // Quelle und Buendler: scripts/deploy/bundle_chat_bridge.mjs
 import http from "node:http";
@@ -2891,6 +2891,54 @@ function _zaehlerZuruecksetzen() {
 }
 
 
+// --- public/chat-bridge-radar.js ---
+// smejj.com Chat-Bruecke — Radar-Wissen (Betreiber-Auftrag 23.09.2026, Punkt 5).
+//
+// Die Schnellspur der Bruecke fragt Groq direkt und erreichte das Wissen des
+// smejj ai radar nie: es liegt im Control-Server (e2 radar/wissen, eigener
+// Index). Hier holt die Bruecke den fertigen Prompt-Block von dort ab —
+// mit dem Anmeldenachweis des Menschen, kurzer Frist und ohne jede Abhaengigkeit.
+//
+// FAIL-SAFE: kommt nichts (Frist, Fehler, keine Anmeldung, kein Treffer), laeuft
+// der Chat genau wie vorher. Radar-Wissen ist Beiwerk, nie ein Hindernis.
+
+
+const RADAR_FRIST_MS = 1200;
+const MAX_ZEICHEN = 3000;
+
+/**
+ * @returns {Promise<string>} der Block aus control-server/src/rag/radarKontext.js oder ""
+ */
+async function holeRadarKontext(frage, headers = {}, { origin, fetchImpl = fetch, fristMs = RADAR_FRIST_MS } = {}) {
+  const token = bearerToken(headers);
+  const text = String(frage || "").trim().slice(0, 2000);
+  if (!token || !text || !origin) return "";
+  const abbruch = new AbortController();
+  const uhr = setTimeout(() => abbruch.abort(), fristMs);
+  try {
+    const antwort = await fetchImpl(`${origin}/api/radar/kontext`, {
+      method: "POST",
+      signal: abbruch.signal,
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, Origin: "https://smejj.com", connection: "close" },
+      body: JSON.stringify({ frage: text })
+    });
+    if (!antwort?.ok) return "";
+    const daten = await antwort.json();
+    const block = typeof daten?.kontext === "string" ? daten.kontext.trim() : "";
+    return block.startsWith("Aktuelles aus der eigenen Recherche (smejj ai radar)") ? block.slice(0, MAX_ZEICHEN) : "";
+  } catch {
+    return "";
+  } finally {
+    clearTimeout(uhr);
+  }
+}
+
+/** Projektwissen und Radar-Wissen in EINEM Block — leer bleibt leer. */
+function mitRadar(wissen, radar) {
+  return [wissen, radar].filter((teil) => String(teil || "").trim()).join("\n\n");
+}
+
+
 // --- public/chat-bridge-sicherheit.js ---
 // smejj.com — Sicherheits-Kopfzeilen und /health-Auskunft der Chat-Bruecke (v157).
 // Ausgelagert aus chat-bridge.js (800-Zeilen-Regel).
@@ -4472,6 +4520,7 @@ console.log(`smejj.com chat-bridge: Projektwissen ${ragInstallResult.ok ? `berei
 
 
 
+
 // Stufe 4 (Groq-Ohr): Whisper-Transkription ueber den Welle-2-Groq-Zugang.
 
 // Gespraechsgedaechtnis. Bewusst DIESELBE gepruefte Bereinigung wie der Control
@@ -4548,7 +4597,7 @@ const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_M
 const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
 const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260923-v161-bildauftrag-15-sprachen";
+const BRIDGE_VERSION = "20260923-v162-radar-wissen";
 
 // Premium-Stimme: ausgelagerte Handler (siehe chat-bridge-voice-tts.js).
 // Funktionsdeklarationen unten sind gehoben — der Aufruf hier oben ist sicher.
@@ -4692,7 +4741,10 @@ async function handleChat(req, res) {
   if (await streamVisionLane(res, body, task, { corsHeaders, securityHeaders, timeoutMs: REQUEST_TIMEOUT_MS, maxBodyBytes: MAX_BODY_BYTES })) return;
   if (task && await streamBilderLane(res, body, task, { corsHeaders, securityHeaders, timeoutMs: BILDER_TIMEOUT_MS, acceptLanguage: req.headers?.["accept-language"] })) return;
   // Anschlussfragen tragen ihr Thema nicht selbst — dann zaehlt die Frage davor.
-  const wissen = buildRagBlockMitVerlauf(lastUserContent(messages), previousUserContent(messages));
+  // v162: dazu das Radar-Wissen vom Control-Server (chat-bridge-radar.js) — die
+  // Schnellspur und /api/chat im Control-Server hatten es vorher nie.
+  const wissen = mitRadar(buildRagBlockMitVerlauf(lastUserContent(messages), previousUserContent(messages)),
+    await holeRadarKontext(lastUserContent(messages), req.headers, { origin: CONTROL_ORIGIN }));
   // Wechselndes ans Ende: der Wissensblock aendert sich mit jeder Frage und
   // stand bisher an Stelle 1 — damit war alles dahinter (Systemregeln folgen
   // dort nicht, aber der ganze Verlauf) fuer den Anbieter-Cache wertlos.
@@ -4730,7 +4782,10 @@ async function handleAgent(req, res) {
   // Block fuer jede Spur. `body.history` endet mit der Frage VOR der aktuellen
   // (app.js schickt die aktuelle nur als `task`), trifft also das Thema, auf
   // das sich eine Anschlussfrage bezieht.
-  const wissen = buildRagBlockMitVerlauf(task, lastUserContent(body.history));
+  // v162: Radar-Wissen fuer die Schnellspur. /api/agent im Control-Server haengt
+  // es selbst an — dorthin geht der Rumpf unveraendert (kein doppelter Block).
+  const wissen = mitRadar(buildRagBlockMitVerlauf(task, lastUserContent(body.history)),
+    await holeRadarKontext(task, req.headers, { origin: CONTROL_ORIGIN }));
   // Rechen-Fast-Path: eine Finanzierungsfrage bekommt die Zahlen EXAKT vorgelegt,
   // statt sie das Modell schaetzen zu lassen. Leer, wenn die Werte nicht
   // eindeutig erkennbar sind — dann laeuft alles unveraendert weiter.
