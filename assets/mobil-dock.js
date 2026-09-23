@@ -43,6 +43,10 @@ export const REGELN = "@media (max-width:600px){"
   // (4) Wachstum bis ~5 Zeilen, dann innen scrollen
   + `body #start .prompt-glass textarea.textarea,body #start .prompt-glass #startMessage{max-height:${MAX_FELD_HOEHE}px;overflow-y:auto}`
   + `body #code .codefeld #codeAufgabe{max-height:${MAX_FELD_HOEHE}px;overflow-y:auto;min-height:44px}`
+  // (4b) Betreiber 23.09.2026 schriftlich: "ja, Schreibfeld auf 148 px begrenzen". GEMESSEN: die Regel oben verlor
+  //      gegen start-styles.css (html body #start.view .prompt-glass x3 #startMessage{max-height:min(40dvh,320px)}) —
+  //      das transparente Feld wuchs mit Diktat-Text auf 300 px und lag unlesbar ueber dem Verlauf. Drei IDs gewinnen.
+  + `html body #start.view .prompt-glass #startMessage#startMessage#startMessage{max-height:${MAX_FELD_HOEHE}px}`
   // (19) Das Start-Feld selbst mass 43,5 px (min-height 40 + Polster) — der einzige Rest aus dem
   //      Rundgang. Ein halber Pixel ist unsichtbar, die 44-px-Regel gilt trotzdem.
   //      Betreiber-Freigabe 08.09. ("alle Rechte von A bis Z"), sonst Design-Lock.
