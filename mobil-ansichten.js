@@ -89,6 +89,15 @@ export const REGELN = "@media (max-width:600px){"
   // Werkzeug-Zeilen in Dateien/Projekte/Speicher/Kosten untereinander, volle Breite
   + "body #files .toolbar,body #projects .toolbar,body #storageView .toolbar,body #cost .toolbar,body #tools .toolbar{display:flex;flex-direction:column;gap:8px}"
   + "body #files .toolbar button,body #projects .toolbar button,body #storageView .toolbar button,body #cost .toolbar button,body #tools .toolbar button{width:100%}"
+  // (7) Kein Zoom beim Antippen (iPhone-Simulator, v962, 23.09.): iOS vergroessert die Seite, sobald
+  //     ein Feld mit Schrift unter 16 px den Fokus bekommt (Konto 15 px, Einstellungen 14,5 px), und
+  //     nimmt den Zoom nach dem Schliessen der Tastatur NICHT zurueck — die Seite blieb nach oben und
+  //     links verschoben, Kopf unter der Statusleiste. 16 px ist Apples Schwelle; kein maximum-scale
+  //     im Viewport, damit das Aufziehen mit zwei Fingern erhalten bleibt.
+  //     .view.view hebt die Regel ueber "#settings .settings-row select" (14,5 px) im Buendel.
+  + "body #profile.view.view input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),body #profile.view.view select,body #profile.view.view textarea,"
+  + "body #settings.view.view input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),body #settings.view.view select,body #settings.view.view textarea,"
+  + "body #chatHistory.view.view input:not([type=checkbox]):not([type=radio]),body #chatHistory.view.view select{font-size:16px}"
   + "}";
 
 export function sorgeFuerStil(doc = document) {
