@@ -14,7 +14,7 @@
 import {
   listChats, listProjekte, erstelleProjekt, setzeProjektAnweisung,
   neuesGespraechImBereich, newChat, openChat
-} from "/assets/chat-store.js?v=geraet-20260923b";
+} from "/assets/chat-store.js?v=g20260924012606";
 
 function geheZu(view) {
   document.querySelector(`.nav-vier .nav-button[data-view="${view}"], .nav-button[data-view="${view}"]`)?.click();

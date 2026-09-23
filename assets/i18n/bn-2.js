@@ -13,6 +13,7 @@ export default {
   "Ich spreche ...": "বলছি ...",
   "Einen Moment ...": "এক মুহূর্ত ...",
   "Bild wird erneut geladen …": "ছবিটি আবার লোড হচ্ছে …",
+  "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "ছবিটি মাঝপথে থেমে গেছে — অনুগ্রহ করে অনুরোধটি আবার পাঠান।",
   "Diktat läuft — der Text erscheint nach dem Stoppen.": "ডিক্টেশন চলছে — থামানোর পরে লেখা দেখা যাবে।",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "কোনো কথা শনাক্ত হয়নি — আবার চেষ্টা করুন।",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "মাইক্রোফোনের অনুমতি নেই — নিচে আপনার প্রশ্ন লিখুন।",

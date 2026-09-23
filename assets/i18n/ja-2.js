@@ -13,6 +13,7 @@ export default {
   "Ich spreche ...": "話しています ...",
   "Einen Moment ...": "少々お待ちください ...",
   "Bild wird erneut geladen …": "画像を再読み込みしています …",
+  "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "画像の生成が中断されました — もう一度リクエストを送信してください。",
   "Diktat läuft — der Text erscheint nach dem Stoppen.": "音声入力中 — 停止するとテキストが表示されます。",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "音声を認識できませんでした — もう一度お試しください。",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "マイクが許可されていません — 下に質問を入力してください。",

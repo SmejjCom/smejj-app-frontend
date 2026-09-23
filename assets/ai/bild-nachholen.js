@@ -62,3 +62,71 @@ export async function holeBildNach({ output, anfrage, renderMarkdown, warte = (m
   renderMarkdown?.(output);
   return false;
 }
+
+/** Auftragstext einer Nutzerblase — ohne Aktionsknoepfe und Menues. */
+export function auftragAus(nutzer) {
+  if (!nutzer) return "";
+  const kopie = nutzer.cloneNode ? nutzer.cloneNode(true) : nutzer;
+  for (const weg of kopie.querySelectorAll?.(".msg-actions, .msg-menu, button, .entry-bild-vorschau") || []) weg.remove();
+  return String(kopie.textContent || "").trim();
+}
+
+/**
+ * RETTUNG NACH NEUSTART (Befund 24.09.2026, Simulator + Versionswache): wird die App
+ * mitten im Malen beendet, speichert der Verlauf die Schrittzeile samt schimmerndem
+ * Platzhalter — nach dem Neustart stand "Male dein Bild … 20 s" fuer immer da.
+ * Beim Wiederherstellen fragt die App die Bruecken-Ablage (bildNurAblage: dort wird
+ * NIE neu gemalt). Liegt das Bild vor, erscheint es; sonst ein ehrlicher Hinweis statt
+ * ewigem Schimmer. Die Aenderung speichert der Beobachter von chat-store.js.
+ * @param {HTMLElement} log
+ * @param {{anfrage: (auftrag: string) => Promise<Response>, renderMarkdown?: Function, hinweis?: string, doc?: Document}} optionen
+ * @returns {Promise<number>} Zahl geretteter Bilder
+ */
+export async function rettePlatzhalter(log, { anfrage, renderMarkdown, hinweis = "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.", doc = globalThis.document } = {}) {
+  if (!log?.querySelectorAll || typeof anfrage !== "function" || !doc) return 0;
+  let gerettet = 0;
+  for (const karte of [...log.querySelectorAll(".chat-schritte .chat-bild-platzhalter")]) {
+    const schritte = karte.closest(".chat-schritte");
+    if (!schritte || schritte.dataset.rettung) continue;
+    schritte.dataset.rettung = "laeuft";
+    const danach = schritte.nextElementSibling;
+    // Das Bild steht schon darunter (nur der Platzhalter blieb haengen): einfach aufraeumen.
+    if (danach?.matches?.(".entry.assistant") && danach.querySelector?.("img")) { karte.remove(); delete schritte.dataset.rettung; continue; }
+    let nutzer = schritte.previousElementSibling;
+    while (nutzer && !nutzer.matches?.(".entry.user")) nutzer = nutzer.previousElementSibling;
+    const auftrag = auftragAus(nutzer);
+    let inhalt = "";
+    if (auftrag) {
+      try {
+        const antwort = await anfrage(auftrag);
+        if (antwort?.ok) inhalt = inhaltAusSse(await antwort.text());
+      } catch { /* kein Netz: Hinweis statt Schimmer */ }
+    }
+    const bild = istVollstaendigesBild(inhalt);
+    const eintrag = doc.createElement("article");
+    eintrag.className = "entry assistant";
+    eintrag.textContent = bild ? inhalt : hinweis;
+    schritte.after(eintrag);
+    if (bild) renderMarkdown?.(eintrag);
+    karte.remove();
+    for (const stand of schritte.querySelectorAll(".chat-schritt-stand")) stand.textContent = bild ? " ✓" : " —";
+    delete schritte.dataset.rettung;
+    if (bild) gerettet += 1;
+  }
+  return gerettet;
+}
+
+/** Einstieg fuer chat-store.js nach dem Wiederherstellen: fragt die Bruecke nur nach ihrer Ablage (bildNurAblage, nie neu malen). */
+export async function retteNachNeustart(log) {
+  const [strom, konfig, sprache, markdown] = await Promise.all([import("./chat-stream.js"), import("../config.js"), import("../i18n/ui.js?v=3"), import("/assets/chat-markdown.js?v=1")]);
+  return rettePlatzhalter(log, {
+    renderMarkdown: markdown.renderChatMarkdown,
+    hinweis: sprache.t("Das Bild wurde unterbrochen — bitte den Auftrag erneut senden."),
+    anfrage: (auftrag) => fetch(konfig.CLIENT_ROUTES.api.chat, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...strom.bridgeAuthHeaders() },
+      body: JSON.stringify({ messages: [{ role: "user", content: auftrag }], bildErneut: true, bildNurAblage: true }),
+      signal: AbortSignal.timeout?.(20_000)
+    })
+  });
+}

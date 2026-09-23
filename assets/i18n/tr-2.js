@@ -13,6 +13,7 @@ export default {
   "Ich spreche ...": "Konuşuyorum ...",
   "Einen Moment ...": "Bir saniye ...",
   "Bild wird erneut geladen …": "Görsel yeniden yükleniyor …",
+  "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "Görsel yarıda kesildi — lütfen isteği yeniden gönderin.",
   "Diktat läuft — der Text erscheint nach dem Stoppen.": "Dikte sürüyor — metin durdurduktan sonra görünür.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "Konuşma algılanmadı — lütfen tekrar deneyin.",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "Mikrofona izin verilmedi — sorunuzu aşağıya yazın.",

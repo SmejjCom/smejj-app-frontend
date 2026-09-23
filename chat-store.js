@@ -4,8 +4,8 @@
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=23";
-export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=23";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=25";
+export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=25";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und Bewertung je
 // Nachricht.
@@ -475,9 +475,7 @@ function renderEntriesInto(log, messages) {
       if (message.role !== "user" && !String(message.raw || "").trim() && /^smejj denkt nach/i.test(String(message.text || "").trim())) continue; // Altbestand: gespeicherter Wartetext
       const node = document.createElement("article");
       node.className = `entry ${message.role === "user" ? "user" : "assistant"}`;
-      // Arbeitsschritte (Geraetebefund 23.09.2026, iPhone + Versionswache): die Zeile "Arbeitsschritte: 1 Schritt"
-      // ist live ein eigener Eintrag mit .chat-schritte und bekommt KEINE Aktionsleiste. Beim Wiederherstellen ging die
-      // Klasse verloren -> zweite, leere Leiste ueber der Antwort. Altbestand ohne Merker: am gespeicherten HTML erkannt.
+      // Schritte-Eintrag behaelt .chat-schritte (sonst zweite, leere Aktionsleiste; 23.09.2026). Altbestand: am HTML erkannt.
       if (message.role === "assistant" && (message.art === "schritte" || SCHRITTE_HTML.test(String(message.html || "")))) {
         node.classList.add("chat-schritte");
         node.dataset.smejjSchritte = "true";
@@ -508,6 +506,8 @@ function renderEntriesInto(log, messages) {
     if (last) last.scrollIntoView({ block: "end" });
     // Ausgelagerte Medien holen.
     medienHolen(log);
+    // Bild-Rettung nach App-Neustart (24.09.2026), Modul erst bei Bedarf.
+    if (log.querySelector(".chat-bild-platzhalter")) import("/assets/ai/bild-nachholen.js").then((m) => m.retteNachNeustart(log)).catch(() => {});
   } finally {
     setTimeout(() => { restoring = false; }, 50);
   }

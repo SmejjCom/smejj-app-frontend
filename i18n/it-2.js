@@ -13,6 +13,7 @@ export default {
   "Ich spreche ...": "Sto parlando ...",
   "Einen Moment ...": "Un momento ...",
   "Bild wird erneut geladen …": "Ricarico l'immagine …",
+  "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "L'immagine è stata interrotta — invia di nuovo la richiesta.",
   "Diktat läuft — der Text erscheint nach dem Stoppen.": "Dettatura in corso — il testo appare dopo l'arresto.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "Nessuna voce riconosciuta — riprova.",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "Microfono non consentito — scrivi la domanda qui sotto.",

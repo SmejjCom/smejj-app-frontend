@@ -43,9 +43,7 @@ export const REGELN = "@media (max-width:600px){"
   // (4) Wachstum bis ~5 Zeilen, dann innen scrollen
   + `body #start .prompt-glass textarea.textarea,body #start .prompt-glass #startMessage{max-height:${MAX_FELD_HOEHE}px;overflow-y:auto}`
   + `body #code .codefeld #codeAufgabe{max-height:${MAX_FELD_HOEHE}px;overflow-y:auto;min-height:44px}`
-  // (4b) Betreiber 23.09.2026 schriftlich: "ja, Schreibfeld auf 148 px begrenzen". GEMESSEN: die Regel oben verlor
-  //      gegen start-styles.css (html body #start.view .prompt-glass x3 #startMessage{max-height:min(40dvh,320px)}) —
-  //      das transparente Feld wuchs mit Diktat-Text auf 300 px und lag unlesbar ueber dem Verlauf. Drei IDs gewinnen.
+  // (4b) Chat-Feld max. 148 px gegen start-styles 320 px (Betreiber 23.09.2026).
   + `html body #start.view .prompt-glass #startMessage#startMessage#startMessage{max-height:${MAX_FELD_HOEHE}px}`
   // (19) Das Start-Feld selbst mass 43,5 px (min-height 40 + Polster) — der einzige Rest aus dem
   //      Rundgang. Ein halber Pixel ist unsichtbar, die 44-px-Regel gilt trotzdem.
@@ -162,15 +160,15 @@ export const REGELN = "@media (max-width:600px){"
   //      und Verlaufshalter (laufender Chat).
   + "body.mobil-chat-offen #code .codegruss{padding-top:calc(env(safe-area-inset-top,0px) + 60px)}"
   + "body #code #codeLogHalter.code-log-halter{padding-top:calc(env(safe-area-inset-top,0px) + 56px);scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}"
-  // (17) Geraetebefund 23.09.2026 (iPhone 17 Pro Max, Build 4): im Code-Bereich lag oben eine
-  //      dunkle Flaeche mit Trennlinie, der Text wurde dort abgeschnitten statt unter der
-  //      Statusleiste weiterzulaufen. GEMESSEN (440 x 956): der adoptierte #startLog scrollte
-  //      SELBST (.start-log overflow:auto aus start-styles.css) — unterhalb des 56-px-Polsters
-  //      des Halters, mit border-top 1px. Der Halter scrollt ja schon (Regel 5 oben). Jetzt ist
-  //      der Halter der EINZIGE Scroller: Polster bleibt (erste Zeile frei), beim Scrollen laeuft
-  //      der Verlauf bis an die Oberkante. Dazu die 4 px Kopfrand der Code-Ansicht — wie im Chat.
+  // (21) Code-Bereich: Halter einziger Scroller (Geraetebefund 23.09.2026, docs/qa).
   + "body #code #codeLogHalter #startLog.start-log{overflow:visible;border-top:0;flex:0 0 auto;min-height:auto}"
   + "body #code.view.is-active.is-active{padding-top:0}"
+  // (22) Code-Feld durchsichtig wie im Chat (Betreiber 24.09.2026, docs/qa).
+  + "body #code.view .codeunten.codeunten{position:absolute;left:0;right:0;bottom:0;z-index:5;background:none}"
+  + "body #code.view .codefeld.codefeld{background:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important;border-color:transparent!important}"
+  + "body #code.view .codefeld #codeAufgabe{text-shadow:0 1px 3px rgba(0,0,0,.85)}"
+  + "body #code.view .codefeld svg{filter:drop-shadow(0 1px 3px rgba(0,0,0,.8))}"
+  + "body #code #codeLogHalter.code-log-halter.code-log-halter{padding-bottom:calc(var(--code-feld-hoehe,58px) + 14px);scroll-padding-bottom:calc(var(--code-feld-hoehe,58px) + 14px)}"
   + "}"
   // (10) Vollbild-Versatz der installierten App (Betreiber 17:32, iPhone, frisch installiert):
   //      iOS legt die Layout-Flaeche oben an, rechnet sie aber um die Statusleistenhoehe
@@ -323,6 +321,21 @@ export function verdrahteAuswahl(doc = document, win = window) {
   return true;
 }
 
+/** (22) Feldhoehe als --code-feld-hoehe; am Ende bleibt der Verlauf am Ende. */
+export function verdrahteCodeFeldHoehe(doc = document, win = window) {
+  const unten = doc.querySelector("#code .codeunten");
+  const halter = doc.getElementById("codeLogHalter");
+  if (!unten || typeof win.ResizeObserver !== "function") return false;
+  const setze = () => {
+    const warUnten = halter ? halter.scrollHeight - halter.scrollTop - halter.clientHeight < 40 : false;
+    doc.documentElement.style.setProperty("--code-feld-hoehe", `${Math.round(unten.getBoundingClientRect().height)}px`);
+    if (warUnten && halter) halter.scrollTop = halter.scrollHeight;
+  };
+  new win.ResizeObserver(setze).observe(unten);
+  setze();
+  return true;
+}
+
 export function sorgeFuerStil(doc = document) {
   if (doc.getElementById(STIL_ID)) return false;
   const stil = doc.createElement("style");
@@ -337,6 +350,7 @@ if (typeof document !== "undefined" && document.querySelector("#startMessage, #c
   verdrahteTastatur();
   verdrahteKopfglas();
   verdrahteAuswahl();
+  verdrahteCodeFeldHoehe();
   // Ansichten nach dem Login (Profil, Einstellungen, Verlauf, Dateien …) — eigenes Modul, ohne Marke.
   import("/assets/mobil-ansichten.js").catch(() => {});
   // Vollbild-Chat (17.09.2026): misst das schwebende Feld (--feld-hoehe), design-v14-vollbild-chat.css.
