@@ -9,6 +9,7 @@
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
 import { fetchStreamWithRetry } from "./fetch-retry.js";
+import { holeBildNach, BILD_ABRISS } from "./bild-nachholen.js";
 import { t } from "../i18n/ui.js?v=3";
 import { API_ORIGIN } from "../config.js";
 import { mitLiveDaten } from "./live-daten.js";
@@ -653,6 +654,16 @@ export async function streamChatAnswer(url, body, output, optionen = {}) {
   } finally {
     aktiveLeser.delete(anker);
     meldeStromstand();
+    // Bild-Strom abgerissen (Betreiber 23.09.2026: "Bild erneut anfordern ohne Neumalen"): die Bruecke hat das
+    // Bild abgelegt — dasselbe Bild nachholen statt neu malen. Nicht nach einem bewussten Stopp.
+    if (!lauf.gestoppt && BILD_ABRISS.test(output?.textContent || "")) {
+      holeBildNach({
+        output, renderMarkdown: optionen.renderMarkdown, hinweis: t("Bild wird erneut geladen …"),
+        anfrage: () => fetchStreamWithRetry(zieleAnpassen(url, (rumpf) => ({ ...rumpf, bildErneut: true })), {
+          method: "POST", headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() }, body: JSON.stringify({ ...body, bildErneut: true })
+        })
+      }).catch(() => {});
+    }
   }
 }
 

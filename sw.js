@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v970";
+const CACHE_NAME = "smejj-shell-v971";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -316,6 +316,7 @@ const SHELL = [
   "/assets/voice-premium-tts.js",
   "/assets/voice-warmup.js",
   "/assets/ai/chat-stream.js",
+  "/assets/ai/bild-nachholen.js",
   // Live-Daten im Browser (Nachdenken holt Wetter/Websuche selbst, 07.09.).
   "/assets/ai/live-daten.js",
   "/assets/chat-bridge-weather.js",

@@ -31,6 +31,8 @@
 //   (3) Jeder (Neu-)Start bekommt eine FRISCHE Instanz; jeder Handler prueft,
 //       ob er noch zur aktuellen Instanz gehoert. Spaete finale Ergebnisse
 //       nach dem Stopp-Klick werden noch geschrieben (stop() statt abort()).
+import { t } from "./i18n/ui.js?v=3";
+
 export function createDictation({ getInput, notifyInputChanged, showToast, RecognitionCtor, lang, speechSupported, setVisual, onBeforeToggle, serverOhr = null, warte = (fn, ms) => setTimeout(fn, ms), uhr = () => Date.now() }) {
   // Eine Sitzung = vom Klick "Start" bis zum Klick "Stopp". Sie kann viele
   // Erkennungs-Instanzen nacheinander verbrauchen (jede Sprechpause eine).
@@ -123,7 +125,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
           s.nurOhr = true;
           s.rec = null;
           beendeErkennung({ rec }, { abbrechen: true });
-          showToast("Diktat läuft — der Text erscheint nach dem Stoppen.", "info");
+          showToast(t("Diktat läuft — der Text erscheint nach dem Stoppen."), "warn"); // "info" zeigt showToast gar nicht
           return;
         }
         stop();
@@ -180,7 +182,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       // Web-Speech blieb stumm — das parallel aufnehmende Ohr liefert den Text.
       serverOhr.finish(s.nurOhr ? { budgetMs: 30000 } : undefined).then((text) => {
         const sauber = String(text || "").trim();
-        if (!sauber && s.nurOhr) showToast("Keine Sprache erkannt — bitte noch einmal versuchen.", "info");
+        if (!sauber && s.nurOhr) showToast(t("Keine Sprache erkannt — bitte noch einmal versuchen."), "warn");
         uebernimmOhrText(s, sauber);
       }).catch(() => {});
     } else {
