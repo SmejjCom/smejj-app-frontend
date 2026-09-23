@@ -1558,7 +1558,57 @@ async function videoWorkerBereit() {
 }
 
 // Laesst smejj 1.0 ein SVG zeichnen. Liefert den Markdown-Inhalt oder "".
-async function erzeugeSvgInhalt(prompt, timeoutMs) {
+// Die zwei Saetze ueber dem Bild waren als einzige Stelle der App noch fest
+// deutsch — ein englischsprachiger Nutzer las ueber seinem Bild "Hier ist dein
+// Bild:". Uebersetzen liess sich das lange nicht: dieses Modul laeuft im SERVER
+// der Bruecke, dort gibt es kein DOM und kein t() aus i18n/ui.js.
+//
+// Die Sprache kommt deshalb MIT DER ANFRAGE. Zwei Quellen, in dieser Reihenfolge:
+//   1. body.preferences.sprache — falls ein Client sie mitschickt. preferences
+//      ist der eingefuehrte Weg (dort reisen schon stufe, modus, voiceMode).
+//   2. der Accept-Language-Kopf, den der Browser von sich aus mitschickt.
+// Damit war KEINE Aenderung an public/app.js noetig — die steht unter dem
+// Start-Lock, und ein Stempel dafuer haette den Betreiber einen Doppelklick
+// gekostet, ohne dass der Nutzer etwas davon haette.
+const BILD_TEXTE = Object.freeze({
+  de: ["Hier ist dein Bild:", "Erstelltes Bild"],
+  en: ["Here is your image:", "Generated image"],
+  es: ["Aquí está tu imagen:", "Imagen generada"],
+  fr: ["Voici ton image :", "Image générée"],
+  pt: ["Aqui está a tua imagem:", "Imagem gerada"],
+  it: ["Ecco la tua immagine:", "Immagine generata"],
+  tr: ["İşte görselin:", "Oluşturulan görsel"],
+  ru: ["Вот твоё изображение:", "Созданное изображение"],
+  ar: ["إليك صورتك:", "صورة مُنشأة"],
+  hi: ["यह रही आपकी तस्वीर:", "बनाई गई तस्वीर"],
+  bn: ["এই যে তোমার ছবি:", "তৈরি করা ছবি"],
+  id: ["Ini gambarmu:", "Gambar yang dibuat"],
+  ja: ["画像ができました:", "生成された画像"],
+  ko: ["이미지가 준비됐어요:", "생성된 이미지"],
+  zh: ["这是你的图片：", "生成的图片"]
+});
+
+/** "en-US,en;q=0.9,de;q=0.8" -> "en". Unbekanntes oder Leeres -> "de". */
+function spracheAusKopf(acceptLanguage) {
+  const roh = String(acceptLanguage || "").split(",")[0].trim().slice(0, 5).toLowerCase();
+  const code = roh.split("-")[0];
+  return Object.prototype.hasOwnProperty.call(BILD_TEXTE, code) ? code : "de";
+}
+
+/** Sprache der Anfrage: erst was der Client sagt, sonst der Browser-Kopf. */
+function spracheAusAnfrage(body, kopf) {
+  const gewuenscht = String(body?.preferences?.sprache || "").trim().toLowerCase();
+  if (Object.prototype.hasOwnProperty.call(BILD_TEXTE, gewuenscht)) return gewuenscht;
+  return spracheAusKopf(kopf);
+}
+
+/** Die fertige Markdown-Antwort mit dem Bild — in der Sprache des Nutzers. */
+function bildAntwort(sprache, mime, b64) {
+  const [satz, alt] = BILD_TEXTE[sprache] || BILD_TEXTE.de;
+  return `${satz}\n\n![${alt}](data:${mime};base64,${b64})`;
+}
+
+async function erzeugeSvgInhalt(prompt, timeoutMs, sprache = "de") {
   if (!BILDER_API_KEY || !BILDER_BASE_URL) return "";
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -1587,7 +1637,7 @@ async function erzeugeSvgInhalt(prompt, timeoutMs) {
   }
   if (!svg) return "";
   const b64 = Buffer.from(svg, "utf8").toString("base64");
-  return `Hier ist dein Bild:\n\n![Erstelltes Bild](data:image/svg+xml;base64,${b64})`;
+  return bildAntwort(sprache, "image/svg+xml", b64);
 }
 
 // SD-Turbo versteht Englisch DEUTLICH besser als Deutsch (live gemessen
@@ -1648,7 +1698,7 @@ async function uebersetzeMalPrompt(rohPrompt) {
 // Rueckgabewert zu aendern (der bleibt Inhalt oder leer).
 // Exportiert NUR fuer die Tests: ohne sie waere jeder Grund wieder nur eine
 // Behauptung. `fetchImpl` ist die Naht, an der das Netz ersetzt wird.
-async function erzeugeFotoInhalt(prompt, timeoutMs, notiz = {}, fetchImpl = fetch) {
+async function erzeugeFotoInhalt(prompt, timeoutMs, notiz = {}, fetchImpl = fetch, sprache = "de") {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const beginn = Date.now();
@@ -1681,7 +1731,7 @@ async function erzeugeFotoInhalt(prompt, timeoutMs, notiz = {}, fetchImpl = fetc
     if (b64.length > BILDER_MAX_B64) return scheitern(`bild_zu_gross_${b64.length}`);
     if (!/^[A-Za-z0-9+/=]+$/.test(b64)) return scheitern("bilddaten_kaputt");
     notiz.sekunden = Math.round((Date.now() - beginn) / 1000);
-    return `Hier ist dein Bild:\n\n![Erstelltes Bild](data:image/png;base64,${b64})`;
+    return bildAntwort(sprache, "image/png", b64);
   } catch (fehler) {
     // Der Abbruch durch die eigene Zeitgrenze sieht wie ein Netzfehler aus —
     // er ist aber der haeufigste Fall und verdient einen eigenen Namen.
@@ -1976,6 +2026,11 @@ async function streamBilderLane(res, body, task, deps) {
   const prompt = erkenneBildAuftrag(task);
   if (!prompt) return false;
 
+  // Einmal bestimmt, an beide Wege weitergereicht: den eigenen Bild-Maler und
+  // den SVG-Rueckfall. Wer nur einen von beiden uebersetzt, laesst den
+  // haeufigeren Fall deutsch.
+  const sprache = spracheAusAnfrage(body, deps.acceptLanguage);
+
   // deps.fetchImpl gibt es nur im Test — im Betrieb bleibt es das echte fetch.
   const malerZustand = await bilderMalerZustand(deps.fetchImpl || fetch);
 
@@ -1991,14 +2046,14 @@ async function streamBilderLane(res, body, task, deps) {
     let inhalt = "";
     const notiz = {};
     try {
-      inhalt = await erzeugeFotoInhalt(await uebersetzeMalPrompt(prompt), BILDER_FOTO_TIMEOUT_MS, notiz);
+      inhalt = await erzeugeFotoInhalt(await uebersetzeMalPrompt(prompt), BILDER_FOTO_TIMEOUT_MS, notiz, deps.fetchImpl || fetch, sprache);
     } finally {
       clearInterval(takt);
     }
     if (!inhalt) {
       // Mitten im Strom: kein Rueckweg zum Text-Pfad mehr — SVG als Reserve.
       bilderSchritt(res, "laeuft", "ausgelastet — zeichne als Vektorgrafik …");
-      inhalt = await erzeugeSvgInhalt(prompt, deps.timeoutMs);
+      inhalt = await erzeugeSvgInhalt(prompt, deps.timeoutMs, sprache);
     }
     // Scheitert AUCH die Reserve, ist der Grund des ersten Versuchs das
     // einzige, was noch etwas erklaert — sonst steht dort ein nacktes
@@ -2014,7 +2069,7 @@ async function streamBilderLane(res, body, task, deps) {
 
   // Weg 2 (Reserve): smejj 1.0 zeichnet SVG. Erst erzeugen, DANN senden —
   // bei "" ist noch kein Byte raus und der Text-Weg uebernimmt.
-  const inhalt = await erzeugeSvgInhalt(prompt, deps.timeoutMs);
+  const inhalt = await erzeugeSvgInhalt(prompt, deps.timeoutMs, sprache);
   if (!inhalt) {
     // Weg 3: Beide Wege aus — aber ein Mal-Auftrag WURDE erkannt. Frueher fiel
     // das stumm auf den Text-Weg, und smejj antwortete "Ich kann leider keine
@@ -4409,7 +4464,7 @@ const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_M
 const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
 const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260920-v159-sprachverlauf";
+const BRIDGE_VERSION = "20260923-v160-bildsatz-sprache";
 
 // Premium-Stimme: ausgelagerte Handler (siehe chat-bridge-voice-tts.js).
 // Funktionsdeklarationen unten sind gehoben — der Aufruf hier oben ist sicher.
@@ -4551,7 +4606,7 @@ async function handleChat(req, res) {
   const task = String(messages[messages.length - 1]?.content || "").trim();
   // v157: ein Bild geht IMMER an die Vision-Spur — auch ohne Begleittext (vorher fiel es dann still ans Textmodell).
   if (await streamVisionLane(res, body, task, { corsHeaders, securityHeaders, timeoutMs: REQUEST_TIMEOUT_MS, maxBodyBytes: MAX_BODY_BYTES })) return;
-  if (task && await streamBilderLane(res, body, task, { corsHeaders, securityHeaders, timeoutMs: BILDER_TIMEOUT_MS })) return;
+  if (task && await streamBilderLane(res, body, task, { corsHeaders, securityHeaders, timeoutMs: BILDER_TIMEOUT_MS, acceptLanguage: req.headers?.["accept-language"] })) return;
   // Anschlussfragen tragen ihr Thema nicht selbst — dann zaehlt die Frage davor.
   const wissen = buildRagBlockMitVerlauf(lastUserContent(messages), previousUserContent(messages));
   // Wechselndes ans Ende: der Wissensblock aendert sich mit jeder Frage und
@@ -4581,7 +4636,7 @@ async function handleAgent(req, res) {
   // Bild-Verstehen (Vision) und Bilder-Zeichnen: bei false laeuft unveraendert
   // der Text-Weg (fail-safe, Details in chat-bridge-vision.js/-bilder.js).
   if (await streamVisionLane(res, body, task, { corsHeaders, securityHeaders, timeoutMs: REQUEST_TIMEOUT_MS, maxBodyBytes: MAX_BODY_BYTES })) return;
-  if (await streamBilderLane(res, body, task, { corsHeaders, securityHeaders, timeoutMs: BILDER_TIMEOUT_MS })) return;
+  if (await streamBilderLane(res, body, task, { corsHeaders, securityHeaders, timeoutMs: BILDER_TIMEOUT_MS, acceptLanguage: req.headers?.["accept-language"] })) return;
   // "schnell" heisst schnell: dann bekommt auch eine Coding- oder Suchfrage die
   // Schnellspur angeboten (streamFastLane entscheidet dann endgueltig).
   const fastTask = stufe === "schnell" || (!coding && !shouldSearchWeb(task));
