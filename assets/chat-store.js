@@ -4,8 +4,8 @@
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=1";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=22";
-export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=22";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=23";
+export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=23";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und Bewertung je
 // Nachricht.
@@ -184,6 +184,8 @@ function readEntries() {
     const verworfen = alle.length - versions.length;
     return {
       role: node.classList.contains("user") ? "user" : "assistant",
+      // Arbeitsschritte-Zeile merken (Geraetebefund 23.09.: nach Neustart bekam sie eine eigene, leere Aktionsleiste).
+      ...(node.classList.contains("chat-schritte") ? { art: "schritte" } : {}),
       text: String(node.textContent || ""),
       html: node.classList.contains("user") ? "" : ohneToteAktion(node.innerHTML), // ohne den Aktionsknopf: gespeichert waere er tot (Befund 2026-09-04)
       raw: String(meta.raw || ""),
@@ -462,6 +464,9 @@ async function parkerBereit(messages) {
   return parkerLaedt;
 }
 
+// Ein gespeicherter Schritte-Eintrag beginnt mit seiner Faltzeile oder einer Schrittgruppe.
+const SCHRITTE_HTML = /^\s*<(details|div)\b[^>]*class="[^"]*\bchat-(schritte-falte|schritt-gruppe|schritt|denken)\b/;
+
 function renderEntriesInto(log, messages) {
   restoring = true;
   try {
@@ -470,6 +475,13 @@ function renderEntriesInto(log, messages) {
       if (message.role !== "user" && !String(message.raw || "").trim() && /^smejj denkt nach/i.test(String(message.text || "").trim())) continue; // Altbestand: gespeicherter Wartetext
       const node = document.createElement("article");
       node.className = `entry ${message.role === "user" ? "user" : "assistant"}`;
+      // Arbeitsschritte (Geraetebefund 23.09.2026, iPhone + Versionswache): die Zeile "Arbeitsschritte: 1 Schritt"
+      // ist live ein eigener Eintrag mit .chat-schritte und bekommt KEINE Aktionsleiste. Beim Wiederherstellen ging die
+      // Klasse verloren -> zweite, leere Leiste ueber der Antwort. Altbestand ohne Merker: am gespeicherten HTML erkannt.
+      if (message.role === "assistant" && (message.art === "schritte" || SCHRITTE_HTML.test(String(message.html || "")))) {
+        node.classList.add("chat-schritte");
+        node.dataset.smejjSchritte = "true";
+      }
       if (message.role === "assistant" && message.html) {
         node.innerHTML = parkeMedien(ohneToteAktion(message.html)); // Adressen geparkt (siehe parkeMedien), sanitisierte Ausgabe
       } else {
