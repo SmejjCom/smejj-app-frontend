@@ -19,7 +19,7 @@ import { createBrowserTts } from "./voice-browser-tts.js";
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
 import { createServerEar, createEarSend, ohrAdressen } from "./voice-ear.js";
-import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=7";
+import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=8";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
@@ -105,7 +105,7 @@ const earSend = createEarSend({
 const liveWelle = verdrahteLive({ state, setStatus: setVoiceModeStatus, setTranskript: setVoiceModeTranscript, setReply: setVoiceModeReply });
 const ohrSolo = verdrahteOhrSolo({
       createServerEar, urls: ohrAdressen(CLIENT_ROUTES.api), state,
-      earAlive: () => serverEar.isAlive(),
+      earAlive: () => serverEar.isAlive(), earCancel: () => serverEar.cancel(),
       setStatus: setVoiceModeStatus, setTranskript: setVoiceModeTranscript,
       senden: voiceModeSend, fallback: enterVoiceFallback,
       stopInterrupt, stopBarge: stopBargeListener, hoerenNeu: voiceModeListen
@@ -289,7 +289,7 @@ function stopBargeListener() {
 }
 
 function startBargeListener(spokenText, failStreak = 0) {
-      if (!RecognitionCtor || !state.voiceModeActive || state.voiceMuted || state.voiceFallback) return;
+      if (!RecognitionCtor || !state.voiceModeActive || state.voiceMuted || state.voiceFallback || state.ohrSoloAktiv) return;
       stopBargeListener();
       const recognition = new RecognitionCtor();
       recognition.lang = speechLang();
@@ -453,7 +453,7 @@ function voiceModeListen() {
               }
       };
       recognition.onerror = (event) => {
-              taubwache.fehler(event.error);
+              if (taubwache.fehler(event.error)) return; // Erkennung verweigert, Mikrofon frei: das eigene Ohr uebernimmt (Geraetebefund 23.09.2026)
               if (event.error === "not-allowed" || event.error === "service-not-allowed") {
                         showToast("Mikrofon-Zugriff verweigert. Bitte in den Browser-Einstellungen erlauben.", "warn");
                         enterVoiceFallback("Mikrofon nicht erlaubt — Frage unten eintippen.");

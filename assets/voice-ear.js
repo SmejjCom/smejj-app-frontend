@@ -99,9 +99,18 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
   let stuecke = [];
   let mime = "";
   let wecker = 0;
+  // Laufnummer (Geraetebefund 23.09.2026, iPhone: orangefarbener Mikrofon-Punkt
+  // blieb an). start() wartet auf getUserMedia; kam in der Zwischenzeit
+  // cancel()/finish(), legte der verspaetete Start trotzdem einen Recorder an,
+  // den niemand mehr stoppte — ein haengendes Mikrofon. Jede Freigabe zaehlt
+  // die Nummer hoch; ein Start, dessen Nummer nicht mehr stimmt, gibt sein
+  // Mikrofon sofort wieder ab. `startet` verhindert zwei parallele Starts.
+  let lauf = 0;
+  let startet = false;
   const holen = fetchFn || ((...args) => fetch(...args));
 
   const aufraeumen = () => {
+    lauf += 1;
     clearTimeout(wecker);
     try {
       if (recorder && recorder.state !== "inactive") recorder.stop();
@@ -123,13 +132,20 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
     },
 
     async start() {
-      if (!alive || recorder) return;
+      if (!alive || recorder || startet) return;
       mime = pickRecorderMime();
       if (!mime || !navigator?.mediaDevices?.getUserMedia) return;
+      const meinLauf = lauf;
+      startet = true;
       try {
         const captured = await navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
         });
+        if (meinLauf !== lauf) {
+          // Waehrend des Wartens abgebrochen: Mikrofon sofort freigeben.
+          captured?.getTracks?.().forEach((track) => { try { track.stop(); } catch { /* schon aus */ } });
+          return;
+        }
         stuecke = [];
         stream = captured;
         recorder = new MediaRecorder(captured, { mimeType: mime, audioBitsPerSecond: 32_000 });
@@ -140,8 +156,15 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
         // Harte Obergrenze: eine vergessene Aufnahme laeuft nie ewig weiter.
         wecker = setTimeout(aufraeumen, MAX_AUFNAHME_MS);
       } catch {
-        aufraeumen(); // z. B. Mikrofon verweigert — Ohr bleibt still, Web Speech laeuft.
+        if (meinLauf === lauf) aufraeumen(); // z. B. Mikrofon verweigert — Ohr bleibt still, Web Speech laeuft.
+      } finally {
+        startet = false;
       }
+    },
+
+    /** true, solange eine Aufnahme laeuft oder gerade startet. */
+    nimmtAuf() {
+      return Boolean(recorder) || startet;
     },
 
     cancel() {
@@ -149,7 +172,10 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
       aufraeumen();
     },
 
-    async finish() {
+    // optionen.budgetMs: laengeres Warten fuer Wege OHNE Web-Speech-Text als
+    // Rueckfall (reines Ohr-Diktat) — dort waere ein gerissenes Budget
+    // verlorener Text.
+    async finish(optionen = {}) {
       if (!alive || !recorder) {
         aufraeumen();
         return "";
@@ -164,7 +190,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
       stuecke = [];
       if (blob.size < 1_000) return ""; // zu kurz fuer echte Sprache
       const abbruch = new AbortController();
-      const budget = setTimeout(() => abbruch.abort(), budgetMs);
+      const budget = setTimeout(() => abbruch.abort(), Number(optionen?.budgetMs) > 0 ? Number(optionen.budgetMs) : budgetMs);
       try {
         for (const adresse of lebende()) {
           let antwort;

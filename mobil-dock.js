@@ -158,6 +158,15 @@ export const REGELN = "@media (max-width:600px){"
   //      und Verlaufshalter (laufender Chat).
   + "body.mobil-chat-offen #code .codegruss{padding-top:calc(env(safe-area-inset-top,0px) + 60px)}"
   + "body #code #codeLogHalter.code-log-halter{padding-top:calc(env(safe-area-inset-top,0px) + 56px);scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}"
+  // (17) Geraetebefund 23.09.2026 (iPhone 17 Pro Max, Build 4): im Code-Bereich lag oben eine
+  //      dunkle Flaeche mit Trennlinie, der Text wurde dort abgeschnitten statt unter der
+  //      Statusleiste weiterzulaufen. GEMESSEN (440 x 956): der adoptierte #startLog scrollte
+  //      SELBST (.start-log overflow:auto aus start-styles.css) — unterhalb des 56-px-Polsters
+  //      des Halters, mit border-top 1px. Der Halter scrollt ja schon (Regel 5 oben). Jetzt ist
+  //      der Halter der EINZIGE Scroller: Polster bleibt (erste Zeile frei), beim Scrollen laeuft
+  //      der Verlauf bis an die Oberkante. Dazu die 4 px Kopfrand der Code-Ansicht — wie im Chat.
+  + "body #code #codeLogHalter #startLog.start-log{overflow:visible;border-top:0;flex:0 0 auto;min-height:auto}"
+  + "body #code.view.is-active.is-active{padding-top:0}"
   + "}"
   // (10) Vollbild-Versatz der installierten App (Betreiber 17:32, iPhone, frisch installiert):
   //      iOS legt die Layout-Flaeche oben an, rechnet sie aber um die Statusleistenhoehe

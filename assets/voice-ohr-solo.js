@@ -240,7 +240,22 @@ export function verdrahteOhrSolo(host) {
       }, taubMs);
       return {
         ergebnis() { ergebnisse += 1; clearTimeout(wecker); },
-        fehler(art) { if (art === "no-speech") noSpeech = true; },
+        // Geraetebefund 23.09.2026 (iPhone-App): WebKit verweigert die
+        // Erkennung mit "service-not-allowed"/"not-allowed", obwohl das
+        // Mikrofon frei ist (der orange Punkt leuchtete). Bisher hiess das
+        // "Mikrofon nicht erlaubt — Frage unten eintippen". Jetzt uebernimmt
+        // das eigene Ohr; true = uebernommen, der Host kehrt sofort um.
+        // Ist auch das Mikrofon gesperrt, meldet solo.start() das mit dem
+        // passenden Text (soloFehlertext) — nie ein haengender Zustand.
+        fehler(art) {
+          if (art === "no-speech") noSpeech = true;
+          if (art !== "not-allowed" && art !== "service-not-allowed") return false;
+          clearTimeout(wecker);
+          if (s.voiceRecognition === recognition) s.voiceRecognition = null;
+          try { recognition.abort(); } catch { /* bereits gestoppt */ }
+          try { host.earCancel?.(); } catch { /* Ohr war still */ }
+          return anschluss.aktivieren();
+        },
         /** true = Taubheit erkannt und uebernommen — der Host kehrt sofort um. */
         ende() {
           clearTimeout(wecker);

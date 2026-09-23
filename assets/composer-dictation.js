@@ -78,7 +78,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
   }
 
   function starteErkennung(s) {
-    if (!s.aktiv || sitzung !== s) return;
+    if (!s.aktiv || sitzung !== s || s.nurOhr) return;
     const rec = new RecognitionCtor();
     rec.lang = typeof lang === "function" ? lang() : lang; // Funktion = Sprache JETZT (Oberflaechensprache kann wechseln)
     rec.continuous = true;
@@ -114,6 +114,18 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       if (s.rec !== rec) return;
       const art = event && event.error;
       if (art === "not-allowed" || art === "service-not-allowed") {
+        // Geraetebefund 23.09.2026 (iPhone-App, Build 4): WebKit verweigert
+        // die Spracherkennung ("service-not-allowed"), das Mikrofon selbst
+        // ist aber frei — das eigene Ohr nimmt bereits auf. Frueher endete
+        // das Diktat hier sofort. Jetzt laeuft die Sitzung als reines Ohr
+        // weiter; der Text kommt beim Stopp-Klick ueber die Bruecke.
+        if (serverOhr && typeof serverOhr.nimmtAuf === "function" && serverOhr.nimmtAuf()) {
+          s.nurOhr = true;
+          s.rec = null;
+          beendeErkennung({ rec }, { abbrechen: true });
+          showToast("Diktat läuft — der Text erscheint nach dem Stoppen.", "info");
+          return;
+        }
         stop();
         showToast("Mikrofon-Zugriff verweigert. Bitte in den Browser-Einstellungen erlauben.", "warn");
       }
@@ -166,7 +178,11 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     if (!serverOhr) return;
     if (warTaub) {
       // Web-Speech blieb stumm — das parallel aufnehmende Ohr liefert den Text.
-      serverOhr.finish().then((text) => uebernimmOhrText(s, String(text || "").trim())).catch(() => {});
+      serverOhr.finish(s.nurOhr ? { budgetMs: 30000 } : undefined).then((text) => {
+        const sauber = String(text || "").trim();
+        if (!sauber && s.nurOhr) showToast("Keine Sprache erkannt — bitte noch einmal versuchen.", "info");
+        uebernimmOhrText(s, sauber);
+      }).catch(() => {});
     } else {
       try { serverOhr.cancel(); } catch { /* Ohr war still */ }
     }
@@ -191,6 +207,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       instFinals: "",
       interim: "",
       hatText: false,
+      nurOhr: false,
       kurzeLaeufe: 0,
       gestartetUm: 0
     };

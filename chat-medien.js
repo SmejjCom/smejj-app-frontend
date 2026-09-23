@@ -179,18 +179,28 @@ export function entwaessere(knoten) {
     if (!adresse) continue;
     // Den angezeigten blob merken: gleich danach will rehydriereMedien ihn
     // zurueck, und ein zweiter fetch fuer dieselben Bytes waere verschenkt.
-    if (bisher.startsWith("blob:")) ANZEIGE_BLOB.set(el, { quelle: bisher, adresse, bis: 0 });
+    // Seit 23.09.2026 auch data: — das frisch erzeugte Bild bleibt so ohne Netz sichtbar.
+    if (bisher.startsWith("blob:") || bisher.startsWith("data:image/")) ANZEIGE_BLOB.set(el, { quelle: bisher, adresse, bis: 0 });
     el.setAttribute("src", adresse);
     zurueck += 1;
   }
   return zurueck;
 }
 
+// Zeitgrenze fuer jeden Medien-Abruf (Geraetebefund 23.09.2026, iPhone ueber
+// LTE): ein haengender Abruf liess das Bild ohne Ende als "?" stehen — ohne
+// Fehler, ohne neuen Versuch. Jetzt endet jeder Abruf spaetestens hier und
+// der naechste Weg (oder der sichtbare Hinweis) kommt dran.
+const ABRUF_MS = 15_000;
+function zeitgrenze() {
+  try { return typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(ABRUF_MS) : undefined; } catch { return undefined; }
+}
+
 async function holeMedium(adresse) {
   const schluessel = token();
   if (!schluessel) return null;
   try {
-    const antwort = await fetch(adresse, { headers: { Authorization: `Bearer ${schluessel}` } });
+    const antwort = await fetch(adresse, { headers: { Authorization: `Bearer ${schluessel}` }, signal: zeitgrenze() });
     if (!antwort.ok) return null;
     return await antwort.blob();
   } catch {
@@ -226,7 +236,8 @@ export async function holeAnzeigeAdressen(ids, { vorschau = false } = {}) {
     const antwort = await fetch(`${basis}/zugang`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${schluessel}` },
-      body: JSON.stringify({ ids: fehlend, vorschau })
+      body: JSON.stringify({ ids: fehlend, vorschau }),
+      signal: zeitgrenze()
     });
     if (!antwort.ok) return null;
     const daten = await antwort.json();
@@ -264,8 +275,9 @@ function hoereAufFehler(el) {
   if (MIT_FEHLERHOERER.has(el) || typeof el.addEventListener !== "function") return;
   MIT_FEHLERHOERER.add(el);
   el.addEventListener("error", () => {
-    const adresse = el.getAttribute(ADRESSE_ATTRIBUT);
-    if (!istAnzeigeAdresse(el.getAttribute("src")) || !istMedienAdresse(adresse)) return;
+    const src = el.getAttribute("src") || "";
+    const adresse = el.getAttribute(ADRESSE_ATTRIBUT) || (istMedienAdresse(src) ? src : "");
+    if (!(istAnzeigeAdresse(src) || istMedienAdresse(src)) || !istMedienAdresse(adresse)) return;
     ANZEIGE_BLOB.delete(el);
     vergissAdressen(kennungAus(adresse));
     const einzeln = { querySelectorAll: () => [el] };
@@ -375,10 +387,56 @@ export async function rehydriereMedien(knoten, { holen = holeMedium, adressenHol
 // Vollbild, Herunterladen und Teilen: ein Klick auf ein ausgelagertes Bild.
 // Das Modul dafuer kommt erst beim ersten Klick — der Verlauf bleibt leicht.
 let klickHoererAn = false;
+// Sichtbarer Ersatz fuer ein Bild, dessen Daten unvollstaendig ankamen (z. B.
+// Verbindung waehrend der Uebertragung abgerissen) — nie das kaputte "?".
+export const UNVOLLSTAENDIGES_BILD = "data:image/svg+xml;utf8," + encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' width='320' height='120' viewBox='0 0 320 120'>"
+  + "<rect width='320' height='120' rx='8' fill='#2a2b2f'/>"
+  + "<text x='160' y='56' text-anchor='middle' font-family='system-ui,sans-serif' font-size='15' fill='#c9c6c0'>Bild nicht vollständig geladen</text>"
+  + "<text x='160' y='80' text-anchor='middle' font-family='system-ui,sans-serif' font-size='12' fill='#8f8c86'>Verbindung unterbrochen — bitte erneut senden.</text>"
+  + "</svg>"
+);
+
+/**
+ * Was ein Chat-Bild nach einem Ladefehler bekommt — pur und testbar.
+ * "neu"   = Serveradresse: frische Anzeige-Adresse holen (rehydriereMedien)
+ * "ersatz"= data:-Bild mit kaputten Daten: sichtbarer Hinweis
+ * ""      = nichts tun (Platzhalter selbst, fremde Quelle)
+ */
+export function reaktionAufBildFehler(src, adresse) {
+  const quelle = String(src || "");
+  if (quelle === FEHLENDES_BILD || quelle === UNVOLLSTAENDIGES_BILD || quelle === LEERES_BILD) return "";
+  if (istMedienAdresse(adresse) || istMedienAdresse(quelle) || istAnzeigeAdresse(quelle)) return "neu";
+  if (quelle.startsWith("data:image/")) return "ersatz";
+  return "";
+}
+
+// Neuer Versuch fuer alles, was noch fehlt, sobald das Netz zurueck ist oder
+// die App wieder sichtbar wird (iOS friert die WebView im Hintergrund ein).
+let letzterNachlauf = 0;
+function nachlauf() {
+  const jetzt = Date.now();
+  if (jetzt - letzterNachlauf < 10_000) return;
+  letzterNachlauf = jetzt;
+  for (const log of document.querySelectorAll("#startLog, #chatLog")) rehydriereMedien(log);
+}
+
 function hoereAufKlicks(knoten) {
   if (klickHoererAn || typeof document === "undefined" || !knoten?.ownerDocument) return;
   klickHoererAn = true;
-  const oeffne = (el) => import("./chat-medien-ansicht.js?v=4").then((m) => m.oeffneVollbild(el)).catch(() => {});
+  window.addEventListener?.("online", nachlauf);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") nachlauf(); });
+  // Ladefehler bubbeln nicht — darum in der Einfangphase.
+  document.addEventListener("error", (ereignis) => {
+    const bild = ereignis.target;
+    if (!bild || bild.tagName !== "IMG" || !bild.closest?.(".entry")) return;
+    const art = reaktionAufBildFehler(bild.getAttribute("src"), bild.getAttribute(ADRESSE_ATTRIBUT));
+    if (art === "ersatz") bild.setAttribute("src", UNVOLLSTAENDIGES_BILD);
+    // Nur EINMAL anstossen: danach fuehrt hoereAufFehler() (ein neuer Versuch,
+    // dann der alte Weg, dann der Hinweis) — sonst Endlosschleife bei totem Netz.
+    else if (art === "neu" && !MIT_FEHLERHOERER.has(bild)) { hoereAufFehler(bild); rehydriereMedien({ querySelectorAll: () => [bild] }); }
+  }, true);
+  const oeffne = (el) => import("./chat-medien-ansicht.js?v=5").then((m) => m.oeffneVollbild(el)).catch(() => {});
   document.addEventListener("click", (ereignis) => {
     const bild = ereignis.target?.closest?.(`.entry img[${ADRESSE_ATTRIBUT}]`);
     if (!bild || !istMedienAdresse(bild.getAttribute(ADRESSE_ATTRIBUT))) return;
@@ -533,6 +591,14 @@ export async function lagereMedienAus(knoten, { basis = medienUrl(), hochladen =
       eintrag.element.removeAttribute(VIDEO_QUELLE_ATTRIBUT);
       eintrag.element.setAttribute("src", adresse);
     } else {
+      // Geraetebefund 23.09.2026 ("Hier ist dein Bild:" und darunter nur "?"):
+      // Das Bild stand fertig als data: im Chat. Hier wurde es gegen die
+      // Serveradresse getauscht, die nur MIT Anmelde-Schluessel antwortet —
+      // die Anzeige hing danach ganz am Netz (Anzeige-Adresse holen), und
+      // scheiterte das ueber LTE, blieb das kaputte Bildsymbol. Jetzt merkt
+      // sich das Element die data:-Anzeige: der Schnappschuss bekommt die
+      // kurze Adresse, rehydriereMedien() stellt die Anzeige ohne Netz zurueck.
+      if (eintrag.element.tagName === "IMG") ANZEIGE_BLOB.set(eintrag.element, { quelle: eintrag.dataUrl, adresse, bis: 0 });
       eintrag.element.setAttribute(eintrag.attribut, adresse);
     }
     ausgelagert += 1;

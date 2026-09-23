@@ -15,7 +15,7 @@
 
 import {
   newChat, openChat, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
-} from "/assets/chat-store.js?v=verlauf-20260722";
+} from "/assets/chat-store.js?v=geraet-20260923";
 // Seit der Zusammenfuehrung der beiden Aufteilungen (2026-08-10) wohnen die
 // reinen Anzeige-Helfer in chat-history-text.js — format.js war deren
 // Teilmenge und ist entfallen.
