@@ -37,7 +37,9 @@ export const REGELN = "@media (max-width:600px){"
   // Reiter tragen am Schreibtisch Titel + Untertitel in zwei Zeilen — in der Zeile nur der Titel
   + "body #settings .settings-nav-button .settings-nav-sub,body #settings .settings-nav-button small,body #settings .settings-nav-button span+span{display:none}"
   // (2) Kopf kompakt
-  + "body #settings.premium-view.premium-view,body #profile.premium-view.premium-view{padding:56px 12px 24px}"
+  // iPhone-Huelle (v961, 23.09.): das Logo sitzt fest bei safe-area-top und lag ueber der Kopfzeile —
+  // der Abstand zaehlt die Statusleiste mit (ohne Aussparung ist env() 0, nichts aendert sich).
+  + "body #settings.premium-view.premium-view,body #profile.premium-view.premium-view{padding:calc(56px + env(safe-area-inset-top,0px)) 12px 24px}"
   + "body #settings .settings-header.settings-header,body #profile .account-header.account-header{display:block;padding-bottom:10px;margin-bottom:8px}"
   + "body #settings .settings-header p,body #profile .account-header p{margin:4px 0 10px}"
   + "body #settings .settings-header .settings-status,body #profile .account-header .state-badge{display:inline-flex;margin-top:6px}"
