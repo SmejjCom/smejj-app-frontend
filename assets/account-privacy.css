@@ -34,7 +34,13 @@
      jeher unwahr, nur hat sie niemand nachgerechnet. Auf Dunkel traegt
      der V11-Ton mit 13.84 muehelos. */
   --konto-fokus: var(--v11-cy);
-  padding: 72px clamp(14px, 4vw, 48px) 28px;
+  /* iPhone-Huelle (v960, 23.09.2026): das Logo sitzt fest bei safe-area-top und
+     lag ueber "KONTO & DATENSCHUTZ" — der Abstand zaehlt die Statusleiste mit.
+     Ohne Aussparung (Desktop, Android-Browser) ist env() 0 und nichts aendert sich.
+     text-size-adjust: nach Tastatur auf/zu blies iOS den Chip auf doppelte Groesse. */
+  padding: calc(72px + env(safe-area-inset-top, 0px)) clamp(14px, 4vw, 48px) 28px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   /* Die "farbigen Lichtflecken NUR in dieser Ansicht" sind am 2026-08-22
      entfallen — genau das war der Punkt: sie galten nur hier, und seit dem
      Abraeumen von design-cyan-views.css trug jede ANDERE Ansicht den ruhigen

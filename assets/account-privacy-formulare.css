@@ -250,7 +250,7 @@
 
 @media (max-width: 480px) {
   #profile.premium-view {
-    padding-top: 64px;
+    padding-top: calc(64px + env(safe-area-inset-top, 0px)); /* iPhone-Huelle: Logo sitzt bei safe-area-top (23.09.2026) */
   }
 
   #profile .account-row {
