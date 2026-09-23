@@ -1,5 +1,5 @@
 // ERZEUGTE DATEI — nicht von Hand bearbeiten.
-// Gebuendelt aus public/chat-bridge-weather.js, public/chat-bridge-strom.js, public/chat-bridge-lebenszeichen.js, src/agent/conversationHistory.js, public/chat-bridge-vision.js, control-server/src/autopilots/antwortTuevAutopilot.js, control-server/src/evolution/qualitaetsEngine.js, public/chat-bridge-evolution.js, public/chat-bridge-bilder.js, public/chat-bridge-rechner.js, public/chat-bridge-websuche.js, public/chat-bridge-auth.js, public/chat-bridge-sicherheit.js, control-server/src/rag/bm25Index.js, control-server/src/rag/ragRanking.js, control-server/src/rag/infrastrukturFrage.js, control-server/src/rag/regelfragen.js, control-server/src/rag/fremdinhaltFilter.js, control-server/src/rag/ragContextBlock.js, public/chat-bridge-rag.js, public/chat-bridge-voice-ear.js, public/chat-bridge-voice-tts.js, public/chat-bridge.js
+// Gebuendelt aus public/chat-bridge-weather.js, public/chat-bridge-strom.js, public/chat-bridge-lebenszeichen.js, src/agent/conversationHistory.js, public/chat-bridge-vision.js, control-server/src/autopilots/antwortTuevAutopilot.js, control-server/src/evolution/qualitaetsEngine.js, public/chat-bridge-evolution.js, public/chat-bridge-bildsprachen.js, public/chat-bridge-bilder.js, public/chat-bridge-rechner.js, public/chat-bridge-websuche.js, public/chat-bridge-auth.js, public/chat-bridge-sicherheit.js, control-server/src/rag/bm25Index.js, control-server/src/rag/ragRanking.js, control-server/src/rag/infrastrukturFrage.js, control-server/src/rag/regelfragen.js, control-server/src/rag/fremdinhaltFilter.js, control-server/src/rag/ragContextBlock.js, public/chat-bridge-rag.js, public/chat-bridge-voice-ear.js, public/chat-bridge-voice-tts.js, public/chat-bridge.js
 // Wissensartefakt: 911 Abschnitte, sha256 2f17f29b67940fe117e8da0db86858f2c77bb9a04a52b17c042044b7159ed56d
 // Quelle und Buendler: scripts/deploy/bundle_chat_bridge.mjs
 import http from "node:http";
@@ -1348,6 +1348,87 @@ function meldeAktion({ art, prompt = "", ergebnis, dauerMs = 0, quelle = "brueck
 }
 
 
+// --- public/chat-bridge-bildsprachen.js ---
+// smejj.com — Mal-Auftraege in den 13 weiteren Oberflaechensprachen erkennen.
+//
+// WARUM (live gemessen 23.09.2026, Bruecke v160): "Dessine une pomme rouge"
+// fiel in die Textspur und bekam eine Beschreibung statt eines Bildes. Die
+// Erkennung in chat-bridge-bilder.js kannte nur deutsche und englische Verben —
+// die Oberflaeche spricht aber 15 Sprachen, und seit v160 antwortet auch der
+// Satz ueber dem Bild in all diesen Sprachen.
+//
+// Zwei Wege, wie in der deutschen Erkennung:
+//  1. MALVERB: ein Verb, das ohne Bild keinen Sinn ergibt ("dessine",
+//     "нарисуй", "描いて"). Es reicht allein, wenn danach noch etwas folgt.
+//  2. MOTIV + ERSTELLEN: ein Bildwort ("image", "imagen", "图片") zusammen mit
+//     einem Erstell-Verb ("génère", "crea", "生成"). Das Bildwort allein reicht
+//     NICHT — "Was bedeutet dieses Bild?" ist keine Bestellung.
+// Bewusst eng gehalten wie das Vorbild: lieber einmal eine Mal-Bitte als Text
+// beantworten als eine Frage ungefragt mit einem Bild.
+//
+// Grenzen: \b kennt in JavaScript weder Akzente noch nicht-lateinische Schrift
+// ("çiz" beginnt mit einem Zeichen, das \b nicht als Buchstaben sieht). Darum
+// Lookarounds auf \p{L}; fuer Chinesisch/Japanisch gibt es keine Wortgrenzen,
+// dort stehen die Muster ohne Grenze.
+
+const L = "(?<![\\p{L}\\p{M}])";   // davor kein Buchstabe
+const R = "(?![\\p{L}\\p{M}])";    // danach kein Buchstabe
+const wort = (liste) => new RegExp(`${L}(?:${liste.join("|")})${R}`, "iu");
+const frei = (liste) => new RegExp(`(?:${liste.join("|")})`, "u");
+
+// 1. Verben, die fuer sich schon "mal mir etwas" heissen.
+const MALVERB = [
+  wort(["dibuja", "dibujame", "dibújame", "dibújeme", "dibuje", "píntame", "pintame"]),             // es
+  wort(["dessine", "dessinez", "dessine-moi", "dessinez-moi", "peins", "peignez", "peins-moi"]),     // fr
+  wort(["disegna", "disegnami", "disegnate", "dipingi", "dipingimi"]),                              // it
+  wort(["desenhe", "desenha", "desenha-me", "desenhe-me", "pinte", "pinta-me"]),                    // pt
+  wort(["çiz", "çizin", "çizer misin", "çizebilir misin", "çizsene"]),                              // tr
+  wort(["нарисуй", "нарисуйте", "нарисуешь", "изобрази"]),                                          // ru
+  wort(["ارسم", "ارسمي", "ارسموا", "ارسم لي"]),                                                    // ar
+  wort(["ड्रॉ करो", "ड्रॉ कीजिए", "स्केच बनाओ", "स्केच बनाइए"]),                                                // hi
+  wort(["আঁকো", "আঁকুন", "এঁকে দাও", "এঁকে দিন"]),                                                     // bn
+  wort(["gambarkan", "gambarlah", "lukis", "lukiskan", "lukislah"]),                                // id
+  frei(["描いて", "描け", "描いてください", "絵を描"]),                                                // ja
+  frei(["그려줘", "그려 줘", "그려주세요", "그려 주세요", "그려봐", "그려 봐"]),                          // ko
+  frei(["画一", "画个", "画幅", "画张", "帮我画", "请画", "画出", "绘制"])                              // zh
+];
+
+// 2. Bildwoerter und Erstell-Verben je Sprache — nur GEMEINSAM ein Auftrag.
+const MOTIV_MIT_VERB = [
+  [wort(["imagen", "imágenes", "dibujo", "ilustración", "foto", "logo"]), wort(["crea", "créame", "crear", "genera", "generar", "haz", "hazme", "diseña"])],                      // es
+  [wort(["image", "images", "dessin", "illustration", "photo", "logo"]), wort(["crée", "crée-moi", "créer", "génère", "génère-moi", "générer", "fais", "fais-moi", "faire"])],   // fr
+  [wort(["immagine", "immagini", "disegno", "illustrazione", "foto", "logo"]), wort(["crea", "creami", "creare", "genera", "generami", "fai", "fammi"])],                       // it
+  [wort(["imagem", "imagens", "desenho", "ilustração", "foto", "logo"]), wort(["crie", "cria", "criar", "gere", "gera", "gerar", "faça", "faz", "faça-me"])],                     // pt
+  [wort(["resim", "resmi", "görsel", "görseli", "görüntü", "fotoğraf", "logo"]), wort(["oluştur", "oluşturur musun", "yap", "yapar mısın", "üret"])],                           // tr
+  [wort(["картинку", "картинка", "изображение", "рисунок", "фото", "логотип"]), wort(["создай", "создайте", "сгенерируй", "сделай", "нарисуй"])],                             // ru
+  [wort(["صورة", "رسمة", "رسم", "شعار"]), wort(["أنشئ", "انشئ", "اصنع", "ولّد", "ولد", "اعمل"])],                                                                          // ar
+  [wort(["चित्र", "तस्वीर", "इमेज", "फोटो", "लोगो"]), wort(["बनाओ", "बनाइए", "बनाएं", "बनाएँ", "बना दो", "जनरेट करो"])],                                                     // hi
+  [wort(["ছবি", "চিত্র", "ইমেজ", "লোগো"]), wort(["বানাও", "বানান", "তৈরি করো", "তৈরি করুন", "আঁকো"])],                                                                     // bn
+  [wort(["gambar", "foto", "ilustrasi", "logo"]), wort(["buat", "buatkan", "buatlah", "hasilkan", "bikin", "bikinkan"])],                                                      // id
+  [frei(["画像", "絵", "イラスト", "ロゴ"]), frei(["作って", "作成", "生成", "描"])],                                                                                             // ja
+  [frei(["이미지", "그림", "사진", "로고"]), frei(["만들어", "생성", "그려"])],                                                                                                  // ko
+  [frei(["图片", "图像", "照片", "插图", "图画", "标志"]), frei(["生成", "创建", "制作", "做一", "画"])]                                                                         // zh
+];
+
+// Fragen UEBER Bilder sind keine Bestellung ("Qu'est-ce qu'une image ?").
+const FRAGE = frei([
+  "qu'est-ce", "que signifie", "qué es", "qué significa", "cos'è", "che cos", "o que é", "o que significa",
+  "nedir", "ne demek", "что такое", "что значит", "ما هو", "ما هي", "क्या है", "কী", "apa itu", "apa arti",
+  "とは", "什么是", "什么意思", "무엇", "뭐야"
+]);
+
+/** true, wenn der Text in einer der 13 weiteren Sprachen ein Bild bestellt. */
+function istWeltMalAuftrag(text) {
+  const t = String(text || "").trim();
+  if (!t || t.length > 600 || FRAGE.test(t.toLowerCase())) return false;
+  for (const verb of MALVERB) {
+    const treffer = t.match(verb);
+    if (treffer && t.replace(treffer[0], "").trim().length >= 2) return true;
+  }
+  return MOTIV_MIT_VERB.some(([motiv, verb]) => motiv.test(t) && verb.test(t));
+}
+
+
 // --- public/chat-bridge-bilder.js ---
 // smejj.com — Bilder-Zeichnen-Spur der Chat-Bruecke (Stufe 2, 2026-08-12).
 // Ausgelagert wie chat-bridge-vision.js/-weather.js (800-Zeilen-Regel).
@@ -1369,6 +1450,7 @@ function meldeAktion({ art, prompt = "", ergebnis, dauerMs = 0, quelle = "brueck
 // ohne den Antworttext zu verschmutzen.
 //
 // Fail-safe: false = kein Byte gesendet, der Text-Weg uebernimmt unveraendert.
+
 
 
 
@@ -1480,6 +1562,8 @@ function erkenneBildAuftrag(task) {
     const rest = text.replace(BILDER_MALVERB_ALLEIN, " ").trim();
     if (rest.length >= 3) return text;
   }
+  // Die 13 weiteren Oberflaechensprachen ("Dessine une pomme rouge", 23.09.2026).
+  if (istWeltMalAuftrag(text)) return text;
   return "";
 }
 
@@ -4464,7 +4548,7 @@ const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_M
 const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
 const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260923-v160-bildsatz-sprache";
+const BRIDGE_VERSION = "20260923-v161-bildauftrag-15-sprachen";
 
 // Premium-Stimme: ausgelagerte Handler (siehe chat-bridge-voice-tts.js).
 // Funktionsdeklarationen unten sind gehoben — der Aufruf hier oben ist sicher.
