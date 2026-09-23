@@ -1,5 +1,5 @@
 // ERZEUGTE DATEI — nicht von Hand bearbeiten.
-// Gebuendelt aus public/chat-bridge-weather.js, public/chat-bridge-strom.js, public/chat-bridge-lebenszeichen.js, src/agent/conversationHistory.js, public/chat-bridge-vision.js, control-server/src/autopilots/antwortTuevAutopilot.js, control-server/src/evolution/qualitaetsEngine.js, public/chat-bridge-evolution.js, public/chat-bridge-bildsprachen.js, public/chat-bridge-bilder.js, public/chat-bridge-rechner.js, public/chat-bridge-websuche.js, public/chat-bridge-auth.js, public/chat-bridge-radar.js, public/chat-bridge-sicherheit.js, control-server/src/rag/bm25Index.js, control-server/src/rag/ragRanking.js, control-server/src/rag/infrastrukturFrage.js, control-server/src/rag/regelfragen.js, control-server/src/rag/fremdinhaltFilter.js, control-server/src/rag/ragContextBlock.js, public/chat-bridge-rag.js, public/chat-bridge-voice-ear.js, public/chat-bridge-voice-tts.js, public/chat-bridge.js
+// Gebuendelt aus public/chat-bridge-weather.js, public/chat-bridge-strom.js, public/chat-bridge-lebenszeichen.js, src/agent/conversationHistory.js, public/chat-bridge-vision.js, control-server/src/autopilots/antwortTuevAutopilot.js, control-server/src/evolution/qualitaetsEngine.js, public/chat-bridge-evolution.js, public/chat-bridge-bildsprachen.js, public/chat-bridge-bildschritte.js, public/chat-bridge-bilder.js, public/chat-bridge-rechner.js, public/chat-bridge-websuche.js, public/chat-bridge-auth.js, public/chat-bridge-radar.js, public/chat-bridge-sicherheit.js, control-server/src/rag/bm25Index.js, control-server/src/rag/ragRanking.js, control-server/src/rag/infrastrukturFrage.js, control-server/src/rag/regelfragen.js, control-server/src/rag/fremdinhaltFilter.js, control-server/src/rag/ragContextBlock.js, public/chat-bridge-rag.js, public/chat-bridge-voice-ear.js, public/chat-bridge-voice-tts.js, public/chat-bridge.js
 // Wissensartefakt: 911 Abschnitte, sha256 2f17f29b67940fe117e8da0db86858f2c77bb9a04a52b17c042044b7159ed56d
 // Quelle und Buendler: scripts/deploy/bundle_chat_bridge.mjs
 import http from "node:http";
@@ -1429,6 +1429,49 @@ function istWeltMalAuftrag(text) {
 }
 
 
+// --- public/chat-bridge-bildschritte.js ---
+// smejj.com — die Fortschrittszeile beim Malen in 15 Sprachen.
+//
+// WARUM (Betreiber 23.09.2026: "Mach 'Male dein Bild' auch in 15 Sprachen"):
+// Seit v160/v161 erkennt die Bruecke Mal-Auftraege in allen 15 Sprachen und
+// antwortet mit "Voici ton image :" — die Zeile DARUEBER stand aber weiter fest
+// deutsch ("Male dein Bild · läuft … 10 s"). Die App (ai/chat-schritte-anzeige.js)
+// zeigt schritt.text und schritt.stand unveraendert an; uebersetzt wird deshalb
+// hier im Server, in derselben Sprache wie der Satz ueber dem Bild
+// (spracheAusAnfrage in chat-bridge-bilder.js). Der Titel bleibt innerhalb EINER
+// Anfrage konstant — die App erkennt daran, dass sie dieselbe Zeile aktualisiert.
+
+const T = (titel, etwa, sek, reserve, fertig, fehl, startet) => ({ titel, etwa, sek, reserve, fertig, fehl, startet });
+
+const BILD_SCHRITTE = Object.freeze({
+  de: T("Male dein Bild", "läuft … (ca. 1 Minute)", "läuft … {n} s", "ausgelastet — zeichne als Vektorgrafik …", "fertig", "fehlgeschlagen", "Bild-Dienst startet gerade"),
+  en: T("Painting your image", "running … (about 1 minute)", "running … {n} s", "busy — drawing as a vector graphic …", "done", "failed", "Image service is starting"),
+  es: T("Pintando tu imagen", "en curso … (aprox. 1 minuto)", "en curso … {n} s", "ocupado — dibujando como gráfico vectorial …", "listo", "falló", "El servicio de imágenes se está iniciando"),
+  fr: T("Je peins ton image", "en cours … (env. 1 minute)", "en cours … {n} s", "occupé — dessin en graphique vectoriel …", "terminé", "échec", "Le service d'images démarre"),
+  pt: T("A pintar a tua imagem", "em curso … (cerca de 1 minuto)", "em curso … {n} s", "ocupado — a desenhar como gráfico vetorial …", "concluído", "falhou", "O serviço de imagens está a iniciar"),
+  it: T("Dipingo la tua immagine", "in corso … (circa 1 minuto)", "in corso … {n} s", "occupato — disegno come grafica vettoriale …", "fatto", "non riuscito", "Il servizio immagini si sta avviando"),
+  tr: T("Görselin çiziliyor", "sürüyor … (yaklaşık 1 dakika)", "sürüyor … {n} sn", "yoğun — vektör grafik olarak çiziliyor …", "tamamlandı", "başarısız", "Görsel hizmeti başlatılıyor"),
+  ru: T("Рисую твоё изображение", "идёт … (около 1 минуты)", "идёт … {n} с", "занято — рисую векторную графику …", "готово", "не удалось", "Сервис изображений запускается"),
+  ar: T("أرسم صورتك", "جارٍ … (حوالي دقيقة)", "جارٍ … {n} ث", "مشغول — أرسمها كرسم متجهي …", "تم", "فشل", "خدمة الصور قيد التشغيل"),
+  hi: T("आपकी तस्वीर बना रहा हूँ", "जारी … (लगभग 1 मिनट)", "जारी … {n} से.", "व्यस्त — वेक्टर ग्राफ़िक के रूप में बना रहा हूँ …", "पूरा", "विफल", "इमेज सेवा शुरू हो रही है"),
+  bn: T("তোমার ছবি আঁকছি", "চলছে … (প্রায় ১ মিনিট)", "চলছে … {n} সে.", "ব্যস্ত — ভেক্টর গ্রাফিক হিসেবে আঁকছি …", "সম্পন্ন", "ব্যর্থ", "ছবি পরিষেবা চালু হচ্ছে"),
+  id: T("Melukis gambarmu", "berjalan … (sekitar 1 menit)", "berjalan … {n} dtk", "sibuk — menggambar sebagai grafik vektor …", "selesai", "gagal", "Layanan gambar sedang dimulai"),
+  ja: T("画像を描いています", "処理中 …（約1分）", "処理中 … {n} 秒", "混雑中 — ベクター画像で描いています …", "完了", "失敗", "画像サービスを起動中です"),
+  ko: T("이미지를 그리는 중", "진행 중 … (약 1분)", "진행 중 … {n}초", "혼잡 — 벡터 그래픽으로 그리는 중 …", "완료", "실패", "이미지 서비스를 시작하는 중"),
+  zh: T("正在绘制你的图片", "进行中 …（约 1 分钟）", "进行中 … {n} 秒", "繁忙 — 改用矢量图绘制 …", "完成", "失败", "图片服务正在启动")
+});
+
+/** Die Texte einer Sprache; Unbekanntes faellt auf Deutsch (wie BILD_TEXTE). */
+function bildSchritte(sprache) {
+  return BILD_SCHRITTE[sprache] || BILD_SCHRITTE.de;
+}
+
+/** "läuft … {n} s" mit eingesetzter Sekundenzahl. */
+function schrittSekunden(sprache, sekunden) {
+  return bildSchritte(sprache).sek.replace("{n}", String(sekunden));
+}
+
+
 // --- public/chat-bridge-bilder.js ---
 // smejj.com — Bilder-Zeichnen-Spur der Chat-Bruecke (Stufe 2, 2026-08-12).
 // Ausgelagert wie chat-bridge-vision.js/-weather.js (800-Zeilen-Regel).
@@ -1450,6 +1493,7 @@ function istWeltMalAuftrag(text) {
 // ohne den Antworttext zu verschmutzen.
 //
 // Fail-safe: false = kein Byte gesendet, der Text-Weg uebernimmt unveraendert.
+
 
 
 
@@ -1884,8 +1928,9 @@ function messeMedienAusgabe(inhalt, { melder = meldeAktion } = {}) {
 
 // Konstanter text = konstante Kennung: die App aktualisiert dann EINE Zeile
 // (Stand + Schimmer-Platzhalter), statt pro 10-s-Meldung eine neue zu stapeln.
-function bilderSchritt(res, zustand, stand) {
-  res.write(`data: ${JSON.stringify({ smejj_schritt: { art: "bild", zustand, text: "Male dein Bild", stand, platzhalter: "bild" } })}\n\n`);
+// Titel und Stand in der Sprache der Anfrage (chat-bridge-bildschritte.js).
+function bilderSchritt(res, zustand, stand, sprache = "de") {
+  res.write(`data: ${JSON.stringify({ smejj_schritt: { art: "bild", zustand, text: bildSchritte(sprache).titel, stand, platzhalter: "bild" } })}\n\n`);
 }
 
 // Zieht das Motiv aus einem Video-Auftrag, damit der Ersatzvorschlag
@@ -2121,11 +2166,12 @@ async function streamBilderLane(res, body, task, deps) {
   // Weg 1: der eigene Bild-Maler (nur wenn wach UND Modell geladen).
   if (malerZustand.bereit) {
     bilderSseKopf(res, deps, body, "bilder-foto", "bild-maler:sd-turbo");
-    bilderSchritt(res, "laeuft", "läuft … (ca. 1 Minute)");
+    const worte = bildSchritte(sprache);
+    bilderSchritt(res, "laeuft", worte.etwa, sprache);
     const beginn = Date.now();
     // Lebenszeichen alle 10 s, damit Zwischenknoten die Leitung nicht kappen.
     const takt = setInterval(() => {
-      bilderSchritt(res, "laeuft", `läuft … ${Math.round((Date.now() - beginn) / 1000)} s`);
+      bilderSchritt(res, "laeuft", schrittSekunden(sprache, Math.round((Date.now() - beginn) / 1000)), sprache);
     }, 10000);
     let inhalt = "";
     const notiz = {};
@@ -2136,15 +2182,15 @@ async function streamBilderLane(res, body, task, deps) {
     }
     if (!inhalt) {
       // Mitten im Strom: kein Rueckweg zum Text-Pfad mehr — SVG als Reserve.
-      bilderSchritt(res, "laeuft", "ausgelastet — zeichne als Vektorgrafik …");
+      bilderSchritt(res, "laeuft", worte.reserve, sprache);
       inhalt = await erzeugeSvgInhalt(prompt, deps.timeoutMs, sprache);
     }
     // Scheitert AUCH die Reserve, ist der Grund des ersten Versuchs das
     // einzige, was noch etwas erklaert — sonst steht dort ein nacktes
     // "fehlgeschlagen", aus dem niemand etwas ableiten kann.
     bilderSchritt(res, "fertig", inhalt
-      ? "fertig"
-      : `fehlgeschlagen (${notiz.grund || "unbekannt"})`);
+      ? worte.fertig
+      : `${worte.fehl} (${notiz.grund || "unbekannt"})`, sprache);
     bilderSendeInhalt(res, inhalt || "Das Malen ist gerade fehlgeschlagen — bitte versuch es gleich noch einmal.");
     res.write("data: [DONE]\n\n");
     res.end();
@@ -2164,7 +2210,7 @@ async function streamBilderLane(res, body, task, deps) {
       const sek = Number(malerZustand.ladezeitSek) || 0;
       const seit = sek > 0 ? ` (seit ${sek} s)` : "";
       bilderSseKopf(res, deps, body, "bilder-warten", "bild-maler:aufwaermen");
-      bilderSchritt(res, "fertig", "Bild-Dienst startet gerade");
+      bilderSchritt(res, "fertig", bildSchritte(sprache).startet, sprache);
       bilderSendeInhalt(res, malerZustand.grund === "gestoert"
         ? "Der Bild-Dienst meldet gerade eine Stoerung. Ich kann sonst Bilder malen — bitte versuch es in ein paar Minuten noch einmal."
         : `Der Bild-Dienst startet gerade${seit} und laedt sein Modell. Ich kann Bilder malen — bitte versuch es in ein bis zwei Minuten noch einmal.`);
@@ -4597,7 +4643,7 @@ const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_M
 const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
 const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260923-v162-radar-wissen";
+const BRIDGE_VERSION = "20260923-v163-bildschritte-15-sprachen";
 
 // Premium-Stimme: ausgelagerte Handler (siehe chat-bridge-voice-tts.js).
 // Funktionsdeklarationen unten sind gehoben — der Aufruf hier oben ist sicher.
