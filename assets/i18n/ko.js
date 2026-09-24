@@ -4,6 +4,8 @@
 import zusatz from "./ko-2.js?v=10";
 
 export default {
+  // Video abgelaufen (IDrive e2, 24.09.2026)
+  "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "동영상이 만료되었어요 — 생성된 동영상 링크는 7일간 유효해요.",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
   "Beim Verbessern von smejj helfen": "smejj 개선에 도움 주기",
   "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "켜기 전까지는 꺼져 있습니다. 켜면 좋아요를 누른 질문과 답변이 이름 없이 자체 모델 smejj 1 학습에 사용될 수 있습니다. 언제든지 다시 끌 수 있습니다.",

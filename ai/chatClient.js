@@ -471,7 +471,7 @@ async function rendereAntwort(output) {
   // wachsenden Text ueber einen Offset (siehe Kopf von chat-markdown.js).
   if (globalThis.smejjVoiceModePreferences?.voiceMode === true) return;
   try {
-    const { renderChatMarkdown } = await import("/assets/chat-markdown.js?v=1");
+    const { renderChatMarkdown } = await import("/assets/chat-markdown.js?v=2");
     renderChatMarkdown(output);
   } catch { /* fail-safe: die Antwort bleibt als Rohtext lesbar */ }
 }

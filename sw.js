@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v972";
+const CACHE_NAME = "smejj-shell-v973";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -259,6 +259,7 @@ const SHELL = [
   "/assets/config.js",
   "/assets/components.js",
   "/assets/chat-markdown.js",
+  "/assets/chat-video-e2.js",
   "/assets/frame-guard.js",
   "/assets/app.js",
   // Herausgeloest aus app.js am 07.09. (812 Zeilen ueber der Hausgrenze).

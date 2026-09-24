@@ -20,7 +20,7 @@
          localStorage "smejj.apiOrigin.v1" auf die Zeabur-Adresse setzen.
          frame-ancestors fehlt absichtlich: In einer Meta-CSP ignorieren Browser die
          Angabe. Den Klickjacking-Schutz uebernimmt der Rahmenwaechter in app.js. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-src 'self' https:; script-src 'self' 'sha256-VlE1d5xGlwIC45bSDwQ4QJLlWTgImI8lmE9DYAk8JMQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.smejj.com; font-src 'self'; media-src 'self' blob: https://api.smejj.com; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com wss://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-src 'self' https:; script-src 'self' 'sha256-VlE1d5xGlwIC45bSDwQ4QJLlWTgImI8lmE9DYAk8JMQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.smejj.com; font-src 'self'; media-src 'self' blob: https://api.smejj.com https://s3.us-west-2.idrivee2.com; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com wss://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai http://localhost:* http://127.0.0.1:*">
     <!-- Kaltstart (Freigabe 25.08.): Stylesheet sofort anstossen — vorher
          startete es erst NACH dem Tor-Skript, eine volle Runde spaeter. -->
     <link rel="preload" href="/assets/start-styles.css?v=v16b-20260922" as="style">
@@ -984,14 +984,14 @@
     <script src="/assets/knopf-puffer.js?v=3"></script>
     <script src="/assets/arbeitsflaeche.js?v=5" type="module"></script>
     <script src="/assets/spur-schalter.js?v=10" type="module"></script>
-    <script src="/assets/spur-start.js?v=g20260924012607" type="module"></script>
+    <script src="/assets/spur-start.js?v=g20260924012607-2" type="module"></script>
     <!-- holt code-flaeche.js (27,1 KB) erst, wenn #code aufgeht — Begruendung im Modul -->
-    <script src="/assets/code-nachladen.js?v=51" type="module"></script>
+    <script src="/assets/code-nachladen.js?v=52" type="module"></script>
     <!-- Peripherie (Fuehrung, Papierkorb, Kamera, @-Erwaehnung, Codeblock-Werkzeuge)
          laedt erst bei ihrer Handlung — Betreiber-Freigabe 2026-08-24 "Startseite abspecken". -->
-    <script src="/assets/bedarf-nachladen.js?v=37" type="module"></script>
-    <script src="/assets/app.js?v=g20260924012609" type="module"></script>
-    <script src="/assets/pwa-schnellstart.js?v=29" type="module"></script>
+    <script src="/assets/bedarf-nachladen.js?v=38" type="module"></script>
+    <script src="/assets/app.js?v=g20260924012609-2" type="module"></script>
+    <script src="/assets/pwa-schnellstart.js?v=30" type="module"></script>
     <!-- Browser-Panel und Maus-Panel: erst wenn sie gebraucht werden.
          63,3 KB von 335,6 KB zahlte bisher jeder Seitenaufruf fuer zwei
          Flaechen, die beim ersten Bildaufbau niemand sieht (browser-nachladen.js). -->
@@ -999,10 +999,10 @@
     <script src="/assets/auth/passkey-ui.js" type="module"></script>
     <script src="/assets/view-chrome.js?v=view-chrome-20260716-3" type="module"></script>
     <script src="/assets/profile-dock.js?v=profile-dock-20260922-14" type="module"></script>
-    <script src="/assets/chat-store.js?v=g20260924012606" type="module"></script>
-    <script src="/assets/chat-actions.js?v=g20260924012608" type="module"></script>
+    <script src="/assets/chat-store.js?v=g20260924012606-2" type="module"></script>
+    <script src="/assets/chat-actions.js?v=g20260924012608-2" type="module"></script>
     <script src="/assets/panel-status.js?v=1" type="module"></script>
-    <script src="/assets/chat-stopp.js?v=20" type="module"></script>
+    <script src="/assets/chat-stopp.js?v=21" type="module"></script>
     <script src="/assets/modell-menue-start.js?v=2" type="module"></script>
   </body>
 </html>

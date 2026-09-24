@@ -4,6 +4,8 @@
 import zusatz from "./bn-2.js?v=10";
 
 export default {
+  // Video abgelaufen (IDrive e2, 24.09.2026)
+  "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "ভিডিওর মেয়াদ শেষ — তৈরি করা ভিডিওর লিংক ৭ দিন বৈধ থাকে।",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
   "Beim Verbessern von smejj helfen": "smejj উন্নত করতে সাহায্য করুন",
   "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "আপনি চালু না করা পর্যন্ত বন্ধ থাকে। চালু করলে, যে প্রশ্ন ও উত্তরে আপনি থাম্বস আপ দেন সেগুলো আপনার নাম ছাড়া আমাদের নিজস্ব মডেল smejj 1 প্রশিক্ষণে ব্যবহার হতে পারে। যেকোনো সময় আবার বন্ধ করা যায়।",

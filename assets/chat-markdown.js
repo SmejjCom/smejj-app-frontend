@@ -170,6 +170,7 @@ export function renderChatMarkdown(node) {
     const html = toHtml(source);
     if (html) node.innerHTML = html;
     videoQuellenUmwandeln(node);
+    e2Videos(node);
   } catch {
     /* fail-safe: im Zweifel bleibt der Rohtext stehen — nie eine leere Antwort */
   }
@@ -335,6 +336,11 @@ function videoAbspielen(video, puffer, mime) {
 // KEIN data: (img-src schon) — ein data:video blieb stumm (Fehler 4). Darum
 // jede data:-Quelle holen (fetch(data:) deckt connect-src ab) und ueber
 // videoAbspielen ausspielen. removeAttribute vor dem fetch: Selektor nie doppelt.
+// Videos als IDrive-e2-Link (24.09.2026): Modul nur laden, wenn eins im Chat steht.
+function e2Videos(w) {
+  if (w.querySelector?.('a[href*=".idrivee2.com/"],video[src*=".idrivee2.com/"]')) import("./chat-video-e2.js?v=1").then((m) => m.e2VideosPruefen(w)).catch(() => {});
+}
+
 function videoQuellenUmwandeln(wurzel) {
   for (const video of wurzel.querySelectorAll?.('video[src^="data:video/"]') || []) {
     const daten = video.getAttribute("src");
@@ -356,7 +362,7 @@ function videoQuellenUmwandeln(wurzel) {
 // Der GESPEICHERTE Verlauf stellt fertiges HTML wieder her und umgeht
 // renderChatMarkdown — der Beobachter wandelt darum JEDES neue data:video um.
 if (typeof document !== "undefined" && typeof MutationObserver !== "undefined") {
-  new MutationObserver(() => videoQuellenUmwandeln(document))
+  new MutationObserver(() => { videoQuellenUmwandeln(document); e2Videos(document); })
     .observe(document.documentElement, { childList: true, subtree: true });
   videoQuellenUmwandeln(document);
 }

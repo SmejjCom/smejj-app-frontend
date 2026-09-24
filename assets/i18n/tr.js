@@ -4,6 +4,8 @@
 import zusatz from "./tr-2.js?v=10";
 
 export default {
+  // Video abgelaufen (IDrive e2, 24.09.2026)
+  "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "Videonun süresi doldu — oluşturulan videoların bağlantıları 7 gün geçerlidir.",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
   "Beim Verbessern von smejj helfen": "smejj'i geliştirmeye yardım et",
   "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Sen açana kadar kapalı. Açınca, beğendiğin (başparmak yukarı) soru ve yanıtlar adın olmadan kendi modelimiz smejj 1'i eğitmek için kullanılabilir. İstediğin zaman yeniden kapatabilirsin.",

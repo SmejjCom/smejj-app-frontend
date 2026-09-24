@@ -4,6 +4,8 @@
 import zusatz from "./zh-2.js?v=10";
 
 export default {
+  // Video abgelaufen (IDrive e2, 24.09.2026)
+  "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "视频已过期 — 生成视频的链接有效期为 7 天。",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
   "Beim Verbessern von smejj helfen": "帮助改进 smejj",
   "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "在你开启之前保持关闭。开启后，你点赞的问题和回答可能会在不含你姓名的情况下用于训练我们自己的模型 smejj 1。你可以随时关闭。",
