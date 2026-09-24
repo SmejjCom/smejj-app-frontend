@@ -281,8 +281,10 @@ function anchor(href, label) {
 // nicht endlos laufen — sonst hoert der Nutzer nichts bzw. die Erzaehlung
 // wiederholt sich ungefragt. Stumme Szenen bleiben eine ruhige Schleife.
 // Die Bruecke markiert den Unterschied im Alt-Text (chat-bridge-bilder.js).
+// Alt-Texte der Bruecke fuer erzaehlte Videos in allen 15 Sprachen (seit v164 uebersetzt).
+const ERZAEHLT = /^(Erzähltes Video|Narrated video|Vídeo narrado|Vidéo narrée|Video narrato|Anlatımlı video|Видео с озвучкой|فيديو مع تعليق صوتي|आवाज़ वाला वीडियो|বর্ণনাসহ ভিডিও|Video dengan narasi|ナレーション付き動画|내레이션 동영상|带旁白的视频)/;
 function video(alt, src) {
-  const erzaehlt = String(alt || "").startsWith("Erzähltes");
+  const erzaehlt = ERZAEHLT.test(String(alt || ""));
   const verhalten = erzaehlt ? "" : " loop muted";
   return `<video class="chat-video" controls${verhalten} playsinline preload="metadata" src="${src}"></video>`;
 }
@@ -338,7 +340,7 @@ function videoAbspielen(video, puffer, mime) {
 // videoAbspielen ausspielen. removeAttribute vor dem fetch: Selektor nie doppelt.
 // Videos als IDrive-e2-Link (24.09.2026): Modul nur laden, wenn eins im Chat steht.
 function e2Videos(w) {
-  if (w.querySelector?.('a[href*=".idrivee2.com/"],video[src*=".idrivee2.com/"]')) import("./chat-video-e2.js?v=1").then((m) => m.e2VideosPruefen(w)).catch(() => {});
+  if (w.querySelector?.('a[href*=".idrivee2.com/"],video[src*=".idrivee2.com/"]')) import("./chat-video-e2.js?v=2").then((m) => m.e2VideosPruefen(w)).catch(() => {});
 }
 
 function videoQuellenUmwandeln(wurzel) {

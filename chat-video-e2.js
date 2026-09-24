@@ -37,8 +37,8 @@ export function restlaufzeitMs(adresse, jetzt = Date.now()) {
 /** Beschreibung des Ersatzes: Player (mit Verhalten wie im Renderer) oder Hinweis. */
 export function ersatzFuer(adresse, alt, jetzt = Date.now()) {
   if (!istE2Video(adresse) || !(restlaufzeitMs(adresse, jetzt) > 0)) return { art: "hinweis", text: HINWEIS };
-  // Erzaehlte Videos laufen mit Ton und einmal (Markierung im Alt-Text, wie chat-markdown.js).
-  const erzaehlt = String(alt || "").startsWith("Erzähltes");
+  // Erzaehlte Videos laufen mit Ton und einmal — Alt-Text in allen 15 Sprachen (wie chat-markdown.js).
+  const erzaehlt = /^(Erzähltes Video|Narrated video|Vídeo narrado|Vidéo narrée|Video narrato|Anlatımlı video|Видео с озвучкой|فيديو مع تعليق صوتي|आवाज़ वाला वीडियो|বর্ণনাসহ ভিডিও|Video dengan narasi|ナレーション付き動画|내레이션 동영상|带旁白的视频)/.test(String(alt || ""));
   return { art: "video", src: adresse, loop: !erzaehlt, muted: !erzaehlt };
 }
 

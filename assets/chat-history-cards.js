@@ -15,7 +15,7 @@
 
 import {
   newChat, openChat, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
-} from "/assets/chat-store.js?v=g20260924012606-2";
+} from "/assets/chat-store.js?v=g20260924012606-2-2";
 // Seit der Zusammenfuehrung der beiden Aufteilungen (2026-08-10) wohnen die
 // reinen Anzeige-Helfer in chat-history-text.js — format.js war deren
 // Teilmenge und ist entfallen.
@@ -24,7 +24,7 @@ import { t } from "./i18n/ui.js?v=3";
 // Geteilte Icon-Bibliothek (Spur, Navigation): Papierkorb, Ordner, Plus kommen
 // von dort — derselbe Spezifizierer wie in spur-start.js, sonst gaebe es eine
 // zweite Modulinstanz.
-import { Icons } from "/assets/components.js?v=b48-2";
+import { Icons } from "/assets/components.js?v=b48-2-2";
 
 // Befund F8 (A-bis-Z 2026-09-14): Die Aktions-Menues des Verlaufs zeigten Emoji
 // (↗ 📌 ✎ 📁 ⤓ 🗑), der Rest des Systems zeichnet Strichsymbole (Antwort-Leiste

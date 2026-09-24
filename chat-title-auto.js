@@ -32,7 +32,7 @@
 // ein abweichender Spezifizierer erzeugt eine ZWEITE Modulinstanz mit eigenem
 // Zustand. chat-store.js laeuft unter "?v=pin-20260806", chat-stream.js und
 // config.js ohne Kennung. tests/module-queries.test.mjs haelt das fest.
-import { listChats, setAutoTitle } from "/assets/chat-store.js?v=g20260924012606-2";
+import { listChats, setAutoTitle } from "/assets/chat-store.js?v=g20260924012606-2-2";
 import { CLIENT_ROUTES } from "/assets/config.js";
 // bridgeAuthHeaders erst beim Titel-Erzeugen laden (2026-08-24 "Startseite
 // abspecken"): der statische Import zog die komplette chat-stream-Kette

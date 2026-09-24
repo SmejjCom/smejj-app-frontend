@@ -118,7 +118,7 @@ export async function rettePlatzhalter(log, { anfrage, renderMarkdown, hinweis =
 
 /** Einstieg fuer chat-store.js nach dem Wiederherstellen: fragt die Bruecke nur nach ihrer Ablage (bildNurAblage, nie neu malen). */
 export async function retteNachNeustart(log) {
-  const [strom, konfig, sprache, markdown] = await Promise.all([import("./chat-stream.js"), import("../config.js"), import("../i18n/ui.js?v=3"), import("/assets/chat-markdown.js?v=2")]);
+  const [strom, konfig, sprache, markdown] = await Promise.all([import("./chat-stream.js"), import("../config.js"), import("../i18n/ui.js?v=3"), import("/assets/chat-markdown.js?v=3")]);
   return rettePlatzhalter(log, {
     renderMarkdown: markdown.renderChatMarkdown,
     hinweis: sprache.t("Das Bild wurde unterbrochen — bitte den Auftrag erneut senden."),
