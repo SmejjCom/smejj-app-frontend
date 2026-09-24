@@ -226,7 +226,7 @@ export async function oeffneModellMenue(kontext = {}) {
   bewacheAussenklick(menueId, chip);
   const kopf = document.createElement("div");
   kopf.className = "code-menue-titel";
-  kopf.textContent = "Unsere Modelle";
+  kopf.textContent = t("Unsere Modelle"); // uebersetzt (Betreiber 24.09.2026)
   menue.append(kopf);
   migriereAlteWahl();
   const istAuto = (localStorage.getItem(MODELL_KEY) || AUTO_WAHL) === AUTO_WAHL; // Freigabe 3: keine Wahl = Auto
@@ -313,7 +313,7 @@ export async function oeffneModellMenue(kontext = {}) {
   // ohne dessen Schluessel jedes Mal mit "Modellwahl hat nicht geklappt" endete.
   const TRENNER = document.createElement("div");
   TRENNER.className = "code-menue-titel";
-  TRENNER.textContent = "Automatisch";
+  TRENNER.textContent = t("Automatisch"); // uebersetzt (Betreiber 24.09.2026)
   menue.append(TRENNER);
   zeile({
     titel: "Auto",

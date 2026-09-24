@@ -644,4 +644,5 @@ export default {
   "Stattdessen hier im Browser anmelden": "대신 브라우저에서 로그인하기",
   // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
   "langsam": "느림",
+  "Unsere Modelle": "우리 모델",
 };

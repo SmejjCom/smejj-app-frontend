@@ -644,4 +644,5 @@ export default {
   "Stattdessen hier im Browser anmelden": "Bunun yerine burada tarayıcıda giriş yap",
   // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
   "langsam": "yavaş",
+  "Unsere Modelle": "Modellerimiz",
 };

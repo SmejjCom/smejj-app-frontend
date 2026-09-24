@@ -644,4 +644,5 @@ export default {
   "Stattdessen hier im Browser anmelden": "代わりにブラウザでログインする",
   // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
   "langsam": "遅め",
+  "Unsere Modelle": "私たちのモデル",
 };

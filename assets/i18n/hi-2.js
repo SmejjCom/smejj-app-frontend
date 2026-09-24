@@ -644,4 +644,5 @@ export default {
   "Stattdessen hier im Browser anmelden": "इसके बजाय यहीं ब्राउज़र में साइन इन करें",
   // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
   "langsam": "धीमा",
+  "Unsere Modelle": "हमारे मॉडल",
 };

@@ -644,4 +644,5 @@ export default {
   "Stattdessen hier im Browser anmelden": "改为在浏览器中登录",
   // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
   "langsam": "较慢",
+  "Unsere Modelle": "我们的模型",
 };

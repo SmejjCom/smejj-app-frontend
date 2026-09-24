@@ -644,4 +644,5 @@ export default {
   "Stattdessen hier im Browser anmelden": "Iniciar sessão aqui no navegador",
   // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
   "langsam": "lento",
+  "Unsere Modelle": "Os nossos modelos",
 };

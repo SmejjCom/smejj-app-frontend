@@ -644,4 +644,5 @@ export default {
   "Stattdessen hier im Browser anmelden": "تسجيل الدخول هنا في المتصفح بدلاً من ذلك",
   // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
   "langsam": "بطيء",
+  "Unsere Modelle": "نماذجنا",
 };

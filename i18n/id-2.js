@@ -644,4 +644,5 @@ export default {
   "Stattdessen hier im Browser anmelden": "Masuk di sini lewat peramban saja",
   // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
   "langsam": "lambat",
+  "Unsere Modelle": "Model kami",
 };
