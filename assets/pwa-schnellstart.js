@@ -110,7 +110,7 @@ if (willNeu || willSprechen) {
 
   if (willNeu) {
     // Dieselbe Modul-Kennung wie ueberall — sonst zweite Instanz (Waechter).
-    import("/assets/chat-store.js?v=g20260924012606-2-2")
+    import("/assets/chat-store.js?v=g20260924012606-2-3")
       .then((m) => m.newChat?.())
       .catch(() => { /* nicht angemeldet oder Modul fehlt: Start bleibt Start */ });
   }
