@@ -642,4 +642,6 @@ export default {
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "已登录。请返回 smejj 应用 — 登录状态会自动同步。",
   "Angemeldet. Wechsle zurück zur smejj-App.": "已登录。请返回 smejj 应用。",
   "Stattdessen hier im Browser anmelden": "改为在浏览器中登录",
+  // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
+  "langsam": "较慢",
 };

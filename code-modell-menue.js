@@ -119,7 +119,7 @@ export const SMEJJ_STAFFEL = [
 // Ohne diese Stufe haette Groq geantwortet, unter dem Namen "smejj 1".
 export const EIGENES_MODELL = Object.freeze({
   titel: "smejj 1",
-  klein: "eigenes Modell · langsamer",
+  klein: "langsam", // Betreiber 24.09.2026: nur noch "slow", ohne "eigenes Modell"
   stufe: "gruendlich",
   hinweis: "Laeuft auf unserem eigenen Server statt bei einem fremden Anbieter. Antwortet langsamer, beim ersten Aufruf rund 30 Sekunden."
 });
@@ -241,7 +241,7 @@ export async function oeffneModellMenue(kontext = {}) {
     const b = document.createElement("b");
     b.textContent = titel;
     links.append(b);
-    if (klein) { const s = document.createElement("small"); s.textContent = klein; links.append(s); }
+    if (klein) { const s = document.createElement("small"); s.textContent = t(klein); links.append(s); }
     const rechts = document.createElement("span");
     rechts.className = "modus-rechts";
     if (aktiv) { const h = document.createElement("span"); h.className = "modus-haken"; h.textContent = "✓"; rechts.append(h); }

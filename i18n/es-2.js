@@ -642,4 +642,6 @@ export default {
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "Sesión iniciada. Vuelve a la app smejj: el inicio de sesión se aplicará allí automáticamente.",
   "Angemeldet. Wechsle zurück zur smejj-App.": "Sesión iniciada. Vuelve a la app smejj.",
   "Stattdessen hier im Browser anmelden": "Iniciar sesión aquí en el navegador",
+  // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
+  "langsam": "lento",
 };

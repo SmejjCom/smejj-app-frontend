@@ -642,4 +642,6 @@ export default {
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "ログインしました。smejj アプリに戻ってください — ログインは自動的に引き継がれます。",
   "Angemeldet. Wechsle zurück zur smejj-App.": "ログインしました。smejj アプリに戻ってください。",
   "Stattdessen hier im Browser anmelden": "代わりにブラウザでログインする",
+  // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
+  "langsam": "遅め",
 };

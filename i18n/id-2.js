@@ -642,4 +642,6 @@ export default {
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "Sudah masuk. Kembali ke aplikasi smejj — proses masuk diterapkan di sana secara otomatis.",
   "Angemeldet. Wechsle zurück zur smejj-App.": "Sudah masuk. Kembali ke aplikasi smejj.",
   "Stattdessen hier im Browser anmelden": "Masuk di sini lewat peramban saja",
+  // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
+  "langsam": "lambat",
 };

@@ -642,4 +642,6 @@ export default {
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "Giriş yapıldı. smejj uygulamasına geri dön — giriş orada otomatik olarak devralınır.",
   "Angemeldet. Wechsle zurück zur smejj-App.": "Giriş yapıldı. smejj uygulamasına geri dön.",
   "Stattdessen hier im Browser anmelden": "Bunun yerine burada tarayıcıda giriş yap",
+  // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
+  "langsam": "yavaş",
 };

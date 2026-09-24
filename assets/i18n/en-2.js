@@ -640,4 +640,6 @@ export default {
   "Angemeldet. Wechsle zurück zur smejj-App — die Anmeldung wird dort automatisch übernommen.": "Signed in. Switch back to the smejj app — your sign-in is picked up there automatically.",
   "Angemeldet. Wechsle zurück zur smejj-App.": "Signed in. Switch back to the smejj app.",
   "Stattdessen hier im Browser anmelden": "Sign in here in the browser instead",
+  // Modell-Menue, Zeile "smejj 1" (Betreiber 24.09.2026: nur "slow")
+  "langsam": "slow",
 };
