@@ -484,8 +484,8 @@ export function baueKopfzeile(deps) {
     if (chip) chip.textContent = deps.stufenText();
     const modell = document.getElementById("codeModellAnzeige");
     if (modell) modell.innerHTML = `<b>${deps.modellAnzeige()}</b>`;
-    const t = document.getElementById("codeTiefeAnzeige");
-    if (t) t.textContent = deps.tiefe();
+    const tiefeAnzeige = document.getElementById("codeTiefeAnzeige"); // nicht "t": das ueberdeckte t() (TDZ-Fehler im Gruss)
+    if (tiefeAnzeige) tiefeAnzeige.textContent = deps.tiefe();
     const modusChip = document.getElementById("codeModusChip");
     if (modusChip) modusChip.textContent = deps.modusText();
     void zeichneProjektChip();
