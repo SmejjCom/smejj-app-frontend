@@ -13,6 +13,7 @@ export default {
   "Ich spreche ...": "Sedang berbicara ...",
   "Einen Moment ...": "Sebentar ...",
   "Bild wird erneut geladen …": "Memuat ulang gambar …",
+  "Was steht als Nächstes an, {name}?": "Apa selanjutnya, {name}?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "Gambar terputus — silakan kirim permintaan lagi.",
   "Diktat läuft — der Text erscheint nach dem Stoppen.": "Dikte berjalan — teks muncul setelah dihentikan.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "Tidak ada ucapan yang dikenali — silakan coba lagi.",

@@ -13,6 +13,7 @@ export default {
   "Ich spreche ...": "正在朗读 ...",
   "Einen Moment ...": "请稍候 ...",
   "Bild wird erneut geladen …": "正在重新加载图片 …",
+  "Was steht als Nächstes an, {name}?": "接下来做什么，{name}？",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "图片生成被中断 — 请重新发送请求。",
   "Diktat läuft — der Text erscheint nach dem Stoppen.": "正在听写 — 停止后会显示文字。",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "未识别到语音 — 请重试。",

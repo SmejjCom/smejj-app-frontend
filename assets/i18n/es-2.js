@@ -13,6 +13,7 @@ export default {
   "Ich spreche ...": "Hablando ...",
   "Einen Moment ...": "Un momento ...",
   "Bild wird erneut geladen …": "Volviendo a cargar la imagen …",
+  "Was steht als Nächstes an, {name}?": "¿Qué sigue, {name}?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "La imagen se interrumpió — vuelve a enviar la solicitud.",
   "Diktat läuft — der Text erscheint nach dem Stoppen.": "Dictado en curso — el texto aparece al detenerlo.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "No se reconoció ninguna voz — inténtalo de nuevo.",

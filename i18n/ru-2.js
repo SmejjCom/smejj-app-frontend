@@ -13,6 +13,7 @@ export default {
   "Ich spreche ...": "Говорю ...",
   "Einen Moment ...": "Секунду ...",
   "Bild wird erneut geladen …": "Изображение загружается повторно …",
+  "Was steht als Nächstes an, {name}?": "Что дальше, {name}?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "Создание изображения прервалось — отправьте запрос ещё раз.",
   "Diktat läuft — der Text erscheint nach dem Stoppen.": "Диктовка идёт — текст появится после остановки.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "Речь не распознана — попробуйте ещё раз.",

@@ -13,6 +13,7 @@ export default {
   "Ich spreche ...": "말하는 중 ...",
   "Einen Moment ...": "잠시만요 ...",
   "Bild wird erneut geladen …": "이미지를 다시 불러오는 중 …",
+  "Was steht als Nächstes an, {name}?": "다음은 무엇인가요, {name}님?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "이미지 생성이 중단되었습니다 — 요청을 다시 보내 주세요.",
   "Diktat läuft — der Text erscheint nach dem Stoppen.": "받아쓰기 중 — 멈추면 텍스트가 나타납니다.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "음성이 인식되지 않았습니다 — 다시 시도해 주세요.",

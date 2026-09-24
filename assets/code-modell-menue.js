@@ -9,6 +9,7 @@
 // Rueckruf nach einer Modellwahl. So bleibt das Modul fuer sich pruefbar
 // und es entsteht kein Ringschluss zwischen den beiden Dateien.
 //
+import { t } from "./i18n/ui.js?v=3"; // Begruessung uebersetzt (Betreiber 24.09.2026)
 
 // ---- Modellwahl (Betreiber 2026-08-17: "warum kann ich bei Code nicht
 // Modelle waehlen?"). Dieselben Speicher wie der Start-Picker, damit Chat und
@@ -476,8 +477,8 @@ export function baueKopfzeile(deps) {
       // ChatGPT und Claude ohne Namen auch tun.
       const istMailAdresse = /\S+@\S+\.\S+/.test(name || "");
       gruss.textContent = name && name !== "Nutzer" && !istMailAdresse
-        ? `Was steht als Nächstes an, ${name.split(" ")[0]}?`
-        : "Was steht als Nächstes an?";
+        ? t("Was steht als Nächstes an, {name}?").replace("{name}", name.split(" ")[0]) // uebersetzt (Betreiber 24.09.2026)
+        : t("Was steht als Nächstes an?");
     }
     const chip = document.getElementById("codeStufeChip");
     if (chip) chip.textContent = deps.stufenText();

@@ -13,6 +13,7 @@ export default {
   "Ich spreche ...": "बोल रहा हूँ ...",
   "Einen Moment ...": "एक क्षण ...",
   "Bild wird erneut geladen …": "छवि फिर से लोड हो रही है …",
+  "Was steht als Nächstes an, {name}?": "आगे क्या है, {name}?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "छवि बीच में रुक गई — कृपया अनुरोध फिर से भेजें।",
   "Diktat läuft — der Text erscheint nach dem Stoppen.": "डिक्टेशन चल रहा है — रोकने के बाद टेक्स्ट दिखेगा।",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "कोई आवाज़ पहचानी नहीं गई — कृपया फिर से प्रयास करें।",
