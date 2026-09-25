@@ -220,8 +220,20 @@ export function istRueckfrage(text) {
 // `abgebrochen` (2026-08-23): liefert true, sobald der Nutzer gestoppt hat —
 // die Schleife endet dann beim naechsten Stueck, die Teilantwort kommt als
 // `ok:false, grund:"gestoppt"` zurueck (kein Server-Rueckfall auf einen Stopp).
-export async function frageLokal(frage, { onDelta, system = "", verlauf = [], umgebung = globalThis, jetzt = () => Date.now(), abgebrochen = () => false } = {}) {
+// Frist bis zum ERSTEN Wort (25.09.2026, Betreiber: "soll blitzschnell sein").
+// GEMESSEN in Chrome auf dem Mac des Betreibers: das Geraetemodell brauchte
+// 15,7 s und 15,9 s bis zum ersten Wort — der Server liefert in 1-3 s. Kommt
+// bis zur Frist nichts, uebernimmt der Server; das Geraet darf nie bremsen.
+export const LOKAL_ERSTES_WORT_MS = 3000;
+
+function mitFrist(versprechen, restMs) {
+  return Promise.race([versprechen, new Promise((fertig) => setTimeout(() => fertig(FRIST_ABGELAUFEN), Math.max(0, restMs)))]);
+}
+const FRIST_ABGELAUFEN = Symbol("frist");
+
+export async function frageLokal(frage, { onDelta, system = "", verlauf = [], umgebung = globalThis, jetzt = () => Date.now(), abgebrochen = () => false, ersteWortFristMs = LOKAL_ERSTES_WORT_MS } = {}) {
   const start = jetzt();
+  const rest = () => ersteWortFristMs - (jetzt() - start);
   const pruefung = await lokalVerfuegbar(umgebung);
   if (!pruefung.da) return { ok: false, text: "", ms: 0, grund: pruefung.grund };
 
@@ -238,10 +250,20 @@ export async function frageLokal(frage, { onDelta, system = "", verlauf = [], um
       ...(system ? [{ role: "system", content: system }] : []),
       ...vorgeschichte
     ];
-    sitzung = await pruefung.api.create(anfang.length ? { initialPrompts: anfang } : {});
+    const erzeugt = pruefung.api.create(anfang.length ? { initialPrompts: anfang } : {});
+    const bereit = await mitFrist(erzeugt, rest());
+    if (bereit === FRIST_ABGELAUFEN) {
+      erzeugt.then((s) => { try { s?.destroy?.(); } catch { /* egal */ } }).catch(() => {});
+      return { ok: false, text: "", ms: jetzt() - start, grund: "zu-langsam" };
+    }
+    sitzung = bereit;
     let text = "";
     if (typeof sitzung.promptStreaming === "function") {
-      for await (const stueck of sitzung.promptStreaming(frage)) {
+      const strom = sitzung.promptStreaming(frage)[Symbol.asyncIterator]();
+      const erstes = await mitFrist(strom.next(), rest());
+      if (erstes === FRIST_ABGELAUFEN) return { ok: false, text: "", ms: jetzt() - start, grund: "zu-langsam" };
+      const alle = { [Symbol.asyncIterator]: () => ({ zuerst: erstes, next() { if (this.zuerst) { const z = this.zuerst; this.zuerst = null; return Promise.resolve(z); } return strom.next(); } }) };
+      for await (const stueck of alle) {
         // Chrome lieferte je nach Fassung mal das GANZE bisherige Ergebnis, mal
         // nur den Zuwachs. Beides muss richtig ankommen, sonst steht der Text
         // doppelt in der Blase.

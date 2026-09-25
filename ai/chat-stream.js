@@ -533,6 +533,10 @@ export function stoppeChatStrom() {
  */
 async function versucheLokaleAntwort(body, output, renderMarkdown) {
   if (!lokalErlaubt()) return false;
+  // Ausdruecklich gewaehltes Modell (smejj 1, 1.2/1.3, GLM, Kimi) = der Mensch
+  // will DIESES Modell, nicht das Geraet (25.09.2026: "smejj 1" gewaehlt, das
+  // Geraetemodell antwortete nach 16 s mit "Auf deinem Geraet beantwortet").
+  if (/^smejj[- ]1$|^smejj 1\.[23]$|glm|kimi/i.test(String(body?.model || "").trim())) return false;
   const lage = {
     frage: String(body?.task || ""),
     dateien: Array.isArray(body?.files) ? body.files.length : 0,
