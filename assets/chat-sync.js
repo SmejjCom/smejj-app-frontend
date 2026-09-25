@@ -259,7 +259,7 @@ async function rette(id) {
     if (!s?.getChat || !s?.importChat) return false;
     const [{ rettteUndSpeichere }, { lagereMedienAusText }] = await Promise.all([
       import("./chat-medien-rettung.js?v=5"),
-      import("./chat-medien.js?v=12")
+      import("./chat-medien.js?v=13")
     ]);
     const ergebnis = await rettteUndSpeichere(id, {
       laden: (kennung) => s.getChat(kennung),
@@ -282,7 +282,7 @@ async function bestandAufraeumen() {
     if (!s?.listChats || !s?.getChat || !s?.importChat) return;
     const [{ raeumeBestandAuf }, { lagereMedienAusText }] = await Promise.all([
       import("./chat-medien-rettung.js?v=5"),
-      import("./chat-medien.js?v=12")
+      import("./chat-medien.js?v=13")
     ]);
     const ergebnis = await raeumeBestandAuf({
       listen: () => s.listChats(),

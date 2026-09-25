@@ -31,7 +31,7 @@ import { t } from "./i18n/ui.js?v=3";
 import {
   listChats, openChat, renameChat, deleteChat, restoreChat, activeChatId, togglePinChat, newChat,
   listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
-} from "/assets/chat-store.js?v=g20260924012606-2-3";
+} from "/assets/chat-store.js?v=g20260925222859";
 // Verlaufs-Text (Titel, Vorschau, Themen, Export), Karten-Bausteine und die
 // Titel-Automatik aus der Bruecke kommen ERST, wenn der Verlauf sichtbar wird
 // (2026-09-03, Web-Vitals: Gewicht > 300 KB — die drei Module wogen 19 KB am Start,
@@ -52,7 +52,7 @@ function ladeBausteine() {
   if (bausteineBereit) return bausteineBereit;
   bausteineBereit = Promise.all([
     import("/assets/chat-history-text.js?v=b47c3"),
-    import("/assets/chat-history-cards.js?v=g20260924012607-2-3"),
+    import("/assets/chat-history-cards.js?v=g20260925222900"),
     import("/assets/chat-title-auto.js")
   ]).then(([text, karten]) => {
     ({ anzeigeTitel, anzeigeVorschau, gruppeVon, volltext, themaVon, merkmaleVon, sichereAlsMarkdown, projektGruppen } = text);

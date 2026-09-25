@@ -126,7 +126,7 @@ export async function retteNachNeustart(log) {
       method: "POST",
       headers: { "Content-Type": "application/json", ...strom.bridgeAuthHeaders() },
       body: JSON.stringify({ messages: [{ role: "user", content: auftrag }], bildErneut: true, bildNurAblage: true }),
-      signal: AbortSignal.timeout?.(20_000)
+      signal: AbortSignal.timeout?.(240_000) // wartet ein laufendes Malen ab (Bruecke v177, ~165 s)
     })
   });
 }

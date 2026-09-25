@@ -365,6 +365,7 @@ export async function rehydriereMedien(knoten, { holen = holeMedium, adressenHol
       el.setAttribute(ADRESSE_ATTRIBUT, adresse);
       if (el.tagName === "IMG") {
         el.setAttribute("src", FEHLENDES_BILD);
+        erfolgszeile(el, true);
         if (!el.getAttribute("alt")) el.setAttribute("alt", "Bild nicht mehr verfügbar");
       } else if (istMedienAdresse(el.getAttribute("src"))) {
         el.removeAttribute("src");
@@ -411,6 +412,16 @@ export function reaktionAufBildFehler(src, adresse) {
   return "";
 }
 
+// Kein Erfolg ohne Bild (Betreiber 23.09.2026, Punkt 7): scheitert ein Bild, wird die Ankuendigung davor
+// ("Hier ist dein Bild:" in jeder Sprache, endet mit Doppelpunkt) ausgeblendet; laedt es spaeter doch, kommt sie zurueck.
+export function erfolgszeile(bild, verbergen) {
+  const absatz = bild?.closest?.("p");
+  const zeile = absatz?.previousElementSibling;
+  if (!zeile || zeile.tagName !== "P" || !/[:：]\s*$/.test(zeile.textContent || "")) return false;
+  if (verbergen) { zeile.hidden = true; zeile.dataset.bildFehlt = "1"; } else if (zeile.dataset.bildFehlt) { zeile.hidden = false; delete zeile.dataset.bildFehlt; }
+  return true;
+}
+
 // Neuer Versuch fuer alles, was noch fehlt, sobald das Netz zurueck ist oder
 // die App wieder sichtbar wird (iOS friert die WebView im Hintergrund ein).
 let letzterNachlauf = 0;
@@ -426,17 +437,21 @@ function hoereAufKlicks(knoten) {
   klickHoererAn = true;
   window.addEventListener?.("online", nachlauf);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") nachlauf(); });
+  document.addEventListener("load", (ereignis) => {
+    const bild = ereignis.target;
+    if (bild?.tagName === "IMG" && bild.closest?.(".entry") && reaktionAufBildFehler(bild.getAttribute("src"), null) !== "") erfolgszeile(bild, false);
+  }, true);
   // Ladefehler bubbeln nicht — darum in der Einfangphase.
   document.addEventListener("error", (ereignis) => {
     const bild = ereignis.target;
     if (!bild || bild.tagName !== "IMG" || !bild.closest?.(".entry")) return;
     const art = reaktionAufBildFehler(bild.getAttribute("src"), bild.getAttribute(ADRESSE_ATTRIBUT));
-    if (art === "ersatz") bild.setAttribute("src", UNVOLLSTAENDIGES_BILD);
+    if (art === "ersatz") { bild.setAttribute("src", UNVOLLSTAENDIGES_BILD); erfolgszeile(bild, true); }
     // Nur EINMAL anstossen: danach fuehrt hoereAufFehler() (ein neuer Versuch,
     // dann der alte Weg, dann der Hinweis) — sonst Endlosschleife bei totem Netz.
     else if (art === "neu" && !MIT_FEHLERHOERER.has(bild)) { hoereAufFehler(bild); rehydriereMedien({ querySelectorAll: () => [bild] }); }
   }, true);
-  const oeffne = (el) => import("./chat-medien-ansicht.js?v=7").then((m) => m.oeffneVollbild(el)).catch(() => {});
+  const oeffne = (el) => import("./chat-medien-ansicht.js?v=8").then((m) => m.oeffneVollbild(el)).catch(() => {});
   document.addEventListener("click", (ereignis) => {
     const bild = ereignis.target?.closest?.(`.entry img[${ADRESSE_ATTRIBUT}]`);
     if (!bild || !istMedienAdresse(bild.getAttribute(ADRESSE_ATTRIBUT))) return;

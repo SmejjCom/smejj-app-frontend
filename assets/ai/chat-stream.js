@@ -448,7 +448,9 @@ export function entferneAbgerisseneMedien(text) {
   const klammer = rest.indexOf("](data:");
   if (klammer === -1 || rest.indexOf(")", klammer) !== -1) return roh;
   const art = rest.slice(klammer).startsWith("](data:video") ? "Video" : "Bild";
-  return `${roh.slice(0, start).trimEnd()}\n\nDie ${art}-Übertragung ist abgerissen — bitte fordere es einfach noch einmal an.`;
+  // Kein Erfolg ohne Bild (Betreiber 23.09.2026, Punkt 7): die Ankuendigung davor ("Hier ist dein Bild:") faellt weg.
+  const davor = roh.slice(0, start).trimEnd().replace(/(^|\n)[^\n]*[:：]\s*$/, "").trimEnd();
+  return `${davor ? `${davor}\n\n` : ""}Die ${art}-Übertragung ist abgerissen — bitte fordere es einfach noch einmal an.`;
 }
 
 /**

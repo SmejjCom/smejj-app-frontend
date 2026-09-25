@@ -29,9 +29,9 @@ import("./entwurf-erhalt.js?v=1").catch(() => {});
 // 2. Papierkorb — erst wenn die Ansicht wirklich aufgeht (Klick oder
 //    Direkteinstieg ueber die URL).
 if (location.pathname.includes("papierkorb")) {
-  import("./papierkorb.js?v=39");
+  import("./papierkorb.js?v=40");
 } else {
-  ladeBeiKlick(['[data-view="papierkorb"]', '[data-jump="papierkorb"]'], () => import("./papierkorb.js?v=39"));
+  ladeBeiKlick(['[data-view="papierkorb"]', '[data-jump="papierkorb"]'], () => import("./papierkorb.js?v=40"));
 }
 
 // 3. Kamera — lebt hinter dem Plus-Menue; derselbe Ausloeser, mit dem app.js
@@ -57,7 +57,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
     const wecker = () => {
       if (!/(^|\s)@/.test(String(feld.value || ""))) return;
       feld.removeEventListener("input", wecker);
-      import("./erwaehnung.js?v=29").then(() => feld.dispatchEvent(new Event("input", { bubbles: true })))
+      import("./erwaehnung.js?v=30").then(() => feld.dispatchEvent(new Event("input", { bubbles: true })))
         .catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
     };
     feld.addEventListener("input", wecker);
@@ -115,7 +115,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 //    egal ob man klickt, ein Lesezeichen oeffnet oder zurueckgeht — und genau
 //    dann, und nur dann, wird das Modul gebraucht.
 {
-  const laden = () => import("./chat-history-view.js?v=g20260924012607-2-3");
+  const laden = () => import("./chat-history-view.js?v=g20260925222900");
   const ansicht = document.getElementById("chatHistory");
   const istOffen = () => ansicht?.classList.contains("is-active") || !!(ansicht?.offsetWidth || ansicht?.offsetHeight);
   if (ansicht) {
@@ -137,7 +137,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 // 6. Projects/Arbeitsbereiche — erst wenn die Ansicht aufgeht (Klick in der
 //    Spur oder Direkteinstieg ueber die URL).
 if (location.pathname.includes("arbeitsbereiche") || location.pathname.includes("projects")) {
-  import("./arbeitsbereiche.js?v=46");
+  import("./arbeitsbereiche.js?v=47");
 } else {
-  ladeBeiKlick(['[data-view="arbeitsbereiche"]', '[data-jump="arbeitsbereiche"]'], () => import("./arbeitsbereiche.js?v=46"));
+  ladeBeiKlick(['[data-view="arbeitsbereiche"]', '[data-jump="arbeitsbereiche"]'], () => import("./arbeitsbereiche.js?v=47"));
 }
