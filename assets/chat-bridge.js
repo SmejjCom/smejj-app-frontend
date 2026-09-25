@@ -5145,7 +5145,7 @@ const RATE_GLOBAL = boundedInteger(process.env.SMEJJ_PUBLIC_AI_GLOBAL_RATE_PER_M
 const clientLimiter = createWindowLimiter({ max: RATE_PER_CLIENT, windowMs: RATE_WINDOW_MS });
 const globalLimiter = createWindowLimiter({ max: RATE_GLOBAL, windowMs: RATE_WINDOW_MS, maxKeys: 1 });
 const STARTED_AT = new Date();
-const BRIDGE_VERSION = "20260924-v175-piper-alle-sprachen";
+const BRIDGE_VERSION = "20260925-v176-smejj1-ehrlich";
 
 // Premium-Stimme: ausgelagerte Handler (siehe chat-bridge-voice-tts.js).
 // Funktionsdeklarationen unten sind gehoben — der Aufruf hier oben ist sicher.
@@ -5609,6 +5609,7 @@ async function streamFastLane(res, messages, profile, requestedModel = "", stufe
   // Frage kurz aussieht; das ist der Unterschied zu 1.0/1.1, bei denen die
   // Automatik entscheidet. Sonst waere die Wahl nur eine Beschriftung.
   if (istSchwereSmejjVersion(requestedModel)) return false;
+  if (/^smejj[- ]1$/i.test(String(requestedModel || "").trim())) return false; // v176: gewaehltes smejj 1 = das eigene Modell, nie verdeckt gpt-oss
   if (stufe !== "schnell"
     && (/glm|kimi|cline|\box\b/i.test(String(requestedModel || "")) || (profile === "coding" && ((CONTROL_ROUTER_ENABLED && CONTROL_ORIGIN) || (LLM_BASE_URL && LLM_API_KEY && LLM_MODEL))))) return false;
   }
