@@ -15,7 +15,7 @@
 // Design-Regeln des Betreibers: viereckig, wenig Farbe, grosse Schrift.
 import { API_ORIGIN } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
-import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=13";
+import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=14";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const STIL_ID = "smejj-medien-ansicht-stil";

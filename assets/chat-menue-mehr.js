@@ -10,7 +10,7 @@
 // so bleiben chat-store.js und chat-messages.js mit ihren Cache-Marken unberuehrt.
 import { metaOf, rawOf } from "/assets/chat-messages.js?v=3";
 import { toPlainText } from "/assets/chat-actions-menu.js?v=19";
-import { activeChatId, newChat } from "/assets/chat-store.js?v=g20260925222859";
+import { activeChatId, newChat } from "/assets/chat-store.js?v=g20260926145006";
 import { showToast } from "/assets/components.js?v=b48-2-2";
 import { t } from "/assets/i18n/ui.js?v=3";
 
@@ -178,7 +178,7 @@ export function fuehreAus(act, eintrag) {
   const text = klartextVon(rawOf(eintrag));
   // Mit Medium: das Teilen-Blatt (Datei oder bewusst erstellter Link) statt Text mit interner Adresse.
   const medium = act === "share" ? eintrag.querySelector("img[data-smejj-adresse], video[data-smejj-adresse]") : null;
-  if (medium) return import("/assets/chat-medien-ansicht.js?v=8").then((m) => m.oeffneTeilenBlatt(medium, { text })).catch(() => teilen(text));
+  if (medium) return import("/assets/chat-medien-ansicht.js?v=9").then((m) => m.oeffneTeilenBlatt(medium, { text })).catch(() => teilen(text));
   if (act === "share") return teilen(text);
   if (act === "reply") return ins(`Zu deiner Antwort „${auszug(text)}“: `);
   if (act === "quote") return ins(`${alsZitat(text)}\n\n`, { vorne: true });

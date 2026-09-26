@@ -422,6 +422,21 @@ export function erfolgszeile(bild, verbergen) {
   return true;
 }
 
+// Ein neues Bild waechst beim Laden um seine volle Hoehe; der Verlauf blieb dabei stehen und das Bild lag
+// unter dem Schreibfeld (Stresstest 25.09., Tastatur offen). War man am Ende, bleibt man jetzt am Ende.
+export function folgeNeuemBild(bild) {
+  const eintrag = bild?.closest?.(".entry");
+  const log = eintrag?.parentElement;
+  if (!log?.querySelectorAll) return false;
+  if ([...log.querySelectorAll(":scope > .entry")].pop() !== eintrag) return false;
+  const scroller = [bild.closest("#codeLogHalter"), log, globalThis.document?.scrollingElement].find((el) => el && el.scrollHeight > el.clientHeight + 1);
+  if (!scroller) return false;
+  const rest = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
+  if (rest > (bild.getBoundingClientRect?.().height || 0) + 240) return false; // weiter oben gelesen: nicht wegreissen
+  scroller.scrollTop = scroller.scrollHeight;
+  return true;
+}
+
 // Neuer Versuch fuer alles, was noch fehlt, sobald das Netz zurueck ist oder
 // die App wieder sichtbar wird (iOS friert die WebView im Hintergrund ein).
 let letzterNachlauf = 0;
@@ -439,7 +454,9 @@ function hoereAufKlicks(knoten) {
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") nachlauf(); });
   document.addEventListener("load", (ereignis) => {
     const bild = ereignis.target;
-    if (bild?.tagName === "IMG" && bild.closest?.(".entry") && reaktionAufBildFehler(bild.getAttribute("src"), null) !== "") erfolgszeile(bild, false);
+    if (bild?.tagName !== "IMG" || !bild.closest?.(".entry")) return;
+    if (reaktionAufBildFehler(bild.getAttribute("src"), null) !== "") erfolgszeile(bild, false);
+    folgeNeuemBild(bild);
   }, true);
   // Ladefehler bubbeln nicht — darum in der Einfangphase.
   document.addEventListener("error", (ereignis) => {
@@ -451,7 +468,7 @@ function hoereAufKlicks(knoten) {
     // dann der alte Weg, dann der Hinweis) — sonst Endlosschleife bei totem Netz.
     else if (art === "neu" && !MIT_FEHLERHOERER.has(bild)) { hoereAufFehler(bild); rehydriereMedien({ querySelectorAll: () => [bild] }); }
   }, true);
-  const oeffne = (el) => import("./chat-medien-ansicht.js?v=8").then((m) => m.oeffneVollbild(el)).catch(() => {});
+  const oeffne = (el) => import("./chat-medien-ansicht.js?v=9").then((m) => m.oeffneVollbild(el)).catch(() => {});
   document.addEventListener("click", (ereignis) => {
     const bild = ereignis.target?.closest?.(`.entry img[${ADRESSE_ATTRIBUT}]`);
     if (!bild || !istMedienAdresse(bild.getAttribute(ADRESSE_ATTRIBUT))) return;

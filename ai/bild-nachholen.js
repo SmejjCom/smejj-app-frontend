@@ -12,7 +12,8 @@
 // wird eingesetzt).
 
 export const BILD_ABRISS = /Die Bild-Übertragung ist abgerissen/;
-const VOLLSTAENDIGES_BILD = /!\[[^\]]*\]\(data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/]+={0,2}\)/i;
+// data:-Bild ODER (v178, Register im Konto) die Serveradresse eines abgelegten Mediums.
+const VOLLSTAENDIGES_BILD = /!\[[^\]]*\]\((?:data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/]+={0,2}|https:\/\/[a-z0-9.-]+\/api\/chat-medien\?id=[a-f0-9]{40}\.(?:png|jpg|jpeg|webp))\)/i;
 
 /** Setzt den Antworttext aus einem SSE-Strom zusammen (nur choices[].delta.content). */
 export function inhaltAusSse(strom) {
