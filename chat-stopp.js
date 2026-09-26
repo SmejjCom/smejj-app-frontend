@@ -157,7 +157,7 @@ async function setzeFort(bereich) {
   const [{ streamChatAnswer }, { buildChatTargets, buildRequestHistory }, { renderChatMarkdown }, { CLIENT_ROUTES, UI_COPY }] = await Promise.all([
     import("/assets/ai/chat-stream.js"),
     import("./chat-history-context.js"),
-    import("./components.js?v=g20260926153735"),
+    import("./components.js?v=g20260926160932"),
     import("./config.js")
   ]);
   const vorher = output.textContent;

@@ -59,7 +59,7 @@ async function meldeAbweisung(kennung, status, grund) {
   if (abgewiesen.has(kennung)) return;
   abgewiesen.add(kennung);
   try {
-    const { showToast } = await import("/assets/components.js?v=g20260926153735");
+    const { showToast } = await import("/assets/components.js?v=g20260926160932");
     const { istZuGross } = await import("./chat-medien-rettung.js?v=5").catch(() => ({ istZuGross: () => false }));
     const text = istZuGross(status, grund)
       ? "Ein Chat ist zu gross und wurde NICHT gesichert — er bleibt nur auf diesem Geraet."
@@ -82,7 +82,7 @@ async function meldeKonflikte(anzahl) {
     ? "Ein Chat wurde auf einem anderen Geraet geaendert — deine Fassung bleibt als Kopie \"(Konflikt vom Geraet …)\" im Verlauf."
     : `${anzahl} Chats wurden auf einem anderen Geraet geaendert — deine Fassungen bleiben als Kopien "(Konflikt vom Geraet …)" im Verlauf.`;
   try {
-    const { showToast } = await import("/assets/components.js?v=g20260926153735");
+    const { showToast } = await import("/assets/components.js?v=g20260926160932");
     showToast(text, "warn");
   } catch {
     console.warn(`smejj Verlauf-Sync: ${text}`);
@@ -259,7 +259,7 @@ async function rette(id) {
     if (!s?.getChat || !s?.importChat) return false;
     const [{ rettteUndSpeichere }, { lagereMedienAusText }] = await Promise.all([
       import("./chat-medien-rettung.js?v=5"),
-      import("./chat-medien.js?v=15")
+      import("./chat-medien.js?v=16")
     ]);
     const ergebnis = await rettteUndSpeichere(id, {
       laden: (kennung) => s.getChat(kennung),
@@ -282,7 +282,7 @@ async function bestandAufraeumen() {
     if (!s?.listChats || !s?.getChat || !s?.importChat) return;
     const [{ raeumeBestandAuf }, { lagereMedienAusText }] = await Promise.all([
       import("./chat-medien-rettung.js?v=5"),
-      import("./chat-medien.js?v=15")
+      import("./chat-medien.js?v=16")
     ]);
     const ergebnis = await raeumeBestandAuf({
       listen: () => s.listChats(),

@@ -2,10 +2,10 @@
 
 // Versionierter Pfad wie in components.js (QA-Welle 1, Befund F-07) — sonst laedt
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
-import { renderChatMarkdown } from "/assets/chat-markdown.js?v=4";
+import { renderChatMarkdown } from "/assets/chat-markdown.js?v=g20260926160932";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=31";
-export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=31";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=32";
+export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=32";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und Bewertung je
 // Nachricht.
@@ -222,7 +222,7 @@ async function medienAuslagern() {
     const log = startLog();
     if (!log || stromLaeuft) return;
     const { lagereMedienAus, lagereMedienAusText, lagereMedienAusTextknoten } =
-      await import("./chat-medien.js?v=15");
+      await import("./chat-medien.js?v=16");
     for (const eintrag of log.querySelectorAll(":scope > .entry.assistant")) {
       // EINE Karte je Eintrag: dasselbe Medium steht unten in bis zu drei
       // Feldern, soll aber nur einmal hochgeladen werden.
@@ -249,7 +249,7 @@ async function medienAuslagern() {
 // wurde. Still und ohne Netz-Zwang — kommt nichts, bleibt die Adresse stehen.
 async function medienHolen(log) {
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=15");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=16");
     await rehydriereMedien(log);
   } catch { /* fail-safe: lieber ein leeres Bild als ein kaputter Verlauf */ }
 }
@@ -461,7 +461,7 @@ async function parkerBereit(messages) {
   if (parkerLaedt) return parkerLaedt;
   const braucht = (Array.isArray(messages) ? messages : []).some((m) => MEDIEN_ADRESSE.test(String(m?.html || "")));
   if (!braucht) return null;
-  parkerLaedt = import("./chat-medien.js?v=15")
+  parkerLaedt = import("./chat-medien.js?v=16")
     .then((m) => { if (typeof m.parkeMedienAdressen === "function") parkeMedien = m.parkeMedienAdressen; })
     .catch(() => { parkerLaedt = null; });
   return parkerLaedt;
@@ -639,7 +639,7 @@ function init() {
         bindObserver();
         if (restoreErlaubt !== false) restoreOnBoot().catch(() => {});
         // Stufe 3: Sync nachladen — dynamisch und fail-safe.
-        import("/assets/chat-sync.js?v=34").catch(() => {});
+        import("/assets/chat-sync.js?v=35").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */

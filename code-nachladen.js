@@ -45,8 +45,8 @@ function laden() {
   // (A-bis-Z-Pruefung 07.09.). Darum kommt es hier mit.
   // E2E-Test 14.09.2026: der blosse Import band NICHTS (initComposerTools lief nie) —
   // derselbe Lader wie auf der Startseite, der auch bindet; Rueckfall wie bisher.
-  (window.smejjLadeComposerTools?.() || import("./composer-tools.js?v=g20260926153735")).catch(() => {});
-  return import("./code-flaeche.js?v=68")
+  (window.smejjLadeComposerTools?.() || import("./composer-tools.js?v=g20260926160933")).catch(() => {});
+  return import("./code-flaeche.js?v=69")
     .then((modul) => {
       modul.initCodeFlaeche?.();
       import("./code-kompakt-menue.js?v=3").then((m) => m.initCodeKompaktMenue()).catch(() => {});
