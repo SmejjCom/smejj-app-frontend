@@ -29,9 +29,9 @@ import("./entwurf-erhalt.js?v=1").catch(() => {});
 // 2. Papierkorb — erst wenn die Ansicht wirklich aufgeht (Klick oder
 //    Direkteinstieg ueber die URL).
 if (location.pathname.includes("papierkorb")) {
-  import("./papierkorb.js?v=41");
+  import("./papierkorb.js?v=42");
 } else {
-  ladeBeiKlick(['[data-view="papierkorb"]', '[data-jump="papierkorb"]'], () => import("./papierkorb.js?v=41"));
+  ladeBeiKlick(['[data-view="papierkorb"]', '[data-jump="papierkorb"]'], () => import("./papierkorb.js?v=42"));
 }
 
 // 3. Kamera — lebt hinter dem Plus-Menue; derselbe Ausloeser, mit dem app.js
@@ -57,7 +57,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
     const wecker = () => {
       if (!/(^|\s)@/.test(String(feld.value || ""))) return;
       feld.removeEventListener("input", wecker);
-      import("./erwaehnung.js?v=31").then(() => feld.dispatchEvent(new Event("input", { bubbles: true })))
+      import("./erwaehnung.js?v=32").then(() => feld.dispatchEvent(new Event("input", { bubbles: true })))
         .catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
     };
     feld.addEventListener("input", wecker);
@@ -75,7 +75,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
     import("./chat-warte-reste.js?v=1")
   ]).catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
   const ladeCodeWerkzeuge = () => Promise.all([
-    import("./chat-code-copy.js?v=zcode3-20260816-2-2"),
+    import("./chat-code-copy.js?v=g20260926153736"),
     import("./chat-code-farben.js?v=1"),
     import("./chat-code-download.js?v=2")
   ]).catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
@@ -115,7 +115,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 //    egal ob man klickt, ein Lesezeichen oeffnet oder zurueckgeht — und genau
 //    dann, und nur dann, wird das Modul gebraucht.
 {
-  const laden = () => import("./chat-history-view.js?v=g20260926145006");
+  const laden = () => import("./chat-history-view.js?v=g20260926153736");
   const ansicht = document.getElementById("chatHistory");
   const istOffen = () => ansicht?.classList.contains("is-active") || !!(ansicht?.offsetWidth || ansicht?.offsetHeight);
   if (ansicht) {
@@ -137,7 +137,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 // 6. Projects/Arbeitsbereiche — erst wenn die Ansicht aufgeht (Klick in der
 //    Spur oder Direkteinstieg ueber die URL).
 if (location.pathname.includes("arbeitsbereiche") || location.pathname.includes("projects")) {
-  import("./arbeitsbereiche.js?v=48");
+  import("./arbeitsbereiche.js?v=49");
 } else {
-  ladeBeiKlick(['[data-view="arbeitsbereiche"]', '[data-jump="arbeitsbereiche"]'], () => import("./arbeitsbereiche.js?v=48"));
+  ladeBeiKlick(['[data-view="arbeitsbereiche"]', '[data-jump="arbeitsbereiche"]'], () => import("./arbeitsbereiche.js?v=49"));
 }

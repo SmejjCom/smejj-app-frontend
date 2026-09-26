@@ -468,7 +468,7 @@ function hoereAufKlicks(knoten) {
     // dann der alte Weg, dann der Hinweis) — sonst Endlosschleife bei totem Netz.
     else if (art === "neu" && !MIT_FEHLERHOERER.has(bild)) { hoereAufFehler(bild); rehydriereMedien({ querySelectorAll: () => [bild] }); }
   }, true);
-  const oeffne = (el) => import("./chat-medien-ansicht.js?v=9").then((m) => m.oeffneVollbild(el)).catch(() => {});
+  const oeffne = (el) => import("./chat-medien-ansicht.js?v=10").then((m) => m.oeffneVollbild(el)).catch(() => {});
   document.addEventListener("click", (ereignis) => {
     const bild = ereignis.target?.closest?.(`.entry img[${ADRESSE_ATTRIBUT}]`);
     if (!bild || !istMedienAdresse(bild.getAttribute(ADRESSE_ATTRIBUT))) return;

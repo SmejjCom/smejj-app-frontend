@@ -35,6 +35,11 @@ const MARKERS = /[*`]|https?:\/\/|!\[/;
 const MD_LINK = /\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g;
 // Markdown-Bild ![Alt](URL) — NUR data:image-base64 (siehe Kopfkommentar).
 const MD_IMAGE = /!\[([^\]\n]*)\]\((data:image\/(?:jpeg|png|webp|svg\+xml);base64,[A-Za-z0-9+/=]+)\)/g;
+// Ausnahme (Bruecke v178, 26.09.2026): das EIGENE abgelegte Medium des Kontos — nur genau diese Adresse,
+// 40 Hex-Zeichen, Bildendung. Geparkt eingefuegt (leeres SVG + data-smejj-adresse): chat-medien.js holt es mit
+// Anmeldung, der Browser laedt die Adresse nie ohne Schluessel.
+const MD_MEDIUM = /!\[([^\]\n]*)\]\((https:\/\/api\.smejj\.com\/api\/chat-medien\?id=[a-f0-9]{40}\.(?:png|jpg|jpeg|webp))\)/g;
+const MEDIUM_PARKPLATZ = "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 // Markdown-Video ![Alt](URL) — NUR data:video-base64 aus der eigenen Bruecke
 // (chat-bridge-bilder.js sichereVideoAntwort). Fremde Video-URLs (http/https)
 // bleiben wie bei Bildern verboten: sie waeren ein Tracking-Kanal.
@@ -266,6 +271,7 @@ function inline(text) {
   return escapeHtml(text)
     .replace(INLINE_CODE, (_match, code) => `<code>${code}</code>`)
     .replace(MD_IMAGE, (_match, alt, src) => `<img class="chat-image" src="${src}" alt="${alt}" loading="lazy">`)
+    .replace(MD_MEDIUM, (_match, alt, adresse) => `<img class="chat-image" data-smejj-adresse="${adresse}" src="${MEDIUM_PARKPLATZ}" alt="${alt}" loading="lazy">`)
     .replace(MD_VIDEO, (_match, alt, src) => video(alt, src))
     .replace(MD_LINK, (_match, label, href) => anchor(href, label))
     .replace(BARE_URL, (_match, lead, href) => `${lead}${anchor(href, href)}`)

@@ -18,10 +18,10 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=g20260926145006";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=g20260926153735";
 // Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
 import { merkmaleVon } from "/assets/chat-merkmale.js?v=1";
-import { Icons } from "/assets/components.js?v=b48-2-2";
+import { Icons } from "/assets/components.js?v=g20260926153735";
 // Abo-Stand ueber den gemeinsamen Speicher (F6, 2026-09-14): EINE Anfrage je
 // Laden fuer Planzeile, Onboarding-Karte und Abo-Panel — dieselbe Kennung wie
 // in account-sessions.js, sonst zweite Instanz und wieder zwei Anfragen.
