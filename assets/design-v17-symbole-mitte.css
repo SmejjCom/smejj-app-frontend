@@ -1,0 +1,34 @@
+/* smejj.com — Design V17: die Symbole des Schreibfelds stehen auf der Hoehe
+ * von "Frag mich alles" (Betreiber-Auftrag 27.09.2026).
+ *
+ * WORTLAUT DES AUFTRAGS (Chat, 27.09.2026): "Kannst du ganz untern Icons und
+ * bissen hoch ziehen sollen in Frgmich alles hohe kommen." — Rueckfrage
+ * bestaetigt mit "Ja".
+ *
+ * GEMESSEN VORHER (375 px, ausgelieferte Seite v987; iPhone TestFlight): V16b
+ * hat den Inhalt der 44-px-Knoepfe an deren Unterkante gesetzt — Mitte der
+ * Symbole 800 px, Mitte der Zeile "Frag mich alles" 789,6 px; am iPhone lagen
+ * die Symbole sichtbar unter dem Platzhalter.
+ *
+ * WAS SICH AENDERT: nur die senkrechte Lage des Inhalts IN den Knoepfen
+ * (+, Modell-Chip, Mikrofon, Sprachwelle/Senden): wieder mittig. Feld, Knopf-
+ * kaesten (44 px Tippziel) und Abstand zur Unterkante (V16) bleiben gleich.
+ * GEMESSEN NACHHER: Symbole 790 px, Chip-Text 790 px, Platzhalter 789,6 px.
+ *
+ * Eigene Datei, neues Kaskaden-Ende nach V16 (100-%-Schutz: kein Rueckbau der
+ * Schichten davor); ein .prompt-glass mehr als V16b, damit sie sicher gewinnt.
+ */
+
+@media (max-width: 600px) {
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .ghost-button.icon-button,
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .ghost-button.text-chip,
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .send-button,
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .model-picker > button {
+    align-items: center;
+    align-content: center;
+  }
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .ghost-button.icon-button svg,
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .send-button svg {
+    align-self: center;
+  }
+}

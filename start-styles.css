@@ -6879,3 +6879,18 @@ html body .msg-menu.msg-menu {
     align-self: end;
   }
 }
+
+/* ---- design-v17-symbole-mitte.css ---- */
+@media (max-width: 600px) {
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .ghost-button.icon-button,
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .ghost-button.text-chip,
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .send-button,
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .model-picker > button {
+    align-items: center;
+    align-content: center;
+  }
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .ghost-button.icon-button svg,
+  html body #start .prompt-glass.prompt-glass.prompt-glass .prompt-actions .send-button svg {
+    align-self: center;
+  }
+}
