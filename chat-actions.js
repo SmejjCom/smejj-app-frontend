@@ -371,7 +371,7 @@ async function speakEntry(entry) {
   }
   let sanitizeForSpeech;
   try {
-    ({ sanitizeForSpeech } = await import("/assets/voice-speech-queue.js?v=emojifrei-20260825"));
+    ({ sanitizeForSpeech } = await import("/assets/voice-speech-queue.js?v=sprachwelle-20260927"));
   } catch (fehler) {
     console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler);
     showToast(t("Vorlesen gerade nicht möglich — bitte noch einmal versuchen."), "warn");

@@ -24,9 +24,17 @@ import { t } from "./i18n/ui.js?v=3";
 // Die Statuszeilen kommen aus drei Modulen und schreiben mal "..." und mal
 // "…". Fuer die Uebersetzung wird darum zuerst vereinheitlicht, sonst
 // verfehlt derselbe Satz je nach Aufrufer seinen Schluessel.
+// Geraetebefund 27.09.2026 (englische Oberflaeche): "Einen Moment ..." blieb
+// deutsch — die Sprachdateien fuehren diesen Satz NUR mit drei Punkten, die
+// Vereinheitlichung auf "…" verfehlte ihn. Darum beide Schreibweisen fragen.
 export function stimmText(roh) {
-  const text = String(roh || "").replace(/\.\.\./g, "\u2026");
-  return t(text);
+  const quelle = String(roh || "");
+  const text = quelle.replace(/\.\.\./g, "\u2026");
+  const uebersetzt = t(text);
+  if (uebersetzt !== text) return uebersetzt;
+  const ascii = quelle.replace(/\u2026/g, "...");
+  const zweiter = t(ascii);
+  return zweiter !== ascii ? zweiter : uebersetzt;
 }
 
 /** Hinweiszeile unter der Welle — auch composer-tools.js schreibt hierher. */

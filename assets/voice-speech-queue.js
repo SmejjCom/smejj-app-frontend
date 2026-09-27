@@ -141,7 +141,19 @@ export function sanitizeForSpeech(text, { lang } = {}) {
 // die danach leer sind (reine Quellen-/URL-Zeilen), werden still uebersprungen.
 // eagerFirst: true laesst den ersten Sprech-Happen bereits an einer
 // Teilsatz-Grenze (Komma/Doppelpunkt) starten — schnellerer Sprachbeginn.
-export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, minChars = DEFAULT_MIN_CHARS, eagerFirst = false } = {}) {
+// maxChars (27.09.2026): Obergrenze der gesprochenen Zeichen — lange Antworten
+// (Code-/Recherche-Modelle) werden nach den ersten Saetzen nicht weiter
+// vorgelesen; die volle Antwort steht in der Mitschrift. 0 = unbegrenzt.
+// Letzte Rettung gegen haengende Stimmen (Geraetebefund 27.09.2026, iOS-
+// WKWebView): liefert speakFn fuer einen Satz nie onend (speechSynthesis startet
+// nicht, WebAudio-Kontext schlaeft), wartete die Queue ewig — der Loop stand bei
+// "Einen Moment ...". Jeder Satz hat darum eine Frist (fristFn(text) in ms,
+// 0 = aus); danach gilt er als gesprochen, stopFn raeumt die Ausgabe ab.
+export function satzFrist(text) {
+  return Math.min(45_000, 8_000 + 120 * String(text || "").length);
+}
+
+export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, minChars = DEFAULT_MIN_CHARS, eagerFirst = false, maxChars = 0, fristFn = satzFrist } = {}) {
   const queue = [];
   let consumed = 0;      // Zeichen des Volltexts, die bereits in Saetze zerlegt wurden
   let spoken = "";       // alles, was der TTS uebergeben wurde (Echo-Filter der Hosts)
@@ -150,9 +162,13 @@ export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, m
   let flushed = false;   // Stream ist zu Ende — Rest darf gesprochen werden
   let cancelled = false; // Barge-in/Schliessen — nichts mehr sprechen, kein onQueueEnd
   let ended = false;     // onQueueEnd bereits gefeuert
+  let satzNummer = 0;    // gegen verspaetete onend eines abgeloesten Satzes
+  let frist = null;
 
   const speakNext = () => {
     if (cancelled || speaking) return;
+    // Genug gesprochen: Rest verwerfen, Ende wie gewohnt erst nach flush().
+    if (maxChars > 0 && spoken.length >= maxChars) queue.length = 0;
     let speech = "";
     for (;;) {
       const sentence = queue.shift();
@@ -173,12 +189,24 @@ export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, m
       started = true;
       onQueueStart?.();
     }
-    speakFn(speech, {
-      onend: () => {
-        speaking = false;
-        if (!cancelled) speakNext();
-      }
-    });
+    satzNummer += 1;
+    const meinSatz = satzNummer;
+    const fertig = () => {
+      if (meinSatz !== satzNummer || !speaking) return; // schon weiter oder abgebrochen
+      clearTimeout(frist);
+      speaking = false;
+      if (!cancelled) speakNext();
+    };
+    const fristMs = Number(fristFn?.(speech)) || 0;
+    if (fristMs > 0) {
+      frist = setTimeout(() => {
+        if (meinSatz !== satzNummer || !speaking || cancelled) return;
+        try { stopFn?.(); } catch { /* Ausgabe war schon still */ }
+        fertig();
+      }, fristMs);
+      frist?.unref?.(); // Node-Tests nicht aufhalten
+    }
+    speakFn(speech, { onend: fertig });
   };
 
   return {
@@ -235,6 +263,7 @@ export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, m
       cancelled = true;
       queue.length = 0;
       speaking = false;
+      clearTimeout(frist);
       stopFn?.();
     },
     spokenText() {

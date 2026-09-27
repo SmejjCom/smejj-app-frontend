@@ -63,6 +63,14 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
   // Sprachwelle unbegrenzt stumm bei "Einen Moment ..." haengen — der Host
   // kann nur zurueckfallen, wenn hier ein Fehler VOR dem ersten Ton kommt.
   const FIRST_TONE_BUDGET_MS = 3000;
+  // Geraetebefund 27.09.2026 (iOS-WKWebView): Nach dem ersten Ton konnte die
+  // Stimme trotzdem haengen — (a) der Strom stockte mitten im Satz (reader.read
+  // kam nie zurueck), (b) der AudioContext war ausserhalb einer Nutzergeste
+  // entstanden und blieb "suspended": currentTime steht, onended feuert nie.
+  // Darum: Stockfrist zwischen zwei Datenstuecken, Endfrist nach Wanduhr, und
+  // ein schlafender Kontext zaehlt als Fehler VOR dem ersten Ton (-> Browser-Stimme).
+  const STALL_BUDGET_MS = 6000;
+  const END_GRACE_MS = 1500;
 
   async function isAvailable() {
     const now = Date.now();
@@ -92,6 +100,12 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     }
     context.resume?.().catch?.(() => {});
     return context;
+  }
+
+  // Innerhalb der Klick-Geste aufrufen (openVoiceMode): iOS weckt den
+  // AudioContext nur dort. Fail-safe: ohne WebAudio passiert nichts.
+  function unlock() {
+    try { ensureContext(); } catch { /* ohne WebAudio bleibt die Browser-Stimme */ }
   }
 
   function isSpeaking() {
@@ -154,16 +168,23 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     let pending = new Uint8Array(0);
     let nextStartAt = 0;
     let lastSource = null;
+    let beendet = false;
+    let endTimer = 0;
+    let stallTimer = 0;
     const finish = () => {
-      if (playback.cancelled) return;
+      clearTimeout(endTimer);
+      if (beendet || playback.cancelled) return;
+      beendet = true;
       if (active === playback) active = null;
       onend?.();
     };
     try {
       for (;;) {
         const { value, done } = await reader.read();
+        clearTimeout(stallTimer);
         if (done) break;
         if (playback.cancelled) return;
+        if (started) stallTimer = setTimeout(() => controller.abort(), STALL_BUDGET_MS);
         const merged = new Uint8Array(pending.length + value.length);
         merged.set(pending, 0);
         merged.set(value, pending.length);
@@ -176,6 +197,10 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
         const { samples, rest } = pcm16ToFloat32(pending);
         pending = rest;
         if (samples.length === 0) continue;
+        if (!started && ctx.state && ctx.state !== "running") {
+          await Promise.race([ctx.resume?.(), new Promise((r) => setTimeout(r, 300))]).catch(() => {});
+          if (ctx.state !== "running") throw new Error("premium_tts_suspended");
+        }
         const buffer = ctx.createBuffer(1, samples.length, header.sampleRate);
         buffer.getChannelData(0).set(samples);
         const source = ctx.createBufferSource();
@@ -189,14 +214,19 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
         if (!started) {
           started = true;
           clearTimeout(firstToneTimer);
+          stallTimer = setTimeout(() => controller.abort(), STALL_BUDGET_MS);
           onstart?.();
         }
       }
     } catch (error) {
       clearTimeout(firstToneTimer);
+      clearTimeout(stallTimer);
       if (!playback.cancelled) {
         if (active === playback) active = null;
-        if (!started) throw error; // vor dem ersten Ton -> Host-Fallback
+        if (!started) {
+          try { controller.abort(); } catch { /* Strom war schon zu */ }
+          throw error; // vor dem ersten Ton -> Host-Fallback
+        }
       }
     }
     clearTimeout(firstToneTimer);
@@ -205,9 +235,13 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
       if (active === playback) active = null;
       throw new Error("premium_tts_empty");
     }
-    if (lastSource) lastSource.onended = finish;
-    else finish();
+    if (lastSource) {
+      lastSource.onended = finish;
+      // Endfrist nach Wanduhr: schlaeft der Kontext, feuert onended nie.
+      const restMs = Math.max(0, (nextStartAt - (ctx.currentTime || 0)) * 1000);
+      endTimer = setTimeout(finish, restMs + END_GRACE_MS);
+    } else finish();
   }
 
-  return { isAvailable, speak, cancel, isSpeaking };
+  return { isAvailable, speak, cancel, isSpeaking, unlock };
 }

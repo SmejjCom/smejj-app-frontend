@@ -6,8 +6,9 @@
 // und der iOS-Unlock innerhalb einer Nutzergeste. Kein Zustand ausser dem
 // Unlock-Merker; die Premium-Stimme (WebAudio) bleibt Sache des Hosts.
 
-export function createBrowserTts({ lang, base, supported } = {}) {
+export function createBrowserTts({ lang, base, supported, startFristMs = 4_000 } = {}) {
   let unlocked = false;
+  const haltend = new Set();
   // lang/base duerfen Funktionen sein: die Oberflaechensprache steht erst zur Laufzeit fest
   // (Geraetetest 22.09.2026: fest beim Laden = immer de-DE, auch in der englischen App).
   const langNow = () => (typeof lang === "function" ? lang() : lang);
@@ -35,9 +36,33 @@ export function createBrowserTts({ lang, base, supported } = {}) {
       utterance.lang = langNow();
       const voice = pickVoice();
       if (voice) utterance.voice = voice;
-      utterance.onstart = () => onstart?.();
-      utterance.onend = () => onend?.();
-      utterance.onerror = () => onend?.();
+      // Fristen (Geraetebefund 27.09.2026, iOS-WKWebView): speechSynthesis
+      // startet dort manchmal gar nicht oder liefert nie onend — der Loop stand
+      // dann ewig bei "Einen Moment ...". onend feuert jetzt GENAU einmal:
+      // echtes Ende, Fehler, "startet nicht" (startFristMs) oder Gesamtfrist.
+      let fertig = false;
+      let gestartet = false;
+      const timer = [];
+      const ende = () => {
+        if (fertig) return;
+        fertig = true;
+        timer.forEach(clearTimeout);
+        haltend.delete(utterance);
+        onend?.();
+      };
+      utterance.onstart = () => { gestartet = true; onstart?.(); };
+      utterance.onend = ende;
+      utterance.onerror = ende;
+      // Chrome raeumt Utterances ohne Referenz weg, dann kommt kein onend.
+      haltend.add(utterance);
+      timer.push(setTimeout(() => {
+        if (gestartet || window.speechSynthesis.speaking) return;
+        ende(); // Stimme startet nicht — Satz ueberspringen statt haengen
+      }, startFristMs));
+      timer.push(setTimeout(() => {
+        try { if (!fertig) window.speechSynthesis.cancel(); } catch { /* still */ }
+        ende();
+      }, Math.min(60_000, 6_000 + 110 * String(text).length)));
       window.speechSynthesis.speak(utterance);
       try {
         // iOS/Safari pausiert die Synthese manchmal direkt nach speak() — resume ist dort Pflicht.

@@ -216,9 +216,10 @@ export function verdrahteLive(host) {
     async starten() {
       if (sitzung?.isActive()) return true;
       antwortText = "";
+      let lief = false; // erst nach session.ready ist ein Abriss ein Abbruch (vorher entscheidet starten())
       sitzung = createRealtimeAudioSession({
         wsUrl: host.url || RELAY_STANDARD,
-        onReady: () => status("listening", "Ich höre zu …"),
+        onReady: () => { lief = true; status("listening", "Ich höre zu …"); },
         onAudioStart: () => { antwortText = ""; status("speaking", "Ich spreche …"); },
         onAudioEnd: () => status("listening", "Ich höre zu …"),
         onInterrupted: () => status("listening", "Ich höre zu …"),
@@ -226,7 +227,15 @@ export function verdrahteLive(host) {
           if (rolle === "user") { try { host.setTranskript?.(text); } catch { /* egal */ } }
           else { antwortText += text; try { host.setReply?.(antwortText); } catch { /* egal */ } }
         },
-        onClose: (grund) => { if (host.state?.voiceModeActive && grund && grund !== "stop") status("listening", "Verbindung beendet — tippe unten oder öffne die Welle neu."); },
+        // 27.09.2026: Reisst der Relay mitten im Gespraech ab, blieb die Welle bei
+        // "Verbindung beendet" stehen. Jetzt geht es still auf dem alten Weg weiter
+        // (host.nachAbbruch: Ohr/Erkennung); nur ohne diesen Weg die Meldung.
+        onClose: (grund) => {
+          if (!lief || !host.state?.voiceModeActive || !grund || grund === "stop") return;
+          sitzung = null;
+          if (typeof host.nachAbbruch === "function") { try { host.nachAbbruch(); return; } catch { /* Meldung unten */ } }
+          status("listening", "Verbindung beendet — tippe unten oder öffne die Welle neu.");
+        },
         onError: () => {}
       });
       const an = await sitzung.start();

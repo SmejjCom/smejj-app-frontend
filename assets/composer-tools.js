@@ -3,7 +3,9 @@
 // Zweck: initComposerTools() verdrahtet die Icon-Zeile des Start-Composers.
 import { showToast } from "./components.js?v=g20260926160932"; // versioniert wie app.js (F-07)
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=emojifrei-20260825";
+import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=sprachwelle-20260927";
+// 27.09.2026: Erkennungsliste (WebKit-Doppelungen) + sprechbarer Antworttext/Fristen.
+import { leseErkennung } from "./voice-erkennung.js?v=1"; import { sprechbarerText, FRISTEN, rendereFertigeAntwort } from "./voice-antwort.js?v=1";
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
 import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
 // Overlay-Gestalt und Fokusfuehrung — ausgelagert (800-Zeilen-Regel).
@@ -11,9 +13,9 @@ import {
   upgradeVoiceOverlay, createVoiceFocusTrap,
   setVoiceModeStatus, setVoiceModeTranscript, setVoiceModeReply, zeigeMikrofonZustand,
   setVoiceModeHint, stimmText,
-} from "./voice-overlay-ui.js";
+} from "./voice-overlay-ui.js?v=sprachwelle-20260927";
 // Browser-Sprachausgabe (Stimmwahl, Safari-resume, iOS-Unlock) — ausgelagert (800-Zeilen-Regel).
-import { createBrowserTts } from "./voice-browser-tts.js";
+import { createBrowserTts } from "./voice-browser-tts.js?v=sprachwelle-20260927";
 // Stufe 3: Rueckfrage statt Blindantwort + Doppel-Sende-Schutz (wie ChatGPT,
 // Live-Vergleich 2026-08-03) — geteilte Naht mit den 14 Sprachseiten.
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
@@ -25,17 +27,17 @@ import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=8";
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
 import { createSpeechInterrupt } from "./voice-vad.js?v=blitz2-20260726";
 import { warmUpAgentConnection } from "./voice-warmup.js";
-import { verdrahteLive } from "./voice-realtime.js?v=1";
+import { verdrahteLive } from "./voice-realtime.js?v=sprachwelle-20260927";
 // Stufe 2a/3a: Interim-Waechter — Sprech-Ende erkennen; seit 3a richtet sich die
 // Wartezeit nach dem Gesagten. Denk-Laut fuellt die Stille bis zur Antwort.
 import { createSilenceWatchdog } from "./voice-endpoint.js";
 import { createThinkingCue } from "./voice-thinking-cue.js";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
 // Unterbrechen wie ChatGPT). Fail-safe: ohne Worker bleibt die Browser-Stimme.
-import { createPremiumVoice } from "./voice-premium-tts.js";
+import { createPremiumVoice } from "./voice-premium-tts.js?v=sprachwelle-20260927";
 import { CLIENT_ROUTES } from "./config.js";
 // Plus-Menue (Anhaenge) — ausgelagert, Verhalten unveraendert.
-import { bindPlusMenu } from "./composer-plus-menu.js?v=g20260926160933";
+import { bindPlusMenu } from "./composer-plus-menu.js?v=sprachwelle-20260927";
 // Mikrofon-Diktat — ausgelagert (800-Zeilen-Regel), Verhalten unveraendert.
 import { createDictation } from "./composer-dictation.js";
 import { t, savedUiLanguage } from "./i18n/ui.js?v=3"; // Sprachmodus-Texte + gespeicherte Sprache (Geraetetest 22.09.2026)
@@ -74,13 +76,13 @@ const state = {
 
 function speechSupported() {
       if (RecognitionCtor) return true;
-      showToast("Spracherkennung wird von diesem Browser nicht unterstuetzt. Bitte Chrome oder Edge nutzen.", "warn");
+      showToast(t("Spracherkennung wird von diesem Browser nicht unterstuetzt. Bitte Chrome oder Edge nutzen."), "warn");
       return false;
 }
 
 function synthesisSupported() {
       if (typeof window !== "undefined" && "speechSynthesis" in window) return true;
-      showToast("Sprachausgabe wird von diesem Browser nicht unterstuetzt.", "warn");
+      showToast(t("Sprachausgabe wird von diesem Browser nicht unterstuetzt."), "warn");
       return false;
 }
 
@@ -102,7 +104,7 @@ const earSend = createEarSend({
 });
 // Ohr-Solo (voice-ohr-solo.js): taube Erkennung -> eigenes Ohr. LIVE (voice-realtime.js):
 // Sprache-zu-Sprache ueber den Relay, zuerst versucht, still zurueck auf Ohr/Erkennung.
-const liveWelle = verdrahteLive({ state, setStatus: setVoiceModeStatus, setTranskript: setVoiceModeTranscript, setReply: setVoiceModeReply });
+const liveWelle = verdrahteLive({ state, setStatus: setVoiceModeStatus, setTranskript: setVoiceModeTranscript, setReply: setVoiceModeReply, nachAbbruch: weiterOhneLive });
 const ohrSolo = verdrahteOhrSolo({
       createServerEar, urls: ohrAdressen(CLIENT_ROUTES.api), state,
       earAlive: () => serverEar.isAlive(), earCancel: () => serverEar.cancel(),
@@ -164,8 +166,6 @@ function lastAssistantEntryText() {
       }
       return "";
 }
-
-// --- Plus-Menue: ausgelagert nach composer-plus-menu.js (800-Zeilen-Regel) ----
 
 // --- Mikrofon-Diktat (ausgelagert nach composer-dictation.js, 800-Zeilen-Regel) ---
 
@@ -300,17 +300,9 @@ function startBargeListener(spokenText, failStreak = 0) {
       let finalTranscript = "";
       recognition.onresult = (event) => {
               if (state.bargeRecognition !== recognition) return;
-              let interim = "";
-              let sawFinal = false;
-              for (let index = event.resultIndex; index < event.results.length; index += 1) {
-                        const result = event.results[index];
-                        if (result.isFinal) {
-                                    finalTranscript += result[0]?.transcript || "";
-                                    sawFinal = true;
-                        } else {
-                                    interim += result[0]?.transcript || "";
-                        }
-              }
+              // Volle Liste statt Zaehl-Ansatz (WebKit liefert sie mit resultIndex 0 erneut).
+              const { final, interim, sawFinal } = leseErkennung(event);
+              finalTranscript = final;
               const heard = `${finalTranscript} ${interim}`.trim();
               if (!state.bargeConfirmed) {
                         // Schonfrist: was in den ersten BARGE_GRACE_MS der eigenen Ausgabe
@@ -415,30 +407,30 @@ function voiceModeListen() {
       let bestConfidence = NaN;
       // Stufe 2a: ~850 ms ohne neue Zwischenergebnisse -> Ende sofort erzwingen
       // (stop -> finales Ergebnis) statt die Browser-Endpause abzuwarten.
+      let gehoert = "";
       const watchdog = createSilenceWatchdog(() => {
               if (state.voiceRecognition !== recognition) return;
-              try {
-                        recognition.stop();
-              } catch {
-                        // Recognition war bereits gestoppt.
-              }
+              try { recognition.stop(); } catch { /* bereits gestoppt */ }
+              // WebKit liefert nach stop() mitunter weder Final noch onend: dann gilt das Gehoerte.
+              setTimeout(() => {
+                        const text = gehoert.trim();
+                        if (state.voiceRecognition !== recognition || !text || state.voiceMuted) return;
+                        state.voiceRecognition = null;
+                        try { recognition.abort(); } catch { /* bereits gestoppt */ }
+                        earSend(text, bestConfidence);
+              }, FRISTEN.stoppNachfristMs);
       });
       recognition.onresult = (event) => {
+              // Geraetebefund 27.09.2026 ("TestTestTest..."): nur die AKTUELLE Instanz schreibt,
+              // und das Transkript entsteht jedes Mal neu aus der VOLLEN Liste (voice-erkennung.js).
+              if (state.voiceRecognition !== recognition) return;
               taubwache.ergebnis();
-              let interim = "";
-              let sawFinal = false;
-              for (let index = event.resultIndex; index < event.results.length; index += 1) {
-                        const result = event.results[index];
-                        if (result.isFinal) {
-                                    finalTranscript += result[0]?.transcript || "";
-                                    sawFinal = true;
-                                    const c = result[0]?.confidence;
-                                    if (Number.isFinite(c)) bestConfidence = Number.isFinite(bestConfidence) ? Math.max(bestConfidence, c) : c;
-                        } else {
-                                    interim += result[0]?.transcript || "";
-                        }
-              }
-              const heard = (finalTranscript + interim).trim();
+              const erkannt = leseErkennung(event);
+              const sawFinal = erkannt.sawFinal;
+              finalTranscript = erkannt.final;
+              if (Number.isFinite(erkannt.confidence)) bestConfidence = erkannt.confidence;
+              const heard = erkannt.heard;
+              gehoert = heard;
               setVoiceModeTranscript(heard);
               watchdog.update(heard); // Stufe 3a: Text statt Ja/Nein -> adaptive Wartezeit
               // Stufe 1e: beim finalen Ergebnis SOFORT senden (Guard in onend).
@@ -455,7 +447,7 @@ function voiceModeListen() {
       recognition.onerror = (event) => {
               if (taubwache.fehler(event.error)) return; // Erkennung verweigert, Mikrofon frei: das eigene Ohr uebernimmt (Geraetebefund 23.09.2026)
               if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-                        showToast("Mikrofon-Zugriff verweigert. Bitte in den Browser-Einstellungen erlauben.", "warn");
+                        showToast(t("Mikrofon nicht erlaubt — Frage unten eintippen."), "warn");
                         enterVoiceFallback("Mikrofon nicht erlaubt — Frage unten eintippen.");
               }
       };
@@ -492,7 +484,7 @@ function voiceModeListen() {
 }
 
 function voiceModeSend(task, { getippt = false } = {}) {
-      const input = composerInput();
+      const input = $("#startMessage"); // Sendeknopf und Antwort-Log gehoeren zum Start-Feld (auch aus der Code-Ansicht)
       const send = $("#startSend");
       if (!input || !send) {
               closeVoiceMode();
@@ -546,7 +538,7 @@ function waitForAssistantReply(knownEntries) {
       const currentReply = () => {
               const entries = document.querySelectorAll(ANSWER_SELECTOR);
               const latest = entries[entries.length - 1];
-              return latest && entries.length > knownEntries ? latest.textContent.trim() : "";
+              return latest && entries.length > knownEntries ? sprechbarerText(latest) : ""; // ohne Knoepfe/Code (voice-antwort.js)
       };
       // Stufe 1c: satzweises Vorlesen — die Ausgabe beginnt mit dem ersten fertigen
       // Satz, waehrend der Rest der Antwort noch streamt (voice-speech-queue.js).
@@ -584,8 +576,9 @@ function waitForAssistantReply(knownEntries) {
       };
       queue = createSpeechQueue({
               speakFn: speak,
-              stopFn: () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); },
+              stopFn: () => { premiumVoice.cancel(); if ("speechSynthesis" in window) window.speechSynthesis.cancel(); },
               eagerFirst: true,
+              maxChars: FRISTEN.sprechMaxZeichen,
               onQueueStart: () => {
                         if (!state.voiceModeActive) return;
                         armBargeIn();
@@ -614,10 +607,10 @@ function waitForAssistantReply(knownEntries) {
       state.speechQueue = queue;
       // Stufe 3a: Antwort ueber 700 ms -> hoerbar Bescheid sagen statt schweigen. Der Laut
       // prueft beim Feuern selbst, ob die Antwort schon laeuft (spokenText) — daher keine Entwarnung noetig.
-      createThinkingCue({ delayMs: 700, antwortLaeuft: () => queue.isCancelled() || queue.spokenText().length > 0, sagen: () => { if (state.voiceModeActive) queue.sayAhead("Einen Moment ..."); } }).arm();
+      createThinkingCue({ delayMs: 700, antwortLaeuft: () => queue.isCancelled() || queue.spokenText().length > 0, sagen: () => { if (state.voiceModeActive) queue.sayAhead(stimmText("Einen Moment ...")); } }).arm();
       const finish = () => {
               if (!state.voiceModeActive) return;
-              if (taskRunning() && Date.now() - startedAt < 120000) {
+              if (taskRunning() && Date.now() - startedAt < FRISTEN.antwortMaxMs) {
                         clearTimeout(state.voiceSettleTimer);
                         state.voiceSettleTimer = setTimeout(finish, 1000);
                         return;
@@ -640,6 +633,7 @@ function waitForAssistantReply(knownEntries) {
               // Stream fertig: Rest in die Queue, onQueueEnd schliesst den Loop ab.
               queue.flush(reply);
               setVoiceModeReply(reply); // V2: vollstaendige Antwort steht in der Mitschrift
+              if (!taskRunning()) rendereFertigeAntwort(ANSWER_SELECTOR); // Bild/Code sichtbar (voice-antwort.js)
       };
       const scheduleSettle = () => {
               clearTimeout(state.voiceSettleTimer);
@@ -723,6 +717,7 @@ function openVoiceMode() {
       syncVoiceMicVisual();
       // Innerhalb der Klick-Geste: Sprachausgabe fuer iOS/Safari freischalten.
       browserTts.unlock();
+      premiumVoice.unlock(); // WebAudio innerhalb der Geste wecken (iOS: sonst schlaeft der Kontext)
       // Stufe B: Premium-Stimme pruefen (laeuft der Server-TTS-Worker?) — asynchron,
       // bis dahin und bei jedem Fehler gilt unveraendert die Browser-Stimme.
       premiumVoiceOn = false;
@@ -742,10 +737,14 @@ function openVoiceMode() {
       voiceFocus.enter(overlay);
       setVoiceModeStatus("listening", "Verbinde …");
       // LIVE zuerst (2026-09-03); scheitert der Relay: iOS ohne Web-Speech ZUERST Ohr solo (2026-08-25), sonst Erkennung.
-      liveWelle.starten().then((an) => {
-              if (an || !state.voiceModeActive) return; if (RecognitionCtor) return voiceModeListen();
-              if (!ohrSolo.aktivieren()) enterVoiceFallback("Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.");
-      });
+      liveWelle.starten().then((an) => { if (!an) weiterOhneLive(); });
+}
+
+// Ohne LIVE (Relay aus ODER mitten im Gespraech abgerissen, 27.09.2026): Erkennung, sonst eigenes Ohr.
+function weiterOhneLive() {
+      if (!state.voiceModeActive) return;
+      if (RecognitionCtor) return voiceModeListen();
+      if (!ohrSolo.aktivieren()) enterVoiceFallback("Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.");
 }
 
 function bindVoiceMode() {
@@ -780,7 +779,7 @@ function toggleReadAloud() {
       }
       const text = lastAssistantEntryText();
       if (!text) {
-              showToast("Noch keine Antwort zum Vorlesen vorhanden.");
+              showToast(t("Noch keine Antwort zum Vorlesen vorhanden."));
               return;
       }
       button?.classList.add("is-speaking");

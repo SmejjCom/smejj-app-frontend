@@ -11,7 +11,8 @@
 import { darfSprechen, buildLoginCta } from "./voice-landing-signin.js?v=8";
 import { CLIENT_ROUTES } from "./config.js";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue } from "./voice-speech-queue.js?v=emojifrei-20260825";
+import { createSpeechQueue } from "./voice-speech-queue.js?v=sprachwelle-20260927";
+import { leseErkennung } from "./voice-erkennung.js?v=1"; // volle Ergebnisliste (WebKit-Doppelungen, 27.09.2026)
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
 import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=voice-send-20260721";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
@@ -30,12 +31,12 @@ import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
 import { createServerEar, createEarSend } from "./voice-ear.js";
 import { buildReserveChatRequest } from "./chat-history-context.js";
-import { appendVoiceTurn, buildAgentPayload } from "./voice-conversation.js";
+import { appendVoiceTurn, buildAgentPayload } from "./voice-conversation.js?v=sprachwelle-20260927";
 // Stufe 3a: Denk-Laut, damit zwischen Frage und Antwort nicht nur Stille steht.
 import { createThinkingCue } from "./voice-thinking-cue.js";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
 // Unterbrechen wie ChatGPT). Fail-safe: ohne Worker bleibt die Browser-Stimme.
-import { createPremiumVoice } from "./voice-premium-tts.js";
+import { createPremiumVoice } from "./voice-premium-tts.js?v=sprachwelle-20260927";
 // Stufe A2: automatischer Neuversuch, wenn eine Salad-Replika ausfaellt.
 import { fetchStreamWithRetry } from "./ai/fetch-retry.js";
 import { bridgeAuthHeaders } from "./ai/chat-stream.js";
@@ -334,17 +335,8 @@ function startBargeListener(spokenText, failStreak = 0) {
   let finalTranscript = "";
   recognition.onresult = (event) => {
     if (state.bargeRecognition !== recognition) return;
-    let interim = "";
-    let sawFinal = false;
-    for (let index = event.resultIndex; index < event.results.length; index += 1) {
-      const result = event.results[index];
-      if (result.isFinal) {
-        finalTranscript += result[0]?.transcript || "";
-        sawFinal = true;
-      } else {
-        interim += result[0]?.transcript || "";
-      }
-    }
+    const { final, interim, sawFinal } = leseErkennung(event);
+    finalTranscript = final;
     const heard = `${finalTranscript} ${interim}`.trim();
     if (!state.bargeConfirmed) {
       if (!enoughForBarge(heard, lang)) return;
@@ -446,20 +438,13 @@ function listen() {
     }
   });
   recognition.onresult = (event) => {
-    let interim = "";
-    let sawFinal = false;
-    for (let index = event.resultIndex; index < event.results.length; index += 1) {
-      const result = event.results[index];
-      if (result.isFinal) {
-        finalTranscript += result[0]?.transcript || "";
-        sawFinal = true;
-        const c = result[0]?.confidence;
-        if (Number.isFinite(c)) bestConfidence = Number.isFinite(bestConfidence) ? Math.max(bestConfidence, c) : c;
-      } else {
-        interim += result[0]?.transcript || "";
-      }
-    }
-    const heard = (finalTranscript + interim).trim();
+    // Nur die aktuelle Instanz; Transkript jedes Mal aus der VOLLEN Liste (WebKit, 27.09.2026).
+    if (state.recognition !== recognition) return;
+    const erkannt = leseErkennung(event);
+    const sawFinal = erkannt.sawFinal;
+    finalTranscript = erkannt.final;
+    if (Number.isFinite(erkannt.confidence)) bestConfidence = erkannt.confidence;
+    const heard = erkannt.heard;
     setTranscript(heard);
     // Stufe 3a: den TEXT uebergeben statt nur "da ist etwas". Der Waechter
     // wartet dadurch kurz nach einem fertigen Satz und laenger nach einem
@@ -689,6 +674,7 @@ function openOverlay() {
   // die erste Antwort startet dadurch spuerbar frueher.
   warmUpAgentConnection();
   unlockSpeechSynthesis();
+  premiumVoice.unlock?.(); // WebAudio in der Geste wecken (iOS, 27.09.2026)
   // Stufe B: Premium-Stimme pruefen (laeuft der Server-TTS-Worker?) — asynchron,
   // bis dahin und bei jedem Fehler gilt unveraendert die Browser-Stimme.
   premiumVoiceOn = false;

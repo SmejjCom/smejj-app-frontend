@@ -50,7 +50,29 @@ export function appendVoiceTurn(history, role, content) {
  * @param {Array<{role: string, content: string}>} [history] bisherige Wendungen
  * @returns {object}
  */
-export function buildAgentPayload(task, lang, history = []) {
+// Modellwahl des Nutzers (Betreiber-Befund 27.09.2026: "Sprachmodus geht mit
+// keinem Modell"): hier stand fest "smejj 1.0" — die im Modell-Menue gewaehlte
+// Wahl kam im Sprachweg nie an. Gelesen wird wie in app.js (Zeile 184):
+// zuerst die gewaehlte Modell-Kennung, dann die Einstellungen, sonst "Auto".
+// BYOK-Kennungen ("key:...") laufen nur client-seitig im Chat (chatClient.js)
+// und sind fuer /api/agent kein Modellname — dort gilt dann "Auto".
+const MODELL_SCHLUESSEL = "smejj.model.selected.v2"; // = STORAGE_KEYS.model
+const EINSTELLUNGEN_SCHLUESSEL = "smejj.settings.v1"; // = STORAGE_KEYS.settings
+const STUFEN = new Set(["schnell", "auto", "gruendlich", "spezial"]);
+
+export function leseModellwahl(speicher = typeof localStorage !== "undefined" ? localStorage : null) {
+  let modell = "";
+  let stufe = "auto";
+  try {
+    const einstellungen = JSON.parse(speicher?.getItem(EINSTELLUNGEN_SCHLUESSEL) || "{}") || {};
+    modell = String(speicher?.getItem(MODELL_SCHLUESSEL) || einstellungen.model || "").trim();
+    if (STUFEN.has(einstellungen.stufe)) stufe = einstellungen.stufe;
+  } catch { /* Speicher gesperrt: Standardwahl */ }
+  if (!modell || modell.startsWith("key:")) modell = "Auto";
+  return { model: modell, stufe };
+}
+
+export function buildAgentPayload(task, lang, history = [], wahl = leseModellwahl()) {
   // Stufe 1c: voiceMode signalisiert dem Control-Server das Sprachprofil
   // (kurze, gespraechige Antworten ohne Markdown, 1-3 Saetze).
   //
@@ -63,9 +85,10 @@ export function buildAgentPayload(task, lang, history = []) {
   const anhang = typeof window !== "undefined" ? window.smejjBildAnhang?.take?.() : null;
   return {
     task,
-    model: "smejj 1.0",
+    model: wahl?.model || "Auto",
     files: [],
     preferences: {
+      stufe: wahl?.stufe || "auto",
       uiLanguage: lang,
       voiceMode: true,
       ...(anhang?.bildDataUrl ? { bildDataUrl: anhang.bildDataUrl } : {})

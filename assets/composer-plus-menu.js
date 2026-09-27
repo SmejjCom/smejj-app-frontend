@@ -4,6 +4,7 @@
 // Versionierter Pfad wie in app.js (QA-Welle 1, Befund F-07) — ein Schutztest
 // verlangt die Cache-Version dort ausdruecklich, also zieht dieser Import nach.
 import { showToast } from "./components.js?v=g20260926160932";
+import { t } from "./i18n/ui.js?v=3";
 import { bindBildAnhang, uebernehmeBildDatei } from "./composer-bild-anhang.js";
 import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=8";
 import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=3";
@@ -166,7 +167,10 @@ export function bindPlusMenu({ getInput, notifyInputChanged }) {
     if (action === "vorlage") {
       const feld = $("#startMessage");
       if (feld) {
-        feld.value = item.dataset.vorlage || "";
+        // Vorlage in der Oberflaechensprache (Geraetebefund 27.09.2026, englische
+        // App: "Look it up on the web" schrieb "Recherchiere für mich: " ins Feld).
+        const vorlage = String(item.dataset.vorlage || "").trim();
+        feld.value = vorlage ? `${t(vorlage)} ` : "";
         feld.dispatchEvent(new Event("input", { bubbles: true }));
         feld.focus();
         feld.setSelectionRange(feld.value.length, feld.value.length);
