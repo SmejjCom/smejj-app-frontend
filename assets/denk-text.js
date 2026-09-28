@@ -1,7 +1,4 @@
-// smejj.com — "smejj denkt nach" in der Oberflaechensprache (Befund 28.09.2026:
-// die englische App zeigte beim Warten den deutschen Platzhalter).
-// Bewusst ein eigenes kleines Modul statt 14 Sprachdateien: deren Marken
-// haengen an i18n/ui.js und damit an ueber 50 Modulen.
+// "smejj denkt nach" in der Oberflaechensprache — Begruendung: sprach-helfer.js.
 import { savedUiLanguage } from "./i18n/ui.js?v=3";
 
 const TEXTE = {
@@ -17,6 +14,5 @@ export function denkText(sprache) {
   if (!lang) {
     try { lang = savedUiLanguage(); } catch { lang = "de"; }
   }
-  const basis = String(lang || "de").toLowerCase().split(/[-_]/)[0];
-  return TEXTE[basis] || TEXTE.de;
+  return TEXTE[String(lang || "de").toLowerCase().split(/[-_]/)[0]] || TEXTE.de;
 }

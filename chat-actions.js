@@ -26,6 +26,7 @@
 // fail-safe: scheitert der Versand, bleibt die Bewertung lokal sichtbar.
 import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=3";
 import { t } from "./i18n/ui.js?v=3";
+const sprachHelfer = () => import("/assets/sprach-helfer.js?v=2");
 import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=19";
 // OHNE ?v=-Kennung — app.js importiert "./browser-context.js" (also
 // /assets/browser-context.js). Ein anderer Spezifizierer erzeugt eine ZWEITE
@@ -313,11 +314,12 @@ function startEdit(entry) {
   editor.dataset.for = meta.id;
   editor.innerHTML = `<textarea class="msg-editor-field" aria-label="${t("Nachricht bearbeiten").replace(/"/g, "&quot;")}" rows="2"></textarea>`
     + '<div class="msg-editor-row">'
-    + '<span class="msg-editor-note">Erzeugt eine neue Version. Die alte bleibt erreichbar.</span>'
+    + '<span class="msg-editor-note"></span>'
     + '<span class="msg-editor-buttons">'
-    + '<button type="button" class="msg-editor-button" data-act="edit-cancel">Abbrechen</button>'
-    + '<button type="button" class="msg-editor-button is-primary" data-act="edit-send">Senden</button>'
+    + `<button type="button" class="msg-editor-button" data-act="edit-cancel">${t("Abbrechen")}</button>`
+    + `<button type="button" class="msg-editor-button is-primary" data-act="edit-send">${t("Senden")}</button>`
     + "</span></div>";
+  sprachHelfer().then((h) => { editor.querySelector(".msg-editor-note").textContent = h.bearbeitenHinweis(); }, () => {});
   const field = editor.querySelector("textarea");
   field.value = rawOf(entry);
   entry.classList.add("is-editing");
@@ -369,18 +371,20 @@ async function speakEntry(entry) {
     vorleseQuelle = null;
     return;
   }
-  let sanitizeForSpeech;
+  let sanitizeForSpeech, sprache;
   try {
-    ({ sanitizeForSpeech } = await import("/assets/voice-speech-queue.js?v=sprachwelle-20260927"));
+    const [q, h] = await Promise.all([import("/assets/voice-speech-queue.js?v=sprachwelle-20260927"), sprachHelfer()]);
+    sanitizeForSpeech = q.sanitizeForSpeech;
+    sprache = h.vorleseSprache(rawOf(entry));
   } catch (fehler) {
     console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler);
     showToast(t("Vorlesen gerade nicht möglich — bitte noch einmal versuchen."), "warn");
     return;
   }
-  const text = sanitizeForSpeech(rawOf(entry), { lang: "de" });
+  const text = sanitizeForSpeech(rawOf(entry), { lang: sprache.basis });
   if (!text) return;
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "de-DE";
+  utterance.lang = sprache.lang;
   vorleseQuelle = entry;
   vorleseUtterance = utterance;
   utterance.onend = () => { if (vorleseQuelle === entry) { vorleseQuelle = null; vorleseUtterance = null; } };

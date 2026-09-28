@@ -10,7 +10,7 @@
 // den Arbeitsbereich oder den Router braucht, bleibt in app.js.
 
 import { scrolleAnsEnde } from "/assets/verlauf-unten.js";
-import { denkText } from "./denk-text.js?v=1";
+import { denkText } from "./denk-text.js?v=5";
 
 const $ = (selector) => document.querySelector(selector);
 

@@ -10,6 +10,7 @@
 // (chat-history-context.js). Dieses Modul empfaengt nur.
 import { fetchStreamWithRetry } from "./fetch-retry.js";
 import { t } from "../i18n/ui.js?v=3";
+import { empfehlungText } from "../sprach-helfer.js?v=2";
 import { API_ORIGIN } from "../config.js";
 import { mitLiveDaten } from "./live-daten.js";
 import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js";
@@ -324,7 +325,7 @@ export function zeigeFrage(output, frage, { senden = sendeAlsNutzer } = {}) {
     knopf.type = "button";
     knopf.className = "chat-frage-option";
     // Gebaut, nie zusammengeklebt: der Text kommt aus der Modellausgabe.
-    knopf.textContent = i === 0 ? `${option} (Empfehlung)` : option;
+    knopf.textContent = i === 0 ? `${option} (${empfehlungText()})` : option;
     knopf.dataset.option = option;
     knopf.addEventListener("click", () => schliesse(knopf, option));
     leiste.append(knopf);
@@ -332,7 +333,7 @@ export function zeigeFrage(output, frage, { senden = sendeAlsNutzer } = {}) {
   const ueberspringen = document.createElement("button");
   ueberspringen.type = "button";
   ueberspringen.className = "chat-frage-option chat-frage-ueberspringen";
-  ueberspringen.textContent = "Überspringen";
+  ueberspringen.textContent = t("Überspringen");
   ueberspringen.addEventListener("click", () => schliesse(null, FRAGE_UEBERSPRINGEN_TEXT));
   leiste.append(ueberspringen);
   karte.append(titel, leiste, stand);
