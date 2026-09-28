@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "عرض الجلسات النشطة",
   "Passwort ändern": "تغيير كلمة المرور",
   "Serverseitig abmelden": "تسجيل الخروج على الخادم",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "قائمة الجلسات والإلغاء عن بُعد تنطبق على حسابات البريد. جلسات Google ومفاتيح المرور موقَّعة بلا حالة وتنتهي عند انقضاء المدة أو تسجيل الخروج على الجهاز.",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "«تسجيل الخروج من كل مكان» ينهي الجلسات على جميع الأجهزة الأخرى، مهما كانت طريقة تسجيل الدخول، بما في ذلك Google وGitHub وApple ومفتاح المرور. يبقى هذا الجهاز مسجَّل الدخول. لا يمكن عرض الجلسات الفردية وإنهاؤها إلا لحسابات البريد الإلكتروني.",
   "Server-Datenexport": "تصدير بيانات الخادم",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "بيانات الحساب من الخادم بصيغة JSON، ولا تشمل أبداً كلمات المرور أو الرموز أو المفاتيح.",
   "Server-Export": "تصدير من الخادم",

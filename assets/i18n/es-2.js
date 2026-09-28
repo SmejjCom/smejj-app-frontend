@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "Mostrar sesiones activas",
   "Passwort ändern": "Cambiar contraseña",
   "Serverseitig abmelden": "Cerrar sesión en el servidor",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "La lista de sesiones y la revocación remota valen para las cuentas de correo. Las sesiones de Google y de clave de acceso se firman sin estado y terminan al expirar o al cerrar sesión en el dispositivo.",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "«Cerrar sesión en todas partes» cierra todos los demás dispositivos, con cualquier método de inicio de sesión, también Google, GitHub, Apple y llave de acceso. Este dispositivo sigue con la sesión iniciada. Las sesiones individuales solo se pueden ver y cerrar en cuentas de correo electrónico.",
   "Server-Datenexport": "Exportación de datos del servidor",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "Datos de la cuenta desde el servidor en JSON; nunca contraseñas, tokens ni claves.",
   "Server-Export": "Exportar del servidor",

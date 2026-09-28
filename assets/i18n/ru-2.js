@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "Показать активные сеансы",
   "Passwort ändern": "Сменить пароль",
   "Serverseitig abmelden": "Выйти на сервере",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "Список сеансов и удалённый отзыв действуют для почтовых аккаунтов. Сеансы Google и ключа доступа подписываются без состояния и заканчиваются по истечении срока или при выходе на устройстве.",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "«Выйти везде» завершает сеансы на всех других устройствах при любом способе входа, включая Google, GitHub, Apple и ключ доступа. Это устройство остаётся в системе. Просматривать и завершать отдельные сеансы можно только для аккаунтов с электронной почтой.",
   "Server-Datenexport": "Экспорт данных с сервера",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "Данные аккаунта с сервера в JSON; никогда пароли, токены или ключи.",
   "Server-Export": "Экспорт с сервера",

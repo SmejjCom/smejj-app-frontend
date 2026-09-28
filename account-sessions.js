@@ -148,7 +148,7 @@ export function initServerSessionControls(view, output) {
         <button id="serverLogout" type="button">${t("Serverseitig abmelden")}</button>
       </div>
       <div id="serverSessionsList" class="account-list" aria-live="polite"></div>
-      <p class="account-note">${t("Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.")}</p>
+      <p class="account-note">${t("„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.")}</p>
     </div>`);
 
   data?.insertAdjacentHTML("beforeend", `

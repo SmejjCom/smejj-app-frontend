@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "Afficher les sessions actives",
   "Passwort ändern": "Changer le mot de passe",
   "Serverseitig abmelden": "Se déconnecter côté serveur",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "La liste des sessions et la révocation à distance valent pour les comptes e-mail. Les sessions Google et clé d’accès sont signées sans état et prennent fin à l’expiration ou à la déconnexion sur l’appareil.",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "« Se déconnecter partout » met fin à tous les autres appareils – quel que soit le mode de connexion, y compris Google, GitHub, Apple et clé d’accès. Cet appareil reste connecté. Les sessions individuelles ne peuvent être affichées et fermées que pour les comptes e-mail.",
   "Server-Datenexport": "Export des données du serveur",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "Données du compte depuis le serveur en JSON ; jamais de mots de passe, jetons ou clés.",
   "Server-Export": "Export serveur",

@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "Tampilkan sesi aktif",
   "Passwort ändern": "Ubah kata sandi",
   "Serverseitig abmelden": "Keluar di sisi server",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "Daftar sesi dan pencabutan jarak jauh berlaku untuk akun e-mail. Sesi Google dan kunci sandi ditandatangani tanpa status dan berakhir saat kedaluwarsa atau saat keluar di perangkat.",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "“Keluar di semua perangkat” mengakhiri sesi di semua perangkat lain – untuk setiap cara masuk, termasuk Google, GitHub, Apple, dan passkey. Perangkat ini tetap masuk. Sesi satu per satu hanya dapat dilihat dan diakhiri untuk akun email.",
   "Server-Datenexport": "Ekspor data server",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "Data akun dari server sebagai JSON; tidak pernah kata sandi, token, atau kunci.",
   "Server-Export": "Ekspor server",

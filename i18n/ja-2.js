@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "有効なセッションを表示",
   "Passwort ändern": "パスワードを変更",
   "Serverseitig abmelden": "サーバー側でサインアウト",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "セッション一覧と遠隔での取り消しはメールアカウントに適用されます。Google とパスキーのセッションはステートレスに署名され、期限切れまたは端末でのサインアウトで終了します。",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "「すべての端末からサインアウト」は、Google・GitHub・Apple・パスキーを含むどのサインイン方法でも、ほかのすべての端末を終了します。この端末はサインインしたままです。個々のセッションの表示と終了はメールアカウントのみ可能です。",
   "Server-Datenexport": "サーバーのデータ書き出し",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "サーバーからのアカウントデータを JSON で。パスワード・トークン・鍵は決して含みません。",
   "Server-Export": "サーバーから書き出し",

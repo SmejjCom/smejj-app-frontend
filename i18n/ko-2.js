@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "활성 세션 보기",
   "Passwort ändern": "비밀번호 변경",
   "Serverseitig abmelden": "서버에서 로그아웃",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "세션 목록과 원격 해지는 이메일 계정에 적용됩니다. Google과 패스키 세션은 상태 없이 서명되며 만료되거나 기기에서 로그아웃하면 종료됩니다.",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "‘모든 기기에서 로그아웃’은 Google, GitHub, Apple, 패스키를 포함한 모든 로그인 방식에서 다른 모든 기기를 로그아웃합니다. 이 기기는 로그인 상태로 유지됩니다. 개별 세션 보기와 종료는 이메일 계정에서만 가능합니다.",
   "Server-Datenexport": "서버 데이터 내보내기",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "서버의 계정 데이터를 JSON으로. 비밀번호·토큰·키는 절대 포함하지 않습니다.",
   "Server-Export": "서버에서 내보내기",

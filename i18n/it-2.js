@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "Mostra le sessioni attive",
   "Passwort ändern": "Cambia password",
   "Serverseitig abmelden": "Esci lato server",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "L’elenco delle sessioni e la revoca a distanza valgono per gli account e-mail. Le sessioni Google e passkey sono firmate senza stato e finiscono alla scadenza o all’uscita sul dispositivo.",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "«Esci ovunque» chiude tutti gli altri dispositivi, con qualsiasi metodo di accesso, anche Google, GitHub, Apple e passkey. Questo dispositivo resta connesso. Le singole sessioni si possono vedere e chiudere solo per gli account e-mail.",
   "Server-Datenexport": "Esportazione dati dal server",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "Dati dell’account dal server in JSON; mai password, token o chiavi.",
   "Server-Export": "Esporta dal server",

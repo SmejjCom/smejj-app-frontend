@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "सक्रिय सत्र दिखाएँ",
   "Passwort ändern": "पासवर्ड बदलें",
   "Serverseitig abmelden": "सर्वर पर साइन आउट करें",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "सत्रों की सूची और दूरस्थ निरस्तीकरण ई-मेल खातों पर लागू होते हैं। Google और पासकी सत्र बिना स्थिति के हस्ताक्षरित होते हैं और समय समाप्त होने पर या डिवाइस पर साइन आउट करने पर खत्म होते हैं।",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "“हर जगह साइन आउट करें” बाकी सभी डिवाइस से साइन आउट कर देता है – हर साइन-इन तरीके के लिए, Google, GitHub, Apple और पासकी सहित। यह डिवाइस साइन इन रहता है। अलग-अलग सेशन केवल ईमेल खातों के लिए देखे और बंद किए जा सकते हैं।",
   "Server-Datenexport": "सर्वर डेटा निर्यात",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "सर्वर से खाता डेटा JSON के रूप में; पासवर्ड, टोकन या कुंजियाँ कभी नहीं।",
   "Server-Export": "सर्वर से निर्यात",

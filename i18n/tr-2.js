@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "Etkin oturumları göster",
   "Passwort ändern": "Parolayı değiştir",
   "Serverseitig abmelden": "Sunucuda oturumu kapat",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "Oturum listesi ve uzaktan iptal e-posta hesapları için geçerlidir. Google ve parola anahtarı oturumları durumsuz imzalanır ve süresi dolduğunda ya da cihazda çıkış yapıldığında sona erer.",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "“Her yerde oturumu kapat” diğer tüm cihazlardaki oturumları sonlandırır – Google, GitHub, Apple ve geçiş anahtarı dahil her giriş yönteminde. Bu cihazda oturum açık kalır. Tek tek oturumlar yalnızca e-posta hesaplarında görüntülenip sonlandırılabilir.",
   "Server-Datenexport": "Sunucu veri dışa aktarımı",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "Hesap verileri sunucudan JSON olarak; asla parola, jeton veya anahtar değil.",
   "Server-Export": "Sunucudan dışa aktar",

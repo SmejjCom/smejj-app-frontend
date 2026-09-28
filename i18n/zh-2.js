@@ -591,7 +591,7 @@ export default {
   "Aktive Sitzungen anzeigen": "显示活动会话",
   "Passwort ändern": "修改密码",
   "Serverseitig abmelden": "在服务器端退出",
-  "Sitzungs-Anzeige und Fern-Widerruf gelten für E-Mail-Konten. Google- und Passkey-Sitzungen sind zustandslos signiert und enden mit Ablauf oder Abmeldung auf dem Gerät.": "会话列表和远程撤销适用于邮箱账户。Google 和通行密钥会话为无状态签名，到期或在设备上退出即结束。",
+  "„Überall abmelden“ beendet alle anderen Geräte – bei jedem Anmeldeweg, auch Google, GitHub, Apple und Passkey. Dieses Gerät bleibt angemeldet. Einzelne Sitzungen lassen sich nur bei E-Mail-Konten anzeigen und beenden.": "“在所有设备退出”会结束所有其他设备上的会话——适用于任何登录方式，包括 Google、GitHub、Apple 和通行密钥。本设备保持登录。仅电子邮件账户可以查看和结束单个会话。",
   "Server-Datenexport": "服务器数据导出",
   "Kontodaten vom Server als JSON; niemals Passwörter, Tokens oder Schlüssel.": "来自服务器的账户数据（JSON）；绝不包含密码、令牌或密钥。",
   "Server-Export": "服务器导出",
