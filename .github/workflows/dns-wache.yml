@@ -1,0 +1,135 @@
+# smejj.com — DNS-Wache, Stufe B: der AUSSENPOSTEN (Betreiber-Freigabe 2026-09-22).
+#
+# WARUM ES DAS GIBT: Am 21.09.2026 war smejj.com ~8 Minuten nicht aufloesbar —
+# beide Nameserver des Anbieters lieferten SERVFAIL/REFUSED. Der Autopilot
+# Nr. 87 (control-server/src/autopilots/dnsWacheAutopilot.js) misst das jetzt
+# alle 30 Minuten VOM SERVER aus. Dieser Workflow misst dasselbe von einem
+# ZWEITEN Standort — und meldet ueber einen Boten, der auch dann ankommt, wenn
+# unsere eigene Zone tot ist: ein GitHub-Issue. GitHub benachrichtigt den
+# Betreiber per Mail von github.com aus, nicht von @smejj.com (deren SPF/DKIM
+# im Ernstfall genau nicht aufloesbar waeren).
+#
+# KEIN GEHEIMNIS NOETIG: nur oeffentliche DNS-Abfragen und das eingebaute
+# GITHUB_TOKEN fuer das Issue. Oeffentliches Repo → Actions kostenlos.
+# UMZUG 2026-09-28: aus smejj.com-app hierher, weil das App-Repo privat wurde
+# (Regel A, docs/policy/GITHUB_KOSTENFREI.md) — Issues landen jetzt hier.
+# Kein neuer Anbieter, keine Kosten (Master-Charta).
+#
+# GRENZE: geplante Actions laufen nicht sekundengenau, 10–30 min Verspaetung sind
+# normal — als ZWEITER Bote reicht das. Ein einzelner Fehlschlag oeffnet noch
+# kein Issue (zweiter Blick nach 20 s, wie Nr. 8/32); geschlossen wird es, wenn
+# drei Messungen in Folge wieder gruen waren.
+name: DNS-Wache
+
+on:
+  schedule:
+    - cron: "17,47 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: dns-wache
+  cancel-in-progress: false
+
+env:
+  ZONE: smejj.com
+  API: api.smejj.com
+  NS1: launch1.spaceship.net
+  NS2: launch2.spaceship.net
+  # Soll: GitHub-Pages-Adressen von smejj.com und das CNAME-Ziel des Servers.
+  SOLL_A: "185.199.108.153 185.199.109.153 185.199.110.153 185.199.111.153"
+  SOLL_CNAME: smejj-control.zeabur.app.
+  ISSUE_TITEL: "DNS: smejj.com nicht aufloesbar (Aussenposten)"
+
+jobs:
+  messen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Messen (Nameserver direkt, Google-DNS mit DNSSEC, Soll-Vergleich)
+        id: mess
+        shell: bash
+        run: |
+          set -u
+          rot=0; gruende=(); zeilen=()
+          ip_von() { dig +time=4 +tries=1 +short @8.8.8.8 "$1" A | head -1; }
+          IP1=$(ip_von "$NS1"); IP2=$(ip_von "$NS2")
+          zeilen+=("Nameserver: $NS1=$IP1, $NS2=$IP2")
+
+          frage_ns() { # $1 = IP; druckt "OK <ms> <A-Adressen>" oder "FEHLER <status>"
+            local ip="$1" t0 t1 out status
+            t0=$(date +%s%N)
+            out=$(dig +time=4 +tries=1 +norecurse @"$ip" "$ZONE" A 2>&1)
+            t1=$(date +%s%N)
+            status=$(printf '%s' "$out" | grep -o 'status: [A-Z]*' | cut -d' ' -f2)
+            if [ "$status" = "NOERROR" ]; then
+              printf 'OK %s %s' "$(( (t1 - t0) / 1000000 ))" "$(printf '%s' "$out" | awk '$4=="A"{print $5}' | sort | tr '\n' ' ')"
+            else
+              printf 'FEHLER %s' "${status:-$(printf '%s' "$out" | grep -o 'timed out\|no servers could be reached' | head -1 | tr ' ' '_')}"
+            fi
+          }
+          NSOK=0
+          for ip in $IP1 $IP2; do
+            [ -n "$ip" ] || continue
+            r=$(frage_ns "$ip")
+            if [[ "$r" == FEHLER* ]]; then sleep 20; r=$(frage_ns "$ip"); fi   # zweiter Blick
+            [[ "$r" == OK* ]] && NSOK=$((NSOK+1))
+            zeilen+=("  $ip → $r")
+          done
+          if [ -n "$IP1$IP2" ] && [ "$NSOK" -eq 0 ]; then rot=1; gruende+=("beide Nameserver antworten nicht"); fi
+
+          doh=$(curl -s -m 12 -H 'accept: application/dns-json' "https://dns.google/resolve?name=$ZONE&type=A")
+          status=$(printf '%s' "$doh" | jq -r '.Status // "netz"'); ad=$(printf '%s' "$doh" | jq -r '.AD // false')
+          adressen=$(printf '%s' "$doh" | jq -r '[.Answer[]? | select(.type==1) | .data] | sort | join(" ")')
+          zeilen+=("Google-DNS $ZONE A: Status $status, AD $ad, Antworten: ${adressen:-—}")
+          if [ "$status" = "netz" ]; then
+            zeilen+=("  (dns.google nicht erreichbar — kein Urteil von diesem Standort)")
+          else
+            [ "$status" = "0" ] || { rot=1; gruende+=("Google-DNS Status $status fuer $ZONE"); }
+            [ "$ad" = "true" ] || { [ "$status" = "0" ] && { rot=1; gruende+=("DNSSEC-Kette gebrochen (AD fehlt)"); }; }
+            if [ "$status" = "0" ] && [ "$adressen" != "$(printf '%s\n' $SOLL_A | sort | tr '\n' ' ' | sed 's/ $//')" ]; then
+              rot=1; gruende+=("A-Adressen weichen vom Soll ab: $adressen")
+            fi
+            api=$(curl -s -m 12 -H 'accept: application/dns-json' "https://dns.google/resolve?name=$API&type=CNAME")
+            ziel=$(printf '%s' "$api" | jq -r '[.Answer[]? | select(.type==5) | .data] | first // "—"')
+            zeilen+=("Google-DNS $API CNAME: $ziel")
+            [ "$ziel" = "$SOLL_CNAME" ] || { rot=1; gruende+=("api.smejj.com zeigt auf $ziel statt $SOLL_CNAME"); }
+          fi
+
+          {
+            echo "## DNS-Wache (Aussenposten) — $(date -u +'%Y-%m-%d %H:%M UTC')"
+            printf -- '- %s\n' "${zeilen[@]}"
+            [ "$rot" = 1 ] && printf '\n**ROT:** %s\n' "$(IFS='; '; echo "${gruende[*]}")" || echo $'\n**GRUEN**'
+          } | tee -a "$GITHUB_STEP_SUMMARY" > bericht.md
+          echo "rot=$rot" >> "$GITHUB_OUTPUT"
+          { echo 'bericht<<EOF'; cat bericht.md; echo 'EOF'; } >> "$GITHUB_OUTPUT"
+
+      - name: Issue oeffnen, fortschreiben oder schliessen
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ROT: ${{ steps.mess.outputs.rot }}
+          BERICHT: ${{ steps.mess.outputs.bericht }}
+        run: |
+          set -u
+          offen=$(gh issue list -R "$REPO" --state open --search "\"$ISSUE_TITEL\" in:title" --json number,title -q '[.[] | select(.title==env.ISSUE_TITEL)] | .[0].number // empty')
+          if [ "$ROT" = "1" ]; then
+            if [ -z "$offen" ]; then
+              gh issue create -R "$REPO" --title "$ISSUE_TITEL" --body "$(printf '%s\n\n%s\n\n%s' "$BERICHT" \
+                "Diagnoseweg: docs/betrieb/DNS_WACHE_VORSCHLAG_2026-09-21.md (Abschnitt 1) und docs/qa/app-a-bis-z-2026-09-19.md (Vorfall 21.09.). Die Seite selbst laeuft meist weiter — pruefen mit: curl --resolve smejj.com:443:185.199.108.153 https://smejj.com/sw.js" \
+                "Dieses Issue schliesst sich von selbst, sobald drei Messungen in Folge wieder gruen sind.")"
+            else
+              gh issue comment -R "$REPO" "$offen" --body "$BERICHT"
+            fi
+          else
+            if [ -n "$offen" ]; then
+              gh issue comment -R "$REPO" "$offen" --body "$BERICHT"
+              # Die letzten drei Kommentare gruen? Dann ist der Ausfall vorbei.
+              gruen=$(gh issue view -R "$REPO" "$offen" --json comments -q '[.comments[-3:][] | .body | test("\\*\\*GRUEN\\*\\*")] | length == 3 and all')
+              [ "$gruen" = "true" ] && gh issue close -R "$REPO" "$offen" --comment "Drei Messungen in Folge gruen — smejj.com ist wieder aufloesbar."
+            fi
+          fi
