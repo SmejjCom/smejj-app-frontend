@@ -15,7 +15,7 @@ import {
   zeitText,
   trefferAusschnitt,
   mitHervorhebung
-} from "/assets/chat-history-text.js?v=b47c3";
+} from "/assets/chat-history-text.js?v=g20260928111037";
 
 // Chats zuerst: wer sucht, sucht fast immer eine alte Unterhaltung.
 const GRUPPEN_REIHENFOLGE = ["Chats", "Projekte", "Projekt-Dateien", "Dateien", "Aufgaben", "Arbeitsbereiche", "Einstellungen", "Werkzeuge", "Memory"];

@@ -32,7 +32,7 @@ function ersteFrage(chat) {
 // Fehlerkennung. An echten Daten gemessen (2026-08-08): "smejj denkt nach…",
 // "authentication_required" und der Task-Capsule-Systemsatz standen als
 // Vorschau auf Karten, obwohl darunter eine richtige Antwort lag.
-const PLATZHALTER = /^(smejj denkt nach|authentication_required|autonomer auftrag wird als|wird geladen|…|\.\.\.)/i;
+const PLATZHALTER = /^(smejj\s*(?:denkt nach|is thinking|está pensando|réfléchit|sta pensando|düşünüyor|думает|が考えています|가 생각 중|正在思考|يفكر|सोच रहा है|ভাবছে|sedang berpikir)|authentication_required|autonomer auftrag wird als|wird geladen|…|\.\.\.)/i;
 
 // Markdown-Bilder und -Links duerfen in der Vorschau nie roh stehen —
 // gemessen 2026-08-15: ein Video-Chat zeigte "![Erzähltes Video](data:video/

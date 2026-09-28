@@ -72,7 +72,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 {
   const ladeLogHelfer = () => Promise.all([
     import("./chat-runter-pfeil.js?v=3"),
-    import("./chat-warte-reste.js?v=1")
+    import("./chat-warte-reste.js?v=2")
   ]).catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
   const ladeCodeWerkzeuge = () => Promise.all([
     import("./chat-code-copy.js?v=g20260926160933"),
@@ -115,7 +115,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 //    egal ob man klickt, ein Lesezeichen oeffnet oder zurueckgeht — und genau
 //    dann, und nur dann, wird das Modul gebraucht.
 {
-  const laden = () => import("./chat-history-view.js?v=g20260926160933");
+  const laden = () => import("./chat-history-view.js?v=g20260928111037");
   const ansicht = document.getElementById("chatHistory");
   const istOffen = () => ansicht?.classList.contains("is-active") || !!(ansicht?.offsetWidth || ansicht?.offsetHeight);
   if (ansicht) {

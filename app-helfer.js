@@ -10,6 +10,7 @@
 // den Arbeitsbereich oder den Router braucht, bleibt in app.js.
 
 import { scrolleAnsEnde } from "/assets/verlauf-unten.js";
+import { denkText } from "./denk-text.js?v=1";
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -47,7 +48,7 @@ export function addEntry(text, role, target = "#startLog") {
   node.className = `entry ${role}`;
   if (!text && role === "assistant") {
     node.dataset.thinking = "true";
-    node.innerHTML = '<span class="thinking-dots">smejj denkt nach<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>';
+    node.innerHTML = `<span class="thinking-dots">${denkText()}<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>`;
   } else {
     node.textContent = text;
   }

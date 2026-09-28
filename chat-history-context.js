@@ -22,7 +22,7 @@ const SKIP_PATTERNS = [
   // Der Wartetext der laufenden Antwort (siehe unten, dataset.thinking). Das
   // Muster ist die zweite Sicherung fuer den Fall, dass ein Aufrufer nur den
   // Text und nicht den Knoten hat.
-  /^smejj denkt nach/i
+  /^smejj\s*(?:denkt nach|is thinking|está pensando|réfléchit|sta pensando|düşünüyor|думает|が考えています|가 생각 중|正在思考|يفكر|सोच रहा है|ভাবছে|sedang berpikir)/iu // alle 15 Sprachen (denk-text.js)
 ];
 
 /**

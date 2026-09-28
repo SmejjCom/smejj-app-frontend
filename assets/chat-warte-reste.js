@@ -21,7 +21,7 @@ export function istWarteRest(roh) {
     .trim();
   if (!text || text.length > 90) return false;
   if (/^⏳?\s*Anfrage l(ae|ä)uft[\s.…]*(\d+\s*s)?[\s.…]*$/iu.test(text)) return true;
-  if (/^smejj denkt nach[\s.…]*$/iu.test(text)) return true;
+  if (/^smejj\s*(?:denkt nach|is thinking|está pensando|réfléchit|sta pensando|düşünüyor|думает|が考えています|가 생각 중|正在思考|يفكر|सोच रहा है|ভাবছে|sedang berpikir)[\s.…]*$/iu.test(text)) return true; // alle 15 Sprachen (denk-text.js)
   return false;
 }
 
