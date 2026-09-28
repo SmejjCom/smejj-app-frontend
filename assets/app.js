@@ -3,7 +3,7 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=g20260926160932";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=8";
-import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=36";
+import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=42";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2";
 import { holeSendepfad } from "./sendepfad-nachladen.js?v=36";

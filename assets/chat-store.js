@@ -4,8 +4,8 @@
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=g20260926160932";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=32";
-export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=32";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=38";
+export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=38";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und Bewertung je
 // Nachricht.
@@ -457,7 +457,11 @@ export async function createChatFrom(messages) {
 let parkeMedien = (html) => html;
 let parkerLaedt = null;
 const MEDIEN_ADRESSE = /\/api\/chat-medien\?id=/;
+let reinige, reinigerLaedt; // html-reiniger.js
+const reinigerBereit = () => (reinigerLaedt ||= import("/assets/html-reiniger.js?v=g20260928").then((m) => { reinige = m.reinigeGespeichertesHtml; }, () => { reinigerLaedt = null; }));
+
 async function parkerBereit(messages) {
+  await reinigerBereit();
   if (parkerLaedt) return parkerLaedt;
   const braucht = (Array.isArray(messages) ? messages : []).some((m) => MEDIEN_ADRESSE.test(String(m?.html || "")));
   if (!braucht) return null;
@@ -483,8 +487,8 @@ function renderEntriesInto(log, messages) {
         node.classList.add("chat-schritte");
         node.dataset.smejjSchritte = "true";
       }
-      if (message.role === "assistant" && message.html) {
-        node.innerHTML = parkeMedien(ohneToteAktion(message.html)); // Adressen geparkt (siehe parkeMedien), sanitisierte Ausgabe
+      if (message.role === "assistant" && message.html && reinige) {
+        node.innerHTML = parkeMedien(ohneToteAktion(reinige(message.html))); // Adressen geparkt (siehe parkeMedien)
       } else {
         node.textContent = message.text;
         if (message.role === "assistant") renderChatMarkdown(node);
