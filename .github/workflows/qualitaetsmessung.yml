@@ -59,7 +59,7 @@ jobs:
 
       - name: Frontend-Repo holen (Ziel der Live-Veroeffentlichung)
         if: steps.zugang.outputs.konfiguriert == 'ja'
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, per SHA gepinnt (28.09.)
 
       - name: Frontend dort bereitstellen, wo das Skript es erwartet
         if: steps.zugang.outputs.konfiguriert == 'ja'
@@ -76,7 +76,7 @@ jobs:
 
       - name: Node bereitstellen
         if: steps.zugang.outputs.konfiguriert == 'ja'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4, per SHA gepinnt (28.09.)
         with:
           node-version: 22
 
