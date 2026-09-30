@@ -68,6 +68,16 @@ export function rmsPegel(daten) {
   return Math.sqrt(summe / daten.length);
 }
 
+// Betreiber-Geraetebefund 30.09.2026 (iPhone-App, Build 6 MIT Sprach-Erlaubnis):
+// die Welle blieb in "Ich höre zu ..." stehen. Auf iPhone/iPad teilen sich die
+// WebKit-Erkennung und die parallele Ohr-Aufnahme (getUserMedia) ein Mikrofon —
+// die Erkennung liefert dann weder Ergebnis noch Fehler, die Taubheits-Wache
+// greift erst nach 2 x 12 s. Dort hoert darum gleich das eigene Ohr (Whisper).
+export function istAppleMobil(nav = typeof navigator !== "undefined" ? navigator : null) {
+  const ua = String(nav?.userAgent || "");
+  return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && Number(nav?.maxTouchPoints) > 1);
+}
+
 /**
  * createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehler })
  *   ear: createServerEar(...) — mit grosszuegigem Budget, denn im Solo-Modus

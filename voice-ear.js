@@ -212,7 +212,9 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
             tot.add(adresse);
             continue;
           }
-          if (!antwort.ok) return "";
+          // 401/429/5xx (Befund 30.09.: Bruecke lehnt das Token ab, der
+          // Rueckfallweg liefert 200) — naechste Adresse statt aufgeben.
+          if (!antwort.ok) continue;
           const daten = await antwort.json();
           return String(daten?.text || "").trim();
         }

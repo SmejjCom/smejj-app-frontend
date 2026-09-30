@@ -21,7 +21,7 @@ import { createBrowserTts } from "./voice-browser-tts.js?v=sprachwelle-20260927"
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
 import { createServerEar, createEarSend, ohrAdressen } from "./voice-ear.js";
-import { verdrahteOhrSolo } from "./voice-ohr-solo.js?v=8";
+import { verdrahteOhrSolo, istAppleMobil } from "./voice-ohr-solo.js?v=9";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
@@ -743,8 +743,8 @@ function openVoiceMode() {
 // Ohne LIVE (Relay aus ODER mitten im Gespraech abgerissen, 27.09.2026): Erkennung, sonst eigenes Ohr.
 function weiterOhneLive() {
       if (!state.voiceModeActive) return;
-      if (RecognitionCtor) return voiceModeListen();
-      if (!ohrSolo.aktivieren()) enterVoiceFallback("Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.");
+      if (RecognitionCtor && !istAppleMobil()) return voiceModeListen(); // iPhone/iPad: eigenes Ohr zuerst (Geraetebefund 30.09.)
+      if (!ohrSolo.aktivieren()) return RecognitionCtor ? voiceModeListen() : enterVoiceFallback("Spracherkennung ist auf diesem Gerät nicht verfügbar — Frage unten eintippen.");
 }
 
 function bindVoiceMode() {
