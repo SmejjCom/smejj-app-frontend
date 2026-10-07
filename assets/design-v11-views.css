@@ -409,3 +409,35 @@
 .view.premium-view {
   margin-top: var(--hinweis-hoehe, 0px);
 }
+
+/* Die Code-Ansicht traegt eine FESTE Hoehe — sie muss den Streifen abziehen.
+ *
+ * GEMESSEN 2026-10-07 in Chrome (920x816, Anmeldung abgelaufen, Ansicht
+ * /code): der Versatz oben schob #code um 63 px nach unten, die Ansicht
+ * blieb aber 100dvh hoch (start-styles.css: #code.view.is-active). Sie endete
+ * bei 879 statt 816 px — das Eingabefeld, das an ihrem unteren Rand sitzt,
+ * rutschte genau um die Streifenhoehe aus dem Fenster und war erst nach dem
+ * Scrollen zu sehen. Alle anderen Ansichten haben nur eine Mindesthoehe und
+ * duerfen wachsen; #code ist die einzige mit height/max-height.
+ *
+ * Zwei Regeln, weil start-styles.css unter 600 px zusaetzlich --sa-top
+ * abzieht: jede uebernimmt die dortige Rechnung und zieht nur die
+ * Streifenhoehe ab. Ohne Streifen ist der Wert 0px — kein Pixel aendert sich.
+ * Der Selektor ist um .premium-view schwerer als die Regeln im Buendel.
+ *
+ * WARUM min-height: 0 — ab 921 px Breite traegt .view im Buendel
+ * min-height: 100dvh, und eine Mindesthoehe schlaegt height und max-height.
+ * Nachgemessen bei 1100x800: ohne diese Zeile blieb #code 800 px hoch. Unter
+ * 921 px setzt das Buendel die Mindesthoehe selbst schon zurueck.
+ */
+#code.view.premium-view.is-active.is-active {
+  min-height: 0;
+  height: calc(100dvh - var(--hinweis-hoehe, 0px));
+  max-height: calc(100dvh - var(--hinweis-hoehe, 0px));
+}
+@media (max-width: 600px) {
+  #code.view.premium-view.is-active.is-active {
+    height: calc(100dvh - var(--sa-top) - var(--hinweis-hoehe, 0px));
+    max-height: calc(100dvh - var(--sa-top) - var(--hinweis-hoehe, 0px));
+  }
+}
