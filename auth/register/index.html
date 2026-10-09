@@ -133,6 +133,12 @@ html, body {
   overflow: hidden;
 }
 
+/* Heller Modus: Die Karte war fest dunkel, die Schrift folgt aber --auth-ink
+   und wurde dunkel auf dunkel (Live-Befund 10.10.2026). */
+@media (prefers-color-scheme: light) {
+  .auth-card { background: rgba(255, 255, 255, 0.92); }
+}
+
 .auth-card::before {
   content: "";
   position: absolute;
