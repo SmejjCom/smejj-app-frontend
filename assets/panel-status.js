@@ -68,7 +68,9 @@ export function initPanelStatus() {
     }
     // Anderer Panel-Reiter oder App-Klick: Tabelle heim, wenn die
     // Systemzustand-Ansicht gleich selbst gebraucht wird.
-    const andererReiter = event.target?.closest?.('#browserPanel [data-jump]');
+    // Der Browser-Knopf traegt data-browser-oeffnen statt data-jump: ohne ihn
+    // hier blieb die Tabelle im Browser-Modus stehen und verdeckte die Seite.
+    const andererReiter = event.target?.closest?.('#browserPanel [data-jump], #browserPanel [data-browser-oeffnen]');
     if (andererReiter && istImPanel()) { try { zurueckgeben(); } catch { /* still */ } }
     setTimeout(() => {
       try {
