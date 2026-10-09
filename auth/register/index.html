@@ -236,6 +236,24 @@ a:focus-visible {
 
 .auth-ic { display: inline-flex; flex: none; }
 
+/* Sign in with Apple (Apple-Pruefung 29.09.2026, Guideline 4): Logo
+   unveraendert aus den Apple Design Resources, Knopffarben nach den Human
+   Interface Guidelines — weiss auf dunklem Grund, schwarz auf hellem. Das
+   Artwork bringt seinen eigenen Rand mit, deshalb kein gap. */
+.auth-button.auth-apple { background: #fff; color: #000; border-color: #fff; gap: 0; }
+.auth-button.auth-apple:hover { border-color: #fff; opacity: 0.92; }
+.auth-apple .auth-ic,
+.auth-apple .auth-apple-logo { height: 100%; }
+.auth-apple .auth-apple-logo { display: flex; }
+.auth-apple .auth-apple-logo svg { height: 100%; width: auto; }
+.auth-apple .auth-apple-logo.fuer-hell { display: none; }
+@media (prefers-color-scheme: light) {
+  .auth-button.auth-apple { background: #000; color: #fff; border-color: #000; }
+  .auth-button.auth-apple:hover { border-color: #000; }
+  .auth-apple .auth-apple-logo.fuer-dunkel { display: none; }
+  .auth-apple .auth-apple-logo.fuer-hell { display: flex; }
+}
+
 /* Trennlinie "oder" */
 .auth-divider {
   display: flex;
@@ -399,8 +417,24 @@ a:focus-visible {
           <button class="auth-button secondary" id="googleLogin" type="button" data-method="google">
             <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.788 5.108a9 9 0 1 0 3.212 6.892h-8"/></svg></span>Mit Google registrieren
           </button>
-          <button class="auth-button secondary" id="appleLogin" type="button" data-method="apple" hidden>
-            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.286 7.008c-3.216 0 -4.286 3.23 -4.286 5.92c0 3.229 2.143 8.072 4.286 8.072c1.165 -.05 1.799 -.538 3.214 -.538c1.406 0 1.607 .538 3.214 .538s4.286 -3.229 4.286 -5.381c-.03 -.011 -2.649 -.434 -2.679 -3.23c-.02 -2.335 2.589 -3.179 2.679 -3.228c-1.096 -1.606 -3.101 -1.643 -3.607 -1.643c-1.586 0 -2.607 .538 -3.214 .538c-.607 0 -1.607 -.538 -2.679 -.538z"/><path d="M12 4a2 2 0 0 0 2 -2a2 2 0 0 0 -2 2"/></svg></span>Mit Apple registrieren
+          <button class="auth-button secondary auth-apple" id="appleLogin" type="button" data-method="apple" hidden>
+            <span class="auth-ic" aria-hidden="true"><span class="auth-apple-logo fuer-dunkel"><svg width="31px" height="44px" viewBox="0 0 31 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61 (89581) - https://sketch.com -->
+    <title>Left Black Logo Medium</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Left-Black-Logo-Medium" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" fill="#FFFFFF" x="0" y="0" width="31" height="44"></rect>
+        <path d="M15.7099491,14.8846154 C16.5675461,14.8846154 17.642562,14.3048315 18.28274,13.5317864 C18.8625238,12.8312142 19.2852829,11.852829 19.2852829,10.8744437 C19.2852829,10.7415766 19.2732041,10.6087095 19.2490464,10.5 C18.2948188,10.5362365 17.1473299,11.140178 16.4588366,11.9494596 C15.9152893,12.56548 15.4200572,13.5317864 15.4200572,14.5222505 C15.4200572,14.6671964 15.4442149,14.8121424 15.4562937,14.8604577 C15.5166879,14.8725366 15.6133185,14.8846154 15.7099491,14.8846154 Z M12.6902416,29.5 C13.8618881,29.5 14.3812778,28.714876 15.8428163,28.714876 C17.3285124,28.714876 17.6546408,29.4758423 18.9591545,29.4758423 C20.2395105,29.4758423 21.0971074,28.292117 21.9063891,27.1325493 C22.8123013,25.8038779 23.1867451,24.4993643 23.2109027,24.4389701 C23.1263509,24.4148125 20.6743484,23.4122695 20.6743484,20.5979021 C20.6743484,18.1579784 22.6069612,17.0588048 22.7156707,16.974253 C21.4353147,15.1382708 19.490623,15.0899555 18.9591545,15.0899555 C17.5217737,15.0899555 16.3501271,15.9596313 15.6133185,15.9596313 C14.8161157,15.9596313 13.7652575,15.1382708 12.521138,15.1382708 C10.1536872,15.1382708 7.75,17.0950413 7.75,20.7911634 C7.75,23.0861411 8.64383344,25.513986 9.74300699,27.0842339 C10.6851558,28.4129053 11.5065162,29.5 12.6902416,29.5 Z" id="" fill="#000000" fill-rule="nonzero"></path>
+    </g>
+</svg></span><span class="auth-apple-logo fuer-hell"><svg width="31px" height="44px" viewBox="0 0 31 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61 (89581) - https://sketch.com -->
+    <title>Left White Logo Medium</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Left-White-Logo-Medium" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" fill="#000000" x="0" y="0" width="31" height="44"></rect>
+        <path d="M15.7099491,14.8846154 C16.5675461,14.8846154 17.642562,14.3048315 18.28274,13.5317864 C18.8625238,12.8312142 19.2852829,11.852829 19.2852829,10.8744437 C19.2852829,10.7415766 19.2732041,10.6087095 19.2490464,10.5 C18.2948188,10.5362365 17.1473299,11.140178 16.4588366,11.9494596 C15.9152893,12.56548 15.4200572,13.5317864 15.4200572,14.5222505 C15.4200572,14.6671964 15.4442149,14.8121424 15.4562937,14.8604577 C15.5166879,14.8725366 15.6133185,14.8846154 15.7099491,14.8846154 Z M12.6902416,29.5 C13.8618881,29.5 14.3812778,28.714876 15.8428163,28.714876 C17.3285124,28.714876 17.6546408,29.4758423 18.9591545,29.4758423 C20.2395105,29.4758423 21.0971074,28.292117 21.9063891,27.1325493 C22.8123013,25.8038779 23.1867451,24.4993643 23.2109027,24.4389701 C23.1263509,24.4148125 20.6743484,23.4122695 20.6743484,20.5979021 C20.6743484,18.1579784 22.6069612,17.0588048 22.7156707,16.974253 C21.4353147,15.1382708 19.490623,15.0899555 18.9591545,15.0899555 C17.5217737,15.0899555 16.3501271,15.9596313 15.6133185,15.9596313 C14.8161157,15.9596313 13.7652575,15.1382708 12.521138,15.1382708 C10.1536872,15.1382708 7.75,17.0950413 7.75,20.7911634 C7.75,23.0861411 8.64383344,25.513986 9.74300699,27.0842339 C10.6851558,28.4129053 11.5065162,29.5 12.6902416,29.5 Z" id="" fill="#FFFFFF" fill-rule="nonzero"></path>
+    </g>
+</svg></span></span>Mit Apple registrieren
           </button>
           <button class="auth-button secondary" id="githubLogin" type="button" data-method="github" hidden>
             <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6.1a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6.1c-.6 .6 -.6 1.2 -.5 2v3.5"/></svg></span>Mit GitHub registrieren
