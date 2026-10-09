@@ -13,6 +13,22 @@
 
 let anker = null; // Merkposten an der Originalstelle der Tabelle
 
+// Stil aus dem Modul, weil die Regeln sonst in start-styles.css (Start-Buendel,
+// gesperrt) muessten. Am Handy ist das Panel nur ~190 px breit: Name und Wert
+// nebeneinander brachen mitten im Wort um ("Brows er-Speich er"). Jetzt rutscht
+// der Wert unter den Namen, sobald beide nicht in eine Zeile passen.
+const STIL_ID = "panel-status-stil";
+const REGELN = ".panel-status .status-grid > div{flex-wrap:wrap;row-gap:2px}"
+  + ".panel-status .status-grid > div > span{flex:1 1 auto}";
+
+function stil() {
+  if (document.getElementById(STIL_ID)) return;
+  const s = document.createElement("style");
+  s.id = STIL_ID;
+  s.textContent = REGELN;
+  document.head.append(s);
+}
+
 function halter() {
   let h = document.getElementById("panelStatus");
   if (!h) {
@@ -48,6 +64,7 @@ function holen() {
   const h = halter();
   const g = grid();
   if (!h || !g || istImPanel()) return;
+  stil();
   anker = document.createComment("status-grid-anker");
   g.replaceWith(anker);
   h.append(g);
