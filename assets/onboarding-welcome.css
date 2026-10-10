@@ -173,3 +173,16 @@
     text-align: center;
   }
 }
+
+/* Apple-Richtlinie 3.1.1 (10.10.2026): Auf iOS zeigt die Begruessung keine
+   Plaene, keine Preise und keinen Kaufknopf — auch die Karte nach der ersten
+   Anmeldung nicht, die ein App-Pruefer mit frischem Konto als Erstes sieht.
+   -webkit-touch-callout kennt nur WebKit auf iOS/iPadOS: Safari und jede
+   App-Huelle dort, kein anderer Browser. Deshalb reicht CSS, ohne Skript. */
+@supports (-webkit-touch-callout: none) {
+  .onboarding-sub,
+  .onboarding-plans,
+  .onboarding-fineprint,
+  .onboarding-note { display: none !important; }
+  .onboarding-actions { justify-content: flex-end; }
+}

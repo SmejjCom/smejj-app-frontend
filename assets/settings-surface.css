@@ -538,3 +538,10 @@
 #settings.premium-view[data-settings-theme="light"] .settings-nav-button.is-active .settings-nav-name {
   color: #0b0b0b;
 }
+
+/* Apple-Richtlinie 3.1.1 (10.10.2026): Die Unterzeile des Reiters "API" nennt
+   Guthaben und Preise. Auf iOS gibt es dort beides nicht zu kaufen, also
+   entfaellt die Unterzeile. Erkennung wie in onboarding-welcome.css. */
+@supports (-webkit-touch-callout: none) {
+  #settings #settings-tab-api .settings-nav-sub { display: none !important; }
+}

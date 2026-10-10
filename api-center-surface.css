@@ -311,3 +311,13 @@ details.ac-anhang[open] summary::after { content: "▾"; }
   .ac-field input, .ac-field select { min-height: 44px; }
   .ac-kontozeile { font-size: 12.5px; }
 }
+
+/* Apple-Richtlinie 3.1.1 (10.10.2026): Auf iOS wird im API-Bereich nichts
+   verkauft — kein Aufladen, keine Betragsknoepfe, keine Preistabelle. Der
+   Kontostand selbst bleibt stehen; er ist eine Auskunft, kein Angebot.
+   Erkennung wie in onboarding-welcome.css. */
+@supports (-webkit-touch-callout: none) {
+  .ac-stat-link[data-ac="aufladen"],
+  .ac-stufen,
+  details.ac-anhang { display: none !important; }
+}
