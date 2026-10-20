@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v948";
+const CACHE_NAME = "smejj-shell-v999";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -259,6 +259,7 @@ const SHELL = [
   "/assets/config.js",
   "/assets/components.js",
   "/assets/chat-markdown.js",
+  "/assets/chat-video-e2.js",
   "/assets/frame-guard.js",
   "/assets/app.js",
   // Herausgeloest aus app.js am 07.09. (812 Zeilen ueber der Hausgrenze).
@@ -309,6 +310,11 @@ const SHELL = [
   "/assets/voice-conversation.js",
   "/assets/voice-ear.js",
   "/assets/voice-speech-queue.js",
+  // 27.09.2026: Erkennungsliste + sprechbarer Antworttext (composer-tools.js, voice-landing.js).
+  "/assets/voice-erkennung.js",
+  "/assets/denk-text.js",
+  "/assets/sprach-helfer.js",
+  "/assets/voice-antwort.js",
   "/assets/voice-echo-filter.js",
   "/assets/voice-vad.js",
   "/assets/voice-endpoint.js",
@@ -316,6 +322,7 @@ const SHELL = [
   "/assets/voice-premium-tts.js",
   "/assets/voice-warmup.js",
   "/assets/ai/chat-stream.js",
+  "/assets/ai/bild-nachholen.js",
   // Live-Daten im Browser (Nachdenken holt Wetter/Websuche selbst, 07.09.).
   "/assets/ai/live-daten.js",
   "/assets/chat-bridge-weather.js",
@@ -324,6 +331,7 @@ const SHELL = [
   "/assets/ai/fetch-retry.js",
   "/assets/composer-dictation.js",
   "/assets/chat-store.js",
+  "/assets/html-reiniger.js",
   "/assets/chat-store-bereiche.js",
   "/assets/chat-history-view.js",
   "/assets/chat-merkmale.js",
@@ -332,6 +340,8 @@ const SHELL = [
   "/assets/chat-title-auto.js",
   "/assets/chat-messages.js",
   "/assets/chat-actions.js",
+  // Lern-Hinweis nach Daumen hoch (23.09.2026), per import() aus chat-actions.js.
+  "/assets/lern-hinweis.js",
   "/assets/chat-neu-versuch.js",
   // Beispiel-Chips der Startseite (2026-08-13). index.html laedt sie per
   // <script>; ohne Eintrag hier fehlen sie offline — check:precache-imports
