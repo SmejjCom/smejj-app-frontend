@@ -1,0 +1,46 @@
+/* smejj.com — Design V18: die Eingabeleiste am Handy sitzt minimal hoeher
+ * (Betreiber-Auftrag 20.10.2026).
+ *
+ * WORTLAUT DES AUFTRAGS (Chat, 20.10.2026): "Die Leiste in der mobilen App und
+ * Handy-Webversion nur minimal hoeher setzen, alle Icons und Funktionen gleich
+ * lassen. Desktop bleibt unveraendert." Startwert: +5 CSS-Pixel gegenueber dem
+ * ausgelieferten Stand v998.
+ *
+ * AUSGANGSLAGE: V16 setzt das Feld bundig auf die Unterkante (bottom 0 im
+ * laufenden Chat, margin-bottom 0 auf der leeren Startseite, bottom 0 bei
+ * offener Tastatur). Ein Safe-Area-Abstand liegt dort nicht — er wird hier
+ * auch NICHT hinzugefuegt.
+ *
+ * WAS SICH AENDERT: nur der Abstand nach unten, um LEISTE_ABSTAND. Die ganze
+ * Zeile (+, "Frag mich alles", Modell-Chip, Mikrofon, Sprachwelle/Senden)
+ * wandert gemeinsam; Groesse, Reihenfolge, Farben, Feldhoehe und die
+ * Symbollage aus V17 bleiben. Der Verlauf bekommt unten dieselben 5 px mehr
+ * Polster, damit die letzte Nachricht nicht unter das Feld rutscht.
+ * Desktop (> 600 px) ist nicht betroffen.
+ *
+ * Eigene Datei, neues Kaskaden-Ende nach V17 (100-%-Schutz: kein Rueckbau der
+ * Schichten davor); ein .prompt-glass mehr als V16, damit sie sicher gewinnt.
+ */
+
+@media (max-width: 600px) {
+  html {
+    --leiste-abstand: 5px;
+  }
+  /* Laufender Chat: absolut ueber der Unterkante der Huelle. */
+  html body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass.prompt-glass {
+    bottom: var(--leiste-abstand);
+  }
+  /* Leere Startseite: dasselbe Feld im Fluss, mit kleinem Rand nach unten. */
+  html body #start:not(.has-start-chat) .home-feed.home-feed > .prompt-glass.prompt-glass.prompt-glass {
+    margin-bottom: var(--leiste-abstand);
+  }
+  /* Bildschirmtastatur offen: derselbe kleine Abstand ueber der Tastaturkante. */
+  html.tastatur-offen body #start.has-start-chat .prompt-glass.prompt-glass.prompt-glass.prompt-glass {
+    bottom: var(--leiste-abstand);
+  }
+  /* Verlauf: Polster unten waechst um denselben Abstand. */
+  html body #start.has-start-chat #startLog.start-log.start-log.start-log {
+    padding-bottom: calc(var(--feld-hoehe, 64px) + 12px + var(--leiste-abstand));
+    scroll-padding-bottom: calc(var(--feld-hoehe, 64px) + 12px + var(--leiste-abstand));
+  }
+}
