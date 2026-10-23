@@ -290,6 +290,11 @@
       return;
     }
     seite.innerHTML = V.akte({ user: antwort.data.user, grund: String(grund).trim() });
+    if (antwort.data.aktivitaet) {
+      const modul = window.adminNutzerakte;
+      seite.insertAdjacentHTML("beforeend", modul.ansicht(antwort.data.aktivitaet));
+      modul.binde(seite, id, String(grund).trim(), antwort.data.aktivitaet);
+    }
     bindeZurueck();
     bindeAkteAktionen(id);
   }
