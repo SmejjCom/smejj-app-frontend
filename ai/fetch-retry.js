@@ -116,6 +116,8 @@ export async function fetchStreamWithRetry(url, init = {}, {
   fetchFn = globalThis.fetch,
   onRetry
 } = {}) {
+  const signal = init.signal;
+  signal?.throwIfAborted();
   const urls = normalizeTargets(url);
   if (!urls.length) throw new Error("bridge_unreachable: keine Endpunkte");
   // Ausdrueckliche Vorgabe gewinnt; sonst entscheidet die angefragte Spur.
@@ -155,6 +157,7 @@ export async function fetchStreamWithRetry(url, init = {}, {
   const versuche = Math.max(attempts, urls.length > 1 ? urls.length + 1 : urls.length);
   let lastReason = "";
   for (let attempt = 1; attempt <= versuche; attempt += 1) {
+    signal?.throwIfAborted();
     const ziel = urls[(attempt - 1) % urls.length];
     // Endpunkte mit eigenem Rumpf bekommen auch ihr eigenes Zeitbudget: die Spur
     // wird am Modellnamen IM RUMPF erkannt, und der kann sich je Ziel unterscheiden.
@@ -168,19 +171,27 @@ export async function fetchStreamWithRetry(url, init = {}, {
       attempt === versuche ? Math.max(zielBudgetMs, letzterBudgetMs) : zielBudgetMs
     );
     try {
-      const response = await fetchFn(ziel.url, { ...anfrage, signal: controller.signal });
+      const response = await fetchFn(ziel.url, { ...anfrage, signal: signal ? AbortSignal.any([signal, controller.signal]) : controller.signal });
       clearTimeout(timer);
+      signal?.throwIfAborted();
       if (response.ok && response.body) return response;
       // 4xx (ausser 429) sind endgueltig — Wiederholen wuerde nichts aendern.
       if (response.status >= 400 && response.status < 500 && response.status !== 429) return response;
       lastReason = `HTTP ${response.status}`;
     } catch (error) {
       clearTimeout(timer);
+      signal?.throwIfAborted();
       lastReason = error?.name === "AbortError" ? "timeout" : (error?.message || "network");
     }
     if (attempt < versuche) {
       onRetry?.({ attempt, reason: lastReason });
-      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+      await new Promise((resolve, reject) => {
+        const done = () => { signal?.removeEventListener("abort", abort); resolve(); };
+        const timer = setTimeout(done, retryDelayMs);
+        const abort = () => { clearTimeout(timer); signal.removeEventListener("abort", abort); reject(signal.reason); };
+        signal?.addEventListener("abort", abort, { once: true });
+        if (signal?.aborted) abort();
+      });
     }
   }
   throw new Error(`bridge_unreachable: ${lastReason}`);

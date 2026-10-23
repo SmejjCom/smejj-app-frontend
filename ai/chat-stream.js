@@ -495,7 +495,7 @@ function meldeStromstand() {
 
 export function stoppeChatStrom() {
   for (const leser of aktiveLeser) {
-    try { leser.cancel(); } catch { /* Strom war schon zu */ }
+    try { Promise.resolve(leser.cancel()).catch(() => {}); } catch { /* Strom war schon zu */ }
   }
 }
 
@@ -651,8 +651,8 @@ function zieleAnpassen(url, aendere) {
  * zum Ende; ein Stopp davor wird gemerkt und die spaete Antwort verworfen.
  */
 export async function streamChatAnswer(url, body, output, optionen = {}) {
-  const lauf = { gestoppt: false };
-  const anker = { cancel: () => { lauf.gestoppt = true; } };
+  const lauf = { gestoppt: false, controller: new AbortController() };
+  const anker = { cancel: () => { lauf.gestoppt = true; lauf.controller.abort(); } };
   aktiveLeser.add(anker);
   meldeStromstand();
   try {
@@ -699,19 +699,19 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   const frageNachher = String(body?.task || "");
   if (frageNachher !== frageVorher) url = zieleAnpassen(url, (rumpf) => ({ ...rumpf, task: frageNachher }));
 
-  // Ab dem Absenden sichtbar arbeiten — der Server meldet sich erst nach
-  // gemessenen 5,75 s (siehe starteWartesignal).
+  // Wartesignal ab dem Absenden.
   const stoppeWartesignal = starteWartesignal(output);
-  let response; // Stufe A2: Replika-Ausfall -> fetchStreamWithRetry versucht sofort neu.
+  let response;
   try {
     response = await fetchStreamWithRetry(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body), signal: lauf.controller.signal
     });
   } catch {
     stoppeWartesignal();
     clearThinkingState(output);
+    if (lauf.gestoppt) return;
     output.textContent = "Verbindung zum Server unterbrochen.";
     haengeAktionsKnopf(output, "Erneut versuchen", letzteNutzerfrage(body));
     return;
@@ -730,7 +730,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   // Jeder Server-Ausfall zaehlt (500/502/503/504) — nicht nur die zwei, die
   // heute gemessen wurden. Der Rueckfall kostet eine Anfrage und kann nur
   // helfen; bleibt auch er erfolglos, kommt unten die ehrliche Meldung.
-  if (response && !response.ok && response.status >= 500 && response.status <= 504
+  if (!lauf.gestoppt && response && !response.ok && response.status >= 500 && response.status <= 504
       && String(body?.preferences?.stufe || "") === "gruendlich") {
     // "schnell", NICHT "auto" — das ist der Unterschied zwischen Antwort und
     // Fehler. Die Bruecke versucht die Schnellspur nur, wenn
@@ -748,7 +748,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
       response = await fetchStreamWithRetry(leichtereZiele, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() },
-        body: JSON.stringify(leichter)
+        body: JSON.stringify(leichter), signal: lauf.controller.signal
       });
     } catch { /* faellt unten in die normale Fehlermeldung */ }
   }
@@ -756,14 +756,14 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   // Abgelaufener kurzer Ausweis (401/403): LAUTLOS aus der gueltigen Sitzung
   // einen frischen holen und die Anfrage GENAU einmal wiederholen, statt den
   // Nutzer auszuloggen. Erst wenn auch das scheitert, kommt der Anmelde-Hinweis.
-  if (response && !response.ok && (response.status === 401 || response.status === 403)) {
+  if (!lauf.gestoppt && response && !response.ok && (response.status === 401 || response.status === 403)) {
     const frisch = await erneuereZugangsToken();
     if (frisch) {
       try {
         response = await fetchStreamWithRetry(url, {
           method: "POST",
           headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() },
-          body: JSON.stringify(body)
+          body: JSON.stringify(body), signal: lauf.controller.signal
         });
       } catch { /* faellt unten in die normale Fehlermeldung */ }
     }
@@ -874,10 +874,10 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
     // 100+ KB base64-Rohtext in der Blase.
     output.textContent = entferneAbgerisseneMedien(output.textContent);
     markiereMedienStrom(output);
+    if (lauf.gestoppt) { stoppeWartesignal(); clearThinkingState(output); return; }
     throw abriss;
   } finally {
-    // Immer deregistrieren — auch wenn read() wirft (Netzabbruch): sonst
-    // bliebe der Stopp-Knopf fuer immer stehen.
+    // Auch bei Abbruch deregistrieren.
     wache.beenden();
     aktiveLeser.delete(reader);
     meldeStromstand();
