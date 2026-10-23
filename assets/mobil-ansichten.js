@@ -33,7 +33,7 @@ export const REGELN = "@media (max-width:600px){"
   + "body .plus-menu-werkzeuge button[role=menuitem] .werk-ic{grid-column:1;grid-row:1}"
   + "body .plus-menu-werkzeuge button[role=menuitem] b{grid-column:2;grid-row:1;white-space:normal!important;overflow-wrap:anywhere}"
   + "body .plus-menu-werkzeuge button[role=menuitem] .werk-was{display:block!important;grid-column:2;font-size:15px;line-height:1.4;white-space:normal;overflow-wrap:anywhere;opacity:.8}"
-  + "body .plus-menu-werkzeuge [data-composer-action=aufnahme] .werk-was{display:none!important}"
+  + "body .plus-menu-werkzeuge button[role=menuitem][data-composer-action=aufnahme] .werk-was{display:none!important}"
   + "body .mobil-code-beispiele{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:16px;max-width:100%}"
   + "body .mobil-code-beispiele[hidden],body .codeleer[hidden]+.mobil-code-beispiele{display:none}"
   + "body .mobil-code-beispiele button{min-height:44px;max-width:100%;white-space:normal;padding:10px 14px;font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:16px}"
@@ -131,7 +131,7 @@ export function sorgeFuerStil(doc = document) {
 if (typeof document !== "undefined" && document.querySelector(".view")) sorgeFuerStil();
 
 // Vorhandene Vorlagen auch im leeren Code-Bereich anbieten. Ein Tipp fuellt
-// nur den Entwurf; der bestehende Vorlagen-Handler bleibt zustaendig.
+// nur den Code-Entwurf; der Chat-Entwurf bleibt unberuehrt.
 async function zeigeCodeBeispiele() {
   if (!matchMedia("(max-width:600px)").matches) return;
   const leer = document.querySelector(".codeleer");
@@ -157,7 +157,8 @@ async function zeigeCodeBeispiele() {
     knopf.addEventListener("click", () => {
       // Bereits eingegebene Entwuerfe niemals durch eine Vorlage ersetzen.
       if (feld.value.trim()) return;
-      vorlage.click();
+      feld.value = `${t(vorlage.dataset.chip)} `;
+      feld.dispatchEvent(new Event("input", { bubbles: true }));
       feld.focus();
       aktualisiere();
     });
