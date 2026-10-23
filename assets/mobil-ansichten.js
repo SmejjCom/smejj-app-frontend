@@ -25,6 +25,22 @@
 // Modul, weil die Quell-Stylesheets im gesperrten Start-Buendel liegen.
 export const STIL_ID = "mobil-ansichten-stil";
 export const REGELN = "@media (max-width:600px){"
+  // Werkzeuggruppen und vorhandene Erklaerungen am Handy lesbar machen.
+  // Desktop, Symbolgrafiken und die mobile Eingabeleiste bleiben unberuehrt.
+  + "body .plus-menu.plus-menu-werkzeuge{width:min(330px,calc(100vw - 24px))!important;min-width:0!important;max-height:min(65vh,520px);max-height:min(65dvh,520px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}"
+  + "body .plus-menu-werkzeuge .plus-gruppe{display:block!important;padding:12px 14px 4px;font-size:15px;font-weight:600;opacity:.75}"
+  + "body .plus-menu-werkzeuge button[role=menuitem]{display:grid!important;grid-template-columns:18px minmax(0,1fr)!important;column-gap:11px!important;row-gap:3px!important;min-height:44px}"
+  + "body .plus-menu-werkzeuge button[role=menuitem] .werk-ic{grid-column:1;grid-row:1}"
+  + "body .plus-menu-werkzeuge button[role=menuitem] b{grid-column:2;grid-row:1;white-space:normal!important;overflow-wrap:anywhere}"
+  + "body .plus-menu-werkzeuge button[role=menuitem] .werk-was{display:block!important;grid-column:2;font-size:15px;line-height:1.4;white-space:normal;overflow-wrap:anywhere;opacity:.8}"
+  + "body .plus-menu-werkzeuge [data-composer-action=aufnahme] .werk-was{display:none!important}"
+  + "body .mobil-code-beispiele{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:16px;max-width:100%}"
+  + "body .mobil-code-beispiele[hidden],body .codeleer[hidden]+.mobil-code-beispiele{display:none}"
+  + "body .mobil-code-beispiele button{min-height:44px;max-width:100%;white-space:normal;padding:10px 14px;font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:16px}"
+  + "body #codeModellMenue,body #startModellMenue{max-width:calc(100vw - 24px);max-height:60vh;max-height:60dvh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}"
+  + "body #codeModellMenue button[title],body #startModellMenue button[title]{flex-wrap:wrap;min-height:44px}"
+  + "body #codeModellMenue button[data-mobil-hilfe]::after,body #startModellMenue button[data-mobil-hilfe]::after{content:attr(data-mobil-hilfe);flex-basis:100%;font-size:15px;line-height:1.4;white-space:normal;text-align:start;overflow-wrap:anywhere;opacity:.8}"
+  + "body .nav-button .nav-label{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}"
   // (1) Reiterzeilen wischbar
   + "body #settings .settings-tabs.settings-tabs,body #profile .account-nav.account-nav,body #chatHistory .ch-chips.ch-chips{"
   + "display:flex;flex-wrap:nowrap;align-items:center;overflow-x:auto;overflow-y:hidden;gap:8px;padding:4px 12px 8px;margin:0 -4px;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;"
@@ -113,3 +129,71 @@ export function sorgeFuerStil(doc = document) {
 }
 
 if (typeof document !== "undefined" && document.querySelector(".view")) sorgeFuerStil();
+
+// Vorhandene Vorlagen auch im leeren Code-Bereich anbieten. Ein Tipp fuellt
+// nur den Entwurf; der bestehende Vorlagen-Handler bleibt zustaendig.
+async function zeigeCodeBeispiele() {
+  if (!matchMedia("(max-width:600px)").matches) return;
+  const leer = document.querySelector(".codeleer");
+  const feld = document.getElementById("codeAufgabe");
+  const vorlagen = document.querySelectorAll(".code-wchips button[data-chip]");
+  if (!leer || !feld || !vorlagen.length || document.querySelector(".mobil-code-beispiele")) return;
+  const { t } = await import("./i18n/ui.js?v=3");
+  const gruppe = document.createElement("div");
+  gruppe.className = "mobil-code-beispiele";
+  for (const vorlage of vorlagen) {
+    const knopf = document.createElement("button");
+    knopf.type = "button";
+    const aufschriften = {
+      "Suche den Fehler in:": "Fehler suchen",
+      "Baue folgende Funktion ein:": "Funktion einbauen",
+      "Schreibe Tests für:": "Tests schreiben",
+      "Erkläre mir diesen Code:": "Code erklären"
+    };
+    const quelle = aufschriften[vorlage.dataset.chip] || vorlage.textContent.trim();
+    const uebersetze = () => { knopf.textContent = t(quelle); };
+    uebersetze();
+    document.addEventListener("smejj:sprache", uebersetze);
+    knopf.addEventListener("click", () => {
+      // Bereits eingegebene Entwuerfe niemals durch eine Vorlage ersetzen.
+      if (feld.value.trim()) return;
+      vorlage.click();
+      feld.focus();
+      aktualisiere();
+    });
+    gruppe.append(knopf);
+  }
+  const mobil = matchMedia("(max-width:600px)");
+  const aktualisiere = () => { gruppe.hidden = !mobil.matches || Boolean(feld.value.trim()); };
+  mobil.addEventListener("change", aktualisiere);
+  feld.addEventListener("input", aktualisiere);
+  aktualisiere();
+  leer.after(gruppe);
+}
+if (typeof document !== "undefined" && document.querySelector(".view")) {
+  zeigeCodeBeispiele().catch((fehler) => console.error("[smejj.com] Code-Vorlagen:", fehler));
+}
+
+// Kurze, bereits uebersetzte Hilfen statt Desktop-Tooltips auf Touchgeraeten.
+async function zeigeModellHilfen() {
+  if (!matchMedia("(max-width:600px)").matches) return;
+  const { t } = await import("./i18n/ui.js?v=3");
+  const texte = {
+    "smejj 1.3": "Gründlicher antworten",
+    "smejj 1.2": "Gründlich — ausführlich, dauert länger",
+    "smejj 1.1": "Wählt selbst zwischen schnell und gründlich",
+    "smejj 1.0": "Schnell — Antwort in Sekunden"
+  };
+  const aktualisiere = () => {
+    document.querySelectorAll("#codeModellMenue button, #startModellMenue button").forEach((knopf) => {
+      const quelle = texte[knopf.querySelector("b")?.textContent.trim()];
+      if (quelle && knopf.dataset.mobilHilfe !== t(quelle)) knopf.dataset.mobilHilfe = t(quelle);
+    });
+  };
+  aktualisiere();
+  document.addEventListener("smejj:sprache", aktualisiere);
+  new MutationObserver(aktualisiere).observe(document.body, { childList: true, subtree: true });
+}
+if (typeof document !== "undefined" && document.querySelector(".view")) {
+  zeigeModellHilfen().catch((fehler) => console.error("[smejj.com] Modellhilfe:", fehler));
+}
