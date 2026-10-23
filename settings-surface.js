@@ -158,7 +158,7 @@ function markup() {
   // Betreiber 2026-08-16: keine doppelten Ueberschriften — die kleine Zeile
   // "Einstellungen" stand direkt ueber der grossen "Einstellungen".
   return `<header class="settings-header"><div><h2>${t("Einstellungen")}</h2><p class="subhead">${t("Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.")}</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">${t("Lokal gespeichert")}</div></header>
-    <div class="settings-shell"><nav class="settings-nav" role="tablist" aria-label="${t("Einstellungsbereiche")}">${suche}${nav}</nav><div class="settings-content">
+    <div class="settings-shell"><div class="settings-nav">${suche}<nav class="settings-tabs" role="tablist" aria-label="${t("Einstellungsbereiche")}">${nav}</nav></div><div class="settings-content">
       ${panel("general", "Allgemein", t("Grundlegendes Verhalten der App."), [
         select(t("Sprache"), "settingsLanguage", LANGUAGE_OPTIONS, false),
         select(t("Beim Öffnen anzeigen"), "settingsStartView", [["start", "Startseite"], ["last", "Letzte Ansicht"], ["projects", "smejjCloud"]]),
@@ -288,6 +288,9 @@ async function ladeApiZentrum(view) {
 
 function activate(view, id) {
   activeTab = id;
+  if (window.matchMedia("(max-width: 600px)").matches) {
+    view.querySelector(`[data-settings-tab="${id}"]`)?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
   if (id === "api") void ladeApiZentrum(view);
   view.querySelectorAll("[data-settings-tab]").forEach((button) => {
     const active = button.dataset.settingsTab === id;
@@ -353,7 +356,7 @@ function applyValues(view, settings) {
 function loadStyles() {
   // Versionsmarke wie in account-privacy.js: GitHub Pages liefert Assets mit
   // max-age; ohne ?v= saehe ein offener Browser die neue Datei erst spaeter.
-  const href = "/assets/settings-surface.css?v=b50";
+  const href = "/assets/settings-surface.css?v=b51";
   if (document.querySelector('link[href^="/assets/settings-surface.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";

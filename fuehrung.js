@@ -11,6 +11,7 @@
 // SPRACHE (20.09.2026): Die vier Blasen standen fest auf Deutsch und
 // begruessten damit auch englische Nutzer auf Deutsch.
 import { t } from "./i18n/ui.js?v=3";
+import { setPanelOpen } from "./panel-layout.js?v=4";
 
 const GESEHEN_KEY = "smejj.fuehrung.v1";
 
@@ -29,6 +30,7 @@ const SCHRITTE = [
   },
   {
     ziel: '.nav-start .nav-button, .nav-vier .nav-button[data-view="chatHistory"]',
+    mobilZiel: "#appMenuButton",
     titel: t("3 von 4 · Hier liegen deine Sachen"),
     text: t("Alte Gespräche, Dateien, Papierkorb — alles in der Spur links."),
     beispiel: ""
@@ -42,23 +44,89 @@ const SCHRITTE = [
 ];
 
 let schritt = 0;
+let aktiv = false;
+let menueVorher = null;
+let fokusVorher = null;
+let wartezeit = null;
 
-function beende() {
+function mobil() {
+  return innerWidth <= 1000 && window.matchMedia("(pointer: coarse)").matches;
+}
+
+function ausserhalb(e) {
+  if (!e.target.closest("#fuehrungBlase")) beende(false);
+}
+
+function strom(e) {
+  if ((Number(e.detail?.laufen) || 0) > 0) beende(false);
+}
+
+function neuPlatzieren() {
+  if (!aktiv || !mobil()) return;
+  const aktion = document.activeElement?.dataset?.fuehrung;
+  zeige();
+  if (aktion) document.querySelector(`[data-fuehrung="${aktion}"]`)?.focus({ preventScroll: true });
+}
+
+function menueZeigen() {
+  const seite = document.querySelector(".sidebar");
+  if (!mobil() || schritt < 2 || !seite || seite.classList.contains("is-open")) return false;
+  if (!menueVorher) {
+    let gespeichert = null;
+    try { gespeichert = localStorage.getItem("smejj.ui.leftPanelOpen.v1"); } catch { /* optional */ }
+    menueVorher = { offen: false, spurZu: document.body.classList.contains("spur-zu"), gespeichert };
+  }
+  document.body.classList.remove("spur-zu");
+  setPanelOpen("left", true);
+  wartezeit = setTimeout(() => { wartezeit = null; if (aktiv) zeige(); }, 240);
+  return true;
+}
+
+function beende(fokus = true) {
+  aktiv = false;
+  clearTimeout(wartezeit);
+  wartezeit = null;
   try { localStorage.setItem(GESEHEN_KEY, "gesehen"); } catch { /* still */ }
   document.getElementById("fuehrungBlase")?.remove();
-  document.removeEventListener("keydown", tastatur);
+  document.getElementById("fuehrungZiel")?.remove();
+  document.removeEventListener("keydown", tastatur, true);
+  document.removeEventListener("click", ausserhalb);
+  window.removeEventListener("resize", neuPlatzieren);
+  window.visualViewport?.removeEventListener("resize", neuPlatzieren);
+  window.removeEventListener("smejj:chat-strom", strom);
+  if (menueVorher) {
+    const vorher = menueVorher;
+    menueVorher = null;
+    setPanelOpen("left", vorher.offen);
+    document.body.classList.toggle("spur-zu", vorher.spurZu);
+    // Der Panel-Beobachter laeuft nach der Klassen-Aenderung: danach den
+    // urspruenglichen Merker wiederherstellen, keine Tour als Nutzerwahl merken.
+    queueMicrotask(() => {
+      try {
+        if (vorher.gespeichert === null) localStorage.removeItem("smejj.ui.leftPanelOpen.v1");
+        else localStorage.setItem("smejj.ui.leftPanelOpen.v1", vorher.gespeichert);
+      } catch { /* optional */ }
+    });
+  }
+  if (fokus && fokusVorher?.isConnected) fokusVorher.focus({ preventScroll: true });
 }
 
 function tastatur(e) {
-  if (e.key === "Escape") beende();
+  if (e.key === "Escape") {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    beende();
+  }
 }
 
 function zeige() {
   document.getElementById("fuehrungBlase")?.remove();
+  document.getElementById("fuehrungZiel")?.remove();
   const s = SCHRITTE[schritt];
   if (!s) { beende(); return; }
-  const ziel = document.querySelector(s.ziel);
-  if (!ziel || ziel.offsetParent === null) {
+  if (menueZeigen()) return;
+  const ziel = document.querySelector(mobil() && s.mobilZiel ? s.mobilZiel : s.ziel);
+  if (!ziel || !ziel.getClientRects().length) {
     // Ziel gerade nicht sichtbar (z. B. Spur zugeklappt am Handy) —
     // Schritt ueberspringen statt ins Leere zu zeigen.
     schritt += 1;
@@ -70,12 +138,14 @@ function zeige() {
   blase.id = "fuehrungBlase";
   blase.setAttribute("role", "dialog");
   blase.setAttribute("aria-label", s.titel);
+  blase.setAttribute("aria-describedby", "fuehrungText");
   blase.innerHTML = `
     <div class="fuehrung-pfeil" aria-hidden="true"></div>
     <b>${s.titel}</b>
-    <p>${s.text}</p>
+    <p id="fuehrungText">${s.text}</p>
     ${s.beispiel ? `<p class="fuehrung-beispiel">${s.beispiel}</p>` : ""}
     <div class="fuehrung-knoepfe">
+      ${mobil() && schritt > 0 ? `<button type="button" data-fuehrung="zurueck">${t("Zurück")}</button>` : ""}
       <button type="button" data-fuehrung="weiter">${schritt === SCHRITTE.length - 1 ? t("Fertig") : t("Weiter")}</button>
       <button type="button" data-fuehrung="aus">${t("Überspringen")}</button>
     </div>`;
@@ -99,8 +169,51 @@ function zeige() {
     pfeil.style.transform = "rotate(225deg)";
   }
 
+  if (mobil()) {
+    const vv = window.visualViewport;
+    const rand = 10;
+    // Safari im Querformat: die Dynamic Island liegt links im Layoutfenster.
+    // Die sicheren Raender aus CSS messen, statt eine iPhone-Groesse zu raten.
+    const messung = document.createElement("div");
+    Object.assign(messung.style, { position: "fixed", visibility: "hidden", pointerEvents: "none",
+      padding: "env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)" });
+    document.body.append(messung);
+    const stil = getComputedStyle(messung);
+    const linksSicher = parseFloat(stil.paddingLeft) || 0, rechtsSicher = parseFloat(stil.paddingRight) || 0;
+    const obenSicher = parseFloat(stil.paddingTop) || 0, untenSicher = parseFloat(stil.paddingBottom) || 0;
+    messung.remove();
+    const x = (vv?.offsetLeft || 0) + linksSicher, y = (vv?.offsetTop || 0) + obenSicher;
+    const w = (vv?.width || innerWidth) - linksSicher - rechtsSicher;
+    const h = (vv?.height || innerHeight) - obenSicher - untenSicher;
+    Object.assign(blase.style, {
+      width: `${Math.min(300, w - rand * 2)}px`, boxSizing: "border-box",
+      maxHeight: `${Math.max(44, h - rand * 2)}px`, overflowY: "auto"
+    });
+    blase.querySelector(".fuehrung-knoepfe").style.flexWrap = "wrap";
+    const mass = blase.getBoundingClientRect();
+    oben = kasten.bottom + 12;
+    if (oben + mass.height > y + h - rand) oben = kasten.top - mass.height - 12;
+    if (schritt === 2) oben = y + h - mass.height - 70;
+    blase.style.left = `${Math.max(x + rand, Math.min(links, x + w - mass.width - rand))}px`;
+    blase.style.top = `${Math.max(y + rand, Math.min(oben, y + h - mass.height - rand))}px`;
+    // Im flachen Querformat waere ein Pfeil zur verdeckten Position irrefuehrend.
+    pfeil.hidden = h < 400;
+    const marke = document.createElement("div");
+    marke.id = "fuehrungZiel";
+    marke.setAttribute("aria-hidden", "true");
+    Object.assign(marke.style, {
+      position: "fixed", pointerEvents: "none", zIndex: "299", boxSizing: "border-box",
+      border: "2px solid #02fdfd", borderRadius: "6px",
+      left: `${kasten.left}px`, top: `${kasten.top}px`,
+      width: `${kasten.width}px`, height: `${kasten.height}px`
+    });
+    document.body.append(marke);
+    blase.querySelector("button")?.focus({ preventScroll: true });
+  }
+
   blase.addEventListener("click", (e) => {
     const aktion = e.target.closest("[data-fuehrung]")?.dataset.fuehrung;
+    if (aktion === "zurueck") { schritt = Math.max(0, schritt - 1); zeige(); }
     if (aktion === "weiter") { schritt += 1; schritt >= SCHRITTE.length ? beende() : zeige(); }
     if (aktion === "aus") beende();
     e.stopPropagation();
@@ -117,13 +230,15 @@ export function initFuehrung() {
   const start = () => {
     if (!document.querySelector("#start")?.classList.contains("is-active")) { beende(); return; }
     schritt = 0;
+    aktiv = true;
+    fokusVorher = document.activeElement;
     zeige();
-    document.addEventListener("keydown", tastatur);
+    document.addEventListener("keydown", tastatur, true);
     // Klick ausserhalb der Blase beendet — "eine Fuehrung, die man nicht
     // loswird, ist schlimmer als gar keine".
-    document.addEventListener("click", function weg(e) {
-      if (!e.target.closest("#fuehrungBlase")) { beende(); document.removeEventListener("click", weg); }
-    });
+    document.addEventListener("click", ausserhalb);
+    window.addEventListener("resize", neuPlatzieren);
+    window.visualViewport?.addEventListener("resize", neuPlatzieren);
     // Sobald wirklich gearbeitet wird, ist die Einfuehrung vorbei — wer eine
     // Antwort bekommt, braucht keine Erklaerung mehr, sondern den Stopp-Knopf.
     //
@@ -132,9 +247,7 @@ export function initFuehrung() {
     // auf der Blase — und weil ein Tipp AUF die Blase sie nicht schliesst,
     // passierte gar nichts. Der Nutzer sah einen Stopp-Knopf, der nicht
     // reagierte, und keinen Hinweis warum.
-    window.addEventListener("smejj:chat-strom", (e) => {
-      if ((Number(e.detail?.laufen) || 0) > 0) beende();
-    }, { once: true });
+    window.addEventListener("smejj:chat-strom", strom);
   };
   setTimeout(start, 1600);
   return true;

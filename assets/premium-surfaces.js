@@ -2,7 +2,7 @@ import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
 import { applyServerAiStatus } from "/assets/storage/index.js";
 import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=7";
-import { initSettingsSurface } from "./settings-surface.js?v=b69";
+import { initSettingsSurface } from "./settings-surface.js?v=b70";
 import { initAccountPrivacySurface } from "./account-privacy.js?v=anmeldung20261023";
 import { afterFirstPaint } from "./deferred-start.js";
 

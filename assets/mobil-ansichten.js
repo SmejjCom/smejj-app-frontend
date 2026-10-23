@@ -26,14 +26,17 @@
 export const STIL_ID = "mobil-ansichten-stil";
 export const REGELN = "@media (max-width:600px){"
   // (1) Reiterzeilen wischbar
-  + "body #settings .settings-nav.settings-nav,body #profile .account-nav.account-nav,body #chatHistory .ch-chips.ch-chips{"
+  + "body #settings .settings-tabs.settings-tabs,body #profile .account-nav.account-nav,body #chatHistory .ch-chips.ch-chips{"
   + "display:flex;flex-wrap:nowrap;align-items:center;overflow-x:auto;overflow-y:hidden;gap:8px;padding:4px 12px 8px;margin:0 -4px;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;"
   + "-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 20px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 20px),transparent 100%)}"
   + "body #settings .settings-nav::-webkit-scrollbar,body #profile .account-nav::-webkit-scrollbar,body #chatHistory .ch-chips::-webkit-scrollbar{display:none}"
   + "body #settings .settings-nav-button.settings-nav-button,body #profile .account-nav button,body #chatHistory .ch-chips .ch-chip{flex:0 0 auto;height:44px;min-height:44px;white-space:nowrap;scroll-snap-align:start;padding:0 14px;display:inline-flex;align-items:center}"
-  // GEMESSEN 08.09.: das Suchfeld liegt IN der Reiterzeile und schrumpfte dort auf 26 px —
-  // unbedienbar und ein Ziel unter 44 px. Es bekommt eine feste Mindestbreite und scrollt mit.
-  + "body #settings .settings-nav #settingsSuche{flex:0 0 clamp(160px,48vw,220px);min-width:160px;min-height:44px;box-sizing:border-box;scroll-snap-align:start}"
+  // Suche bleibt sichtbar, die Kategorien scrollen in einer eigenen Reihe.
+  + "body #settings .settings-nav.settings-nav{display:flex;flex-direction:column;align-items:stretch;flex-wrap:nowrap;min-width:0;width:100%;overflow:visible;margin:0;padding:0;mask-image:none;-webkit-mask-image:none}"
+  + "body #settings .settings-nav #settingsSuche{flex:0 0 auto;width:100%;min-width:0;min-height:44px;box-sizing:border-box;margin:0 0 8px}"
+  + "body #settings .settings-tabs.settings-tabs{width:100%;min-width:0;box-sizing:border-box;margin:0;scrollbar-width:thin;mask-image:none;-webkit-mask-image:none}"
+  + "body #settings .settings-tabs::-webkit-scrollbar{display:block;height:6px}"
+  + "body #settings .settings-tabs::-webkit-scrollbar-thumb{background:#71858b;border-radius:3px}"
   // Reiter tragen am Schreibtisch Titel + Untertitel in zwei Zeilen — in der Zeile nur der Titel
   + "body #settings .settings-nav-button .settings-nav-sub,body #settings .settings-nav-button small,body #settings .settings-nav-button span+span{display:none}"
   // (2) Kopf kompakt

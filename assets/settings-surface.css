@@ -108,6 +108,8 @@
 }
 
 /* Navigation: eine Glasleiste, Punkte durch hauchduenne Linien getrennt. */
+#settings .settings-tabs { display: contents; }
+
 #settings .settings-nav {
   display: flex;
   flex-direction: column;
