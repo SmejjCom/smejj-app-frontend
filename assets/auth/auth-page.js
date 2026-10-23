@@ -702,7 +702,7 @@ async function applyAvailableMethods() {
   } catch { methods = { google: true, email: true, passkey: true }; }
   for (const button of document.querySelectorAll("[data-method]")) {
     const method = button.dataset.method;
-    if (method === "email" || method === "passkey" || method === "google" || method === "github") { button.hidden = false; continue; }
+    if (method === "email") { button.hidden = false; continue; }
     button.hidden = methods[method] !== true;
   }
 }

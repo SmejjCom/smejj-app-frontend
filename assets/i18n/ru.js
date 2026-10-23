@@ -385,8 +385,6 @@ export default {
   "Mit Apple fortfahren": "Продолжить с Apple",
   "Anmelden oder registrieren": "Войти или зарегистрироваться",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "Ты получаешь собственное хранилище и историю на всех устройствах — бесплатно.",
-  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "По твоему адресу мы поймём, есть ли у тебя уже аккаунт.",
-  "Du musst dich nicht entscheiden.": "Выбирать не нужно.",
   "Nutzungsbedingungen": "Условия использования",
   "Passkey einrichten": "Настроить passkey",
   "Lokal anmelden": "Локальный вход",

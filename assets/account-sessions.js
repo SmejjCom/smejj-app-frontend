@@ -452,3 +452,11 @@ export async function fetchTrainingConsentDecision(hinweis) {
   const antwort = await api(`${API.trainingConsentDecision}?${abfrage}`, { method: "GET" });
   return antwort?.ok === true ? antwort.payload : null;
 }
+
+// Nur Statusdaten des eigenen, serverseitig authentifizierten Kontos.
+export async function fetchLoginMethods() {
+  try {
+    const response = await fetch(`${API_ORIGIN}/api/auth/account/methods`, { headers: authHeaders(), cache: "no-store" });
+    return response.ok ? await response.json() : null;
+  } catch { return null; }
+}

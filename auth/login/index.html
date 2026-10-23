@@ -33,7 +33,7 @@
     <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
     <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="/auth/auth.css?v=logo-20260812">
+    <link rel="stylesheet" href="/auth/auth.css?v=anmeldung-20261023">
   <style id="authInlineStyle">
 /* smejj.com — Anmelde-/Registrierungsseiten (Codex-Stil, Freigabe 2026-07-21).
    Prinzip: eine Frage pro Schritt, grosse Knoepfe, kurze Wege.
@@ -477,12 +477,6 @@ a:focus-visible {
     </g>
 </svg></span></span>Mit Apple fortfahren
           </button>
-          <button class="auth-button secondary" id="githubLogin" type="button" data-method="github">
-            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.05 11.05 0 0 1 5.78 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.7 5.38-5.26 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg></span>Mit GitHub fortfahren
-          </button>
-          <button class="auth-button secondary" id="passkeyLogin" type="button" data-method="passkey">
-            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.9 7a8 8 0 0 1 1.1 5v1a6 6 0 0 0 .8 3"/><path d="M8 11a4 4 0 0 1 8 0v1a10 10 0 0 0 2 6"/><path d="M12 11v2a14 14 0 0 0 2.5 8"/><path d="M8 15a18 18 0 0 0 1.8 6"/><path d="M4.9 19a22 22 0 0 1-.9-7v-1a8 8 0 0 1 12-6.95"/></svg></span>Mit Fingerabdruck fortfahren
-          </button>
           <!-- Vierte Zeile = die E-Mail-Eingabe selbst (Mockup 4): cyan
                umrandet, Platzhalter "Mit E-Mail fortfahren", Pfeil sendet.
                #profileEmail bleibt DIE Adresse fuer auth-page.js. -->
@@ -491,6 +485,14 @@ a:focus-visible {
             <input id="profileEmail" type="email" autocomplete="email" placeholder="Mit E-Mail fortfahren" aria-label="E-Mail-Adresse">
             <button class="auth-pfeil" id="emailPfeil" type="button" aria-label="Mit E-Mail fortfahren">↑</button>
           </div>
+          <details class="auth-more"><summary>Weitere Möglichkeiten</summary><div class="auth-stack">
+          <button class="auth-button secondary" id="githubLogin" type="button" data-method="github">
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.05 11.05 0 0 1 5.78 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.7 5.38-5.26 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg></span>Mit GitHub fortfahren
+          </button>
+          <button class="auth-button secondary" id="passkeyLogin" type="button" data-method="passkey">
+            <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.9 7a8 8 0 0 1 1.1 5v1a6 6 0 0 0 .8 3"/><path d="M8 11a4 4 0 0 1 8 0v1a10 10 0 0 0 2 6"/><path d="M12 11v2a14 14 0 0 0 2.5 8"/><path d="M8 15a18 18 0 0 0 1.8 6"/><path d="M4.9 19a22 22 0 0 1-.9-7v-1a8 8 0 0 1 12-6.95"/></svg></span>Mit Fingerabdruck fortfahren
+          </button>
+          </div></details>
         </div>
 
         <!-- Passwort/Login-Link klappen unter der vierten Zeile auf
@@ -511,14 +513,16 @@ a:focus-visible {
           <p class="auth-note">Wir fragen danach nur, was nötig ist: Passwort, Passkey oder Login-Link.</p>
         </div>
 
+        <div class="auth-verification" id="verificationHelp" hidden><p>Bestätigungslink fehlt? Prüfe auch den Spamordner. Der Link gilt 24 Stunden.</p><button class="auth-linkbutton" id="resendVerification" type="button">Bestätigungsmail erneut senden</button> · <button class="auth-linkbutton" id="correctEmail" type="button">E-Mail-Adresse korrigieren</button></div>
         <p class="auth-status" id="profileOutput" role="status" aria-live="polite"></p><span id="sessionStatus" hidden></span>
-        <p class="auth-footer">Wir erkennen an deiner Adresse, ob du schon ein Konto hast.<br>Du musst dich nicht entscheiden.</p>
+        <p class="auth-footer">Mit Google oder Apple direkt weiter. Für E-Mail: anmelden oder <a href="/auth/register/">Konto erstellen</a>.</p>
       </section>
       <p class="auth-legal"><a href="/agb.html">Nutzungsbedingungen</a> · <a href="/datenschutz.html">Datenschutz</a> · <a href="/impressum.html">Impressum</a></p>
     </main>
     <script type="module" src="/frame-guard.js?v=1"></script>
-    <script type="module" src="/auth/auth-page.js?v=app-rueckweg-20260922d"></script>
+    <script type="module" src="/auth/auth-page.js?v=anmeldung-20261023"></script>
     <script type="module" src="/auth/passkey-ui.js"></script>
+    <script type="module" src="/auth/anmeldung-komfort.js?v=1"></script>
     <script type="module" src="/auth/vier-zeilen.js?v=1"></script>
   </body>
 </html>
