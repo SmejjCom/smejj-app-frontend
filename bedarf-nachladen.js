@@ -18,8 +18,8 @@ import { ladeBeiKlick } from "./nachladen.js?v=2";
 try {
   const neuStart = new URLSearchParams(location.search).get("fuehrung") === "neu";
   const gesehen = localStorage.getItem("smejj.fuehrung.v1") === "gesehen";
-  if (neuStart || !gesehen) import("./fuehrung.js?v=7");
-} catch { import("./fuehrung.js?v=7"); }
+  if (neuStart || !gesehen) import("./fuehrung.js?v=8");
+} catch { import("./fuehrung.js?v=8"); }
 
 // 1b. Entwurf-Erhalt (15.09.2026) — nachgeladen statt <script>-Tag: 1,3 KB gzip
 //     haetten das Startgewicht ueber die Toleranz geschoben. Stellt den Entwurf

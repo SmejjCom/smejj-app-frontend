@@ -70,14 +70,18 @@ function neuPlatzieren() {
 
 function menueZeigen() {
   const seite = document.querySelector(".sidebar");
-  if (!mobil() || schritt < 2 || !seite || seite.classList.contains("is-open")) return false;
+  if (!mobil() || !seite) return false;
+  const offen = seite.classList.contains("is-open");
+  const sollOffen = schritt >= 2;
+  if (offen === sollOffen) return false;
   if (!menueVorher) {
     let gespeichert = null;
     try { gespeichert = localStorage.getItem("smejj.ui.leftPanelOpen.v1"); } catch { /* optional */ }
-    menueVorher = { offen: false, spurZu: document.body.classList.contains("spur-zu"), gespeichert };
+    menueVorher = { offen, spurZu: document.body.classList.contains("spur-zu"), gespeichert };
   }
-  document.body.classList.remove("spur-zu");
-  setPanelOpen("left", true);
+  if (sollOffen) document.body.classList.remove("spur-zu");
+  setPanelOpen("left", sollOffen);
+  clearTimeout(wartezeit);
   wartezeit = setTimeout(() => { wartezeit = null; if (aktiv) zeige(); }, 240);
   return true;
 }
