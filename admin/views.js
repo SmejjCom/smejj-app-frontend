@@ -505,3 +505,112 @@
     fehlerblock: fehlerblock
   };
 })();
+
+(function () {
+"use strict";
+// smejj.com — Betriebsdaten und geschuetzte Inhalte einer Nutzerakte.
+const A = window.adminApi, V = window.adminViews;
+const e = A.escapeHtml;
+const zeile = werte => '<tr>' + werte.map(w => '<td>' + w + '</td>').join('') + '</tr>';
+const wert = x => e(x === null || x === undefined ? 'Nicht erfasst' : String(x));
+const zeit = x => x ? e(A.zeit(x)) : 'Nicht erfasst';
+
+function ansicht(d) {
+  if (!d) return '';
+  const netz = d.netz;
+  const k = V.kachelBlock, p = V.panelBlock, t = V.tabelleBlock;
+  const kacheln = '<div class="kpis">'
+    + k('Chats', d.chatsErreichbar ? String(d.chats.length) : 'Nicht verfügbar', 'Gespeicherte, nicht gelöschte Chats')
+    + k('Medien', d.medienErreichbar ? String(d.medien.length) : 'Nicht verfügbar', 'Upload oder Generierung: siehe Herkunft')
+    + k('Erzeugte Bilder', d.medienErreichbar && d.auftraegeErreichbar ? String(d.medien.filter(m => m.herkunft.startsWith('Erzeugtes Bild')).length) : 'Nicht verfügbar', 'Nur durch das Bildauftragsregister belegte Ergebnisse')
+    + k('Letzte bekannte Aktivität', d.zuletzt ? A.zeit(d.zuletzt) : 'Nicht erfasst', 'Aus gespeicherten Ereignissen, Chats und Sitzungen')
+    + k('Tarif', d.abo?.plan || 'Nicht verfügbar', d.abo?.status || '')
+    + k('KI-Anfragen', d.verbrauch ? String(d.verbrauch.anfragen) : 'Nicht erfasst', 'Seit Serverneustart')
+    + k('Kosten (USD)', d.verbrauch ? String(d.verbrauch.kostenUsd) : 'Nicht erfasst', 'Seit Serverneustart; unbekannte Modellpreise nicht enthalten') + '</div>';
+  const netzZeilen = netz ? [zeile(['IP-Adresse', wert(netz.ip)]), zeile(['Land (geschätzt)', wert(netz.land)]),
+    zeile(['Stadt (geschätzt)', wert(netz.stadt)]), zeile(['Beobachtet', zeit(netz.zeit)]),
+    zeile(['Quelle', wert(netz.quelle)]), zeile(['Browserangabe', wert(netz.browser)])] : [];
+  return '<div id="nutzerAkteErweiterung" class="stack">' + kacheln
+    + p('Datenlage', 'Keine rückwirkend erfundenen Aktivitäten', '<p>' + e(d.hinweis) + '</p>'
+      + (d.teilweise ? '<p>Unvollständige Daten: Liste begrenzt oder einzelne Objekte nicht lesbar. Zahlen sind Mindestwerte.</p>' : '')
+      + (!d.chatsErreichbar ? '<p>Chatablage nicht verfügbar oder Synchronisierung deaktiviert.</p>' : '')
+      + (!d.medienErreichbar ? '<p>Medienablage nicht verfügbar oder Synchronisierung deaktiviert.</p>' : '')
+      + (!d.aktivitaetErreichbar ? '<p>Aktivitätsablage derzeit nicht erreichbar.</p>' : ''))
+    + p('Aktivitäten', 'Neueste zuerst · HTTP-Erfolg bestätigt keine abgeschlossene Generierung', t(['Zeit', 'Aktion', 'Ergebnis'],
+      d.ereignisse.map(x => zeile([zeit(x.zeit), wert(x.aktion), wert(x.ergebnis) + ' · ' + wert(x.status)]))))
+    + (d.sicherheit ? p('Netz & Standort', 'IP ist eine Netzwerkadresse; VPN und Mobilfunk können den geschätzten Ort verändern.',
+      t(['Merkmal', 'Wert'], netzZeilen)) : '')
+    + p('Chats', 'Inhalte und Titel nur mit zusätzlicher Freigabe', t(['Chat', 'Erstellt', 'Geändert', 'Modell', 'Nachrichten', ''], d.chats.map(c => zeile([
+      wert(c.title || c.id), zeit(c.createdAt), zeit(c.updatedAt), wert(c.model), wert(c.nachrichten),
+      d.inhalte ? '<button class="btn" data-akte-chat="' + e(c.id) + '">Chat ansehen</button>' : 'Geschützt'
+    ]))))
+    + p('Bilder & Medien', 'Bestand der Medienablage; keine Annahme über den Ursprung', t(['Datei', 'Typ', 'Herkunft', 'Gespeichert', ''], d.medien.map(m => zeile([
+      wert(m.id), wert(m.typ), wert(m.herkunft), zeit(m.zeit), d.inhalte ? '<button class="btn" data-akte-medium="' + e(m.id) + '">Medium ansehen</button>' : 'Geschützt'
+    ]))))
+    + p('Geschützte Inhalte', 'Owner: zweite Person muss freigeben · Zugriff 15 Minuten · jeder Abruf protokolliert',
+      '<div class="bar"><button class="btn" id="akteInhaltAntrag">Freigabe beantragen</button>'
+      + '<button class="btn" id="akteInhaltFreigeben">Antrag als zweite Person freigeben</button>'
+      + '<button class="btn" id="akteInhaltLaden">Freigegebene Inhalte laden</button></div>'
+      + '<p id="akteInhaltStatus" role="status"></p><div id="akteInhaltAnsicht"></div>') + '</div>';
+}
+
+function binde(seite, id, grund, daten) {
+  let approval = '';
+  let mediumUrl = '';
+  const basis = '/api/admin/users/' + encodeURIComponent(id);
+  const pfad = extra => basis + '?' + new URLSearchParams({ reason: grund, ...(approval ? { approval } : {}), ...extra });
+  const status = text => { seite.querySelector('#akteInhaltStatus').textContent = text; };
+  const D = window.adminDialog || window.adminDialogs;
+  async function frage(text) {
+    if (!D?.text) { status('Dialog nicht verfügbar.'); return null; }
+    return D.text({ titel: text, platzhalter: 'ap_…', minLaenge: 4, okText: 'Weiter' });
+  }
+  seite.querySelector('#akteInhaltAntrag').onclick = async () => {
+    const r = await A.sende(pfad({ contentApproval: 'request' }), {});
+    status(r.ok ? 'Antrag: ' + r.data.approval.id + ' — eine zweite Person mit Adminrechten muss diesen Antrag hier freigeben.' : r.fehler);
+  };
+  seite.querySelector('#akteInhaltFreigeben').onclick = async () => {
+    const kennung = await frage('Welche Antrags-ID soll freigegeben werden?');
+    if (!kennung) return;
+    const r = await A.sende(pfad({ contentApproval: 'approve', approval: kennung.trim() }), {});
+    status(r.ok ? 'Freigegeben. Die antragstellende Person kann Inhalte 15 Minuten lang laden.' : r.fehler);
+  };
+  seite.querySelector('#akteInhaltLaden').onclick = async () => {
+    const kennung = await frage('Freigegebene Antrags-ID');
+    if (!kennung) return;
+    approval = kennung.trim();
+    const r = await A.hole(pfad({}));
+    if (!r.ok) return status(r.fehler);
+    if (!r.data.aktivitaet?.inhalte) return status('Keine gültige Freigabe für dieses Konto und deine Anmeldung.');
+    seite.querySelector('#nutzerAkteErweiterung').outerHTML = ansicht(r.data.aktivitaet);
+    binde(seite, id, grund, r.data.aktivitaet);
+    // Handler fuer Inhalte behalten die gepruefte Freigabe; nie in localStorage speichern.
+    inhalte(kennung.trim());
+  };
+  function inhalte(kennung) {
+    approval = kennung;
+    seite.querySelectorAll('[data-akte-chat], [data-akte-medium]').forEach(knopf => {
+      knopf.onclick = async () => {
+        const chat = knopf.dataset.akteChat, medium = knopf.dataset.akteMedium;
+        const r = await A.hole(pfad(chat ? { chat } : { medium }));
+        if (!r.ok) return status(r.fehler);
+        const ziel = seite.querySelector('#akteInhaltAnsicht');
+        if (mediumUrl) { URL.revokeObjectURL(mediumUrl); mediumUrl = ''; }
+        if (chat) {
+          ziel.innerHTML = '<h3>' + e(r.data.chat.title || r.data.chat.id) + '</h3>' + r.data.chat.messages.map(m =>
+            '<p><b>' + e(m.role) + '</b> · ' + zeit(m.createdAt) + '</p><pre>' + e(m.text) + '</pre>').join('');
+        } else {
+          const m = r.data.medium;
+          const bytes = Uint8Array.from(atob(m.base64), c => c.charCodeAt(0));
+          mediumUrl = URL.createObjectURL(new Blob([bytes], { type: m.mime }));
+          ziel.innerHTML = m.mime.startsWith('image/') ? '<img width="320" alt="Geschütztes Medium" src="data:' + e(m.mime) + ';base64,' + e(m.base64) + '">' :
+            '<a download="medium" href="' + mediumUrl + '">Medium herunterladen</a>';
+        }
+      };
+    });
+  }
+  if (daten.inhalte) inhalte(approval);
+}
+
+window.adminNutzerakte = { ansicht, binde };
+})();
