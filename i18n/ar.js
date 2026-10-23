@@ -385,8 +385,6 @@ export default {
   "Mit Apple fortfahren": "المتابعة عبر Apple",
   "Anmelden oder registrieren": "تسجيل الدخول أو إنشاء حساب",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "تحصل على مساحة تخزين خاصة بك وسجلّك على جميع الأجهزة — مجانًا.",
-  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "نعرف من عنوانك إن كان لديك حساب بالفعل.",
-  "Du musst dich nicht entscheiden.": "لست مضطرًا للاختيار.",
   "Nutzungsbedingungen": "شروط الاستخدام",
   "Passkey einrichten": "إعداد مفتاح المرور",
   "Lokal anmelden": "تسجيل دخول محلي",

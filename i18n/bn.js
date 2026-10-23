@@ -385,8 +385,6 @@ export default {
   "Mit Apple fortfahren": "Apple দিয়ে চালিয়ে যান",
   "Anmelden oder registrieren": "লগইন বা নিবন্ধন",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "আপনি পাবেন নিজের স্টোরেজ এবং সব ডিভাইসে ইতিহাস — বিনামূল্যে।",
-  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "আপনার ঠিকানা থেকে আমরা বুঝি আপনার অ্যাকাউন্ট আছে কি না।",
-  "Du musst dich nicht entscheiden.": "বেছে নিতে হবে না।",
   "Nutzungsbedingungen": "ব্যবহারের শর্তাবলী",
   "Passkey einrichten": "পাসকি সেট আপ করুন",
   "Lokal anmelden": "স্থানীয়ভাবে লগইন করুন",

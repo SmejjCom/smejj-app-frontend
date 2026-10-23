@@ -1,6 +1,6 @@
 import { STORAGE_KEYS } from "./config.js";
-import { initServerSessionControls, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
-  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=h28a";
+import { initServerSessionControls, fetchLoginMethods, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
+  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=anmeldung20261023";
 import { languageOptionsMarkup } from "./language-options.js?v=1";
 import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=3";
 import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=1";
@@ -117,7 +117,11 @@ async function hydrateAuthSession(view) {
   const user = await fetchAuthenticatedUser();
   // Zustandsrichtige Oberflaeche: auch der abgemeldete Fall muss angewendet werden.
   applyAuthState(view, user);
-  if (!user) return;
+  if (!user) {
+    const wege = view.querySelector("#accountLoginMethods");
+    if (wege) wege.textContent = "Melde dich an, um deine verbundenen Anmeldewege zu sehen.";
+    return;
+  }
   maybeImportAccountPicture(user, (text) => output(view, text));
   const nameField = view.querySelector("#profileName");
   const emailField = view.querySelector("#profileEmail");
@@ -127,6 +131,7 @@ async function hydrateAuthSession(view) {
   if (sessionStatus) sessionStatus.textContent = `${t("angemeldet als")} ${user.email || user.name} (${user.method || "google"})`;
   const roleStatus = view.querySelector("#userRoleStatus");
   if (roleStatus) roleStatus.textContent = t("angemeldeter Nutzer");
+  hydrateLoginMethods(view);
   hydrateBillingStatus(view); // asynchron, fail-safe: ohne Server bleibt Free stehen
 }
 
@@ -263,7 +268,7 @@ function markup() {
     ${panel("voice", "Sprache & Stimme", `<div class="account-list">${statusRow("Basis-Stimme", "Läuft direkt auf deinem Gerät, auch offline. Immer frei.", "Aktiv", true)}${dataAction("Premium-Stimme (Server)", "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.", "voiceSettingsOpen", "Einstellungen öffnen")}${statusRow("Sprechtempo & weitere Stimmen", "Auswahl folgt mit dem nächsten Sprach-Update.", "Bald verfügbar")}</div>`)}
     ${panel("apps", "Verbundene Apps", `<div class="account-list">${dataAction("KI-Modelle & API-Keys", "GLM-5.2 aktiv · eigene Schlüssel und Modellwahl liegen in den Einstellungen.", "modelsSettingsOpen", "Einstellungen öffnen")}${statusRow("GitHub", "Für Coding: über die rechte Seitenleiste der App verbunden.", "In der App", true)}${statusRow("Google Drive", "Dateien direkt in den Chat holen.", "Bald verfügbar")}${statusRow("Google Kalender", "Termine ansehen und vorlesen lassen — nur lesend.", "Bald verfügbar")}${statusRow("Slack", "Zusammenfassungen aus Kanälen holen.", "Bald verfügbar")}</div><p class="account-note">${t("Apps sehen nur, was du ausdrücklich freigibst — Zugriff jederzeit widerrufbar.")}</p>`)}
     ${panel("notifications", "Benachrichtigungen", `<div class="account-list">${toggle("Coding-Agent fertig", "notifyAgentDone", "Meldung, wenn eine lange Aufgabe abgeschlossen ist.")}${toggle("Antwort fertig", "notifyReplyDone", "Wenn du die App verlassen hast, während smejj noch arbeitet.")}${toggle("Limit fast erreicht", "notifyLimit80", "Hinweis bei 80 % — Limits starten erst mit den Plänen.")}${statusRow("Sicherheitswarnungen", "Neue Anmeldung, neues Gerät — immer per E-Mail.", "Immer an", true)}${statusRow("Rechnungen & Zahlungen", "Kommt mit den Bezahl-Plänen.", "Immer an", true)}</div><p class="account-note">${t("Diese Auswahl gilt auf diesem Gerät.")}</p>`)}
-    ${panel("security", "Anmeldung & Sicherheit", `<div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
+    ${panel("security", "Anmeldung & Sicherheit", `<div id="accountLoginMethods" role="status">Anmeldewege werden geprüft …</div><div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
     ${panel("billing", "Mein Plan", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">${iosHuelle() ? "Free" : "Free — 0 €"}</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div>${planKaufTeil()}<div class="account-actions">${iosHuelle() ? "" : `<button id="planManageOpen" type="button" hidden>${t("Abo verwalten — Rechnungen, Plan & Kündigung")}</button>`}<button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}
     ${panel("usage", "Nutzung & Limits", `<div class="account-list">${usageRow("Nachrichten", "Aufbauphase: ohne Limit.", "usageMessages")}${usageRow("Sprachminuten (Premium-Stimme)", "Zählt erst, wenn die Premium-Stimme aktiv ist.", "usageVoice")}${usageRow("Coding-Aufgaben", "Nur erfolgreich gestartete Läufe zählen.", "usageCoding")}</div><p class="account-note" id="usagePeriodNote">${t("Zähler laufen nur auf diesem Gerät und setzen sich jeden Monat automatisch zurück. Mit den Plänen bekommt jede Zeile einen Balken: verbraucht und noch offen.")}</p>`)}
     ${panel("data", "Meine Daten", `<div class="daten-fragen">
@@ -657,4 +662,23 @@ function loadStyles() {
     link.href = `/assets/${name}?v=${STYLE_VERSION}`;
     document.head.append(link);
   }
+}
+
+// Keine Ableitung aus lokalen Profilformularen: nur belegte Serverdaten.
+async function hydrateLoginMethods(view) {
+  const ziel = view.querySelector("#accountLoginMethods");
+  if (!ziel) return;
+  const data = await fetchLoginMethods();
+  if (!data?.ok) { ziel.textContent = "Verbundene Anmeldewege sind gerade nicht abrufbar."; return; }
+  const titel = document.createElement("h3"); titel.textContent = "Verbundene Anmeldewege";
+  const liste = document.createElement("ul");
+  const namen = { google: "Google", apple: "Apple", github: "GitHub", email: "E-Mail und Passwort", passkey: "Passkey" };
+  const status = { connected: "Verbunden", unknown: "Nicht belegt", pending: "E-Mail-Bestätigung ausstehend", not_set: "Nicht eingerichtet", unavailable: "Nicht abrufbar" };
+  for (const weg of data.methods || []) {
+    const zeile = document.createElement("li");
+    zeile.textContent = `${namen[weg.id] || weg.id}: ${status[weg.status] || "Unbekannt"}${data.current === weg.id ? " · Aktuelle Anmeldung" : ""}`;
+    liste.append(zeile);
+  }
+  const hinweis = document.createElement("p"); hinweis.className = "account-note"; hinweis.textContent = data.note;
+  ziel.replaceChildren(titel, liste, hinweis);
 }

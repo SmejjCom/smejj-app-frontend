@@ -354,3 +354,9 @@ a:focus-visible {
   .auth-brand { padding: 20px 20px; }
   h1 { font-size: 26px; }
 }
+
+/* smejj.com — Hauptwege und weitere Anmeldemoeglichkeiten. */
+.auth-more { width: 100%; margin-top: 8px; }
+.auth-more summary { cursor: pointer; padding: 12px; text-align: center; }
+.auth-more .auth-stack { margin-top: 10px; }
+.auth-verification { margin-top: 16px; font-size: 14px; line-height: 1.6; }

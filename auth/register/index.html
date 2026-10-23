@@ -31,7 +31,7 @@
     <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
     <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="/auth/auth.css?v=logo-20260812">
+    <link rel="stylesheet" href="/auth/auth.css?v=anmeldung-20261023">
   <style id="authInlineStyle">
 /* smejj.com — Anmelde-/Registrierungsseiten (Codex-Stil, Freigabe 2026-07-21).
    Prinzip: eine Frage pro Schritt, grosse Knoepfe, kurze Wege.
@@ -442,6 +442,7 @@ a:focus-visible {
     </g>
 </svg></span></span>Mit Apple registrieren
           </button>
+          <details class="auth-more"><summary>Weitere Möglichkeiten</summary><div class="auth-stack">
           <button class="auth-button secondary" id="githubLogin" type="button" data-method="github" hidden>
             <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6.1a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6.1c-.6 .6 -.6 1.2 -.5 2v3.5"/></svg></span>Mit GitHub registrieren
           </button>
@@ -451,6 +452,7 @@ a:focus-visible {
           <button class="auth-button secondary" id="magicLinkLogin" type="button" data-method="magicLink" hidden>
             <span class="auth-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/></svg></span>Link per E-Mail schicken
           </button>
+          </div></details>
         </div>
 
         <div class="auth-divider"><span>oder mit E-Mail</span></div>
@@ -469,13 +471,15 @@ a:focus-visible {
         <p class="auth-terms">Mit dem Erstellen stimmst du den Nutzungsbedingungen zu.</p>
         <p class="auth-note">Passkey kannst du danach mit einem Klick einrichten.</p>
 
+        <div class="auth-verification" id="verificationHelp" hidden><p>Bestätigungslink fehlt? Prüfe auch den Spamordner. Der Link gilt 24 Stunden.</p><button class="auth-linkbutton" id="resendVerification" type="button">Bestätigungsmail erneut senden</button> · <button class="auth-linkbutton" id="correctEmail" type="button">E-Mail-Adresse korrigieren</button></div>
         <p class="auth-status" id="profileOutput" role="status" aria-live="polite"></p><span id="sessionStatus" hidden></span>
         <p class="auth-footer">Schon registriert? <a href="/auth/login/">Anmelden</a></p>
       </section>
       <p class="auth-legal"><a href="/agb.html">Nutzungsbedingungen</a> · <a href="/datenschutz.html">Datenschutz</a> · <a href="/impressum.html">Impressum</a></p>
     </main>
     <script type="module" src="/frame-guard.js?v=1"></script>
-    <script type="module" src="/auth/auth-page.js?v=app-rueckweg-20260922d"></script>
+    <script type="module" src="/auth/auth-page.js?v=anmeldung-20261023"></script>
     <script type="module" src="/auth/passkey-ui.js"></script>
+    <script type="module" src="/auth/anmeldung-komfort.js?v=1"></script>
   </body>
 </html>

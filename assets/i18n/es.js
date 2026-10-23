@@ -385,8 +385,6 @@ export default {
   "Mit Apple fortfahren": "Continuar con Apple",
   "Anmelden oder registrieren": "Inicia sesión o regístrate",
   "Du bekommst deinen eigenen Speicher und den Verlauf auf allen Geräten — kostenlos.": "Obtienes tu propio almacenamiento y tu historial en todos tus dispositivos — gratis.",
-  "Wir erkennen an deiner Adresse, ob du schon ein Konto hast.": "Reconocemos por tu dirección si ya tienes una cuenta.",
-  "Du musst dich nicht entscheiden.": "No tienes que elegir.",
   "Nutzungsbedingungen": "Condiciones de uso",
   "Passkey einrichten": "Configurar passkey",
   "Lokal anmelden": "Iniciar sesión local",
