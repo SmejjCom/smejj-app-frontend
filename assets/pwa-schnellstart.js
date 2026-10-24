@@ -1,3 +1,4 @@
+import "./mobil-tastatur.js?v=5";
 // smejj.com — PWA-Schnellstarts (Manifest-Shortcuts, 25.08.).
 //
 // Android/Chrome zeigt beim App-Icon Langdruck die Manifest-Shortcuts. Damit
@@ -74,6 +75,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     if (!tastaturOffen() && window.innerHeight > groesste) groesste = window.innerHeight;
   };
   const heile = (versuch = 0) => {
+    if (document.documentElement.classList.contains("mobil-chat-viewport")) return;
     if (tastaturOffen()) return;
     if (!brauchtHeilung({ innerHeight: window.innerHeight, groesste, standalone: istStandalone() })) return;
     erzwingeReflow(document);
