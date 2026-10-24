@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1010";
+const CACHE_NAME = "smejj-shell-v1012";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -290,6 +290,8 @@ const SHELL = [
   "/assets/view-chrome.js",
   "/assets/composer-tools.js",
   "/assets/pwa-schnellstart.js",
+  "/assets/mobil-tastatur.js",
+  "/assets/mobil-tastatur-platz.js",
   "/assets/such-nachladen.js",
   // Ohr-Solo der Sprachwelle (25.08.): statischer Import aus composer-tools.
   "/assets/voice-ohr-solo.js",

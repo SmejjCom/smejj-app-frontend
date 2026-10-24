@@ -1,0 +1,78 @@
+/* smejj.com — Freigabe 24.10.2026: Tastatur darf den Composer nicht verdecken.
+   Ein begrenzter Chat-Rahmen; nur Verlauf und Textfeld scrollen im Inneren.
+   !important loest hier gezielt die alten dvh-Minima (inkl. Legacy-Webclips).
+   Keine Farben, Symbole oder Desktop-Geometrie werden geaendert. */
+html.mobil-chat-viewport,
+html.mobil-chat-viewport body {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+/* WebKit darf den sichtbaren Ausschnitt beim Fokus verschieben. Die beiden
+   Kopfaktionen folgen demselben Ausschnitt wie der Chat, statt abzuspringen. */
+html.mobil-chat-viewport body :is(#appMenuButton, #browserButton).glass-icon {
+  top: calc(var(--chat-sichtbar-oben, 0px) + max(0px, calc(var(--sa-top, 0px) - 24px))) !important;
+}
+html.mobil-chat-viewport body main.shell.shell {
+  position: fixed !important;
+  top: var(--chat-sichtbar-oben, 0px) !important;
+  bottom: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin-left: 0 !important;
+  width: 100%;
+  height: var(--chat-sichtbar-hoehe, 100dvh) !important;
+  min-height: 0 !important;
+  max-height: var(--chat-sichtbar-hoehe, 100dvh) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  overflow: hidden !important;
+}
+html.mobil-chat-viewport body .workspace,
+html.mobil-chat-viewport body #start.view.is-active,
+html.mobil-chat-viewport body #start .home-feed.home-feed {
+  box-sizing: border-box;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+html.mobil-chat-viewport body #start:not(.has-start-chat) .home-feed.home-feed {
+  padding-top: calc(var(--sa-top, 0px) + 44px);
+}
+html.mobil-chat-viewport body #start .home-hero {
+  flex-shrink: 0;
+}
+html.mobil-chat-viewport body #start .prompt-glass.prompt-glass {
+  flex-shrink: 0;
+}
+/* Erstbesucher behalten alle Karten: bei wenig Platz scrollen diese innen. */
+html.mobil-chat-viewport body #start .erste-schritte {
+  min-height: 0;
+  overflow-y: auto;
+  flex-shrink: 1;
+}
+html.mobil-chat-viewport body #start #startMessage {
+  max-height: min(calc(var(--chat-sichtbar-hoehe) * .4), 320px) !important;
+}
+/* Native Tastatur im Querformat: Polster duerfen nicht hoeher als der
+   sichtbare Bereich werden. Die Begruessung weicht der Eingabe. */
+html.chat-wenig-hoehe body #start:not(.has-start-chat) .home-feed.home-feed {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+html.chat-wenig-hoehe body #start .home-hero {
+  display: none !important;
+}
+
+html.mobil-chat-viewport .chat-platz-hinweis {
+  position: absolute;
+  inset: 48px 16px auto;
+  z-index: 20;
+  padding: 12px;
+  border-radius: 16px;
+  color: var(--chat-glas-text);
+  background: var(--chat-glas-ton);
+  font-size: 16px;
+  text-align: center;
+  pointer-events: none;
+}
