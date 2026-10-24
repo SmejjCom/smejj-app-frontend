@@ -194,7 +194,7 @@ export function verdrahteOhrSolo(host) {
   function soloFehlertext(fehler) {
     const art = fehler?.name || "";
     if (art === "NotAllowedError" || art === "SecurityError" || art === "PermissionDeniedError") {
-      return "Mikrofon ist für diese App gesperrt — bitte unter Einstellungen › Datenschutz › Mikrofon für smejj.com erlauben (oder einmal in Safari öffnen) und es erneut versuchen. Bis dahin: Frage unten eintippen, die Antwort wird vorgelesen.";
+      return "Der Mikrofonzugriff ist blockiert. Bitte erlaube smejj.com den Zugriff in den Website- oder App-Einstellungen deines Geräts und versuche es erneut. Bis dahin: Frage unten eintippen, die Antwort wird vorgelesen.";
     }
     if (art === "NotFoundError" || art === "OverconstrainedError") {
       return "Kein Mikrofon gefunden — Frage unten eintippen, die Antwort wird vorgelesen.";

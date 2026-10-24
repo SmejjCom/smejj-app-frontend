@@ -21,7 +21,7 @@ import { createBrowserTts } from "./voice-browser-tts.js?v=sprachwelle-20260927"
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
 import { createServerEar, createEarSend, ohrAdressen } from "./voice-ear.js";
-import { verdrahteOhrSolo, istAppleMobil } from "./voice-ohr-solo.js?v=9";
+import { verdrahteOhrSolo, istAppleMobil } from "./voice-ohr-solo.js?v=10";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
