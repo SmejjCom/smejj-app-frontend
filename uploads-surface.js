@@ -80,6 +80,9 @@ export function zeichneDateiTabelle(state, $) {
 export function bindUploads({ $, state, writeOutput }) {
   $("#upload").addEventListener("change", async (event) => {
     state.uploads = [];
+    // Anzeige und Anhangzustand muessen auch bei einer Rueckweisung uebereinstimmen.
+    $("#uploadList").value = "";
+    zeichneDateiTabelle(state, $);
     const files = Array.from(event.target.files || []);
     if (files.length > UPLOAD_LIMITS.maxCount) {
       $("#upload").value = "";

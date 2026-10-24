@@ -1,0 +1,280 @@
+/* smejj.com — ruhige mobile Vollbildthemen. Logo, Formen und Geometrie bleiben.
+   Desktop bleibt hinter der mobilen Medienabfrage vollstaendig unveraendert. */
+@media (max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px) {
+  body[data-mobile-theme] {
+    --ruhe-grund:#151719;
+    --ruhe-flaeche:#23262a;
+    --ruhe-text:#f1f3f5;
+    --ruhe-neben:#b8bec6;
+    --ruhe-kante:#464c54;
+    --ruhe-schrift:19px;
+    background:var(--ruhe-grund)!important;
+  }
+  body[data-mobile-theme="light"] {
+    --ruhe-grund:#f7f7f8;
+    --ruhe-flaeche:#ffffff;
+    --ruhe-text:#202428;
+    --ruhe-neben:#555d66;
+    --ruhe-kante:#c6cbd1;
+  }
+  body[data-mobile-font="small"] { --ruhe-schrift:18px; }
+  body[data-mobile-font="large"] { --ruhe-schrift:23px; }
+  body[data-mobile-theme]::before,
+  body[data-mobile-theme]::after {
+    background:none!important;
+    box-shadow:none!important;
+    border:0!important;
+  }
+  body[data-mobile-theme] main.shell.shell {
+    border-color:transparent!important;
+    box-shadow:none!important;
+    background:var(--ruhe-grund)!important;
+  }
+  body[data-mobile-theme] .workspace {
+    background:var(--ruhe-grund)!important;
+    box-shadow:none!important;
+  }
+  body[data-mobile-theme] #start.view,
+  body[data-mobile-theme] #start .home-feed.home-feed,
+  body[data-mobile-theme] .view:not(#start) {
+    background:var(--ruhe-grund)!important;
+    box-shadow:none!important;
+    border-color:transparent!important;
+  }
+  body[data-mobile-theme] .view:not(#start)::before,
+  body[data-mobile-theme] #start .home-feed::before {
+    background:none!important;
+    box-shadow:none!important;
+  }
+  body[data-mobile-theme] #start .home-hero,
+  body[data-mobile-theme] #start #startLog,
+  body[data-mobile-theme] #start .erste-schritte,
+  body[data-mobile-theme] .view:not(#start) {
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif!important;
+    color:var(--ruhe-text)!important;
+    --premium-text:var(--ruhe-text);
+    --premium-muted:var(--ruhe-neben);
+    --premium-surface:var(--ruhe-flaeche);
+    --premium-line:var(--ruhe-kante);
+    --mobil-glas-flaeche:var(--ruhe-flaeche);
+    --mobil-glas-kante:var(--ruhe-kante);
+    --mobil-glas-schrift:var(--ruhe-schrift);
+  }
+  body[data-mobile-theme] #start .home-hero h2 {
+    color:var(--ruhe-text)!important;
+    font-size:clamp(26px,7vw,32px)!important;
+    line-height:1.25!important;
+    max-width:22ch;
+    margin-inline:auto;
+    text-wrap:balance;
+  }
+  body[data-mobile-theme] #start .erste-schritte {
+    padding-inline:20px;
+    gap:14px;
+  }
+  body[data-mobile-theme] #start .erste-schritte .es-raster {
+    gap:14px;
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  body[data-mobile-theme] #start .erste-schritte header {
+    color:var(--ruhe-neben)!important;
+  }
+  body[data-mobile-theme] #start .erste-schritte header h3 {
+    font-size:16px!important;
+    color:var(--ruhe-neben)!important;
+    opacity:1!important;
+  }
+  body[data-mobile-theme] #start .erste-schritte .es-weg {
+    font-size:16px!important;
+    color:var(--ruhe-neben)!important;
+    min-height:44px;
+  }
+  body[data-mobile-theme] #start .erste-schritte .es-karte {
+    background:var(--ruhe-flaeche)!important;
+    border:1px solid var(--ruhe-kante)!important;
+    border-radius:18px!important;
+    box-shadow:none!important;
+    min-height:48px;
+    padding:16px!important;
+    text-align:start;
+    color:var(--ruhe-text)!important;
+    font-size:var(--ruhe-schrift)!important;
+    line-height:1.5!important;
+    overflow-wrap:anywhere;
+  }
+  body[data-mobile-theme] #start .erste-schritte .es-karte strong {
+    font-size:inherit!important;
+    line-height:1.5!important;
+  }
+  body[data-mobile-theme] #start .erste-schritte .es-karte span,
+  body[data-mobile-theme] #start .erste-schritte .es-karte p {
+    color:var(--ruhe-neben)!important;
+    opacity:1!important;
+    font-size:var(--ruhe-schrift)!important;
+    line-height:1.5!important;
+  }
+  body[data-mobile-theme] #start #startLog {
+    font-size:var(--ruhe-schrift)!important;
+    line-height:1.6!important;
+  }
+  body[data-mobile-theme] #start #startLog :is(p,li) {
+    color:var(--ruhe-text)!important;
+    font-size:inherit!important;
+    line-height:1.6!important;
+    overflow-wrap:anywhere;
+  }
+  body[data-mobile-theme] .view:not(#start) :is(h2,h3,h4,p,label,strong,small,legend,.subhead) {
+    color:var(--ruhe-text)!important;
+    line-height:1.5;
+    overflow-wrap:anywhere;
+  }
+  body[data-mobile-theme] .view:not(#start) :is(p,label,strong,small,button,input,select,textarea,.settings-nav-name,.settings-schriftprobe) {
+    font-size:var(--ruhe-schrift)!important;
+    line-height:1.5;
+  }
+  body[data-mobile-theme] .view:not(#start) :is(.settings-panel,.account-card,.account-section,.panel-grid,.surface,.toolbar,.empty-state,.output,.panel) {
+    background:var(--ruhe-flaeche)!important;
+    color:var(--ruhe-text)!important;
+    border-color:var(--ruhe-kante)!important;
+    border-radius:18px!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  body[data-mobile-theme] .view:not(#start) :is(input,select,textarea,button):not(.icon-button):not(.glass-icon):not(.view-chrome button):not(.send-button) {
+    color:var(--ruhe-text)!important;
+    background-color:var(--ruhe-flaeche)!important;
+    border-color:var(--ruhe-kante)!important;
+  }
+  body[data-mobile-theme] .view:not(#start) :is(summary,.more-menu,.panel-grid > label) {
+    color:var(--ruhe-text)!important;
+    background-color:var(--ruhe-flaeche)!important;
+    border-color:var(--ruhe-kante)!important;
+    text-shadow:none!important;
+  }
+  body[data-mobile-theme] .view:not(#start) :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]) {
+    min-height:48px;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+  body[data-mobile-theme] :is(.erste-schritte,.view:not(#start)) :is(button,input,select,textarea,a):focus-visible {
+    outline:2px solid var(--ruhe-text)!important;
+    outline-offset:3px;
+  }
+  body[data-mobile-theme] #settings .settings-nav-name { color:var(--ruhe-text)!important; }
+  body[data-mobile-theme] #settings .settings-row-copy > span { color:var(--ruhe-neben)!important; }
+  body[data-mobile-theme] #settings .settings-hinweis-hell { display:none; }
+  /* Freigabe 24.10.: gleiche Grundflaeche bis an beide Kanten; nur Farben. */
+  html:root[data-mobile-theme] {
+    background:#151719!important;
+    color-scheme:dark;
+  }
+  html:root[data-mobile-theme="light"] {
+    background:#f7f7f8!important;
+    color-scheme:light;
+  }
+  body[data-mobile-theme] .workspace::after {
+    content:"";
+    position:fixed;
+    inset:0 0 auto;
+    height:calc(48px + env(safe-area-inset-top,0px));
+    background:var(--ruhe-grund);
+    pointer-events:none;
+    z-index:2;
+  }
+  html body[data-mobile-theme] #start .prompt-glass.prompt-glass.prompt-glass.prompt-glass {
+    background:var(--ruhe-grund)!important;
+    color:var(--ruhe-text)!important;
+    text-shadow:none!important;
+  }
+  html body[data-mobile-theme] #start .prompt-glass :is(.prompt-input,textarea,.prompt-actions,button,.chip-label,.model-label) {
+    color:var(--ruhe-text)!important;
+    text-shadow:none!important;
+    caret-color:var(--ruhe-text);
+  }
+  /* Auch der Code-Auftrag braucht in beiden Themen lesbare Eingaben.
+     Nur Farben: bestehende Leiste, Formen und Positionen bleiben erhalten. */
+  html body[data-mobile-theme] #code .codefeld {
+    background:var(--ruhe-grund)!important;
+    color:var(--ruhe-text)!important;
+    text-shadow:none!important;
+  }
+  html body[data-mobile-theme] #code .codefeld :is(textarea,.codeleiste,button,b,#codeTiefeAnzeige) {
+    color:var(--ruhe-text)!important;
+    text-shadow:none!important;
+    caret-color:var(--ruhe-text);
+  }
+  html body[data-mobile-theme] #code .codefeld textarea::placeholder {
+    color:var(--ruhe-neben)!important;
+    opacity:1;
+  }
+  html body[data-mobile-theme] #start .prompt-glass textarea::placeholder {
+    color:var(--ruhe-neben)!important;
+    opacity:1;
+  }
+  html body[data-mobile-theme] #start .prompt-glass .prompt-actions svg,
+  html body[data-mobile-theme] .glass-icon.glass-icon svg {
+    filter:none!important;
+  }
+  html body[data-mobile-theme] :is(#browserButton,#mausButton,.view-chrome button) {
+    color:var(--ruhe-text)!important;
+    text-shadow:none!important;
+  }
+  html body[data-mobile-theme] :is(.sidebar,#profileDockMenu,#composerPlusMenu,.model-menu,.model-submenu,.code-modus-menue) {
+    background:var(--ruhe-flaeche)!important;
+    color:var(--ruhe-text)!important;
+    border-color:var(--ruhe-kante)!important;
+    box-shadow:none!important;
+  }
+  html body[data-mobile-theme] :is(.sidebar,#profileDockMenu,#composerPlusMenu,.model-menu,.model-submenu,.code-modus-menue) :is(button,a,span,small,strong,b,p,h3,h4,.nav-gruppe,.code-menue-titel,[role="menuitem"]) {
+    color:var(--ruhe-text)!important;
+    text-shadow:none!important;
+  }
+  /* Schriftliche Freigabe 24.10.: Browser und angrenzende App-Panels
+     folgen dem gespeicherten Thema; fremde Webseiten bleiben unveraendert. */
+  html body[data-mobile-theme] :is(#browserPanel,.bp-tabmenue,.bp-vorschlaege,.bp-suche,#modalRoot .modal,.search-overlay-panel) {
+    background:var(--ruhe-flaeche)!important;
+    color:var(--ruhe-text)!important;
+    border-color:var(--ruhe-kante)!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  html body[data-mobile-theme] :is(.bp-content,.bp-empty,.bp-fallback,.bp-tabstrip,.bp-toolbar,.bp-hint) {
+    background:var(--ruhe-grund)!important;
+    color:var(--ruhe-text)!important;
+    border-color:var(--ruhe-kante)!important;
+  }
+  html body[data-mobile-theme] :is(#browserPanel,.bp-tabmenue,.bp-vorschlaege,.bp-suche,#modalRoot .modal,.search-overlay-panel) :is(button,a,input,textarea,select,strong,span,p,h2,h3,label,small,.bp-tab-title) {
+    color:var(--ruhe-text)!important;
+    text-shadow:none!important;
+  }
+  html body[data-mobile-theme] :is(.bp-address,.bp-suche-feld,#browserPanel input,#browserPanel textarea,#browserPanel select) {
+    background:var(--ruhe-flaeche)!important;
+    border-color:var(--ruhe-kante)!important;
+    caret-color:var(--ruhe-text);
+  }
+  html body[data-mobile-theme] :is(.bp-address,.bp-suche-feld)::placeholder {
+    color:var(--ruhe-neben)!important;
+    opacity:1;
+  }
+  html body[data-mobile-theme] :is(.bp-tab.is-active,.bp-tabmenue-eintrag:hover:not(:disabled),.bp-vorschlag.is-markiert,#browserPanel button:hover:not(:disabled)) {
+    background:var(--ruhe-flaeche)!important;
+    border-color:var(--ruhe-kante)!important;
+  }
+  html body[data-mobile-theme] :is(.bp-empty span,.bp-fallback span,.bp-suche-zahl,#browserPanel button:disabled,.bp-tabmenue-eintrag:disabled) {
+    color:var(--ruhe-neben)!important;
+  }
+  html body[data-mobile-theme] .bp-empty-mark svg { stroke:var(--ruhe-neben)!important; }
+  html body[data-mobile-theme] :is(#browserPanel,.bp-tabmenue,.bp-suche) :is(button,input,a):focus-visible {
+    outline:2px solid var(--ruhe-text)!important;
+    outline-offset:-2px;
+  }
+  /* Freigabe 24.10.: ausschliesslich mobile Logo-FARBE bei hellem Thema. */
+  html body[data-mobile-theme="light"] #appMenuButton .menu-logo {
+    filter:url(#mobil-logo-hell)!important;
+  }
+  @media (forced-colors:active) {
+    body[data-mobile-theme] { --ruhe-grund:Canvas; --ruhe-flaeche:Canvas; --ruhe-text:CanvasText; --ruhe-neben:CanvasText; --ruhe-kante:CanvasText; }
+  }
+}

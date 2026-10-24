@@ -24,6 +24,174 @@
 // (grosse Schrift, Betreiber-Regel), keine Ziele unter 44 px. Stil aus dem
 // Modul, weil die Quell-Stylesheets im gesperrten Start-Buendel liegen.
 export const STIL_ID = "mobil-ansichten-stil";
+// Freigabe 23.10.2026: mobiles iPhone-Glasdesign. Ausschliesslich bestehende
+// Inhaltsflaechen; Startseite, Desktop, Eingabeleiste und Symbole bleiben gleich.
+// Lokale Tokens erben die vorhandenen Hell-/Dunkelfarben und den Markenakzent.
+export const GLAS_REGELN = `
+@media (max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px) {
+  body :is(#settings,#profile,#files,#projects,#storageView,#cost,#tools).premium-view {
+    --mobil-glas-flaeche:var(--premium-surface,var(--v11-glas-2));
+    --mobil-glas-kante:var(--premium-line,var(--v11-hair));
+    --mobil-glas-radius:20px;
+    --mobil-glas-abstand:16px;
+    border-color:transparent!important;
+    box-shadow:none!important;
+    padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
+    scroll-padding-block:24px calc(24px + env(safe-area-inset-bottom,0px));
+  }
+  body :is(#settings,#profile,#files,#projects,#storageView,#cost,#tools)[data-settings-font-size="small"] {
+    --mobil-glas-schrift:16px;
+  }
+  body :is(#settings,#profile,#files,#projects,#storageView,#cost,#tools)[data-settings-font-size="medium"] {
+    --mobil-glas-schrift:19px;
+  }
+  body :is(#settings,#profile,#files,#projects,#storageView,#cost,#tools)[data-settings-font-size="large"] {
+    --mobil-glas-schrift:23px;
+  }
+  body :is(#settings,#profile,#files,#projects,#storageView,#cost,#tools)[data-settings-font-size]
+    :is(p,label,strong,button,input,select,textarea,.settings-nav-name,.settings-schriftprobe) {
+    font-size:var(--mobil-glas-schrift,16px)!important;
+    line-height:1.5;
+    overflow-wrap:anywhere;
+  }
+  body :is(#settings,#profile) :is(.settings-header,.account-header) {
+    border-bottom:0;
+    padding-bottom:8px;
+  }
+  body :is(#settings,#profile) :is(.settings-header,.account-header) p {
+    line-height:1.55;
+    overflow-wrap:anywhere;
+  }
+  body #settings .settings-shell.settings-shell {
+    gap:var(--mobil-glas-abstand);
+    padding-top:8px;
+  }
+  body #settings .settings-nav.settings-nav {
+    flex:1 1 100%;
+    max-width:none;
+    border:0;
+    background:transparent;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+  body #settings #settingsSuche {
+    min-height:48px;
+    border:1px solid var(--mobil-glas-kante);
+    border-radius:14px!important;
+    background:var(--mobil-glas-flaeche);
+    padding:12px 14px;
+    font-size:16px;
+  }
+  body #settings .settings-tabs.settings-tabs,
+  body #profile .account-nav.account-nav {
+    display:flex;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    gap:8px;
+    padding:4px 2px 10px;
+    margin:0;
+    scrollbar-width:thin;
+    scroll-padding-inline:8px;
+    mask-image:none;
+    -webkit-mask-image:none;
+  }
+  body #settings .settings-tabs .settings-nav-button,
+  body #profile .account-nav button {
+    flex:0 0 auto;
+    width:auto;
+    min-height:44px;
+    height:auto;
+    max-width:min(280px,80vw);
+    white-space:normal;
+    text-align:start;
+    overflow-wrap:anywhere;
+    padding:11px 14px;
+    border:1px solid var(--mobil-glas-kante);
+    border-radius:14px!important;
+    background:var(--mobil-glas-flaeche);
+    color:var(--premium-text);
+  }
+  body #settings .settings-tabs .settings-nav-button.is-active {
+    box-shadow:inset 0 -3px 0 var(--v11-fokus);
+    border-color:var(--v11-fokus);
+  }
+  body :is(#settings,#profile,#files,#projects,#storageView,#cost,#tools)
+    :is(.settings-panel,.account-card,.account-section,.panel-grid,.surface,.toolbar,.empty-state) {
+    min-width:0;
+    max-width:100%;
+    box-sizing:border-box;
+    border:1px solid var(--mobil-glas-kante);
+    border-radius:var(--mobil-glas-radius)!important;
+    background:var(--mobil-glas-flaeche);
+    box-shadow:inset 0 1px 0 var(--v11-lichtkante),0 8px 24px rgba(0,0,0,.12);
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+  body :is(#settings,#profile) :is(.settings-panel,.account-card,.account-section) {
+    padding:var(--mobil-glas-abstand);
+  }
+  body #files #dateiTabelle {
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scrollbar-width:thin;
+  }
+  body #files .datei-tabelle {
+    width:100%;
+    min-width:640px;
+    table-layout:fixed;
+  }
+  body #files .datei-tabelle :is(th,td) {
+    width:20%!important;
+    font-size:var(--mobil-glas-schrift,16px)!important;
+    line-height:1.5;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  body #files .datei-tabelle :is(th,td):first-child { width:40%!important; }
+  body #settings .settings-list { border:0; }
+  body #settings .settings-row.settings-row { padding:14px 0;gap:10px; }
+  body #settings .settings-row select,
+  body #settings .settings-row textarea {
+    min-height:48px;
+    max-width:100%;
+    border-radius:12px!important;
+    padding:12px;
+    font-size:16px;
+  }
+  body #settings .settings-status,
+  body #profile .state-badge { border-radius:12px!important;white-space:normal; }
+  body :is(#settings,#profile) :is(button,input,select,textarea,a):focus-visible {
+    outline:2px solid var(--v11-fokus);
+    outline-offset:3px;
+  }
+  @supports (backdrop-filter:blur(1px)) {
+    body #settings .settings-panel,
+    body #profile .account-card {
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+  }
+  @media (prefers-reduced-transparency:reduce), (prefers-contrast:more) {
+    body :is(#settings,#profile) :is(.settings-panel,.account-card) {
+      backdrop-filter:none;
+      -webkit-backdrop-filter:none;
+      background:Canvas;
+      color:CanvasText;
+      border-color:currentColor;
+      box-shadow:none;
+    }
+    body :is(#settings,#profile) :is(.settings-panel,.account-card) :is(h3,p,strong,label,span,button,select,textarea) {
+      color:CanvasText!important;
+    }
+    body :is(#settings,#profile) :is(.settings-panel,.account-card) :is(select,textarea,input) {
+      background:Canvas;
+      color:CanvasText!important;
+      border-color:CanvasText;
+    }
+    body :is(#settings,#profile) :focus-visible { outline-color:CanvasText; }
+  }
+}
+`;
 export const REGELN = "@media (max-width:600px){"
   // Werkzeuggruppen und vorhandene Erklaerungen am Handy lesbar machen.
   // Desktop, Symbolgrafiken und die mobile Eingabeleiste bleiben unberuehrt.
@@ -117,7 +285,7 @@ export const REGELN = "@media (max-width:600px){"
   + "body #profile.view.view input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),body #profile.view.view select,body #profile.view.view textarea,"
   + "body #settings.view.view input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),body #settings.view.view select,body #settings.view.view textarea,"
   + "body #chatHistory.view.view input:not([type=checkbox]):not([type=radio]),body #chatHistory.view.view select{font-size:16px}"
-  + "}";
+  + "}" + GLAS_REGELN.trimEnd();
 
 export function sorgeFuerStil(doc = document) {
   if (doc.getElementById(STIL_ID)) return false;
@@ -133,6 +301,8 @@ if (typeof document !== "undefined" && document.querySelector(".view")) sorgeFue
 // Vorhandene Vorlagen auch im leeren Code-Bereich anbieten. Ein Tipp fuellt
 // nur den Code-Entwurf; der Chat-Entwurf bleibt unberuehrt.
 async function zeigeCodeBeispiele() {
+  // Freigabe 24.10.: mobiles Lesedesign erst im mobilen Inhaltslader.
+  import("/assets/mobil-ruhe.js?v=20261024-6").catch(fehler => console.error("[smejj.com] Lesedesign:", fehler));
   if (!matchMedia("(max-width:600px)").matches) return;
   const leer = document.querySelector(".codeleer");
   const feld = document.getElementById("codeAufgabe");

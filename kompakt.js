@@ -172,4 +172,25 @@ export function breitePruefen(feld, glas) {
   return soll;
 }
 
-if (typeof document !== "undefined" && document.querySelector(".view")) { sorgeFuerStil(); spiegleDiktat(); haltCursorSichtbar(); }
+// Ein frischer Start im Handy-Querformat durchlaeuft nie den <=600-px-Lader.
+// Nur Inhaltsstile nachladen; das geschuetzte Eingabe-Dock bleibt unveraendert.
+export function ladeQuerformatInhalte(win = window, lade = () => import("/assets/mobil-ansichten.js")) {
+  let mq;
+  try { mq = win.matchMedia("(pointer:coarse) and (max-height:500px) and (max-width:1100px)"); }
+  catch { return false; }
+  let geladen = false;
+  const wecke = () => {
+    if (!mq.matches || geladen) return false;
+    geladen = true;
+    mq.removeEventListener?.("change", wecke);
+    Promise.resolve(lade()).catch(() => {});
+    return true;
+  };
+  if (!wecke()) mq.addEventListener?.("change", wecke);
+  return wecke;
+}
+
+if (typeof document !== "undefined" && document.querySelector(".view")) {
+  sorgeFuerStil(); spiegleDiktat(); haltCursorSichtbar();
+  ladeQuerformatInhalte();
+}
