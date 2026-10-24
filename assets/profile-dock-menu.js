@@ -73,8 +73,31 @@ function setOpen(button, menu, open) {
   // des Menues wird sie aufgehoben — das Menue ist eine Bedienflaeche, kein Text.
   if (open) raeumeTextauswahlAuf();
   menu.hidden = !open;
+  sichereMenueEbene(menu, open, window.matchMedia("(max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px)").matches);
   button.setAttribute("aria-expanded", String(open));
   if (open) placeAboveButton(button, menu);
+}
+
+// Das native iPhone traf trotz sichtbarem Menue die Ebene dahinter.
+// Die Browser-Top-Layer garantiert beim mobilen Profilmenue dieselbe oberste
+// Ebene fuer Zeichnen und Trefferpruefung. Desktop und alte Browser behalten
+// den bisherigen Weg; Navigation, Konto und gespeicherte Daten bleiben gleich.
+export function sichereMenueEbene(menu, open, mobile) {
+  if (!mobile || typeof menu.showPopover !== "function" || typeof menu.hidePopover !== "function") return false;
+  if (!open) {
+    if (menu.matches(":popover-open")) menu.hidePopover();
+    return true;
+  }
+  menu.setAttribute("popover", "manual");
+  menu.style.margin = "0";
+  menu.style.inset = "auto";
+  try {
+    if (!menu.matches(":popover-open")) menu.showPopover();
+    return true;
+  } catch {
+    menu.removeAttribute("popover");
+    return false;
+  }
 }
 
 // Setzt das Menue ueber den Avatar und haelt es im sichtbaren Bereich.

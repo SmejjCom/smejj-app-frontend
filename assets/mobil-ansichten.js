@@ -302,7 +302,7 @@ if (typeof document !== "undefined" && document.querySelector(".view")) sorgeFue
 // nur den Code-Entwurf; der Chat-Entwurf bleibt unberuehrt.
 async function zeigeCodeBeispiele() {
   // Freigabe 24.10.: mobiles Lesedesign erst im mobilen Inhaltslader.
-  import("/assets/mobil-ruhe.js?v=20261024-6").catch(fehler => console.error("[smejj.com] Lesedesign:", fehler));
+  import("/assets/mobil-ruhe.js?v=20261024-7").catch(fehler => console.error("[smejj.com] Lesedesign:", fehler));
   if (!matchMedia("(max-width:600px)").matches) return;
   const leer = document.querySelector(".codeleer");
   const feld = document.getElementById("codeAufgabe");

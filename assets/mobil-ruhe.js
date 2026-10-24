@@ -34,7 +34,7 @@ export function initMobileReading(win = window, doc = document) {
       if (!doc.getElementById("mobil-ruhe-stil")) {
         const sheet = doc.createElement("link");
         sheet.id = "mobil-ruhe-stil"; sheet.rel = "stylesheet";
-        sheet.href = "/assets/mobil-ruhe.css?v=20261024-6";
+        sheet.href = "/assets/mobil-ruhe.css?v=20261024-7";
         doc.head.append(sheet);
       }
       const theme = mobileTheme(settings, system.matches);
