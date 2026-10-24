@@ -21,7 +21,7 @@ export function pruefePlatz(win, doc) {
       note.setAttribute("role", "status");
       doc.getElementById("start").append(note);
     }
-    note.textContent = "Zu wenig Platz zum Tippen. Bitte ins Hochformat drehen oder die Safari-Leisten ausblenden.";
+    note.textContent = "Zu wenig Platz zum Tippen. Bitte ins Hochformat drehen oder die Browserleisten ausblenden.";
     note.hidden = false;
     const hide = () => { note.hidden = true; doc.removeEventListener("focusin", hide); win.removeEventListener("orientationchange", hide); };
     doc.addEventListener("focusin", hide);

@@ -23,7 +23,7 @@ export function initChatViewport(win = window, doc = document) {
     const active = mobile.matches && start.classList.contains("is-active");
     const size = sichtbarerChat(vv, win.innerHeight);
     if (active && vv?.height < 72 && doc.activeElement?.id === "startMessage")
-      import("./mobil-tastatur-platz.js?v=1").then(m => m.pruefePlatz(win, doc));
+      import("./mobil-tastatur-platz.js?v=2").then(m => m.pruefePlatz(win, doc));
     if (active && size) {
       if (width !== win.innerWidth) { width = win.innerWidth; normalHeight = 0; }
       normalHeight = Math.max(normalHeight, size.height);

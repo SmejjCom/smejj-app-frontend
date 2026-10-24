@@ -1,4 +1,4 @@
-import "./mobil-tastatur.js?v=4";
+import "./mobil-tastatur.js?v=5";
 // smejj.com — PWA-Schnellstarts (Manifest-Shortcuts, 25.08.).
 //
 // Android/Chrome zeigt beim App-Icon Langdruck die Manifest-Shortcuts. Damit
