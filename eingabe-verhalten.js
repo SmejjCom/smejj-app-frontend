@@ -17,8 +17,37 @@ export function laengenHinweis(length, incoming, limit) {
 }
 
 let started = false;
+export const API_VERBINDUNGEN = Object.freeze([
+  'https://api.smejj.com', 'https://smejj-chat-bridge.zeabur.app'
+]);
+export function istVerbindungsAbsicht(event) {
+  return event?.isTrusted === true && Boolean(event.target?.closest?.(
+    '#probierForm, #startMessage, #codeAufgabe, #composerPlusButton, [data-start-tool]'
+  ));
+}
+export function bereiteApiVerbindungVor(doc, navigator = globalThis.navigator) {
+  if (!doc?.head || navigator?.onLine === false || navigator?.connection?.saveData) return false;
+  for (const origin of API_VERBINDUNGEN) {
+    if (doc.getElementById('probierForm') && origin !== API_VERBINDUNGEN[0]) continue;
+    const vorhanden = [...doc.head.querySelectorAll('link[rel~="preconnect"]')]
+      .some(link => link.href.replace(/\/$/, '') === origin && link.crossOrigin === 'anonymous');
+    if (vorhanden) continue;
+    const link = doc.createElement('link'); link.rel = 'preconnect';
+    link.href = origin; link.crossOrigin = 'anonymous'; doc.head.append(link);
+  }
+  return true;
+}
 export function initEingabeVerhalten(doc = globalThis.document) {
   if (!doc || started) return; started = true;
+  // Erst echte Schreibabsicht bereitet DNS/TCP/TLS vor. Kein API-Aufruf,
+  // keine Verbindung beim bloßen Seitenaufruf, Autofokus oder Wiederherstellen.
+  const vorbereiten = event => {
+    if (!istVerbindungsAbsicht(event) || !bereiteApiVerbindungVor(doc)) return;
+    doc.removeEventListener('pointerdown', vorbereiten, true);
+    doc.removeEventListener('keydown', vorbereiten, true);
+    doc.removeEventListener('input', vorbereiten, true);
+  };
+  for (const event of ['pointerdown', 'keydown', 'input']) doc.addEventListener(event, vorbereiten, {capture:true, passive:true});
   const fields = 'input, textarea', hints = new WeakMap(); let hintNumber = 0;
   const prepare = node => {
     const list = [...(node.matches?.(fields) ? [node] : []), ...(node.querySelectorAll?.(fields) || [])];

@@ -1,4 +1,4 @@
-import "../eingabe-verhalten.js";
+import "../eingabe-verhalten.js?v=2026102530";
 import {capturePlan, planTarget, preservePlanLinks, planStorage} from '/assets/auth/plan-auswahl.js?v=20261025';
 import { API_ORIGIN, CLIENT_ROUTES } from "../config.js";
 import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "../i18n/ui.js?v=3";

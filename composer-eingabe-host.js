@@ -1,4 +1,4 @@
-import "./eingabe-verhalten.js";
+import "./eingabe-verhalten.js?v=2026102530";
 // smejj.com — gemeinsame Datei-Gesten fuer Gastseite und Chat. Keine Uploads.
 export function dateienAusTransfer(transfer) {
   const files = Array.from(transfer?.files || []);
