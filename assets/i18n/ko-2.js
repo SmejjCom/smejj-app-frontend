@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "음성 입력",
+  "Aufnahmedauer": "녹음 시간",
+  "Mikrofon wird geöffnet …": "마이크 여는 중 …",
+  "Aufnahme läuft …": "녹음 중 …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "녹음 중 · 음량 측정 불가",
+  "Diktat prüfen und übernehmen": "음성 입력을 확인하고 적용",
+  "Stoppen": "중지",
+  "Übernehmen": "적용",
+  "Verwerfen": "취소",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "음성 인식을 사용할 수 없습니다 — 아래에 질문을 입력하세요.",
   "Spracherkennung nicht verfügbar": "음성 인식을 사용할 수 없습니다",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "아래에 질문을 입력하세요 — 답변을 소리 내어 읽어 드립니다. X 또는 Esc로 종료.",

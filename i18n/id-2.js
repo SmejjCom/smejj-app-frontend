@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "Dikte",
+  "Aufnahmedauer": "Durasi rekaman",
+  "Mikrofon wird geöffnet …": "Membuka mikrofon …",
+  "Aufnahme läuft …": "Merekam …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "Merekam · Tingkat audio tidak tersedia",
+  "Diktat prüfen und übernehmen": "Tinjau dan terima dikte",
+  "Stoppen": "Hentikan",
+  "Übernehmen": "Terima",
+  "Verwerfen": "Buang",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Pengenalan suara tidak tersedia — ketik pertanyaan Anda di bawah.",
   "Spracherkennung nicht verfügbar": "Pengenalan suara tidak tersedia",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Ketik pertanyaan Anda di bawah — jawaban akan dibacakan. Tutup dengan X atau Escape.",

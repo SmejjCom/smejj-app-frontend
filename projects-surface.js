@@ -19,6 +19,7 @@ export function bindProjects(deps) {
     // W2-09: Klick legte vorher sofort ein Projekt an; Abbrechen legt nichts an.
     const eingabe = window.prompt("Wie soll das Projekt heißen?", "Mein Projekt");
     if (eingabe === null) return;
+    if (eingabe.trim().length > 80) { showToast("Projektname zu lang: maximal 80 Zeichen.", "warn"); return; }
     const { project } = await workspace.createProject({
       name: eingabe.trim().slice(0, 80) || "smejj.com Projekt",
       ownerUserId: state.session.userId || PROJECT_ROLES.localOnly

@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "Диктовка",
+  "Aufnahmedauer": "Длительность записи",
+  "Mikrofon wird geöffnet …": "Открытие микрофона …",
+  "Aufnahme läuft …": "Запись …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "Запись · Уровень звука недоступен",
+  "Diktat prüfen und übernehmen": "Проверьте и примите диктовку",
+  "Stoppen": "Остановить",
+  "Übernehmen": "Принять",
+  "Verwerfen": "Отменить",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Распознавание речи недоступно — введите вопрос ниже.",
   "Spracherkennung nicht verfügbar": "Распознавание речи недоступно",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Введите вопрос ниже — ответ будет прочитан вслух. Закрыть: X или Escape.",

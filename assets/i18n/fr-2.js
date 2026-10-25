@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "Dictée",
+  "Aufnahmedauer": "Durée de l’enregistrement",
+  "Mikrofon wird geöffnet …": "Ouverture du microphone …",
+  "Aufnahme läuft …": "Enregistrement …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "Enregistrement · Niveau audio indisponible",
+  "Diktat prüfen und übernehmen": "Vérifier et accepter la dictée",
+  "Stoppen": "Arrêter",
+  "Übernehmen": "Accepter",
+  "Verwerfen": "Annuler",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Reconnaissance vocale indisponible — saisissez votre question ci-dessous.",
   "Spracherkennung nicht verfügbar": "Reconnaissance vocale indisponible",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Saisissez votre question ci-dessous — la réponse sera lue à voix haute. Quitter avec X ou Échap.",

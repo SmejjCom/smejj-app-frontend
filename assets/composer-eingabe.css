@@ -15,10 +15,8 @@
 .dictation-controls { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:8px; flex-basis:100%; }
 .dictation-controls button { min-height:40px; cursor:pointer; }
 .dictation-wave { display:flex; align-items:center; gap:3px; height:28px; }
-.dictation-wave i { background:currentColor; width:3px; height:8px; animation:dictation-pulse .6s alternate infinite; }
-.dictation-wave i:nth-child(2n) { animation-delay:.2s; } .dictation-wave i:nth-child(3n) { animation-delay:.4s; }
-@keyframes dictation-pulse { to { height:26px; } }
-@media(prefers-reduced-motion:reduce) { .dictation-wave i { animation:none; height:18px; } }
+.dictation-wave i { background:currentColor; width:3px; height:3px; }
+.dictation-controls output { font-variant-numeric:tabular-nums; }
 
 #composerUpdateHinweis { position:fixed; top:12px; left:12px; right:12px; z-index:9998; padding:12px; background:var(--glas-2, #172325); color:var(--ink,#fff); border:1px solid currentColor; border-radius:12px; }
 

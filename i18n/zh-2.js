@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "听写",
+  "Aufnahmedauer": "录音时长",
+  "Mikrofon wird geöffnet …": "正在打开麦克风 …",
+  "Aufnahme läuft …": "正在录音 …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "正在录音 · 无法获取音量",
+  "Diktat prüfen und übernehmen": "检查并采用听写内容",
+  "Stoppen": "停止",
+  "Übernehmen": "采用",
+  "Verwerfen": "舍弃",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "语音识别不可用 — 请在下方输入问题。",
   "Spracherkennung nicht verfügbar": "语音识别不可用",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "请在下方输入问题 — 回答将被朗读。按 X 或 Esc 结束。",

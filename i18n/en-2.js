@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "Dictation",
+  "Aufnahmedauer": "Recording duration",
+  "Mikrofon wird geöffnet …": "Opening microphone …",
+  "Aufnahme läuft …": "Recording …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "Recording · Audio level unavailable",
+  "Diktat prüfen und übernehmen": "Review and accept dictation",
+  "Stoppen": "Stop",
+  "Übernehmen": "Accept",
+  "Verwerfen": "Discard",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Speech recognition unavailable — type your question below.",
   "Spracherkennung nicht verfügbar": "Speech recognition unavailable",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Type your question below — the answer will be read aloud. Close with X or Escape.",

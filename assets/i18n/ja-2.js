@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "音声入力",
+  "Aufnahmedauer": "録音時間",
+  "Mikrofon wird geöffnet …": "マイクを準備中 …",
+  "Aufnahme läuft …": "録音中 …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "録音中 · 音量を取得できません",
+  "Diktat prüfen und übernehmen": "音声入力を確認して確定",
+  "Stoppen": "停止",
+  "Übernehmen": "確定",
+  "Verwerfen": "破棄",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "音声認識を利用できません — 下に質問を入力してください。",
   "Spracherkennung nicht verfügbar": "音声認識を利用できません",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "下に質問を入力してください — 回答を読み上げます。X または Escape で終了。",

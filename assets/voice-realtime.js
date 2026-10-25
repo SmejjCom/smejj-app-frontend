@@ -115,10 +115,12 @@ export function createRealtimeAudioSession({
   let active = false;
   let muted = false;
   let bereit = false;
+  let generation = 0, readyTimer = null, settleStart = () => {};
 
   const stopSession = (grund = "") => {
     if (!active) return;
     active = false;
+    generation += 1; clearTimeout(readyTimer); settleStart(false);
     bereit = false;
     try { if (socket?.readyState === 1) socket.send(JSON.stringify({ type: "session.stop" })); } catch { /* weg */ }
     try { scriptProcessor?.disconnect(); } catch { /* egal */ }
@@ -133,10 +135,13 @@ export function createRealtimeAudioSession({
   const startSession = () => new Promise((loese) => {
     if (active) { loese(bereit); return; }
     active = true;
+    const currentGeneration = ++generation;
     let entschieden = false;
     const entscheide = (wert) => { if (!entschieden) { entschieden = true; loese(wert); } };
-    const scheitere = (fehler, grund) => { onError?.(fehler); stopSession(grund); entscheide(false); };
+    settleStart = entscheide;
+    const scheitere = (fehler, grund) => { if (generation !== currentGeneration) return; onError?.(fehler); stopSession(grund); entscheide(false); };
     const uhr = setTimeout(() => { if (!bereit) scheitere(new Error("session.ready blieb aus"), "ready_timeout"); }, READY_BUDGET_MS);
+    readyTimer = uhr;
     (async () => {
       const Ctor = typeof window !== "undefined" ? (window.AudioContext || window.webkitAudioContext) : null;
       if (!Ctor || !navigator?.mediaDevices?.getUserMedia || typeof WebSocket !== "function") {
@@ -144,17 +149,25 @@ export function createRealtimeAudioSession({
       }
       const tok = token ?? sitzungsToken();
       if (!tok) throw new Error("keine Sitzung");
-      mediaStream = await navigator.mediaDevices.getUserMedia({
+      const captured = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 }
       });
+      if (!active || generation !== currentGeneration) { captured.getTracks().forEach(track => track.stop()); return; }
+      mediaStream = captured;
+      for (const track of mediaStream.getAudioTracks?.() || []) {
+        track.enabled = !muted;
+        for (const event of ['ended','mute']) track.addEventListener?.(event, () => { if (generation === currentGeneration) stopSession('audio_interrupted'); }, {once:true});
+      }
       audioContext = new Ctor();
       await audioContext.resume().catch(() => {});
+      if (!active || generation !== currentGeneration) return;
       wiedergabe = createWiedergabe(audioContext);
       const ziel = typeof window !== "undefined" && window.location?.protocol === "http:" && /localhost|127\.0\.0\.1/.test(wsUrl)
         ? wsUrl.replace(/^wss:/, "ws:") : wsUrl;
       socket = new WebSocket(ziel, [`smejj.sitzung.${tok}`]);
       socket.binaryType = "arraybuffer";
       socket.onmessage = (ereignis) => {
+        if (generation !== currentGeneration) return;
         if (typeof ereignis.data === "string") {
           let msg = null;
           try { msg = JSON.parse(ereignis.data); } catch { return; }
@@ -172,15 +185,15 @@ export function createRealtimeAudioSession({
           onAudioChunk?.(ereignis.data);
         }
       };
-      socket.onerror = () => { if (!bereit) scheitere(new Error("relay_unreachable"), "relay_unreachable"); else onError?.(new Error("relay_error")); };
-      socket.onclose = (ev) => { if (!bereit) scheitere(new Error(`relay_closed_${ev?.code || ""}`), "relay_closed"); else stopSession("relay_closed"); };
-      socket.onopen = () => { try { socket.send(JSON.stringify({ type: "session.start", sampleRate: EINGANG_RATE })); } catch { /* weg */ } };
+      socket.onerror = () => { if (generation !== currentGeneration) return; if (!bereit) scheitere(new Error("relay_unreachable"), "relay_unreachable"); else onError?.(new Error("relay_error")); };
+      socket.onclose = (ev) => { if (generation !== currentGeneration) return; if (!bereit) scheitere(new Error(`relay_closed_${ev?.code || ""}`), "relay_closed"); else stopSession("relay_closed"); };
+      socket.onopen = () => { if (generation !== currentGeneration) return; try { socket.send(JSON.stringify({ type: "session.start", sampleRate: EINGANG_RATE })); } catch { /* weg */ } };
 
       const quelle = audioContext.createMediaStreamSource(mediaStream);
       scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
       const rate = audioContext.sampleRate;
       scriptProcessor.onaudioprocess = (e) => {
-        if (!active || muted || !bereit || socket?.readyState !== 1) return;
+        if (!active || generation !== currentGeneration || muted || !bereit || socket?.readyState !== 1) return;
         const pcm = rechneAufSechzehnKhz(e.inputBuffer.getChannelData(0), rate);
         if (pcm.length) socket.send(pcm.buffer);
       };
@@ -190,13 +203,13 @@ export function createRealtimeAudioSession({
       still.gain.value = 0;
       scriptProcessor.connect(still);
       still.connect(audioContext.destination);
-    })().catch((fehler) => scheitere(fehler, "start_failed"));
+    })().catch((fehler) => { if (generation === currentGeneration) scheitere(fehler, "start_failed"); });
   });
 
   return {
     start: startSession,
     stop: () => stopSession("stop"),
-    setMuted: (wert) => { muted = Boolean(wert); if (muted) wiedergabe?.unterbrechen(); },
+    setMuted: (wert) => { muted = Boolean(wert); mediaStream?.getAudioTracks?.().forEach(track => { track.enabled = !muted; }); if (muted) wiedergabe?.unterbrechen(); },
     isActive: () => active,
     isReady: () => bereit
   };
@@ -233,6 +246,7 @@ export function verdrahteLive(host) {
         onClose: (grund) => {
           if (!lief || !host.state?.voiceModeActive || !grund || grund === "stop") return;
           sitzung = null;
+          if (grund === 'audio_interrupted') { host.state.voiceMuted = true; status('muted', 'Mikrofon unterbrochen. Zum Fortsetzen Mikrofon antippen.'); return; }
           if (typeof host.nachAbbruch === "function") { try { host.nachAbbruch(); return; } catch { /* Meldung unten */ } }
           status("listening", "Verbindung beendet — tippe unten oder öffne die Welle neu.");
         },

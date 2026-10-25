@@ -8,6 +8,7 @@
 // das Modul initialisiert sich nur auf Seiten OHNE App-Composer (#startSend).
 // Inhalt oeffentlich, Interaktion angemeldet: fuer Abgemeldete steht auf den
 // Sprachseiten nur ein Anmelde-Knopf (Begruendung im Modulkopf dort).
+import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js";
 import { darfSprechen, buildLoginCta } from "./voice-landing-signin.js?v=8";
 import { CLIENT_ROUTES } from "./config.js";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
@@ -29,7 +30,7 @@ import { createSilenceWatchdog } from "./voice-endpoint.js";
 // mit der Startseite; Muster aus dem ChatGPT-Live-Vergleich 2026-08-03).
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
-import { createServerEar, createEarSend } from "./voice-ear.js";
+import { createServerEar, createEarSend } from "./voice-ear.js?v=2026102522";
 import { buildReserveChatRequest } from "./chat-history-context.js";
 import { appendVoiceTurn, buildAgentPayload } from "./voice-conversation.js?v=sprachwelle-20260927";
 // Stufe 3a: Denk-Laut, damit zwischen Frage und Antwort nicht nur Stille steht.
@@ -682,7 +683,7 @@ function openOverlay() {
     if (state.active) premiumVoiceOn = up === true;
   }).catch(() => {});
   const input = $id("voiceLandingInput");
-  if (input) input.value = "";
+  if (input) input.dispatchEvent(new Event("input", { bubbles: true }));
   syncTypedSend();
   overlay.hidden = false;
   if (!RecognitionCtor) {
@@ -708,6 +709,7 @@ function restartListening() {
 }
 
 function buildUi() {
+  bindAufnahmeUnterbrechung({ stop: () => state.active ? (closeOverlay(), true) : false });
   const style = document.createElement("style");
   style.textContent = CSS;
   document.head.appendChild(style);

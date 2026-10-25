@@ -17,6 +17,7 @@
 // Zeitbudget nach dem Sprech-Ende: laenger warten wir nicht auf den Server,
 // sonst fuehlt sich das Gespraech traege an. Groq transkribiert eine Stunde
 // Audio in ~15 s — der Engpass ist der Upload, nicht das Modell.
+import { beobachtePegel } from "./audio-pegel.js";
 export const EAR_BUDGET_MS = 1500;
 // Obergrenze der Aufnahme (Schutz von Free-Tier und Upload-Zeit).
 const MAX_AUFNAHME_MS = 60_000;
@@ -100,6 +101,8 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
   let mime = "";
   let wecker = 0;
   let aufnahmeEnde = null;
+  let pegelStop = () => {};
+  let fehlerMelden = () => {};
   // Laufnummer (Geraetebefund 23.09.2026, iPhone: orangefarbener Mikrofon-Punkt
   // blieb an). start() wartet auf getUserMedia; kam in der Zwischenzeit
   // cancel()/finish(), legte der verspaetete Start trotzdem einen Recorder an,
@@ -111,6 +114,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
   const holen = fetchFn || ((...args) => fetch(...args));
 
   const aufraeumen = () => {
+    pegelStop(); pegelStop = () => {};
     lauf += 1;
     clearTimeout(wecker);
     try {
@@ -133,12 +137,13 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
         && Boolean(navigator.mediaDevices?.getUserMedia);
     },
 
-    async start({ stream: audioStream, onLimit } = {}) {
+    async start({ stream: audioStream, onLimit, onLevel, onStream, onError } = {}) {
       if (!alive || recorder || startet || aufnahmeEnde) return { ok: false, error: "unavailable" };
       mime = pickRecorderMime();
       if (!mime || !globalThis.navigator?.mediaDevices?.getUserMedia) return { ok: false, error: "unavailable" };
       const meinLauf = lauf;
       startet = true;
+      fehlerMelden = onError || (() => {});
       try {
         const captured = audioStream ? audioStream.clone() : await navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
@@ -157,6 +162,8 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
           if (event.data && event.data.size > 0) teile.push(event.data);
         };
         recorder.start();
+        onStream?.(captured);
+        if (onLevel) pegelStop = beobachtePegel(captured, onLevel);
         // Harte Obergrenze: eine vergessene Aufnahme laeuft nie ewig weiter.
         wecker = setTimeout(() => {
           aufnahmeEnde = new Promise(resolve => {
@@ -190,6 +197,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
     // Rueckfall (reines Ohr-Diktat) — dort waere ein gerissenes Budget
     // verlorener Text.
     async finish(optionen = {}) {
+      const meldeFehler = fehlerMelden;
       if (!alive || (!recorder && !aufnahmeEnde)) {
         aufraeumen();
         return "";
@@ -236,8 +244,10 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
         }
         // Keine Adresse mehr uebrig — erst JETZT gibt das Ohr auf.
         if (lebende().length === 0) alive = false;
+        meldeFehler(abbruch.signal.aborted ? "timeout" : globalThis.navigator?.onLine === false ? "offline" : "server_unreachable");
         return "";
       } catch {
+        meldeFehler(abbruch.signal.aborted ? "timeout" : "server_unreachable");
         return ""; // Budget gerissen — Web-Speech-Text gewinnt
       } finally {
         clearTimeout(budget);

@@ -1,5 +1,5 @@
 // smejj.com — mehrzeiliger Gast-Composer; Dateien bleiben bis zur Anmeldung lokal.
-import { initEingabeHost } from "./composer-eingabe-host.js?v=2026102519";
+import { initEingabeHost } from "./composer-eingabe-host.js?v=2026102522";
 const form = document.getElementById("probierForm"), input = document.getElementById("probierFeld");
 if (form && input) {
   initEingabeHost();
@@ -30,7 +30,7 @@ if (form && input) {
   let dictation;
   document.getElementById("gastDiktat").addEventListener("click", async () => {
     if (!dictation) {
-      const [{ createDictation }, { createServerEar }, { CLIENT_ROUTES }] = await Promise.all([import("./composer-dictation.js"), import("./voice-ear.js"), import("./config.js")]);
+      const [{ createDictation }, { createServerEar }, { CLIENT_ROUTES }] = await Promise.all([import("./composer-dictation.js?v=2026102522"), import("./voice-ear.js?v=2026102522"), import("./config.js")]);
       const RecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
       const warn = text => { const p = document.getElementById("gastDiktatStatus"); p.textContent = text; };
       dictation = createDictation({ getInput: () => input, notifyInputChanged: notify, RecognitionCtor, speechSupported: () => Boolean(RecognitionCtor), lang: () => document.documentElement.lang || "de-DE", showToast: warn, serverOhr: createServerEar({ urls: [CLIENT_ROUTES.api.voiceTranscribeFallback], budgetMs: 6000 }), setVisual: active => document.getElementById("gastDiktat").setAttribute("aria-pressed", String(active)) });

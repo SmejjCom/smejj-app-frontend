@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "Dikte",
+  "Aufnahmedauer": "Kayıt süresi",
+  "Mikrofon wird geöffnet …": "Mikrofon açılıyor …",
+  "Aufnahme läuft …": "Kaydediliyor …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "Kaydediliyor · Ses düzeyi kullanılamıyor",
+  "Diktat prüfen und übernehmen": "Dikteyi kontrol et ve kabul et",
+  "Stoppen": "Durdur",
+  "Übernehmen": "Kabul et",
+  "Verwerfen": "Vazgeç",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Konuşma tanıma kullanılamıyor — sorunuzu aşağıya yazın.",
   "Spracherkennung nicht verfügbar": "Konuşma tanıma kullanılamıyor",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Sorunuzu aşağıya yazın — yanıt sesli okunacak. X veya Escape ile kapatın.",

@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "श्रुतलेख",
+  "Aufnahmedauer": "रिकॉर्डिंग अवधि",
+  "Mikrofon wird geöffnet …": "माइक्रोफ़ोन खोला जा रहा है …",
+  "Aufnahme läuft …": "रिकॉर्डिंग जारी है …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "रिकॉर्डिंग जारी है · ऑडियो स्तर उपलब्ध नहीं",
+  "Diktat prüfen und übernehmen": "श्रुतलेख की समीक्षा करें और स्वीकार करें",
+  "Stoppen": "रोकें",
+  "Übernehmen": "स्वीकार करें",
+  "Verwerfen": "त्यागें",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "वाक् पहचान उपलब्ध नहीं — अपना प्रश्न नीचे लिखें।",
   "Spracherkennung nicht verfügbar": "वाक् पहचान उपलब्ध नहीं",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "अपना प्रश्न नीचे लिखें — उत्तर ज़ोर से पढ़ा जाएगा। X या Escape से बंद करें।",

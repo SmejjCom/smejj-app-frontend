@@ -13,7 +13,7 @@ import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js
 import { lesbarerStatus } from "./system-status-text.js";
 import { afterFirstPaint } from "./deferred-start.js";
 import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=2026102516";
-import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js";
+import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js?v=2026102522";
 import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=4";
 import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js";
 import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=b51";
@@ -352,7 +352,7 @@ function bindStartComposer() {
   send.addEventListener("click", submit);
   bindPasteAttach({ getInput: () => input });
   // E24: auch fuer die Datei-Chips (start-chips.js).
-  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=2026102521").then((m) => m.initComposerTools()));
+  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=2026102522").then((m) => m.initComposerTools()));
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {

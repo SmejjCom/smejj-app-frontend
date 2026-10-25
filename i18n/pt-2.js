@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "Ditado",
+  "Aufnahmedauer": "Duração da gravação",
+  "Mikrofon wird geöffnet …": "Abrindo o microfone …",
+  "Aufnahme läuft …": "Gravando …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "Gravando · Nível de áudio indisponível",
+  "Diktat prüfen und übernehmen": "Revisar e aceitar o ditado",
+  "Stoppen": "Parar",
+  "Übernehmen": "Aceitar",
+  "Verwerfen": "Descartar",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Reconhecimento de voz indisponível — escreva a sua pergunta abaixo.",
   "Spracherkennung nicht verfügbar": "Reconhecimento de voz indisponível",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Escreva a sua pergunta abaixo — a resposta será lida em voz alta. Fechar com X ou Escape.",

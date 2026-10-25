@@ -31,10 +31,11 @@
 //   (3) Jeder (Neu-)Start bekommt eine FRISCHE Instanz; jeder Handler prueft,
 //       ob er noch zur aktuellen Instanz gehoert. Spaete finale Ergebnisse
 //       nach dem Stopp-Klick werden noch geschrieben (stop() statt abort()).
-import { diktatLeiste } from "./composer-diktat-leiste.js?v=2026102519";
+import { diktatLeiste } from "./composer-diktat-leiste.js?v=2026102522";
 import { t } from "./i18n/ui.js?v=3";
+import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js";
 
-export function createDictation({ getInput, notifyInputChanged, showToast, RecognitionCtor, lang, speechSupported, setVisual, onBeforeToggle, serverOhr = null, warte = (fn, ms) => setTimeout(fn, ms), uhr = () => Date.now() }) {
+export function createDictation({ getInput, notifyInputChanged, showToast, RecognitionCtor, lang, speechSupported, setVisual, onBeforeToggle, serverOhr = null, warte = (fn, ms) => setTimeout(fn, ms), uhr = () => Date.now(), limitTimer = (fn, ms) => setTimeout(fn, ms) }) {
   // Eine Sitzung = vom Klick "Start" bis zum Klick "Stopp". Sie kann viele
   // Erkennungs-Instanzen nacheinander verbrauchen (jede Sprechpause eine).
   let sitzung = null;
@@ -115,6 +116,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     rec.continuous = true;
     rec.interimResults = true;
     rec.maxAlternatives = 1;
+    rec.onstart = () => { if (sitzung === s && s.aktiv) { leiste({ recording: true }); if (!s.hatStream) leiste({ level: null }); } };
     s.rec = rec;
     s.instFinals = "";
     s.interim = "";
@@ -212,6 +214,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     s.aktiv = false;
     sitzung = null;
     letzte = s;
+    s.unbind?.(); clearTimeout(s.limit);
     visual(false);
     // stop() statt abort(): das letzte gesprochene Stueck kommt noch als
     // finales Ergebnis an und wird geschrieben (Handler pruefen die Instanz).
@@ -271,6 +274,10 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       gestartetUm: 0
     };
     sitzung = s;
+    const unterbrechen = () => { if (sitzung === s) { stop(); showToast("Diktat angehalten. Du kannst den Text prüfen oder die Aufnahme neu starten.", "warn"); } };
+    s.unbind = bindAufnahmeUnterbrechung({ stop: unterbrechen });
+    s.limit = limitTimer(() => { if (sitzung === s) { showToast("Zeitlimit erreicht: Die Aufnahme wurde nach 60 Sekunden gestoppt.", "warn"); stop(); } }, 60_000);
+    s.limit?.unref?.();
     leiste("close");
     leiste = diktatLeiste(input, { stop, accept, discard });
     visual(true);
@@ -281,7 +288,12 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       showToast(t(result.error === "microphone_denied" ? "Mikrofon nicht freigegeben" : "Mikrofon konnte nicht gestartet werden."), "warn");
     };
     try {
-      const gestartet = serverOhr?.start({ onLimit: () => { if (sitzung === s) stop(); } });
+      const gestartet = serverOhr?.start({
+        onLimit: () => { if (sitzung === s) { showToast("Zeitlimit erreicht: Die Aufnahme wurde nach 60 Sekunden gestoppt.", "warn"); stop(); } },
+        onStream: stream => { if (sitzung !== s) return; s.hatStream = true; s.unbind?.(); s.unbind = bindAufnahmeUnterbrechung({ stop: unterbrechen, stream }); leiste({ recording: true }); },
+        onLevel: level => { if (sitzung === s) leiste({ level }); },
+        onError: error => { if (s.verworfen || (sitzung && sitzung !== s)) return; showToast(error === "offline" ? "Keine Internetverbindung. Dein bisheriger Text bleibt erhalten." : error === "timeout" ? "Die Transkription hat zu lange gedauert. Bitte erneut versuchen." : "Der Sprachserver ist nicht erreichbar. Dein bisheriger Text bleibt erhalten.", "warn"); }
+      });
       if (gestartet && typeof gestartet.then === "function") {
         s.ohrStart = Promise.resolve(gestartet).then(result => {
           gescheitert(result);

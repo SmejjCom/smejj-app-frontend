@@ -20,14 +20,14 @@ import { createBrowserTts } from "./voice-browser-tts.js?v=sprachwelle-20260927"
 // Live-Vergleich 2026-08-03) — geteilte Naht mit den 14 Sprachseiten.
 import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
-import { createServerEar, createEarSend, ohrAdressen } from "./voice-ear.js";
+import { createServerEar, createEarSend, ohrAdressen } from "./voice-ear.js?v=2026102522";
 import { verdrahteOhrSolo, istAppleMobil } from "./voice-ohr-solo.js?v=12";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
 import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js";
 import { createSpeechInterrupt } from "./voice-vad.js?v=blitz2-20260726";
 import { warmUpAgentConnection } from "./voice-warmup.js";
-import { verdrahteLive } from "./voice-realtime.js?v=sprachwelle-20260927";
+import { verdrahteLive } from "./voice-realtime.js?v=2026102522";
 // Stufe 2a/3a: Interim-Waechter — Sprech-Ende erkennen; seit 3a richtet sich die
 // Wartezeit nach dem Gesagten. Denk-Laut fuellt die Stille bis zur Antwort.
 import { createSilenceWatchdog } from "./voice-endpoint.js";
@@ -37,9 +37,10 @@ import { createThinkingCue } from "./voice-thinking-cue.js";
 import { createPremiumVoice } from "./voice-premium-tts.js?v=sprachwelle-20260927";
 import { CLIENT_ROUTES } from "./config.js";
 // Plus-Menue (Anhaenge) — ausgelagert, Verhalten unveraendert.
+import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js";
 import { bindPlusMenu } from "./composer-plus-menu.js?v=2026102521";
 // Mikrofon-Diktat — ausgelagert (800-Zeilen-Regel), Verhalten unveraendert.
-import { createDictation } from "./composer-dictation.js";
+import { createDictation } from "./composer-dictation.js?v=2026102522";
 import { t, savedUiLanguage } from "./i18n/ui.js?v=3"; // Sprachmodus-Texte + gespeicherte Sprache (Geraetetest 22.09.2026)
 const $ = (selector) => document.querySelector(selector);
 // Sprache bei JEDEM Aufruf: zuerst die GESPEICHERTE Oberflaechensprache, sonst das lang-Attribut (huelle-sprache.js setzt es erst nach dem Nachladen — v956 gemessen: Luecke von Sekunden).
@@ -729,8 +730,7 @@ function openVoiceMode() {
       if (mic) mic.title = stimmText("Stummschalten");
       const typedInput = $("#voiceModeInput");
       if (typedInput) {
-              typedInput.value = "";
-              // Sende-Button-Zustand nachziehen (Feld ist jetzt leer -> inaktiv).
+              // Sende-Button nachziehen; ein ungesendeter Entwurf bleibt erhalten.
               typedInput.dispatchEvent(new Event("input", { bubbles: true }));
       }
       overlay.hidden = false;
@@ -748,6 +748,7 @@ function weiterOhneLive() {
 }
 
 function bindVoiceMode() {
+      bindAufnahmeUnterbrechung({ stop: () => state.voiceModeActive ? (closeVoiceMode(), true) : false, resume: () => showToast("Sprachgespräch pausiert. Zum Fortsetzen den Sprachmodus öffnen.", "warn") });
       upgradeVoiceOverlay({ sendIcon: SEND_ICON_SVG });
       $("#voiceModeClose")?.addEventListener("click", closeVoiceMode);
       $("#voiceModeMic")?.addEventListener("click", toggleVoiceMute);

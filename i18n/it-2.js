@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "Dettatura",
+  "Aufnahmedauer": "Durata della registrazione",
+  "Mikrofon wird geöffnet …": "Apertura del microfono …",
+  "Aufnahme läuft …": "Registrazione …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "Registrazione · Livello audio non disponibile",
+  "Diktat prüfen und übernehmen": "Controlla e accetta la dettatura",
+  "Stoppen": "Interrompi",
+  "Übernehmen": "Accetta",
+  "Verwerfen": "Scarta",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "Riconoscimento vocale non disponibile — scrivi la domanda qui sotto.",
   "Spracherkennung nicht verfügbar": "Riconoscimento vocale non disponibile",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "Scrivi la domanda qui sotto — la risposta verrà letta ad alta voce. Chiudi con X o Esc.",

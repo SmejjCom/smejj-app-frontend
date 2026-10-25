@@ -52,7 +52,15 @@ export async function initDateiEntwurf(annehmen) {
   document.addEventListener("input", e => { if (["probierFeld", "startMessage", "codeAufgabe"].includes(e.target.id)) plane(); });
   window.addEventListener("smejj:anhang-geaendert", plane);
   window.addEventListener("smejj:task-status", plane);
-  window.addEventListener("pagehide", speichern);
+  // IndexedDB-Schreibvorgänge dürfen beim sofortigen Neuladen abgebrochen
+  // werden. Nur die begrenzten Composer-Texte synchron als Notfallstand sichern.
+  const textKey = "smejj.com-composer-text-reload:" + identitaet;
+  const notfallText = () => {
+    const texts = Object.fromEntries([...document.querySelectorAll("#probierFeld, #startMessage, #codeAufgabe")].map(input => [input.id, input.value]));
+    if (Object.values(texts).some(text => text.length > 200000)) return;
+    try { localStorage.setItem(textKey, JSON.stringify({ at: Date.now(), texts })); } catch { hinweis(); }
+  };
+  window.addEventListener("pagehide", () => { notfallText(); void speichern(); });
   document.addEventListener("visibilitychange", () => { if (document.hidden) void speichern(); });
   try {
     db = await oeffneEntwurfDB();
@@ -62,6 +70,13 @@ export async function initDateiEntwurf(annehmen) {
         data = waehleGastUebernahme(data, await entwurfTransaktion(db, undefined, "guest")); sessionStorage.removeItem("smejj.gastAnhangUebernahme.v1");
       }
     } catch {}
+    try {
+      const text = JSON.parse(localStorage.getItem(textKey) || "null");
+      if (text?.texts && Number.isFinite(text.at) && Date.now() - text.at < 86400000 && text.at > (data?.at || 0)
+        && Object.values(text.texts).every(value => typeof value === "string" && value.length <= 200000)) {
+        data = { ...(data || { files: [], textChips: [] }), at: text.at, texts: text.texts };
+      }
+    } catch { /* Ein unlesbarer Notfallstand verdrängt keinen Datei-Entwurf. */ }
     if (gueltigerEntwurf(data)) {
       // Tippen/Auswahl waehrend des asynchronen Lesens hat Vorrang.
       const input = feld();

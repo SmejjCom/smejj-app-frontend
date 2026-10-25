@@ -1,3 +1,4 @@
+import "./eingabe-verhalten.js";
 // smejj.com — gemeinsame Datei-Gesten fuer Gastseite und Chat. Keine Uploads.
 export function dateienAusTransfer(transfer) {
   const files = Array.from(transfer?.files || []);
@@ -46,7 +47,7 @@ let bereit = false;
 export function initEingabeHost() {
   if (bereit) return; bereit = true;
   if (!document.getElementById("composerEingabeStil")) {
-    const link = document.createElement("link"); link.id = "composerEingabeStil"; link.rel = "stylesheet"; link.href = "/assets/composer-eingabe.css"; document.head.append(link);
+    const link = document.createElement("link"); link.id = "composerEingabeStil"; link.rel = "stylesheet"; link.href = "/assets/composer-eingabe.css?v=2026102522"; document.head.append(link);
   }
   window.addEventListener("smejj:datei-hinweis", e => {
     const feld = aktivesSchreibfeld(); if (!feld) return;
@@ -69,5 +70,5 @@ export function initEingabeHost() {
     feld.scrollIntoView?.({ block: "center", behavior: "smooth" });
   };
   bindDateiGesten({ annehmen });
-  void import("./composer-entwurf-dateien.js?v=2026102519").then(m => m.initDateiEntwurf(annehmen));
+  void import("./composer-entwurf-dateien.js?v=2026102522").then(m => m.initDateiEntwurf(annehmen));
 }

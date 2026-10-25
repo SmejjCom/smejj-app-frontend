@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "শ্রুতলিখন",
+  "Aufnahmedauer": "রেকর্ডিংয়ের সময়কাল",
+  "Mikrofon wird geöffnet …": "মাইক্রোফোন খোলা হচ্ছে …",
+  "Aufnahme läuft …": "রেকর্ড হচ্ছে …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "রেকর্ড হচ্ছে · শব্দের মাত্রা পাওয়া যাচ্ছে না",
+  "Diktat prüfen und übernehmen": "শ্রুতলিখন যাচাই করে গ্রহণ করুন",
+  "Stoppen": "থামান",
+  "Übernehmen": "গ্রহণ করুন",
+  "Verwerfen": "বাতিল করুন",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "কণ্ঠস্বর শনাক্তকরণ উপলব্ধ নয় — নিচে আপনার প্রশ্ন লিখুন।",
   "Spracherkennung nicht verfügbar": "কণ্ঠস্বর শনাক্তকরণ উপলব্ধ নয়",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "নিচে আপনার প্রশ্ন লিখুন — উত্তর জোরে পড়ে শোনানো হবে। X বা Escape দিয়ে বন্ধ করুন।",

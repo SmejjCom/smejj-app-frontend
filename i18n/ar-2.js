@@ -6,6 +6,16 @@
 // diese Datei und legt seine eigenen Eintraege darueber. Fuer alle
 // Aufrufer bleibt es EIN Woerterbuch.
 export default {
+  "Diktat": "إملاء",
+  "Aufnahmedauer": "مدة التسجيل",
+  "Mikrofon wird geöffnet …": "جارٍ فتح الميكروفون …",
+  "Aufnahme läuft …": "جارٍ التسجيل …",
+  "Aufnahme läuft · Pegelmessung nicht verfügbar": "جارٍ التسجيل · مستوى الصوت غير متاح",
+  "Diktat prüfen und übernehmen": "مراجعة الإملاء واعتماده",
+  "Stoppen": "إيقاف",
+  "Übernehmen": "اعتماد",
+  "Verwerfen": "تجاهل",
+
   "Spracherkennung nicht verfügbar — Frage unten eintippen.": "التعرّف على الكلام غير متاح — اكتب سؤالك أدناه.",
   "Spracherkennung nicht verfügbar": "التعرّف على الكلام غير متاح",
   "Frage unten eintippen — die Antwort wird vorgelesen. Beenden mit X oder Escape.": "اكتب سؤالك أدناه — سيُقرأ الجواب بصوت عالٍ. للإنهاء اضغط X أو Escape.",
