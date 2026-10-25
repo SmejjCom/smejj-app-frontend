@@ -27,8 +27,7 @@ export function bindBildAnhang(selector, getInput, notifyInputChanged) {
       const files = Array.from(ziel.files || []);
       if (!files.length) return;
       event.stopImmediatePropagation();
-      const vorhanden = window.smejjAnhangChips?.anhangListe?.() || [];
-      const neu = files.filter(f => !vorhanden.some(a => a.file === f || (a.name === f.name && a.groesse === f.size && a.file?.lastModified === f.lastModified)));
+      const neu = files;
       ziel.value = "";
       const input = zielFeld?.();
       if (input && neu.length) void uebernehmeDateiAuswahl(neu, input, meldeFeld);
@@ -38,4 +37,4 @@ export function bindBildAnhang(selector, getInput, notifyInputChanged) {
 }
 if (typeof document !== "undefined") bindBildAnhang("#composerPhotoInput", () => document.querySelector("#code.view.is-active #codeAufgabe") || document.querySelector("#startMessage"), input => input.dispatchEvent(new Event("input", { bubbles: true })));
 // Auch Ziehen ausserhalb der Textarea und Wiederherstellung nach Neuladen.
-if (typeof document !== "undefined") void import("./composer-eingabe-host.js").then(m => m.initEingabeHost());
+if (typeof document !== "undefined") void import("./composer-eingabe-host.js?v=2026102519").then(m => m.initEingabeHost());

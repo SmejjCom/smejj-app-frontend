@@ -25,3 +25,6 @@
 .dictation-wave[hidden] { display:none; }
 
 .dictation-controls button, .probier button:not(.los) { background:transparent; color:inherit; border:1px solid currentColor; border-radius:10px; padding:6px 10px; font:inherit; }
+
+#dateiAnnahmeStatus { flex-basis:100%; font-size:14px; padding:4px 8px; margin:0; }
+#dateiAnnahmeStatus[hidden] { display:none; }

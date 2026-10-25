@@ -1,5 +1,5 @@
 // smejj.com — mehrzeiliger Gast-Composer; Dateien bleiben bis zur Anmeldung lokal.
-import { initEingabeHost } from "./composer-eingabe-host.js";
+import { initEingabeHost } from "./composer-eingabe-host.js?v=2026102519";
 const form = document.getElementById("probierForm"), input = document.getElementById("probierFeld");
 if (form && input) {
   initEingabeHost();

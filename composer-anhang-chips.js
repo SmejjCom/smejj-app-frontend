@@ -144,7 +144,7 @@ export function uebernehmeAnhang(file, input, notify) {
   if (!file || !input) return null;
   aktuellesFeld = input;
   notifyFeld = notify;
-  const vorhanden = anhaenge.find(a => a.file === file || (a.name === file.name && a.groesse === file.size && a.file?.lastModified === file.lastModified));
+  const vorhanden = anhaenge.find(a => a.file === file);
   if (vorhanden) return vorhanden;
   seq += 1;
   const art = dateiArt(file);

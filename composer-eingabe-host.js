@@ -48,6 +48,12 @@ export function initEingabeHost() {
   if (!document.getElementById("composerEingabeStil")) {
     const link = document.createElement("link"); link.id = "composerEingabeStil"; link.rel = "stylesheet"; link.href = "/assets/composer-eingabe.css"; document.head.append(link);
   }
+  window.addEventListener("smejj:datei-hinweis", e => {
+    const feld = aktivesSchreibfeld(); if (!feld) return;
+    let node = document.getElementById("dateiAnnahmeStatus");
+    if (!node) { node = document.createElement("p"); node.id = "dateiAnnahmeStatus"; node.setAttribute("role", "status"); feld.parentElement.append(node); }
+    node.textContent = e.detail?.text || ""; node.hidden = !node.textContent;
+  });
   let aufnahme = false;
   window.addEventListener("smejj:diktat-status", e => { aufnahme = Boolean(e.detail?.active); });
   const blockiereSenden = e => {
@@ -63,5 +69,5 @@ export function initEingabeHost() {
     feld.scrollIntoView?.({ block: "center", behavior: "smooth" });
   };
   bindDateiGesten({ annehmen });
-  void import("./composer-entwurf-dateien.js").then(m => m.initDateiEntwurf(annehmen));
+  void import("./composer-entwurf-dateien.js?v=2026102519").then(m => m.initDateiEntwurf(annehmen));
 }

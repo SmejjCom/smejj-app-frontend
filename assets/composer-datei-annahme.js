@@ -1,9 +1,19 @@
 // smejj.com — gemeinsamer Bildweg fuer Auswahl, Kamera, Einfuegen und Drop.
 // Das bestehende API-Feld bildDataUrl bleibt erhalten. Mehrere Bilder werden
 // nummeriert zu einer Bildtafel zusammengefuegt, statt weitere Bilder zu verlieren.
-import { showToast } from "./components.js?v=2026102515";
-import { uebernehmeAnhang, aktualisiereAnhang, anhangListe, versandListe, leereVersand, dateiArt } from "./composer-anhang-chips.js?v=2026102517";
+import { showToast as zeigeToast } from "./components.js?v=2026102515";
+import { uebernehmeAnhang, aktualisiereAnhang, anhangListe, versandListe, leereVersand, dateiArt } from "./composer-anhang-chips.js?v=2026102519";
 
+function meldeDateiHinweis(text, tone = "warn") {
+  if (text) zeigeToast(text, tone);
+  try { window.dispatchEvent(new CustomEvent("smejj:datei-hinweis", { detail: { text } })); } catch {}
+}
+const hashes = new WeakMap();
+/** Inhaltsvergleich statt Dateiname/Zeitstempel: Drop und Paste liefern neue File-Objekte. */
+export function dateiInhaltsHash(file) {
+  if (!hashes.has(file)) hashes.set(file, file.arrayBuffer().then(bytes => crypto.subtle.digest("SHA-256", bytes)).then(hash => Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2, "0")).join("")).catch(error => { hashes.delete(file); throw error; }));
+  return hashes.get(file);
+}
 const MAX_DATA_URL_ZEICHEN = 600 * 1024;
 const MAX_BILD_BYTES = 20 * 1024 * 1024;
 function leseDatei(file) {
@@ -60,13 +70,20 @@ export function bildTafel(bilder, dokument = document) {
 /** Bild als sofort sichtbaren, einzeln entfernbaren Chip lesen. */
 export async function uebernehmeBildDatei(file, input, notifyInputChanged) {
   if (!file || !input) return false;
-  if (!file.size || file.size > MAX_BILD_BYTES) { showToast("Bild ist leer oder größer als 20 MB.", "warn"); return false; }
+  if (!file.size || file.size > MAX_BILD_BYTES) { meldeDateiHinweis("Bild ist leer oder größer als 20 MB.", "warn"); return false; }
   const bestand = anhangListe();
   const bekannt = bestand.some(a => a.file === file);
   if (!bekannt && (bestand.length >= 12 || bestand.reduce((n, a) => n + a.groesse, 0) + file.size > 50 * 1024 * 1024)) {
-    showToast("Maximal 12 Anhänge und zusammen 50 MB pro Nachricht.", "warn"); return false;
+    meldeDateiHinweis("Maximal 12 Anhänge und zusammen 50 MB pro Nachricht.", "warn"); return false;
+  }
+  let hash;
+  if (!bekannt) {
+    try { hash = await dateiInhaltsHash(file); }
+    catch { meldeDateiHinweis("Datei konnte nicht sicher gelesen werden. Bitte erneut auswählen."); return false; }
+    if (anhangListe().some(a => a.contentHash === hash)) { meldeDateiHinweis("Bereits angehängt", "info"); return false; }
   }
   const a = uebernehmeAnhang(file, input, notifyInputChanged);
+  if (hash) aktualisiereAnhang(a.id, { contentHash: hash });
   if (a.image || a.status === "loading") return true;
   const retry = () => uebernehmeBildDatei(file, input, notifyInputChanged);
   aktualisiereAnhang(a.id, { status: "loading", statusText: "Bild wird gelesen …", retry });
@@ -87,7 +104,7 @@ export async function uebernehmeBildDatei(file, input, notifyInputChanged) {
     return aktualisiereAnhang(a.id, { image: kompakt, url: vorschau.bildDataUrl, status: "ready", statusText: "Bereit · lokal auf diesem Gerät" });
   } catch (error) {
     aktualisiereAnhang(a.id, { status: "error", statusText: error.message });
-    showToast(error.message, "warn");
+    meldeDateiHinweis(error.message, "warn");
     return false;
   }
 }
@@ -108,7 +125,7 @@ export function pruefeDatei(file, bestand = []) {
   if (!file || !Number.isFinite(file.size) || file.size <= 0) return "Datei ist leer.";
   if (file.size > DATEI_LIMIT) return "Datei ist größer als 20 MB.";
   if (GEFAEHRLICH.test(file.name || "")) return "Dieser Dateityp kann hier nicht angehängt werden.";
-  const doppelt = bestand.some(a => a.file === file || (a.name === file.name && a.groesse === file.size && a.file?.lastModified === file.lastModified));
+  const doppelt = bestand.some(a => a.file === file);
   if (doppelt) return "duplicate";
   if (bestand.length >= ANZAHL_LIMIT) return "Maximal 12 Anhänge pro Nachricht.";
   if (bestand.reduce((n, a) => n + a.groesse, 0) + file.size > GESAMT_LIMIT) return "Anhänge zusammen größer als 50 MB.";
@@ -154,17 +171,26 @@ async function liesDatei(file, input, notify) {
     aktualisiereAnhang(a.id, { text, status: "ready", statusText: "Inhalt bereit · lokal auf diesem Gerät" });
   } catch (error) {
     aktualisiereAnhang(a.id, { status: "error", statusText: error.message });
-    showToast(error.message, "warn");
+    meldeDateiHinweis(error.message, "warn");
   }
 }
 
 /** Alle Dateien sofort vormerken, danach nacheinander lesen; keine Mehrfachausfuehrung. */
 export async function uebernehmeDateien(files, input, notify) {
   const zugesagt = [];
+  meldeDateiHinweis("");
   for (const file of files) {
     const fehler = pruefeDatei(file, anhangListe());
-    if (fehler) { if (fehler !== "duplicate") showToast(fehler, "warn"); continue; }
+    if (fehler) { meldeDateiHinweis(fehler === "duplicate" ? "Bereits angehängt" : fehler, fehler === "duplicate" ? "info" : "warn"); continue; }
+    let contentHash;
+    try { contentHash = await dateiInhaltsHash(file); }
+    catch { meldeDateiHinweis("Datei konnte nicht sicher gelesen werden. Bitte erneut auswählen."); continue; }
+    if (anhangListe().some(a => a.contentHash === contentHash)) { meldeDateiHinweis("Bereits angehängt", "info"); continue; }
+    // Waehrend des Hashens kann eine andere Auswahl den Bestand erweitert haben.
+    const erneut = pruefeDatei(file, anhangListe());
+    if (erneut) { meldeDateiHinweis(erneut === "duplicate" ? "Bereits angehängt" : erneut); continue; }
     const a = uebernehmeAnhang(file, input, notify);
+    aktualisiereAnhang(a.id, { contentHash });
     aktualisiereAnhang(a.id, { status: "queued", statusText: "Wartet auf Verarbeitung …" });
     zugesagt.push({ file, a });
   }

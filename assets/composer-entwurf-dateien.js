@@ -7,6 +7,9 @@ export function gueltigerEntwurf(value, jetzt = Date.now()) {
   return value && Number.isFinite(value.at) && jetzt - value.at < 86400000 && Array.isArray(value.files) && value.files.length <= 12
     && value.files.reduce((n, f) => n + (f.size || 0), 0) <= 50 * 1024 * 1024;
 }
+export function waehleGastUebernahme(aktuell, gast, jetzt = Date.now()) {
+  return gueltigerEntwurf(gast, jetzt) ? gast : aktuell;
+}
 export function oeffneEntwurfDB(idb = globalThis.indexedDB) {
   return new Promise((resolve, reject) => {
     if (!idb) { reject(new Error("Lokaler Dateispeicher nicht verfügbar")); return; }
@@ -56,7 +59,7 @@ export async function initDateiEntwurf(annehmen) {
     let data = await entwurfTransaktion(db, undefined, identitaet);
     try {
       if (identitaet !== "guest" && sessionStorage.getItem("smejj.gastAnhangUebernahme.v1") === "ja") {
-        data = await entwurfTransaktion(db, undefined, "guest"); sessionStorage.removeItem("smejj.gastAnhangUebernahme.v1");
+        data = waehleGastUebernahme(data, await entwurfTransaktion(db, undefined, "guest")); sessionStorage.removeItem("smejj.gastAnhangUebernahme.v1");
       }
     } catch {}
     if (gueltigerEntwurf(data)) {
