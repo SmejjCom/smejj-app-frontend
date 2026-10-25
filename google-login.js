@@ -112,6 +112,8 @@ async function handleGoogleCredential(response, deps) {
 }
 
 function showSignedIn(user, deps) {
+  const method = String(user.method || "google").toLowerCase();
+  const provider = ({ google: "Google", apple: "Apple", github: "GitHub", email: "E-Mail", passkey: "Passkey" })[method] || "Anmeldung";
   const { $, state, writeOutput, refreshSessionStatus } = deps;
   $("#profileName").value = user.name || "";
   $("#profileEmail").value = user.email || "";
@@ -119,7 +121,7 @@ function showSignedIn(user, deps) {
   $("#googleSignIn").innerHTML = "";
   const button = document.createElement("button");
   button.type = "button";
-  button.textContent = `Google: ${user.email} abmelden`;
+  button.textContent = `${provider}: ${user.email} abmelden`;
   button.addEventListener("click", async () => {
     await postJson(CLIENT_ROUTES.api.authLogout, {});
     try { localStorage.removeItem("smejj.auth.accessToken.v1"); } catch {}
@@ -132,16 +134,16 @@ function showSignedIn(user, deps) {
   $("#googleSignIn").append(button);
   state.session = {
     authenticated: true,
-    mode: "google-session",
+    mode: `${method}-session`,
     userId: user.email ? `user_${user.email.toLowerCase().replace(/[^a-z0-9]+/g, "_")}` : "google_user",
     email: user.email,
-    method: "google",
+    method,
     permanent: true,
     startedAt: new Date().toISOString()
   };
   localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(state.session));
   refreshSessionStatus();
-  writeOutput("#profileOutput", `${t("Google Login aktiv für")} ${user.email}.`);
+  writeOutput("#profileOutput", `${t("Google Login aktiv für").replace(/Google/g, provider)} ${user.email}.`);
 }
 
 function loadGoogleIdentity() {

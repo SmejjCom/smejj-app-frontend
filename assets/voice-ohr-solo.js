@@ -139,7 +139,12 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
         quelle.connect(analyser);
         const daten = new Uint8Array(analyser.fftSize);
         const automat = automatFactory();
-        await ear.start({ stream });
+        const recording = await ear.start({ stream });
+        if (recording?.ok === false) {
+          const error = new Error("Mikrofonaufnahme konnte nicht gestartet werden");
+          error.name = recording.error === "microphone_denied" ? "NotAllowedError" : "NotReadableError";
+          throw error;
+        }
         let sprichtGemeldet = false;
         takt = setInterval(async () => {
           if (!laeuft) return;
@@ -264,8 +269,9 @@ export function verdrahteOhrSolo(host) {
           clearTimeout(wecker);
           if (s.voiceRecognition === recognition) s.voiceRecognition = null;
           try { recognition.abort(); } catch { /* bereits gestoppt */ }
-          try { host.earCancel?.(); } catch { /* Ohr war still */ }
-          return anschluss.aktivieren();
+          const aktiviert = anschluss.aktivieren();
+          if (!aktiviert) { try { host.earCancel?.(); } catch { /* Ohr war still */ } }
+          return aktiviert;
         },
         /** true = Taubheit erkannt und uebernommen — der Host kehrt sofort um. */
         ende() {
