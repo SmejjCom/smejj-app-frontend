@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1033";
+const CACHE_NAME = "smejj-shell-v1034";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -536,6 +536,8 @@ const SHELL = [
 const EINGANG = new URL(self.location.href).searchParams.get("eingang") || "";
 const SCHMAL = EINGANG === "willkommen";
 const WILLKOMMEN_SHELL = [
+  "/assets/composer-entwurf-dateien.js",
+  "/assets/mobil-tastatur.js",
   "/assets/composer-eingabe-host.js",
   "/assets/composer-eingabe.css",
   "/assets/willkommen-composer.js",
@@ -545,10 +547,8 @@ const WILLKOMMEN_SHELL = [
   "/assets/willkommen-sprache.js",
   "/assets/willkommen-fokus.js",
   "/assets/gast-frage.js",
-  "/assets/auth/plan-auswahl.js",
   "/assets/plan-checkout.js",
   "/assets/pwa-schnellstart.js",
-  "/assets/besucher-puls.js",
   "/assets/willkommen-offline.js",
   "/assets/offline-banner.js",
   "/icons/smejj_full_logo_on_dark.svg",
@@ -632,6 +632,15 @@ self.addEventListener("activate", (event) => {
 
 // Precache-Pfade ohne Query — fuer den cache-first-Abgleich (F-24).
 const PRECACHE_PATHS = new Set(INSTALL_LISTE.map((entry) => new URL(entry, "https://smejj.com").pathname));
+// Nur feste oeffentliche Gastmodule, erst nach tatsaechlicher Nutzung ablegen.
+// So bleiben Dateientwuerfe offline lesbar, ohne die volle App vorzuladen.
+const GAST_LAZY_MODULE = new Set([
+  "/assets/composer-bild-anhang.js", "/assets/composer-datei-annahme.js",
+  "/assets/composer-anhang-chips.js", "/assets/components.js",
+  "/assets/chat-markdown.js",
+  "/assets/i18n/ui.js", "/assets/config.js", "/assets/language-options.js",
+  "/assets/besucher-puls.js"
+]);
 
 // Dateien, die sich ohne Deploy aendern: netz-zuerst, Cache nur als Rueckfall.
 // Sie bleiben im Precache (damit sie offline ueberhaupt da sind), werden online
@@ -668,6 +677,18 @@ self.addEventListener("fetch", (event) => {
   // Anfrage zu "ServiceWorker fing die Anfrage ab … unerwarteter Fehler". Ohne
   // respondWith holt der Browser selbst — ein Abbruch ist dann nur ein Abbruch.
   if (url.pathname.startsWith("/api/")) return;
+  if (SCHMAL && url.origin === self.location.origin && request.method === "GET" && GAST_LAZY_MODULE.has(url.pathname)) {
+    event.respondWith(caches.open(AKTIVER_CACHE).then(async cache => {
+      const cached = await cache.match(url.pathname);
+      if (cached) return cached;
+      const response = await fetch(request);
+      if (response.ok && /javascript/.test(response.headers.get("content-type") || "")) {
+        await cache.put(url.pathname, response.clone());
+      }
+      return response;
+    }));
+    return;
+  }
   // MESSDATEN SIND KEINE ASSETS: netz-zuerst, Cache nur als Rueckfall.
   //
   // Befund 2026-08-04: /verlauf-messwerte.json lag cache-first im Precache. Die
