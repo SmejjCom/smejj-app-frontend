@@ -3,30 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-    <!-- Sicherheitsregeln (QA-Welle 1, Befund F-04). GitHub Pages Free kann keine
-         eigenen HTTP-Header setzen, deshalb steht die Content-Security-Policy hier
-         als Meta-Angabe. Die App enthaelt bewusst KEIN Inline-Skript und KEINEN
-         Inline-Style — dadurch kommt sie ohne 'unsafe-inline' fuer Skripte aus.
-         connect-src listet jeden Host, den die App kontaktieren darf: die eigenen
-         Dienste aus assets/config.js und die BYOK-Ziele aus
-         assets/shared/securityPolicy.js. WER DORT EINEN HOST AENDERT, MUSS IHN HIER
-         EINTRAGEN — sonst blockiert der Browser die Verbindung. Der Test
-         tests/csp-hosts.test.mjs erzwingt genau das.
-         UMZUG SALAD -> ZEABUR (Freigabe 2026-07-29): smejj-control.zeabur.app
-         steht hier bereits, wird aber noch NICHT benutzt — config.js zeigt
-         weiter auf Salad. Ein zusaetzlicher connect-src-Eintrag aendert nichts
-         am Verhalten; er trennt nur die riskante Umstellung in zwei kleine
-         Schritte statt eines grossen. Zum Testen vor dem Umschalten:
-         localStorage "smejj.apiOrigin.v1" auf die Zeabur-Adresse setzen.
-         frame-ancestors fehlt absichtlich: In einer Meta-CSP ignorieren Browser die
-         Angabe. Den Klickjacking-Schutz uebernimmt der Rahmenwaechter in app.js. -->
+    <!---->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-src 'self' https://api.smejj.com https://accounts.google.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app; script-src 'self' 'sha256-VlE1d5xGlwIC45bSDwQ4QJLlWTgImI8lmE9DYAk8JMQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.smejj.com; font-src 'self'; media-src 'self' blob: https://api.smejj.com https://s3.us-west-2.idrivee2.com; worker-src 'self' blob:; manifest-src 'self'; connect-src 'self' blob: data: https://api.smejj.com wss://api.smejj.com https://smejj-control.zeabur.app https://smejj-chat-bridge.zeabur.app https://api.openai.com https://api.moonshot.ai https://api.mistral.ai">
-    <!-- Kaltstart (Freigabe 25.08.): Stylesheet sofort anstossen — vorher
-         startete es erst NACH dem Tor-Skript, eine volle Runde spaeter. -->
+    <!---->
     <link rel="preload" href="/assets/start-styles.css?v=tastatur-20261025-9" as="style">
-    <!-- Fruehes Tor (Betreiber-Freigabe 2026-08-23): Anonyme sofort zur Landeseite,
-         statt 3,7 s (Desktop) / 15 s (iPhone) die App-Huelle zu sehen. Kein Modul,
-         kein Import — laeuft vor dem ersten Pixel. Regeln bleiben in auth-gate.js. -->
+    <!---->
     <script>// smejj.com — das fruehe Tor der Startseite (Betreiber-Freigabe 2026-08-23,
 // Nutzerreise USA). GEMESSEN: das volle Gate (auth-gate.js) haengt an
 // profile-dock.js, Modul-Skript 24 von 34 — ein anonymer Besucher sah 3,7 s
@@ -53,9 +34,7 @@
     <meta name="description" content="smejj.com ist ein schneller KI- und Code-Assistent für Chat, Programmierung und Agenten-Aufgaben.">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="smejj.com">
-    <!-- Vollbild oben (V12, 13.09. gemessen): Inhalt unter der Statusleiste, Insets 62/34; der
-         812-pt-Erstzustand zeigt den <html>-Grund (App-Farbe), Ausgleich in mobil-dock.js.
-         Begruendung und Messung: design-v12-vollbild.css. -->
+    <!---->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
@@ -76,14 +55,7 @@
     <meta name="twitter:image" content="https://smejj.com/og-image.png">
     <meta name="twitter:image:alt" content="smejj.com">
     <link rel="canonical" href="https://smejj.com/">
-    <!-- Kein hreflang-Block mehr (QA-Welle 1, Befund F-06). Vorher beanspruchte
-         diese Seite hreflang="de" fuer "/", waehrend alle 15 Sprachseiten dieselbe
-         Sprache fuer "/de/" beanspruchen. Zwei URLs fuer eine Sprache, und "/" kam
-         im Cluster der Sprachseiten selbst nicht vor — eine nicht-wechselseitige
-         Auszeichnung, die Suchmaschinen komplett verwerfen. "/" ist die App-Huelle,
-         keine lokalisierte Inhaltsseite; der Sprach-Cluster gehoert den 15
-         Landingpages, die untereinander bereits vollstaendig wechselseitig sind.
-         Die Sprachen bleiben ueber sitemap.xml auffindbar. -->
+    <!---->
     <title>smejj.com — KI- und Code-Assistent</title>
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/favicon.ico?v=112" sizes="any">
@@ -91,15 +63,9 @@
     <link rel="icon" href="/icons/favicon-32x32.png?v=112" type="image/png" sizes="32x32">
     <link rel="icon" href="/icons/favicon-16x16.png?v=112" type="image/png" sizes="16x16">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
-    <!-- Ein Buendel statt acht Dateien (Freigabe Ladezeit 2026-07-27). Gemessen:
-         die acht Stylesheets starteten alle bei ~822 ms und waren erst bei
-         1452-1531 ms fertig — acht Runden Latenz vor dem ersten Bildaufbau.
-         Erzeugt aus den unveraenderten Quelldateien:
-         node scripts/build/bundle-start-styles.mjs -->
+    <!---->
     <link rel="stylesheet" href="/assets/start-styles.css?v=tastatur-20261025-9">
-    <!-- Strukturierte Daten (QA-Welle 1, Befund F-13). Die 15 Sprachseiten hatten
-         sie bereits, ausgerechnet die Hauptseite nicht. Bewusst ohne FAQPage: Die
-         Fragen stehen auf den Landingpages, nicht hier. -->
+    <!---->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -124,9 +90,7 @@
     </script>
   </head>
   <body data-left-menu-state="closed">
-    <!-- Betreiber 2026-08-16: das LOGO ist der Spur-Schalter, wie bei
-         ChatGPT — Klick oeffnet und schliesst die linke Spur. Das alte
-         Doppel-Logo daneben blendet design-v11.css aus. -->
+    <!---->
     <button id="appMenuButton" class="glass-icon app-menu-button" type="button" aria-label="Spur öffnen oder schließen" aria-expanded="false">
       <img class="menu-logo" src="/icons/smejj_favicon.svg" alt="" aria-hidden="true" width="24" height="24">
     </button>
@@ -134,19 +98,11 @@
       <img class="app-brand-icon" src="/icons/smejj_icon.svg" alt="" aria-hidden="true" width="2000" height="1532">
       <img class="app-brand-wordmark" src="/icons/smejj_full_logo_on_dark.svg" alt="" aria-hidden="true" width="2920" height="660">
     </a>
-    <!-- Betreiber 2026-08-16 (zweite Ansage): rechts oben ein BROWSER-Icon
-         (Globus) — das Profil wohnt unten links in der Spur. Der Knopf
-         oeffnet und schliesst das rechte Fenster. -->
+    <!---->
     <button id="browserButton" class="glass-icon browser-button" type="button" aria-label="Browser-Fenster öffnen oder schließen" aria-expanded="false" title="Browser">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>
     </button>
-    <!-- Freigabe "Maus-Sichtbarkeit" (Wof Kadavanich, 2026-07-28): oeffnet die
-         Maus-Engine-Wiedergabe direkt im rechten Browser-Panel (dieselben
-         Klassen wie #browserButton). .browser-button setzt "right: 0" fest,
-         darum hier ein Inline-style (per CSP style-src 'unsafe-inline'
-         erlaubt, keine gesperrte CSS-Datei angefasst), das den Knopf um
-         Breite+Abstand nach links versetzt — sonst liegt er deckungsgleich
-         auf #browserButton. Logik ausschliesslich in public/maus-panel.js. -->
+    <!---->
     <button id="mausButton" class="glass-icon browser-button" type="button" aria-label="Maus-Wiedergabe öffnen" title="Maus">
       <img src="/icons/maus-cursor.png" alt="" aria-hidden="true" width="20" height="20">
     </button>
@@ -154,15 +110,7 @@
     <main class="shell">
       <aside class="sidebar">
         <nav class="nav" aria-label="Arbeitsbereiche">
-          <!-- Seitenleiste 1:1 nach Mockup V11, Bildschirm 19 ("Alle Bereiche
-               in der Spur — in vier beschrifteten Gruppen"). Der Trick heisst
-               Gruppieren, nicht Verstecken: vier Ueberschriften machen 15
-               Punkte uebersichtlicher als 5 Punkte plus Raetselmenue. Jede
-               Zeile hat Symbol UND Wort. Abweichungen vom Mockup, ehrlich:
-               "Papierkorb" fehlt (die Ansicht existiert noch nicht) — dafuer
-               bleibt "Dateien" erreichbar; "Bilder erstellen" und "Sprechen"
-               springen zum Chat und loesen dort die vorhandene Funktion aus
-               (nav-absichten.js), weil es keine eigenen Ansichten dafuer gibt. -->
+          <!---->
           <div class="nav-gruppe" aria-hidden="true">Reden</div>
           <button class="nav-button is-active" type="button" data-view="start" data-icon="chat" title="Chat">Chat</button>
           <button class="nav-button" type="button" data-view="start" data-icon="mic" data-nav-absicht="sprechen" title="Sprechen">Sprechen</button>
@@ -184,13 +132,7 @@
           <button class="nav-button" type="button" data-view="storageView" data-icon="storage" title="Speicher">Speicher</button>
         </nav>
         <nav class="nav bottom-nav" aria-label="Nutzer und Einstellungen">
-          <!-- Mockup V11, Bildschirm 19, Fusszeile: "Unten steht, was es
-               kostet — zwei Aengste beantwortet, bevor sie entstehen."
-               Bewusste Abweichung vom Mockup-Beispiel "0,00 € · 13 Bilder
-               uebrig": ein Bilder-Kontingent gibt es nicht, und eine
-               erfundene Zahl waere eine Luege. Die Zeile sagt, was wahr ist
-               (der Kostenschutz startet nichts Kostenpflichtiges), und
-               fuehrt zur Kostenansicht mit den echten Zahlen. -->
+          <!---->
           <button class="nav-button nav-kosten" type="button" data-jump="cost" data-icon="cost" title="Kosten">Kostenschutz an</button>
           <div id="profileDock" class="profile-dock">
             <button id="profileDockButton" class="profile-dock-button" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="profileDockMenu" title="Profil" aria-label="Profil">
@@ -203,11 +145,7 @@
                 <strong id="profileDockMenuName">Nutzer</strong>
                 <span id="profileDockMenuEmail" hidden></span>
               </div>
-              <!-- Bildschirm 40: neun Eintraege, drei Gruppen, Wert rechts an der
-                   Zeile. Werte sind ECHT (Plan aus dem Abo-Status, Sprache aus
-                   der Laufzeit) oder entfallen — keine erfundenen Zahlen, keine
-                   Kuerzel, die nicht verdrahtet sind. "Papierkorb" folgt, sobald
-                   die Ansicht existiert. -->
+              <!---->
               <button type="button" role="menuitem" data-dock-action="account" data-dock-reiter="identity">Mein Konto<span class="dock-wert" id="dockWertPlanKurz"></span></button>
               <button type="button" role="menuitem" data-dock-action="settings">Einstellungen</button>
               <button type="button" role="menuitem" data-dock-action="settings">Sprache<span class="dock-wert" id="dockWertSprache"></span></button>
@@ -248,10 +186,7 @@
             <div id="startLog" class="start-log" aria-label="Start Chat" hidden></div>
             <section class="prompt-glass" aria-label="Start Eingabe">
               <textarea id="startMessage" rows="1" aria-label="Startprompt" placeholder="Frag mich alles"></textarea>
-              <!-- Arbeits-Viereck wie im CODE-Bereich (Betreiber 2026-08-18:
-                   "kannst du das fuer den Chat-Bereich auch machen"):
-                   stiller Umriss in Ruhe, cyan waehrend gearbeitet wird.
-                   Gleiches Signal (smejj:chat-strom), gleiche Optik. -->
+              <!---->
               <span id="startArbeit" class="code-arbeit start-arbeit" aria-hidden="true"></span>
               <div class="prompt-actions">
                 <div class="plus-picker">
@@ -259,11 +194,7 @@
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
                   </button>
                   <div id="composerPlusMenu" class="plus-menu plus-menu-werkzeuge" role="menu" hidden>
-                    <!-- Mockup V11, Bildschirm "Alle Werkzeuge auf einmal — in
-                         drei Gruppen": nichts unter "Weitere", alle acht
-                         sichtbar, jede Zeile mit Namen, Erklaersatz und
-                         Beispiel. Man liest die Ueberschrift und weiss, wo man
-                         suchen muss. -->
+                    <!---->
                     <p class="plus-gruppe" role="separator" aria-hidden="true">Sachen hinzufügen</p>
                     <button type="button" role="menuitem" data-composer-action="attach-photo" title="Bild hinzufügen">
                       <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></svg><b>Fotos</b>
@@ -279,7 +210,7 @@
                       <span class="werk-was">PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.</span>
                       <span class="werk-bsp">„Was steht in diesem Vertrag zum Kündigen?"</span>
                     </button>
-                    <!-- Die bisherige Foto-/Videoaufnahme bleibt zusätzlich erhalten. -->
+                    <!---->
                     <button type="button" role="menuitem" data-composer-action="aufnahme">
                       <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h2l2-2h6l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/><path d="M18 3l1 2"/></svg><b>Foto oder Video aufnehmen</b>
                       <span class="werk-was">Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.</span>
@@ -295,7 +226,7 @@
                       <span class="werk-was">smejj sieht die Fehlermeldung, statt sie sich beschreiben zu lassen.</span>
                       <span class="werk-bsp">„Warum geht dieser Knopf nicht?"</span>
                     </button>
-                    <p class="plus-gruppe" role="separator" aria-hidden="true">Sprechen und hören</p><!-- 16.09.2026: Audio und Stimme aus der alten Eingabezeile; composer-tools.js bindet sie per [data-start-tool], "werkzeug" schliesst nur das Menue -->
+                    <p class="plus-gruppe" role="separator" aria-hidden="true">Sprechen und hören</p><!---->
                     <button type="button" role="menuitem" data-start-tool="audio" data-composer-action="werkzeug" aria-label="Audio" title="Audio"><svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4"/><path d="M8 7v10"/><path d="M12 4v16"/><path d="M16 7v10"/><path d="M20 10v4"/></svg><b>Audio</b><span class="werk-was">Gespräch mit smejj — du sprichst, smejj antwortet mit Stimme.</span></button>
                     <button type="button" role="menuitem" data-start-tool="speaker" data-composer-action="werkzeug" aria-label="Stimme" title="Stimme"><svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10H4Z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a8 8 0 0 1 0 11"/></svg><b>Stimme</b><span class="werk-was">Liest die letzte Antwort vor. Nochmal antippen stoppt.</span></button>
                     <p class="plus-gruppe" role="separator" aria-hidden="true">Nachschauen</p>
@@ -347,22 +278,14 @@
                   </div>
                 </div>
                 <button class="ghost-button icon-button" type="button" data-start-tool="voice" aria-label="Mikrofon" title="Diktieren"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0V7a4 4 0 0 0-4-4Z"/><path d="M5 11v1a7 7 0 0 0 14 0v-1"/><path d="M12 19v3"/></svg></button>
-                <!-- 16.09.2026 kompakt: EINE Zeile [+] [Feld] [Modell] [Mikrofon] [Senden]; Uhr-Pille "Nachdenken" raus (Stufe bleibt im Modellmenue), Audio/Stimme im Plus-Menue -->
+                <!---->
                 <button id="startSend" class="send-button icon-button" type="button" aria-label="Senden" title="Senden">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V4"/><path d="M5 11l7-7 7 7"/></svg>
                 </button>
               </div>
             </section>
-            <!-- Bildschirm 32, exakt: drei Vorschlagzeilen, darunter die sieben
-                 Werkzeug-Chips. Die Vorlagen (data-chip) sind dieselben wie
-                 bisher — nur die Aufschriften folgen dem Mockup. "Bild
-                 verstehen" und "Datei" oeffnen zusaetzlich die Dateiwahl,
-                 "Browser" springt in die Browser-Ansicht (data-jump). -->
-            <!-- Betreiber-Entscheide 2026-08-15/16 (Chat): ChatGPT-sauber.
-                 DIREKT unter dem Feld die Werkzeuge — "nur als Icons, alle
-                 eine Zeile" (title + aria-label tragen den Namen, das
-                 Label-Wort blendet design-v11.css aus). Darunter die drei
-                 Vorschlaege als nackter Text, wie beim echten ChatGPT. -->
+            <!---->
+            <!---->
             <div class="start-chips start-chipreihe" aria-label="Werkzeuge">
               <button type="button" data-chip="Recherchiere für mich:" title="Im Netz" aria-label="Im Netz"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg><span class="chip-label">Im Netz</span></button>
               <button type="button" data-chip="Generiere ein Bild von:" title="Bild" aria-label="Bild"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></svg><span class="chip-label">Bild</span></button>
@@ -373,9 +296,7 @@
               <button type="button" data-chip="Erledige mit der Maus im Browser:" title="Maus — arbeitet für dich" aria-label="Maus — arbeitet für dich"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 3 15 7-7 2-2 7z"/></svg><span class="chip-label">Browser</span></button>
               <button type="button" data-composer-action="attach-file" title="Datei" aria-label="Datei"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v5h5"/></svg><span class="chip-label">Datei</span></button>
             </div>
-            <!-- Betreiber 2026-08-16: die drei Textzeilen sind raus — die
-                 Icon-Zeile darueber traegt jetzt alles (ausgeblendet, nicht
-                 geloescht). -->
+            <!---->
             <div class="start-chips start-vorschlaege" aria-label="Vorschläge" hidden>
               <button type="button" data-chip="Generiere ein Bild von:"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></svg><span class="chip-label">Erstelle ein Bild</span></button>
               <button type="button" data-chip="Verbessere diesen Text:"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h10"/><path d="M4 17h13"/></svg><span class="chip-label">Schreiben oder überarbeiten</span></button>
@@ -464,52 +385,27 @@
         </section>
 
         <section id="code" class="view" aria-label="Code-Assistent">
-          <!-- Gibt der Code-Ansicht einen eigenen Tab-Titel (view-title.js liest die erste
-               h1/h2). Visuell versteckt. Befund und Begruendung: docs/qa/befunde-live.md -->
+          <!---->
           <h2 class="visually-hidden">Code</h2>
-          <!-- Code-Bereich 1:1 nach Mockup-Bildschirm 26: persoenliche
-               Begruessung oben, leere Flaeche fuer die Auftraege, unten
-               Projektwahl und Schreibfeld. Die Editor-Werkzeuge von frueher
-               bleiben vollstaendig erhalten — eingeklappt darunter (Rote
-               Liste: keine verifizierte Funktion entfernen). Verdrahtung in
-               code-flaeche.js; ohne das Modul bleibt alles bedienbar. -->
+          <!---->
           <div class="codeflaeche">
-            <!-- Betreiber 2026-08-18: das Code-Zeichen vor dem Gruss ist RAUS —
-                 es deckte das Logo oben links zu. -->
+            <!---->
             <div class="codegruss"><span id="codeGruss">Was steht als Nächstes an?</span></div>
             <div class="codeleer" aria-hidden="true"></div>
-            <!-- Hierher wandert der ECHTE #startLog beim Senden (kein Klon):
-                 der Auftrag streamt auf dieser Seite, wie bei Codex/Claude. -->
+            <!---->
             <div id="codeLogHalter" class="code-log-halter"></div>
             <div class="codeunten">
-              <!-- Betreiber 2026-08-16: KEINE Projekt-Zeile mehr ueber dem
-                   Feld — der Platz gehoert dem Text. Der Projekt-Chip sitzt
-                   jetzt schlank unten in der Leiste (siehe codeleiste). -->
+              <!---->
               <div class="codefeld">
-                <!-- Anhaenge erscheinen als Chips statt als Text im Feld
-                     (Betreiber: "[Bild angehaengt: …] im Feld ist nicht
-                     professionell"). code-flaeche.js zieht Verweis-Zeilen
-                     hierher; beim Senden reisen sie unsichtbar mit. -->
-                <!-- Ordner-Chip wie Claude: nur sichtbar, wenn ein Ordner
-                     verbunden ist (code-flaeche.js zeichneOrdnerChip). -->
+                <!---->
+                <!---->
                 <div id="codeOrdnerZeile" class="code-anhaenge" hidden></div>
                 <div id="codeAnhaenge" class="code-anhaenge" hidden></div>
-                <!-- Arbeits-Viereck wie bei Claude (Betreiber 2026-08-16):
-                     ruhig wenn frei, cyan pulsierend solange smejj arbeitet.
-                     Signal: smejj:chat-strom (code-flaeche.js). -->
+                <!---->
                 <span id="codeArbeit" class="code-arbeit" aria-hidden="true"></span>
                 <textarea id="codeAufgabe" rows="1" placeholder="Beschreibe eine Aufgabe oder stelle eine Frage" aria-label="Code-Auftrag"></textarea>
-                <!-- Betreiber 2026-08-16: das Plus im CODE-Feld oeffnet ein
-                     Menue wie bei Claude (1:1-Optik: Gruppen, Trennlinie,
-                     Kuerzel rechts, Untermenue-Pfeil). Dahinter liegen NUR
-                     echte smejj-Funktionen — Claudes Skills/Konnektoren/
-                     Plugins gibt es hier nicht und stehen darum nicht drin
-                     (Blindgaenger-Verbot). Verdrahtung: code-flaeche.js. -->
-                <!-- Betreiber-Nachtrag (Screenshot des Claude-CODE-Menues):
-                     GENAU diese Punkte — Dateien/Fotos, Ordner hinzufuegen,
-                     Slash-Befehle, Konnektoren. Claudes fuenfter Punkt
-                     "Plugins hinzufuegen…" fehlt BEWUSST: smejj hat kein
-                     Plugin-System, der Knopf wuerde ins Leere fuehren. -->
+                <!---->
+                <!---->
                 <div id="codePlusMenue" class="code-plus-menu" role="menu" aria-label="Hinzufügen" hidden>
                   <button type="button" role="menuitem" data-code-plus="dateien">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.44 11.05 12 20.5a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.74 9.1L9.17 17.67a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
@@ -533,12 +429,7 @@
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22v-3"/><path d="M9 8V5"/><path d="M15 8V5"/><path d="M6 8h12v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4Z"/></svg>
                     <span>Plugins hinzufügen …</span>
                   </button>
-                  <!-- Konnektoren-Untermenue wie Claude (Betreiber-Screenshot
-                       2026-08-16): Zeilen mit Schalter, darunter Verwalten und
-                       Durchsuchen. Unser echter schaltbarer Konnektor ist der
-                       Projekt-Ordner (verbinden/trennen, projekt-ordner.js);
-                       der Schalter zeichnet VIERECKIG (Betreiber-Designgesetz
-                       schlaegt Claudes Pille). -->
+                  <!---->
                   <div id="codeKonnektorenMenue" class="code-plus-menu code-plus-unter" role="menu" aria-label="Konnektoren" hidden>
                     <button type="button" role="menuitemcheckbox" aria-checked="false" data-code-konnektor="ordner">
                       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
@@ -563,10 +454,7 @@
                   <button type="button" class="ghost-button icon-button code-mini" id="codeAnhang" aria-label="Datei anhängen" title="Datei anhängen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
                   <button type="button" class="ghost-button icon-button code-mini" id="codeDiktat" aria-label="Diktieren" title="Diktieren"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></button>
                   <div class="code-rechts">
-                    <!-- Betreiber 2026-08-17: klickbar wie Claudes "Fable 5" —
-                         oeffnet das Modell-Menue (code-modell-menue.js:
-                         unsere Staffel und Auto, seit 2026-09-10 ohne
-                         Fremdkatalog). -->
+                    <!---->
                     <button type="button" class="repochip" id="codeModellAnzeige" title="Modell wählen"><b>Auto</b></button>
                     <span id="codeTiefeAnzeige">Mittel</span>
                     <button type="button" class="send-button icon-button" id="codeSenden" aria-label="Auftrag senden" title="Auftrag senden">
@@ -648,10 +536,7 @@
           <header class="view-header">
             <p class="eyebrow">Meine Sachen</p>
             <h2>Dateien</h2>
-            <!-- Bildschirm 39: die Spalte "Von smejj gelesen" beantwortet
-                 vorab, warum eine Frage zu einer frisch hochgeladenen Datei
-                 manchmal noch nicht funktioniert. Tabelle in
-                 uploads-surface.js, nur echte Werte. -->
+            <!---->
             <p class="subhead">Was du hochgeladen hast — und ob smejj es schon lesen konnte.</p>
           </header>
           <div id="dateiTabelle" class="output" hidden></div>
@@ -724,10 +609,7 @@
           <header class="view-header">
             <p class="eyebrow">Betrieb</p>
             <h2>KI-Modelle &amp; Anbieter</h2>
-            <!-- Bildschirm 56: diese Ansicht ist fuers Betreibercockpit —
-                 hier stehen die echten Modellnamen und Zahlen. Die
-                 Nutzersicht auf dieselbe Sache heisst "smejj schnell/
-                 gruendlich" (Stufen-Chip und Einstellungen). -->
+            <!---->
             <p class="subhead">Standardmäßig ist alles aus. Es wird nie automatisch und nie versteckt etwas benutzt, das Geld kostet.</p>
           </header>
           <div class="panel-grid">
@@ -788,9 +670,7 @@
           <header class="view-header">
             <p class="eyebrow">Betrieb</p>
             <h2>Systemzustand</h2>
-            <!-- Bildschirm 55: "grau heisst nicht rot" — die Lehre aus den 39
-                 grauen Autopiloten, die trotzdem liefen (455 Laeufe am selben
-                 Tag). Grau heisst nur: kein Herzschlag angekommen. -->
+            <!---->
             <p class="subhead">Läuft · gemeldet-aber-still · steht. Grau heißt nur: kein Herzschlag angekommen — nicht, dass etwas kaputt ist.</p>
           </header>
           <div class="toolbar">
@@ -837,10 +717,7 @@
           <div class="toolbar">
             <button type="button" data-jump="cost">Kosten &amp; Limits</button>
             <button type="button" data-jump="profile">Nutzer</button>
-            <!-- Die Gedaechtnis-Ansicht war fertig, verdrahtet und ueber KEINEN
-                 Knopf erreichbar (gemessen 2026-08-15): nur wer /memory in die
-                 Adresszeile tippte, kam hin. Hier statt in die Seitenleiste,
-                 weil die dem Betreiber schon zu lang ist. -->
+            <!---->
             <button type="button" data-jump="memory">Was smejj sich merkt</button>
           </div>
           <p class="legal-links">
@@ -906,10 +783,7 @@
           <header class="view-header">
             <p class="eyebrow">Arbeiten</p>
             <h2>Projekte</h2>
-            <!-- Bildschirm 36: ein Ordner mit eigenem Wissen und eigener
-                 Anweisung. Die Dauer-Anweisung WIRKT: chat-store legt sie beim
-                 Oeffnen eines Bereichs-Gespraechs in den Sitzungsspeicher,
-                 settings-runtime nimmt sie in den Systemprompt. -->
+            <!---->
             <p class="subhead">Alle Gespräche eines Bereichs haben denselben Hintergrund — und eine Dauer-Anweisung, die dort in jedem Gespräch gilt.</p>
           </header>
           <div id="bereicheListe" class="output"></div>
@@ -919,9 +793,7 @@
           <header class="view-header">
             <p class="eyebrow">Meine Sachen</p>
             <h2>Papierkorb</h2>
-            <!-- Bildschirm 48: "30 Tage lang ist nichts verloren." Geloeschte
-                 Gespraeche liegen hier, wiederherstellbar; nach 30 Tagen
-                 raeumt die App von selbst. Logik in papierkorb.js. -->
+            <!---->
             <p class="subhead">Gelöschte Gespräche bleiben hier 30 Tage. Du kannst sie jederzeit zurückholen — erst danach sind sie wirklich weg.</p>
           </header>
           <div id="papierkorbListe" class="output"></div>
@@ -985,16 +857,13 @@
     <script src="/assets/arbeitsflaeche.js?v=5" type="module"></script>
     <script src="/assets/spur-schalter.js?v=10" type="module"></script>
     <script src="/assets/spur-start.js?v=2026102515" type="module"></script>
-    <!-- holt code-flaeche.js (27,1 KB) erst, wenn #code aufgeht — Begruendung im Modul -->
+    <!---->
     <script src="/assets/code-nachladen.js?v=2026102521" type="module"></script>
-    <!-- Peripherie (Fuehrung, Papierkorb, Kamera, @-Erwaehnung, Codeblock-Werkzeuge)
-         laedt erst bei ihrer Handlung — Betreiber-Freigabe 2026-08-24 "Startseite abspecken". -->
+    <!---->
     <script src="/assets/bedarf-nachladen.js?v=2026102515" type="module"></script>
     <script src="/assets/app.js?v=20261025-a11y1032" type="module"></script>
     <script src="/assets/pwa-schnellstart.js?v=2026102520" type="module"></script>
-    <!-- Browser-Panel und Maus-Panel: erst wenn sie gebraucht werden.
-         63,3 KB von 335,6 KB zahlte bisher jeder Seitenaufruf fuer zwei
-         Flaechen, die beim ersten Bildaufbau niemand sieht (browser-nachladen.js). -->
+    <!---->
     <script src="/assets/browser-nachladen.js?v=20261025" type="module"></script>
     <script src="/assets/auth/passkey-ui.js" type="module"></script>
     <script src="/assets/view-chrome.js?v=view-chrome-20260716-3" type="module"></script>
