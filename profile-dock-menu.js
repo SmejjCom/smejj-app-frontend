@@ -10,6 +10,7 @@
 
 import { STORAGE_KEYS } from "./config.js";
 import { t } from "./i18n/ui.js?v=3";
+import { focusMenuEdge, handleMenuKeyboard } from "./profile-menue-tasten.js?v=1";
 
 // Oeffnet/schliesst das Menue und verdrahtet die Aktionen.
 // Input: keiner (arbeitet auf #profileDockButton/#profileDockMenu). Output: void.
@@ -28,12 +29,13 @@ export function initProfileDockMenu() {
   button.addEventListener("click", (event) => {
     event.stopPropagation();
     setOpen(button, menu, menu.hidden);
+    if (!menu.hidden) focusMenuEdge(menu);
   });
   button.addEventListener("keydown", (event) => {
     if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
     event.preventDefault();
     setOpen(button, menu, true);
-    menu.querySelector("[role='menuitem']")?.focus();
+    focusMenuEdge(menu, event.key === "ArrowUp");
   });
   menu.addEventListener("click", (event) => {
     const item = event.target.closest("[data-dock-action]");
@@ -42,10 +44,7 @@ export function initProfileDockMenu() {
     runAction(item.dataset.dockAction, item.dataset.dockReiter);
   });
   menu.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      setOpen(button, menu, false);
-      button.focus();
-    }
+    handleMenuKeyboard(event, menu, button, () => setOpen(button, menu, false));
   });
   document.addEventListener("click", (event) => {
     if (!menu.hidden && !menu.contains(event.target) && event.target !== button) setOpen(button, menu, false);

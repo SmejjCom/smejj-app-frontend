@@ -186,6 +186,7 @@
     }
     /* .held p (0,1,1) schlug die Klassenregel (0,1,0) und nahm der Zeile ihren Abstand —
        im Pixel-7-Emulator (2026-09-07) klebte der Satz am Probier-Feld. */
+    #probierFeld::placeholder { color: var(--ink-dim); opacity: 1; }
     .probier-zeile, .held .probier-zeile { font-size: 14px; color: var(--ink-dim); margin-top: 12px; }
     .held { max-width: 860px; margin: 0 auto; padding: 72px 22px 40px; text-align: center; }
     .held .vertrauen {
@@ -244,6 +245,7 @@
     </div>
   </header>
 
+  <main id="willkommenMain">
   <div class="held">
     <span class="vertrauen">Deine Daten bleiben bei dir</span>
     <h1>Frag alles.<br>Kostenlos.</h1>
@@ -378,6 +380,8 @@
     </div>
     <p class="hinweis">Funktioniert offline: einmal geladen, startet smejj auch ohne Netz — deine Gespräche sind da, sobald du wieder online bist.</p>
   </section>
+
+  </main>
 
   <footer>
     <a href="/impressum.html">Impressum</a>

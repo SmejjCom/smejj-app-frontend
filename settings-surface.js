@@ -157,7 +157,7 @@ function markup() {
   const suche = `<input type="search" id="settingsSuche" class="settings-suche" placeholder="${t("Einstellung suchen…")}" aria-label="${t("Einstellung suchen…")}">`;
   // Betreiber 2026-08-16: keine doppelten Ueberschriften — die kleine Zeile
   // "Einstellungen" stand direkt ueber der grossen "Einstellungen".
-  return `<header class="settings-header"><div><h2>${t("Einstellungen")}</h2><p class="subhead">${t("Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.")}</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">${t("Lokal gespeichert")}</div></header>
+  return `<header class="settings-header"><div><h2 role="heading" aria-level="1">${t("Einstellungen")}</h2><p class="subhead">${t("Passe smejj.com an deine Arbeitsweise an. Änderungen bleiben sicher auf diesem Gerät.")}</p></div><div class="settings-status" id="settingsSaveStatus" role="status" aria-live="polite">${t("Lokal gespeichert")}</div></header>
     <div class="settings-shell"><div class="settings-nav">${suche}<nav class="settings-tabs" role="tablist" aria-label="${t("Einstellungsbereiche")}">${nav}</nav></div><div class="settings-content">
       ${panel("general", "Allgemein", t("Grundlegendes Verhalten der App."), [
         select(t("Sprache"), "settingsLanguage", LANGUAGE_OPTIONS, false),
@@ -223,7 +223,7 @@ function markup() {
 }
 
 function panel(id, title, description, rows) {
-  return `<section id="settings-${id}" class="settings-panel" data-settings-panel="${id}"><header><h3>${t(title)}</h3><p>${t(description)}</p></header><div class="settings-list">${rows.join("")}</div></section>`;
+  return `<section id="settings-${id}" class="settings-panel" data-settings-panel="${id}"><header><h3 role="heading" aria-level="2">${t(title)}</h3><p>${t(description)}</p></header><div class="settings-list">${rows.join("")}</div></section>`;
 }
 
 // translateOptions=false laesst Optionstexte unangetastet (z. B. native Sprachnamen).

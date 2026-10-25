@@ -360,3 +360,21 @@ a:focus-visible {
 .auth-more summary { cursor: pointer; padding: 12px; text-align: center; }
 .auth-more .auth-stack { margin-top: 10px; }
 .auth-verification { margin-top: 16px; font-size: 14px; line-height: 1.6; }
+
+/* smejj.com — A11y 25.10.2026: bestehende Textpalette statt zu schwachem
+   Akzenttext vor dem Verlauf. Position, Groesse und Markenfarben bleiben. */
+.auth-card .auth-subhead { color: var(--auth-ink); }
+@media (prefers-color-scheme: light) {
+  .auth-card .auth-footer a {
+    color: var(--auth-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--auth-accent);
+  }
+}
+
+/* Tastaturfokus: dieselbe vorhandene Textfarbe traegt auch auf hellem Grund. */
+.auth-shell :is(input, button, a, summary):focus-visible,
+.auth-legal a:focus-visible {
+  outline: 2px solid var(--auth-ink);
+  outline-offset: 3px;
+}
