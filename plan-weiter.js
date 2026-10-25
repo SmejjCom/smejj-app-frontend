@@ -3,7 +3,7 @@ import {API_ORIGIN} from './config.js';
 import {capturePlan, checkoutTarget, forgetPlan, planStorage} from './auth/plan-auswahl.js?v=20261025';
 const storage = planStorage(window);
 const plan = capturePlan(location.search, storage);
-const status = document.querySelector('#authStatus');
+const status = document.querySelector('#authStatus, #profileOutput');
 for (const selector of ['#authProviders', '#emailFormGroup', '#signedInBox']) document.querySelector(selector)?.setAttribute('hidden', '');
 const retry = document.createElement('button');
 retry.type = 'button'; retry.className = 'auth-button secondary'; retry.textContent = 'Erneut versuchen';
