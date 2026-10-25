@@ -155,6 +155,7 @@ export function bindPlusMenu({ getInput, notifyInputChanged }) {
     const action = item.dataset.composerAction;
     if (action === "attach-file") $("#composerFileInput")?.click();
     if (action === "attach-photo") $("#composerPhotoInput")?.click();
+    if (action === "attach-camera") $("#composerCameraInput")?.click();
     // "Foto oder Video aufnehmen" (Betreiber 2026-08-16): der capture-Input
     // oeffnet am Handy/Tablet direkt die Kamera, am Rechner die Dateiwahl —
     // derselbe Weg wie bei ChatGPT und Gemini.

@@ -19,7 +19,7 @@ export function bindBildAnhang(selector, getInput, notifyInputChanged) {
   zielFeld = getInput; meldeFeld = notifyInputChanged;
   const fileInput = document.querySelector(selector);
   if (!fileInput) return;
-  for (const ziel of [fileInput, document.querySelector("#composerFileInput"), document.querySelector("#composerCaptureInput")].filter(Boolean)) {
+  for (const ziel of [fileInput, document.querySelector("#composerFileInput"), document.querySelector("#composerCaptureInput"), document.querySelector("#composerCameraInput")].filter(Boolean)) {
     if (gebunden.has(ziel)) continue;
     gebunden.add(ziel);
     const fileInput = ziel;

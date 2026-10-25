@@ -76,7 +76,6 @@
        Registriert den schmalen Service Worker (~19 KB statt 2 MB) und zeigt
        das Offline-Band der App nach einer echten Netzprobe. -->
   <script src="/assets/willkommen-offline.js?v=2" type="module"></script>
-  <link rel="stylesheet" href="/assets/composer-eingabe.css">
   <script type="module" src="/assets/willkommen-composer.js?v=2026102519"></script>
   <style>
     /* Apple 3.1.1: alles mit data-nur-web verschwindet in der iOS-Huelle
@@ -227,6 +226,7 @@
     }
     footer a { text-decoration: none; }
   </style>
+  <link id="composerEingabeStil" rel="stylesheet" href="/assets/composer-eingabe.css">
 </head>
 <body>
   <header class="leiste">
@@ -266,7 +266,7 @@
       <div id="gastDateiMenu" class="composer-picker-menu" hidden>
         <button type="button" data-picker="gastFotos">Fotos</button><button type="button" data-picker="gastKamera">Kamera</button><button type="button" data-picker="gastDateien">Dateien</button>
       </div>
-      <input id="gastFotos" type="file" accept="image/*,.heic,.heif" multiple hidden>
+      <input id="gastFotos" type="file" accept="image/*" multiple hidden>
       <input id="gastKamera" type="file" accept="image/*" capture="environment" hidden>
       <input id="gastDateien" type="file" multiple hidden>
       <button id="gastDiktat" type="button" aria-label="Diktieren" aria-pressed="false">Diktieren</button>

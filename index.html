@@ -265,29 +265,28 @@
                          Beispiel. Man liest die Ueberschrift und weiss, wo man
                          suchen muss. -->
                     <p class="plus-gruppe" role="separator" aria-hidden="true">Sachen hinzufügen</p>
-                    <button type="button" role="menuitem" data-composer-action="attach-file">
-                      <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v5h5"/></svg><b>Datei hinzufügen</b>
-                      <span class="werk-was">PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.</span>
-                      <span class="werk-bsp">„Was steht in diesem Vertrag zum Kündigen?"</span>
-                    </button>
-                    <button type="button" role="menuitem" data-composer-action="attach-photo">
-                      <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></svg><b>Bild hinzufügen</b>
+                    <button type="button" role="menuitem" data-composer-action="attach-photo" title="Bild hinzufügen">
+                      <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></svg><b>Fotos</b>
                       <span class="werk-was">Foto oder Bildschirmfoto. smejj sagt dir, was darauf zu sehen ist.</span>
                       <span class="werk-bsp">„Was bedeutet diese Fehlermeldung?"</span>
                     </button>
-                    <!-- Betreiber 2026-08-16: "Foto oder Video machen und direkt
-                         hochladen, wie ChatGPT/Gemini" — der capture-Input
-                         oeffnet am Handy/Tablet direkt die Kamera-App, am
-                         Rechner die Aufnahme-/Dateiwahl. Fotos gehen durch den
-                         vorhandenen Bild-Verstehen-Weg; bei Videos sagt die
-                         App EHRLICH, dass Video-Verstehen noch fehlt. -->
+                    <button type="button" role="menuitem" data-composer-action="attach-camera">
+                      <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h2l2-2h6l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/></svg><b>Kamera</b>
+                      <span class="werk-was">Ein Foto aufnehmen und als Anhang hinzufügen.</span>
+                    </button>
+                    <button type="button" role="menuitem" data-composer-action="attach-file" title="Datei hinzufügen">
+                      <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v5h5"/></svg><b>Dateien</b>
+                      <span class="werk-was">PDF, Word, Tabelle oder Text. smejj liest sie und du fragst dazu.</span>
+                      <span class="werk-bsp">„Was steht in diesem Vertrag zum Kündigen?"</span>
+                    </button>
+                    <!-- Die bisherige Foto-/Videoaufnahme bleibt zusätzlich erhalten. -->
                     <button type="button" role="menuitem" data-composer-action="aufnahme">
                       <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h2l2-2h6l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/><path d="M18 3l1 2"/></svg><b>Foto oder Video aufnehmen</b>
                       <span class="werk-was">Öffnet direkt die Kamera — am Handy, Tablet oder Rechner — und hängt die Aufnahme an.</span>
                       <span class="werk-bsp">Aufnehmen, fertig — smejj schaut es sich an.</span>
                     </button>
                     <button type="button" role="menuitem" data-kamera-start="kamera">
-                      <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h2l2-2h6l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/></svg><b>Kamera</b>
+                      <svg class="werk-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h2l2-2h6l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/></svg><b>Live-Kamera</b>
                       <span class="werk-was">smejj sieht, was deine Kamera sieht — ein Bild je Aufnahme, keine Daueraufnahme.</span>
                       <span class="werk-bsp">„Was ist das für ein Bauteil?"</span>
                     </button>
@@ -328,8 +327,9 @@
                       <span class="werk-was">Für größere Arbeiten. Läuft weiter, auch wenn du das Fenster schließt.</span>
                       <span class="werk-bsp">„Beobachte diesen Preis und sag mir, wenn er fällt."</span>
                     </button>
-                    <input id="composerFileInput" class="visually-hidden-input" type="file" multiple aria-hidden="true" tabindex="-1">
+                    <input id="composerFileInput" class="visually-hidden-input" type="file" accept="application/*,text/*,image/*,audio/*,video/*,.pdf,.docx,.txt" multiple aria-hidden="true" tabindex="-1">
                     <input id="composerPhotoInput" class="visually-hidden-input" type="file" accept="image/*" multiple aria-hidden="true" tabindex="-1">
+                    <input id="composerCameraInput" class="visually-hidden-input" type="file" accept="image/*" capture="environment" aria-hidden="true" tabindex="-1">
                     <input id="composerCaptureInput" class="visually-hidden-input" type="file" accept="image/*,video/*" capture="environment" aria-hidden="true" tabindex="-1">
                   </div>
                 </div>
@@ -986,11 +986,11 @@
     <script src="/assets/spur-schalter.js?v=10" type="module"></script>
     <script src="/assets/spur-start.js?v=2026102515" type="module"></script>
     <!-- holt code-flaeche.js (27,1 KB) erst, wenn #code aufgeht — Begruendung im Modul -->
-    <script src="/assets/code-nachladen.js?v=2026102520" type="module"></script>
+    <script src="/assets/code-nachladen.js?v=2026102521" type="module"></script>
     <!-- Peripherie (Fuehrung, Papierkorb, Kamera, @-Erwaehnung, Codeblock-Werkzeuge)
          laedt erst bei ihrer Handlung — Betreiber-Freigabe 2026-08-24 "Startseite abspecken". -->
     <script src="/assets/bedarf-nachladen.js?v=2026102515" type="module"></script>
-    <script src="/assets/app.js?v=2026102520" type="module"></script>
+    <script src="/assets/app.js?v=2026102521" type="module"></script>
     <script src="/assets/pwa-schnellstart.js?v=2026102520" type="module"></script>
     <!-- Browser-Panel und Maus-Panel: erst wenn sie gebraucht werden.
          63,3 KB von 335,6 KB zahlte bisher jeder Seitenaufruf fuer zwei
