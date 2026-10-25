@@ -1,0 +1,27 @@
+/* smejj.com — funktionale Anhang-, Ablage- und Diktat-Zustaende. */
+#composerDropZone { position:fixed; inset:12px; z-index:9999; display:grid; place-items:center; border:3px dashed currentColor; border-radius:20px; background:var(--glas-2, #172325); color:var(--ink, #fff); font:600 22px system-ui; pointer-events:none; }
+#composerDropZone[hidden] { display:none; }
+.probier { flex-wrap:wrap; border-radius:24px !important; }
+.probier textarea { flex:1 1 60%; width:100%; min-width:0; min-height:44px; max-height:230px; resize:none; overflow-y:auto; background:none; border:0; outline:none; color:var(--ink); font:inherit; line-height:1.45; }
+.probier #anhangChipRow { flex-basis:100%; width:100%; display:flex; flex-wrap:wrap; gap:8px; }
+.probier .anhang-chip { display:flex; align-items:center; gap:8px; max-width:100%; padding:8px; border:1px solid currentColor; border-radius:12px; text-align:left; }
+.probier .anhang-chip-vorschau img { width:56px; height:56px; object-fit:cover; border-radius:8px; }
+.probier .anhang-chip-text { display:grid; min-width:0; overflow-wrap:anywhere; }
+.probier .anhang-chip-unter { font-size:12px; opacity:.8; }
+.probier button { min-width:40px; min-height:40px; }
+.probier .composer-picker-menu { display:flex; gap:8px; flex-wrap:wrap; flex-basis:100%; }
+.probier .composer-picker-menu[hidden] { display:none; }
+#gastAnhangHinweis { flex-basis:100%; text-align:left; font-size:14px; }
+.dictation-controls { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:8px; flex-basis:100%; }
+.dictation-controls button { min-height:40px; cursor:pointer; }
+.dictation-wave { display:flex; align-items:center; gap:3px; height:28px; }
+.dictation-wave i { background:currentColor; width:3px; height:8px; animation:dictation-pulse .6s alternate infinite; }
+.dictation-wave i:nth-child(2n) { animation-delay:.2s; } .dictation-wave i:nth-child(3n) { animation-delay:.4s; }
+@keyframes dictation-pulse { to { height:26px; } }
+@media(prefers-reduced-motion:reduce) { .dictation-wave i { animation:none; height:18px; } }
+
+#composerUpdateHinweis { position:fixed; top:12px; left:12px; right:12px; z-index:9998; padding:12px; background:var(--glas-2, #172325); color:var(--ink,#fff); border:1px solid currentColor; border-radius:12px; }
+
+.dictation-wave[hidden] { display:none; }
+
+.dictation-controls button, .probier button:not(.los) { background:transparent; color:inherit; border:1px solid currentColor; border-radius:10px; padding:6px 10px; font:inherit; }

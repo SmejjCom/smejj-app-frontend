@@ -135,16 +135,29 @@ if (willNeu || willSprechen) {
 // gerade eine Antwort laeuft oder Text im Eingabefeld steht — dann greift
 // der Reload einfach beim naechsten App-Start.
 if ("serviceWorker" in navigator) {
-  let schonNeuGeladen = false;
-  // E21 (14.09.): Erstbesuch nicht neu laden (alles frisch), nur bei Worker-Wechsel.
+  let schonNeuGeladen = false, aufnahme = false;
   const hatteSteuerung = Boolean(navigator.serviceWorker.controller);
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
+  window.addEventListener("smejj:diktat-status", e => { aufnahme = Boolean(e.detail?.active); });
+  const aktualisieren = async () => {
+    if (aufnahme || document.body?.classList?.contains("task-indicator-active")) return false;
+    const files = window.smejjAnhangChips?.anhangListe?.().length;
+    if (files && !window.smejjSichereDateiEntwurf) return false;
+    if (window.smejjSichereDateiEntwurf && await window.smejjSichereDateiEntwurf() === false) return false;
+    schonNeuGeladen = true; location.reload(); return true;
+  };
+  navigator.serviceWorker.addEventListener("controllerchange", async () => {
     if (schonNeuGeladen || !navigator.serviceWorker.controller || !hatteSteuerung) return;
-    const antwortLaeuft = document.body?.classList?.contains("task-indicator-active");
-    const feld = document.querySelector("#startMessage, .prompt-glass textarea");
-    const tipptGerade = Boolean(feld && feld.value && feld.value.trim());
-    if (antwortLaeuft || tipptGerade) return; // naechster Start uebernimmt
-    schonNeuGeladen = true;
-    location.reload();
+    const entwurf = Array.from(document.querySelectorAll("#startMessage, #codeAufgabe, #probierFeld")).some(f => f.value?.trim()) || window.smejjAnhangChips?.anhangListe?.().length;
+    if (!entwurf && !aufnahme && !document.body?.classList?.contains("task-indicator-active")) { await aktualisieren(); return; }
+    if (document.getElementById("composerUpdateHinweis")) return;
+    const box = document.createElement("div"); box.id = "composerUpdateHinweis"; box.setAttribute("role", "status");
+    box.append(document.createTextNode("Neue Version verfügbar. Dein Entwurf bleibt auf diesem Gerät. "));
+    const button = document.createElement("button"); button.type = "button"; button.textContent = "Jetzt aktualisieren";
+    button.addEventListener("click", async () => { if (!await aktualisieren()) button.textContent = "Aufnahme/Antwort beenden oder Entwurf sichern"; });
+    box.append(button); document.body.append(box);
   });
+  const pruefeUpdate = () => { if (!document.hidden) navigator.serviceWorker.getRegistration().then(r => r?.update()).catch(() => {}); };
+  document.addEventListener("visibilitychange", pruefeUpdate);
+  window.addEventListener("pageshow", pruefeUpdate);
+  pruefeUpdate();
 }

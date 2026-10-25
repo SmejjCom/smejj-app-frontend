@@ -37,3 +37,5 @@ export function bindBildAnhang(selector, getInput, notifyInputChanged) {
   if (fileInput.files?.length) fileInput.dispatchEvent(new Event("change"));
 }
 if (typeof document !== "undefined") bindBildAnhang("#composerPhotoInput", () => document.querySelector("#code.view.is-active #codeAufgabe") || document.querySelector("#startMessage"), input => input.dispatchEvent(new Event("input", { bubbles: true })));
+// Auch Ziehen ausserhalb der Textarea und Wiederherstellung nach Neuladen.
+if (typeof document !== "undefined") void import("./composer-eingabe-host.js").then(m => m.initEingabeHost());

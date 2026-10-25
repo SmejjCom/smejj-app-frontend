@@ -190,7 +190,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1027";
+const CACHE_NAME = "smejj-shell-v1028";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -308,6 +308,11 @@ const SHELL = [
   "/assets/composer-anhang-chips.js",
   "/assets/composer-bild-anhang.js",
   "/assets/composer-datei-annahme.js",
+  "/assets/composer-eingabe-host.js",
+  "/assets/composer-entwurf-dateien.js",
+  "/assets/composer-diktat-leiste.js",
+  "/assets/composer-eingabe.css",
+  "/assets/willkommen-composer.js",
   "/assets/voice-typed-send.js",
   "/assets/voice-overlay-ui.js",
   "/assets/voice-browser-tts.js",
@@ -530,6 +535,10 @@ const SHELL = [
 const EINGANG = new URL(self.location.href).searchParams.get("eingang") || "";
 const SCHMAL = EINGANG === "willkommen";
 const WILLKOMMEN_SHELL = [
+  "/assets/composer-eingabe-host.js",
+  "/assets/composer-eingabe.css",
+  "/assets/willkommen-composer.js",
+
   "/willkommen.html",
   "/assets/ios-preise-aus.js",
   "/assets/willkommen-sprache.js",

@@ -2,7 +2,7 @@
 // Das bestehende API-Feld bildDataUrl bleibt erhalten. Mehrere Bilder werden
 // nummeriert zu einer Bildtafel zusammengefuegt, statt weitere Bilder zu verlieren.
 import { showToast } from "./components.js?v=2026102515";
-import { uebernehmeAnhang, aktualisiereAnhang, anhangListe, versandListe, leereVersand, dateiArt } from "./composer-anhang-chips.js?v=2026102516";
+import { uebernehmeAnhang, aktualisiereAnhang, anhangListe, versandListe, leereVersand, dateiArt } from "./composer-anhang-chips.js?v=2026102517";
 
 const MAX_DATA_URL_ZEICHEN = 600 * 1024;
 const MAX_BILD_BYTES = 20 * 1024 * 1024;
@@ -71,12 +71,20 @@ export async function uebernehmeBildDatei(file, input, notifyInputChanged) {
   const retry = () => uebernehmeBildDatei(file, input, notifyInputChanged);
   aktualisiereAnhang(a.id, { status: "loading", statusText: "Bild wird gelesen …", retry });
   try {
-    const image = await ladeBild(await leseDatei(file));
+    let image;
+    try { image = await ladeBild(await leseDatei(file)); }
+    catch (error) {
+      if (!/\.hei[cf]$/i.test(file.name || "") && !/image\/hei[cf]/i.test(file.type || "")) throw error;
+      aktualisiereAnhang(a.id, { statusText: "HEIC wird auf diesem Gerät in JPEG umgewandelt …" });
+      const { heicTo } = await import("./vendor/heic-to/heic-to.js");
+      const jpeg = await heicTo({ blob: file, type: "image/jpeg", quality: 0.85 });
+      image = await ladeBild(await leseDatei(jpeg));
+    }
     if (!image.naturalWidth || !image.naturalHeight || image.naturalWidth * image.naturalHeight > 80_000_000) throw new Error("Bild hat zu viele Bildpunkte (maximal 80 Millionen).");
     // Testet bereits vor dem Senden, ob Canvas und Request-Grenze passen.
     const vorschau = bildTafel([{ name: a.name, image }]);
     const kompakt = await ladeBild(vorschau.bildDataUrl);
-    return aktualisiereAnhang(a.id, { image: kompakt, status: "ready", statusText: "Bereit · lokal auf diesem Gerät" });
+    return aktualisiereAnhang(a.id, { image: kompakt, url: vorschau.bildDataUrl, status: "ready", statusText: "Bereit · lokal auf diesem Gerät" });
   } catch (error) {
     aktualisiereAnhang(a.id, { status: "error", statusText: error.message });
     showToast(error.message, "warn");

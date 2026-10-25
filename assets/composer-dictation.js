@@ -31,6 +31,7 @@
 //   (3) Jeder (Neu-)Start bekommt eine FRISCHE Instanz; jeder Handler prueft,
 //       ob er noch zur aktuellen Instanz gehoert. Spaete finale Ergebnisse
 //       nach dem Stopp-Klick werden noch geschrieben (stop() statt abort()).
+import { diktatLeiste } from "./composer-diktat-leiste.js";
 import { t } from "./i18n/ui.js?v=3";
 
 export function createDictation({ getInput, notifyInputChanged, showToast, RecognitionCtor, lang, speechSupported, setVisual, onBeforeToggle, serverOhr = null, warte = (fn, ms) => setTimeout(fn, ms), uhr = () => Date.now() }) {
@@ -39,6 +40,25 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
   let sitzung = null;
   let letzte = null; // die zuletzt beendete Sitzung (ihre Instanz darf noch nachliefern)
   let zaehler = 0;
+  let leiste = () => {};
+  const visual = active => {
+    setVisual?.(active); leiste(active);
+    try { window.dispatchEvent(new CustomEvent("smejj:diktat-status", { detail: { active } })); } catch {}
+  };
+  function discard() {
+    const s = sitzung || letzte;
+    if (s) {
+      s.verworfen = true;
+      if (s.input?.value === s.letzterText) { s.input.value = s.original; notifyInputChanged(s.input); }
+    }
+    stop();
+    try { serverOhr?.cancel(); } catch {}
+    leiste("close");
+  }
+  function accept() { stop(); leiste("close"); }
+  function zusammensetzen(s, gesprochen, interim = false) {
+    return `${s.prefix}${gesprochen}${s.suffix ? (gesprochen && !/\s$/.test(gesprochen) && !/^\s/.test(s.suffix) ? " " : "") + s.suffix : (interim ? "" : " ")}`.trimStart();
+  }
   // Sicherheitsnetz gegen eine heisse Schleife: stirbt die Erkennung fuenfmal
   // hintereinander sofort (unter 300 ms, kein Ergebnis), gibt das Geraet sie
   // nicht her — dann endet die Sitzung sauber, das Ohr liefert den Text.
@@ -55,8 +75,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       if (sitzung === s) stop();
       return;
     }
-    const text = `${s.prefix}${s.finals}${s.instFinals}${interim}`;
-    input.value = text.replace(/\s+$/, interim ? "" : " ").trimStart();
+    input.value = zusammensetzen(s, `${s.finals}${s.instFinals}${interim}`.replace(/\s+$/, ""), Boolean(interim));
     s.letzterText = input.value;
     notifyInputChanged(input);
   }
@@ -73,7 +92,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       return;
     }
     if (s.input.value !== s.letzterText) return;
-    s.input.value = `${s.prefix}${s.finals}${text} `.trimStart();
+    s.input.value = zusammensetzen(s, `${s.finals}${text}`);
     s.letzterText = s.input.value;
     notifyInputChanged(s.input);
   }
@@ -193,11 +212,12 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     s.aktiv = false;
     sitzung = null;
     letzte = s;
-    setVisual?.(false);
+    visual(false);
     // stop() statt abort(): das letzte gesprochene Stueck kommt noch als
     // finales Ergebnis an und wird geschrieben (Handler pruefen die Instanz).
     beendeErkennung(s);
     if (!serverOhr) return;
+    if (s.verworfen) { try { serverOhr.cancel(); } catch {} return; }
     const beendeOhr = () => {
       // Nachgelieferte Web-Speech-Ergebnisse waehrend der Startfreigabe
       // zaehlen mit; nur ohne Browsertext wird Audio transkribiert.
@@ -236,10 +256,12 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       nr: zaehler,
       input,
       letzterText: input.value,
+      original: input.value,
+      suffix: Number.isInteger(input.selectionStart) ? input.value.slice(input.selectionEnd) : "",
       verworfen: false,
       aktiv: true,
       rec: null,
-      prefix: input.value ? `${input.value.replace(/\s+$/, "")} ` : "",
+      prefix: Number.isInteger(input.selectionStart) ? input.value.slice(0, input.selectionStart) : (input.value ? `${input.value.replace(/\s+$/, "")} ` : ""),
       finals: "",
       instFinals: "",
       interim: "",
@@ -249,10 +271,12 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       gestartetUm: 0
     };
     sitzung = s;
-    setVisual?.(true);
+    leiste("close");
+    leiste = diktatLeiste(input, { stop, accept, discard });
+    visual(true);
     const gescheitert = result => {
       if (sitzung !== s || !s.nurOhr || result?.ok !== false) return;
-      s.aktiv = false; sitzung = null; setVisual?.(false);
+      s.aktiv = false; sitzung = null; visual(false);
       serverOhr.cancel();
       showToast(t(result.error === "microphone_denied" ? "Mikrofon nicht freigegeben" : "Mikrofon konnte nicht gestartet werden."), "warn");
     };
@@ -291,6 +315,8 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
   return {
     toggle,
     stop,
+    accept,
+    discard,
     isActive: () => Boolean(sitzung)
   };
 }

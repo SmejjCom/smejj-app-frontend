@@ -46,7 +46,17 @@ const SCHWELLE = 8000;
 const chips = [];
 let chipSeq = 0;
 const pasteGebunden = new WeakSet();
-if (typeof window !== "undefined") window.smejjTextAnhaenge = { hat: () => chips.length > 0 };
+if (typeof window !== "undefined") window.smejjTextAnhaenge = {
+  hat: () => chips.length > 0,
+  liste: () => chips.map(({ name, text }) => ({ name, text })),
+  wiederherstellen: (liste, input) => {
+    for (const item of liste || []) {
+      if (typeof item.text !== "string" || chips.some(c => c.name === item.name && c.text === item.text)) continue;
+      chips.push({ id: ++chipSeq, name: item.name, text: item.text });
+    }
+    if (chips.length) { renderChips(input); notifyInputChanged(input); }
+  }
+};
 
 function formatZeichen(anzahl) {
   return anzahl.toLocaleString("de-DE");

@@ -37,7 +37,7 @@ import { createThinkingCue } from "./voice-thinking-cue.js";
 import { createPremiumVoice } from "./voice-premium-tts.js?v=sprachwelle-20260927";
 import { CLIENT_ROUTES } from "./config.js";
 // Plus-Menue (Anhaenge) — ausgelagert, Verhalten unveraendert.
-import { bindPlusMenu } from "./composer-plus-menu.js?v=2026102516";
+import { bindPlusMenu } from "./composer-plus-menu.js?v=2026102517";
 // Mikrofon-Diktat — ausgelagert (800-Zeilen-Regel), Verhalten unveraendert.
 import { createDictation } from "./composer-dictation.js";
 import { t, savedUiLanguage } from "./i18n/ui.js?v=3"; // Sprachmodus-Texte + gespeicherte Sprache (Geraetetest 22.09.2026)

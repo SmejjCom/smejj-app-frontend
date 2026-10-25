@@ -120,6 +120,9 @@ function zeichne(input, notify) {
     weg.title = "Entfernen";
     weg.textContent = "×";
     weg.addEventListener("click", () => { entferne(a.id); zeichne(input, notify); notify?.(input); meldeAnhangWechsel(); input.focus(); });
+    if (a.status === "queued" || a.status === "loading") {
+      const progress = document.createElement("progress"); progress.setAttribute("aria-label", "Datei wird verarbeitet"); text.append(progress);
+    }
     chip.append(vorschau, text, weg);
     row.append(chip);
   }
@@ -217,5 +220,5 @@ export function meldeAnhangWechsel() {
 }
 
 if (typeof window !== "undefined") {
-  window.smejjAnhangChips = { nimmVerweise, hatAnhaenge, meldeAnhangWechsel, anhangListe, anhangNichtBereit, versandLaeuft, zeigeAnhaenge, beendeAnhangVersand };
+  window.smejjAnhangChips = { versandListe, nimmVerweise, hatAnhaenge, meldeAnhangWechsel, anhangListe, anhangNichtBereit, versandLaeuft, zeigeAnhaenge, beendeAnhangVersand };
 }

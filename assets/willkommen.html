@@ -28,7 +28,7 @@
   <meta name="twitter:title" content="smejj.com — Frag alles. Kostenlos.">
   <meta name="twitter:description" content="smejj.com — Schreiben, recherchieren, Bilder und Videos erstellen, programmieren. In einem Fenster, kostenlos starten, deine Daten bleiben bei dir.">
   <meta name="twitter:image" content="https://smejj.com/og-image.png">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.smejj.com">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; worker-src 'self' blob:; font-src 'self'; connect-src 'self' https://api.smejj.com">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="theme-color" content="#070b11">
   <!-- Als App installierbar — MIT durchsichtiger Statusleiste (Betreiber-Befund 18.09.2026).
@@ -66,7 +66,7 @@
        index.html (gleiche Marke, eine Instanz). Als Web-App oeffnet "/" abgemeldet
        diese Seite; die Tastatur des Probier-Felds loest denselben WebKit-Fehler aus
        (Layout-Viewport bleibt klein, schwarzer Balken unten). -->
-  <script src="/assets/pwa-schnellstart.js?v=2026102515" type="module"></script>
+  <script src="/assets/pwa-schnellstart.js?v=2026102517" type="module"></script>
   <!-- Besucher-Puls (Autopilot Nr. 81): EINE Strichliste je Sitzung, ohne Cookie
        und ohne Kennung. Ohne diese Zahl ist "es kommt niemand" nicht von
        "niemand kann melden" zu unterscheiden. -->
@@ -76,6 +76,8 @@
        Registriert den schmalen Service Worker (~19 KB statt 2 MB) und zeigt
        das Offline-Band der App nach einer echten Netzprobe. -->
   <script src="/assets/willkommen-offline.js?v=2" type="module"></script>
+  <link rel="stylesheet" href="/assets/composer-eingabe.css">
+  <script type="module" src="/assets/willkommen-composer.js"></script>
   <style>
     /* Apple 3.1.1: alles mit data-nur-web verschwindet in der iOS-Huelle
        (ios-preise-aus.js setzt das Attribut am <html>). */
@@ -138,7 +140,7 @@
     @media (max-width: 640px) {
       /* Anfänger-Handy: alle Ziele der Probier-Zeile mindestens 44 px (UI/UX-Programm 02.09.) */
       .probier { padding: 8px 10px; }
-      .probier input { min-height: 44px; }
+      .probier textarea { min-height: 44px; }
       .probier button.los { width: 44px; height: 44px; } /* spezifischer als die 38-px-Regel weiter unten */
       .leiste nav a, .fuss a, .fuss-links a, footer a { min-height: 44px; display: inline-flex; align-items: center; }
       .schwerpunkte a, .karten a { min-height: 44px; display: inline-flex; align-items: center; }
@@ -170,7 +172,7 @@
       padding: 10px 14px; border-radius: 999px; background: var(--glas-2);
       box-shadow: inset 0 1px 0 var(--licht);
     }
-    .probier input {
+    .probier textarea {
       flex: 1; min-width: 0; background: none; border: 0; outline: none;
       color: var(--ink); font: inherit; font-size: 16.5px;
     }
@@ -259,7 +261,16 @@
          Adresszeile landen. willkommen-fokus.js legt sie in sessionStorage,
          die App holt sie nach der Anmeldung ins Schreibfeld. -->
     <form class="probier" id="probierForm" action="/auth/register/" method="get">
-      <input id="probierFeld" placeholder="Frag mich alles" autocomplete="off">
+      <textarea id="probierFeld" rows="1" aria-label="Frag mich alles" placeholder="Frag mich alles" autocomplete="off"></textarea>
+      <button id="gastPlus" type="button" aria-label="Bilder und Dateien hinzufügen" aria-expanded="false" aria-controls="gastDateiMenu">＋</button>
+      <div id="gastDateiMenu" class="composer-picker-menu" hidden>
+        <button type="button" data-picker="gastFotos">Fotos</button><button type="button" data-picker="gastKamera">Kamera</button><button type="button" data-picker="gastDateien">Dateien</button>
+      </div>
+      <input id="gastFotos" type="file" accept="image/*,.heic,.heif" multiple hidden>
+      <input id="gastKamera" type="file" accept="image/*" capture="environment" hidden>
+      <input id="gastDateien" type="file" multiple hidden>
+      <button id="gastDiktat" type="button" aria-label="Diktieren" aria-pressed="false">Diktieren</button>
+      <span id="gastDiktatStatus" role="status"></span>
       <span class="chip">Nachdenken</span>
       <button class="los" type="submit" aria-label="Frage stellen">↑</button>
     </form>

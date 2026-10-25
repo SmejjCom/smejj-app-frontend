@@ -1,0 +1,9 @@
+heic-to 1.6.6, CSP distribution with a packaging-only split of its worker string, LGPL-3.0-or-later.
+Source and replacement/rebuild instructions: https://github.com/hoppergee/heic-to
+Exact source package: https://registry.npmjs.org/heic-to/-/heic-to-1.6.6.tgz
+Includes libheif/libde265; see upstream source package and LICENSE.txt.
+Registry integrity: sha512-PYpOtPFEzgPxIoGF4LQ+oBD8o/tMvcFDNynrNzK1fLXfE6mTe2W+AHOvBKc5MwnVak4/Pnb51g9CJAtWL5YGWA==
+This optional decoder is hosted locally, loaded only for HEIC unsupported by the browser.
+No external runtime request, no initial-page or service-worker precache download.
+
+Packaging modification by smejj.com, 2026-10-25: the single worker string is split into ES modules to respect the existing per-file size limit. Decoded string equality verified; decoder logic unchanged. Source package and registry integrity above identify the exact original.
