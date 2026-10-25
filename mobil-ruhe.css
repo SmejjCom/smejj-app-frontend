@@ -7,7 +7,7 @@
     --ruhe-text:#f1f3f5;
     --ruhe-neben:#b8bec6;
     --ruhe-kante:#464c54;
-    --ruhe-schrift:19px;
+    --ruhe-schrift:21px;
     background:var(--ruhe-grund)!important;
   }
   body[data-mobile-theme="light"] {
@@ -17,8 +17,8 @@
     --ruhe-neben:#555d66;
     --ruhe-kante:#c6cbd1;
   }
-  body[data-mobile-font="small"] { --ruhe-schrift:18px; }
-  body[data-mobile-font="large"] { --ruhe-schrift:23px; }
+  body[data-mobile-font="small"] { --ruhe-schrift:19px; }
+  body[data-mobile-font="large"] { --ruhe-schrift:24px; }
   body[data-mobile-theme]::before,
   body[data-mobile-theme]::after {
     background:none!important;
@@ -114,6 +114,16 @@
     line-height:1.5!important;
   }
   body[data-mobile-theme] #start #startLog {
+    /* Neue Nachrichten sofort sichtbar, auch bei vergroesserter Schrift. */
+    scroll-behavior:auto!important;
+    font-size:var(--ruhe-schrift)!important;
+    line-height:1.6!important;
+  }
+  html body[data-mobile-theme] #start.view .prompt-glass.prompt-glass.prompt-glass #startMessage {
+    font-size:var(--ruhe-schrift)!important;
+  }
+  /* Auch rohe Streaming-Texte und Nutzerfragen tragen eigene entry-Regeln. */
+  html body[data-mobile-theme] #start #startLog .entry {
     font-size:var(--ruhe-schrift)!important;
     line-height:1.6!important;
   }

@@ -34,7 +34,7 @@ export function initMobileReading(win = window, doc = document) {
       if (!doc.getElementById("mobil-ruhe-stil")) {
         const sheet = doc.createElement("link");
         sheet.id = "mobil-ruhe-stil"; sheet.rel = "stylesheet";
-        sheet.href = "/assets/mobil-ruhe.css?v=20261024-7";
+        sheet.href = "/assets/mobil-ruhe.css?v=20261025-schrift-1";
         doc.head.append(sheet);
       }
       const theme = mobileTheme(settings, system.matches);
@@ -53,10 +53,11 @@ export function initMobileReading(win = window, doc = document) {
       if (!original.has(note)) original.set(note, note.textContent);
       note.textContent = mobile.matches ? t("Größe, Farbschema, Dichte") : original.get(note);
     }
-    const normal = doc.querySelector('#settingsFontSize option[value="small"]');
-    if (normal) {
-      if (!original.has(normal)) original.set(normal, normal.textContent);
-      normal.textContent = mobile.matches ? original.get(normal).replace("16 px", "18 px") : original.get(normal);
+    for (const [value, size] of [["small", "19"], ["medium", "21"], ["large", "24"]]) {
+      const option = doc.querySelector(`#settingsFontSize option[value="${value}"]`);
+      if (!option) continue;
+      if (!original.has(option)) original.set(option, option.textContent);
+      option.textContent = mobile.matches ? original.get(option).replace(/\d+ px/, `${size} px`) : original.get(option);
     }
     const select = doc.getElementById("settingsTheme");
     select?.querySelectorAll('option[value="light"],option[value="system"]').forEach(option => {

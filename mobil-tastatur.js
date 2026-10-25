@@ -80,5 +80,5 @@ export function initChatViewport(win = window, doc = document) {
 
 if (typeof document !== "undefined" && document.getElementById("start")) {
   initChatViewport();
-  if (window.matchMedia(HANDY_QUERY).matches) import("/assets/mobil-ruhe.js?v=20261024-7").catch(() => {});
+  if (window.matchMedia(HANDY_QUERY).matches) import("/assets/mobil-ruhe.js?v=schrift20261025").catch(() => {});
 }
