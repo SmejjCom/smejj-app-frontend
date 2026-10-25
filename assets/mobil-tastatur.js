@@ -22,8 +22,8 @@ export function initChatViewport(win = window, doc = document) {
     frame = 0;
     const active = mobile.matches && start.classList.contains("is-active");
     const size = sichtbarerChat(vv, win.innerHeight);
-    if (active && vv?.height < 72 && doc.activeElement?.id === "startMessage")
-      import("./mobil-tastatur-platz.js?v=2").then(m => m.pruefePlatz(win, doc));
+    if (active && (vv?.height < 72 || (win.innerHeight > 600 && win.innerWidth < win.innerHeight && vv?.height < 220)) && doc.activeElement?.id === "startMessage")
+      import("./mobil-tastatur-platz.js?v=3").then(m => m.pruefePlatz(win, doc));
     if (active && size) {
       if (width !== win.innerWidth) { width = win.innerWidth; normalHeight = 0; }
       normalHeight = Math.max(normalHeight, size.height);
@@ -37,26 +37,36 @@ export function initChatViewport(win = window, doc = document) {
     root.classList.toggle("chat-wenig-hoehe", active && Boolean(size && size.height < 220));
   };
   const schedule = () => { if (!frame) frame = win.requestAnimationFrame(update); };
+  // WebKit: nach der Animation auch ohne letztes resize erneut messen.
+  let timer = 0;
+  const settle = () => {
+    schedule();
+    win.clearTimeout(timer);
+    timer = win.setTimeout(schedule, 600);
+  };
   const observer = new win.MutationObserver(schedule);
   observer.observe(start, { attributes: true, attributeFilter: ["class"] });
-  vv?.addEventListener("resize", schedule);
+  vv?.addEventListener("resize", settle);
   vv?.addEventListener("scroll", schedule);
-  win.addEventListener("resize", schedule);
+  win.addEventListener("resize", settle);
+  win.addEventListener("orientationchange", settle);
   win.addEventListener("pageshow", schedule);
   mobile.addEventListener("change", schedule);
-  doc.addEventListener("focusin", schedule);
-  doc.addEventListener("focusout", schedule);
+  doc.addEventListener("focusin", settle);
+  doc.addEventListener("focusout", settle);
   update();
   return () => {
     observer.disconnect();
+    win.clearTimeout(timer);
     if (frame) win.cancelAnimationFrame(frame);
-    vv?.removeEventListener("resize", schedule);
+    vv?.removeEventListener("resize", settle);
     vv?.removeEventListener("scroll", schedule);
-    win.removeEventListener("resize", schedule);
+    win.removeEventListener("resize", settle);
+    win.removeEventListener("orientationchange", settle);
     win.removeEventListener("pageshow", schedule);
     mobile.removeEventListener("change", schedule);
-    doc.removeEventListener("focusin", schedule);
-    doc.removeEventListener("focusout", schedule);
+    doc.removeEventListener("focusin", settle);
+    doc.removeEventListener("focusout", settle);
     root.classList.remove("mobil-chat-viewport");
     root.classList.remove("chat-wenig-hoehe");
     root.style.removeProperty("--chat-sichtbar-hoehe");

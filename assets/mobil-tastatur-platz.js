@@ -8,8 +8,9 @@ export function pruefePlatz(win, doc) {
     pending.delete(doc);
     const input = doc.activeElement;
     const height = win.visualViewport?.height;
+    const portrait = win.innerHeight > 600 && win.innerWidth < win.innerHeight;
     if (input?.id !== "startMessage" || !doc.getElementById("start")?.classList.contains("is-active") ||
-        !Number.isFinite(height) || height >= 72 || win.visualViewport.scale > 1.02) return;
+        !Number.isFinite(height) || height >= (portrait ? 220 : 72) || win.visualViewport.scale > 1.02) return;
     // Safari-Leisten und Systemtastatur lassen sich von einer Website nicht
     // verkleinern. Fokus loesen, Text bewahren, bedienbare Seite wiederherstellen.
     input.blur();
@@ -21,7 +22,9 @@ export function pruefePlatz(win, doc) {
       note.setAttribute("role", "status");
       doc.getElementById("start").append(note);
     }
-    note.textContent = "Zu wenig Platz zum Tippen. Bitte ins Hochformat drehen oder die Browserleisten ausblenden.";
+    note.textContent = portrait
+      ? "Die Tastaturansicht wurde zurückgesetzt. Tippe zum Weiterschreiben erneut ins Textfeld."
+      : "Zu wenig Platz zum Tippen. Bitte ins Hochformat drehen oder die Browserleisten ausblenden.";
     note.hidden = false;
     const hide = () => { note.hidden = true; doc.removeEventListener("focusin", hide); win.removeEventListener("orientationchange", hide); };
     doc.addEventListener("focusin", hide);
