@@ -4,8 +4,8 @@
 // Code zeilengleich uebernommen, kein Verhaltenswechsel; die Abhaengigkeiten
 // kommen ausdruecklich als `deps` herein.
 
-import { STORAGE_KEYS } from "./config.js";
-import { t } from "./i18n/ui.js?v=3";
+import { STORAGE_KEYS } from "./config.js?v=2026102537";
+import { t } from "./i18n/ui.js?v=2026102537";
 
 export function bindLocalWorkspace(deps) {
   const { $, state, workspace, showToast, writeOutput, setText, renderEmptyState } = deps;

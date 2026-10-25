@@ -29,16 +29,22 @@ export function bereiteApiVerbindungVor(doc, navigator = globalThis.navigator) {
   if (!doc?.head || navigator?.onLine === false || navigator?.connection?.saveData) return false;
   for (const origin of API_VERBINDUNGEN) {
     if (doc.getElementById('probierForm') && origin !== API_VERBINDUNGEN[0]) continue;
-    const vorhanden = [...doc.head.querySelectorAll('link[rel~="preconnect"]')]
-      .some(link => link.href.replace(/\/$/, '') === origin && link.crossOrigin === 'anonymous');
-    if (vorhanden) continue;
-    const link = doc.createElement('link'); link.rel = 'preconnect';
-    link.href = origin; link.crossOrigin = 'anonymous'; doc.head.append(link);
+    // Der Chat nutzt Sitzungscookies, öffentliche Lesepfade nicht. Browser
+    // verwalten dafür getrennte Verbindungspools; beide bleiben reine Hinweise.
+    for (const modus of origin === API_VERBINDUNGEN[0] ? ['anonymous','use-credentials'] : ['anonymous']) {
+      const vorhanden = [...doc.head.querySelectorAll('link[rel~="preconnect"]')]
+        .some(link => link.href.replace(/\/$/, '') === origin && link.crossOrigin === modus);
+      if (vorhanden) continue;
+      const link = doc.createElement('link'); link.rel = 'preconnect';
+      link.href = origin; link.crossOrigin = modus; doc.head.append(link);
+    }
   }
   return true;
 }
 export function initEingabeVerhalten(doc = globalThis.document) {
-  if (!doc || started) return; started = true;
+  const win = doc?.defaultView || globalThis.window;
+  if (!doc || started || win?.smejjEingabeVerhaltenBereit) return;
+  started = true; if (win) win.smejjEingabeVerhaltenBereit = true;
   // Erst echte Schreibabsicht bereitet DNS/TCP/TLS vor. Kein API-Aufruf,
   // keine Verbindung beim bloßen Seitenaufruf, Autofokus oder Wiederherstellen.
   const vorbereiten = event => {
@@ -85,9 +91,4 @@ export function initEingabeVerhalten(doc = globalThis.document) {
   globalThis.visualViewport?.addEventListener('resize', () => {
     clearTimeout(resizeTimer); resizeTimer = setTimeout(() => showField(doc.activeElement), 75);
   });
-}
-
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => initEingabeVerhalten(), {once:true});
-  else initEingabeVerhalten();
 }

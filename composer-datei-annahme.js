@@ -1,8 +1,8 @@
 // smejj.com — gemeinsamer Bildweg fuer Auswahl, Kamera, Einfuegen und Drop.
 // Das bestehende API-Feld bildDataUrl bleibt erhalten. Mehrere Bilder werden
 // nummeriert zu einer Bildtafel zusammengefuegt, statt weitere Bilder zu verlieren.
-import { showToast as zeigeToast } from "./components.js?v=2026102515";
-import { uebernehmeAnhang, aktualisiereAnhang, anhangListe, versandListe, leereVersand, dateiArt } from "./composer-anhang-chips.js?v=2026102520";
+import { showToast as zeigeToast } from "./components.js?v=2026102537";
+import { uebernehmeAnhang, aktualisiereAnhang, anhangListe, versandListe, leereVersand, dateiArt } from "./composer-anhang-chips.js?v=2026102537";
 
 function meldeDateiHinweis(text, tone = "warn") {
   if (text) zeigeToast(text, tone);
@@ -93,7 +93,7 @@ export async function uebernehmeBildDatei(file, input, notifyInputChanged) {
     catch (error) {
       if (!/\.hei[cf]$/i.test(file.name || "") && !/image\/hei[cf]/i.test(file.type || "")) throw error;
       aktualisiereAnhang(a.id, { statusText: "HEIC wird auf diesem Gerät in JPEG umgewandelt …" });
-      const { heicTo } = await import("./vendor/heic-to/heic-to.js");
+      const { heicTo } = await import("./vendor/heic-to/heic-to.js?v=2026102537");
       const jpeg = await heicTo({ blob: file, type: "image/jpeg", quality: 0.85 });
       image = await ladeBild(await leseDatei(jpeg));
     }
@@ -144,18 +144,18 @@ async function liesDatei(file, input, notify) {
       text = await file.text();
       if (text.includes("\u0000")) throw new Error("Datei enthält binäre Daten statt Text.");
     } else if (dateiArt(file) === "pdf") {
-      const { liesPdfText } = await import("./anhang-pdf-text.js?v=3");
+      const { liesPdfText } = await import("./anhang-pdf-text.js?v=2026102537");
       const r = await liesPdfText(file);
       if (!r.ok) throw new Error("PDF nicht lesbar oder ohne Textebene. Bitte ein lesbares Dokument auswählen.");
       text = r.text;
     } else if (/\.(docx|xlsx|pptx)$/i.test(file.name || "")) {
-      const { liesOfficeText } = await import("./anhang-office-text.js?v=2026102516");
+      const { liesOfficeText } = await import("./anhang-office-text.js?v=2026102537");
       const r = await liesOfficeText(file);
       if (!r.ok) throw new Error("Dokument konnte nicht gelesen werden.");
       text = r.text;
     } else if (/^(audio|video)\//.test(file.type || "")) {
-      const { transkribiereTonspur } = await import("./anhang-tonspur.js?v=1");
-      const { CLIENT_ROUTES } = await import("./config.js");
+      const { transkribiereTonspur } = await import("./anhang-tonspur.js?v=2026102537");
+      const { CLIENT_ROUTES } = await import("./config.js?v=2026102537");
       const r = await transkribiereTonspur(file, { url: CLIENT_ROUTES.api.voiceTranscribe, aufFortschritt: (f, g) => aktualisiereAnhang(a.id, { statusText: `Tonspur ${f}/${g} …` }) });
       if (!r.ok) throw new Error("Tonspur nicht lesbar. Bitte erneut versuchen oder Anhang entfernen.");
       text = r.text;

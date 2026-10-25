@@ -6,7 +6,7 @@
 // der Oberflaechensprache — die englische App zeigte beim Warten den deutschen
 // Platzhalter. Eigenes kleines Modul statt 14 Sprachdateien, weil deren Marken
 // an i18n/ui.js und damit an ueber 50 Modulen haengen.
-import { savedUiLanguage } from "./i18n/ui.js?v=3";
+import { savedUiLanguage } from "./i18n/ui.js?v=2026102537";
 
 // Rueckfrage-Karte (Befund 28.09.2026, A-bis-Z Android): die erste Option trug
 // fest "(Empfehlung)" — auch in der englischen App.

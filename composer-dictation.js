@@ -31,9 +31,9 @@
 //   (3) Jeder (Neu-)Start bekommt eine FRISCHE Instanz; jeder Handler prueft,
 //       ob er noch zur aktuellen Instanz gehoert. Spaete finale Ergebnisse
 //       nach dem Stopp-Klick werden noch geschrieben (stop() statt abort()).
-import { diktatLeiste } from "./composer-diktat-leiste.js?v=2026102522";
-import { t } from "./i18n/ui.js?v=3";
-import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js";
+import { diktatLeiste } from "./composer-diktat-leiste.js?v=2026102537";
+import { t } from "./i18n/ui.js?v=2026102537";
+import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026102537";
 
 export function createDictation({ getInput, notifyInputChanged, showToast, RecognitionCtor, lang, speechSupported, setVisual, onBeforeToggle, serverOhr = null, warte = (fn, ms) => setTimeout(fn, ms), uhr = () => Date.now(), limitTimer = (fn, ms) => setTimeout(fn, ms) }) {
   // Eine Sitzung = vom Klick "Start" bis zum Klick "Stopp". Sie kann viele

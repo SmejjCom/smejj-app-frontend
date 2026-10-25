@@ -1,8 +1,8 @@
 // smejj.com — Passkey-UI-Verdrahtung (Single Responsibility: Buttons im Konto-View).
 // Bewusst als eigenes Modul, damit app.js unveraendert bleibt (Ratchet-Baseline).
 // Bindet "Passkey einrichten" und "Mit Passkey anmelden" an public/auth/passkey.js.
-import { hasPlatformAuthenticator, isPasskeySupported, loginWithPasskey, registerPasskey } from "./passkey.js";
-import { API_ORIGIN } from "../config.js";
+import { hasPlatformAuthenticator, isPasskeySupported, loginWithPasskey, registerPasskey } from "./passkey.js?v=2026102537";
+import { API_ORIGIN } from "../config.js?v=2026102537";
 
 const SESSION_KEY = "smejj.session.v1";
 const API_TOKEN_KEY = "smejj.apiToken.v1";

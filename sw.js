@@ -190,7 +190,8 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1036";
+const CACHE_NAME = "smejj-shell-v1037";
+const ASSET_BUILD = "2026102537";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -683,11 +684,19 @@ self.addEventListener("fetch", (event) => {
   // Anfrage zu "ServiceWorker fing die Anfrage ab … unerwarteter Fehler". Ohne
   // respondWith holt der Browser selbst — ein Abbruch ist dann nur ein Abbruch.
   if (url.pathname.startsWith("/api/")) return;
+  // Ein noch aktiver Worker darf eine neue Build-URL nicht mit seinem alten
+  // Pfad-Cache beantworten. Der Abruf muss auch den normalen HTTP-Cache umgehen.
+  const requestedBuild = url.searchParams.get("v") || "";
+  if (url.origin === self.location.origin && /\.m?js$/.test(url.pathname)
+      && /^\d{10}$/.test(requestedBuild) && requestedBuild !== ASSET_BUILD) {
+    event.respondWith(fetch(request, { cache: "reload" }));
+    return;
+  }
   if (SCHMAL && url.origin === self.location.origin && request.method === "GET" && GAST_LAZY_MODULE.has(url.pathname)) {
     event.respondWith(caches.open(AKTIVER_CACHE).then(async cache => {
       const cached = await cache.match(url.pathname);
       if (cached) return cached;
-      const response = await fetch(request);
+      const response = await fetch(request, { cache: "reload" });
       if (response.ok && /javascript/.test(response.headers.get("content-type") || "")) {
         await cache.put(url.pathname, response.clone());
       }
@@ -725,7 +734,7 @@ self.addEventListener("fetch", (event) => {
   // MUSS die Version oben hochzaehlen, sonst sehen Bestandsnutzer den alten Stand.
   if (url.origin === self.location.origin && !isHtmlRequest(request, url) && PRECACHE_PATHS.has(url.pathname)) {
     event.respondWith(
-      caches.match(request, { ignoreSearch: true }).then((cached) => cached || fetch(request))
+      caches.open(AKTIVER_CACHE).then(cache => cache.match(url.pathname)).then((cached) => cached || fetch(request))
     );
     return;
   }

@@ -4,7 +4,7 @@
 // Links nur http(s) — die Shell laeuft sandboxed ohne allow-same-origin.
 
 // Oberflaechentexte ueber die Sprachdateien (Stufe 3, 20.09.2026).
-import { t } from "./i18n/ui.js?v=3";
+import { t } from "./i18n/ui.js?v=2026102537";
 export function buildExternalFallbackHtml({ url, title, message }) {
   const safeUrl = escapeHtml(url || "");
   const safeTitle = escapeHtml(title || "Echter Browser erforderlich");
