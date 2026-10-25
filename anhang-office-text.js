@@ -25,35 +25,76 @@ export function zipEintraege(bytes) {
   }
   if (eocd < 0) throw new Error("kein ZIP (Endsignatur fehlt)");
   const anzahl = u16(v, eocd + 10);
+  if (anzahl > 4096) throw new Error("zu viele ZIP-Eintraege");
   let pos = u32(v, eocd + 16);
   const aus = new Map();
+  let gesamtBytes = 0;
   for (let n = 0; n < anzahl; n++) {
     if (u32(v, pos) !== 0x02014b50) break;
+    if (u16(v, pos + 8) & 1) throw new Error("verschluesselter ZIP-Eintrag");
     const methode = u16(v, pos + 10);
+    const pruefsumme = u32(v, pos + 16);
     const komprimiert = u32(v, pos + 20);
     const groesse = u32(v, pos + 24);
+    gesamtBytes += groesse;
+    if (gesamtBytes > MAX_BYTES) throw new Error("entpacktes Dokument zu gross");
     const nameLaenge = u16(v, pos + 28), extraLaenge = u16(v, pos + 30), kommentarLaenge = u16(v, pos + 32);
     const lokalOffset = u32(v, pos + 42);
     const name = dec.decode(bytes.subarray(pos + 46, pos + 46 + nameLaenge));
-    aus.set(name, { methode, komprimiert, groesse, lokalOffset });
+    aus.set(name, { methode, komprimiert, groesse, lokalOffset, pruefsumme });
     pos += 46 + nameLaenge + extraLaenge + kommentarLaenge;
   }
   return aus;
 }
 
-/** Einen Eintrag entpacken -> Uint8Array. */
+const CRC_TABELLE = Uint32Array.from({ length: 256 }, (_, n) => {
+  for (let k = 0; k < 8; k++) n = n & 1 ? 0xedb88320 ^ (n >>> 1) : n >>> 1;
+  return n >>> 0;
+});
+function pruefeCrc(bytes, eintrag) {
+  if (eintrag.pruefsumme === undefined) return;
+  let crc = 0xffffffff;
+  for (const b of bytes) crc = CRC_TABELLE[(crc ^ b) & 255] ^ (crc >>> 8);
+  if (((crc ^ 0xffffffff) >>> 0) !== eintrag.pruefsumme) throw new Error("ZIP-Pruefsumme ungueltig");
+}
+
+/** Einen Eintrag entpacken -> Uint8Array, begrenzt und mit Integritaetspruefung. */
 export async function zipEntpacke(bytes, eintrag) {
+  const MAX_ENTPACKT = 8 * 1024 * 1024;
+  if (!eintrag || eintrag.groesse > MAX_ENTPACKT || eintrag.komprimiert > MAX_BYTES) throw new Error("ZIP-Eintrag zu gross");
   const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const p = eintrag.lokalOffset;
   if (u32(v, p) !== 0x04034b50) throw new Error("lokale Kopfzeile fehlt");
   const nameLaenge = u16(v, p + 26), extraLaenge = u16(v, p + 28);
   const start = p + 30 + nameLaenge + extraLaenge;
   const daten = bytes.subarray(start, start + eintrag.komprimiert);
-  if (eintrag.methode === 0) return daten;
+  if (start + eintrag.komprimiert > bytes.length || daten.length > MAX_ENTPACKT) throw new Error("ZIP-Eintrag ungueltig");
+  if (eintrag.methode === 0) {
+    if (daten.length !== eintrag.groesse) throw new Error("ZIP-Groesse ungueltig");
+    pruefeCrc(daten, eintrag);
+    return daten;
+  }
   if (eintrag.methode !== 8) throw new Error(`ZIP-Methode ${eintrag.methode} nicht unterstuetzt`);
   if (typeof DecompressionStream !== "function") throw new Error("DecompressionStream fehlt");
   const strom = new Blob([daten]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
-  return new Uint8Array(await new Response(strom).arrayBuffer());
+  const reader = strom.getReader();
+  const teile = [];
+  let laenge = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      laenge += value.byteLength;
+      if (laenge > MAX_ENTPACKT || laenge > eintrag.groesse) throw new Error("ZIP-Eintrag zu gross");
+      teile.push(value);
+    }
+    if (laenge !== eintrag.groesse) throw new Error("ZIP-Groesse ungueltig");
+  } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+  const aus = new Uint8Array(laenge);
+  let offset = 0;
+  for (const teil of teile) { aus.set(teil, offset); offset += teil.byteLength; }
+  pruefeCrc(aus, eintrag);
+  return aus;
 }
 
 // ---------------------------------------------------------------------- XML --

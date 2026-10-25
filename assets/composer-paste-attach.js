@@ -8,7 +8,14 @@ import { showToast } from "./components.js?v=2026102515";
 // Bild-Einfuegen (2026-08-14): der Betreiber fuegte einen Screenshot per
 // Cmd+V ein und nichts passierte — dieser Handler kannte nur Text. Bilder
 // laufen jetzt ueber DENSELBEN Weg wie der Datei-Waehler (eine Quelle).
-import { uebernehmeBildDatei } from "./composer-bild-anhang.js";
+import { uebernehmeDateiAuswahl, dateiAuswahlLaeuft } from "./composer-bild-anhang.js";
+// Der Anhangbestand ist erst nach der ersten Auswahl geladen.
+const bestand = () => typeof window !== "undefined" ? window.smejjAnhangChips : null;
+const anhangNichtBereit = () => bestand()?.anhangNichtBereit?.() || false;
+const versandLaeuft = () => bestand()?.versandLaeuft?.() || false;
+const zeigeAnhaenge = input => bestand()?.zeigeAnhaenge?.(input);
+const beendeAnhangVersand = ok => bestand()?.beendeAnhangVersand?.(ok);
+const meldeAnhangWechsel = () => { try { window.dispatchEvent(new CustomEvent("smejj:anhang-geaendert")); } catch {} };
 
 /**
  * Bilddateien aus einer Zwischenablage. Pur und testbar: macOS liefert den
@@ -38,6 +45,8 @@ const SCHWELLE = 8000;
 
 const chips = [];
 let chipSeq = 0;
+const pasteGebunden = new WeakSet();
+if (typeof window !== "undefined") window.smejjTextAnhaenge = { hat: () => chips.length > 0 };
 
 function formatZeichen(anzahl) {
   return anzahl.toLocaleString("de-DE");
@@ -56,6 +65,7 @@ function ensureRow(input) {
     row.setAttribute("aria-label", "Eingefügte Texte");
     input.parentElement.insertBefore(row, input);
   }
+  if (row.parentElement !== input.parentElement) input.parentElement.insertBefore(row, input);
   return row;
 }
 
@@ -65,6 +75,7 @@ function removeChip(id) {
 }
 
 function renderChips(input) {
+  meldeAnhangWechsel();
   const row = ensureRow(input);
   row.replaceChildren();
   if (chips.length === 0) {
@@ -111,16 +122,64 @@ function renderChips(input) {
   }
 }
 
+let guardGebunden = false;
+let textVersand = null;
+function bindeAnhangSchutz() {
+  if (guardGebunden) return;
+  guardGebunden = true;
+  const blockiere = event => {
+    const sendet = event.type === "click" && event.target.closest?.("#startSend, #codeSenden")
+      || event.type === "keydown" && event.key === "Enter" && !event.shiftKey && ["startMessage", "codeAufgabe"].includes(event.target.id);
+    if (!sendet || !anhangNichtBereit() && !versandLaeuft() && !dateiAuswahlLaeuft()) return;
+    event.preventDefault(); event.stopImmediatePropagation();
+    showToast("Anhänge werden noch gelesen oder benötigen eine Korrektur. Bitte warten, erneut versuchen oder entfernen.", "warn");
+  };
+  window.addEventListener("smejj:task-status", event => {
+    const status = event.detail?.status;
+    if (status !== "done" && status !== "idle") return;
+    beendeAnhangVersand(status === "done");
+    if (textVersand && status === "idle") {
+      chips.unshift(...textVersand.chips);
+      const input = textVersand.input || document.getElementById("startMessage");
+      if (input) {
+        if (!input.value) input.value = textVersand.typed;
+        renderChips(input); notifyInputChanged(input);
+      }
+    }
+    textVersand = null;
+  });
+  document.addEventListener("click", blockiere, true);
+  document.addEventListener("keydown", blockiere, true);
+  document.addEventListener("focusin", event => {
+    if (["startMessage", "codeAufgabe"].includes(event.target.id)) {
+      zeigeAnhaenge(event.target);
+      bindPasteAttach({ getInput: () => event.target });
+      if (chips.length) renderChips(event.target);
+    }
+  });
+}
+
 export function bindPasteAttach({ getInput }) {
+  bindeAnhangSchutz();
   const input = getInput();
-  if (!input) return;
+  if (!input || pasteGebunden.has(input)) return;
+  pasteGebunden.add(input);
+  input.addEventListener("dragover", event => {
+    if (Array.from(event.dataTransfer?.types || []).includes("Files")) event.preventDefault();
+  });
+  input.addEventListener("drop", event => {
+    const files = Array.from(event.dataTransfer?.files || []);
+    if (!files.length) return;
+    event.preventDefault();
+    void uebernehmeDateiAuswahl(files, input, notifyInputChanged);
+  });
   input.addEventListener("paste", (event) => {
     // Bilder ZUERST: ein eingefuegter Screenshot traegt oft auch einen
     // Text-Teil (Dateiname) — der darf den Bild-Weg nicht verdecken.
     const bilder = bildDateienAusClipboard(event.clipboardData);
     if (bilder.length) {
       event.preventDefault();
-      void uebernehmeBildDatei(bilder[0], input, notifyInputChanged, { herkunft: "Einfuegen" });
+      void uebernehmeDateiAuswahl(bilder, input, notifyInputChanged);
       return;
     }
     const text = event.clipboardData?.getData("text/plain") || "";
@@ -159,6 +218,8 @@ export function uebernehmeTextAnhang(name, text, input) {
 // Beim Senden: getippte Aufgabe und Chip-Inhalte zu EINEM Text verbinden.
 // Die Chips gelten danach als verschickt und verschwinden.
 export function composePastedTask(typed) {
+  if (anhangNichtBereit() || versandLaeuft() || dateiAuswahlLaeuft()) return "";
+  textVersand = { typed, chips: [...chips], input: document.querySelector("#code.view.is-active #codeAufgabe") || document.getElementById("startMessage") };
   // Anhang-Chips (Video, PDF, weitere Bilder) liefern ihre Verweise mit (2026-09-03).
   const verweise = (typeof window !== "undefined" && window.smejjAnhangChips?.nimmVerweise?.()) || [];
   if (chips.length === 0) return verweise.length ? [typed, ...verweise].filter(Boolean).join("\n") : typed;

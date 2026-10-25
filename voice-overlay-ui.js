@@ -100,7 +100,7 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
   eingabe?.addEventListener("paste", async (event) => {
     try {
       const [{ bildDateienAusClipboard }, { uebernehmeBildDatei }] = await Promise.all([
-        import("./composer-paste-attach.js?v=2026102515"),
+        import("./composer-paste-attach.js?v=2026102516"),
         import("./composer-bild-anhang.js")
       ]);
       const bilder = bildDateienAusClipboard(event.clipboardData);

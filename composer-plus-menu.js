@@ -6,8 +6,8 @@
 import { showToast } from "./components.js?v=2026102515";
 import { t } from "./i18n/ui.js?v=3";
 import { bindBildAnhang, uebernehmeBildDatei } from "./composer-bild-anhang.js";
-import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=2026102515";
-import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=3";
+import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=2026102516";
+import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=2026102516";
 
 // Was als Text mitgeht: Textarten und die ueblichen Quell-/Daten-Endungen,
 // hoechstens 200 KB — mehr traegt keine Frage sinnvoll (Server kuerzt ohnehin).
@@ -92,7 +92,7 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
       // INHALT; alte Binaerformate (.doc/.xls/.ppt) bleiben Verweis-Chip.
       if (input.id === "startMessage" && /\.(docx|xlsx|pptx)$/i.test(file.name || "")) {
         try {
-          const { liesOfficeText } = await import("./anhang-office-text.js?v=1");
+          const { liesOfficeText } = await import("./anhang-office-text.js?v=2026102516");
           const r = await liesOfficeText(file);
           if (r.ok && uebernehmeTextAnhang(file.name, r.text, input)) { showToast(`Dokument gelesen: ${file.name}`); continue; }
           showToast(`Kein lesbarer Text im Dokument: ${file.name}`);

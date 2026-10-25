@@ -95,6 +95,7 @@ let taskIndicatorTimer;
 /** Aufgabenanzeige; "done" blendet nach 1,4 s aus. */
 export function showTaskIndicator(status = "active") {
   clearTimeout(taskIndicatorTimer);
+  window.dispatchEvent(new CustomEvent("smejj:task-status", { detail: { status } }));
   document.body.classList.remove("task-indicator-active", "task-indicator-done");
   document.body.classList.add("task-indicator-active");
   if (status === "done") {
@@ -104,6 +105,7 @@ export function showTaskIndicator(status = "active") {
 }
 
 export function hideTaskIndicator() {
+  window.dispatchEvent(new CustomEvent("smejj:task-status", { detail: { status: "idle" } }));
   clearTimeout(taskIndicatorTimer);
   document.body.classList.remove("task-indicator-active", "task-indicator-done");
 }

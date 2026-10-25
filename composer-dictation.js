@@ -46,26 +46,36 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
   const MAX_KURZE_LAEUFE = 5;
 
   function schreibe(s, interim = "") {
-    const input = getInput();
-    if (!input) return;
+    const input = s.input;
+    // Ein spaetes Ergebnis darf weder ein anderes Feld noch eine inzwischen
+    // bearbeitete oder abgesendete Eingabe ueberschreiben.
+    if (!input || s.verworfen) return;
+    if (input.value !== s.letzterText) {
+      s.verworfen = true;
+      if (sitzung === s) stop();
+      return;
+    }
     const text = `${s.prefix}${s.finals}${s.instFinals}${interim}`;
     input.value = text.replace(/\s+$/, interim ? "" : " ").trimStart();
+    s.letzterText = input.value;
     notifyInputChanged(input);
   }
 
   function uebernimmOhrText(s, text) {
     if (!text) return;
     if (s.hatText) return; // Web-Speech hat doch noch geliefert (spaetes Final)
+    if (s.verworfen || !s.input) return;
     if (sitzung && sitzung !== s) {
-      // Der Nutzer diktiert schon wieder: der Ohr-Text rueckt vor die neue Sitzung.
+      // Nur derselbe unveraenderte Entwurf darf ein altes Transkript erhalten.
+      if (sitzung.input !== s.input || sitzung.prefix !== s.prefix || sitzung.verworfen) return;
       sitzung.prefix = `${s.prefix}${s.finals}${text} `;
       schreibe(sitzung, sitzung.interim);
       return;
     }
-    const input = getInput();
-    if (!input) return;
-    input.value = `${s.prefix}${s.finals}${text} `.trimStart();
-    notifyInputChanged(input);
+    if (s.input.value !== s.letzterText) return;
+    s.input.value = `${s.prefix}${s.finals}${text} `.trimStart();
+    s.letzterText = s.input.value;
+    notifyInputChanged(s.input);
   }
 
   function beendeErkennung(s, { abbrechen = false } = {}) {
@@ -131,7 +141,18 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
         stop();
         showToast("Mikrofon-Zugriff verweigert. Bitte in den Browser-Einstellungen erlauben.", "warn");
       }
-      // no-speech, aborted, network, audio-capture: onend folgt und startet neu.
+      if (art === "network" || art === "audio-capture" || art === "language-not-supported") {
+        if (art === "network" && serverOhr?.nimmtAuf?.()) {
+          s.nurOhr = true;
+          s.rec = null;
+          beendeErkennung({ rec }, { abbrechen: true });
+          showToast(t("Diktat läuft — der Text erscheint nach dem Stoppen."), "warn");
+          return;
+        }
+        stop();
+        showToast(art === "audio-capture" ? "Kein Mikrofon verfügbar. Bitte Mikrofonverbindung prüfen." : art === "language-not-supported" ? "Die ausgewählte Sprache wird von diesem Browser nicht erkannt." : "Spracherkennung nicht erreichbar. Bitte die Internetverbindung prüfen.", "warn");
+      }
+      // no-speech und aborted: onend folgt, solange die Sitzung aktiv ist.
     };
 
     rec.onend = () => {
@@ -169,7 +190,6 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
   function stop() {
     const s = sitzung;
     if (!s) return;
-    const warTaub = !s.hatText;
     s.aktiv = false;
     sitzung = null;
     letzte = s;
@@ -178,31 +198,45 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     // finales Ergebnis an und wird geschrieben (Handler pruefen die Instanz).
     beendeErkennung(s);
     if (!serverOhr) return;
-    if (warTaub) {
-      // Web-Speech blieb stumm — das parallel aufnehmende Ohr liefert den Text.
-      serverOhr.finish(s.nurOhr ? { budgetMs: 30000 } : undefined).then((text) => {
-        const sauber = String(text || "").trim();
-        if (!sauber && s.nurOhr) showToast(t("Keine Sprache erkannt — bitte noch einmal versuchen."), "warn");
-        uebernimmOhrText(s, sauber);
-      }).catch(() => {});
-    } else {
-      try { serverOhr.cancel(); } catch { /* Ohr war still */ }
-    }
+    const beendeOhr = () => {
+      // Nachgelieferte Web-Speech-Ergebnisse waehrend der Startfreigabe
+      // zaehlen mit; nur ohne Browsertext wird Audio transkribiert.
+      if (!s.hatText) {
+        Promise.resolve(serverOhr.finish(s.nurOhr ? { budgetMs: 30000 } : undefined)).then((text) => {
+          const sauber = String(text || "").trim();
+          if (!sauber && s.nurOhr) showToast(t("Keine Sprache erkannt — bitte noch einmal versuchen."), "warn");
+          uebernimmOhrText(s, sauber);
+        }).catch(() => showToast(t("Keine Sprache erkannt — bitte noch einmal versuchen."), "warn"));
+      } else {
+        try { serverOhr.cancel(); } catch { /* Ohr war still */ }
+      }
+    };
+    // Ein Stopp waehrend getUserMedia darf finish() nicht vor start()
+    // ausfuehren und dadurch die noch wartende Aufnahme verwerfen.
+    if (s.ohrStart) s.ohrStart.then(result => { if (result?.ok !== false) beendeOhr(); });
+    else beendeOhr();
   }
 
   function start() {
     const input = getInput();
     const nurOhr = !RecognitionCtor && Boolean(serverOhr?.isAlive?.());
-    if (!input || (!nurOhr && !speechSupported())) return;
+    if (!input) return;
+    if ((!RecognitionCtor && !nurOhr) || (!nurOhr && !speechSupported())) {
+      showToast(t("Spracherkennung ist in diesem Browser nicht verfügbar."), "warn");
+      return;
+    }
     if (sitzung) return; // laeuft schon
     // Liefert die Vorgaenger-Instanz noch nach, wuerde sie das Feld der neuen
     // Sitzung ueberschreiben — sie wird jetzt hart beendet (das Feld traegt
     // ihren Stand bereits, er wandert in den prefix).
-    if (letzte && letzte.rec) beendeErkennung(letzte, { abbrechen: true });
+    if (letzte && letzte.rec) { letzte.rec.onresult = null; beendeErkennung(letzte, { abbrechen: true }); }
     letzte = null;
     zaehler += 1;
     const s = {
       nr: zaehler,
+      input,
+      letzterText: input.value,
+      verworfen: false,
       aktiv: true,
       rec: null,
       prefix: input.value ? `${input.value.replace(/\s+$/, "")} ` : "",
@@ -223,10 +257,26 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       showToast(t(result.error === "microphone_denied" ? "Mikrofon nicht freigegeben" : "Mikrofon konnte nicht gestartet werden."), "warn");
     };
     try {
-      Promise.resolve(serverOhr?.start({ onLimit: () => { if (sitzung === s && s.nurOhr) stop(); } }))
-        .then(gescheitert, () => gescheitert({ ok: false }));
-    } catch { gescheitert({ ok: false }); }
-    starteErkennung(s);
+      const gestartet = serverOhr?.start({ onLimit: () => { if (sitzung === s) stop(); } });
+      if (gestartet && typeof gestartet.then === "function") {
+        s.ohrStart = Promise.resolve(gestartet).then(result => {
+          gescheitert(result);
+          starteErkennung(s);
+          return result;
+        }, () => {
+          const result = { ok: false };
+          gescheitert(result);
+          starteErkennung(s);
+          return result;
+        });
+      } else {
+        gescheitert(gestartet);
+        starteErkennung(s);
+      }
+    } catch {
+      gescheitert({ ok: false });
+      starteErkennung(s);
+    }
   }
 
   function toggle() {

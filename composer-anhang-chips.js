@@ -1,22 +1,16 @@
-// smejj.com — Anhang-Chips fuer Dateien, die kein Text und kein einzelnes Bild sind
-// (Video, PDF, Archive, weitere Bilder). Betreiber-Befund 2026-09-03 (iPhone):
-// ein hochgeladenes Video stand als nackte Textzeile "[Anhang: IMG_5287.mov (63595 KB)]"
-// im Schreibfeld — wie ein Fehler. ChatGPT, Gemini und Claude zeigen stattdessen einen
-// Chip ueber dem Feld: Vorschau oder Symbol, Name, Groesse, Entfernen-Kreuz. Genau das
-// macht dieses Modul; beim Senden haengt composePastedTask() (composer-paste-attach.js)
-// die Verweise an die Aufgabe, damit das Modell weiss, was mitkam.
-//
-// EHRLICH GEGENUEBER DEM NUTZER: smejj kann Videos noch nicht ansehen (kein Modell der
-// Kette nimmt Video). Der Chip sagt das im Untertitel, statt es beim Senden schweigend
-// fallen zu lassen. Bilder (erstes Bild = Bild-Verstehen) und Textdateien (Inhalt als
-// Chip) gehen weiter ihre bewaehrten Wege — dieses Modul ergaenzt nur die Luecke.
-//
-// Kein Upload in Stufe 1: 60-MB-Videos wuerden das Body-Limit der Bruecke sprengen und
-// haetten keinen Empfaenger. Die Datei bleibt lokal; der Verweis traegt Name, Art, Groesse.
-// Oberflaechentexte ueber die Sprachdateien (Inventur 20.09.2026).
+// smejj.com — lokale Originale, Vorschauen und Sendetransaktion des Composers.
+// Dateiinhalt wird nur nach erfolgreicher Verarbeitung mitgeschickt. Die
+// Originale bleiben bis zum bestaetigten Abschluss fuer einen erneuten Versuch
+// erhalten. Es findet hier kein dauerhafter Upload in den Objektspeicher statt.
+// Auswahl, Kamera, Paste und Drop benutzen denselben Bestand; vorhandene
+// Verweisformate bleiben fuer nicht lesbare Archiv-/Altformate erhalten.
 import { t } from "./i18n/ui.js?v=3";
 const anhaenge = [];
 let seq = 0;
+let versand = [];
+let aktuellesFeld = null;
+let notifyFeld = null;
+let laufend = null;
 const VORSCHAU_MAX_BYTES = 200 * 1024 * 1024;
 
 export function formatGroesse(bytes) {
@@ -77,6 +71,7 @@ function reihe(input) {
     row.setAttribute("aria-label", t("Anhänge"));
     input.parentElement.insertBefore(row, input);
   }
+  if (row.parentElement !== input.parentElement) input.parentElement.insertBefore(row, input);
   return row;
 }
 
@@ -108,8 +103,16 @@ function zeichne(input, notify) {
     name.title = a.name;
     const unter = document.createElement("span");
     unter.className = "anhang-chip-unter";
-    unter.textContent = `${WORT[a.art]} · ${formatGroesse(a.groesse)} · ${HINWEIS[a.art]}`;
+    unter.textContent = `${WORT[a.art]} · ${formatGroesse(a.groesse)} · ${a.statusText || HINWEIS[a.art]}`;
     text.append(name, unter);
+    chip.setAttribute("aria-busy", String(a.status === "loading"));
+    if (a.status === "error" && a.retry) {
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.textContent = t("Erneut versuchen");
+      retry.addEventListener("click", () => { void a.retry(); });
+      text.append(retry);
+    }
     const weg = document.createElement("button");
     weg.type = "button";
     weg.className = "paste-attach-remove";
@@ -122,11 +125,12 @@ function zeichne(input, notify) {
   }
 }
 
-function entferne(id) {
+export function entferne(id) {
   const i = anhaenge.findIndex((a) => a.id === id);
   if (i === -1) return;
   try { if (anhaenge[i].url) URL.revokeObjectURL(anhaenge[i].url); } catch { /* egal */ }
   anhaenge.splice(i, 1);
+  meldeAnhangWechsel();
 }
 
 /**
@@ -135,11 +139,15 @@ function entferne(id) {
  */
 export function uebernehmeAnhang(file, input, notify) {
   if (!file || !input) return null;
+  aktuellesFeld = input;
+  notifyFeld = notify;
+  const vorhanden = anhaenge.find(a => a.file === file || (a.name === file.name && a.groesse === file.size && a.file?.lastModified === file.lastModified));
+  if (vorhanden) return vorhanden;
   seq += 1;
   const art = dateiArt(file);
   let url = "";
   try { if ((art === "bild" || art === "video") && file.size <= VORSCHAU_MAX_BYTES && typeof URL?.createObjectURL === "function") url = URL.createObjectURL(file); } catch { url = ""; }
-  const eintrag = { id: seq, name: String(file.name || "Datei"), groesse: Number(file.size) || 0, art, url };
+  const eintrag = { file, status: "reference", id: seq, name: String(file.name || "Datei"), groesse: Number(file.size) || 0, art, url };
   anhaenge.push(eintrag);
   zeichne(input, notify);
   notify?.(input);
@@ -150,15 +158,52 @@ export function uebernehmeAnhang(file, input, notify) {
 /** Beim Senden: alle Verweise als Zeilen liefern und die Chips leeren. */
 export function nimmVerweise() {
   if (!anhaenge.length) return [];
-  const zeilen = anhaenge.map(verweisFuer);
-  for (const a of anhaenge) { try { if (a.url) URL.revokeObjectURL(a.url); } catch { /* egal */ } }
+  if (anhaenge.some(a => a.status === "queued" || a.status === "loading" || a.status === "error")) return [];
+  versand = [...anhaenge];
+  laufend = { anhaenge: [...anhaenge], input: aktuellesFeld };
+  const zeilen = anhaenge.map(a => a.text ? `[Datei: ${a.name}]\n${a.text}` : verweisFuer(a));
   anhaenge.length = 0;
   document.getElementById("anhangChipRow")?.remove();
   meldeAnhangWechsel();
   return zeilen;
 }
 
-export function hatAnhaenge() { return anhaenge.length > 0; }
+export function hatAnhaenge() { return anhaenge.length > 0 || (typeof window !== "undefined" && window.smejjTextAnhaenge?.hat?.() === true); }
+
+/** Snapshot ohne Dateikopie; entferntes Material kann nicht nachtraeglich zurueckkehren. */
+export function anhangListe() { return [...anhaenge]; }
+export function versandListe() { return [...versand]; }
+export function leereVersand() { versand = []; }
+export function versandLaeuft() { return Boolean(laufend); }
+/** Erst bestaetigte Antworten geben Originale frei; Fehler stellen Chips wieder her. */
+export function beendeAnhangVersand(erfolg) {
+  if (!laufend) return;
+  const vorher = laufend;
+  laufend = null;
+  versand = [];
+  if (erfolg) {
+    for (const a of vorher.anhaenge) { try { if (a.url) URL.revokeObjectURL(a.url); } catch { /* Vorschau bereits frei */ } }
+  } else {
+    for (const a of vorher.anhaenge) if (!anhaenge.some(e => e.id === a.id)) anhaenge.push(a);
+    if (vorher.input) { aktuellesFeld = vorher.input; zeichne(vorher.input, notifyFeld); notifyFeld?.(vorher.input); }
+  }
+  meldeAnhangWechsel();
+}
+export function aktualisiereAnhang(id, patch) {
+  const a = anhaenge.find(e => e.id === id);
+  if (!a) return false;
+  Object.assign(a, patch);
+  if (aktuellesFeld) zeichne(aktuellesFeld, notifyFeld);
+  notifyFeld?.(aktuellesFeld);
+  meldeAnhangWechsel();
+  return true;
+}
+export function zeigeAnhaenge(input) {
+  if (!input || !anhaenge.length) return;
+  aktuellesFeld = input;
+  zeichne(input, notifyFeld);
+}
+export function anhangNichtBereit() { return anhaenge.some(a => a.status === "queued" || a.status === "loading" || a.status === "error"); }
 
 /**
  * Sagt der Oberflaeche Bescheid, dass sich der Anhang-Bestand geaendert hat.
@@ -172,5 +217,5 @@ export function meldeAnhangWechsel() {
 }
 
 if (typeof window !== "undefined") {
-  window.smejjAnhangChips = { nimmVerweise, hatAnhaenge, meldeAnhangWechsel };
+  window.smejjAnhangChips = { nimmVerweise, hatAnhaenge, meldeAnhangWechsel, anhangListe, anhangNichtBereit, versandLaeuft, zeigeAnhaenge, beendeAnhangVersand };
 }
