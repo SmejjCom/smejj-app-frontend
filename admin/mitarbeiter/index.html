@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<!-- Die Konsole wird an zwei Orten ausgeliefert: statisch von smejj.com/admin
+     (GitHub Pages setzt KEINE Kopfzeilen — deshalb steht die Regel hier im
+     Markup) und vom Control-Server (der zusaetzlich seine eigene Kopfzeile
+     setzt; es gilt dann die Schnittmenge, und die ist dieselbe).
+     connect-src listet den Control-Server, weil die Konsole von smejj.com aus
+     fremde Herkunft anspricht. WER DIE API-ADRESSE AENDERT, MUSS SIE HIER
+     EINTRAGEN — sonst blockiert der Browser jede Abfrage. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.smejj.com https://smejj-control.zeabur.app; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<title>smejj.com — Operations Console</title>
+<link rel="stylesheet" href="/admin/console.css">
+<!-- Verbindungs-Vorbereitung zum Control-Server (Befund 2026-09-04): der erste
+     Ruf der Konsole geht an api.smejj.com. Ohne preconnect beginnt dessen
+     TLS-Handshake erst, wenn api.js laeuft — auf dem Betreiber-Netz gemessene
+     0,6-1,7 s, die vollstaendig im Wartebalken landen. Mit preconnect laeuft er
+     parallel zum Laden der Konsolen-Dateien.
+     crossorigin ist Pflicht: fetch() zu fremder Herkunft benutzt sonst eine
+     ANDERE Verbindung als die vorgewaermte, und die Zeile waere wirkungslos.
+     Die Zeabur-Adresse ist der zweite Zugang (api.js weicht dorthin aus) —
+     nur dns-prefetch, damit nicht zwei Handshakes um dieselbe Leitung streiten.
+     WER DIE API-ADRESSE AENDERT, AENDERT SIE HIER MIT. -->
+<link rel="preconnect" href="https://api.smejj.com" crossorigin>
+<link rel="dns-prefetch" href="https://smejj-control.zeabur.app">
+<!-- Tuersteher: verbirgt die Huelle und leitet Abgemeldete zur Anmeldung.
+     MUSS im <head> stehen und ohne defer laden, sonst blitzt der Adminbereich
+     kurz auf, bevor umgeleitet wird. Siehe gate.js fuer den Befund. -->
+<script src="/admin/gate.js"></script>
+<!-- Klickjacking-Schutz. MUSS mit, weil GitHub Pages keine eigenen Kopfzeilen
+     setzen kann und frame-ancestors in einer meta-CSP wirkungslos ist. Auf dem
+     Control-Server faengt stattdessen dessen Kopfzeile x-frame-options: DENY.
+     Befund 2026-08-14: das Modul gab es laengst, hing aber nur an 3 von 12
+     Seiten — der Adminbereich war NICHT dabei. -->
+<script type="module" src="/frame-guard.js?v=1"></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="rail-brand">
+      <!-- Die Marke ist ein KNOPF (Betreiber-Freigabe 2026-09-04): erster Klick
+           fuehrt zur Startseite der Konsole, ein weiterer Klick auf der
+           Startseite klappt die linke Schiene ein und wieder aus. Die Logik
+           steht in console.js (bindeMarke).
+           Das Zeichen ist das echte smejj.com-Logo — dieselbe Form wie
+           /icons/smejj_favicon.svg, hier aber INLINE: die Konsole wird auch vom
+           Control-Server mit FESTER Dateiliste ausgeliefert (adminUiRoutes.js),
+           dort waere ein Bild aus /icons/ eine 404. Inline kostet ausserdem
+           keine zweite Anfrage. currentColor, damit das Logo im Ruhezustand
+           akzentfarben ist und beim Ueberfahren aufhellt. -->
+      <button type="button" class="mark" id="markeKnopf" aria-controls="rail" aria-expanded="true"
+              title="smejj.com — zur Startseite der Konsole; noch einmal klicken klappt das Menü ein">
+        <span class="logo" aria-hidden="true"><svg viewBox="0 0 2000 1532.335" width="20" height="20" focusable="false" fill="currentColor"><path d="M691.785,1526.022c-27.687,0-55.336-10.754-76.161-32.17L74.655,937.544c-44.875-46.145-69.587-107.01-69.587-171.376s24.712-125.23,69.587-171.376L615.623,38.486c40.899-42.061,108.149-43.004,150.205-2.1,42.059,40.899,42.997,108.149,2.1,150.205L226.96,742.898c-12.69,13.05-12.69,33.491,0,46.541l540.968,556.308c40.897,42.056,39.958,109.306-2.1,150.205-20.641,20.072-47.36,30.069-74.044,30.069Z"/><path d="M1308.215,1526.022c-26.688,0-53.4-9.993-74.044-30.069-42.059-40.899-42.997-108.149-2.1-150.205l540.968-556.308c12.688-13.05,12.688-33.491,0-46.541L1232.072,186.591c-40.897-42.056-39.958-109.306,2.1-150.205,42.061-40.895,109.31-39.952,150.205,2.1l540.968,556.308c44.873,46.145,69.587,107.01,69.587,171.376s-24.715,125.23-69.587,171.376l-540.968,556.308c-20.823,21.415-48.479,32.17-76.161,32.17Z"/><circle cx="1000" cy="555.122" r="118.015"/><circle cx="1000" cy="977.214" r="118.015"/></svg></span>
+        <b>smejj.com</b>
+      </button>
+      <div class="sub">Operations Console</div>
+    </div>
+    <div class="rail-env"><span class="live"></span> <span id="umgebung">Produktion</span></div>
+    <nav class="rail-nav" id="nav"></nav>
+    <div class="rail-foot">
+      <div class="rail-user">
+        <div class="av" id="akteurKuerzel">··</div>
+        <div><div class="nm" id="akteurName">wird geladen …</div><div class="rl" id="akteurRolle">—</div></div>
+      </div>
+      <div class="pill acc" id="stufe">Stufe 2 · nur lesend</div>
+    </div>
+  </aside>
+
+  <!-- Zieh-Griff auf der Trennlinie (Betreiber-Freigabe 2026-09-04): mit der
+       Maus (oder dem Finger) auf die Kante zwischen Schiene und Inhalt gehen
+       und ziehen. Nach links bis zum Logo klappt die Schiene ein, nach rechts
+       wieder auf. role="separator" mit aria-valuenow, damit der Griff auch mit
+       der Tastatur bedienbar ist (Pfeiltasten). Logik: console.js (bindeGriff). -->
+  <div class="rail-griff" id="railGriff" role="separator" aria-orientation="vertical"
+       tabindex="0" aria-label="Breite des Menüs" aria-valuemin="68" aria-valuemax="420" aria-valuenow="284"
+       title="Ziehen: Menü breiter oder schmaler. Bis zum Logo ziehen klappt es ein. Doppelklick schaltet um."></div>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb">Operations Console · <b id="crumb">Übersicht</b></div>
+      <div class="spacer"></div>
+      <!-- Die beiden Stand-Pillen erscheinen nur, wenn eine Seite einen Wert
+           liefert (Nutzer: Index-Alter, Audit: Kette). Ein dauerhaftes "—" auf
+           allen anderen Seiten war eine Pille ohne Aussage (Befund 2026-08-23). -->
+      <div class="pill" id="indexStand" hidden>Index —</div>
+      <div class="pill" id="ketteStand" hidden>Kette —</div>
+    </header>
+    <div id="seite"></div>
+  </div>
+</div>
+
+<!-- Linke Schiene (Breite, Ein-/Ausklappen, Zieh-Griff) — muss VOR console.js
+     laden, console.js greift beim Start auf window.smejjAdminSchiene zu. -->
+<!-- ALLE Konsolen-Skripte mit defer (Befund 2026-09-04, im Browser des
+     Betreibers gemessen). VORHER: sie luden STRENG NACHEINANDER — jede Datei
+     startete auf die Millisekunde genau dann, wenn die vorige fertig war. Auf
+     der Leitung des Betreibers (3G, 1,5 Mbit/s, 500 ms Umlaufzeit) kostete
+     jede der 26 Dateien eine eigene Umlaufzeit: die letzte war erst nach 21
+     Sekunden da, console.js nach 26. Genau daher kam "Konsole nicht geladen".
+     MIT defer holt der Browser alle 26 GLEICHZEITIG und fuehrt sie danach in
+     der Reihenfolge dieser Liste aus. Die Reihenfolge ist damit weiterhin
+     garantiert — sie MUSS stimmen, jede console-stage*.js meldet ihre Seiten
+     an, bevor console.js sie einsammelt.
+     gate.js im <head> bleibt bewusst OHNE defer: es muss vor dem ersten Pixel
+     laufen, sonst blitzt der Adminbereich auf, bevor umgeleitet wird. -->
+<script defer src="/admin/schiene.js"></script>
+<script defer src="/admin/dialog.js"></script>
+<script defer src="/admin/api.js"></script>
+<script defer src="/admin/views.js"></script>
+<script defer src="/admin/views-stage4.js"></script>
+<script defer src="/admin/console-stage4.js"></script>
+<script defer src="/admin/views-stage5.js"></script>
+<script defer src="/admin/console-stage5.js"></script>
+<script defer src="/admin/views-stage6.js"></script>
+<script defer src="/admin/console-stage6.js"></script>
+<script defer src="/admin/views-stage7.js"></script>
+<script defer src="/admin/console-stage7.js"></script>
+<script defer src="/admin/views-stage8.js"></script>
+<script defer src="/admin/console-stage8.js"></script>
+<script defer src="/admin/views-stage9.js"></script>
+<script defer src="/admin/console-stage9.js"></script>
+    <script defer src="/admin/views-cockpit.js"></script>
+    <script defer src="/admin/console-cockpit.js"></script>
+    <script defer src="/admin/views-control-center.js"></script>
+    <script defer src="/admin/console-control-center.js"></script>
+    <script defer src="/admin/views-stage10.js"></script>
+    <script defer src="/admin/console-stage10.js"></script>
+<script defer src="/admin/views-stage11.js"></script>
+<script defer src="/admin/console-stage11.js"></script>
+<script defer src="/admin/views-stage12.js"></script>
+<script defer src="/admin/console-stage12.js"></script>
+<script defer src="/admin/views-stage13.js"></script>
+<script defer src="/admin/console-stage13.js"></script>
+<!-- Stufe 14 (Modelle): e2-Bestand, Motoren, Zugaenge. Muss VOR console.js
+     stehen, das die angemeldeten Seiten beim Start einsammelt.
+     DIESE DATEI ist die einzige Quelle: sync_admin_console_pages.mjs
+     kopiert sie in alle Seitenordner. Wer den Eintrag nur im
+     Frontend-Klon macht, verliert ihn bei der naechsten Spiegelung
+     (Befund 2026-09-08). -->
+<script defer src="/admin/views-stage14.js"></script>
+<script defer src="/admin/console-stage14.js"></script>
+<!-- smejj ai radar (Nr. 86, 21.09.2026): die zweite Schiene — Recherche und
+     Wissensbasis. Muss wie jede Seite VOR console.js stehen, das die
+     angemeldeten Seiten beim Start einsammelt. -->
+<script defer src="/admin/views-ai-radar.js"></script>
+<script defer src="/admin/console-ai-radar.js"></script>
+<script defer src="/admin/console-workforce.js"></script>
+<script defer src="/admin/console.js"></script>
+</body>
+</html>

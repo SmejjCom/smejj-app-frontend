@@ -25,6 +25,7 @@
   // zusammengefuehrt, damit der Kern nur EINE Nachschlagetabelle kennt.
   const ANGEMELDET = Object.assign(
     {},
+    (window.adminWorkforce || {}).seiten || {},
     (window.adminStage4 || {}).seiten || {},
     (window.adminStage5 || {}).seiten || {},
     (window.adminStage6 || {}).seiten || {},
@@ -79,7 +80,7 @@
     moderation: "3.1", schluessel: "3.2", ereignisse: "3.3",
     abrechnung: "4.1", kosten: "4.2", api: "4.3",
     modelle: "5.1", jobs: "5.2", worker: "5.3", deploy: "5.4", speicher: "5.5",
-    autopiloten: "5.6", evolution: "5.7", auslieferung: "5.8",
+    mitarbeiter: "5.9", autopiloten: "5.6", evolution: "5.7", auslieferung: "5.8",
     ankuendigungen: "6.1", flags: "6.2", wissen: "6.3", sprachen: "6.4",
     experimente: "6.5", email: "6.6", analytik: "6.7", aufgaben: "6.8",
     radar: "6.9", "ai-radar": "6.10",
@@ -174,7 +175,7 @@
 
   function schreibeNav(aktiv) {
     let gruppe = null;
-    nav.innerHTML = SEITEN.map(function (s) {
+    nav.innerHTML = SEITEN.filter(function (s) { return s.pfad !== "mitarbeiter" || ["owner", "admin"].indexOf((zustand.akteur || {}).role) >= 0; }).map(function (s) {
       let vorsatz = "";
       if (s.gruppe !== gruppe) {
         gruppe = s.gruppe;
@@ -723,6 +724,7 @@
     // Konsole ueberhaupt sichtbar werden.
     GATE.freigeben();
     zustand.akteur = antwort.data.actor || {};
+    schreibeNav(navZiel());
     // (zeigeUmgebung() steht weiter unten, nach den Kopfzeilen-Feldern.)
     // Damit der Sicherheitsdialog sagen kann, WOHIN der Code ging, statt nur
     // "deine Admin-E-Mail-Adresse". Beim allerersten Aufruf einer noch nicht
