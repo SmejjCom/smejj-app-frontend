@@ -60,6 +60,11 @@ export function erzwingeReflow(doc = document) {
   el.style.display = vorher;
   return true;
 }
+// Ein Versionswechsel darf weder Diktat noch den laufenden Sprachmodus abbrechen.
+export function updateHatLaufendeArbeit(doc, aufnahme = false) {
+  return aufnahme || Boolean(doc?.body?.classList?.contains("task-indicator-active")) || doc?.querySelector?.("#voiceModeOverlay")?.hidden === false;
+}
+
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   const istStandalone = () => {
     try { return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch { return false; }
@@ -139,7 +144,7 @@ if ("serviceWorker" in navigator) {
   const hatteSteuerung = Boolean(navigator.serviceWorker.controller);
   window.addEventListener("smejj:diktat-status", e => { aufnahme = Boolean(e.detail?.active); });
   const aktualisieren = async () => {
-    if (aufnahme || document.body?.classList?.contains("task-indicator-active")) return false;
+    if (updateHatLaufendeArbeit(document, aufnahme)) return false;
     const files = window.smejjAnhangChips?.anhangListe?.().length;
     if (files && !window.smejjSichereDateiEntwurf) return false;
     if (window.smejjSichereDateiEntwurf && await window.smejjSichereDateiEntwurf() === false) return false;
@@ -148,7 +153,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.addEventListener("controllerchange", async () => {
     if (schonNeuGeladen || !navigator.serviceWorker.controller || !hatteSteuerung) return;
     const entwurf = Array.from(document.querySelectorAll("#startMessage, #codeAufgabe, #probierFeld")).some(f => f.value?.trim()) || window.smejjAnhangChips?.anhangListe?.().length;
-    if (!entwurf && !aufnahme && !document.body?.classList?.contains("task-indicator-active")) { await aktualisieren(); return; }
+    if (!entwurf && !updateHatLaufendeArbeit(document, aufnahme)) { await aktualisieren(); return; }
     if (document.getElementById("composerUpdateHinweis")) return;
     const box = document.createElement("div"); box.id = "composerUpdateHinweis"; box.setAttribute("role", "status");
     box.append(document.createTextNode("Neue Version verfügbar. Dein Entwurf bleibt auf diesem Gerät. "));

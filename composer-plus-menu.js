@@ -7,7 +7,7 @@ import { showToast } from "./components.js?v=2026102515";
 import { t } from "./i18n/ui.js?v=3";
 import { bindBildAnhang, uebernehmeBildDatei } from "./composer-bild-anhang.js";
 import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=2026102516";
-import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=2026102519";
+import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=2026102520";
 
 // Was als Text mitgeht: Textarten und die ueblichen Quell-/Daten-Endungen,
 // hoechstens 200 KB — mehr traegt keine Frage sinnvoll (Server kuerzt ohnehin).

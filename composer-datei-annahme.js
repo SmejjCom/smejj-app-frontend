@@ -2,7 +2,7 @@
 // Das bestehende API-Feld bildDataUrl bleibt erhalten. Mehrere Bilder werden
 // nummeriert zu einer Bildtafel zusammengefuegt, statt weitere Bilder zu verlieren.
 import { showToast as zeigeToast } from "./components.js?v=2026102515";
-import { uebernehmeAnhang, aktualisiereAnhang, anhangListe, versandListe, leereVersand, dateiArt } from "./composer-anhang-chips.js?v=2026102519";
+import { uebernehmeAnhang, aktualisiereAnhang, anhangListe, versandListe, leereVersand, dateiArt } from "./composer-anhang-chips.js?v=2026102520";
 
 function meldeDateiHinweis(text, tone = "warn") {
   if (text) zeigeToast(text, tone);

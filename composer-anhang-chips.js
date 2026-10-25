@@ -195,6 +195,9 @@ export function beendeAnhangVersand(erfolg) {
 export function aktualisiereAnhang(id, patch) {
   const a = anhaenge.find(e => e.id === id);
   if (!a) return false;
+  if (patch.url && patch.url !== a.url && String(a.url).startsWith("blob:")) {
+    try { URL.revokeObjectURL(a.url); } catch { /* Vorschau kann bereits frei sein */ }
+  }
   Object.assign(a, patch);
   if (aktuellesFeld) zeichne(aktuellesFeld, notifyFeld);
   notifyFeld?.(aktuellesFeld);
