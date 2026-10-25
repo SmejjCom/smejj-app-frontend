@@ -1,3 +1,4 @@
+import {capturePlan, planTarget, preservePlanLinks, planStorage} from '/assets/auth/plan-auswahl.js?v=20261025';
 import { API_ORIGIN, CLIENT_ROUTES } from "../config.js";
 import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "../i18n/ui.js?v=3";
 
@@ -33,6 +34,9 @@ const ERROR_TEXT = {
 
 const output = document.querySelector("#authStatus, #profileOutput");
 const mode = document.body.dataset.authMode || "login";
+const selectedPlanStorage = planStorage(window);
+capturePlan(window.location.search, selectedPlanStorage);
+preservePlanLinks(document, selectedPlanStorage);
 
 function status(message, tone = "") {
   if (!output) return;
@@ -52,6 +56,8 @@ function errorText(payload, fallback) {
 // /profile — Befund Betreiber 2026-08-09: nach dem Login stand er auf der
 // Kontoseite und musste den Chat selbst suchen.
 function nextTarget() {
+  const selectedPlan = planTarget(selectedPlanStorage);
+  if (selectedPlan) return selectedPlan;
   const raw = new URLSearchParams(window.location.search).get("next") || "";
   if (/^\/(?![/\\])/.test(raw) && !raw.startsWith("/auth")) return raw;
   return "/";
@@ -748,7 +754,9 @@ document.querySelector("#appleLogin")?.addEventListener("click", startAppleLogin
 document.querySelector("#homeLink")?.addEventListener("click", () => { window.location.href = "/"; });
 // Google-Rueckkehr zuerst: Wenn ein Handoff-Token vorliegt, wird direkt angemeldet.
 zeigeRueckkehrFehler();
-completeGoogleHandoff().then((handled) => {
+if (new URLSearchParams(window.location.search).get("checkout") === "1") {
+  import("/assets/plan-weiter.js?v=20261025").catch(() => status(t("Anmeldung ist momentan nicht erreichbar."), "error"));
+} else completeGoogleHandoff().then((handled) => {
   if (handled) return;
   refreshSession();
   handleUrlTokens();

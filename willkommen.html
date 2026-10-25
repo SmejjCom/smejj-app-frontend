@@ -57,10 +57,10 @@
        und als erstes, damit sie nicht fuer einen Moment sichtbar sind — mit
        defer stuenden sie im Video des Pruefers. -->
   <script src="/assets/ios-preise-aus.js?v=1"></script>
-  <script src="/assets/willkommen-sprache.js?v=3" defer></script>
+  <script src="/assets/willkommen-sprache.js?v=4" defer></script>
   <!-- Die erste Frage OHNE Konto (21.09.2026). Laedt VOR dem Fokus-Skript,
        damit window.smejjGastFrage beim ersten Absenden schon steht. -->
-  <script src="/assets/gast-frage.js?v=3" defer></script>
+  <script src="/assets/gast-frage.js?v=4" defer></script>
   <script src="/assets/willkommen-fokus.js?v=w4" defer></script>
   <!-- Vollbild-Heilung fuer die installierte App (2026-09-07): dieselbe Datei wie in
        index.html (gleiche Marke, eine Instanz). Als Web-App oeffnet "/" abgemeldet
@@ -323,7 +323,7 @@
           <li>Mehr Bilder, Videos und Aufträge</li>
           <li>Schnellere Antworten</li>
         </ul>
-        <a class="knopf" href="/auth/register/">Plus nehmen</a>
+        <a class="knopf" href="/auth/register/?plan=plus">Plus nehmen</a>
       </div>
       <div class="plan">
         <span class="stufe">smejj Pro</span>
@@ -332,7 +332,7 @@
           <li>Alles aus Plus sowie:</li>
           <li>Für tägliche Arbeit mit Bildern und Code</li>
         </ul>
-        <a class="knopf" href="/auth/register/">Pro nehmen</a>
+        <a class="knopf" href="/auth/register/?plan=pro">Pro nehmen</a>
       </div>
       <div class="plan">
         <span class="stufe">smejj Max</span>
@@ -341,7 +341,7 @@
           <li>Alles aus Pro sowie:</li>
           <li>Die höchsten Mengen für Vielnutzer</li>
         </ul>
-        <a class="knopf" href="/auth/register/">Max nehmen</a>
+        <a class="knopf" href="/auth/register/?plan=max">Max nehmen</a>
       </div>
     </div>
     <p class="hinweis">Monatlich kündbar, kein Kleingedrucktes. Abgeschlossen und verwaltet wird nach der kostenlosen Anmeldung unter „Mein Plan“.</p>
@@ -373,6 +373,8 @@
     <a href="/datenschutz.html">Datenschutzerklärung</a>
     <a href="/hilfe.html">Hilfe</a>
     <a href="/status.html">Betriebsstatus</a>
+    <a href="/agb.html">AGB</a>
+    <a href="/widerruf.html">Widerruf</a>
   </footer>
 </body>
 </html>

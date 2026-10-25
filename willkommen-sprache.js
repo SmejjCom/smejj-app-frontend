@@ -14,6 +14,8 @@
     "Preise": "Pricing",
     "Herunterladen": "Download",
     "Hilfe": "Help",
+    "AGB": "Terms",
+    "Widerruf": "Right of withdrawal",
     "Anmelden": "Sign in",
     "Kostenlos starten": "Start for free",
     "Deine Daten bleiben bei dir": "Your data stays with you",

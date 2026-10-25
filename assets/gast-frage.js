@@ -144,11 +144,26 @@
     } catch (fehler) { /* ohne matchMedia bleibt es, wie es ist */ }
   }
 
+  function antwortInBlick(text) {
+    var box = text && text.parentNode;
+    if (!box || document.getElementById("gastAntwort") !== box) return;
+    var viewport = window.visualViewport;
+    var oben = viewport ? viewport.offsetTop : 0;
+    var unten = oben + (viewport ? viewport.height : window.innerHeight);
+    var rect = text.getBoundingClientRect();
+    if (rect.top < oben || rect.bottom > unten) {
+      try { text.scrollIntoView({ block: "nearest", behavior: "auto" }); } catch (fehler) { /* alter Browser */ }
+    }
+  }
+
   window.smejjGastFrage = async function (frage, form) {
     var ziel = form || document.getElementById("probierForm");
     if (!ziel || !frage) return false;
     var text = kasten(ziel, frage);
     feldAufraeumen();
+    antwortInBlick(text);
+    setTimeout(function () { antwortInBlick(text); }, 350);
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { antwortInBlick(text); }, { once: true });
     var antwort = "";
     var steuerung = new AbortController();
     var start = Date.now();
@@ -177,8 +192,10 @@
         var stueck = await leser.read();
         if (stueck.done) break;
         puffer = lies(decoder.decode(stueck.value, { stream: true }), puffer, function (teil) {
+          var erstesStueck = !antwort;
           antwort += teil;
           text.textContent = antwort;
+          if (erstesStueck) antwortInBlick(text);
         });
       }
       clearTimeout(uhr); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
