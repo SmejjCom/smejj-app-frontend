@@ -253,7 +253,23 @@ function schalte() {
   if (startModus && halter) void zeichneStartSpur(halter);
 }
 
+function initNeuerChatStart(starten) {
+  if (document.getElementById("neuerChatStart")) return;
+  const knopf = punkt({ icon: "plus", text: t("Neuer Chat"), aktion: () => {
+    starten();
+    const input = document.getElementById("startMessage");
+    if (!input) return;
+    input.value = "";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.focus({ preventScroll: true });
+  } });
+  knopf.id = "neuerChatStart";
+  knopf.className = "neuer-chat-start";
+  document.body.append(knopf);
+}
+
 export function initSpurStart() {
+  initNeuerChatStart(() => { newChat(); geheZu("start"); });
   const vier = document.querySelector('.nav[aria-label="Arbeitsbereiche"]');
   if (!vier || document.querySelector(".nav-start")) return false;
   vier.classList.add("nav-vier");

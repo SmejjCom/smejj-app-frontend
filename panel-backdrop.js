@@ -1,21 +1,7 @@
-// panel-backdrop.js — Abdunkeln, Wegklicken und Escape fuer die Seitenpanels.
-//
-// Freigabe Wof Kadavanich, 2026-07-18: "Design-Lock fuer Sidebar-Fix, eng begrenzt".
-//
-// Eigenes Modul statt Logik in app.js (AI_Guidelines 2, Single Responsibility):
-// app.js steht bei 1404 Zeilen an seiner Ratchet-Baseline, Ziel sind 800. Der
-// Ratchet soll die Altlast schrumpfen - ihn fuer diesen Fix anzuheben ginge in
-// die falsche Richtung. Durch die Auslagerung wird app.js sogar kleiner.
-//
-// Kein <script>-Tag noetig: app.js importiert dieses Modul als ESM, und das
-// Stylesheet haengt sich hier selbst ein (gleiche Konvention wie
-// account-privacy.js). Damit bleiben index.html, styles.css und sw.js
-// byte-identisch zum Start-Lock.
-
-// Versionsmarke: GitHub Pages liefert Assets mit max-age. Ohne ?v= sieht ein
-// bestehender Nutzer die Aenderung erst nach Ablauf der Frist.
-// Bei jeder Aenderung an panel-backdrop.css erhoehen.
-const STYLE_VERSION = "panel-backdrop-20260721";
+// smejj.com — Abdunkler und Schliessen der Seitenpanels.
+// Gleiche Stapelebene wie die Sidebar, auch im festen mobilen Chat-Rahmen.
+// Styles mit Cache-Marke laden; Sichtbarkeit folgt dem hidden-Attribut.
+const STYLE_VERSION = "panel-backdrop-20261025-3";
 
 function loadStyles() {
   if (document.querySelector('link[href^="/assets/panel-backdrop.css"]')) return;
@@ -68,6 +54,10 @@ export function initPanelBackdrop({
   setBrowserPanelOpen
 }) {
   loadStyles();
+  // Der Abdunkler muss mit der festen mobilen Sidebar dieselbe Stapelebene teilen.
+  if (backdrop && sidebar?.parentElement && backdrop.parentElement !== sidebar.parentElement) {
+    sidebar.before(backdrop);
+  }
 
   // Sichtbarkeit haengt am hidden-Attribut, nicht an einer CSS-Klasse:
   // styles.css hat `[hidden] { display: none !important }` - dagegen gewinnt

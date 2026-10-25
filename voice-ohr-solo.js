@@ -139,7 +139,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
         quelle.connect(analyser);
         const daten = new Uint8Array(analyser.fftSize);
         const automat = automatFactory();
-        await ear.start();
+        await ear.start({ stream });
         let sprichtGemeldet = false;
         takt = setInterval(async () => {
           if (!laeuft) return;
@@ -226,6 +226,7 @@ export function verdrahteOhrSolo(host) {
     },
     aktivieren() {
       if (!host.earAlive() || !navigator?.mediaDevices?.getUserMedia) return false;
+      host.earCancel?.(); // parallele Web-Speech-Sicherungsaufnahme freigeben
       host.state.ohrSoloAktiv = true;
       host.state.voiceFailStreak = 0;
       host.hoerenNeu();

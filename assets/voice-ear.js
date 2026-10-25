@@ -128,17 +128,18 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
 
   return {
     isAlive() {
-      return alive;
+      return alive && Boolean(pickRecorderMime()) && typeof navigator !== "undefined"
+        && Boolean(navigator.mediaDevices?.getUserMedia);
     },
 
-    async start() {
+    async start({ stream: audioStream, onLimit } = {}) {
       if (!alive || recorder || startet) return;
       mime = pickRecorderMime();
       if (!mime || !navigator?.mediaDevices?.getUserMedia) return;
       const meinLauf = lauf;
       startet = true;
       try {
-        const captured = await navigator.mediaDevices.getUserMedia({
+        const captured = audioStream ? audioStream.clone() : await navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
         });
         if (meinLauf !== lauf) {
@@ -154,7 +155,9 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
         };
         recorder.start();
         // Harte Obergrenze: eine vergessene Aufnahme laeuft nie ewig weiter.
-        wecker = setTimeout(aufraeumen, MAX_AUFNAHME_MS);
+        wecker = setTimeout(() => {
+          try { onLimit?.(); } finally { aufraeumen(); }
+        }, MAX_AUFNAHME_MS);
       } catch {
         if (meinLauf === lauf) aufraeumen(); // z. B. Mikrofon verweigert — Ohr bleibt still, Web Speech laeuft.
       } finally {

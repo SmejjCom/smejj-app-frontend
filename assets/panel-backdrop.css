@@ -68,3 +68,31 @@
     animation: none;
   }
 }
+
+/* Sichtbarer Neuer-Chat-Einstieg. */
+body .neuer-chat-start {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 2px);
+  right: calc(env(safe-area-inset-right, 0px) + 44px);
+  z-index: 76;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid var(--ruhe-linie, rgba(127, 127, 127, .22));
+  background: var(--glass-bg, rgba(127, 127, 127, .10));
+  backdrop-filter: blur(16px);
+  padding: 0 12px;
+  border-radius: 22px !important;
+  color: var(--ruhe-text, var(--text-primary, inherit));
+  font: inherit;
+  font-size: 14px;
+}
+.neuer-chat-start svg { width: 18px; height: 18px; flex: 0 0 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+body:not(.spur-start-aktiv) .neuer-chat-start { display: none; }
+html.mobil-chat-viewport body .neuer-chat-start {
+  top: calc(var(--chat-sichtbar-oben, 0px) + max(0px, calc(var(--sa-top, 0px) - 24px)));
+}

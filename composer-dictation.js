@@ -192,7 +192,8 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
 
   function start() {
     const input = getInput();
-    if (!input || !speechSupported()) return;
+    const nurOhr = !RecognitionCtor && Boolean(serverOhr?.isAlive?.());
+    if (!input || (!nurOhr && !speechSupported())) return;
     if (sitzung) return; // laeuft schon
     // Liefert die Vorgaenger-Instanz noch nach, wuerde sie das Feld der neuen
     // Sitzung ueberschreiben — sie wird jetzt hart beendet (das Feld traegt
@@ -209,13 +210,13 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       instFinals: "",
       interim: "",
       hatText: false,
-      nurOhr: false,
+      nurOhr,
       kurzeLaeufe: 0,
       gestartetUm: 0
     };
     sitzung = s;
     setVisual?.(true);
-    try { serverOhr?.start(); } catch { /* Ohr bleibt still, Web-Speech laeuft */ }
+    try { serverOhr?.start({ onLimit: () => { if (sitzung === s && s.nurOhr) stop(); } }); } catch { /* Ohr bleibt still, Web-Speech laeuft */ }
     starteErkennung(s);
   }
 
