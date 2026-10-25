@@ -22,7 +22,7 @@
       + '</span></td><td>' + e(a.budgetEur) + ' €</td><td>' + e(lastAction(a.lastAction)) + '</td></tr>').join('');
     const notice = d.source === 'persisted' ? 'Status und letzte Aktionen aus dem vorhandenen Speicher gelesen.'
       : 'Gespeicherte Aktivitäten sind NICHT VERFÜGBAR. Angezeigt werden die 170 Rollendefinitionen; es werden keine Aktivitäten erfunden.';
-    ctx.zeichne('<div class="head"><h1>170 digitale Mitarbeiter</h1><p>Nur lesend · ausschließlich Owner und Admin</p></div>'
+    ctx.zeichne('<div class="head" data-workforce-overview><h1>170 digitale Mitarbeiter</h1><p>Nur lesend · ausschließlich Owner und Admin</p></div>'
       + '<section class="panel glass"><div class="ph"><h3>Betriebsübersicht</h3><button class="btn" data-workforce-refresh>Neu laden</button></div>'
       + '<div class="pb kpis">' + card('Rollen', d.totals.defined) + card('An', d.totals.on) + card('Aus', d.totals.off)
       + card('Budget', d.operatingPolicy.budgetEur + ' €') + card('Kill-Switch', d.operatingPolicy.killSwitch ? 'AKTIV' : 'INAKTIV') + '</div>'
