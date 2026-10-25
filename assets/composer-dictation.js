@@ -216,7 +216,16 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     };
     sitzung = s;
     setVisual?.(true);
-    try { serverOhr?.start({ onLimit: () => { if (sitzung === s && s.nurOhr) stop(); } }); } catch { /* Ohr bleibt still, Web-Speech laeuft */ }
+    const gescheitert = result => {
+      if (sitzung !== s || !s.nurOhr || result?.ok !== false) return;
+      s.aktiv = false; sitzung = null; setVisual?.(false);
+      serverOhr.cancel();
+      showToast(t(result.error === "microphone_denied" ? "Mikrofon nicht freigegeben" : "Mikrofon konnte nicht gestartet werden."), "warn");
+    };
+    try {
+      Promise.resolve(serverOhr?.start({ onLimit: () => { if (sitzung === s && s.nurOhr) stop(); } }))
+        .then(gescheitert, () => gescheitert({ ok: false }));
+    } catch { gescheitert({ ok: false }); }
     starteErkennung(s);
   }
 

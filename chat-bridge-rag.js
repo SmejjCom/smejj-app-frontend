@@ -173,12 +173,37 @@ export function buildRagBlockMitVerlauf(task, vorherigesThema = "", options = {}
 }
 
 /**
+ * Stelle, an der ein wechselnder Block stehen darf, ohne den Cache zu zerstoeren:
+ * direkt VOR der letzten Nutzernachricht.
+ *
+ * WARUM DAS ZAEHLT (gemessen am 2026-08-18): Anbieter cachen den laengsten
+ * uebereinstimmenden ANFANG einer Anfrage und geben darauf 90 bis 98 % Rabatt.
+ * Ein Block, der sich mit jeder Frage aendert, macht ALLES dahinter wertlos —
+ * steht er ganz vorn, ist die gesamte Anfrage jedes Mal ein Volltreffer-Fehlschlag.
+ * Systemregeln und Verlauf sind dagegen ueber viele Runden gleich; sie gehoeren
+ * in den Anfang, das Wechselnde ans Ende.
+ *
+ * Die Zusicherung des Aufrufers bleibt erfuellt: der Kontext steht weiterhin VOR
+ * der Aufgaben-Anweisung, die in der letzten Nutzernachricht steckt — sogar
+ * direkter davor als zuvor.
+ *
+ * @param {Array} messages Nachrichten in Reihenfolge
+ * @returns {number} Einfuegestelle; ohne Nutzernachricht das Listenende
+ */
+export function vorLetzterNutzerNachricht(messages) {
+  if (!Array.isArray(messages)) return 0;
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    if (messages[index]?.role === "user") return index;
+  }
+  return messages.length;
+}
+
+/**
  * Setzt einen fertigen Kontextblock als System-Nachricht in eine Nachrichtenliste.
  *
- * Der Block kommt VOR die fallspezifische System-Anweisung — dieselbe Reihenfolge,
- * mit der gemessen wurde (src/evaluation/evalRagContext.js haengt ihn dort ebenfalls
- * davor). Die Anweisung des Aufrufers muss zuletzt gelten, sonst prueft eine
- * Zusicherung den Kontext statt der Anweisung.
+ * Die Einfuegestelle bestimmt der Aufrufer. Fuer wechselnde Bloecke ist
+ * `vorLetzterNutzerNachricht(messages)` die richtige Wahl — siehe dort, warum
+ * die alte Stelle 0 den Prompt-Cache jedes Mal zerstoerte.
  *
  * Warum der Block hier hineingereicht und nicht erneut gesucht wird: eine Anfrage
  * kann drei Spuren erreichen (Schnellspur, Control-Server, tiefe Spur). Gesucht

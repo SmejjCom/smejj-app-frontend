@@ -18,6 +18,7 @@ export function initChatViewport(win = window, doc = document) {
   let frame = 0;
   let width = win.innerWidth;
   let normalHeight = 0;
+  let rotating = false;
   const update = () => {
     frame = 0;
     const active = mobile.matches && start.classList.contains("is-active");
@@ -26,7 +27,7 @@ export function initChatViewport(win = window, doc = document) {
       import("./mobil-tastatur-platz.js?v=3").then(m => m.pruefePlatz(win, doc));
     if (active && size) {
       if (width !== win.innerWidth) { width = win.innerWidth; normalHeight = 0; }
-      normalHeight = Math.max(normalHeight, size.height);
+      if (!rotating) normalHeight = Math.max(normalHeight, size.height);
       const editing = doc.activeElement?.id === "startMessage";
       const keyboard = editing && (normalHeight - size.height > 80 || win.innerHeight - size.height > 80);
       root.style.setProperty("--chat-sichtbar-hoehe", `${size.height}px`);
@@ -42,18 +43,20 @@ export function initChatViewport(win = window, doc = document) {
   const settle = () => {
     schedule();
     win.clearTimeout(timer);
-    timer = win.setTimeout(schedule, 600);
+    timer = win.setTimeout(() => { rotating = false; schedule(); }, 600);
   };
+  const orient = () => { normalHeight = 0; rotating = true; settle(); };
+  const focus = event => { if (event.target?.id === "startMessage") settle(); };
   const observer = new win.MutationObserver(schedule);
   observer.observe(start, { attributes: true, attributeFilter: ["class"] });
   vv?.addEventListener("resize", settle);
   vv?.addEventListener("scroll", schedule);
   win.addEventListener("resize", settle);
-  win.addEventListener("orientationchange", settle);
+  win.addEventListener("orientationchange", orient);
   win.addEventListener("pageshow", schedule);
   mobile.addEventListener("change", schedule);
-  doc.addEventListener("focusin", settle);
-  doc.addEventListener("focusout", settle);
+  doc.addEventListener("focusin", focus);
+  doc.addEventListener("focusout", focus);
   update();
   return () => {
     observer.disconnect();
@@ -62,11 +65,11 @@ export function initChatViewport(win = window, doc = document) {
     vv?.removeEventListener("resize", settle);
     vv?.removeEventListener("scroll", schedule);
     win.removeEventListener("resize", settle);
-    win.removeEventListener("orientationchange", settle);
+    win.removeEventListener("orientationchange", orient);
     win.removeEventListener("pageshow", schedule);
     mobile.removeEventListener("change", schedule);
-    doc.removeEventListener("focusin", settle);
-    doc.removeEventListener("focusout", settle);
+    doc.removeEventListener("focusin", focus);
+    doc.removeEventListener("focusout", focus);
     root.classList.remove("mobil-chat-viewport");
     root.classList.remove("chat-wenig-hoehe");
     root.style.removeProperty("--chat-sichtbar-hoehe");

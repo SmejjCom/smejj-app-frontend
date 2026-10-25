@@ -4,8 +4,8 @@
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
 import { renderChatMarkdown } from "/assets/chat-markdown.js?v=g20260926160932";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=38";
-export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=38";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=20261025";
+export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=20261025";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und Bewertung je
 // Nachricht.
@@ -463,7 +463,7 @@ const reinigerBereit = () => (reinigerLaedt ||= import("/assets/html-reiniger.js
 async function parkerBereit(messages) {
   await reinigerBereit();
   if (parkerLaedt) return parkerLaedt;
-  const braucht = (Array.isArray(messages) ? messages : []).some((m) => MEDIEN_ADRESSE.test(String(m?.html || "")));
+  const braucht = (Array.isArray(messages) ? messages : []).some((m) => [m?.html, ...(Array.isArray(m?.versions) ? m.versions.map(v => v?.html) : [])].some(html => MEDIEN_ADRESSE.test(String(html || ""))));
   if (!braucht) return null;
   parkerLaedt = import("./chat-medien.js?v=16")
     .then((m) => { if (typeof m.parkeMedienAdressen === "function") parkeMedien = m.parkeMedienAdressen; })
@@ -503,7 +503,10 @@ function renderEntriesInto(log, messages) {
         rating: message.rating,
         sources: message.sources,
         // Fassungen mitgeben, damit "Version 2 von 3" ein Neuladen ueberlebt.
-        versions: message.versions,
+        versions: Array.isArray(message.versions) ? message.versions.map(version => ({
+          ...version, html: reinige && typeof version?.html === "string"
+            ? parkeMedien(ohneToteAktion(reinige(version.html))) : ""
+        })) : [],
         active: message.active
       });
     }

@@ -158,3 +158,8 @@ export function shortHost(url) {
     return url;
   }
 }
+
+// Produktions-CSP: fremde Seiten reisen ueber den bestehenden Server-Proxy.
+export function direkterRahmenErlaubt(url, origin = globalThis.location?.origin) {
+  try { return [origin, "https://api.smejj.com", "https://accounts.google.com", "https://smejj-control.zeabur.app", "https://smejj-chat-bridge.zeabur.app"].includes(new URL(url, origin).origin); } catch { return false; }
+}

@@ -29,12 +29,8 @@ const STRIPE_PLAN_LINKS = {
   pro: "https://buy.stripe.com/28E6oJ2Ci4HabCE72sfIs01",
   max: "https://buy.stripe.com/14AdRb7WC5Le6ik2McfIs02"
 };
-// Kuendigungsbutton nach § 312k BGB ("Verträge hier kündigen"): fuehrt zum
-// Stripe-Kundenportal, in dem der Kunde das laufende Abo selbst kuendigt. Der
-// Link wird — wie die Zahlungslinks — nach der Stripe-Konto-Aktivierung vom
-// Betreiber eingetragen (Stripe Dashboard → Einstellungen → Kundenportal →
-// "Link teilen"). BETREIBER-TODO: leer lassen, bis der echte Portal-Link
-// vorliegt; solange greift der Mailto-Notweg in handleCancelSubscription().
+// Oeffentliches Stripe-Portal als Rueckfall. Fuer bestehende Abos wird zuerst
+// eine kontogebundene Portal-Sitzung vom Server angefordert.
 const STRIPE_BILLING_PORTAL_URL = "https://billing.stripe.com/p/login/5kQaEZ2Cic9C5egbiIfIs00";
 const SAFE_EXPORT_KEYS = [STORAGE_KEYS.profile, STORAGE_KEYS.settings, STORAGE_KEYS.session, STORAGE_KEYS.model];
 // Abo-Anzeige (Schritt 3b): checkoutRef kommt vom Control-Server

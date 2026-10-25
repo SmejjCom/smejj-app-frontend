@@ -7,7 +7,7 @@
 //
 // WICHTIG: derselbe chat-store-Spezifizierer wie in search.js und
 // chat-history-view.js — ein abweichender Pfad erzeugt eine ZWEITE Modulinstanz.
-import { listChats } from "/assets/chat-store.js?v=g20260928133220";
+import { listChats } from "/assets/chat-store.js?v=20261025";
 import {
   anzeigeTitel,
   anzeigeVorschau,

@@ -1,18 +1,6 @@
-// smejj.com — Integrierter Browser (Codex-Stil) im rechten Panel.
-// Live-Browser: blockierende Seiten (Amazon & Co.) laufen als interaktive
-// Remote-Session (klicken/tippen/scrollen wie in Chrome); Details in
-// browser-pane-session.js. Fallback bleibt die Standbild-Ansicht.
-// Split-View: links bleibt der Arbeitsbereich, rechts oeffnet sich der Browser.
-// Tabs ohne Nutzer-Limit (Betreiber 2026-09-06), Zurueck/Vor/Neu laden, URL- und Suchleiste.
-// Rendering: direkt einbettbare Seiten laufen im Original-Iframe (volles JS),
-// blockierende Seiten (Google, GitHub, ...) kommen als sichere, serverseitig
-// umgeschriebene Ansicht ueber /api/browser/fetch. Fail-closed: ohne Server
-// wird direkt eingebettet und "In neuem Tab oeffnen" angeboten.
-// Ohne Version wie alle 25 uebrigen Importe (QA-Welle 1, Befund F-07): Der
-// abweichende Spezifizierer liess config.js ein zweites Mal laden — zwei Modul-
-// instanzen mit getrennten CLIENT_ROUTES.
+// smejj.com — Browser-Panel mit Server-Proxy und Live-Browser.
 import { CLIENT_ROUTES } from "./config.js";
-import { baueFernwege } from "./browser-pane-fernwege.js?v=browser-pane-20260918-11";
+import { baueFernwege } from "./browser-pane-fernwege.js?v=20261025";
 import {
   buildExternalFallbackHtml,
   buildLiveBrowserHtml,
@@ -41,11 +29,11 @@ import { buildErrorPageHtml, buildPaneShellHtml } from "./browser-pane-render.js
 // zugleich WEITER EXPORTIERT, damit tests/browser-pane.test.mjs und jeder
 // bisherige Aufrufer sie unveraendert von browser-pane.js bekommt.
 import {
-  clampZoom, clampViewport, normalizeAddress, normalizeAgentBrowserUrl,
+  direkterRahmenErlaubt, clampZoom, clampViewport, normalizeAddress, normalizeAgentBrowserUrl,
   shouldOpenInRealBrowser, shouldPreferRealBrowserUrl, shortHost
-} from "./browser-pane-adressen.js?v=browser-pane-20260820-5";
-import { applyZoom, baueZoomHaken } from "./browser-pane-zoom.js?v=4";
-import { verdrahteHauptmenue } from "./browser-pane-hauptmenue.js?v=6";
+} from "./browser-pane-adressen.js?v=20261025";
+import { applyZoom, baueZoomHaken } from "./browser-pane-zoom.js?v=20261025";
+import { verdrahteHauptmenue } from "./browser-pane-hauptmenue.js?v=20261025";
 // E2E-Pruefung 14.09.2026: fehlte — Rechtsklick auf Zurueck/Vor warf ReferenceError.
 import { zeigeVerlaufMenue } from "./browser-pane-menue.js?v=browser-pane-20260918-3";
 // Der Zoom lebt in browser-pane-zoom.js; hier nur seine drei Anschluesse.
@@ -630,6 +618,11 @@ function stepHistory(delta) {
 }
 
 export function setFrame(tab, { src = "", srcdoc = "", mode }) {
+  if (src && !srcdoc && !direkterRahmenErlaubt(src)) {
+    const proxy = proxyRahmen(src);
+    if (proxy.src === src) { srcdoc = buildErrorPageHtml({ url: src, grund: "Server-Proxy nicht erreichbar." }); src = ""; }
+    else { src = proxy.src || ""; srcdoc = proxy.srcdoc || ""; mode = proxy.mode; }
+  }
   tab.frame?.remove();
   const frame = document.createElement("iframe");
   frame.className = "bp-frame";

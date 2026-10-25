@@ -1,29 +1,5 @@
-// smejj.com — Aktionen pro Chat-Nachricht (2026-07-28).
-//
-// Kopieren, Bearbeiten, Neu generieren, Bewerten, Vorlesen, Abzweigen und
-// "Ab hier loeschen" — je Nachricht, mit Versionen. Recherchierter Stand von
-// ChatGPT, Gemini und Claude (Juli 2026) plus drei Punkte, die dort fehlen:
-//   1. Bearbeiten der eigenen Nachricht (ChatGPT hat es im Mai 2026 entfernt).
-//   2. Alles per Tastatur erreichbar — die drei Grossen haengen an :hover, was
-//      WCAG 2.1.1 verletzt und fuer Touch- und Screenreader-Nutzer nichts liefert.
-//   3. "Version 2 von 3" als lesbares Label statt zwei winziger Pfeile.
-//
-// Architektur: Die Leiste ist ein GESCHWISTER der Nachricht, niemals ein Kind.
-// chat-store.js, chat-history-context.js und das Vorlesen in composer-tools.js
-// lesen den textContent eines Eintrags; ein Bedienelement darin waere im
-// gespeicherten Verlauf und im Modellkontext gelandet ("Version 2 von 3" als
-// Teil der Frage). Aus demselben Grund liegt der Editor neben der Nachricht und
-// die Nachricht wird beim Bearbeiten nur ausgeblendet.
-//
-// Erneutes Senden laeuft ueber den bestehenden Composer (#startMessage +
-// #startSend). Dadurch bleibt public/app.js unangetastet — es liegt unter dem
-// Start-Lock und an der 800-Zeilen-Grenze.
-//
-// Fail-safe: jeder Fehler bleibt lokal; der Chat funktioniert unveraendert
-// weiter (Non-Regression-Pflicht). Kein Netzverkehr — mit EINER seit
-// 2026-08-13 dokumentierten Ausnahme: ein gesetzter Daumen schickt ein
-// Qualitaets-Signal an den Control-Server (Daten-Schwungrad). Auch das
-// fail-safe: scheitert der Versand, bleibt die Bewertung lokal sichtbar.
+// smejj.com — Aktionen und sichere Versionen pro Chat-Nachricht.
+// Bedienelemente bleiben Geschwister der Nachricht, damit Kopieren und Verlauf nur Inhalt enthalten.
 import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=3";
 import { t } from "./i18n/ui.js?v=3";
 const sprachHelfer = () => import("/assets/sprach-helfer.js?v=2");
@@ -47,7 +23,7 @@ import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainTex
 // sanitizeForSpeech erst beim Vorlese-Klick laden (2026-08-24 "Startseite
 // abspecken") — derselbe Spezifizierer wie ueberall, sonst laedt der Browser
 // die Datei doppelt (Vorfall 2026-07-29, siehe oben).
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=g20260928133220";
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=20261025";
 import { showToast } from "/assets/components.js?v=g20260926160932";
 import { wendeAn, entferneEndgueltig } from "./chat-neu-versuch.js?v=1";
 
@@ -477,14 +453,19 @@ function sourcePanelOf(entry) {
   return log()?.querySelector(`.msg-sources[data-for="${meta.id}"]`) || null;
 }
 
-function showVersion(entry, index) {
+async function showVersion(entry, index) {
   const meta = metaOf(entry);
   const version = meta.versions[index];
   if (!version) return;
   meta.active = index;
   meta.raw = version.raw;
-  if (version.html) entry.innerHTML = version.html;
-  else entry.textContent = version.raw;
+  entry.textContent = version.raw;
+  if (version.html) {
+    try {
+      const { reinigeGespeichertesHtml } = await import("/assets/html-reiniger.js?v=g20260928");
+      if (meta.active === index && meta.versions[index] === version) entry.innerHTML = reinigeGespeichertesHtml(version.html);
+    } catch { /* Ohne Reiniger bleibt nur der Rohtext sichtbar. */ }
+  }
   ensureBar(entry);
 }
 

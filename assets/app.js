@@ -3,10 +3,10 @@ import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js";
 import { AI_MODES, createAiRouter } from "/assets/ai/index.js";
 import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=g20260926160932";
 import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=8";
-import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=42";
+import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=20261025";
 import { initWorkspaceBridge } from "./workspace-bridge.js";
 import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2";
-import { holeSendepfad } from "./sendepfad-nachladen.js?v=36";
+import { holeSendepfad } from "./sendepfad-nachladen.js?v=20261025";
 import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js";
 import { initPanelBackdrop } from "./panel-backdrop.js?v=panel-backdrop-20261025-3";
 import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js";
@@ -80,7 +80,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
-const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=bedienung20261023").then((m) => (m.enhancePremiumSurfaces(), m)));
+const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=20261025").then((m) => (m.enhancePremiumSurfaces(), m)));
 // Google-Login gehoert zur Profilseite — laedt erst beim Verlassen von Start/Chat.
 const holeGoogleLogin = ladeBeiAnsicht(["start", "chat"], () => import("./google-login.js")
   .then((m) => m.initGoogleLogin({ $, state, writeOutput, refreshSessionStatus }))

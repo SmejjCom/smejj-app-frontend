@@ -99,6 +99,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
   let stuecke = [];
   let mime = "";
   let wecker = 0;
+  let aufnahmeEnde = null;
   // Laufnummer (Geraetebefund 23.09.2026, iPhone: orangefarbener Mikrofon-Punkt
   // blieb an). start() wartet auf getUserMedia; kam in der Zwischenzeit
   // cancel()/finish(), legte der verspaetete Start trotzdem einen Recorder an,
@@ -133,9 +134,9 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
     },
 
     async start({ stream: audioStream, onLimit } = {}) {
-      if (!alive || recorder || startet) return;
+      if (!alive || recorder || startet || aufnahmeEnde) return { ok: false, error: "unavailable" };
       mime = pickRecorderMime();
-      if (!mime || !navigator?.mediaDevices?.getUserMedia) return;
+      if (!mime || !globalThis.navigator?.mediaDevices?.getUserMedia) return { ok: false, error: "unavailable" };
       const meinLauf = lauf;
       startet = true;
       try {
@@ -145,21 +146,30 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
         if (meinLauf !== lauf) {
           // Waehrend des Wartens abgebrochen: Mikrofon sofort freigeben.
           captured?.getTracks?.().forEach((track) => { try { track.stop(); } catch { /* schon aus */ } });
-          return;
+          return { ok: false, error: "cancelled" };
         }
-        stuecke = [];
+        aufnahmeEnde = null;
+        const teile = [];
+        stuecke = teile;
         stream = captured;
         recorder = new MediaRecorder(captured, { mimeType: mime, audioBitsPerSecond: 32_000 });
         recorder.ondataavailable = (event) => {
-          if (event.data && event.data.size > 0) stuecke.push(event.data);
+          if (event.data && event.data.size > 0) teile.push(event.data);
         };
         recorder.start();
         // Harte Obergrenze: eine vergessene Aufnahme laeuft nie ewig weiter.
         wecker = setTimeout(() => {
-          try { onLimit?.(); } finally { aufraeumen(); }
+          aufnahmeEnde = new Promise(resolve => {
+            recorder.onstop = resolve;
+            setTimeout(resolve, 400);
+          });
+          aufraeumen();
+          onLimit?.();
         }, MAX_AUFNAHME_MS);
-      } catch {
-        if (meinLauf === lauf) aufraeumen(); // z. B. Mikrofon verweigert — Ohr bleibt still, Web Speech laeuft.
+        return { ok: true };
+      } catch (error) {
+        if (meinLauf === lauf) aufraeumen();
+        return { ok: false, error: ["NotAllowedError", "SecurityError"].includes(error?.name) ? "microphone_denied" : "recorder_failed" };
       } finally {
         startet = false;
       }
@@ -171,6 +181,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
     },
 
     cancel() {
+      aufnahmeEnde = null;
       stuecke = [];
       aufraeumen();
     },
@@ -179,18 +190,20 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
     // Rueckfall (reines Ohr-Diktat) — dort waere ein gerissenes Budget
     // verlorener Text.
     async finish(optionen = {}) {
-      if (!alive || !recorder) {
+      if (!alive || (!recorder && !aufnahmeEnde)) {
         aufraeumen();
         return "";
       }
-      const beendet = new Promise((resolve) => {
+      const teile = stuecke;
+      const beendet = aufnahmeEnde || new Promise((resolve) => {
         recorder.onstop = () => resolve();
         setTimeout(resolve, 400); // onstop darf nie haengen
       });
+      aufnahmeEnde = null;
       aufraeumen();
       await beendet;
-      const blob = new Blob(stuecke, { type: mime });
-      stuecke = [];
+      const blob = new Blob(teile, { type: mime });
+      if (stuecke === teile) stuecke = [];
       if (blob.size < 1_000) return ""; // zu kurz fuer echte Sprache
       const abbruch = new AbortController();
       const budget = setTimeout(() => abbruch.abort(), Number(optionen?.budgetMs) > 0 ? Number(optionen.budgetMs) : budgetMs);
