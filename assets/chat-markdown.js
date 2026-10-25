@@ -30,6 +30,7 @@ const INLINE_CODE = /`([^`\n]+)`/g;
 const BOLD = /\*\*([^*\n]+)\*\*/g;
 const ITALIC = /(^|[\s(])\*([^*\n]+)\*(?=[\s).,;:!?]|$)/g;
 const BULLET = /^[-*]\s+(.*)$/;
+const ORDERED = /^\d+[.)]\s+(.*)$/;
 const MARKERS = /[*`]|https?:\/\/|!\[/;
 // Markdown-Link [Text](URL) — nur http/https, keine Leerzeichen im Ziel.
 const MD_LINK = /\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g;
@@ -133,7 +134,7 @@ function hatZitat(source) {
 // "*" haette eines, "-" nicht. Jede schlichte Strichliste des Modells blieb
 // damit Rohtext, obwohl BULLET sie laengst kennt.
 function hatListe(source) {
-  return String(source).split("\n").some((zeile) => BULLET.test(zeile.trim()));
+  return String(source).split("\n").some((zeile) => (BULLET.test(zeile.trim()) || ORDERED.test(zeile.trim())));
 }
 
 /**
@@ -171,15 +172,22 @@ export function renderChatMarkdown(node) {
     // weder Stern noch Backtick noch Adresse. Ohne diese zweite Frage bliebe
     // genau sie als Rohtext stehen (gemessen 2026-08-13).
     if (!MARKERS.test(source) && !hatTabelle(source) && !hatUeberschrift(source)
-      && !hatZitat(source) && !hatListe(source)) return; // nichts auszuzeichnen
+      && !hatZitat(source) && !hatListe(source) && !/\n\s*\n/.test(source)) return; // nichts auszuzeichnen
     const html = toHtml(source);
     if (html) node.innerHTML = html;
+    if (/Open-Meteo/i.test(source)) {
+      import("./chat-weather-card.js?v=2026102515").then(({wetterKarte}) => {
+        const card = wetterKarte(source, toHtml, escapeHtml);
+        if (card && node.innerHTML === html) node.innerHTML = card;
+      }).catch(() => {});
+    }
     videoQuellenUmwandeln(node);
     e2Videos(node);
   } catch {
     /* fail-safe: im Zweifel bleibt der Rohtext stehen — nie eine leere Antwort */
   }
 }
+
 
 function isVoiceModeActive() {
   return Boolean(window.smejjVoiceModePreferences?.voiceMode);
@@ -218,9 +226,29 @@ function renderBlock(part) {
   // Ueberschriften duerfen mit Textzeilen im selben Block stehen ("## Titel"
   // direkt gefolgt vom Absatz) — deshalb zeilenweise, nicht alles-oder-nichts.
   if (lines.some((line) => UEBERSCHRIFT.test(line.trim()))) return mitUeberschriften(lines);
-  if (lines.every((line) => BULLET.test(line.trim()))) {
-    const items = lines.map((line) => `<li>${inline(line.trim().replace(BULLET, "$1"))}</li>`).join("");
-    return `<ul class="chat-list">${items}</ul>`;
+  if (lines.some((line) => BULLET.test(line.trim()) || ORDERED.test(line.trim()))) {
+    const parts = [];
+    let kind = "";
+    let items = [];
+    const close = () => {
+      if (items.length) parts.push(`<${kind} class="chat-list">${items.join("")}</${kind}>`);
+      items = [];
+      kind = "";
+    };
+    for (const line of lines) {
+      const bullet = line.trim().match(BULLET);
+      const ordered = line.trim().match(ORDERED);
+      const next = bullet ? "ul" : ordered ? "ol" : "";
+      if (next !== kind) close();
+      if (next) {
+        kind = next;
+        items.push(`<li>${inline((bullet || ordered)[1])}</li>`);
+      } else {
+        parts.push(`<p>${inline(line)}</p>`);
+      }
+    }
+    close();
+    return parts.join("");
   }
   return `<p>${lines.map((line) => inline(line)).join("<br>")}</p>`;
 }

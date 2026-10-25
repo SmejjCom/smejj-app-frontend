@@ -3,10 +3,10 @@
 // unveraendert: Menue oeffnen/schliessen, Anhaenge als Text-Referenz einfuegen.
 // Versionierter Pfad wie in app.js (QA-Welle 1, Befund F-07) — ein Schutztest
 // verlangt die Cache-Version dort ausdruecklich, also zieht dieser Import nach.
-import { showToast } from "./components.js?v=g20260926160932";
+import { showToast } from "./components.js?v=2026102515";
 import { t } from "./i18n/ui.js?v=3";
 import { bindBildAnhang, uebernehmeBildDatei } from "./composer-bild-anhang.js";
-import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=8";
+import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=2026102515";
 import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=3";
 
 // Was als Text mitgeht: Textarten und die ueblichen Quell-/Daten-Endungen,

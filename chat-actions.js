@@ -23,8 +23,8 @@ import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainTex
 // sanitizeForSpeech erst beim Vorlese-Klick laden (2026-08-24 "Startseite
 // abspecken") — derselbe Spezifizierer wie ueberall, sonst laedt der Browser
 // die Datei doppelt (Vorfall 2026-07-29, siehe oben).
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=20261025";
-import { showToast } from "/assets/components.js?v=g20260926160932";
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=2026102515";
+import { showToast } from "/assets/components.js?v=2026102515";
 import { wendeAn, entferneEndgueltig } from "./chat-neu-versuch.js?v=1";
 
 const SETTLE_MS = 900;

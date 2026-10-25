@@ -2641,6 +2641,16 @@ opacity: 0.9}
 .entry.assistant .chat-hinweis[data-art="warning"] .chat-hinweis-titel { color: #d99b3f; }
 .entry.assistant .chat-hinweis[data-art="caution"] { border-left-color: #d9614a; }
 .entry.assistant .chat-hinweis[data-art="caution"] .chat-hinweis-titel { color: #d9614a; }
+.entry.assistant .chat-weather { border: 1px solid rgba(127,127,127,.3); border-radius: 16px; padding: 16px; margin: 8px 0 16px; overflow-wrap: anywhere; }
+.entry.assistant .chat-weather h3 { margin: 0 0 10px; font-size: 1.15em; }
+.entry.assistant .chat-weather-temperature { font-size: 2em; font-weight: 700; line-height: 1.2; }
+.entry.assistant .chat-weather dl { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,120px),1fr)); gap: 10px; margin: 16px 0; }
+.entry.assistant .chat-weather dl div { padding: 10px; background: rgba(127,127,127,.08); border-radius: 10px; min-width: 0; }
+.entry.assistant .chat-weather dt { font-size: .8em; }
+.entry.assistant .chat-weather dd { margin: 5px 0 0; font-weight: 700; }
+.entry.assistant .chat-weather summary { cursor: pointer; padding: 10px 0; min-height: 44px; box-sizing: border-box; }
+.entry.assistant .chat-weather details[open] summary { margin-bottom: 8px; }
+.entry.assistant .chat-weather summary:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
 /* ---- chat-actions.css ---- */
 .msg-actions {
