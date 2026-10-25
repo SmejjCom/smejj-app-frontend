@@ -1,4 +1,4 @@
-import { t } from "./i18n/ui.js?v=2026102537";
+import { t } from "./i18n/ui.js?v=2026102538";
 // smejj.com — gemessener Mikrofonpegel, Aufnahmedauer und bewusste Übernahme.
 export function diktatLeiste(input, { stop, accept, discard }) {
   if (typeof document === "undefined" || !input?.parentElement?.insertBefore) return () => {};

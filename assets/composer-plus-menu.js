@@ -3,11 +3,11 @@
 // unveraendert: Menue oeffnen/schliessen, Anhaenge als Text-Referenz einfuegen.
 // Versionierter Pfad wie in app.js (QA-Welle 1, Befund F-07) — ein Schutztest
 // verlangt die Cache-Version dort ausdruecklich, also zieht dieser Import nach.
-import { showToast } from "./components.js?v=2026102537";
-import { t } from "./i18n/ui.js?v=2026102537";
-import { bindBildAnhang, uebernehmeBildDatei } from "./composer-bild-anhang.js?v=2026102537";
-import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=2026102537";
-import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=2026102537";
+import { showToast } from "./components.js?v=2026102538";
+import { t } from "./i18n/ui.js?v=2026102538";
+import { bindBildAnhang, uebernehmeBildDatei } from "./composer-bild-anhang.js?v=2026102538";
+import { uebernehmeTextAnhang } from "./composer-paste-attach.js?v=2026102538";
+import { uebernehmeAnhang } from "./composer-anhang-chips.js?v=2026102538";
 
 // Was als Text mitgeht: Textarten und die ueblichen Quell-/Daten-Endungen,
 // hoechstens 200 KB — mehr traegt keine Frage sinnvoll (Server kuerzt ohnehin).
@@ -82,7 +82,7 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
       if (input.id === "startMessage" && (/\.pdf$/i.test(file.name || "") || file.type === "application/pdf")) {
         try {
           showToast(`PDF wird gelesen: ${file.name}`);
-          const { liesPdfText } = await import("./anhang-pdf-text.js?v=2026102537");
+          const { liesPdfText } = await import("./anhang-pdf-text.js?v=2026102538");
           const r = await liesPdfText(file);
           if (r.ok && uebernehmeTextAnhang(file.name, r.text, input)) { showToast(`PDF gelesen: ${file.name} (${r.seiten} Seiten)`); continue; }
           showToast(r.grund === "verschluesselt" ? `PDF ist verschluesselt: ${file.name}` : `Kein lesbarer Text im PDF: ${file.name}`);
@@ -92,7 +92,7 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
       // INHALT; alte Binaerformate (.doc/.xls/.ppt) bleiben Verweis-Chip.
       if (input.id === "startMessage" && /\.(docx|xlsx|pptx)$/i.test(file.name || "")) {
         try {
-          const { liesOfficeText } = await import("./anhang-office-text.js?v=2026102537");
+          const { liesOfficeText } = await import("./anhang-office-text.js?v=2026102538");
           const r = await liesOfficeText(file);
           if (r.ok && uebernehmeTextAnhang(file.name, r.text, input)) { showToast(`Dokument gelesen: ${file.name}`); continue; }
           showToast(`Kein lesbarer Text im Dokument: ${file.name}`);
@@ -104,8 +104,8 @@ function bindAttachInput(selector, label, getInput, notifyInputChanged) {
       uebernehmeAnhang(file, input, notifyInputChanged);
       if (input.id === "startMessage" && istTon) {
         try {
-          const { transkribiereTonspur } = await import("./anhang-tonspur.js?v=2026102537");
-          const { CLIENT_ROUTES } = await import("./config.js?v=2026102537");
+          const { transkribiereTonspur } = await import("./anhang-tonspur.js?v=2026102538");
+          const { CLIENT_ROUTES } = await import("./config.js?v=2026102538");
           showToast(`Tonspur wird gelesen: ${file.name}`);
           const r = await transkribiereTonspur(file, { url: CLIENT_ROUTES.api.voiceTranscribe, aufFortschritt: (f, g) => { if (f && f < g) showToast(`Tonspur ${f}/${g} Minuten …`); } });
           if (r.ok && uebernehmeTextAnhang(`Tonspur von ${file.name}`, r.text, input)) showToast(`Tonspur gelesen: ${Math.round(r.sekunden / 60)} min, ${r.stuecke} Stuecke`);

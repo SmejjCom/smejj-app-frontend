@@ -1,4 +1,4 @@
-import "./mobil-tastatur.js?v=2026102537";
+import "./mobil-tastatur.js?v=2026102538";
 // smejj.com — PWA-Schnellstarts (Manifest-Shortcuts, 25.08.).
 //
 // Android/Chrome zeigt beim App-Icon Langdruck die Manifest-Shortcuts. Damit
@@ -117,7 +117,7 @@ if (willNeu || willSprechen) {
 
   if (willNeu) {
     // Dieselbe Modul-Kennung wie ueberall — sonst zweite Instanz (Waechter).
-    import("/assets/chat-store.js?v=2026102537")
+    import("/assets/chat-store.js?v=2026102538")
       .then((m) => m.newChat?.())
       .catch(() => { /* nicht angemeldet oder Modul fehlt: Start bleibt Start */ });
   }
@@ -141,7 +141,7 @@ if (willNeu || willSprechen) {
 // der Reload einfach beim naechsten App-Start.
 if ("serviceWorker" in navigator) {
   let schonNeuGeladen = false, aufnahme = false;
-  const hatteSteuerung = Boolean(navigator.serviceWorker.controller);
+  let hatteSteuerung = Boolean(navigator.serviceWorker.controller);
   window.addEventListener("smejj:diktat-status", e => { aufnahme = Boolean(e.detail?.active); });
   const aktualisieren = async () => {
     if (updateHatLaufendeArbeit(document, aufnahme)) return false;
@@ -151,7 +151,8 @@ if ("serviceWorker" in navigator) {
     schonNeuGeladen = true; location.reload(); return true;
   };
   navigator.serviceWorker.addEventListener("controllerchange", async () => {
-    if (schonNeuGeladen || !navigator.serviceWorker.controller || !hatteSteuerung) return;
+    if (schonNeuGeladen || !navigator.serviceWorker.controller) return;
+    if (!hatteSteuerung) { hatteSteuerung = true; return; }
     const entwurf = Array.from(document.querySelectorAll("#startMessage, #codeAufgabe, #probierFeld")).some(f => f.value?.trim()) || window.smejjAnhangChips?.anhangListe?.().length;
     if (!entwurf && !updateHatLaufendeArbeit(document, aufnahme)) { await aktualisieren(); return; }
     if (document.getElementById("composerUpdateHinweis")) return;

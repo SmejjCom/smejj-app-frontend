@@ -13,13 +13,13 @@
 //   werden uebernommen; lokal juengere bleiben und werden beim naechsten Push
 //   hochgereicht. Massstab ist updatedAt — dieselbe Regel wie serverseitig.
 // - Jeder Fehler ist still: Sync ist Komfort, der Chat laeuft immer weiter.
-import { API_ORIGIN } from "/assets/config.js?v=2026102537";
-import { OWNER_KEY, gehoertNutzer, kontoAliase, merkeKontoKennung, sessionUserId } from "/assets/chat-owner.js?v=2026102537";
+import { API_ORIGIN } from "/assets/config.js?v=2026102538";
+import { OWNER_KEY, gehoertNutzer, kontoAliase, merkeKontoKennung, sessionUserId } from "/assets/chat-owner.js?v=2026102538";
 import {
   abgleichsKarte, teileAuf, erzeugeVorfahrt, erzeugeAbgleichsSpeicher,
   istUeberschreibKonflikt, konfliktKopie, geraeteKurzname, neueKonfliktId, ohneAbgleichsmarke, nachzutragen, grabsteinWeg,
   abarbeitenMitGrenze, neuesteZuerst
-} from "./chat-sync-auswahl.js?v=2026102537";
+} from "./chat-sync-auswahl.js?v=2026102538";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const PUSH_ENTPRELLUNG_MS = 4000;
@@ -59,8 +59,8 @@ async function meldeAbweisung(kennung, status, grund) {
   if (abgewiesen.has(kennung)) return;
   abgewiesen.add(kennung);
   try {
-    const { showToast } = await import("/assets/components.js?v=2026102537");
-    const { istZuGross } = await import("./chat-medien-rettung.js?v=2026102537").catch(() => ({ istZuGross: () => false }));
+    const { showToast } = await import("/assets/components.js?v=2026102538");
+    const { istZuGross } = await import("./chat-medien-rettung.js?v=2026102538").catch(() => ({ istZuGross: () => false }));
     const text = istZuGross(status, grund)
       ? "Ein Chat ist zu gross und wurde NICHT gesichert — er bleibt nur auf diesem Geraet."
       : `Ein Chat konnte nicht gesichert werden (${status}${grund ? `: ${grund}` : ""}) — er bleibt nur auf diesem Geraet.`;
@@ -82,7 +82,7 @@ async function meldeKonflikte(anzahl) {
     ? "Ein Chat wurde auf einem anderen Geraet geaendert — deine Fassung bleibt als Kopie \"(Konflikt vom Geraet …)\" im Verlauf."
     : `${anzahl} Chats wurden auf einem anderen Geraet geaendert — deine Fassungen bleiben als Kopien "(Konflikt vom Geraet …)" im Verlauf.`;
   try {
-    const { showToast } = await import("/assets/components.js?v=2026102537");
+    const { showToast } = await import("/assets/components.js?v=2026102538");
     showToast(text, "warn");
   } catch {
     console.warn(`smejj Verlauf-Sync: ${text}`);
@@ -258,8 +258,8 @@ async function rette(id) {
     const s = store();
     if (!s?.getChat || !s?.importChat) return false;
     const [{ rettteUndSpeichere }, { lagereMedienAusText }] = await Promise.all([
-      import("./chat-medien-rettung.js?v=2026102537"),
-      import("./chat-medien.js?v=2026102537")
+      import("./chat-medien-rettung.js?v=2026102538"),
+      import("./chat-medien.js?v=2026102538")
     ]);
     const ergebnis = await rettteUndSpeichere(id, {
       laden: (kennung) => s.getChat(kennung),
@@ -281,8 +281,8 @@ async function bestandAufraeumen() {
     const s = store();
     if (!s?.listChats || !s?.getChat || !s?.importChat) return;
     const [{ raeumeBestandAuf }, { lagereMedienAusText }] = await Promise.all([
-      import("./chat-medien-rettung.js?v=2026102537"),
-      import("./chat-medien.js?v=2026102537")
+      import("./chat-medien-rettung.js?v=2026102538"),
+      import("./chat-medien.js?v=2026102538")
     ]);
     const ergebnis = await raeumeBestandAuf({
       listen: () => s.listChats(),
@@ -390,7 +390,7 @@ async function push() {
       // ist die Pruefung in istZuGross zustaendig, nicht die Statusklasse.
       const rohgrund = antwort.status >= 400 ? await grundAus(antwort) : "";
       const grossFehler = antwort.status >= 400 && antwort.status < 500;
-      const { istZuGross } = await import("./chat-medien-rettung.js?v=2026102537").catch(() => ({ istZuGross: () => false }));
+      const { istZuGross } = await import("./chat-medien-rettung.js?v=2026102538").catch(() => ({ istZuGross: () => false }));
       if (grossFehler || istZuGross(antwort.status, rohgrund)) {
         const grund = rohgrund;
         // "Zu gross" ist der EINZIGE 4xx-Grund, den wir selbst beheben

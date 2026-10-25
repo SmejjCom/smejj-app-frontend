@@ -4,7 +4,7 @@
 // Profilbilds. Die eigentliche Normalisierung und Speicherung liegt in
 // public/profile-picture-store.js (Single Responsibility).
 
-import { t } from "./i18n/ui.js?v=2026102537";
+import { t } from "./i18n/ui.js?v=2026102538";
 import {
   MAX_EDGE,
   PROFILE_PICTURE_EVENT,
@@ -12,7 +12,7 @@ import {
   importProfilePictureFromUrl,
   readProfilePicture,
   saveProfilePicture
-} from "./profile-picture-store.js?v=2026102537";
+} from "./profile-picture-store.js?v=2026102538";
 
 // Merker: Das Kontobild wird HOECHSTENS EINMAL uebernommen. Sonst holt es sich
 // ein bewusst entferntes Bild beim naechsten Laden wieder zurueck.
