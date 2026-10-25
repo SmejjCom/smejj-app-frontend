@@ -755,7 +755,7 @@ document.querySelector("#homeLink")?.addEventListener("click", () => { window.lo
 // Google-Rueckkehr zuerst: Wenn ein Handoff-Token vorliegt, wird direkt angemeldet.
 zeigeRueckkehrFehler();
 if (new URLSearchParams(window.location.search).get("checkout") === "1") {
-  import("/assets/plan-weiter.js?v=20261025b").catch(() => status(t("Anmeldung ist momentan nicht erreichbar."), "error"));
+  import("/assets/plan-checkout.js?v=1").catch(() => status(t("Anmeldung ist momentan nicht erreichbar."), "error"));
 } else completeGoogleHandoff().then((handled) => {
   if (handled) return;
   refreshSession();
