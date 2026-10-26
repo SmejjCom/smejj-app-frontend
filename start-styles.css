@@ -6125,6 +6125,9 @@ backdrop-filter: none !important;
 color: var(--chat-glas-text)}
 html body:has(#start.view.is-active) .neuer-chat-start .button-icon {
 color: inherit !important}
+html body #start.has-start-chat #startLog.start-log.start-log.start-log {
+-webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.16) 0, rgba(0,0,0,.16) calc(var(--sa-top, 0px) + 44px), #000 calc(var(--sa-top, 0px) + 56px));
+mask-image: linear-gradient(to bottom, rgba(0,0,0,.16) 0, rgba(0,0,0,.16) calc(var(--sa-top, 0px) + 44px), #000 calc(var(--sa-top, 0px) + 56px))}
 @media (prefers-reduced-transparency:reduce), (prefers-contrast:more) {
 html body #start.view .home-feed .prompt-glass.prompt-glass.prompt-glass.prompt-glass,
 html body #start.view .home-feed .prompt-glass.prompt-glass.prompt-glass.prompt-glass:focus-within,
@@ -6133,5 +6136,8 @@ html body:has(#start.view.is-active) .workspace::after {
 background: var(--ruhe-grund, #151719) !important;
 -webkit-backdrop-filter: none !important;
 backdrop-filter: none !important}
+html body #start.has-start-chat #startLog.start-log.start-log.start-log {
+-webkit-mask-image: none;
+mask-image: none}
 }
 }

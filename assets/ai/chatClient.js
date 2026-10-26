@@ -7,9 +7,9 @@
 //   - "local browser": Chrome Prompt API (lokales Modell im Browser), falls verfuegbar.
 // Alle anderen Modi geben false zurueck — der bestehende fail-closed Server-Pfad
 // in app.js bleibt unveraendert zustaendig.
-import { validateByokConfig } from "./byok.js?v=2026102661";
-import { starteStilleWache, stilleText } from "./strom-stillstand.js?v=2026102661";
-import { API_ORIGIN, STORAGE_KEYS } from "../config.js?v=2026102661";
+import { validateByokConfig } from "./byok.js?v=2026102671";
+import { starteStilleWache, stilleText } from "./strom-stillstand.js?v=2026102671";
+import { API_ORIGIN, STORAGE_KEYS } from "../config.js?v=2026102671";
 
 const MAX_HISTORY_MESSAGES = 12;
 const MAX_MESSAGE_CHARS = 8000;
@@ -471,7 +471,7 @@ async function rendereAntwort(output) {
   // wachsenden Text ueber einen Offset (siehe Kopf von chat-markdown.js).
   if (globalThis.smejjVoiceModePreferences?.voiceMode === true) return;
   try {
-    const { renderChatMarkdown } = await import("/assets/chat-markdown.js?v=2026102661");
+    const { renderChatMarkdown } = await import("/assets/chat-markdown.js?v=2026102671");
     renderChatMarkdown(output);
   } catch { /* fail-safe: die Antwort bleibt als Rohtext lesbar */ }
 }

@@ -17,7 +17,7 @@
 //
 // Der Haken darf die Seite NIE mitreissen: jede Sendung ist try/catch- und
 // .catch(()=>{})-gesichert, und er wirft selbst keine Fehler nach oben.
-import { API_ORIGIN } from "./config.js?v=2026102661";
+import { API_ORIGIN } from "./config.js?v=2026102671";
 
 // Gleicher Schluessel wie auth-gate.js/profile-dock.js — bewusst dupliziert,
 // damit der Haken ohne Auth-Modul startfaehig bleibt (gleiches Muster dort).

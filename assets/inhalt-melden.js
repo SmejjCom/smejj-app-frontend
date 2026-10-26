@@ -8,13 +8,13 @@
 // WARUM EIN EIGENES MODUL: chat-menue-mehr.js traegt die anderen Menuepunkte; der Dialog samt
 // Gruenden und Versand ist ein eigener Belang und ohne DOM pruefbar (GRUENDE, meldungsNutzlast).
 // Der Menuepunkt selbst steht in chat-actions-menu.js (act "report").
-import { metaOf, rawOf } from "/assets/chat-messages.js?v=2026102661";
-import { toPlainText } from "/assets/chat-actions-menu.js?v=2026102661";
-import { showToast } from "/assets/components.js?v=2026102661";
+import { metaOf, rawOf } from "/assets/chat-messages.js?v=2026102671";
+import { toPlainText } from "/assets/chat-actions-menu.js?v=2026102671";
+import { showToast } from "/assets/components.js?v=2026102671";
 // :hover-Regeln im Stil unten (iPhone-Test 20.09.): styles.css faerbt jeden button bei :hover weiss, am Handy klebt
 // :hover an der zuletzt beruehrten Stelle — dort lag eben noch der Menuepunkt, die Grund-Zeile stand weiss und unlesbar da.
 // Texte laufen ueber t() (Geraetetest 20.09.): der Dialog blieb in englischer App deutsch.
-import { t } from "/assets/i18n/ui.js?v=2026102661";
+import { t } from "/assets/i18n/ui.js?v=2026102671";
 
 // Dieselben Kennungen wie in chat-actions.js (Daumen-Signal) — ein Schluesselwechsel
 // soll alle Stellen gemeinsam finden.

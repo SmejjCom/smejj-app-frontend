@@ -24,8 +24,8 @@
 //
 // FAIL-SAFE: Jeder Fehler, jede leere Antwort und jedes Zeitlimit fuehren zur
 // unveraenderten Frage. Es kann also nur besser werden, nie schlechter.
-import { isWeatherTask, buildWeatherContext } from "../chat-bridge-weather.js?v=2026102661";
-import { API_ORIGIN } from "../config.js?v=2026102661";
+import { isWeatherTask, buildWeatherContext } from "../chat-bridge-weather.js?v=2026102671";
+import { API_ORIGIN } from "../config.js?v=2026102671";
 
 // Die Websuche der Bruecke (chat-bridge-websuche.js) laesst sich hier NICHT
 // wiederverwenden: sie importiert chat-bridge-evolution.js, das nur im Node-

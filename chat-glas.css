@@ -186,6 +186,15 @@ html.mobil-chat-viewport #start .prompt-glass :is(.plus-menu,.model-menu,.code-m
   html body:has(#start.view.is-active) .neuer-chat-start .button-icon {
     color: inherit !important;
   }
+  /* Kontrast oben (v1043, Variante C): Icons und Chattext haben dieselbe Farbe,
+     beim Scrollen lagen sie 1:1 uebereinander. Die Kopfzeile bleibt ohne Flaeche,
+     Schatten und Unschaerfe; nur der Verlauf dimmt hinter ihr auf 16 % und ist
+     ab der ersten Zeile (56 px Abstand oben) wieder voll da. Gemessen: Icon gegen
+     Text darunter 10,3:1 dunkel, 10,7:1 hell. */
+  html body #start.has-start-chat #startLog.start-log.start-log.start-log {
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.16) 0, rgba(0,0,0,.16) calc(var(--sa-top, 0px) + 44px), #000 calc(var(--sa-top, 0px) + 56px));
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.16) 0, rgba(0,0,0,.16) calc(var(--sa-top, 0px) + 44px), #000 calc(var(--sa-top, 0px) + 56px));
+  }
   /* Barrierefreiheitswunsch des Geraets hat Vorrang vor der Standardansicht. */
   @media (prefers-reduced-transparency:reduce), (prefers-contrast:more) {
     html body #start.view .home-feed .prompt-glass.prompt-glass.prompt-glass.prompt-glass,
@@ -195,6 +204,10 @@ html.mobil-chat-viewport #start .prompt-glass :is(.plus-menu,.model-menu,.code-m
       background: var(--ruhe-grund, #151719) !important;
       -webkit-backdrop-filter: none !important;
       backdrop-filter: none !important;
+    }
+    html body #start.has-start-chat #startLog.start-log.start-log.start-log {
+      -webkit-mask-image: none;
+      mask-image: none;
     }
   }
 }

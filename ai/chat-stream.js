@@ -8,13 +8,13 @@
 // Was hier bewusst NICHT liegt: welche Endpunkte in welcher Reihenfolge gefragt
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
-import { fetchStreamWithRetry } from "./fetch-retry.js?v=2026102661";
-import { t } from "../i18n/ui.js?v=2026102661";
-import { empfehlungText } from "../sprach-helfer.js?v=2026102661";
-import { API_ORIGIN } from "../config.js?v=2026102661";
-import { mitLiveDaten } from "./live-daten.js?v=2026102661";
-import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js?v=2026102661";
-import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js?v=2026102661";
+import { fetchStreamWithRetry } from "./fetch-retry.js?v=2026102671";
+import { t } from "../i18n/ui.js?v=2026102671";
+import { empfehlungText } from "../sprach-helfer.js?v=2026102671";
+import { API_ORIGIN } from "../config.js?v=2026102671";
+import { mitLiveDaten } from "./live-daten.js?v=2026102671";
+import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js?v=2026102671";
+import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js?v=2026102671";
 
 // Gleicher Schluessel wie in auth/auth-page.js, account-sessions.js und
 // auth-gate.js — dort bewusst dupliziert, damit kein Modul den anderen nur
@@ -99,8 +99,8 @@ export async function erneuereZugangsToken() {
   return "";
 }
 
-import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js?v=2026102661";
-export { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, QUELLEN_LEER_HINWEIS } from "./chat-schritte-anzeige.js?v=2026102661";
+import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js?v=2026102671";
+export { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, QUELLEN_LEER_HINWEIS } from "./chat-schritte-anzeige.js?v=2026102671";
 // ---------------------------------------------------------------------------
 // Denk-Zeile (Betreiber 2026-08-23, Vorbild Antigravity "Thought for 1s ›"):
 // Denk-Text des Modells (delta.reasoning_content) gehoert NICHT in die
@@ -208,7 +208,7 @@ export function letzteNutzerfrage(body) {
  */
 // Wörter unter den Symbolen der Antwort-Leiste auf dem Handy (UI/UX Nr. 4) —
 // eigenes Modul, dynamisch, stumm bei Fehlern; die Leiste selbst bleibt unberührt.
-if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js?v=2026102661").catch(() => {});
+if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js?v=2026102671").catch(() => {});
 
 const AKTION_STIL_ID = "antwort-aktion-stil";
 // Der Stil kommt aus dem Modul, nicht aus chat-actions.css: die CSS liegt im
@@ -664,7 +664,7 @@ export async function streamChatAnswer(url, body, output, optionen = {}) {
     // Bild abgelegt — dasselbe Bild nachholen statt neu malen. Nicht nach einem bewussten Stopp.
     // Das Modul kommt erst beim Abriss (Startgewicht: es gehoert nicht in jeden Seitenaufruf).
     if (!lauf.gestoppt && /Die Bild-Übertragung ist abgerissen/.test(output?.textContent || "")) {
-      import("./bild-nachholen.js?v=2026102661").then(({ holeBildNach }) => holeBildNach({
+      import("./bild-nachholen.js?v=2026102671").then(({ holeBildNach }) => holeBildNach({
         output, renderMarkdown: optionen.renderMarkdown, hinweis: t("Bild wird erneut geladen …"),
         anfrage: () => fetchStreamWithRetry(zieleAnpassen(url, (rumpf) => ({ ...rumpf, bildErneut: true })), {
           method: "POST", headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() }, body: JSON.stringify({ ...body, bildErneut: true })
@@ -678,7 +678,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   // Fragen-Erfassung (Trainingsplan smejj 1.1, Stufe 1): loest nur aus, wartet
   // nie, bricht nie — der Server entscheidet aus Ledger und Schalter. Dynamisch
   // nachgeladen, damit ein fehlendes Modul den Chat nicht beruehrt.
-  import("/assets/ai/frage-erfassung.js?v=2026102661").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
+  import("/assets/ai/frage-erfassung.js?v=2026102671").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
   // Stufe 0 zuerst: was das Geraet des Nutzers selbst beantworten kann, kostet
   // niemanden etwas und ist meist schneller (gemessen 1,7-3,5 s gegen 2,9-6,6 s).
   if (await versucheLokaleAntwort(body, output, renderMarkdown)) return;
