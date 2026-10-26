@@ -147,3 +147,54 @@ html.mobil-chat-viewport #start .prompt-glass :is(.plus-menu,.model-menu,.code-m
     backdrop-filter: none !important;
   }
 }
+
+/* Freigabe 26.10.2026: keine Farbplatte oben oder im Eingabefeld.
+   Gleiche Schrift auf scrollender Schrift hat ohne Trennung Kontrast 1:1.
+   Nur der durchsichtige Hintergrund wird weichgezeichnet; Konturen bleiben
+   lesbar. Menues und die bewusst gewaehlte reduzierte Transparenz bleiben. */
+@media (max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px) {
+  html body #start.view .home-feed .prompt-glass.prompt-glass.prompt-glass.prompt-glass,
+  html body #start.view .home-feed .prompt-glass.prompt-glass.prompt-glass.prompt-glass:focus-within {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+  html body #start.view .prompt-glass :is(#startMessage, #composerPlusButton, #modelPickerButton, [data-start-tool="voice"], #startSend) {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+  html body #start.view #startMessage:focus-visible {
+    outline: 2px solid var(--chat-glas-text) !important;
+    outline-offset: 2px;
+  }
+  html body:has(#start.view.is-active) .workspace::after {
+    background: transparent !important;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  html body:has(#start.view.is-active) :is(.glass-icon, .neuer-chat-start) {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    backdrop-filter: blur(12px) !important;
+    color: var(--chat-glas-text);
+  }
+  html body:has(#start.view.is-active) .neuer-chat-start .button-icon {
+    color: inherit !important;
+  }
+  /* Barrierefreiheitswunsch des Geraets hat Vorrang vor der Standardansicht. */
+  @media (prefers-reduced-transparency:reduce), (prefers-contrast:more) {
+    html body #start.view .home-feed .prompt-glass.prompt-glass.prompt-glass.prompt-glass,
+    html body #start.view .home-feed .prompt-glass.prompt-glass.prompt-glass.prompt-glass:focus-within,
+    html body:has(#start.view.is-active) :is(.glass-icon, .neuer-chat-start),
+    html body:has(#start.view.is-active) .workspace::after {
+      background: var(--ruhe-grund, #151719) !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+  }
+}
