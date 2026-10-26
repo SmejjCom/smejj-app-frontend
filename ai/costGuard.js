@@ -1,5 +1,5 @@
-import { AI_MODES, getProvider } from "./providers.js?v=2026102651";
-import { disabledMode } from "./disabledMode.js?v=2026102651";
+import { AI_MODES, getProvider } from "./providers.js?v=2026102661";
+import { disabledMode } from "./disabledMode.js?v=2026102661";
 
 const PAID_MARKERS = [
   "paid",

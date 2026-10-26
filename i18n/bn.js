@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung বাংলা (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von bn-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./bn-2.js?v=2026102651";
+import zusatz from "./bn-2.js?v=2026102661";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)

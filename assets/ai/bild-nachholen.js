@@ -119,7 +119,7 @@ export async function rettePlatzhalter(log, { anfrage, renderMarkdown, hinweis =
 
 /** Einstieg fuer chat-store.js nach dem Wiederherstellen: fragt die Bruecke nur nach ihrer Ablage (bildNurAblage, nie neu malen). */
 export async function retteNachNeustart(log) {
-  const [strom, konfig, sprache, markdown] = await Promise.all([import("./chat-stream.js?v=2026102651"), import("../config.js?v=2026102651"), import("../i18n/ui.js?v=2026102651"), import("/assets/chat-markdown.js?v=2026102651")]);
+  const [strom, konfig, sprache, markdown] = await Promise.all([import("./chat-stream.js?v=2026102661"), import("../config.js?v=2026102661"), import("../i18n/ui.js?v=2026102661"), import("/assets/chat-markdown.js?v=2026102661")]);
   const gerettet = await rettePlatzhalter(log, {
     renderMarkdown: markdown.renderChatMarkdown,
     hinweis: sprache.t("Das Bild wurde unterbrochen — bitte den Auftrag erneut senden."),
@@ -131,6 +131,6 @@ export async function retteNachNeustart(log) {
     })
   });
   // Ein Medium aus dem Konto-Register steht geparkt da — sofort mit Anmeldung holen, nicht erst beim naechsten Speichern.
-  if (gerettet) await import("../chat-medien.js?v=2026102651").then((m) => m.rehydriereMedien(log)).catch(() => {});
+  if (gerettet) await import("../chat-medien.js?v=2026102661").then((m) => m.rehydriereMedien(log)).catch(() => {});
   return gerettet;
 }

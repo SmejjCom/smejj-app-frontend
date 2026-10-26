@@ -8,8 +8,8 @@
 // Grenzen, ehrlich: gescannte PDFs ohne Textebene liefern nichts (dann bleibt der
 // Verweis-Chip); Text wird bei MAX_ZEICHEN gekappt (Bruecken-Body 1 MB); der
 // Worker laeuft unter worker-src 'self' (CSP) von derselben Herkunft.
-const PDFJS_URL = "/assets/vendor/pdfjs/pdf.min.js?v=2026102651";
-const WORKER_URL = "/assets/vendor/pdfjs/pdf.worker.min.js?v=2026102651";
+const PDFJS_URL = "/assets/vendor/pdfjs/pdf.min.js?v=2026102661";
+const WORKER_URL = "/assets/vendor/pdfjs/pdf.worker.min.js?v=2026102661";
 export const MAX_ZEICHEN = 200_000;
 export const MAX_SEITEN = 300;
 let pdfjsPromise = null;

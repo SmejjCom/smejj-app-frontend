@@ -11,27 +11,27 @@
 // Fail-safe wie ueberall: schlaegt ein Nachladen fehl, meldet nachladen.js
 // das in der Konsole (Fehler-Faenger sieht es), und der naechste Ausloeser
 // versucht es erneut. Nie bleibt ein Knopf stumm zurueck.
-import { ladeBeiKlick } from "./nachladen.js?v=2026102651";
+import { ladeBeiKlick } from "./nachladen.js?v=2026102661";
 
 // 1. Erste Fuehrung — zeigt sich nur Erstbesuchern (oder auf ?fuehrung=neu
 //    aus der Hilfe). Wiederkehrer brauchen das Modul nie.
 try {
   const neuStart = new URLSearchParams(location.search).get("fuehrung") === "neu";
   const gesehen = localStorage.getItem("smejj.fuehrung.v1") === "gesehen";
-  if (neuStart || !gesehen) import("./fuehrung.js?v=2026102651");
-} catch { import("./fuehrung.js?v=2026102651"); }
+  if (neuStart || !gesehen) import("./fuehrung.js?v=2026102661");
+} catch { import("./fuehrung.js?v=2026102661"); }
 
 // 1b. Entwurf-Erhalt (15.09.2026) — nachgeladen statt <script>-Tag: 1,3 KB gzip
 //     haetten das Startgewicht ueber die Toleranz geschoben. Stellt den Entwurf
 //     wenige Millisekunden nach dem Start wieder her.
-import("./entwurf-erhalt.js?v=2026102651").catch(() => {});
+import("./entwurf-erhalt.js?v=2026102661").catch(() => {});
 
 // 2. Papierkorb — erst wenn die Ansicht wirklich aufgeht (Klick oder
 //    Direkteinstieg ueber die URL).
 if (location.pathname.includes("papierkorb")) {
-  import("./papierkorb.js?v=2026102651");
+  import("./papierkorb.js?v=2026102661");
 } else {
-  ladeBeiKlick(['[data-view="papierkorb"]', '[data-jump="papierkorb"]'], () => import("./papierkorb.js?v=2026102651"));
+  ladeBeiKlick(['[data-view="papierkorb"]', '[data-jump="papierkorb"]'], () => import("./papierkorb.js?v=2026102661"));
 }
 
 // 3. Kamera — lebt hinter dem Plus-Menue; derselbe Ausloeser, mit dem app.js
@@ -46,7 +46,7 @@ if (location.pathname.includes("papierkorb")) {
 //    Aufgefallen ist es erst, weil danach GEMESSEN wurde, ob das Modul im
 //    Netzwerk auftaucht; sichtbar passiert bei einer Attrappe ja nichts, und
 //    "nichts passiert" sieht aus wie "die Kamera darf nicht".
-ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"], () => import("./kamera.js?v=2026102651"));
+ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"], () => import("./kamera.js?v=2026102661"));
 
 // 4. "@"-Erwaehnung — erst wenn im Startfeld ein "@" getippt wird. Nach dem
 //    Laden bekommt das Feld ein synthetisches input-Ereignis, damit die
@@ -57,7 +57,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
     const wecker = () => {
       if (!/(^|\s)@/.test(String(feld.value || ""))) return;
       feld.removeEventListener("input", wecker);
-      import("./erwaehnung.js?v=2026102651").then(() => feld.dispatchEvent(new Event("input", { bubbles: true })))
+      import("./erwaehnung.js?v=2026102661").then(() => feld.dispatchEvent(new Event("input", { bubbles: true })))
         .catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
     };
     feld.addEventListener("input", wecker);
@@ -71,13 +71,13 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 //    Weitere mit; der hiesige loest sich auf, wenn beide Stufen geladen sind.
 {
   const ladeLogHelfer = () => Promise.all([
-    import("./chat-runter-pfeil.js?v=2026102651"),
-    import("./chat-warte-reste.js?v=2026102651")
+    import("./chat-runter-pfeil.js?v=2026102661"),
+    import("./chat-warte-reste.js?v=2026102661")
   ]).catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
   const ladeCodeWerkzeuge = () => Promise.all([
-    import("./chat-code-copy.js?v=2026102651"),
-    import("./chat-code-farben.js?v=2026102651"),
-    import("./chat-code-download.js?v=2026102651")
+    import("./chat-code-copy.js?v=2026102661"),
+    import("./chat-code-farben.js?v=2026102661"),
+    import("./chat-code-download.js?v=2026102661")
   ]).catch((fehler) => console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler));
   const log = document.querySelector("#startLog");
   if (log) {
@@ -115,7 +115,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 //    egal ob man klickt, ein Lesezeichen oeffnet oder zurueckgeht — und genau
 //    dann, und nur dann, wird das Modul gebraucht.
 {
-  const laden = () => import("./chat-history-view.js?v=2026102651");
+  const laden = () => import("./chat-history-view.js?v=2026102661");
   const ansicht = document.getElementById("chatHistory");
   const istOffen = () => ansicht?.classList.contains("is-active") || !!(ansicht?.offsetWidth || ansicht?.offsetHeight);
   if (ansicht) {
@@ -137,7 +137,7 @@ ladeBeiKlick(["#composerPlusButton", "[data-start-tool]", "[data-kamera-start]"]
 // 6. Projects/Arbeitsbereiche — erst wenn die Ansicht aufgeht (Klick in der
 //    Spur oder Direkteinstieg ueber die URL).
 if (location.pathname.includes("arbeitsbereiche") || location.pathname.includes("projects")) {
-  import("./arbeitsbereiche.js?v=2026102651");
+  import("./arbeitsbereiche.js?v=2026102661");
 } else {
-  ladeBeiKlick(['[data-view="arbeitsbereiche"]', '[data-jump="arbeitsbereiche"]'], () => import("./arbeitsbereiche.js?v=2026102651"));
+  ladeBeiKlick(['[data-view="arbeitsbereiche"]', '[data-jump="arbeitsbereiche"]'], () => import("./arbeitsbereiche.js?v=2026102661"));
 }

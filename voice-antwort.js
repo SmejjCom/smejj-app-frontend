@@ -95,7 +95,7 @@ export async function rendereFertigeAntwort(selektor) {
     const alle = document.querySelectorAll(selektor);
     const knoten = alle[alle.length - 1];
     if (!knoten || !/```|!\[|\*\*|^#{1,6} |^[-*] /m.test(knoten.textContent || "")) return;
-    const { renderChatMarkdown } = await import("./chat-markdown.js?v=2026102651");
+    const { renderChatMarkdown } = await import("./chat-markdown.js?v=2026102661");
     const vorher = window.smejjVoiceModePreferences;
     window.smejjVoiceModePreferences = null; // Sperre nur fuer diesen einen Aufruf lockern
     try { renderChatMarkdown(knoten); } finally { window.smejjVoiceModePreferences = vorher; }

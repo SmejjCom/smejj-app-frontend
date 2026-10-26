@@ -1,9 +1,9 @@
 // smejj.com — Aktionen und sichere Versionen pro Chat-Nachricht.
 // Bedienelemente bleiben Geschwister der Nachricht, damit Kopieren und Verlauf nur Inhalt enthalten.
-import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=2026102651";
-import { t } from "./i18n/ui.js?v=2026102651";
-const sprachHelfer = () => import("/assets/sprach-helfer.js?v=2026102651");
-import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=2026102651";
+import { addSources, addVersion, entriesUpTo, hasSources, metaOf, nextMenuIndex, observeLog, planEdit, planRegenerate, planRemoval, planSettle, previousUserEntry, rawOf, restoreNodes, setRating } from "/assets/chat-messages.js?v=2026102661";
+import { t } from "./i18n/ui.js?v=2026102661";
+const sprachHelfer = () => import("/assets/sprach-helfer.js?v=2026102661");
+import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainText, versionLabel } from "/assets/chat-actions-menu.js?v=2026102661";
 // OHNE ?v=-Kennung — app.js importiert "./browser-context.js" (also
 // /assets/browser-context.js). Ein anderer Spezifizierer erzeugt eine ZWEITE
 // Modulinstanz mit eigenem Quellen-Gedaechtnis; der Menuepunkt "Quellen
@@ -23,9 +23,9 @@ import { barSpecFor, buildMenu, buildSourcePanel, ohneMedienAdressen, toPlainTex
 // sanitizeForSpeech erst beim Vorlese-Klick laden (2026-08-24 "Startseite
 // abspecken") — derselbe Spezifizierer wie ueberall, sonst laedt der Browser
 // die Datei doppelt (Vorfall 2026-07-29, siehe oben).
-import { createChatFrom, openChat } from "/assets/chat-store.js?v=2026102651";
-import { showToast } from "/assets/components.js?v=2026102651";
-import { wendeAn, entferneEndgueltig } from "./chat-neu-versuch.js?v=2026102651";
+import { createChatFrom, openChat } from "/assets/chat-store.js?v=2026102661";
+import { showToast } from "/assets/components.js?v=2026102661";
+import { wendeAn, entferneEndgueltig } from "./chat-neu-versuch.js?v=2026102661";
 
 const SETTLE_MS = 900;
 const COPY_FEEDBACK_MS = 2000;
@@ -349,7 +349,7 @@ async function speakEntry(entry) {
   }
   let sanitizeForSpeech, sprache;
   try {
-    const [q, h] = await Promise.all([import("/assets/voice-speech-queue.js?v=2026102651"), sprachHelfer()]);
+    const [q, h] = await Promise.all([import("/assets/voice-speech-queue.js?v=2026102661"), sprachHelfer()]);
     sanitizeForSpeech = q.sanitizeForSpeech;
     sprache = h.vorleseSprache(rawOf(entry));
   } catch (fehler) {
@@ -462,7 +462,7 @@ async function showVersion(entry, index) {
   entry.textContent = version.raw;
   if (version.html) {
     try {
-      const { reinigeGespeichertesHtml } = await import("/assets/html-reiniger.js?v=2026102651");
+      const { reinigeGespeichertesHtml } = await import("/assets/html-reiniger.js?v=2026102661");
       if (meta.active === index && meta.versions[index] === version) entry.innerHTML = reinigeGespeichertesHtml(version.html);
     } catch { /* Ohne Reiniger bleibt nur der Rohtext sichtbar. */ }
   }
@@ -579,7 +579,7 @@ function sendeDaumenSignal(entry, richtung) {
     }).then((r) => r.json()).then((a) => {
       // Daumen hoch OHNE Trainings-Einwilligung: einmal je Sitzung ein leiser
       // Hinweis unter der Antwort (23.09.2026). Nachgeladen, nie blockierend.
-      if (a?.lernpaar?.grund === "einwilligung_fehlt_oder_veraltet") import("./lern-hinweis.js?v=2026102651").then((m) => m.zeigeLernHinweis(entry)).catch(() => {});
+      if (a?.lernpaar?.grund === "einwilligung_fehlt_oder_veraltet") import("./lern-hinweis.js?v=2026102661").then((m) => m.zeigeLernHinweis(entry)).catch(() => {});
     }).catch(() => {});
   } catch { /* Fail-safe: die Bewertung bleibt lokal sichtbar, der Chat laeuft */ }
 }
@@ -594,7 +594,7 @@ const HANDLERS = {
   // HTML-Fassung verloren — der Text landet trotzdem in der Zwischenablage.
   copy: async (entry, button) => {
     const roh = ohneMedienAdressen(rawOf(entry));
-    const { htmlOf } = await import("/assets/chat-actions-text.js?v=2026102651").catch(() => ({ htmlOf: () => "" }));
+    const { htmlOf } = await import("/assets/chat-actions-text.js?v=2026102661").catch(() => ({ htmlOf: () => "" }));
     return copyText(roh, button, htmlOf(entry, roh));
   },
   "copy-plain": (entry) => copyText(toPlainText(rawOf(entry))),
@@ -679,7 +679,7 @@ async function attachSources() {
     const frage = previousUserEntry(last);
     if (!frage) return;
     // WICHTIG: exakt derselbe Spezifizierer wie in app.js — sonst zweite Instanz.
-    const { groundingFor } = await import("/assets/browser-context.js?v=2026102651");
+    const { groundingFor } = await import("/assets/browser-context.js?v=2026102661");
     const quelle = groundingFor(rawOf(frage));
     if (!quelle) return;
     addSources(last, [quelle]);

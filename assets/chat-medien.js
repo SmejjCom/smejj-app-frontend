@@ -31,7 +31,7 @@
 // einzige Fehlermeldung — der fail-safe Rueckweg sieht genauso aus wie
 // "nichts zu tun". chat-sync.js baut seine Adresse aus demselben Grund direkt
 // aus API_ORIGIN; das ist die eine Quelle, der beide folgen.
-import { API_ORIGIN } from "./config.js?v=2026102651";
+import { API_ORIGIN } from "./config.js?v=2026102661";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 
@@ -468,7 +468,7 @@ function hoereAufKlicks(knoten) {
     // dann der alte Weg, dann der Hinweis) — sonst Endlosschleife bei totem Netz.
     else if (art === "neu" && !MIT_FEHLERHOERER.has(bild)) { hoereAufFehler(bild); rehydriereMedien({ querySelectorAll: () => [bild] }); }
   }, true);
-  const oeffne = (el) => import("./chat-medien-ansicht.js?v=2026102651").then((m) => m.oeffneVollbild(el)).catch(() => {});
+  const oeffne = (el) => import("./chat-medien-ansicht.js?v=2026102661").then((m) => m.oeffneVollbild(el)).catch(() => {});
   document.addEventListener("click", (ereignis) => {
     const bild = ereignis.target?.closest?.(`.entry img[${ADRESSE_ATTRIBUT}]`);
     if (!bild || !istMedienAdresse(bild.getAttribute(ADRESSE_ATTRIBUT))) return;
