@@ -19,6 +19,23 @@
 // zurueckgesetzt und der naechste Klick versucht es erneut. Nie bleibt ein
 // Knopf tot zurueck.
 
+// Mehrere Module koennen denselben Knopf brauchen (Plus: Werkzeuge + Kamera).
+// Alle Capture-Zuhoerer sammeln ihre Ladung am ORIGINAL-Ereignis. Erst wenn
+// alle bereit sind, wird genau EIN Klick wiederholt — sonst toggelt ein
+// schneller Nachlader das Menue auf und der zweite es sofort wieder zu.
+const klickLadungen = new WeakMap();
+function wiederholeNachLadungen(ereignis, ziel, ladung) {
+  let gemeinsam = klickLadungen.get(ereignis);
+  if (!gemeinsam) {
+    gemeinsam = [];
+    klickLadungen.set(ereignis, gemeinsam);
+    Promise.resolve().then(() => Promise.all(gemeinsam)).then(() => {
+      ziel.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+    }).catch(() => { /* hole() meldet den Fehler; naechster echter Klick versucht es erneut. */ });
+  }
+  gemeinsam.push(ladung);
+}
+
 /**
  * Laedt ein Modul beim ERSTEN Klick auf einen der Ausloeser.
  *
@@ -28,6 +45,13 @@
  */
 export function ladeBeiKlick(ausloeser, laden) {
   let laeuft = null;
+  const starte = () => {
+    if (!laeuft) {
+      laeuft = hole(laden).then(() => { loese(); })
+        .catch((fehler) => { laeuft = null; throw fehler; });
+    }
+    return laeuft;
+  };
   // EIN Zuhoerer am Dokument statt einer Bindung je Knopf.
   //
   // GEMESSEN 2026-09-10: Vorher lief hier document.querySelectorAll(auswahl)
@@ -41,23 +65,19 @@ export function ladeBeiKlick(ausloeser, laden) {
   // Mit Delegation gilt die Regel fuer JEDEN Knopf, der das Merkmal traegt —
   // auch fuer den, den es beim Start noch gar nicht gab.
   const wecker = (ereignis) => {
-    if (laeuft) return;
     const ziel = ereignis.target?.closest?.(ausloeser.join(", "));
     if (!ziel) return;
     // Den ersten Klick anhalten, sonst liefe er ins Leere: die echten Handler
     // existieren ja noch nicht.
     ereignis.preventDefault();
     ereignis.stopPropagation();
-    laeuft = hole(laden).then(() => {
-      loese();
-      ziel.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
-    }).catch(() => { laeuft = null; });
+    wiederholeNachLadungen(ereignis, ziel, starte());
   };
   const loese = () => document.removeEventListener("click", wecker, true);
   document.addEventListener("click", wecker, true);
   return () => {
-    if (!laeuft) { loese(); laeuft = hole(laden).catch((fehler) => { laeuft = null; throw fehler; }); }
-    return laeuft;
+    loese();
+    return starte();
   };
 }
 

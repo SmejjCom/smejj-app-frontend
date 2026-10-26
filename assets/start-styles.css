@@ -6113,14 +6113,15 @@ outline: 2px solid var(--chat-glas-text) !important;
 outline-offset: 2px}
 html body:has(#start.view.is-active) .workspace::after {
 background: transparent !important;
--webkit-backdrop-filter: blur(12px);
-backdrop-filter: blur(12px)}
+box-shadow: none !important;
+-webkit-backdrop-filter: none !important;
+backdrop-filter: none !important}
 html body:has(#start.view.is-active) :is(.glass-icon, .neuer-chat-start) {
 background: transparent !important;
 border-color: transparent !important;
 box-shadow: none !important;
--webkit-backdrop-filter: blur(12px) !important;
-backdrop-filter: blur(12px) !important;
+-webkit-backdrop-filter: none !important;
+backdrop-filter: none !important;
 color: var(--chat-glas-text)}
 html body:has(#start.view.is-active) .neuer-chat-start .button-icon {
 color: inherit !important}

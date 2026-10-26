@@ -92,6 +92,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
   let ctx = null;
   let stream = null;
   let laeuft = false;
+  let lauf = 0;
 
   const freigeben = () => {
     clearInterval(takt);
@@ -109,6 +110,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
     istAktiv: () => laeuft,
 
     stop() {
+      lauf += 1;
       freigeben();
       try { ear?.cancel?.(); } catch { /* Ohr war still */ }
     },
@@ -116,14 +118,21 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
     async start() {
       if (laeuft) return;
       laeuft = true;
+      const meinLauf = ++lauf;
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
+        const captured = await navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
         });
+        if (meinLauf !== lauf) {
+          captured.getTracks().forEach(track => track.stop());
+          return;
+        }
+        stream = captured;
         ctx = new (window.AudioContext || window.webkitAudioContext)();
         // iOS startet AudioContexte "suspended" — ohne resume() liefert der
         // Analyser nur Stille (Pegel 0) und der Automat laeuft ins Zeitlimit.
         await ctx.resume().catch(() => { /* wecken uebernimmt */ });
+        if (meinLauf !== lauf) return;
         if (ctx.state === "suspended") {
           const wecken = () => {
             document.removeEventListener("touchend", wecken);
@@ -140,6 +149,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
         const daten = new Uint8Array(analyser.fftSize);
         const automat = automatFactory();
         const recording = await ear.start({ stream });
+        if (meinLauf !== lauf) return;
         if (recording?.ok === false) {
           const error = new Error("Mikrofonaufnahme konnte nicht gestartet werden");
           error.name = recording.error === "microphone_denied" ? "NotAllowedError" : "NotReadableError";
@@ -164,10 +174,12 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
             return;
           }
           const text = String((await ear.finish().catch(() => "")) || "").trim();
+          if (meinLauf !== lauf) return;
           if (text) aufTranskript?.(text);
           else aufLeer?.();
         }, taktMs);
       } catch (fehler) {
+        if (meinLauf !== lauf) return;
         freigeben();
         try { ear?.cancel?.(); } catch { /* still */ }
         aufFehler?.(fehler);

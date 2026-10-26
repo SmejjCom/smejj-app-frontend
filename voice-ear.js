@@ -17,7 +17,7 @@
 // Zeitbudget nach dem Sprech-Ende: laenger warten wir nicht auf den Server,
 // sonst fuehlt sich das Gespraech traege an. Groq transkribiert eine Stunde
 // Audio in ~15 s — der Engpass ist der Upload, nicht das Modell.
-import { beobachtePegel } from "./audio-pegel.js?v=2026102538";
+import { beobachtePegel } from "./audio-pegel.js?v=2026102651";
 export const EAR_BUDGET_MS = 1500;
 // Obergrenze der Aufnahme (Schutz von Free-Tier und Upload-Zeit).
 const MAX_AUFNAHME_MS = 60_000;

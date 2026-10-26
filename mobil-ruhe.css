@@ -290,4 +290,33 @@
   @media (forced-colors:active) {
     body[data-mobile-theme] { --ruhe-grund:Canvas; --ruhe-flaeche:Canvas; --ruhe-text:CanvasText; --ruhe-neben:CanvasText; --ruhe-kante:CanvasText; }
   }
+
+/* Schriftliche Freigabe 26.10.2026: Sprachmodus folgt der mobilen Themenwahl. */
+html body[data-mobile-theme] #voiceModeOverlay {
+  background: var(--ruhe-grund) !important;
+  color: var(--ruhe-text) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html body[data-mobile-theme] #voiceModeOverlay :is(.voice-mode-status, .voice-mode-hint, .voice-mode-transcript, .voice-mode-reply, #voiceModeInput, #voiceModeClose, .voice-mode-bar button) {
+  color: var(--ruhe-text) !important;
+}
+html body[data-mobile-theme] #voiceModeInput::placeholder {
+  color: var(--ruhe-neben) !important;
+  opacity: 1;
+}
+html body[data-mobile-theme] #voiceModeOverlay :is(.voice-mode-bar, .voice-mode-input-wrap, .voice-mode-bar button, .voice-mode-transcript) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html body[data-mobile-theme] #voiceModeOverlay .voice-mode-input-wrap {
+  border: 1px solid var(--ruhe-neben) !important;
+  border-radius: 24px !important;
+}
+html body[data-mobile-theme] #voiceModeOverlay .voice-mode-bar button {
+  border-radius: 50% !important;
+}
+html body[data-mobile-theme] #voiceModeOverlay #voiceModeMic[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--ruhe-text) 14%, transparent) !important;
+}
 }

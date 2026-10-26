@@ -1,7 +1,7 @@
 // smejj.com — freigegebenes mobiles Lesedesign, 24.10.2026.
 // Keine globale Freischaltung des unvollstaendigen Desktop-Hellmodus.
-import { readRuntimeSettings } from "./settings-runtime.js?v=2026102538";
-import { t } from "./i18n/ui.js?v=2026102538";
+import { readRuntimeSettings } from "./settings-runtime.js?v=2026102651";
+import { t } from "./i18n/ui.js?v=2026102651";
 
 export const MOBILE_QUERY = "(max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px)";
 export function mobileTheme(settings, systemLight = false) {
@@ -34,7 +34,7 @@ export function initMobileReading(win = window, doc = document) {
       if (!doc.getElementById("mobil-ruhe-stil")) {
         const sheet = doc.createElement("link");
         sheet.id = "mobil-ruhe-stil"; sheet.rel = "stylesheet";
-        sheet.href = "/assets/mobil-ruhe.css?v=20261025-schrift-1";
+        sheet.href = "/assets/mobil-ruhe.css?v=20261026-sprachmodus-1";
         doc.head.append(sheet);
       }
       const theme = mobileTheme(settings, system.matches);

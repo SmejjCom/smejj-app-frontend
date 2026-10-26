@@ -40,7 +40,7 @@
 
 // Absoluter /assets/-Pfad mit derselben Kennung wie in chat-actions.js: ein
 // anderer Spezifizierer erzeugt eine ZWEITE Modulinstanz von components.js.
-import { showToast } from "/assets/components.js?v=2026102538";
+import { showToast } from "/assets/components.js?v=2026102651";
 
 const FEEDBACK_MS = 2000;
 

@@ -1,5 +1,5 @@
 // "smejj denkt nach" in der Oberflaechensprache — Begruendung: sprach-helfer.js.
-import { savedUiLanguage } from "./i18n/ui.js?v=2026102538";
+import { savedUiLanguage } from "./i18n/ui.js?v=2026102651";
 
 const TEXTE = {
   de: "smejj denkt nach", en: "smejj is thinking", es: "smejj está pensando",
