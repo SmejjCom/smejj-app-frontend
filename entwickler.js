@@ -4,8 +4,8 @@
 // Seite keine Panel-Ueberschrift mitbringt.
 //
 // Auth-Guard: Nur angemeldete Nutzer sehen den API-Bereich.
-import { API_ORIGIN } from "./config.js?v=2026102671";
-import { initApiCenter } from "./api-center-surface.js?v=2026102671";
+import { API_ORIGIN } from "./config.js?v=2026102781";
+import { initApiCenter } from "./api-center-surface.js?v=2026102781";
 
 const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
 const mount = document.querySelector("[data-dev-mount]");

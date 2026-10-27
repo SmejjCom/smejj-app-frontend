@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Bahasa Indonesia (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von id-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./id-2.js?v=2026102671";
+import zusatz from "./id-2.js?v=2026102781";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)

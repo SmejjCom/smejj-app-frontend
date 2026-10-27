@@ -302,13 +302,13 @@ if (typeof document !== "undefined" && document.querySelector(".view")) sorgeFue
 // nur den Code-Entwurf; der Chat-Entwurf bleibt unberuehrt.
 async function zeigeCodeBeispiele() {
   // Freigabe 24.10.: mobiles Lesedesign erst im mobilen Inhaltslader.
-  import("/assets/mobil-ruhe.js?v=2026102671").catch(fehler => console.error("[smejj.com] Lesedesign:", fehler));
+  import("/assets/mobil-ruhe.js?v=2026102781").catch(fehler => console.error("[smejj.com] Lesedesign:", fehler));
   if (!matchMedia("(max-width:600px)").matches) return;
   const leer = document.querySelector(".codeleer");
   const feld = document.getElementById("codeAufgabe");
   const vorlagen = document.querySelectorAll(".code-wchips button[data-chip]");
   if (!leer || !feld || !vorlagen.length || document.querySelector(".mobil-code-beispiele")) return;
-  const { t } = await import("./i18n/ui.js?v=2026102671");
+  const { t } = await import("./i18n/ui.js?v=2026102781");
   const gruppe = document.createElement("div");
   gruppe.className = "mobil-code-beispiele";
   for (const vorlage of vorlagen) {
@@ -348,7 +348,7 @@ if (typeof document !== "undefined" && document.querySelector(".view")) {
 // Kurze, bereits uebersetzte Hilfen statt Desktop-Tooltips auf Touchgeraeten.
 async function zeigeModellHilfen() {
   if (!matchMedia("(max-width:600px)").matches) return;
-  const { t } = await import("./i18n/ui.js?v=2026102671");
+  const { t } = await import("./i18n/ui.js?v=2026102781");
   const texte = {
     "smejj 1.3": "Gründlicher antworten",
     "smejj 1.2": "Gründlich — ausführlich, dauert länger",

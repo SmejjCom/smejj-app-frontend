@@ -1,10 +1,10 @@
 // Oberflaechentexte ueber die Sprachdateien (Stufe 4, 20.09.2026).
-import { t } from "./i18n/ui.js?v=2026102671";
-import { CLIENT_ROUTES } from "./config.js?v=2026102671";
+import { t } from "./i18n/ui.js?v=2026102781";
+import { CLIENT_ROUTES } from "./config.js?v=2026102781";
 // Chats kommen aus dem Speicher, nicht aus dem DOM (QA-Welle 2, Befund W2-01).
 // WICHTIG: derselbe Pfad wie in chat-history-view.js — ein abweichender
 // Spezifizierer (z. B. "./chat-store.js") erzeugt eine ZWEITE Modulinstanz.
-import { listChats, openChat } from "/assets/chat-store.js?v=2026102671";
+import { listChats, openChat } from "/assets/chat-store.js?v=2026102781";
 // Overlay-Logik (Cmd+K, Rendern, Tastatur) wohnt in search-overlay.js — diese
 // Datei bleibt klein und die Such-Seite hier ist nur noch die Rueckfallebene.
 // Seit 2026-08-24 ("Startseite abspecken") wird das Overlay erst beim ERSTEN
@@ -96,7 +96,7 @@ export function initGlobalSearch({ $, goToView, showTaskIndicator, showToast, st
     openResult({ view: button.dataset.searchView, label: button.dataset.searchLabel, jobId: button.dataset.searchJobId, chatId: button.dataset.searchChatId }, goToView, showTaskIndicator, showToast);
   });
   overlayLader = () => {
-    overlayGeladen ||= import("./search-overlay.js?v=2026102671").then((m) => {
+    overlayGeladen ||= import("./search-overlay.js?v=2026102781").then((m) => {
       m.initSearchOverlay({
         findResults: (query) => findResults(query, state, workspace),
         openResult: (result) => openResult(result, goToView, showTaskIndicator, showToast)

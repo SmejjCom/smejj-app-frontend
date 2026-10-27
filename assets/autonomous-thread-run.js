@@ -17,7 +17,7 @@
 // Automatik-Ansicht. Der bewaehrte Weg bleibt damit vollstaendig erhalten; der
 // neue kann nur gewinnen, nie verlieren.
 
-import { CLIENT_ROUTES } from "./config.js?v=2026102671";
+import { CLIENT_ROUTES } from "./config.js?v=2026102781";
 
 // Dieselben zwei Schluessel wie in autonomous-coding.js — dort bewusst
 // dupliziert, damit kein Modul das andere nur wegen einer Zeichenkette laedt.
