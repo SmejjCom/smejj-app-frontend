@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 日本語 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ja-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ja-2.js?v=2026102781";
+import zusatz from "./ja-2.js?v=2026102791";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -301,7 +301,7 @@ export default {
   "Projektkontext automatisch berücksichtigen": "プロジェクトのコンテキストを自動的に含める",
   "Relevante Projektdateien und Anweisungen einbeziehen.": "関連するプロジェクトファイルと指示を含めます。",
   "KI-Modelle & Anbieter": "モデル",
-  "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.": "GLM-5.2 は引き続き smejj.com の品質基盤です。",
+  "GLM-5.3-Flash bleibt das Qualitätsfundament von smejj.com.": "GLM-5.3-Flash は引き続き smejj.com の品質基盤です。",
   "Reasoning-Aufwand": "推論の強度",
   "Hoch": "高",
   "Maximal": "最大",

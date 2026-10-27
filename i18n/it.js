@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Italiano (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von it-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./it-2.js?v=2026102781";
+import zusatz from "./it-2.js?v=2026102791";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -301,7 +301,7 @@ export default {
   "Projektkontext automatisch berücksichtigen": "Includi automaticamente il contesto del progetto",
   "Relevante Projektdateien und Anweisungen einbeziehen.": "Includi file e istruzioni rilevanti del progetto.",
   "KI-Modelle & Anbieter": "Modelli",
-  "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.": "GLM-5.2 resta il fondamento di qualità di smejj.com.",
+  "GLM-5.3-Flash bleibt das Qualitätsfundament von smejj.com.": "GLM-5.3-Flash resta il fondamento di qualità di smejj.com.",
   "Reasoning-Aufwand": "Sforzo di ragionamento",
   "Hoch": "Alto",
   "Maximal": "Massimo",

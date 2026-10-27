@@ -1,10 +1,10 @@
-import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js?v=2026102781";
-import { t } from "./i18n/ui.js?v=2026102781";
-import { applyServerAiStatus } from "/assets/storage/index.js?v=2026102781";
-import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=2026102781";
-import { initSettingsSurface } from "./settings-surface.js?v=2026102781";
-import { initAccountPrivacySurface } from "./account-privacy.js?v=2026102781";
-import { afterFirstPaint } from "./deferred-start.js?v=2026102781";
+import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js?v=2026102791";
+import { t } from "./i18n/ui.js?v=2026102791";
+import { applyServerAiStatus } from "/assets/storage/index.js?v=2026102791";
+import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=2026102791";
+import { initSettingsSurface } from "./settings-surface.js?v=2026102791";
+import { initAccountPrivacySurface } from "./account-privacy.js?v=2026102791";
+import { afterFirstPaint } from "./deferred-start.js?v=2026102791";
 
 export function enhancePremiumSurfaces() {
   loadPremiumStyles();
@@ -64,7 +64,7 @@ function enhanceModelRegistry() {
     const output = document.querySelector("#aiOutput");
     if (output) output.textContent = option?.dataset.runtimeAvailable === "true"
       ? `${model}: bereit`
-      : `${model}: GLM-5.2-Fallback aktiv`;
+      : `${model}: GLM-5.3-Flash-Fallback aktiv`;
   });
 
   renderModelRegistry({

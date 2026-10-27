@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung العربية (Quellsprache Deutsch als Schluessel, RTL).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ar-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ar-2.js?v=2026102781";
+import zusatz from "./ar-2.js?v=2026102791";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -301,7 +301,7 @@ export default {
   "Projektkontext automatisch berücksichtigen": "تضمين سياق المشروع تلقائيًا",
   "Relevante Projektdateien und Anweisungen einbeziehen.": "تضمين ملفات المشروع والتعليمات ذات الصلة.",
   "KI-Modelle & Anbieter": "النماذج",
-  "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.": "يبقى GLM-5.2 أساس الجودة في smejj.com.",
+  "GLM-5.3-Flash bleibt das Qualitätsfundament von smejj.com.": "يبقى GLM-5.3-Flash أساس الجودة في smejj.com.",
   "Reasoning-Aufwand": "جهد الاستدلال",
   "Hoch": "مرتفع",
   "Maximal": "أقصى",

@@ -1,23 +1,23 @@
-import { STORAGE_KEYS } from "./config.js?v=2026102781";
+import { STORAGE_KEYS } from "./config.js?v=2026102791";
 import { initServerSessionControls, fetchLoginMethods, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
-  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026102781";
-import { languageOptionsMarkup } from "./language-options.js?v=2026102781";
-import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026102781";
-import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026102781";
-import { clearProfilePicture } from "./profile-picture-store.js?v=2026102781";
-import { afterFirstPaint } from "./deferred-start.js?v=2026102781";
+  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026102791";
+import { languageOptionsMarkup } from "./language-options.js?v=2026102791";
+import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026102791";
+import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026102791";
+import { clearProfilePicture } from "./profile-picture-store.js?v=2026102791";
+import { afterFirstPaint } from "./deferred-start.js?v=2026102791";
 // Ohne ?v=: siehe die Begruendung in account-auth-state.js. Eine Marke hier
 // wuerde erzwingen, dass diese ABO-GESPERRTE Datei bei jeder Stil-Aenderung
 // wieder angefasst wird — genau das soll die Auslagerung verhindern.
-import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026102781";
+import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026102791";
 // Gleicher Schluessel wie in profile-dock-menu.js — bewusst dupliziert statt
 // importiert (wie TOKEN_KEY in auth-gate.js): profile-dock-menu.js liegt im
 // Startbuendel, diese Datei wird nachgeladen. Ein Import zoege das Startmodul
 // unter einer zweiten Marke herein — genau die Falle, vor der die Markenkette
 // warnt (zwei Kopien mit getrenntem Zustand).
 const KONTO_REITER_SCHLUESSEL = "smejj.konto.reiter.v1";
-import { usageSummary } from "./usage-meter.js?v=2026102781";
-import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026102781";
+import { usageSummary } from "./usage-meter.js?v=2026102791";
+import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026102791";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const PERSONAL_KEY = "smejj.personalization.v1";
@@ -262,7 +262,7 @@ function markup() {
     ${panel("identity", "Profil", `${profilePictureMarkup()}<div class="account-grid"><label>${t("Name")}<input id="profileName" placeholder="${t("Dein Name")}"></label><label>${t("E-Mail")}<input id="profileEmail" placeholder="name@example.com" inputmode="email"></label><label>${t("Sprache")}<select id="language" aria-label="${t("Sprache")}">${languageOptionsMarkup()}</select></label><label>${t("Antwortmodus")}<select id="mode" aria-label="${t("Antwortmodus")}"><option value="safe">Free-safe</option><option value="byok">${t("BYOK vorbereitet")}</option><option value="local">${t("Lokal")}</option></select></label></div><div class="account-actions"><button id="saveProfile" type="button">${t("Profil speichern")}</button><button id="registerLocal" type="button">${t("Lokales Profil erstellen")}</button></div>`)}
     ${panel("personalization", "Personalisierung", `<div class="account-list">${statusRow("Gedächtnis", "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.", "Bald verfügbar")}</div><label class="account-textarea"><strong>${t("Eigene Anweisungen")}</strong><textarea id="personalInstructions" rows="4" placeholder="${t("z. B. Antworte kurz und auf Deutsch. Erkläre Fachwörter einfach.")}"></textarea></label><p class="account-note">${t("Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.")}</p><div class="account-actions"><button id="savePersonalization" type="button">${t("Anweisungen speichern")}</button></div>`)}
     ${panel("voice", "Sprache & Stimme", `<div class="account-list">${statusRow("Basis-Stimme", "Läuft direkt auf deinem Gerät, auch offline. Immer frei.", "Aktiv", true)}${dataAction("Premium-Stimme (Server)", "Natürlicher Klang über den smejj-Server — wird in den Einstellungen aktiviert.", "voiceSettingsOpen", "Einstellungen öffnen")}${statusRow("Sprechtempo & weitere Stimmen", "Auswahl folgt mit dem nächsten Sprach-Update.", "Bald verfügbar")}</div>`)}
-    ${panel("apps", "Verbundene Apps", `<div class="account-list">${dataAction("KI-Modelle & API-Keys", "GLM-5.2 aktiv · eigene Schlüssel und Modellwahl liegen in den Einstellungen.", "modelsSettingsOpen", "Einstellungen öffnen")}${statusRow("GitHub", "Für Coding: über die rechte Seitenleiste der App verbunden.", "In der App", true)}${statusRow("Google Drive", "Dateien direkt in den Chat holen.", "Bald verfügbar")}${statusRow("Google Kalender", "Termine ansehen und vorlesen lassen — nur lesend.", "Bald verfügbar")}${statusRow("Slack", "Zusammenfassungen aus Kanälen holen.", "Bald verfügbar")}</div><p class="account-note">${t("Apps sehen nur, was du ausdrücklich freigibst — Zugriff jederzeit widerrufbar.")}</p>`)}
+    ${panel("apps", "Verbundene Apps", `<div class="account-list">${dataAction("KI-Modelle & API-Keys", "GLM-5.3-Flash aktiv · eigene Schlüssel und Modellwahl liegen in den Einstellungen.", "modelsSettingsOpen", "Einstellungen öffnen")}${statusRow("GitHub", "Für Coding: über die rechte Seitenleiste der App verbunden.", "In der App", true)}${statusRow("Google Drive", "Dateien direkt in den Chat holen.", "Bald verfügbar")}${statusRow("Google Kalender", "Termine ansehen und vorlesen lassen — nur lesend.", "Bald verfügbar")}${statusRow("Slack", "Zusammenfassungen aus Kanälen holen.", "Bald verfügbar")}</div><p class="account-note">${t("Apps sehen nur, was du ausdrücklich freigibst — Zugriff jederzeit widerrufbar.")}</p>`)}
     ${panel("notifications", "Benachrichtigungen", `<div class="account-list">${toggle("Coding-Agent fertig", "notifyAgentDone", "Meldung, wenn eine lange Aufgabe abgeschlossen ist.")}${toggle("Antwort fertig", "notifyReplyDone", "Wenn du die App verlassen hast, während smejj noch arbeitet.")}${toggle("Limit fast erreicht", "notifyLimit80", "Hinweis bei 80 % — Limits starten erst mit den Plänen.")}${statusRow("Sicherheitswarnungen", "Neue Anmeldung, neues Gerät — immer per E-Mail.", "Immer an", true)}${statusRow("Rechnungen & Zahlungen", "Kommt mit den Bezahl-Plänen.", "Immer an", true)}</div><p class="account-note">${t("Diese Auswahl gilt auf diesem Gerät.")}</p>`)}
     ${panel("security", "Anmeldung & Sicherheit", `<div id="accountLoginMethods" role="status">Anmeldewege werden geprüft …</div><div class="account-status"><div><strong>Session</strong><span id="sessionStatus">${t("nicht angemeldet")}</span></div><div><strong>${t("Rolle")}</strong><span id="userRoleStatus">local-only</span></div><div><strong>${t("Projektrechte")}</strong><span id="projectRightsStatus">${t("owner/editor/viewer vorbereitet")}</span></div><div><strong>${t("Gerät")}</strong><span id="currentDevice">${t("Dieser Browser")}</span></div></div><div class="account-actions"><div id="googleSignIn"></div><button id="passkeyLogin" type="button">${t("Mit Passkey anmelden")}</button><button id="passkeyRegister" type="button">${t("Passkey einrichten")}</button><button id="loginLocal" type="button">${t("Lokal anmelden")}</button><button id="logoutLocal" type="button">${t("Ausloggen")}</button></div><p class="account-note">${t("E-Mail-Konten besitzen eine serverseitige Session-Liste mit einzelnem Fern-Widerruf (unten). Zustandslose Google-/Passkey-Sitzungen enden mit Ablauf oder Logout auf dem Gerät.")}</p>`)}
     ${panel("billing", "Mein Plan", `<div class="account-plan"><div><p class="eyebrow">${t("Dein Plan")}</p><strong class="plan-name">${iosHuelle() ? "Free" : "Free — 0 €"}</strong><small>${t("Aufbauphase: alle Funktionen frei, keine Zahlung nötig.")}</small></div><span class="state-badge is-ok">${t("Aktiv")}</span></div>${planKaufTeil()}<div class="account-actions">${iosHuelle() ? "" : `<button id="planManageOpen" type="button" hidden>${t("Abo verwalten — Rechnungen, Plan & Kündigung")}</button>`}<button id="planCancelOpen" type="button">${t("Verträge hier kündigen")}</button></div>`)}

@@ -14,7 +14,7 @@
 // gar nicht erst gesendet — dieselbe Pflicht, die der Control-Server durchsetzt
 // (control-server/src/routes/mausEngineRoutes.js). Doppelt geprueft ist hier
 // richtig: der Nutzer bekommt den Grund sofort, statt nach einem Netzweg.
-import { API_ORIGIN } from "./config.js?v=2026102781";
+import { API_ORIGIN } from "./config.js?v=2026102791";
 
 const MAUS_RUN_PATH = "/api/maus/run";
 

@@ -1,5 +1,5 @@
-import { STORAGE_KEYS } from "./config.js?v=2026102781";
-import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=2026102781";
+import { STORAGE_KEYS } from "./config.js?v=2026102791";
+import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=2026102791";
 // api-center-surface.js und provider-settings.js werden BEWUSST nicht statisch
 // importiert (Seitengewicht). Der Startreiter ist "general" — bis der Nutzer
 // dorthin wechselt, wird ihr Code nie gebraucht. Zusammen mit ihrem selbst
@@ -8,8 +8,8 @@ import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } f
 // Geprueft vor dem Umbau: app.js (Start-Lock) bindet KEINE der von ihnen
 // erzeugten Kennungen (ac*, apiCenterSurface, cline*) — die Boot-Bindings von
 // app.js koennen dadurch nichts verlieren.
-import { LANGUAGE_OPTIONS } from "./language-options.js?v=2026102781";
-import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026102781";
+import { LANGUAGE_OPTIONS } from "./language-options.js?v=2026102791";
+import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026102791";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
@@ -178,7 +178,7 @@ function markup() {
         select(t("Bestätigungen"), "settingsConfirmations", [["strict", t("Immer bestätigen")], ["balanced", "Bei wichtigen Aktionen"], ["trusted", "Nur externe Auswirkungen"]]),
         select(t("Wie ausführlich?"), "settingsResponseStyle", [["concise", "Kurz"], ["balanced", "Ausgewogen"], ["detailed", t("Ausführlich")]]),
         toggle(t("Projektkontext automatisch berücksichtigen"), "settingsAutoContext", t("Relevante Projektdateien und Anweisungen einbeziehen."))])}
-      ${panel("models", "KI-Modelle & Anbieter", t("GLM-5.2 bleibt das Qualitätsfundament von smejj.com."), [
+      ${panel("models", "KI-Modelle & Anbieter", t("GLM-5.3-Flash bleibt das Qualitätsfundament von smejj.com."), [
         select("Reasoning-Aufwand", "settingsReasoningEffort", [["medium", "Mittel"], ["high", "Hoch"], ["max", "Maximal"]]),
         action("Modellverwaltung", t("Standardmodell, BYOK und lokale Modelle."), t("KI-Modelle öffnen"), "ai")])}
       ${/* OpenRouter-Look: kein Panel-Kopf, die Flaeche bringt "API-Keys" selbst mit */ `<section id="settings-api" class="settings-panel" data-settings-panel="api"><div class="settings-list"><div id="apiCenterSurface" data-api-center></div></div></section>`}
@@ -279,7 +279,7 @@ function handleClick(view, event) {
 // hinsieht. Kompakter Kopf: die Panel-Ueberschrift liefert den Titel.
 async function ladeApiZentrum(view) {
   try {
-    const modul = await import("./api-center-surface.js?v=2026102781");
+    const modul = await import("./api-center-surface.js?v=2026102791");
     modul.initApiCenter(view.querySelector("#apiCenterSurface"), { kopf: "kompakt" });
   } catch {
     /* fail-safe: uebrige Einstellungen bleiben bedienbar */

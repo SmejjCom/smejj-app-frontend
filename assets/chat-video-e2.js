@@ -47,7 +47,7 @@ function baue(ersatz) {
     const p = document.createElement("p");
     p.className = "chat-video-abgelaufen";
     p.textContent = HINWEIS;
-    import("./i18n/ui.js?v=2026102781").then(({ t }) => { p.textContent = t(HINWEIS); }).catch(() => {});
+    import("./i18n/ui.js?v=2026102791").then(({ t }) => { p.textContent = t(HINWEIS); }).catch(() => {});
     return p;
   }
   const video = document.createElement("video");

@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 中文 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von zh-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./zh-2.js?v=2026102781";
+import zusatz from "./zh-2.js?v=2026102791";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -301,7 +301,7 @@ export default {
   "Projektkontext automatisch berücksichtigen": "自动纳入项目上下文",
   "Relevante Projektdateien und Anweisungen einbeziehen.": "包含相关的项目文件和指令。",
   "KI-Modelle & Anbieter": "模型",
-  "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.": "GLM-5.2 仍是 smejj.com 的质量基石。",
+  "GLM-5.3-Flash bleibt das Qualitätsfundament von smejj.com.": "GLM-5.3-Flash 仍是 smejj.com 的质量基石。",
   "Reasoning-Aufwand": "推理强度",
   "Hoch": "高",
   "Maximal": "最高",

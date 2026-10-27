@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung বাংলা (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von bn-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./bn-2.js?v=2026102781";
+import zusatz from "./bn-2.js?v=2026102791";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -301,7 +301,7 @@ export default {
   "Projektkontext automatisch berücksichtigen": "প্রকল্পের প্রসঙ্গ স্বয়ংক্রিয়ভাবে অন্তর্ভুক্ত করুন",
   "Relevante Projektdateien und Anweisungen einbeziehen.": "প্রাসঙ্গিক প্রকল্প ফাইল ও নির্দেশনা অন্তর্ভুক্ত করুন।",
   "KI-Modelle & Anbieter": "মডেল",
-  "GLM-5.2 bleibt das Qualitätsfundament von smejj.com.": "GLM-5.2 এখনও smejj.com-এর মানের ভিত্তি।",
+  "GLM-5.3-Flash bleibt das Qualitätsfundament von smejj.com.": "GLM-5.3-Flash এখনও smejj.com-এর মানের ভিত্তি।",
   "Reasoning-Aufwand": "যুক্তির মাত্রা",
   "Hoch": "উচ্চ",
   "Maximal": "সর্বোচ্চ",

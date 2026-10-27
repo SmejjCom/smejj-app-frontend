@@ -1,47 +1,47 @@
 // smejj.com — Composer-Werkzeuge der Startseite (Plus-Menue, Diktat, Sprachmodus, Vorlesen).
 // Alles laeuft lokal im Browser (Web Speech API + speechSynthesis) — free-only, keine externen Dienste.
 // Zweck: initComposerTools() verdrahtet die Icon-Zeile des Start-Composers.
-import { showToast } from "./components.js?v=2026102781"; // versioniert wie app.js (F-07)
+import { showToast } from "./components.js?v=2026102791"; // versioniert wie app.js (F-07)
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=2026102781";
+import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=2026102791";
 // 27.09.2026: Erkennungsliste (WebKit-Doppelungen) + sprechbarer Antworttext/Fristen.
-import { leseErkennung } from "./voice-erkennung.js?v=2026102781"; import { sprechbarerText, FRISTEN, rendereFertigeAntwort } from "./voice-antwort.js?v=2026102781";
+import { leseErkennung } from "./voice-erkennung.js?v=2026102791"; import { sprechbarerText, FRISTEN, rendereFertigeAntwort } from "./voice-antwort.js?v=2026102791";
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
-import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=2026102781";
+import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=2026102791";
 // Overlay-Gestalt und Fokusfuehrung — ausgelagert (800-Zeilen-Regel).
 import {
   upgradeVoiceOverlay, createVoiceFocusTrap,
   setVoiceModeStatus, setVoiceModeTranscript, setVoiceModeReply, zeigeMikrofonZustand,
   setVoiceModeHint, stimmText,
-} from "./voice-overlay-ui.js?v=2026102781";
+} from "./voice-overlay-ui.js?v=2026102791";
 // Browser-Sprachausgabe (Stimmwahl, Safari-resume, iOS-Unlock) — ausgelagert (800-Zeilen-Regel).
-import { createBrowserTts } from "./voice-browser-tts.js?v=2026102781";
+import { createBrowserTts } from "./voice-browser-tts.js?v=2026102791";
 // Stufe 3: Rueckfrage statt Blindantwort + Doppel-Sende-Schutz (wie ChatGPT,
 // Live-Vergleich 2026-08-03) — geteilte Naht mit den 14 Sprachseiten.
-import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js?v=2026102781";
+import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js?v=2026102791";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
-import { createServerEar, createEarSend, ohrAdressen } from "./voice-ear.js?v=2026102781";
-import { verdrahteOhrSolo, istAppleMobil } from "./voice-ohr-solo.js?v=2026102781";
+import { createServerEar, createEarSend, ohrAdressen } from "./voice-ear.js?v=2026102791";
+import { verdrahteOhrSolo, istAppleMobil } from "./voice-ohr-solo.js?v=2026102791";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
-import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js?v=2026102781";
-import { createSpeechInterrupt } from "./voice-vad.js?v=2026102781";
-import { warmUpAgentConnection } from "./voice-warmup.js?v=2026102781";
-import { verdrahteLive } from "./voice-realtime.js?v=2026102781";
+import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho } from "./voice-echo-filter.js?v=2026102791";
+import { createSpeechInterrupt } from "./voice-vad.js?v=2026102791";
+import { warmUpAgentConnection } from "./voice-warmup.js?v=2026102791";
+import { verdrahteLive } from "./voice-realtime.js?v=2026102791";
 // Stufe 2a/3a: Interim-Waechter — Sprech-Ende erkennen; seit 3a richtet sich die
 // Wartezeit nach dem Gesagten. Denk-Laut fuellt die Stille bis zur Antwort.
-import { createSilenceWatchdog } from "./voice-endpoint.js?v=2026102781";
-import { createThinkingCue } from "./voice-thinking-cue.js?v=2026102781";
+import { createSilenceWatchdog } from "./voice-endpoint.js?v=2026102791";
+import { createThinkingCue } from "./voice-thinking-cue.js?v=2026102791";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
 // Unterbrechen wie ChatGPT). Fail-safe: ohne Worker bleibt die Browser-Stimme.
-import { createPremiumVoice } from "./voice-premium-tts.js?v=2026102781";
-import { CLIENT_ROUTES } from "./config.js?v=2026102781";
+import { createPremiumVoice } from "./voice-premium-tts.js?v=2026102791";
+import { CLIENT_ROUTES } from "./config.js?v=2026102791";
 // Plus-Menue (Anhaenge) — ausgelagert, Verhalten unveraendert.
-import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026102781";
-import { bindPlusMenu } from "./composer-plus-menu.js?v=2026102781";
+import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026102791";
+import { bindPlusMenu } from "./composer-plus-menu.js?v=2026102791";
 // Mikrofon-Diktat — ausgelagert (800-Zeilen-Regel), Verhalten unveraendert.
-import { createDictation } from "./composer-dictation.js?v=2026102781";
-import { t, savedUiLanguage } from "./i18n/ui.js?v=2026102781"; // Sprachmodus-Texte + gespeicherte Sprache (Geraetetest 22.09.2026)
+import { createDictation } from "./composer-dictation.js?v=2026102791";
+import { t, savedUiLanguage } from "./i18n/ui.js?v=2026102791"; // Sprachmodus-Texte + gespeicherte Sprache (Geraetetest 22.09.2026)
 const $ = (selector) => document.querySelector(selector);
 // Sprache bei JEDEM Aufruf: zuerst die GESPEICHERTE Oberflaechensprache, sonst das lang-Attribut (huelle-sprache.js setzt es erst nach dem Nachladen — v956 gemessen: Luecke von Sekunden).
 const LANG_MAP = {
