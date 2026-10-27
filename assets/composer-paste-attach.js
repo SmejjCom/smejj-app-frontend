@@ -4,11 +4,11 @@
 // Chip-Inhalte wieder an die Aufgabe an; "Als Text einfuegen" holt einen
 // Chip in die Eingabezeile zurueck. Versionierter Import wie in app.js —
 // der Schutztest aus QA-Welle 1 (F-07) verlangt die Cache-Version dort.
-import { showToast } from "./components.js?v=2026102791";
+import { showToast } from "./components.js?v=2026102793";
 // Bild-Einfuegen (2026-08-14): der Betreiber fuegte einen Screenshot per
 // Cmd+V ein und nichts passierte — dieser Handler kannte nur Text. Bilder
 // laufen jetzt ueber DENSELBEN Weg wie der Datei-Waehler (eine Quelle).
-import { uebernehmeDateiAuswahl, dateiAuswahlLaeuft } from "./composer-bild-anhang.js?v=2026102791";
+import { uebernehmeDateiAuswahl, dateiAuswahlLaeuft } from "./composer-bild-anhang.js?v=2026102793";
 // Der Anhangbestand ist erst nach der ersten Auswahl geladen.
 const bestand = () => typeof window !== "undefined" ? window.smejjAnhangChips : null;
 const anhangNichtBereit = () => bestand()?.anhangNichtBereit?.() || false;

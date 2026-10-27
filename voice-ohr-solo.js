@@ -86,6 +86,15 @@ export function istAppleMobil(nav = typeof navigator !== "undefined" ? navigator
  *          Hooks; der Aufrufer entscheidet, ob er erneut start() ruft.
  * stop():  Runde abbrechen und alles freigeben (Mute, Schliessen).
  */
+/** resume() mit Zeitlimit: iOS laesst das Versprechen ohne Tipp offen; dann uebernimmt wecken. */
+export const RESUME_WARTE_MS = 400;
+function kurzWecken(ctx) {
+  return Promise.race([
+    Promise.resolve().then(() => ctx.resume()).catch(() => { /* wecken uebernimmt */ }),
+    new Promise((fertig) => setTimeout(fertig, RESUME_WARTE_MS))
+  ]);
+}
+
 export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehler, aufPegel,
   automatFactory = createSoloAutomat, taktMs = 80 } = {}) {
   let takt = 0;
@@ -93,10 +102,17 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
   let stream = null;
   let laeuft = false;
   let lauf = 0;
+  let ohrLauf = 0; // Lauf, der zuletzt ear.start() gerufen hat
+  let wecken = null;
 
   const freigeben = () => {
     clearInterval(takt);
     takt = 0;
+    if (wecken) {
+      document.removeEventListener("touchend", wecken);
+      document.removeEventListener("click", wecken);
+      wecken = null;
+    }
     try { aufPegel?.(0); } catch { /* Anzeige egal */ }
     try { stream?.getTracks?.().forEach((t) => t.stop()); } catch { /* schon zu */ }
     stream = null;
@@ -128,16 +144,22 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
           return;
         }
         stream = captured;
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const laufCtx = new (window.AudioContext || window.webkitAudioContext)();
+        ctx = laufCtx;
         // iOS startet AudioContexte "suspended" — ohne resume() liefert der
         // Analyser nur Stille (Pegel 0) und der Automat laeuft ins Zeitlimit.
-        await ctx.resume().catch(() => { /* wecken uebernimmt */ });
-        if (meinLauf !== lauf) return;
+        // Ohne Tipp bleibt resume() auf iOS mitunter ewig offen: hoechstens kurz warten.
+        await kurzWecken(laufCtx);
+        if (meinLauf !== lauf) {
+          if (laufCtx.state !== "closed") laufCtx.close?.()?.catch?.(() => { /* schon zu */ });
+          return;
+        }
         if (ctx.state === "suspended") {
-          const wecken = () => {
+          wecken = () => {
             document.removeEventListener("touchend", wecken);
             document.removeEventListener("click", wecken);
-            ctx?.resume?.().catch(() => { /* Kontext bereits zu */ });
+            wecken = null;
+            if (meinLauf === lauf) laufCtx.resume?.().catch(() => { /* Kontext bereits zu */ });
           };
           document.addEventListener("touchend", wecken, { once: true });
           document.addEventListener("click", wecken, { once: true });
@@ -148,8 +170,13 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
         quelle.connect(analyser);
         const daten = new Uint8Array(analyser.fftSize);
         const automat = automatFactory();
+        ohrLauf = meinLauf;
         const recording = await ear.start({ stream });
-        if (meinLauf !== lauf) return;
+        if (meinLauf !== lauf) {
+          // Spaet gestartetes Ohr dieses alten Laufs beenden — nie das eines neueren.
+          if (ohrLauf === meinLauf) { try { ear?.cancel?.(); } catch { /* still */ } }
+          return;
+        }
         if (recording?.ok === false) {
           const error = new Error("Mikrofonaufnahme konnte nicht gestartet werden");
           error.name = recording.error === "microphone_denied" ? "NotAllowedError" : "NotReadableError";
@@ -157,7 +184,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
         }
         let sprichtGemeldet = false;
         takt = setInterval(async () => {
-          if (!laeuft) return;
+          if (!laeuft || meinLauf !== lauf) return;
           analyser.getByteTimeDomainData(daten);
           const pegel = rmsPegel(daten);
           try { aufPegel?.(pegel); } catch { /* Anzeige darf nie stoeren */ }
@@ -188,6 +215,13 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
   };
 }
 
+/** Bricht die Vorlese-Warteschlange ab (ihr stopFn stoppt Premium- und Browser-Stimme). */
+export function stummeAusgabe(state) {
+  try { state.speechQueue?.cancel?.(); } catch { /* Queue war schon zu */ }
+  state.speechQueue = null;
+  try { globalThis.window?.speechSynthesis?.cancel?.(); } catch { /* keine Browser-Stimme */ }
+}
+
 /**
  * verdrahteOhrSolo(host) — die komplette Anbindung an einen Sprach-Host
  * (composer-tools.js), damit dessen Datei unter der 800-Zeilen-Regel bleibt.
@@ -196,7 +230,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
  * Rueckgabe: { hoeren, aktivieren, stop } —
  *   hoeren():     eine Solo-Hoer-Runde (Status setzen, Wachen stoppen, start)
  *   aktivieren(): Solo einschalten, wenn Ohr+Mikrofon verfuegbar (true/false)
- *   stop():       laufende Runde beenden (Mute, Schliessen)
+ *   stop():       laufende Runde beenden (Mute, Schliessen); bei Mute auch Vorlesen stoppen
  */
 export function verdrahteOhrSolo(host) {
   // urls hat Vorrang: seit 2026-09-10 gibt es zwei Adressen fuer das Ohr
@@ -221,7 +255,11 @@ export function verdrahteOhrSolo(host) {
   const solo = createOhrSolo({
     ear,
     aufStatus: () => host.setStatus("listening", "Ich höre zu ..."),
-    aufTranskript: (text) => { host.setTranskript(text); host.senden(text); },
+    aufTranskript: (text) => {
+      const s = host.state;
+      if (!s.voiceModeActive || s.voiceMuted || !s.ohrSoloAktiv) return; // stumm/zu: nichts senden
+      host.setTranskript(text); host.senden(text);
+    },
     aufLeer: () => { const s = host.state; if (s.voiceModeActive && !s.voiceMuted && s.ohrSoloAktiv) solo.start(); },
     aufFehler: (fehler) => host.fallback(soloFehlertext(fehler)),
     // Lebendes Sprach-Logo (Betreiber-Massgabe 2026-08-30 "wie ChatGPT"): der
@@ -232,8 +270,35 @@ export function verdrahteOhrSolo(host) {
       if (overlay) overlay.style.setProperty("--pegel", Math.min(1, pegel * 4.5).toFixed(3));
     }
   });
+  // Der Host (start-gelockt) schaltet im Fallback (keine Erkennung) gar nicht um und
+  // ruft stop() nicht: der Mikrofon-Tipp beendet dort das Vorlesen ueber diesen Klick-Waechter.
+  if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+    document.addEventListener("click", (ereignis) => {
+      const s = host.state;
+      if (!s?.voiceModeActive || !s.voiceFallback || !ereignis?.target?.closest?.("#voiceModeMic")) return;
+      stummeAusgabe(s);
+      try { host.stopInterrupt?.(); host.stopBarge?.(); } catch { /* Wachen waren aus */ }
+      host.setStatus?.("muted", "Frage unten eintippen — die Antwort wird vorgelesen.");
+    }, true);
+  }
+  // Spaete Rueckrufe des Hosts (armBargeIn nach Stumm) setzen "speaking" und schalten
+  // den Pegel-Detektor scharf: im Stummzustand sofort wieder abschalten.
+  let stummWache = null;
+  function wacheStumm() {
+    const overlay = typeof document !== "undefined" ? document.getElementById?.("voiceModeOverlay") : null;
+    if (stummWache || !overlay || typeof MutationObserver !== "function") return;
+    stummWache = new MutationObserver(() => {
+      const s = host.state;
+      if (!s?.voiceModeActive || !s.voiceMuted || overlay.dataset.mode !== "speaking") return;
+      try { host.stopInterrupt?.(); host.stopBarge?.(); } catch { /* Wachen waren aus */ }
+      host.setStatus?.("muted", "Mikrofon aus");
+    });
+    stummWache.observe(overlay, { attributes: true, attributeFilter: ["data-mode"] });
+  }
   const anschluss = {
-    stop: () => solo.stop(),
+    // Inhaber-Freigabe 27.10.2026 „Mikrofon-Tipp stoppt auch das Reden“: der Host ruft
+    // stop() beim Stummschalten (nach voiceMuted = true) — dann auch das Vorlesen beenden.
+    stop: () => { solo.stop(); if (host.state?.voiceMuted) { stummeAusgabe(host.state); wacheStumm(); } },
     hoeren() {
       host.stopInterrupt();
       host.stopBarge();

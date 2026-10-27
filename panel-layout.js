@@ -3,7 +3,7 @@
 // Ausgelagert aus public/app.js am 2026-07-28 (Freigabe "Ja, Punkt 1").
 // Code zeilengleich uebernommen, kein Verhaltenswechsel.
 
-import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js?v=2026102791";
+import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js?v=2026102793";
 
 // Bei der Auslagerung aus app.js kam dessen modul-lokales $ nicht mit:
 // setPanelOpen griff seither auf ein GLOBALES $ zu, das nirgends existiert —

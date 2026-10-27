@@ -5,8 +5,8 @@
 // Der Unterschied zum Plan-Modus ist kein technischer, sondern ein praktischer: Ein Plan
 // wird EINMAL gemacht und scheitert an allem, was dazwischenkommt. Hier schaut die Maus
 // nach JEDEM Schritt neu hin.
-import { alsSitzungsAktion, beschreibe, erlaubteHosts } from "./browser-pane-maus-plan.js?v=2026102791";
-import { t } from "./i18n/ui.js?v=2026102791";
+import { alsSitzungsAktion, beschreibe, erlaubteHosts } from "./browser-pane-maus-plan.js?v=2026102793";
+import { t } from "./i18n/ui.js?v=2026102793";
 
 //
 // Der Unterschied zum Plan-Modus ist kein technischer, sondern ein

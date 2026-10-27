@@ -155,11 +155,14 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     } catch (error) {
       clearTimeout(firstToneTimer);
       if (active === playback) active = null;
+      // Abgebrochen (Stumm/Barge-in): kein Fehler, sonst spraeche der Host-Fallback doch noch.
+      if (playback.cancelled) return;
       throw error;
     }
     if (!response.ok || !response.body) {
       clearTimeout(firstToneTimer);
       if (active === playback) active = null;
+      if (playback.cancelled) return;
       availability = { at: Date.now(), value: false }; // Worker weg -> Browser-Stimme
       throw new Error(`premium_tts_${response.status}`);
     }
@@ -199,6 +202,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
         if (samples.length === 0) continue;
         if (!started && ctx.state && ctx.state !== "running") {
           await Promise.race([ctx.resume?.(), new Promise((r) => setTimeout(r, 300))]).catch(() => {});
+          if (playback.cancelled) return; // waehrend des Weckens abgebrochen: nichts mehr einplanen
           if (ctx.state !== "running") throw new Error("premium_tts_suspended");
         }
         const buffer = ctx.createBuffer(1, samples.length, header.sampleRate);

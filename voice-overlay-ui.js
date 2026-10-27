@@ -19,7 +19,7 @@
 // untere Leiste mit Eingabefeld, Mikrofon-Stummschalter und Beenden-Button).
 // Das index.html-Markup bleibt unveraendert — das Upgrade passiert rein im Browser.
 // sendIcon: das gemeinsame Pfeil-Symbol aus voice-typed-send.js (SEND_ICON_SVG).
-import { t } from "./i18n/ui.js?v=2026102791";
+import { t } from "./i18n/ui.js?v=2026102793";
 
 // Die Statuszeilen kommen aus drei Modulen und schreiben mal "..." und mal
 // "…". Fuer die Uebersetzung wird darum zuerst vereinheitlicht, sonst
@@ -100,8 +100,8 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
   eingabe?.addEventListener("paste", async (event) => {
     try {
       const [{ bildDateienAusClipboard }, { uebernehmeBildDatei }] = await Promise.all([
-        import("./composer-paste-attach.js?v=2026102791"),
-        import("./composer-bild-anhang.js?v=2026102791")
+        import("./composer-paste-attach.js?v=2026102793"),
+        import("./composer-bild-anhang.js?v=2026102793")
       ]);
       const bilder = bildDateienAusClipboard(event.clipboardData);
       if (!bilder.length) return;

@@ -6,7 +6,7 @@
 
 // E2E-Pruefung 14.09.2026: fehlte — "Liste herunterladen" warf "downloadText is not defined".
 // Gleiche Adresse wie app.js (?v=4), sonst laedt der Browser das Modul ein zweites Mal.
-import { downloadText } from "./app-helfer.js?v=2026102791";
+import { downloadText } from "./app-helfer.js?v=2026102793";
 
 const UPLOAD_LIMITS = Object.freeze({
   maxBytes: 1_000_000,
@@ -116,7 +116,7 @@ export function bindUploads({ $, state, writeOutput }) {
   // lokal und fail-safe: Fehler landen lesbar in der Ausgabe.
   $("#storageAgain").addEventListener("click", async () => {
     try {
-      const [{ CLIENT_ROUTES }, { getJson }] = await Promise.all([import("./config.js?v=2026102791"), import("./shared/http-json.js?v=2026102791")]);
+      const [{ CLIENT_ROUTES }, { getJson }] = await Promise.all([import("./config.js?v=2026102793"), import("./shared/http-json.js?v=2026102793")]);
       const daten = await getJson(CLIENT_ROUTES.api.storageStatus, { mitAusweis: true });
       writeOutput("#fileOutput", daten?.nurAngemeldet ? daten.hinweis : JSON.stringify(daten, null, 2));
     } catch (fehler) {

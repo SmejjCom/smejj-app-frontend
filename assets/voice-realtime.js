@@ -20,6 +20,7 @@ const RELAY_STANDARD = "wss://api.smejj.com/api/voice-realtime";
 const EINGANG_RATE = 16000;
 const AUSGANG_RATE = 24000;
 const READY_BUDGET_MS = 6000;
+const RESUME_WARTE_MS = 400; // iOS: resume() ohne Tipp bleibt mitunter offen
 
 function sitzungsToken() {
   try { return localStorage.getItem(AUTH_TOKEN_KEY) || ""; } catch { return ""; }
@@ -114,13 +115,16 @@ export function createRealtimeAudioSession({
   let wiedergabe = null;
   let active = false;
   let muted = false;
+  // Nach Stumm bleibt die alte Antwort stumm, bis nach dem Einschalten eine NEUE beginnt.
+  let verwerfen = false;
   let bereit = false;
   let generation = 0, readyTimer = null, settleStart = () => {};
 
   const stopSession = (grund = "") => {
+    // Immer eine neue Runde: auch ein noch ausstehendes getUserMedia gehoert nicht mehr uns.
+    generation += 1; clearTimeout(readyTimer); settleStart(false);
     if (!active) return;
     active = false;
-    generation += 1; clearTimeout(readyTimer); settleStart(false);
     bereit = false;
     try { if (socket?.readyState === 1) socket.send(JSON.stringify({ type: "session.stop" })); } catch { /* weg */ }
     try { scriptProcessor?.disconnect(); } catch { /* egal */ }
@@ -158,9 +162,17 @@ export function createRealtimeAudioSession({
         track.enabled = !muted;
         for (const event of ['ended','mute']) track.addEventListener?.(event, () => { if (generation === currentGeneration) stopSession('audio_interrupted'); }, {once:true});
       }
-      audioContext = new Ctor();
-      await audioContext.resume().catch(() => {});
-      if (!active || generation !== currentGeneration) return;
+      const rundenCtx = new Ctor();
+      audioContext = rundenCtx;
+      // Ohne Tipp bleibt resume() auf iOS mitunter ewig offen: hoechstens kurz warten.
+      await Promise.race([
+        Promise.resolve().then(() => rundenCtx.resume()).catch(() => {}),
+        new Promise((fertig) => setTimeout(fertig, RESUME_WARTE_MS))
+      ]);
+      if (!active || generation !== currentGeneration) {
+        if (rundenCtx.state !== "closed") rundenCtx.close?.()?.catch?.(() => { /* schon zu */ });
+        return;
+      }
       wiedergabe = createWiedergabe(audioContext);
       const ziel = typeof window !== "undefined" && window.location?.protocol === "http:" && /localhost|127\.0\.0\.1/.test(wsUrl)
         ? wsUrl.replace(/^wss:/, "ws:") : wsUrl;
@@ -172,14 +184,15 @@ export function createRealtimeAudioSession({
           let msg = null;
           try { msg = JSON.parse(ereignis.data); } catch { return; }
           if (msg.type === "session.ready") { bereit = true; clearTimeout(uhr); onReady?.(); entscheide(true); }
-          else if (msg.type === "response.audio.start") onAudioStart?.();
-          else if (msg.type === "response.audio.end") onAudioEnd?.();
+          else if (msg.type === "response.audio.start") { if (muted) return; verwerfen = false; onAudioStart?.(); }
+          else if (msg.type === "response.audio.end") { if (!muted && !verwerfen) onAudioEnd?.(); }
           else if (msg.type === "response.interrupted") { wiedergabe?.unterbrechen(); onInterrupted?.(); }
           else if (msg.type === "transcript") onTranscript?.(msg.rolle, msg.text);
           else if (msg.type === "error") { onError?.(new Error(msg.code || "relay_error")); if (!bereit) { clearTimeout(uhr); stopSession(msg.code); entscheide(false); } }
           return;
         }
         if (ereignis.data instanceof ArrayBuffer) {
+          if (muted || verwerfen) return; // spaete Ton-Brocken nach Stumm nie hoerbar
           const float = pcmZuFloat(ereignis.data);
           wiedergabe?.spiele(float);
           onAudioChunk?.(ereignis.data);
@@ -209,7 +222,13 @@ export function createRealtimeAudioSession({
   return {
     start: startSession,
     stop: () => stopSession("stop"),
-    setMuted: (wert) => { muted = Boolean(wert); mediaStream?.getAudioTracks?.().forEach(track => { track.enabled = !muted; }); if (muted) wiedergabe?.unterbrechen(); },
+    // Inhaber-Freigabe 27.10.2026 „Mikrofon-Tipp stoppt auch das Reden“: Stumm sperrt
+    // die Eingabe UND bricht die laufende Ausgabe ab; deren Rest bleibt verworfen.
+    setMuted: (wert) => {
+      muted = Boolean(wert);
+      mediaStream?.getAudioTracks?.().forEach(track => { track.enabled = !muted; });
+      if (muted) { verwerfen = true; try { wiedergabe?.unterbrechen(); } catch { /* schon still */ } }
+    },
     isActive: () => active,
     isReady: () => bereit
   };
@@ -223,6 +242,7 @@ export function createRealtimeAudioSession({
 export function verdrahteLive(host) {
   let sitzung = null;
   let antwortText = "";
+  let stumm = false; // gilt auch fuer jede spaeter gestartete Sitzung
   const status = (m, t) => { try { host.setStatus?.(m, t); } catch { /* Anzeige egal */ } };
   return {
     aktiv: () => Boolean(sitzung?.isActive()),
@@ -230,12 +250,12 @@ export function verdrahteLive(host) {
       if (sitzung?.isActive()) return true;
       antwortText = "";
       let lief = false; // erst nach session.ready ist ein Abriss ein Abbruch (vorher entscheidet starten())
-      sitzung = createRealtimeAudioSession({
+      const neueSitzung = createRealtimeAudioSession({
         wsUrl: host.url || RELAY_STANDARD,
         onReady: () => { lief = true; status("listening", "Ich höre zu …"); },
-        onAudioStart: () => { antwortText = ""; status("speaking", "Ich spreche …"); },
-        onAudioEnd: () => status("listening", "Ich höre zu …"),
-        onInterrupted: () => status("listening", "Ich höre zu …"),
+        onAudioStart: () => { antwortText = ""; if (!stumm) status("speaking", "Ich spreche …"); },
+        onAudioEnd: () => { if (!stumm) status("listening", "Ich höre zu …"); },
+        onInterrupted: () => { if (!stumm) status("listening", "Ich höre zu …"); },
         onTranscript: (rolle, text) => {
           if (rolle === "user") { try { host.setTranskript?.(text); } catch { /* egal */ } }
           else { antwortText += text; try { host.setReply?.(antwortText); } catch { /* egal */ } }
@@ -245,6 +265,7 @@ export function verdrahteLive(host) {
         // (host.nachAbbruch: Ohr/Erkennung); nur ohne diesen Weg die Meldung.
         onClose: (grund) => {
           if (!lief || !host.state?.voiceModeActive || !grund || grund === "stop") return;
+          if (sitzung !== neueSitzung) return; // Abriss einer alten Sitzung
           sitzung = null;
           if (grund === 'audio_interrupted') { host.state.voiceMuted = true; status('muted', 'Mikrofon unterbrochen. Zum Fortsetzen Mikrofon antippen.'); return; }
           if (typeof host.nachAbbruch === "function") { try { host.nachAbbruch(); return; } catch { /* Meldung unten */ } }
@@ -252,11 +273,14 @@ export function verdrahteLive(host) {
         },
         onError: () => {}
       });
-      const an = await sitzung.start();
+      neueSitzung.setMuted(stumm || host.state?.voiceMuted === true);
+      sitzung = neueSitzung;
+      const an = await neueSitzung.start();
+      if (sitzung !== neueSitzung) return false; // waehrenddessen gestoppt
       if (!an) sitzung = null;
       return an;
     },
     stop() { try { sitzung?.stop(); } catch { /* egal */ } sitzung = null; },
-    mute(wert) { try { sitzung?.setMuted(wert); } catch { /* egal */ } if (sitzung) status("listening", wert ? "Mikrofon stumm" : "Ich höre zu …"); }
+    mute(wert) { stumm = Boolean(wert); try { sitzung?.setMuted(stumm); } catch { /* egal */ } if (sitzung) status(stumm ? "muted" : "listening", stumm ? "Mikrofon aus" : "Ich höre zu …"); }
   };
 }

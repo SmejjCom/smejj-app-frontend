@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Português (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von pt-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./pt-2.js?v=2026102791";
+import zusatz from "./pt-2.js?v=2026102793";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)

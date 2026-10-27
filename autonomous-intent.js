@@ -132,7 +132,7 @@ function renderRunOffer({ request, output, goToView, eventTarget }) {
     // wie bisher die Automatik-Ansicht geoeffnet — der bewaehrte Weg bleibt.
     let imFaden = false;
     try {
-      const { starteImFaden } = await import("./autonomous-thread-run.js?v=2026102791");
+      const { starteImFaden } = await import("./autonomous-thread-run.js?v=2026102793");
       imFaden = await starteImFaden({ request, karte: stand });
     } catch {
       imFaden = false;

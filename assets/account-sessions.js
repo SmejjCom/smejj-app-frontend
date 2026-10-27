@@ -1,15 +1,15 @@
 // smejj.com — Server-Sitzungen & Konto-Sicherheit (Single Responsibility:
 // serverseitige Session-Liste, Widerruf, Passwortwechsel, Export, Löschung).
 // Ergänzt die Account-Oberfläche aus account-privacy.js; keine Secrets im UI.
-import { API_ORIGIN } from "./config.js?v=2026102791";
+import { API_ORIGIN } from "./config.js?v=2026102793";
 // F6 (2026-09-14): /api/auth/me und /api/billing/status liefen je DREIMAL je
 // Laden. Beide Speicher buendeln gleichzeitige Fragen und halten die Antwort
 // wenige Sekunden — gleiche Kennung wie auth-gate.js/spur-start.js, sonst
 // zweite Instanz.
-import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026102791";
-import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026102791";
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026102793";
+import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026102793";
 // Der Loeschweg spricht die Sprache der Huelle (Apple prueft auf Englisch).
-import { t, uiLanguage } from "./i18n/ui.js?v=2026102791";
+import { t, uiLanguage } from "./i18n/ui.js?v=2026102793";
 
 // Cross-Origin: smejj.com und Control-Server sind verschiedene Sites. Auth laeuft
 // per Bearer-Token (localStorage), nicht per Cookie (SameSite=Lax geht cross-site
