@@ -8,13 +8,13 @@
 // Was hier bewusst NICHT liegt: welche Endpunkte in welcher Reihenfolge gefragt
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
-import { fetchStreamWithRetry } from "./fetch-retry.js?v=2026102802";
-import { t } from "../i18n/ui.js?v=2026102802";
-import { empfehlungText } from "../sprach-helfer.js?v=2026102802";
-import { API_ORIGIN } from "../config.js?v=2026102802";
-import { mitLiveDaten } from "./live-daten.js?v=2026102802";
-import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js?v=2026102802";
-import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js?v=2026102802";
+import { fetchStreamWithRetry } from "./fetch-retry.js?v=2026102803";
+import { t } from "../i18n/ui.js?v=2026102803";
+import { empfehlungText } from "../sprach-helfer.js?v=2026102803";
+import { API_ORIGIN } from "../config.js?v=2026102803";
+import { mitLiveDaten } from "./live-daten.js?v=2026102803";
+import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js?v=2026102803";
+import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js?v=2026102803";
 
 // Gleicher Schluessel wie in auth/auth-page.js, account-sessions.js und
 // auth-gate.js — dort bewusst dupliziert, damit kein Modul den anderen nur
@@ -99,8 +99,8 @@ export async function erneuereZugangsToken() {
   return "";
 }
 
-import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js?v=2026102802";
-export { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, QUELLEN_LEER_HINWEIS } from "./chat-schritte-anzeige.js?v=2026102802";
+import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js?v=2026102803";
+export { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, QUELLEN_LEER_HINWEIS } from "./chat-schritte-anzeige.js?v=2026102803";
 // ---------------------------------------------------------------------------
 // Denk-Zeile (Betreiber 2026-08-23, Vorbild Antigravity "Thought for 1s ›"):
 // Denk-Text des Modells (delta.reasoning_content) gehoert NICHT in die
@@ -208,7 +208,7 @@ export function letzteNutzerfrage(body) {
  */
 // Wörter unter den Symbolen der Antwort-Leiste auf dem Handy (UI/UX Nr. 4) —
 // eigenes Modul, dynamisch, stumm bei Fehlern; die Leiste selbst bleibt unberührt.
-if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js?v=2026102802").catch(() => {});
+if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js?v=2026102803").catch(() => {});
 
 const AKTION_STIL_ID = "antwort-aktion-stil";
 // Der Stil kommt aus dem Modul, nicht aus chat-actions.css: die CSS liegt im
@@ -373,6 +373,8 @@ export function verstaendlicheMeldung(status, roh) {
   if (status === 403) return t("Dafür fehlt die Berechtigung in deinem Konto.");
   if (status === 429 || /rate_limit/.test(code)) return t("Gerade zu viele Anfragen auf einmal. In 20 Sekunden kannst du es noch einmal schicken.");
   if (status === 402) return t("Dein Guthaben ist aufgebraucht. Unter Einstellungen → API kannst du es aufladen.");
+  // QA 2026-10-28 (R2): die Bruecke kann die Anmeldung gerade nicht pruefen — kein Modellfehler.
+  if (/auth_unavailable/.test(code)) return t("Die Anmeldung kann gerade nicht geprüft werden. Bitte versuche es gleich noch einmal.");
   if (status >= 500 || /backends failed|model_unavailable/i.test(code)) return t("Die Modelle antworten gerade nicht. Das ist unser Fehler, nicht deiner.");
   return code;
 }
@@ -664,7 +666,7 @@ export async function streamChatAnswer(url, body, output, optionen = {}) {
     // Bild abgelegt — dasselbe Bild nachholen statt neu malen. Nicht nach einem bewussten Stopp.
     // Das Modul kommt erst beim Abriss (Startgewicht: es gehoert nicht in jeden Seitenaufruf).
     if (!lauf.gestoppt && /Die Bild-Übertragung ist abgerissen/.test(output?.textContent || "")) {
-      import("./bild-nachholen.js?v=2026102802").then(({ holeBildNach }) => holeBildNach({
+      import("./bild-nachholen.js?v=2026102803").then(({ holeBildNach }) => holeBildNach({
         output, renderMarkdown: optionen.renderMarkdown, hinweis: t("Bild wird erneut geladen …"),
         anfrage: () => fetchStreamWithRetry(zieleAnpassen(url, (rumpf) => ({ ...rumpf, bildErneut: true })), {
           method: "POST", headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() }, body: JSON.stringify({ ...body, bildErneut: true })
@@ -678,7 +680,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   // Fragen-Erfassung (Trainingsplan smejj 1.1, Stufe 1): loest nur aus, wartet
   // nie, bricht nie — der Server entscheidet aus Ledger und Schalter. Dynamisch
   // nachgeladen, damit ein fehlendes Modul den Chat nicht beruehrt.
-  import("/assets/ai/frage-erfassung.js?v=2026102802").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
+  import("/assets/ai/frage-erfassung.js?v=2026102803").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
   // Stufe 0 zuerst: was das Geraet des Nutzers selbst beantworten kann, kostet
   // niemanden etwas und ist meist schneller (gemessen 1,7-3,5 s gegen 2,9-6,6 s).
   if (await versucheLokaleAntwort(body, output, renderMarkdown)) return;
@@ -701,18 +703,29 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
 
   // Wartesignal ab dem Absenden.
   const stoppeWartesignal = starteWartesignal(output);
+  // QA 2026-10-28 (R2): Nach wiederholtem 503 wirft fetch-retry.js nur "bridge_unreachable" und
+  // verschluckt den Grund. Meldet die Bruecke auth_unavailable, ist der Server erreichbar — nur die
+  // Anmeldung gerade nicht pruefbar. Diese Huelle schaut darum bei 503 in eine Kopie der Antwort.
+  const grund = { authAusfall: false };
+  const mitGrund = async (...args) => {
+    const antwort = await globalThis.fetch(...args);
+    if (antwort?.status === 503) {
+      try { if ((await antwort.clone().json())?.error === "auth_unavailable") grund.authAusfall = true; } catch { /* kein JSON */ }
+    }
+    return antwort;
+  };
   let response;
   try {
     response = await fetchStreamWithRetry(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() },
       body: JSON.stringify(body), signal: lauf.controller.signal
-    });
+    }, { fetchFn: mitGrund });
   } catch {
     stoppeWartesignal();
     clearThinkingState(output);
     if (lauf.gestoppt) return;
-    output.textContent = "Verbindung zum Server unterbrochen.";
+    output.textContent = grund.authAusfall ? t("Die Anmeldung kann gerade nicht geprüft werden. Bitte versuche es gleich noch einmal.") : "Verbindung zum Server unterbrochen.";
     haengeAktionsKnopf(output, "Erneut versuchen", letzteNutzerfrage(body));
     return;
   }

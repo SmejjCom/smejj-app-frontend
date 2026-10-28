@@ -8,7 +8,7 @@ const WORKER_URL = String(process.env.SMEJJ_REMOTE_BROWSER_WORKER_URL || "").rep
 const TOKEN = String(process.env.SMEJJ_REMOTE_BROWSER_TOKEN || "").trim();
 const ORIGINS = new Set(["https://smejj.com", "https://www.smejj.com"]);
 // Version im /health sichtbar: zeigt eindeutig, welcher Bridge-Code live laeuft.
-const BRIDGE_VERSION = "live-browser-2026-07-15-1";
+const BRIDGE_VERSION = "live-browser-2026-10-28-1";
 const RATE = new Map();
 const RATE_CAPACITY = Number(process.env.SMEJJ_REMOTE_BROWSER_RATE_CAPACITY || 12);
 const RATE_REFILL_PER_SEC = Number(process.env.SMEJJ_REMOTE_BROWSER_RATE_REFILL_PER_SEC || 0.2);
@@ -31,8 +31,90 @@ function send(res, status, payload, origin = "") {
   res.end(JSON.stringify(payload, null, 2));
 }
 
+// >>> GENERIERT aus src/shared/clientAdresse.js — nicht von Hand aendern (node scripts/build/einbetten-clientadresse.mjs)
+// smejj.com — echte Client-Adresse fuer Bremsen und Protokolle (QA 2026-10-28).
+//
+// EINE Regel fuer Control-Server (rateLimiter.js -> clientKeyFromRequest), Chat-Bruecke
+// (chat-bridge-grenzen.js) und Remote-Browser-Dienst (remote-browser-bridge.js, dort als erzeugter
+// Block: scripts/build/einbetten-clientadresse.mjs). Ohne Abhaengigkeiten (wird gebuendelt/eingebettet).
+//
+// Befund: clientKeyFromRequest las X-Forwarded-For von rechts (richtig hinter dem Proxy, der die
+// echte Adresse HINTEN anhaengt — Live-Test 17.09., Sicherheitspruefung 28.09.), pruefte aber nie,
+// WER die Kopfzeile geschickt hat. Bei direkter Verbindung ohne Proxy setzt der Absender die ganze
+// Kette selbst und bekommt mit jedem Wert einen frischen Bremsen-Topf.
+//
+// Regel: X-Forwarded-For zaehlt NUR, wenn der direkte Socket-Partner ein vertrauenswuerdiger Proxy
+// ist. Dann wird die Kette von rechts gelesen und vertrauenswuerdige Proxys werden uebersprungen;
+// der erste nicht vertrauenswuerdige Eintrag ist der Client. Ungueltige Eintraege -> Socket-Adresse.
+// Vertrauenswuerdig: Liste in SMEJJ_TRUSTED_PROXY_CIDRS (IPv4-CIDR, einzelne IPv4/IPv6, "loopback",
+// "intern"); ohne Liste gilt der Standard des Aufrufers.
+
+// Interne Netze: Loopback, RFC1918, Link-Local, CGNAT (100.64/10), IPv6 ULA/Link-Local.
+const INTERNE_ADRESSE = /^(?:10\.|127\.|169\.254\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.|100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|::1$|fc|fd|fe80:)/i;
+
+/** "::ffff:1.2.3.4" -> "1.2.3.4", Klammern/Leerzeichen weg, klein geschrieben. "" wenn ungueltig. */
+function normalisiereIp(wert) {
+  let ip = String(wert || "").trim().toLowerCase().replace(/^\[|\]$/g, "");
+  if (ip.startsWith("::ffff:") && /^\d+\.\d+\.\d+\.\d+$/.test(ip.slice(7))) ip = ip.slice(7);
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(ip)) return ip.split(".").every((t) => Number(t) <= 255) ? ip : "";
+  return /^[0-9a-f:]+$/.test(ip) && ip.includes(":") ? ip : "";
+}
+
+function ipv4Zahl(ip) {
+  return ip.split(".").reduce((summe, teil) => (summe * 256) + Number(teil), 0);
+}
+
+/** Liste vertrauenswuerdiger Proxys aus der Umgebung; leer, wenn nicht gesetzt. */
+function vertrauteProxys(env = process.env) {
+  return String(env?.SMEJJ_TRUSTED_PROXY_CIDRS || "").split(",").map((t) => t.trim().toLowerCase()).filter(Boolean);
+}
+
+function istVertraut(ip, liste) {
+  const n = normalisiereIp(ip);
+  if (!n) return false;
+  return liste.some((eintrag) => {
+    if (eintrag === "intern") return INTERNE_ADRESSE.test(n);
+    if (eintrag === "loopback") return n === "::1" || n.startsWith("127.");
+    const [netz, laenge] = eintrag.split("/");
+    const netzIp = normalisiereIp(netz);
+    if (!netzIp) return false;
+    if (laenge === undefined) return netzIp === n;
+    if (!/^\d+\.\d+\.\d+\.\d+$/.test(netzIp) || !/^\d+\.\d+\.\d+\.\d+$/.test(n)) return false;
+    const bits = Number(laenge);
+    if (!(bits >= 0 && bits <= 32)) return false;
+    const maske = bits === 0 ? 0 : (0xffffffff << (32 - bits)) >>> 0;
+    return ((ipv4Zahl(n) & maske) >>> 0) === ((ipv4Zahl(netzIp) & maske) >>> 0);
+  });
+}
+
+/**
+ * Die Adresse, nach der gebremst wird.
+ * @param {object} req  Node-Anfrage (socket.remoteAddress, headers)
+ * @param {object} env  Umgebung (SMEJJ_TRUSTED_PROXY_CIDRS)
+ * @param {{ standardVertraut?: string[], ohnePeer?: string }} optionen
+ *   standardVertraut: gilt, wenn SMEJJ_TRUSTED_PROXY_CIDRS leer ist; ohnePeer: Rueckgabe ohne Socket.
+ */
+function clientAdresse(req, env = process.env, { standardVertraut = [], ohnePeer = "unbekannt" } = {}) {
+  const peer = normalisiereIp(req?.socket?.remoteAddress || req?.connection?.remoteAddress);
+  if (!peer) return ohnePeer; // ohne Socket kein Beleg, wer XFF geschickt hat — XFF zaehlt dann nicht
+  const gesetzt = vertrauteProxys(env);
+  const liste = gesetzt.length ? gesetzt : standardVertraut;
+  if (!liste.length || !istVertraut(peer, liste)) return peer;
+  const kette = String(req?.headers?.["x-forwarded-for"] || "").split(",").map((t) => t.trim()).filter(Boolean);
+  for (let i = kette.length - 1; i >= 0; i--) {
+    const ip = normalisiereIp(kette[i]);
+    if (!ip) return peer;
+    if (!istVertraut(ip, liste)) return ip;
+  }
+  return peer;
+}
+// <<< ENDE src/shared/clientAdresse.js
+
+// Bremsen-Schluessel (QA 2026-10-28): frueher der ERSTE X-Forwarded-For-Eintrag — bei direkter
+// Verbindung frei faelschbar (jeder Wert = frischer Topf). Jetzt die gemeinsame Regel: XFF nur, wenn
+// der direkte Partner ein vertrauenswuerdiger Proxy ist (SMEJJ_TRUSTED_PROXY_CIDRS, sonst "intern").
 function clientKey(req) {
-  return String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(",")[0].trim();
+  return clientAdresse(req, process.env, { standardVertraut: ["intern"], ohnePeer: "unbekannt" });
 }
 
 function takeRate(key) {

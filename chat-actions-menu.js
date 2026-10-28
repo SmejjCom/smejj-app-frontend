@@ -5,7 +5,7 @@
 // Handy, Verlaufs- und Code-Helfer erst mit offenem Chat bzw. Code-Bereich. Jeder Haken behaelt
 // die Form import("/assets/…").catch(() => {}) — die Modultests pruefen genau diese Zeile.
 // Oberflaechentexte laufen ueber die Sprachdateien (Inventur 20.09.2026).
-import { t } from "./i18n/ui.js?v=2026102802";
+import { t } from "./i18n/ui.js?v=2026102803";
 if (typeof document !== "undefined") {
   const beiHandy = (lade) => {
     try {
@@ -31,28 +31,28 @@ if (typeof document !== "undefined") {
   let kartenWeg = false;
   try { kartenWeg = JSON.parse(localStorage.getItem("smejj.erste-schritte.v1") || "{}")?.weg === true; } catch { kartenWeg = false; }
   // Kompakt-Programm (Betreiber 03.09.): halbe Abstaende in allen Ansichten — sofort, sonst springt das Layout.
-  import("/assets/kompakt.js?v=2026102802").catch(() => {});
+  import("/assets/kompakt.js?v=2026102803").catch(() => {});
   // Deutsch durchgaengig + Modell-Chips erklaert (UI/UX 02.09., Nr. 7+8) — nur auf der Startseite.
-  if (start) import("/assets/deutsch-klartext.js?v=2026102802").catch(() => {});
+  if (start) import("/assets/deutsch-klartext.js?v=2026102803").catch(() => {});
   // Huelle in der Sprache des Nutzers (Inventur 20.09.2026): index.html liegt unter
   // dem Start-Lock, darum uebersetzt huelle-sprache.js die Beschriftungen zur Laufzeit.
-  if (start) import("/assets/huelle-sprache.js?v=2026102802").catch(() => {});
+  if (start) import("/assets/huelle-sprache.js?v=2026102803").catch(() => {});
   // Erste-Schritte-Karten (UI/UX 02.09., Nr. 9) — nur Startseite und nur, solange nicht weggeklickt.
-  if (start && !kartenWeg) import("/assets/erste-schritte.js?v=2026102802").catch(() => {});
+  if (start && !kartenWeg) import("/assets/erste-schritte.js?v=2026102803").catch(() => {});
   // Woerter unter den Symbolen (UI/UX 02.09., Nr. 4) und Werkzeugzeile in einer Zeile (03.09.) — nur am Handy.
-  beiHandy(() => import("/assets/chat-actions-woerter.js?v=2026102802").catch(() => {}));
-  beiHandy(() => import("/assets/composer-zeile.js?v=2026102802").catch(() => {}));
+  beiHandy(() => import("/assets/chat-actions-woerter.js?v=2026102803").catch(() => {}));
+  beiHandy(() => import("/assets/composer-zeile.js?v=2026102803").catch(() => {}));
   // Schlankes Dock am Handy (Betreiber 07.09.: Safe-Area nur einmal, Code-Leiste eine Zeile, Felder bis 5 Zeilen) — nur am Handy.
-  beiHandy(() => import("/assets/mobil-dock.js?v=2026102802").catch(() => {}));
+  beiHandy(() => import("/assets/mobil-dock.js?v=2026102803").catch(() => {}));
   // Erweitertes Nachrichten-Menue (Betreiber 16.09.: Teilen, Antworten, Zitieren, Weiterleiten,
   // Text auswaehlen, Uebersetzen, Anpinnen) — die Handler leben dort, chat-actions.js steht bei 799 Zeilen.
-  import("/assets/chat-menue-mehr.js?v=2026102802").catch(() => {});
+  import("/assets/chat-menue-mehr.js?v=2026102803").catch(() => {});
   // "Inhalt melden" (Google-Play-Pflicht): ohne dieses Modul ist der Menuepunkt tot.
-  import("/assets/inhalt-melden.js?v=2026102802").catch(() => {});
+  import("/assets/inhalt-melden.js?v=2026102803").catch(() => {});
   // Verlauf steht nach dem Oeffnen ganz unten (Betreiber-Befund 03.09.) — erst, wenn ein Chat im Log steht.
-  beiKindern(document.getElementById("startLog"), () => import("/assets/verlauf-unten.js?v=2026102802").catch(() => {}));
+  beiKindern(document.getElementById("startLog"), () => import("/assets/verlauf-unten.js?v=2026102803").catch(() => {}));
   // Code-Bereich: Schreibfeld am unteren Rand (Betreiber-Befund 03.09.) — erst im Code-Bereich.
-  beiKlasse(document.getElementById("code"), "is-active", () => import("/assets/code-feld-unten.js?v=2026102802").catch(() => {}));
+  beiKlasse(document.getElementById("code"), "is-active", () => import("/assets/code-feld-unten.js?v=2026102803").catch(() => {}));
 }
 // (2026-07-28).
 //

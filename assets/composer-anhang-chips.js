@@ -4,7 +4,7 @@
 // erhalten. Es findet hier kein dauerhafter Upload in den Objektspeicher statt.
 // Auswahl, Kamera, Paste und Drop benutzen denselben Bestand; vorhandene
 // Verweisformate bleiben fuer nicht lesbare Archiv-/Altformate erhalten.
-import { t } from "./i18n/ui.js?v=2026102802";
+import { t } from "./i18n/ui.js?v=2026102803";
 const anhaenge = [];
 let seq = 0;
 let versand = [];

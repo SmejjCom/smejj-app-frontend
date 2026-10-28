@@ -1,4 +1,4 @@
-import { initEingabeVerhalten } from "./eingabe-verhalten.js?v=2026102802";
+import { initEingabeVerhalten } from "./eingabe-verhalten.js?v=2026102803";
 // smejj.com — gemeinsame Datei-Gesten fuer Gastseite und Chat. Keine Uploads.
 export function dateienAusTransfer(transfer) {
   const files = Array.from(transfer?.files || []);
@@ -52,7 +52,7 @@ export function initEingabeHost() {
   if (window.smejjSichereDateiEntwurf) return;
   initEingabeVerhalten();
   if (!document.getElementById("composerEingabeStil")) {
-    const link = document.createElement("link"); link.id = "composerEingabeStil"; link.rel = "stylesheet"; link.href = "/assets/composer-eingabe.css?v=2026102802"; document.head.append(link);
+    const link = document.createElement("link"); link.id = "composerEingabeStil"; link.rel = "stylesheet"; link.href = "/assets/composer-eingabe.css?v=2026102803"; document.head.append(link);
   }
   window.addEventListener("smejj:datei-hinweis", e => {
     const feld = aktivesSchreibfeld(); if (!feld) return;
@@ -69,11 +69,11 @@ export function initEingabeHost() {
   document.addEventListener("click", blockiereSenden, true);
   document.addEventListener("keydown", blockiereSenden, true);
   const annehmen = async (files, feld) => {
-    const { uebernehmeDateiAuswahl } = await import("./composer-bild-anhang.js?v=2026102802");
+    const { uebernehmeDateiAuswahl } = await import("./composer-bild-anhang.js?v=2026102803");
     await uebernehmeDateiAuswahl(files, feld, input => input.dispatchEvent(new Event("input", { bubbles: true })));
     if (feld.id === "probierFeld") window.dispatchEvent(new Event("smejj:gast-anhang"));
     feld.scrollIntoView?.({ block: "center", behavior: "smooth" });
   };
   bindDateiGesten({ annehmen });
-  void import("./composer-entwurf-dateien.js?v=2026102802").then(m => m.initDateiEntwurf(annehmen));
+  void import("./composer-entwurf-dateien.js?v=2026102803").then(m => m.initDateiEntwurf(annehmen));
 }
