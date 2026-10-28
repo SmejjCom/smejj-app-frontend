@@ -215,6 +215,14 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
   };
 }
 
+// Tipp-Flaechen fuers Unterbrechen (wie ChatGPT: auf die Kugel tippen) und die Anzeige-Texte.
+const UNTERBRECHEN_ZIELE = "#voiceModeOverlay .voice-mode-logo, #voiceModeOverlay .voice-mode-wave, #voiceModeStatus";
+const ANZEIGE = { speaking: "Ich spreche ...", thinking: "Einen Moment ..." };
+function overlayModus() {
+  const overlay = typeof document !== "undefined" ? document.getElementById?.("voiceModeOverlay") : null;
+  return overlay?.dataset?.mode || "";
+}
+
 /** Bricht die Vorlese-Warteschlange ab (ihr stopFn stoppt Premium- und Browser-Stimme). */
 export function stummeAusgabe(state) {
   try { state.speechQueue?.cancel?.(); } catch { /* Queue war schon zu */ }
@@ -230,7 +238,8 @@ export function stummeAusgabe(state) {
  * Rueckgabe: { hoeren, aktivieren, stop } —
  *   hoeren():     eine Solo-Hoer-Runde (Status setzen, Wachen stoppen, start)
  *   aktivieren(): Solo einschalten, wenn Ohr+Mikrofon verfuegbar (true/false)
- *   stop():       laufende Runde beenden (Mute, Schliessen); bei Mute auch Vorlesen stoppen
+ *   stop():       laufende Runde beenden (Mute, Schliessen); eine laufende Antwort spricht weiter
+ *   unterbrechen(): laufende Antwort abbrechen (Tipp auf das Logo) und wieder zuhoeren
  */
 export function verdrahteOhrSolo(host) {
   // urls hat Vorrang: seit 2026-09-10 gibt es zwei Adressen fuer das Ohr
@@ -270,19 +279,18 @@ export function verdrahteOhrSolo(host) {
       if (overlay) overlay.style.setProperty("--pegel", Math.min(1, pegel * 4.5).toFixed(3));
     }
   });
-  // Der Host (start-gelockt) schaltet im Fallback (keine Erkennung) gar nicht um und
-  // ruft stop() nicht: der Mikrofon-Tipp beendet dort das Vorlesen ueber diesen Klick-Waechter.
+  // Inhaber-Auftrag 28.10.2026 „wie ChatGPT/Gemini Voice“: Der Mikrofon-Knopf schaltet NUR
+  // das Mikrofon. Abbrechen der Antwort geht ueber X oder den Tipp auf das Logo (Unterbrechen).
+  // pointerup statt click: iOS-Safari meldet Klicks auf ein reines Anzeige-Element nicht.
   if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
-    document.addEventListener("click", (ereignis) => {
-      const s = host.state;
-      if (!s?.voiceModeActive || !s.voiceFallback || !ereignis?.target?.closest?.("#voiceModeMic")) return;
-      stummeAusgabe(s);
-      try { host.stopInterrupt?.(); host.stopBarge?.(); } catch { /* Wachen waren aus */ }
-      host.setStatus?.("muted", "Frage unten eintippen — die Antwort wird vorgelesen.");
+    document.addEventListener("pointerup", (ereignis) => {
+      if (!ereignis?.target?.closest?.(UNTERBRECHEN_ZIELE)) return;
+      anschluss.unterbrechen();
     }, true);
   }
   // Spaete Rueckrufe des Hosts (armBargeIn nach Stumm) setzen "speaking" und schalten
-  // den Pegel-Detektor scharf: im Stummzustand sofort wieder abschalten.
+  // den Pegel-Detektor scharf: im Stummzustand sofort wieder abschalten. Die Antwort
+  // selbst spricht weiter ("speaking" bleibt) — erst ihr Ende zeigt "Mikrofon aus".
   let stummWache = null;
   function wacheStumm() {
     const overlay = typeof document !== "undefined" ? document.getElementById?.("voiceModeOverlay") : null;
@@ -291,14 +299,37 @@ export function verdrahteOhrSolo(host) {
       const s = host.state;
       if (!s?.voiceModeActive || !s.voiceMuted || overlay.dataset.mode !== "speaking") return;
       try { host.stopInterrupt?.(); host.stopBarge?.(); } catch { /* Wachen waren aus */ }
-      host.setStatus?.("muted", "Mikrofon aus");
     });
     stummWache.observe(overlay, { attributes: true, attributeFilter: ["data-mode"] });
   }
   const anschluss = {
-    // Inhaber-Freigabe 27.10.2026 „Mikrofon-Tipp stoppt auch das Reden“: der Host ruft
-    // stop() beim Stummschalten (nach voiceMuted = true) — dann auch das Vorlesen beenden.
-    stop: () => { solo.stop(); if (host.state?.voiceMuted) { stummeAusgabe(host.state); wacheStumm(); } },
+    // Inhaber-Auftrag 28.10.2026 (ersetzt die Freigabe vom 27.10. „Mikrofon-Tipp stoppt
+    // auch das Reden“): Stumm schaltet nur das Mikrofon aus. Die laufende Antwort wird zu
+    // Ende gesprochen; danach bleibt das Mikrofon aus, bis der Nutzer es wieder einschaltet.
+    // Der Host setzt direkt nach stop() "muted" — laeuft noch eine Antwort, kommt ihre
+    // Anzeige ("Ich spreche ..." / "Einen Moment ...") gleich danach zurueck.
+    stop: () => {
+      solo.stop();
+      const s = host.state;
+      if (!s?.voiceMuted) return;
+      wacheStumm();
+      const vorher = overlayModus();
+      if (vorher !== "speaking" && vorher !== "thinking") return;
+      queueMicrotask(() => {
+        if (!s.voiceModeActive || !s.voiceMuted || overlayModus() !== "muted") return;
+        if (vorher === "thinking" || s.speechQueue?.isActive?.() === true) host.setStatus?.(vorher, ANZEIGE[vorher]);
+      });
+    },
+    unterbrechen() {
+      const s = host.state;
+      if (!s?.voiceModeActive || overlayModus() !== "speaking" || s.speechQueue?.isActive?.() !== true) return false;
+      stummeAusgabe(s);
+      try { host.stopInterrupt?.(); host.stopBarge?.(); } catch { /* Wachen waren aus */ }
+      if (s.voiceFallback) host.setStatus?.("muted", "Frage unten eintippen — die Antwort wird vorgelesen.");
+      else if (s.voiceMuted) host.setStatus?.("muted", "Mikrofon aus");
+      else host.hoerenNeu?.();
+      return true;
+    },
     hoeren() {
       host.stopInterrupt();
       host.stopBarge();

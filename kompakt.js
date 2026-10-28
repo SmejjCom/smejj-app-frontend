@@ -174,7 +174,7 @@ export function breitePruefen(feld, glas) {
 
 // Ein frischer Start im Handy-Querformat durchlaeuft nie den <=600-px-Lader.
 // Nur Inhaltsstile nachladen; das geschuetzte Eingabe-Dock bleibt unveraendert.
-export function ladeQuerformatInhalte(win = window, lade = () => import("/assets/mobil-ansichten.js?v=2026102803")) {
+export function ladeQuerformatInhalte(win = window, lade = () => import("/assets/mobil-ansichten.js?v=2026102804")) {
   let mq;
   try { mq = win.matchMedia("(pointer:coarse) and (max-height:500px) and (max-width:1100px)"); }
   catch { return false; }

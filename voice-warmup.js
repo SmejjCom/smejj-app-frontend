@@ -4,7 +4,7 @@
 // auf, BEVOR die erste Frage gestellt ist — die erste Antwort startet dadurch
 // spuerbar frueher (~0,5 s). Fail-safe und free-only: Fehler werden ignoriert,
 // es entstehen keine neuen Dienste und keine Kosten (reiner Health-Ping).
-import { CLIENT_ROUTES } from "./config.js?v=2026102803";
+import { CLIENT_ROUTES } from "./config.js?v=2026102804";
 
 const WARMUP_INTERVAL_MS = 60000;
 let lastWarmupAt = 0;

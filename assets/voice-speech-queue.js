@@ -153,7 +153,13 @@ export function satzFrist(text) {
   return Math.min(45_000, 8_000 + 120 * String(text || "").length);
 }
 
-export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, minChars = DEFAULT_MIN_CHARS, eagerFirst = false, maxChars = 0, fristFn = satzFrist } = {}) {
+// prefetchFn (28.10.2026, „wie ChatGPT Voice“): bekommt den naechsten sprechfertigen
+// Satz, sobald der aktuelle laeuft — die Premium-Stimme laedt ihn vor, damit zwischen
+// zwei Saetzen keine Netzwerk-Luecke entsteht. Standard: der Vorlader, den
+// voice-premium-tts.js anmeldet (ohne Premium-Stimme passiert nichts).
+const standardVorlader = (text) => globalThis.smejjSprachVorlader?.(text);
+
+export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, minChars = DEFAULT_MIN_CHARS, eagerFirst = false, maxChars = 0, fristFn = satzFrist, prefetchFn = standardVorlader } = {}) {
   const queue = [];
   let consumed = 0;      // Zeichen des Volltexts, die bereits in Saetze zerlegt wurden
   let spoken = "";       // alles, was der TTS uebergeben wurde (Echo-Filter der Hosts)
@@ -164,6 +170,19 @@ export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, m
   let ended = false;     // onQueueEnd bereits gefeuert
   let satzNummer = 0;    // gegen verspaetete onend eines abgeloesten Satzes
   let frist = null;
+  let vorgeladen = "";   // zuletzt zum Vorladen gemeldeter Satz
+
+  const vorladeNaechsten = () => {
+    if (cancelled || !speaking || typeof prefetchFn !== "function") return;
+    if (maxChars > 0 && spoken.length >= maxChars) return;
+    for (const satz of queue) {
+      const naechster = sanitizeForSpeech(satz);
+      if (!naechster) continue;
+      if (naechster === vorgeladen) return;
+      try { if (prefetchFn(naechster) !== false) vorgeladen = naechster; } catch { /* Vorladen ist nur Beschleunigung */ }
+      return;
+    }
+  };
 
   const speakNext = () => {
     if (cancelled || speaking) return;
@@ -207,6 +226,7 @@ export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, m
       frist?.unref?.(); // Node-Tests nicht aufhalten
     }
     speakFn(speech, { onend: fertig });
+    vorladeNaechsten();
   };
 
   return {
@@ -228,6 +248,7 @@ export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, m
       }
       for (const sentence of sentences) queue.push(sentence);
       speakNext();
+      vorladeNaechsten();
     },
     // Stufe 3a: Eine wortwoertliche Ansage VOR der Antwort einreihen (Denk-Laut,
     // siehe voice-thinking-cue.js). Sie laeuft bewusst durch dieselbe
@@ -256,6 +277,7 @@ export function createSpeechQueue({ speakFn, stopFn, onQueueStart, onQueueEnd, m
       }
       flushed = true;
       speakNext();
+      vorladeNaechsten();
     },
     // Barge-in/Schliessen: Queue leeren, laufende Ausgabe stoppen, kein onQueueEnd.
     cancel() {

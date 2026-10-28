@@ -115,7 +115,7 @@ export function createRealtimeAudioSession({
   let wiedergabe = null;
   let active = false;
   let muted = false;
-  // Nach Stumm bleibt die alte Antwort stumm, bis nach dem Einschalten eine NEUE beginnt.
+  // Nach "Unterbrechen" bleibt die alte Antwort stumm, bis eine NEUE beginnt.
   let verwerfen = false;
   let bereit = false;
   let generation = 0, readyTimer = null, settleStart = () => {};
@@ -184,15 +184,15 @@ export function createRealtimeAudioSession({
           let msg = null;
           try { msg = JSON.parse(ereignis.data); } catch { return; }
           if (msg.type === "session.ready") { bereit = true; clearTimeout(uhr); onReady?.(); entscheide(true); }
-          else if (msg.type === "response.audio.start") { if (muted) return; verwerfen = false; onAudioStart?.(); }
-          else if (msg.type === "response.audio.end") { if (!muted && !verwerfen) onAudioEnd?.(); }
+          else if (msg.type === "response.audio.start") { verwerfen = false; onAudioStart?.(); }
+          else if (msg.type === "response.audio.end") { if (!verwerfen) onAudioEnd?.(); }
           else if (msg.type === "response.interrupted") { wiedergabe?.unterbrechen(); onInterrupted?.(); }
           else if (msg.type === "transcript") onTranscript?.(msg.rolle, msg.text);
           else if (msg.type === "error") { onError?.(new Error(msg.code || "relay_error")); if (!bereit) { clearTimeout(uhr); stopSession(msg.code); entscheide(false); } }
           return;
         }
         if (ereignis.data instanceof ArrayBuffer) {
-          if (muted || verwerfen) return; // spaete Ton-Brocken nach Stumm nie hoerbar
+          if (verwerfen) return; // spaete Ton-Brocken nach "Unterbrechen" nie hoerbar
           const float = pcmZuFloat(ereignis.data);
           wiedergabe?.spiele(float);
           onAudioChunk?.(ereignis.data);
@@ -222,12 +222,16 @@ export function createRealtimeAudioSession({
   return {
     start: startSession,
     stop: () => stopSession("stop"),
-    // Inhaber-Freigabe 27.10.2026 „Mikrofon-Tipp stoppt auch das Reden“: Stumm sperrt
-    // die Eingabe UND bricht die laufende Ausgabe ab; deren Rest bleibt verworfen.
+    // Inhaber-Auftrag 28.10.2026 „wie ChatGPT/Gemini Voice“: Stumm sperrt NUR die
+    // Eingabe — die laufende Antwort wird zu Ende gesprochen.
     setMuted: (wert) => {
       muted = Boolean(wert);
       mediaStream?.getAudioTracks?.().forEach(track => { track.enabled = !muted; });
-      if (muted) { verwerfen = true; try { wiedergabe?.unterbrechen(); } catch { /* schon still */ } }
+    },
+    // Unterbrechen (Tipp auf das Logo): Wiedergabe sofort still, Rest der Antwort verworfen.
+    unterbrechen: () => {
+      verwerfen = true;
+      try { wiedergabe?.unterbrechen(); } catch { /* schon still */ }
     },
     isActive: () => active,
     isReady: () => bereit
@@ -237,14 +241,16 @@ export function createRealtimeAudioSession({
 /**
  * Verdrahtung mit der Sprachwelle (composer-tools.js, 800-Zeilen-Regel: alles hier).
  * host: { state, setStatus(mode, text), setTranskript(text), setReply(text), url? }
- * Rueckgabe: { starten(): Promise<boolean>, stop(), mute(bool), aktiv(): boolean }
+ * Rueckgabe: { starten(): Promise<boolean>, stop(), mute(bool), unterbrechen(): boolean, aktiv(): boolean }
  */
 export function verdrahteLive(host) {
   let sitzung = null;
   let antwortText = "";
   let stumm = false; // gilt auch fuer jede spaeter gestartete Sitzung
+  let spricht = false; // eine Antwort ist gerade hoerbar
   const status = (m, t) => { try { host.setStatus?.(m, t); } catch { /* Anzeige egal */ } };
-  return {
+  const nachAntwort = () => { spricht = false; status(stumm ? "muted" : "listening", stumm ? "Mikrofon aus" : "Ich höre zu …"); };
+  const live = {
     aktiv: () => Boolean(sitzung?.isActive()),
     async starten() {
       if (sitzung?.isActive()) return true;
@@ -253,9 +259,9 @@ export function verdrahteLive(host) {
       const neueSitzung = createRealtimeAudioSession({
         wsUrl: host.url || RELAY_STANDARD,
         onReady: () => { lief = true; status("listening", "Ich höre zu …"); },
-        onAudioStart: () => { antwortText = ""; if (!stumm) status("speaking", "Ich spreche …"); },
-        onAudioEnd: () => { if (!stumm) status("listening", "Ich höre zu …"); },
-        onInterrupted: () => { if (!stumm) status("listening", "Ich höre zu …"); },
+        onAudioStart: () => { antwortText = ""; spricht = true; status("speaking", "Ich spreche …"); },
+        onAudioEnd: nachAntwort,
+        onInterrupted: nachAntwort,
         onTranscript: (rolle, text) => {
           if (rolle === "user") { try { host.setTranskript?.(text); } catch { /* egal */ } }
           else { antwortText += text; try { host.setReply?.(antwortText); } catch { /* egal */ } }
@@ -280,7 +286,26 @@ export function verdrahteLive(host) {
       if (!an) sitzung = null;
       return an;
     },
-    stop() { try { sitzung?.stop(); } catch { /* egal */ } sitzung = null; },
-    mute(wert) { stumm = Boolean(wert); try { sitzung?.setMuted(stumm); } catch { /* egal */ } if (sitzung) status(stumm ? "muted" : "listening", stumm ? "Mikrofon aus" : "Ich höre zu …"); }
+    stop() { try { sitzung?.stop(); } catch { /* egal */ } sitzung = null; spricht = false; },
+    // Stumm schaltet nur das Mikrofon: eine laufende Antwort bleibt hoerbar ("speaking").
+    mute(wert) {
+      stumm = Boolean(wert);
+      try { sitzung?.setMuted(stumm); } catch { /* egal */ }
+      if (!sitzung || spricht) return;
+      status(stumm ? "muted" : "listening", stumm ? "Mikrofon aus" : "Ich höre zu …");
+    },
+    unterbrechen() {
+      if (!sitzung?.isActive() || !spricht) return false;
+      try { sitzung.unterbrechen(); } catch { /* egal */ }
+      nachAntwort();
+      return true;
+    }
   };
+  // Tipp auf das Logo waehrend der Live-Antwort = Unterbrechen (wie ChatGPT Voice).
+  if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+    document.addEventListener("pointerup", (ereignis) => {
+      if (ereignis?.target?.closest?.("#voiceModeOverlay .voice-mode-logo, #voiceModeOverlay .voice-mode-wave, #voiceModeStatus")) live.unterbrechen();
+    }, true);
+  }
+  return live;
 }

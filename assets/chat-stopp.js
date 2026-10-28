@@ -86,7 +86,7 @@ function stoppeAlleStroeme() {
   // Das Ereignis zuerst und OHNE Nachladen: es erreicht die Anbieter-Leser in chatClient.js
   // sofort.
   try { window.dispatchEvent(new CustomEvent("smejj:chat-stoppen")); } catch { /* still */ }
-  import("/assets/ai/chat-stream.js?v=2026102803")
+  import("/assets/ai/chat-stream.js?v=2026102804")
     .then((m) => { m.stoppeChatStrom(); raeumeNachAbbruch(m); })
     .catch(() => { /* fail-safe: das Ereignis oben hat schon gewirkt */ });
 }
@@ -97,7 +97,7 @@ function stoppeAlleStroeme() {
  * @param {Document} [dok]
  */
 function raeumeNachAbbruch(strom, dok = document) {
-  import("/assets/app-helfer.js?v=2026102803")
+  import("/assets/app-helfer.js?v=2026102804")
     .then((m) => m.hideTaskIndicator())
     .catch(() => { /* der Balken ist Anzeige, kein Zustand */ });
   for (const knoten of dok.querySelectorAll('.entry.assistant[data-thinking="true"]')) {
@@ -155,10 +155,10 @@ async function setzeFort(bereich) {
     return true;
   }
   const [{ streamChatAnswer }, { buildChatTargets, buildRequestHistory }, { renderChatMarkdown }, { CLIENT_ROUTES, UI_COPY }] = await Promise.all([
-    import("/assets/ai/chat-stream.js?v=2026102803"),
-    import("./chat-history-context.js?v=2026102803"),
-    import("./components.js?v=2026102803"),
-    import("./config.js?v=2026102803")
+    import("/assets/ai/chat-stream.js?v=2026102804"),
+    import("./chat-history-context.js?v=2026102804"),
+    import("./components.js?v=2026102804"),
+    import("./config.js?v=2026102804")
   ]);
   const vorher = output.textContent;
   const anfrage = {

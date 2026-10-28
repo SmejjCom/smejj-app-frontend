@@ -81,7 +81,9 @@ export const FRISTEN = Object.freeze({
   // ein finales Ergebnis noch onend, gilt nach dieser Frist das Gehoerte.
   stoppNachfristMs: 1_500,
   // Laengste gesprochene Antwort; der Rest steht in der Mitschrift/im Chat.
-  sprechMaxZeichen: 900
+  // 28.10.2026 („kein Abschneiden“): 900 -> 1800 — normale Sprachantworten werden
+  // ganz vorgelesen; nur sehr lange (Code/Recherche) enden nach einem ganzen Satz.
+  sprechMaxZeichen: 1800
 });
 
 // Bilder/Code nach dem Sprechen sichtbar machen (27.09.2026): Im Sprachmodus
@@ -95,7 +97,7 @@ export async function rendereFertigeAntwort(selektor) {
     const alle = document.querySelectorAll(selektor);
     const knoten = alle[alle.length - 1];
     if (!knoten || !/```|!\[|\*\*|^#{1,6} |^[-*] /m.test(knoten.textContent || "")) return;
-    const { renderChatMarkdown } = await import("./chat-markdown.js?v=2026102803");
+    const { renderChatMarkdown } = await import("./chat-markdown.js?v=2026102804");
     const vorher = window.smejjVoiceModePreferences;
     window.smejjVoiceModePreferences = null; // Sperre nur fuer diesen einen Aufruf lockern
     try { renderChatMarkdown(knoten); } finally { window.smejjVoiceModePreferences = vorher; }

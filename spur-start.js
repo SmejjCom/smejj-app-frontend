@@ -18,18 +18,18 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026102803";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026102804";
 // Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
-import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026102803";
-import { Icons } from "/assets/components.js?v=2026102803";
+import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026102804";
+import { Icons } from "/assets/components.js?v=2026102804";
 // Abo-Stand ueber den gemeinsamen Speicher (F6, 2026-09-14): EINE Anfrage je
 // Laden fuer Planzeile, Onboarding-Karte und Abo-Panel — dieselbe Kennung wie
 // in account-sessions.js, sonst zweite Instanz und wieder zwei Anfragen.
-import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026102803";
+import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026102804";
 // Nutzerreise USA 2026-08-23: die Spur blieb auf Englisch deutsch ("Neuer
 // Chat", "Heute", "Gestern", "Alle 127 Gespräche"). t() liefert fail-safe den
 // deutschen Quelltext, solange kein Wörterbuch geladen ist.
-import { t } from "./i18n/ui.js?v=2026102803";
+import { t } from "./i18n/ui.js?v=2026102804";
 
 function alleGespraeche(n) {
   return t("Alle {n} Gespräche").replace("{n}", String(n));

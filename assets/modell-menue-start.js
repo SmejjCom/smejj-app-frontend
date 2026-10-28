@@ -24,7 +24,7 @@
 // Jetzt: vorladen, sobald der Knopf in Reichweite ist (Zeigen, Fokus, Fingerdruck,
 // ruhige Minute nach dem Laden); waehrend des Ladens aria-busy statt eines falschen
 // aria-expanded; aria-expanded folgt dem ECHTEN Menue (auch beim Schliessen).
-export function initModellMenueStart({ dokument = document, lade = () => import("./code-modell-menue.js?v=2026102803"), leerlauf = globalThis.requestIdleCallback } = {}) {
+export function initModellMenueStart({ dokument = document, lade = () => import("./code-modell-menue.js?v=2026102804"), leerlauf = globalThis.requestIdleCallback } = {}) {
   const knopf = dokument.getElementById("modelPickerButton");
   if (!knopf || knopf.dataset.modellZentral === "an") return false;
   knopf.dataset.modellZentral = "an";

@@ -51,12 +51,30 @@ function authHeaders(extra = {}) {
 // createPremiumVoice({ statusUrl, ttsUrl, lang }) -> { isAvailable, speak, cancel, isSpeaking }
 // speak(text, { onstart, onend }) spielt einen Satz; wirft bei Fehler VOR dem
 // ersten Ton (Host faellt dann auf die Browser-Stimme zurueck).
+// Inhaber-Auftrag 28.10.2026 „wie ein Mensch reden“ (Vorbild ChatGPT Voice / Gemini Live):
+// Zwischen zwei Saetzen eine kurze, zum Satzzeichen passende Atempause statt einer
+// Netzwerk-Luecke. Die Zeit seit dem Ende des vorigen Satzes wird angerechnet.
+export function natuerlichePause(vorigerText) {
+  const t = String(vorigerText || "").trim();
+  if (!t) return 0;
+  if (/[?!？！؟]["'»”)]*$/.test(t)) return 260;
+  if (/[.…。]["'»”)]*$/.test(t)) return 200;
+  if (/[,;:—–、，；：]$/.test(t)) return 90;
+  return 150;
+}
+
 export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args) => globalThis.fetch(...args) } = {}) {
   // lang darf eine Funktion sein: Sprache zum Zeitpunkt der Anfrage (Oberflaechensprache, 22.09.2026).
   const langNow = () => (typeof lang === "function" ? lang() : lang);
   let availability = { at: 0, value: false };
   let context = null;
   let active = null; // { abort, sources, cancelled }
+  // Vorladen: der naechste Satz wird schon angefragt, waehrend der aktuelle laeuft —
+  // so beginnt er ohne Netzwerk-Luecke. Hoechstens ein Satz im Voraus.
+  const vorrat = new Map(); // text -> { controller, antwort, at }
+  let defekt = false; // nach einem Fehler nichts mehr vorladen (Host nimmt die Browser-Stimme)
+  let letzterText = "";
+  let letztesEnde = 0;
   const AVAILABILITY_TTL_MS = 60000;
   // Zeitbudget bis zum ERSTEN Ton. Live-Befund 2026-08-05: ein TTS-Stream, der
   // verbindet, aber keine Daten liefert (kalter GPU-Worker), liess die
@@ -90,6 +108,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
       value = false;
     }
     availability = { at: now, value };
+    if (value) defekt = false;
     return value;
   }
 
@@ -112,7 +131,34 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     return Boolean(active);
   }
 
+  function verwerfeVorrat() {
+    for (const eintrag of vorrat.values()) { try { eintrag.controller.abort(); } catch { /* schon zu */ } }
+    vorrat.clear();
+  }
+
+  /** Naechsten Satz schon anfragen (nur waehrend die Premium-Stimme spricht). */
+  function vorladen(text) {
+    const satz = String(text || "");
+    if (!satz || !active || defekt || !availability.value || vorrat.has(satz)) return false;
+    verwerfeVorrat(); // nur der unmittelbar naechste Satz
+    const controller = new AbortController();
+    const antwort = fetchFn(ttsUrl, {
+      method: "POST",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ text: satz, language: langNow() }),
+      signal: controller.signal
+    });
+    antwort?.catch?.(() => {}); // Fehler zeigt sich erst beim Abholen in speak()
+    vorrat.set(satz, { controller, antwort, at: Date.now() });
+    return true;
+  }
+
   function cancel() {
+    verwerfeVorrat();
+    stoppeAktive();
+  }
+
+  function stoppeAktive() {
     const current = active;
     active = null;
     if (!current) return;
@@ -132,9 +178,18 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
   }
 
   async function speak(text, { onstart, onend } = {}) {
-    cancel();
+    const vorab = vorrat.get(text);
+    vorrat.delete(text);
+    const frisch = vorab && Date.now() - vorab.at <= 30_000 ? vorab : null;
+    if (vorab && !frisch) { try { vorab.controller.abort(); } catch { /* alt */ } }
+    verwerfeVorrat(); // anderer Satz als vorgeladen: Vorrat ist ueberholt
+    stoppeAktive();
+    const pauseMs = letztesEnde && Date.now() - letztesEnde < 2000
+      ? Math.max(0, natuerlichePause(letzterText) - (Date.now() - letztesEnde)) : 0;
+    letzterText = text;
+    letztesEnde = 0;
     const ctx = ensureContext();
-    const controller = new AbortController();
+    const controller = frisch?.controller || new AbortController();
     const playback = { abort: () => controller.abort(), sources: [], cancelled: false };
     active = playback;
     // Kommt binnen Budget kein erster Ton, bricht der Abbruch den fetch/read ab;
@@ -146,17 +201,18 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     }, FIRST_TONE_BUDGET_MS);
     let response;
     try {
-      response = await fetchFn(ttsUrl, {
+      response = await (frisch ? frisch.antwort : fetchFn(ttsUrl, {
         method: "POST",
         headers: authHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ text, language: langNow() }),
         signal: controller.signal
-      });
+      }));
     } catch (error) {
       clearTimeout(firstToneTimer);
       if (active === playback) active = null;
-      // Abgebrochen (Stumm/Barge-in): kein Fehler, sonst spraeche der Host-Fallback doch noch.
+      // Abgebrochen (Unterbrechen/Barge-in/X): kein Fehler, sonst spraeche der Host-Fallback doch noch.
       if (playback.cancelled) return;
+      defekt = true;
       throw error;
     }
     if (!response.ok || !response.body) {
@@ -164,6 +220,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
       if (active === playback) active = null;
       if (playback.cancelled) return;
       availability = { at: Date.now(), value: false }; // Worker weg -> Browser-Stimme
+      defekt = true;
       throw new Error(`premium_tts_${response.status}`);
     }
     const reader = response.body.getReader();
@@ -178,6 +235,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
       clearTimeout(endTimer);
       if (beendet || playback.cancelled) return;
       beendet = true;
+      letztesEnde = Date.now();
       if (active === playback) active = null;
       onend?.();
     };
@@ -210,7 +268,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
         const source = ctx.createBufferSource();
         source.buffer = buffer;
         source.connect(ctx.destination);
-        const startAt = Math.max(ctx.currentTime + 0.06, nextStartAt);
+        const startAt = Math.max(ctx.currentTime + 0.06 + (nextStartAt ? 0 : pauseMs / 1000), nextStartAt);
         source.start(startAt);
         nextStartAt = startAt + buffer.duration;
         playback.sources.push(source);
@@ -229,6 +287,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
         if (active === playback) active = null;
         if (!started) {
           try { controller.abort(); } catch { /* Strom war schon zu */ }
+          defekt = true;
           throw error; // vor dem ersten Ton -> Host-Fallback
         }
       }
@@ -247,5 +306,8 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     } else finish();
   }
 
-  return { isAvailable, speak, cancel, isSpeaking, unlock };
+  const stimme = { isAvailable, speak, cancel, isSpeaking, unlock, vorladen };
+  // Die Vorlese-Queue (voice-speech-queue.js) meldet hier den naechsten Satz an.
+  try { globalThis.smejjSprachVorlader = vorladen; } catch { /* ohne globalThis kein Vorladen */ }
+  return stimme;
 }
