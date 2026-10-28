@@ -122,8 +122,10 @@
     }
     .leiste img { height: 26px; width: auto; }
     .leiste nav { display: flex; gap: 18px; font-size: 15px; color: var(--ink-dim); }
-    /* Befund 28.10.2026: "Help" (en) war nur 29 px breit — Tippziel mind. 44 px. */
-    .leiste nav a { text-decoration: none; display: inline-block; padding: 12px 0; min-width: 44px; text-align: center; }
+    /* Befund 28.10.2026: "Help" (en) war nur 29 px breit — Tippziel mind. 44 px.
+       Raster statt min-width: eine feste Mindestbreite haette die eingebaute
+       Untergrenze (laengstes Wort) aufgehoben; so gilt das Groessere von beiden. */
+    .leiste nav a { text-decoration: none; display: inline-grid; grid-template-columns: minmax(44px, auto); justify-items: center; align-items: center; padding: 12px 0; }
     .leiste nav a:hover { color: var(--ink); }
     .leiste .rechts { margin-left: auto; display: flex; gap: 10px; }
     /* Handy (Nutzerreise USA, 2026-08-23, gemessen bei 375 px): die Leiste war
@@ -147,7 +149,7 @@
       .probier .chip, .schwerpunkte button { min-height: 44px; display: inline-flex; align-items: center; }
       .leiste { gap: 10px 12px; padding: calc(12px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-right, 0px)) 12px calc(16px + env(safe-area-inset-left, 0px)); }
       .leiste nav { order: 3; width: 100%; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
-      .leiste nav a { padding: 12px 0; }
+      .leiste nav a { padding: 12px 0; display: inline-grid; } /* Raster wie oben, nach der gemeinsamen inline-flex-Regel */
       .leiste .rechts { gap: 8px; }
       /* iPhone 17 Pro (402 pt, SF-Schrift, gemessen 2026-09-07 als Web-App): Logo +
          zwei Knoepfe waren ~396 pt breit und brachen um. Roboto auf Android ist
