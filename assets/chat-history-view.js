@@ -27,11 +27,11 @@
 // Versionierter Pfad wie in index.html (QA-Welle 1, Befund F-07): Ein abweichender
 // Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js mit eigenem Zustand.
 // Oberflaechentexte laufen ueber die Sprachdateien (Inventur 20.09.2026).
-import { t } from "./i18n/ui.js?v=2026102793";
+import { t } from "./i18n/ui.js?v=2026102801";
 import {
   listChats, openChat, renameChat, deleteChat, restoreChat, activeChatId, togglePinChat, newChat,
   listProjekte, erstelleProjekt, benenneProjektUm, loescheProjekt, setzeChatProjekt
-} from "/assets/chat-store.js?v=2026102793";
+} from "/assets/chat-store.js?v=2026102801";
 // Verlaufs-Text (Titel, Vorschau, Themen, Export), Karten-Bausteine und die
 // Titel-Automatik aus der Bruecke kommen ERST, wenn der Verlauf sichtbar wird
 // (2026-09-03, Web-Vitals: Gewicht > 300 KB — die drei Module wogen 19 KB am Start,
@@ -51,9 +51,9 @@ let bausteineBereit = null;
 function ladeBausteine() {
   if (bausteineBereit) return bausteineBereit;
   bausteineBereit = Promise.all([
-    import("/assets/chat-history-text.js?v=2026102793"),
-    import("/assets/chat-history-cards.js?v=2026102793"),
-    import("/assets/chat-title-auto.js?v=2026102793")
+    import("/assets/chat-history-text.js?v=2026102801"),
+    import("/assets/chat-history-cards.js?v=2026102801"),
+    import("/assets/chat-title-auto.js?v=2026102801")
   ]).then(([text, karten]) => {
     ({ anzeigeTitel, anzeigeVorschau, gruppeVon, volltext, themaVon, merkmaleVon, sichereAlsMarkdown, projektGruppen } = text);
     ({ menuEintrag } = karten);

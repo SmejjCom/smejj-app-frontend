@@ -2,16 +2,16 @@
 
 // Versionierter Pfad wie in components.js (QA-Welle 1, Befund F-07) — sonst laedt
 // der Browser chat-markdown.js ein zweites Mal als eigenstaendiges Modul.
-import { renderChatMarkdown } from "/assets/chat-markdown.js?v=2026102793";
+import { renderChatMarkdown } from "/assets/chat-markdown.js?v=2026102801";
 // Papierkorb & Projekte/Bereiche: chat-store-bereiche.js (Diaet 25.08.); Re-Export = EINE Instanz.
-import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=2026102793";
-export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=2026102793";
+import { aktualisiereBereichsAnweisung, verbraucheBereichVormerkung, BEREICH_ANWEISUNG_KEY, BEREICH_NEU_KEY } from "./chat-store-bereiche.js?v=2026102801";
+export { PAPIERKORB_TAGE, restoreChat, endgueltigLoeschen, listGeloeschteChats, listEigeneChatsMitGeloeschten, listProjekte, getProjekt, erstelleProjekt, benenneProjektUm, setzeProjektAnweisung, neuesGespraechImBereich, loescheProjekt, setzeChatProjekt, importProjekt } from "./chat-store-bereiche.js?v=2026102801";
 
 // Nachrichten-Modell (2026-07-28): liefert Rohtext, Zeitstempel, Modell und Bewertung je
 // Nachricht.
-import { clampVersionIndex, metaOf, ohneToteAktion, seedMeta } from "/assets/chat-messages.js?v=2026102793";
+import { clampVersionIndex, metaOf, ohneToteAktion, seedMeta } from "/assets/chat-messages.js?v=2026102801";
 // Besitzer-Logik separat und Node-testbar (tests/chat-owner.test.mjs).
-import { OWNER_KEY, gehoertNutzer, kontoAliase, ownerDecision, sessionUserId } from "/assets/chat-owner.js?v=2026102793";
+import { OWNER_KEY, gehoertNutzer, kontoAliase, ownerDecision, sessionUserId } from "/assets/chat-owner.js?v=2026102801";
 
 // Stufe 4: Besitzpruefung mit dem Server-Alias der Sitzung (chat-owner.js).
 export function eigen(objekt, userId, geraeteBesitzer) {
@@ -222,7 +222,7 @@ async function medienAuslagern() {
     const log = startLog();
     if (!log || stromLaeuft) return;
     const { lagereMedienAus, lagereMedienAusText, lagereMedienAusTextknoten } =
-      await import("./chat-medien.js?v=2026102793");
+      await import("./chat-medien.js?v=2026102801");
     for (const eintrag of log.querySelectorAll(":scope > .entry.assistant")) {
       // EINE Karte je Eintrag: dasselbe Medium steht unten in bis zu drei
       // Feldern, soll aber nur einmal hochgeladen werden.
@@ -249,7 +249,7 @@ async function medienAuslagern() {
 // wurde. Still und ohne Netz-Zwang — kommt nichts, bleibt die Adresse stehen.
 async function medienHolen(log) {
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=2026102793");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2026102801");
     await rehydriereMedien(log);
   } catch { /* fail-safe: lieber ein leeres Bild als ein kaputter Verlauf */ }
 }
@@ -458,14 +458,14 @@ let parkeMedien = (html) => html;
 let parkerLaedt = null;
 const MEDIEN_ADRESSE = /\/api\/chat-medien\?id=/;
 let reinige, reinigerLaedt; // html-reiniger.js
-const reinigerBereit = () => (reinigerLaedt ||= import("/assets/html-reiniger.js?v=2026102793").then((m) => { reinige = m.reinigeGespeichertesHtml; }, () => { reinigerLaedt = null; }));
+const reinigerBereit = () => (reinigerLaedt ||= import("/assets/html-reiniger.js?v=2026102801").then((m) => { reinige = m.reinigeGespeichertesHtml; }, () => { reinigerLaedt = null; }));
 
 async function parkerBereit(messages) {
   await reinigerBereit();
   if (parkerLaedt) return parkerLaedt;
   const braucht = (Array.isArray(messages) ? messages : []).some((m) => [m?.html, ...(Array.isArray(m?.versions) ? m.versions.map(v => v?.html) : [])].some(html => MEDIEN_ADRESSE.test(String(html || ""))));
   if (!braucht) return null;
-  parkerLaedt = import("./chat-medien.js?v=2026102793")
+  parkerLaedt = import("./chat-medien.js?v=2026102801")
     .then((m) => { if (typeof m.parkeMedienAdressen === "function") parkeMedien = m.parkeMedienAdressen; })
     .catch(() => { parkerLaedt = null; });
   return parkerLaedt;
@@ -517,7 +517,7 @@ function renderEntriesInto(log, messages) {
     // Ausgelagerte Medien holen.
     medienHolen(log);
     // Bild-Rettung nach App-Neustart (24.09.2026), Modul erst bei Bedarf.
-    if (log.querySelector(".chat-bild-platzhalter")) import("/assets/ai/bild-nachholen.js?v=2026102793").then((m) => m.retteNachNeustart(log)).catch(() => {});
+    if (log.querySelector(".chat-bild-platzhalter")) import("/assets/ai/bild-nachholen.js?v=2026102801").then((m) => m.retteNachNeustart(log)).catch(() => {});
   } finally {
     setTimeout(() => { restoring = false; }, 50);
   }
@@ -646,7 +646,7 @@ function init() {
         bindObserver();
         if (restoreErlaubt !== false) restoreOnBoot().catch(() => {});
         // Stufe 3: Sync nachladen — dynamisch und fail-safe.
-        import("/assets/chat-sync.js?v=2026102793").catch(() => {});
+        import("/assets/chat-sync.js?v=2026102801").catch(() => {});
       });
   } catch {
     /* fail-safe: ohne Verlauf laeuft die App unveraendert weiter */

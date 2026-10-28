@@ -7,8 +7,9 @@
 //
 // FAIL-SAFE IN JEDER RICHTUNG — die Sprachwelle darf durch das Ohr nie
 // schlechter werden als ohne:
-//   - Bridge ohne Route/Schluessel (404/503) -> Ohr schaltet sich fuer die
-//     Sitzung ab (Sicherung), Web Speech laeuft wie bisher.
+//   - Bridge ohne Route/Schluessel (404 / 503 ear_not_configured) -> Ohr
+//     schaltet sich fuer die Sitzung ab (Sicherung), Web Speech laeuft wie
+//     bisher. Jeder andere 503 gilt als voruebergehend (naechster Satz fragt neu).
 //   - Antwort langsamer als das Zeitbudget -> Web-Speech-Text wird genommen.
 //   - Kein MediaRecorder/kein Mikrofon -> Ohr bleibt still.
 // Datenschutz: Die Aufnahme geht NUR zur Transkription an die Bridge und von
@@ -17,7 +18,7 @@
 // Zeitbudget nach dem Sprech-Ende: laenger warten wir nicht auf den Server,
 // sonst fuehlt sich das Gespraech traege an. Groq transkribiert eine Stunde
 // Audio in ~15 s — der Engpass ist der Upload, nicht das Modell.
-import { beobachtePegel } from "./audio-pegel.js?v=2026102793";
+import { beobachtePegel } from "./audio-pegel.js?v=2026102801";
 export const EAR_BUDGET_MS = 1500;
 // Obergrenze der Aufnahme (Schutz von Free-Tier und Upload-Zeit).
 const MAX_AUFNAHME_MS = 60_000;
@@ -88,6 +89,15 @@ function authHeaders(extra = {}) {
  */
 export function ohrAdressen(api = {}) {
   return [api.voiceTranscribe, api.voiceTranscribeFallback].filter(Boolean);
+}
+
+// Nur das ausdrueckliche "kein Schluessel" der Route schaltet eine Adresse ab.
+async function ohneSchluessel(antwort) {
+  try {
+    return (await antwort.json())?.error === "ear_not_configured";
+  } catch {
+    return false; // kein lesbarer Koerper: lieber spaeter neu fragen
+  }
 }
 
 export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn } = {}) {
@@ -230,7 +240,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
             // aber die tote wird nicht gemerkt — ein Aussetzer ist kein Ausfall.
             continue;
           }
-          if (antwort.status === 404 || antwort.status === 503) {
+          if (antwort.status === 404 || (antwort.status === 503 && await ohneSchluessel(antwort))) {
             // Route fehlt oder Ohr dort nicht konfiguriert: diese Adresse ist
             // fuer die Sitzung erledigt, die naechste kommt dran.
             tot.add(adresse);
@@ -238,6 +248,9 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
           }
           // 401/429/5xx (Befund 30.09.: Bruecke lehnt das Token ab, der
           // Rueckfallweg liefert 200) — naechste Adresse statt aufgeben.
+          // Ein 503 OHNE "ear_not_configured" (QA 28.10.: auth_unavailable,
+          // Anmeldedienst kurz weg) ist voruebergehend: frueher blieb die
+          // Adresse bis zum Neuladen tot, auch nachdem der Server wieder lief.
           if (!antwort.ok) continue;
           const daten = await antwort.json();
           return String(daten?.text || "").trim();

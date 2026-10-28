@@ -32,8 +32,8 @@
 // ein abweichender Spezifizierer erzeugt eine ZWEITE Modulinstanz mit eigenem
 // Zustand. chat-store.js laeuft unter "?v=pin-20260806", chat-stream.js und
 // config.js ohne Kennung. tests/module-queries.test.mjs haelt das fest.
-import { listChats, setAutoTitle } from "/assets/chat-store.js?v=2026102793";
-import { CLIENT_ROUTES } from "/assets/config.js?v=2026102793";
+import { listChats, setAutoTitle } from "/assets/chat-store.js?v=2026102801";
+import { CLIENT_ROUTES } from "/assets/config.js?v=2026102801";
 // bridgeAuthHeaders erst beim Titel-Erzeugen laden (2026-08-24 "Startseite
 // abspecken"): der statische Import zog die komplette chat-stream-Kette
 // (~29 KB) in JEDEN Seitenstart, obwohl ein Auto-Titel erst NACH der ersten
@@ -186,7 +186,7 @@ async function holeTitel(chat) {
   try {
     const antwort = await fetch(CLIENT_ROUTES.api.chat, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...(await import("/assets/ai/chat-stream.js?v=2026102793")).bridgeAuthHeaders() },
+      headers: { "Content-Type": "application/json", ...(await import("/assets/ai/chat-stream.js?v=2026102801")).bridgeAuthHeaders() },
       body: JSON.stringify({ messages: [...nachrichten, { role: "user", content: AUFTRAG }], model: "" }),
       signal: abbruch.signal
     });

@@ -4,8 +4,8 @@
 // Code zeilengleich uebernommen, kein Verhaltenswechsel. Der App-Zustand kommt
 // ausdruecklich als `state` herein statt aus dem Modulumfeld.
 
-import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js?v=2026102793";
-import { postJson } from "./shared/http-json.js?v=2026102793";
+import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js?v=2026102801";
+import { postJson } from "./shared/http-json.js?v=2026102801";
 
 // E2E-Pruefung 14.09.2026: hier stand `state.currentProjectId` — `state` gibt es in
 // diesem Modul nicht, der Rueckfall warf ReferenceError genau dann, wenn er

@@ -34,7 +34,7 @@ const WISSENSFRAGE = /\b(unterschied|was ist|wie geht|bedeutung|erkläre|erklare
 // Kommentarblock, und die Regel bleibt an EINER Stelle.
 export async function chatOhneMedienauftrag(auftrag) {
   if (istMedienAuftrag(auftrag?.task)) return false;
-  const { runClientChat } = await import("/assets/ai/chatClient.js?v=2026102793");
+  const { runClientChat } = await import("/assets/ai/chatClient.js?v=2026102801");
   return runClientChat(auftrag);
 }
 

@@ -4,7 +4,7 @@
 // auth-gated Presign-Leseweg (nur download, Prefix capsules/maus-engine/),
 // entpackt per DecompressionStream und animiert den Favicon-Cursor darueber.
 // Rein additives Modul: eigene Route /maus-replay.html, keine gelockte Datei.
-import { API_ORIGIN } from "./config.js?v=2026102793";
+import { API_ORIGIN } from "./config.js?v=2026102801";
 
 const PRESIGN_PATH = "/api/storage/presign";
 const MAUS_RUN_PATH = "/api/maus/run";

@@ -7,7 +7,7 @@
 // Eingehaengt ueber account-privacy.js (NICHT Start-Lock): die Anmeldung
 // leitet zu /profile — genau dort begruessen wir. Fail-safe: jeder Fehler
 // wird geschluckt, die Kontoseite laeuft immer weiter.
-import { t } from "./i18n/ui.js?v=2026102793";
+import { t } from "./i18n/ui.js?v=2026102801";
 
 const ONBOARDING_KEY = "smejj.onboarding.v1";
 const SESSION_KEY = "smejj.session.v1";

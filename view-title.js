@@ -16,7 +16,7 @@
 // uebersetzt wird beim Ansichtswechsel. index.html bleibt unberuehrt (Start-Lock, SEO): Suchmaschinen
 // sehen weiter den deutschen Titel, der Mensch den seiner Sprache. Markennamen (smejjBot, smejjCloud)
 // haben keinen Schluessel und bleiben, wie sie sind — t() gibt dann den Quelltext zurueck.
-import { t } from "./i18n/ui.js?v=2026102793";
+import { t } from "./i18n/ui.js?v=2026102801";
 
 const BASE_TITLE = typeof document !== "undefined" ? document.title : "smejj.com";
 

@@ -42,8 +42,8 @@
 // Dann zeigte activeTab() auf ein leeres Panel und starteMausLauf() meldete
 // ewig "Der Browser ist noch nicht bereit". Nichts waere kaputt zu sehen,
 // alles waere kaputt.
-const PANEL = "./browser-pane.js?v=2026102793";
-const PANEL_MAUS = "./browser-pane-maus.js?v=2026102793";
+const PANEL = "./browser-pane.js?v=2026102801";
+const PANEL_MAUS = "./browser-pane-maus.js?v=2026102801";
 
 async function holePanel() {
   const [pane, maus] = await Promise.all([import(PANEL), import(PANEL_MAUS)]);
@@ -80,11 +80,11 @@ async function holePanel() {
 //
 // Ist die Bruecke nicht da, bleibt der ferne Weg unveraendert bestehen.
 async function ueberChrome({ aufgabe, ziel, schreibe }) {
-  const { brueckeDa, sendeAnChrome } = await import("./maus-chrome.js?v=2026102793");
+  const { brueckeDa, sendeAnChrome } = await import("./maus-chrome.js?v=2026102801");
   if (!brueckeDa()) return false;
 
   const panel = await holePanel();
-  const { CLIENT_ROUTES } = await import("./config.js?v=2026102793");
+  const { CLIENT_ROUTES } = await import("./config.js?v=2026102801");
 
   // ERST ÖFFNEN, DANN ANKÜNDIGEN. Live gesehen 2026-09-05: „Ich arbeite in
   // deinem eigenen Chrome …“ stand im Chat, und die nächste Zeile nahm es
@@ -488,7 +488,7 @@ export async function warteAufSitzung({ tab, warte, versuche = WARTE_VERSUCHE })
 async function sammleVorlagen() {
   const vorlagen = [MAUS_VORLAGE];
   try {
-    const { t } = await import("./i18n/ui.js?v=2026102793");
+    const { t } = await import("./i18n/ui.js?v=2026102801");
     const uebersetzt = t(MAUS_VORLAGE);
     if (uebersetzt && uebersetzt !== MAUS_VORLAGE) vorlagen.push(uebersetzt);
   } catch { /* ohne Uebersetzung bleibt der deutsche Wortlaut — fail-safe */ }

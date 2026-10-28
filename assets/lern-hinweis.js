@@ -8,7 +8,7 @@
 // Wohin: ein Knopf fuehrt direkt zum Schalter (Konto -> Meine Daten -> Datenschutz).
 //
 // Nachgeladen aus chat-actions.js: wer nie Daumen hoch gibt, laedt nichts.
-import { t } from "./i18n/ui.js?v=2026102793";
+import { t } from "./i18n/ui.js?v=2026102801";
 
 export const LERN_HINWEIS_MERKER = "smejj.lernhinweis.gezeigt.v1";
 // Gemeinsamer Schluessel mit account-privacy.js / profile-dock-menu.js — bewusst
