@@ -1,7 +1,7 @@
-import { API_ORIGIN, CLIENT_ROUTES } from "./config.js?v=2026102801";
-import { afterFirstPaint } from "./deferred-start.js?v=2026102801";
+import { API_ORIGIN, CLIENT_ROUTES } from "./config.js?v=2026102802";
+import { afterFirstPaint } from "./deferred-start.js?v=2026102802";
 // F6 (2026-09-14): gleiche Kennung wie auth-gate.js, sonst zweite Instanz.
-import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026102801";
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026102802";
 
 const API_TOKEN_KEY = "smejj.apiToken.v1";
 const ACTIVE_STATUSES = new Set(["open", "queued", "planning", "fast_path", "starting_worker", "running", "verifying"]);

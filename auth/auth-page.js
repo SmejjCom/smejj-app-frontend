@@ -1,9 +1,9 @@
-import { initEingabeVerhalten } from "../eingabe-verhalten.js?v=2026102801";
+import { initEingabeVerhalten } from "../eingabe-verhalten.js?v=2026102802";
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => initEingabeVerhalten(), { once: true });
 else initEingabeVerhalten();
-import {capturePlan, planTarget, preservePlanLinks, planStorage} from '/assets/auth/plan-auswahl.js?v=2026102801';
-import { API_ORIGIN, CLIENT_ROUTES } from "../config.js?v=2026102801";
-import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "../i18n/ui.js?v=2026102801";
+import {capturePlan, planTarget, preservePlanLinks, planStorage} from '/assets/auth/plan-auswahl.js?v=2026102802';
+import { API_ORIGIN, CLIENT_ROUTES } from "../config.js?v=2026102802";
+import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "../i18n/ui.js?v=2026102802";
 
 // Cross-Origin-Auth: smejj.com und der Control-Server sind verschiedene Sites.
 // Session-Cookies (SameSite=Lax) werden cross-site nicht gesendet und CORS
@@ -758,7 +758,7 @@ document.querySelector("#homeLink")?.addEventListener("click", () => { window.lo
 // Google-Rueckkehr zuerst: Wenn ein Handoff-Token vorliegt, wird direkt angemeldet.
 zeigeRueckkehrFehler();
 if (new URLSearchParams(window.location.search).get("checkout") === "1") {
-  import("/assets/plan-checkout.js?v=2026102801").catch(() => status(t("Anmeldung ist momentan nicht erreichbar."), "error"));
+  import("/assets/plan-checkout.js?v=2026102802").catch(() => status(t("Anmeldung ist momentan nicht erreichbar."), "error"));
 } else completeGoogleHandoff().then((handled) => {
   if (handled) return;
   refreshSession();

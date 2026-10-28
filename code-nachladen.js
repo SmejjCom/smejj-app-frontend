@@ -36,7 +36,7 @@ function laden() {
   // projekt-ordner.js gehoert zur Code-Flaeche (window.smejjProjektOrdner) und
   // haengt seit 2026-08-24 nicht mehr als eigener <script>-Tag an index.html —
   // er kommt hier mit, sobald die Flaeche wirklich gebraucht wird.
-  import("./projekt-ordner.js?v=2026102801").catch(() => {});
+  import("./projekt-ordner.js?v=2026102802").catch(() => {});
   // composer-tools.js verdrahtet den Datei-Wähler (#composerFileInput ->
   // bindAttachInput). Bisher kam es NUR ueber den Plus-Knopf der Startseite
   // (app.js ladeBeiKlick). Wer direkt in "Programmieren" ging und dort
@@ -45,11 +45,11 @@ function laden() {
   // (A-bis-Z-Pruefung 07.09.). Darum kommt es hier mit.
   // E2E-Test 14.09.2026: der blosse Import band NICHTS (initComposerTools lief nie) —
   // derselbe Lader wie auf der Startseite, der auch bindet; Rueckfall wie bisher.
-  (window.smejjLadeComposerTools?.() || import("./composer-tools.js?v=2026102801")).catch(() => {});
-  return import("./code-flaeche.js?v=2026102801")
+  (window.smejjLadeComposerTools?.() || import("./composer-tools.js?v=2026102802")).catch(() => {});
+  return import("./code-flaeche.js?v=2026102802")
     .then((modul) => {
       modul.initCodeFlaeche?.();
-      import("./code-kompakt-menue.js?v=2026102801").then((m) => m.initCodeKompaktMenue()).catch(() => {});
+      import("./code-kompakt-menue.js?v=2026102802").then((m) => m.initCodeKompaktMenue()).catch(() => {});
       return modul;
     })
     .catch((fehler) => {

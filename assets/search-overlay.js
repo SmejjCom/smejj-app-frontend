@@ -7,7 +7,7 @@
 //
 // WICHTIG: derselbe chat-store-Spezifizierer wie in search.js und
 // chat-history-view.js — ein abweichender Pfad erzeugt eine ZWEITE Modulinstanz.
-import { listChats } from "/assets/chat-store.js?v=2026102801";
+import { listChats } from "/assets/chat-store.js?v=2026102802";
 import {
   anzeigeTitel,
   anzeigeVorschau,
@@ -15,7 +15,7 @@ import {
   zeitText,
   trefferAusschnitt,
   mitHervorhebung
-} from "/assets/chat-history-text.js?v=2026102801";
+} from "/assets/chat-history-text.js?v=2026102802";
 
 // Chats zuerst: wer sucht, sucht fast immer eine alte Unterhaltung.
 const GRUPPEN_REIHENFOLGE = ["Chats", "Projekte", "Projekt-Dateien", "Dateien", "Aufgaben", "Arbeitsbereiche", "Einstellungen", "Werkzeuge", "Memory"];
@@ -148,7 +148,8 @@ async function zeigeTreffer(frage, lauf) {
   if (lauf !== suchlauf) return;
   beginneAnzeige();
   if (!treffer.length) {
-    els.log.append(hinweis(`Keine Treffer fuer "${frage}". Fuer die Websuche Browser/Quellen nutzen.`));
+    els.log.append(hinweis(`Keine Treffer fuer "${frage}" in deinen Chats und Dateien.`), netzGruppe(frage));
+    setzeAktiv(0);
     return;
   }
   const nadel = frage.toLowerCase();
@@ -168,7 +169,36 @@ async function zeigeTreffer(frage, lauf) {
     }
     els.log.append(abschnitt);
   }
+  els.log.append(netzGruppe(frage));
   setzeAktiv(0);
+}
+
+// Befund 28.10.2026: "Im Netz suchen" in der Seitenleiste oeffnete nur diese
+// interne Suche — eine Websuche gab es von hier aus nicht. Die Websuche selbst
+// kann der Chat (Werkzeug web_suche); diese Zeile stellt die Frage dort, in
+// einem neuen Chat. Immer als letzte Gruppe, damit Enter weiterhin den besten
+// eigenen Treffer oeffnet; ohne eigene Treffer ist sie die erste.
+export const NETZ_PRAEFIX = "Suche im Internet: ";
+
+function netzGruppe(frage) {
+  const abschnitt = baueGruppe("Im Netz");
+  abschnitt.append(baueZeile({
+    titel: `Im Netz suchen: „${frage}“`,
+    detail: "smejj sucht im Internet und nennt Quellen",
+    oeffne: () => imNetzSuchen(frage)
+  }));
+  return abschnitt;
+}
+
+export function imNetzSuchen(frage, dok = document) {
+  dok.querySelector('.nav-button[data-view="start"]')?.click();
+  const feld = dok.getElementById("startMessage");
+  const senden = dok.getElementById("startSend");
+  if (!feld || !senden) return false;
+  feld.value = NETZ_PRAEFIX + frage;
+  feld.dispatchEvent(new Event("input", { bubbles: true }));
+  senden.click();
+  return true;
 }
 
 function beginneAnzeige() {

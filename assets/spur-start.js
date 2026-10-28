@@ -18,18 +18,18 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026102801";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026102802";
 // Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
-import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026102801";
-import { Icons } from "/assets/components.js?v=2026102801";
+import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026102802";
+import { Icons } from "/assets/components.js?v=2026102802";
 // Abo-Stand ueber den gemeinsamen Speicher (F6, 2026-09-14): EINE Anfrage je
 // Laden fuer Planzeile, Onboarding-Karte und Abo-Panel — dieselbe Kennung wie
 // in account-sessions.js, sonst zweite Instanz und wieder zwei Anfragen.
-import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026102801";
+import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026102802";
 // Nutzerreise USA 2026-08-23: die Spur blieb auf Englisch deutsch ("Neuer
 // Chat", "Heute", "Gestern", "Alle 127 Gespräche"). t() liefert fail-safe den
 // deutschen Quelltext, solange kein Wörterbuch geladen ist.
-import { t } from "./i18n/ui.js?v=2026102801";
+import { t } from "./i18n/ui.js?v=2026102802";
 
 function alleGespraeche(n) {
   return t("Alle {n} Gespräche").replace("{n}", String(n));
@@ -82,7 +82,11 @@ function geheZu(view) {
   // .nav-button[data-view] generisch — hier wird der vorhandene Knopf der
   // Vier-Gruppen-Spur stellvertretend geklickt, damit Verlauf, Adresse und
   // Aktiv-Zustand ueberall gleich laufen.
-  document.querySelector(`.nav-vier .nav-button[data-view="${view}"]`)?.click();
+  // Befund 2026-10-28: "Regeln"/"Mehr" (settings) taten nichts — der
+  // Einstellungen-Knopf wohnt im Profil-Dock, nicht in der Vier-Gruppen-Spur.
+  // Darum dort zuerst, sonst derselbe generische Knopf an anderer Stelle.
+  (document.querySelector(`.nav-vier .nav-button[data-view="${view}"]`)
+    || document.querySelector(`.nav-button[data-view="${view}"]`))?.click();
 }
 
 let zeichenLauf = 0;
@@ -116,8 +120,10 @@ async function zeichneStartSpur(halter) {
 
   if (codeAktiv) {
     // Bildschirm 18: die Code-Spur hat EIGENE Punkte. "Neuer Auftrag"
-    // fokussiert das Auftragsfeld; "Nach Zeitplan" ist der echte Nachtbau —
-    // er wohnt unter Auftraege. Ohne erfundene Abzeichen und Uhrzeiten.
+    // fokussiert das Auftragsfeld; "smejjBot" oeffnet die wiederholbaren
+    // Ablaeufe. Ohne erfundene Abzeichen und Uhrzeiten. Befund 28.10.2026:
+    // der Punkt hiess "Nach Zeitplan", eine Zeitplanung gibt es dort aber
+    // nicht — der Name verspricht jetzt nur, was der Bereich wirklich ist.
     // Claude nennt den Punkt kurz "Neu" — unser "Neuer Auftrag" wurde in der
     // schmalen Spur abgeschnitten ("Neuer Auf…", Betreiber-Chrome 2026-08-16).
     liste.append(punkt({ icon: "plus", text: t("Neu"), kuerzel: "⌘K", aktiv: true, aktion: () => {
@@ -129,7 +135,7 @@ async function zeichneStartSpur(halter) {
       if (feld) { feld.value = ""; feld.focus(); }
     } }));
     liste.append(punkt({ icon: "projects", text: t("Meine Projekte"), aktion: () => geheZu("projects") }));
-    liste.append(punkt({ icon: "automation", text: t("Nach Zeitplan"), aktion: () => geheZu("automation") }));
+    liste.append(punkt({ icon: "automation", text: t("smejjBot"), aktion: () => geheZu("automation") }));
     liste.append(punkt({ icon: "sliders", text: t("Regeln"), aktion: () => geheZu("settings") }));
     liste.append(punkt({ icon: "chevron", text: t("Mehr"), aktion: () => geheZu("settings") }));
     let chats = [];

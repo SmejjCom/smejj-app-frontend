@@ -1,6 +1,6 @@
-import { AI_MODES } from "./providers.js?v=2026102801";
-import { evaluateAiCost } from "./costGuard.js?v=2026102801";
-import { validateByokEndpoint } from "../shared/securityPolicy.js?v=2026102801";
+import { AI_MODES } from "./providers.js?v=2026102802";
+import { evaluateAiCost } from "./costGuard.js?v=2026102802";
+import { validateByokEndpoint } from "../shared/securityPolicy.js?v=2026102802";
 
 export function validateByokConfig({ apiKey, baseUrl, model } = {}) {
   const key = String(apiKey || "").trim();

@@ -9,17 +9,17 @@
 // Das Dock liest den Profil-Zustand ausschliesslich aus localStorage
 // (Single Source of Truth von app.js) und schreibt ihn nie zurueck.
 
-import "./auth-gate.js?v=2026102801";
+import "./auth-gate.js?v=2026102802";
 // Anonyme Icon-Nutzungsmessung (Konkurrenz-Radar Ausbaustufe 5). Hier
 // eingehaengt statt per <script> in index.html, weil die Startseite unter dem
 // Start-Lock steht — gleiches Muster wie auth-gate.js eine Zeile darueber.
 // Quellen-Panel (Konkurrenz-Radar V5) — ebenfalls hier eingehaengt, damit
 // index.html unter dem Start-Lock bleibt.
-import { STORAGE_KEYS } from "./config.js?v=2026102801";
-import { t } from "./i18n/ui.js?v=2026102801";
-import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=2026102801";
-import { ladeBeiKlick } from "./nachladen.js?v=2026102801";
-import { initUsageCapture } from "./usage-meter.js?v=2026102801";
+import { STORAGE_KEYS } from "./config.js?v=2026102802";
+import { t } from "./i18n/ui.js?v=2026102802";
+import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=2026102802";
+import { ladeBeiKlick } from "./nachladen.js?v=2026102802";
+import { initUsageCapture } from "./usage-meter.js?v=2026102802";
 
 // Buttons, nach deren Klick sich Name/Session aendern koennen (app.js schreibt
 // localStorage synchron im Handler; das Neuzeichnen laeuft danach im Makrotask).
@@ -28,7 +28,7 @@ import { initUsageCapture } from "./usage-meter.js?v=2026102801";
 let menueGeladen = null;
 let letzterMenueStand = ["", "", false];
 function holeMenue() {
-  menueGeladen ||= import("./profile-dock-menu.js?v=2026102801").catch((f) => { menueGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", f); throw f; });
+  menueGeladen ||= import("./profile-dock-menu.js?v=2026102802").catch((f) => { menueGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", f); throw f; });
   return menueGeladen;
 }
 
@@ -48,7 +48,7 @@ export function initProfileDock() {
   ladeBeiKlick(["#profileDockButton"], () => holeMenue().then((m) => { m.initProfileDockMenu(); m.renderProfileDockMenu(...letzterMenueStand); return m; }));
   window.addEventListener("smejj:chats-changed", function quellenEinmal() {
     window.removeEventListener("smejj:chats-changed", quellenEinmal);
-    import("./quellen-panel.js?v=2026102801").catch((f) => console.error("[smejj.com] Nachladen fehlgeschlagen:", f));
+    import("./quellen-panel.js?v=2026102802").catch((f) => console.error("[smejj.com] Nachladen fehlgeschlagen:", f));
   });
   // Icon-Zaehler erst beim ersten Druck auf ein BEDIENELEMENT (Startgewicht,
   // gemessen 2026-09-14): er zaehlt nur Knoepfe und Links aus seiner
@@ -59,7 +59,7 @@ export function initProfileDock() {
   const zaehlerHolen = (event) => {
     if (!event.target?.closest?.("button, a, [role='button'], [data-jump], [data-composer-action], [data-start-tool], [data-browser-oeffnen]")) return;
     document.removeEventListener("pointerdown", zaehlerHolen, { capture: true });
-    import("./icon-nutzung.js?v=2026102801").catch(() => {});
+    import("./icon-nutzung.js?v=2026102802").catch(() => {});
   };
   document.addEventListener("pointerdown", zaehlerHolen, { capture: true });
   render();

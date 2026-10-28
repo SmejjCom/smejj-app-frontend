@@ -25,13 +25,13 @@
 // Zwei Orte, ein Modul: Einstellungen-Reiter "API" (kopf: "kompakt", die
 // Panel-Ueberschrift liefert den Titel) und /entwickler.html
 // (kopf: "voll"). Idempotent — Doppel-Init steigt aus.
-import { afterFirstPaint } from "./deferred-start.js?v=2026102801";
-import { API_ORIGIN } from "./config.js?v=2026102801";
-import { catalogProvider, selectableProviders } from "./ai/providers-catalog.js?v=2026102801";
-import { t } from "./i18n/ui.js?v=2026102801";
-import { api, baseAnbieterId, cssEscape, datum, escapeAttr, escapeHtml, fehlerText, kurz, kurzZahl, statusStufe, usd, zahl } from "./api-center-helfer.js?v=2026102801";
+import { afterFirstPaint } from "./deferred-start.js?v=2026102802";
+import { API_ORIGIN } from "./config.js?v=2026102802";
+import { catalogProvider, selectableProviders } from "./ai/providers-catalog.js?v=2026102802";
+import { t } from "./i18n/ui.js?v=2026102802";
+import { api, baseAnbieterId, cssEscape, datum, escapeAttr, escapeHtml, fehlerText, kurz, kurzZahl, statusStufe, usd, zahl } from "./api-center-helfer.js?v=2026102802";
 // Die vier Listen-Aktionen liegen in einem eigenen Modul (800-Zeilen-Regel).
-import { entferne, loescheEndgueltig, schalteUm, umbenenne, zeigeAktivitaet } from "./api-center-aktionen.js?v=2026102801";
+import { entferne, loescheEndgueltig, schalteUm, umbenenne, zeigeAktivitaet } from "./api-center-aktionen.js?v=2026102802";
 
 const MODELL_KEY = "smejj.model.selected.v2";
 const AKTIVER_ANBIETER_KEY = "smejj.activeProvider.v1";

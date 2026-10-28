@@ -2,7 +2,7 @@
 // dem Käufer SOFORT bestätigen, dass sein Abo angekommen ist). Fail-safe:
 // Ohne Token oder ohne Serverantwort bleibt die neutrale Meldung stehen —
 // die Seite behauptet nie ein Abo, das der Server nicht bestätigt hat.
-import { API_ORIGIN } from "./config.js?v=2026102801";
+import { API_ORIGIN } from "./config.js?v=2026102802";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1"; // wie account-sessions.js/auth-gate.js
 const PLAN_LABELS = { plus: "smejj Plus", pro: "smejj Pro", max: "smejj Max" };

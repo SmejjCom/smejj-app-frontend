@@ -8,39 +8,39 @@
 // das Modul initialisiert sich nur auf Seiten OHNE App-Composer (#startSend).
 // Inhalt oeffentlich, Interaktion angemeldet: fuer Abgemeldete steht auf den
 // Sprachseiten nur ein Anmelde-Knopf (Begruendung im Modulkopf dort).
-import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026102801";
-import { darfSprechen, buildLoginCta } from "./voice-landing-signin.js?v=2026102801";
-import { CLIENT_ROUTES } from "./config.js?v=2026102801";
+import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026102802";
+import { darfSprechen, buildLoginCta } from "./voice-landing-signin.js?v=2026102802";
+import { CLIENT_ROUTES } from "./config.js?v=2026102802";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue } from "./voice-speech-queue.js?v=2026102801";
-import { leseErkennung } from "./voice-erkennung.js?v=2026102801"; // volle Ergebnisliste (WebKit-Doppelungen, 27.09.2026)
+import { createSpeechQueue } from "./voice-speech-queue.js?v=2026102802";
+import { leseErkennung } from "./voice-erkennung.js?v=2026102802"; // volle Ergebnisliste (WebKit-Doppelungen, 27.09.2026)
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
-import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=2026102801";
+import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=2026102802";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
-import { normalizeSpeechText, isLikelyEcho, enoughForBarge } from "./voice-echo-filter.js?v=2026102801";
-import { createSpeechInterrupt } from "./voice-vad.js?v=2026102801";
-import { warmUpAgentConnection } from "./voice-warmup.js?v=2026102801";
+import { normalizeSpeechText, isLikelyEcho, enoughForBarge } from "./voice-echo-filter.js?v=2026102802";
+import { createSpeechInterrupt } from "./voice-vad.js?v=2026102802";
+import { warmUpAgentConnection } from "./voice-warmup.js?v=2026102802";
 // Stufe 2a: Interim-Waechter — Sprech-Ende ~1 s frueher erkennen und senden.
 // OHNE ?v= — dieselbe Kennung wie in public/composer-tools.js. Zwei Kennungen
 // waeren zwei Modulinstanzen mit getrenntem Zustand (check:module-queries).
 // Der Cache wird ueber die Version in sw.js gebrochen, nicht ueber die Import-URL.
-import { createSilenceWatchdog } from "./voice-endpoint.js?v=2026102801";
+import { createSilenceWatchdog } from "./voice-endpoint.js?v=2026102802";
 // Stufe 3: Rueckfrage statt Blindantwort + Doppel-Sende-Schutz (geteilte Naht
 // mit der Startseite; Muster aus dem ChatGPT-Live-Vergleich 2026-08-03).
-import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js?v=2026102801";
+import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js?v=2026102802";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
-import { createServerEar, createEarSend } from "./voice-ear.js?v=2026102801";
-import { buildReserveChatRequest } from "./chat-history-context.js?v=2026102801";
-import { appendVoiceTurn, buildAgentPayload } from "./voice-conversation.js?v=2026102801";
+import { createServerEar, createEarSend } from "./voice-ear.js?v=2026102802";
+import { buildReserveChatRequest } from "./chat-history-context.js?v=2026102802";
+import { appendVoiceTurn, buildAgentPayload } from "./voice-conversation.js?v=2026102802";
 // Stufe 3a: Denk-Laut, damit zwischen Frage und Antwort nicht nur Stille steht.
-import { createThinkingCue } from "./voice-thinking-cue.js?v=2026102801";
+import { createThinkingCue } from "./voice-thinking-cue.js?v=2026102802";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
 // Unterbrechen wie ChatGPT). Fail-safe: ohne Worker bleibt die Browser-Stimme.
-import { createPremiumVoice } from "./voice-premium-tts.js?v=2026102801";
+import { createPremiumVoice } from "./voice-premium-tts.js?v=2026102802";
 // Stufe A2: automatischer Neuversuch, wenn eine Salad-Replika ausfaellt.
-import { fetchStreamWithRetry } from "./ai/fetch-retry.js?v=2026102801";
-import { bridgeAuthHeaders } from "./ai/chat-stream.js?v=2026102801";
+import { fetchStreamWithRetry } from "./ai/fetch-retry.js?v=2026102802";
+import { bridgeAuthHeaders } from "./ai/chat-stream.js?v=2026102802";
 
 // Re-Export fuer bestehende Nutzer der bisherigen Modul-API.
 export { normalizeSpeechText, isLikelyEcho, enoughForBarge };

@@ -14,8 +14,8 @@
 // bremsen oder brechen — deshalb kein await auf dem Sendepfad, ein eigenes
 // Zeitbudget, und ein Merker je Frage, damit Wiederholungen (Neu generieren)
 // dieselbe Frage nicht doppelt erfassen.
-import { API_ORIGIN, CLIENT_ROUTES } from "/assets/config.js?v=2026102801";
-import { bridgeAuthHeaders } from "/assets/ai/chat-stream.js?v=2026102801";
+import { API_ORIGIN, CLIENT_ROUTES } from "/assets/config.js?v=2026102802";
+import { bridgeAuthHeaders } from "/assets/ai/chat-stream.js?v=2026102802";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";      // wie account-privacy.js
 const ERFASSUNGS_PFAD = CLIENT_ROUTES?.api?.trainingCapture || "/api/training/capture";

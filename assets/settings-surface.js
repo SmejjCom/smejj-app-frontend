@@ -1,5 +1,5 @@
-import { STORAGE_KEYS } from "./config.js?v=2026102801";
-import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=2026102801";
+import { STORAGE_KEYS } from "./config.js?v=2026102802";
+import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=2026102802";
 // api-center-surface.js und provider-settings.js werden BEWUSST nicht statisch
 // importiert (Seitengewicht). Der Startreiter ist "general" — bis der Nutzer
 // dorthin wechselt, wird ihr Code nie gebraucht. Zusammen mit ihrem selbst
@@ -8,8 +8,8 @@ import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } f
 // Geprueft vor dem Umbau: app.js (Start-Lock) bindet KEINE der von ihnen
 // erzeugten Kennungen (ac*, apiCenterSurface, cline*) — die Boot-Bindings von
 // app.js koennen dadurch nichts verlieren.
-import { LANGUAGE_OPTIONS } from "./language-options.js?v=2026102801";
-import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026102801";
+import { LANGUAGE_OPTIONS } from "./language-options.js?v=2026102802";
+import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026102802";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
@@ -279,7 +279,7 @@ function handleClick(view, event) {
 // hinsieht. Kompakter Kopf: die Panel-Ueberschrift liefert den Titel.
 async function ladeApiZentrum(view) {
   try {
-    const modul = await import("./api-center-surface.js?v=2026102801");
+    const modul = await import("./api-center-surface.js?v=2026102802");
     modul.initApiCenter(view.querySelector("#apiCenterSurface"), { kopf: "kompakt" });
   } catch {
     /* fail-safe: uebrige Einstellungen bleiben bedienbar */

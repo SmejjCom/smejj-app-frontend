@@ -66,7 +66,7 @@
        index.html (gleiche Marke, eine Instanz). Als Web-App oeffnet "/" abgemeldet
        diese Seite; die Tastatur des Probier-Felds loest denselben WebKit-Fehler aus
        (Layout-Viewport bleibt klein, schwarzer Balken unten). -->
-  <script src="/assets/pwa-schnellstart.js?v=2026102801" type="module"></script>
+  <script src="/assets/pwa-schnellstart.js?v=2026102802" type="module"></script>
   <!-- Besucher-Puls (Autopilot Nr. 81): EINE Strichliste je Sitzung, ohne Cookie
        und ohne Kennung. Ohne diese Zahl ist "es kommt niemand" nicht von
        "niemand kann melden" zu unterscheiden. -->
@@ -75,8 +75,8 @@
        bekam keinen Service Worker und sah offline die Fehlerseite des Browsers.
        Registriert den schmalen Service Worker (~19 KB statt 2 MB) und zeigt
        das Offline-Band der App nach einer echten Netzprobe. -->
-  <script src="/assets/willkommen-offline.js?v=2026102801" type="module"></script>
-  <script type="module" src="/assets/willkommen-composer.js?v=2026102801"></script>
+  <script src="/assets/willkommen-offline.js?v=2026102802" type="module"></script>
+  <script type="module" src="/assets/willkommen-composer.js?v=2026102802"></script>
   <style>
     /* Apple 3.1.1: alles mit data-nur-web verschwindet in der iOS-Huelle
        (ios-preise-aus.js setzt das Attribut am <html>). */
@@ -122,7 +122,8 @@
     }
     .leiste img { height: 26px; width: auto; }
     .leiste nav { display: flex; gap: 18px; font-size: 15px; color: var(--ink-dim); }
-    .leiste nav a { text-decoration: none; display: inline-block; padding: 12px 0; }
+    /* Befund 28.10.2026: "Help" (en) war nur 29 px breit — Tippziel mind. 44 px. */
+    .leiste nav a { text-decoration: none; display: inline-block; padding: 12px 0; min-width: 44px; text-align: center; }
     .leiste nav a:hover { color: var(--ink); }
     .leiste .rechts { margin-left: auto; display: flex; gap: 10px; }
     /* Handy (Nutzerreise USA, 2026-08-23, gemessen bei 375 px): die Leiste war
@@ -227,7 +228,7 @@
     }
     footer a { text-decoration: none; }
   </style>
-  <link id="composerEingabeStil" rel="stylesheet" href="/assets/composer-eingabe.css?v=2026102801">
+  <link id="composerEingabeStil" rel="stylesheet" href="/assets/composer-eingabe.css?v=2026102802">
 </head>
 <body>
   <header class="leiste">

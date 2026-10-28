@@ -84,11 +84,17 @@ export async function pruefeDienst(dienst, holen = fetch) {
   }
 }
 
+// Befund 2026-10-28: "Alle Dienste laufen." stand gruen da, waehrend die
+// Video-Erzeugung ausfiel — Bild-Maler und Video-Worker misst diese Seite nicht
+// (sie haben keinen oeffentlichen, kostenfreien Gesundheits-Endpunkt hierfuer).
+// Darum sagt die Seite ehrlich, was sie NICHT bestaetigt.
+export const NICHT_GEPRUEFT = "Bilder und Videos prüft diese Seite nicht — ein grüner Status bestätigt sie nicht.";
+
 // Fasst die Einzelergebnisse zu einer Gesamtaussage zusammen. Pure Funktion.
 // Input: Liste aus {dienst, ergebnis}. Output: {stufe, text}.
 export function gesamtlage(zeilen) {
   const kaputt = zeilen.filter((z) => z.ergebnis.zustand !== "ok");
-  if (kaputt.length === 0) return { stufe: "ok", text: "Alle Dienste laufen." };
+  if (kaputt.length === 0) return { stufe: "ok", text: "Alle hier geprüften Dienste laufen." };
   const kritischKaputt = kaputt.filter((z) => z.dienst.kritisch);
   if (kritischKaputt.length === 0) {
     return { stufe: "teilweise", text: "Die Hauptfunktionen laufen. Eine Zusatzfunktion ist gerade gestört." };
@@ -146,6 +152,15 @@ export async function statusAktualisieren(dokument = document, holen = fetch) {
   const lage = gesamtlage(zeilen);
   gesamt.dataset.stufe = lage.stufe;
   gesamt.textContent = lage.text;
+  // Sichtbar direkt unter der Gesamtaussage, in jedem Zustand (ohne HTML-Aenderung).
+  let ungeprueft = dokument.querySelector("#statusUngeprueft");
+  if (!ungeprueft && typeof gesamt.insertAdjacentElement === "function") {
+    ungeprueft = dokument.createElement("p");
+    ungeprueft.id = "statusUngeprueft";
+    ungeprueft.className = "status-text";
+    gesamt.insertAdjacentElement("afterend", ungeprueft);
+  }
+  if (ungeprueft) ungeprueft.textContent = NICHT_GEPRUEFT;
   if (stand) {
     const jetzt = new Date();
     stand.textContent = `Zuletzt geprüft: ${jetzt.toLocaleTimeString("de-DE")} (${Intl.DateTimeFormat().resolvedOptions().timeZone})`;
