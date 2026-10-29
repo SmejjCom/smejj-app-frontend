@@ -37,6 +37,26 @@
     return typeof f === "function" ? f(text) : text;
   }
 
+  // Der bezahlte Bildweg setzt eine Sitzung voraus (bildExternRoutes.js).
+  // Ein Gastauftrag darf deshalb nicht beim reinen Textmodell landen.
+  function istBildAuftrag(frage) {
+    var text = String(frage || "").trim();
+    if (!text || /\b(unterschied|was ist|wie geht|bedeutung|erkläre|erklare|definition|what is|explain)\b/i.test(text)) return false;
+    if (/\b(video(s)?|film(e|s)?|animation(en)?|clip(s)?|mp4|movie(s)?)\b/i.test(text)) return false;
+    var motiv = /\b(bild(er|es)?|foto(s)?|grafik(en)?|illustration(en)?|zeichnung(en)?|logo(s)?|skizze(n)?|gem(ae|ä)lde|image(s)?|picture(s)?|photo(s)?|drawing(s)?|sketch(es)?)\b/i;
+    var verb = /\b(zeichne|zeichnen|male|malen|erstelle|erstellen|erstell|generiere|generieren|erzeuge|erzeugen|mach|mache|machen|draw|paint|generate|create|make)\b/i;
+    return motiv.test(text) && verb.test(text);
+  }
+
+  async function formatiereAntwort(text) {
+    try {
+      // Derselbe sichere Renderer wie im angemeldeten Chat. Erst nach Ende
+      // des Streams auszeichnen: weitere Textstuecke wuerden Links loeschen.
+      var renderer = await import("./chat-markdown.js?v=2026102804");
+      renderer.renderChatMarkdown(text);
+    } catch (fehler) { /* bei Ladefehlern bleibt die vollstaendige Textantwort */ }
+  }
+
   function stil() {
     if (document.getElementById("gastFrageStil")) return;
     var s = document.createElement("style");
@@ -60,7 +80,7 @@
     var kopf = document.createElement("p");
     kopf.className = "gast-frage-zeile";
     kopf.textContent = frage;
-    var text = document.createElement("p");
+    var text = document.createElement("div");
     text.className = "gast-text";
     text.id = "gastText";
     text.textContent = T("Einen Moment …");
@@ -144,6 +164,7 @@
     } catch (fehler) { /* ohne matchMedia bleibt es, wie es ist */ }
   }
 
+  // Bereits live vorhandener Handy-Fix: die Antwort bleibt ueber der Tastatur.
   function antwortInBlick(text) {
     var box = text && text.parentNode;
     if (!box || document.getElementById("gastAntwort") !== box) return;
@@ -164,6 +185,14 @@
     antwortInBlick(text);
     setTimeout(function () { antwortInBlick(text); }, 350);
     if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { antwortInBlick(text); }, { once: true });
+    if (istBildAuftrag(frage)) {
+      // Derselbe Uebergabeschluessel wie willkommen-fokus.js / app.js.
+      try { sessionStorage.setItem("smejj.probierFrage.v1", frage); } catch (fehler) { /* Text bleibt in der Karte sichtbar */ }
+      text.textContent = T("Zum Erstellen eines Bildes melde dich bitte kostenlos an. Deine Bildbeschreibung bleibt erhalten und wird nach der Anmeldung ins Schreibfeld übernommen.");
+      fuss(text.parentNode);
+      antwortInBlick(text);
+      return true;
+    }
     var antwort = "";
     var steuerung = new AbortController();
     var start = Date.now();
@@ -200,7 +229,10 @@
       }
       clearTimeout(uhr); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
       if (!antwort.trim()) throw new Error("leere Antwort");
+      await formatiereAntwort(text);
       var karte = document.getElementById("gastAntwort");
+      var alterHinweis = document.getElementById("gastHinweis");
+      if (alterHinweis) alterHinweis.remove();
       fuss(karte);
       // Die Karte waechst beim Schreiben; am Ende einmal in den Blick holen,
       // damit auch der Knopf darunter sichtbar ist.
