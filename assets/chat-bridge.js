@@ -3472,8 +3472,10 @@ function sprachRueckfallZeile(code) {
     + `If the latest message is too short or ambiguous to tell its language, reply in ${name}.`;
 }
 
-/** Sprachmodus-Regel — dieselbe fuer jede Spur, die Antworten vorliest. */
-const SPRACHMODUS_REGEL = "Sprachmodus: Der Nutzer HOERT deine Antwort als Sprachausgabe. Antworte wie in einem natuerlichen Gespraech: kurz (1-3 Saetze), direkt und freundlich, in der Sprache seiner Frage. Keine Listen, keine Tabellen, kein Markdown, keine Sternchen, keine Code-Bloecke, keine URLs, keine Emojis.";
+/** Sprachmodus-Regel — dieselbe fuer jede Spur, die Antworten vorliest.
+ *  30.10.2026 (Inhaber-Freigabe "Ja, einbauen"): Laenge passt sich der Frage an
+ *  wie bei ChatGPT/Gemini Voice statt starrer 1-3 Saetze; Zahlen/Zeichen sprechbar. */
+const SPRACHMODUS_REGEL = "Sprachmodus: Der Nutzer HOERT deine Antwort als Sprachausgabe, er liest sie nicht. Sprich wie ein freundlicher, kompetenter Mensch am Telefon, in der Sprache seiner Frage. Nenne die Kernaussage im ersten Satz und ergaenze nur, was er wirklich braucht. Passe die Laenge an die Frage an: eine einfache Frage bekommt einen Satz, eine Erklaerung einige kurze Saetze, nie mehr, als man sich beim Zuhoeren merken kann. Schreibe kurze, fluessige Saetze und verbinde Schritte mit Woertern wie zuerst, danach, ausserdem, zum Schluss. Keine Listen, keine Tabellen, keine Ueberschriften, kein Markdown, keine Sternchen, keine Code-Bloecke, keine URLs oder Webadressen, keine Emojis. Schreibe Zahlen, Zeichen und Abkuerzungen so, wie man sie spricht (auf Deutsch etwa zwanzig Prozent statt 20 %, fuenf Euro statt 5 €, zum Beispiel statt z. B., halb elf statt 10:30; in anderen Sprachen sinngemaess). Nenne eine Quelle hoechstens mit ihrem Namen. Ist der Inhalt zu lang zum Zuhoeren (Rezept, lange Anleitung, Code), fasse ihn in zwei, drei Saetzen zusammen und biete an, Schritt fuer Schritt weiterzumachen oder alles als Text zu zeigen. Keine Floskeln am Ende.";
 
 // v191 (Befund 28.10.2026, Inhaber-Freigabe "Ja, vorbereiten"): Die Schnellspur
 // laeuft auf gpt-oss und stellte sich auf "Wer bist du?" als "ChatGPT von OpenAI"
