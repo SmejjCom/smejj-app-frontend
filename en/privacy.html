@@ -193,6 +193,25 @@
         (Art. 6(1)(a) GDPR). Without consent, nothing whatsoever is collected for training
         purposes; the feature is switched off by default.
       </p>
+      <p>
+        Likewise, <strong>your questions to the assistant</strong> may be used as training
+        data. If you mark an answer as helpful with “thumbs up”, we additionally store
+        <strong>that answer together with your question</strong> (a “learning pair”). For
+        training we use only answers from our own smejj models; answers from third-party
+        providers are stored separately and are not trained on unless the provider’s terms
+        of use expressly allow it. A “thumbs down” creates no learning pair; the feedback
+        is stored only as a quality signal. This too happens only with your prior, explicit
+        consent. Questions and answers that contain credentials or personal details are
+        detected and <strong>discarded entirely</strong> rather than stored in cleaned form;
+        so are very short or very long inputs and (for questions) requests to take an action.
+      </p>
+      <p>
+        Questions and learning pairs are stored without your email address and without your
+        name. They do, however, carry a reference to your consent with a derived identifier
+        (pseudonym), which lets us match the consent and any withdrawal. The data is
+        therefore <strong>pseudonymised, not anonymised</strong>. We keep it until you
+        withdraw consent, and for three years at most from the time of storage.
+      </p>
       <div class="card">
         <p>
           Consent is voluntary and split three ways: (1) collection and review of the data,
@@ -202,16 +221,17 @@
       </div>
       <p>
         Before anything is stored, the data is cleaned automatically: credentials, API keys
-        and personal details are removed (sanitization). The cleaned data is encrypted
-        (AES-256-GCM) and stored immutably in the IDrive e2 object store. It is not passed
-        on to third parties; data from third-party model APIs is not used for training.
+        and personal details are removed (sanitization). The cleaned questions are encrypted
+        (AES-256-GCM) and stored immutably in the IDrive e2 object store; learning pairs
+        are stored immutably in IDrive e2 after the same cleaning. Nothing is passed on to
+        third parties; answers from third-party models are not used for training.
       </p>
       <p>
         You can withdraw any consent at any time with effect for the future (Art. 7(3)
         GDPR), directly in the app or by email to
         <a href="mailto:s@smejj.com">s@smejj.com</a>. After withdrawal, your data will no
-        longer be used for future training, and stored training data will be deleted or
-        blocked unless statutory retention obligations prevent this.
+        longer be used for future training, and stored training data, including your learning
+        pairs, will be deleted or blocked unless statutory retention obligations prevent this.
       </p>
 
       <h2>12. Retention period</h2>

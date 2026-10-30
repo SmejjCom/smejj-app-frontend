@@ -206,12 +206,26 @@
       </p>
       <p>
         Ebenso können <strong>Ihre an den Assistenten gerichteten Fragen</strong> als
-        Trainingsdaten verwendet werden — ausdrücklich <strong>ohne die Antworten</strong>,
-        da diese von Fremdmodellen stammen und dafür nicht genutzt werden dürfen. Auch
-        dies geschieht ausschließlich mit Ihrer vorherigen Einwilligung. Fragen, die
-        Zugangsdaten oder personenbezogene Angaben enthalten, werden erkannt und
-        <strong>vollständig verworfen</strong> statt bereinigt gespeichert; ebenso
-        Handlungsaufforderungen und sehr kurze oder sehr lange Eingaben.
+        Trainingsdaten verwendet werden. Wenn Sie eine Antwort mit „Daumen hoch“ als
+        hilfreich markieren, speichern wir zusätzlich <strong>diese Antwort zusammen mit
+        Ihrer Frage</strong> („Lernpaar“). Für das Training verwenden wir nur Antworten
+        unserer eigenen smejj-Modelle; Antworten fremder Anbieter werden getrennt
+        gespeichert und nicht trainiert, solange die Nutzungsbedingungen des jeweiligen
+        Anbieters dies nicht ausdrücklich erlauben. Bei „Daumen runter“ entsteht kein
+        Lernpaar; die Rückmeldung wird nur als Qualitätssignal gespeichert. Auch dies
+        geschieht ausschließlich mit Ihrer vorherigen, ausdrücklichen Einwilligung.
+        Fragen und Antworten, die Zugangsdaten oder personenbezogene Angaben enthalten,
+        werden erkannt und <strong>vollständig verworfen</strong> statt bereinigt
+        gespeichert; ebenso sehr kurze oder sehr lange Eingaben sowie (bei Fragen)
+        Handlungsaufforderungen.
+      </p>
+      <p>
+        Fragen und Lernpaare werden ohne Ihre E-Mail-Adresse und ohne Ihren Namen
+        gespeichert. Sie tragen jedoch einen Verweis auf Ihre Einwilligung mit einer
+        abgeleiteten Kennung (Pseudonym), über die wir die Einwilligung und einen
+        Widerruf zuordnen können. Die Daten sind daher <strong>pseudonymisiert, nicht
+        anonymisiert</strong>. Wir speichern sie bis zu Ihrem Widerruf, höchstens drei
+        Jahre ab der Speicherung.
       </p>
       <div class="card">
         <p>
@@ -224,17 +238,18 @@
       <p>
         Vor jeder Speicherung werden die Daten automatisiert bereinigt: Zugangsdaten,
         API-Schlüssel und personenbezogene Angaben werden entfernt (Sanitization).
-        Die bereinigten Daten werden verschlüsselt (AES-256-GCM) und unveränderlich
-        im Objektspeicher IDrive e2 abgelegt. Es erfolgt keine Weitergabe an Dritte;
-        Daten aus Fremdmodell-APIs werden nicht für das Training verwendet.
+        Die bereinigten Fragen werden verschlüsselt (AES-256-GCM) und unveränderlich
+        im Objektspeicher IDrive e2 abgelegt; Lernpaare werden nach derselben Bereinigung
+        ebenfalls unveränderlich in IDrive e2 abgelegt. Es erfolgt keine Weitergabe an
+        Dritte; Antworten von Fremdmodellen werden nicht für das Training verwendet.
       </p>
       <p>
         Sie können jede Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen
         (Art. 7 Abs. 3 DSGVO), direkt in der App oder per E-Mail an
         <a href="mailto:s@smejj.com">s@smejj.com</a>. Nach dem Widerruf werden Ihre
         Daten nicht mehr für künftiges Training verwendet und gespeicherte
-        Trainingsdaten gelöscht bzw. gesperrt, soweit keine gesetzlichen
-        Aufbewahrungspflichten entgegenstehen.
+        Trainingsdaten einschließlich Ihrer Lernpaare gelöscht bzw. gesperrt, soweit
+        keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
       </p>
 
       <h2>12. Speicherdauer</h2>
