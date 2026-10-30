@@ -3,7 +3,7 @@
 // Freigabe: docs/approvals/2026-08-13-startseite-glas-design-freigabe.md
 // Uebersetzt per t() (Quellsprache Deutsch, fail-safe Quelltext) — erster
 // Besuch in neuer Sprache zeigt einmal Deutsch, wie ueberall in der App.
-import { t } from "./i18n/ui.js?v=2026102804";
+import { t } from "./i18n/ui.js?v=2026103001";
 
 const feld = document.getElementById("startMessage");
 // Hero-Ueberschrift und Eingabe-Platzhalter haengen am selben t()-Weg wie

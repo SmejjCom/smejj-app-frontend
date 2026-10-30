@@ -1,4 +1,4 @@
-import "./mobil-tastatur.js?v=2026102804";
+import "./mobil-tastatur.js?v=2026103001";
 // smejj.com — PWA-Schnellstarts (Manifest-Shortcuts, 25.08.).
 //
 // Android/Chrome zeigt beim App-Icon Langdruck die Manifest-Shortcuts. Damit
@@ -117,7 +117,7 @@ if (willNeu || willSprechen) {
 
   if (willNeu) {
     // Dieselbe Modul-Kennung wie ueberall — sonst zweite Instanz (Waechter).
-    import("/assets/chat-store.js?v=2026102804")
+    import("/assets/chat-store.js?v=2026103001")
       .then((m) => m.newChat?.())
       .catch(() => { /* nicht angemeldet oder Modul fehlt: Start bleibt Start */ });
   }

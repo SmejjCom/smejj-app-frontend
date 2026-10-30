@@ -6,6 +6,24 @@
 // und der iOS-Unlock innerhalb einer Nutzergeste. Kein Zustand ausser dem
 // Unlock-Merker; die Premium-Stimme (WebAudio) bleibt Sache des Hosts.
 
+import { leseStimmWahl, persoenlichkeitVon, stimmeVon, waehleBrowserStimme } from "./voice-stimmen.js?v=2026103001";
+
+// Gewaehlte Stimme/Persoenlichkeit (30.10.2026) auch fuer die Browser-Stimme: Geschlecht
+// per Namens-Heuristik, Tempo als rate, Lautsprecher aus = volume 0. Fehler: alte Wahl.
+function browserWahl(lang) {
+  try {
+    const wahl = leseStimmWahl();
+    const stil = persoenlichkeitVon(wahl);
+    return {
+      geschlecht: stimmeVon(lang, wahl).geschlecht,
+      rate: stil.id === "individuell" ? wahl.eigenesTempo : stil.tempo,
+      volume: wahl.lautsprecher === false ? 0 : 1
+    };
+  } catch {
+    return { geschlecht: "", rate: 1, volume: 1 };
+  }
+}
+
 export function createBrowserTts({ lang, base, supported, startFristMs = 4_000 } = {}) {
   let unlocked = false;
   const haltend = new Set();
@@ -14,10 +32,12 @@ export function createBrowserTts({ lang, base, supported, startFristMs = 4_000 }
   const langNow = () => (typeof lang === "function" ? lang() : lang);
   const baseNow = () => (typeof base === "function" ? base() : (base || String(langNow() || "").split("-")[0]));
 
-  const pickVoice = () => {
+  const pickVoice = (geschlecht = "") => {
     const voices = window.speechSynthesis.getVoices() || [];
     const matching = voices.filter((v) => v.lang === langNow() || (v.lang || "").startsWith(baseNow()));
     if (matching.length === 0) return null;
+    const nachGeschlecht = waehleBrowserStimme(matching, geschlecht);
+    if (nachGeschlecht) return nachGeschlecht;
     // Bevorzuge natürliche/neuronale Premium-Stimmen (Natural, Neural, Enhanced, Google) für menschlichen Klang:
     const natural = matching.find((v) => /\b(natural|neural|premium|enhanced|google)\b/i.test(v.name));
     return natural || matching[0];
@@ -34,8 +54,11 @@ export function createBrowserTts({ lang, base, supported, startFristMs = 4_000 }
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = langNow();
-      const voice = pickVoice();
+      const wahl = browserWahl(langNow());
+      const voice = pickVoice(wahl.geschlecht);
       if (voice) utterance.voice = voice;
+      if (wahl.rate !== 1) utterance.rate = wahl.rate;
+      if (wahl.volume !== 1) utterance.volume = wahl.volume;
       // Fristen (Geraetebefund 27.09.2026, iOS-WKWebView): speechSynthesis
       // startet dort manchmal gar nicht oder liefert nie onend — der Loop stand
       // dann ewig bei "Einen Moment ...". onend feuert jetzt GENAU einmal:

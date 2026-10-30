@@ -8,6 +8,12 @@
 // die Browser-Stimme zurueck (kein Funktionsverlust). Free-only im Browser;
 // GPU-Kosten entstehen nur serverseitig waehrend aktiver Nutzung.
 
+import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026103001";
+
+function lautsprecherAn() {
+  try { return leseStimmWahl().lautsprecher !== false; } catch { return true; }
+}
+
 // WAV-Kopf (44 Byte, PCM) lesen — pure Logik, testbar.
 export function parseWavHeader(bytes) {
   if (!bytes || bytes.length < 44) return null;
@@ -63,9 +69,16 @@ export function natuerlichePause(vorigerText) {
   return 150;
 }
 
-export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args) => globalThis.fetch(...args) } = {}) {
+// Stimmenbibliothek (30.10.2026): parameter(lang) liefert { voice, tempo, ausdruck } der
+// gespeicherten Wahl (voice-stimmen.js). Die Vorschau im Stimmen-Menue reicht eine
+// feste Stimme herein und meldet sich NICHT als globaler Vorlader an (vorlader:false).
+export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args) => globalThis.fetch(...args), parameter = sprechParameter, vorlader = true } = {}) {
   // lang darf eine Funktion sein: Sprache zum Zeitpunkt der Anfrage (Oberflaechensprache, 22.09.2026).
   const langNow = () => (typeof lang === "function" ? lang() : lang);
+  const sprechWahl = () => { try { return parameter(langNow()) || {}; } catch { return {}; } };
+  // Vorrat je Stimme+Text: nach einem Stimmwechsel passt ein vorgeladener Satz nicht mehr.
+  const vorratSchluessel = (text) => `${JSON.stringify(sprechWahl())}|${text}`;
+  let lautstaerke = null; // GainNode: Lautsprecher aus = stumm weiterlaufen (Zeiten bleiben gleich)
   let availability = { at: 0, value: false };
   let context = null;
   let active = null; // { abort, sources, cancelled }
@@ -100,7 +113,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
         headers: authHeaders({ "Content-Type": "application/json" }),
         // Sprache mitgeben: der Server bedient ggf. nur bestimmte Sprachen
         // (CPU-Stimme mit fester Stimme) — sonst bleibt die Browser-Stimme.
-        body: JSON.stringify({ language: langNow() })
+        body: JSON.stringify({ language: langNow(), voice: sprechWahl().voice })
       });
       const payload = await response.json();
       value = payload?.premiumVoice === true;
@@ -117,6 +130,11 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
       const Ctor = window.AudioContext || window.webkitAudioContext;
       context = new Ctor();
     }
+    if (!lautstaerke && context.createGain) {
+      lautstaerke = context.createGain();
+      lautstaerke.connect(context.destination);
+    }
+    if (lautstaerke) lautstaerke.gain.value = lautsprecherAn() ? 1 : 0;
     context.resume?.().catch?.(() => {});
     return context;
   }
@@ -139,17 +157,18 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
   /** Naechsten Satz schon anfragen (nur waehrend die Premium-Stimme spricht). */
   function vorladen(text) {
     const satz = String(text || "");
-    if (!satz || !active || defekt || !availability.value || vorrat.has(satz)) return false;
+    const schluessel = vorratSchluessel(satz);
+    if (!satz || !active || defekt || !availability.value || vorrat.has(schluessel)) return false;
     verwerfeVorrat(); // nur der unmittelbar naechste Satz
     const controller = new AbortController();
     const antwort = fetchFn(ttsUrl, {
       method: "POST",
       headers: authHeaders({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ text: satz, language: langNow() }),
+      body: JSON.stringify({ text: satz, language: langNow(), ...sprechWahl() }),
       signal: controller.signal
     });
     antwort?.catch?.(() => {}); // Fehler zeigt sich erst beim Abholen in speak()
-    vorrat.set(satz, { controller, antwort, at: Date.now() });
+    vorrat.set(schluessel, { controller, antwort, at: Date.now() });
     return true;
   }
 
@@ -178,8 +197,8 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
   }
 
   async function speak(text, { onstart, onend } = {}) {
-    const vorab = vorrat.get(text);
-    vorrat.delete(text);
+    const vorab = vorrat.get(vorratSchluessel(text));
+    vorrat.delete(vorratSchluessel(text));
     const frisch = vorab && Date.now() - vorab.at <= 30_000 ? vorab : null;
     if (vorab && !frisch) { try { vorab.controller.abort(); } catch { /* alt */ } }
     verwerfeVorrat(); // anderer Satz als vorgeladen: Vorrat ist ueberholt
@@ -204,7 +223,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
       response = await (frisch ? frisch.antwort : fetchFn(ttsUrl, {
         method: "POST",
         headers: authHeaders({ "Content-Type": "application/json" }),
-        body: JSON.stringify({ text, language: langNow() }),
+        body: JSON.stringify({ text, language: langNow(), ...sprechWahl() }),
         signal: controller.signal
       }));
     } catch (error) {
@@ -267,7 +286,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
         buffer.getChannelData(0).set(samples);
         const source = ctx.createBufferSource();
         source.buffer = buffer;
-        source.connect(ctx.destination);
+        source.connect(lautstaerke || ctx.destination);
         const startAt = Math.max(ctx.currentTime + 0.06 + (nextStartAt ? 0 : pauseMs / 1000), nextStartAt);
         source.start(startAt);
         nextStartAt = startAt + buffer.duration;
@@ -306,8 +325,15 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     } else finish();
   }
 
+  // Lautsprecher-Knopf und Stimmwechsel wirken sofort, auch mitten im Satz.
+  try {
+    globalThis.addEventListener?.("smejj:stimme", () => {
+      availability = { at: 0, value: availability.value }; // neue Stimme beim Server vorladen lassen
+      if (lautstaerke) lautstaerke.gain.value = lautsprecherAn() ? 1 : 0;
+    });
+  } catch { /* ohne Ereignisse gilt die Wahl ab dem naechsten Satz */ }
   const stimme = { isAvailable, speak, cancel, isSpeaking, unlock, vorladen };
   // Die Vorlese-Queue (voice-speech-queue.js) meldet hier den naechsten Satz an.
-  try { globalThis.smejjSprachVorlader = vorladen; } catch { /* ohne globalThis kein Vorladen */ }
+  if (vorlader) { try { globalThis.smejjSprachVorlader = vorladen; } catch { /* ohne globalThis kein Vorladen */ } }
   return stimme;
 }

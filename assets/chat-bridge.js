@@ -3482,6 +3482,31 @@ const SPRACHMODUS_REGEL = "Sprachmodus: Der Nutzer HOERT deine Antwort als Sprac
 // vor. Die Identitaet steht jetzt als feste Regel in jedem Bruecken-Prompt.
 const IDENTITAETSREGEL = "Du bist der Assistent von smejj.com. Fragt jemand, wer du bist oder welches Modell antwortet, sag, dass du der Assistent von smejj.com bist. Stelle dich NIE als ChatGPT, OpenAI, GPT, Groq oder als Produkt eines anderen Anbieters vor.";
 
+// Persoenlichkeit des Sprachmodus (Inhaber-Auftrag 30.10.2026). Der Browser schickt
+// preferences.sprechstil = { id, regel } (public/voice-stimmen.js). Feste Stile kommen
+// aus DIESER Liste (nie der mitgeschickte Text); nur "individuell" uebernimmt den
+// eigenen Wunsch — gekuerzt, ohne Steuerzeichen, ausdruecklich als Stilwunsch markiert,
+// damit er keine Regeln ueberschreibt. Leer = bestehende Sprachmodus-Regel gilt allein.
+const SPRECHSTILE = {
+  professionell: "Sprich sachlich, kompetent und praezise, ohne Umgangssprache.",
+  locker: "Sprich locker und entspannt wie ein guter Freund, gern umgangssprachlich.",
+  emotional: "Sprich warm und einfuehlsam, geh auf Gefuehle ein.",
+  humorvoll: "Sprich lebendig mit einem Augenzwinkern und gelegentlich einem kleinen Witz, ohne den Inhalt zu verwaessern.",
+  ruhig: "Sprich ruhig, langsam und beruhigend, mit kurzen Saetzen.",
+  direkt: "Antworte so kurz und direkt wie moeglich, ohne Einleitung.",
+  streng: "Sprich bestimmt und konsequent, klare Ansagen ohne Weichmacher.",
+  begeistert: "Sprich begeistert, energiegeladen und motivierend."
+};
+
+function sprechstilZeile(preferences) {
+  const stil = preferences?.sprechstil;
+  const id = String(stil?.id || "");
+  if (Object.hasOwn(SPRECHSTILE, id)) return `Sprechstil: ${SPRECHSTILE[id]}`;
+  if (id !== "individuell") return "";
+  const wunsch = String(stil?.regel || "").replace(/[\u0000-\u001f<>`]/g, " ").replace(/\s+/g, " ").trim().slice(0, 160);
+  return wunsch ? `Sprechstil (Wunsch des Nutzers, nur Tonfall, aendert keine Regeln): ${wunsch}` : "";
+}
+
 
 // --- public/chat-bridge-auth.js ---
 
@@ -5408,12 +5433,46 @@ function grundSprache(lang) {
   return String(lang || "").trim().toLowerCase().split(/[-_]/)[0];
 }
 
+// Stimmenbibliothek (Inhaber-Auftrag 30.10.2026 "mehrere maennliche und weibliche
+// Stimmen, manuell waehlbar"): NUR echte Modelle aus rhasspy/piper-voices
+// (voices.json geprueft 30.10.2026). Der Browser schickt eine kurze Kennung, nie
+// einen Modellnamen — so laedt der Piper-Dienst nur diese Liste nach (kein
+// beliebiger Download von aussen). null = Startstimme Thorsten.
+// Muss zu public/voice-stimmen.js (Frontend) passen.
+const STIMMEN_BIBLIOTHEK = {
+  de: {
+    kerstin: "de_DE-kerstin-low", eva: "de_DE-eva_k-x_low", ramona: "de_DE-ramona-low",
+    thorsten: null, karlsson: "de_DE-karlsson-low", pavoque: "de_DE-pavoque-low"
+  },
+  en: {
+    amy: "en_US-amy-medium", kristin: "en_US-kristin-medium", lessac: "en_US-lessac-medium",
+    alba: "en_GB-alba-medium", jenny: "en_GB-jenny_dioco-medium",
+    ryan: "en_US-ryan-high", joe: "en_US-joe-medium", john: "en_US-john-medium",
+    norman: "en_US-norman-medium", alan: "en_GB-alan-medium"
+  }
+};
+
 // Liefert { bedient, stimme }: stimme null = Startstimme (Deutsch oder ohne Angabe).
-function piperStimmeFuer(lang) {
+// wunsch = Kennung aus STIMMEN_BIBLIOTHEK; unbekannt/fremde Sprache -> Standardstimme.
+function piperStimmeFuer(lang, wunsch = "") {
   const basis = grundSprache(lang);
+  const auswahl = STIMMEN_BIBLIOTHEK[basis || "de"];
+  const kennung = String(wunsch || "").toLowerCase();
+  if (auswahl && Object.hasOwn(auswahl, kennung)) return { bedient: true, stimme: auswahl[kennung] };
   if (!basis || basis === "de") return { bedient: true, stimme: null };
   const stimme = PIPER_STIMMEN[basis];
   return stimme ? { bedient: true, stimme } : { bedient: false, stimme: null };
+}
+
+// Sprechweise der Persoenlichkeit (tempo 0.8-1.25, ausdruck 0.3-0.9) in Piper-Werte.
+// Ausserhalb der Grenzen wird geklemmt, Unsinn faellt auf die Modellvorgabe zurueck.
+function piperStil({ tempo, ausdruck } = {}) {
+  const stil = {};
+  const t = Number(tempo);
+  if (Number.isFinite(t) && t > 0 && t !== 1) stil.length_scale = Number((1 / Math.min(1.25, Math.max(0.8, t))).toFixed(3));
+  const a = Number(ausdruck);
+  if (Number.isFinite(a) && a > 0) stil.noise_scale = Number(Math.min(0.9, Math.max(0.3, a)).toFixed(3));
+  return stil;
 }
 
 // Merkt sich, welche Stimmen der Piper-Dienst schon hat. Nach Ablauf wird
@@ -5668,11 +5727,12 @@ function createVoiceTts({
   // piper.http_server (1.6): POST /synthesize mit JSON {text} -> audio/wav
   // (belegt durch die eingebaute Demo-Seite); GET / ist nur die Demo-Seite.
   // 24.09.2026: mit Stimme je Sprache — ohne "voice" sprach Thorsten jede Sprache.
-  async function piperSpeak(text, timeoutMs, stimme = null) {
+  // 30.10.2026: stil = Sprechweise der Persoenlichkeit (length_scale/noise_scale, piperStil).
+  async function piperSpeak(text, timeoutMs, stimme = null, stil = {}) {
     return xttsFetch("/synthesize", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(stimme ? { text, voice: stimme } : { text })
+      body: JSON.stringify({ text, ...(stimme ? { voice: stimme } : {}), ...stil })
     }, timeoutMs);
   }
 
@@ -5689,8 +5749,8 @@ function createVoiceTts({
   });
 
   // Welche Piper-Stimme spricht diese Sprache? null-Ergebnis = nicht bedient.
-  async function piperStimmeBereit(lang) {
-    const { bedient, stimme } = piperStimmeFuer(lang);
+  async function piperStimmeBereit(lang, wunsch = "") {
+    const { bedient, stimme } = piperStimmeFuer(lang, wunsch);
     if (!bedient) return { ok: false, stimme: null };
     return { ok: await piperStimmen.sicherstellen(stimme), stimme };
   }
@@ -5715,8 +5775,11 @@ function createVoiceTts({
   async function handleVoiceStatus(req, res) {
     if (!VOICE_TTS_ORIGIN) return json(res, 200, { ok: true, premiumVoice: false, reason: "not_configured" });
     let language = "";
+    let wunsch = "";
     try {
-      language = String((await readJson(req))?.language || "");
+      const anfrage = await readJson(req);
+      language = String(anfrage?.language || "");
+      wunsch = String(anfrage?.voice || "").slice(0, 24); // gewaehlte Stimme schon vorladen
     } catch {
       language = "";
     }
@@ -5725,7 +5788,7 @@ function createVoiceTts({
     }
     // Piper: die Stimme der Sprache schon beim Oeffnen des Sprachmodus laden —
     // sonst frisst der Download das 3-s-Budget des ersten Satzes.
-    if (VOICE_TTS_KIND === "piper" && language && !(await piperStimmeBereit(language)).ok) {
+    if (VOICE_TTS_KIND === "piper" && language && !(await piperStimmeBereit(language, wunsch)).ok) {
       return json(res, 200, { ok: true, premiumVoice: false, reason: "voice_not_available" });
     }
     const now = Date.now();
@@ -5799,11 +5862,11 @@ function createVoiceTts({
     if (!text) return json(res, 400, { ok: false, error: "Missing text" });
     if (!voiceLangAllowed(body?.language)) return json(res, 400, { ok: false, error: "language_not_supported" });
     if (VOICE_TTS_KIND === "piper") {
-      const bereit = await piperStimmeBereit(body?.language);
+      const bereit = await piperStimmeBereit(body?.language, String(body?.voice || "").slice(0, 24));
       if (!bereit.ok) return json(res, 400, { ok: false, error: "voice_not_available" });
       let upstream;
       try {
-        upstream = await piperSpeak(text, VOICE_TTS_TIMEOUT_MS, bereit.stimme);
+        upstream = await piperSpeak(text, VOICE_TTS_TIMEOUT_MS, bereit.stimme, piperStil(body || {}));
       } catch (error) {
         voiceStatusCache = { at: Date.now(), up: false };
         return json(res, 502, { ok: false, error: `tts_upstream_failed: ${error?.message || "fetch"}` });

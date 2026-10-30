@@ -5,7 +5,7 @@
 // dieses Startmodul dieselben Texte zur Laufzeit — genau wie start-chips.js die Chips
 // übersetzt. Läuft das Skript, findet das Modul nichts mehr zu tun (idempotent).
 // Nur Texte und Tooltips: keine ids, keine data-Attribute, keine Verdrahtung.
-import { uiLanguage } from "./i18n/ui.js?v=2026102804";
+import { uiLanguage } from "./i18n/ui.js?v=2026103001";
 
 export const TEXTE = [
   // Nr. 7 — Deutsch durchgängig

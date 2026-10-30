@@ -16,7 +16,7 @@
 // die KI schreibt — Chatverlauf, Schrittzeilen, Code-Editor, Eingabefelder.
 // Dort stünde eine "Übersetzung" gegen den Inhalt. Die Sperrliste unten ist
 // deshalb die wichtigste Zeile dieser Datei.
-import { t, savedUiLanguage } from "./i18n/ui.js?v=2026102804";
+import { t, savedUiLanguage } from "./i18n/ui.js?v=2026103001";
 
 /** Teilbäume mit Nutzer- oder Modell-Inhalt: nie anfassen. */
 const GESPERRT = [

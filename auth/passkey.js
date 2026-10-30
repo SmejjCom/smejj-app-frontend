@@ -3,7 +3,7 @@
 // Es wird NIE ein Passwort erzeugt oder gesendet — nur oeffentliche Schluessel.
 // Kommunikation mit den vier Server-Endpunkten; Challenge-Token wird 1:1
 // zurueckgereicht (stateless, cross-origin-tauglich).
-import { CLIENT_ROUTES } from "../config.js?v=2026102804";
+import { CLIENT_ROUTES } from "../config.js?v=2026103001";
 
 export function isPasskeySupported() {
   return typeof window !== "undefined"

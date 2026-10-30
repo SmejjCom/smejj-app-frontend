@@ -3,9 +3,9 @@
 // 800-Zeilen-Regel des Projekts (check:guidelines) sonst reisst — die Flaeche war auf 813
 // Zeilen gewachsen. Verhalten unveraendert; die Funktionen bekommen ihre Umgebung als
 // "hof" (alleEintraege, laden, melde) uebergeben, statt sie aus dem Modul zu ziehen.
-import { t } from "./i18n/ui.js?v=2026102804";
-import { api, cssEscape, escapeHtml, fehlerText, zahl } from "./api-center-helfer.js?v=2026102804";
-import { API_ORIGIN } from "./config.js?v=2026102804";
+import { t } from "./i18n/ui.js?v=2026103001";
+import { api, cssEscape, escapeHtml, fehlerText, zahl } from "./api-center-helfer.js?v=2026103001";
+import { API_ORIGIN } from "./config.js?v=2026103001";
 
 // E2E-Pruefung 14.09.2026 (statische Suche nach undefinierten Namen, dann live):
 // Bei der Auslagerung blieben sieben Namen in api-center-surface.js zurueck —

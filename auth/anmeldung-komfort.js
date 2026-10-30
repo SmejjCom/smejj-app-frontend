@@ -1,5 +1,5 @@
 // smejj.com — E-Mail-Bestaetigung ohne oeffentliche Kontoauskunft.
-import { API_ORIGIN } from "../config.js?v=2026102804";
+import { API_ORIGIN } from "../config.js?v=2026103001";
 const email = document.querySelector("#profileEmail");
 const hilfe = document.querySelector("#verificationHelp");
 const output = document.querySelector("#profileOutput");

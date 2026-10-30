@@ -9,7 +9,7 @@
 // Rueckruf nach einer Modellwahl. So bleibt das Modul fuer sich pruefbar
 // und es entsteht kein Ringschluss zwischen den beiden Dateien.
 //
-import { t } from "./i18n/ui.js?v=2026102804"; // Begruessung uebersetzt (Betreiber 24.09.2026)
+import { t } from "./i18n/ui.js?v=2026103001"; // Begruessung uebersetzt (Betreiber 24.09.2026)
 
 // ---- Modellwahl (Betreiber 2026-08-17: "warum kann ich bei Code nicht
 // Modelle waehlen?"). Dieselben Speicher wie der Start-Picker, damit Chat und

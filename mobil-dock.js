@@ -352,7 +352,7 @@ if (typeof document !== "undefined" && document.querySelector("#startMessage, #c
   verdrahteAuswahl();
   verdrahteCodeFeldHoehe();
   // Ansichten nach dem Login (Profil, Einstellungen, Verlauf, Dateien …) — eigenes Modul, ohne Marke.
-  import("/assets/mobil-ansichten.js?v=2026102804").catch(() => {});
+  import("/assets/mobil-ansichten.js?v=2026103001").catch(() => {});
   // Vollbild-Chat (17.09.2026): misst das schwebende Feld (--feld-hoehe), design-v14-vollbild-chat.css.
-  import("/assets/vollbild-chat.js?v=2026102804").catch(() => {});
+  import("/assets/vollbild-chat.js?v=2026103001").catch(() => {});
 }
