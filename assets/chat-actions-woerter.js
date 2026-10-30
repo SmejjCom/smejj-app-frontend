@@ -9,7 +9,7 @@
 // WARUM EIN EIGENES MODUL: chat-actions.js steht bei 799 Zeilen (800-Regel), und
 // chat-actions.css liegt im gesperrten Start-Bündel. Dieses Modul beobachtet den
 // Verlauf und ergänzt nur; fällt es aus, sieht die Leiste aus wie vorher.
-import { t } from "/assets/i18n/ui.js?v=2026102804";
+import { t } from "/assets/i18n/ui.js?v=2026103001";
 
 export const WOERTER = Object.freeze({
   copy: "Kopieren",

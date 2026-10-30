@@ -19,7 +19,7 @@
 // untere Leiste mit Eingabefeld, Mikrofon-Stummschalter und Beenden-Button).
 // Das index.html-Markup bleibt unveraendert — das Upgrade passiert rein im Browser.
 // sendIcon: das gemeinsame Pfeil-Symbol aus voice-typed-send.js (SEND_ICON_SVG).
-import { t } from "./i18n/ui.js?v=2026102804";
+import { t } from "./i18n/ui.js?v=2026103001";
 
 // Die Statuszeilen kommen aus drei Modulen und schreiben mal "..." und mal
 // "…". Fuer die Uebersetzung wird darum zuerst vereinheitlicht, sonst
@@ -100,8 +100,8 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
   eingabe?.addEventListener("paste", async (event) => {
     try {
       const [{ bildDateienAusClipboard }, { uebernehmeBildDatei }] = await Promise.all([
-        import("./composer-paste-attach.js?v=2026102804"),
-        import("./composer-bild-anhang.js?v=2026102804")
+        import("./composer-paste-attach.js?v=2026103001"),
+        import("./composer-bild-anhang.js?v=2026103001")
       ]);
       const bilder = bildDateienAusClipboard(event.clipboardData);
       if (!bilder.length) return;
@@ -120,6 +120,24 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
   // dafuer drei Zeilen (59 px gemessen) direkt ueber der Bedienzone. Was die
   // Knoepfe tun, sagen ihre eigenen Beschriftungen (aria-label/title).
   if (hint) hint.textContent = stimmText("Sprich einfach — beenden mit X oder Escape.");
+  // 30.10.2026: Glas-Gestalt, Steuerleiste und Stimmen-Menue (voice-stimmen-panel.js).
+  // Dynamisch und fail-safe: scheitert das Laden, bleibt der Sprachmodus wie bisher.
+  ladeStimmenPanel(overlay);
+}
+
+function ladeStimmenPanel(overlay) {
+  try {
+    if (!document.querySelector("link[data-voice-glas]")) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = new URL("./voice-glas.css?v=2026102804", import.meta.url).href;
+      link.dataset.voiceGlas = "true";
+      document.head.appendChild(link);
+    }
+    import("./voice-stimmen-panel.js?v=2026103001")
+      .then(({ bindeStimmenPanel }) => bindeStimmenPanel({ overlay }))
+      .catch(() => { /* Panel nicht ladbar: Sprachmodus bleibt unveraendert */ });
+  } catch { /* ohne DOM/import.meta: nichts tun */ }
 }
 
 // Fokusfuehrung des Sprachmodus (QA-Welle 2, Befund W2-03): Das Overlay meldet

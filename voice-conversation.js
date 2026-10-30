@@ -56,6 +56,8 @@ export function appendVoiceTurn(history, role, content) {
 // zuerst die gewaehlte Modell-Kennung, dann die Einstellungen, sonst "Auto".
 // BYOK-Kennungen ("key:...") laufen nur client-seitig im Chat (chatClient.js)
 // und sind fuer /api/agent kein Modellname — dort gilt dann "Auto".
+import { leseStimmWahl, sprechstilRegel } from "./voice-stimmen.js?v=2026103001";
+
 const MODELL_SCHLUESSEL = "smejj.model.selected.v2"; // = STORAGE_KEYS.model
 const EINSTELLUNGEN_SCHLUESSEL = "smejj.settings.v1"; // = STORAGE_KEYS.settings
 const STUFEN = new Set(["schnell", "auto", "gruendlich", "spezial"]);
@@ -69,7 +71,7 @@ export function leseModellwahl(speicher = typeof localStorage !== "undefined" ? 
     if (STUFEN.has(einstellungen.stufe)) stufe = einstellungen.stufe;
   } catch { /* Speicher gesperrt: Standardwahl */ }
   if (!modell || modell.startsWith("key:")) modell = "Auto";
-  return { model: modell, stufe };
+  return { model: modell, stufe, sprechstil: sprechstilRegel(leseStimmWahl(speicher)) };
 }
 
 export function buildAgentPayload(task, lang, history = [], wahl = leseModellwahl()) {
@@ -83,6 +85,8 @@ export function buildAgentPayload(task, lang, history = [], wahl = leseModellwah
   // die Payload byteidentisch wie bisher. Die Bruecke liest
   // preferences.bildDataUrl (chat-bridge-vision.js) auf beiden Wegen gleich.
   const anhang = typeof window !== "undefined" ? window.smejjBildAnhang?.take?.() : null;
+  // Persoenlichkeit (30.10.2026, voice-stimmen.js): Wortwahl-Regel nur, wenn eine gilt.
+  const sprechstil = wahl?.sprechstil?.regel ? wahl.sprechstil : null;
   return {
     task,
     model: wahl?.model || "Auto",
@@ -91,7 +95,8 @@ export function buildAgentPayload(task, lang, history = [], wahl = leseModellwah
       stufe: wahl?.stufe || "auto",
       uiLanguage: lang,
       voiceMode: true,
-      ...(anhang?.bildDataUrl ? { bildDataUrl: anhang.bildDataUrl } : {})
+      ...(anhang?.bildDataUrl ? { bildDataUrl: anhang.bildDataUrl } : {}),
+      ...(sprechstil ? { sprechstil } : {})
     },
     history: Array.isArray(history) ? history : []
   };

@@ -1,0 +1,243 @@
+/* smejj.com — Glas-Gestalt des Sprachmodus (Inhaber-Auftrag 30.10.2026:
+   „transparente Premium-Glasoberflaeche, Startseite bleibt sichtbar,
+   Texte gut lesbar, hell und dunkel“). Nur der Sprachmodus-Dialog und seine
+   neue Steuerleiste/Menue; Startseite und unteres Eingabefeld bleiben
+   unberuehrt. Geladen von voice-overlay-ui.js, erst wenn der Dialog aufgebaut
+   wird. Bestehende smejj.com Tokens (--v11-marke) werden weiterverwendet. */
+
+#voiceModeOverlay.voice-mode-overlay {
+  --glas-grund: rgba(8, 11, 16, 0.46);
+  --glas-flaeche: rgba(255, 255, 255, 0.09);
+  --glas-flaeche-stark: rgba(255, 255, 255, 0.16);
+  --glas-kante: rgba(255, 255, 255, 0.18);
+  --glas-licht: rgba(255, 255, 255, 0.22);
+  --glas-text: #f4f6f7;
+  --glas-neben: rgba(244, 246, 247, 0.78);
+  --glas-schatten: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --glas-akzent: var(--v11-marke, #02fdfd);
+  --glas-blatt: rgba(14, 17, 22, 0.86);
+}
+
+html body[data-mobile-theme="light"] #voiceModeOverlay.voice-mode-overlay {
+  --glas-grund: rgba(246, 247, 249, 0.5);
+  --glas-flaeche: rgba(255, 255, 255, 0.42);
+  --glas-flaeche-stark: rgba(255, 255, 255, 0.66);
+  --glas-kante: rgba(32, 36, 40, 0.14);
+  --glas-licht: rgba(255, 255, 255, 0.85);
+  --glas-text: #15181b;
+  --glas-neben: rgba(21, 24, 27, 0.74);
+  --glas-schatten: 0 1px 1px rgba(255, 255, 255, 0.6);
+  --glas-akzent: #007c8a;
+  --glas-blatt: rgba(250, 251, 252, 0.9);
+}
+
+/* Vollflaechiges Glas statt dunkler Platte: die Startseite scheint durch. */
+html body #voiceModeOverlay.voice-mode-overlay,
+html body[data-mobile-theme] #voiceModeOverlay.voice-mode-overlay {
+  background: linear-gradient(180deg, var(--glas-licht) -60%, transparent 22%), var(--glas-grund) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(170%) !important;
+  backdrop-filter: blur(26px) saturate(170%) !important;
+  color: var(--glas-text) !important;
+}
+
+#voiceModeOverlay.voice-mode-overlay:not([hidden]) {
+  animation: voice-glas-ein 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes voice-glas-ein {
+  from { opacity: 0; transform: scale(1.015); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Lesbarkeit auf Glas: kraeftige Schrift, feiner Schatten, keine Vollkarten. */
+html body #voiceModeOverlay.voice-mode-overlay[data-upgraded] :is(.voice-mode-status, .voice-mode-hint, .voice-mode-transcript, .voice-mode-reply) {
+  color: var(--glas-text) !important;
+  text-shadow: var(--glas-schatten);
+}
+html body #voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-hint { color: var(--glas-neben) !important; }
+html body #voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-transcript:not(:empty),
+html body #voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-reply:not(:empty) {
+  background: var(--glas-flaeche) !important;
+  border: 1px solid var(--glas-kante) !important;
+  border-radius: 18px !important;
+  box-shadow: inset 0 1px 0 var(--glas-licht) !important;
+  padding: 10px 14px;
+}
+html body #voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-logo { color: var(--glas-akzent); }
+
+html body #voiceModeOverlay.voice-mode-overlay[data-upgraded] :is(.voice-mode-input-wrap, #voiceModeClose, #voiceModeMic) {
+  background: var(--glas-flaeche) !important;
+  border: 1px solid var(--glas-kante) !important;
+  box-shadow: inset 0 1px 0 var(--glas-licht) !important;
+  color: var(--glas-text) !important;
+}
+html body #voiceModeOverlay.voice-mode-overlay[data-upgraded] #voiceModeInput { color: var(--glas-text) !important; }
+html body #voiceModeOverlay.voice-mode-overlay[data-upgraded] #voiceModeInput::placeholder { color: var(--glas-neben) !important; }
+
+/* Mikrofonstatus deutlich: stumm = durchgestrichen + Warnton-Rand. */
+html body #voiceModeOverlay.voice-mode-overlay[data-upgraded] #voiceModeMic[aria-pressed="true"] {
+  background: rgba(220, 60, 60, 0.22) !important;
+  border-color: rgba(220, 60, 60, 0.6) !important;
+}
+
+/* Schwebende Steuerleiste ueber der Eingabe. */
+.voice-steuerleiste {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--glas-flaeche);
+  border: 1px solid var(--glas-kante);
+  box-shadow: inset 0 1px 0 var(--glas-licht), 0 8px 24px rgba(0, 0, 0, 0.12);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  margin-bottom: 4px;
+}
+.voice-steuerleiste button,
+.voice-stimme-vorschau {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--glas-text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.voice-steuerleiste button:hover,
+.voice-stimme-vorschau:hover { background: var(--glas-flaeche-stark); }
+.voice-steuerleiste button:focus-visible,
+.voice-stimmen-sheet button:focus-visible,
+.voice-stimmen-sheet textarea:focus-visible {
+  outline: 2px solid var(--glas-akzent);
+  outline-offset: 2px;
+}
+.voice-steuerleiste svg,
+.voice-stimme-vorschau svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.voice-steuer-stopp svg rect,
+.voice-stimme-vorschau svg path { fill: currentColor; }
+.voice-steuer-laut[aria-pressed="true"] { border-color: rgba(220, 60, 60, 0.6); }
+/* Stoppen nur sinnvoll, solange smejj spricht. */
+#voiceModeOverlay:not([data-mode="speaking"]) .voice-steuer-stopp { opacity: 0.45; }
+
+/* Stimmen-Menue: Glas-Blatt von unten. */
+.voice-stimmen-sheet {
+  position: absolute;
+  left: 50%;
+  bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+  transform: translateX(-50%);
+  width: min(560px, calc(100% - 24px));
+  max-height: min(72vh, 640px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  z-index: 5;
+  text-align: left;
+  padding: 14px 16px 18px;
+  border-radius: 24px;
+  background: var(--glas-blatt);
+  border: 1px solid var(--glas-kante);
+  box-shadow: inset 0 1px 0 var(--glas-licht), 0 18px 48px rgba(0, 0, 0, 0.28);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(180%);
+  color: var(--glas-text);
+  animation: voice-glas-blatt 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.voice-stimmen-sheet[hidden] { display: none; }
+@keyframes voice-glas-blatt {
+  from { opacity: 0; transform: translate(-50%, 16px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.voice-stimmen-kopf { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+.voice-stimmen-reiter,
+.voice-stimmen-sprachen { display: inline-flex; gap: 4px; padding: 3px; border-radius: 999px; background: var(--glas-flaeche); }
+.voice-stimmen-reiter button,
+.voice-stimmen-sprachen button,
+.voice-stimmen-fertig {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--glas-text);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+.voice-stimmen-reiter [aria-selected="true"],
+.voice-stimmen-sprachen [aria-pressed="true"] { background: var(--glas-flaeche-stark); font-weight: 600; }
+.voice-stimmen-fertig { border: 1px solid var(--glas-kante); font-weight: 600; }
+.voice-stimmen-hinweis { margin: 8px 2px; font-size: 13px; color: var(--glas-neben); }
+.voice-stimmen-gruppe h3 { margin: 12px 2px 6px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--glas-neben); }
+.voice-stimme { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.voice-stimme-wahl,
+.voice-stil {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  min-height: 52px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--glas-kante);
+  background: var(--glas-flaeche);
+  color: var(--glas-text);
+  font: inherit;
+  cursor: pointer;
+}
+/* Seitenweite Knopf-Hover-Regeln duerfen das Glas nicht weiss fuellen. */
+.voice-stimmen-sheet .voice-stimme-wahl:hover,
+.voice-stimmen-sheet .voice-stil:hover {
+  background: var(--glas-flaeche-stark) !important;
+  color: var(--glas-text) !important;
+}
+.voice-stimme-wahl span,
+.voice-stil span { font-size: 13px; color: var(--glas-neben); }
+.voice-stimme-wahl[aria-checked="true"],
+.voice-stil[aria-checked="true"] {
+  border-color: var(--glas-akzent);
+  box-shadow: inset 0 0 0 1px var(--glas-akzent);
+  background: var(--glas-flaeche-stark);
+}
+.voice-stimme-vorschau { border-color: var(--glas-kante); background: var(--glas-flaeche); flex: none; }
+.voice-stimme-vorschau.is-playing { border-color: var(--glas-akzent); color: var(--glas-akzent); }
+.voice-stil-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.voice-stil-eigen { display: grid; gap: 10px; margin-top: 12px; }
+.voice-stil-eigen[hidden] { display: none; }
+.voice-stil-eigen label { display: grid; gap: 6px; font-size: 14px; }
+.voice-stil-eigen textarea {
+  font: inherit;
+  font-size: 16px; /* iOS: kein Zoom beim Fokus */
+  color: var(--glas-text);
+  background: var(--glas-flaeche);
+  border: 1px solid var(--glas-kante);
+  border-radius: 14px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+.voice-stil-eigen input[type="range"] { accent-color: var(--glas-akzent); }
+/* Waehrend das Menue offen ist, tritt die Gespraechsmitte zurueck. */
+#voiceModeOverlay[data-stimmen-menue="offen"] :is(.voice-mode-reply, .voice-mode-transcript, .voice-mode-hint, .voice-mode-status, .voice-mode-logo) { opacity: 0.12; }
+
+@media (prefers-reduced-motion: reduce) {
+  #voiceModeOverlay.voice-mode-overlay:not([hidden]),
+  .voice-stimmen-sheet { animation: none; }
+}
+@media (forced-colors: active) {
+  .voice-steuerleiste, .voice-stimmen-sheet, .voice-stimme-wahl, .voice-stil { border: 1px solid CanvasText; }
+}
+
+/* Mobile Ruhe-Themen setzen Knoepfe eckig — im Glas-Menue bleiben die Formen rund. */
+html body #voiceModeOverlay :is(.voice-stimme-wahl, .voice-stil) { border-radius: 16px !important; }
+html body #voiceModeOverlay :is(.voice-stimme-vorschau, .voice-steuerleiste button) { border-radius: 50% !important; }
+html body #voiceModeOverlay :is(.voice-steuerleiste, .voice-stimmen-reiter, .voice-stimmen-sprachen, .voice-stimmen-reiter button, .voice-stimmen-sprachen button, .voice-stimmen-fertig) { border-radius: 999px !important; }
+html body #voiceModeOverlay .voice-stimmen-sheet { border-radius: 24px !important; }

@@ -8,11 +8,11 @@
 //
 // Anpinnen: im Browser pro Chat gemerkt (smejj.angepinnt.v1), nicht im Verlaufs-Speicher —
 // so bleiben chat-store.js und chat-messages.js mit ihren Cache-Marken unberuehrt.
-import { metaOf, rawOf } from "/assets/chat-messages.js?v=2026102804";
-import { toPlainText } from "/assets/chat-actions-menu.js?v=2026102804";
-import { activeChatId, newChat } from "/assets/chat-store.js?v=2026102804";
-import { showToast } from "/assets/components.js?v=2026102804";
-import { t } from "/assets/i18n/ui.js?v=2026102804";
+import { metaOf, rawOf } from "/assets/chat-messages.js?v=2026103001";
+import { toPlainText } from "/assets/chat-actions-menu.js?v=2026103001";
+import { activeChatId, newChat } from "/assets/chat-store.js?v=2026103001";
+import { showToast } from "/assets/components.js?v=2026103001";
+import { t } from "/assets/i18n/ui.js?v=2026103001";
 
 export const PIN_KEY = "smejj.angepinnt.v1";
 const MAX_ZITAT = 1200;
@@ -178,7 +178,7 @@ export function fuehreAus(act, eintrag) {
   const text = klartextVon(rawOf(eintrag));
   // Mit Medium: das Teilen-Blatt (Datei oder bewusst erstellter Link) statt Text mit interner Adresse.
   const medium = act === "share" ? eintrag.querySelector("img[data-smejj-adresse], video[data-smejj-adresse]") : null;
-  if (medium) return import("/assets/chat-medien-ansicht.js?v=2026102804").then((m) => m.oeffneTeilenBlatt(medium, { text })).catch(() => teilen(text));
+  if (medium) return import("/assets/chat-medien-ansicht.js?v=2026103001").then((m) => m.oeffneTeilenBlatt(medium, { text })).catch(() => teilen(text));
   if (act === "share") return teilen(text);
   if (act === "reply") return ins(`Zu deiner Antwort „${auszug(text)}“: `);
   if (act === "quote") return ins(`${alsZitat(text)}\n\n`, { vorne: true });

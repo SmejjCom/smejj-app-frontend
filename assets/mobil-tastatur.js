@@ -24,7 +24,7 @@ export function initChatViewport(win = window, doc = document) {
     const active = mobile.matches && start.classList.contains("is-active");
     const size = sichtbarerChat(vv, win.innerHeight);
     if (active && (vv?.height < 72 || (win.innerHeight > 600 && win.innerWidth < win.innerHeight && vv?.height < 220)) && doc.activeElement?.id === "startMessage")
-      import("./mobil-tastatur-platz.js?v=2026102804").then(m => m.pruefePlatz(win, doc));
+      import("./mobil-tastatur-platz.js?v=2026103001").then(m => m.pruefePlatz(win, doc));
     if (active && size) {
       if (width !== win.innerWidth) { width = win.innerWidth; normalHeight = 0; }
       if (!rotating) normalHeight = Math.max(normalHeight, size.height);
@@ -80,5 +80,5 @@ export function initChatViewport(win = window, doc = document) {
 
 if (typeof document !== "undefined" && document.getElementById("start")) {
   initChatViewport();
-  if (window.matchMedia(HANDY_QUERY).matches) import("/assets/mobil-ruhe.js?v=2026102804").catch(() => {});
+  if (window.matchMedia(HANDY_QUERY).matches) import("/assets/mobil-ruhe.js?v=2026103001").catch(() => {});
 }
