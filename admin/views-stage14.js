@@ -480,6 +480,7 @@
       + (leitstand ? leitstandBlock(rechner, lagen, jetzt) + fliessbandBlock(rechner, lagen) : "")
       + '<div class="al-leiste"><span class="s">Stand ' + e(A.zeit(jetzt)) + " · lädt alle 30 Sekunden neu</span>"
       + knopf("Alle starten", 'data-frRechner="alle" data-frZustand="laeuft"') + " "
+      + knopf("Alle auf Vollgas", 'data-frRechner="alle" data-frStufe="vollgas"') + " "
       + knopf("Alle pausieren", 'data-frRechner="alle" data-frZustand="pause"') + " "
       + knopf("Not-Aus alle", 'data-frRechner="alle" data-frZustand="stopp"') + " "
       + '<span class="btn" data-trNeu>Neu laden</span></div>'

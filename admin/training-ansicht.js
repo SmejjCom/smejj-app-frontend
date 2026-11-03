@@ -127,6 +127,7 @@
       + '<button class="tb-knopf primaer" data-tbNeu type="button">＋ Neue Aufgabe</button>'
       + '<button class="tb-knopf" data-frRechner="alle" data-frZustand="pause" type="button">❚❚ Alle pausieren</button>'
       + '<button class="tb-knopf" data-frRechner="alle" data-frZustand="laeuft" type="button">▶ Alle starten</button>'
+      + '<button class="tb-knopf" data-frRechner="alle" data-frStufe="vollgas" type="button" title="Alle drei Rechner auf volle Leistung. Der Schutz bleibt an.">⚡ Alle auf Vollgas</button>'
       + '<button class="tb-knopf gefahr" data-frRechner="alle" data-frZustand="stopp" type="button">■ Not-Aus</button>'
       + '<button class="tb-knopf leise" data-trNeu type="button" title="Daten neu laden">↻ Neu laden</button>'
       + "</div></div>"
