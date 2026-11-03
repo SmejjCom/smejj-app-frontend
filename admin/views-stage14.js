@@ -183,28 +183,69 @@
     return '<span class="btn" ' + daten + ">" + e(text) + "</span>";
   }
 
-  function rechnerKarte(m, l) {
+  /** Dauer in einfachen Worten: „5 Min“, „2 Std 10 Min“. */
+  function zeitpunkt(iso) {   // auch „…-0800“ (iMac-Messung) lesen, nicht nur „…-08:00“
+    return Date.parse(String(iso || "").replace(/([+-]\d\d)(\d\d)$/, "$1:$2"));
+  }
+
+  function dauer(vonIso, bisIso) {
+    const ms = zeitpunkt(bisIso || new Date().toISOString()) - zeitpunkt(vonIso);
+    if (!isFinite(ms) || ms < 0) return "";
+    const min = Math.round(ms / 60000);
+    if (min < 60) return min + " Min";
+    const std = Math.floor(min / 60);
+    return std + " Std" + (min % 60 ? " " + (min % 60) + " Min" : "");
+  }
+
+  function uhr(iso) {
+    const d = new Date(iso);
+    return isNaN(d) ? "" : ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+  }
+
+  const NAME_KURZ = { "fabrik-macbook-pro": "MacBook Pro", "fabrik-macbook-air": "MacBook Air", "fabrik-imac": "iMac" };
+
+  /** Stand eines Knopf-Wunsches: null (keiner), "offen" (Rechner hat ihn noch nicht) oder "uebernommen". */
+  function wunschStand(o, l) {
+    if (!o) return null;
+    const passt = (!o.zustand || o.zustand === l.admin) && (!o.stufe || o.stufe === l.stufe);
+    return passt ? "uebernommen" : "offen";
+  }
+
+  function rechnerKarte(m, l, jetzt, offen) {
     const kennung = String(m.id || "").replace(/^fabrik-/, "");
+    const f = m.fabrik || {};
     const stufen = ["leise", "mittel", "vollgas"].map(function (s) {
       return s === l.stufe ? V.pilleBlock(STUFE_TEXT[s] + " ✓", "up")
         : knopf(STUFE_TEXT[s], 'data-frRechner="' + e(kennung) + '" data-frStufe="' + s + '"');
     }).join(" ");
-    const steuer = [
-      knopf("Start", 'data-frRechner="' + e(kennung) + '" data-frZustand="laeuft"'),
-      knopf("Pause", 'data-frRechner="' + e(kennung) + '" data-frZustand="pause"'),
-      knopf("Stopp", 'data-frRechner="' + e(kennung) + '" data-frZustand="stopp"')
-    ].join(" ");
+    const steuer = [["Start", "laeuft"], ["Pause", "pause"], ["Stopp", "stopp"]].map(function (k) {
+      return k[1] === l.admin && l.admin !== "laeuft" ? V.pilleBlock(k[0] + " ✓", "wr")
+        : knopf(k[0], 'data-frRechner="' + e(kennung) + '" data-frZustand="' + k[1] + '"');
+    }).join(" ");
+    const o = offen && offen[kennung];
+    const stand = wunschStand(o, l);
+    const rueck = stand === "offen" ? '<p class="s">⏳ Wird übernommen … (gesendet ' + e(uhr(o.am)) + ", bis zu 1 Min)</p>"
+      : stand === "uebernommen" ? '<p class="s">✓ Übernommen (gesendet ' + e(uhr(o.am)) + ")</p>" : "";
+    const rest = typeof f.restMinuten === "number" && f.restMinuten >= 0
+      ? "noch ca. " + dauer(new Date(0).toISOString(), new Date(f.restMinuten * 60000).toISOString())
+        + " · fertig um " + uhr(new Date(Date.parse(jetzt) + f.restMinuten * 60000).toISOString())
+      : "Restzeit wird nach 5 Min berechnet";
+    const gpu = typeof f.gpuJetzt === "number" ? f.gpuJetzt : l.gpu;
+    const watt = l.watt === null ? "" : " · " + l.watt + " W"
+      + (f.messungAm && dauer(f.messungAm, jetzt) ? " (Messung vor " + dauer(f.messungAm, jetzt) + ")" : "");
+    const seit = f.seit ? (l.lage === "rechnet" ? "arbeitet seit " : "steht seit ") + dauer(f.seit, jetzt) : "";
     const hinweis = tipp(l);
-    return V.panelBlock(m.name || m.id, l.rolle, '<div class="pb">'
+    return V.panelBlock(m.name || m.id, seit, '<div class="pb">'
       + "<p><b>" + e(l.tut || "—") + "</b></p>"
-      + (l.fortschritt ? "<p>Fortschritt: " + e(l.fortschritt.text) + " (" + l.fortschritt.prozent + " %)</p>" : "")
-      + '<p class="s">Auslastung (letzte Messung): ' + e(l.gpu === null ? "—" : "GPU " + l.gpu + " % · " + l.watt + " W")
+      + (l.fortschritt ? '<p><progress max="100" value="' + l.fortschritt.prozent + '"></progress> '
+        + l.fortschritt.prozent + " %</p><p class=\"s\">" + e(l.fortschritt.text) + " · " + e(rest) + "</p>" : "")
+      + '<p class="s">GPU jetzt ' + e(gpu === null ? "—" : gpu + " %") + e(watt)
       + (l.akku != null ? " · Akku " + e(String(l.akku)) + " %" : "")
-      + " · Warteschlange " + e(l.schlange === null ? "—" : String(l.schlange))
-      + " · gemeldet " + e(m.letzteMeldung ? A.zeit(m.letzteMeldung) : "nie") + "</p>"
+      + " · Warteschlange " + e(l.schlange === null ? "—" : String(l.schlange)) + "</p>"
       + (hinweis ? '<p class="s">Tipp: ' + e(hinweis) + "</p>" : "")
-      + '<div class="al-leiste"><span class="s">Stufe</span> ' + stufen + "</div>"
-      + '<div class="al-leiste"><span class="s">Steuern</span> ' + steuer + "</div>"
+      + rueck
+      + '<p class="s">Stufe</p><div class="al-leiste">' + stufen + "</div>"
+      + '<p class="s">Steuern</p><div class="al-leiste">' + steuer + "</div>"
       + "</div>", zustandPille(l.lage, FABRIK_LAGE));
   }
 
@@ -221,8 +262,37 @@
         + '<td class="al-satz">' + e(r.titel || r.id) + " — " + e(stand)
         + (r.tor ? " · Live-Tor: " + e(r.tor) : " · Live-Tor: noch kein fertiger Kandidat") + "</td></tr>");
     });
-    return V.panelBlock("Unsere Modelle", "die Nummer bekommt eine Version erst, wenn sie alle 6 Prüfungen besteht",
+    return V.panelBlock("Unsere Modelle", "eine Versionsnummer gibt es erst, wenn alle 6 Prüfungen bestanden sind",
       V.tabelleBlock(["Version", "Stand", "Was"], zeilen));
+  }
+
+  /** Verlaufszeile der Fabrik (Pro-Takt) in einfachen Worten. */
+  function verlaufKlartext(zeile) {
+    const z = String(zeile || "");
+    const m = /^\d{4}-\d\d-(\d\d) (\d\d:\d\d):\d\d (.*)$/.exec(z);
+    const zeit = m ? m[2] : "";
+    const t = m ? m[3] : z;
+    let s = t;
+    let r;
+    if ((r = /^gestartet: (\S+)/.exec(t))) s = "Pro beginnt: " + klartext(r[1]);
+    else if ((r = /^fertig: (\S+)/.exec(t))) s = "Pro ist fertig: " + klartext(r[1]);
+    else if ((r = /^eingereiht: (\S+)/.exec(t))) s = "Neuer Auftrag eingereiht: " + klartext(r[1]);
+    else if ((r = /^Admin-Wunsch (\S+): Zustand (\S+), Stufe (\S+)/.exec(t))) {
+      const was = { laeuft: "gestartet", pause: "pausiert", stopp: "gestoppt" }[r[2]];
+      s = "Im Admin: " + (NAME_KURZ["fabrik-" + r[1]] || r[1]) + (was ? " " + was : "")
+        + (STUFE_TEXT[r[3]] ? (was ? ", Stufe " : " auf Stufe ") + STUFE_TEXT[r[3]] : "");
+    } else if ((r = /^Waechter stoppt PID \d+: (.*)$/.exec(t))) s = "Schutz hat angehalten: " + r[1];
+    else if ((r = /^Motor: (\d+) neue/.exec(t))) s = r[1] + " neue Aufträge geplant";
+    return { zeit: zeit, text: s };
+  }
+
+  function verlaufBlock(zeilen) {
+    const liste = (zeilen || []).slice().reverse().map(verlaufKlartext);
+    return V.panelBlock("Verlauf", "was zuletzt passiert ist", liste.length
+      ? '<div class="tl">' + liste.map(function (x) {
+        return '<div class="e"><span class="tm">' + e(x.zeit) + "</span><span>" + e(x.text) + "</span></div>";
+      }).join("") + "</div>"
+      : '<div class="pb"><span class="s">Noch nichts gemeldet.</span></div>');
   }
 
   function listenBlock(titel, unter, eintraege, leer) {
@@ -231,23 +301,42 @@
       : '<div class="pb"><span class="s">' + e(leer) + "</span></div>");
   }
 
-  function training(d) {
+  /** Ampel ganz oben: ein Satz je Rechner, der nicht arbeitet. */
+  function ampel(rechner, lagen, jetzt) {
+    if (!rechner.length) {
+      return '<div class="note glass bad"><div class="nx">▲</div><div><div class="nt">Kein Fabrik-Rechner meldet sich</div>'
+        + '<div class="ns">Die Lebenszeichen fehlen oder sind älter als drei Minuten.</div></div></div>';
+    }
+    const probleme = rechner.map(function (m, i) {
+      const l = lagen[i];
+      if (l.lage === "rechnet") return "";
+      const f = m.fabrik || {};
+      const seit = f.seit ? " seit " + dauer(f.seit, jetzt) : "";
+      const tipp1 = tipp(l);
+      return "<div>" + e((NAME_KURZ[m.id] || m.name) + " " + FABRIK_LAGE[l.lage].text + seit + " — " + (l.tut || "")
+        + (tipp1 ? " — " + tipp1 : "")) + "</div>";
+    }).filter(Boolean);
+    const aktiv = rechner.length - probleme.length;
+    if (!probleme.length) {
+      return '<div class="note glass"><div class="nx">✓</div><div><div class="nt">Alle ' + rechner.length
+        + " Rechner arbeiten</div></div></div>";
+    }
+    return '<div class="note glass ' + (aktiv ? "warn" : "bad") + '"><div class="nx">▲</div><div><div class="nt">'
+      + aktiv + " von " + rechner.length + " Rechnern arbeiten</div><div class=\"ns\">" + probleme.join("") + "</div></div></div>";
+  }
+
+  function training(d, offen) {
     const alle = d.motoren || [];
     const rechner = alle.filter(function (m) { return m.art === "fabrik"; });
     const plan = alle.filter(function (m) { return m.art === "fabrik-plan"; })[0] || null;
     const lagen = rechner.map(fabrikLage);
     const aktiv = lagen.filter(function (l) { return l.lage === "rechnet"; }).length;
     const p = (plan && plan.fabrik) || {};
-    const lage = !rechner.length
-      ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Kein Fabrik-Rechner meldet sich</div>'
-        + '<div class="ns">Die Lebenszeichen fehlen oder sind älter als drei Minuten.</div></div></div>'
-      : aktiv === rechner.length
-        ? '<div class="note glass"><div class="nx">✓</div><div><div class="nt">Alle ' + rechner.length + " Rechner arbeiten</div></div></div>"
-        : '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + aktiv + " von " + rechner.length
-          + " Rechnern arbeiten gerade</div><div class=\"ns\">Bei jedem Rechner steht unten, warum er nicht arbeitet.</div></div></div>";
+    const jetzt = d.erstelltAm || new Date().toISOString();
     return V.kopfBlock("TR", "Training models", "Unsere Modelle trainieren",
-      "Alles zum Training an einem Ort: welche Rechner arbeiten, woran, wie schnell — und Start, Pause, Stopp und Stufe"
+      "Alles zum Training an einem Ort: welche Rechner arbeiten, woran, wie lange noch — und Start, Pause, Stopp und Stufe"
       + " für jeden Rechner. Was live im Chat antwortet, steht unter „Modelle“.")
+      + '<div class="stack">' + ampel(rechner, lagen, jetzt)
       + '<div class="kpis">'
       + V.kachelBlock("Rechner arbeiten", aktiv + " von " + rechner.length, aktiv ? "gerade aktiv" : "keiner aktiv",
         rechner.length && aktiv === rechner.length ? "up" : "dn")
@@ -255,16 +344,17 @@
         p.vorratStunden >= 48 ? "up" : "wr")
       + V.kachelBlock("Nächste Aufträge", String((p.naechste || []).length), "in der Warteschlange", "")
       + "</div>"
-      + '<div class="stack">' + lage
-      + '<div class="al-leiste"><span class="s">Stand ' + e(A.zeit(d.erstelltAm)) + " · lädt alle 30 Sekunden neu</span>"
+      + '<div class="al-leiste"><span class="s">Stand ' + e(A.zeit(jetzt)) + " · lädt alle 30 Sekunden neu</span>"
       + knopf("Alle starten", 'data-frRechner="alle" data-frZustand="laeuft"') + " "
       + knopf("Alle pausieren", 'data-frRechner="alle" data-frZustand="pause"') + " "
       + knopf("Not-Aus alle", 'data-frRechner="alle" data-frZustand="stopp"') + " "
       + '<span class="btn" data-trNeu>Neu laden</span></div>'
+      + '<div class="cols3">' + rechner.map(function (m, i) { return rechnerKarte(m, lagen[i], jetzt, offen); }).join("") + "</div>"
       + modelleBlock(plan)
-      + rechner.map(function (m, i) { return rechnerKarte(m, lagen[i]); }).join("")
+      + '<div class="cols2">'
       + listenBlock("Als Nächstes", "die nächsten Aufträge der Fabrik", (p.naechste || []).map(klartext), "Nichts in der Warteschlange.")
-      + listenBlock("Verlauf", "was zuletzt passiert ist", (p.verlauf || []).slice().reverse(), "Noch nichts gemeldet.")
+      + verlaufBlock(p.verlauf)
+      + "</div>"
       + '<div class="note glass"><div class="nx">◆</div><div><div class="nt">So wirken die Knöpfe</div>'
       + '<div class="ns">Start, Pause, Stopp und Stufe übernimmt der Rechner im Minutentakt. Pause: nichts Neues starten,'
       + " der laufende Auftrag wird fertig. Stopp: sofort anhalten, der Auftrag bleibt in der Warteschlange."
@@ -414,5 +504,5 @@
       + "</div>";
   }
 
-  window.adminViewsStage14 = { modelle: modelle, training: training, groesse: groesse, fabrikLage: fabrikLage };
+  window.adminViewsStage14 = { modelle: modelle, training: training, groesse: groesse, fabrikLage: fabrikLage, verlaufKlartext: verlaufKlartext };
 })();

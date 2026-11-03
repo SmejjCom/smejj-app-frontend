@@ -69,6 +69,30 @@
   // Fabrik-Rechner. Eigener Takt, damit die beiden Seiten sich nicht stören.
   let trTakt = null;
   let trDaten = null;
+  // Knopf-Rueckmeldung: was zuletzt gewuenscht wurde, bis der Rechner es meldet.
+  // Nur Bequemlichkeit je Browser-Tab (sessionStorage); fehlt der Speicher, geht nur die Anzeige verloren.
+  const OFFEN_SCHLUESSEL = "smejj.admin.fabrik.offen";
+  let offen = {};
+  try { offen = JSON.parse(sessionStorage.getItem(OFFEN_SCHLUESSEL) || "{}") || {}; } catch (_) { offen = {}; }
+
+  function offenSpeichern() {
+    try { sessionStorage.setItem(OFFEN_SCHLUESSEL, JSON.stringify(offen)); } catch (_) { /* nur Anzeige */ }
+  }
+
+  /** Erledigte Rueckmeldungen nach 10 Min, haengende nach 30 Min wegraeumen. */
+  function offenAufraeumen(daten) {
+    const jetzt = Date.now();
+    (daten.motoren || []).forEach(function (m) {
+      const k = String(m.id || "").replace(/^fabrik-/, "");
+      const o = offen[k];
+      if (!o) return;
+      const f = m.fabrik || {};
+      const passt = (!o.zustand || o.zustand === f.admin) && (!o.stufe || o.stufe === f.stufe);
+      const alter = jetzt - Date.parse(o.am);
+      if ((passt && alter > 600000) || alter > 1800000) delete offen[k];
+    });
+    offenSpeichern();
+  }
 
   function trTaktStoppen() {
     if (trTakt && typeof clearInterval === "function") clearInterval(trTakt);
@@ -83,7 +107,8 @@
       return ctx.fehler(antwort.fehler);
     }
     trDaten = antwort.data;
-    ctx.zeichne(S.training(trDaten));
+    offenAufraeumen(trDaten);
+    ctx.zeichne(S.training(trDaten, offen));
     document.querySelectorAll("[data-trNeu]").forEach(function (el) {
       el.addEventListener("click", function () { ladenTraining(ctx); });
     });
@@ -128,6 +153,14 @@
     if (stufe) body.stufe = stufe;
     const antwort = await A.sende("/api/admin/fabrik/wunsch", body);
     if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
+    const am = new Date().toISOString();
+    (rechner === "alle" ? ["macbook-pro", "macbook-air", "imac"] : [rechner]).forEach(function (k) {
+      const o = Object.assign({}, offen[k] || {}, { am: am });
+      if (zustand) o.zustand = zustand;
+      if (stufe) o.stufe = stufe;
+      offen[k] = o;
+    });
+    offenSpeichern();
     ctx.meldung(antwort.data && antwort.data.hinweis ? antwort.data.hinweis : "Vermerkt.", false);
     ladenTraining(ctx, true);
   }
