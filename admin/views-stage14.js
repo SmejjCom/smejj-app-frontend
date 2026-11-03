@@ -301,7 +301,136 @@
       : '<div class="pb"><span class="s">' + e(leer) + "</span></div>");
   }
 
-  /** Ampel ganz oben: ein Satz je Rechner, der nicht arbeitet. */
+  // ------------------------------------------------------------ Leitstand
+  // Inhaber 03.11.2026 („Stufe 1 + 2 bauen“): auf einen Blick, welcher Rechner
+  // was tut, wie lange seine Arbeit reicht und wo der Engpass ist. Die Zahlen
+  // rechnet leitstand.py auf dem Pro (Felder zeitstrahl, tankStunden, leerAb,
+  // wartet, startklar, grund, nutzung24h, fertig24h). Fehlen sie (ältere
+  // Meldung), bleibt die Zeile leer statt zu raten. Balken als SVG mit
+  // Attributen — style-Attribute verbietet die CSP.
+
+  const FENSTER_MIN = 12 * 60;
+  const TANK_ZIEL_STD = 48;
+  const FARBE = { laeuft: "#3a9d4f", startklar: "#9ccf86", leer: "#d9534f", ruhe: "#8a8f98" };
+
+  function svgBalken(teile, titel) {
+    let x = 0;
+    const rects = teile.map(function (t) {
+      const w = Math.max(0, Math.min(100 - x, 100 * t.anteil));
+      if (w < 0.05) return "";
+      const r = '<rect x="' + x.toFixed(1) + '%" y="0" width="' + w.toFixed(1) + '%" height="14" fill="' + t.farbe + '">'
+        + "<title>" + e(t.titel) + "</title></rect>";
+      x += w;
+      return r;
+    });
+    return '<svg width="100%" height="14" role="img" aria-label="' + e(titel) + '">'
+      + '<rect width="100%" height="14" rx="3" fill="' + FARBE.ruhe + '" fill-opacity="0.18"></rect>' + rects.join("") + "</svg>";
+  }
+
+  /** Zeitstrahl der nächsten 12 Std: grün läuft, hellgrün startklar, rot leer. */
+  function zeitstrahlZeile(m, l, jetzt) {
+    const f = m.fabrik || {};
+    if (!Array.isArray(f.zeitstrahl)) return { svg: "", text: "Noch keine Leitstand-Daten." };
+    if (l.lage === "stumm") return { svg: svgBalken([], "meldet sich nicht"), text: "Meldet sich nicht." };
+    const teile = [];
+    let belegt = 0;
+    let unbekannt = false;
+    f.zeitstrahl.forEach(function (z) {
+      if (z.status === "bedingt") return;            // wartet auf Freigabe – keine sichere Arbeit
+      let min = typeof z.minuten === "number" ? z.minuten : null;
+      if (min === null) { unbekannt = true; min = 60; }
+      teile.push({ anteil: min / FENSTER_MIN, farbe: z.status === "laeuft" ? FARBE.laeuft : FARBE.startklar,
+        titel: klartext(z.name) + (typeof z.minuten === "number" ? " · ca. " + dauer(new Date(0).toISOString(),
+          new Date(z.minuten * 60000).toISOString()) : " · Dauer unbekannt") });
+      belegt += min;
+    });
+    const gewollt = ["pausiert", "gestoppt", "notaus", "pause"].indexOf(l.lage) >= 0;   // Inhaber oder Schutz hält an
+    if (belegt < FENSTER_MIN && !unbekannt) {
+      teile.push({ anteil: 1, farbe: gewollt ? FARBE.ruhe : FARBE.leer, titel: gewollt ? FABRIK_LAGE[l.lage].text : "nichts zu tun" });
+    }
+    const svg = svgBalken(teile, "Zeitstrahl " + (NAME_KURZ[m.id] || m.name));
+    const laeuft = f.zeitstrahl.filter(function (z) { return z.status === "laeuft"; })[0];
+    const startklar = f.zeitstrahl.filter(function (z) { return z.status === "startklar"; }).length;
+    let text;
+    if (gewollt) text = FABRIK_LAGE[l.lage].text + (f.seit ? " seit " + uhr(f.seit) : "") + (l.lage === "pause" ? " — " + l.tut : "") + ".";
+    else if (!laeuft) text = "Nichts zu tun" + (f.seit ? " seit " + uhr(f.seit) : "") + (f.grund ? " — " + f.grund : "") + ".";
+    else {
+      text = klartext(laeuft.name).replace(/ \(.*\)$/, "")
+        + (typeof laeuft.minuten === "number" ? " · noch ca. " + dauer(new Date(0).toISOString(), new Date(laeuft.minuten * 60000).toISOString()) : " · Ende unbekannt")
+        + " · danach " + (startklar ? startklar + " startklar" : "nichts startklar")
+        + (f.leerAb ? " · leer ab ca. " + uhr(f.leerAb) : "");
+    }
+    return { svg: svg, text: text };
+  }
+
+  /** Tank: bestätigte Arbeit in Stunden, Ziel 48 Std. Rot unter 6, gelb unter 24. */
+  function tankZeile(f) {
+    if (typeof f.tankStunden !== "number") return { svg: "", text: "—", ton: "" };
+    const std = f.tankStunden;
+    const ton = std < 6 ? "dn" : std < 24 ? "wr" : "up";
+    const farbe = std < 6 ? FARBE.leer : std < 24 ? "#d4a017" : FARBE.laeuft;
+    return { svg: svgBalken([{ anteil: std / TANK_ZIEL_STD, farbe: farbe, titel: std + " Std"}], "Tank"),
+      text: std.toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " von " + TANK_ZIEL_STD + " Std", ton: ton };
+  }
+
+  function leitstandBlock(rechner, lagen, jetzt) {
+    const zeilen = rechner.map(function (m, i) {
+      const l = lagen[i];
+      const z = zeitstrahlZeile(m, l, jetzt);
+      const t = tankZeile(m.fabrik || {});
+      // Zeilen statt Tabelle: Admin-Tabellen haben eine Mindestbreite, auf dem Handy wäre der Balken abgeschnitten.
+      return '<div class="pb"><p><b>' + e(NAME_KURZ[m.id] || m.name || m.id) + "</b> " + zustandPille(l.lage, FABRIK_LAGE) + "</p>"
+        + z.svg + '<p class="s">' + e(z.text) + "</p>"
+        + (t.svg ? t.svg + '<p class="s ' + t.ton + '">Tank: ' + e(t.text) + "</p>" : "") + "</div>";
+    });
+    return V.panelBlock("Leitstand", "jetzt ▸ nächste 12 Std · grün läuft, hellgrün startklar, rot leer · Tank = Arbeit auf Vorrat (Ziel 48 Std)",
+      zeilen.join(""));
+  }
+
+  /** Fließband: wartet auf Freigabe → startklar → läuft → fertig. Der Engpass ist rot. */
+  function fliessbandBlock(rechner, lagen) {
+    const summe = function (k) { return rechner.reduce(function (s, m) { return s + (Number((m.fabrik || {})[k]) || 0); }, 0); };
+    const laeuft = lagen.filter(function (l) { return l.lage === "rechnet"; }).length;
+    const startklar = summe("startklar");
+    const engpass = startklar < rechner.length;
+    const gruende = rechner.filter(function (m) { return (m.fabrik || {}).grund && !(m.fabrik || {}).startklar; })
+      .map(function (m) { return (NAME_KURZ[m.id] || m.name) + ": " + m.fabrik.grund; });
+    return V.panelBlock("Fließband der Aufträge", "alle Rechner zusammen",
+      '<div class="pb"><div class="kpis">'
+      + V.kachelBlock("1 · Wartet auf Freigabe", String(summe("wartet")), "noch nicht startbar", "")
+      + V.kachelBlock("2 · Startklar", String(startklar), engpass ? "Engpass — zu wenig freigegeben" : "genug vorbereitet", engpass ? "dn" : "up")
+      + V.kachelBlock("3 · Läuft", String(laeuft), "gerade in Arbeit", laeuft ? "up" : "dn")
+      + V.kachelBlock("4 · Fertig", String(summe("fertig24h")), "in den letzten 24 Std", "")
+      + "</div>" + (gruende.length ? '<p class="s">Warum nicht startklar: ' + e(gruende.join(" · ")) + "</p>" : "")
+      + "</div>");
+  }
+
+  /** Kopfzahlen: arbeiten · Arbeit reicht bis · genutzt 24 Std · fertig 24 Std. */
+  function kopfzahlen(rechner, lagen, jetzt) {
+    const aktiv = lagen.filter(function (l) { return l.lage === "rechnet"; }).length;
+    const enden = rechner.map(function (m) { return (m.fabrik || {}).leerAb; }).filter(Boolean).sort();
+    const leer = rechner.filter(function (m, i) { return lagen[i].lage === "wartet"; });
+    const reicht = leer.length ? "jetzt" : enden.length ? uhr(enden[0]) : "—";
+    const knapp = leer.length || (enden.length && zeitpunkt(enden[0]) - zeitpunkt(jetzt) < 6 * 3600000);
+    const nutz = rechner.map(function (m) { return (m.fabrik || {}).nutzung24h; }).filter(function (n) { return n && n.gemessenMin; });
+    const gearbeitet = nutz.reduce(function (s, n) { return s + n.gearbeitetMin; }, 0);
+    const gemessen = nutz.reduce(function (s, n) { return s + n.gemessenMin; }, 0);
+    const prozent = gemessen ? Math.round(100 * gearbeitet / gemessen) + " %" : "—";
+    const seit = nutz.length && Math.max.apply(null, nutz.map(function (n) { return n.gemessenMin; })) < 1380
+      ? "gemessen seit " + dauer(new Date(0).toISOString(), new Date(Math.max.apply(null, nutz.map(function (n) { return n.gemessenMin; })) * 60000).toISOString())
+      : "Anteil der Zeit mit Arbeit";
+    const fertig = rechner.reduce(function (s, m) { return s + (Number((m.fabrik || {}).fertig24h) || 0); }, 0);
+    return '<div class="kpis">'
+      + V.kachelBlock("Rechner arbeiten", aktiv + " von " + rechner.length, aktiv ? "gerade aktiv" : "keiner aktiv",
+        rechner.length && aktiv === rechner.length ? "up" : "dn")
+      + V.kachelBlock("Arbeit reicht bis", reicht, leer.length ? (leer.length + " Rechner schon leer") : "dann ist nichts mehr startklar",
+        knapp ? "dn" : "up")
+      + V.kachelBlock("Genutzt (24 Std)", prozent, seit, gemessen && gearbeitet / gemessen < 0.8 ? "wr" : "")
+      + V.kachelBlock("Fertig (24 Std)", String(fertig), "erledigte Aufträge", "")
+      + "</div>";
+  }
+
+  /** Ampel ganz oben: ein Satz je Rechner, der nicht arbeitet — mit Grund und dem einen Schritt. */
   function ampel(rechner, lagen, jetzt) {
     if (!rechner.length) {
       return '<div class="note glass bad"><div class="nx">▲</div><div><div class="nt">Kein Fabrik-Rechner meldet sich</div>'
@@ -312,17 +441,27 @@
       if (l.lage === "rechnet") return "";
       const f = m.fabrik || {};
       const seit = f.seit ? " seit " + dauer(f.seit, jetzt) : "";
-      const tipp1 = tipp(l);
-      return "<div>" + e((NAME_KURZ[m.id] || m.name) + " " + FABRIK_LAGE[l.lage].text + seit + " — " + (l.tut || "")
+      const grund = l.lage === "wartet" && f.grund ? f.grund : l.tut || "";
+      const tipp1 = l.lage === "wartet" && f.grund ? "Schritt: entscheiden, welche neue Arbeit er bekommt." : tipp(l);
+      return "<div>" + e((NAME_KURZ[m.id] || m.name) + " " + FABRIK_LAGE[l.lage].text + seit + " — " + grund
         + (tipp1 ? " — " + tipp1 : "")) + "</div>";
     }).filter(Boolean);
+    const knapp = rechner.filter(function (m, i) {
+      const f = m.fabrik || {};
+      return lagen[i].lage === "rechnet" && typeof f.tankStunden === "number" && f.tankStunden < 6;
+    }).map(function (m) {
+      const f = m.fabrik;
+      return "<div>" + e((NAME_KURZ[m.id] || m.name) + " arbeitet, hat aber nur noch Arbeit "
+        + (f.leerAb ? "bis ca. " + uhr(f.leerAb) : "für den laufenden Auftrag") + " — neue Aufträge vorbereiten lassen.") + "</div>";
+    });
     const aktiv = rechner.length - probleme.length;
-    if (!probleme.length) {
+    if (!probleme.length && !knapp.length) {
       return '<div class="note glass"><div class="nx">✓</div><div><div class="nt">Alle ' + rechner.length
         + " Rechner arbeiten</div></div></div>";
     }
     return '<div class="note glass ' + (aktiv ? "warn" : "bad") + '"><div class="nx">▲</div><div><div class="nt">'
-      + aktiv + " von " + rechner.length + " Rechnern arbeiten</div><div class=\"ns\">" + probleme.join("") + "</div></div></div>";
+      + aktiv + " von " + rechner.length + " Rechnern arbeiten" + (knapp.length ? " · Arbeit wird knapp" : "")
+      + "</div><div class=\"ns\">" + probleme.concat(knapp).join("") + "</div></div></div>";
   }
 
   function training(d, offen) {
@@ -330,20 +469,15 @@
     const rechner = alle.filter(function (m) { return m.art === "fabrik"; });
     const plan = alle.filter(function (m) { return m.art === "fabrik-plan"; })[0] || null;
     const lagen = rechner.map(fabrikLage);
-    const aktiv = lagen.filter(function (l) { return l.lage === "rechnet"; }).length;
     const p = (plan && plan.fabrik) || {};
     const jetzt = d.erstelltAm || new Date().toISOString();
+    const leitstand = rechner.some(function (m) { return Array.isArray((m.fabrik || {}).zeitstrahl); });
     return V.kopfBlock("TR", "Training models", "Unsere Modelle trainieren",
-      "Alles zum Training an einem Ort: welche Rechner arbeiten, woran, wie lange noch — und Start, Pause, Stopp und Stufe"
-      + " für jeden Rechner. Was live im Chat antwortet, steht unter „Modelle“.")
+      "Alles zum Training an einem Ort: welche Rechner arbeiten, woran, wie lange die Arbeit noch reicht — und Start, Pause,"
+      + " Stopp und Stufe für jeden Rechner. Was live im Chat antwortet, steht unter „Modelle“.")
       + '<div class="stack">' + ampel(rechner, lagen, jetzt)
-      + '<div class="kpis">'
-      + V.kachelBlock("Rechner arbeiten", aktiv + " von " + rechner.length, aktiv ? "gerade aktiv" : "keiner aktiv",
-        rechner.length && aktiv === rechner.length ? "up" : "dn")
-      + V.kachelBlock("Vorrat", p.vorratStunden == null ? "—" : zahl(p.vorratStunden) + " Std", "bestätigte Arbeit (Ziel 48 Std)",
-        p.vorratStunden >= 48 ? "up" : "wr")
-      + V.kachelBlock("Nächste Aufträge", String((p.naechste || []).length), "in der Warteschlange", "")
-      + "</div>"
+      + (rechner.length ? kopfzahlen(rechner, lagen, jetzt) : "")
+      + (leitstand ? leitstandBlock(rechner, lagen, jetzt) + fliessbandBlock(rechner, lagen) : "")
       + '<div class="al-leiste"><span class="s">Stand ' + e(A.zeit(jetzt)) + " · lädt alle 30 Sekunden neu</span>"
       + knopf("Alle starten", 'data-frRechner="alle" data-frZustand="laeuft"') + " "
       + knopf("Alle pausieren", 'data-frRechner="alle" data-frZustand="pause"') + " "
