@@ -89,6 +89,68 @@
         : '<div class="pb"><span class="s">Kein Motor eingetragen. Ohne Motor ist jedes Modell nur eine Datei in e2.</span></div>'));
   }
 
+  // --------------------------------------------------------- Training models
+
+  // Die drei Fabrik-Rechner (art "fabrik") melden jede Minute ihr
+  // Lebenszeichen nach e2. Der Server reicht davon nur den Hinweis-Satz durch;
+  // der hat ein festes Format (lebenszeichen_fabrik.py):
+  //   "Rechnet: <Auftrag> · Messung HH:MM: URTEIL, GPU n %, w W (max m) · Warteschlange n"
+  //   "Pause: <Grund> · …"  oder  "Wartet auf den nächsten Auftrag … · …"
+  // Nur Anzeige: Steuern (Leise/Mittel/Vollgas) kommt erst, wenn die Fabrik
+  // Wünsche aus dem Admin sicher prüft — ein Knopf ohne Mechanik wäre gelogen.
+  function fabrikLage(m) {
+    const h = String(m.hinweis || "");
+    const kopf = h.split(" · ")[0] || "";
+    const messung = /GPU (\d+) %, (\d+) W/.exec(h);
+    const schlange = /Warteschlange (\d+)/.exec(h);
+    let lage = "wartet";
+    if (m.zustand !== "verbunden") lage = "stumm";
+    else if (/^Rechnet:/.test(kopf)) lage = "rechnet";
+    else if (/^(Pause|STARTSCHUTZ|gestoppt|Not-Aus|NOTAUS)/.test(kopf)) lage = "pause";
+    return {
+      lage: lage,
+      tut: lage === "stumm" ? "meldet sich nicht — Rechner aus, im Ruhezustand oder ohne Netz"
+        : kopf.replace(/^Rechnet:\s*/, "trainiert/prüft: "),
+      gpu: messung ? Number(messung[1]) : null,
+      watt: messung ? Number(messung[2]) : null,
+      schlange: schlange ? Number(schlange[1]) : null
+    };
+  }
+
+  const FABRIK_LAGE = {
+    rechnet: { text: "rechnet", ton: "up" },
+    pause: { text: "Pause", ton: "wr" },
+    wartet: { text: "wartet", ton: "wr" },
+    stumm: { text: "stumm", ton: "dn" }
+  };
+
+  function trainierenBlock(d) {
+    const rechner = (d.motoren || []).filter(function (m) { return m.art === "fabrik"; });
+    if (!rechner.length) return "";
+    const lagen = rechner.map(fabrikLage);
+    const aktiv = lagen.filter(function (l) { return l.lage === "rechnet"; }).length;
+    const zeilen = rechner.map(function (m, i) {
+      const l = lagen[i];
+      const last = l.gpu === null ? "—" : "GPU " + l.gpu + " % · " + l.watt + " W";
+      return "<tr><td><b>" + e(m.name || m.id) + "</b></td>"
+        + "<td>" + zustandPille(l.lage, FABRIK_LAGE) + "</td>"
+        + '<td class="al-satz">' + e(l.tut) + "</td>"
+        + "<td>" + e(last) + "</td>"
+        + "<td>" + e(l.schlange === null ? "—" : String(l.schlange)) + "</td>"
+        + '<td class="al-satz">' + e(m.letzteMeldung ? A.zeit(m.letzteMeldung) : "nie") + "</td></tr>";
+    });
+    const lageText = aktiv === rechner.length
+      ? '<div class="note glass"><div class="nx">✓</div><div><div class="nt">Alle ' + rechner.length
+        + " Rechner trainieren</div>"
+      : '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + aktiv + " von "
+        + rechner.length + " Rechnern trainieren gerade</div>";
+    return V.panelBlock("Training models", "unsere Fabrik-Rechner — jede Minute neu gemeldet",
+      lageText + '<div class="ns">Die Messung (GPU, Watt) kommt alle paar Minuten vom Rechner selbst.'
+      + " Steuern (Leise · Mittel · Vollgas) folgt im nächsten Schritt; Not-Aus, Speicher-, Hitze-"
+      + " und Akkuschutz bleiben immer an.</div></div></div>"
+      + V.tabelleBlock(["Rechner", "Zustand", "Was er gerade tut", "Auslastung", "Warteschlange", "Gemeldet"], zeilen));
+  }
+
   // ---------------------------------------------------------------- Modelle
 
   function knoepfe(m, kannSchalten) {
@@ -208,6 +270,7 @@
       + '<div class="al-leiste"><span class="s">Stand ' + e(A.zeit(d.erstelltAm))
       + " · frisch aus e2 und den Motoren gelesen, nichts zwischengespeichert</span>"
       + '<span class="btn" data-mdNeu>Neu laden</span></div>'
+      + trainierenBlock(d)
       + motorenBlock(d)
       + V.panelBlock("Modelle", "Größe, Motor und Zustand — gefiltert über die Reiter",
         reiter(reiterAktiv, zaehler)
@@ -230,5 +293,5 @@
       + "</div>";
   }
 
-  window.adminViewsStage14 = { modelle: modelle, groesse: groesse };
+  window.adminViewsStage14 = { modelle: modelle, groesse: groesse, fabrikLage: fabrikLage };
 })();
