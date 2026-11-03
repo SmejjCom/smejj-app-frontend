@@ -76,7 +76,7 @@
   function motorenBlock(d) {
     // Die Fabrik-Rechner trainieren nur und bedienen keine Live-Modelle; sie
     // stehen auf ihrer eigenen Seite „Training models“ (Inhaber 03.11.2026).
-    const motoren = (d.motoren || []).filter(function (m) { return m.art !== "fabrik"; });
+    const motoren = (d.motoren || []).filter(function (m) { return !/^fabrik/.test(String(m.art || "")); });
     const stumme = motoren.filter(function (m) { return m.zustand === "stumm"; });
     const warnung = stumme.length
       ? '<div class="note glass fehler"><div class="nx">▲</div><div>'
@@ -93,90 +93,184 @@
 
   // --------------------------------------------------------- Training models
 
-  // Die drei Fabrik-Rechner (art "fabrik") melden jede Minute ihr
-  // Lebenszeichen nach e2. Der Server reicht davon nur den Hinweis-Satz durch;
-  // der hat ein festes Format (lebenszeichen_fabrik.py):
-  //   "Rechnet: <Auftrag> · Messung HH:MM: URTEIL, GPU n %, w W (max m) · Warteschlange n"
-  //   "Pause: <Grund> · …"  oder  "Wartet auf den nächsten Auftrag … · …"
-  // Nur Anzeige: Steuern (Leise/Mittel/Vollgas) kommt erst, wenn die Fabrik
-  // Wünsche aus dem Admin sicher prüft — ein Knopf ohne Mechanik wäre gelogen.
+  // Eigene Seite „Training models“ (Inhaber 03.11.2026: eigener Menüpunkt, nur
+  // Training, A bis Z steuerbar). Quelle: die Lebenszeichen der Fabrik
+  // (admin/motoren/fabrik-*.json, jede Minute) samt Zusatzfeld „fabrik“.
+  // Knöpfe schreiben nur einen Wunsch (POST /api/admin/fabrik/wunsch, nur
+  // Inhaber, Step-up, Audit); die Rechner übernehmen ihn im Minutentakt.
+  // Schutz (Speicher, Hitze, Akku, Not-Aus) ist von hier aus nicht abschaltbar.
+
+  /** Lage eines Rechners. Nutzt das Zusatzfeld, sonst den Hinweis-Satz (ältere Meldungen). */
   function fabrikLage(m) {
+    const f = m.fabrik || {};
     const h = String(m.hinweis || "");
     const kopf = h.split(" · ")[0] || "";
     const messung = /GPU (\d+) %, (\d+) W/.exec(h);
     const schlange = /Warteschlange (\d+)/.exec(h);
     let lage = "wartet";
     if (m.zustand !== "verbunden") lage = "stumm";
+    else if (f.notaus) lage = "notaus";
+    else if (f.admin === "stopp") lage = "gestoppt";
     else if (/^Rechnet:/.test(kopf)) lage = "rechnet";
+    else if (f.admin === "pause") lage = "pausiert";
     else if (/^(Pause|STARTSCHUTZ|gestoppt|Not-Aus|NOTAUS)/.test(kopf)) lage = "pause";
+    const fort = f.fortschritt && f.fortschritt.gesamt > 0 ? f.fortschritt : null;
     return {
       lage: lage,
-      tut: lage === "stumm" ? "meldet sich nicht — Rechner aus, im Ruhezustand oder ohne Netz"
-        : kopf.replace(/^Rechnet:\s*/, "trainiert/prüft: "),
-      gpu: messung ? Number(messung[1]) : null,
-      watt: messung ? Number(messung[2]) : null,
-      schlange: schlange ? Number(schlange[1]) : null
+      tut: lage === "stumm" ? "Meldet sich nicht — Rechner aus, im Ruhezustand oder ohne Netz"
+        : /^Rechnet:/.test(kopf) ? "Arbeitet an: " + klartext(kopf.replace(/^Rechnet:\s*/, "")) : kopf,
+      gpu: typeof f.gpuProzent === "number" ? f.gpuProzent : messung ? Number(messung[1]) : null,
+      watt: typeof f.watt === "number" ? f.watt : messung ? Number(messung[2]) : null,
+      schlange: typeof f.warteschlange === "number" ? f.warteschlange : schlange ? Number(schlange[1]) : null,
+      stufe: ["leise", "mittel", "vollgas"].indexOf(f.stufe) >= 0 ? f.stufe : "vollgas",
+      admin: f.admin || "laeuft",
+      fortschritt: fort ? { text: zahl(fort.getan) + " von " + zahl(fort.gesamt) + " " + (fort.einheit || ""),
+        prozent: Math.min(100, Math.round(100 * fort.getan / fort.gesamt)) } : null,
+      akku: f.akkuProzent, netz: f.netzteil, rolle: f.rolle || ""
     };
   }
 
   const FABRIK_LAGE = {
-    rechnet: { text: "rechnet", ton: "up" },
-    pause: { text: "Pause", ton: "wr" },
+    rechnet: { text: "arbeitet", ton: "up" },
+    pause: { text: "Pause (Schutz)", ton: "wr" },
+    pausiert: { text: "pausiert", ton: "wr" },
+    gestoppt: { text: "gestoppt", ton: "dn" },
+    notaus: { text: "Not-Aus", ton: "dn" },
     wartet: { text: "wartet", ton: "wr" },
     stumm: { text: "stumm", ton: "dn" }
   };
+  const STUFE_TEXT = { leise: "Leise", mittel: "Mittel", vollgas: "Vollgas" };
 
-  // Eigene Seite „Training models“ (Inhaber 03.11.2026: eigener Menüpunkt, hat
-  // mit den Live-Modellen nichts zu tun). Liest dieselbe Server-Antwort wie
-  // „Modelle“, zeigt davon aber nur die Fabrik-Rechner.
-  function training(d) {
-    const rechner = (d.motoren || []).filter(function (m) { return m.art === "fabrik"; });
-    const lagen = rechner.map(fabrikLage);
-    const aktiv = lagen.filter(function (l) { return l.lage === "rechnet"; }).length;
-    const gpu = lagen.filter(function (l) { return l.gpu !== null; });
-    const schnitt = gpu.length
-      ? Math.round(gpu.reduce(function (s, l) { return s + l.gpu; }, 0) / gpu.length) + " %" : "—";
-    const schlange = lagen.reduce(function (s, l) { return s + (l.schlange || 0); }, 0);
-    return V.kopfBlock("TR", "Training models", "Unsere Modelle trainieren",
-      "Hier steht nur das Training: welche Rechner gerade lernen, woran und wie stark sie ausgelastet sind."
-      + " Was live im Chat antwortet, steht unter „Modelle“.")
-      + '<div class="kpis">'
-      + V.kachelBlock("Rechner trainieren", aktiv + " von " + rechner.length, aktiv ? "gerade aktiv" : "keiner aktiv",
-        rechner.length && aktiv === rechner.length ? "up" : "dn")
-      + V.kachelBlock("Auslastung", schnitt, "GPU im Schnitt, letzte Messung", "")
-      + V.kachelBlock("Warteschlange", String(schlange), "Aufträge warten", schlange ? "up" : "wr")
-      + "</div>"
-      + '<div class="stack">'
-      + '<div class="al-leiste"><span class="s">Stand ' + e(A.zeit(d.erstelltAm))
-      + " · lädt alle 30 Sekunden neu</span>"
-      + '<span class="btn" data-trNeu>Neu laden</span></div>'
-      + (rechner.length ? trainierenBlock(rechner, lagen, aktiv)
-        : '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Kein Fabrik-Rechner meldet sich</div>'
-          + '<div class="ns">Die Lebenszeichen fehlen oder sind älter als drei Minuten.</div></div></div>')
-      + "</div>";
+  function zahl(n) { return Number(n || 0).toLocaleString("de-DE"); }
+
+  /** Auftragsname in einfachen Worten (der technische Name bleibt in Klammern stehen). */
+  const KLARTEXT = [
+    [/^rueck-.*-dok-/, "Lehrermodell schreibt Lerntexte"],
+    [/^rueck-.*-schueler-/, "Unser Modell beantwortet Übungsfragen"],
+    [/^rueck-.*-lehrer-/, "Lehrermodell beantwortet Übungsfragen"],
+    [/^rueck-.*rueckblick/, "Eigene Antworten sammeln (gegen Vergessen)"],
+    [/^rueck-/, "Antworten erzeugen"],
+    [/^ragbelegt-.*-fragen/, "Lerntexte prüfen und Fragen bauen"],
+    [/^ragbelegt-.*-auswahl/, "Nur richtige Antworten auswählen"],
+    [/^(m-|qwen|.*-seed\d)/, "Training"],
+    [/^pruef/, "Prüfung"],
+    [/^oeff/, "Öffentlicher Vergleichstest"],
+    [/^livetor/, "Live-Tor prüfen"],
+    [/^(messung|tempo|cce|packing|speicher)/, "Messung"],
+    [/^(q-|mini-)/, "Vortest kleines Modell"],
+    [/^spaeher/, "Späher (Neuigkeiten sammeln)"]
+  ];
+
+  function klartext(name) {
+    const n = String(name || "");
+    const treffer = KLARTEXT.filter(function (k) { return k[0].test(n); })[0];
+    return treffer ? treffer[1] + " (" + n + ")" : n;
   }
 
-  function trainierenBlock(rechner, lagen, aktiv) {
-    const zeilen = rechner.map(function (m, i) {
-      const l = lagen[i];
-      const last = l.gpu === null ? "—" : "GPU " + l.gpu + " % · " + l.watt + " W";
-      return "<tr><td><b>" + e(m.name || m.id) + "</b></td>"
-        + "<td>" + zustandPille(l.lage, FABRIK_LAGE) + "</td>"
-        + '<td class="al-satz">' + e(l.tut) + "</td>"
-        + "<td>" + e(last) + "</td>"
-        + "<td>" + e(l.schlange === null ? "—" : String(l.schlange)) + "</td>"
-        + '<td class="al-satz">' + e(m.letzteMeldung ? A.zeit(m.letzteMeldung) : "nie") + "</td></tr>";
+  /** Kurzer Tipp in einfachen Worten, wenn ein Rechner nicht arbeitet. */
+  function tipp(l) {
+    if (l.lage === "stumm") return "Rechner einschalten oder Netz prüfen.";
+    if (l.lage === "notaus") return "Not-Aus durch den Schutz — Start erst nach Prüfung der Ursache.";
+    if (l.lage === "gestoppt" || l.lage === "pausiert") return "Mit „Start“ geht es weiter.";
+    if (/Speicher|Swap/i.test(l.tut)) return "Speicher voll: auf diesem Rechner Programme schließen (z. B. Chrome, Simulator).";
+    if (/Akku/i.test(l.tut)) return "Netzteil anschließen.";
+    if (/W(ae|ä)rme/i.test(l.tut)) return "Rechner kühlt ab und startet von selbst.";
+    if (l.lage === "wartet") return "Kein Auftrag frei — die Fabrik plant nach.";
+    return "";
+  }
+
+  function knopf(text, daten) {
+    return '<span class="btn" ' + daten + ">" + e(text) + "</span>";
+  }
+
+  function rechnerKarte(m, l) {
+    const kennung = String(m.id || "").replace(/^fabrik-/, "");
+    const stufen = ["leise", "mittel", "vollgas"].map(function (s) {
+      return s === l.stufe ? V.pilleBlock(STUFE_TEXT[s] + " ✓", "up")
+        : knopf(STUFE_TEXT[s], 'data-frRechner="' + e(kennung) + '" data-frStufe="' + s + '"');
+    }).join(" ");
+    const steuer = [
+      knopf("Start", 'data-frRechner="' + e(kennung) + '" data-frZustand="laeuft"'),
+      knopf("Pause", 'data-frRechner="' + e(kennung) + '" data-frZustand="pause"'),
+      knopf("Stopp", 'data-frRechner="' + e(kennung) + '" data-frZustand="stopp"')
+    ].join(" ");
+    const hinweis = tipp(l);
+    return V.panelBlock(m.name || m.id, l.rolle, '<div class="pb">'
+      + "<p><b>" + e(l.tut || "—") + "</b></p>"
+      + (l.fortschritt ? "<p>Fortschritt: " + e(l.fortschritt.text) + " (" + l.fortschritt.prozent + " %)</p>" : "")
+      + '<p class="s">Auslastung (letzte Messung): ' + e(l.gpu === null ? "—" : "GPU " + l.gpu + " % · " + l.watt + " W")
+      + (l.akku != null ? " · Akku " + e(String(l.akku)) + " %" : "")
+      + " · Warteschlange " + e(l.schlange === null ? "—" : String(l.schlange))
+      + " · gemeldet " + e(m.letzteMeldung ? A.zeit(m.letzteMeldung) : "nie") + "</p>"
+      + (hinweis ? '<p class="s">Tipp: ' + e(hinweis) + "</p>" : "")
+      + '<div class="al-leiste"><span class="s">Stufe</span> ' + stufen + "</div>"
+      + '<div class="al-leiste"><span class="s">Steuern</span> ' + steuer + "</div>"
+      + "</div>", zustandPille(l.lage, FABRIK_LAGE));
+  }
+
+  function modelleBlock(plan) {
+    const p = (plan && plan.fabrik) || {};
+    const live = p.live || { name: "smejj 1.0" };
+    const zeilen = ["<tr><td><b>" + e(live.name) + "</b></td><td>" + V.pilleBlock("live", "up") + "</td>"
+      + '<td class="al-satz">antwortet im Chat' + (live.basis ? " (Grundlage " + e(live.basis) + ")" : "") + "</td></tr>"];
+    (p.richtungen || []).forEach(function (r) {
+      const stand = r.trainings
+        ? r.trainings + " Trainingslauf/-läufe · " + r.bestanden + " bestanden · " + r.fehlschlaege + " nicht gut genug"
+        : "Vorbereitung: Schritt " + r.schritt + " von " + r.von;
+      zeilen.push("<tr><td><b>Kandidat für smejj 1.1</b></td><td>" + V.pilleBlock("im Training", "wr") + "</td>"
+        + '<td class="al-satz">' + e(r.titel || r.id) + " — " + e(stand)
+        + (r.tor ? " · Live-Tor: " + e(r.tor) : " · Live-Tor: noch kein fertiger Kandidat") + "</td></tr>");
     });
-    const lageText = aktiv === rechner.length
-      ? '<div class="note glass"><div class="nx">✓</div><div><div class="nt">Alle ' + rechner.length
-        + " Rechner trainieren</div>"
-      : '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + aktiv + " von "
-        + rechner.length + " Rechnern trainieren gerade</div>";
-    return V.panelBlock("Rechner", "unsere Fabrik-Rechner — jede Minute neu gemeldet",
-      lageText + '<div class="ns">Die Messung (GPU, Watt) kommt alle paar Minuten vom Rechner selbst.'
-      + " Steuern (Leise · Mittel · Vollgas) folgt im nächsten Schritt; Not-Aus, Speicher-, Hitze-"
-      + " und Akkuschutz bleiben immer an.</div></div></div>"
-      + V.tabelleBlock(["Rechner", "Zustand", "Was er gerade tut", "Auslastung", "Warteschlange", "Gemeldet"], zeilen));
+    return V.panelBlock("Unsere Modelle", "die Nummer bekommt eine Version erst, wenn sie alle 6 Prüfungen besteht",
+      V.tabelleBlock(["Version", "Stand", "Was"], zeilen));
+  }
+
+  function listenBlock(titel, unter, eintraege, leer) {
+    return V.panelBlock(titel, unter, eintraege && eintraege.length
+      ? V.tabelleBlock([titel], eintraege.map(function (x) { return '<tr><td class="al-satz">' + e(x) + "</td></tr>"; }))
+      : '<div class="pb"><span class="s">' + e(leer) + "</span></div>");
+  }
+
+  function training(d) {
+    const alle = d.motoren || [];
+    const rechner = alle.filter(function (m) { return m.art === "fabrik"; });
+    const plan = alle.filter(function (m) { return m.art === "fabrik-plan"; })[0] || null;
+    const lagen = rechner.map(fabrikLage);
+    const aktiv = lagen.filter(function (l) { return l.lage === "rechnet"; }).length;
+    const p = (plan && plan.fabrik) || {};
+    const lage = !rechner.length
+      ? '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Kein Fabrik-Rechner meldet sich</div>'
+        + '<div class="ns">Die Lebenszeichen fehlen oder sind älter als drei Minuten.</div></div></div>'
+      : aktiv === rechner.length
+        ? '<div class="note glass"><div class="nx">✓</div><div><div class="nt">Alle ' + rechner.length + " Rechner arbeiten</div></div></div>"
+        : '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + aktiv + " von " + rechner.length
+          + " Rechnern arbeiten gerade</div><div class=\"ns\">Bei jedem Rechner steht unten, warum er nicht arbeitet.</div></div></div>";
+    return V.kopfBlock("TR", "Training models", "Unsere Modelle trainieren",
+      "Alles zum Training an einem Ort: welche Rechner arbeiten, woran, wie schnell — und Start, Pause, Stopp und Stufe"
+      + " für jeden Rechner. Was live im Chat antwortet, steht unter „Modelle“.")
+      + '<div class="kpis">'
+      + V.kachelBlock("Rechner arbeiten", aktiv + " von " + rechner.length, aktiv ? "gerade aktiv" : "keiner aktiv",
+        rechner.length && aktiv === rechner.length ? "up" : "dn")
+      + V.kachelBlock("Vorrat", p.vorratStunden == null ? "—" : zahl(p.vorratStunden) + " Std", "bestätigte Arbeit (Ziel 48 Std)",
+        p.vorratStunden >= 48 ? "up" : "wr")
+      + V.kachelBlock("Nächste Aufträge", String((p.naechste || []).length), "in der Warteschlange", "")
+      + "</div>"
+      + '<div class="stack">' + lage
+      + '<div class="al-leiste"><span class="s">Stand ' + e(A.zeit(d.erstelltAm)) + " · lädt alle 30 Sekunden neu</span>"
+      + knopf("Alle starten", 'data-frRechner="alle" data-frZustand="laeuft"') + " "
+      + knopf("Alle pausieren", 'data-frRechner="alle" data-frZustand="pause"') + " "
+      + knopf("Not-Aus alle", 'data-frRechner="alle" data-frZustand="stopp"') + " "
+      + '<span class="btn" data-trNeu>Neu laden</span></div>'
+      + modelleBlock(plan)
+      + rechner.map(function (m, i) { return rechnerKarte(m, lagen[i]); }).join("")
+      + listenBlock("Als Nächstes", "die nächsten Aufträge der Fabrik", (p.naechste || []).map(klartext), "Nichts in der Warteschlange.")
+      + listenBlock("Verlauf", "was zuletzt passiert ist", (p.verlauf || []).slice().reverse(), "Noch nichts gemeldet.")
+      + '<div class="note glass"><div class="nx">◆</div><div><div class="nt">So wirken die Knöpfe</div>'
+      + '<div class="ns">Start, Pause, Stopp und Stufe übernimmt der Rechner im Minutentakt. Pause: nichts Neues starten,'
+      + " der laufende Auftrag wird fertig. Stopp: sofort anhalten, der Auftrag bleibt in der Warteschlange."
+      + " Leise ≈ halbe, Mittel ≈ drei Viertel Leistung — gleiches Ergebnis, nur langsamer und kühler."
+      + " Schutz bei Speicher, Hitze und Akku bleibt immer an.</div></div></div>"
+      + "</div>";
   }
 
   // ---------------------------------------------------------------- Modelle

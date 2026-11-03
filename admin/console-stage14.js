@@ -87,6 +87,11 @@
     document.querySelectorAll("[data-trNeu]").forEach(function (el) {
       el.addEventListener("click", function () { ladenTraining(ctx); });
     });
+    document.querySelectorAll("[data-frRechner]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        wunsch(ctx, el.getAttribute("data-frRechner"), el.getAttribute("data-frZustand"), el.getAttribute("data-frStufe"));
+      });
+    });
     if (typeof setInterval !== "function") return;
     trTaktStoppen();
     trTakt = setInterval(function () {
@@ -94,6 +99,37 @@
       if (!document.querySelector("[data-trNeu]")) return trTaktStoppen();
       ladenTraining(ctx, true);
     }, TAKT_MS);
+  }
+
+  const RECHNER_NAME = { "macbook-pro": "MacBook Pro", "macbook-air": "MacBook Air", imac: "iMac", alle: "alle drei Rechner" };
+  const WUNSCH_TEXT = {
+    laeuft: ["Starten", "Der Rechner nimmt wieder Aufträge an. Ein Not-Aus des Schutzes bleibt bestehen."],
+    pause: ["Pausieren", "Es startet nichts Neues. Der laufende Auftrag darf fertig werden."],
+    stopp: ["Stoppen", "Der laufende Auftrag wird sofort angehalten und bleibt in der Warteschlange. Nichts geht verloren."],
+    leise: ["Stufe Leise", "Etwa halbe Leistung: kühler und leiser, gleiches Ergebnis, dauert länger."],
+    mittel: ["Stufe Mittel", "Etwa drei Viertel Leistung."],
+    vollgas: ["Stufe Vollgas", "Volle Leistung. Der Schutz (Speicher, Hitze, Akku) bleibt trotzdem an."]
+  };
+
+  // Training models: Wunsch an einen Rechner (oder alle). Grund ist Pflicht (Audit-Log).
+  async function wunsch(ctx, rechner, zustand, stufe) {
+    const art = WUNSCH_TEXT[zustand || stufe];
+    if (!art) return;
+    const grund = await D.text({
+      titel: art[0] + " — " + (RECHNER_NAME[rechner] || rechner),
+      absaetze: [art[1], "Die Rechner übernehmen es im Minutentakt — das dauert bis zu einer Minute."],
+      platzhalter: "Kurzer Grund, z. B. „ich arbeite am Air“",
+      minLaenge: 5,
+      okText: art[0]
+    });
+    if (!grund) return;
+    const body = { rechner: rechner, reason: grund };
+    if (zustand) body.zustand = zustand;
+    if (stufe) body.stufe = stufe;
+    const antwort = await A.sende("/api/admin/fabrik/wunsch", body);
+    if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
+    ctx.meldung(antwort.data && antwort.data.hinweis ? antwort.data.hinweis : "Vermerkt.", false);
+    ladenTraining(ctx, true);
   }
 
   // Jede Schreibaktion braucht einen Grund — der Server weist ohne ihn ab, und
