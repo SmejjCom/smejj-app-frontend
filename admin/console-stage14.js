@@ -64,6 +64,38 @@
     taktStarten(ctx);
   }
 
+  // ---- Training models (eigene Seite, Inhaber 03.11.2026) -------------------
+  // Nur lesend: dieselbe Server-Antwort wie „Modelle“, gezeigt werden nur die
+  // Fabrik-Rechner. Eigener Takt, damit die beiden Seiten sich nicht stören.
+  let trTakt = null;
+  let trDaten = null;
+
+  function trTaktStoppen() {
+    if (trTakt && typeof clearInterval === "function") clearInterval(trTakt);
+    trTakt = null;
+  }
+
+  async function ladenTraining(ctx, still) {
+    const antwort = await A.hole("/api/admin/ops/modellbestand");
+    if (!antwort.ok) {
+      trTaktStoppen();
+      if (still && trDaten) return ctx.meldung(antwort.fehler, true);
+      return ctx.fehler(antwort.fehler);
+    }
+    trDaten = antwort.data;
+    ctx.zeichne(S.training(trDaten));
+    document.querySelectorAll("[data-trNeu]").forEach(function (el) {
+      el.addEventListener("click", function () { ladenTraining(ctx); });
+    });
+    if (typeof setInterval !== "function") return;
+    trTaktStoppen();
+    trTakt = setInterval(function () {
+      if (document.hidden) return;
+      if (!document.querySelector("[data-trNeu]")) return trTaktStoppen();
+      ladenTraining(ctx, true);
+    }, TAKT_MS);
+  }
+
   // Jede Schreibaktion braucht einen Grund — der Server weist ohne ihn ab, und
   // im Audit-Log ist eine Änderung ohne Grund später nicht von einem Versehen
   // zu unterscheiden. Der Dialog fragt ihn deshalb hier, nicht der Server.
@@ -190,7 +222,8 @@
 
   window.adminStage14 = {
     seiten: {
-      modelle: { id: "MD", gruppe: "Betrieb", name: "Modelle", laden: laden }
+      modelle: { id: "MD", gruppe: "Betrieb", name: "Modelle", laden: laden },
+      training: { id: "TR", gruppe: "Betrieb", name: "Training models", laden: ladenTraining }
     }
   };
 })();

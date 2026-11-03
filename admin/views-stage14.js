@@ -74,7 +74,9 @@
   }
 
   function motorenBlock(d) {
-    const motoren = d.motoren || [];
+    // Die Fabrik-Rechner trainieren nur und bedienen keine Live-Modelle; sie
+    // stehen auf ihrer eigenen Seite „Training models“ (Inhaber 03.11.2026).
+    const motoren = (d.motoren || []).filter(function (m) { return m.art !== "fabrik"; });
     const stumme = motoren.filter(function (m) { return m.zustand === "stumm"; });
     const warnung = stumme.length
       ? '<div class="note glass fehler"><div class="nx">▲</div><div>'
@@ -124,11 +126,37 @@
     stumm: { text: "stumm", ton: "dn" }
   };
 
-  function trainierenBlock(d) {
+  // Eigene Seite „Training models“ (Inhaber 03.11.2026: eigener Menüpunkt, hat
+  // mit den Live-Modellen nichts zu tun). Liest dieselbe Server-Antwort wie
+  // „Modelle“, zeigt davon aber nur die Fabrik-Rechner.
+  function training(d) {
     const rechner = (d.motoren || []).filter(function (m) { return m.art === "fabrik"; });
-    if (!rechner.length) return "";
     const lagen = rechner.map(fabrikLage);
     const aktiv = lagen.filter(function (l) { return l.lage === "rechnet"; }).length;
+    const gpu = lagen.filter(function (l) { return l.gpu !== null; });
+    const schnitt = gpu.length
+      ? Math.round(gpu.reduce(function (s, l) { return s + l.gpu; }, 0) / gpu.length) + " %" : "—";
+    const schlange = lagen.reduce(function (s, l) { return s + (l.schlange || 0); }, 0);
+    return V.kopfBlock("TR", "Training models", "Unsere Modelle trainieren",
+      "Hier steht nur das Training: welche Rechner gerade lernen, woran und wie stark sie ausgelastet sind."
+      + " Was live im Chat antwortet, steht unter „Modelle“.")
+      + '<div class="kpis">'
+      + V.kachelBlock("Rechner trainieren", aktiv + " von " + rechner.length, aktiv ? "gerade aktiv" : "keiner aktiv",
+        rechner.length && aktiv === rechner.length ? "up" : "dn")
+      + V.kachelBlock("Auslastung", schnitt, "GPU im Schnitt, letzte Messung", "")
+      + V.kachelBlock("Warteschlange", String(schlange), "Aufträge warten", schlange ? "up" : "wr")
+      + "</div>"
+      + '<div class="stack">'
+      + '<div class="al-leiste"><span class="s">Stand ' + e(A.zeit(d.erstelltAm))
+      + " · lädt alle 30 Sekunden neu</span>"
+      + '<span class="btn" data-trNeu>Neu laden</span></div>'
+      + (rechner.length ? trainierenBlock(rechner, lagen, aktiv)
+        : '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">Kein Fabrik-Rechner meldet sich</div>'
+          + '<div class="ns">Die Lebenszeichen fehlen oder sind älter als drei Minuten.</div></div></div>')
+      + "</div>";
+  }
+
+  function trainierenBlock(rechner, lagen, aktiv) {
     const zeilen = rechner.map(function (m, i) {
       const l = lagen[i];
       const last = l.gpu === null ? "—" : "GPU " + l.gpu + " % · " + l.watt + " W";
@@ -144,7 +172,7 @@
         + " Rechner trainieren</div>"
       : '<div class="note glass fehler"><div class="nx">▲</div><div><div class="nt">' + aktiv + " von "
         + rechner.length + " Rechnern trainieren gerade</div>";
-    return V.panelBlock("Training models", "unsere Fabrik-Rechner — jede Minute neu gemeldet",
+    return V.panelBlock("Rechner", "unsere Fabrik-Rechner — jede Minute neu gemeldet",
       lageText + '<div class="ns">Die Messung (GPU, Watt) kommt alle paar Minuten vom Rechner selbst.'
       + " Steuern (Leise · Mittel · Vollgas) folgt im nächsten Schritt; Not-Aus, Speicher-, Hitze-"
       + " und Akkuschutz bleiben immer an.</div></div></div>"
@@ -270,7 +298,6 @@
       + '<div class="al-leiste"><span class="s">Stand ' + e(A.zeit(d.erstelltAm))
       + " · frisch aus e2 und den Motoren gelesen, nichts zwischengespeichert</span>"
       + '<span class="btn" data-mdNeu>Neu laden</span></div>'
-      + trainierenBlock(d)
       + motorenBlock(d)
       + V.panelBlock("Modelle", "Größe, Motor und Zustand — gefiltert über die Reiter",
         reiter(reiterAktiv, zaehler)
@@ -293,5 +320,5 @@
       + "</div>";
   }
 
-  window.adminViewsStage14 = { modelle: modelle, groesse: groesse, fabrikLage: fabrikLage };
+  window.adminViewsStage14 = { modelle: modelle, training: training, groesse: groesse, fabrikLage: fabrikLage };
 })();
