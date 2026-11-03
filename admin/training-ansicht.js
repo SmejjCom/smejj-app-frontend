@@ -305,7 +305,7 @@
     const s = (w && w.summen) || null;
     return '<div class="tb-karte"><div class="tb-karte-kopf"><h2>Wissen &amp; Herkunft</h2>' + (w ? altText(w.stand, o.jetzt, 30) : "") + "</div>"
       + (s ? '<div class="tb-kette"><div class="tb-schritt-box">Datensätze<b>' + zahl(s.saetze) + '</b></div><div class="tb-schritt-box">Lernbeispiele<b>'
-        + zahl(s.beispiele) + '</b></div><div class="tb-schritt-box">Größe<b>' + zahl(s.mb, 1) + ' MB</b></div><div class="tb-schritt-box">Token<b>nicht erfasst</b></div></div>'
+        + zahl(s.beispiele) + '</b></div><div class="tb-schritt-box">Größe<b>' + zahl(s.mb, 1) + ' MB</b></div><div class="tb-schritt-box">Token<b>' + (typeof s.token === "number" ? zahl(s.token / 1e6, 1) + " Mio." : "nicht erfasst") + "</b></div></div>"
         + '<div class="tb-kette tb-oben">' + '<div class="tb-schritt-box">Gesammelt<b>' + zahl(s.saetze) + '</b></div><span class="tb-pfeil">→</span>'
         + '<div class="tb-schritt-box">Herkunft ohne Befund<b>' + zahl(s.saetze - s.herkunftFunde) + '</b></div><span class="tb-pfeil">→</span>'
         + '<div class="tb-schritt-box">Im Training verwendet<b>' + zahl(s.imTraining) + "</b></div></div>"
@@ -355,7 +355,7 @@
   }
 
   // ------------------------------------------------------------ Wissen
-  function wissen(o) {
+  function wissen(o, rag) {
     const w = o.t.wissen;
     if (!w) return '<div class="tb-karte"><h2>Wissen &amp; Daten</h2><div class="tb-hinweis warn">Noch nicht erfasst – keine Datenübersicht der Fabrik.</div></div>';
     const s = w.summen || {};
@@ -367,23 +367,34 @@
       + '<div class="tb-schritt-box">Modell live<b>' + zahl(((o.t.auftraege || {}).stufen || {}).modelleLive) + "</b></div></div>"
       + '<div class="tb-hinweis">ⓘ <span>' + zahl(s.herkunftFunde) + " Datensätze mit Herkunfts-Befund (Gate 3 würde sie ablehnen) · "
       + zahl(s.ohneLizenz) + " ohne eigene Lizenzdatei · " + zahl(s.gesperrt) + " für die Automatik gesperrt (KEIN_AUTO) · Größe gesamt "
-      + zahl(s.mb, 1) + " MB · Token: nicht erfasst.</span></div></div>"
+      + zahl(s.mb, 1) + " MB · Token: " + (typeof s.token === "number" ? zahl(s.token) + " (Qwen-Tokenizer, " + zahl(s.tokenSaetze) + " von " + zahl(s.saetze) + " Datensätzen)" : "nicht erfasst") + ".</span></div></div>"
       + '<div class="tb-karte"><div class="tb-karte-kopf"><h2>Neueste Datensätze</h2><span class="tb-klein">' + zahl((w.saetze || []).length) + " von " + zahl(s.saetze)
       + " · Ort: " + e(w.ort || "—") + '</span></div><div class="tb-daten-huelle"><table class="tb-daten"><thead><tr><th>Datensatz</th><th>Beispiele</th><th>Größe</th>'
-      + "<th>Lizenz</th><th>Herkunft</th><th>Prüfung</th><th>Im Training</th><th>Stand</th></tr></thead><tbody>"
+      + "<th>Token</th><th>Lizenz</th><th>Herkunft</th><th>Prüfung</th><th>Dubletten · Test-Überschneidung · Datenschutz</th><th>Im Training</th><th>Stand</th></tr></thead><tbody>"
       + (w.saetze || []).map((x) => "<tr><td><b>" + e(x.n) + '</b></td><td class="z">' + zahl(x.b) + (x.v ? " + " + zahl(x.v) + " Test" : "")
-        + '</td><td class="z">' + zahl(x.mb, 1) + " MB</td><td>" + (x.liz ? e(x.liz) : pille("fehlt", "warn")) + "</td><td>" + e(x.her || "—")
+        + '</td><td class="z">' + zahl(x.mb, 1) + ' MB</td><td class="z">' + (typeof x.tok === "number" ? zahl(x.tok) : "—") + "</td><td>" + (x.liz ? e(x.liz) : pille("fehlt", "warn")) + "</td><td>" + e(x.her || "—")
         + "</td><td>" + (x.f === null || x.f === undefined ? pille("nicht geprüft", "") : x.f ? pille(x.f + " Befund" + (x.f > 1 ? "e" : ""), "bad") : pille("ohne Befund", "ok"))
-        + (x.auto ? "" : " " + pille("gesperrt", "warn")) + '</td><td class="z">' + (x.tr ? zahl(x.tr) + "×" : "nein") + "</td><td>" + e(tagUhr(x.am)) + "</td></tr>").join("")
+        + (x.auto ? "" : " " + pille("gesperrt", "warn")) + "</td><td>" + (x.dup === undefined ? pille("nicht geprüft", "")
+          : pille(zahl(x.dup) + " doppelt", x.dup ? "warn" : "ok") + " " + pille(zahl(x.ov) + " im Test", x.ov ? "bad" : "ok") + " " + pille(zahl(x.pii) + " Muster", x.pii ? "warn" : "ok")
+            + (x.lp ? " " + pille("Lernpaare", "acc") : ""))
+        + '</td><td class="z">' + (x.tr ? zahl(x.tr) + "×" : "nein") + "</td><td>" + e(tagUhr(x.am)) + "</td></tr>").join("")
       + "</tbody></table></div></div>"
-      + '<div class="tb-reihe k2"><div class="tb-karte"><h2>Wissenssuche (RAG) – getrennt vom Modell</h2><p class="tb-dim">Gespeicherte Suchquellen sind nicht automatisch im Modell gelernt. '
-      + "Ein Datensatz verändert das Modell erst, wenn ein Training ihn verwendet hat und das Ergebnis alle 6 Pflichtprüfungen bestanden hat.</p>"
-      + '<div class="tb-hinweis warn">Stand des Live-Suchspeichers: in dieser Ansicht noch nicht angebunden (nicht erfasst).</div></div>'
+      + '<div class="tb-reihe k2"><div class="tb-karte"><div class="tb-karte-kopf"><h2>Wissenssuche (RAG) – getrennt vom Modell</h2>'
+      + (rag && rag.gemessenAm ? altText(rag.gemessenAm, o.jetzt, 24 * 60) : "") + "</div>"
+      + (rag ? '<div class="tb-kette"><div class="tb-schritt-box">Quellen<b>' + zahl(rag.quellenGesamt) + '</b></div><div class="tb-schritt-box">Abschnitte<b>'
+        + zahl(rag.chunksGesamt) + '</b></div><div class="tb-schritt-box">Zeichen<b>' + zahl(rag.zeichenGesamt) + "</b></div></div>"
+        + '<ul class="tb-liste">' + (rag.quellen || []).slice(0, 6).map((q) => "<li><span>" + e(q.quelle) + '</span><span class="tb-klein tb-rechts">' + zahl(q.chunks) + " Abschnitte</span></li>").join("") + "</ul>"
+        + '<div class="tb-klein">Aktualität je Quelle: ' + (rag.alterMessbar ? "gemessen" : "nicht messbar (Änderungsdatum fehlt)") + " · Details: <a href=\"/admin/wissen/\">Inhalte &amp; Wissen</a></div>"
+        : '<div class="tb-hinweis">Wird geladen … (Quelle: Admin „Inhalte &amp; Wissen“)</div>')
+      + '<p class="tb-dim">Gespeicherte Suchquellen sind nicht im Modell gelernt. Ein Datensatz verändert das Modell erst, wenn ein Training ihn verwendet und das Ergebnis alle 6 Pflichtprüfungen bestanden hat.</p></div>'
       + '<div class="tb-karte"><h2>Rechte, Einwilligung, Datenschutz</h2><ul class="tb-pruefliste">'
-      + '<li><span class="ja">✓</span>Herkunftsprüfung (Gate 3) je Datensatz – Ergebnis oben</li>'
-      + '<li><span class="ja">✓</span>Testfragen (295 Prüffälle) liegen getrennt vom Lernstoff</li>'
-      + '<li><span class="offen">?</span>Einwilligung je Lernpaar: nicht erfasst – Lernpaare vor dem 31.10.2026 dürfen nicht ins Training</li>'
-      + '<li><span class="offen">?</span>Personenbezogene Daten, Dubletten: je Datensatz nicht erfasst</li></ul></div></div>';
+      + '<li><span class="' + (s.herkunftFunde ? "offen\">!" : "ja\">✓") + "</span>Herkunft (Gate 3): " + zahl(s.saetze - s.herkunftFunde) + " ohne Befund, " + zahl(s.herkunftFunde) + " mit Befund – solche Daten lässt das Live-Tor nicht durch</li>"
+      + '<li><span class="' + (s.ohneLizenz ? "offen\">!" : "ja\">✓") + "</span>Nutzungsrechte: " + zahl(s.ohneLizenz) + " Datensätze ohne eigene Lizenzdatei (Herkunft verweist auf die Grundlage)</li>"
+      + '<li><span class="ja">✓</span>Einwilligung: ' + zahl(s.lernpaarSaetze) + " Datensätze mit Nutzer-Lernpaaren; Lernpaare nur mit gültiger Einwilligung ab 31.10.2026 (Lernpaar-Sperre der Fabrik)</li>"
+      + '<li><span class="' + (s.datenschutzMuster ? "offen\">!" : "ja\">✓") + "</span>Datenschutz: " + zahl(s.datenschutzMuster) + " Zeilen mit E-Mail- oder Telefon-Muster (zu prüfen, nicht automatisch personenbezogen)</li>"
+      + '<li><span class="' + (s.dubletten ? "offen\">!" : "ja\">✓") + "</span>Dubletten: " + zahl(s.dubletten) + " doppelte Fragen im Lernteil</li>"
+      + '<li><span class="' + (s.ueberschneidung ? "nein\">✗" : "ja\">✓") + "</span>Testfragen getrennt: " + zahl(s.ueberschneidung) + " Fragen stehen sowohl im Lern- als auch im Testteil eines Datensatzes</li>"
+      + "</ul><div class=\"tb-klein\">Geprüft: " + zahl(s.geprueft) + " von " + zahl(s.saetze) + " Datensätzen. Den Abgleich mit den 295 Prüffällen der Qualitätsmessung macht die Fabrik vor jedem Training (kontamination.py).</div></div></div>";
   }
 
   // ------------------------------------------------------------ Qualität
@@ -420,7 +431,14 @@
         + (q.live ? (x === "kritisch" ? zahl(q.live[x]) : (prozent(q.live[x]) ?? "—") + " %") : "—") + "</td></tr>").join("") + "</tbody></table>"
       + ((q.verschlechtert || []).length ? '<div class="tb-hinweis warn">Verschlechtert (über 2 Punkte): ' + e(q.verschlechtert.join(", ")) + "</div>" : "")
       + '<div class="tb-klein">Fabrik-Urteil: ' + e((k && k.tor) || "—") + "</div>"
-      + '<div class="tb-hinweis">ⓘ <span>Antwortbeispiele speichert die Prüfung nicht – nur Punkte je Fall. Wissenslücken = Themen mit niedrigen Punkten, kein Vollständigkeits-Prozent.</span></div></div></div>';
+      + '<div class="tb-hinweis">ⓘ <span>Wissenslücken = Themen mit niedrigen Punkten, kein Vollständigkeits-Prozent.</span></div></div></div>'
+      + '<div class="tb-karte"><div class="tb-karte-kopf"><h2>Beispiele: Fälle, die der Kandidat schlechter löst</h2><span class="tb-klein">'
+      + (typeof q.faelleSchlechter === "number" ? zahl(q.faelleSchlechter) + " schlechter · " + zahl(q.faelleBesser) + " besser (Einzelfälle des letzten Prüflaufs)" : "") + "</span></div>"
+      + ((q.faelle || []).length ? '<div class="tb-daten-huelle"><table class="tb-daten"><thead><tr><th>Prüffall</th><th>Thema</th><th>Kandidat</th><th>live</th><th></th></tr></thead><tbody>'
+        + q.faelle.map((f) => "<tr><td><b>" + e(f.id) + "</b></td><td>" + e(f.k) + '</td><td class="z">' + Math.round(100 * f.a) + ' %</td><td class="z">' + Math.round(100 * f.b) + " %</td><td>"
+          + (f.kr ? pille("kritisch", "bad") : "") + "</td></tr>").join("") + "</tbody></table></div>"
+        : '<p class="tb-dim">Kein Fall schlechter als live – oder noch kein Kandidat gemessen.</p>')
+      + '<div class="tb-klein">Die Prüfung speichert Punkte je Fall, aber keine Antworttexte; der Fallname sagt, was geprüft wurde.</div></div>';
   }
 
   // ------------------------------------------------------------ Verlauf

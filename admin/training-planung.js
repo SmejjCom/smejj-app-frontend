@@ -37,7 +37,7 @@
   };
   const ZUSTAND_TON = { gesendet: "", angenommen: "acc", freigegeben: "acc", "in-arbeit": "laeuft", ausgefuehrt: "ok", erledigt: "ok", abgelehnt: "bad", zurueckgezogen: "", fehlgeschlagen: "bad" };
 
-  const s = { reiter: "uebersicht", d: null, liste: null, listeOk: false, einst: null, kosten: null, bearbeite: null, rechnerVorgabe: null };
+  const s = { reiter: "uebersicht", rag: null, d: null, liste: null, listeOk: false, einst: null, kosten: null, bearbeite: null, rechnerVorgabe: null };
   try { s.reiter = sessionStorage.getItem(REITER_SCHLUESSEL) || "uebersicht"; } catch (_) { /* nur Bequemlichkeit */ }
   if (s.reiter === "neu") s.reiter = "aufgaben";
 
@@ -195,7 +195,7 @@
       + "<div><label>Auftragslimit (wartend)</label>" + zahlFeld("auftragslimit", ein.auftragslimit == null ? 3 : ein.auftragslimit, 1, 10) + "</div></div>"
       + '<div class="tb-feldreihe"><div><label>Wiederholungsversuche</label>' + zahlFeld("versuche", ein.versuche == null ? 2 : ein.versuche, 1, 5) + '<div class="tb-klein">je Admin-Aufgabe; Motor: höchstens ' + e(String(mt.fehlschlagGrenze || 5)) + " Fehlschläge je Richtung (fest)</div></div>"
       + '<div><label>Benachrichtigen bei</label><div class="tb-radio">' + [["fehler", "Fehler"], ["entscheidung", "Entscheidung nötig"], ["fertig", "fertig"]].map((b) => '<label><input type="checkbox" name="benachrichtigen" value="' + b[0] + '"' + ((ein.benachrichtigen || ["fehler", "entscheidung"]).indexOf(b[0]) >= 0 ? " checked" : "") + "> " + b[1] + "</label>").join("") + "</div></div></div>"
-      + '<div class="tb-hinweis">ⓘ <span>Push-Meldungen kommen heute über den Fabrik-Wächter bei Leerlauf, knappem Vorrat und Schutzpausen. Die Auswahl wird gespeichert; Meldungen je Admin-Aufgabe (Fehler/fertig) sind noch nicht angebunden.</span></div></div>'
+      + '<div class="tb-hinweis">ⓘ <span>Push aufs Handy über den Fabrik-Wächter (alle 10 Min.): bei Leerlauf, knappem Vorrat und Schutzpausen immer; je Admin-Aufgabe nach dieser Auswahl (Fehler = abgelehnt/fehlgeschlagen, Entscheidung = Vorrat wartet auf Freigabe, fertig).</span></div></div>'
       + '<div class="tb-karte"><h2>Kosten- &amp; Speichergrenzen</h2><div class="tb-feldreihe zwei"><div><label>Strompreis (€ je kWh)</label>' + zahlFeld("strompreisEurKwh", ein.strompreisEurKwh, 0.01, 2, 0.001)
       + '</div><div><label>Quelle des Preises</label><input type="text" name="strompreisQuelle" maxlength="60" value="' + e(ein.strompreisQuelle || "") + '" placeholder="z. B. Stromrechnung 10/2026"></div></div>'
       + '<label>Speicher-Kontingent IDrive e2 (GB)</label>' + zahlFeld("speicherKontingentGb", ein.speicherKontingentGb, 1, 100000)
@@ -251,7 +251,7 @@
   // ------------------------------------------------------------ Steuerung
   function zeichnen(ctx, deps) {
     const o = T.ordnen(s.d, Date.now());
-    const inhalt = s.reiter === "aufgaben" ? aufgaben(o) : s.reiter === "neu" ? neu(o) : s.reiter === "wissen" ? T.wissen(o)
+    const inhalt = s.reiter === "aufgaben" ? aufgaben(o) : s.reiter === "neu" ? neu(o) : s.reiter === "wissen" ? T.wissen(o, s.rag)
       : s.reiter === "qualitaet" ? T.qualitaet(o) : s.reiter === "kosten" ? kosten(o) : s.reiter === "automatik" ? automatik(o)
         : s.reiter === "verlauf" ? T.verlauf(o, s.liste) : T.uebersicht(o, deps.offen());
     ctx.zeichne(T.rahmen(s.reiter === "neu" ? "aufgaben" : s.reiter, inhalt, o));
@@ -262,6 +262,9 @@
     s.reiter = r;
     if (r !== "neu") { s.bearbeite = null; s.rechnerVorgabe = null; }
     try { sessionStorage.setItem(REITER_SCHLUESSEL, r); } catch (_) { /* nur Bequemlichkeit */ }
+    if (r === "wissen" && !s.rag) {
+      A.hole("/api/admin/ops/wissen").then((a) => { if (a.ok) { s.rag = a.data; if (s.reiter === "wissen") zeichnen(ctx, deps); } });
+    }
     if (r === "kosten" && !s.kosten) {
       A.hole("/api/admin/geld/kosten").then((a) => { if (a.ok) { s.kosten = a.data; if (s.reiter === "kosten") zeichnen(ctx, deps); } });
     }
