@@ -88,7 +88,7 @@
     const rechner = RECHNER.map((id) => alle.filter((m) => m.id === id)[0]).filter(Boolean);
     const lagen = rechner.map((m) => (S14.fabrikLage ? S14.fabrikLage(m) : { lage: "wartet", tut: "" }));
     const t = {};
-    ["auftraege", "qualitaet", "wissen", "kosten", "automatik", "steuerung"].forEach((k) => {
+    ["auftraege", "qualitaet", "wissen", "kosten", "automatik", "steuerung", "ressourcen"].forEach((k) => {
       const m = teil("fabrik-" + k);
       t[k] = m ? Object.assign({ _am: m.letzteMeldung, _alt: min(m.letzteMeldung, jetzt) }, m.fabrik || {}) : null;
     });
@@ -105,6 +105,7 @@
       if (l.lage === "stumm") aus.push({ kurz: n + " meldet sich nicht", ursache: "Kein Lebenszeichen seit über 3 Min.", schritt: "Rechner einschalten bzw. aufwecken und Netz prüfen. Nichts wird automatisch neu gestartet." });
       else if (l.lage === "notaus") aus.push({ kurz: n + ": Not-Aus", ursache: "Not-Aus des Schutzes ist aktiv.", schritt: "Ursache im Verlauf prüfen. Der Not-Aus wird nie aus dem Admin gelöst." });
       else if (l.lage === "pause") aus.push({ kurz: n + " wegen Schutz pausiert", ursache: f.pause || l.tut || "Schutzgrenze erreicht", schritt: "Auf dem Rechner Programme schließen bzw. Netzteil prüfen. Der Schutz bleibt aktiv und startet von selbst wieder." });
+      else if (l.lage === "wartet" && f.betrieb === "manuell") return;   // Inhaber will es so (Betrieb Manuell)
       else if (l.lage === "wartet") {
         const grund = f.grund || (f.warteschlange ? "Aufträge warten auf Voraussetzungen" : "keine freigegebene Aufgabe");
         aus.push({ kurz: n + " ohne Aufgabe", ursache: grund, schritt: f.grund ? "Grund beheben oder eine passende neue Aufgabe zuweisen." : "Neue Aufgabe anlegen oder eine Aufgabe aus dem Vorrat freigeben." });
@@ -199,8 +200,9 @@
     if (!o) return "";
     const f = m.fabrik || {};
     const quittiert = (auto && auto.wunschNr && o.nr && auto.wunschNr[KAMEL[k]] === o.nr);
-    const ausgefuehrt = (!o.zustand || o.zustand === f.admin) && (!o.stufe || o.stufe === f.stufe);
-    const was = [o.zustand && ({ laeuft: "Starten", pause: "Pause", stopp: "Stopp" }[o.zustand]), o.stufe && "Stufe " + o.stufe].filter(Boolean).join(", ");
+    const ausgefuehrt = (!o.zustand || o.zustand === f.admin) && (!o.stufe || o.stufe === f.stufe) && (!o.betrieb || o.betrieb === f.betrieb);
+    const was = [o.zustand && ({ laeuft: "Starten", pause: "Pause", stopp: "Stopp" }[o.zustand]), o.stufe && "Stufe " + o.stufe,
+      o.betrieb && "Betrieb " + ({ auto: "Automatisch", manuell: "Manuell" }[o.betrieb] || o.betrieb), o.einmal && "nächste Aufgabe"].filter(Boolean).join(", ");
     let stand;
     if (ausgefuehrt && (quittiert || !o.nr)) stand = pille("ausgeführt", "ok");
     else if (quittiert) stand = pille("angenommen", "acc");
@@ -477,17 +479,79 @@
     return '<div class="tb-daten-huelle"><table class="tb-daten"><thead><tr>' + kopf.map((k) => "<th>" + e(k) + "</th>").join("")
       + "</tr></thead><tbody>" + zeilen.join("") + "</tbody></table></div>";
   }
+  // ------------------------------------------------------------ Ressourcen-Zentrale (Inhaber 04.11.2026)
+  // Alle Rechen-Quellen an einem Ort mit derselben Bedienung: Betrieb (Automatisch/Manuell), Start/Pause/Stopp, Leistung.
+  // Steuerbar sind nur die drei Macs. Cloud, EVREN und Live-Dienst zeigen ehrlich, wer sie steuert und was fehlt
+  // (Meldung fabrik-ressourcen aus ressourcen_meldung.py) – nie ein Knopf, der nichts bewirkt.
+  const RES_TON = { ok: "ok", warn: "warn", bad: "bad", acc: "acc" };
+  function seg(titel, k, attr, werte, aktiv, name) {
+    return '<div class="tb-zeile">' + e(titel) + ': <span class="tb-seg" role="group" aria-label="' + e(titel + " " + name) + '">'
+      + werte.map((w) => '<button type="button" data-frRechner="' + k + '" ' + attr + '="' + w[0] + '" aria-pressed="' + (w[0] === aktiv) + '">'
+        + e(w[1]) + "</button>").join("") + "</span></div>";
+  }
+  function macKarte(m, l, o, offen) {
+    const f = m.fabrik || {};
+    const k = KENNUNG[m.id];
+    const manuell = f.betrieb === "manuell";
+    const lg = manuell && l.lage === "wartet" ? ["Manuell – wartet auf Ihren Start", ""] : LAGE[l.lage] || LAGE.wartet;
+    const angehalten = ["pausiert", "gestoppt"].indexOf(l.lage) >= 0;
+    const erkl = manuell ? "Startet nichts von selbst. Eine neue Aufgabe beginnt erst, wenn Sie „Nächste Aufgabe starten“ drücken."
+      : "Holt sich rund um die Uhr selbst Arbeit und startet nach Schutzpausen von selbst wieder.";
+    const naechste = !manuell || angehalten || l.lage === "rechnet" ? ""
+      : f.einmal ? pille("Start vorgemerkt", "acc", true)
+      : '<button class="tb-knopf primaer" type="button" data-frRechner="' + k + '" data-frEinmal="1">▶ Nächste Aufgabe starten</button>';
+    return '<div class="tb-karte"><div class="tb-karte-kopf"><h3>' + e(NAME[m.id]) + "</h3>" + pille(lg[0], lg[1], true) + "</div>"
+      + '<div class="tb-klein">' + e(f.rolle || "") + " · Kosten: nur Strom</div>"
+      + '<div class="tb-zweck">' + e(l.lage === "rechnet" ? klartext(f.auftrag) : l.lage === "pause" ? (f.pause || l.tut || "") : "") + "</div>"
+      + seg("Betrieb", k, "data-frBetrieb", [["auto", "Automatisch"], ["manuell", "Manuell"]], manuell ? "manuell" : "auto", NAME[m.id])
+      + '<div class="tb-klein">' + e(erkl) + "</div>"
+      + seg("Leistung", k, "data-frStufe", [["leise", "Leise"], ["mittel", "Mittel"], ["vollgas", "Vollgas"]], l.stufe || f.stufe || "vollgas", NAME[m.id])
+      + '<div class="tb-zeile">' + naechste
+      + (angehalten ? '<button class="tb-knopf" type="button" data-frRechner="' + k + '" data-frZustand="laeuft">▶ Starten</button>'
+        : '<button class="tb-knopf" type="button" data-frRechner="' + k + '" data-frZustand="pause">❚❚ Pause</button>')
+      + (l.lage !== "gestoppt" ? '<button class="tb-knopf gefahr" type="button" data-frRechner="' + k + '" data-frZustand="stopp">■ Stopp</button>' : "")
+      + (l.lage === "pause" ? pille("Schutz bleibt aktiv", "warn") : "")
+      + "</div>" + befehlStand(m, offen, o.t.automatik, o.jetzt) + "</div>";
+  }
+  function fremdKarte(x) {
+    return '<div class="tb-karte"><div class="tb-karte-kopf"><h3>' + e(x.name || x.id || "") + "</h3>" + pille(x.status || "nicht erfasst", RES_TON[x.ton] || "", true) + "</div>"
+      + '<ul class="tb-liste"><li>Steuerung: <b>' + e(x.steuerung || "nicht erfasst") + "</b>" + (x.aktiv ? " " + pille("erste Wahl", "laeuft") : "") + "</li>"
+      + "<li>Kontingent: " + e(x.kontingent || "nicht erfasst") + "</li><li>Kosten: <b>" + e(x.kosten || "nicht erfasst") + "</b></li></ul>"
+      + '<div class="tb-klein">' + e(x.nutzen || "") + "</div>"
+      + (x.tun ? '<div class="tb-hinweis warn">👉 <span><b>Ihr Schritt:</b> ' + e(x.tun) + "</span></div>" : "")
+      + (x.id === "zeabur" ? '<div class="tb-zeile"><a class="tb-knopf leise" href="/admin/modelle/">Live-Modelle ansehen →</a></div>' : "") + "</div>";
+  }
+  function ressourcen(o, offen) {
+    const r = o.t.ressourcen;
+    const macs = o.rechner.length ? o.rechner.map((m, i) => macKarte(m, o.lagen[i], o, offen)).join("")
+      : '<div class="tb-karte"><p class="tb-dim">Keine Rechner-Meldung empfangen – nicht erfasst.</p></div>';
+    const fremd = r && Array.isArray(r.liste) && r.liste.length ? r.liste.map(fremdKarte).join("")
+      : '<div class="tb-karte"><p class="tb-dim">Cloud, EVREN und Live-Dienst: noch keine Meldung – nicht erfasst.</p></div>';
+    return '<div class="tb-karte"><div class="tb-karte-kopf"><h2>Alle Ressourcen – zentral steuern</h2><div class="tb-aktionen">'
+      + '<button class="tb-knopf" data-frRechner="alle" data-frBetrieb="auto" type="button">⟳ Alle automatisch</button>'
+      + '<button class="tb-knopf" data-frRechner="alle" data-frStufe="vollgas" type="button">⚡ Alle auf Vollgas</button>'
+      + '<button class="tb-knopf" data-frRechner="alle" data-frZustand="pause" type="button">❚❚ Alle pausieren</button>'
+      + '<button class="tb-knopf gefahr" data-frRechner="alle" data-frZustand="stopp" type="button">■ Not-Aus</button></div></div>'
+      + '<ul class="tb-pruefliste"><li><b>Automatisch:</b>&nbsp;arbeitet rund um die Uhr allein.</li><li><b>Manuell:</b>&nbsp;arbeitet nur auf Ihren Knopfdruck.</li>'
+      + "<li><b>Leistung:</b>&nbsp;Leise, Mittel oder Vollgas.</li><li><b>Pause</b> lässt die laufende Aufgabe fertig werden, <b>Stopp</b> hält sie sofort an – nichts geht verloren.</li></ul>"
+      + '<div class="tb-klein">Der Schutz vor vollem Speicher, Hitze und leerem Akku bleibt immer an. Jede Änderung fragt nach einem kurzen Grund und wirkt nach höchstens einer Minute.'
+      + (r && r.stand ? " Stand Cloud/Partner: " + e(uhr(r.stand)) + "." : "") + "</div>"
+      + '<h3 class="tb-oben">Eigene Rechner – steuerbar</h3><div class="tb-reihe k3 tb-oben">' + macs + "</div>"
+      + '<h3 class="tb-oben">Cloud, Partner und Live-Dienst</h3><div class="tb-reihe k3 tb-oben">' + fremd + "</div></div>";
+  }
+
   function offeneListe(titel, liste, leer, feld) {
     return '<div class="tb-karte"><h2>' + e(titel) + " " + pille(String(liste.length), liste.length ? "warn" : "ok") + "</h2>"
       + (liste.length ? '<ul class="tb-liste">' + liste.map((x) => '<li><span class="tb-punkt warn"></span><span><b>' + e(x.was || "") + "</b>"
         + (x[feld] ? '<div class="tb-klein">' + e(x[feld]) + "</div>" : "") + (x.seit ? '<div class="tb-klein">seit ' + e(tagUhr(x.seit)) + "</div>" : "")
         + "</span></li>").join("") + "</ul>" : '<p class="tb-dim">' + e(leer) + "</p>") + "</div>";
   }
-  function steuerung(o) {
+  function steuerung(o, offen) {
     const s = o.t.steuerung;
-    if (!s) return '<div class="tb-karte"><h2>Steuerung</h2><p class="tb-dim">Noch keine Steuerungsmeldung der Fabrik empfangen – nicht erfasst.</p></div>';
-    const kopf = '<div class="tb-hinweis">ⓘ <span>Stand ' + e(tagUhr(s.stand)) + " · " + altText(s._am || s.stand, o.jetzt, TEIL_ALT_MIN)
-      + ". Nur Anzeige: Starten, Freigeben, Löschen und Live-Schalten geschieht nie über diese Seite.</span></div>";
+    const zentrale = ressourcen(o, offen || {});
+    if (!s) return zentrale + '<div class="tb-karte"><h2>Steuerung</h2><p class="tb-dim">Noch keine Steuerungsmeldung der Fabrik empfangen – nicht erfasst.</p></div>';
+    const kopf = zentrale + '<div class="tb-hinweis">ⓘ <span>Stand ' + e(tagUhr(s.stand)) + " · " + altText(s._am || s.stand, o.jetzt, TEIL_ALT_MIN)
+      + ". Gesteuert wird nur oben unter „Alle Ressourcen“. Freigeben, Löschen und Live-Schalten geschieht nie über diese Seite.</span></div>";
     const r = (s.rechner || []).map((x) => {
       const a = AMPEL[x.ampel] || ["", "unbekannt"];
       return "<tr><td><b>" + e(SNAME[x.id] || x.id) + "</b></td><td>" + pille(a[1], a[0], true) + "</td><td>" + e(ZUSTAND_ST[x.zustand] || x.zustand || "")
@@ -538,7 +602,7 @@
   }
 
   window.adminTrainingAnsicht = {
-    ordnen: ordnen, rahmen: rahmen, uebersicht: uebersicht, steuerung: steuerung, wissen: wissen, qualitaet: qualitaet, verlauf: verlauf, engpaesse: engpaesse,
+    ordnen: ordnen, rahmen: rahmen, uebersicht: uebersicht, steuerung: steuerung, ressourcen: ressourcen, wissen: wissen, qualitaet: qualitaet, verlauf: verlauf, engpaesse: engpaesse,
     helfer: { zahl: zahl, uhr: uhr, tagUhr: tagUhr, dauerText: dauerText, altText: altText, pille: pille, klartext: klartext, min: min,
       NAME: NAME, KENNUNG: KENNUNG, KAMEL: KAMEL, TYP_TEXT: TYP_TEXT, ZUSTAND: ZUSTAND, GATES: GATES, TEIL_ALT_MIN: TEIL_ALT_MIN }
   };

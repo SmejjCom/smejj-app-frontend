@@ -251,7 +251,7 @@
   // ------------------------------------------------------------ Steuerung
   function zeichnen(ctx, deps) {
     const o = T.ordnen(s.d, Date.now());
-    const inhalt = s.reiter === "steuerung" ? T.steuerung(o) : s.reiter === "aufgaben" ? aufgaben(o) : s.reiter === "neu" ? neu(o) : s.reiter === "wissen" ? T.wissen(o, s.rag)
+    const inhalt = s.reiter === "steuerung" ? T.steuerung(o, deps.offen()) : s.reiter === "aufgaben" ? aufgaben(o) : s.reiter === "neu" ? neu(o) : s.reiter === "wissen" ? T.wissen(o, s.rag)
       : s.reiter === "qualitaet" ? T.qualitaet(o) : s.reiter === "kosten" ? kosten(o) : s.reiter === "automatik" ? automatik(o)
         : s.reiter === "verlauf" ? T.verlauf(o, s.liste) : T.uebersicht(o, deps.offen());
     ctx.zeichne(T.rahmen(s.reiter === "neu" ? "aufgaben" : s.reiter, inhalt, o));
@@ -291,7 +291,8 @@
     alle("[data-tbReiter]", (el, ev) => { ev.preventDefault(); reiter(ctx, deps, el.getAttribute("data-tbReiter")); });
     alle("[data-tbNeu]", (el) => { s.bearbeite = null; s.rechnerVorgabe = el.getAttribute("data-tbRechner"); s.reiter = "neu"; zeichnen(ctx, deps); });
     alle("[data-trNeu]", () => deps.neuLaden());
-    alle("[data-frRechner]", (el) => deps.wunsch(el.getAttribute("data-frRechner"), el.getAttribute("data-frZustand"), el.getAttribute("data-frStufe")));
+    alle("[data-frRechner]", (el) => deps.wunsch(el.getAttribute("data-frRechner"), el.getAttribute("data-frZustand"), el.getAttribute("data-frStufe"),
+      el.getAttribute("data-frBetrieb"), el.getAttribute("data-frEinmal") === "1"));
     alle("[data-tbLoesung]", (el) => { const box = document.querySelector("[data-tbLoesungen]"); if (!box) return; box.hidden = !box.hidden; el.setAttribute("aria-expanded", String(!box.hidden)); });
     alle("[data-tbBearbeite]", (el) => { s.bearbeite = el.getAttribute("data-tbBearbeite"); s.reiter = "neu"; zeichnen(ctx, deps); });
     alle("[data-tbZurueck]", async (el) => {

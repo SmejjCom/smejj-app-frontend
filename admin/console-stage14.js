@@ -87,7 +87,7 @@
       const o = offen[k];
       if (!o) return;
       const f = m.fabrik || {};
-      const passt = (!o.zustand || o.zustand === f.admin) && (!o.stufe || o.stufe === f.stufe);
+      const passt = (!o.zustand || o.zustand === f.admin) && (!o.stufe || o.stufe === f.stufe) && (!o.betrieb || o.betrieb === f.betrieb);
       const alter = jetzt - Date.parse(o.am);
       if ((passt && alter > 600000) || alter > 1800000) delete offen[k];
     });
@@ -102,7 +102,7 @@
   // Neuer Bereich „Training & Wissen“ (Inhaber 03.11.2026): eigene Dateien training-ansicht.js,
   // training-planung.js und training.css, hier nachgeladen (index.html steht im Admin-Lock). Laden sie
   // nicht (z. B. Konsole vom Control-Server, dessen Dateiliste fest ist), bleibt die bisherige Ansicht.
-  const TB_FASSUNG = "20261103d";
+  const TB_FASSUNG = "20261104a";
   let tbDateien = null;
   function trainingDateien() {
     if (window.adminTraining) return Promise.resolve(true);
@@ -134,7 +134,7 @@
       await window.adminTraining.laden(ctx, {
         offen: function () { return offen; },
         aufraeumen: offenAufraeumen,
-        wunsch: function (rechner, zustand, stufe) { wunsch(ctx, rechner, zustand, stufe); },
+        wunsch: function (rechner, zustand, stufe, betrieb, einmal) { wunsch(ctx, rechner, zustand, stufe, betrieb, einmal); },
         neuLaden: function () { ladenTraining(ctx); }
       }, still);
       return taktTraining(ctx);
@@ -153,7 +153,8 @@
     });
     document.querySelectorAll("[data-frRechner]").forEach(function (el) {
       el.addEventListener("click", function () {
-        wunsch(ctx, el.getAttribute("data-frRechner"), el.getAttribute("data-frZustand"), el.getAttribute("data-frStufe"));
+        wunsch(ctx, el.getAttribute("data-frRechner"), el.getAttribute("data-frZustand"), el.getAttribute("data-frStufe"),
+          el.getAttribute("data-frBetrieb"), el.getAttribute("data-frEinmal") === "1");
       });
     });
     taktTraining(ctx);
@@ -176,12 +177,15 @@
     stopp: ["Stoppen", "Der laufende Auftrag wird sofort angehalten und bleibt in der Warteschlange. Nichts geht verloren."],
     leise: ["Stufe Leise", "Etwa halbe Leistung: kühler und leiser, gleiches Ergebnis, dauert länger."],
     mittel: ["Stufe Mittel", "Etwa drei Viertel Leistung."],
-    vollgas: ["Stufe Vollgas", "Volle Leistung. Der Schutz (Speicher, Hitze, Akku) bleibt trotzdem an."]
+    vollgas: ["Stufe Vollgas", "Volle Leistung. Der Schutz (Speicher, Hitze, Akku) bleibt trotzdem an."],
+    auto: ["Betrieb Automatisch", "Der Rechner holt sich rund um die Uhr selbst Arbeit und startet nach Schutzpausen von selbst wieder."],
+    manuell: ["Betrieb Manuell", "Der Rechner startet nichts mehr von selbst. Die laufende Aufgabe darf fertig werden. Neue Aufgaben beginnen nur mit „Nächste Aufgabe starten“."],
+    einmal: ["Nächste Aufgabe starten", "Der Rechner startet genau eine Aufgabe aus seiner Warteschlange und wartet danach wieder auf Sie."]
   };
 
   // Training models: Wunsch an einen Rechner (oder alle). Grund ist Pflicht (Audit-Log).
-  async function wunsch(ctx, rechner, zustand, stufe) {
-    const art = WUNSCH_TEXT[zustand || stufe];
+  async function wunsch(ctx, rechner, zustand, stufe, betrieb, einmal) {
+    const art = WUNSCH_TEXT[zustand || stufe || betrieb || (einmal ? "einmal" : "")];
     if (!art) return;
     const grund = await D.text({
       titel: art[0] + " — " + (RECHNER_NAME[rechner] || rechner),
@@ -194,6 +198,8 @@
     const body = { rechner: rechner, reason: grund };
     if (zustand) body.zustand = zustand;
     if (stufe) body.stufe = stufe;
+    if (betrieb) body.betrieb = betrieb;
+    if (einmal) body.einmal = true;
     const antwort = await A.sende("/api/admin/fabrik/wunsch", body);
     if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
     const am = new Date().toISOString();
@@ -203,6 +209,8 @@
       const o = Object.assign({}, offen[k] || {}, { am: am, nr: nr[k] || null });
       if (zustand) o.zustand = zustand;
       if (stufe) o.stufe = stufe;
+      if (betrieb) o.betrieb = betrieb;
+      if (einmal) o.einmal = true;
       offen[k] = o;
     });
     offenSpeichern();
