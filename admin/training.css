@@ -1,0 +1,189 @@
+/* smejj.com Operations Console — Bereich „Training & Wissen“ (Inhaber 03.11.2026).
+   Verbindliche Vorlage: zwei Mockups vom 03.11. (helle Arbeitsfläche, weiße Karten, Indigo als Handlungsfarbe,
+   Blau läuft · Grün bestanden · Gelb prüfen/Schutz · Rot Fehler · Grau wartet). Gilt NUR innerhalb von .tb;
+   die übrige Konsole (dunkel, viereckig) bleibt unberührt. Wird von console-stage14.js nachgeladen. */
+.tb{
+  --tb-bg:#f4f6fb; --tb-card:#ffffff; --tb-line:#e3e7ef; --tb-line2:#cfd6e3;
+  --tb-ink:#0f172a; --tb-dim:#475569; --tb-faint:#64748b;
+  --tb-acc:#4338ca; --tb-acc-soft:#eef0ff; --tb-acc-line:#c7cbfb;
+  --tb-run:#3b6ef5; --tb-run-soft:#e8efff; --tb-ok:#15803d; --tb-ok-soft:#e7f6ec;
+  --tb-warn:#b45309; --tb-warn-soft:#fff6e0; --tb-warn-line:#f6d58a;
+  --tb-bad:#b91c1c; --tb-bad-soft:#fdecec; --tb-bad-line:#f3b4b4; --tb-wait:#94a3b8; --tb-wait-soft:#eef1f5;
+  color-scheme:light;
+  background:var(--tb-bg); color:var(--tb-ink);
+  margin:-8px; padding:22px 26px 28px; min-height:100%;
+  font-size:14.5px; line-height:1.45;
+}
+.tb *{border-radius:0;}
+/* Die Konsole färbt Tabellen, Fett und Überschriften hell für ihren dunklen Grund — hier zurück auf die helle Fläche. */
+.tb td,.tb li,.tb p,.tb b,.tb strong,.tb label,.tb summary,.tb h1,.tb h2,.tb h3{color:inherit;}
+.tb td,.tb th{background:none;text-transform:none;letter-spacing:normal;}
+.tb th{color:var(--tb-dim);} .tb td{color:var(--tb-ink);}
+.tb .r,.tb .tb-karte,.tb .tb-kpi,.tb .tb-knopf,.tb .tb-feld,.tb .tb-chip,.tb .tb-banner,.tb .tb-seg,.tb .tb-vorrat,
+.tb select,.tb input,.tb textarea,.tb .tb-hinweis,.tb .tb-schritt-box{border-radius:10px!important;}
+.tb .tb-pille,.tb .tb-punkt,.tb .tb-nr,.tb .tb-schalter,.tb .tb-schalter i{border-radius:999px!important;}
+.tb .tb-karte{border-radius:14px!important;}
+.tb .tb-seg>*{border-radius:0!important;}
+.tb .tb-seg>*:first-child{border-radius:8px 0 0 8px!important;} .tb .tb-seg>*:last-child{border-radius:0 8px 8px 0!important;}
+.tb a{color:var(--tb-acc);text-decoration:none;font-weight:600;cursor:pointer;}
+.tb a:hover{text-decoration:underline;}
+.tb h1{font-size:32px;line-height:1.1;margin:0;font-weight:800;letter-spacing:-.02em;}
+.tb h2{font-size:20px;margin:0;font-weight:750;letter-spacing:-.01em;}
+.tb h3{font-size:15px;margin:0;font-weight:700;}
+.tb .tb-unter{color:var(--tb-dim);margin-top:4px;font-size:15.5px;}
+.tb .tb-klein{font-size:12.5px;color:var(--tb-faint);}
+.tb .tb-dim{color:var(--tb-dim);}
+.tb .tb-oben{margin-top:12px;} .tb .tb-rechts{margin-left:auto;}
+
+/* Kopf + Reiter */
+.tb-kopf{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+.tb-aktionen{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.tb-knopf{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;font:inherit;font-weight:650;font-size:14.5px;
+  background:#fff;color:var(--tb-ink);border:1px solid var(--tb-line2);cursor:pointer;min-height:40px;white-space:nowrap;}
+.tb-knopf:hover{border-color:var(--tb-acc-line);background:#fafbff;}
+.tb-knopf:focus-visible,.tb select:focus-visible,.tb input:focus-visible,.tb textarea:focus-visible,.tb a:focus-visible{outline:3px solid #a5b4fc;outline-offset:1px;}
+.tb-knopf.primaer{background:var(--tb-acc);border-color:var(--tb-acc);color:#fff;}
+.tb-knopf.primaer:hover{background:#3730a3;}
+.tb-knopf.gefahr{color:var(--tb-bad);border-color:var(--tb-bad-line);background:#fff;}
+.tb-knopf.gefahr:hover{background:var(--tb-bad-soft);}
+.tb-knopf.leise{font-weight:550;font-size:13px;padding:6px 11px;min-height:32px;}
+.tb-knopf[disabled],.tb-knopf.aus{opacity:.5;cursor:not-allowed;background:#f3f4f7;}
+.tb-reiter{display:flex;gap:4px;margin:16px 0 14px;border-bottom:1px solid var(--tb-line);overflow-x:auto;}
+.tb-reiter button{font:inherit;font-size:15.5px;background:none;border:0;padding:9px 16px 11px;color:var(--tb-dim);cursor:pointer;
+  border-bottom:3px solid transparent;white-space:nowrap;}
+.tb-reiter button[aria-selected="true"]{color:var(--tb-acc);border-bottom-color:var(--tb-acc);font-weight:700;}
+.tb-stand{font-size:12.5px;color:var(--tb-faint);margin-left:auto;align-self:center;white-space:nowrap;padding-left:12px;}
+
+/* Banner, Karten, Kennzahlen */
+.tb-banner{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--tb-warn-line);background:var(--tb-warn-soft);
+  margin-bottom:14px;flex-wrap:wrap;}
+.tb-banner.gut{border-color:#b7e2c4;background:var(--tb-ok-soft);}
+.tb-banner.schlecht{border-color:var(--tb-bad-line);background:var(--tb-bad-soft);}
+.tb-banner b{font-weight:750;} .tb-banner .tb-rechts{margin-left:auto;}
+.tb-loesungen{margin:-6px 0 14px;padding:10px 16px;background:#fff;border:1px solid var(--tb-warn-line);border-radius:10px!important;}
+.tb-loesungen li{margin:6px 0;}
+.tb-karte{background:var(--tb-card);border:1px solid var(--tb-line);padding:16px 18px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+.tb-karte+.tb-karte,.tb-reihe+.tb-karte,.tb-karte+.tb-reihe,.tb-reihe+.tb-reihe{margin-top:14px;}
+.tb-karte-kopf{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px;}
+.tb-reihe{display:grid;gap:14px;}
+.tb-reihe>*{min-width:0;}   /* sonst drücken breite Tabellen die Spalte über den Rand */
+.tb-reihe.k4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.tb-reihe.k3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.tb-reihe.k2{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);}
+.tb-kpi{background:#fff;border:1px solid var(--tb-line);padding:14px 16px;display:flex;gap:12px;}
+.tb-kpi .tb-sym{flex:none;width:28px;height:28px;color:var(--tb-dim);}
+.tb-kpi .k{font-weight:650;color:var(--tb-dim);}
+.tb-kpi .v{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:2px 0;}
+.tb-kpi .d{font-size:13px;color:var(--tb-faint);}
+
+/* Pillen, Punkte, Legenden */
+.tb-pille{display:inline-flex;align-items:center;gap:6px;padding:3px 11px;font-size:13px;font-weight:650;background:var(--tb-wait-soft);color:#334155;white-space:nowrap;}
+.tb-pille.laeuft{background:var(--tb-run-soft);color:#1d4ed8;} .tb-pille.ok{background:var(--tb-ok-soft);color:var(--tb-ok);}
+.tb-pille.warn{background:var(--tb-warn-soft);color:var(--tb-warn);} .tb-pille.bad{background:var(--tb-bad-soft);color:var(--tb-bad);}
+.tb-pille.acc{background:var(--tb-acc-soft);color:var(--tb-acc);}
+.tb-punkt{display:inline-block;width:9px;height:9px;background:var(--tb-wait);flex:none;}
+.tb-punkt.laeuft{background:var(--tb-run);} .tb-punkt.ok{background:#22a35a;} .tb-punkt.warn{background:#f2b01e;} .tb-punkt.bad{background:#e0453a;}
+.tb-legende{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--tb-dim);align-items:center;}
+.tb-legende span{display:inline-flex;align-items:center;gap:6px;}
+.tb-fuss{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:14px;padding:10px 4px;font-size:13px;color:var(--tb-dim);}
+
+/* Rechner-Tabelle */
+.tb-tabelle{width:100%;border-collapse:collapse;}
+.tb-tabelle th{font-size:13px;text-align:left;font-weight:700;color:var(--tb-dim);padding:8px 10px;border-bottom:1px solid var(--tb-line);}
+.tb-tabelle td{padding:12px 10px;border-bottom:1px solid var(--tb-line);vertical-align:top;}
+.tb-tabelle tr:last-child td{border-bottom:0;}
+.tb-rechner{display:flex;gap:10px;align-items:center;font-weight:750;font-size:15.5px;white-space:nowrap;}
+.tb-rechner svg{width:26px;height:26px;flex:none;}
+.tb-zweck{font-size:13px;color:var(--tb-dim);margin-top:5px;max-width:260px;}
+.tb-prozent{font-size:20px;font-weight:800;}
+.tb-balken{height:8px;background:var(--tb-wait-soft);margin:6px 0 4px;overflow:hidden;border-radius:999px!important;}
+.tb-balken svg,.tb-zeit svg{display:block;}
+.tb-zeit .tb-ticks{display:flex;justify-content:space-between;font-size:11.5px;color:var(--tb-faint);}
+.tb-vorrat{background:var(--tb-wait-soft);padding:6px 10px;font-size:13px;min-width:92px;}
+.tb-vorrat b{display:block;font-size:14.5px;}
+.tb-metrik{font-size:13px;color:var(--tb-dim);}
+.tb-metrik .tb-zeile{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px;}
+.tb-seg{display:inline-flex;border:1px solid var(--tb-line2);overflow:hidden;}
+.tb-seg button{font:inherit;font-size:13px;border:0;border-right:1px solid var(--tb-line2);background:#fff;padding:5px 11px;cursor:pointer;color:var(--tb-ink);}
+.tb-seg button:last-child{border-right:0;}
+.tb-seg button[aria-pressed="true"]{background:var(--tb-acc-soft);color:var(--tb-acc);font-weight:700;}
+.tb-befehl{font-size:12.5px;margin-top:4px;}
+.tb-veraltet{background:var(--tb-warn-soft);color:var(--tb-warn);font-size:12px;font-weight:650;padding:2px 8px;border-radius:6px!important;white-space:nowrap;}
+
+/* Fluss */
+.tb-fluss{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.tb-fluss .tb-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--tb-line);background:#fff;font-weight:650;}
+.tb-fluss .tb-chip b{font-size:16px;}
+.tb-chip.laeuft{background:var(--tb-run-soft);border-color:#bcd0ff;} .tb-chip.ok{background:var(--tb-ok-soft);border-color:#b7e2c4;}
+.tb-chip.warn{background:var(--tb-warn-soft);border-color:var(--tb-warn-line);} .tb-chip.bad{background:var(--tb-bad-soft);border-color:var(--tb-bad-line);}
+.tb-pfeil{color:var(--tb-faint);}
+
+/* Modelle, Gates, Kette */
+.tb-liste{list-style:none;margin:0;padding:0;}
+.tb-liste>li{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--tb-line);flex-wrap:wrap;}
+.tb-liste>li:last-child{border-bottom:0;}
+.tb-gates{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;}
+.tb-nr{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;font-weight:750;font-size:13.5px;
+  background:var(--tb-wait-soft);color:#475569;border:1px solid var(--tb-line2);}
+.tb-nr.ok{background:#22a35a;color:#fff;border-color:#22a35a;} .tb-nr.bad{background:#e0453a;color:#fff;border-color:#e0453a;}
+.tb-kette{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;}
+.tb-kette .tb-schritt-box{flex:1;min-width:92px;border:1px solid var(--tb-line);background:#f8f9fc;padding:8px 10px;text-align:center;font-size:13px;}
+.tb-kette .tb-schritt-box b{display:block;font-size:16px;}
+.tb-schalter{display:inline-block;width:40px;height:22px;background:#cbd2dd;position:relative;flex:none;}
+.tb-schalter i{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;}
+.tb-schalter.an{background:var(--tb-acc);} .tb-schalter.an i{left:21px;}
+.tb-hinweis{padding:9px 12px;background:#f3f5f9;color:var(--tb-dim);font-size:13px;margin-top:10px;display:flex;gap:8px;align-items:flex-start;}
+.tb-hinweis.warn{background:var(--tb-warn-soft);color:#7c4a03;}
+
+/* Daten-Tabellen */
+.tb-daten{width:100%;border-collapse:collapse;font-size:13.5px;}
+.tb-daten th{text-align:left;color:var(--tb-dim);font-weight:700;padding:7px 8px;border-bottom:1px solid var(--tb-line);white-space:nowrap;}
+.tb-daten td{padding:8px;border-bottom:1px solid var(--tb-line);vertical-align:top;}
+.tb-daten td.z{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.tb-daten-huelle{overflow-x:auto;max-width:100%;}
+.tb-vergleich{display:grid;grid-template-columns:120px 1fr 54px;gap:4px 10px;align-items:center;font-size:13px;}
+
+/* Formular (Neue Aufgabe) */
+.tb-schritte{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 14px;}
+.tb-schritte span{display:inline-flex;gap:8px;align-items:center;font-weight:650;color:var(--tb-dim);}
+.tb-schritte .tb-nr.an{background:var(--tb-acc);color:#fff;border-color:var(--tb-acc);}
+.tb-form h2{font-size:18px;margin-bottom:12px;}
+.tb-feldreihe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px;}
+.tb-feldreihe.zwei{grid-template-columns:repeat(2,minmax(0,1fr));}
+.tb-form label{display:block;font-weight:700;font-size:13.5px;margin-bottom:5px;}
+.tb select,.tb input[type=text],.tb input[type=number],.tb input[type=datetime-local],.tb textarea{
+  width:100%;font:inherit;font-size:14.5px;padding:8px 11px;border:1px solid var(--tb-line2);background:#fff;color:var(--tb-ink);min-height:40px;}
+.tb textarea{min-height:64px;resize:vertical;}
+.tb-typen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px;}
+.tb-typen button{font:inherit;font-weight:650;padding:9px;border:1px solid var(--tb-line2);background:#fff;cursor:pointer;border-radius:10px!important;}
+.tb-typen button[aria-pressed="true"]{background:var(--tb-acc);color:#fff;border-color:var(--tb-acc);}
+.tb-pruefliste{list-style:none;margin:0;padding:0;font-size:14px;}
+.tb-pruefliste li{display:flex;gap:9px;align-items:flex-start;padding:4px 0;}
+.tb-pruefliste .ja{color:var(--tb-ok);font-weight:800;} .tb-pruefliste .nein{color:var(--tb-bad);font-weight:800;} .tb-pruefliste .offen{color:var(--tb-warn);font-weight:800;}
+.tb-radio{display:flex;gap:10px;flex-wrap:wrap;}
+.tb-radio label{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid var(--tb-line2);font-weight:600;cursor:pointer;background:#fff;border-radius:8px!important;}
+.tb-radio label.an{border-color:var(--tb-acc);background:var(--tb-acc-soft);color:var(--tb-acc);}
+.tb-radio input{accent-color:var(--tb-acc);}
+.tb details summary{cursor:pointer;font-weight:700;padding:4px 0;}
+.tb-fussleiste{display:flex;gap:12px;align-items:center;justify-content:flex-end;flex-wrap:wrap;}
+
+/* Tablet + Handy */
+@media (max-width:1280px){.tb-reihe.k4{grid-template-columns:repeat(2,minmax(0,1fr));}.tb-reihe.k3{grid-template-columns:1fr 1fr;}}
+@media (max-width:1100px){
+  .tb-reihe.k2{grid-template-columns:1fr;}
+  .tb-tabelle thead{display:none;}
+  .tb-tabelle,.tb-tabelle tbody,.tb-tabelle tr,.tb-tabelle td{display:block;width:100%;}
+  .tb-tabelle tr{border:1px solid var(--tb-line);border-radius:12px!important;margin-bottom:12px;padding:6px 4px;}
+  .tb-tabelle td{border-bottom:0;padding:7px 10px;}
+  .tb-tabelle td[data-k]::before{content:attr(data-k);display:block;font-size:12px;font-weight:700;color:var(--tb-faint);margin-bottom:3px;}
+}
+@media (max-width:760px){
+  .tb{padding:16px 16px 22px;margin:-8px -8px;}
+  .tb h1{font-size:26px;}
+  .tb-reihe.k4,.tb-reihe.k3{grid-template-columns:1fr;}
+  .tb-feldreihe,.tb-feldreihe.zwei,.tb-typen{grid-template-columns:1fr;}
+  .tb-aktionen{width:100%;} .tb-aktionen .tb-knopf{flex:1 1 auto;justify-content:center;}
+  .tb-vergleich{grid-template-columns:90px 1fr 46px;}
+  .tb-daten-huelle{overflow-x:auto;}
+  .tb-stand{margin-left:0;padding-left:0;}
+}

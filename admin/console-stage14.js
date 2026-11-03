@@ -99,7 +99,46 @@
     trTakt = null;
   }
 
+  // Neuer Bereich „Training & Wissen“ (Inhaber 03.11.2026): eigene Dateien training-ansicht.js,
+  // training-planung.js und training.css, hier nachgeladen (index.html steht im Admin-Lock). Laden sie
+  // nicht (z. B. Konsole vom Control-Server, dessen Dateiliste fest ist), bleibt die bisherige Ansicht.
+  const TB_FASSUNG = "20261103";
+  let tbDateien = null;
+  function trainingDateien() {
+    if (window.adminTraining) return Promise.resolve(true);
+    if (typeof document === "undefined" || !document.head || typeof document.createElement !== "function") return Promise.resolve(false);
+    if (tbDateien) return tbDateien;
+    tbDateien = new Promise(function (fertig) {
+      if (!document.querySelector("link[data-tbCss]")) {
+        const l = document.createElement("link");
+        l.rel = "stylesheet";
+        l.href = "/admin/training.css?v=" + TB_FASSUNG;
+        l.setAttribute("data-tbCss", "");
+        document.head.appendChild(l);
+      }
+      const reihe = ["/admin/training-ansicht.js?v=" + TB_FASSUNG, "/admin/training-planung.js?v=" + TB_FASSUNG];
+      (function naechste(i) {
+        if (i >= reihe.length) return fertig(!!window.adminTraining);
+        const sc = document.createElement("script");
+        sc.src = reihe[i];
+        sc.onload = function () { naechste(i + 1); };
+        sc.onerror = function () { fertig(false); };
+        document.head.appendChild(sc);
+      })(0);
+    });
+    return tbDateien;
+  }
+
   async function ladenTraining(ctx, still) {
+    if (await trainingDateien()) {
+      await window.adminTraining.laden(ctx, {
+        offen: function () { return offen; },
+        aufraeumen: offenAufraeumen,
+        wunsch: function (rechner, zustand, stufe) { wunsch(ctx, rechner, zustand, stufe); },
+        neuLaden: function () { ladenTraining(ctx); }
+      }, still);
+      return taktTraining(ctx);
+    }
     const antwort = await A.hole("/api/admin/ops/modellbestand");
     if (!antwort.ok) {
       trTaktStoppen();
@@ -117,6 +156,10 @@
         wunsch(ctx, el.getAttribute("data-frRechner"), el.getAttribute("data-frZustand"), el.getAttribute("data-frStufe"));
       });
     });
+    taktTraining(ctx);
+  }
+
+  function taktTraining(ctx) {
     if (typeof setInterval !== "function") return;
     trTaktStoppen();
     trTakt = setInterval(function () {
@@ -154,8 +197,10 @@
     const antwort = await A.sende("/api/admin/fabrik/wunsch", body);
     if (!antwort.ok) return ctx.meldung(antwort.fehler, true);
     const am = new Date().toISOString();
+    const nr = {};   // Server-Nummer je Rechner: daran erkennt die Seite „angenommen“
+    ((antwort.data && antwort.data.wuensche) || []).forEach(function (w) { if (w && w.nr) nr[w.rechner] = w.nr; });
     (rechner === "alle" ? ["macbook-pro", "macbook-air", "imac"] : [rechner]).forEach(function (k) {
-      const o = Object.assign({}, offen[k] || {}, { am: am });
+      const o = Object.assign({}, offen[k] || {}, { am: am, nr: nr[k] || null });
       if (zustand) o.zustand = zustand;
       if (stufe) o.stufe = stufe;
       offen[k] = o;
