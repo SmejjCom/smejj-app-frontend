@@ -88,7 +88,7 @@
     const rechner = RECHNER.map((id) => alle.filter((m) => m.id === id)[0]).filter(Boolean);
     const lagen = rechner.map((m) => (S14.fabrikLage ? S14.fabrikLage(m) : { lage: "wartet", tut: "" }));
     const t = {};
-    ["auftraege", "qualitaet", "wissen", "kosten", "automatik"].forEach((k) => {
+    ["auftraege", "qualitaet", "wissen", "kosten", "automatik", "steuerung"].forEach((k) => {
       const m = teil("fabrik-" + k);
       t[k] = m ? Object.assign({ _am: m.letzteMeldung, _alt: min(m.letzteMeldung, jetzt) }, m.fabrik || {}) : null;
     });
@@ -116,7 +116,7 @@
   }
 
   // ------------------------------------------------------------ Rahmen
-  const REITER = [["uebersicht", "Übersicht"], ["aufgaben", "Aufgaben"], ["wissen", "Wissen"], ["qualitaet", "Qualität"],
+  const REITER = [["uebersicht", "Übersicht"], ["steuerung", "Steuerung"], ["aufgaben", "Aufgaben"], ["wissen", "Wissen"], ["qualitaet", "Qualität"],
     ["kosten", "Kosten"], ["automatik", "Automatik"], ["verlauf", "Verlauf"]];
 
   function rahmen(aktiv, inhalt, o) {
@@ -339,7 +339,11 @@
         + '<div class="tb-loesungen" data-tbLoesungen hidden><ul>' + eng.map((x) => "<li><b>" + e(x.kurz) + ":</b> " + e(x.ursache)
           + "<br><span class=\"tb-dim\">Nächster sicherer Schritt: " + e(x.schritt) + "</span></li>").join("") + "</ul></div>"
       : '<div class="tb-banner gut">✔ <span><b>Kein Engpass:</b> alle Rechner arbeiten oder sind gewollt angehalten.</span></div>';
-    return banner + kennzahlen(o) + rechnerBlock(o, offen) + fluss(o)
+    const st = o.t.steuerung;
+    const dich = st && st.wartetInhaber && st.wartetInhaber.length
+      ? '<div class="tb-banner">' + SYM.warn + "<span><b>Wartet auf dich (" + st.wartetInhaber.length + "):</b> " + e(st.wartetInhaber.map((x) => x.was).join(" · "))
+        + '</span><a class="tb-rechts" data-tbReiter="steuerung">Steuerung ansehen →</a></div>' : "";
+    return banner + dich + kennzahlen(o) + rechnerBlock(o, offen) + fluss(o)
       + '<div class="tb-reihe k3">' + modelleKarte(o) + wissenKarte(o) + automatikKarte(o) + "</div>"
       + '<div class="tb-fuss"><span class="tb-legende"><span><i class="tb-punkt laeuft"></i>Blau läuft</span><span><i class="tb-punkt ok"></i>Grün bestanden</span>'
       + '<span><i class="tb-punkt warn"></i>Gelb prüfen</span><span><i class="tb-punkt bad"></i>Rot Fehler</span><span><i class="tb-punkt"></i>Grau wartet</span></span>'
@@ -455,8 +459,85 @@
       + (auftraege && auftraege.length ? " · " + zahl(auftraege.length) + " Aufträge gespeichert" : "") + ".</div></div></div>";
   }
 
+  // ------------------------------------------------------------ Steuerung (Inhaber 03.11.2026 „Ja, umsetzen“)
+  // Quelle: Meldung fabrik-steuerung (steuerung098.py). Nur Anzeige: Starten, Freigeben und Löschen geschieht nie hier.
+  const AMPEL = { gruen: ["ok", "Läuft"], gelb: ["warn", "Wartet"], rot: ["bad", "Gestoppt"], grau: ["", "Angehalten"] };
+  const ZUSTAND_ST = { laeuft: "rechnet", leer: "ohne startbare Aufgabe", schutzpause: "Schutzpause", notaus: "Not-Aus",
+    stumm: "meldet sich nicht", angehalten: "vom Inhaber angehalten" };
+  const RICHTUNG_ST = { offen: ["laeuft", "offen"], ungenutzt: ["", "noch ungenutzt"], analysehalt: ["warn", "Analysehalt"], erschoepft: ["bad", "erschöpft"] };
+  const BEDARF_ST = { OVERDUE: ["bad", "Frist verpasst"], OVERDUE_ACKNOWLEDGED: ["warn", "spät übernommen"], ACKNOWLEDGED: ["laeuft", "übernommen"],
+    BLOCKED_CONTENT: ["warn", "blockiert: kein freigegebener Inhalt"], BLOCKED_PROTECTION: ["warn", "blockiert: Schutzpause"],
+    PENDING_VERIFICATION: ["laeuft", "umgesetzt, wird geprüft"], OPEN: ["warn", "offen"] };
+  const QUARTAL_BEGINN = ["2026-11-01", "2027-02-01", "2027-05-01", "2027-08-01", "2027-11-01", "2028-01-01"];
+  const SNAME = { macbookPro: "MacBook Pro", macbookAir: "MacBook Air", imac: "iMac" };
+  const prozent = (x) => (typeof x === "number" && isFinite(x) ? zahl(x * 100, 1) + " %" : "—");
+  const zelle = (x) => (x === null || x === undefined || x === "" ? '<span class="tb-dim">nicht erfasst</span>' : e(String(x)));
+  function tabelle(kopf, zeilen) {
+    return '<div class="tb-daten-huelle"><table class="tb-daten"><thead><tr>' + kopf.map((k) => "<th>" + e(k) + "</th>").join("")
+      + "</tr></thead><tbody>" + zeilen.join("") + "</tbody></table></div>";
+  }
+  function offeneListe(titel, liste, leer, feld) {
+    return '<div class="tb-karte"><h2>' + e(titel) + " " + pille(String(liste.length), liste.length ? "warn" : "ok") + "</h2>"
+      + (liste.length ? '<ul class="tb-liste">' + liste.map((x) => '<li><span class="tb-punkt warn"></span><span><b>' + e(x.was || "") + "</b>"
+        + (x[feld] ? '<div class="tb-klein">' + e(x[feld]) + "</div>" : "") + (x.seit ? '<div class="tb-klein">seit ' + e(tagUhr(x.seit)) + "</div>" : "")
+        + "</span></li>").join("") + "</ul>" : '<p class="tb-dim">' + e(leer) + "</p>") + "</div>";
+  }
+  function steuerung(o) {
+    const s = o.t.steuerung;
+    if (!s) return '<div class="tb-karte"><h2>Steuerung</h2><p class="tb-dim">Noch keine Steuerungsmeldung der Fabrik empfangen – nicht erfasst.</p></div>';
+    const kopf = '<div class="tb-hinweis">ⓘ <span>Stand ' + e(tagUhr(s.stand)) + " · " + altText(s._am || s.stand, o.jetzt, TEIL_ALT_MIN)
+      + ". Nur Anzeige: Starten, Freigeben, Löschen und Live-Schalten geschieht nie über diese Seite.</span></div>";
+    const r = (s.rechner || []).map((x) => {
+      const a = AMPEL[x.ampel] || ["", "unbekannt"];
+      return "<tr><td><b>" + e(SNAME[x.id] || x.id) + "</b></td><td>" + pille(a[1], a[0], true) + "</td><td>" + e(ZUSTAND_ST[x.zustand] || x.zustand || "")
+        + '<div class="tb-klein">' + e(x.grund || "") + "</div></td><td>" + zelle(x.aktiv) + '</td><td class="z">'
+        + (typeof x.startbarStd === "number" ? zahl(x.startbarStd, 1) + " Std." : zelle(null)) + ' <span class="tb-klein">Ziel ' + VORRAT_ZIEL + "</span></td>"
+        + '<td class="z">' + (typeof x.angehalten === "number" ? zahl(x.angehalten) + " (nicht startbar)" : zelle(null)) + "</td></tr>";
+    });
+    const rechnerKarte = '<div class="tb-karte"><h2>Rechner – Ampel und Grund</h2>' + tabelle(["Rechner", "Ampel", "Zustand / Grund", "Arbeitet an",
+      "Vorrat startbar", "Angehalten"], r) + '<div class="tb-klein">Grün läuft · Gelb wartet auf Freigabe oder Vorrat · Rot Schutzpause/Not-Aus/stumm · Grau gewollt angehalten. Angehaltene Aufträge zählen nicht als Vorrat.</div></div>';
+    const richt = (s.richtungen || []).map((t) => {
+      const [id, v, f, l, st] = String(t).split("|");
+      const z = RICHTUNG_ST[st] || ["", st || ""];
+      return "<tr><td>" + e(klartext(id)) + '</td><td class="z">' + e(v || "") + '</td><td class="z">' + e((f || "") + " von " + (l || "5")) + "</td><td>" + pille(z[1], z[0], true) + "</td></tr>";
+    });
+    const richtKarte = '<div class="tb-karte"><h2>Richtungen – Fehlversuche (Grenze je Richtung)</h2>'
+      + (richt.length ? tabelle(["Richtung", "Versuche", "Fehlversuche", "Status"], richt) : '<p class="tb-dim">nicht erfasst</p>')
+      + '<div class="tb-klein">Gleiche Zählung wie die Startprüfung. Erschöpfte Richtungen starten nie wieder, auch nicht unter neuem Namen.</div></div>';
+    const erg = (s.ergebnisse || []).map((x) => "<tr><td>" + e(klartext(x.name)) + "</td><td>" + e(tagUhr(x.ende)) + '</td><td class="z">' + prozent(x.kern)
+      + '</td><td class="z">' + prozent(x.breite) + '</td><td class="z">' + prozent(x.rag) + "</td></tr>");
+    const ergKarte = '<div class="tb-karte"><h2>Letzte Prüfergebnisse</h2>' + (erg.length ? tabelle(["Prüfung", "Ende", "Kern", "Breite", "RAG"], erg)
+      : '<p class="tb-dim">nicht erfasst</p>') + '<div class="tb-klein">Prüfung bestanden ≠ live. Live geht ein Modell nur über das Live-Tor mit allen 6 Pflichtprüfungen.</div></div>';
+    const sp = s.speicher || {};
+    const spTon = typeof sp.freiGiB !== "number" ? "" : sp.freiGiB < sp.pauseUnterGiB ? "bad" : sp.freiGiB < sp.warnungUnterGiB ? "warn" : "ok";
+    const spKarte = '<div class="tb-karte"><h2>Speicher MacBook Pro ' + pille(typeof sp.freiGiB === "number" ? zahl(sp.freiGiB, 1) + " GiB frei" : "nicht erfasst", spTon, true) + "</h2>"
+      + '<ul class="tb-liste"><li>Fabrik pausiert unter <b>' + zahl(sp.pauseUnterGiB) + " GiB</b>, Warnung unter " + zahl(sp.warnungUnterGiB) + " GiB</li>"
+      + "<li>Verbrauch: " + (typeof sp.verbrauchGiBTag === "number" ? "<b>" + zahl(sp.verbrauchGiBTag, 1) + " GiB/Tag</b>" : '<span class="tb-dim">noch nicht erfasst (Messpunkte stündlich, ab 6 Std.)</span>') + "</li>"
+      + "<li>Pause erreicht in: " + (typeof sp.pauseInTagen === "number" ? "<b>ca. " + zahl(sp.pauseInTagen, 1) + " Tagen</b>" : '<span class="tb-dim">nicht berechenbar</span>') + "</li></ul>"
+      + '<div class="tb-klein">Gelöscht wird nur mit schriftlicher Freigabe des Inhabers.</div></div>';
+    const w = s.wache || {};
+    const tm = min(w.taktLetzter, o.jetzt);
+    const bed = (w.bedarf || []).map((b) => { const z = BEDARF_ST[b.status] || ["", b.status || ""];
+      return "<tr><td>" + e(b.rechner === "imac" ? "iMac" : b.rechner === "air" ? "MacBook Air" : b.rechner) + "</td><td>" + pille(z[1], z[0], true) + "</td><td>" + e(tagUhr(b.erkannt))
+        + "</td><td>" + e(tagUhr(b.frist)) + "</td><td>" + zelle(b.zustaendig) + "</td></tr>"; });
+    const wacheKarte = '<div class="tb-karte"><h2>33-Minuten-Wache ' + pille(tm === null ? "Takt nicht erfasst" : tm <= 10 ? "Takt aktiv" : "Takt still", tm === null ? "" : tm <= 10 ? "ok" : "bad", true) + "</h2>"
+      + '<div class="tb-klein">Letzter Takt ' + e(tagUhr(w.taktLetzter)) + " · Takt alle " + zahl(w.taktMin) + " Min. · Wächter alle " + zahl(w.waechterMin) + " Min. · Kontrolle alle "
+      + zahl(w.kontrolleMin) + " Min. · Reaktion spätestens nach " + zahl(w.reaktionMin) + " Min.</div>"
+      + (bed.length ? tabelle(["Rechner", "Nachschub-Meldung", "Erkannt", "Frist", "Zuständig"], bed) : '<p class="tb-dim">Kein offener Nachschub-Bedarf.</p>') + "</div>";
+    const heute = new Date(o.jetzt).toISOString().slice(0, 10);
+    const qi = QUARTAL_BEGINN.findIndex((b, i) => heute >= b && heute < (QUARTAL_BEGINN[i + 1] || "9999"));
+    const pl = (s.plan && s.plan.quartale) || [];
+    const planKarte = '<div class="tb-karte"><h2>Plan bis 31.12.2027</h2>'
+      + (pl.length ? tabelle(["Quartal", "Zeitraum", "Schwerpunkt", "Messbares Ziel"], pl.map((q, i) => "<tr><td>" + (i === qi ? pille(q.q + " jetzt", "laeuft", true) : e(q.q)) + "</td><td>"
+        + e(q.zeit || "") + "</td><td>" + e(q.inhalt || "") + "</td><td>" + e(q.ziel || "") + "</td></tr>")) : '<p class="tb-dim">nicht erfasst</p>')
+      + '<div class="tb-klein">Quelle: Jahresplan der Fabrik. Neue Richtungen nur mit Daten-, Lizenz-, Trennungs- und Prüfbelegen und unabhängiger Abnahme.</div></div>';
+    return kopf + rechnerKarte + '<div class="tb-reihe k2">' + offeneListe("Wartet auf dich", s.wartetInhaber || [], "Nichts offen – keine Handlung nötig.", "warum")
+      + offeneListe("Wartet auf Codex (Abnahme)", s.wartetCodex || [], "Keine offene Abnahme.", "beleg") + "</div>"
+      + richtKarte + ergKarte + '<div class="tb-reihe k2">' + spKarte + wacheKarte + "</div>" + planKarte;
+  }
+
   window.adminTrainingAnsicht = {
-    ordnen: ordnen, rahmen: rahmen, uebersicht: uebersicht, wissen: wissen, qualitaet: qualitaet, verlauf: verlauf, engpaesse: engpaesse,
+    ordnen: ordnen, rahmen: rahmen, uebersicht: uebersicht, steuerung: steuerung, wissen: wissen, qualitaet: qualitaet, verlauf: verlauf, engpaesse: engpaesse,
     helfer: { zahl: zahl, uhr: uhr, tagUhr: tagUhr, dauerText: dauerText, altText: altText, pille: pille, klartext: klartext, min: min,
       NAME: NAME, KENNUNG: KENNUNG, KAMEL: KAMEL, TYP_TEXT: TYP_TEXT, ZUSTAND: ZUSTAND, GATES: GATES, TEIL_ALT_MIN: TEIL_ALT_MIN }
   };
