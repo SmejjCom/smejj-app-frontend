@@ -16,7 +16,7 @@
   const pille = H.pille;
   const zahl = H.zahl;
 
-  const REITER_SCHLUESSEL = "smejj.admin.training.reiter";
+  const REITER_SCHLUESSEL = "smejj.admin.training.reiter.v2";   // v2 (04.11.): nach dem Leitstand-Umbau öffnet jeder einmal den Leitstand, statt der alten gemerkten Ansicht
   const ENTWURF_SCHLUESSEL = "smejj.admin.training.entwurf";
   const TYPEN = [["wissen", "Wissen sammeln"], ["daten", "Daten prüfen"], ["training", "Modell trainieren"], ["qualitaet", "Qualität testen"]];
   const MODELLE = ["smejj 1.0 (Qwen3-4B-Instruct-2507)", "Qwen3.5-4B", "Qwen3.5-9B", "Qwen3.5-0.8B (nur Vortest)"];
