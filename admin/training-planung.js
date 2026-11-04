@@ -37,8 +37,8 @@
   };
   const ZUSTAND_TON = { gesendet: "", angenommen: "acc", freigegeben: "acc", "in-arbeit": "laeuft", ausgefuehrt: "ok", erledigt: "ok", abgelehnt: "bad", zurueckgezogen: "", fehlgeschlagen: "bad" };
 
-  const s = { reiter: "uebersicht", rag: null, d: null, liste: null, listeOk: false, einst: null, kosten: null, bearbeite: null, rechnerVorgabe: null };
-  try { s.reiter = sessionStorage.getItem(REITER_SCHLUESSEL) || "uebersicht"; } catch (_) { /* nur Bequemlichkeit */ }
+  const s = { reiter: "ressourcen", rag: null, d: null, liste: null, listeOk: false, einst: null, kosten: null, bearbeite: null, rechnerVorgabe: null };
+  try { s.reiter = sessionStorage.getItem(REITER_SCHLUESSEL) || "ressourcen"; } catch (_) { /* nur Bequemlichkeit */ }
   if (s.reiter === "neu") s.reiter = "aufgaben";
 
   const fehlerText = (a) => FEHLER[(a.data || {}).error] || a.fehler || "Fehlgeschlagen.";

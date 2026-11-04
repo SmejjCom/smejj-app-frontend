@@ -102,7 +102,7 @@
   // Neuer Bereich „Training & Wissen“ (Inhaber 03.11.2026): eigene Dateien training-ansicht.js,
   // training-planung.js und training.css, hier nachgeladen (index.html steht im Admin-Lock). Laden sie
   // nicht (z. B. Konsole vom Control-Server, dessen Dateiliste fest ist), bleibt die bisherige Ansicht.
-  const TB_FASSUNG = "20261104d";
+  const TB_FASSUNG = "20261104e";
   let tbDateien = null;
   function trainingDateien() {
     if (window.adminTraining) return Promise.resolve(true);
@@ -116,7 +116,7 @@
         l.setAttribute("data-tbCss", "");
         document.head.appendChild(l);
       }
-      const reihe = ["/admin/training-ansicht.js?v=" + TB_FASSUNG, "/admin/training-planung.js?v=" + TB_FASSUNG];
+      const reihe = ["/admin/training-ansicht.js?v=" + TB_FASSUNG, "/admin/training-leitstand.js?v=" + TB_FASSUNG, "/admin/training-planung.js?v=" + TB_FASSUNG];
       (function naechste(i) {
         if (i >= reihe.length) return fertig(!!window.adminTraining);
         const sc = document.createElement("script");

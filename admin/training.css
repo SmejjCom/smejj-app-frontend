@@ -209,3 +209,68 @@
   .tb .tb-blick td[data-k="Ressource"]{display:block;text-align:left;padding-top:8px;}
   .tb .tb-blick td[data-k="Ressource"]::before{display:none;}
 }
+
+/* Leitstand (Inhaber 04.11.2026 „Ja, so bauen“): eine Kachel je Maschine – Ampel, Symbol, große Knöpfe. Farbe nie allein: immer Text dabei. */
+.tb .lt{--lt-gruen:#15803d;--lt-gruen-soft:#e7f6ec;--lt-gelb:#b45309;--lt-gelb-soft:#fff6e0;--lt-rot:#b91c1c;--lt-rot-soft:#fdecec;--lt-grau:#64748b;--lt-grau-soft:#eef1f5;}
+.tb .lt-leiste{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.tb .lt-titel{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;}
+.tb .lt-titel svg{width:30px;height:30px;color:var(--tb-acc);}
+.tb .lt-zahlen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+.tb .lt-zahl{background:var(--tb-card);border:1px solid var(--tb-line);padding:12px 14px;border-radius:12px!important;}
+.tb .lt-zahl span{display:block;font-size:13px;color:var(--tb-dim);}
+.tb .lt-zahl b{display:block;font-size:26px;line-height:1.2;}
+.tb .lt-zahl.gruen b{color:var(--lt-gruen);} .tb .lt-zahl.gelb b{color:var(--lt-gelb);} .tb .lt-zahl.rot b{color:var(--lt-rot);}
+.tb .lt-legende{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--tb-dim);margin:4px 0 6px;}
+.tb .lt-legende span{display:inline-flex;align-items:center;gap:6px;}
+.tb .lt-licht{display:inline-block;width:11px;height:11px;border-radius:999px!important;background:var(--lt-grau);flex:0 0 auto;}
+.tb .lt-licht.gruen,.tb .lt-status.gruen .lt-licht{background:var(--lt-gruen);}
+.tb .lt-licht.gelb,.tb .lt-status.gelb .lt-licht{background:#f2b01e;}
+.tb .lt-licht.rot,.tb .lt-status.rot .lt-licht{background:var(--lt-rot);}
+.tb .lt-abschnitt{margin:20px 0 10px;font-size:18px;}
+.tb .lt-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+.tb .lt-raster.klein{grid-template-columns:repeat(3,minmax(0,1fr));}
+.tb .lt-kachel,.tb .lt-dienst{background:var(--tb-card);border:2px solid var(--tb-line);border-radius:16px!important;padding:14px;display:flex;flex-direction:column;gap:9px;min-width:0;}
+.tb .lt-kachel.gruen{border-color:#86d3a1;} .tb .lt-kachel.gelb{border-color:var(--tb-warn-line);} .tb .lt-kachel.rot{border-color:var(--tb-bad-line);}
+.tb .lt-dienst{border-width:1px;padding:12px;}
+.tb .lt-kopf{display:flex;align-items:center;gap:12px;min-width:0;}
+.tb .lt-ikone{width:52px;height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:center;border-radius:14px!important;background:var(--lt-grau-soft);color:var(--lt-grau);}
+.tb .lt-ikone.klein{width:40px;height:40px;flex-basis:40px;}
+.tb .lt-ikone svg{width:30px;height:30px;} .tb .lt-ikone.klein svg{width:22px;height:22px;}
+.tb .lt-ikone.gruen{background:var(--lt-gruen-soft);color:var(--lt-gruen);} .tb .lt-ikone.gelb{background:var(--lt-gelb-soft);color:var(--lt-gelb);}
+.tb .lt-ikone.rot{background:var(--lt-rot-soft);color:var(--lt-rot);}
+.tb .lt-name{font-size:17px;font-weight:700;line-height:1.25;overflow-wrap:anywhere;}
+.tb .lt-status{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:3px 10px;margin-top:3px;border-radius:999px!important;background:var(--lt-grau-soft);color:var(--lt-grau);}
+.tb .lt-status svg{width:14px;height:14px;}
+.tb .lt-status.gruen{background:var(--lt-gruen-soft);color:var(--lt-gruen);} .tb .lt-status.gelb{background:var(--lt-gelb-soft);color:var(--lt-gelb);}
+.tb .lt-status.rot{background:var(--lt-rot-soft);color:var(--lt-rot);}
+.tb .lt-was{font-weight:600;overflow-wrap:anywhere;}
+.tb .lt-klein{font-size:12.5px;color:var(--tb-dim);overflow-wrap:anywhere;}
+.tb .lt-zeile{display:flex;gap:8px;flex-wrap:wrap;}
+.tb .lt-stufen,.tb .lt-betrieb{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--tb-line2);border-radius:10px!important;overflow:hidden;}
+.tb .lt-betrieb{grid-template-columns:1fr 1fr;}
+.tb .lt-stufen button,.tb .lt-betrieb button{border:0;background:var(--tb-card);color:var(--tb-ink);font:inherit;font-size:13px;padding:8px 4px;cursor:pointer;min-height:40px;}
+.tb .lt-stufen button+button,.tb .lt-betrieb button+button{border-left:1px solid var(--tb-line2);}
+.tb .lt-stufen button[aria-pressed="true"],.tb .lt-betrieb button[aria-pressed="true"]{background:var(--tb-acc-soft);color:var(--tb-acc);font-weight:700;}
+.tb .lt-knoepfe{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.tb .lt-knopf{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 12px;border:1px solid var(--tb-line2);border-radius:10px!important;
+  background:var(--tb-card);color:var(--tb-ink);font:inherit;font-weight:700;cursor:pointer;text-decoration:none;}
+.tb .lt-knopf:hover:not(:disabled){border-color:var(--tb-acc);}
+.tb .lt-knopf.start{color:var(--lt-gruen);border-color:#86d3a1;} .tb .lt-knopf.stopp{color:var(--lt-rot);border-color:var(--tb-bad-line);}
+.tb .lt-knopf[aria-pressed="true"]{background:var(--tb-acc-soft);color:var(--tb-acc);border-color:var(--tb-acc-line);}
+.tb .lt-knopf:disabled,.tb .lt-stufen button:disabled,.tb .lt-betrieb button:disabled{cursor:not-allowed;}
+.tb .lt-knopf:disabled:not([aria-pressed="true"]),.tb .gesperrt button:disabled{background:var(--lt-grau-soft);color:#94a3b8;border-color:var(--tb-line);}
+.tb .lt-knopf.breit{width:100%;}
+.tb .lt-sperre{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--lt-rot);background:var(--lt-rot-soft);padding:8px 10px;border-radius:10px!important;}
+.tb .lt-sperre svg{width:16px;height:16px;flex:0 0 16px;margin-top:1px;}
+.tb .lt-tun{font-size:13px;background:var(--lt-gelb-soft);color:#7c3a03;padding:8px 10px;border-radius:10px!important;}
+.tb .lt-hilfe summary{cursor:pointer;font-weight:700;color:var(--tb-acc);}
+.tb .lt-hilfe p{margin:6px 0 0;font-size:13px;}
+.tb .lt-fuss{margin-top:14px;}
+.tb .tb-ausfuehrlich>summary{cursor:pointer;font-weight:700;color:var(--tb-acc);padding:10px 0;}
+.tb .lt-kachel .tb-balken{margin:0;}
+@media (max-width:1280px){.tb .lt-raster,.tb .lt-raster.klein{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:760px){
+  .tb .lt-raster,.tb .lt-raster.klein{grid-template-columns:1fr;}
+  .tb .lt-zahlen{grid-template-columns:1fr 1fr;}
+  .tb .lt-titel{font-size:19px;}
+}

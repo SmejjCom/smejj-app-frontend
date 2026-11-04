@@ -117,7 +117,7 @@
   }
 
   // ------------------------------------------------------------ Rahmen
-  const REITER = [["uebersicht", "Übersicht"], ["ressourcen", "Alle Ressourcen"], ["steuerung", "Steuerung"], ["aufgaben", "Aufgaben"], ["wissen", "Wissen"], ["qualitaet", "Qualität"],
+  const REITER = [["ressourcen", "Leitstand"], ["uebersicht", "Übersicht"], ["steuerung", "Steuerung"], ["aufgaben", "Aufgaben"], ["wissen", "Wissen"], ["qualitaet", "Qualität"],
     ["kosten", "Kosten"], ["automatik", "Automatik"], ["verlauf", "Verlauf"]];
 
   function rahmen(aktiv, inhalt, o) {
@@ -594,7 +594,10 @@
       : '<div class="tb-karte"><p class="tb-dim">Cloud-Rechner: noch keine Meldung – nicht erfasst.</p></div>';
     const dienste = dListe.length ? dListe.map((x) => fremdKarte(x, o.jetzt)).join("")
       : '<div class="tb-karte"><p class="tb-dim">Dienste (Zeabur, IDrive e2, GitHub, Spaceship, EVREN, Salad): noch keine Meldung – nicht erfasst.</p></div>';
-    return '<div class="tb-karte"><div class="tb-karte-kopf"><h2>Alle Ressourcen – zentral steuern</h2><div class="tb-aktionen">'
+    // 04.11. Leitstand (training-leitstand.js) oben; die bisherige ausführliche Ansicht bleibt vollständig darunter.
+    const L = window.adminTrainingLeitstand;
+    const leit = L ? L.leitstand(o, offen, cloudListe, dListe) : "";
+    const ausfuehrlich = '<div class="tb-karte"><div class="tb-karte-kopf"><h2>Alle Ressourcen – zentral steuern</h2><div class="tb-aktionen">'
       + '<button class="tb-knopf" data-frRechner="alle" data-frBetrieb="auto" type="button">⟳ Alle automatisch</button>'
       + '<button class="tb-knopf" data-frRechner="alle" data-frStufe="vollgas" type="button">⚡ Alle auf Maximal</button>'
       + '<button class="tb-knopf" data-frRechner="alle" data-frZustand="pause" type="button">❚❚ Alle pausieren</button>'
@@ -607,6 +610,8 @@
       + '<h3 class="tb-oben">1 · Eigene Rechner – steuerbar</h3><div class="tb-reihe k3 tb-oben">' + macs + "</div>"
       + '<h3 class="tb-oben">2 · Cloud-Rechner (kostenlos)</h3><div class="tb-reihe k3 tb-oben">' + cloud + "</div>"
       + '<h3 class="tb-oben">3 · Dienste, Speicher und Partner – nur Anzeige</h3><div class="tb-reihe k3 tb-oben">' + dienste + "</div>";
+    return L ? leit + '<details class="tb-ausfuehrlich tb-oben"><summary>Ausführliche Ansicht – Tabelle, Erklärungen und alle Einstellungen</summary>' + ausfuehrlich + "</details>"
+      : ausfuehrlich;
   }
 
   function offeneListe(titel, liste, leer, feld) {
@@ -617,10 +622,10 @@
   }
   function steuerung(o, offen) {
     const s = o.t.steuerung;
-    const zentrale = '<div class="tb-hinweis">ⓘ <span>Rechner und Kaggle starten, stoppen und einstellen: Reiter <a data-tbReiter="ressourcen">Alle Ressourcen →</a></span></div>';
+    const zentrale = '<div class="tb-hinweis">ⓘ <span>Rechner und Kaggle starten, stoppen und einstellen: Reiter <a data-tbReiter="ressourcen">Leitstand →</a></span></div>';
     if (!s) return zentrale + '<div class="tb-karte"><h2>Steuerung</h2><p class="tb-dim">Noch keine Steuerungsmeldung der Fabrik empfangen – nicht erfasst.</p></div>';
     const kopf = zentrale + '<div class="tb-hinweis">ⓘ <span>Stand ' + e(tagUhr(s.stand)) + " · " + altText(s._am || s.stand, o.jetzt, TEIL_ALT_MIN)
-      + ". Gesteuert wird im Reiter „Alle Ressourcen“. Freigeben, Löschen und Live-Schalten geschieht nie über diese Seite.</span></div>";
+      + ". Gesteuert wird im Reiter „Leitstand“. Freigeben, Löschen und Live-Schalten geschieht nie über diese Seite.</span></div>";
     const r = (s.rechner || []).map((x) => {
       const a = AMPEL[x.ampel] || ["", "unbekannt"];
       return "<tr><td><b>" + e(SNAME[x.id] || x.id) + "</b></td><td>" + pille(a[1], a[0], true) + "</td><td>" + e(ZUSTAND_ST[x.zustand] || x.zustand || "")
@@ -673,6 +678,7 @@
   window.adminTrainingAnsicht = {
     ordnen: ordnen, rahmen: rahmen, uebersicht: uebersicht, steuerung: steuerung, ressourcen: ressourcen, wissen: wissen, qualitaet: qualitaet, verlauf: verlauf, engpaesse: engpaesse,
     helfer: { zahl: zahl, uhr: uhr, tagUhr: tagUhr, dauerText: dauerText, altText: altText, pille: pille, klartext: klartext, min: min,
-      NAME: NAME, KENNUNG: KENNUNG, KAMEL: KAMEL, TYP_TEXT: TYP_TEXT, ZUSTAND: ZUSTAND, GATES: GATES, TEIL_ALT_MIN: TEIL_ALT_MIN }
+      NAME: NAME, KENNUNG: KENNUNG, KAMEL: KAMEL, TYP_TEXT: TYP_TEXT, ZUSTAND: ZUSTAND, GATES: GATES, TEIL_ALT_MIN: TEIL_ALT_MIN,
+      balken: balken, LAGE: LAGE, befehlStand: befehlStand }
   };
 })();
