@@ -88,7 +88,7 @@
     const rechner = RECHNER.map((id) => alle.filter((m) => m.id === id)[0]).filter(Boolean);
     const lagen = rechner.map((m) => (S14.fabrikLage ? S14.fabrikLage(m) : { lage: "wartet", tut: "" }));
     const t = {};
-    ["auftraege", "qualitaet", "wissen", "kosten", "automatik", "steuerung", "ressourcen"].forEach((k) => {
+    ["auftraege", "qualitaet", "wissen", "kosten", "automatik", "steuerung", "ressourcen", "dienste"].forEach((k) => {
       const m = teil("fabrik-" + k);
       t[k] = m ? Object.assign({ _am: m.letzteMeldung, _alt: min(m.letzteMeldung, jetzt) }, m.fabrik || {}) : null;
     });
@@ -117,7 +117,7 @@
   }
 
   // ------------------------------------------------------------ Rahmen
-  const REITER = [["uebersicht", "Übersicht"], ["steuerung", "Steuerung"], ["aufgaben", "Aufgaben"], ["wissen", "Wissen"], ["qualitaet", "Qualität"],
+  const REITER = [["uebersicht", "Übersicht"], ["ressourcen", "Alle Ressourcen"], ["steuerung", "Steuerung"], ["aufgaben", "Aufgaben"], ["wissen", "Wissen"], ["qualitaet", "Qualität"],
     ["kosten", "Kosten"], ["automatik", "Automatik"], ["verlauf", "Verlauf"]];
 
   function rahmen(aktiv, inhalt, o) {
@@ -128,7 +128,7 @@
       + '<button class="tb-knopf primaer" data-tbNeu type="button">＋ Neue Aufgabe</button>'
       + '<button class="tb-knopf" data-frRechner="alle" data-frZustand="pause" type="button">❚❚ Alle pausieren</button>'
       + '<button class="tb-knopf" data-frRechner="alle" data-frZustand="laeuft" type="button">▶ Alle starten</button>'
-      + '<button class="tb-knopf" data-frRechner="alle" data-frStufe="vollgas" type="button" title="Alle drei Rechner auf volle Leistung. Der Schutz bleibt an.">⚡ Alle auf Vollgas</button>'
+      + '<button class="tb-knopf" data-frRechner="alle" data-frStufe="vollgas" type="button" title="Alle drei Rechner und Kaggle auf höchste Leistung. Der Schutz bleibt an.">⚡ Alle auf Maximal</button>'
       + '<button class="tb-knopf gefahr" data-frRechner="alle" data-frZustand="stopp" type="button">■ Not-Aus</button>'
       + '<button class="tb-knopf leise" data-trNeu type="button" title="Daten neu laden">↻ Neu laden</button>'
       + "</div></div>"
@@ -480,14 +480,28 @@
       + "</tr></thead><tbody>" + zeilen.join("") + "</tbody></table></div>";
   }
   // ------------------------------------------------------------ Ressourcen-Zentrale (Inhaber 04.11.2026)
-  // Alle Rechen-Quellen an einem Ort mit derselben Bedienung: Betrieb (Automatisch/Manuell), Start/Pause/Stopp, Leistung.
-  // Steuerbar sind nur die drei Macs. Cloud, EVREN und Live-Dienst zeigen ehrlich, wer sie steuert und was fehlt
-  // (Meldung fabrik-ressourcen aus ressourcen_meldung.py) – nie ein Knopf, der nichts bewirkt.
+  // Alle Ressourcen an einem Ort, jede mit derselben Bedienung: Betrieb (Automatisch/Manuell), Start/Pause/Stopp,
+  // Leistung (Minimal/Mittel/Maximal). Steuerbar: die drei Macs und – sobald die Fabrik es meldet (steuerbar) – Kaggle.
+  // Alles andere (Colab, Lightning, Zeabur, IDrive e2, GitHub, Spaceship, EVREN, Salad) zeigt ehrlich Zustand, Messzeit,
+  // wer es steuert und den einen nächsten Schritt – nie ein Knopf, der nichts bewirkt.
+  // Quellen: fabrik-ressourcen (Cloud) und fabrik-dienste (Dienste mit Messung) aus ressourcen_meldung.py.
   const RES_TON = { ok: "ok", warn: "warn", bad: "bad", acc: "acc" };
+  const LEISTUNG = [["leise", "Minimal"], ["mittel", "Mittel"], ["vollgas", "Maximal"]];
+  const LEISTUNG_NAME = { leise: "Minimal", mittel: "Mittel", vollgas: "Maximal" };
+  const BETRIEB_NAME = { auto: "Automatisch", manuell: "Manuell" };
+  const ART_NAME = { cloud: "Cloud-Rechner", live: "Live-Dienst", speicher: "Speicher", dienst: "Dienst", partner: "Partner" };
   function seg(titel, k, attr, werte, aktiv, name) {
     return '<div class="tb-zeile">' + e(titel) + ': <span class="tb-seg" role="group" aria-label="' + e(titel + " " + name) + '">'
       + werte.map((w) => '<button type="button" data-frRechner="' + k + '" ' + attr + '="' + w[0] + '" aria-pressed="' + (w[0] === aktiv) + '">'
         + e(w[1]) + "</button>").join("") + "</span></div>";
+  }
+  function knoepfe(k, zustand, mehr) {
+    const angehalten = zustand === "pausiert" || zustand === "gestoppt" || zustand === "pause" || zustand === "stopp";
+    return '<div class="tb-zeile">' + (mehr || "")
+      + (angehalten ? '<button class="tb-knopf" type="button" data-frRechner="' + k + '" data-frZustand="laeuft">▶ Starten</button>'
+        : '<button class="tb-knopf" type="button" data-frRechner="' + k + '" data-frZustand="pause">❚❚ Pause</button>')
+      + (zustand !== "gestoppt" && zustand !== "stopp" ? '<button class="tb-knopf gefahr" type="button" data-frRechner="' + k + '" data-frZustand="stopp">■ Stopp</button>' : "")
+      + "</div>";
   }
   function macKarte(m, l, o, offen) {
     const f = m.fabrik || {};
@@ -501,43 +515,97 @@
       : f.einmal ? pille("Start vorgemerkt", "acc", true)
       : '<button class="tb-knopf primaer" type="button" data-frRechner="' + k + '" data-frEinmal="1">▶ Nächste Aufgabe starten</button>';
     return '<div class="tb-karte"><div class="tb-karte-kopf"><h3>' + e(NAME[m.id]) + "</h3>" + pille(lg[0], lg[1], true) + "</div>"
-      + '<div class="tb-klein">' + e(f.rolle || "") + " · Kosten: nur Strom</div>"
+      + '<div class="tb-klein">' + e(f.rolle || "") + " · Kosten: nur Strom · " + altText(m.letzteMeldung, o.jetzt, TEIL_ALT_MIN) + "</div>"
       + '<div class="tb-zweck">' + e(l.lage === "rechnet" ? klartext(f.auftrag) : l.lage === "pause" ? (f.pause || l.tut || "") : "") + "</div>"
       + seg("Betrieb", k, "data-frBetrieb", [["auto", "Automatisch"], ["manuell", "Manuell"]], manuell ? "manuell" : "auto", NAME[m.id])
       + '<div class="tb-klein">' + e(erkl) + "</div>"
-      + seg("Leistung", k, "data-frStufe", [["leise", "Leise"], ["mittel", "Mittel"], ["vollgas", "Vollgas"]], l.stufe || f.stufe || "vollgas", NAME[m.id])
-      + '<div class="tb-zeile">' + naechste
-      + (angehalten ? '<button class="tb-knopf" type="button" data-frRechner="' + k + '" data-frZustand="laeuft">▶ Starten</button>'
-        : '<button class="tb-knopf" type="button" data-frRechner="' + k + '" data-frZustand="pause">❚❚ Pause</button>')
-      + (l.lage !== "gestoppt" ? '<button class="tb-knopf gefahr" type="button" data-frRechner="' + k + '" data-frZustand="stopp">■ Stopp</button>' : "")
-      + (l.lage === "pause" ? pille("Schutz bleibt aktiv", "warn") : "")
-      + "</div>" + befehlStand(m, offen, o.t.automatik, o.jetzt) + "</div>";
+      + seg("Leistung", k, "data-frStufe", LEISTUNG, l.stufe || f.stufe || "vollgas", NAME[m.id])
+      + '<div class="tb-klein">Minimal ≈ halbe Leistung (kühl, leise) · Mittel ≈ drei Viertel · Maximal = volle Leistung.</div>'
+      + knoepfe(k, angehalten ? l.lage : "laeuft", naechste) + (l.lage === "pause" ? '<div class="tb-zeile">' + pille("Schutz bleibt aktiv", "warn") + "</div>" : "")
+      + befehlStand(m, offen, o.t.automatik, o.jetzt) + "</div>";
   }
-  function fremdKarte(x) {
+  /** Kaggle mit derselben Bedienung wie die Macs. Leistung = Wochenbudget; wirkt beim nächsten Durchgang der Fabrik-Kontrolle. */
+  function kaggleKarte(x, o, offen) {
+    const manuell = x.betrieb === "manuell";
+    const b = typeof x.budgetH === "number" ? x.budgetH : null;
+    const v = typeof x.verbrauchtH === "number" ? x.verbrauchtH : null;
+    const naechste = !manuell || x.zustand !== "laeuft" ? "" : x.einmal ? pille("Start vorgemerkt", "acc", true)
+      : '<button class="tb-knopf primaer" type="button" data-frRechner="kaggle" data-frEinmal="1">▶ Nächsten Lauf starten</button>';
+    const w = offen && offen.kaggle;
+    let quittung = "";
+    if (w) {
+      const stand = w.nr && x.nr === w.nr ? pille("übernommen", "ok") : min(w.am, o.jetzt) > 5 ? pille("keine Quittung nach 5 Min.", "bad") : pille("gesendet", "");
+      quittung = '<div class="tb-befehl">Letzter Befehl (' + e(uhr(w.am)) + "): " + stand + "</div>";
+    }
+    return '<div class="tb-karte"><div class="tb-karte-kopf"><h3>' + e(x.name || "Kaggle") + "</h3>" + pille(x.status || "nicht erfasst", RES_TON[x.ton] || "", true) + "</div>"
+      + '<div class="tb-klein">Grafikkarte in der Cloud · Kosten: <b>' + e(x.kosten || "nicht erfasst") + "</b>" + (x.aktiv ? " · " + pille("erste Wahl", "laeuft") : "") + "</div>"
+      + '<div class="tb-zeile">Diese Woche: <b>' + (v === null ? "nicht erfasst" : zahl(v, 1) + " von " + (b === null ? "—" : b) + " Std.") + "</b>"
+      + (v !== null && b ? balken(100 * v / b, v >= b ? "#b45309" : "#3b6ef5") : "") + "</div>"
+      + '<div class="tb-klein">Verbrauch ist geschätzt (Kaggle nennt ihn nicht); echtes Wochenlimit max. 30 Std.</div>'
+      + seg("Betrieb", "kaggle", "data-frBetrieb", [["auto", "Automatisch"], ["manuell", "Manuell"]], manuell ? "manuell" : "auto", "Kaggle")
+      + '<div class="tb-klein">' + (manuell ? "Startet nur auf Ihren Knopfdruck genau einen Lauf." : "Die Fabrik nutzt Kaggle selbst, wenn die Macs nicht reichen.") + "</div>"
+      + seg("Leistung", "kaggle", "data-frStufe", LEISTUNG, x.stufe || "vollgas", "Kaggle")
+      + '<div class="tb-klein">Grafikkarten-Stunden pro Woche: Minimal 10 · Mittel 20 · Maximal 30 (kostenlose Grenze).</div>'
+      + knoepfe("kaggle", x.zustand || "laeuft", naechste)
+      + '<div class="tb-klein">Wirkt beim nächsten stündlichen Durchgang der Fabrik-Kontrolle. Pause und Stopp starten keine neuen Läufe; ein laufender Lauf endet von selbst.</div>'
+      + (x.tun ? '<div class="tb-hinweis warn">👉 <span><b>Ihr Schritt:</b> ' + e(x.tun) + "</span></div>" : "") + quittung + "</div>";
+  }
+  function fremdKarte(x, jetzt) {
     return '<div class="tb-karte"><div class="tb-karte-kopf"><h3>' + e(x.name || x.id || "") + "</h3>" + pille(x.status || "nicht erfasst", RES_TON[x.ton] || "", true) + "</div>"
       + '<ul class="tb-liste"><li>Steuerung: <b>' + e(x.steuerung || "nicht erfasst") + "</b>" + (x.aktiv ? " " + pille("erste Wahl", "laeuft") : "") + "</li>"
-      + "<li>Kontingent: " + e(x.kontingent || "nicht erfasst") + "</li><li>Kosten: <b>" + e(x.kosten || "nicht erfasst") + "</b></li></ul>"
+      + "<li>Kontingent: " + e(x.kontingent || "nicht erfasst") + "</li><li>Kosten: <b>" + e(x.kosten || "nicht erfasst") + "</b></li>"
+      + (x.gemessen !== undefined ? "<li>" + (x.gemessen ? altText(x.gemessen, jetzt, 15) : '<span class="tb-klein">keine Messung möglich – feste Angabe</span>') + "</li>" : "") + "</ul>"
       + '<div class="tb-klein">' + e(x.nutzen || "") + "</div>"
       + (x.tun ? '<div class="tb-hinweis warn">👉 <span><b>Ihr Schritt:</b> ' + e(x.tun) + "</span></div>" : "")
       + (x.id === "zeabur" ? '<div class="tb-zeile"><a class="tb-knopf leise" href="/admin/modelle/">Live-Modelle ansehen →</a></div>' : "") + "</div>";
   }
+  /** Alle Ressourcen auf einen Blick: eine Zeile je Ressource, gleiche Spalten. */
+  function blick(o, cloudListe, dienstListe, rStand) {
+    const zeile = (name, art, zustand, betrieb, leistung, kosten, mess) => "<tr><td data-k=\"Ressource\"><b>" + e(name) + '</b><div class="tb-klein">' + e(art) + "</div></td>"
+      + '<td data-k="Zustand">' + zustand + '</td><td data-k="Betrieb">' + e(betrieb) + '</td><td data-k="Leistung">' + e(leistung)
+      + '</td><td data-k="Kosten">' + e(kosten) + '</td><td data-k="Messung">' + mess + "</td></tr>";
+    const z = [];
+    o.rechner.forEach((m, i) => {
+      const f = m.fabrik || {}, l = o.lagen[i] || {};
+      const lg = f.betrieb === "manuell" && l.lage === "wartet" ? ["Manuell – wartet", ""] : LAGE[l.lage] || LAGE.wartet;
+      z.push(zeile(NAME[m.id], "Eigener Rechner · steuerbar", pille(lg[0], lg[1], true), BETRIEB_NAME[f.betrieb] || "Automatisch",
+        LEISTUNG_NAME[l.stufe || f.stufe] || "nicht erfasst", "nur Strom", altText(m.letzteMeldung, o.jetzt, TEIL_ALT_MIN)));
+    });
+    cloudListe.forEach((x) => z.push(zeile(x.name || x.id, (ART_NAME[x.art] || "Cloud") + (x.steuerbar ? " · steuerbar" : " · nicht verbunden"),
+      pille(x.status || "nicht erfasst", RES_TON[x.ton] || "", true), x.steuerbar ? BETRIEB_NAME[x.betrieb] || "Automatisch" : x.steuerung || "—",
+      x.steuerbar ? (LEISTUNG_NAME[x.stufe] || "—") + (typeof x.budgetH === "number" ? " · " + x.budgetH + " Std./Woche" : "") : "—",
+      x.kosten || "nicht erfasst", altText(rStand, o.jetzt, TEIL_ALT_MIN))));
+    dienstListe.forEach((x) => z.push(zeile(x.name || x.id, (ART_NAME[x.art] || "Dienst") + " · nur Anzeige", pille(x.status || "nicht erfasst", RES_TON[x.ton] || "", true),
+      x.steuerung || "—", "—", x.kosten || "nicht erfasst", x.gemessen ? altText(x.gemessen, o.jetzt, 15) : '<span class="tb-klein">feste Angabe</span>')));
+    return '<div class="tb-karte"><h2>Alle auf einen Blick ' + pille(String(z.length), "acc") + "</h2>"
+      + '<div class="tb-daten-huelle"><table class="tb-tabelle tb-blick"><thead><tr><th>Ressource</th><th>Zustand</th><th>Betrieb</th><th>Leistung</th><th>Kosten</th><th>Messung</th></tr></thead><tbody>'
+      + z.join("") + "</tbody></table></div></div>";
+  }
   function ressourcen(o, offen) {
-    const r = o.t.ressourcen;
+    const r = o.t.ressourcen, d = o.t.dienste;
+    const rListe = r && Array.isArray(r.liste) ? r.liste : [];
+    const dListe = d && Array.isArray(d.liste) ? d.liste : [];
+    // Mit Dienste-Meldung stehen Zeabur und EVREN dort (mit Messung); ohne sie bleiben sie wie bisher bei der Cloud.
+    const cloudListe = dListe.length ? rListe.filter((x) => x.art === "cloud") : rListe;
     const macs = o.rechner.length ? o.rechner.map((m, i) => macKarte(m, o.lagen[i], o, offen)).join("")
       : '<div class="tb-karte"><p class="tb-dim">Keine Rechner-Meldung empfangen – nicht erfasst.</p></div>';
-    const fremd = r && Array.isArray(r.liste) && r.liste.length ? r.liste.map(fremdKarte).join("")
-      : '<div class="tb-karte"><p class="tb-dim">Cloud, EVREN und Live-Dienst: noch keine Meldung – nicht erfasst.</p></div>';
+    const cloud = cloudListe.length ? cloudListe.map((x) => (x.id === "kaggle" && x.steuerbar === true ? kaggleKarte(x, o, offen) : fremdKarte(x, o.jetzt))).join("")
+      : '<div class="tb-karte"><p class="tb-dim">Cloud-Rechner: noch keine Meldung – nicht erfasst.</p></div>';
+    const dienste = dListe.length ? dListe.map((x) => fremdKarte(x, o.jetzt)).join("")
+      : '<div class="tb-karte"><p class="tb-dim">Dienste (Zeabur, IDrive e2, GitHub, Spaceship, EVREN, Salad): noch keine Meldung – nicht erfasst.</p></div>';
     return '<div class="tb-karte"><div class="tb-karte-kopf"><h2>Alle Ressourcen – zentral steuern</h2><div class="tb-aktionen">'
       + '<button class="tb-knopf" data-frRechner="alle" data-frBetrieb="auto" type="button">⟳ Alle automatisch</button>'
-      + '<button class="tb-knopf" data-frRechner="alle" data-frStufe="vollgas" type="button">⚡ Alle auf Vollgas</button>'
+      + '<button class="tb-knopf" data-frRechner="alle" data-frStufe="vollgas" type="button">⚡ Alle auf Maximal</button>'
       + '<button class="tb-knopf" data-frRechner="alle" data-frZustand="pause" type="button">❚❚ Alle pausieren</button>'
       + '<button class="tb-knopf gefahr" data-frRechner="alle" data-frZustand="stopp" type="button">■ Not-Aus</button></div></div>'
       + '<ul class="tb-pruefliste"><li><b>Automatisch:</b>&nbsp;arbeitet rund um die Uhr allein.</li><li><b>Manuell:</b>&nbsp;arbeitet nur auf Ihren Knopfdruck.</li>'
-      + "<li><b>Leistung:</b>&nbsp;Leise, Mittel oder Vollgas.</li><li><b>Pause</b> lässt die laufende Aufgabe fertig werden, <b>Stopp</b> hält sie sofort an – nichts geht verloren.</li></ul>"
-      + '<div class="tb-klein">Der Schutz vor vollem Speicher, Hitze und leerem Akku bleibt immer an. Jede Änderung fragt nach einem kurzen Grund und wirkt nach höchstens einer Minute.'
-      + (r && r.stand ? " Stand Cloud/Partner: " + e(uhr(r.stand)) + "." : "") + "</div>"
-      + '<h3 class="tb-oben">Eigene Rechner – steuerbar</h3><div class="tb-reihe k3 tb-oben">' + macs + "</div>"
-      + '<h3 class="tb-oben">Cloud, Partner und Live-Dienst</h3><div class="tb-reihe k3 tb-oben">' + fremd + "</div></div>";
+      + "<li><b>Leistung:</b>&nbsp;Minimal, Mittel oder Maximal.</li><li><b>Pause</b> lässt die laufende Aufgabe fertig werden, <b>Stopp</b> hält sie sofort an – nichts geht verloren.</li></ul>"
+      + '<div class="tb-klein">„Alle“ meint die drei Macs und Kaggle. Der Schutz vor vollem Speicher, Hitze und leerem Akku bleibt immer an. '
+      + "Jede Änderung fragt nach einem kurzen Grund; die Macs übernehmen sie in höchstens einer Minute.</div></div>"
+      + blick(o, cloudListe, dListe, r && (r._am || r.stand))
+      + '<h3 class="tb-oben">1 · Eigene Rechner – steuerbar</h3><div class="tb-reihe k3 tb-oben">' + macs + "</div>"
+      + '<h3 class="tb-oben">2 · Cloud-Rechner (kostenlos)</h3><div class="tb-reihe k3 tb-oben">' + cloud + "</div>"
+      + '<h3 class="tb-oben">3 · Dienste, Speicher und Partner – nur Anzeige</h3><div class="tb-reihe k3 tb-oben">' + dienste + "</div>";
   }
 
   function offeneListe(titel, liste, leer, feld) {
@@ -548,10 +616,10 @@
   }
   function steuerung(o, offen) {
     const s = o.t.steuerung;
-    const zentrale = ressourcen(o, offen || {});
+    const zentrale = '<div class="tb-hinweis">ⓘ <span>Rechner und Kaggle starten, stoppen und einstellen: Reiter <a data-tbReiter="ressourcen">Alle Ressourcen →</a></span></div>';
     if (!s) return zentrale + '<div class="tb-karte"><h2>Steuerung</h2><p class="tb-dim">Noch keine Steuerungsmeldung der Fabrik empfangen – nicht erfasst.</p></div>';
     const kopf = zentrale + '<div class="tb-hinweis">ⓘ <span>Stand ' + e(tagUhr(s.stand)) + " · " + altText(s._am || s.stand, o.jetzt, TEIL_ALT_MIN)
-      + ". Gesteuert wird nur oben unter „Alle Ressourcen“. Freigeben, Löschen und Live-Schalten geschieht nie über diese Seite.</span></div>";
+      + ". Gesteuert wird im Reiter „Alle Ressourcen“. Freigeben, Löschen und Live-Schalten geschieht nie über diese Seite.</span></div>";
     const r = (s.rechner || []).map((x) => {
       const a = AMPEL[x.ampel] || ["", "unbekannt"];
       return "<tr><td><b>" + e(SNAME[x.id] || x.id) + "</b></td><td>" + pille(a[1], a[0], true) + "</td><td>" + e(ZUSTAND_ST[x.zustand] || x.zustand || "")

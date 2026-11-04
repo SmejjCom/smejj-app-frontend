@@ -165,6 +165,11 @@
 .tb-radio label.an{border-color:var(--tb-acc);background:var(--tb-acc-soft);color:var(--tb-acc);}
 .tb-radio input{accent-color:var(--tb-acc);}
 .tb details summary{cursor:pointer;font-weight:700;padding:4px 0;}
+/* Konsolen-Raster: die Spalte neben der Seitenleiste darf schmaler werden als ihr breitester Inhalt.
+   Sonst schiebt die Reiterleiste den ganzen Bereich bei schmalem Fenster (z. B. 987 px) seitlich über den Rand. */
+.main:has(.tb){grid-template-columns:minmax(0,1fr);}
+.main>*:has(>.tb){min-width:0;}
+.main>*:has(>.tb)>.tb{margin-left:0;margin-right:0;}   /* der Rahmen hat keinen Innenabstand; -8px ragte sonst über den Rand */
 .tb-fussleiste{display:flex;gap:12px;align-items:center;justify-content:flex-end;flex-wrap:wrap;}
 
 /* Tablet + Handy */
@@ -186,4 +191,21 @@
   .tb-vergleich{grid-template-columns:90px 1fr 46px;}
   .tb-daten-huelle{overflow-x:auto;}
   .tb-stand{margin-left:0;padding-left:0;}
+}
+/* Alle Ressourcen „auf einen Blick“: bleibt bis 761 px eine kompakte Tabelle (scrollt notfalls in sich), erst darunter Karten */
+@media (min-width:761px){
+  .tb .tb-blick{display:table;width:100%;}
+  .tb .tb-blick thead{display:table-header-group;}
+  .tb .tb-blick tbody{display:table-row-group;}
+  .tb .tb-blick tr{display:table-row;border:0;margin:0;padding:0;}
+  .tb .tb-blick td{display:table-cell;width:auto;padding:8px 10px;border-bottom:1px solid var(--tb-line);vertical-align:top;}
+  .tb .tb-blick td[data-k]::before{content:none;}
+}
+.tb .tb-blick .tb-pille{white-space:normal;border-radius:10px!important;}   /* lange Zustände brechen um, statt die Tabelle zu verbreitern */
+.tb .tb-karte-kopf .tb-pille{white-space:normal;max-width:100%;}   /* lange Zustände (z. B. Kaggle) bleiben in der Karte */
+@media (max-width:760px){   /* Handy: „auf einen Blick“ kompakt – Beschriftung links, Wert rechts in einer Zeile */
+  .tb .tb-blick td[data-k]{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:4px 10px;text-align:right;}
+  .tb .tb-blick td[data-k]::before{margin:0;flex:0 0 auto;text-align:left;}
+  .tb .tb-blick td[data-k="Ressource"]{display:block;text-align:left;padding-top:8px;}
+  .tb .tb-blick td[data-k="Ressource"]::before{display:none;}
 }

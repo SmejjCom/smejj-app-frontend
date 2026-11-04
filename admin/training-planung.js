@@ -251,7 +251,7 @@
   // ------------------------------------------------------------ Steuerung
   function zeichnen(ctx, deps) {
     const o = T.ordnen(s.d, Date.now());
-    const inhalt = s.reiter === "steuerung" ? T.steuerung(o, deps.offen()) : s.reiter === "aufgaben" ? aufgaben(o) : s.reiter === "neu" ? neu(o) : s.reiter === "wissen" ? T.wissen(o, s.rag)
+    const inhalt = s.reiter === "ressourcen" ? T.ressourcen(o, deps.offen()) : s.reiter === "steuerung" ? T.steuerung(o, deps.offen()) : s.reiter === "aufgaben" ? aufgaben(o) : s.reiter === "neu" ? neu(o) : s.reiter === "wissen" ? T.wissen(o, s.rag)
       : s.reiter === "qualitaet" ? T.qualitaet(o) : s.reiter === "kosten" ? kosten(o) : s.reiter === "automatik" ? automatik(o)
         : s.reiter === "verlauf" ? T.verlauf(o, s.liste) : T.uebersicht(o, deps.offen());
     ctx.zeichne(T.rahmen(s.reiter === "neu" ? "aufgaben" : s.reiter, inhalt, o));

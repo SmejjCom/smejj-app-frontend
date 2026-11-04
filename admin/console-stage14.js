@@ -102,7 +102,7 @@
   // Neuer Bereich „Training & Wissen“ (Inhaber 03.11.2026): eigene Dateien training-ansicht.js,
   // training-planung.js und training.css, hier nachgeladen (index.html steht im Admin-Lock). Laden sie
   // nicht (z. B. Konsole vom Control-Server, dessen Dateiliste fest ist), bleibt die bisherige Ansicht.
-  const TB_FASSUNG = "20261104a";
+  const TB_FASSUNG = "20261104c";
   let tbDateien = null;
   function trainingDateien() {
     if (window.adminTraining) return Promise.resolve(true);
@@ -170,26 +170,42 @@
     }, TAKT_MS);
   }
 
-  const RECHNER_NAME = { "macbook-pro": "MacBook Pro", "macbook-air": "MacBook Air", imac: "iMac", alle: "alle drei Rechner" };
+  const RECHNER_NAME = { "macbook-pro": "MacBook Pro", "macbook-air": "MacBook Air", imac: "iMac", kaggle: "Kaggle (Cloud)", alle: "alle Rechner und Kaggle" };
   const WUNSCH_TEXT = {
     laeuft: ["Starten", "Der Rechner nimmt wieder Aufträge an. Ein Not-Aus des Schutzes bleibt bestehen."],
     pause: ["Pausieren", "Es startet nichts Neues. Der laufende Auftrag darf fertig werden."],
     stopp: ["Stoppen", "Der laufende Auftrag wird sofort angehalten und bleibt in der Warteschlange. Nichts geht verloren."],
-    leise: ["Stufe Leise", "Etwa halbe Leistung: kühler und leiser, gleiches Ergebnis, dauert länger."],
-    mittel: ["Stufe Mittel", "Etwa drei Viertel Leistung."],
-    vollgas: ["Stufe Vollgas", "Volle Leistung. Der Schutz (Speicher, Hitze, Akku) bleibt trotzdem an."],
+    leise: ["Leistung Minimal", "Etwa halbe Leistung: kühler und leiser, gleiches Ergebnis, dauert länger."],
+    mittel: ["Leistung Mittel", "Etwa drei Viertel Leistung."],
+    vollgas: ["Leistung Maximal", "Volle Leistung. Der Schutz (Speicher, Hitze, Akku) bleibt trotzdem an."],
     auto: ["Betrieb Automatisch", "Der Rechner holt sich rund um die Uhr selbst Arbeit und startet nach Schutzpausen von selbst wieder."],
     manuell: ["Betrieb Manuell", "Der Rechner startet nichts mehr von selbst. Die laufende Aufgabe darf fertig werden. Neue Aufgaben beginnen nur mit „Nächste Aufgabe starten“."],
     einmal: ["Nächste Aufgabe starten", "Der Rechner startet genau eine Aufgabe aus seiner Warteschlange und wartet danach wieder auf Sie."]
   };
 
-  // Training models: Wunsch an einen Rechner (oder alle). Grund ist Pflicht (Audit-Log).
+  // Kaggle (Cloud-Reserve) hat eigene Worte: Leistung = Wochenbudget, Wirkung erst beim nächsten Durchgang der Fabrik-Kontrolle.
+  const KAGGLE_TEXT = {
+    laeuft: ["Starten", "Die Fabrik darf Kaggle wieder für neue Läufe nutzen."],
+    pause: ["Pausieren", "Es startet kein neuer Kaggle-Lauf. Ein laufender Lauf endet von selbst."],
+    stopp: ["Stoppen", "Kaggle wird nicht mehr genutzt, bis Sie wieder starten. Ein laufender Lauf endet von selbst."],
+    leise: ["Leistung Minimal", "Höchstens 10 Grafikkarten-Stunden pro Woche."],
+    mittel: ["Leistung Mittel", "Höchstens 20 Grafikkarten-Stunden pro Woche."],
+    vollgas: ["Leistung Maximal", "Höchstens 30 Grafikkarten-Stunden pro Woche – das ist Kaggles kostenlose Grenze."],
+    auto: ["Betrieb Automatisch", "Die Fabrik nutzt Kaggle selbst, wenn die Macs nicht reichen."],
+    manuell: ["Betrieb Manuell", "Kaggle wird nur noch auf Ihren Knopfdruck genutzt."],
+    einmal: ["Nächsten Lauf starten", "Die Fabrik startet genau einen Kaggle-Lauf und wartet danach wieder auf Sie."]
+  };
+
+  // Training models: Wunsch an einen Rechner, an Kaggle (oder alle). Grund ist Pflicht (Audit-Log).
   async function wunsch(ctx, rechner, zustand, stufe, betrieb, einmal) {
-    const art = WUNSCH_TEXT[zustand || stufe || betrieb || (einmal ? "einmal" : "")];
+    const schluessel = zustand || stufe || betrieb || (einmal ? "einmal" : "");
+    const art = (rechner === "kaggle" ? KAGGLE_TEXT : WUNSCH_TEXT)[schluessel];
     if (!art) return;
     const grund = await D.text({
       titel: art[0] + " — " + (RECHNER_NAME[rechner] || rechner),
-      absaetze: [art[1], "Die Rechner übernehmen es im Minutentakt — das dauert bis zu einer Minute."],
+      absaetze: [art[1], rechner === "kaggle"
+        ? "Die Fabrik übernimmt es im Minutentakt; neue Kaggle-Läufe startet die stündliche Fabrik-Kontrolle."
+        : "Die Rechner übernehmen es im Minutentakt — das dauert bis zu einer Minute."],
       platzhalter: "Kurzer Grund, z. B. „ich arbeite am Air“",
       minLaenge: 5,
       okText: art[0]
@@ -205,7 +221,7 @@
     const am = new Date().toISOString();
     const nr = {};   // Server-Nummer je Rechner: daran erkennt die Seite „angenommen“
     ((antwort.data && antwort.data.wuensche) || []).forEach(function (w) { if (w && w.nr) nr[w.rechner] = w.nr; });
-    (rechner === "alle" ? ["macbook-pro", "macbook-air", "imac"] : [rechner]).forEach(function (k) {
+    (rechner === "alle" ? ["macbook-pro", "macbook-air", "imac", "kaggle"] : [rechner]).forEach(function (k) {
       const o = Object.assign({}, offen[k] || {}, { am: am, nr: nr[k] || null });
       if (zustand) o.zustand = zustand;
       if (stufe) o.stufe = stufe;
