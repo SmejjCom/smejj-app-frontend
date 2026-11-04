@@ -291,6 +291,13 @@
     alle("[data-tbReiter]", (el, ev) => { ev.preventDefault(); reiter(ctx, deps, el.getAttribute("data-tbReiter")); });
     alle("[data-tbNeu]", (el) => { s.bearbeite = null; s.rechnerVorgabe = el.getAttribute("data-tbRechner"); s.reiter = "neu"; zeichnen(ctx, deps); });
     alle("[data-trNeu]", () => deps.neuLaden());
+    alle("[data-tbThema]", (el) => {   // Hell/Dunkel sofort umschalten und je Gerät merken
+      const w = el.getAttribute("data-tbThema") === "dunkel" ? "dunkel" : "hell";
+      try { localStorage.setItem(T.THEMA_SCHLUESSEL, w); } catch (_) { /* nur Bequemlichkeit */ }
+      const tb = document.querySelector("[data-tb]");
+      if (tb) tb.classList.toggle("tb-dunkel", w === "dunkel");
+      document.querySelectorAll("[data-tbThema]").forEach((b) => b.setAttribute("aria-pressed", String(b.getAttribute("data-tbThema") === w)));
+    });
     alle("[data-frRechner]", (el) => deps.wunsch(el.getAttribute("data-frRechner"), el.getAttribute("data-frZustand"), el.getAttribute("data-frStufe"),
       el.getAttribute("data-frBetrieb"), el.getAttribute("data-frEinmal") === "1"));
     alle("[data-tbLoesung]", (el) => { const box = document.querySelector("[data-tbLoesungen]"); if (!box) return; box.hidden = !box.hidden; el.setAttribute("aria-expanded", String(!box.hidden)); });

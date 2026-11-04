@@ -120,9 +120,20 @@
   const REITER = [["ressourcen", "Leitstand"], ["uebersicht", "Übersicht"], ["steuerung", "Steuerung"], ["aufgaben", "Aufgaben"], ["wissen", "Wissen"], ["qualitaet", "Qualität"],
     ["kosten", "Kosten"], ["automatik", "Automatik"], ["verlauf", "Verlauf"]];
 
+  // Hell/Dunkel (Inhaber 04.11.2026): Schalter oben rechts in der Titelzeile, je Gerät gemerkt. Standard bleibt hell (Vorlage 03.11.).
+  const THEMA_SCHLUESSEL = "smejj.admin.training.thema";
+  function thema() {
+    try { return localStorage.getItem(THEMA_SCHLUESSEL) === "dunkel" ? "dunkel" : "hell"; } catch (_) { return "hell"; }
+  }
+  function themaSchalter(t) {
+    const k = (w, zeichen, text) => '<button type="button" data-tbThema="' + w + '" aria-pressed="' + (t === w) + '" aria-label="' + text + ' Ansicht">'
+      + '<span aria-hidden="true">' + zeichen + '</span><span class="tb-thema-text">' + text + "</span></button>";
+    return '<div class="tb-thema" role="group" aria-label="Hell oder dunkel">' + k("hell", "☀", "Hell") + k("dunkel", "☾", "Dunkel") + "</div>";
+  }
   function rahmen(aktiv, inhalt, o) {
     const stand = o.rechner.map((m) => m.letzteMeldung).filter(Boolean).sort().pop();
-    return '<div class="tb" data-tb>'
+    const t = thema();
+    return '<div class="tb' + (t === "dunkel" ? " tb-dunkel" : "") + '" data-tb>' + themaSchalter(t)
       + '<div class="tb-kopf"><div><h1>Training &amp; Wissen</h1><div class="tb-unter">Arbeit planen. Modelle verbessern. Ergebnisse belegen.</div></div>'
       + '<div class="tb-aktionen">'
       + '<button class="tb-knopf primaer" data-tbNeu type="button">＋ Neue Aufgabe</button>'
@@ -676,7 +687,7 @@
   }
 
   window.adminTrainingAnsicht = {
-    ordnen: ordnen, rahmen: rahmen, uebersicht: uebersicht, steuerung: steuerung, ressourcen: ressourcen, wissen: wissen, qualitaet: qualitaet, verlauf: verlauf, engpaesse: engpaesse,
+    ordnen: ordnen, rahmen: rahmen, THEMA_SCHLUESSEL: THEMA_SCHLUESSEL, uebersicht: uebersicht, steuerung: steuerung, ressourcen: ressourcen, wissen: wissen, qualitaet: qualitaet, verlauf: verlauf, engpaesse: engpaesse,
     helfer: { zahl: zahl, uhr: uhr, tagUhr: tagUhr, dauerText: dauerText, altText: altText, pille: pille, klartext: klartext, min: min,
       NAME: NAME, KENNUNG: KENNUNG, KAMEL: KAMEL, TYP_TEXT: TYP_TEXT, ZUSTAND: ZUSTAND, GATES: GATES, TEIL_ALT_MIN: TEIL_ALT_MIN,
       balken: balken, LAGE: LAGE, befehlStand: befehlStand }

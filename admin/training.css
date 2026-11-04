@@ -277,3 +277,41 @@
 .tb .lt-alle{display:flex;gap:8px;flex-wrap:wrap;}   /* Entwurf: vier Knöpfe für alle direkt am Leitstand */
 .tb .lt-zahl .lt-klein{display:block;margin-top:2px;}
 @media (max-width:760px){.tb .lt-alle{width:100%;display:grid;grid-template-columns:1fr 1fr;}}
+
+/* Hell/Dunkel-Schalter (Inhaber 04.11.2026): oben rechts in der Titelzeile; Wahl je Gerät (localStorage). */
+.tb{position:relative;}
+.tb-kopf{padding-right:170px;}
+.tb-thema{position:absolute;top:22px;right:26px;display:inline-grid;grid-template-columns:1fr 1fr;border:1px solid var(--tb-line2);border-radius:999px!important;overflow:hidden;background:var(--tb-card);z-index:1;}
+.tb-thema button{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--tb-dim);font:inherit;font-size:13px;font-weight:650;padding:7px 12px;min-height:36px;cursor:pointer;}
+.tb-thema button+button{border-left:1px solid var(--tb-line2);}
+.tb-thema button[aria-pressed="true"]{background:var(--tb-acc);color:#fff;}
+.tb-thema button:focus-visible{outline:3px solid #a5b4fc;outline-offset:-3px;}
+@media (max-width:760px){.tb-thema{top:16px;right:16px;}.tb-thema .tb-thema-text{display:none;}.tb-kopf{padding-right:84px;}.tb-kopf .tb-aktionen{margin-right:-84px;}}
+
+/* Dunkle Fassung: gleiche Bedeutungsfarben (Grün/Gelb/Rot), dunkle Flächen, heller Text. */
+.tb.tb-dunkel{
+  --tb-bg:#0b1220; --tb-card:#131c2e; --tb-line:#24314a; --tb-line2:#33425f;
+  --tb-ink:#e5e9f2; --tb-dim:#aab4c8; --tb-faint:#8b96ad;
+  --tb-acc:#6d72f6; --tb-acc-soft:#1e2550; --tb-acc-line:#3c4390;
+  --tb-run:#5b8cff; --tb-run-soft:#16264a; --tb-ok:#4ade80; --tb-ok-soft:#0f2a1c;
+  --tb-warn:#fbbf24; --tb-warn-soft:#2c2210; --tb-warn-line:#6b5418;
+  --tb-bad:#f87171; --tb-bad-soft:#2d1416; --tb-bad-line:#6e2a2e; --tb-wait:#64748b; --tb-wait-soft:#1b2436;
+  --lt-gruen:#4ade80; --lt-gruen-soft:#0f2a1c; --lt-gelb:#fbbf24; --lt-gelb-soft:#2c2210; --lt-rot:#f87171; --lt-rot-soft:#2d1416; --lt-grau:#94a3b8; --lt-grau-soft:#1b2436;
+  color-scheme:dark;
+}
+.tb.tb-dunkel .tb-knopf,.tb.tb-dunkel .tb-knopf.gefahr,.tb.tb-dunkel .tb-kpi,.tb.tb-dunkel .tb-seg button,.tb.tb-dunkel .tb-fluss .tb-chip,.tb.tb-dunkel .tb-loesungen,
+.tb.tb-dunkel select,.tb.tb-dunkel input,.tb.tb-dunkel textarea,.tb.tb-dunkel .tb-typen button,.tb.tb-dunkel .tb-radio label{background:var(--tb-card);color:var(--tb-ink);}
+.tb.tb-dunkel .tb-knopf:hover{background:#1a2540;}
+.tb.tb-dunkel .tb-knopf.primaer,.tb.tb-dunkel .tb-typen button[aria-pressed="true"]{background:var(--tb-acc);color:#fff;}
+.tb.tb-dunkel .tb-knopf.gefahr{color:var(--tb-bad);}
+.tb.tb-dunkel .tb-knopf[disabled],.tb.tb-dunkel .tb-knopf.aus{background:#1b2436;}
+.tb.tb-dunkel .tb-pille{color:var(--tb-dim);} .tb.tb-dunkel .tb-pille.laeuft{color:#93b4ff;}
+.tb.tb-dunkel .tb-hinweis{background:#18213a;color:var(--tb-dim);} .tb.tb-dunkel .tb-hinweis.warn,.tb.tb-dunkel .lt-tun{background:var(--tb-warn-soft);color:#fcd77a;}
+.tb.tb-dunkel .tb-kette .tb-schritt-box{background:#18213a;}
+.tb.tb-dunkel .tb-schalter{background:#33425f;} .tb.tb-dunkel .tb-chip.laeuft{border-color:#2c4a8a;} .tb.tb-dunkel .tb-chip.ok{border-color:#1f5a37;}
+.tb.tb-dunkel .tb-karte{box-shadow:none;}
+.tb.tb-dunkel .lt-kachel.gruen{border-color:#1f6b3d;} .tb.tb-dunkel .lt-knopf.start{border-color:#1f6b3d;}
+.tb.tb-dunkel .lt-knopf:disabled:not([aria-pressed="true"]),.tb.tb-dunkel .gesperrt button:disabled{background:#1b2436;color:#5f6b82;border-color:var(--tb-line);}
+.tb.tb-dunkel .lt-stufen button,.tb.tb-dunkel .lt-betrieb button,.tb.tb-dunkel .lt-knopf{background:var(--tb-card);color:var(--tb-ink);}
+.tb.tb-dunkel .lt-stufen button[aria-pressed="true"],.tb.tb-dunkel .lt-betrieb button[aria-pressed="true"],.tb.tb-dunkel .lt-knopf[aria-pressed="true"]{background:var(--tb-acc-soft);color:#c7caff;}
+.tb.tb-dunkel .lt-knopf.start{color:var(--lt-gruen);} .tb.tb-dunkel .lt-knopf.stopp{color:var(--lt-rot);}
