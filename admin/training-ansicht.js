@@ -153,7 +153,7 @@
     const st = a.stufen || {};
     const kpi = (sym, k, v, d) => '<div class="tb-kpi"><div class="tb-sym">' + sym + '</div><div><div class="k">' + e(k)
       + '</div><div class="v">' + v + '</div><div class="d">' + d + "</div></div></div>";
-    const unter = [anz("wartet") + " wartet", anz("pause") + " Schutzpause", anz("pausiert") + anz("gestoppt") ? (anz("pausiert") + anz("gestoppt")) + " vom Inhaber angehalten" : "", anz("stumm") ? anz("stumm") + " stumm" : ""].filter((x) => x && !/^0 /.test(x));
+    const unter = [anz("wartet") + " wartet", anz("pause") + " Notbremse", anz("pausiert") + anz("gestoppt") ? (anz("pausiert") + anz("gestoppt")) + " vom Inhaber angehalten" : "", anz("stumm") ? anz("stumm") + " stumm" : ""].filter((x) => x && !/^0 /.test(x));
     return '<div class="tb-reihe k4">'
       + kpi(SYM.monitor, "Arbeiten", anz("rechnet") + " von " + n, e(unter.join(" · ") || "alle arbeiten"))
       + kpi(SYM.stapel, "Arbeit auf Vorrat", tanks.length ? zahl(tanks.reduce((s, x) => s + x, 0), 1) + " / " + VORRAT_ZIEL + " Std." : "nicht erfasst",
@@ -170,7 +170,7 @@
     const FENSTER = 12 * 60;
     let x = 0;
     const teile = [];
-    if (lage === "pause") teile.push({ min: 60, farbe: "#f2b01e", titel: "Schutzpause – Ende unbekannt" });
+    if (lage === "pause") teile.push({ min: 60, farbe: "#f2b01e", titel: "Notbremse – startet von selbst wieder, sobald die Gefahr vorbei ist" });
     (f.zeitstrahl || []).forEach((z) => {
       const m = typeof z.minuten === "number" && z.minuten > 0 ? z.minuten : 30;
       teile.push({ min: m, farbe: z.status === "laeuft" ? "#3b6ef5" : z.status === "startklar" ? "#9db7ff" : "#cbd5e1",
@@ -189,7 +189,7 @@
   }
 
   const LAGE = {
-    rechnet: ["Arbeitet", "laeuft"], wartet: ["Wartet auf Arbeit", ""], pause: ["Schutzpause", "warn"], pausiert: ["Pausiert (Inhaber)", ""],
+    rechnet: ["Arbeitet", "laeuft"], wartet: ["Wartet auf Arbeit", ""], pause: ["Notbremse", "warn"], pausiert: ["Pausiert (Inhaber)", ""],
     gestoppt: ["Gestoppt (Inhaber)", "warn"], notaus: ["Not-Aus", "bad"], stumm: ["Meldet sich nicht", "bad"]
   };
 
@@ -257,7 +257,7 @@
     }
     return '<div class="tb-karte"><div class="tb-karte-kopf"><h2>Rechner &amp; nächste 12 Stunden</h2>'
       + '<div class="tb-legende"><span><i class="tb-punkt laeuft"></i>Blau läuft</span><span><i class="tb-punkt"></i>Grau wartet</span>'
-      + '<span><i class="tb-punkt warn"></i>Gelb Schutzpause</span></div></div>'
+      + '<span><i class="tb-punkt warn"></i>Gelb Notbremse</span></div></div>'
       + '<table class="tb-tabelle"><thead><tr><th>Rechner</th><th>Status &amp; aktueller Zweck</th><th>Fortschritt (Aufgabe)</th>'
       + "<th>Nächste 12 Stunden</th><th>Vorrat (48 h)</th><th>Metrik &amp; Steuerung</th></tr></thead><tbody>"
       + o.rechner.map((m, i) => rechnerZeile(m, o.lagen[i], o, offen)).join("") + "</tbody></table>"
@@ -465,7 +465,7 @@
   // ------------------------------------------------------------ Steuerung (Inhaber 03.11.2026 „Ja, umsetzen“)
   // Quelle: Meldung fabrik-steuerung (steuerung098.py). Nur Anzeige: Starten, Freigeben und Löschen geschieht nie hier.
   const AMPEL = { gruen: ["ok", "Läuft"], gelb: ["warn", "Wartet"], rot: ["bad", "Gestoppt"], grau: ["", "Angehalten"] };
-  const ZUSTAND_ST = { laeuft: "rechnet", leer: "ohne startbare Aufgabe", schutzpause: "Schutzpause", notaus: "Not-Aus",
+  const ZUSTAND_ST = { laeuft: "rechnet", leer: "ohne startbare Aufgabe", schutzpause: "Notbremse", notaus: "Not-Aus",
     stumm: "meldet sich nicht", angehalten: "vom Inhaber angehalten" };
   const RICHTUNG_ST = { offen: ["laeuft", "offen"], ungenutzt: ["", "noch ungenutzt"], analysehalt: ["warn", "Analysehalt"], erschoepft: ["bad", "erschöpft"] };
   const BEDARF_ST = { OVERDUE: ["bad", "Frist verpasst"], OVERDUE_ACKNOWLEDGED: ["warn", "spät übernommen"], ACKNOWLEDGED: ["laeuft", "übernommen"],
@@ -510,7 +510,7 @@
     const lg = manuell && l.lage === "wartet" ? ["Manuell – wartet auf Ihren Start", ""] : LAGE[l.lage] || LAGE.wartet;
     const angehalten = ["pausiert", "gestoppt"].indexOf(l.lage) >= 0;
     const erkl = manuell ? "Startet nichts von selbst. Eine neue Aufgabe beginnt erst, wenn Sie „Nächste Aufgabe starten“ drücken."
-      : "Holt sich rund um die Uhr selbst Arbeit und startet nach Schutzpausen von selbst wieder.";
+      : "Holt sich rund um die Uhr selbst Arbeit und startet nach einer Notbremse von selbst wieder.";
     const naechste = !manuell || angehalten || l.lage === "rechnet" ? ""
       : f.einmal ? pille("Start vorgemerkt", "acc", true)
       : '<button class="tb-knopf primaer" type="button" data-frRechner="' + k + '" data-frEinmal="1">▶ Nächste Aufgabe starten</button>';
@@ -568,7 +568,8 @@
     o.rechner.forEach((m, i) => {
       const f = m.fabrik || {}, l = o.lagen[i] || {};
       const lg = f.betrieb === "manuell" && l.lage === "wartet" ? ["Manuell – wartet", ""] : LAGE[l.lage] || LAGE.wartet;
-      z.push(zeile(NAME[m.id], "Eigener Rechner · steuerbar", pille(lg[0], lg[1], true), BETRIEB_NAME[f.betrieb] || "Automatisch",
+      const grund = l.lage === "pause" ? '<div class="tb-klein">' + e(f.pause || l.tut || "Grund nicht gemeldet") + " · startet von selbst wieder</div>" : "";
+      z.push(zeile(NAME[m.id], "Eigener Rechner · steuerbar", pille(lg[0], lg[1], true) + grund, BETRIEB_NAME[f.betrieb] || "Automatisch",
         LEISTUNG_NAME[l.stufe || f.stufe] || "nicht erfasst", "nur Strom", altText(m.letzteMeldung, o.jetzt, TEIL_ALT_MIN)));
     });
     cloudListe.forEach((x) => z.push(zeile(x.name || x.id, (ART_NAME[x.art] || "Cloud") + (x.steuerbar ? " · steuerbar" : " · nicht verbunden"),
@@ -628,7 +629,7 @@
         + '<td class="z">' + (typeof x.angehalten === "number" ? zahl(x.angehalten) + " (nicht startbar)" : zelle(null)) + "</td></tr>";
     });
     const rechnerKarte = '<div class="tb-karte"><h2>Rechner – Ampel und Grund</h2>' + tabelle(["Rechner", "Ampel", "Zustand / Grund", "Arbeitet an",
-      "Vorrat startbar", "Angehalten"], r) + '<div class="tb-klein">Grün läuft · Gelb wartet auf Freigabe oder Vorrat · Rot Schutzpause/Not-Aus/stumm · Grau gewollt angehalten. Angehaltene Aufträge zählen nicht als Vorrat.</div></div>';
+      "Vorrat startbar", "Angehalten"], r) + '<div class="tb-klein">Grün läuft · Gelb wartet auf Freigabe oder Vorrat · Rot Notbremse/Not-Aus/stumm · Grau gewollt angehalten. Angehaltene Aufträge zählen nicht als Vorrat.</div></div>';
     const richt = (s.richtungen || []).map((t) => {
       const [id, v, f, l, st] = String(t).split("|");
       const z = RICHTUNG_ST[st] || ["", st || ""];

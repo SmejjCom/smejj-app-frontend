@@ -102,7 +102,7 @@
   // Neuer Bereich „Training & Wissen“ (Inhaber 03.11.2026): eigene Dateien training-ansicht.js,
   // training-planung.js und training.css, hier nachgeladen (index.html steht im Admin-Lock). Laden sie
   // nicht (z. B. Konsole vom Control-Server, dessen Dateiliste fest ist), bleibt die bisherige Ansicht.
-  const TB_FASSUNG = "20261104c";
+  const TB_FASSUNG = "20261104d";
   let tbDateien = null;
   function trainingDateien() {
     if (window.adminTraining) return Promise.resolve(true);
@@ -178,7 +178,7 @@
     leise: ["Leistung Minimal", "Etwa halbe Leistung: kühler und leiser, gleiches Ergebnis, dauert länger."],
     mittel: ["Leistung Mittel", "Etwa drei Viertel Leistung."],
     vollgas: ["Leistung Maximal", "Volle Leistung. Der Schutz (Speicher, Hitze, Akku) bleibt trotzdem an."],
-    auto: ["Betrieb Automatisch", "Der Rechner holt sich rund um die Uhr selbst Arbeit und startet nach Schutzpausen von selbst wieder."],
+    auto: ["Betrieb Automatisch", "Der Rechner holt sich rund um die Uhr selbst Arbeit und startet nach einer Notbremse von selbst wieder."],
     manuell: ["Betrieb Manuell", "Der Rechner startet nichts mehr von selbst. Die laufende Aufgabe darf fertig werden. Neue Aufgaben beginnen nur mit „Nächste Aufgabe starten“."],
     einmal: ["Nächste Aufgabe starten", "Der Rechner startet genau eine Aufgabe aus seiner Warteschlange und wartet danach wieder auf Sie."]
   };
