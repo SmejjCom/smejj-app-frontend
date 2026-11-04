@@ -67,7 +67,10 @@
     const rest = fort ? H.zahl(fort.getan) + " / " + H.zahl(fort.gesamt) + " " + (fort.einheit || "") + (typeof f.restMinuten === "number" ? " · noch ca. " + H.dauerText(f.restMinuten) : "")
       : l.lage === "rechnet" ? "Fortschritt nicht messbar" : "keine laufende Aufgabe";
     const druck = { 1: "Speicher normal", 2: "Speicher knapp", 4: "Speicher kritisch" }[f.speicherdruck];
-    const werte = [typeof l.gpu === "number" ? "Grafik " + l.gpu + " %" : null, typeof l.watt === "number" ? l.watt + " W" : null, druck,
+    // Reihenfolge wie im Inhaber-Entwurf: Wärme · freier Platz · Last · Speicher · Akku · Vorrat
+    const waerme = { normal: "Wärme normal", warm: "Wärme hoch" }[f.waerme];
+    const werte = [waerme, typeof f.freiGb === "number" ? H.zahl(f.freiGb) + " GB frei" : null,
+      typeof l.gpu === "number" ? "Grafik " + l.gpu + " %" : null, typeof l.watt === "number" ? l.watt + " W" : null, druck,
       typeof f.akkuProzent === "number" ? "Akku " + f.akkuProzent + " %" : null,
       typeof f.tankStunden === "number" ? "Vorrat " + H.zahl(f.tankStunden, 1) + " Std." : null].filter(Boolean);
     const jetzt = l.lage === "pausiert" ? "pause" : l.lage === "gestoppt" ? "stopp" : "laeuft";
@@ -79,6 +82,7 @@
       '<div class="lt-was">' + e(was) + "</div>" + H.balken(p, ampel === "gruen" ? "#15803d" : "#cbd5e1")
       + '<div class="lt-klein">' + e(rest) + "</div>"
       + (werte.length ? '<div class="lt-klein">' + e(werte.join(" · ")) + " · " + H.altText(m.letzteMeldung, o.jetzt, H.TEIL_ALT_MIN) + "</div>" : "")
+      + (f.rolle ? '<div class="lt-klein">Aufgabe: ' + e(f.rolle) + "</div>" : "")
       + stufen(k, l.stufe || f.stufe || "vollgas", name) + knoepfe(k, jetzt, name) + betrieb(k, manuell, name) + extra
       + H.befehlStand(m, offen, o.t.automatik, o.jetzt));
   }
@@ -97,7 +101,8 @@
       '<div class="lt-was">' + e(lauf || x.status || "") + "</div>"
       + '<div class="lt-klein">Gratis-Stunden diese Woche: <b>' + (v === null ? "nicht erfasst" : H.zahl(v, 1) + " von 30") + "</b></div>"
       + H.balken(v === null ? 0 : 100 * v / 30, v !== null && v >= 27 ? "#b45309" : "#3b6ef5")
-      + '<div class="lt-klein">Kosten: ' + e(x.kosten || "nicht erfasst") + " · Grenze Ihrer Wahl: " + (typeof x.budgetH === "number" ? x.budgetH + " Std./Woche" : "—") + "</div>"
+      + '<div class="lt-klein">Kosten: ' + e(x.kosten || "nicht erfasst") + " · kostenlos, neue Stunden jeden Samstag · Grenze Ihrer Wahl: "
+      + (typeof x.budgetH === "number" ? x.budgetH + " Std./Woche" : "—") + "</div>"
       + stufen("kaggle", x.stufe || "vollgas", "Kaggle") + knoepfe("kaggle", x.zustand || "laeuft", "Kaggle") + betrieb("kaggle", manuell, "Kaggle") + extra
       + (x.tun ? '<div class="lt-tun">👉 ' + e(x.tun) + "</div>" : "") + quittung);
   }
@@ -159,14 +164,25 @@
       return html;
     });
     const gratis = cloudListe.concat(dienstListe).filter((x) => /^0 €|kostenlos|gratis/i.test(x.kosten || "")).length;
-    const kennzahl = (ampel, titel, wert) => '<div class="lt-zahl ' + ampel + '"><span>' + e(titel) + "</span><b>" + wert + "</b></div>";
+    // „Kosten heute“ wie im Entwurf: Strom der eigenen Rechner (24 Std., gemessen × hinterlegter Preis); Cloud nur gratis.
+    const k = o.t.kosten || {};
+    const preis = typeof k.strompreisEurKwh === "number" ? k.strompreisEurKwh : null;
+    const wh = Object.values(k.energie || {}).reduce((s, x) => s + (x && x.h24 && typeof x.h24.wh === "number" ? x.h24.wh : 0), 0);
+    const kostenHeute = preis !== null && wh > 0 ? H.zahl(wh / 1000 * preis, 2) + " €" : "nur Strom";
+    const kostenText = (preis !== null && wh > 0 ? "Strom 24 Std. (geschätzt) · " : "Strompreis nicht hinterlegt · ") + "Cloud: " + gratis + " von "
+      + (cloudListe.length + dienstListe.length) + " gratis";
+    const kennzahl = (ampel, titel, wert, unter) => '<div class="lt-zahl ' + ampel + '"><span>' + e(titel) + "</span><b>" + wert + "</b>"
+      + (unter ? '<span class="lt-klein">' + e(unter) + "</span>" : "") + "</div>";
     return '<div class="lt">'
-      // „Alle starten / Maximal / Pause / Not-Aus“ stehen schon in der Kopfleiste des Bereichs – hier nicht doppelt.
-      + '<div class="lt-leiste"><div class="lt-titel">' + ICON.fabrik + "<span>Leitstand – alle Rechner</span></div>"
-      + '<div class="lt-klein">Knöpfe oben gelten für alle steuerbaren Rechner gleichzeitig.</div></div>'
+      // Wie im Entwurf: die vier Knöpfe für alle direkt am Leitstand (dieselben Befehle wie in der Kopfleiste des Bereichs).
+      + '<div class="lt-leiste"><div class="lt-titel">' + ICON.fabrik + "<span>Leitstand – alle Rechner</span></div><div class=\"lt-alle\">"
+      + '<button type="button" class="lt-knopf start" data-frRechner="alle" data-frZustand="laeuft">▶ Alle starten</button>'
+      + '<button type="button" class="lt-knopf" data-frRechner="alle" data-frStufe="vollgas">⚡ Alle Maximal</button>'
+      + '<button type="button" class="lt-knopf" data-frRechner="alle" data-frZustand="pause">❚❚ Alle Pause</button>'
+      + '<button type="button" class="lt-knopf stopp" data-frRechner="alle" data-frZustand="stopp">⏻ Not-Aus</button></div></div>'
       + '<div class="lt-zahlen">' + kennzahl("gruen", "Arbeiten gerade", zaehl.gruen + " von " + (kacheln.length + cloud.length))
       + kennzahl("gelb", "Warten / Pause", zaehl.gelb) + kennzahl("rot", "Gestoppt / gesperrt", zaehl.rot + zaehl.grau)
-      + kennzahl("", "Kostenlose Dienste", gratis + " von " + (cloudListe.length + dienstListe.length)) + "</div>"
+      + kennzahl("", "Kosten heute", kostenHeute, kostenText) + "</div>"
       + '<div class="lt-legende"><span><i class="lt-licht gruen"></i>Grün = arbeitet</span><span><i class="lt-licht gelb"></i>Gelb = wartet oder Pause</span>'
       + '<span><i class="lt-licht rot"></i>Rot = gestoppt oder gesperrt</span><span><i class="lt-licht grau"></i>Grau = nicht verbunden</span></div>'
       + '<h3 class="lt-abschnitt">Eigene Rechner</h3><div class="lt-raster">'

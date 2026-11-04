@@ -274,3 +274,6 @@
   .tb .lt-zahlen{grid-template-columns:1fr 1fr;}
   .tb .lt-titel{font-size:19px;}
 }
+.tb .lt-alle{display:flex;gap:8px;flex-wrap:wrap;}   /* Entwurf: vier Knöpfe für alle direkt am Leitstand */
+.tb .lt-zahl .lt-klein{display:block;margin-top:2px;}
+@media (max-width:760px){.tb .lt-alle{width:100%;display:grid;grid-template-columns:1fr 1fr;}}

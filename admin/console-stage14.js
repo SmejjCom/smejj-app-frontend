@@ -102,7 +102,7 @@
   // Neuer Bereich „Training & Wissen“ (Inhaber 03.11.2026): eigene Dateien training-ansicht.js,
   // training-planung.js und training.css, hier nachgeladen (index.html steht im Admin-Lock). Laden sie
   // nicht (z. B. Konsole vom Control-Server, dessen Dateiliste fest ist), bleibt die bisherige Ansicht.
-  const TB_FASSUNG = "20261104f";
+  const TB_FASSUNG = "20261104g";
   let tbDateien = null;
   function trainingDateien() {
     if (window.adminTraining) return Promise.resolve(true);
