@@ -100,6 +100,7 @@
       const feld = document.createElement(config.mehrzeilig ? "textarea" : "input");
       feld.className = "dlg-feld" + (config.mehrzeilig ? " dlg-feld-gross" : "");
       if (!config.mehrzeilig) feld.type = "text";
+      feld.autocomplete = "off";   // sonst schlägt der Browser gespeicherte Namen vor
       feld.value = config.vorgabe || "";
       if (config.platzhalter) feld.placeholder = config.platzhalter;
       feld.setAttribute("aria-label", config.titel || "Eingabe");

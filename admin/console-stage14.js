@@ -197,11 +197,15 @@
   };
 
   // Training models: Wunsch an einen Rechner, an Kaggle (oder alle). Grund ist Pflicht (Audit-Log).
+  // Ein Klick (Inhaber 05.11.2026): Kleine, umkehrbare Schalter an EINEM Gerät gehen ohne Frage raus;
+  // der Grund wird automatisch vermerkt. Stopp und alles, was alle Geräte trifft, fragen weiter nach.
   async function wunsch(ctx, rechner, zustand, stufe, betrieb, einmal) {
     const schluessel = zustand || stufe || betrieb || (einmal ? "einmal" : "");
     const art = (rechner === "kaggle" ? KAGGLE_TEXT : WUNSCH_TEXT)[schluessel];
     if (!art) return;
-    const grund = await D.text({
+    const einKlick = rechner !== "alle" && zustand !== "stopp";
+    const uhr = new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+    const grund = einKlick ? "Leitstand-Klick " + art[0] + " (Inhaber, " + uhr + ")" : await D.text({
       titel: art[0] + " — " + (RECHNER_NAME[rechner] || rechner),
       absaetze: [art[1], rechner === "kaggle"
         ? "Die Fabrik übernimmt es im Minutentakt; neue Kaggle-Läufe startet die stündliche Fabrik-Kontrolle."
@@ -230,7 +234,8 @@
       offen[k] = o;
     });
     offenSpeichern();
-    ctx.meldung(antwort.data && antwort.data.hinweis ? antwort.data.hinweis : "Vermerkt.", false);
+    ctx.meldung((antwort.data && antwort.data.hinweis ? antwort.data.hinweis : "Vermerkt.")
+      + (einKlick ? " Zurücknehmen: einfach den anderen Knopf drücken." : ""), false);
     ladenTraining(ctx, true);
   }
 
