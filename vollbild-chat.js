@@ -36,4 +36,55 @@ export function beobachteFeld(doc = document, Beobachter = typeof ResizeObserver
   return true;
 }
 
-if (typeof document !== "undefined" && document.getElementById("startMessage")) beobachteFeld();
+// Kopf wegwischen (Inhaberfreigabe 05.11.2026, design-v19-glas-wischen.css): liest man
+// im Chat weiter nach unten, gleitet der Kopf nach oben weg (html.kopf-weg); zurueck-
+// scrollen oder ganz oben holt ihn wieder. Nur Scrollen durch den Finger zaehlt —
+// das Mitlaufen beim Antworten (Programm-Scroll) laesst den Kopf stehen.
+export const KOPF_SCHWELLE_PX = 6;
+export const KOPF_OBEN_PX = 48;
+export const FINGER_NACHLAUF_MS = 2500;
+
+/** Neuer Zustand des Kopfes aus zwei Scrollstaenden. Reine Funktion. */
+export function kopfWeg({ vorher, jetzt, weg, max }) {
+  if (jetzt <= KOPF_OBEN_PX / 6) return false;
+  if (Number.isFinite(max) && (jetzt > max || vorher > max)) return weg;
+  const delta = jetzt - vorher;
+  if (delta > KOPF_SCHWELLE_PX && jetzt > KOPF_OBEN_PX) return true;
+  if (delta < -KOPF_SCHWELLE_PX) return false;
+  return weg;
+}
+
+export function verdrahteKopfWischen(doc = document, win = window) {
+  const start = doc.getElementById("start");
+  const log = doc.getElementById("startLog");
+  if (!start || !log || start.dataset.kopfWischen === "an") return false;
+  start.dataset.kopfWischen = "an";
+  const root = doc.documentElement;
+  const schmal = win.matchMedia ? win.matchMedia("(max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px)") : null;
+  let finger = -Infinity;
+  let vorher = log.scrollTop;
+  const setze = (weg) => root.classList.toggle("kopf-weg", Boolean(weg));
+  const anfassen = () => { finger = Date.now(); };
+  for (const art of ["touchstart", "touchmove", "touchend", "wheel"]) log.addEventListener(art, anfassen, { passive: true });
+  log.addEventListener("scroll", () => {
+    const jetzt = log.scrollTop;
+    const vomFinger = Date.now() - finger < FINGER_NACHLAUF_MS;
+    if (schmal?.matches && start.classList.contains("has-start-chat") && vomFinger) {
+      setze(kopfWeg({ vorher, jetzt, weg: root.classList.contains("kopf-weg"), max: log.scrollHeight - log.clientHeight }));
+    } else if (jetzt <= KOPF_OBEN_PX / 6) setze(false);
+    vorher = jetzt;
+  }, { passive: true });
+  // Neuer Chat, Ansichtswechsel oder Tastatur-Fokus im Kopf: Kopf immer zeigen.
+  new MutationObserver(() => {
+    if (!start.classList.contains("has-start-chat") || !start.classList.contains("is-active")) setze(false);
+  }).observe(start, { attributes: true, attributeFilter: ["class"] });
+  doc.addEventListener("focusin", (event) => {
+    if (event.target?.closest?.("#appMenuButton, #browserButton, #mausButton, #neuerChatStart")) setze(false);
+  });
+  return true;
+}
+
+if (typeof document !== "undefined" && document.getElementById("startMessage")) {
+  beobachteFeld();
+  verdrahteKopfWischen();
+}
