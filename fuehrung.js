@@ -10,8 +10,8 @@
 
 // SPRACHE (20.09.2026): Die vier Blasen standen fest auf Deutsch und
 // begruessten damit auch englische Nutzer auf Deutsch.
-import { t } from "./i18n/ui.js?v=2026110507";
-import { setPanelOpen } from "./panel-layout.js?v=2026110507";
+import { t } from "./i18n/ui.js?v=2026110508";
+import { setPanelOpen } from "./panel-layout.js?v=2026110508";
 
 const GESEHEN_KEY = "smejj.fuehrung.v1";
 

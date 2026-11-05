@@ -219,6 +219,14 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
 const UNTERBRECHEN_ZIELE = "#voiceModeOverlay .voice-mode-logo, #voiceModeOverlay .voice-mode-wave, #voiceModeStatus";
 const ANZEIGE = { speaking: "Ich spreche ...", thinking: "Einen Moment ..." };
 const antwortLaeuft = () => ["thinking", "speaking"].includes(overlayModus());
+const NACHLAUF_MS = 2000;
+const woerter = (text) => String(text || "").toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter(Boolean);
+/** true, wenn (fast) alle Woerter des Nachlaufs schon in der gesendeten Frage stehen. */
+export function istSchonEnthalten(nachlauf, frage) {
+  const rest = woerter(nachlauf);
+  const drin = new Set(woerter(frage));
+  return rest.length > 0 && rest.filter((w) => drin.has(w)).length / rest.length >= 0.7;
+}
 function overlayModus() {
   const overlay = typeof document !== "undefined" ? document.getElementById?.("voiceModeOverlay") : null;
   return overlay?.dataset?.mode || "";
@@ -268,12 +276,24 @@ export function verdrahteOhrSolo(host) {
     // beim Denken UND beim Sprechen; die Echo-Unterdrueckung des Geraets (getUserMedia) haelt
     // die eigene Stimme fern. Spricht jemand, wird smejj sofort leiser; ist es echte Sprache,
     // stoppt die Antwort (senden -> voiceModeSend), sonst wird es wieder laut.
-    aufStatus: () => { if (zwischen) return void host.ducken?.(true); host.setStatus("listening", "Ich höre zu ..."); },
+    // Spricht der Nutzer beim Start des Ohrs noch (die Erkennung schickte zu frueh ab), ist das
+    // KEINE neue Frage, sondern der Rest der alten (Live-Befund 05.11.: „… Mittelalter bis heute“).
+    aufStatus: () => {
+      if (!zwischen) return void host.setStatus("listening", "Ich höre zu ...");
+      if (Date.now() - zwischenSeit < NACHLAUF_MS) nachlauf = true;
+      else host.ducken?.(true);
+    },
     aufTranskript: (text) => {
       const s = host.state;
       if (zwischen) {
         host.ducken?.(false);
         if (!s.voiceModeActive || s.voiceMuted || !antwortLaeuft()) { zwischen = false; return; }
+        if (nachlauf) {
+          nachlauf = false;
+          const frage = host.letzteFrage?.() || "";
+          if (!frage || istSchonEnthalten(text, frage)) return void solo.start(); // Rest stand schon in der Frage
+          const ganz = `${frage} ${text}`; host.setTranskript(ganz); host.senden(ganz); return; // Frage vervollstaendigen
+        }
         if (host.istEcho?.(text)) return void solo.start(); // eigenes Echo/Geraeusch: weiter lauschen
         host.setTranskript(text); host.senden(text); return;
       }
@@ -285,7 +305,13 @@ export function verdrahteOhrSolo(host) {
       if (zwischen) host.ducken?.(false);
       if (s.voiceModeActive && !s.voiceMuted && (zwischen ? antwortLaeuft() : s.ohrSoloAktiv)) solo.start();
     },
-    aufFehler: (fehler) => { if (zwischen) { zwischen = false; return; } host.fallback(soloFehlertext(fehler)); },
+    // Direkt nach einer Unterbrechung ist das Ohr manchmal noch nicht aufgeraeumt: kurz warten und
+    // neu starten (Live-Befund 05.11.: danach war es stumm), hoechstens 3 Versuche.
+    aufFehler: (fehler) => {
+      if (!zwischen) return void host.fallback(soloFehlertext(fehler));
+      if (++zwischenVersuche > 3) { zwischen = false; return; }
+      setTimeout(() => { if (zwischen && antwortLaeuft()) solo.start(); }, 500);
+    },
     // Lebendes Sprach-Logo (Betreiber-Massgabe 2026-08-30 "wie ChatGPT"): der
     // Pegel dieser Runde steuert Chevron-Spitzen, Punkte und Aura im Overlay.
     // Sprach-RMS liegt typisch bei 0,03-0,2 — Faktor 4,5 hebt das auf 0,14-0,9.
@@ -318,6 +344,9 @@ export function verdrahteOhrSolo(host) {
     stummWache.observe(overlay, { attributes: true, attributeFilter: ["data-mode"] });
   }
   let zwischen = false;
+  let zwischenSeit = 0;
+  let zwischenVersuche = 0;
+  let nachlauf = false;
   const anschluss = {
     // Inhaber 05.11.2026 „wie ChatGPT“: waehrend smejj denkt, hoert das Ohr weiter zu; eine
     // neue Frage bricht die alte Antwort ab (composer-tools.js voiceModeSend). Kein Statuswechsel.
@@ -325,6 +354,9 @@ export function verdrahteOhrSolo(host) {
       const s = host.state;
       if (!s?.voiceModeActive || s.voiceMuted || !(s.ohrSoloAktiv || host.earAlive?.())) return false;
       zwischen = true;
+      zwischenSeit = Date.now();
+      zwischenVersuche = 0;
+      nachlauf = false;
       solo.start();
       return true;
     },
