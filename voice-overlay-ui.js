@@ -19,7 +19,7 @@
 // untere Leiste mit Eingabefeld, Mikrofon-Stummschalter und Beenden-Button).
 // Das index.html-Markup bleibt unveraendert — das Upgrade passiert rein im Browser.
 // sendIcon: das gemeinsame Pfeil-Symbol aus voice-typed-send.js (SEND_ICON_SVG).
-import { t } from "./i18n/ui.js?v=2026110506";
+import { t } from "./i18n/ui.js?v=2026110507";
 
 // Die Statuszeilen kommen aus drei Modulen und schreiben mal "..." und mal
 // "…". Fuer die Uebersetzung wird darum zuerst vereinheitlicht, sonst
@@ -117,8 +117,8 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
   eingabe?.addEventListener("paste", async (event) => {
     try {
       const [{ bildDateienAusClipboard }, { uebernehmeBildDatei }] = await Promise.all([
-        import("./composer-paste-attach.js?v=2026110506"),
-        import("./composer-bild-anhang.js?v=2026110506")
+        import("./composer-paste-attach.js?v=2026110507"),
+        import("./composer-bild-anhang.js?v=2026110507")
       ]);
       const bilder = bildDateienAusClipboard(event.clipboardData);
       if (!bilder.length) return;
@@ -147,11 +147,11 @@ function ladeStimmenPanel(overlay) {
     if (!document.querySelector("link[data-voice-glas]")) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = new URL("./voice-glas.css?v=2026110506", import.meta.url).href;
+      link.href = new URL("./voice-glas.css?v=2026110507", import.meta.url).href;
       link.dataset.voiceGlas = "true";
       document.head.appendChild(link);
     }
-    import("./voice-stimmen-panel.js?v=2026110506")
+    import("./voice-stimmen-panel.js?v=2026110507")
       .then(({ bindeStimmenPanel }) => bindeStimmenPanel({ overlay }))
       .catch(() => { /* Panel nicht ladbar: Sprachmodus bleibt unveraendert */ });
   } catch { /* ohne DOM/import.meta: nichts tun */ }

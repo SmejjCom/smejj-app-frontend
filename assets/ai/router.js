@@ -1,10 +1,10 @@
-import { AI_MODES, getProvider } from "./providers.js?v=2026110506";
-import { validateByokConfig } from "./byok.js?v=2026110506";
-import { detectLocalBrowserAi } from "./localBrowser.js?v=2026110506";
-import { evaluateFreeDemo } from "./freeDemoHardlimit.js?v=2026110506";
-import { disabledMode } from "./disabledMode.js?v=2026110506";
-import { containsPaidRisk, evaluateAiCost } from "./costGuard.js?v=2026110506";
-import { buildPromptContext } from "./promptContextBuilder.js?v=2026110506";
+import { AI_MODES, getProvider } from "./providers.js?v=2026110507";
+import { validateByokConfig } from "./byok.js?v=2026110507";
+import { detectLocalBrowserAi } from "./localBrowser.js?v=2026110507";
+import { evaluateFreeDemo } from "./freeDemoHardlimit.js?v=2026110507";
+import { disabledMode } from "./disabledMode.js?v=2026110507";
+import { containsPaidRisk, evaluateAiCost } from "./costGuard.js?v=2026110507";
+import { buildPromptContext } from "./promptContextBuilder.js?v=2026110507";
 
 export function createAiRouter({ navigatorRef = globalThis.navigator } = {}) {
   function resolveMode({ mode = AI_MODES.disabled, byok = {}, freeDemo = {} } = {}) {
