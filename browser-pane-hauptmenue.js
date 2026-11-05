@@ -17,10 +17,10 @@
 //
 // SRP: kennt Eintraege und ihre Reihenfolge. WAS ein Eintrag ausloest, kommt
 // als Befehl herein — dadurch bleibt alles ohne DOM pruefbar.
-import { zeigeMenue } from "./browser-pane-menue.js?v=2026110509";
-import { t } from "./i18n/ui.js?v=2026110509";
-import { applyZoom, ZOOM_STEP } from "./browser-pane-zoom.js?v=2026110509";
-import { clampZoom } from "./browser-pane-adressen.js?v=2026110509";
+import { zeigeMenue } from "./browser-pane-menue.js?v=2026110510";
+import { t } from "./i18n/ui.js?v=2026110510";
+import { applyZoom, ZOOM_STEP } from "./browser-pane-zoom.js?v=2026110510";
+import { clampZoom } from "./browser-pane-adressen.js?v=2026110510";
 
 /**
  * Reine Liste — ohne DOM pruefbar.

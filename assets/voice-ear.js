@@ -18,7 +18,7 @@
 // Zeitbudget nach dem Sprech-Ende: laenger warten wir nicht auf den Server,
 // sonst fuehlt sich das Gespraech traege an. Groq transkribiert eine Stunde
 // Audio in ~15 s — der Engpass ist der Upload, nicht das Modell.
-import { beobachtePegel } from "./audio-pegel.js?v=2026110509";
+import { beobachtePegel } from "./audio-pegel.js?v=2026110510";
 export const EAR_BUDGET_MS = 1500;
 // Obergrenze der Aufnahme (Schutz von Free-Tier und Upload-Zeit).
 const MAX_AUFNAHME_MS = 60_000;
@@ -112,7 +112,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
   let wecker = 0;
   let aufnahmeEnde = null;
   let pegelStop = () => {};
-  let ruhe = Infinity, spitze = 0;
+  let ruhe = Infinity, spitze = 0, letzteSprache = 0;
   let fehlerMelden = () => {};
   // Laufnummer (Geraetebefund 23.09.2026, iPhone: orangefarbener Mikrofon-Punkt
   // blieb an). start() wartet auf getUserMedia; kam in der Zwischenzeit
@@ -144,6 +144,12 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
 
   return {
     /** true, wenn in der laufenden Aufnahme deutlich lauter als die Raumruhe gesprochen wurde. */
+    /** Wartet, bis seit stilleMs niemand mehr spricht (hoechstens maxMs) — die Erkennung schickte
+     *  Fragen sonst bei einer Komma-Pause ab und der Satzrest fehlte (Live-Befund 05.11.2026). */
+    async wartenAufStille(stilleMs = 700, maxMs = 3000) {
+      const bis = Date.now() + maxMs;
+      while (recorder && Date.now() < bis && Date.now() - letzteSprache < stilleMs) await new Promise((r) => setTimeout(r, 100));
+    },
     hoerteSprache: () => Boolean(recorder) && spitze >= Math.max(0.03, ruhe * 4),
     isAlive() {
       return alive && Boolean(pickRecorderMime()) && typeof navigator !== "undefined"
@@ -180,7 +186,10 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
         // jemand sprach, rettet composer-tools.js die Aufnahme (hoerteSprache()).
         ruhe = Infinity; spitze = 0;
         pegelStop = beobachtePegel(captured, (pegel) => {
-          if (Number.isFinite(pegel)) { ruhe = Math.min(ruhe, Math.max(pegel, 0.002)); spitze = Math.max(spitze, pegel); }
+          if (Number.isFinite(pegel)) {
+            ruhe = Math.min(ruhe, Math.max(pegel, 0.002)); spitze = Math.max(spitze, pegel);
+            if (pegel >= Math.max(0.03, ruhe * 4)) letzteSprache = Date.now();
+          }
           onLevel?.(pegel);
         });
         // Harte Obergrenze: eine vergessene Aufnahme laeuft nie ewig weiter.
@@ -287,6 +296,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
 export function createEarSend({ ear, istAktiv, istStumm, zeigeDenken, zeigeTranskript, sollNachfragenFn, nachfragen, senden }) {
   return async function earSend(task, confidence) {
     zeigeDenken?.();
+    await ear?.wartenAufStille?.(); // ganzer Satz statt Abbruch an der Komma-Pause
     const serverText = ear ? await ear.finish() : "";
     if (!istAktiv()) return;
     if (istStumm?.()) return; // waehrenddessen stummgeschaltet — nichts senden
