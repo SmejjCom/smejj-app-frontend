@@ -12,8 +12,8 @@
 //
 // Wichtig: dir/lang werden NUR auf Surface-Ebene gesetzt (uiDirection),
 // niemals global — die start-gelockte Startseite bleibt unberuehrt.
-import { STORAGE_KEYS } from "../config.js?v=2026110511";
-import { LANGUAGE_OPTIONS } from "../language-options.js?v=2026110511";
+import { STORAGE_KEYS } from "../config.js?v=2026110512";
+import { LANGUAGE_OPTIONS } from "../language-options.js?v=2026110512";
 
 const SUPPORTED = new Set(LANGUAGE_OPTIONS.map(([code]) => code));
 const RTL_LANGUAGES = new Set(["ar"]);
@@ -93,7 +93,7 @@ export async function loadUiLanguage(language) {
     return currentLanguage;
   }
   try {
-    const bundle = await import(`./${next}.js?v=2026110511`);
+    const bundle = await import(`./${next}.js?v=2026110512`);
     messages = bundle.default || null;
     currentLanguage = messages ? next : SOURCE_LANGUAGE;
     writeCache(currentLanguage, messages);
