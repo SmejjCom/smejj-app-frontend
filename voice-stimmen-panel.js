@@ -12,12 +12,12 @@
 // nutzt den vorhandenen Unterbrechen-Weg (Tipp auf das Logo,
 // voice-ohr-solo.js/voice-realtime.js), statt einen zweiten zu bauen.
 // Eingehaengt von voice-overlay-ui.js per dynamischem Import (fail-safe).
-import { stimmText } from "./voice-overlay-ui.js?v=2026110505";
-import { CLIENT_ROUTES } from "./config.js?v=2026110505";
-import { createPremiumVoice } from "./voice-premium-tts.js?v=2026110505";
+import { stimmText } from "./voice-overlay-ui.js?v=2026110506";
+import { CLIENT_ROUTES } from "./config.js?v=2026110506";
+import { createPremiumVoice } from "./voice-premium-tts.js?v=2026110506";
 import {
   PERSOENLICHKEITEN, STIMMEN, leseStimmWahl, persoenlichkeitVon, speichereStimmWahl, sprechstilRegel, waehleBrowserStimme
-} from "./voice-stimmen.js?v=2026110505";
+} from "./voice-stimmen.js?v=2026110506";
 
 // Eigene Texte dieses Menues: Deutsch ist der Schluessel (wie i18n/ui.js);
 // fehlt dort eine Uebersetzung, hilft fuer Englisch diese kleine Tabelle.

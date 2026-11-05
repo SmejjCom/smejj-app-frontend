@@ -218,6 +218,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
 // Tipp-Flaechen fuers Unterbrechen (wie ChatGPT: auf die Kugel tippen) und die Anzeige-Texte.
 const UNTERBRECHEN_ZIELE = "#voiceModeOverlay .voice-mode-logo, #voiceModeOverlay .voice-mode-wave, #voiceModeStatus";
 const ANZEIGE = { speaking: "Ich spreche ...", thinking: "Einen Moment ..." };
+const antwortLaeuft = () => ["thinking", "speaking"].includes(overlayModus());
 function overlayModus() {
   const overlay = typeof document !== "undefined" ? document.getElementById?.("voiceModeOverlay") : null;
   return overlay?.dataset?.mode || "";
@@ -263,15 +264,28 @@ export function verdrahteOhrSolo(host) {
   }
   const solo = createOhrSolo({
     ear,
-    aufStatus: () => host.setStatus("listening", "Ich höre zu ..."),
+    // Zwischenfrage-Ohr (05.11.2026, Inhaber am Telefon: „ich rede, keine Reaktion“): lauscht
+    // beim Denken UND beim Sprechen; die Echo-Unterdrueckung des Geraets (getUserMedia) haelt
+    // die eigene Stimme fern. Spricht jemand, wird smejj sofort leiser; ist es echte Sprache,
+    // stoppt die Antwort (senden -> voiceModeSend), sonst wird es wieder laut.
+    aufStatus: () => { if (zwischen) return void host.ducken?.(true); host.setStatus("listening", "Ich höre zu ..."); },
     aufTranskript: (text) => {
       const s = host.state;
+      if (zwischen) {
+        host.ducken?.(false);
+        if (!s.voiceModeActive || s.voiceMuted || !antwortLaeuft()) { zwischen = false; return; }
+        if (host.istEcho?.(text)) return void solo.start(); // eigenes Echo/Geraeusch: weiter lauschen
+        host.setTranskript(text); host.senden(text); return;
+      }
       if (!s.voiceModeActive || s.voiceMuted || !s.ohrSoloAktiv) return; // stumm/zu: nichts senden
       host.setTranskript(text); host.senden(text);
     },
-    // Zwischenfrage-Ohr (05.11.2026): beim Denken weiter lauschen, beim Sprechen nicht (Echo).
-    aufLeer: () => { const s = host.state; if (s.voiceModeActive && !s.voiceMuted && s.ohrSoloAktiv && (!zwischen || overlayModus() === "thinking")) solo.start(); },
-    aufFehler: (fehler) => host.fallback(soloFehlertext(fehler)),
+    aufLeer: () => {
+      const s = host.state;
+      if (zwischen) host.ducken?.(false);
+      if (s.voiceModeActive && !s.voiceMuted && (zwischen ? antwortLaeuft() : s.ohrSoloAktiv)) solo.start();
+    },
+    aufFehler: (fehler) => { if (zwischen) { zwischen = false; return; } host.fallback(soloFehlertext(fehler)); },
     // Lebendes Sprach-Logo (Betreiber-Massgabe 2026-08-30 "wie ChatGPT"): der
     // Pegel dieser Runde steuert Chevron-Spitzen, Punkte und Aura im Overlay.
     // Sprach-RMS liegt typisch bei 0,03-0,2 — Faktor 4,5 hebt das auf 0,14-0,9.
@@ -309,10 +323,12 @@ export function verdrahteOhrSolo(host) {
     // neue Frage bricht die alte Antwort ab (composer-tools.js voiceModeSend). Kein Statuswechsel.
     zwischenHoeren() {
       const s = host.state;
-      if (!s?.voiceModeActive || s.voiceMuted || !s.ohrSoloAktiv) return;
+      if (!s?.voiceModeActive || s.voiceMuted || !(s.ohrSoloAktiv || host.earAlive?.())) return false;
       zwischen = true;
       solo.start();
+      return true;
     },
+    zwischenAktiv: () => zwischen,
     zwischenEnde() {
       if (!zwischen) return;
       zwischen = false;
