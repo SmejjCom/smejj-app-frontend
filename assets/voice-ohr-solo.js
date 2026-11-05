@@ -269,7 +269,8 @@ export function verdrahteOhrSolo(host) {
       if (!s.voiceModeActive || s.voiceMuted || !s.ohrSoloAktiv) return; // stumm/zu: nichts senden
       host.setTranskript(text); host.senden(text);
     },
-    aufLeer: () => { const s = host.state; if (s.voiceModeActive && !s.voiceMuted && s.ohrSoloAktiv) solo.start(); },
+    // Zwischenfrage-Ohr (05.11.2026): beim Denken weiter lauschen, beim Sprechen nicht (Echo).
+    aufLeer: () => { const s = host.state; if (s.voiceModeActive && !s.voiceMuted && s.ohrSoloAktiv && (!zwischen || overlayModus() === "thinking")) solo.start(); },
     aufFehler: (fehler) => host.fallback(soloFehlertext(fehler)),
     // Lebendes Sprach-Logo (Betreiber-Massgabe 2026-08-30 "wie ChatGPT"): der
     // Pegel dieser Runde steuert Chevron-Spitzen, Punkte und Aura im Overlay.
@@ -302,13 +303,28 @@ export function verdrahteOhrSolo(host) {
     });
     stummWache.observe(overlay, { attributes: true, attributeFilter: ["data-mode"] });
   }
+  let zwischen = false;
   const anschluss = {
+    // Inhaber 05.11.2026 „wie ChatGPT“: waehrend smejj denkt, hoert das Ohr weiter zu; eine
+    // neue Frage bricht die alte Antwort ab (composer-tools.js voiceModeSend). Kein Statuswechsel.
+    zwischenHoeren() {
+      const s = host.state;
+      if (!s?.voiceModeActive || s.voiceMuted || !s.ohrSoloAktiv) return;
+      zwischen = true;
+      solo.start();
+    },
+    zwischenEnde() {
+      if (!zwischen) return;
+      zwischen = false;
+      solo.stop();
+    },
     // Inhaber-Auftrag 28.10.2026 (ersetzt die Freigabe vom 27.10. „Mikrofon-Tipp stoppt
     // auch das Reden“): Stumm schaltet nur das Mikrofon aus. Die laufende Antwort wird zu
     // Ende gesprochen; danach bleibt das Mikrofon aus, bis der Nutzer es wieder einschaltet.
     // Der Host setzt direkt nach stop() "muted" — laeuft noch eine Antwort, kommt ihre
     // Anzeige ("Ich spreche ..." / "Einen Moment ...") gleich danach zurueck.
     stop: () => {
+      zwischen = false;
       solo.stop();
       const s = host.state;
       if (!s?.voiceMuted) return;
@@ -331,6 +347,7 @@ export function verdrahteOhrSolo(host) {
       return true;
     },
     hoeren() {
+      zwischen = false;
       host.stopInterrupt();
       host.stopBarge();
       host.setStatus("listening", "Ich höre zu ...");

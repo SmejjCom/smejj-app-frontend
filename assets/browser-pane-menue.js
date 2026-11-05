@@ -1,4 +1,4 @@
-import { t } from "./i18n/ui.js?v=2026110502";
+import { t } from "./i18n/ui.js?v=2026110503";
 
 // smejj.com — ein Kontextmenue fuer alles im Panel.
 //

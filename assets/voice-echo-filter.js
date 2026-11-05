@@ -78,3 +78,12 @@ export function istGeraeusch(text) {
   if (GERAEUSCH_ETIKETTEN.has(normalized)) return true;
   return GERAEUSCH_ANFAENGE.some((anfang) => normalized.startsWith(anfang));
 }
+
+// Inhaber 05.11.2026 („waehrend er denkt, will ich was anderes fragen“): smejj hoert jetzt
+// auch beim Denken zu. Sein eigener Denk-Laut („Einen Moment …“) darf dabei keine Frage sein —
+// sonst bricht er sich selbst ab („moment“ ist zugleich ein Stopp-Wort).
+export function istDenkLautEcho(text, denkLaut = "Einen Moment") {
+  const gehoert = normalizeSpeechText(text);
+  const laut = normalizeSpeechText(denkLaut);
+  return Boolean(gehoert) && (gehoert === laut || laut.endsWith(gehoert) || gehoert === `${laut} bitte`);
+}

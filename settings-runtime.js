@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from "./config.js?v=2026110502";
+import { STORAGE_KEYS } from "./config.js?v=2026110503";
 
 // Version des gespeicherten Einstellungsstands. Erhoehen, wenn ein Feld seine
 // Bedeutung aendert und ein alter Wert nicht mehr als bewusste Wahl gelten darf.
