@@ -272,6 +272,8 @@ export function verdrahteOhrSolo(host) {
   }
   const solo = createOhrSolo({
     ear,
+    // Zwischenfrage: hoechstens 10 s je Aufnahme, dann auswerten (nie bis zum 45-s-Limit haengen).
+    automatFactory: () => createSoloAutomat(zwischen ? { maxMs: 10_000 } : {}),
     // Zwischenfrage-Ohr (05.11.2026, Inhaber am Telefon: „ich rede, keine Reaktion“): lauscht
     // beim Denken UND beim Sprechen; die Echo-Unterdrueckung des Geraets (getUserMedia) haelt
     // die eigene Stimme fern. Spricht jemand, wird smejj sofort leiser; ist es echte Sprache,
@@ -281,7 +283,9 @@ export function verdrahteOhrSolo(host) {
     aufStatus: () => {
       if (!zwischen) return void host.setStatus("listening", "Ich höre zu ...");
       if (Date.now() - zwischenSeit < NACHLAUF_MS) nachlauf = true;
-      else host.ducken?.(true);
+      // Immer leiser: sonst haelt die eigene Stimme den Pegel hoch, das Ohr findet kein Satzende
+      // und wertet nie aus (Live-Befund 05.11. v1078).
+      host.ducken?.(true);
     },
     aufTranskript: (text) => {
       const s = host.state;

@@ -1,10 +1,10 @@
-import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js?v=2026110508";
-import { t } from "./i18n/ui.js?v=2026110508";
-import { applyServerAiStatus } from "/assets/storage/index.js?v=2026110508";
-import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=2026110508";
-import { initSettingsSurface } from "./settings-surface.js?v=2026110508";
-import { initAccountPrivacySurface } from "./account-privacy.js?v=2026110508";
-import { afterFirstPaint } from "./deferred-start.js?v=2026110508";
+import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js?v=2026110509";
+import { t } from "./i18n/ui.js?v=2026110509";
+import { applyServerAiStatus } from "/assets/storage/index.js?v=2026110509";
+import { initAutonomousCodingSurface } from "./autonomous-coding.js?v=2026110509";
+import { initSettingsSurface } from "./settings-surface.js?v=2026110509";
+import { initAccountPrivacySurface } from "./account-privacy.js?v=2026110509";
+import { afterFirstPaint } from "./deferred-start.js?v=2026110509";
 
 export function enhancePremiumSurfaces() {
   loadPremiumStyles();

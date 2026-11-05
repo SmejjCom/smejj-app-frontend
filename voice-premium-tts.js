@@ -8,7 +8,7 @@
 // die Browser-Stimme zurueck (kein Funktionsverlust). Free-only im Browser;
 // GPU-Kosten entstehen nur serverseitig waehrend aktiver Nutzung.
 
-import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026110508";
+import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026110509";
 
 function lautsprecherAn() {
   try { return leseStimmWahl().lautsprecher !== false; } catch { return true; }
@@ -332,14 +332,14 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
       if (lautstaerke) lautstaerke.gain.value = lautsprecherAn() ? 1 : 0;
     });
   } catch { /* ohne Ereignisse gilt die Wahl ab dem naechsten Satz */ }
-  // 05.11.2026: sofort leiser, sobald jemand dazwischenspricht (wie ChatGPT); nach 4 s ohne
+  // 05.11.2026: sofort leiser, sobald jemand dazwischenspricht (wie ChatGPT); nach 8 s ohne
   // Entscheidung wieder laut (Fehlalarm darf die Antwort nicht stumm lassen).
   let duckUhr = 0;
   function ducken(an) {
     clearTimeout(duckUhr);
     if (!lautstaerke) return;
     lautstaerke.gain.value = lautsprecherAn() ? (an ? 0.2 : 1) : 0;
-    if (an) duckUhr = setTimeout(() => ducken(false), 4000);
+    if (an) duckUhr = setTimeout(() => ducken(false), 8000);
   }
   const stimme = { isAvailable, speak, cancel, isSpeaking, unlock, vorladen, ducken };
   // Die Vorlese-Queue (voice-speech-queue.js) meldet hier den naechsten Satz an.

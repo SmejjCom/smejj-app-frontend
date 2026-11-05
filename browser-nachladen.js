@@ -44,9 +44,9 @@ const MAUS_EREIGNISSE = ["smejj:maus-replay-request", "smejj:maus-lauf-gestartet
 /** Die Module in der Reihenfolge, in der die Skript-Tags sie geladen haben. */
 function laden() {
   return Promise.all([
-    import("./browser-pane.js?v=2026110508"),
-    import("./browser-pane-backdrop.js?v=2026110508"),
-    import("./maus-panel.js?v=2026110508")
+    import("./browser-pane.js?v=2026110509"),
+    import("./browser-pane-backdrop.js?v=2026110509"),
+    import("./maus-panel.js?v=2026110509")
   ]).catch((fehler) => {
     console.error("[smejj.com] Browser-/Maus-Panel konnte nicht nachgeladen werden:", fehler);
     throw fehler;
