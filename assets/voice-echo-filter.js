@@ -60,3 +60,21 @@ export function enoughForBarge(text, lang) {
   }
   return words.length >= BARGE_MIN_WORDS;
 }
+
+// Inhaber 05.11.2026 (Live-Befund: aus Raumgeraeuschen wurden Fragen wie "music",
+// "Screams" oder "." gesendet): reine Satzzeichen und die typischen Geraeusch-Etiketten
+// der Spracherkennung sind keine Frage. Echte Ein-Wort-Fragen ("Hallo") bleiben erlaubt.
+const GERAEUSCH_ETIKETTEN = new Set([
+  "music", "music plays", "musik", "musik spielt", "screams", "scream", "schreie", "applause",
+  "applaus", "laughter", "lachen", "gelächter", "noise", "geräusch", "geräusche", "silence",
+  "stille", "thanks for watching", "thank you for watching", "vielen dank fürs zuschauen",
+  "danke fürs zuschauen", "sound", "beep", "piep", "inaudible", "unverständlich"
+]);
+const GERAEUSCH_ANFAENGE = ["untertitel im auftrag", "untertitelung", "untertitel der amara", "subtitles by"];
+
+export function istGeraeusch(text) {
+  const normalized = normalizeSpeechText(text);
+  if (!normalized) return true;
+  if (GERAEUSCH_ETIKETTEN.has(normalized)) return true;
+  return GERAEUSCH_ANFAENGE.some((anfang) => normalized.startsWith(anfang));
+}

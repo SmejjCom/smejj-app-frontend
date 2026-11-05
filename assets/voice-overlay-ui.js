@@ -19,7 +19,7 @@
 // untere Leiste mit Eingabefeld, Mikrofon-Stummschalter und Beenden-Button).
 // Das index.html-Markup bleibt unveraendert — das Upgrade passiert rein im Browser.
 // sendIcon: das gemeinsame Pfeil-Symbol aus voice-typed-send.js (SEND_ICON_SVG).
-import { t } from "./i18n/ui.js?v=2026110101";
+import { t } from "./i18n/ui.js?v=2026110501";
 
 // Die Statuszeilen kommen aus drei Modulen und schreiben mal "..." und mal
 // "…". Fuer die Uebersetzung wird darum zuerst vereinheitlicht, sonst
@@ -41,6 +41,19 @@ export function stimmText(roh) {
 export function setVoiceModeHint(text) {
   const hint = document.querySelector("#voiceModeOverlay .voice-mode-hint");
   if (hint) hint.textContent = stimmText(text);
+}
+
+// Kugel und Leiste mittig ueber dem Chat (Desktop: rechts neben der Seitenleiste).
+function anChatAusrichten(overlay) {
+  if (typeof window === "undefined" || typeof MutationObserver !== "function") return;
+  const richte = () => {
+    if (overlay.hidden) return;
+    const links = Math.round(document.getElementById("startLog")?.getBoundingClientRect?.().left || 0);
+    overlay.style.left = links > 0 && links < window.innerWidth / 2 ? links + "px" : "";
+  };
+  new MutationObserver(richte).observe(overlay, { attributes: true, attributeFilter: ["hidden"] });
+  window.addEventListener("resize", richte);
+  richte();
 }
 
 export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
@@ -77,6 +90,10 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
     + '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path class="voice-mic-slash" d="M4 4l16 16"/></svg>'
     + '</button>';
   overlay.appendChild(bar);
+  // Inhaber 05.11.2026 „wie ChatGPT“: Beenden-X unten neben dem Mikrofon statt oben rechts.
+  const schliessen = overlay.querySelector("#voiceModeClose");
+  if (schliessen) bar.appendChild(schliessen);
+  anChatAusrichten(overlay);
   // KEINE JS-MESSUNG DER BEDIENZONE MEHR.
   //
   // Zwei Anlaeufe, zwei Messfehler: erst meldete sie 812px bei 812px
@@ -100,8 +117,8 @@ export function upgradeVoiceOverlay({ sendIcon = "" } = {}) {
   eingabe?.addEventListener("paste", async (event) => {
     try {
       const [{ bildDateienAusClipboard }, { uebernehmeBildDatei }] = await Promise.all([
-        import("./composer-paste-attach.js?v=2026110101"),
-        import("./composer-bild-anhang.js?v=2026110101")
+        import("./composer-paste-attach.js?v=2026110501"),
+        import("./composer-bild-anhang.js?v=2026110501")
       ]);
       const bilder = bildDateienAusClipboard(event.clipboardData);
       if (!bilder.length) return;
@@ -130,11 +147,11 @@ function ladeStimmenPanel(overlay) {
     if (!document.querySelector("link[data-voice-glas]")) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = new URL("./voice-glas.css?v=2026102804", import.meta.url).href;
+      link.href = new URL("./voice-glas.css?v=2026110501", import.meta.url).href;
       link.dataset.voiceGlas = "true";
       document.head.appendChild(link);
     }
-    import("./voice-stimmen-panel.js?v=2026110101")
+    import("./voice-stimmen-panel.js?v=2026110501")
       .then(({ bindeStimmenPanel }) => bindeStimmenPanel({ overlay }))
       .catch(() => { /* Panel nicht ladbar: Sprachmodus bleibt unveraendert */ });
   } catch { /* ohne DOM/import.meta: nichts tun */ }

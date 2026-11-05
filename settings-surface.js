@@ -1,5 +1,5 @@
-import { STORAGE_KEYS } from "./config.js?v=2026110101";
-import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=2026110101";
+import { STORAGE_KEYS } from "./config.js?v=2026110501";
+import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=2026110501";
 // api-center-surface.js und provider-settings.js werden BEWUSST nicht statisch
 // importiert (Seitengewicht). Der Startreiter ist "general" — bis der Nutzer
 // dorthin wechselt, wird ihr Code nie gebraucht. Zusammen mit ihrem selbst
@@ -8,8 +8,8 @@ import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } f
 // Geprueft vor dem Umbau: app.js (Start-Lock) bindet KEINE der von ihnen
 // erzeugten Kennungen (ac*, apiCenterSurface, cline*) — die Boot-Bindings von
 // app.js koennen dadurch nichts verlieren.
-import { LANGUAGE_OPTIONS } from "./language-options.js?v=2026110101";
-import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026110101";
+import { LANGUAGE_OPTIONS } from "./language-options.js?v=2026110501";
+import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026110501";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
@@ -30,6 +30,7 @@ const GROUPS = [
   ["general", "Allgemein", t("Sprache, Start, Sicherheitsmodus")],
   ["appearance", t("Aussehen & Schriftgröße"), t("Größe, Farbschema, Dichte")],
   ["behavior", "Wie smejj antwortet", t("Länge, Gründlichkeit, Stil")],
+  ["voice", t("Sprache & Stimme"), t("Vorlesen, Stimme, Persönlichkeit")],
   ["models", "KI-Modelle & Anbieter", t("Modelle und Reasoning")],
   ["api", "API", t("Schlüssel, Guthaben, Preise")],
   ["personalization", t("Persönliches"), "Deine Anweisungen an smejj"],
@@ -178,6 +179,7 @@ function markup() {
         select(t("Bestätigungen"), "settingsConfirmations", [["strict", t("Immer bestätigen")], ["balanced", "Bei wichtigen Aktionen"], ["trusted", "Nur externe Auswirkungen"]]),
         select(t("Wie ausführlich?"), "settingsResponseStyle", [["concise", "Kurz"], ["balanced", "Ausgewogen"], ["detailed", t("Ausführlich")]]),
         toggle(t("Projektkontext automatisch berücksichtigen"), "settingsAutoContext", t("Relevante Projektdateien und Anweisungen einbeziehen."))])}
+      ${panel("voice", t("Sprache & Stimme"), t("Gilt für den Sprachmodus. Antwort stoppen: im Gespräch auf das Logo tippen."), [`<div id="settingsStimme" class="settings-stimme"></div>`])}
       ${panel("models", "KI-Modelle & Anbieter", t("GLM-5.3-Flash bleibt das Qualitätsfundament von smejj.com."), [
         select("Reasoning-Aufwand", "settingsReasoningEffort", [["medium", "Mittel"], ["high", "Hoch"], ["max", "Maximal"]]),
         action("Modellverwaltung", t("Standardmodell, BYOK und lokale Modelle."), t("KI-Modelle öffnen"), "ai")])}
@@ -279,8 +281,18 @@ function handleClick(view, event) {
 // hinsieht. Kompakter Kopf: die Panel-Ueberschrift liefert den Titel.
 async function ladeApiZentrum(view) {
   try {
-    const modul = await import("./api-center-surface.js?v=2026110101");
+    const modul = await import("./api-center-surface.js?v=2026110501");
     modul.initApiCenter(view.querySelector("#apiCenterSurface"), { kopf: "kompakt" });
+  } catch {
+    /* fail-safe: uebrige Einstellungen bleiben bedienbar */
+  }
+}
+
+// Inhaber 05.11.2026: Lautsprecher, Stimme und Sprechstil der frueheren Sprachmodus-Leiste.
+async function ladeStimme(view) {
+  try {
+    const modul = await import("./voice-stimmen-panel.js?v=2026110501");
+    modul.bindeStimmenEinstellungen(view.querySelector("#settingsStimme"));
   } catch {
     /* fail-safe: uebrige Einstellungen bleiben bedienbar */
   }
@@ -292,6 +304,7 @@ function activate(view, id) {
     view.querySelector(`[data-settings-tab="${id}"]`)?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }
   if (id === "api") void ladeApiZentrum(view);
+  if (id === "voice") void ladeStimme(view);
   view.querySelectorAll("[data-settings-tab]").forEach((button) => {
     const active = button.dataset.settingsTab === id;
     button.classList.toggle("is-active", active);

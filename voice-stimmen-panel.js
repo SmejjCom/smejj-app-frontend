@@ -12,12 +12,12 @@
 // nutzt den vorhandenen Unterbrechen-Weg (Tipp auf das Logo,
 // voice-ohr-solo.js/voice-realtime.js), statt einen zweiten zu bauen.
 // Eingehaengt von voice-overlay-ui.js per dynamischem Import (fail-safe).
-import { stimmText } from "./voice-overlay-ui.js?v=2026110101";
-import { CLIENT_ROUTES } from "./config.js?v=2026110101";
-import { createPremiumVoice } from "./voice-premium-tts.js?v=2026110101";
+import { stimmText } from "./voice-overlay-ui.js?v=2026110501";
+import { CLIENT_ROUTES } from "./config.js?v=2026110501";
+import { createPremiumVoice } from "./voice-premium-tts.js?v=2026110501";
 import {
   PERSOENLICHKEITEN, STIMMEN, leseStimmWahl, persoenlichkeitVon, speichereStimmWahl, sprechstilRegel, waehleBrowserStimme
-} from "./voice-stimmen.js?v=2026110101";
+} from "./voice-stimmen.js?v=2026110501";
 
 // Eigene Texte dieses Menues: Deutsch ist der Schluessel (wie i18n/ui.js);
 // fehlt dort eine Uebersetzung, hilft fuer Englisch diese kleine Tabelle.
@@ -326,4 +326,72 @@ export function bindeStimmenPanel({ overlay = document.querySelector("#voiceMode
   new MutationObserver(() => { if (overlay.hidden) schliesse(); }).observe(overlay, { attributes: true, attributeFilter: ["hidden"] });
   zeigeLautsprecher();
   return { oeffne, schliesse, leiste, sheet };
+}
+
+// Inhaber 05.11.2026 („Diese Felder kannst du raus nehmen … Funktionen unter Einstellungen,
+// sie sollen nicht verloren gehen“): Lautsprecher, Stimme mit Hoerprobe und Sprechstil der
+// frueheren Steuerleiste leben jetzt unter Einstellungen → Sprache & Stimme. Gleicher
+// Speicher (voice-stimmen.js): jede Wahl gilt sofort fuer das naechste Gespraech.
+// Antwort stoppen bleibt im Gespraech selbst (Tipp auf das Logo).
+let hoerprobeStimme = null;
+function spieleHoerprobe(sprache, id) {
+  const stimme = STIMMEN[sprache]?.find((s) => s.id === id);
+  if (!stimme) return;
+  hoerprobeStimme ||= createPremiumVoice({
+    statusUrl: CLIENT_ROUTES.api.voiceStatus,
+    ttsUrl: CLIENT_ROUTES.api.voiceTts,
+    lang: () => VORSCHAU_SPRACHE[hoerprobeStimme.sprache || "de"],
+    parameter: () => ({ voice: hoerprobeStimme.id, tempo: 1, ausdruck: 0.667 }),
+    vorlader: false
+  });
+  Object.assign(hoerprobeStimme, { sprache, id });
+  hoerprobeStimme.cancel();
+  try { window.speechSynthesis?.cancel(); } catch { /* still */ }
+  const text = tx("Hallo, ich bin {name}. So klinge ich als deine smejj.com Stimme.").replace("{name}", stimme.name);
+  hoerprobeStimme.unlock();
+  hoerprobeStimme.isAvailable().then((da) => {
+    if (!da) throw new Error("kein Sprachdienst");
+    return hoerprobeStimme.speak(text);
+  }).catch(() => {
+    try {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = VORSCHAU_SPRACHE[sprache];
+      const v = waehleBrowserStimme((window.speechSynthesis.getVoices() || []).filter((s) => (s.lang || "").startsWith(sprache)), stimme.geschlecht);
+      if (v) u.voice = v;
+      window.speechSynthesis.speak(u);
+    } catch { /* ohne Stimme bleibt es still */ }
+  });
+}
+
+export function bindeStimmenEinstellungen(ziel) {
+  if (!ziel || ziel.dataset.gebunden === "true") return;
+  ziel.dataset.gebunden = "true";
+  const wahl = leseStimmWahl();
+  const zeile = (titel, hinweis, feld) => `<div class="settings-row"><div class="settings-row-copy"><strong>${tx(titel)}</strong>${hinweis ? `<span>${tx(hinweis)}</span>` : ""}</div>${feld}</div>`;
+  const stimmWahl = (sprache, titel) => zeile(titel, "", `<select id="settingsStimme-${sprache}" data-stimme-sprache="${sprache}" aria-label="${tx(titel)}">${STIMMEN[sprache].map((s) =>
+    `<option value="${s.id}"${s.id === wahl.stimmen[sprache] ? " selected" : ""}>${s.name} · ${tx(s.geschlecht === "w" ? "Weiblich" : "Männlich")} · ${tx(s.art)}</option>`).join("")}</select>`
+    + `<button type="button" class="settings-action" data-hoerprobe="${sprache}">${tx("Vorschau")}</button>`);
+  ziel.innerHTML = zeile("Antworten laut vorlesen", "Im Sprachmodus spricht smejj die Antwort. Aus: nur Text.",
+    `<label class="settings-switch" aria-label="${tx("Antworten laut vorlesen")}"><input id="settingsStimmeLaut" type="checkbox"${wahl.lautsprecher ? " checked" : ""}><span aria-hidden="true"></span></label>`)
+    + stimmWahl("de", "Stimme Deutsch") + stimmWahl("en", "Stimme Englisch")
+    + zeile("Persönlichkeit", "Wie smejj im Gespräch klingt und formuliert.", `<select id="settingsSprechstil" aria-label="${tx("Persönlichkeit")}">${PERSOENLICHKEITEN.map((p) =>
+      `<option value="${p.id}"${p.id === wahl.persoenlichkeit ? " selected" : ""}>${tx(p.name)} · ${tx(p.art)}</option>`).join("")}</select>`)
+    + `<div class="settings-row settings-row-stack" data-stimme-eigen${wahl.persoenlichkeit === "individuell" ? "" : " hidden"}><div class="settings-row-copy"><strong>${tx("Eigene Sprechweise")}</strong></div>`
+    + `<textarea id="settingsEigenerStil" maxlength="160" rows="2" placeholder="${tx("z. B. wie ein geduldiger Lehrer, mit Beispielen")}"></textarea>`
+    + `<label>${tx("Tempo")} <input id="settingsEigenesTempo" type="range" min="0.8" max="1.25" step="0.05" value="${wahl.eigenesTempo}"></label></div>`;
+  ziel.querySelector("#settingsEigenerStil").value = wahl.eigenerStil;
+  ziel.addEventListener("change", (ereignis) => {
+    const feld = ereignis.target;
+    if (feld.id === "settingsStimmeLaut") speichereStimmWahl({ lautsprecher: feld.checked });
+    else if (feld.dataset.stimmeSprache) speichereStimmWahl({ stimmen: { [feld.dataset.stimmeSprache]: feld.value } });
+    else if (feld.id === "settingsSprechstil") {
+      speichereStimmWahl({ persoenlichkeit: feld.value });
+      ziel.querySelector("[data-stimme-eigen]").hidden = feld.value !== "individuell";
+    } else if (feld.id === "settingsEigenerStil") speichereStimmWahl({ eigenerStil: feld.value });
+    else if (feld.id === "settingsEigenesTempo") speichereStimmWahl({ eigenesTempo: Number(feld.value) });
+  });
+  ziel.addEventListener("click", (ereignis) => {
+    const sprache = ereignis.target.closest("[data-hoerprobe]")?.dataset.hoerprobe;
+    if (sprache) spieleHoerprobe(sprache, ziel.querySelector(`#settingsStimme-${sprache}`)?.value);
+  });
 }

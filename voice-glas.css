@@ -241,3 +241,34 @@ html body #voiceModeOverlay :is(.voice-stimme-wahl, .voice-stil) { border-radius
 html body #voiceModeOverlay :is(.voice-stimme-vorschau, .voice-steuerleiste button) { border-radius: 50% !important; }
 html body #voiceModeOverlay :is(.voice-steuerleiste, .voice-stimmen-reiter, .voice-stimmen-sprachen, .voice-stimmen-reiter button, .voice-stimmen-sprachen button, .voice-stimmen-fertig) { border-radius: 999px !important; }
 html body #voiceModeOverlay .voice-stimmen-sheet { border-radius: 24px !important; }
+/* Inhaber 05.11.2026 („wie ChatGPT“, Freigabe „Ja, alles freigeben“): Der Chat bleibt
+   im Sprachmodus sichtbar und lesbar — kein Vollbild-Glas mehr. Unten sitzt nur eine
+   kleine Kugel mit Status, darunter Steuerleiste und Eingabe mit Mikrofon und X.
+   Leere Flaechen lassen Tipps und Scrollen zum Chat durch. */
+html body #voiceModeOverlay.voice-mode-overlay[data-upgraded],
+html body[data-mobile-theme] #voiceModeOverlay.voice-mode-overlay[data-upgraded] {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  justify-content: flex-end;
+  gap: 10px;
+  pointer-events: none;
+}
+#voiceModeOverlay.voice-mode-overlay[data-upgraded] > * { pointer-events: auto; }
+#voiceModeOverlay.voice-mode-overlay[data-upgraded]:not([hidden]) { animation: none; }
+#voiceModeOverlay[data-upgraded] :is(.voice-mode-reply, .voice-mode-hint) { display: none !important; }
+#voiceModeOverlay[data-upgraded] .voice-mode-logo svg { width: 84px; height: auto; }
+#voiceModeOverlay[data-upgraded] .voice-mode-logo::before { inset: -12px; }
+#voiceModeOverlay[data-upgraded] .voice-mode-status { margin: 0; font-size: 14px; }
+#voiceModeOverlay[data-upgraded] .voice-mode-transcript { margin: 0; max-width: min(560px, 100%); font-size: 14px; }
+#voiceModeOverlay[data-upgraded] .voice-mode-transcript:empty { display: none; }
+/* X sitzt jetzt in der unteren Leiste neben dem Mikrofon (voice-overlay-ui.js). */
+#voiceModeOverlay[data-upgraded] .voice-mode-bar #voiceModeClose { position: static; flex: 0 0 auto; }
+/* Damit die letzte Antwort nicht hinter Kugel und Leiste verschwindet. */
+body:has(#voiceModeOverlay[data-upgraded]:not([hidden])) #startLog { padding-bottom: 260px; }
+/* Die Sprach-Leiste ersetzt waehrend des Gespraechs das normale Eingabefeld. */
+body:has(#voiceModeOverlay[data-upgraded]:not([hidden])) .prompt-glass { visibility: hidden; }
+/* Inhaber 05.11.2026 (Screenshot „Diese Felder kannst du raus nehmen“): keine Steuerleiste
+   (Stopp, Lautsprecher, Stimme, Einstellungen) im Sprachmodus — wie ChatGPT nur Mikrofon und X.
+   Stoppen bleibt per Tipp auf das Logo. */
+#voiceModeOverlay[data-upgraded] .voice-steuerleiste { display: none !important; }

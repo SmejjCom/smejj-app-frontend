@@ -1,4 +1,4 @@
-import { AI_MODES } from "./providers.js?v=2026110101";
+import { AI_MODES } from "./providers.js?v=2026110501";
 
 export function disabledMode(reason = "ai_mode_disabled") {
   return {
