@@ -194,6 +194,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
             aufStatus?.("hoert-sprache");
           }
           if (stand !== "ende" && stand !== "zeitlimit") return;
+          protokoll(`runde ${stand} sprach=${sprichtGemeldet}`);
           freigeben();
           if (stand === "zeitlimit" && !sprichtGemeldet) {
             try { ear.cancel(); } catch { /* still */ }
@@ -201,7 +202,8 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
             return;
           }
           const text = String((await ear.finish().catch(() => "")) || "").trim();
-          if (meinLauf !== lauf) return;
+          if (meinLauf !== lauf) return void protokoll("runde verworfen (neuer Lauf)");
+          protokoll(`runde text=${text.length}`);
           if (text) aufTranskript?.(text);
           else aufLeer?.();
         }, taktMs);
@@ -220,6 +222,8 @@ const UNTERBRECHEN_ZIELE = "#voiceModeOverlay .voice-mode-logo, #voiceModeOverla
 const ANZEIGE = { speaking: "Ich spreche ...", thinking: "Einen Moment ..." };
 const antwortLaeuft = () => ["thinking", "speaking"].includes(overlayModus());
 const NACHLAUF_MS = 2000;
+// Stille Diagnose (05.11.2026): nur aktiv, wenn im Browser globalThis.smejjOhrProtokoll gesetzt ist.
+const protokoll = (was) => { try { globalThis.smejjOhrProtokoll?.(was); } catch { /* Diagnose darf nie stoeren */ } };
 const woerter = (text) => String(text || "").toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter(Boolean);
 /** true, wenn (fast) alle Woerter des Nachlaufs schon in der gesendeten Frage stehen. */
 export function istSchonEnthalten(nachlauf, frage) {
@@ -289,6 +293,7 @@ export function verdrahteOhrSolo(host) {
     },
     aufTranskript: (text) => {
       const s = host.state;
+      protokoll(`transkript zwischen=${zwischen} nachlauf=${nachlauf} „${text.slice(0, 40)}“`);
       if (zwischen) {
         host.ducken?.(false);
         if (!s.voiceModeActive || s.voiceMuted || !antwortLaeuft()) { zwischen = false; return; }
@@ -306,12 +311,14 @@ export function verdrahteOhrSolo(host) {
     },
     aufLeer: () => {
       const s = host.state;
+      protokoll(`leer zwischen=${zwischen} modus=${overlayModus()}`);
       if (zwischen) host.ducken?.(false);
       if (s.voiceModeActive && !s.voiceMuted && (zwischen ? antwortLaeuft() : s.ohrSoloAktiv)) solo.start();
     },
     // Direkt nach einer Unterbrechung ist das Ohr manchmal noch nicht aufgeraeumt: kurz warten und
     // neu starten (Live-Befund 05.11.: danach war es stumm), hoechstens 3 Versuche.
     aufFehler: (fehler) => {
+      protokoll(`fehler ${fehler?.name || fehler} zwischen=${zwischen}`);
       if (!zwischen) return void host.fallback(soloFehlertext(fehler));
       if (++zwischenVersuche > 3) { zwischen = false; return; }
       setTimeout(() => { if (zwischen && antwortLaeuft()) solo.start(); }, 500);
@@ -357,6 +364,7 @@ export function verdrahteOhrSolo(host) {
     zwischenHoeren() {
       const s = host.state;
       if (!s?.voiceModeActive || s.voiceMuted || !(s.ohrSoloAktiv || host.earAlive?.())) return false;
+      protokoll("zwischen start");
       zwischen = true;
       zwischenSeit = Date.now();
       zwischenVersuche = 0;
@@ -367,6 +375,7 @@ export function verdrahteOhrSolo(host) {
     zwischenAktiv: () => zwischen,
     zwischenEnde() {
       if (!zwischen) return;
+      protokoll(`zwischen ende ${String(new Error().stack || "").split("\n")[2]?.trim() || ""}`);
       zwischen = false;
       solo.stop();
     },
@@ -376,6 +385,7 @@ export function verdrahteOhrSolo(host) {
     // Der Host setzt direkt nach stop() "muted" — laeuft noch eine Antwort, kommt ihre
     // Anzeige ("Ich spreche ..." / "Einen Moment ...") gleich danach zurueck.
     stop: () => {
+      if (zwischen) protokoll(`stop ${String(new Error().stack || "").split("\n")[2]?.trim() || ""}`);
       zwischen = false;
       solo.stop();
       const s = host.state;
