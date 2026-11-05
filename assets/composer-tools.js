@@ -1,46 +1,46 @@
 // smejj.com — Composer-Werkzeuge der Startseite (Plus-Menue, Diktat, Sprachmodus, Vorlesen).
 // Alles laeuft lokal im Browser (Web Speech API + speechSynthesis) — free-only, keine externen Dienste.
 // Zweck: initComposerTools() verdrahtet die Icon-Zeile des Start-Composers.
-import { showToast } from "./components.js?v=2026110503"; // versioniert wie app.js (F-07)
+import { showToast } from "./components.js?v=2026110504"; // versioniert wie app.js (F-07)
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=2026110503";
+import { createSpeechQueue, sanitizeForSpeech } from "./voice-speech-queue.js?v=2026110504";
 // 27.09.2026: Erkennungsliste (WebKit-Doppelungen) + sprechbarer Antworttext/Fristen.
-import { leseErkennung } from "./voice-erkennung.js?v=2026110503"; import { sprechbarerText, FRISTEN, rendereFertigeAntwort } from "./voice-antwort.js?v=2026110503";
+import { leseErkennung } from "./voice-erkennung.js?v=2026110504"; import { sprechbarerText, FRISTEN, rendereFertigeAntwort } from "./voice-antwort.js?v=2026110504";
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
-import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=2026110503";
+import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=2026110504";
 // Overlay-Gestalt und Fokusfuehrung — ausgelagert (800-Zeilen-Regel).
 import {
   upgradeVoiceOverlay, createVoiceFocusTrap,
   setVoiceModeStatus, setVoiceModeTranscript, setVoiceModeReply, zeigeMikrofonZustand,
   setVoiceModeHint, stimmText,
-} from "./voice-overlay-ui.js?v=2026110503";
+} from "./voice-overlay-ui.js?v=2026110504";
 // Browser-Sprachausgabe (Stimmwahl, Safari-resume, iOS-Unlock) — ausgelagert (800-Zeilen-Regel).
-import { createBrowserTts } from "./voice-browser-tts.js?v=2026110503";
+import { createBrowserTts } from "./voice-browser-tts.js?v=2026110504";
 // Stufe 3: Rueckfrage statt Blindantwort + Doppel-Sende-Schutz (wie ChatGPT,
 // Live-Vergleich 2026-08-03) — geteilte Naht mit den 14 Sprachseiten.
-import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js?v=2026110503";
+import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js?v=2026110504";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
-import { createServerEar, createEarSend, ohrAdressen } from "./voice-ear.js?v=2026110503";
-import { verdrahteOhrSolo, istAppleMobil } from "./voice-ohr-solo.js?v=2026110503";
+import { createServerEar, createEarSend, ohrAdressen } from "./voice-ear.js?v=2026110504";
+import { verdrahteOhrSolo, istAppleMobil } from "./voice-ohr-solo.js?v=2026110504";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
-import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho, istGeraeusch, istDenkLautEcho } from "./voice-echo-filter.js?v=2026110503";
-import { warmUpAgentConnection } from "./voice-warmup.js?v=2026110503";
-import { verdrahteLive } from "./voice-realtime.js?v=2026110503";
+import { BARGE_MIN_WORDS, normalizeSpeechText, isLikelyEcho, istGeraeusch, istDenkLautEcho } from "./voice-echo-filter.js?v=2026110504";
+import { warmUpAgentConnection } from "./voice-warmup.js?v=2026110504";
+import { verdrahteLive } from "./voice-realtime.js?v=2026110504";
 // Stufe 2a/3a: Interim-Waechter — Sprech-Ende erkennen; seit 3a richtet sich die
 // Wartezeit nach dem Gesagten. Denk-Laut fuellt die Stille bis zur Antwort.
-import { createSilenceWatchdog } from "./voice-endpoint.js?v=2026110503";
-import { createThinkingCue } from "./voice-thinking-cue.js?v=2026110503";
+import { createSilenceWatchdog } from "./voice-endpoint.js?v=2026110504";
+import { createThinkingCue } from "./voice-thinking-cue.js?v=2026110504";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
 // Unterbrechen wie ChatGPT). Fail-safe: ohne Worker bleibt die Browser-Stimme.
-import { createPremiumVoice } from "./voice-premium-tts.js?v=2026110503";
-import { CLIENT_ROUTES } from "./config.js?v=2026110503";
+import { createPremiumVoice } from "./voice-premium-tts.js?v=2026110504";
+import { CLIENT_ROUTES } from "./config.js?v=2026110504";
 // Plus-Menue (Anhaenge) — ausgelagert, Verhalten unveraendert.
-import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026110503";
-import { bindPlusMenu } from "./composer-plus-menu.js?v=2026110503";
+import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026110504";
+import { bindPlusMenu } from "./composer-plus-menu.js?v=2026110504";
 // Mikrofon-Diktat — ausgelagert (800-Zeilen-Regel), Verhalten unveraendert.
-import { createDictation } from "./composer-dictation.js?v=2026110503";
-import { t, savedUiLanguage } from "./i18n/ui.js?v=2026110503"; // Sprachmodus-Texte + gespeicherte Sprache (Geraetetest 22.09.2026)
+import { createDictation } from "./composer-dictation.js?v=2026110504";
+import { t, savedUiLanguage } from "./i18n/ui.js?v=2026110504"; // Sprachmodus-Texte + gespeicherte Sprache (Geraetetest 22.09.2026)
 const $ = (selector) => document.querySelector(selector);
 // Sprache bei JEDEM Aufruf: zuerst die GESPEICHERTE Oberflaechensprache, sonst das lang-Attribut (huelle-sprache.js setzt es erst nach dem Nachladen — v956 gemessen: Luecke von Sekunden).
 const LANG_MAP = {
@@ -527,7 +527,7 @@ function voiceModeSend(task, { getippt = false, nachStopp = false } = {}) {
       setVoiceModeStatus("thinking", "Einen Moment ...");
       setVoiceModeTranscript(task);
       // Neue Frage: die Mitschrift der vorigen Antwort raeumen.
-      setVoiceModeReply("");
+      setVoiceModeReply(""); state.antwortText = null;
       const knownEntries = document.querySelectorAll(ANSWER_SELECTOR).length;
       input.value = task;
       notifyInputChanged(input);
@@ -535,7 +535,7 @@ function voiceModeSend(task, { getippt = false, nachStopp = false } = {}) {
       waitForAssistantReply(knownEntries);
       // Zwischenfrage: schon beim Denken zuhoeren (iPhone: eigenes Ohr, sonst Spracherkennung).
       if (state.ohrSoloAktiv) ohrSolo.zwischenHoeren();
-      else setTimeout(() => { if (!state.bargeRecognition) startBargeListener(() => `${state.speechQueue?.spokenText?.() || ""} ${stimmText("Einen Moment ...")}`); }, 300);
+      else setTimeout(() => { if (!state.bargeRecognition) startBargeListener(() => `${state.antwortText?.() || ""} ${stimmText("Einen Moment ...")}`); }, 300);
 }
 
 function waitForAssistantReply(knownEntries) {
@@ -570,7 +570,7 @@ function waitForAssistantReply(knownEntries) {
               state.bargeGraceUntil = Date.now() + BARGE_GRACE_MS;
               // Barge-in: Waehrend des Vorlesens weiterhoeren; der Echo-Filter
               // vergleicht live gegen alles bereits Gesprochene (Getter).
-              if (!state.bargeRecognition) startBargeListener(() => queue.spokenText()); // laeuft schon seit dem Denken
+              if (!state.bargeRecognition) startBargeListener(() => currentReply() || queue.spokenText()); // laeuft schon seit dem Denken
               // 05.11.2026: kein reiner Pegel-Abbruch mehr (Echo brach Antworten nach ~1 s ab) —
               // nur erkannte Worte oder Tipp aufs Logo. iPhone-Ohr beim Sprechen aus (Echo).
               stopInterrupt(); ohrSolo.zwischenEnde();
@@ -605,7 +605,7 @@ function waitForAssistantReply(knownEntries) {
                         }, 450);
               }
       });
-      state.speechQueue = queue;
+      state.speechQueue = queue; state.antwortText = currentReply; // ganze Antwort fuer den Echo-Filter
       // Stufe 3a: Antwort ueber 700 ms -> hoerbar Bescheid sagen statt schweigen. Der Laut
       // prueft beim Feuern selbst, ob die Antwort schon laeuft (spokenText) — daher keine Entwarnung noetig.
       createThinkingCue({ delayMs: 700, antwortLaeuft: () => queue.isCancelled() || queue.spokenText().length > 0, sagen: () => { if (state.voiceModeActive) queue.sayAhead(stimmText("Einen Moment ...")); } }).arm();

@@ -36,15 +36,21 @@ export function normalizeSpeechText(text) {
 // Echo-Heuristik: Der gehoerte Text gilt als eigenes Lautsprecher-Echo, wenn er
 // (nahezu) vollstaendig in der gerade vorgelesenen Antwort vorkommt.
 // Ausdrückliche Befehlswörter gelten NIE als Echo, sondern lösen den Abbruch sofort aus.
+// 05.11.2026 (Live-Mitschnitt): die Erkennung hoerte die eigene Stimme verzerrt („die Geschichte
+// stand bayerischen Reich“ statt „… des Roemischen Reiches“) und brach ab. Darum zaehlen auch
+// gleiche Wortstaemme (erste 5 Buchstaben), und ein Stopp-Wort, das smejj gerade selbst
+// vorliest, ist kein Befehl.
+const stamm = (wort) => (wort.length >= 4 ? wort.slice(0, 5) : "");
 export function isLikelyEcho(heardText, spokenText) {
   const heard = normalizeSpeechText(heardText);
   if (!heard) return true;
   const heardWords = heard.split(" ");
-  if (heardWords.some((word) => STOP_COMMANDS.has(word))) return false;
   const spoken = normalizeSpeechText(spokenText);
-  if (spoken.includes(heard)) return true;
   const spokenWords = new Set(spoken.split(" "));
-  const matches = heardWords.filter((word) => spokenWords.has(word)).length;
+  if (heardWords.some((word) => STOP_COMMANDS.has(word) && !spokenWords.has(word))) return false;
+  if (spoken.includes(heard)) return true;
+  const spokenStaemme = new Set([...spokenWords].map(stamm).filter(Boolean));
+  const matches = heardWords.filter((word) => spokenWords.has(word) || (stamm(word) && spokenStaemme.has(stamm(word)))).length;
   return matches / heardWords.length >= 0.5;
 }
 
