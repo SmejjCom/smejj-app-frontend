@@ -427,6 +427,7 @@ export default {
   "Mindestens 10 Zeichen": "Не менее 10 символов",
   "Passwort vergessen?": "Забыли пароль?",
   "Mit Google registrieren": "Зарегистрироваться через Google",
+  "Weitere Möglichkeiten": "Другие варианты",
   "Mit Apple registrieren": "Зарегистрироваться через Apple",
   "Mit Passkey registrieren": "Зарегистрироваться с passkey",
   "Hinweis": "Примечание",

@@ -427,6 +427,7 @@ export default {
   "Mindestens 10 Zeichen": "10文字以上",
   "Passwort vergessen?": "パスワードをお忘れですか?",
   "Mit Google registrieren": "Google で登録",
+  "Weitere Möglichkeiten": "その他のオプション",
   "Mit Apple registrieren": "Apple で登録",
   "Mit Passkey registrieren": "パスキーで登録",
   "Hinweis": "注記",

@@ -427,6 +427,7 @@ export default {
   "Mindestens 10 Zeichen": "Al menos 10 caracteres",
   "Passwort vergessen?": "¿Olvidaste la contraseña?",
   "Mit Google registrieren": "Registrarse con Google",
+  "Weitere Möglichkeiten": "Más opciones",
   "Mit Apple registrieren": "Registrarse con Apple",
   "Mit Passkey registrieren": "Registrarse con passkey",
   "Hinweis": "Nota",

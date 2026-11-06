@@ -427,6 +427,7 @@ export default {
   "Mindestens 10 Zeichen": "至少 10 个字符",
   "Passwort vergessen?": "忘记密码?",
   "Mit Google registrieren": "使用 Google 注册",
+  "Weitere Möglichkeiten": "更多选项",
   "Mit Apple registrieren": "使用 Apple 注册",
   "Mit Passkey registrieren": "使用通行密钥注册",
   "Hinweis": "提示",

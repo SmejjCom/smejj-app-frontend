@@ -427,6 +427,7 @@ export default {
   "Mindestens 10 Zeichen": "10 أحرف على الأقل",
   "Passwort vergessen?": "نسيت كلمة المرور؟",
   "Mit Google registrieren": "التسجيل عبر Google",
+  "Weitere Möglichkeiten": "خيارات أخرى",
   "Mit Apple registrieren": "التسجيل عبر Apple",
   "Mit Passkey registrieren": "التسجيل بمفتاح المرور",
   "Hinweis": "ملاحظة",

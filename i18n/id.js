@@ -427,6 +427,7 @@ export default {
   "Mindestens 10 Zeichen": "Minimal 10 karakter",
   "Passwort vergessen?": "Lupa kata sandi?",
   "Mit Google registrieren": "Daftar dengan Google",
+  "Weitere Möglichkeiten": "Opsi lainnya",
   "Mit Apple registrieren": "Daftar dengan Apple",
   "Mit Passkey registrieren": "Daftar dengan passkey",
   "Hinweis": "Catatan",

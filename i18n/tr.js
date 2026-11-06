@@ -427,6 +427,7 @@ export default {
   "Mindestens 10 Zeichen": "En az 10 karakter",
   "Passwort vergessen?": "Parolanı mı unuttun?",
   "Mit Google registrieren": "Google ile kaydol",
+  "Weitere Möglichkeiten": "Diğer seçenekler",
   "Mit Apple registrieren": "Apple ile kaydol",
   "Mit Passkey registrieren": "Geçiş anahtarıyla kaydol",
   "Hinweis": "Not",

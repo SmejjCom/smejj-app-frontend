@@ -427,6 +427,7 @@ export default {
   "Mindestens 10 Zeichen": "최소 10자",
   "Passwort vergessen?": "비밀번호를 잊으셨나요?",
   "Mit Google registrieren": "Google로 가입",
+  "Weitere Möglichkeiten": "더 많은 옵션",
   "Mit Apple registrieren": "Apple로 가입",
   "Mit Passkey registrieren": "패스키로 가입",
   "Hinweis": "안내",

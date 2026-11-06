@@ -427,6 +427,7 @@ export default {
   "Mindestens 10 Zeichen": "কমপক্ষে ১০ অক্ষর",
   "Passwort vergessen?": "পাসওয়ার্ড ভুলে গেছেন?",
   "Mit Google registrieren": "Google দিয়ে নিবন্ধন করুন",
+  "Weitere Möglichkeiten": "আরও বিকল্প",
   "Mit Apple registrieren": "Apple দিয়ে নিবন্ধন করুন",
   "Mit Passkey registrieren": "পাসকি দিয়ে নিবন্ধন করুন",
   "Hinweis": "দ্রষ্টব্য",

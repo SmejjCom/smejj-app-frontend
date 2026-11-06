@@ -427,6 +427,7 @@ export default {
   "Mindestens 10 Zeichen": "कम से कम 10 अक्षर",
   "Passwort vergessen?": "पासवर्ड भूल गए?",
   "Mit Google registrieren": "Google से पंजीकरण करें",
+  "Weitere Möglichkeiten": "और विकल्प",
   "Mit Apple registrieren": "Apple से पंजीकरण करें",
   "Mit Passkey registrieren": "पासकी से पंजीकरण करें",
   "Hinweis": "सूचना",
