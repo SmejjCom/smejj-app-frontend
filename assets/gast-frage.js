@@ -21,7 +21,7 @@
 // Ein Besucher landet nie in einer Sackgasse.
 (function () {
   var API = "https://api.smejj.com/api/chat";
-  var ZEITGRENZE_MS = 45000;
+  var ZEITGRENZE_MS = 90000;
   // Geraetetest 22.09.2026 (echtes iPhone, WLAN): "Einen Moment …" stand ueber
   // drei Minuten, ohne Antwort und ohne Rueckfall — der Server antwortete per
   // curl in 6 s, ueber 5G kam die Antwort in 6 s. Zwei Luecken: (1) waehrend der
@@ -31,6 +31,12 @@
   // Jetzt: nach HINWEIS_MS ein Satz mit dem Ausweg zur Anmeldung, und eine Wache
   // an der Uhrzeit (nicht am Timer), die beim Sichtbarwerden nachrechnet.
   var HINWEIS_MS = 15000;
+  // Gastprobe 06.11.2026 (live): smejj 1 brauchte bis zum ersten Wort 10–40 s und schrieb dann
+  // langsam weiter. Die 45-s-Grenze brach auch LAUFENDE Antworten ab und schickte den Gast zur
+  // Anmeldung — die Frage blieb unbeantwortet. Jetzt: ZEITGRENZE_MS gilt nur bis zum ersten
+  // Wort (90 s, der Hinweis mit Ausweg kommt weiter nach 15 s); danach bricht nur eine Stille
+  // von STILLE_MS ab, und schon angekommener Text bleibt stehen.
+  var STILLE_MS = 60000;
 
   function T(text) {
     var f = window.smejjWillkommenT;
@@ -198,10 +204,13 @@
     var start = Date.now();
     var uhr = setTimeout(function () { steuerung.abort(); }, ZEITGRENZE_MS);
     var hinweis = setTimeout(function () { if (!antwort) zeigeHinweis(text); }, HINWEIS_MS);
+    var stille = null;
+    var zuletzt = start;
     var wache = function () {
       if (document.visibilityState !== "visible") return;
       var alter = Date.now() - start;
-      if (alter >= ZEITGRENZE_MS) steuerung.abort();
+      if (!antwort && alter >= ZEITGRENZE_MS) steuerung.abort();
+      else if (antwort && Date.now() - zuletzt >= STILLE_MS) steuerung.abort();
       else if (alter >= HINWEIS_MS && !antwort) zeigeHinweis(text);
     };
     document.addEventListener("visibilitychange", wache);
@@ -222,12 +231,16 @@
         if (stueck.done) break;
         puffer = lies(decoder.decode(stueck.value, { stream: true }), puffer, function (teil) {
           var erstesStueck = !antwort;
+          if (erstesStueck) clearTimeout(uhr);
+          zuletzt = Date.now();
+          clearTimeout(stille);
+          stille = setTimeout(function () { steuerung.abort(); }, STILLE_MS);
           antwort += teil;
           text.textContent = antwort;
           if (erstesStueck) antwortInBlick(text);
         });
       }
-      clearTimeout(uhr); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
+      clearTimeout(uhr); clearTimeout(stille); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
       if (!antwort.trim()) throw new Error("leere Antwort");
       await formatiereAntwort(text);
       var karte = document.getElementById("gastAntwort");
@@ -239,7 +252,15 @@
       try { karte.scrollIntoView({ block: "nearest" }); } catch (fehler) { /* aelterer Browser */ }
       return true;
     } catch (fehler) {
-      clearTimeout(uhr); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
+      clearTimeout(uhr); clearTimeout(stille); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
+      // Schon angekommener Text bleibt stehen — samt Fusszeile mit dem Weg zur Anmeldung.
+      if (antwort.trim()) {
+        try { await formatiereAntwort(text); } catch (f) { /* Text bleibt roh sichtbar */ }
+        var teilHinweis = document.getElementById("gastHinweis");
+        if (teilHinweis) teilHinweis.remove();
+        fuss(document.getElementById("gastAntwort"));
+        return true;
+      }
       // Zurueck auf den alten, bewaehrten Weg — mit der Frage im Gepaeck.
       location.href = "/auth/register/";
       return false;
