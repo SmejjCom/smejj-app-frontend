@@ -19,14 +19,14 @@ function resolveApiOrigin() {
 export const API_ORIGIN = resolveApiOrigin();
 
 const API_PATHS = {
-  // 100% Zeabur Primary Operating Path (Salad-Exit 2026-08-11):
-  agent: "https://smejj-chat-bridge.zeabur.app/api/agent",
-  chat: "https://smejj-chat-bridge.zeabur.app/api/chat",
+  // Bruecke auf dem MacBook Air hinter api.smejj.com/bruecke/ (Zeabur-Umzug 11/2026):
+  agent: "https://api.smejj.com/bruecke/api/agent",
+  chat: "https://api.smejj.com/bruecke/api/chat",
   agentFallback: "https://api.smejj.com/api/agent",
   chatFallback: "https://api.smejj.com/api/chat",
-  voiceStatus: "https://smejj-chat-bridge.zeabur.app/api/voice/status",
-  voiceTts: "https://smejj-chat-bridge.zeabur.app/api/voice/tts",
-  voiceTranscribe: "https://smejj-chat-bridge.zeabur.app/api/voice/transcribe",
+  voiceStatus: "https://api.smejj.com/bruecke/api/voice/status",
+  voiceTts: "https://api.smejj.com/bruecke/api/voice/tts",
+  voiceTranscribe: "https://api.smejj.com/bruecke/api/voice/transcribe",
   // ZWEITER WEG fuer Ohr und Status (2026-09-10). Chat und Agent haben ihn seit
   // jeher, der Sprachwelle fehlte er: faellt die Bridge aus, schaltete sich das
   // Ohr bei der ersten 404 fuer die ganze Sitzung ab und uebrig blieb die

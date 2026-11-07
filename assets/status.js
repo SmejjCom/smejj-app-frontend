@@ -36,7 +36,7 @@ export const DIENSTE = Object.freeze([
     id: "chat",
     name: "Chat und Assistent",
     beschreibung: "Antworten im Gespräch und Sprachausgabe.",
-    url: "https://smejj-chat-bridge.zeabur.app/health",
+    url: "https://api.smejj.com/bruecke/health",
     kritisch: true
   },
   {
