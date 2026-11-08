@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="de" class="p-recht">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; connect-src 'self' https://api.smejj.com">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="theme-color" content="#101113">
+    <meta name="description" content="Widerspruch gegen die Nutzung Ihrer Fragen zum Training von smejj 1 – ohne Konto möglich.">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://smejj.com/lernen.html">
+    <link rel="alternate" hreflang="de" href="https://smejj.com/lernen.html">
+    <link rel="alternate" hreflang="en" href="https://smejj.com/en/learning.html">
+    <title>Fragen nicht zum Lernen verwenden – smejj.com</title>
+    <link rel="stylesheet" href="/assets/static-pages.css">
+    <script type="module" src="/assets/lernen-seite.js?v=2026110802"></script>
+  </head>
+  <body>
+    <main>
+      <a class="legal-brand" href="/" aria-label="smejj.com">
+        <img src="/icons/smejj_icon.svg" alt="smejj.com" width="2000" height="1532">
+      </a>
+      <h1>Fragen nicht zum Lernen verwenden</h1>
+      <p>smejj.com verwendet Fragen an smejj 1 in bereinigter Form, damit das Modell besser antwortet (Datenschutzerklärung, <a href="/datenschutz.html#lernen">Abschnitt 11.1</a>). Hier können Sie jederzeit widersprechen – auch ohne Konto.</p>
+      <div class="card">
+        <p><label style="display:flex;gap:12px;align-items:center;cursor:pointer;font-weight:600"><input id="lernenAus" type="checkbox" style="width:24px;height:24px"> Meine Fragen nicht zum Lernen verwenden</label></p>
+        <p>Gilt sofort für jede Frage aus diesem Browser bzw. dieser App. Wenn Sie angemeldet sind, gilt der Widerspruch zusätzlich dauerhaft in Ihrem Konto. Als Gast speichern wir keine Kennung – der Widerspruch gilt deshalb je Gerät.</p>
+        <p id="lernenStatus" role="status" aria-live="polite"></p>
+      </div>
+      <div class="card" id="lernenLoeschBereich" hidden>
+        <p><strong>Gespeicherte Fragen löschen</strong><br>Entfernt Ihre gespeicherten Fragen; künftig wird nichts mehr verwendet.</p>
+        <p><button id="lernenLoeschen" type="button" style="min-height:44px;padding:8px 16px">Löschen</button></p>
+      </div>
+      <p>Zurück zu <a href="/">smejj.com</a> · <a href="/datenschutz.html">Datenschutzerklärung</a></p>
+      <footer>
+        <a href="/">Startseite</a>
+        <a href="/impressum.html">Impressum</a>
+        <a href="/datenschutz.html">Datenschutz</a>
+        <a href="/en/learning.html" hreflang="en">English</a>
+      </footer>
+    </main>
+  </body>
+</html>
