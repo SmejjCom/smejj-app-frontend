@@ -8,7 +8,7 @@
 // die Browser-Stimme zurueck (kein Funktionsverlust). Free-only im Browser;
 // GPU-Kosten entstehen nur serverseitig waehrend aktiver Nutzung.
 
-import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026110701";
+import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026110801";
 
 function lautsprecherAn() {
   try { return leseStimmWahl().lautsprecher !== false; } catch { return true; }
@@ -38,6 +38,54 @@ export function pcm16ToFloat32(bytes) {
     out[i / 2] = sample / 32768;
   }
   return { samples: out, rest: bytes.slice(usable) };
+}
+
+// Inhaber-Auftrag 08.11.2026 „richtig laut wie eine Box“: Die Stimme lief bisher
+// unverstaerkt auf den Lautsprecher; am iPhone senkt die Echounterdrueckung den
+// Pegel zusaetzlich. Kette: Kompressor hebt leise Silben an -> Aufholverstaerkung
+// -> Begrenzer verhindert Uebersteuern. Lautstaerke-Knopf und Ducken bleiben davor.
+export const DUCK_PEGEL = 0.5;
+export const DUCK_MAX_MS = 3500;
+export const BOX_KLANG = Object.freeze({
+  kompressor: { threshold: -28, knee: 8, ratio: 6, attack: 0.003, release: 0.18 },
+  aufholen: 3.2, // ~ +10 dB nach der Kompression
+  begrenzer: { threshold: -1.5, knee: 0, ratio: 20, attack: 0.001, release: 0.08 }
+});
+
+function stelleKompressor(knoten, werte) {
+  for (const [name, wert] of Object.entries(werte)) {
+    if (knoten[name] && "value" in knoten[name]) knoten[name].value = wert;
+  }
+  return knoten;
+}
+
+/** Baut die Laut-Kette und liefert ihren Eingang; ohne Kompressor-Unterstuetzung direkt das Ziel. */
+export function baueBoxKette(ctx) {
+  try {
+    if (!ctx.createDynamicsCompressor || !ctx.createGain) return ctx.destination;
+    const kompressor = stelleKompressor(ctx.createDynamicsCompressor(), BOX_KLANG.kompressor);
+    const aufholen = ctx.createGain();
+    aufholen.gain.value = BOX_KLANG.aufholen;
+    const begrenzer = stelleKompressor(ctx.createDynamicsCompressor(), BOX_KLANG.begrenzer);
+    kompressor.connect(aufholen);
+    aufholen.connect(begrenzer);
+    begrenzer.connect(ctx.destination);
+    return kompressor;
+  } catch {
+    return ctx.destination; // lieber normal laut als stumm
+  }
+}
+
+// Zeitmessung (08.11.2026, Gegenstueck zu sprachZeit in voice-ear.js): beim ersten Ton
+// nach einer gesendeten Frage eine Zeile in die Konsole — wo die Sekunden bleiben.
+function meldeErstenTon() {
+  try {
+    const z = globalThis.smejjSprachZeiten;
+    if (!z || !z.gesendet || z.ersterTon) return;
+    z.ersterTon = globalThis.performance?.now?.() ?? Date.now();
+    const ms = (a, b) => (z[a] && z[b] ? Math.round(z[b] - z[a]) : "-");
+    console.info(`[sprache] ruhe ${ms("stille", "ruhe")} ms | ohr ${ms("ruhe", "ohr")} ms | antwort bis ton ${ms("gesendet", "ersterTon")} ms | gesamt ${ms("stille", "ersterTon")} ms`);
+  } catch { /* Messung darf nie stoeren */ }
 }
 
 // Gleicher Schluessel wie in auth-gate.js/account-sessions.js — bewusst
@@ -132,7 +180,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
     }
     if (!lautstaerke && context.createGain) {
       lautstaerke = context.createGain();
-      lautstaerke.connect(context.destination);
+      lautstaerke.connect(baueBoxKette(context));
     }
     if (lautstaerke) lautstaerke.gain.value = lautsprecherAn() ? 1 : 0;
     context.resume?.().catch?.(() => {});
@@ -296,6 +344,7 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
           started = true;
           clearTimeout(firstToneTimer);
           stallTimer = setTimeout(() => controller.abort(), STALL_BUDGET_MS);
+          meldeErstenTon();
           onstart?.();
         }
       }
@@ -332,14 +381,16 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
       if (lautstaerke) lautstaerke.gain.value = lautsprecherAn() ? 1 : 0;
     });
   } catch { /* ohne Ereignisse gilt die Wahl ab dem naechsten Satz */ }
-  // 05.11.2026: sofort leiser, sobald jemand dazwischenspricht (wie ChatGPT); nach 8 s ohne
-  // Entscheidung wieder laut (Fehlalarm darf die Antwort nicht stumm lassen).
+  // 05.11.2026: sofort leiser, sobald jemand dazwischenspricht (wie ChatGPT).
+  // 08.11.2026 („viel zu leise“): am iPhone loeste schon das eigene Echo das Ducken aus und
+  // die Antwort lief dann bis zu 8 s auf 20 %. Jetzt nur noch auf DUCK_PEGEL (-6 dB) und
+  // nach DUCK_MAX_MS wieder voll laut.
   let duckUhr = 0;
   function ducken(an) {
     clearTimeout(duckUhr);
     if (!lautstaerke) return;
-    lautstaerke.gain.value = lautsprecherAn() ? (an ? 0.2 : 1) : 0;
-    if (an) duckUhr = setTimeout(() => ducken(false), 8000);
+    lautstaerke.gain.value = lautsprecherAn() ? (an ? DUCK_PEGEL : 1) : 0;
+    if (an) duckUhr = setTimeout(() => ducken(false), DUCK_MAX_MS);
   }
   const stimme = { isAvailable, speak, cancel, isSpeaking, unlock, vorladen, ducken };
   // Die Vorlese-Queue (voice-speech-queue.js) meldet hier den naechsten Satz an.

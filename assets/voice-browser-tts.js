@@ -6,7 +6,7 @@
 // und der iOS-Unlock innerhalb einer Nutzergeste. Kein Zustand ausser dem
 // Unlock-Merker; die Premium-Stimme (WebAudio) bleibt Sache des Hosts.
 
-import { leseStimmWahl, persoenlichkeitVon, stimmeVon, waehleBrowserStimme } from "./voice-stimmen.js?v=2026110701";
+import { leseStimmWahl, persoenlichkeitVon, stimmeVon, waehleBrowserStimme } from "./voice-stimmen.js?v=2026110801";
 
 // Gewaehlte Stimme/Persoenlichkeit (30.10.2026) auch fuer die Browser-Stimme: Geschlecht
 // per Namens-Heuristik, Tempo als rate, Lautsprecher aus = volume 0. Fehler: alte Wahl.

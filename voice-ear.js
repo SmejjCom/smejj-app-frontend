@@ -18,8 +18,9 @@
 // Zeitbudget nach dem Sprech-Ende: laenger warten wir nicht auf den Server,
 // sonst fuehlt sich das Gespraech traege an. Groq transkribiert eine Stunde
 // Audio in ~15 s — der Engpass ist der Upload, nicht das Modell.
-import { beobachtePegel } from "./audio-pegel.js?v=2026110701";
-export const EAR_BUDGET_MS = 1500;
+import { beobachtePegel } from "./audio-pegel.js?v=2026110801";
+// 08.11.2026 („Blitz schneller“): 1500 -> 1100 ms; ist Whisper langsamer, gilt der Browser-Text.
+export const EAR_BUDGET_MS = 1100;
 // Obergrenze der Aufnahme (Schutz von Free-Tier und Upload-Zeit).
 const MAX_AUFNAHME_MS = 60_000;
 
@@ -146,7 +147,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
     /** true, wenn in der laufenden Aufnahme deutlich lauter als die Raumruhe gesprochen wurde. */
     /** Wartet, bis seit stilleMs niemand mehr spricht (hoechstens maxMs) — die Erkennung schickte
      *  Fragen sonst bei einer Komma-Pause ab und der Satzrest fehlte (Live-Befund 05.11.2026). */
-    async wartenAufStille(stilleMs = 700, maxMs = 3000) {
+    async wartenAufStille(stilleMs = 500, maxMs = 1800) { // 08.11.: 700/3000 -> 500/1800 (Erkennung wartete schon)
       const bis = Date.now() + maxMs;
       while (recorder && Date.now() < bis && Date.now() - letzteSprache < stilleMs) await new Promise((r) => setTimeout(r, 100));
     },
@@ -295,13 +296,17 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
  */
 export function createEarSend({ ear, istAktiv, istStumm, zeigeDenken, zeigeTranskript, sollNachfragenFn, nachfragen, senden }) {
   return async function earSend(task, confidence) {
+    sprachZeit("stille");
     zeigeDenken?.();
     await ear?.wartenAufStille?.(); // ganzer Satz statt Abbruch an der Komma-Pause
+    sprachZeit("ruhe");
     const serverText = ear ? await ear.finish() : "";
+    sprachZeit("ohr");
     if (!istAktiv()) return;
     if (istStumm?.()) return; // waehrenddessen stummgeschaltet — nichts senden
     if (serverText) {
       zeigeTranskript?.(serverText);
+      sprachZeit("gesendet");
       senden(serverText);
       return;
     }
@@ -309,6 +314,22 @@ export function createEarSend({ ear, istAktiv, istStumm, zeigeDenken, zeigeTrans
       nachfragen();
       return;
     }
+    sprachZeit("gesendet");
     senden(task);
   };
+}
+
+// Zeitmessung der Sprachkette (08.11.2026): Stille erkannt -> Ruhe bestaetigt -> Ohr fertig
+// -> gesendet -> erster Ton (voice-premium-tts.js). Nur im Speicher und in der Konsole,
+// keine Inhalte, kein Netz. Abruf: globalThis.smejjSprachZeiten
+export function sprachZeit(name) {
+  try {
+    const jetzt = globalThis.performance?.now?.() ?? Date.now();
+    if (name === "stille") globalThis.smejjSprachZeiten = {};
+    const z = globalThis.smejjSprachZeiten || (globalThis.smejjSprachZeiten = {});
+    z[name] = jetzt;
+    return z;
+  } catch {
+    return null;
+  }
 }

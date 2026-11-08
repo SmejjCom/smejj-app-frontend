@@ -195,6 +195,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
           }
           if (stand !== "ende" && stand !== "zeitlimit") return;
           protokoll(`runde ${stand} sprach=${sprichtGemeldet}`);
+          markiere("stille"); markiere("ruhe");
           freigeben();
           if (stand === "zeitlimit" && !sprichtGemeldet) {
             try { ear.cancel(); } catch { /* still */ }
@@ -202,6 +203,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
             return;
           }
           const text = String((await ear.finish().catch(() => "")) || "").trim();
+          markiere("ohr");
           if (meinLauf !== lauf) return void protokoll("runde verworfen (neuer Lauf)");
           protokoll(`runde text=${text.length}`);
           if (text) aufTranskript?.(text);
@@ -222,6 +224,8 @@ const UNTERBRECHEN_ZIELE = "#voiceModeOverlay .voice-mode-logo, #voiceModeOverla
 const ANZEIGE = { speaking: "Ich spreche ...", thinking: "Einen Moment ..." };
 const antwortLaeuft = () => ["thinking", "speaking"].includes(overlayModus());
 const NACHLAUF_MS = 2000;
+// Zeitmessung (08.11.2026) wie sprachZeit in voice-ear.js — ohne Import, damit dieses Modul eigenstaendig bleibt.
+const markiere = (name) => { try { const jetzt = globalThis.performance?.now?.() ?? Date.now(); if (name === "stille") globalThis.smejjSprachZeiten = {}; (globalThis.smejjSprachZeiten ||= {})[name] = jetzt; } catch { /* Messung darf nie stoeren */ } };
 // Stille Diagnose (05.11.2026): nur aktiv, wenn im Browser globalThis.smejjOhrProtokoll gesetzt ist.
 const protokoll = (was) => { try { globalThis.smejjOhrProtokoll?.(was); } catch { /* Diagnose darf nie stoeren */ } };
 const woerter = (text) => String(text || "").toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter(Boolean);
@@ -307,6 +311,7 @@ export function verdrahteOhrSolo(host) {
         host.setTranskript(text); host.senden(text); return;
       }
       if (!s.voiceModeActive || s.voiceMuted || !s.ohrSoloAktiv) return; // stumm/zu: nichts senden
+      markiere("gesendet");
       host.setTranskript(text); host.senden(text);
     },
     aufLeer: () => {
