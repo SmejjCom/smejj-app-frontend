@@ -1,14 +1,12 @@
 // smejj.com — UI-Uebersetzung 中文 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von zh-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./zh-2.js?v=2026110801";
+import zusatz from "./zh-2.js?v=2026110802";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
   "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "视频已过期 — 生成视频的链接有效期为 7 天。",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
-  "Beim Verbessern von smejj helfen": "帮助改进 smejj",
-  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "在你开启之前保持关闭。开启后，你点赞的问题和回答可能会在不含你姓名的情况下用于训练我们自己的模型 smejj 1。你可以随时关闭。",
   "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "关闭后不会再添加新内容，你之前标记的回答也不再用于任何训练。",
   "Danke! Darf smejj aus solchen Antworten lernen?": "谢谢！smejj 可以从这样的回答中学习吗？",
   "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "仅在你同意时：问题和回答会在不含你姓名的情况下保存，用于改进我们自己的模型 smejj 1。可随时关闭。",

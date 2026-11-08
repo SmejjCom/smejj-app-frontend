@@ -1,14 +1,12 @@
 // smejj.com — UI-Uebersetzung Italiano (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von it-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./it-2.js?v=2026110801";
+import zusatz from "./it-2.js?v=2026110802";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
   "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "Video scaduto — i link ai video generati valgono 7 giorni.",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
-  "Beim Verbessern von smejj helfen": "Aiuta a migliorare smejj",
-  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Disattivato finché non lo attivi. Poi le domande e le risposte che segni con il pollice in su potranno essere usate, senza il tuo nome, per addestrare il nostro modello smejj 1. Puoi disattivarlo in qualsiasi momento.",
   "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "Se lo disattivi, non si aggiunge nulla di nuovo e le risposte segnate finora non vengono più usate per alcun addestramento.",
   "Danke! Darf smejj aus solchen Antworten lernen?": "Grazie! smejj può imparare da risposte come questa?",
   "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Solo con il tuo sì: domanda e risposta vengono salvate senza il tuo nome e aiutano a migliorare il nostro modello smejj 1. Puoi disattivarlo in qualsiasi momento.",

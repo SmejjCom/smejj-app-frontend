@@ -22,6 +22,11 @@
 (function () {
   var API = "https://api.smejj.com/api/chat";
   var ZEITGRENZE_MS = 90000;
+  // Lern-Kreislauf 08.11.2026: Widerspruch dieses Geraets (Einstellungen -> Datenschutz) reist mit der Gast-Frage.
+  function mitLernWiderspruch(koerper) {
+    try { if (localStorage.getItem("smejj.lernen.v1") === "aus") koerper.preferences = { lernen: false }; } catch (e) { /* Speicher gesperrt */ }
+    return koerper;
+  }
   // Geraetetest 22.09.2026 (echtes iPhone, WLAN): "Einen Moment …" stand ueber
   // drei Minuten, ohne Antwort und ohne Rueckfall — der Server antwortete per
   // curl in 6 s, ueber 5G kam die Antwort in 6 s. Zwei Luecken: (1) waehrend der
@@ -58,7 +63,7 @@
     try {
       // Derselbe sichere Renderer wie im angemeldeten Chat. Erst nach Ende
       // des Streams auszeichnen: weitere Textstuecke wuerden Links loeschen.
-      var renderer = await import("./chat-markdown.js?v=2026110801");
+      var renderer = await import("./chat-markdown.js?v=2026110802");
       renderer.renderChatMarkdown(text);
     } catch (fehler) { /* bei Ladefehlern bleibt die vollstaendige Textantwort */ }
   }
@@ -220,7 +225,7 @@
         headers: { "Content-Type": "application/json" },
         signal: steuerung.signal,
         cache: "no-store",
-        body: JSON.stringify({ model: "smejj-1", stream: true, messages: [{ role: "user", content: frage }] })
+        body: JSON.stringify(mitLernWiderspruch({ model: "smejj-1", stream: true, messages: [{ role: "user", content: frage }] }))
       });
       if (!res.ok || !res.body) throw new Error("kein Strom");
       var leser = res.body.getReader();

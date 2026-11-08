@@ -190,8 +190,8 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1085";
-const ASSET_BUILD = "2026110801";
+const CACHE_NAME = "smejj-shell-v1086";
+const ASSET_BUILD = "2026110802";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -360,6 +360,7 @@ const SHELL = [
   "/assets/chat-actions.js",
   // Lern-Hinweis nach Daumen hoch (23.09.2026), per import() aus chat-actions.js.
   "/assets/lern-hinweis.js",
+  "/assets/lern-widerspruch.js",
   "/assets/chat-neu-versuch.js",
   // Beispiel-Chips der Startseite (2026-08-13). index.html laedt sie per
   // <script>; ohne Eintrag hier fehlen sie offline — check:precache-imports

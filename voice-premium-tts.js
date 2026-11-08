@@ -8,7 +8,7 @@
 // die Browser-Stimme zurueck (kein Funktionsverlust). Free-only im Browser;
 // GPU-Kosten entstehen nur serverseitig waehrend aktiver Nutzung.
 
-import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026110801";
+import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026110802";
 
 function lautsprecherAn() {
   try { return leseStimmWahl().lautsprecher !== false; } catch { return true; }

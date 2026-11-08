@@ -1,14 +1,12 @@
 // smejj.com — UI-Uebersetzung Türkçe (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von tr-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./tr-2.js?v=2026110801";
+import zusatz from "./tr-2.js?v=2026110802";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
   "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "Videonun süresi doldu — oluşturulan videoların bağlantıları 7 gün geçerlidir.",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
-  "Beim Verbessern von smejj helfen": "smejj'i geliştirmeye yardım et",
-  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Sen açana kadar kapalı. Açınca, beğendiğin (başparmak yukarı) soru ve yanıtlar adın olmadan kendi modelimiz smejj 1'i eğitmek için kullanılabilir. İstediğin zaman yeniden kapatabilirsin.",
   "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "Kapatırsan yeni bir şey eklenmez ve daha önce işaretlediğin yanıtlar artık hiçbir eğitimde kullanılmaz.",
   "Danke! Darf smejj aus solchen Antworten lernen?": "Teşekkürler! smejj bunun gibi yanıtlardan öğrenebilir mi?",
   "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Yalnızca onay verirsen: soru ve yanıt adın olmadan kaydedilir ve kendi modelimiz smejj 1'i geliştirmeye yardım eder. İstediğin zaman kapatabilirsin.",

@@ -1,23 +1,23 @@
-import { STORAGE_KEYS } from "./config.js?v=2026110801";
+import { STORAGE_KEYS } from "./config.js?v=2026110802";
 import { initServerSessionControls, fetchLoginMethods, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
-  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026110801";
-import { languageOptionsMarkup } from "./language-options.js?v=2026110801";
-import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026110801";
-import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026110801";
-import { clearProfilePicture } from "./profile-picture-store.js?v=2026110801";
-import { afterFirstPaint } from "./deferred-start.js?v=2026110801";
+  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026110802";
+import { languageOptionsMarkup } from "./language-options.js?v=2026110802";
+import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026110802";
+import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026110802";
+import { clearProfilePicture } from "./profile-picture-store.js?v=2026110802";
+import { afterFirstPaint } from "./deferred-start.js?v=2026110802";
 // Ohne ?v=: siehe die Begruendung in account-auth-state.js. Eine Marke hier
 // wuerde erzwingen, dass diese ABO-GESPERRTE Datei bei jeder Stil-Aenderung
 // wieder angefasst wird — genau das soll die Auslagerung verhindern.
-import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026110801";
+import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026110802";
 // Gleicher Schluessel wie in profile-dock-menu.js — bewusst dupliziert statt
 // importiert (wie TOKEN_KEY in auth-gate.js): profile-dock-menu.js liegt im
 // Startbuendel, diese Datei wird nachgeladen. Ein Import zoege das Startmodul
 // unter einer zweiten Marke herein — genau die Falle, vor der die Markenkette
 // warnt (zwei Kopien mit getrenntem Zustand).
 const KONTO_REITER_SCHLUESSEL = "smejj.konto.reiter.v1";
-import { usageSummary } from "./usage-meter.js?v=2026110801";
-import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026110801";
+import { usageSummary } from "./usage-meter.js?v=2026110802";
+import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026110802";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const PERSONAL_KEY = "smejj.personalization.v1";
@@ -269,9 +269,9 @@ function markup() {
     ${panel("usage", "Nutzung & Limits", `<div class="account-list">${usageRow("Nachrichten", "Aufbauphase: ohne Limit.", "usageMessages")}${usageRow("Sprachminuten (Premium-Stimme)", "Zählt erst, wenn die Premium-Stimme aktiv ist.", "usageVoice")}${usageRow("Coding-Aufgaben", "Nur erfolgreich gestartete Läufe zählen.", "usageCoding")}</div><p class="account-note" id="usagePeriodNote">${t("Zähler laufen nur auf diesem Gerät und setzen sich jeden Monat automatisch zurück. Mit den Plänen bekommt jede Zeile einen Balken: verbraucht und noch offen.")}</p>`)}
     ${panel("data", "Meine Daten", `<div class="daten-fragen">
       <div class="daten-karte"><h5>${t("Wo liegen sie?")}</h5><p>${t("In deinem eigenen Bereich bei IDrive e2, verschlüsselt — nicht in einem gemeinsamen Topf mit anderen Nutzern.")}</p></div>
-      <div class="daten-karte"><h5>${t("Wer liest mit?")}</h5><p>${t("Zum Training werden deine Texte nur mit deinem ausdrücklichen Ja benutzt — die Einwilligung ist standardmäßig aus.")}</p></div>
+      <div class="daten-karte"><h5>${t("Wer liest mit?")}</h5><p>${t("Fragen an smejj 1 helfen bereinigt beim Lernen — ohne Namen und Kontaktdaten. Du kannst jederzeit widersprechen: Einstellungen → Datenschutz & Training.")}</p></div>
       <div class="daten-karte"><h5>${t("Wie komme ich raus?")}</h5><p>${t("Ein Klick unter Daten verwalten — der Export kommt sofort, ohne Nachfrage und ohne Wartezeit.")}</p></div>
-    </div><h4 class="account-subhead">${t("Datenschutz")}</h4><div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Beim Verbessern von smejj helfen", "privacyTraining", "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.")}</p><h4 class="account-subhead">${t("Berechtigungen")}</h4><div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div><h4 class="account-subhead">${t("Daten verwalten")}</h4><div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">${t("Datenschutzerklärung öffnen")}</button></div>`)}
+    </div><h4 class="account-subhead">${t("Datenschutz")}</h4><div class="account-list">${toggle("Memory aus verifizierten Ergebnissen", "privacyMemory", "Nur erfolgreich geprüfte Lösungen; keine Trainingsfreigabe.")}${toggle("Daumen-hoch-Antworten zusätzlich teilen", "privacyTraining", "Aus, bis du es einschaltest. Dann dürfen Antworten, die du mit Daumen hoch markierst, ohne deinen Namen als Lernpaar genutzt werden. Deine Fragen allgemein: Widerspruch unter Einstellungen → Datenschutz & Training.")}${toggle("Diagnosedaten lokal aufbewahren", "privacyDiagnostics", "Keine automatische Übertragung.")}</div><p class="account-note">${t("Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.")}</p><h4 class="account-subhead">${t("Berechtigungen")}</h4><div class="account-list">${permission("Dateien lesen", "Projektbezogen")}${permission("Dateien schreiben", "Bestätigung erforderlich")}${permission("Terminal", "Allowlist und Sandbox")}${permission("Netzwerk", "Standardmäßig blockiert")}${permission("Browser", "Nur sichtbare Nutzeraktion")}${permission("Git/Veröffentlichung", "Exakte Diff-Freigabe")}</div><h4 class="account-subhead">${t("Daten verwalten")}</h4><div class="account-list">${dataAction("Datenexport", "Profil, Einstellungen und lokale Session-Metadaten; niemals Tokens oder Schlüssel.", "accountExport", "Export erstellen")}${dataAction("Lokale App-Daten", "Entfernt lokale smejj.com Daten erst nach ausdrücklicher Bestätigung.", "clearLocal", "Lokale Daten löschen", true)}</div><div class="account-actions"><button id="accountPrivacyOpen" type="button">${t("Datenschutzerklärung öffnen")}</button></div>`)}
   </div></div><div id="profileOutput" class="output" role="status" aria-live="polite">${t("Bereit.")}</div>`;
 }
 

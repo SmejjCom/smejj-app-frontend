@@ -1,14 +1,12 @@
 // smejj.com — UI-Uebersetzung Bahasa Indonesia (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von id-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./id-2.js?v=2026110801";
+import zusatz from "./id-2.js?v=2026110802";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
   "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "Video kedaluwarsa — tautan ke video yang dibuat berlaku 7 hari.",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
-  "Beim Verbessern von smejj helfen": "Bantu tingkatkan smejj",
-  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Mati sampai kamu menyalakannya. Setelah itu, pertanyaan dan jawaban yang kamu beri jempol boleh dipakai, tanpa namamu, untuk melatih model milik kami sendiri, smejj 1. Bisa dimatikan lagi kapan saja.",
   "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "Kalau kamu mematikannya, tidak ada yang baru ditambahkan, dan jawaban yang sudah kamu tandai tidak lagi dipakai untuk pelatihan apa pun.",
   "Danke! Darf smejj aus solchen Antworten lernen?": "Terima kasih! Bolehkah smejj belajar dari jawaban seperti ini?",
   "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Hanya dengan persetujuanmu: pertanyaan dan jawaban disimpan tanpa namamu dan membantu meningkatkan model milik kami, smejj 1. Bisa dimatikan kapan saja.",

@@ -1,14 +1,12 @@
 // smejj.com — UI-Uebersetzung Français (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von fr-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./fr-2.js?v=2026110801";
+import zusatz from "./fr-2.js?v=2026110802";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
   "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "Vidéo expirée — les liens vers les vidéos générées sont valables 7 jours.",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
-  "Beim Verbessern von smejj helfen": "Aider à améliorer smejj",
-  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Désactivé tant que tu ne l’actives pas. Ensuite, les questions et réponses que tu marques d’un pouce levé pourront servir, sans ton nom, à entraîner notre propre modèle smejj 1. Tu peux le désactiver à tout moment.",
   "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "Si tu le désactives, plus rien de nouveau n’est ajouté et les réponses marquées auparavant ne servent plus à aucun entraînement.",
   "Danke! Darf smejj aus solchen Antworten lernen?": "Merci ! smejj peut-il apprendre de réponses comme celle-ci ?",
   "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Uniquement avec ton accord : la question et la réponse sont enregistrées sans ton nom et aident à améliorer notre propre modèle smejj 1. Désactivable à tout moment.",

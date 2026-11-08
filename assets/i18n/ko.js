@@ -1,14 +1,12 @@
 // smejj.com — UI-Uebersetzung 한국어 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ko-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ko-2.js?v=2026110801";
+import zusatz from "./ko-2.js?v=2026110802";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
   "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "동영상이 만료되었어요 — 생성된 동영상 링크는 7일간 유효해요.",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
-  "Beim Verbessern von smejj helfen": "smejj 개선에 도움 주기",
-  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "켜기 전까지는 꺼져 있습니다. 켜면 좋아요를 누른 질문과 답변이 이름 없이 자체 모델 smejj 1 학습에 사용될 수 있습니다. 언제든지 다시 끌 수 있습니다.",
   "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "끄면 새로운 것은 추가되지 않으며, 이전에 표시한 답변도 더 이상 학습에 사용되지 않습니다.",
   "Danke! Darf smejj aus solchen Antworten lernen?": "고마워요! smejj가 이런 답변에서 배워도 될까요?",
   "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "동의한 경우에만: 질문과 답변이 이름 없이 저장되어 자체 모델 smejj 1 개선에 쓰입니다. 언제든지 끌 수 있습니다.",

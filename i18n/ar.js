@@ -1,14 +1,12 @@
 // smejj.com — UI-Uebersetzung العربية (Quellsprache Deutsch als Schluessel, RTL).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ar-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ar-2.js?v=2026110801";
+import zusatz from "./ar-2.js?v=2026110802";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
   "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "انتهت صلاحية الفيديو — روابط الفيديوهات المُنشأة صالحة لمدة 7 أيام.",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
-  "Beim Verbessern von smejj helfen": "المساعدة في تحسين smejj",
-  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "مُعطَّل حتى تُفعّله. بعد ذلك يمكن استخدام الأسئلة والإجابات التي تمنحها إعجابًا، من دون اسمك، لتدريب نموذجنا الخاص smejj 1. يمكنك إيقافه في أي وقت.",
   "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "إذا أوقفته فلن يُضاف شيء جديد، ولن تُستخدم الإجابات التي علّمتها سابقًا في أي تدريب بعد ذلك.",
   "Danke! Darf smejj aus solchen Antworten lernen?": "شكرًا! هل يمكن لـ smejj أن يتعلّم من إجابات كهذه؟",
   "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "فقط بموافقتك: يُحفظ السؤال والإجابة من دون اسمك ويساعدان في تحسين نموذجنا الخاص smejj 1. يمكنك الإيقاف في أي وقت.",

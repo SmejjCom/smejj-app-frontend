@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from "./config.js?v=2026110801";
+import { STORAGE_KEYS } from "./config.js?v=2026110802";
 
 // Version des gespeicherten Einstellungsstands. Erhoehen, wenn ein Feld seine
 // Bedeutung aendert und ein alter Wert nicht mehr als bewusste Wahl gelten darf.
@@ -86,7 +86,9 @@ export function taskPreferences() {
     // damit der Halt DORT durchgesetzt wird — die reine Systemprompt-Zeile
     // im Client verlor gegen den Coding-Prompt der Bruecke (live gemessen
     // 2026-08-16, zweimal).
-    modus: (() => { try { return localStorage.getItem("smejj.codeModus.v1") || "auto"; } catch { return "auto"; } })()
+    modus: (() => { try { return localStorage.getItem("smejj.codeModus.v1") || "auto"; } catch { return "auto"; } })(),
+    // Lern-Kreislauf 08.11.2026: Widerspruch des Geräts reist mit jeder Frage (Schlüssel wie lern-widerspruch.js).
+    ...((() => { try { return localStorage.getItem("smejj.lernen.v1") === "aus"; } catch { return false; } })() ? { lernen: false } : {})
   };
 }
 

@@ -1,5 +1,5 @@
-import { STORAGE_KEYS } from "./config.js?v=2026110801";
-import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=2026110801";
+import { STORAGE_KEYS } from "./config.js?v=2026110802";
+import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=2026110802";
 // api-center-surface.js und provider-settings.js werden BEWUSST nicht statisch
 // importiert (Seitengewicht). Der Startreiter ist "general" — bis der Nutzer
 // dorthin wechselt, wird ihr Code nie gebraucht. Zusammen mit ihrem selbst
@@ -8,8 +8,8 @@ import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } f
 // Geprueft vor dem Umbau: app.js (Start-Lock) bindet KEINE der von ihnen
 // erzeugten Kennungen (ac*, apiCenterSurface, cline*) — die Boot-Bindings von
 // app.js koennen dadurch nichts verlieren.
-import { LANGUAGE_OPTIONS } from "./language-options.js?v=2026110801";
-import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026110801";
+import { LANGUAGE_OPTIONS } from "./language-options.js?v=2026110802";
+import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026110802";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
@@ -119,11 +119,37 @@ function render(view) {
   // wenn der Reiter "models" wirklich dran ist.
   applyValues(view, readSettings());
   zeigeAktiveSprache(view);
+  bindeLernSchalter(view);
   activate(view, activeTab);
   view.querySelector("#settingsPersonalization")?.addEventListener("input", debounce(() => save(view), 350));
 }
 
+// Lern-Kreislauf (08.11.2026): Widerspruch gegen das Lernen aus Fragen. Eigener Speicher
+// (smejj.lernen.v1), NICHT in den Einstellungen: „Zurücksetzen“ darf einen Widerspruch nie aufheben.
+function bindeLernSchalter(view) {
+  const feld = view.querySelector("#settingsLernenAus");
+  if (!feld) return;
+  try { feld.checked = localStorage.getItem("smejj.lernen.v1") === "aus"; } catch { feld.checked = false; }
+  import("./lern-widerspruch.js?v=2026110802").then((m) => m.kontoStandAngleichen()).then((stand) => {
+    if (stand?.widerspruch) feld.checked = true;
+  }).catch(() => {});
+}
+
+function lernStatus(view, text) {
+  const status = view.querySelector("#settingsLernenStatus");
+  if (status) status.textContent = text;
+}
+
 function handleChange(view, event) {
+  if (event.target?.id === "settingsLernenAus") {
+    const aus = event.target.checked === true;
+    import("./lern-widerspruch.js?v=2026110802").then((m) => m.widerspruchSetzen(aus)).then((r) => {
+      lernStatus(view, aus
+        ? (r.konto ? t("Gespeichert: deine Fragen werden nicht mehr zum Lernen verwendet (Gerät und Konto).") : t("Gespeichert: auf diesem Gerät werden deine Fragen nicht mehr zum Lernen verwendet."))
+        : t("Deine Fragen helfen wieder beim Verbessern von smejj 1."));
+    }).catch(() => lernStatus(view, t("Nicht gespeichert — bitte erneut versuchen.")));
+    return;
+  }
   // Erst die Wahl merken, dann speichern: save() nimmt die Sprache bewusst
   // nicht aus dem Feld (siehe dort), sonst ginge genau diese Wahl verloren.
   // Push/Notification: die Berechtigung JETZT anfragen (wir sind in einer echten
@@ -202,9 +228,11 @@ function markup() {
         action("Speicherstatus", t("Lokalen Speicher, IDrive e2 und Sync prüfen."), t("Speicher öffnen"), "storageView"),
         action("Lokale Einstellungsdaten", "Standardeinstellungen wiederherstellen.", t("Zurücksetzen"), "reset")])}
       ${panel("privacy", "Datenschutz & Training", t("In Klartext: was smejj.com sammelt und wo du Ja oder Nein sagst."), [
-        info(t("Was gesammelt wird"), "Nur deine Fragen — nie die Antworten, nie Dateien. Und nur, wenn du das Modelltraining ausdrücklich erlaubst. Standardmäßig ist es aus."),
-        info("Wofür", t("Damit smejj 1.1 echte Fragen von echten Menschen lernt. Jederzeit widerrufbar, dann wird nichts mehr gespeichert.")),
-        action("Beim Verbessern von smejj helfen", t("Der Schalter liegt in deinem Konto unter Meine Daten."), "Zum Schalter", "kontoDaten")])}
+        info(t("Was gesammelt wird"), t("Deine Fragen an smejj 1 und die Antwort — vorher automatisch ohne Namen, Kontaktdaten, Nummern und Passwörter. Fragen zu Gesundheit, Religion, Politik oder Kindern speichern wir gar nicht.")),
+        info("Wofür", t("Damit smejj 1 echte Fragen von echten Menschen lernt und besser antwortet. Rohdaten werden nach 30 Tagen gelöscht.")),
+        toggle("Meine Fragen nicht zum Lernen verwenden", "settingsLernenAus", "Gilt sofort für jede Frage auf diesem Gerät. Angemeldet gilt es zusätzlich in deinem Konto."),
+        action("Gespeicherte Fragen löschen", t("Nur angemeldet: entfernt deine gespeicherten Fragen; künftig wird nichts mehr verwendet."), "Löschen", "lernenLoeschen"),
+        `<div class="settings-row"><div class="settings-row-copy"><strong>${t("Details")}</strong><span id="settingsLernenStatus" role="status" aria-live="polite">${t("Datenschutzerklärung, Abschnitt 11.")}</span></div><div class="settings-links"><a href="/datenschutz.html#lernen">${t("Datenschutz")}</a></div></div>`])}
       ${panel("advanced", "Erweitert", t("Diagnose und rechtliche Informationen."), [
         toggle("Diagnoseinformationen anzeigen", "settingsDiagnostics", "Technische Statusdetails in Nicht-Start-Bereichen."),
         action("Systemstatus", t("Verbindungen, Modelle und Betrieb prüfen."), t("Status öffnen"), "tools"),
@@ -257,6 +285,13 @@ function handleClick(view, event) {
     sprachwahlVomNutzer = DEFAULTS.language;
     save(view, t("Standardeinstellungen wiederhergestellt"));
     loadUiLanguage(DEFAULTS.language).then(() => render(view));
+  } else if (jump === "lernenLoeschen") {
+    lernStatus(view, t("Löschung wird angefragt …"));
+    import("./lern-widerspruch.js?v=2026110802").then((m) => m.fragenLoeschen()).then((r) => {
+      if (r.ok) { const feld = view.querySelector("#settingsLernenAus"); if (feld) feld.checked = true; }
+      lernStatus(view, r.ok ? t("Löschung angenommen. Deine gespeicherten Fragen werden entfernt und künftig nicht mehr verwendet.")
+        : r.angemeldet ? t("Löschen gerade nicht möglich — bitte später erneut versuchen.") : t("Bitte zuerst anmelden. Als Gast speichern wir keine Kennung, die man dir zuordnen könnte."));
+    }).catch(() => lernStatus(view, t("Löschen gerade nicht möglich — bitte später erneut versuchen.")));
   } else if (jump === "kontoDaten") {
     // UI/UX-Programm 02.09., Nr. 5: zwei Klicks bis zum Schalter. Der Konto-
     // Bereich rendert nach dem Wechsel; der Reiter wird kurz danach gewaehlt.
@@ -281,7 +316,7 @@ function handleClick(view, event) {
 // hinsieht. Kompakter Kopf: die Panel-Ueberschrift liefert den Titel.
 async function ladeApiZentrum(view) {
   try {
-    const modul = await import("./api-center-surface.js?v=2026110801");
+    const modul = await import("./api-center-surface.js?v=2026110802");
     modul.initApiCenter(view.querySelector("#apiCenterSurface"), { kopf: "kompakt" });
   } catch {
     /* fail-safe: uebrige Einstellungen bleiben bedienbar */
@@ -291,7 +326,7 @@ async function ladeApiZentrum(view) {
 // Inhaber 05.11.2026: Lautsprecher, Stimme und Sprechstil der frueheren Sprachmodus-Leiste.
 async function ladeStimme(view) {
   try {
-    const modul = await import("./voice-stimmen-panel.js?v=2026110801");
+    const modul = await import("./voice-stimmen-panel.js?v=2026110802");
     modul.bindeStimmenEinstellungen(view.querySelector("#settingsStimme"));
   } catch {
     /* fail-safe: uebrige Einstellungen bleiben bedienbar */

@@ -1,14 +1,12 @@
 // smejj.com — UI-Uebersetzung Русский (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ru-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ru-2.js?v=2026110801";
+import zusatz from "./ru-2.js?v=2026110802";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
   "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "Срок видео истёк — ссылки на созданные видео действуют 7 дней.",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
-  "Beim Verbessern von smejj helfen": "Помогать улучшать smejj",
-  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "Выключено, пока ты не включишь. Тогда вопросы и ответы, отмеченные «палец вверх», могут без твоего имени использоваться для обучения нашей собственной модели smejj 1. Выключить можно в любой момент.",
   "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "Если выключить, ничего нового не добавляется, а ранее отмеченные ответы больше не используются ни в каком обучении.",
   "Danke! Darf smejj aus solchen Antworten lernen?": "Спасибо! Можно smejj учиться на таких ответах?",
   "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "Только с твоего согласия: вопрос и ответ сохраняются без твоего имени и помогают улучшать нашу модель smejj 1. Выключить можно в любой момент.",

@@ -1,14 +1,12 @@
 // smejj.com — UI-Uebersetzung 日本語 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ja-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ja-2.js?v=2026110801";
+import zusatz from "./ja-2.js?v=2026110802";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
   "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "動画の有効期限が切れました — 生成した動画のリンクは7日間有効です。",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
-  "Beim Verbessern von smejj helfen": "smejj の改善に協力する",
-  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "オンにするまでオフです。オンにすると、👍を付けた質問と回答が、名前なしで自社モデル smejj 1 の学習に使われることがあります。いつでもオフに戻せます。",
   "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "オフにすると新しいものは追加されず、これまでに付けた回答も今後の学習には使われません。",
   "Danke! Darf smejj aus solchen Antworten lernen?": "ありがとうございます！smejj がこのような回答から学んでもよいですか？",
   "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "同意した場合のみ：質問と回答は名前なしで保存され、自社モデル smejj 1 の改善に役立ちます。いつでもオフにできます。",

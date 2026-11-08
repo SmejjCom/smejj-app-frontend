@@ -1,14 +1,12 @@
 // smejj.com — UI-Uebersetzung বাংলা (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von bn-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./bn-2.js?v=2026110801";
+import zusatz from "./bn-2.js?v=2026110802";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
   "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.": "ভিডিওর মেয়াদ শেষ — তৈরি করা ভিডিওর লিংক ৭ দিন বৈধ থাকে।",
   // Lernweg 23.09.: Schalter verstaendlich + Lern-Hinweis nach Daumen hoch
-  "Beim Verbessern von smejj helfen": "smejj উন্নত করতে সাহায্য করুন",
-  "Aus, bis du es einschaltest. Dann dürfen Fragen und Antworten, die du mit Daumen hoch markierst, ohne deinen Namen zum Trainieren des eigenen Modells smejj 1 genutzt werden. Jederzeit wieder abschaltbar.": "আপনি চালু না করা পর্যন্ত বন্ধ থাকে। চালু করলে, যে প্রশ্ন ও উত্তরে আপনি থাম্বস আপ দেন সেগুলো আপনার নাম ছাড়া আমাদের নিজস্ব মডেল smejj 1 প্রশিক্ষণে ব্যবহার হতে পারে। যেকোনো সময় আবার বন্ধ করা যায়।",
   "Schaltest du es aus, kommt nichts Neues mehr dazu, und deine bisher markierten Antworten fließen in kein Training mehr ein.": "বন্ধ করলে নতুন কিছু যোগ হয় না, আর আগে চিহ্নিত উত্তরগুলোও আর কোনো প্রশিক্ষণে ব্যবহার হয় না।",
   "Danke! Darf smejj aus solchen Antworten lernen?": "ধন্যবাদ! smejj কি এমন উত্তর থেকে শিখতে পারে?",
   "Nur mit deinem Ja: Frage und Antwort werden ohne deinen Namen gespeichert und helfen, das eigene Modell smejj 1 zu verbessern. Jederzeit wieder abschaltbar.": "শুধু আপনার সম্মতিতে: প্রশ্ন ও উত্তর আপনার নাম ছাড়া সংরক্ষিত হয় এবং আমাদের নিজস্ব মডেল smejj 1 উন্নত করতে সাহায্য করে। যেকোনো সময় বন্ধ করা যায়।",

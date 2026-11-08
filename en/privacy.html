@@ -185,7 +185,37 @@
         <a href="https://stripe.com/privacy" rel="noopener">Stripe privacy policy</a>.
       </p>
 
-      <h2>11. Training data for smejj 1.0 (only with consent)</h2>
+      <h2 id="learning">11. Training our own model smejj 1</h2>
+      <h3>11.1 Your questions to smejj 1 (you can object at any time)</h3>
+      <p>
+        To keep improving our own model smejj 1, we use questions asked to smejj 1, together with
+        the answer, <strong>in cleaned form</strong> for training. This covers smejj.com on the web,
+        the app (iOS/Android) and search queries forwarded to smejj 1 by spipp.com. Legal basis:
+        our legitimate interest in a good assistant of our own (Art. 6(1)(f) GDPR).
+      </p>
+      <p>
+        Before storage we automatically remove names, email addresses, phone numbers, postal
+        addresses, account, card and ID numbers, passwords and access keys. We do
+        <strong>not</strong> store questions about health, religion, political opinions, sex life,
+        origin, trade-union membership, genetic or biometric data, criminal offences or children.
+        For signed-in users we store only a non-reversible hash instead of your identifier; for
+        guests and spipp.com no identifier at all. Data is stored encrypted (AES-256-GCM) with our
+        storage provider IDrive e2. Raw data is deleted after 30 days; afterwards only cleaned
+        question–answer pairs remain whose answer was written by our own, locally run teacher
+        model. Nothing is passed on to third parties.
+      </p>
+      <div class="card">
+        <p>
+          <strong>Objection (Art. 21 GDPR):</strong> you can object at any time – in the app under
+          “Settings → Privacy &amp; training → Don’t use my questions for learning” (applies
+          immediately to every question on this device and, when signed in, to your account) or via
+          the browser setting “Global Privacy Control”. Signed-in users can also request deletion of
+          their stored questions there, or by email to <a href="mailto:s@smejj.com">s@smejj.com</a>.
+          After objection or deletion your questions are excluded from all future training; a model
+          already trained is replaced by the next training run without this data.
+        </p>
+      </div>
+      <h3>11.2 Further training data (only with consent)</h3>
       <p>
         smejj.com is developing its own AI model (smejj 1.0). To improve this model,
         selected work results (e.g. verified task results and your own corrections) may be
@@ -194,9 +224,8 @@
         purposes; the feature is switched off by default.
       </p>
       <p>
-        Likewise, <strong>your questions to the assistant</strong> may be used as training
-        data. If you mark an answer as helpful with “thumbs up”, we additionally store
-        <strong>that answer together with your question</strong> (a “learning pair”). For
+        If you have consented and mark an answer as helpful with “thumbs up”, we additionally
+        store <strong>that answer together with your question</strong> (a “learning pair”). For
         training we use only answers from our own smejj models; answers from third-party
         providers are stored separately and are not trained on unless the provider’s terms
         of use expressly allow it. A “thumbs down” creates no learning pair; the feedback
