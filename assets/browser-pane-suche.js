@@ -1,4 +1,4 @@
-import { t } from "./i18n/ui.js?v=2026110803";
+import { t } from "./i18n/ui.js?v=2026110901";
 
 // Beschriftungen in HTML-Attributen IMMER escapen: Uebersetzungen tragen
 // Apostrophe und Anfuehrungszeichen (20.09.2026 live gemessen, als t("…") in

@@ -18,18 +18,18 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026110803";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026110901";
 // Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
-import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026110803";
-import { Icons } from "/assets/components.js?v=2026110803";
+import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026110901";
+import { Icons } from "/assets/components.js?v=2026110901";
 // Abo-Stand ueber den gemeinsamen Speicher (F6, 2026-09-14): EINE Anfrage je
 // Laden fuer Planzeile, Onboarding-Karte und Abo-Panel — dieselbe Kennung wie
 // in account-sessions.js, sonst zweite Instanz und wieder zwei Anfragen.
-import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026110803";
+import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026110901";
 // Nutzerreise USA 2026-08-23: die Spur blieb auf Englisch deutsch ("Neuer
 // Chat", "Heute", "Gestern", "Alle 127 Gespräche"). t() liefert fail-safe den
 // deutschen Quelltext, solange kein Wörterbuch geladen ist.
-import { t } from "./i18n/ui.js?v=2026110803";
+import { t } from "./i18n/ui.js?v=2026110901";
 
 function alleGespraeche(n) {
   return t("Alle {n} Gespräche").replace("{n}", String(n));
@@ -51,6 +51,8 @@ function tageHer(iso) {
 // unangetastet (das Haekchen dort ist anderswo ein echtes Haekchen).
 const SPUR_ICONS = {
   chevron: '<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>',
+  // Neuer Chat oben (Design V20, Inhaberfreigabe 09.11.2026): Stift im Kaestchen.
+  stift: '<svg viewBox="0 0 24 24"><path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"/><path d="M20.4 6.6a2.1 2.1 0 0 0-3-3L9 12v3h3l8.4-8.4z"/><path d="m16 5 3 3"/></svg>',
   sliders: '<svg viewBox="0 0 24 24"><path d="M4 7h8"/><path d="M18 7h2"/><circle cx="15" cy="7" r="2.2"/><path d="M4 17h2"/><path d="M11 17h9"/><circle cx="8" cy="17" r="2.2"/></svg>'
 };
 
@@ -261,7 +263,7 @@ function schalte() {
 
 function initNeuerChatStart(starten) {
   if (document.getElementById("neuerChatStart")) return;
-  const knopf = punkt({ icon: "plus", text: t("Neuer Chat"), aktion: () => {
+  const knopf = punkt({ icon: "stift", text: t("Neuer Chat"), aktion: () => {
     starten();
     const input = document.getElementById("startMessage");
     if (!input) return;
@@ -271,6 +273,8 @@ function initNeuerChatStart(starten) {
   } });
   knopf.id = "neuerChatStart";
   knopf.className = "neuer-chat-start";
+  // Nur Symbol sichtbar (V20) — der Name bleibt fuer Vorlesehilfen und als Tooltip.
+  knopf.setAttribute("aria-label", t("Neuer Chat"));
   document.body.append(knopf);
 }
 

@@ -6175,3 +6175,116 @@ html.kopf-weg body #start.has-start-chat #startLog.start-log.start-log.start-log
 mask-image: none}
 }
 }
+
+/* ---- design-v20-neuer-chat-oben.css ---- */
+html body:has(#start.view) .neuer-chat-start.neuer-chat-start {
+top: env(safe-area-inset-top, 0px);
+right: calc(env(safe-area-inset-right, 0px) + 52px);
+width: 48px;
+height: 48px;
+min-height: 48px;
+padding: 0;
+gap: 0;
+border: 1.5px solid color-mix(in srgb, currentColor 40%, transparent) !important;
+border-radius: 50% !important;
+background: transparent !important;
+-webkit-backdrop-filter: none !important;
+backdrop-filter: none !important;
+box-shadow: none !important}
+html body:has(#start.view) .neuer-chat-start.neuer-chat-start .button-icon {
+display: grid;
+place-items: center}
+html body:has(#start.view) .neuer-chat-start.neuer-chat-start svg {
+width: 24px;
+height: 24px;
+flex: 0 0 24px;
+stroke-width: 2;
+stroke-linejoin: round}
+html body:has(#start.view) .neuer-chat-start.neuer-chat-start :is(.nav-label, .nav-kuerzel) {
+position: absolute;
+width: 1px;
+height: 1px;
+overflow: hidden;
+clip-path: inset(50%);
+white-space: nowrap}
+@media (max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px) {
+html.kopf-weg body:has(#start.has-start-chat.is-active) :is(#appMenuButton, #browserButton, #mausButton, #neuerChatStart) {
+transform: none !important;
+opacity: 1 !important;
+pointer-events: auto !important}
+html body #start.has-start-chat #startLog.start-log.start-log.start-log.start-log,
+html.kopf-weg body #start.has-start-chat #startLog.start-log.start-log.start-log.start-log {
+-webkit-mask-image: none !important;
+mask-image: none !important}
+html body:has(#start.view.is-active) :is(#appMenuButton, #browserButton, #mausButton, #neuerChatStart):is(.glass-icon, .neuer-chat-start) {
+top: calc(var(--sa-top, 0px) + 6px)}
+html.mobil-chat-viewport body:has(#start.view.is-active) :is(#appMenuButton, #browserButton, #mausButton, #neuerChatStart):is(.glass-icon, .neuer-chat-start) {
+top: calc(var(--chat-sichtbar-oben, 0px) + var(--sa-top, 0px) + 6px) !important}
+html body:has(#start.view.is-active) #neuerChatStart.neuer-chat-start {
+top: calc(var(--sa-top, 0px) + 4px);
+right: calc(env(safe-area-inset-right, 0px) + 62px) !important}
+html.mobil-chat-viewport body:has(#start.view.is-active) #neuerChatStart.neuer-chat-start {
+top: calc(var(--chat-sichtbar-oben, 0px) + var(--sa-top, 0px) + 4px) !important}
+html body:has(#start.view.is-active) :is(#appMenuButton, #browserButton).glass-icon.glass-icon.glass-icon.glass-icon {
+width: 44px;
+height: 44px;
+min-height: 44px;
+border: 1.5px solid color-mix(in srgb, currentColor 40%, transparent) !important;
+border-radius: 50% !important;
+background: transparent !important;
+-webkit-backdrop-filter: none !important;
+backdrop-filter: none !important;
+box-shadow: none !important}
+html body:has(#start.view.is-active) #appMenuButton.glass-icon.glass-icon.glass-icon.glass-icon {
+left: calc(env(safe-area-inset-left, 0px) + 10px) !important}
+html body:has(#start.view.is-active) #browserButton.glass-icon.glass-icon.glass-icon.glass-icon {
+right: calc(env(safe-area-inset-right, 0px) + 10px) !important}
+html body #start.view .home-feed .prompt-glass.prompt-glass.prompt-glass.prompt-glass.prompt-glass,
+html body #start.view .home-feed .prompt-glass.prompt-glass.prompt-glass.prompt-glass.prompt-glass:focus-within {
+flex-wrap: wrap !important;
+align-items: center !important;
+row-gap: 6px !important;
+column-gap: 6px !important;
+padding: 8px 8px 8px !important;
+border: 1.5px solid color-mix(in srgb, currentColor 35%, transparent) !important;
+border-radius: 26px !important;
+background: transparent !important;
+box-shadow: none !important;
+-webkit-backdrop-filter: none !important;
+backdrop-filter: none !important}
+html body #start.view .home-feed .prompt-glass #startMessage#startMessage {
+order: 0 !important;
+flex: 1 0 100% !important;
+width: 100% !important;
+max-width: none !important;
+min-height: 40px !important;
+padding: 8px 10px 4px !important}
+html body #start.view .home-feed .prompt-glass .prompt-actions > .plus-picker { order: 1 !important; }
+html body #start.view .home-feed .prompt-glass .prompt-actions > .prompt-spacer { order: 2 !important; flex: 1 1 auto !important; }
+html body #start.view .home-feed .prompt-glass .prompt-actions > .model-picker { order: 3 !important; margin-left: auto !important; }
+html body #start.view .home-feed .prompt-glass .prompt-actions > button.icon-button:not(#startSend) { order: 4 !important; }
+html body #start.view .home-feed .prompt-glass .prompt-actions > #startSend { order: 5 !important; }
+html body #start.view .home-feed .prompt-glass .prompt-actions :is(#composerPlusButton, #startSend),
+html body #start.view .home-feed .prompt-glass .prompt-actions > button.icon-button:not(#startSend) {
+width: 44px !important;
+height: 44px !important;
+min-width: 44px !important;
+min-height: 44px !important;
+border: 1.5px solid color-mix(in srgb, currentColor 40%, transparent) !important;
+border-radius: 50% !important;
+background: transparent !important;
+box-shadow: none !important}
+html body #start.view .home-feed .prompt-glass .prompt-actions #modelPickerButton#modelPickerButton {
+width: auto !important;
+min-width: 44px !important;
+height: 44px !important;
+min-height: 44px !important;
+padding: 0 14px !important;
+border: 1.5px solid color-mix(in srgb, currentColor 40%, transparent) !important;
+border-radius: 22px !important;
+background: transparent !important;
+box-shadow: none !important}
+html body #start.view .home-feed .prompt-glass .prompt-actions :is(#composerPlusButton, #startSend, button.icon-button) svg {
+width: 24px !important;
+height: 24px !important}
+}

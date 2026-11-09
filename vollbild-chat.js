@@ -86,5 +86,6 @@ export function verdrahteKopfWischen(doc = document, win = window) {
 
 if (typeof document !== "undefined" && document.getElementById("startMessage")) {
   beobachteFeld();
-  verdrahteKopfWischen();
+  // Design V20 (Inhaberfreigabe 09.11.2026): der Kopf bleibt beim Scrollen immer stehen —
+  // verdrahteKopfWischen() bleibt fuer Tests exportiert, wird aber nicht mehr verdrahtet.
 }
