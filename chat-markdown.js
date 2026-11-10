@@ -162,12 +162,32 @@ function tabelle(zeilen) {
     + `</table></div>`;
 }
 
+// Interne Quellenmarke aus dem Wissensabruf (control-server/src/rag/
+// fremdinhaltFilter.js: "[FREMDQUELLE aus dem Netz: internet-ernte/<datum> — Titel]").
+// Sie ist fuer das Modell gedacht, nicht fuer Menschen — live 10.11.2026 stand
+// sie trotzdem woertlich in einer Antwort. Uebrig bleibt nur der Seitentitel.
+// Input: Rohtext. Output: Text ohne Marke (unveraendert, wenn keine da ist).
+export function ohneInterneQuellenmarke(text) {
+  const roh = String(text ?? "");
+  if (!/FREMDQUELLE/i.test(roh)) return roh;
+  return roh
+    .replace(/\[\s*FREMDQUELLE aus dem Netz:\s*[^\]\n]*?(?:\s+[—–-]\s+([^\]\n]+))?\s*\]/gi, (_m, titel) => (titel || "").trim())
+    .replace(/FREMDQUELLE aus dem Netz:\s*\S+(?:\s+[—–-]\s+)?/gi, "")
+    .replace(/FREMDQUELLE:?\s*/gi, "")
+    .replace(/\(\s*[„"“]\s*[“"”]\s*\)|[„"“]\s*[“"”]/g, "")
+    .replace(/\(\s*\)/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/ +([,.;:])/g, "$1");
+}
+
 // Rendert die Antwort eines Chat-Eintrags als Markdown.
 // Input: node (Element mit dem Rohtext). Output: void (idempotent, fail-safe).
 export function renderChatMarkdown(node) {
   try {
     if (!node || isVoiceModeActive()) return;
-    const source = node.textContent || "";
+    const roh = node.textContent || "";
+    const source = ohneInterneQuellenmarke(roh);
+    if (source !== roh) node.textContent = source;
     // Tabellen tragen kein Zeichen aus MARKERS — eine reine Zahlentabelle hat
     // weder Stern noch Backtick noch Adresse. Ohne diese zweite Frage bliebe
     // genau sie als Rohtext stehen (gemessen 2026-08-13).
@@ -176,7 +196,7 @@ export function renderChatMarkdown(node) {
     const html = toHtml(source);
     if (html) node.innerHTML = html;
     if (/Open-Meteo/i.test(source)) {
-      import("./chat-weather-card.js?v=2026111001").then(({wetterKarte}) => {
+      import("./chat-weather-card.js?v=2026111002").then(({wetterKarte}) => {
         const card = wetterKarte(source, toHtml, escapeHtml);
         if (card && node.innerHTML === html) node.innerHTML = card;
       }).catch(() => {});
@@ -374,7 +394,7 @@ function videoAbspielen(video, puffer, mime) {
 // videoAbspielen ausspielen. removeAttribute vor dem fetch: Selektor nie doppelt.
 // Videos als IDrive-e2-Link (24.09.2026): Modul nur laden, wenn eins im Chat steht.
 function e2Videos(w) {
-  if (w.querySelector?.('a[href*=".idrivee2.com/"],video[src*=".idrivee2.com/"]')) import("./chat-video-e2.js?v=2026111001").then((m) => m.e2VideosPruefen(w)).catch(() => {});
+  if (w.querySelector?.('a[href*=".idrivee2.com/"],video[src*=".idrivee2.com/"]')) import("./chat-video-e2.js?v=2026111002").then((m) => m.e2VideosPruefen(w)).catch(() => {});
 }
 
 function videoQuellenUmwandeln(wurzel) {

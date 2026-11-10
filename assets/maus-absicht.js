@@ -42,8 +42,8 @@
 // Dann zeigte activeTab() auf ein leeres Panel und starteMausLauf() meldete
 // ewig "Der Browser ist noch nicht bereit". Nichts waere kaputt zu sehen,
 // alles waere kaputt.
-const PANEL = "./browser-pane.js?v=2026111001";
-const PANEL_MAUS = "./browser-pane-maus.js?v=2026111001";
+const PANEL = "./browser-pane.js?v=2026111002";
+const PANEL_MAUS = "./browser-pane-maus.js?v=2026111002";
 
 async function holePanel() {
   const [pane, maus] = await Promise.all([import(PANEL), import(PANEL_MAUS)]);
@@ -80,11 +80,11 @@ async function holePanel() {
 //
 // Ist die Bruecke nicht da, bleibt der ferne Weg unveraendert bestehen.
 async function ueberChrome({ aufgabe, ziel, schreibe }) {
-  const { brueckeDa, sendeAnChrome } = await import("./maus-chrome.js?v=2026111001");
+  const { brueckeDa, sendeAnChrome } = await import("./maus-chrome.js?v=2026111002");
   if (!brueckeDa()) return false;
 
   const panel = await holePanel();
-  const { CLIENT_ROUTES } = await import("./config.js?v=2026111001");
+  const { CLIENT_ROUTES } = await import("./config.js?v=2026111002");
 
   // ERST ÖFFNEN, DANN ANKÜNDIGEN. Live gesehen 2026-09-05: „Ich arbeite in
   // deinem eigenen Chrome …“ stand im Chat, und die nächste Zeile nahm es
@@ -271,7 +271,36 @@ export function istMausAuftrag(text, vorlagen = [MAUS_VORLAGE]) {
   const roh = String(text || "").trim();
   if (!roh) return false;
   if (vorlagen.some((vorlage) => beginntMitVorlage(roh, vorlage))) return true;
-  return FREIE_MUSTER.some((muster) => muster.test(roh));
+  if (FREIE_MUSTER.some((muster) => muster.test(roh))) return true;
+  return istAlltagsAuftrag(roh);
+}
+
+// Alltagssaetze OHNE das Wort "Maus" (Befund live 10.11.2026): "Oeffne im
+// Browser de.wikipedia.org und suche dort nach Berlin" ging am Maus-Weg
+// vorbei an das Sprachmodell, das nur die Startseite oeffnete und dann
+// erklaerte, es koenne nicht suchen. Gemeint ist eindeutig: hingehen UND
+// etwas tun. Deshalb zaehlt hier nur das Paar "oeffnen/hingehen" + "und dann
+// handeln" — und nur mit einer Adresse oder dem ausdruecklichen "im Browser".
+// "Oeffne wikipedia.org" allein bleibt beim normalen Weg, ebenso jede Frage
+// ("Wie klicke ich im Browser ...?").
+const FRAGEWORT = /^(wie|was|warum|wieso|weshalb|wo|wann|welche[rsmn]?|kann\s+man|how|what|why|where|when|which|can\s+i)\b/i;
+const HANDLUNG = "(?:such|klick|tipp|scroll|füll|fuell|drück|drueck|meld|logg|bestell|find|wähl|waehl|trag|schreib|lies|les"
+  + "|search|click|type|scroll|fill|press|log|sign|order|find|select|enter)";
+// Die Luecke darf Punkte enthalten (Adressen wie de.wikipedia.org), aber
+// keinen Satzschluss mit ! oder ? und keinen Zeilenumbruch. Wortgrenzen ueber
+// \p{L} statt \b: \b kennt kein "ö", "Öffne" am Satzanfang fiele sonst durch.
+const HINGEHEN_UND_HANDELN = new RegExp(
+  "(?<!\\p{L})(?:öffne|oeffne|geh(?:e)?\\s+(?:auf|zu|nach)|navigiere\\s+(?:zu|auf|nach)|besuche|ruf(?:e)?\\s+\\S+\\s+auf"
+  + "|open|go\\s+to|navigate\\s+to|visit)(?!\\p{L})[^!?\\n]{0,100}?(?<!\\p{L})(?:und|dann|danach|and|then)\\s+(?:dort\\s+|da\\s+|there\\s+)?" + HANDLUNG,
+  "iu"
+);
+const IM_BROWSER = /\b(?:im\s+browser|in\s+the\s+browser)\b/i;
+
+export function istAlltagsAuftrag(text) {
+  const roh = String(text || "").trim();
+  if (!roh || FRAGEWORT.test(roh)) return false;
+  if (!HINGEHEN_UND_HANDELN.test(roh)) return false;
+  return IM_BROWSER.test(roh) || ADRESSE.test(roh);
 }
 
 function beginntMitVorlage(text, vorlage) {
@@ -488,7 +517,7 @@ export async function warteAufSitzung({ tab, warte, versuche = WARTE_VERSUCHE })
 async function sammleVorlagen() {
   const vorlagen = [MAUS_VORLAGE];
   try {
-    const { t } = await import("./i18n/ui.js?v=2026111001");
+    const { t } = await import("./i18n/ui.js?v=2026111002");
     const uebersetzt = t(MAUS_VORLAGE);
     if (uebersetzt && uebersetzt !== MAUS_VORLAGE) vorlagen.push(uebersetzt);
   } catch { /* ohne Uebersetzung bleibt der deutsche Wortlaut — fail-safe */ }

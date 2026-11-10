@@ -343,10 +343,15 @@
    (ohne browser-pane-open) bleibt der Globus, wie panel-backdrop.css es will.
    visibility statt display: aria-expanded und Fokus-Reihenfolge bleiben heil. */
 body.browser-pane-open #browserButton,
-body.browser-pane-open #mausButton {
+body.browser-pane-open #mausButton,
+body.browser-pane-open #neuerChatStart {
   visibility: hidden;
   pointer-events: none;
 }
+/* Der Stift "Neuer Chat" (Design V20, fest oben rechts, z-index 76) lag live am
+   10.11.2026 genau ueber Tab, Lesezeichen-Stern und "In neuem Tab oeffnen" des
+   Browsers — dieselbe Falle wie oben beim Globus. "Neuer Chat" bleibt in der
+   Seitenleiste und kommt zurueck, sobald der Browser zu ist. */
 
 /* TREFFERFLAECHEN AM HANDY (A-bis-Z-Test 19.09., Pixel-Emulator 412 px, live gemessen):
    alle sieben Kopfknoepfe des Browsers massen 22x22 px — die Hausregel verlangt 44

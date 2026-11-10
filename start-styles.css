@@ -2117,7 +2117,8 @@ background: rgba(159, 231, 212, 0.18);
 color: #9fe7d4;
 animation: bp-pulse 1.4s ease-in-out infinite}
 body.browser-pane-open #browserButton,
-body.browser-pane-open #mausButton {
+body.browser-pane-open #mausButton,
+body.browser-pane-open #neuerChatStart {
 visibility: hidden;
 pointer-events: none}
 @media (max-width: 680px) and (pointer: coarse) {
