@@ -1,4 +1,4 @@
-import { initEingabeVerhalten } from "./eingabe-verhalten.js?v=2026111005";
+import { initEingabeVerhalten } from "./eingabe-verhalten.js?v=2026111006";
 // smejj.com — gemeinsame Datei-Gesten fuer Gastseite und Chat. Keine Uploads.
 export function dateienAusTransfer(transfer) {
   const files = Array.from(transfer?.files || []);
@@ -52,7 +52,7 @@ export function initEingabeHost() {
   if (window.smejjSichereDateiEntwurf) return;
   initEingabeVerhalten();
   if (!document.getElementById("composerEingabeStil")) {
-    const link = document.createElement("link"); link.id = "composerEingabeStil"; link.rel = "stylesheet"; link.href = "/assets/composer-eingabe.css?v=2026111005"; document.head.append(link);
+    const link = document.createElement("link"); link.id = "composerEingabeStil"; link.rel = "stylesheet"; link.href = "/assets/composer-eingabe.css?v=2026111006"; document.head.append(link);
   }
   window.addEventListener("smejj:datei-hinweis", e => {
     const feld = aktivesSchreibfeld(); if (!feld) return;
@@ -69,11 +69,46 @@ export function initEingabeHost() {
   document.addEventListener("click", blockiereSenden, true);
   document.addEventListener("keydown", blockiereSenden, true);
   const annehmen = async (files, feld) => {
-    const { uebernehmeDateiAuswahl } = await import("./composer-bild-anhang.js?v=2026111005");
+    const { uebernehmeDateiAuswahl } = await import("./composer-bild-anhang.js?v=2026111006");
     await uebernehmeDateiAuswahl(files, feld, input => input.dispatchEvent(new Event("input", { bubbles: true })));
     if (feld.id === "probierFeld") window.dispatchEvent(new Event("smejj:gast-anhang"));
     feld.scrollIntoView?.({ block: "center", behavior: "smooth" });
   };
   bindDateiGesten({ annehmen });
-  void import("./composer-entwurf-dateien.js?v=2026111005").then(m => m.initDateiEntwurf(annehmen));
+  void import("./composer-entwurf-dateien.js?v=2026111006").then(m => m.initDateiEntwurf(annehmen));
+}
+
+// Eingabefeld bleibt ueber der Tastatur (Inhaber 10.11.2026 „Ja, Punkt 5“).
+// Android/Chrome: Auf der Willkommensseite verdeckte die Bildschirmtastatur das Feld „Frag mich
+// alles“. Wird der sichtbare Bereich kleiner (Tastatur geht auf), rueckt die Seite so weit nach
+// oben, dass das ganze Eingabefeld samt Knoepfen mit etwas Abstand sichtbar ist.
+// Reines Verhalten: kein CSS, kein Design-Eingriff. Ohne visualViewport passiert nichts.
+export const ABSTAND_PX = 12;
+
+/** Wie viele Pixel ragt das Ziel unter den sichtbaren Bereich (0 = alles sichtbar)? */
+export function verdecktUm(rect, sichtHoehe, sichtOben = 0, abstand = ABSTAND_PX) {
+  if (!rect || !(sichtHoehe > 0)) return 0;
+  return Math.max(0, Math.ceil(rect.bottom - sichtOben + abstand - sichtHoehe));
+}
+
+/** Beobachtet Fokus und Tastatur; liefert true, wenn die Hilfe aktiv ist. */
+export function haltFeldSichtbar(feld, ziel = feld, win = globalThis.window) {
+  const vv = win?.visualViewport;
+  if (!feld || !ziel || !vv) return false;
+  let uhr = 0;
+  const pruefe = () => {
+    if (win.document.activeElement !== feld) return;
+    const um = verdecktUm(ziel.getBoundingClientRect(), vv.height, vv.offsetTop);
+    if (um <= 0) return;
+    win.scrollBy({ top: um, behavior: "instant" });
+    // Scrollt nicht das Fenster (eigener Scroll-Bereich), dann das Ziel selbst ins Bild holen.
+    if (verdecktUm(ziel.getBoundingClientRect(), vv.height, vv.offsetTop) > 0) {
+      ziel.scrollIntoView({ block: "end", behavior: "instant" });
+    }
+  };
+  const gleich = () => { win.clearTimeout(uhr); uhr = win.setTimeout(pruefe, 60); };
+  vv.addEventListener("resize", gleich);
+  win.addEventListener?.("resize", gleich); // manche Geraete melden nur das Fenster
+  feld.addEventListener("focus", () => { gleich(); win.setTimeout(pruefe, 400); });
+  return true;
 }

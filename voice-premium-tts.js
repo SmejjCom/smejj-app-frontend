@@ -8,7 +8,7 @@
 // die Browser-Stimme zurueck (kein Funktionsverlust). Free-only im Browser;
 // GPU-Kosten entstehen nur serverseitig waehrend aktiver Nutzung.
 
-import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026111005";
+import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026111006";
 
 function lautsprecherAn() {
   try { return leseStimmWahl().lautsprecher !== false; } catch { return true; }
@@ -38,6 +38,43 @@ export function pcm16ToFloat32(bytes) {
     out[i / 2] = sample / 32768;
   }
   return { samples: out, rest: bytes.slice(usable) };
+}
+
+// Audio-Sitzung fuer den Sprachmodus (Inhaber 10.11.2026 „Ja, Punkt 3“:
+// Lautsprecher statt Hoermuschel). Safari ab iOS 17 kennt navigator.audioSession:
+// „play-and-record“ = Ausgabe standardmaessig ueber den Lautsprecher und auch bei
+// eingeschaltetem Stumm-Schalter hoerbar (wie Sprach-Apps). Ohne Sprachmodus spielt
+// reines WebAudio in Safari als „ambient“ — das schweigt bei Stumm-Schalter.
+// Solange das Sprach-Fenster offen ist, gilt „play-and-record“, danach wieder „auto“.
+// Ohne navigator.audioSession (Chrome, Android, aeltere Safari) passiert nichts.
+
+/** Setzt die Sitzung; liefert true, wenn der Browser sie kennt. Nie ein Fehler nach aussen. */
+export function setzeSprachSitzung(aktiv, nav = globalThis.navigator) {
+  const sitzung = nav?.audioSession;
+  if (!sitzung || typeof sitzung !== "object" || !("type" in sitzung)) return false;
+  try {
+    const ziel = aktiv ? "play-and-record" : "auto";
+    if (sitzung.type !== ziel) sitzung.type = ziel;
+    return true;
+  } catch {
+    return false; // lieber unveraendert als kaputt
+  }
+}
+
+const beobachtet = new WeakSet();
+
+/**
+ * Folgt dem Sprach-Fenster: sichtbar -> „play-and-record“, verborgen -> „auto“.
+ * Mehrfache Aufrufe sind harmlos (je Fenster nur ein Beobachter).
+ */
+export function folgeSprachFenster(fenster, nav = globalThis.navigator) {
+  if (!fenster || beobachtet.has(fenster) || typeof MutationObserver !== "function") return false;
+  if (!nav?.audioSession) return false;
+  beobachtet.add(fenster);
+  const abgleichen = () => setzeSprachSitzung(!fenster.hidden, nav);
+  new MutationObserver(abgleichen).observe(fenster, { attributes: true, attributeFilter: ["hidden"] });
+  abgleichen();
+  return true;
 }
 
 // Inhaber-Auftrag 08.11.2026 „richtig laut wie eine Box“: Die Stimme lief bisher
@@ -190,6 +227,8 @@ export function createPremiumVoice({ statusUrl, ttsUrl, lang, fetchFn = (...args
   // Innerhalb der Klick-Geste aufrufen (openVoiceMode): iOS weckt den
   // AudioContext nur dort. Fail-safe: ohne WebAudio passiert nichts.
   function unlock() {
+    // iPhone: Lautsprecher + hoerbar trotz Stumm-Schalter, solange das Sprach-Fenster offen ist.
+    try { folgeSprachFenster(globalThis.document?.getElementById?.("voiceModeOverlay")); } catch { /* egal */ }
     try { ensureContext(); } catch { /* ohne WebAudio bleibt die Browser-Stimme */ }
   }
 
