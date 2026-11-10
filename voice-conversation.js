@@ -56,7 +56,7 @@ export function appendVoiceTurn(history, role, content) {
 // zuerst die gewaehlte Modell-Kennung, dann die Einstellungen, sonst "Auto".
 // BYOK-Kennungen ("key:...") laufen nur client-seitig im Chat (chatClient.js)
 // und sind fuer /api/agent kein Modellname — dort gilt dann "Auto".
-import { leseStimmWahl, sprechstilRegel } from "./voice-stimmen.js?v=2026110901";
+import { leseStimmWahl, sprechstilRegel } from "./voice-stimmen.js?v=2026111001";
 
 const MODELL_SCHLUESSEL = "smejj.model.selected.v2"; // = STORAGE_KEYS.model
 const EINSTELLUNGEN_SCHLUESSEL = "smejj.settings.v1"; // = STORAGE_KEYS.settings
@@ -70,7 +70,9 @@ export function leseModellwahl(speicher = typeof localStorage !== "undefined" ? 
     modell = String(speicher?.getItem(MODELL_SCHLUESSEL) || einstellungen.model || "").trim();
     if (STUFEN.has(einstellungen.stufe)) stufe = einstellungen.stufe;
   } catch { /* Speicher gesperrt: Standardwahl */ }
-  if (!modell || modell.startsWith("key:")) modell = "Auto";
+  if (!modell || modell.startsWith("key:")) modell = "smejj 1.0"; // 10.11.2026: Standard smejj 1.0
+  // smejj 1.0–1.3 = unser Modell; der Server kennt es als "smejj 1" (code-modell-menue.js: serverModell).
+  if (/^smejj 1(\.[0-3])?$/i.test(modell)) { modell = "smejj 1"; stufe = "gruendlich"; }
   return { model: modell, stufe, sprechstil: sprechstilRegel(leseStimmWahl(speicher)) };
 }
 
@@ -89,7 +91,7 @@ export function buildAgentPayload(task, lang, history = [], wahl = leseModellwah
   const sprechstil = wahl?.sprechstil?.regel ? wahl.sprechstil : null;
   return {
     task,
-    model: wahl?.model || "Auto",
+    model: wahl?.model || "smejj 1",
     files: [],
     preferences: {
       stufe: wahl?.stufe || "auto",

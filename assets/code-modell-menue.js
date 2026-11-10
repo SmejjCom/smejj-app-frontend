@@ -9,7 +9,7 @@
 // Rueckruf nach einer Modellwahl. So bleibt das Modul fuer sich pruefbar
 // und es entsteht kein Ringschluss zwischen den beiden Dateien.
 //
-import { t } from "./i18n/ui.js?v=2026110901"; // Begruessung uebersetzt (Betreiber 24.09.2026)
+import { t } from "./i18n/ui.js?v=2026111001"; // Begruessung uebersetzt (Betreiber 24.09.2026)
 
 // ---- Modellwahl (Betreiber 2026-08-17: "warum kann ich bei Code nicht
 // Modelle waehlen?"). Dieselben Speicher wie der Start-Picker, damit Chat und
@@ -26,6 +26,22 @@ export const MODELL_KEY = "smejj.model.selected.v2";
 // Derselbe Schluessel wie in app.js (STUFE_KEY). Beide Seiten muessen ihn
 // kennen: das Menue SETZT die Stufe, app.js LIEST sie beim Senden.
 export const STUFE_KEY = "smejj.stufe.v1";
+
+// Inhaber 10.11.2026 („Ja, umsetzen“): smejj 1.0 bis 1.3 sind UNSER eigenes
+// Modell und smejj 1.0 ist der Standard; nur „Auto“ nutzt fremde Modelle.
+// Der Server kennt das eigene Modell unter dem Namen „smejj 1“ (modelRegistry:
+// smejj-1 -> Hausmodell); die Markennamen 1.0–1.3 zeigen dort dagegen auf das
+// Standardmodell des Servers (fremd). Darum wird beim SENDEN umgeschrieben.
+// Bis eine eigene Version 1.1–1.3 fertig trainiert ist, antwortet unter ihrem
+// Namen das beste eigene Modell, das es gibt.
+export const STANDARD_WAHL = "smejj 1.0";
+const EIGENE_NAMEN = /^smejj 1(\.[0-3])?$/i;
+
+/** Anzeigename aus dem Menue -> Modellname fuer den Server. Reine Funktion. */
+export function serverModell(wahl) {
+  const name = String(wahl || "").trim();
+  return EIGENE_NAMEN.test(name) ? "smejj 1" : (name || "smejj 1");
+}
 
 
 // Wohin mit einem Menue, das links aus seiner Spalte laeuft? Reine Rechnung,
@@ -76,7 +92,12 @@ const ALTER_CLINE_MODELL_KEY = "smejj.cline.model.v1";
 export function migriereAlteWahl(speicher = typeof localStorage !== "undefined" ? localStorage : null) {
   if (!speicher) return false;
   try {
-    if (!ALTE_AUTO_WERTE.has(speicher.getItem(MODELL_KEY) || "")) return false;
+    // 10.11.2026: die Zeile „smejj 1 (langsam)“ heisst jetzt smejj 1.0.
+    // Alte Staffel-Wahlen bekommen die Stufe, die das eigene Modell erreicht.
+    const jetzt = speicher.getItem(MODELL_KEY) || "";
+    if (jetzt === EIGENES_MODELL.titel) speicher.setItem(MODELL_KEY, STANDARD_WAHL);
+    if (EIGENE_NAMEN.test(jetzt) && speicher.getItem(STUFE_KEY) !== EIGENE_STUFE) speicher.setItem(STUFE_KEY, EIGENE_STUFE);
+    if (!ALTE_AUTO_WERTE.has(jetzt)) return false;
     speicher.setItem(MODELL_KEY, AUTO_WAHL);
     speicher.removeItem(ALTER_CLINE_MODELL_KEY);
     speicher.removeItem("smejj.cline.status.v1");
@@ -91,11 +112,15 @@ export function migriereAlteWahl(speicher = typeof localStorage !== "undefined" 
 // ganz oben stehen" und "zukuenftige smejj-Versionen automatisch ergaenzen".
 // Darum steht sie hier als Daten und wird beim Zeichnen absteigend sortiert:
 // eine neue Version ist EINE Zeile, keine Code-Aenderung im Menue.
+// 10.11.2026: alle vier Zeilen laufen auf UNSEREM Modell. Stufe "gruendlich"
+// ist der Weg dorthin: die Bruecke gibt damit die fremde Groq-Schnellspur ab
+// und reicht die Frage an den Server-Router weiter (siehe EIGENES_MODELL).
+const EIGENE_STUFE = "gruendlich";
 export const SMEJJ_STAFFEL = [
-  { titel: "smejj 1.3", stufe: "spezial", hinweis: "Spezialfaelle — tiefste Denkstufe, keine Schnellspur" },
-  { titel: "smejj 1.2", stufe: "gruendlich", hinweis: "Komplex — immer die tiefe Spur" },
-  { titel: "smejj 1.1", stufe: "auto", hinweis: "Alltag — die Automatik entscheidet" },
-  { titel: "smejj 1.0", stufe: "schnell", hinweis: "Schnellste Antwort" }
+  { titel: "smejj 1.3", stufe: EIGENE_STUFE, hinweis: "Unsere beste Version" },
+  { titel: "smejj 1.2", stufe: EIGENE_STUFE, hinweis: "Unser eigenes Modell" },
+  { titel: "smejj 1.1", stufe: EIGENE_STUFE, hinweis: "Unser eigenes Modell" },
+  { titel: "smejj 1.0", stufe: EIGENE_STUFE, hinweis: "Unser eigenes Modell — Standard" }
 ];
 
 // DAS EIGENE MODELL — bewusst NICHT Teil der Staffel.
@@ -144,12 +169,12 @@ export function nachVersionAbsteigend(liste) {
 // Betreiber-Freigabe 3 (15.09.2026): "Standard soll ehrlich ‚Auto' anzeigen und Auto
 // senden." Ohne gespeicherte Wahl zeigte der Chip "smejj 1.0 ✓", gesendet wurde aber
 // Stufe "auto" (live gemessen 14.09.). Keine Wahl heisst jetzt ueberall: Auto.
+// 10.11.2026 (Inhaber): keine Wahl heisst jetzt smejj 1.0, nicht mehr Auto.
 export function modellAnzeige(hausText) {
   migriereAlteWahl();
-  const wahl = localStorage.getItem(MODELL_KEY) || AUTO_WAHL;
+  const wahl = localStorage.getItem(MODELL_KEY) || STANDARD_WAHL;
   if (wahl === AUTO_WAHL) return "Auto";
   // Sonst zeigte der Chip die Stufe ("smejj 1.2") statt der Wahl.
-  if (wahl === EIGENES_MODELL.titel) return EIGENES_MODELL.titel;
   return hausText;
 }
 
@@ -229,7 +254,7 @@ export async function oeffneModellMenue(kontext = {}) {
   kopf.textContent = t("Unsere Modelle"); // uebersetzt (Betreiber 24.09.2026)
   menue.append(kopf);
   migriereAlteWahl();
-  const istAuto = (localStorage.getItem(MODELL_KEY) || AUTO_WAHL) === AUTO_WAHL; // Freigabe 3: keine Wahl = Auto
+  const istAuto = (localStorage.getItem(MODELL_KEY) || STANDARD_WAHL) === AUTO_WAHL; // 10.11.2026: keine Wahl = smejj 1.0
   const zeile = ({ titel, klein, hinweis, aktiv, aktion }) => {
     const k = document.createElement("button");
     k.type = "button";
@@ -257,10 +282,9 @@ export async function oeffneModellMenue(kontext = {}) {
   // Menue sonst zur Attrappe wird: vier Zeilen, ein Verhalten. Die Stufe reist
   // als preferences.stufe zur Bruecke (chat-bridge.js: leseStufe) und
   // entscheidet dort ueber die Spur:
-  //   1.0 Standard      -> schnell     Groq-Schnellspur, auch bei Coding
-  //   1.1 Alltag        -> auto        die Automatik entscheidet
-  //   1.2 Komplex       -> gruendlich  nie die Schnellspur, immer die tiefe
-  //   1.3 Spezialfaelle -> spezial     wie gruendlich, hoechste Denktiefe
+  //   Seit 10.11.2026 (Inhaber): alle vier -> gruendlich -> UNSER Modell
+  //   (vorher 1.0 schnell/Groq, 1.1 auto, 1.2 gruendlich, 1.3 spezial).
+  //   Gesendet wird serverModell(titel) = "smejj 1" (app.js, Sprachmodus).
   //
   // Ox Alpha stand hier vom 26.08. bis 06.09.2026 an dritter Stelle und ist
   // abgeschafft. Wer den Namen noch im Browserspeicher hat, wird still auf
@@ -286,23 +310,8 @@ export async function oeffneModellMenue(kontext = {}) {
     }
   });
   for (const eintrag of nachVersionAbsteigend(SMEJJ_STAFFEL)) stufenZeile(eintrag);
-  // Unter "Unsere Modelle", nicht in einem eigenen Bereich: der Betreiber hat
-  // am 10.09. genau zwei Bereiche festgelegt (Unsere Modelle / Auto).
-  zeile({
-    titel: EIGENES_MODELL.titel,
-    klein: EIGENES_MODELL.klein,
-    hinweis: EIGENES_MODELL.hinweis,
-    aktiv: !istAuto && gewaehlt === EIGENES_MODELL.titel,
-    aktion: () => {
-      localStorage.setItem(MODELL_KEY, EIGENES_MODELL.titel);
-      localStorage.setItem(STUFE_KEY, EIGENES_MODELL.stufe);
-      window.dispatchEvent(new CustomEvent("smejj:model-selected", {
-        detail: { model: EIGENES_MODELL.titel, stufe: EIGENES_MODELL.stufe }
-      }));
-      zu();
-      kontext.beiWahl?.();
-    }
-  });
+  // Die eigene Zeile „smejj 1 (langsam)“ ist seit 10.11.2026 smejj 1.0
+  // (Inhaber): sie erscheint nicht mehr extra, migriereAlteWahl stellt um.
 
   // Auto ganz unten — der zweite und letzte Bereich (Betreiber 2026-09-10).
   //
@@ -317,7 +326,8 @@ export async function oeffneModellMenue(kontext = {}) {
   menue.append(TRENNER);
   zeile({
     titel: "Auto",
-    hinweis: "Standard — waehlt pro Auftrag das passendste verfuegbare Modell — kostenlose, eigene und lokale — und wechselt bei Limit oder Ausfall",
+    klein: "fremde Modelle", // Inhaber 10.11.2026: „info: Auto sind fremde Modelle“
+    hinweis: "Nutzt fremde Modelle anderer Anbieter und wechselt bei Limit oder Ausfall",
     aktiv: istAuto,
     aktion: () => {
       localStorage.setItem(MODELL_KEY, AUTO_WAHL);

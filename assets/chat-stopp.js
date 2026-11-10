@@ -86,7 +86,7 @@ function stoppeAlleStroeme() {
   // Das Ereignis zuerst und OHNE Nachladen: es erreicht die Anbieter-Leser in chatClient.js
   // sofort.
   try { window.dispatchEvent(new CustomEvent("smejj:chat-stoppen")); } catch { /* still */ }
-  import("/assets/ai/chat-stream.js?v=2026110901")
+  import("/assets/ai/chat-stream.js?v=2026111001")
     .then((m) => { m.stoppeChatStrom(); raeumeNachAbbruch(m); })
     .catch(() => { /* fail-safe: das Ereignis oben hat schon gewirkt */ });
 }
@@ -97,7 +97,7 @@ function stoppeAlleStroeme() {
  * @param {Document} [dok]
  */
 function raeumeNachAbbruch(strom, dok = document) {
-  import("/assets/app-helfer.js?v=2026110901")
+  import("/assets/app-helfer.js?v=2026111001")
     .then((m) => m.hideTaskIndicator())
     .catch(() => { /* der Balken ist Anzeige, kein Zustand */ });
   for (const knoten of dok.querySelectorAll('.entry.assistant[data-thinking="true"]')) {
@@ -155,17 +155,18 @@ async function setzeFort(bereich) {
     return true;
   }
   const [{ streamChatAnswer }, { buildChatTargets, buildRequestHistory }, { renderChatMarkdown }, { CLIENT_ROUTES, UI_COPY }] = await Promise.all([
-    import("/assets/ai/chat-stream.js?v=2026110901"),
-    import("./chat-history-context.js?v=2026110901"),
-    import("./components.js?v=2026110901"),
-    import("./config.js?v=2026110901")
+    import("/assets/ai/chat-stream.js?v=2026111001"),
+    import("./chat-history-context.js?v=2026111001"),
+    import("./components.js?v=2026111001"),
+    import("./config.js?v=2026111001")
   ]);
   // 05.11.2026: war die Teilantwort schon gerendert, mit dem Rohtext (Markdown) weitermachen.
   if (output.dataset.rohtext) { output.textContent = output.dataset.rohtext; delete output.dataset.rohtext; }
   const vorher = output.textContent;
   const anfrage = {
     task: FORTSETZUNGS_AUFTRAG,
-    model: localStorage.getItem(MODELL_SCHLUESSEL) || "Auto", // Freigabe 3: Standard = Auto
+    // 10.11.2026 (Inhaber): Standard smejj 1.0; smejj 1.0–1.3 = unser Modell = "smejj 1" beim Server.
+    model: ((m) => /^smejj 1(\.[0-3])?$/i.test(m) ? "smejj 1" : m)(localStorage.getItem(MODELL_SCHLUESSEL) || "smejj 1.0"),
     files: [],
     preferences: { ...(window.smejjSettingsRuntime?.task?.() || {}) },
     history: buildRequestHistory(FORTSETZUNGS_AUFTRAG)
