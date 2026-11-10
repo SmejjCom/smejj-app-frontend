@@ -27,8 +27,7 @@
 //
 // v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
 // (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
-// Eigene Nummer statt v236, damit ein spaeterer Deploy des Modellwahl-Chips
-// nicht faelschlich als schon ausgeliefert gilt.
+// Eigene Nummer statt v236, damit ein spaeterer Deploy des Modellwahl-Chips nicht faelschlich als schon ausgeliefert gilt.
 //
 // v237 -> v238 (2026-08-09): in sechs Ansichten stand die Ueberschrift zweimal
 // untereinander — `<p class="eyebrow">Verlauf</p>` ueber `<h2>Verlauf</h2>`
@@ -190,8 +189,8 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1095";
-const ASSET_BUILD = "2026111002";
+const CACHE_NAME = "smejj-shell-v1096";
+const ASSET_BUILD = "2026111003";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -300,6 +299,7 @@ const SHELL = [
   "/assets/voice-ohr-solo.js",
   // Sprachwelle LIVE (03.09.): statischer Import aus composer-tools.
   "/assets/voice-realtime.js",
+  "/assets/voice-nahweg.js",
   "/assets/composer-plus-menu.js",
   // Drei Textauszieher, die composer-plus-menu.js per import() nachlaedt.
   // Ohne sie liest smejj offline einen angehaengten PDF-, Office- oder

@@ -18,7 +18,7 @@
 // Zeitbudget nach dem Sprech-Ende: laenger warten wir nicht auf den Server,
 // sonst fuehlt sich das Gespraech traege an. Groq transkribiert eine Stunde
 // Audio in ~15 s — der Engpass ist der Upload, nicht das Modell.
-import { beobachtePegel } from "./audio-pegel.js?v=2026111002";
+import { beobachtePegel } from "./audio-pegel.js?v=2026111003";
 // 08.11.2026 („Blitz schneller“): 1500 -> 1100 ms; ist Whisper langsamer, gilt der Browser-Text.
 export const EAR_BUDGET_MS = 1100;
 // Obergrenze der Aufnahme (Schutz von Free-Tier und Upload-Zeit).
@@ -88,8 +88,10 @@ function authHeaders(extra = {}) {
  * eine Zwischenvariable zu verbrauchen — die Datei steht exakt auf der
  * 800-Zeilen-Grenze des Hauses.
  */
-export function ohrAdressen(api = {}) {
-  return [api.voiceTranscribe, api.voiceTranscribeFallback].filter(Boolean);
+export function ohrAdressen(api = {}, { controlZuerst = false } = {}) {
+  // 10.11.2026: Nimmt der Control-Server den Ohr-Kontext an, fragt er zuerst (Namen besser erkannt).
+  const liste = controlZuerst ? [api.voiceTranscribeFallback, api.voiceTranscribe] : [api.voiceTranscribe, api.voiceTranscribeFallback];
+  return liste.filter(Boolean);
 }
 
 // Nur das ausdrueckliche "kein Schluessel" der Route schaltet eine Adresse ab.
@@ -101,11 +103,26 @@ async function ohneSchluessel(antwort) {
   }
 }
 
-export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn } = {}) {
-  const adressen = (Array.isArray(urls) ? urls : [url]).map((a) => String(a || "").trim()).filter(Boolean);
+/** Kontextkopf fuer Whisper — nur an den Control-Server (die Bruecke kennt den Kopf nicht). Rein, testbar. */
+export function ohrKontextKopf(adresse, kontext) {
+  if (typeof kontext !== "function" || /\/bruecke\//.test(String(adresse || ""))) return {};
+  try {
+    const text = String(kontext() || "").trim();
+    return text ? { "x-smejj-ohr-kontext": encodeURIComponent(text.slice(0, 300)) } : {};
+  } catch {
+    return {};
+  }
+}
+
+export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn, kontext } = {}) {
+  // urls darf eine Funktion sein (10.11.2026): die Reihenfolge haengt davon ab, ob der Control-Server
+  // den Ohr-Kontext annimmt (voice-nahweg.js) — dann fragt er zuerst.
+  const adressenJetzt = () => (typeof urls === "function" ? urls() : Array.isArray(urls) ? urls : [url]).map((a) => String(a || "").trim()).filter(Boolean);
   const tot = new Set();
-  const lebende = () => adressen.filter((a) => !tot.has(a));
-  let alive = adressen.length > 0;
+  const lebende = () => adressenJetzt().filter((a) => !tot.has(a));
+  let alive = adressenJetzt().length > 0;
+  const kontextKopf = (adresse) => ohrKontextKopf(adresse, kontext);
+
   let recorder = null;
   let stream = null;
   let stuecke = [];
@@ -250,7 +267,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn }
           try {
             antwort = await holen(adresse, {
               method: "POST",
-              headers: authHeaders({ "Content-Type": mime }),
+              headers: authHeaders({ "Content-Type": mime, ...kontextKopf(adresse) }),
               body: blob,
               signal: abbruch.signal
             });

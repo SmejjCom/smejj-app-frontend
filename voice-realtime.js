@@ -20,6 +20,23 @@ const RELAY_STANDARD = "wss://api.smejj.com/api/voice-realtime";
 const EINGANG_RATE = 16000;
 const AUSGANG_RATE = 24000;
 const READY_BUDGET_MS = 6000;
+// Sofortstart (10.11.2026, gemessen): Ist LIVE auf dem Server aus (SMEJJ_VOICE_LIVE_ENABLED=false, Stand
+// 10.11.), kostete JEDES Oeffnen Mikrofon-Start + AudioContext + WebSocket-Handshake ueber Los Angeles
+// (~1,2-2 s "Verbinde ...") bis zum Rueckfall. Ein abgelehnter Relay wird darum 12 Stunden gemerkt;
+// in der Zeit hoert die Welle sofort ueber Erkennung/Ohr zu. Nur Server-Absagen zaehlen, nie ein
+// fehlendes Mikrofon oder eine fehlende Anmeldung.
+const LIVE_AUS_KEY = "smejj.voice.live.aus.v1";
+export const LIVE_AUS_MS = 12 * 3600 * 1000;
+const SERVER_ABSAGEN = new Set(["relay_unreachable", "relay_closed", "ready_timeout"]);
+export function liveKuerzlichAus(jetzt = Date.now(), speicher = globalThis.localStorage) {
+  try { const t = Number(speicher?.getItem(LIVE_AUS_KEY)); return t > 0 && jetzt - t < LIVE_AUS_MS; } catch { return false; }
+}
+export function merkeLiveErgebnis(an, grund, speicher = globalThis.localStorage, jetzt = Date.now()) {
+  try {
+    if (an) speicher?.removeItem(LIVE_AUS_KEY);
+    else if (SERVER_ABSAGEN.has(grund) || /^voice_live_/.test(String(grund || ""))) speicher?.setItem(LIVE_AUS_KEY, String(jetzt));
+  } catch { /* Speicher gesperrt: dann eben jedes Mal versuchen */ }
+}
 const RESUME_WARTE_MS = 400; // iOS: resume() ohne Tipp bleibt mitunter offen
 
 function sitzungsToken() {
@@ -254,7 +271,9 @@ export function verdrahteLive(host) {
     aktiv: () => Boolean(sitzung?.isActive()),
     async starten() {
       if (sitzung?.isActive()) return true;
+      if (liveKuerzlichAus()) return false; // Server hat LIVE kuerzlich abgelehnt: sofort Erkennung/Ohr
       antwortText = "";
+      let absage = "";
       let lief = false; // erst nach session.ready ist ein Abriss ein Abbruch (vorher entscheidet starten())
       const neueSitzung = createRealtimeAudioSession({
         wsUrl: host.url || RELAY_STANDARD,
@@ -270,6 +289,7 @@ export function verdrahteLive(host) {
         // "Verbindung beendet" stehen. Jetzt geht es still auf dem alten Weg weiter
         // (host.nachAbbruch: Ohr/Erkennung); nur ohne diesen Weg die Meldung.
         onClose: (grund) => {
+          if (!lief) absage = grund || "";
           if (!lief || !host.state?.voiceModeActive || !grund || grund === "stop") return;
           if (sitzung !== neueSitzung) return; // Abriss einer alten Sitzung
           sitzung = null;
@@ -282,6 +302,7 @@ export function verdrahteLive(host) {
       neueSitzung.setMuted(stumm || host.state?.voiceMuted === true);
       sitzung = neueSitzung;
       const an = await neueSitzung.start();
+      merkeLiveErgebnis(an, absage);
       if (sitzung !== neueSitzung) return false; // waehrenddessen gestoppt
       if (!an) sitzung = null;
       return an;
