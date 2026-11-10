@@ -33,6 +33,33 @@ export function beobachteFeld(doc = document, Beobachter = typeof ResizeObserver
   };
   new Beobachter(setze).observe(glas);
   setze();
+  if (log) haltEndeSichtbar(log, Beobachter);
+  return true;
+}
+
+// Tastatur-Platz (Inhaberfreigabe 10.11.2026): geht die Tastatur auf, wird der
+// Verlauf niedriger, WebKit laesst scrollTop aber stehen — die letzte Antwort
+// rutscht hinter Feld und Tastatur. Der Verlauf haelt darum seinen Abstand zum
+// Ende fest (wie ChatGPT/iMessage): was unten sichtbar war, bleibt unten sichtbar.
+export function neuerScrollStand({ scrollHeight, scrollTop, alteHoehe, neueHoehe }) {
+  const vomEnde = Math.max(0, scrollHeight - scrollTop - alteHoehe);
+  return Math.max(0, Math.min(scrollHeight - neueHoehe, scrollHeight - neueHoehe - vomEnde));
+}
+
+export function haltEndeSichtbar(log, Beobachter) {
+  if (!log || !Beobachter || log.dataset.endeHalten === "an") return false;
+  log.dataset.endeHalten = "an";
+  let hoehe = log.clientHeight;
+  new Beobachter(() => {
+    const neu = log.clientHeight;
+    if (!neu || neu === hoehe) return;
+    // GEMESSEN (iPhone 18 Pro, Safari): wird der Verlauf wieder hoeher (Tastatur zu),
+    // hat WebKit scrollTop schon selbst begrenzt — nachziehen wuerde 330 px hochspringen.
+    if (neu > hoehe) { hoehe = neu; return; }
+    const ziel = neuerScrollStand({ scrollHeight: log.scrollHeight, scrollTop: log.scrollTop, alteHoehe: hoehe, neueHoehe: neu });
+    hoehe = neu;
+    if (Math.abs(log.scrollTop - ziel) > 1) log.scrollTop = ziel;
+  }).observe(log);
   return true;
 }
 
