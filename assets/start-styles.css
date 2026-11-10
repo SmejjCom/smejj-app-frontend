@@ -6325,3 +6325,85 @@ html.kopf-weg body #start.has-start-chat #startLog.start-log.start-log.start-log
 -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 132px), transparent calc(100% - 120px)) !important;
 mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 132px), transparent calc(100% - 120px)) !important}
 }
+
+/* ---- design-v22-glas-icons-text.css ---- */
+@media (max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px) {
+html body {
+--g22-flaeche: rgba(255, 255, 255, 0.085);
+--g22-rand: rgba(255, 255, 255, 0.18);
+--g22-logo: #02fdfd}
+html body[data-mobile-theme="light"] {
+--g22-flaeche: rgba(255, 255, 255, 0.48);
+--g22-rand: rgba(0, 0, 0, 0.10)}
+html body:has(#start.view),
+html body[data-mobile-theme="light"]:has(#start.view) {
+--mg-flaeche: var(--g22-flaeche);
+--mg-rand: var(--g22-rand)}
+html body #start.has-start-chat #startLog.start-log.start-log.start-log.start-log.start-log,
+html.kopf-weg body #start.has-start-chat #startLog.start-log.start-log.start-log.start-log.start-log {
+-webkit-mask-image: none !important;
+mask-image: none !important}
+html body[data-mobile-theme] #appMenuButton .menu-logo.menu-logo {
+opacity: 1 !important}
+html body[data-mobile-theme="light"] #appMenuButton .menu-logo.menu-logo {
+filter: drop-shadow(0 0 0.6px rgba(0, 40, 45, 0.9)) !important}
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-logo {
+width: 104px;
+height: 104px;
+flex: 0 0 auto;
+box-sizing: border-box;
+border-radius: 50% !important;
+border: 0.5px solid var(--g22-rand);
+background: var(--g22-flaeche);
+-webkit-backdrop-filter: blur(6px) saturate(1.1);
+backdrop-filter: blur(6px) saturate(1.1);
+color: var(--g22-logo);
+opacity: 1}
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-logo::before {
+display: none !important}
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-logo svg {
+width: 100px !important;
+height: auto !important;
+overflow: visible;
+filter: none}
+html body[data-mobile-theme="light"] #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-logo svg {
+filter: drop-shadow(0 0 0.6px rgba(0, 40, 45, 0.9))}
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-logo path {
+stroke: var(--g22-logo) !important;
+filter: none !important;
+opacity: 1 !important}
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-logo circle {
+fill: var(--g22-logo) !important;
+filter: none !important;
+animation: none !important;
+transition: none !important;
+opacity: 1 !important}
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-status {
+padding: 3px 12px;
+border-radius: 999px !important;
+border: 0.5px solid var(--g22-rand);
+background: var(--g22-flaeche);
+-webkit-backdrop-filter: blur(6px) saturate(1.1);
+backdrop-filter: blur(6px) saturate(1.1)}
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-transcript:not(:empty) {
+-webkit-backdrop-filter: blur(6px) saturate(1.1);
+backdrop-filter: blur(6px) saturate(1.1)}
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-bar .voice-mode-input-wrap {
+border-color: transparent !important;
+background: transparent !important;
+box-shadow: none !important;
+-webkit-backdrop-filter: none !important;
+backdrop-filter: none !important}
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-bar :is(#voiceModeAttach, [data-kamera-start], #voiceModeClose),
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-bar #voiceModeMic:not([aria-pressed="true"]) {
+border: 0.5px solid var(--g22-rand) !important;
+border-radius: 50% !important;
+background: var(--g22-flaeche) !important;
+-webkit-backdrop-filter: blur(6px) saturate(1.1) !important;
+backdrop-filter: blur(6px) saturate(1.1) !important;
+box-shadow: none !important}
+html body #voiceModeOverlay#voiceModeOverlay.voice-mode-overlay[data-upgraded] .voice-mode-bar #voiceModeMic[aria-pressed="true"] {
+border-radius: 50% !important;
+-webkit-backdrop-filter: blur(6px) saturate(1.1) !important;
+backdrop-filter: blur(6px) saturate(1.1) !important}
+}
