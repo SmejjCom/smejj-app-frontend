@@ -8,7 +8,7 @@
 // die Browser-Stimme zurueck (kein Funktionsverlust). Free-only im Browser;
 // GPU-Kosten entstehen nur serverseitig waehrend aktiver Nutzung.
 
-import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026111004";
+import { leseStimmWahl, sprechParameter } from "./voice-stimmen.js?v=2026111005";
 
 function lautsprecherAn() {
   try { return leseStimmWahl().lautsprecher !== false; } catch { return true; }
@@ -47,8 +47,8 @@ export function pcm16ToFloat32(bytes) {
 export const DUCK_PEGEL = 0.5;
 export const DUCK_MAX_MS = 3500;
 export const BOX_KLANG = Object.freeze({
-  kompressor: { threshold: -28, knee: 8, ratio: 6, attack: 0.003, release: 0.18 },
-  aufholen: 3.2, // ~ +10 dB nach der Kompression
+  kompressor: { threshold: -30, knee: 8, ratio: 6, attack: 0.003, release: 0.18 },
+  aufholen: 4, // ~ +12 dB nach der Kompression (10.11.2026: vorher 3,2)
   begrenzer: { threshold: -1.5, knee: 0, ratio: 20, attack: 0.001, release: 0.08 }
 });
 

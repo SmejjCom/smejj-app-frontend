@@ -15,6 +15,7 @@
 // AudioWorklet: laeuft ohne Zusatzdatei ueberall (Safari eingeschlossen); der
 // Kontext wird per ctx.resume() innerhalb der Klick-Geste geweckt (iOS startet
 // "suspended", Lehre 2026-08-25).
+import { baueBoxKette } from "./voice-premium-tts.js?v=2026111005";
 const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1"; // wie voice-premium-tts.js / auth-gate.js
 const RELAY_STANDARD = "wss://api.smejj.com/api/voice-realtime";
 const EINGANG_RATE = 16000;
@@ -82,9 +83,13 @@ export function pcmZuFloat(arrayBuffer) {
  * Wiedergabe-Warteschlange: Brocken werden lueckenlos hintereinander eingeplant;
  * unterbrechen() stoppt alles Geplante sofort (Barge-in).
  */
+// Inhaber 10.11.2026 „Sprachmodus lauter machen“: Der Live-Weg spielte unverstaerkt direkt
+// auf den Lautsprecher. Jetzt dieselbe Laut-Kette wie die Premium-Stimme
+// (Kompressor -> Aufholen -> Begrenzer); ohne WebAudio-Knoten bleibt es beim Ziel.
 export function createWiedergabe(ctx) {
   let naechsterStart = 0;
   let quellen = [];
+  let ausgang = null;
   return {
     spiele(float32) {
       if (!ctx || !float32.length) return;
@@ -92,7 +97,8 @@ export function createWiedergabe(ctx) {
       puffer.getChannelData(0).set(float32);
       const quelle = ctx.createBufferSource();
       quelle.buffer = puffer;
-      quelle.connect(ctx.destination);
+      if (!ausgang) ausgang = baueBoxKette(ctx);
+      quelle.connect(ausgang);
       const jetzt = ctx.currentTime;
       const start = Math.max(jetzt + 0.02, naechsterStart);
       quelle.start(start);

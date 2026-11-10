@@ -56,7 +56,7 @@ export function appendVoiceTurn(history, role, content) {
 // zuerst die gewaehlte Modell-Kennung, dann die Einstellungen, sonst "Auto".
 // BYOK-Kennungen ("key:...") laufen nur client-seitig im Chat (chatClient.js)
 // und sind fuer /api/agent kein Modellname — dort gilt dann "Auto".
-import { leseStimmWahl, sprechstilRegel } from "./voice-stimmen.js?v=2026111004";
+import { leseStimmWahl, sprechstilRegel } from "./voice-stimmen.js?v=2026111005";
 
 const MODELL_SCHLUESSEL = "smejj.model.selected.v2"; // = STORAGE_KEYS.model
 const EINSTELLUNGEN_SCHLUESSEL = "smejj.settings.v1"; // = STORAGE_KEYS.settings
