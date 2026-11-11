@@ -39,7 +39,7 @@ export function filtereChats(chats, filter) {
     .slice(0, MAX_TREFFER);
 }
 
-export function initErwaehnung({ dokument = document, ladeSpeicher = () => import("./chat-store.js?v=2026111006") } = {}) {
+export function initErwaehnung({ dokument = document, ladeSpeicher = () => import("./chat-store.js?v=2026111101") } = {}) {
   const feld = dokument.getElementById("startMessage");
   const halter = feld?.closest?.(".prompt-glass") || feld?.parentElement;
   if (!feld || !halter || feld.dataset.erwaehnung === "an") return false;

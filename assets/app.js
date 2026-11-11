@@ -1,28 +1,28 @@
-import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js?v=2026111006";
-import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js?v=2026111006";
-import { AI_MODES, createAiRouter } from "/assets/ai/index.js?v=2026111006";
-import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=2026111006";
-import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=2026111006";
-import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=2026111006";
-import { initWorkspaceBridge } from "./workspace-bridge.js?v=2026111006";
-import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2026111006";
-import { holeSendepfad } from "./sendepfad-nachladen.js?v=2026111006";
-import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js?v=2026111006";
-import { initPanelBackdrop } from "./panel-backdrop.js?v=2026111006";
-import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js?v=2026111006";
-import { lesbarerStatus } from "./system-status-text.js?v=2026111006";
-import { afterFirstPaint } from "./deferred-start.js?v=2026111006";
-import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=2026111006";
-import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js?v=2026111006";
-import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2026111006";
-import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js?v=2026111006";
-import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=2026111006";
-import { applyViewTitle } from "./view-title.js?v=2026111006";
-import { getJson, postJson } from "./shared/http-json.js?v=2026111006";
+import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js?v=2026111101";
+import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js?v=2026111101";
+import { AI_MODES, createAiRouter } from "/assets/ai/index.js?v=2026111101";
+import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=2026111101";
+import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=2026111101";
+import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=2026111101";
+import { initWorkspaceBridge } from "./workspace-bridge.js?v=2026111101";
+import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2026111101";
+import { holeSendepfad } from "./sendepfad-nachladen.js?v=2026111101";
+import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js?v=2026111101";
+import { initPanelBackdrop } from "./panel-backdrop.js?v=2026111101";
+import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js?v=2026111101";
+import { lesbarerStatus } from "./system-status-text.js?v=2026111101";
+import { afterFirstPaint } from "./deferred-start.js?v=2026111101";
+import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=2026111101";
+import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js?v=2026111101";
+import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2026111101";
+import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js?v=2026111101";
+import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=2026111101";
+import { applyViewTitle } from "./view-title.js?v=2026111101";
+import { getJson, postJson } from "./shared/http-json.js?v=2026111101";
 // Kleine DOM-, Speicher- und Anzeige-Helfer. Herausgeloest am 07.09., weil
 // app.js mit 812 Zeilen ueber der Hausgrenze von 800 lag und damit
 // `npm run check:all` bei der ersten Pruefung abbrach.
-import { addEntry, downloadText, hideTaskIndicator, loadJson, loadText, setText, showTaskIndicator, snippet, writeOutput } from "./app-helfer.js?v=2026111006";
+import { addEntry, downloadText, hideTaskIndicator, loadJson, loadText, setText, showTaskIndicator, snippet, writeOutput } from "./app-helfer.js?v=2026111101";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
@@ -54,11 +54,21 @@ const STUFE_KEY = "smejj.stufe.v1";
 // sie eigene Versionsnummern, und "spezial" kam als vierte dazu. Der Chip zeigt
 // damit denselben Namen, den der Nutzer im Modell-Menue angeklickt hat; vorher
 // stand dort in Klammern etwas anderes als im Menue, und beide meinten dasselbe.
+// 11.11.2026 (Inhaber): im Menue steht nur noch die aktuelle Version – jede Stufe zeigt sie (gleicher Wert wie
+// AKTUELLE_VERSION in code-modell-menue.js; der Test prueft den Gleichstand).
+const SMEJJ_AKTUELL = "smejj 1.0";
+// Alte Versionswahl (smejj 1.1–1.3 aus dem Browserspeicher) -> aktuelle Version, schon beim Start (11.11.2026, Inhaber).
+function alteVersionZuAktuell(wahl) {
+  const w = String(wahl || "");
+  if (!/^smejj 1\.\d+$/i.test(w) || w === SMEJJ_AKTUELL) return wahl;
+  try { localStorage.setItem(STORAGE_KEYS.model, SMEJJ_AKTUELL); } catch { /* privater Modus: nur anzeigen */ }
+  return SMEJJ_AKTUELL;
+}
 const STUFE_LABEL = Object.freeze({
-  schnell: "smejj 1.0",
-  auto: "smejj 1.1",
-  gruendlich: "smejj 1.2",
-  spezial: "smejj 1.3"
+  schnell: SMEJJ_AKTUELL,
+  auto: SMEJJ_AKTUELL,
+  gruendlich: SMEJJ_AKTUELL,
+  spezial: SMEJJ_AKTUELL
 });
 function normalizeStufe(value) {
   // Bewusst weiter "auto" als Rueckfall: ein unbekannter Wert darf niemanden in
@@ -80,9 +90,9 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
-const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=2026111006").then((m) => (m.enhancePremiumSurfaces(), m)));
+const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=2026111101").then((m) => (m.enhancePremiumSurfaces(), m)));
 // Google-Login gehoert zur Profilseite — laedt erst beim Verlassen von Start/Chat.
-const holeGoogleLogin = ladeBeiAnsicht(["start", "chat"], () => import("./google-login.js?v=2026111006")
+const holeGoogleLogin = ladeBeiAnsicht(["start", "chat"], () => import("./google-login.js?v=2026111101")
   .then((m) => m.initGoogleLogin({ $, state, writeOutput, refreshSessionStatus }))
   .catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")));
 boot();
@@ -181,7 +191,7 @@ function bindModelPicker() {
   const menu = $("#modelPickerMenu");
   if (!button || !menu) return;
   state.settings = { ...state.settings, stufe: normalizeStufe(localStorage.getItem(STUFE_KEY) || state.settings.stufe) };
-  applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) || state.settings.model || "smejj 1.0", { persist: false, quiet: true }); window.addEventListener("smejj:model-selected", (event) => {
+  applySelectedModel(alteVersionZuAktuell(localStorage.getItem(STORAGE_KEYS.model)) || state.settings.model || SMEJJ_AKTUELL, { persist: false, quiet: true }); window.addEventListener("smejj:model-selected", (event) => {
     // Das Menue schickt Modell UND Stufe. Die Stufe hier zu ignorieren war die
     // Ursache dafuer, dass eine Wahl von "smejj 1.0" den Chip auf "smejj 1.1"
     // stellte (live gemessen 2026-09-11): der Chip las die alte Stufe.
@@ -269,7 +279,7 @@ function applySelectedStufe(stufe) {
   // "Auto" ist eine Modellwahl, keine Stufe: den Traeger waehlt der Server pro
   // Auftrag. Wer die Stufe umschaltet, darf sie nicht verlieren — bis
   // 2026-09-11 loeschte ein Klick auf "Nachdenken" genau das (live gemessen).
-  applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) === "Auto" ? "Auto" : STUFE_LABEL[selected] || "smejj 1.0");
+  applySelectedModel(localStorage.getItem(STORAGE_KEYS.model) === "Auto" ? "Auto" : STUFE_LABEL[selected] || SMEJJ_AKTUELL);
 }
 window.smejjApplyStufe = applySelectedStufe;
 
@@ -353,7 +363,7 @@ function bindStartComposer() {
   send.addEventListener("click", submit);
   bindPasteAttach({ getInput: () => input });
   // E24: auch fuer die Datei-Chips (start-chips.js).
-  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=2026111006").then((m) => m.initComposerTools()));
+  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=2026111101").then((m) => m.initComposerTools()));
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {

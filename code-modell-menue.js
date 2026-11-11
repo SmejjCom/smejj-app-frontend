@@ -9,7 +9,7 @@
 // Rueckruf nach einer Modellwahl. So bleibt das Modul fuer sich pruefbar
 // und es entsteht kein Ringschluss zwischen den beiden Dateien.
 //
-import { t } from "./i18n/ui.js?v=2026111006"; // Begruessung uebersetzt (Betreiber 24.09.2026)
+import { t } from "./i18n/ui.js?v=2026111101"; // Begruessung uebersetzt (Betreiber 24.09.2026)
 
 // ---- Modellwahl (Betreiber 2026-08-17: "warum kann ich bei Code nicht
 // Modelle waehlen?"). Dieselben Speicher wie der Start-Picker, damit Chat und
@@ -34,8 +34,13 @@ export const STUFE_KEY = "smejj.stufe.v1";
 // Standardmodell des Servers (fremd). Darum wird beim SENDEN umgeschrieben.
 // Bis eine eigene Version 1.1–1.3 fertig trainiert ist, antwortet unter ihrem
 // Namen das beste eigene Modell, das es gibt.
-export const STANDARD_WAHL = "smejj 1.0";
-const EIGENE_NAMEN = /^smejj 1(\.[0-3])?$/i;
+// Inhaber 11.11.2026 (schriftlich, Design-Lock Modell-Menue): im Menue steht NUR die aktuelle Version (heute smejj 1.0).
+// 1.1–1.3 sind entfernt; eine alte Wahl fuehrt automatisch zur aktuellen Version (migriereAlteWahl). Besteht ein trainiertes
+// Modell das Qualitaetstor, zaehlt die Aufgabe smejj-modell-update die Nummer hoch (1.1, 1.2 …) – dann NUR diese Zeile aendern
+// (und SMEJJ_AKTUELL in app.js, Test tests/code-modell-menue.test.mjs prueft den Gleichstand).
+export const AKTUELLE_VERSION = "smejj 1.0";
+export const STANDARD_WAHL = AKTUELLE_VERSION;
+const EIGENE_NAMEN = /^smejj 1(\.\d+)?$/i;
 
 /** Anzeigename aus dem Menue -> Modellname fuer den Server. Reine Funktion. */
 export function serverModell(wahl) {
@@ -96,6 +101,8 @@ export function migriereAlteWahl(speicher = typeof localStorage !== "undefined" 
     // Alte Staffel-Wahlen bekommen die Stufe, die das eigene Modell erreicht.
     const jetzt = speicher.getItem(MODELL_KEY) || "";
     if (jetzt === EIGENES_MODELL.titel) speicher.setItem(MODELL_KEY, STANDARD_WAHL);
+    // 11.11.2026: alte Versionswahl (z. B. smejj 1.1–1.3) -> aktuelle Version
+    if (EIGENE_NAMEN.test(jetzt) && jetzt !== AKTUELLE_VERSION) speicher.setItem(MODELL_KEY, AKTUELLE_VERSION);
     if (EIGENE_NAMEN.test(jetzt) && speicher.getItem(STUFE_KEY) !== EIGENE_STUFE) speicher.setItem(STUFE_KEY, EIGENE_STUFE);
     if (!ALTE_AUTO_WERTE.has(jetzt)) return false;
     speicher.setItem(MODELL_KEY, AUTO_WAHL);
@@ -117,10 +124,8 @@ export function migriereAlteWahl(speicher = typeof localStorage !== "undefined" 
 // und reicht die Frage an den Server-Router weiter (siehe EIGENES_MODELL).
 const EIGENE_STUFE = "gruendlich";
 export const SMEJJ_STAFFEL = [
-  { titel: "smejj 1.3", stufe: EIGENE_STUFE, hinweis: "Unsere beste Version" },
-  { titel: "smejj 1.2", stufe: EIGENE_STUFE, hinweis: "Unser eigenes Modell" },
-  { titel: "smejj 1.1", stufe: EIGENE_STUFE, hinweis: "Unser eigenes Modell" },
-  { titel: "smejj 1.0", stufe: EIGENE_STUFE, hinweis: "Unser eigenes Modell — Standard" }
+  // 11.11.2026 (Inhaber): nur noch die aktuelle Version – siehe AKTUELLE_VERSION oben.
+  { titel: AKTUELLE_VERSION, stufe: EIGENE_STUFE, hinweis: "Unser eigenes Modell — Standard" }
 ];
 
 // DAS EIGENE MODELL — bewusst NICHT Teil der Staffel.
@@ -291,10 +296,11 @@ export async function oeffneModellMenue(kontext = {}) {
   // smejj 1.0 gesetzt — sonst zeigte seine Auswahl auf etwas, das es nicht
   // mehr gibt, und das Menue markierte gar nichts als gewaehlt.
   if (localStorage.getItem(MODELL_KEY) === "Ox Alpha") {
-    localStorage.setItem(MODELL_KEY, "smejj 1.0");
+    localStorage.setItem(MODELL_KEY, STANDARD_WAHL);
     localStorage.removeItem(STUFE_KEY);
   }
-  const gewaehlt = localStorage.getItem(MODELL_KEY) || "smejj 1.0";
+  migriereAlteWahl();   // 11.11.2026: alte Versionswahl (1.1–1.3) zeigt sonst auf eine Zeile, die es nicht mehr gibt
+  const gewaehlt = localStorage.getItem(MODELL_KEY) || STANDARD_WAHL;
   const stufenZeile = ({ titel, stufe, hinweis }) => zeile({
     titel,
     hinweis,
