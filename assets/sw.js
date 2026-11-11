@@ -189,7 +189,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1100";
+const CACHE_NAME = "smejj-shell-v1101";
 const ASSET_BUILD = "2026111101";
 const SHELL = [
   "/",
@@ -323,7 +323,7 @@ const SHELL = [
   "/assets/voice-overlay-ui.js",
   "/assets/voice-browser-tts.js",
   "/assets/voice-clarify.js",
-  "/assets/voice-conversation.js",
+  "/assets/voice-conversation.js", "/assets/voice-stimmen-panel.js", // Stimmen-Auswahl (dyn. Import settings-surface.js), 11.11.2026
   "/assets/voice-ear.js",
   "/assets/voice-speech-queue.js",
   // 27.09.2026: Erkennungsliste + sprechbarer Antworttext (composer-tools.js, voice-landing.js).
