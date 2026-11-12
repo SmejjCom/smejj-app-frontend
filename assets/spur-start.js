@@ -18,18 +18,18 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026111102";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026111103";
 // Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
-import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026111102";
-import { Icons } from "/assets/components.js?v=2026111102";
+import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026111103";
+import { Icons } from "/assets/components.js?v=2026111103";
 // Abo-Stand ueber den gemeinsamen Speicher (F6, 2026-09-14): EINE Anfrage je
 // Laden fuer Planzeile, Onboarding-Karte und Abo-Panel — dieselbe Kennung wie
 // in account-sessions.js, sonst zweite Instanz und wieder zwei Anfragen.
-import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026111102";
+import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026111103";
 // Nutzerreise USA 2026-08-23: die Spur blieb auf Englisch deutsch ("Neuer
 // Chat", "Heute", "Gestern", "Alle 127 Gespräche"). t() liefert fail-safe den
 // deutschen Quelltext, solange kein Wörterbuch geladen ist.
-import { t } from "./i18n/ui.js?v=2026111102";
+import { t } from "./i18n/ui.js?v=2026111103";
 
 function alleGespraeche(n) {
   return t("Alle {n} Gespräche").replace("{n}", String(n));
@@ -187,8 +187,14 @@ async function zeichneStartSpur(halter) {
   }
 
   const startAktiv = document.querySelector("#start")?.classList.contains("is-active");
-  liste.append(punkt({ icon: "plus", text: t("Neuer Chat"), kuerzel: "⌘K", aktiv: startAktiv, aktion: () => { newChat(); geheZu("start"); } }));
-  liste.append(punkt({ icon: "search", text: t("Suchen"), aktion: () => geheZu("search") }));
+  // Handy-Menue (Inhaber-Freigabe 11.11.2026, Bild entwurf6): am Handy fallen
+  // "Neuer Chat" (Stift oben rechts), "Suchen" (Lupe im Menue-Kopf) und
+  // "smejjBot" weg (.nur-desktop) — die Web-Spur bleibt unveraendert.
+  const neu = punkt({ icon: "plus", text: t("Neuer Chat"), kuerzel: "⌘K", aktiv: startAktiv, aktion: () => { newChat(); geheZu("start"); } });
+  const suche = punkt({ icon: "search", text: t("Suchen"), aktion: () => geheZu("search") });
+  neu.classList.add("nur-desktop");
+  suche.classList.add("nur-desktop");
+  liste.append(neu, suche);
   // Mobil-Entwurf (Inhaber-Freigabe 11.11.2026): am Handy stehen Bilder und
   // Videos direkt in der Spur. Sie loesen die echten Vorlagen aus dem Chat aus
   // (nav-absichten.js) und sind nur am Handy sichtbar (.nur-mobil, CSS in
@@ -200,7 +206,9 @@ async function zeichneStartSpur(halter) {
     liste.append(knopf);
   }
   liste.append(punkt({ icon: "projects", text: "smejjCloud", aktion: () => geheZu("projects") }));
-  liste.append(punkt({ icon: "automation", text: "smejjBot", aktion: () => geheZu("automation") }));
+  const bot = punkt({ icon: "automation", text: "smejjBot", aktion: () => geheZu("automation") });
+  bot.classList.add("nur-desktop");
+  liste.append(bot);
 
   // Letzte Gespraeche — echt, aus dem Verlauf. Kein Eintrag, keine Gruppe.
   let chats = [];
@@ -290,8 +298,27 @@ function initNeuerChatStart(starten) {
   document.body.append(knopf);
 }
 
+// Handy-Menue (Inhaber-Freigabe 11.11.2026): Lupe im Kopf der geoeffneten
+// Spur, auf Hoehe des Logos am rechten Rand. Nur am Handy sichtbar (.nur-mobil,
+// CSS in design-v20-neuer-chat-oben.css); sie oeffnet die echte Suche.
+export function initSpurSucheMobil(doc = document) {
+  const spur = doc.querySelector(".sidebar");
+  if (!spur || doc.getElementById("spurSucheMobil")) return false;
+  const knopf = doc.createElement("button");
+  knopf.type = "button";
+  knopf.id = "spurSucheMobil";
+  knopf.className = "spur-suche-mobil nur-mobil";
+  knopf.setAttribute("aria-label", t("Suchen"));
+  knopf.title = t("Suchen");
+  knopf.innerHTML = Icons.search || "";
+  knopf.addEventListener("click", () => geheZu("search"));
+  spur.append(knopf);
+  return true;
+}
+
 export function initSpurStart() {
   initNeuerChatStart(() => { newChat(); geheZu("start"); });
+  initSpurSucheMobil();
   const vier = document.querySelector('.nav[aria-label="Arbeitsbereiche"]');
   if (!vier || document.querySelector(".nav-start")) return false;
   vier.classList.add("nav-vier");

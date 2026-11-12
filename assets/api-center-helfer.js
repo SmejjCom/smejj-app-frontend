@@ -2,8 +2,8 @@
 // Ausgelagert wegen der 800-Zeilen-Regel: reine Funktionen ohne Oberflaechen-
 // Zustand — Netzwerk/Auth, Fehlertexte, Formatierung, Escaping. Die Oberflaeche
 // importiert sie; das Verhalten ist identisch mit dem frueheren Inline-Code.
-import { API_ORIGIN } from "./config.js?v=2026111102";
-import { t } from "./i18n/ui.js?v=2026111102";
+import { API_ORIGIN } from "./config.js?v=2026111103";
+import { t } from "./i18n/ui.js?v=2026111103";
 
 const TOKEN_KEY = "smejj.apiToken.v1";
 

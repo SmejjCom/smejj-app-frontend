@@ -6218,6 +6218,37 @@ display: none !important}
 html body .sidebar .nav-button.nur-mobil.nur-mobil,
 html body #profileDockMenu .nur-mobil.nur-mobil {
 display: flex !important}
+html body .sidebar .spur-reiter.spur-reiter {
+display: none !important}
+html body .sidebar .nur-desktop.nur-desktop {
+display: none !important}
+html body .sidebar .nav-start .spur-liste {
+padding-top: 32px !important}
+html body .sidebar #spurSucheMobil.spur-suche-mobil.nur-mobil {
+display: grid !important;
+place-items: center;
+position: absolute;
+z-index: 3;
+top: calc(var(--sa-top, 0px) + 6px);
+right: 10px;
+width: 44px;
+height: 44px;
+padding: 0;
+color: inherit;
+border: 1.5px solid color-mix(in srgb, currentColor 40%, transparent) !important;
+border-radius: 50% !important;
+background: transparent !important;
+box-shadow: none !important;
+cursor: pointer}
+html body .sidebar #spurSucheMobil svg {
+width: 20px;
+height: 20px;
+fill: none;
+stroke: currentColor;
+stroke-width: 2;
+stroke-linecap: round}
+html body.left-panel-open #neuerChatStart.neuer-chat-start {
+display: none !important}
 html.kopf-weg body:has(#start.has-start-chat.is-active) :is(#appMenuButton, #browserButton, #mausButton, #neuerChatStart) {
 transform: none !important;
 opacity: 1 !important;
