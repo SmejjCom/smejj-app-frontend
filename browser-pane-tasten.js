@@ -12,7 +12,7 @@
 //
 // SRP: Die Zuordnung Taste -> Befehl ist eine REINE FUNKTION und dadurch
 // ohne Browser testbar. Was ein Befehl tut, weiss nur der Aufrufer.
-import { sortiertNachPinnung } from "./browser-pane-tableiste.js?v=2026111218";
+import { sortiertNachPinnung } from "./browser-pane-tableiste.js?v=2026111219";
 
 /**
  * Welcher Befehl gehoert zu diesem Tastendruck?

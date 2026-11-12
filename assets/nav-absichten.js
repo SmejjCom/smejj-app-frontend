@@ -25,7 +25,7 @@ function loeseAus(absicht) {
 }
 
 let galerie = null;
-const ladeGalerie = () => (galerie ||= import("./galerie.js?v=2026111218").then((m) => (m.initGalerie(), m), (f) => { galerie = null; throw f; }));
+const ladeGalerie = () => (galerie ||= import("./galerie.js?v=2026111219").then((m) => (m.initGalerie(), m), (f) => { galerie = null; throw f; }));
 
 export function initNavAbsichten({ dokument = document } = {}) {
   dokument.addEventListener("click", (ereignis) => {

@@ -16,10 +16,10 @@ import {
   listChats, listProjekte, benenneProjektUm, setzeProjektAnweisung, setzeProjektFarbe,
   loescheProjekt, setzeChatProjekt, neuesGespraechImBereich, newChat, openChat, getProjekt,
   renameChat, deleteChat
-} from "/assets/chat-store.js?v=2026111218";
-import { ordnerSvg, oeffneFenster, oeffneNeuesProjekt, farbWahl } from "./projekte-fenster.js?v=2026111218";
+} from "/assets/chat-store.js?v=2026111219";
+import { ordnerSvg, oeffneFenster, oeffneNeuesProjekt, farbWahl } from "./projekte-fenster.js?v=2026111219";
 
-const dateienModul = () => import("./projekt-dateien.js?v=2026111218");
+const dateienModul = () => import("./projekt-dateien.js?v=2026111219");
 
 function geheZu(view) {
   document.querySelector(`.nav-vier .nav-button[data-view="${view}"], .nav-button[data-view="${view}"]`)?.click();

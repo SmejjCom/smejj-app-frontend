@@ -7,8 +7,8 @@
 // „Neuer Chat in <Projekt>“. Ein normaler „Neuer Chat“ beendet den Projekt-Modus.
 // Alles echt: chat-store (projectId des Chats, Vormerkung beim neuen Chat).
 
-import { activeChatId, getChat, getProjekt, neuesGespraechImBereich, newChat, renameChat } from "/assets/chat-store.js?v=2026111218";
-import { ordnerSvg, oeffneFenster } from "./projekte-fenster.js?v=2026111218";
+import { activeChatId, getChat, getProjekt, neuesGespraechImBereich, newChat, renameChat } from "/assets/chat-store.js?v=2026111219";
+import { ordnerSvg, oeffneFenster } from "./projekte-fenster.js?v=2026111219";
 
 const NEU_KEY = "smejj.bereichNeu.v1";
 let platzhalterAlt = null;
@@ -28,7 +28,7 @@ body.projekt-chat #startLog{padding-top:64px!important}
 #projektKopf .pk-titel{display:block;font-size:14px;opacity:.65;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
 html body #projektKopf button.pk-rund{width:42px!important;height:42px!important;min-height:0!important;border-radius:50%!important;padding:0!important;display:grid!important;place-items:center!important;flex:none!important;background:rgba(127,127,127,.12)!important;border:1px solid rgba(127,127,127,.25)!important;color:inherit!important}
 #projektKopf .pk-rund svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-body.projekt-chat #start .start-chips,body.projekt-chat #start .home-hero{display:none!important}
+body.projekt-chat #start .start-chips,body.projekt-chat #start .home-hero,body.projekt-chat #start .erste-schritte{display:none!important}
 @media (max-width:760px){
   #projektKopf{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top) + 6px) 12px 8px;z-index:95;background:var(--app-bg,#0f1012)}
   body.projekt-chat #appMenuButton,body.projekt-chat #neuerChatStart{visibility:hidden}
@@ -67,7 +67,7 @@ const ZURUECK = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
 const STIFT = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>';
 
 async function zurProjektseite(id) {
-  try { await (await import("./arbeitsbereiche.js?v=2026111218")).oeffneProjekt(id); } catch { /* bleibt im Chat */ }
+  try { await (await import("./arbeitsbereiche.js?v=2026111219")).oeffneProjekt(id); } catch { /* bleibt im Chat */ }
 }
 
 function umbenennen(chat) {
