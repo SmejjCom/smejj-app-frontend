@@ -6,13 +6,16 @@
 //    einzige Zeile „smejj.com läuft normal“ (echte Prüfung: /api/health) — sonst ein
 //    ruhiger Störungshinweis. Die Technik bleibt im Adminbereich.
 // 2. Kostenschutz (#cost): für Nutzer ohne Bedeutung → direkt zu Konto → „Nutzung & Limits“.
+// 3. Handy: Entwickler-Einstellungen und Technik-Kopf im Konto ausgeblendet (Stil unten).
 // Nachgeladen über ansicht-schliessen.js (nur wenn eine Unterseite aufgeht).
-import { t } from "./i18n/ui.js?v=2026111203";
-import { API_ORIGIN } from "./config.js?v=2026111203";
+import { t } from "./i18n/ui.js?v=2026111204";
+import { API_ORIGIN } from "./config.js?v=2026111204";
 
 const STIL_ID = "unterseiten-einfach-stil";
 export const KARTE_ID = "betriebEinfach";
 const REITER_SCHLUESSEL = "smejj.konto.reiter.v1";
+// Gleiche Handy-Grenze wie spur-start.js / design-v20-neuer-chat-oben.css.
+export const HANDY = "(max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px)";
 
 function sorgeFuerStil(doc) {
   if (doc.getElementById(STIL_ID)) return;
@@ -23,7 +26,14 @@ function sorgeFuerStil(doc) {
     + `#${KARTE_ID} .be-punkt{flex:none;width:14px;height:14px;border-radius:50%!important;background:#8a9099}`
     + `#${KARTE_ID}[data-zustand="gut"] .be-punkt{background:#2fd0bd;box-shadow:0 0 0 5px rgba(47,208,189,.18)}`
     + `#${KARTE_ID}[data-zustand="stoerung"] .be-punkt{background:#f5b041;box-shadow:0 0 0 5px rgba(245,176,65,.18)}`
-    + `#${KARTE_ID} small{display:block;opacity:.75;font-size:14px;margin-top:2px}`;
+    + `#${KARTE_ID} small{display:block;opacity:.75;font-size:14px;margin-top:2px}`
+    // Inhaber 12.11.2026: „diese Info soll in der mobilen Version (App iOS und Android) nicht sein“ – am Handy
+    // keine Entwickler-Einstellungen (Programmieren, Sicherheit/fail-closed, Speicher/IDrive, API, BYOK-Modus,
+    // Modellverwaltung, Diff-Freigaben) und kein Technik-Kopf im Konto. Computer/Web unverändert.
+    + `@media ${HANDY}{`
+    + ["coding", "permissions", "storage", "api"].map((id) => `.settings-tabs [data-settings-tab="${id}"],[data-settings-panel="${id}"]`).join(",") + "{display:none!important}"
+    + ".settings-row:has(#settingsMode),.settings-row:has([data-settings-jump=\"ai\"]),.settings-row:has(#settingsNotifyApproval),.settings-row:has(#settingsDiagnostics),.settings-row:has([data-settings-jump=\"tools\"]),.settings-row:has(#settingsConfirmations),.settings-row:has(#settingsAutoContext){display:none!important}"
+    + ".account-header .subhead,.account-header .account-security{display:none!important}}";
   doc.head.append(stil);
 }
 
@@ -89,6 +99,7 @@ function pruefeAnsicht(doc, win) {
 
 export function initUnterseitenEinfach(doc = document, win = window) {
   if (!doc?.body) return;
+  sorgeFuerStil(doc);
   new win.MutationObserver((liste) => {
     if (liste.some((m) => m.target?.classList?.contains("view") && m.target.classList.contains("is-active"))) pruefeAnsicht(doc, win);
   }).observe(doc.body, { subtree: true, attributes: true, attributeFilter: ["class"] });

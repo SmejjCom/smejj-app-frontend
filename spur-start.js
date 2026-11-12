@@ -18,18 +18,18 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026111203";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026111204";
 // Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
-import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026111203";
-import { Icons } from "/assets/components.js?v=2026111203";
+import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026111204";
+import { Icons } from "/assets/components.js?v=2026111204";
 // Abo-Stand ueber den gemeinsamen Speicher (F6, 2026-09-14): EINE Anfrage je
 // Laden fuer Planzeile, Onboarding-Karte und Abo-Panel — dieselbe Kennung wie
 // in account-sessions.js, sonst zweite Instanz und wieder zwei Anfragen.
-import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026111203";
+import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026111204";
 // Nutzerreise USA 2026-08-23: die Spur blieb auf Englisch deutsch ("Neuer
 // Chat", "Heute", "Gestern", "Alle 127 Gespräche"). t() liefert fail-safe den
 // deutschen Quelltext, solange kein Wörterbuch geladen ist.
-import { t } from "./i18n/ui.js?v=2026111203";
+import { t } from "./i18n/ui.js?v=2026111204";
 
 function alleGespraeche(n) {
   return t("Alle {n} Gespräche").replace("{n}", String(n));
@@ -273,9 +273,14 @@ function baueReiter({ startAn = false, codeAn = false } = {}) {
   return reiter;
 }
 
+// Handy: immer die kurze Spur (Inhaber 12.11.2026).
+const HANDY = "(max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px)";
+function istHandy() {
+  try { return window.matchMedia(HANDY).matches; } catch { return false; }
+}
 function schalte() {
   const aktiv = document.querySelector(".view.is-active")?.id || "start";
-  const startModus = START_ANSICHTEN.has(aktiv);
+  const startModus = START_ANSICHTEN.has(aktiv) || istHandy();
   document.body.classList.toggle("spur-start-aktiv", startModus);
   const halter = document.querySelector(".nav-start");
   if (startModus && halter) void zeichneStartSpur(halter);
@@ -333,18 +338,14 @@ export function initSpurStart() {
   halter.className = "nav nav-start";
   halter.setAttribute("aria-label", t("Start und letzte Gespräche"));
   vier.before(halter);
-  // Ansichtswechsel laufen ueber Klicks und den Verlauf (gleiches Muster wie
-  // topbar-krume.js) — plus ein Lauscher auf Chat-Aenderungen, damit ein
-  // frisch gefuehrtes Gespraech sofort in der Spur erscheint.
+  // Neu zeichnen bei Klick, Verlauf und Chat-Aenderung.
   document.addEventListener("click", () => setTimeout(schalte, 150));
   window.addEventListener("popstate", () => setTimeout(schalte, 150));
   window.addEventListener("smejj:chats-changed", () => setTimeout(schalte, 150));
-  // Beim direkten /code-Aufruf schaltet der Router die is-active-Klasse
-  // ERST NACH dem ersten Zeichnen um — ohne Klick und ohne popstate. Der
-  // Beobachter zeichnet dann nach (Betreiber-Screenshot 2026-08-16:
-  // Start-Spur auf der Code-Seite).
+  // Direkter /code-Aufruf: Router schaltet erst nach dem Zeichnen (2026-08-16).
   const codeView = document.querySelector("#code");
   if (codeView) new MutationObserver(() => setTimeout(schalte, 30)).observe(codeView, { attributes: true, attributeFilter: ["class"] });
+  try { window.matchMedia(HANDY).addEventListener("change", schalte); } catch { /* alt */ }
   schalte();
   return true;
 }
