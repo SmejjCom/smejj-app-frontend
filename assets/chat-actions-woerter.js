@@ -9,7 +9,7 @@
 // WARUM EIN EIGENES MODUL: chat-actions.js steht bei 799 Zeilen (800-Regel), und
 // chat-actions.css liegt im gesperrten Start-Bündel. Dieses Modul beobachtet den
 // Verlauf und ergänzt nur; fällt es aus, sieht die Leiste aus wie vorher.
-import { t } from "/assets/i18n/ui.js?v=2026111212";
+import { t } from "/assets/i18n/ui.js?v=2026111213";
 
 export const WOERTER = Object.freeze({
   copy: "Kopieren",
@@ -50,6 +50,12 @@ function sorgeFuerStil(doc = document) {
     // "Naechste Version" ragte 22 px hinaus. Mit Waehler weicht die Uhrzeit (reine
     // Anzeige, kein Ziel): 351 px, alles in einer Zeile, alle Ziele 44 px.
     + ".msg-actions:has(.msg-versions) .msg-zeit{display:none}"
+    // Inhaber-Screenshot 12.11.2026 (iPhone, Freigabe "Blasen-Anzeigefehler reparieren"): Das "⋯" der EIGENEN
+    // Frage sitzt per margin-top:-34px in der Blasenecke (start-styles.css). Mit Wort darunter wurde der Knopf
+    // 54 px hoch: "⋯" lag auf dem Fragezeichen, "Mehr" hing unter der Blase. Jetzt: ohne Wort, ruhig UNTER der Blase.
+    + "#startLog .msg-actions.is-user{margin-top:-14px;min-height:44px;padding-right:2px;justify-content:flex-end}"
+    + "#startLog .msg-actions.is-user .msg-act{flex-direction:row;min-height:44px;height:44px;padding:0}"
+    + ".msg-actions.is-user .msg-act-wort{display:none}"
     + "}";
   doc.head.appendChild(stil);
 }
@@ -57,7 +63,8 @@ function sorgeFuerStil(doc = document) {
 /** Ergänzt fehlende Wörter in allen Leisten; gibt die Zahl der neuen Wörter zurück. */
 export function ergaenzeWoerter(wurzel = document) {
   let neu = 0;
-  for (const knopf of wurzel.querySelectorAll(".msg-actions .msg-act[data-act]")) {
+  // Eigene Fragen bekommen kein Wort (nur das kleine "⋯" unter der Blase, siehe Stil oben).
+  for (const knopf of wurzel.querySelectorAll(".msg-actions:not(.is-user) .msg-act[data-act]")) {
     if (knopf.querySelector(".msg-act-wort")) continue;
     const wort = wortFuer(knopf.dataset.act);
     if (!wort) continue;
