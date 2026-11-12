@@ -1,34 +1,18 @@
-// smejj.com — zwei Spur-Eintraege, die mehr tun als eine Ansicht zu oeffnen
-// (Mockup V11, Bildschirm 19: "Sprechen" und "Bilder erstellen").
-//
-// Beide Faehigkeiten LEBEN im Chat: der Sprachmodus haengt am vorhandenen
-// Knopf [data-start-tool="audio"], das Bilderzeugen am Beispiel-Chip
-// "Bilder generieren". Eigene Ansichten dafuer gibt es nicht — und eine
-// Attrappe zu bauen waere schlechter, als die echte Funktion auszuloesen.
-//
-// Darum tragen die zwei Spur-Knoepfe data-view="start" (app.js wechselt wie
-// immer die Ansicht) plus data-nav-absicht; dieses Modul loest DANACH die
-// Absicht aus. Bewusst im Bubble-Ohr ohne capture: app.js soll zuerst
-// fertig sein, sonst klickt man einen Knopf in einer noch unsichtbaren
-// Ansicht an.
-//
-// Faellt dieses Modul aus, bleiben die Knoepfe gewoehnliche Wege zum Chat —
-// nichts bricht, es fehlt nur die Abkuerzung.
+// smejj.com — Spur-Eintraege mit Absicht (data-nav-absicht). Sprechen startet den
+// Sprachmodus; Bilder/Videos oeffnen die Galerie (galerie.js, Inhaber 12.11.2026),
+// bild-neu/video-neu setzen die Vorlage im Chat. Faellt ein Modul aus, bleibt
+// der Knopf ein Weg zum Chat. Begruendungen und Messungen: Git-Verlauf.
 
 function loeseAus(absicht) {
   if (absicht === "sprechen") {
     document.querySelector('[data-start-tool="audio"]')?.click();
     return;
   }
-  if (absicht === "bilder" || absicht === "videos") {
-    // Nicht den Chip klicken, sondern seine Vorlage direkt einsetzen: der
-    // Chip-Klick ging im Getriebe des Ansichtswechsels verloren (live
-    // gemessen 2026-08-15 — Feld blieb leer). Die Vorlage kommt trotzdem
-    // vom Chip selbst (data-chip), damit Uebersetzungen weiter greifen.
+  if (absicht === "bild-neu" || absicht === "video-neu") {
+    // Vorlage direkt einsetzen (Chip-Klick ging im Ansichtswechsel verloren).
     const feld = document.querySelector("#startMessage");
     if (!feld) return;
-    // "videos" (Mobil-Spur, 11.11.2026): derselbe Weg mit der Video-Vorlage.
-    const video = absicht === "videos";
+    const video = absicht === "video-neu";
     const chip = [...document.querySelectorAll(".start-chips button")].find((knopf) =>
       (video ? /^generiere ein video/i : /bilder|image/i).test(video ? knopf.dataset.chip || "" : knopf.textContent)
     );
@@ -40,36 +24,34 @@ function loeseAus(absicht) {
   }
 }
 
+let galerie = null;
+const ladeGalerie = () => (galerie ||= import("./galerie.js?v=2026111215").then((m) => (m.initGalerie(), m), (f) => { galerie = null; throw f; }));
+
 export function initNavAbsichten({ dokument = document } = {}) {
   dokument.addEventListener("click", (ereignis) => {
     const knopf = ereignis.target.closest("[data-nav-absicht]");
     if (!knopf) return;
     const absicht = knopf.dataset.navAbsicht;
-    // Nach dem Ansichtswechsel von app.js. Fester kurzer Abstand statt
-    // requestAnimationFrame: waehrend des Menue-Uebergangs kann ein Frame
-    // ausbleiben, ein Timer nicht.
-    setTimeout(() => loeseAus(absicht), 220);
+    // Nach dem Ansichtswechsel von app.js (Timer statt Frame: im Menue-Uebergang
+    // kann ein Frame ausbleiben).
+    const spaeter = (a) => setTimeout(() => loeseAus(a), 220);
+    if (absicht === "bilder" || absicht === "videos") {
+      const rueck = absicht === "bilder" ? "bild-neu" : "video-neu";
+      ladeGalerie().then((m) => m.oeffneGalerie(absicht) || spaeter(rueck), () => spaeter(rueck));
+      return;
+    }
+    spaeter(absicht);
   });
   return true;
 }
 
 if (typeof document !== "undefined") {
   initNavAbsichten();
+  (globalThis.requestIdleCallback || ((f) => setTimeout(f, 1200)))(() => ladeGalerie().catch(() => {}));
 }
 
-
-// Die Pille "Nachdenken" (Mockup Bildschirm 32): schaltet die echte
-// Gruendlich-Stufe um. Zustand kommt aus dem Speicher der Stufe selbst.
-//
-// SIE GING BIS 2026-09-11 UEBER DAS ALTE MENUE ([data-stufe]) — und das war ein
-// echter Schaden, live gemessen: dieser Weg setzt die Modellwahl zwangsweise
-// auf "smejj 1.0". Wer "Auto" gewaehlt hatte und einmal Nachdenken drueckte,
-// verlor die Automatik STILL; der Chip zeigte danach "smejj 1.2", der Haken im
-// Menue stand auf 1.0. Jetzt geht die Pille den benannten Weg
-// (window.smejjApplyStufe) und laesst "Auto" in Ruhe.
-//
-// Der Merker haelt die Stufe von VOR dem Einschalten: ein Umschalter muss beim
-// Ausschalten dorthin zurueck, wo er herkam — sonst landet jeder auf 1.1.
+// Pille "Nachdenken": schaltet die Gruendlich-Stufe ueber window.smejjApplyStufe
+// (laesst "Auto" in Ruhe) und kehrt beim Ausschalten zur Stufe von vorher zurueck.
 const STUFE_SPEICHER = "smejj.stufe.v1";
 const VORHER_SPEICHER = "smejj.stufe.vor-nachdenken.v1";
 
@@ -94,16 +76,11 @@ if (typeof document !== "undefined") {
       localStorage.setItem(VORHER_SPEICHER, localStorage.getItem(STUFE_SPEICHER) || "auto");
       ziel = "gruendlich";
     }
-    // Rueckfall auf den alten Weg, falls app.js nicht geladen ist: dann ist die
-    // Pille wie vorher — eine Abkuerzung, die wirkt, statt keiner.
     if (typeof window.smejjApplyStufe === "function") window.smejjApplyStufe(ziel);
     else document.querySelector(`[data-stufe="${ziel}"]`)?.click();
     setTimeout(zeichneNachdenken, 80);
   });
-  // Auch nach einer MODELLWAHL neu zeichnen: die Staffel-Zeilen setzen die
-  // Stufe mit (1.2 = gruendlich). Ohne dieses Ohr zeigte die Pille nach der
-  // Wahl von "smejj 1.2" weiter "aus", obwohl gruendlich lief — und der erste
-  // Klick darauf schaltete dann AUS statt an (live gemessen 2026-09-11).
+  // Nach einer Modellwahl neu zeichnen (1.2 = gruendlich).
   window.addEventListener("smejj:model-selected", () => setTimeout(zeichneNachdenken, 0));
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", zeichneNachdenken, { once: true });
   else zeichneNachdenken();

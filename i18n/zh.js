@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 中文 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von zh-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./zh-2.js?v=2026111214";
+import zusatz from "./zh-2.js?v=2026111215";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -78,7 +78,6 @@ export default {
   "Browser bedienen": "操作浏览器",
   "smejjBot": "smejjBot",
   "Meine Sachen": "我的内容",
-  "smejjCloud": "smejjCloud",
   "Betrieb": "运行",
   "Datei": "文件",
   "Bild": "图片",

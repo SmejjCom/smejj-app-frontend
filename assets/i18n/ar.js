@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung العربية (Quellsprache Deutsch als Schluessel, RTL).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ar-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ar-2.js?v=2026111214";
+import zusatz from "./ar-2.js?v=2026111215";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -78,7 +78,6 @@ export default {
   "Browser bedienen": "تشغيل المتصفح",
   "smejjBot": "smejjBot",
   "Meine Sachen": "أغراضي",
-  "smejjCloud": "smejjCloud",
   "Betrieb": "التشغيل",
   "Datei": "ملف",
   "Bild": "صورة",

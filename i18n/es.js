@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Español (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von es-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./es-2.js?v=2026111214";
+import zusatz from "./es-2.js?v=2026111215";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -78,7 +78,6 @@ export default {
   "Browser bedienen": "Manejar el navegador",
   "smejjBot": "smejjBot",
   "Meine Sachen": "Mis cosas",
-  "smejjCloud": "smejjCloud",
   "Betrieb": "Operación",
   "Datei": "Archivo",
   "Bild": "Imagen",
