@@ -8,10 +8,10 @@
 // 2. Kostenschutz (#cost): für Nutzer ohne Bedeutung → direkt zu Konto → „Nutzung & Limits“.
 // 3. Handy: Entwickler-Einstellungen und Technik-Kopf im Konto ausgeblendet (Stil unten).
 // Nachgeladen über ansicht-schliessen.js (nur wenn eine Unterseite aufgeht).
-import { t } from "./i18n/ui.js?v=2026111205";
-import { API_ORIGIN } from "./config.js?v=2026111205";
+import { t } from "./i18n/ui.js?v=2026111206";
+import { API_ORIGIN } from "./config.js?v=2026111206";
 // iPhone-18-Glas für die Unterseiten (Inhaber 12.11.2026), Schritt für Schritt.
-import "./glas-unterseiten.js?v=2026111205";
+import "./glas-unterseiten.js?v=2026111206";
 
 const STIL_ID = "unterseiten-einfach-stil";
 export const KARTE_ID = "betriebEinfach";
@@ -34,7 +34,7 @@ function sorgeFuerStil(doc) {
     // Modellverwaltung, Diff-Freigaben) und kein Technik-Kopf im Konto. Computer/Web unverändert.
     + `@media ${HANDY}{`
     + ["coding", "permissions", "storage", "api"].map((id) => `.settings-tabs [data-settings-tab="${id}"],[data-settings-panel="${id}"]`).join(",") + "{display:none!important}"
-    + ".settings-row:has(#settingsMode),.settings-row:has([data-settings-jump=\"ai\"]),.settings-row:has(#settingsNotifyApproval),.settings-row:has(#settingsDiagnostics),.settings-row:has([data-settings-jump=\"tools\"]),.settings-row:has(#settingsConfirmations),.settings-row:has(#settingsAutoContext){display:none!important}"
+    + ".settings-row:has(#settingsMode),.settings-row:has([data-settings-jump=\"ai\"]),.settings-row:has(#settingsNotifyApproval),.settings-row:has(#settingsDiagnostics),.settings-row:has([data-settings-jump=\"tools\"]),.settings-row:has(#settingsConfirmations),.settings-row:has(#settingsAutoContext),html body .view.view:not(#start):not(#code) .account-row:has(#privacyMemory),html body .view.view:not(#start):not(#code) .account-row:has(#notifyAgentDone){display:none!important}"
     + ".account-header .subhead,.account-header .account-security{display:none!important}}";
   doc.head.append(stil);
 }
