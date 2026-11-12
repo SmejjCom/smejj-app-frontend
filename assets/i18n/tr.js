@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Türkçe (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von tr-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./tr-2.js?v=2026111103";
+import zusatz from "./tr-2.js?v=2026111201";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -378,7 +378,9 @@ export default {
   "Dieser Browser": "Bu tarayıcı",
   "Mit Passkey anmelden": "Geçiş anahtarıyla giriş yap",
   "Mit Google fortfahren": "Google ile devam et",
-  "Mit Fingerabdruck fortfahren": "Parmak iziyle devam et",
+  "Mit Fingerabdruck / Face ID": "Parmak izi / Face ID",
+  "Schon eingerichtet?": "Zaten kurulu mu?",
+  "Neu hier? Mit Google, Apple oder GitHub entsteht dein Konto automatisch. Mit E-Mail:": "Yeni misin? Google, Apple veya GitHub ile hesabın otomatik oluşturulur. E-posta ile:",
   "Mit GitHub fortfahren": "GitHub ile devam et",
   "Mit E-Mail fortfahren": "E-posta ile devam et",
   "Mit Apple fortfahren": "Apple ile devam et",

@@ -1,25 +1,14 @@
 // smejj.com — Profil-Dock in der linken Navigation (unten).
 //
-// Zeigt Profilbild + Namen des angemeldeten Nutzers; der Klick springt in die
-// Kontoseite (#profile). Das Zahnrad daneben bleibt unveraendert der Einstieg
-// in die Einstellungen (nav-button, von app.js verdrahtet).
-//
-// Architektur: eigenes Modul, weil public/app.js und public/styles.css per
-// Ratchet-Baseline (scripts/check-guidelines.mjs) nicht weiter wachsen duerfen.
-// Das Dock liest den Profil-Zustand ausschliesslich aus localStorage
-// (Single Source of Truth von app.js) und schreibt ihn nie zurueck.
+// Bild + Name unten links; liest nur localStorage (app.js), schreibt nie zurueck.
 
-import "./auth-gate.js?v=2026111103";
-// Anonyme Icon-Nutzungsmessung (Konkurrenz-Radar Ausbaustufe 5). Hier
-// eingehaengt statt per <script> in index.html, weil die Startseite unter dem
-// Start-Lock steht — gleiches Muster wie auth-gate.js eine Zeile darueber.
-// Quellen-Panel (Konkurrenz-Radar V5) — ebenfalls hier eingehaengt, damit
-// index.html unter dem Start-Lock bleibt.
-import { STORAGE_KEYS } from "./config.js?v=2026111103";
-import { t } from "./i18n/ui.js?v=2026111103";
-import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=2026111103";
-import { ladeBeiKlick } from "./nachladen.js?v=2026111103";
-import { initUsageCapture } from "./usage-meter.js?v=2026111103";
+import "./auth-gate.js?v=2026111201";
+// Hier eingehaengt statt in index.html (Start-Lock).
+import { STORAGE_KEYS } from "./config.js?v=2026111201";
+import { t } from "./i18n/ui.js?v=2026111201";
+import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=2026111201";
+import { ladeBeiKlick } from "./nachladen.js?v=2026111201";
+import { initUsageCapture } from "./usage-meter.js?v=2026111201";
 
 // Buttons, nach deren Klick sich Name/Session aendern koennen (app.js schreibt
 // localStorage synchron im Handler; das Neuzeichnen laeuft danach im Makrotask).
@@ -28,7 +17,7 @@ import { initUsageCapture } from "./usage-meter.js?v=2026111103";
 let menueGeladen = null;
 let letzterMenueStand = ["", "", false];
 function holeMenue() {
-  menueGeladen ||= import("./profile-dock-menu.js?v=2026111103").catch((f) => { menueGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", f); throw f; });
+  menueGeladen ||= import("./profile-dock-menu.js?v=2026111201").catch((f) => { menueGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", f); throw f; });
   return menueGeladen;
 }
 
@@ -48,7 +37,7 @@ export function initProfileDock() {
   ladeBeiKlick(["#profileDockButton"], () => holeMenue().then((m) => { m.initProfileDockMenu(); m.renderProfileDockMenu(...letzterMenueStand); return m; }));
   window.addEventListener("smejj:chats-changed", function quellenEinmal() {
     window.removeEventListener("smejj:chats-changed", quellenEinmal);
-    import("./quellen-panel.js?v=2026111103").catch((f) => console.error("[smejj.com] Nachladen fehlgeschlagen:", f));
+    import("./quellen-panel.js?v=2026111201").catch((f) => console.error("[smejj.com] Nachladen fehlgeschlagen:", f));
   });
   // Icon-Zaehler erst beim ersten Druck auf ein BEDIENELEMENT (Startgewicht,
   // gemessen 2026-09-14): er zaehlt nur Knoepfe und Links aus seiner
@@ -59,10 +48,11 @@ export function initProfileDock() {
   const zaehlerHolen = (event) => {
     if (!event.target?.closest?.("button, a, [role='button'], [data-jump], [data-composer-action], [data-start-tool], [data-browser-oeffnen]")) return;
     document.removeEventListener("pointerdown", zaehlerHolen, { capture: true });
-    import("./icon-nutzung.js?v=2026111103").catch(() => {});
+    import("./icon-nutzung.js?v=2026111201").catch(() => {});
   };
   document.addEventListener("pointerdown", zaehlerHolen, { capture: true });
   render();
+  ladeSchliessenBeiUnterseite();
   window.addEventListener(PROFILE_PICTURE_EVENT, render);
   window.addEventListener("storage", (event) => {
     if (!event.key || event.key === STORAGE_KEYS.profile || event.key === STORAGE_KEYS.session) render();
@@ -70,6 +60,19 @@ export function initProfileDock() {
   document.addEventListener("click", (event) => {
     if (event.target.closest(REFRESH_TRIGGERS)) setTimeout(render, 0);
   });
+}
+
+// X-Knopf auf Unterseiten (12.11.2026), erst beim Oeffnen nachgeladen (Startgewicht).
+function ladeSchliessenBeiUnterseite() {
+  const hole = () => import("./ansicht-schliessen.js?v=2026111201").catch(() => {});
+  const unterseite = (el) => el?.classList?.contains("view") && el.classList.contains("is-active") && el.id !== "start" && el.id !== "code";
+  if (unterseite(document.querySelector(".view.is-active"))) { hole(); return; }
+  const wache = new MutationObserver((liste) => {
+    if (!liste.some((m) => unterseite(m.target))) return;
+    wache.disconnect();
+    hole();
+  });
+  wache.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["class"] });
 }
 
 // Zeichnet Bild/Initiale und Namen neu. Input: keiner. Output: void.
@@ -83,7 +86,7 @@ function render() {
   // Abgemeldet KEINE Initiale: sonst stuende dort ein "n" von "Nutzer". Ohne Bild
   // und ohne Initiale greift .profile-avatar.is-empty — das neutrale Personen-
   // Symbol aus styles.css.
-  const initial = isSignedIn() ? displayName.trim().charAt(0) : "";
+  const initial = isSignedIn() && displayName !== t("Name eintragen") ? displayName.trim().charAt(0) : "";
   name.textContent = displayName;
   button.setAttribute("aria-label", `${t("Profil")}: ${displayName}`);
   button.setAttribute("title", displayName);
@@ -111,17 +114,18 @@ function resolveDisplayName() {
   if (!isSignedIn()) return t("Nutzer");
   const profile = read(STORAGE_KEYS.profile);
   const session = read(STORAGE_KEYS.session);
-  const candidate = profile.name || session.email || profile.email || "";
-  return candidate.trim() || t("Nutzer");
+  const email = String(session.email || profile.email || "").trim();
+  const name = String(profile.name || "").trim();
+  // 12.11.2026: Apples Zufallsadresse ist kein Name (Details: docs/approvals/2026-11-12-login-ux-freigabe.md).
+  if (istAppleErsatz(email) && (!name || name === email.split("@")[0] || name === email)) return t("Name eintragen");
+  return name || email || t("Nutzer");
 }
 
-// Angemeldet? Zwei Quellen, weil beide Anmeldewege existieren:
-// - Server-Sitzung (Google/Passkey/E-Mail): Zugangs-Token liegt lokal
-// - Lokales Profil: session.authenticated
-// WICHTIG (Live-Fehler 2026-07-17): Ohne diese Pruefung zeigte das Dock nach dem
-// Ausloggen weiter Name und Bild — der Nutzer hielt das Abmelden fuer kaputt.
-// Das gespeicherte Profil und das Bild bleiben erhalten, sie werden nur nicht
-// mehr angezeigt und kehren beim naechsten Anmelden zurueck.
+export function istAppleErsatz(email) {
+  return /@privaterelay\.appleid\.com$/i.test(String(email || "").trim());
+}
+
+// Angemeldet? Token (Server-Sitzung) oder session.authenticated. Abgemeldet: kein Name/Bild (2026-07-17).
 export function isSignedIn() {
   try {
     if (localStorage.getItem(AUTH_TOKEN_KEY)) return true;

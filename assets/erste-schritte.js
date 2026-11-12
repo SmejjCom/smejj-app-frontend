@@ -2,18 +2,18 @@
 //
 // Ein neuer Nutzer sah nach dem ersten Login nur eine Überschrift, ein Feld und acht
 // Symbole. Jetzt stehen unter der Werkzeugzeile drei Karten: Frag etwas, Bild erzeugen,
-// Code schreiben. Ein Klick füllt das Startfeld (oder drückt den passenden Werkzeug-Chip);
+// Video erstellen (seit 12.11.2026 statt Code schreiben). Ein Klick füllt das Startfeld (oder drückt den passenden Werkzeug-Chip);
 // gesendet wird erst vom Nutzer — wie bei start-chips.js.
 //
 // Sichtbar nur, solange der Nutzer KEIN Gespräch hat (listChats() leer) und die Karten
 // nicht ausgeblendet wurden (smejj.erste-schritte.v1). Sobald das erste Gespräch beginnt
 // (#startLog bekommt Kinder), verschwinden sie. Zum Prüfen mit Bestand: ?erste-schritte=1.
 // Stil aus dem Modul (Start-Bündel ist gesperrt), eigenes Modul (800-Zeilen-Regel).
-import { t } from "/assets/i18n/ui.js?v=2026111103";
+import { t } from "/assets/i18n/ui.js?v=2026111201";
 // Derselbe Spezifizierer wie index.html und alle anderen Module (?v=b65): ein abweichender
 // Spezifizierer erzeugt eine ZWEITE Instanz von chat-store.js — 12,9 KB doppelt übertragen,
 // zweite IndexedDB-Verbindung, eigener Zustand (Web-Vitals-Befund 2026-09-03, Gewicht 324 KB).
-import { listChats } from "/assets/chat-store.js?v=2026111103";
+import { listChats } from "/assets/chat-store.js?v=2026111201";
 
 export const MERKER = "smejj.erste-schritte.v1";
 const STIL_ID = "erste-schritte-stil";
@@ -22,7 +22,7 @@ const KLASSE = "erste-schritte";
 export const KARTEN = [
   { id: "frage", titel: "Frag etwas", text: "Stell eine Frage in deinen Worten — die Antwort kommt sofort.", vorlage: "Erkläre mir in drei Sätzen, was du für mich tun kannst." },
   { id: "bild", titel: "Bild erzeugen", text: "Beschreibe ein Motiv, smejj malt es.", chip: "Bild", vorlage: "Generiere ein Bild von:" },
-  { id: "code", titel: "Code schreiben", text: "Sag, was das Programm tun soll.", chip: "Programmieren", vorlage: "Schreibe Code für:" }
+  { id: "video", titel: "Video erstellen", text: "Beschreib die Szene, smejj erzeugt ein kurzes Video.", chip: "Video", vorlage: "Generiere ein Video von:" }
 ];
 
 /** Zeigen? Nur ohne eigene Gespräche und solange nicht ausgeblendet; ?erste-schritte=1 erzwingt. */

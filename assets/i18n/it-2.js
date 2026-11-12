@@ -279,6 +279,7 @@ export default {
   "Bild erstellen": "Crea un'immagine",
   "Beschreib, was du sehen willst. Dauert etwa 12 Sekunden.": "Descrivi ciò che vuoi vedere. Ci vogliono circa 12 secondi.",
   "„Ein schlichtes Logo für eine Bäckerei, schwarz-weiß.\"": "«Un logo semplice per una panetteria, in bianco e nero.»",
+  "Name eintragen": "Aggiungi il tuo nome",
   "Video erstellen": "Crea un video",
   "Beschreib die Szene, smejj erzeugt ein kurzes Video.": "Descrivi la scena e smejj crea un breve video.",
   "Text einfügen — smejj verbessert, kürzt oder formuliert um.": "Incolla un testo: smejj lo migliora, lo accorcia o lo riformula.",
@@ -569,8 +570,6 @@ export default {
   "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Fai una domanda con parole tue — la risposta arriva subito.",
   "Bild erzeugen": "Crea un'immagine",
   "Beschreibe ein Motiv, smejj malt es.": "Descrivi un soggetto, smejj lo dipinge.",
-  "Code schreiben": "Scrivi codice",
-  "Sag, was das Programm tun soll.": "Di' cosa deve fare il programma.",
   "Ausblenden": "Nascondi",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Spiegami in tre frasi cosa puoi fare per me.",
   // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)

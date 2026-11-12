@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Français (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von fr-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./fr-2.js?v=2026111103";
+import zusatz from "./fr-2.js?v=2026111201";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -378,7 +378,9 @@ export default {
   "Dieser Browser": "Ce navigateur",
   "Mit Passkey anmelden": "Se connecter avec une passkey",
   "Mit Google fortfahren": "Continuer avec Google",
-  "Mit Fingerabdruck fortfahren": "Continuer avec l'empreinte",
+  "Mit Fingerabdruck / Face ID": "Empreinte / Face ID",
+  "Schon eingerichtet?": "Déjà configuré ?",
+  "Neu hier? Mit Google, Apple oder GitHub entsteht dein Konto automatisch. Mit E-Mail:": "Nouveau ? Avec Google, Apple ou GitHub, ton compte est créé automatiquement. Par e-mail :",
   "Mit GitHub fortfahren": "Continuer avec GitHub",
   "Mit E-Mail fortfahren": "Continuer avec l'e-mail",
   "Mit Apple fortfahren": "Continuer avec Apple",

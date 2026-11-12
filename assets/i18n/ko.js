@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 한국어 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ko-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ko-2.js?v=2026111103";
+import zusatz from "./ko-2.js?v=2026111201";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -378,7 +378,9 @@ export default {
   "Dieser Browser": "이 브라우저",
   "Mit Passkey anmelden": "패스키로 로그인",
   "Mit Google fortfahren": "Google로 계속하기",
-  "Mit Fingerabdruck fortfahren": "지문으로 계속하기",
+  "Mit Fingerabdruck / Face ID": "지문 / Face ID",
+  "Schon eingerichtet?": "이미 설정하셨나요?",
+  "Neu hier? Mit Google, Apple oder GitHub entsteht dein Konto automatisch. Mit E-Mail:": "처음이신가요? Google, Apple 또는 GitHub로 계정이 자동으로 만들어집니다. 이메일로:",
   "Mit GitHub fortfahren": "GitHub로 계속하기",
   "Mit E-Mail fortfahren": "이메일로 계속하기",
   "Mit Apple fortfahren": "Apple로 계속하기",

@@ -279,6 +279,7 @@ export default {
   "Bild erstellen": "画像を作る",
   "Beschreib, was du sehen willst. Dauert etwa 12 Sekunden.": "見たいものを説明してください。約 12 秒かかります。",
   "„Ein schlichtes Logo für eine Bäckerei, schwarz-weiß.\"": "「パン屋さん向けのシンプルな白黒ロゴ。」",
+  "Name eintragen": "名前を入力",
   "Video erstellen": "動画を作る",
   "Beschreib die Szene, smejj erzeugt ein kurzes Video.": "場面を説明すると、smejj が短い動画を作ります。",
   "Text einfügen — smejj verbessert, kürzt oder formuliert um.": "文章を貼り付けてください — smejj が改善・短縮・書き換えをします。",
@@ -569,8 +570,6 @@ export default {
   "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "自分の言葉で質問すると、すぐに答えが返ってきます。",
   "Bild erzeugen": "画像を作る",
   "Beschreibe ein Motiv, smejj malt es.": "題材を伝えると、smejjが描きます。",
-  "Code schreiben": "コードを書く",
-  "Sag, was das Programm tun soll.": "プログラムに何をさせたいか伝えてください。",
   "Ausblenden": "非表示",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "あなたが私のためにできることを三文で説明して。",
   // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)

@@ -279,6 +279,7 @@ export default {
   "Bild erstellen": "이미지 만들기",
   "Beschreib, was du sehen willst. Dauert etwa 12 Sekunden.": "보고 싶은 것을 설명하세요. 약 12초 걸립니다.",
   "„Ein schlichtes Logo für eine Bäckerei, schwarz-weiß.\"": "“빵집을 위한 단순한 흑백 로고.”",
+  "Name eintragen": "이름 입력",
   "Video erstellen": "동영상 만들기",
   "Beschreib die Szene, smejj erzeugt ein kurzes Video.": "장면을 설명하면 smejj가 짧은 동영상을 만듭니다.",
   "Text einfügen — smejj verbessert, kürzt oder formuliert um.": "텍스트를 붙여넣으세요 — smejj가 다듬고, 줄이고, 다시 씁니다.",
@@ -569,8 +570,6 @@ export default {
   "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "자신의 말로 질문하면 답이 바로 옵니다.",
   "Bild erzeugen": "이미지 만들기",
   "Beschreibe ein Motiv, smejj malt es.": "소재를 설명하면 smejj가 그립니다.",
-  "Code schreiben": "코드 작성",
-  "Sag, was das Programm tun soll.": "프로그램이 무엇을 해야 하는지 말해 주세요.",
   "Ausblenden": "숨기기",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "네가 나를 위해 할 수 있는 일을 세 문장으로 설명해 줘.",
   // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)

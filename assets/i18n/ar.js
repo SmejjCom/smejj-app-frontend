@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung العربية (Quellsprache Deutsch als Schluessel, RTL).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ar-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ar-2.js?v=2026111103";
+import zusatz from "./ar-2.js?v=2026111201";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -378,7 +378,9 @@ export default {
   "Dieser Browser": "هذا المتصفح",
   "Mit Passkey anmelden": "تسجيل الدخول بمفتاح المرور",
   "Mit Google fortfahren": "المتابعة عبر Google",
-  "Mit Fingerabdruck fortfahren": "المتابعة ببصمة الإصبع",
+  "Mit Fingerabdruck / Face ID": "بصمة الإصبع / Face ID",
+  "Schon eingerichtet?": "هل تم الإعداد بالفعل؟",
+  "Neu hier? Mit Google, Apple oder GitHub entsteht dein Konto automatisch. Mit E-Mail:": "جديد هنا؟ مع Google أو Apple أو GitHub يُنشأ حسابك تلقائيًا. بالبريد الإلكتروني:",
   "Mit GitHub fortfahren": "المتابعة عبر GitHub",
   "Mit E-Mail fortfahren": "المتابعة عبر البريد الإلكتروني",
   "Mit Apple fortfahren": "المتابعة عبر Apple",

@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 中文 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von zh-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./zh-2.js?v=2026111103";
+import zusatz from "./zh-2.js?v=2026111201";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -378,7 +378,9 @@ export default {
   "Dieser Browser": "此浏览器",
   "Mit Passkey anmelden": "使用通行密钥登录",
   "Mit Google fortfahren": "使用 Google 继续",
-  "Mit Fingerabdruck fortfahren": "使用指纹继续",
+  "Mit Fingerabdruck / Face ID": "指纹 / Face ID",
+  "Schon eingerichtet?": "已经设置好了？",
+  "Neu hier? Mit Google, Apple oder GitHub entsteht dein Konto automatisch. Mit E-Mail:": "第一次来？使用 Google、Apple 或 GitHub 会自动创建账户。使用邮箱：",
   "Mit GitHub fortfahren": "使用 GitHub 继续",
   "Mit E-Mail fortfahren": "使用电子邮件继续",
   "Mit Apple fortfahren": "使用 Apple 继续",

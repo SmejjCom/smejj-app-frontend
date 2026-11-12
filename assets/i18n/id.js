@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Bahasa Indonesia (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von id-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./id-2.js?v=2026111103";
+import zusatz from "./id-2.js?v=2026111201";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -378,7 +378,9 @@ export default {
   "Dieser Browser": "Browser ini",
   "Mit Passkey anmelden": "Masuk dengan passkey",
   "Mit Google fortfahren": "Lanjutkan dengan Google",
-  "Mit Fingerabdruck fortfahren": "Lanjutkan dengan sidik jari",
+  "Mit Fingerabdruck / Face ID": "Sidik jari / Face ID",
+  "Schon eingerichtet?": "Sudah diatur?",
+  "Neu hier? Mit Google, Apple oder GitHub entsteht dein Konto automatisch. Mit E-Mail:": "Baru di sini? Dengan Google, Apple, atau GitHub akunmu dibuat otomatis. Dengan email:",
   "Mit GitHub fortfahren": "Lanjutkan dengan GitHub",
   "Mit E-Mail fortfahren": "Lanjutkan dengan email",
   "Mit Apple fortfahren": "Lanjutkan dengan Apple",

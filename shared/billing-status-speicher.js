@@ -29,8 +29,8 @@
 // Der Speicher haelt NUR die erfolgreiche Antwort (ok: true). Ein Fehlschlag
 // wird nicht gemerkt — sonst haette eine kurze Stoerung Sekunden Nachhall.
 
-import { API_ORIGIN } from "../config.js?v=2026111103";
-import { erzeugeAuthMeSpeicher } from "./auth-me-speicher.js?v=2026111103";
+import { API_ORIGIN } from "../config.js?v=2026111201";
+import { erzeugeAuthMeSpeicher } from "./auth-me-speicher.js?v=2026111201";
 
 /** Gleicher Schluessel wie account-sessions.js / auth-gate.js. */
 const TOKEN_KEY = "smejj.auth.accessToken.v1";

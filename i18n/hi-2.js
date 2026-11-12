@@ -279,6 +279,7 @@ export default {
   "Bild erstellen": "छवि बनाएँ",
   "Beschreib, was du sehen willst. Dauert etwa 12 Sekunden.": "बताइए आप क्या देखना चाहते हैं। लगभग 12 सेकंड लगते हैं।",
   "„Ein schlichtes Logo für eine Bäckerei, schwarz-weiß.\"": "„एक बेकरी के लिए सरल लोगो, श्वेत-श्याम।”",
+  "Name eintragen": "अपना नाम जोड़ें",
   "Video erstellen": "वीडियो बनाएँ",
   "Beschreib die Szene, smejj erzeugt ein kurzes Video.": "दृश्य बताइए, smejj एक छोटा वीडियो बनाता है।",
   "Text einfügen — smejj verbessert, kürzt oder formuliert um.": "टेक्स्ट चिपकाएँ — smejj उसे सुधारता, छोटा करता या दोबारा लिखता है।",
@@ -569,8 +570,6 @@ export default {
   "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "अपने शब्दों में सवाल पूछें — जवाब तुरंत आता है।",
   "Bild erzeugen": "चित्र बनाएँ",
   "Beschreibe ein Motiv, smejj malt es.": "एक विषय बताएँ, smejj उसे बनाता है।",
-  "Code schreiben": "कोड लिखें",
-  "Sag, was das Programm tun soll.": "बताएँ कि प्रोग्राम को क्या करना है।",
   "Ausblenden": "छिपाएँ",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "तीन वाक्यों में समझाओ कि तुम मेरे लिए क्या कर सकते हो।",
   // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)

@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung বাংলা (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von bn-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./bn-2.js?v=2026111103";
+import zusatz from "./bn-2.js?v=2026111201";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -378,7 +378,9 @@ export default {
   "Dieser Browser": "এই ব্রাউজার",
   "Mit Passkey anmelden": "পাসকি দিয়ে লগইন করুন",
   "Mit Google fortfahren": "Google দিয়ে চালিয়ে যান",
-  "Mit Fingerabdruck fortfahren": "আঙুলের ছাপ দিয়ে চালিয়ে যান",
+  "Mit Fingerabdruck / Face ID": "আঙুলের ছাপ / Face ID",
+  "Schon eingerichtet?": "আগেই সেট আপ করেছেন?",
+  "Neu hier? Mit Google, Apple oder GitHub entsteht dein Konto automatisch. Mit E-Mail:": "নতুন? Google, Apple বা GitHub দিয়ে আপনার অ্যাকাউন্ট স্বয়ংক্রিয়ভাবে তৈরি হয়। ইমেল দিয়ে:",
   "Mit GitHub fortfahren": "GitHub দিয়ে চালিয়ে যান",
   "Mit E-Mail fortfahren": "ইমেইল দিয়ে চালিয়ে যান",
   "Mit Apple fortfahren": "Apple দিয়ে চালিয়ে যান",

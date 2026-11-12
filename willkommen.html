@@ -57,7 +57,7 @@
        und als erstes, damit sie nicht fuer einen Moment sichtbar sind — mit
        defer stuenden sie im Video des Pruefers. -->
   <script src="/assets/ios-preise-aus.js?v=1"></script>
-  <script src="/assets/willkommen-sprache.js?v=5" defer></script>
+  <script src="/assets/willkommen-sprache.js?v=6" defer></script>
   <!-- Die erste Frage OHNE Konto (21.09.2026). Laedt VOR dem Fokus-Skript,
        damit window.smejjGastFrage beim ersten Absenden schon steht. -->
   <script src="/assets/gast-frage.js?v=25" defer></script>
@@ -66,7 +66,7 @@
        index.html (gleiche Marke, eine Instanz). Als Web-App oeffnet "/" abgemeldet
        diese Seite; die Tastatur des Probier-Felds loest denselben WebKit-Fehler aus
        (Layout-Viewport bleibt klein, schwarzer Balken unten). -->
-  <script src="/assets/pwa-schnellstart.js?v=2026111103" type="module"></script>
+  <script src="/assets/pwa-schnellstart.js?v=2026111201" type="module"></script>
   <!-- Besucher-Puls (Autopilot Nr. 81): EINE Strichliste je Sitzung, ohne Cookie
        und ohne Kennung. Ohne diese Zahl ist "es kommt niemand" nicht von
        "niemand kann melden" zu unterscheiden. -->
@@ -75,8 +75,8 @@
        bekam keinen Service Worker und sah offline die Fehlerseite des Browsers.
        Registriert den schmalen Service Worker (~19 KB statt 2 MB) und zeigt
        das Offline-Band der App nach einer echten Netzprobe. -->
-  <script src="/assets/willkommen-offline.js?v=2026111103" type="module"></script>
-  <script type="module" src="/assets/willkommen-composer.js?v=2026111103"></script>
+  <script src="/assets/willkommen-offline.js?v=2026111201" type="module"></script>
+  <script type="module" src="/assets/willkommen-composer.js?v=2026111201"></script>
   <style>
     /* Apple 3.1.1: alles mit data-nur-web verschwindet in der iOS-Huelle
        (ios-preise-aus.js setzt das Attribut am <html>). */
@@ -230,7 +230,7 @@
     }
     footer a { text-decoration: none; }
   </style>
-  <link id="composerEingabeStil" rel="stylesheet" href="/assets/composer-eingabe.css?v=2026111103">
+  <link id="composerEingabeStil" rel="stylesheet" href="/assets/composer-eingabe.css?v=2026111201">
 </head>
 <body>
   <header class="leiste">
@@ -365,14 +365,14 @@
 
   <section id="herunterladen">
     <!-- Mockup 6: "smejj auf deinem Gerät" + die drei Anwendungen von iMild.
-         con.ax und smyst.com sind echte, erreichbare Seiten (geprueft) —
+         muuny.com (frueher con.ax) und smyst.com sind echte, erreichbare Seiten (geprueft 12.11.2026) —
          die Karten verlinken dorthin, kein erfundenes Produkt. -->
     <h2>smejj auf deinem Gerät</h2>
     <p style="color:var(--ink-dim);max-width:640px;margin-bottom:18px">Ohne App-Store, ohne Installation im klassischen Sinn. Ein Klick im Browser und smejj liegt auf dem Startbildschirm wie jede andere App — mit eigenem Fenster, eigenem Symbol und offline nutzbarem Verlauf.</p>
     <h2 style="font-size:20px">Die drei Anwendungen von iMild</h2>
     <div class="karten">
-      <div class="karte"><h3>smejj.com — Denken &amp; Bauen</h3><p>Fragen, schreiben, Bilder und Videos erstellen, programmieren. Das KI-Betriebssystem, das Software selbst baut.</p><p style="margin-top:8px;color:var(--cy-ink)">Du bist hier</p></div>
-      <div class="karte"><h3>con.ax — Verbinden</h3><p>Das soziale Netzwerk mit interaktiven Karten — Menschen, Orte und Momente geografisch verbunden.</p><p style="margin-top:8px"><a href="https://con.ax" rel="noopener">Ansehen</a> · Eigenes Konto nötig</p></div>
+      <div class="karte"><h3>smejj.com — Denken &amp; Bauen</h3><p>Fragen, schreiben, Bilder und Videos erstellen. Deine KI für jeden Tag.</p><p style="margin-top:8px;color:var(--cy-ink)">Du bist hier</p></div>
+      <div class="karte"><h3>muuny.com — Verbinden</h3><p>Kurze Videos, Geschichten, Menschen und Orte in deiner Nähe — schnell entdecken, am Handy und am Computer.</p><p style="margin-top:8px"><a href="https://muuny.com" rel="noopener">Ansehen</a> · Eigenes Konto nötig</p></div>
       <div class="karte"><h3>smyst.com — Bewahren</h3><p>Dein digitaler KI-Zwilling — mit deinem Wissen und deinen Erinnerungen, für Familie und kommende Generationen.</p><p style="margin-top:8px"><a href="https://smyst.com" rel="noopener">Ansehen</a> · Eigenes Konto nötig</p></div>
     </div>
     <h2 style="font-size:20px;margin-top:26px">So geht das Installieren — je Gerät</h2>

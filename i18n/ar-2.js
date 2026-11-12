@@ -279,6 +279,7 @@ export default {
   "Bild erstellen": "إنشاء صورة",
   "Beschreib, was du sehen willst. Dauert etwa 12 Sekunden.": "صِف ما تريد رؤيته. يستغرق نحو 12 ثانية.",
   "„Ein schlichtes Logo für eine Bäckerei, schwarz-weiß.\"": "«شعار بسيط لمخبز، بالأبيض والأسود.»",
+  "Name eintragen": "أضف اسمك",
   "Video erstellen": "إنشاء فيديو",
   "Beschreib die Szene, smejj erzeugt ein kurzes Video.": "صِف المشهد وسينشئ smejj فيديو قصيرًا.",
   "Text einfügen — smejj verbessert, kürzt oder formuliert um.": "الصق نصًا — يحسّنه smejj أو يختصره أو يعيد صياغته.",
@@ -569,8 +570,6 @@ export default {
   "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "اطرح سؤالًا بكلماتك — يأتي الجواب فورًا.",
   "Bild erzeugen": "إنشاء صورة",
   "Beschreibe ein Motiv, smejj malt es.": "صف مشهدًا، وسيرسمه smejj.",
-  "Code schreiben": "كتابة كود",
-  "Sag, was das Programm tun soll.": "قل ما يجب أن يفعله البرنامج.",
   "Ausblenden": "إخفاء",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "اشرح لي في ثلاث جمل ما يمكنك فعله من أجلي.",
   // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)

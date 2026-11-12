@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung हिन्दी (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von hi-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./hi-2.js?v=2026111103";
+import zusatz from "./hi-2.js?v=2026111201";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -378,7 +378,9 @@ export default {
   "Dieser Browser": "यह ब्राउज़र",
   "Mit Passkey anmelden": "पासकी से लॉगिन करें",
   "Mit Google fortfahren": "Google के साथ जारी रखें",
-  "Mit Fingerabdruck fortfahren": "फ़िंगरप्रिंट से जारी रखें",
+  "Mit Fingerabdruck / Face ID": "फ़िंगरप्रिंट / Face ID",
+  "Schon eingerichtet?": "पहले से सेट है?",
+  "Neu hier? Mit Google, Apple oder GitHub entsteht dein Konto automatisch. Mit E-Mail:": "नए हैं? Google, Apple या GitHub से आपका खाता अपने-आप बन जाता है। ईमेल से:",
   "Mit GitHub fortfahren": "GitHub के साथ जारी रखें",
   "Mit E-Mail fortfahren": "ईमेल से जारी रखें",
   "Mit Apple fortfahren": "Apple के साथ जारी रखें",

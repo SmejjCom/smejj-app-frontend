@@ -279,6 +279,7 @@ export default {
   "Bild erstellen": "Buat gambar",
   "Beschreib, was du sehen willst. Dauert etwa 12 Sekunden.": "Jelaskan apa yang ingin kamu lihat. Perlu sekitar 12 detik.",
   "„Ein schlichtes Logo für eine Bäckerei, schwarz-weiß.\"": "“Logo sederhana untuk toko roti, hitam putih.”",
+  "Name eintragen": "Tambahkan namamu",
   "Video erstellen": "Buat video",
   "Beschreib die Szene, smejj erzeugt ein kurzes Video.": "Jelaskan adegannya, smejj membuat video pendek.",
   "Text einfügen — smejj verbessert, kürzt oder formuliert um.": "Tempel teks — smejj memperbaiki, memperpendek, atau menulis ulang.",
@@ -569,8 +570,6 @@ export default {
   "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Ajukan pertanyaan dengan kata-katamu — jawaban langsung datang.",
   "Bild erzeugen": "Buat gambar",
   "Beschreibe ein Motiv, smejj malt es.": "Gambarkan sebuah objek, smejj melukisnya.",
-  "Code schreiben": "Tulis kode",
-  "Sag, was das Programm tun soll.": "Katakan apa yang harus dilakukan program.",
   "Ausblenden": "Sembunyikan",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Jelaskan dalam tiga kalimat apa yang bisa kamu lakukan untukku.",
   // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)

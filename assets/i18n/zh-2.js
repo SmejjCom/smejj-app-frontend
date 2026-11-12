@@ -279,6 +279,7 @@ export default {
   "Bild erstellen": "生成图片",
   "Beschreib, was du sehen willst. Dauert etwa 12 Sekunden.": "描述你想看到的内容，大约需要 12 秒。",
   "„Ein schlichtes Logo für eine Bäckerei, schwarz-weiß.\"": "“一个简洁的面包店标志，黑白配色。”",
+  "Name eintragen": "填写姓名",
   "Video erstellen": "生成视频",
   "Beschreib die Szene, smejj erzeugt ein kurzes Video.": "描述场景，smejj 生成一段短视频。",
   "Text einfügen — smejj verbessert, kürzt oder formuliert um.": "粘贴文本 —— smejj 会改进、精简或重写。",
@@ -569,8 +570,6 @@ export default {
   "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "用你自己的话提问，答案马上就来。",
   "Bild erzeugen": "生成图片",
   "Beschreibe ein Motiv, smejj malt es.": "描述一个主题，smejj 来画。",
-  "Code schreiben": "编写代码",
-  "Sag, was das Programm tun soll.": "说说程序应该做什么。",
   "Ausblenden": "隐藏",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "用三句话说明你能为我做什么。",
   // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)

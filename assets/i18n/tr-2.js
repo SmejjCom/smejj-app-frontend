@@ -279,6 +279,7 @@ export default {
   "Bild erstellen": "Görsel oluştur",
   "Beschreib, was du sehen willst. Dauert etwa 12 Sekunden.": "Ne görmek istediğini anlat. Yaklaşık 12 saniye sürer.",
   "„Ein schlichtes Logo für eine Bäckerei, schwarz-weiß.\"": "„Bir fırın için sade bir logo, siyah beyaz.”",
+  "Name eintragen": "Adını ekle",
   "Video erstellen": "Video oluştur",
   "Beschreib die Szene, smejj erzeugt ein kurzes Video.": "Sahneyi anlat, smejj kısa bir video üretir.",
   "Text einfügen — smejj verbessert, kürzt oder formuliert um.": "Metni yapıştır — smejj iyileştirir, kısaltır veya yeniden yazar.",
@@ -569,8 +570,6 @@ export default {
   "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Kendi sözlerinle bir soru sor — yanıt hemen gelir.",
   "Bild erzeugen": "Görsel oluştur",
   "Beschreibe ein Motiv, smejj malt es.": "Bir konu tarif et, smejj çizsin.",
-  "Code schreiben": "Kod yaz",
-  "Sag, was das Programm tun soll.": "Programın ne yapması gerektiğini söyle.",
   "Ausblenden": "Gizle",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Benim için neler yapabileceğini üç cümleyle açıkla.",
   // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)

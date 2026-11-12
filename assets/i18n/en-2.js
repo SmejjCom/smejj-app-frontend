@@ -279,6 +279,7 @@ export default {
   "Bild erstellen": "Create an image",
   "Beschreib, was du sehen willst. Dauert etwa 12 Sekunden.": "Describe what you want to see. Takes about 12 seconds.",
   "„Ein schlichtes Logo für eine Bäckerei, schwarz-weiß.\"": "“A simple logo for a bakery, black and white.”",
+  "Name eintragen": "Add your name",
   "Video erstellen": "Create a video",
   "Beschreib die Szene, smejj erzeugt ein kurzes Video.": "Describe the scene, smejj makes a short video.",
   "Text einfügen — smejj verbessert, kürzt oder formuliert um.": "Paste text — smejj improves, shortens or rewrites it.",
@@ -567,8 +568,6 @@ export default {
   "Stell eine Frage in deinen Worten — die Antwort kommt sofort.": "Ask a question in your own words — the answer comes right away.",
   "Bild erzeugen": "Create an image",
   "Beschreibe ein Motiv, smejj malt es.": "Describe a subject, smejj paints it.",
-  "Code schreiben": "Write code",
-  "Sag, was das Programm tun soll.": "Say what the program should do.",
   "Ausblenden": "Hide",
   "Erkläre mir in drei Sätzen, was du für mich tun kannst.": "Explain in three sentences what you can do for me.",
   // Konto loeschen fuer jeden Anmeldeweg (Apple 5.1.1(v), 21.09.2026)
