@@ -39,6 +39,24 @@
     ziel.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => { filter.nurRot = b.dataset.filter === 'rot'; ergebnisse(); }));
     ziel.querySelectorAll('tr[data-tag]').forEach(r => r.addEventListener('click', () => { filter.tag = r.dataset.tag; ergebnisse(); }));
   }
+  async function gehirn() {
+    const ziel = document.querySelector('[data-workforce-brain]');
+    if (!ziel) return;
+    const answer = await A.hole('/api/admin/workforce/gehirn');
+    if (!answer.ok) { ziel.innerHTML = '<div class="pb"><p>Gehirn-Daten sind NICHT VERFÜGBAR: ' + e(answer.fehler || '') + '</p></div>'; return; }
+    const d = answer.data;
+    const plan = d.plaene[0];
+    const liste = d.liste.map(m => '<tr><td>' + e(m.id) + '</td><td>' + e(m.modell) + '</td><td>' + e(m.lizenz) + '</td><td>' + e(m.kosten) + '</td></tr>').join('');
+    const proto = d.protokoll.slice(0, 20).map(p => '<tr><td>' + e(zeit(p.at)) + '</td><td>' + e(p.agentId) + '</td><td>' + e(p.zweck) + '</td><td>' + e(p.modell) + '</td><td>'
+      + pille(p.ok ? 'gruen' : 'rot') + (p.fehler ? '<div class="s">' + e(p.fehler) + '</div>' : '') + '</td><td>' + e(p.ms) + ' ms</td><td>' + e(p.kostenEur) + ' €</td></tr>').join('');
+    const fokus = plan ? plan.fokus.map(f => '<li>' + e(f.werkzeug) + ' ' + e(JSON.stringify(f.eingabe)) + (f.grund ? ' – ' + e(f.grund) : '') + '</li>').join('') : '';
+    ziel.innerHTML = '<div class="pb"><h4>Plan des KI-Geschäftsleiters' + (plan ? ' · ' + e(plan.tag) + ' · ' + e(plan.quelle) : '') + '</h4>'
+      + (plan ? '<p>' + e(plan.begruendung || '') + (plan.rueckfallGrund ? ' (feste Regeln, weil: ' + e(plan.rueckfallGrund) + ')' : '') + '</p><ul>' + fokus + '</ul>' : '<p>Heute noch kein Plan.</p>')
+      + '<p class="s">Modell-Aufrufe heute: ' + e(d.nutzung.gesamt) + ' von ' + e(d.grenzen.gesamtTag) + ' (je Mitarbeiter höchstens ' + e(d.grenzen.jeMitarbeiterTag) + ') · Kosten: 0 €</p></div>'
+      + '<div class="pb flush"><table><thead><tr><th>Gratis-Modell</th><th>Modell</th><th>Lizenz</th><th>Kosten</th></tr></thead><tbody>' + liste + '</tbody></table></div>'
+      + '<div class="pb flush"><table><thead><tr><th>Zeit</th><th>Mitarbeiter</th><th>Zweck</th><th>Modell</th><th>Ergebnis</th><th>Dauer</th><th>Kosten</th></tr></thead><tbody>'
+      + (proto || '<tr><td colspan="7">Noch keine Modell-Aufrufe.</td></tr>') + '</tbody></table></div>';
+  }
   async function laden(ctx) {
     const answer = await A.hole('/api/admin/workforce/overview');
     if (!answer.ok) return ctx.fehler(answer.fehler);
@@ -58,13 +76,17 @@
       + '<div class="pb"><p>' + e(notice) + '</p><p>Ist der Not-Aus an, ruhen alle Mitarbeiter – unabhängig davon, was gespeichert ist.</p>'
       + '<p>Die Mitarbeiter arbeiten jeden Tag automatisch: jede Rolle prüft mit einem lesenden Gratis-Werkzeug, QA prüft unabhängig nach. '
       + 'Ihr Arbeitsstand liegt in IDrive e2 (Aufgaben, Archiv, Protokoll). Kosten: 0 €. Diese Ansicht selbst startet oder verändert nichts.</p></div></section>'
+      + '<section class="panel glass" id="freigabe-fach"><div class="ph"><h3>Freigabe-Fach</h3></div><div data-freigabe-fach><div class="pb"><p>Wird geladen …</p></div></div></section>'
+      + '<section class="panel glass" id="befunde"><div class="ph"><h3>Befunde und Arbeitsabläufe</h3></div><div data-befunde><div class="pb"><p>Wird geladen …</p></div></div></section>'
+      + '<section class="panel glass" id="gehirn"><div class="ph"><h3>Gehirn: Plan und Modell-Protokoll</h3></div><div data-workforce-brain><div class="pb"><p>Wird geladen …</p></div></div></section>'
       + '<section class="panel glass" id="ergebnisse"><div class="ph"><h3>Ergebnisse</h3></div><div data-workforce-results><div class="pb"><p>Ergebnisse werden geladen …</p></div></div></section>'
       + '<section class="panel glass"><div class="ph"><h3>Mitarbeiterverzeichnis</h3></div><div class="pb flush"><table><thead><tr>'
       + '<th>Nr.</th><th>Rolle</th><th>Team</th><th>Status</th><th>Budget</th><th>Letzte Aktion</th>'
       + '</tr></thead><tbody>' + rows + '</tbody></table></div></section>');
     document.querySelector('[data-workforce-refresh]').addEventListener('click', () => laden(ctx));
-    await ergebnisse();
-    if (location.hash === '#ergebnisse') document.getElementById('ergebnisse')?.scrollIntoView();
+    await Promise.all([ergebnisse(), gehirn(), window.adminFreigabeFach ? window.adminFreigabeFach.zeichne() : null]);
+    const ziel = (location.hash || '').slice(1);
+    if (['ergebnisse', 'freigabe-fach', 'befunde', 'gehirn'].includes(ziel)) document.getElementById(ziel)?.scrollIntoView();
   }
   window.adminWorkforce = { seiten: { mitarbeiter: { id: 'MA', gruppe: 'Betrieb', name: '170 KI-Mitarbeiter', laden } } };
 })();
