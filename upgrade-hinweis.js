@@ -9,7 +9,7 @@
 // Apple 3.1.1: In der iOS-Hülle (und fail-closed auf jedem iOS-Gerät, wie die Preise im
 // Konto-Bereich) erscheint nichts. Nur angemeldet und nur im Plan „Frei“.
 // Eigenes Modul, nachgeladen aus profile-dock.js — die Startseite wird nicht schwerer.
-import { t } from "./i18n/ui.js?v=2026111202";
+import { t } from "./i18n/ui.js?v=2026111203";
 
 export const DOCK_ID = "upgradeDock";
 export const MENUE_ID = "upgradeMenue";
@@ -62,6 +62,8 @@ function sorgeFuerStil(doc) {
     + `#${DOCK_ID}[hidden],#${MENUE_ID}[hidden]{display:none!important}`
     // Das Handy-Menue ist schmal (~180 px): der Knopf steht als eigene Zeile direkt UEBER dem Namen.
     + `#profileDock.mit-upgrade{flex-wrap:wrap}`
+    // Inhaber 12.11.2026: Technik-Status braucht kein Nutzer (ChatGPT hat keinen) – Menüpunkt aus, für alle.
+    + `#profileDockMenu [data-jump="tools"]{display:none!important}`
     + `#${DOCK_ID}:focus-visible,#${MENUE_ID}:focus-visible{outline:2px solid #5eead4;outline-offset:2px}`
     + `#${MENUE_ID}{display:flex!important;align-items:center;gap:12px;width:calc(100% - 16px);margin:8px;padding:12px;border-radius:12px;`
     + `border:1px solid rgba(47,208,189,.5);background:linear-gradient(135deg,rgba(47,208,189,.18),rgba(94,224,240,.08));color:inherit;font:inherit;text-align:left;cursor:pointer}`
@@ -128,6 +130,17 @@ export function initUpgradeHinweis(doc = document, win = window) {
   // Plan-Zeile kommt asynchron (spur-start.js, /api/billing/status) — darauf warten.
   new win.MutationObserver(zeichne).observe(dock, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["aria-busy"] });
   win.addEventListener("storage", zeichne);
+  // „Verbrauch“ läuft über den normalen App-Weg; die Kostenschutz-Seite leitet selbst zu Konto →
+  // „Nutzung & Limits“ weiter (unterseiten-einfach.js). Alt-Fehler (Screenshot Inhaber 12.11.2026):
+  // Menüpunkte mit Seitensprung (Verbrauch, Papierkorb) ließen das Profilmenü offen über der Seite.
+  doc.addEventListener("click", (e) => {
+    if (!e.target?.closest?.("#profileDockMenu [data-jump]")) return;
+    win.setTimeout(() => {
+      const menue = doc.getElementById("profileDockMenu");
+      if (menue) menue.hidden = true;
+      dockKnopf.setAttribute("aria-expanded", "false");
+    }, 0);
+  });
   zeichne();
   return zeichne;
 }

@@ -10,7 +10,9 @@
 // Nur bis 900 px Breite (Handy/Tablet); am Computer bleibt die Seitenleiste.
 // Eigenes Modul (800-Zeilen-Regel), Stil aus dem Modul, keine Aenderung am
 // gesperrten Start-Buendel.
-import { t } from "./i18n/ui.js?v=2026111202";
+import { t } from "./i18n/ui.js?v=2026111203";
+// Systemzustand/Kosten kinderleicht (Inhaber 12.11.2026), mit den Unterseiten nachgeladen.
+import "./unterseiten-einfach.js?v=2026111203";
 
 export const KNOPF_ID = "ansichtSchliessen";
 const STIL_ID = "ansicht-schliessen-stil";
@@ -25,6 +27,19 @@ export function brauchtKnopf(viewId) {
 /** Aktive Ansicht (Element .view.is-active) als ID, sonst "". */
 export function aktiveAnsicht(doc = document) {
   return doc.querySelector(".view.is-active")?.id || "";
+}
+
+/** Hat die aktive Ansicht schon ein sichtbares X (view-chrome.js)? Dann kein zweites (Inhaber 12.11.2026: „X ist 2 mal“). */
+export function hatEigenesX(doc = document, win = window) {
+  const x = doc.querySelector(".view.is-active .view-chrome-close");
+  if (!x) return false;
+  try {
+    const stil = win.getComputedStyle(x);
+    const rahmen = x.getBoundingClientRect();
+    return stil.display !== "none" && stil.visibility !== "hidden" && rahmen.width > 0 && rahmen.height > 0;
+  } catch {
+    return true;
+  }
 }
 
 /** Zum Chat zurueck: Adresse "/" (Suchteil bleibt) und app.js per popstate neu zeichnen lassen. */
@@ -76,13 +91,13 @@ export function initAnsichtSchliessen(doc = document, win = window) {
   if (!doc?.body || doc.getElementById(KNOPF_ID)) return () => {};
   sorgeFuerStil(doc);
   const knopf = baueKnopf(doc, win);
-  const zeichne = () => { knopf.hidden = !brauchtKnopf(aktiveAnsicht(doc)); };
+  const zeichne = () => { knopf.hidden = !brauchtKnopf(aktiveAnsicht(doc)) || hatEigenesX(doc, win); };
   // Ansichtswechsel = Klassenwechsel an einem .view-Element; nur diese zaehlen.
   const beobachter = new win.MutationObserver((liste) => {
-    if (liste.some((m) => m.target?.classList?.contains("view"))) zeichne();
+    if (liste.some((m) => m.target?.classList?.contains("view"))) win.requestAnimationFrame(zeichne);
   });
   beobachter.observe(doc.body, { subtree: true, attributes: true, attributeFilter: ["class"] });
-  win.addEventListener("popstate", () => win.setTimeout(zeichne, 0));
+  win.addEventListener("popstate", () => win.setTimeout(zeichne, 50));
   zeichne();
   return zeichne;
 }
