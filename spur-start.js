@@ -18,18 +18,18 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026111217";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026111218";
 // Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
-import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026111217";
-import { Icons } from "/assets/components.js?v=2026111217";
+import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026111218";
+import { Icons } from "/assets/components.js?v=2026111218";
 // Abo-Stand ueber den gemeinsamen Speicher (F6, 2026-09-14): EINE Anfrage je
 // Laden fuer Planzeile, Onboarding-Karte und Abo-Panel — dieselbe Kennung wie
 // in account-sessions.js, sonst zweite Instanz und wieder zwei Anfragen.
-import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026111217";
+import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026111218";
 // Nutzerreise USA 2026-08-23: die Spur blieb auf Englisch deutsch ("Neuer
 // Chat", "Heute", "Gestern", "Alle 127 Gespräche"). t() liefert fail-safe den
 // deutschen Quelltext, solange kein Wörterbuch geladen ist.
-import { t } from "./i18n/ui.js?v=2026111217";
+import { t } from "./i18n/ui.js?v=2026111218";
 
 function alleGespraeche(n) {
   return t("Alle {n} Gespräche").replace("{n}", String(n));
@@ -212,7 +212,7 @@ async function zeichneStartSpur(halter) {
   const projekteHalter = document.createElement("div");
   projekteHalter.className = "spur-projekte";
   liste.append(projekteHalter);
-  import("./projekte-spur.js?v=2026111217").then((m) => m.zeichneProjekteSpur(projekteHalter)).catch(() => {});
+  import("./projekte-spur.js?v=2026111218").then((m) => m.zeichneProjekteSpur(projekteHalter)).catch(() => {});
   const bot = punkt({ icon: "automation", text: "smejjBot", aktion: () => geheZu("automation") });
   bot.classList.add("nur-desktop");
   liste.append(bot);
@@ -222,7 +222,7 @@ async function zeichneStartSpur(halter) {
   try { chats = await listChats(); } catch { /* Spur bleibt ohne Verlauf nutzbar */ }
   if (veraltet()) return;
   const sortiert = [...chats]
-    .filter((chat) => chat && chat.updatedAt)
+    .filter((chat) => chat && chat.updatedAt && !chat.projectId) // Projekt-Chats stehen im Projekt (wie ChatGPT)
     .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
     .slice(0, MAX_LETZTE);
   let letzteGruppe = "";

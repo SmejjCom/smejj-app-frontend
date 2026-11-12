@@ -7,8 +7,8 @@
 // (alte App, Safari), bleibt alles wie bisher: keine Preise, kein Kauf.
 // Ablauf: Kauf in der App mit Konto-Token -> signierter Beleg -> smejj-Server prüft ihn bei Apple-
 // Zertifikaten und stellt das Konto um. Die Seite selbst schaltet nie etwas frei.
-import { API_ORIGIN } from "./config.js?v=2026111217";
-import { t } from "./i18n/ui.js?v=2026111217";
+import { API_ORIGIN } from "./config.js?v=2026111218";
+import { t } from "./i18n/ui.js?v=2026111218";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1"; // wie account-sessions.js
 export const APPLE_PRODUKTE = Object.freeze([

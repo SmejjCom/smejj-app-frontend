@@ -16,10 +16,10 @@ import {
   listChats, listProjekte, benenneProjektUm, setzeProjektAnweisung, setzeProjektFarbe,
   loescheProjekt, setzeChatProjekt, neuesGespraechImBereich, newChat, openChat, getProjekt,
   renameChat, deleteChat
-} from "/assets/chat-store.js?v=2026111217";
-import { ordnerSvg, oeffneFenster, oeffneNeuesProjekt, farbWahl } from "./projekte-fenster.js?v=2026111217";
+} from "/assets/chat-store.js?v=2026111218";
+import { ordnerSvg, oeffneFenster, oeffneNeuesProjekt, farbWahl } from "./projekte-fenster.js?v=2026111218";
 
-const dateienModul = () => import("./projekt-dateien.js?v=2026111217");
+const dateienModul = () => import("./projekt-dateien.js?v=2026111218");
 
 function geheZu(view) {
   document.querySelector(`.nav-vier .nav-button[data-view="${view}"], .nav-button[data-view="${view}"]`)?.click();
@@ -87,6 +87,7 @@ function stil() {
 .pj-zweit{display:flex;flex-direction:column;gap:2px;text-align:left}
 .pj-zweit b{font-size:15px;font-weight:600}
 .pj-zweit span{font-size:13px;opacity:.7}
+.pj-kurz{display:none!important}
 .pj-reiter{font-size:14px;font-weight:600;opacity:.8;margin:0 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(127,127,127,.2)}
 .pj-zeile{display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(127,127,127,.14);position:relative}
 .pj-zeile-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
@@ -118,7 +119,7 @@ ${S} .pj-menue button:hover{background:rgba(127,127,127,.18)!important}
 ${S} .pj-gefahr{color:#ff7b72!important}
 ${S} .pj-x{padding:4px 8px!important;flex:none!important}
 ${S} .pj-unten button{text-decoration:underline;padding:0!important}
-@media (max-width:640px){.pj-titel{font-size:22px}.pj-karten2{grid-template-columns:1fr}.pj-raster{grid-template-columns:1fr}.pj-datum{display:none}}`;
+@media (max-width:640px){#bereicheListe{display:flex;flex-direction:column;min-height:calc(100dvh - 140px)}.pj-lang{display:none!important}.pj-kurz{display:block!important}.pj-zurueck,.pj-unten{display:none!important}.pj-kopf .pj-titel{justify-content:center;text-align:center}.pj-kopf::before{content:"";width:36px;flex:none}.pj-eingabe{order:99;position:sticky;bottom:calc(env(safe-area-inset-bottom) + 10px);margin-top:auto;background:#18191c;z-index:5}.pj-titel{font-size:22px}.pj-karten2{grid-template-columns:1fr 1fr;gap:8px}.pj-raster{grid-template-columns:1fr}.pj-datum{display:none}}`;
   document.head.append(s);
 }
 
@@ -215,6 +216,7 @@ async function projektSeite({ chats, projekte, proProjekt }, projekt) {
     { text: "Umbenennen", klick: () => umbenennen(projekt) },
     { text: "Farbe ändern", klick: () => farbeAendern(projekt) },
     ...(window.smejjProjektOrdner ? [{ text: "Ordner für Code verbinden", klick: () => ordnerVerbinden(projekt) }] : []),
+    { text: "Sicherung & Export", klick: () => geheZu("projects") },
     { text: "Projekt löschen", gefahr: true, klick: () => loeschen(projekt, seine.length) }
   ]);
   seite.append(el("div", { class: "pj-kopf", style: "position:relative" },
@@ -222,7 +224,7 @@ async function projektSeite({ chats, projekte, proProjekt }, projekt) {
     ...kopfMenue));
 
   // Eingabe „Neuer Chat in …“ — wie ChatGPT: tippen, senden, der Chat gehoert ins Projekt.
-  const feld = el("textarea", { rows: "1", "aria-label": `Neuer Chat in ${projekt.name}`, placeholder: `Neuer Chat in „${projekt.name}“` });
+  const feld = el("textarea", { rows: "1", "aria-label": `Neuer Chat in ${projekt.name}`, placeholder: `Neuer Chat in ${projekt.name}` });
   feld.addEventListener("input", () => { feld.style.height = "auto"; feld.style.height = `${Math.min(feld.scrollHeight, 180)}px`; });
   const senden = () => starteChat(projekt.id, feld.value);
   feld.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); senden(); } });
@@ -232,11 +234,13 @@ async function projektSeite({ chats, projekte, proProjekt }, projekt) {
   try { dateiZahl = (await (await dateienModul()).listeDateien(projekt.id)).length; } catch { /* 0 */ }
   seite.append(el("div", { class: "pj-karten2" },
     el("button", { type: "button", class: "pj-zweit", onclick: () => dateienFenster(projekt) },
-      el("b", { text: dateiZahl ? `Dateien (${dateiZahl})` : "Dateien hinzufügen" }),
-      el("span", { text: "Chats in diesem Projekt können den Inhalt der Dateien nutzen" })),
+      el("b", { text: "Dateien" }),
+      el("span", { class: "pj-lang", text: "Chats in diesem Projekt können den Inhalt der Dateien nutzen" }),
+      el("span", { class: "pj-kurz", text: dateiZahl ? `${dateiZahl} ${dateiZahl === 1 ? "Datei" : "Dateien"}` : "Hinzufügen" })),
     el("button", { type: "button", class: "pj-zweit", onclick: () => anweisungenFenster(projekt) },
-      el("b", { text: projekt.anweisung ? "Anweisungen bearbeiten" : "Anweisungen hinzufügen" }),
-      el("span", { text: projekt.anweisung ? projekt.anweisung.slice(0, 70) : "Lege fest, wie smejj in diesem Projekt antwortet" }))));
+      el("b", { text: "Anweisungen" }),
+      el("span", { class: "pj-lang", text: projekt.anweisung ? projekt.anweisung.slice(0, 70) : "Lege fest, wie smejj in diesem Projekt antwortet" }),
+      el("span", { class: "pj-kurz", text: projekt.anweisung ? projekt.anweisung.slice(0, 24) + (projekt.anweisung.length > 24 ? " …" : "") : "Hinzufügen" }))));
 
   // Chats des Projekts.
   seite.append(el("p", { class: "pj-reiter", text: seine.length ? `Chats in diesem Projekt (${seine.length})` : "Chats in diesem Projekt" }));

@@ -186,8 +186,8 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1120";
-const ASSET_BUILD = "2026111217";
+const CACHE_NAME = "smejj-shell-v1121";
+const ASSET_BUILD = "2026111218";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -391,6 +391,7 @@ const SHELL = [
   "/assets/projekt-dateien.js",
   "/assets/projekte-fenster.js",
   "/assets/projekte-spur.js",
+  "/assets/projekt-kontext.js",
   "/assets/topbar-krume.js",
   "/assets/spur-start.js",
   "/assets/code-flaeche.js",
@@ -667,7 +668,6 @@ function isHtmlRequest(request, url) {
   if (request.mode === "navigate" || request.destination === "document") return true;
   return url.pathname === "/" || url.pathname.endsWith(".html") || url.pathname.endsWith("/");
 }
-
 // Die App-Routen (Spiegel von public/view-routes.js — siehe Begruendung unten
 // beim Navigations-Zweig). tests/sw-app-routen.test.mjs vergleicht beide Listen.
 const APP_ROUTEN = new Set([

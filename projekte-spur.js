@@ -3,11 +3,13 @@
 // oeffnet die Projektseite. Chats aus der Liste darunter lassen sich am Computer
 // auf ein Projekt ziehen. Faellt dieses Modul aus, bleibt der Punkt „Projekte“.
 
-import { listProjekte, setzeChatProjekt } from "/assets/chat-store.js?v=2026111217";
-import { ordnerSvg, oeffneNeuesProjekt } from "./projekte-fenster.js?v=2026111217";
+import { listProjekte, setzeChatProjekt } from "/assets/chat-store.js?v=2026111218";
+import { ordnerSvg, oeffneNeuesProjekt } from "./projekte-fenster.js?v=2026111218";
 
 const MAX_SICHTBAR = 5;
-const projektSeite = () => import("./arbeitsbereiche.js?v=2026111217");
+// Projekt-Kopf im Chat (Bild 3) mitladen — nur Nebenwirkung, kein Start-Gewicht.
+import("./projekt-kontext.js?v=2026111218").catch(() => {});
+const projektSeite = () => import("./arbeitsbereiche.js?v=2026111218");
 
 function stil() {
   if (document.getElementById("projekteSpurStil")) return;
@@ -15,7 +17,8 @@ function stil() {
   s.id = "projekteSpurStil";
   s.textContent = `
 .spur-projekte{display:flex;flex-direction:column}
-.spur-projekte .nav-button{padding-left:22px}
+.nav-start .nav-button[data-ziel="arbeitsbereiche"]{display:none!important}
+.spur-projekte .spur-projekte-kopf{cursor:pointer;background:none;border:0;text-align:left;width:100%}
 .spur-projekte .spur-projekt-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .spur-projekte .nav-button.ist-ziel{outline:2px dashed rgba(95,212,200,.8);outline-offset:-2px}
 .spur-projekte .button-icon svg{width:18px;height:18px}`;
@@ -53,6 +56,16 @@ export async function zeichneProjekteSpur(halter) {
   try { projekte = await listProjekte(); } catch { projekte = []; }
   if (!halter.isConnected) return;
   const stueck = document.createDocumentFragment();
+  // Gruppen-Ueberschrift wie bei ChatGPT; ein Klick zeigt alle Projekte.
+  const kopf = document.createElement("div");
+  kopf.className = "nav-gruppe spur-projekte-kopf";
+  kopf.setAttribute("role", "button");
+  kopf.tabIndex = 0;
+  kopf.textContent = "Projekte";
+  const alle = () => document.querySelector('.nav-button[data-view="arbeitsbereiche"]')?.click();
+  kopf.addEventListener("click", alle);
+  kopf.addEventListener("keydown", (e) => { if (e.key === "Enter") alle(); });
+  stueck.append(kopf);
   stueck.append(eintrag({ svg: NEU_SVG, text: "Neues Projekt", klick: () => oeffneNeuesProjekt((id) => oeffne(id)) }));
   const sortiert = [...projekte].sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
   for (const projekt of sortiert.slice(0, MAX_SICHTBAR)) {
