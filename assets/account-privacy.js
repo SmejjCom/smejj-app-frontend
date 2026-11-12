@@ -1,23 +1,25 @@
-import { STORAGE_KEYS } from "./config.js?v=2026111211";
+import { STORAGE_KEYS } from "./config.js?v=2026111212";
 import { initServerSessionControls, fetchLoginMethods, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
-  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026111211";
-import { languageOptionsMarkup } from "./language-options.js?v=2026111211";
-import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026111211";
-import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026111211";
-import { clearProfilePicture } from "./profile-picture-store.js?v=2026111211";
-import { afterFirstPaint } from "./deferred-start.js?v=2026111211";
+  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026111212";
+import { languageOptionsMarkup } from "./language-options.js?v=2026111212";
+import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026111212";
+import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026111212";
+import { clearProfilePicture } from "./profile-picture-store.js?v=2026111212";
+import { afterFirstPaint } from "./deferred-start.js?v=2026111212";
 // Ohne ?v=: siehe die Begruendung in account-auth-state.js. Eine Marke hier
 // wuerde erzwingen, dass diese ABO-GESPERRTE Datei bei jeder Stil-Aenderung
 // wieder angefasst wird — genau das soll die Auslagerung verhindern.
-import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026111211";
+import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026111212";
 // Gleicher Schluessel wie in profile-dock-menu.js — bewusst dupliziert statt
 // importiert (wie TOKEN_KEY in auth-gate.js): profile-dock-menu.js liegt im
 // Startbuendel, diese Datei wird nachgeladen. Ein Import zoege das Startmodul
 // unter einer zweiten Marke herein — genau die Falle, vor der die Markenkette
 // warnt (zwei Kopien mit getrenntem Zustand).
 const KONTO_REITER_SCHLUESSEL = "smejj.konto.reiter.v1";
-import { usageSummary } from "./usage-meter.js?v=2026111211";
-import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026111211";
+import { usageSummary } from "./usage-meter.js?v=2026111212";
+import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026111212";
+// Apple-In-App-Kauf in der iOS-App (Inhaber 12.11.2026: „Soll mit Plus usw Pakete sein überall, Mach überall rein.“)
+import { appleBruecke, appleKaufMarkup, appleVerwalten, bindeAppleKauf, zeichneAppleKnoepfe } from "./apple-kauf.js?v=2026111212";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const PERSONAL_KEY = "smejj.personalization.v1";
@@ -81,7 +83,8 @@ export function initAccountPrivacySurface() {
   } catch { /* Speicher gesperrt: der Standard greift ohnehin */ }
   // Onboarding ZUERST: es liest den Login-Marker aus der Adresse, BEVOR die
   // Bereinigung unten ihn entfernt (erscheint nur einmal, smejj.onboarding.v1).
-  initOnboardingWelcome(STRIPE_PLAN_LINKS, document, fetchBillingStatus);
+  // Nicht in der iOS-App: die Begruessung zeigt Web-Preise und Stripe-Links (Apple 3.1.1).
+  if (!iosHuelle()) initOnboardingWelcome(STRIPE_PLAN_LINKS, document, fetchBillingStatus);
   // Mehrfach zeitversetzt: der app.js-Router (Start-Lock, nicht anfassbar)
   // haengt beim Ansichtswechsel location.search wieder an — je nach Ladetempo
   // gewinnt er das Rennen. Die spaeteren Durchlaeufe raeumen dann endgueltig auf.
@@ -186,6 +189,7 @@ function renderBillingState(view, billing) {
       knopf.textContent = t("Zahlungspflichtig abonnieren");
       knopf.disabled = false;
     }
+    if (iosHuelle()) zeichneAppleKnoepfe(panel, billing);
     return;
   }
   const datum = billing.periodEnd
@@ -222,6 +226,7 @@ function renderBillingState(view, billing) {
       knopf.textContent = t("Plan wechseln");
     }
   }
+  if (iosHuelle()) zeichneAppleKnoepfe(panel, billing);
 }
 
 // Kundenportal oeffnen: bevorzugt eine direkte Portal-Sitzung vom Server
@@ -276,6 +281,12 @@ function markup() {
 
 function bind(view) {
   activate(view, "identity");
+  // iOS-App ab 1.0.6: Plaene ueber Apple (nur wenn die Kauf-Bruecke da ist; sonst bleibt alles wie bisher).
+  bindeAppleKauf(view, {
+    holeBilling: () => billingAktuell,
+    setzeBilling: (stand) => { billingCheckoutRef = String(stand.checkoutRef || billingCheckoutRef); billingAktuell = stand; renderBillingState(view, stand); },
+    ausgabe: (text) => output(view, text)
+  });
   // Der Aufrufer darf den Reiter mitgeben ("Mein Plan" im Profilmenue) — als
   // Merknotiz, NICHT im Hash: der gehoert dem Router, der ihn als
   // ANSICHTSNAMEN liest (mit "#billing" landete das ganze Konto auf der
@@ -434,6 +445,11 @@ function handleCancelSubscription(view) {
   // Zahlungsmittel, und Apple wertet das nach 3.1.1 als fremden Bezahlweg. Die
   // Kuendigung bleibt trotzdem moeglich — ueber die vorbereitete E-Mail unten.
   // Apple stoert sich am Kauf, nicht am Beenden.
+  // Apple-Abo (in der iOS-App gekauft): gekuendigt wird in Apples Abo-Verwaltung.
+  if (iosHuelle() && billingAktuell?.quelle === "apple" && appleVerwalten()) {
+    output(view, t("Kündigung: Apples Abo-Verwaltung ist geöffnet. Dort kannst du dein Abo sofort kündigen."));
+    return;
+  }
   if (!iosHuelle()) {
     // Mit aktivem Abo geht es direkt in die eigene Portal-Sitzung (ohne
     // erneute Stripe-Anmeldung); sonst ueber den oeffentlichen Login-Link.
@@ -629,6 +645,8 @@ function iosHuelle() {
 // unserer Website" — das waere nach 3.1.1 wieder eine Handlungsaufforderung).
 function planKaufTeil() {
   if (iosHuelle()) {
+    // Ab App 1.0.6: Kauf nur ueber Apple (Preise von Apple). Ohne Bruecke (alte App, Safari) wie bisher.
+    if (appleBruecke()) return appleKaufMarkup();
     return `<p class="account-note">${t("In dieser App wird nichts verkauft.")}</p>`;
   }
   return `<p class="account-note">${t("Alle Preise sind Gesamtpreise pro Monat inkl. gesetzlicher Umsatzsteuer. Das kostenpflichtige Abo hat eine Laufzeit von einem Monat und verlängert sich automatisch um jeweils einen weiteren Monat, bis du kündigst. Jederzeit zum Ende des bezahlten Monats kündbar.")}</p><div class="plan-karten"><div class="plan-karte ist-beliebt"><div class="plan-kopf"><h4>Plus</h4><span class="plan-beliebt">${t("Beliebt")}</span></div><p class="plan-preis"><b>9 €</b> ${t("/ Monat")}</p><small>${t("inkl. USt.")}</small><ul><li>${t("1 000 Nachrichten")}</li><li>${t("Premium-Stimme")}</li><li>${t("Schnellere Antworten")}</li></ul><button id="planPlusOpen" type="button" class="plan-knopf">${t("Zahlungspflichtig abonnieren")}</button></div><div class="plan-karte"><div class="plan-kopf"><h4>Pro</h4></div><p class="plan-preis"><b>19 €</b> ${t("/ Monat")}</p><small>${t("inkl. USt.")}</small><ul><li>${t("Alles aus Plus")}</li><li>${t("Unbegrenzte Nachrichten")}</li><li>${t("Coding-Agent & Projekte")}</li></ul><button id="planProOpen" type="button" class="plan-knopf">${t("Zahlungspflichtig abonnieren")}</button></div><div class="plan-karte"><div class="plan-kopf"><h4>Max</h4></div><p class="plan-preis"><b>39 €</b> ${t("/ Monat")}</p><small>${t("inkl. USt.")}</small><ul><li>${t("Alles aus Pro")}</li><li>${t("5× Limits")}</li><li>${t("Früher Zugriff auf Neues")}</li><li>${t("Direkter Support")}</li></ul><button id="planMaxOpen" type="button" class="plan-knopf">${t("Zahlungspflichtig abonnieren")}</button></div></div><style>.plan-karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0}.plan-karte{display:flex;flex-direction:column;gap:6px;padding:16px;border:1px solid rgba(127,127,127,.35);border-radius:16px!important;background:rgba(255,255,255,.03)}.plan-karte.ist-beliebt{border-color:#2fd0bd;box-shadow:0 0 0 1px #2fd0bd inset;background:linear-gradient(160deg,rgba(47,208,189,.12),rgba(94,224,240,.03))}.plan-kopf{display:flex;align-items:center;justify-content:space-between;gap:8px}.plan-kopf h4{margin:0;font-size:18px}.plan-beliebt{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:#2fd0bd;color:#06201c}.plan-preis{margin:4px 0 0;font-size:15px}.plan-preis b{font-size:28px}.plan-karte small{opacity:.7}.plan-karte ul{margin:8px 0 10px;padding-left:18px;display:grid;gap:4px}.plan-karte li{font-size:15px!important;line-height:1.45}.plan-knopf{margin-top:auto;min-height:48px;padding:10px 14px;border-radius:12px!important;font-size:16px!important;font-weight:700;line-height:1.25}.plan-karte.ist-beliebt .plan-knopf{background:linear-gradient(90deg,#2fd0bd,#5ee0f0);color:#06201c;border:0}</style><p class="account-note">${t("Mit „Zahlungspflichtig abonnieren“ wirst du zum Zahlungsdienstleister Stripe weitergeleitet und schließt dort ein kostenpflichtiges Abo ab. Kartendaten liegen ausschließlich bei Stripe, nie auf smejj-Servern. Nach der Zahlung bekommst du eine Bestätigung per E-Mail. Es gelten unsere")} <a href="/agb.html">${t("AGB")}</a> ${t("und die")} <a href="/widerruf.html">${t("Widerrufsbelehrung")}</a>.</p>`;

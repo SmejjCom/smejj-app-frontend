@@ -189,8 +189,8 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1114";
-const ASSET_BUILD = "2026111211";
+const CACHE_NAME = "smejj-shell-v1115";
+const ASSET_BUILD = "2026111212";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -276,6 +276,7 @@ const SHELL = [
   "/assets/mobil-ruhe.js",
   "/assets/mobil-ruhe.css",
   "/assets/account-privacy.js",
+  "/assets/apple-kauf.js",
   "/assets/profile-dock.js",
   "/assets/profile-dock-menu.js",
   "/assets/profile-menue-tasten.js",
@@ -632,7 +633,6 @@ self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(AKTIVER_CACHE).then((cache) => fuelleSpeicher(cache, INSTALL_LISTE)));
   self.skipWaiting();
 });
-
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== AKTIVER_CACHE).map((key) => caches.delete(key))))

@@ -6,14 +6,17 @@
 // 3. Plan-Limit im Chat: siehe chat-stream.js (istPlanLimit) — nur wenn der Server es meldet.
 // Ziel jedes Knopfes: Konto → Reiter „Mein Plan“ (dieselbe Merknotiz wie profile-dock-menu.js).
 //
-// Apple 3.1.1: In der iOS-Hülle (und fail-closed auf jedem iOS-Gerät, wie die Preise im
-// Konto-Bereich) erscheint nichts. Nur angemeldet und nur im Plan „Frei“.
+// Apple 3.1.1: Auf iOS erscheint der Hinweis nur in der App ab 1.0.6 mit Apple-Kauf-Brücke
+// (Kauf dort nur über Apple, ohne Web-Preis; Inhaber 12.11.2026: „Soll mit Plus usw Pakete sein
+// überall, Mach überall rein.“). Ohne Brücke (alte App, Safari auf iOS) fail-closed nichts.
+// Nur angemeldet und nur im Plan „Frei“.
 // Eigenes Modul, nachgeladen aus profile-dock.js — die Startseite wird nicht schwerer.
-import { t } from "./i18n/ui.js?v=2026111211";
+import { t } from "./i18n/ui.js?v=2026111212";
 // Mitgeladen (12.11.2026): Glas für Seiten-/Profilmenü und Selbstheilung veralteter Zwischenspeicher.
-import "./glas-menue.js?v=2026111211";
-import "./aktuell-halten.js?v=2026111211";
-import "./bild-erstellen.js?v=2026111211";
+import "./glas-menue.js?v=2026111212";
+import "./aktuell-halten.js?v=2026111212";
+import "./bild-erstellen.js?v=2026111212";
+import { appleBruecke } from "./apple-kauf.js?v=2026111212";
 
 export const DOCK_ID = "upgradeDock";
 export const MENUE_ID = "upgradeMenue";
@@ -41,9 +44,9 @@ export function istAngemeldet(speicher = globalThis.localStorage) {
   }
 }
 
-/** Zeigen? Nur Plan „Frei“, angemeldet, nicht iOS. Input: Plantext der Dock-Zeile. */
-export function sollZeigen(planText, { angemeldet = istAngemeldet(), ios = istIos() } = {}) {
-  return angemeldet && !ios && String(planText || "").trim() === "Frei";
+/** Zeigen? Nur Plan „Frei“, angemeldet; auf iOS nur mit Apple-Kauf-Brücke. Input: Plantext der Dock-Zeile. */
+export function sollZeigen(planText, { angemeldet = istAngemeldet(), ios = istIos(), apple = Boolean(appleBruecke()) } = {}) {
+  return angemeldet && (!ios || apple) && String(planText || "").trim() === "Frei";
 }
 
 /** Zum Reiter „Mein Plan“ (ohne Neuladen; app.js hört auf popstate). */
@@ -102,7 +105,9 @@ function baueMenueEintrag(doc, win) {
   const titel = doc.createElement("strong");
   titel.textContent = t("Auf Plus upgraden");
   const vorteil = doc.createElement("small");
-  vorteil.textContent = t("1 000 Nachrichten, Premium-Stimme, schnellere Antworten · 9 €/Monat");
+  // In der iOS-App ohne Web-Preis: dort gilt der Apple-Preis der Plan-Karte (Landeswährung).
+  vorteil.textContent = istIos() ? t("1 000 Nachrichten, Premium-Stimme, schnellere Antworten")
+    : t("1 000 Nachrichten, Premium-Stimme, schnellere Antworten · 9 €/Monat");
   text.append(titel, vorteil);
   eintrag.append(stern, text);
   // Über „Mein Plan“ gehen, wenn das Menü-Modul geladen ist: schließt das Menü sauber.
