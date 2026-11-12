@@ -6,9 +6,9 @@
 //  2) Während der Übertragung: KEIN Zeichensalat mehr (Inhaber-Screenshot: base64-Wand vor dem Bild).
 //     Die Rohdaten bleiben im Chat (daraus entsteht das Bild), werden aber nicht mehr angezeigt.
 //  3) Fertig: Bild von Rand zu Rand (Handy), weich scharf werdend, Glasleiste Sichern/Teilen/Ändern/Neu.
-//  4) Antippen: Vollbild über den ganzen Bildschirm, Zoom (2 Finger / Doppeltipp), nach unten wischen schließt.
+//  4) Frisch fertig: öffnet sich von selbst im Vollbild; später per Antippen. Vollbild über den ganzen Bildschirm, Zoom (2 Finger / Doppeltipp), nach unten wischen schließt.
 // Nachgeladen über upgrade-hinweis.js – die Startseite wird nicht schwerer, gesperrte Dateien bleiben unberührt.
-import { t } from "./i18n/ui.js?v=2026111210";
+import { t } from "./i18n/ui.js?v=2026111211";
 
 export const STIL_ID = "bild-erstellen-stil";
 export const DAUER_KEY = "smejj.bild.dauer.v1";
@@ -269,6 +269,9 @@ function rahmeEin(bild) {
   rahmen.append(bild, knoepfe(bild));
   rahmen.addEventListener("click", () => oeffneVollbild(bild));
   if (erster) { merkeDauer(Date.now() - erster); erster = 0; }
+  // Inhaber 12.11.2026: „wenn Bild fertig soll Vollbild sein, wie im Mockup“ – frisch erstellte Bilder
+  // öffnen sich einmal von selbst im Vollbild (alte Bilder im Verlauf nicht). X/Wischen → zurück zum Chat.
+  if (neu && !document.querySelector(".bild-vollbild")) setTimeout(() => { if (bild.isConnected) oeffneVollbild(bild); }, 700);
 }
 
 // ---------------------------------------------------------------------------
@@ -370,7 +373,7 @@ export function starteBildErstellen(doc = globalThis.document) {
   new MutationObserver(() => {
     if (geplant) return;
     geplant = true;
-    (globalThis.requestAnimationFrame || setTimeout)(() => { geplant = false; pruefe(false); });
+    setTimeout(() => { geplant = false; pruefe(false); }, 60); // fester Takt: requestAnimationFrame ruht, wenn nicht gezeichnet wird
   }).observe(doc.body, { childList: true, subtree: true });
   setInterval(() => { if (laufend.size) pruefe(true); }, 500);
   pruefe(true);

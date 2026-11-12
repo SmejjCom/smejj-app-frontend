@@ -9,11 +9,11 @@
 // Apple 3.1.1: In der iOS-Hülle (und fail-closed auf jedem iOS-Gerät, wie die Preise im
 // Konto-Bereich) erscheint nichts. Nur angemeldet und nur im Plan „Frei“.
 // Eigenes Modul, nachgeladen aus profile-dock.js — die Startseite wird nicht schwerer.
-import { t } from "./i18n/ui.js?v=2026111210";
+import { t } from "./i18n/ui.js?v=2026111211";
 // Mitgeladen (12.11.2026): Glas für Seiten-/Profilmenü und Selbstheilung veralteter Zwischenspeicher.
-import "./glas-menue.js?v=2026111210";
-import "./aktuell-halten.js?v=2026111210";
-import "./bild-erstellen.js?v=2026111210";
+import "./glas-menue.js?v=2026111211";
+import "./aktuell-halten.js?v=2026111211";
+import "./bild-erstellen.js?v=2026111211";
 
 export const DOCK_ID = "upgradeDock";
 export const MENUE_ID = "upgradeMenue";
