@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "Nom, formule, réglages, aide. Un seul endroit, pas cinq.",
   "Überspringen": "Passer",
   "Mein Konto": "Mon compte",
+  "Meine Geräte": "Mes appareils",
   "Papierkorb": "Corbeille",
   "Systemzustand": "État du système",
   "Hilfe & Rückmeldung": "Aide et commentaires",

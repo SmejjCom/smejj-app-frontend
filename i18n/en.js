@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "Name, plan, settings, help. One place, not five.",
   "Überspringen": "Skip",
   "Mein Konto": "My account",
+  "Meine Geräte": "My devices",
   "Papierkorb": "Trash",
   "Systemzustand": "System status",
   "Hilfe & Rückmeldung": "Help & feedback",

@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "নাম, প্ল্যান, সেটিংস, সাহায্য। পাঁচ জায়গায় নয়, এক জায়গায়।",
   "Überspringen": "এড়িয়ে যান",
   "Mein Konto": "আমার অ্যাকাউন্ট",
+  "Meine Geräte": "আমার ডিভাইস",
   "Papierkorb": "ট্র্যাশ",
   "Systemzustand": "সিস্টেমের অবস্থা",
   "Hilfe & Rückmeldung": "সাহায্য ও মতামত",

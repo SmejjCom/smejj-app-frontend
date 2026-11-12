@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "Ad, plan, ayarlar, yardım. Beş yerde değil, tek yerde.",
   "Überspringen": "Atla",
   "Mein Konto": "Hesabım",
+  "Meine Geräte": "Cihazlarım",
   "Papierkorb": "Çöp kutusu",
   "Systemzustand": "Sistem durumu",
   "Hilfe & Rückmeldung": "Yardım ve geri bildirim",

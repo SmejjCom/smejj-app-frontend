@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "الاسم والخطة والإعدادات والمساعدة. مكان واحد لا خمسة.",
   "Überspringen": "تخطّي",
   "Mein Konto": "حسابي",
+  "Meine Geräte": "أجهزتي",
   "Papierkorb": "سلة المحذوفات",
   "Systemzustand": "حالة النظام",
   "Hilfe & Rückmeldung": "المساعدة والملاحظات",

@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "Nome, piano, impostazioni, aiuto. Un posto solo, non cinque.",
   "Überspringen": "Salta",
   "Mein Konto": "Il mio account",
+  "Meine Geräte": "I miei dispositivi",
   "Papierkorb": "Cestino",
   "Systemzustand": "Stato del sistema",
   "Hilfe & Rückmeldung": "Aiuto e feedback",

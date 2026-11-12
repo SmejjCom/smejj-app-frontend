@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "이름, 요금제, 설정, 도움말. 다섯 곳이 아니라 한 곳에.",
   "Überspringen": "건너뛰기",
   "Mein Konto": "내 계정",
+  "Meine Geräte": "내 기기",
   "Papierkorb": "휴지통",
   "Systemzustand": "시스템 상태",
   "Hilfe & Rückmeldung": "도움말 및 피드백",

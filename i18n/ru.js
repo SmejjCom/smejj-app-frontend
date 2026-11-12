@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "Имя, тариф, настройки, помощь. Одно место, а не пять.",
   "Überspringen": "Пропустить",
   "Mein Konto": "Мой аккаунт",
+  "Meine Geräte": "Мои устройства",
   "Papierkorb": "Корзина",
   "Systemzustand": "Состояние системы",
   "Hilfe & Rückmeldung": "Помощь и отзывы",

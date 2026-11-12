@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "Nome, plano, configurações, ajuda. Um lugar, não cinco.",
   "Überspringen": "Pular",
   "Mein Konto": "Minha conta",
+  "Meine Geräte": "Meus dispositivos",
   "Papierkorb": "Lixeira",
   "Systemzustand": "Estado do sistema",
   "Hilfe & Rückmeldung": "Ajuda e feedback",

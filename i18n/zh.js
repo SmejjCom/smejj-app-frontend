@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "名称、套餐、设置、帮助。只有一个地方，而不是五个。",
   "Überspringen": "跳过",
   "Mein Konto": "我的账户",
+  "Meine Geräte": "我的设备",
   "Papierkorb": "回收站",
   "Systemzustand": "系统状态",
   "Hilfe & Rückmeldung": "帮助与反馈",

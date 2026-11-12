@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "名前、プラン、設定、ヘルプ。5 か所ではなく 1 か所に。",
   "Überspringen": "スキップ",
   "Mein Konto": "マイアカウント",
+  "Meine Geräte": "マイデバイス",
   "Papierkorb": "ゴミ箱",
   "Systemzustand": "システムの状態",
   "Hilfe & Rückmeldung": "ヘルプとフィードバック",

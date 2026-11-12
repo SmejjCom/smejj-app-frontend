@@ -246,6 +246,7 @@ export default {
   "Name, Plan, Einstellungen, Hilfe. Ein Ort, nicht fünf.": "Nama, paket, pengaturan, bantuan. Satu tempat, bukan lima.",
   "Überspringen": "Lewati",
   "Mein Konto": "Akun saya",
+  "Meine Geräte": "Perangkat saya",
   "Papierkorb": "Tempat sampah",
   "Systemzustand": "Status sistem",
   "Hilfe & Rückmeldung": "Bantuan & masukan",
