@@ -7,7 +7,7 @@
 // Settle SOFORT entfernt, damit spaetere, nutzerausgeloeste Aufrufe garantiert
 // frisch laden (kein Stale-Cache). Fail-open bleibt unveraendert: Netzfehler
 // liefern ein Fehlerobjekt, es wird nicht geworfen.
-import { API_ORIGIN, UI_COPY } from "../config.js?v=2026111207";
+import { API_ORIGIN, UI_COPY } from "../config.js?v=2026111208";
 
 const inflightGetJson = new Map();
 

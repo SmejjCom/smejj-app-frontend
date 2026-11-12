@@ -1,2 +1,2 @@
 // smejj.com — Kompatibilität für bereits ausgelieferte Planlinks.
-import "/assets/plan-checkout.js?v=2026111207";
+import "/assets/plan-checkout.js?v=2026111208";

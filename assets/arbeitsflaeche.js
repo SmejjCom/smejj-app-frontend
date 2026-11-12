@@ -14,7 +14,7 @@
 
 // SPRACHE (20.09.2026): Die Karte stand fest auf Deutsch ("… Zeilen",
 // "Rechts oeffnen") und erschien so auch in der englischen Oberflaeche.
-import { t } from "./i18n/ui.js?v=2026111207";
+import { t } from "./i18n/ui.js?v=2026111208";
 
 const MIN_ZEILEN = 20;
 
