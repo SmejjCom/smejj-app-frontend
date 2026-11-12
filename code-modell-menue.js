@@ -9,7 +9,7 @@
 // Rueckruf nach einer Modellwahl. So bleibt das Modul fuer sich pruefbar
 // und es entsteht kein Ringschluss zwischen den beiden Dateien.
 //
-import { t } from "./i18n/ui.js?v=2026111206"; // Begruessung uebersetzt (Betreiber 24.09.2026)
+import { t } from "./i18n/ui.js?v=2026111207"; // Begruessung uebersetzt (Betreiber 24.09.2026)
 
 // ---- Modellwahl (Betreiber 2026-08-17: "warum kann ich bei Code nicht
 // Modelle waehlen?"). Dieselben Speicher wie der Start-Picker, damit Chat und
@@ -38,7 +38,7 @@ export const STUFE_KEY = "smejj.stufe.v1";
 // 1.1–1.3 sind entfernt; eine alte Wahl fuehrt automatisch zur aktuellen Version (migriereAlteWahl). Besteht ein trainiertes
 // Modell das Qualitaetstor, zaehlt die Aufgabe smejj-modell-update die Nummer hoch (1.1, 1.2 …) – dann NUR diese Zeile aendern
 // (und SMEJJ_AKTUELL in app.js, Test tests/code-modell-menue.test.mjs prueft den Gleichstand).
-export const AKTUELLE_VERSION = "smejj 1.0";
+export const AKTUELLE_VERSION = "smejj 1.1";
 export const STANDARD_WAHL = AKTUELLE_VERSION;
 const EIGENE_NAMEN = /^smejj 1(\.\d+)?$/i;
 
