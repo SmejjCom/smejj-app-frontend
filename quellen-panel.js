@@ -1,4 +1,4 @@
-import { t } from "./i18n/ui.js?v=2026111101";
+import { t } from "./i18n/ui.js?v=2026111102";
 
 // smejj.com — Quellen-Panel (Konkurrenz-Radar V5, 2026-08-06).
 //

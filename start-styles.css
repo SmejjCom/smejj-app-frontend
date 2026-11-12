@@ -6208,7 +6208,16 @@ height: 1px;
 overflow: hidden;
 clip-path: inset(50%);
 white-space: nowrap}
+html body .nur-mobil.nur-mobil {
+display: none !important}
 @media (max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px) {
+html body #browserButton.browser-button.browser-button {
+display: none !important}
+html body .spur-reiter [data-reiter="code"] {
+display: none !important}
+html body .sidebar .nav-button.nur-mobil.nur-mobil,
+html body #profileDockMenu .nur-mobil.nur-mobil {
+display: flex !important}
 html.kopf-weg body:has(#start.has-start-chat.is-active) :is(#appMenuButton, #browserButton, #mausButton, #neuerChatStart) {
 transform: none !important;
 opacity: 1 !important;
@@ -6223,7 +6232,7 @@ html.mobil-chat-viewport body:has(#start.view.is-active) :is(#appMenuButton, #br
 top: calc(var(--chat-sichtbar-oben, 0px) + var(--sa-top, 0px) + 6px) !important}
 html body:has(#start.view.is-active) #neuerChatStart.neuer-chat-start {
 top: calc(var(--sa-top, 0px) + 4px);
-right: calc(env(safe-area-inset-right, 0px) + 62px) !important}
+right: calc(env(safe-area-inset-right, 0px) + 10px) !important}
 html.mobil-chat-viewport body:has(#start.view.is-active) #neuerChatStart.neuer-chat-start {
 top: calc(var(--chat-sichtbar-oben, 0px) + var(--sa-top, 0px) + 4px) !important}
 html body:has(#start.view.is-active) :is(#appMenuButton, #browserButton).glass-icon.glass-icon.glass-icon.glass-icon {

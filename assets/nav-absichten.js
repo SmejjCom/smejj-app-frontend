@@ -20,17 +20,19 @@ function loeseAus(absicht) {
     document.querySelector('[data-start-tool="audio"]')?.click();
     return;
   }
-  if (absicht === "bilder") {
+  if (absicht === "bilder" || absicht === "videos") {
     // Nicht den Chip klicken, sondern seine Vorlage direkt einsetzen: der
     // Chip-Klick ging im Getriebe des Ansichtswechsels verloren (live
     // gemessen 2026-08-15 — Feld blieb leer). Die Vorlage kommt trotzdem
     // vom Chip selbst (data-chip), damit Uebersetzungen weiter greifen.
     const feld = document.querySelector("#startMessage");
     if (!feld) return;
+    // "videos" (Mobil-Spur, 11.11.2026): derselbe Weg mit der Video-Vorlage.
+    const video = absicht === "videos";
     const chip = [...document.querySelectorAll(".start-chips button")].find((knopf) =>
-      /bilder|image/i.test(knopf.textContent)
+      (video ? /^generiere ein video/i : /bilder|image/i).test(video ? knopf.dataset.chip || "" : knopf.textContent)
     );
-    const vorlage = chip?.dataset.chip || "Generiere ein Bild von: ";
+    const vorlage = chip?.dataset.chip || (video ? "Generiere ein Video von: " : "Generiere ein Bild von: ");
     feld.value = vorlage.endsWith(" ") ? vorlage : vorlage + " ";
     feld.dispatchEvent(new Event("input", { bubbles: true }));
     feld.focus();

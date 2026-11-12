@@ -8,9 +8,9 @@
 // wachsen darf. Die Navigation laeuft ueber history + popstate — genau den
 // Mechanismus, den app.js bereits fuer Deep-Links verwendet (kein Reload).
 
-import { STORAGE_KEYS } from "./config.js?v=2026111101";
-import { t } from "./i18n/ui.js?v=2026111101";
-import { focusMenuEdge, handleMenuKeyboard } from "./profile-menue-tasten.js?v=2026111101";
+import { STORAGE_KEYS } from "./config.js?v=2026111102";
+import { t } from "./i18n/ui.js?v=2026111102";
+import { focusMenuEdge, handleMenuKeyboard } from "./profile-menue-tasten.js?v=2026111102";
 
 // Oeffnet/schliesst das Menue und verdrahtet die Aktionen.
 // Input: keiner (arbeitet auf #profileDockButton/#profileDockMenu). Output: void.
@@ -19,6 +19,7 @@ export function initProfileDockMenu() {
   const menu = document.querySelector("#profileDockMenu");
   if (!button || !menu || menu.dataset.menuReady) return;
   menu.dataset.menuReady = "true";
+  fuegeGeraeteEin(menu);
   applyLabels(menu);
   // Das Menue MUSS aus der Sidebar heraus: .sidebar hat overflow:hidden und
   // wuerde es abschneiden (live gemessen: 208px Menue in 199px Sidebar). Ein
@@ -49,6 +50,26 @@ export function initProfileDockMenu() {
   document.addEventListener("click", (event) => {
     if (!menu.hidden && !menu.contains(event.target) && event.target !== button) setOpen(button, menu, false);
   });
+}
+
+// Mobil-Entwurf (Inhaber-Freigabe 11.11.2026): "Meine Geräte" unter "Mein
+// Konto". Fuehrt zur echten Liste der angemeldeten Geraete (Konto ->
+// "Anmeldung & Sicherheit", account-sessions.js). Nur am Handy sichtbar
+// (.nur-mobil in design-v20-neuer-chat-oben.css); am Desktop ist die Zeile
+// unsichtbar und wird von der Pfeiltasten-Steuerung uebersprungen.
+export function fuegeGeraeteEin(menu) {
+  if (!menu || menu.querySelector('[data-dock-reiter="security"]')) return false;
+  const konto = menu.querySelector('[data-dock-action="account"][data-dock-reiter="identity"]');
+  if (!konto) return false;
+  const zeile = konto.ownerDocument.createElement("button");
+  zeile.type = "button";
+  zeile.setAttribute("role", "menuitem");
+  zeile.dataset.dockAction = "account";
+  zeile.dataset.dockReiter = "security";
+  zeile.className = "nur-mobil";
+  zeile.textContent = "Meine Geräte";
+  konto.after(zeile);
+  return true;
 }
 
 // Zeichnet den Kopf (Name/E-Mail) neu. Input: displayName, email. Output: void.
@@ -235,7 +256,7 @@ export function schliesseSpurAmHandy(dok = document) {
 // kein Sitzungsdatum, und "Lokale Daten loeschen" bleibt der Weg dafuer.
 async function logout() {
   try {
-    const module = await import("./account-sessions.js?v=2026111101");
+    const module = await import("./account-sessions.js?v=2026111102");
     await module.logoutCurrentSession();
   } catch {
     /* fail-safe: auch ohne Server-Antwort lokal abmelden */
