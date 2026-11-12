@@ -7,7 +7,7 @@ import {
   geraeteBesitzer, getChat, importChat, listChats, neueProjektId, newChat, notifyChanged,
   notifyProjekteChanged, openChat, persistActive, renameChat, rohEigenerChat,
   sauberProjektName, scheduleSave, tx
-} from "./chat-store.js?v=2026111216";
+} from "./chat-store.js?v=2026111217";
 
 // GEMESSEN 2026-09-14 (A-bis-Z, angemeldet): der Papierkorb war IMMER leer.
 // listGeloeschteChats() warf "PAPIERKORB_TAGE is not defined" — die Konstante
@@ -194,6 +194,17 @@ export async function setzeProjektAnweisung(id, text) {
   return true;
 }
 
+/** Farbe des Projekt-Symbols (wie bei ChatGPT), "" = Standard. */
+export async function setzeProjektFarbe(id, farbe) {
+  const projekt = await getProjekt(id);
+  if (!projekt) return false;
+  projekt.farbe = /^#[0-9a-f]{6}$/i.test(String(farbe || "")) ? String(farbe).toLowerCase() : "";
+  projekt.updatedAt = new Date().toISOString();
+  await tx(PROJEKT_STORE, "readwrite", (store) => store.put(projekt));
+  notifyProjekteChanged();
+  return true;
+}
+
 export const BEREICH_ANWEISUNG_KEY = "smejj.bereichAnweisung.v1";
 export const BEREICH_NEU_KEY = "smejj.bereichNeu.v1";
 
@@ -203,7 +214,7 @@ export async function aktualisiereBereichsAnweisung(projectId) {
     // Projekt-Dateien (Textdateien, gedeckelt) als Wissen dazu — Projektverwaltung 12.11.2026.
     let wissen = "";
     if (projekt) {
-      try { wissen = await (await import("./projekt-dateien.js?v=2026111216")).kontextFuer(projekt.id); } catch { wissen = ""; }
+      try { wissen = await (await import("./projekt-dateien.js?v=2026111217")).kontextFuer(projekt.id); } catch { wissen = ""; }
     }
     const anweisung = [projekt?.anweisung || "", wissen ? `Wissen aus den Projektdateien:\n${wissen}` : ""].filter(Boolean).join("\n\n");
     if (anweisung) {

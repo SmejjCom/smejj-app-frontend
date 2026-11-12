@@ -18,24 +18,24 @@
 // Die letzten Gespraeche kommen aus dem echten Verlauf (chat-store.listChats)
 // und oeffnen per openChat — keine Attrappen.
 
-import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026111216";
+import { listChats, openChat, newChat, activeChatId } from "/assets/chat-store.js?v=2026111217";
 // Nur die Kennzeichen (Datei/Bild/Code), nicht die 8,7 KB Verlaufs-Text — 2026-09-03.
-import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026111216";
-import { Icons } from "/assets/components.js?v=2026111216";
+import { merkmaleVon } from "/assets/chat-merkmale.js?v=2026111217";
+import { Icons } from "/assets/components.js?v=2026111217";
 // Abo-Stand ueber den gemeinsamen Speicher (F6, 2026-09-14): EINE Anfrage je
 // Laden fuer Planzeile, Onboarding-Karte und Abo-Panel — dieselbe Kennung wie
 // in account-sessions.js, sonst zweite Instanz und wieder zwei Anfragen.
-import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026111216";
+import { holeBillingStatus } from "./shared/billing-status-speicher.js?v=2026111217";
 // Nutzerreise USA 2026-08-23: die Spur blieb auf Englisch deutsch ("Neuer
 // Chat", "Heute", "Gestern", "Alle 127 Gespräche"). t() liefert fail-safe den
 // deutschen Quelltext, solange kein Wörterbuch geladen ist.
-import { t } from "./i18n/ui.js?v=2026111216";
+import { t } from "./i18n/ui.js?v=2026111217";
 
 function alleGespraeche(n) {
   return t("Alle {n} Gespräche").replace("{n}", String(n));
 }
 
-const START_ANSICHTEN = new Set(["start", "code"]);
+const START_ANSICHTEN = new Set(["start", "code", "arbeitsbereiche"]); // Projekte: Seitenleiste bleibt wie bei ChatGPT
 const MAX_LETZTE = 5;
 
 function tageHer(iso) {
@@ -208,6 +208,11 @@ async function zeichneStartSpur(halter) {
   const cloud = punkt({ icon: "projects", text: t("Projekte"), aktion: () => geheZu("arbeitsbereiche") });
   cloud.dataset.ziel = "arbeitsbereiche"; // fuer die Zahl (galerie.js); Projektverwaltung 12.11.
   liste.append(cloud);
+  // Projekte wie bei ChatGPT (12.11.2026): Neues Projekt + Projektliste, nachgeladen.
+  const projekteHalter = document.createElement("div");
+  projekteHalter.className = "spur-projekte";
+  liste.append(projekteHalter);
+  import("./projekte-spur.js?v=2026111217").then((m) => m.zeichneProjekteSpur(projekteHalter)).catch(() => {});
   const bot = punkt({ icon: "automation", text: "smejjBot", aktion: () => geheZu("automation") });
   bot.classList.add("nur-desktop");
   liste.append(bot);
@@ -237,6 +242,7 @@ async function zeichneStartSpur(halter) {
     // Gleiche Markierung wie in der Code-Spur: das offene Gespraech ist
     // hervorgehoben (Betreiber 2026-08-16).
     eintrag.className = `nav-button spur-chat${chat.id === activeChatId() ? " is-active" : ""}`;
+    eintrag.dataset.chatId = chat.id; // Ziehen auf ein Projekt (projekte-spur.js)
     eintrag.title = chat.title || "Unterhaltung";
     eintrag.textContent = chat.title || "Unterhaltung";
     eintrag.addEventListener("click", () => { openChat(chat.id); geheZu("start"); });

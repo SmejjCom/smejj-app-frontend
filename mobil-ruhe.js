@@ -1,7 +1,7 @@
 // smejj.com — freigegebenes mobiles Lesedesign, 24.10.2026.
 // Keine globale Freischaltung des unvollstaendigen Desktop-Hellmodus.
-import { readRuntimeSettings } from "./settings-runtime.js?v=2026111216";
-import { t } from "./i18n/ui.js?v=2026111216";
+import { readRuntimeSettings } from "./settings-runtime.js?v=2026111217";
+import { t } from "./i18n/ui.js?v=2026111217";
 
 export const MOBILE_QUERY = "(max-width:600px), (pointer:coarse) and (max-height:500px) and (max-width:1100px)";
 export function mobileTheme(settings, systemLight = false) {

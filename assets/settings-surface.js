@@ -1,5 +1,5 @@
-import { STORAGE_KEYS } from "./config.js?v=2026111216";
-import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=2026111216";
+import { STORAGE_KEYS } from "./config.js?v=2026111217";
+import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } from "./settings-runtime.js?v=2026111217";
 // api-center-surface.js und provider-settings.js werden BEWUSST nicht statisch
 // importiert (Seitengewicht). Der Startreiter ist "general" — bis der Nutzer
 // dorthin wechselt, wird ihr Code nie gebraucht. Zusammen mit ihrem selbst
@@ -8,10 +8,10 @@ import { initSettingsRuntime, SETTINGS_VERSION, ensureNotificationPermission } f
 // Geprueft vor dem Umbau: app.js (Start-Lock) bindet KEINE der von ihnen
 // erzeugten Kennungen (ac*, apiCenterSurface, cline*) — die Boot-Bindings von
 // app.js koennen dadurch nichts verlieren.
-import { LANGUAGE_OPTIONS } from "./language-options.js?v=2026111216";
-import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026111216";
+import { LANGUAGE_OPTIONS } from "./language-options.js?v=2026111217";
+import { t, loadUiLanguage, savedUiLanguage, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026111217";
 // Inhaber 12.11.2026: eigenes Modell statt GLM; Nummer folgt dem Modell-Menue.
-import { AKTUELLE_VERSION } from "./code-modell-menue.js?v=2026111216";
+import { AKTUELLE_VERSION } from "./code-modell-menue.js?v=2026111217";
 
 const DEFAULTS = {
   language: "de", mode: "safe", theme: "system", density: "comfortable",
@@ -132,7 +132,7 @@ function bindeLernSchalter(view) {
   const feld = view.querySelector("#settingsLernenAus");
   if (!feld) return;
   try { feld.checked = localStorage.getItem("smejj.lernen.v1") === "aus"; } catch { feld.checked = false; }
-  import("./lern-widerspruch.js?v=2026111216").then((m) => m.kontoStandAngleichen()).then((stand) => {
+  import("./lern-widerspruch.js?v=2026111217").then((m) => m.kontoStandAngleichen()).then((stand) => {
     if (stand?.widerspruch) feld.checked = true;
   }).catch(() => {});
 }
@@ -145,7 +145,7 @@ function lernStatus(view, text) {
 function handleChange(view, event) {
   if (event.target?.id === "settingsLernenAus") {
     const aus = event.target.checked === true;
-    import("./lern-widerspruch.js?v=2026111216").then((m) => m.widerspruchSetzen(aus)).then((r) => {
+    import("./lern-widerspruch.js?v=2026111217").then((m) => m.widerspruchSetzen(aus)).then((r) => {
       lernStatus(view, aus
         ? (r.konto ? t("Gespeichert: deine Fragen werden nicht mehr zum Lernen verwendet (Gerät und Konto).") : t("Gespeichert: auf diesem Gerät werden deine Fragen nicht mehr zum Lernen verwendet."))
         : t("Deine Fragen helfen wieder beim Verbessern von smejj 1."));
@@ -289,7 +289,7 @@ function handleClick(view, event) {
     loadUiLanguage(DEFAULTS.language).then(() => render(view));
   } else if (jump === "lernenLoeschen") {
     lernStatus(view, t("Löschung wird angefragt …"));
-    import("./lern-widerspruch.js?v=2026111216").then((m) => m.fragenLoeschen()).then((r) => {
+    import("./lern-widerspruch.js?v=2026111217").then((m) => m.fragenLoeschen()).then((r) => {
       if (r.ok) { const feld = view.querySelector("#settingsLernenAus"); if (feld) feld.checked = true; }
       lernStatus(view, r.ok ? t("Löschung angenommen. Deine gespeicherten Fragen werden entfernt und künftig nicht mehr verwendet.")
         : r.angemeldet ? t("Löschen gerade nicht möglich — bitte später erneut versuchen.") : t("Bitte zuerst anmelden. Als Gast speichern wir keine Kennung, die man dir zuordnen könnte."));
@@ -318,7 +318,7 @@ function handleClick(view, event) {
 // hinsieht. Kompakter Kopf: die Panel-Ueberschrift liefert den Titel.
 async function ladeApiZentrum(view) {
   try {
-    const modul = await import("./api-center-surface.js?v=2026111216");
+    const modul = await import("./api-center-surface.js?v=2026111217");
     modul.initApiCenter(view.querySelector("#apiCenterSurface"), { kopf: "kompakt" });
   } catch {
     /* fail-safe: uebrige Einstellungen bleiben bedienbar */
@@ -328,7 +328,7 @@ async function ladeApiZentrum(view) {
 // Inhaber 05.11.2026: Lautsprecher, Stimme und Sprechstil der frueheren Sprachmodus-Leiste.
 async function ladeStimme(view) {
   try {
-    const modul = await import("./voice-stimmen-panel.js?v=2026111216");
+    const modul = await import("./voice-stimmen-panel.js?v=2026111217");
     modul.bindeStimmenEinstellungen(view.querySelector("#settingsStimme"));
   } catch {
     /* fail-safe: uebrige Einstellungen bleiben bedienbar */
