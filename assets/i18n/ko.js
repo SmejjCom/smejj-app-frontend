@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 한국어 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ko-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ko-2.js?v=2026111201";
+import zusatz from "./ko-2.js?v=2026111202";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -300,7 +300,7 @@ export default {
   "Projektkontext automatisch berücksichtigen": "프로젝트 컨텍스트 자동 포함",
   "Relevante Projektdateien und Anweisungen einbeziehen.": "관련 프로젝트 파일과 지침을 포함합니다.",
   "KI-Modelle & Anbieter": "모델",
-  "GLM-5.3-Flash bleibt das Qualitätsfundament von smejj.com.": "GLM-5.3-Flash는 여전히 smejj.com의 품질 기반입니다.",
+  "{modell} ist das eigene Modell von smejj.com.": "{modell}은 smejj.com의 자체 모델입니다.",
   "Reasoning-Aufwand": "추론 강도",
   "Hoch": "높음",
   "Maximal": "최대",

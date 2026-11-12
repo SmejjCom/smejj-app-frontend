@@ -8,13 +8,13 @@
 // Was hier bewusst NICHT liegt: welche Endpunkte in welcher Reihenfolge gefragt
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
-import { fetchStreamWithRetry } from "./fetch-retry.js?v=2026111201";
-import { t } from "../i18n/ui.js?v=2026111201";
-import { empfehlungText } from "../sprach-helfer.js?v=2026111201";
-import { API_ORIGIN } from "../config.js?v=2026111201";
-import { mitLiveDaten } from "./live-daten.js?v=2026111201";
-import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js?v=2026111201";
-import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js?v=2026111201";
+import { fetchStreamWithRetry } from "./fetch-retry.js?v=2026111202";
+import { t } from "../i18n/ui.js?v=2026111202";
+import { empfehlungText } from "../sprach-helfer.js?v=2026111202";
+import { API_ORIGIN } from "../config.js?v=2026111202";
+import { mitLiveDaten } from "./live-daten.js?v=2026111202";
+import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js?v=2026111202";
+import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js?v=2026111202";
 
 // Gleicher Schluessel wie in auth/auth-page.js, account-sessions.js und
 // auth-gate.js — dort bewusst dupliziert, damit kein Modul den anderen nur
@@ -99,8 +99,8 @@ export async function erneuereZugangsToken() {
   return "";
 }
 
-import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js?v=2026111201";
-export { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, QUELLEN_LEER_HINWEIS } from "./chat-schritte-anzeige.js?v=2026111201";
+import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js?v=2026111202";
+export { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, QUELLEN_LEER_HINWEIS } from "./chat-schritte-anzeige.js?v=2026111202";
 // ---------------------------------------------------------------------------
 // Denk-Zeile (Betreiber 2026-08-23, Vorbild Antigravity "Thought for 1s ›"):
 // Denk-Text des Modells (delta.reasoning_content) gehoert NICHT in die
@@ -208,7 +208,7 @@ export function letzteNutzerfrage(body) {
  */
 // Wörter unter den Symbolen der Antwort-Leiste auf dem Handy (UI/UX Nr. 4) —
 // eigenes Modul, dynamisch, stumm bei Fehlern; die Leiste selbst bleibt unberührt.
-if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js?v=2026111201").catch(() => {});
+if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js?v=2026111202").catch(() => {});
 
 const AKTION_STIL_ID = "antwort-aktion-stil";
 // Der Stil kommt aus dem Modul, nicht aus chat-actions.css: die CSS liegt im
@@ -369,6 +369,8 @@ export function clearThinkingState(output) {
  */
 export function verstaendlicheMeldung(status, roh) {
   const code = String(roh || "").trim();
+  // 12.11.2026 (Inhaber): Plan-Limit erreicht – freundlich, mit Upgrade-Knopf (fehlerAktion). Nur wenn der Server es meldet.
+  if (istPlanLimit(code)) return t("Dein Gratis-Kontingent ist aufgebraucht. Mit Plus geht es sofort weiter – oder später kostenlos.");
   if (status === 401 || /authentication_required|session_revoked_or_expired/.test(code)) return t("Du bist nicht mehr angemeldet. Nach der Anmeldung geht es hier weiter.");
   if (status === 403) return t("Dafür fehlt die Berechtigung in deinem Konto.");
   if (status === 429 || /rate_limit/.test(code)) return t("Gerade zu viele Anfragen auf einmal. In 20 Sekunden kannst du es noch einmal schicken.");
@@ -383,7 +385,17 @@ export function verstaendlicheMeldung(status, roh) {
  * Zu jeder Meldung die passende Handlung: Anmelden, Erneut versuchen oder ein
  * kurzer Zaehler bei 429. Nie ein Rat ohne Knopf.
  */
+/** Meldet der Server ein Plan-Limit (nicht die kurze Bremse pro Minute)? */
+export function istPlanLimit(code) {
+  return /plan_limit|quota_exceeded|free_limit|monthly_limit|daily_limit/i.test(String(code || ""));
+}
+
 export function fehlerAktion(output, status, frage, { senden = sendeAlsNutzer, gehZu = (ziel) => location.assign(ziel) } = {}) {
+  if (istPlanLimit(output?.dataset?.fehlerCode)) {
+    // Apple 3.1.1: in der iOS-Huelle kein Kaufweg – dort nur „Erneut versuchen“.
+    const ios = (() => { try { return Boolean(globalThis.Capacitor) || /iPad|iPhone|iPod/.test(navigator.platform || navigator.userAgent); } catch { return true; } })();
+    if (!ios) return haengeAktionsKnopf(output, t("Upgrade auf Plus"), "upgrade", { senden: () => { try { sessionStorage.setItem("smejj.konto.reiter.v1", "billing"); } catch { /* Standard-Reiter */ } gehZu("/profile"); } });
+  }
   if (status === 401 || status === 403) {
     const knopf = haengeAktionsKnopf(output, "Anmelden", "anmelden", { senden: () => gehZu("/auth/login/?zurueck=" + encodeURIComponent(location.pathname)) });
     return knopf;
@@ -666,7 +678,7 @@ export async function streamChatAnswer(url, body, output, optionen = {}) {
     // Bild abgelegt — dasselbe Bild nachholen statt neu malen. Nicht nach einem bewussten Stopp.
     // Das Modul kommt erst beim Abriss (Startgewicht: es gehoert nicht in jeden Seitenaufruf).
     if (!lauf.gestoppt && /Die Bild-Übertragung ist abgerissen/.test(output?.textContent || "")) {
-      import("./bild-nachholen.js?v=2026111201").then(({ holeBildNach }) => holeBildNach({
+      import("./bild-nachholen.js?v=2026111202").then(({ holeBildNach }) => holeBildNach({
         output, renderMarkdown: optionen.renderMarkdown, hinweis: t("Bild wird erneut geladen …"),
         anfrage: () => fetchStreamWithRetry(zieleAnpassen(url, (rumpf) => ({ ...rumpf, bildErneut: true })), {
           method: "POST", headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() }, body: JSON.stringify({ ...body, bildErneut: true })
@@ -680,7 +692,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   // Fragen-Erfassung (Trainingsplan smejj 1.1, Stufe 1): loest nur aus, wartet
   // nie, bricht nie — der Server entscheidet aus Ledger und Schalter. Dynamisch
   // nachgeladen, damit ein fehlendes Modul den Chat nicht beruehrt.
-  import("/assets/ai/frage-erfassung.js?v=2026111201").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
+  import("/assets/ai/frage-erfassung.js?v=2026111202").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
   // Stufe 0 zuerst: was das Geraet des Nutzers selbst beantworten kann, kostet
   // niemanden etwas und ist meist schneller (gemessen 1,7-3,5 s gegen 2,9-6,6 s).
   if (await versucheLokaleAntwort(body, output, renderMarkdown)) return;
@@ -791,7 +803,9 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   if (!response.ok || !response.body) {
     stoppeWartesignal();
     clearThinkingState(output);
-    output.textContent = verstaendlicheMeldung(response.status, await readableError(response, offlineNotice));
+    const rohFehler = await readableError(response, offlineNotice);
+    output.dataset.fehlerCode = istPlanLimit(rohFehler) ? "plan_limit" : "";
+    output.textContent = verstaendlicheMeldung(response.status, rohFehler);
     fehlerAktion(output, response.status, letzteNutzerfrage(body));
     return;
   }

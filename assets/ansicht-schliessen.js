@@ -10,7 +10,7 @@
 // Nur bis 900 px Breite (Handy/Tablet); am Computer bleibt die Seitenleiste.
 // Eigenes Modul (800-Zeilen-Regel), Stil aus dem Modul, keine Aenderung am
 // gesperrten Start-Buendel.
-import { t } from "./i18n/ui.js?v=2026111201";
+import { t } from "./i18n/ui.js?v=2026111202";
 
 export const KNOPF_ID = "ansichtSchliessen";
 const STIL_ID = "ansicht-schliessen-stil";
