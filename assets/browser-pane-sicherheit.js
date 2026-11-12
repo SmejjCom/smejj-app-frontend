@@ -1,4 +1,4 @@
-import { t } from "./i18n/ui.js?v=2026111213";
+import { t } from "./i18n/ui.js?v=2026111214";
 // smejj.com — Sicherheitsanzeige der Adressleiste, wie Chromes Schloss.
 //
 // WARUM DAS MEHR IST ALS EIN SYMBOL: Seit die Adresse gekuerzt angezeigt wird

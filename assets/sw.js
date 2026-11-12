@@ -1,9 +1,6 @@
-// smejj.com — Service Worker.
-//
-// DER AENDERUNGSVERLAUF STEHT NICHT MEHR HIER:
-//   docs/frontend/SW_VERSIONSVERLAUF.md            (bis v212)
-//   docs/frontend/SW_VERSIONSVERLAUF_2026-08.md    (ab v213)
-//
+// smejj.com — Service Worker. 
+// DER AENDERUNGSVERLAUF STEHT NICHT MEHR HIER: docs/frontend/SW_VERSIONSVERLAUF.md            (bis v212)
+//   docs/frontend/SW_VERSIONSVERLAUF_2026-08.md    (ab v213) 
 // Warum: Am 2026-08-05 wanderten 586 Kommentarzeilen aus dieser Datei aus.
 // Zwei Tage spaeter waren es wieder 646 von 863 Zeilen — 76 % einer Datei mit
 // 217 Zeilen echtem Code. Jede neue Cache-Version brachte ihre Begruendung mit,
@@ -189,8 +186,8 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1116";
-const ASSET_BUILD = "2026111213";
+const CACHE_NAME = "smejj-shell-v1117";
+const ASSET_BUILD = "2026111214";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -278,6 +275,8 @@ const SHELL = [
   "/assets/account-privacy.js",
   "/assets/apple-kauf.js",
   "/assets/profile-dock.js",
+  "/assets/upgrade-hinweis.js",
+  "/assets/ansicht-schliessen.js",
   "/assets/profile-dock-menu.js",
   "/assets/profile-menue-tasten.js",
   "/assets/account-auth-state.js",
