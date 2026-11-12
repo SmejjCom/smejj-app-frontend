@@ -1,6 +1,6 @@
 // smejj.com — nur nach bestätigter Anmeldung zur gewählten Planübersicht.
-import {API_ORIGIN} from '/config.js?v=2026111208';
-import {capturePlan, checkoutTarget, forgetPlan, planStorage} from '/assets/auth/plan-auswahl.js?v=2026111208';
+import {API_ORIGIN} from '/config.js?v=2026111209';
+import {capturePlan, checkoutTarget, forgetPlan, planStorage} from '/assets/auth/plan-auswahl.js?v=2026111209';
 const storage = planStorage(window);
 const plan = capturePlan(location.search, storage);
 const status = document.querySelector('#authStatus, #profileOutput');

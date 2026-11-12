@@ -11,12 +11,12 @@
 let sendepfadGeladen = null;
 export function holeSendepfad() {
   sendepfadGeladen ||= Promise.all([
-    import("/assets/ai/chat-stream.js?v=2026111208"),
-    import("./autonomous-intent.js?v=2026111208"),
-    import("./browser-context.js?v=2026111208"),
-    import("./medien-absicht.js?v=2026111208"),
-    import("./maus-absicht.js?v=2026111208"),
-    import("./free-coding-fallback.js?v=2026111208")
+    import("/assets/ai/chat-stream.js?v=2026111209"),
+    import("./autonomous-intent.js?v=2026111209"),
+    import("./browser-context.js?v=2026111209"),
+    import("./medien-absicht.js?v=2026111209"),
+    import("./maus-absicht.js?v=2026111209"),
+    import("./free-coding-fallback.js?v=2026111209")
   ]).then((teile) => Object.assign({}, ...teile))
     .catch((fehler) => { sendepfadGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", fehler); throw fehler; });
   return sendepfadGeladen;
