@@ -11,7 +11,7 @@
 // Datenquelle: der echte Verlauf auf diesem Geraet (chat-store.listChats) —
 // erstellte Medien stecken als <img>/<video> im gespeicherten Antwort-HTML
 // (ausgelagert ueber chat-medien.js). Keine Attrappen, keine neue Serverroute.
-// Projekte: dieselbe lokale Ablage wie die Projekte-Seite (Ansicht #projects).
+// Projekte: die Projektverwaltung (chat-store listProjekte, Ansicht #arbeitsbereiche).
 //
 // FAIL-SAFE: Faellt dieses Modul aus, bleiben die Menuepunkte wie vorher
 // (Vorlage im Chat). Nichts im Chat oder Verlauf wird veraendert.
@@ -19,8 +19,8 @@
 // Speicher und Woerterbuch erst bei Bedarf laden: der reine Teil (sammleMedien)
 // bleibt so ohne Browser testbar, und der Start traegt kein Byte mehr.
 let t = (text) => text;
-const speicher = () => import("./chat-store.js?v=2026111215");
-const woerterbuch = import("./i18n/ui.js?v=2026111215").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
+const speicher = () => import("./chat-store.js?v=2026111216");
+const woerterbuch = import("./i18n/ui.js?v=2026111216").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
 
 const TYPEN = {
   bilder: { titel: "Bilder", knopf: "Bild erstellen", absicht: "bild-neu", leer: "Noch keine Bilder. Erstelle dein erstes Bild.", einheit: ["Bild", "Bilder"] },
@@ -107,8 +107,8 @@ let zaehlLauf = null;
 
 async function zaehleProjekte() {
   try {
-    const { createLocalWorkspace } = await import("/assets/storage/index.js?v=2026111215");
-    const liste = await createLocalWorkspace().listProjects();
+    // Seit 12.11. (Projektverwaltung wie ChatGPT): die Projekte mit Chats/Dateien/Anweisungen.
+    const liste = await (await speicher()).listProjekte();
     return Array.isArray(liste) ? liste.length : 0;
   } catch {
     return 0;
@@ -137,12 +137,12 @@ function zahlFuer(knopf) {
   const absicht = knopf.dataset.navAbsicht;
   if (absicht === "bilder") return stand.bilder.length;
   if (absicht === "videos") return stand.videos.length;
-  if (knopf.dataset.view === "projects" || knopf.dataset.ziel === "projects") return stand.cloud;
+  if (knopf.dataset.view === "arbeitsbereiche" || knopf.dataset.ziel === "arbeitsbereiche") return stand.cloud;
   return null;
 }
 
 function schmuecke() {
-  const knoepfe = document.querySelectorAll('.sidebar .nav-button[data-nav-absicht="bilder"], .sidebar .nav-button[data-nav-absicht="videos"], .sidebar .nav-button[data-view="projects"], .sidebar .nav-button[data-ziel="projects"]');
+  const knoepfe = document.querySelectorAll('.sidebar .nav-button[data-nav-absicht="bilder"], .sidebar .nav-button[data-nav-absicht="videos"], .sidebar .nav-button[data-view="arbeitsbereiche"], .sidebar .nav-button[data-ziel="arbeitsbereiche"]');
   for (const knopf of knoepfe) {
     const n = zahlFuer(knopf);
     if (n === null) continue;
@@ -161,7 +161,7 @@ function schmuecke() {
     pille.setAttribute("aria-label", `${text} ${t("Einträge")}`);
   }
   // Kopf der Projekte-Seite: „Projekte 3“.
-  const kopf = document.querySelector("#projects .view-header h2");
+  const kopf = document.querySelector("#arbeitsbereiche .view-header h2");
   if (kopf) kopfZahl(kopf, stand.cloud);
 }
 
@@ -353,7 +353,7 @@ async function oeffneGespraech(chatId) {
 async function ladeMedien(raster) {
   if (!raster.querySelector("[data-smejj-adresse]")) return;
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111215");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111216");
     await rehydriereMedien(raster);
   } catch { /* ohne Netz bleiben die Kacheln leer, nichts bricht */ }
 }
@@ -390,8 +390,9 @@ export function initGalerie() {
   window.addEventListener("smejj:chats-changed", () => void aktualisiere());
   // Neue Projekte entstehen auf der Projekte-Seite — beim Oeffnen nachzaehlen.
   document.addEventListener("click", (e) => {
-    if (e.target.closest?.('#projects button, .nav-button[data-view="projects"], .sidebar .nav-button')) setTimeout(() => void aktualisiere(), 400);
+    if (e.target.closest?.('#arbeitsbereiche button, .sidebar .nav-button')) setTimeout(() => void aktualisiere(), 400);
   });
+  window.addEventListener("smejj:projekte-geaendert", () => void aktualisiere());
   void aktualisiere();
   return true;
 }

@@ -7,7 +7,7 @@ import {
   geraeteBesitzer, getChat, importChat, listChats, neueProjektId, newChat, notifyChanged,
   notifyProjekteChanged, openChat, persistActive, renameChat, rohEigenerChat,
   sauberProjektName, scheduleSave, tx
-} from "./chat-store.js?v=2026111215";
+} from "./chat-store.js?v=2026111216";
 
 // GEMESSEN 2026-09-14 (A-bis-Z, angemeldet): der Papierkorb war IMMER leer.
 // listGeloeschteChats() warf "PAPIERKORB_TAGE is not defined" — die Konstante
@@ -200,8 +200,14 @@ export const BEREICH_NEU_KEY = "smejj.bereichNeu.v1";
 export async function aktualisiereBereichsAnweisung(projectId) {
   try {
     const projekt = projectId ? await getProjekt(projectId) : null;
-    if (projekt?.anweisung) {
-      sessionStorage.setItem(BEREICH_ANWEISUNG_KEY, JSON.stringify({ name: projekt.name, anweisung: projekt.anweisung }));
+    // Projekt-Dateien (Textdateien, gedeckelt) als Wissen dazu — Projektverwaltung 12.11.2026.
+    let wissen = "";
+    if (projekt) {
+      try { wissen = await (await import("./projekt-dateien.js?v=2026111216")).kontextFuer(projekt.id); } catch { wissen = ""; }
+    }
+    const anweisung = [projekt?.anweisung || "", wissen ? `Wissen aus den Projektdateien:\n${wissen}` : ""].filter(Boolean).join("\n\n");
+    if (anweisung) {
+      sessionStorage.setItem(BEREICH_ANWEISUNG_KEY, JSON.stringify({ name: projekt.name, anweisung }));
     } else {
       sessionStorage.removeItem(BEREICH_ANWEISUNG_KEY);
     }

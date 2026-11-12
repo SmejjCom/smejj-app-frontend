@@ -1,25 +1,25 @@
-import { STORAGE_KEYS } from "./config.js?v=2026111215";
+import { STORAGE_KEYS } from "./config.js?v=2026111216";
 import { initServerSessionControls, fetchLoginMethods, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
-  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026111215";
-import { languageOptionsMarkup } from "./language-options.js?v=2026111215";
-import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026111215";
-import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026111215";
-import { clearProfilePicture } from "./profile-picture-store.js?v=2026111215";
-import { afterFirstPaint } from "./deferred-start.js?v=2026111215";
+  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026111216";
+import { languageOptionsMarkup } from "./language-options.js?v=2026111216";
+import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026111216";
+import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026111216";
+import { clearProfilePicture } from "./profile-picture-store.js?v=2026111216";
+import { afterFirstPaint } from "./deferred-start.js?v=2026111216";
 // Ohne ?v=: siehe die Begruendung in account-auth-state.js. Eine Marke hier
 // wuerde erzwingen, dass diese ABO-GESPERRTE Datei bei jeder Stil-Aenderung
 // wieder angefasst wird — genau das soll die Auslagerung verhindern.
-import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026111215";
+import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026111216";
 // Gleicher Schluessel wie in profile-dock-menu.js — bewusst dupliziert statt
 // importiert (wie TOKEN_KEY in auth-gate.js): profile-dock-menu.js liegt im
 // Startbuendel, diese Datei wird nachgeladen. Ein Import zoege das Startmodul
 // unter einer zweiten Marke herein — genau die Falle, vor der die Markenkette
 // warnt (zwei Kopien mit getrenntem Zustand).
 const KONTO_REITER_SCHLUESSEL = "smejj.konto.reiter.v1";
-import { usageSummary } from "./usage-meter.js?v=2026111215";
-import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026111215";
+import { usageSummary } from "./usage-meter.js?v=2026111216";
+import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026111216";
 // Apple-In-App-Kauf in der iOS-App (Inhaber 12.11.2026: „Soll mit Plus usw Pakete sein überall, Mach überall rein.“)
-import { appleBruecke, appleKaufMarkup, appleVerwalten, bindeAppleKauf, zeichneAppleKnoepfe } from "./apple-kauf.js?v=2026111215";
+import { appleBruecke, appleKaufMarkup, appleVerwalten, bindeAppleKauf, zeichneAppleKnoepfe } from "./apple-kauf.js?v=2026111216";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const PERSONAL_KEY = "smejj.personalization.v1";
