@@ -86,6 +86,31 @@ export function istAppleMobil(nav = typeof navigator !== "undefined" ? navigator
  *          Hooks; der Aufrufer entscheidet, ob er erneut start() ruft.
  * stop():  Runde abbrechen und alles freigeben (Mute, Schliessen).
  */
+// EIN Audio-Kontext fuer alle Hoer-Runden, geweckt INNERHALB des Tipps (Inhaber-Screenshot 13.11.2026: iPhone zeigte
+// endlos „Ich höre zu …“, orangener Mikrofon-Punkt, aber keine einzige Erkennungs-Anfrage am Server). Jede Runde legte
+// bisher nach mehreren await einen NEUEN Kontext an — ausserhalb der Geste startet iOS ihn schlafend, der Pegel blieb 0,
+// das Ohr hoerte nie „Sprache“ und begann still von vorn. Jetzt: beim Tipp auf den Sprachknopf aufwecken, danach behalten.
+let geteilterCtx = null;
+export function ohrKontextEntsperren() {
+  try {
+    const Ctor = globalThis.window?.AudioContext || globalThis.window?.webkitAudioContext;
+    if (!Ctor) return null;
+    if (!geteilterCtx || geteilterCtx.state === "closed") geteilterCtx = new Ctor();
+    geteilterCtx.resume?.()?.catch?.(() => { /* naechster Tipp weckt */ });
+    return geteilterCtx;
+  } catch {
+    return null;
+  }
+}
+/** Nur fuer Tests. */
+export function _geteilterOhrKontext(neu) { if (neu !== undefined) geteilterCtx = neu; return geteilterCtx; }
+const SPRACH_STARTER = "#startSend, [data-start-tool=\"audio\"], #voiceModeOverlay";
+if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+  for (const art of ["touchend", "click"]) {
+    document.addEventListener(art, (e) => { if (e?.target?.closest?.(SPRACH_STARTER)) ohrKontextEntsperren(); }, { capture: true, passive: true });
+  }
+}
+
 /** resume() mit Zeitlimit: iOS laesst das Versprechen ohne Tipp offen; dann uebernimmt wecken. */
 export const RESUME_WARTE_MS = 400;
 function kurzWecken(ctx) {
@@ -104,6 +129,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
   let lauf = 0;
   let ohrLauf = 0; // Lauf, der zuletzt ear.start() gerufen hat
   let wecken = null;
+  let quelleKnoten = null;
 
   const freigeben = () => {
     clearInterval(takt);
@@ -116,9 +142,12 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
     try { aufPegel?.(0); } catch { /* Anzeige egal */ }
     try { stream?.getTracks?.().forEach((t) => t.stop()); } catch { /* schon zu */ }
     stream = null;
+    try { quelleKnoten?.disconnect?.(); } catch { /* schon getrennt */ }
+    quelleKnoten = null;
     const alterCtx = ctx;
     ctx = null;
-    try { alterCtx?.close?.(); } catch { /* schon zu */ }
+    // Den geteilten (im Tipp geweckten) Kontext behalten — nur eigene Ersatz-Kontexte schliessen.
+    if (alterCtx !== geteilterCtx) { try { alterCtx?.close?.(); } catch { /* schon zu */ } }
     laeuft = false;
   };
 
@@ -144,14 +173,14 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
           return;
         }
         stream = captured;
-        const laufCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const laufCtx = geteilterCtx && geteilterCtx.state !== "closed" ? geteilterCtx : new (window.AudioContext || window.webkitAudioContext)();
         ctx = laufCtx;
         // iOS startet AudioContexte "suspended" — ohne resume() liefert der
         // Analyser nur Stille (Pegel 0) und der Automat laeuft ins Zeitlimit.
         // Ohne Tipp bleibt resume() auf iOS mitunter ewig offen: hoechstens kurz warten.
         await kurzWecken(laufCtx);
         if (meinLauf !== lauf) {
-          if (laufCtx.state !== "closed") laufCtx.close?.()?.catch?.(() => { /* schon zu */ });
+          if (laufCtx !== geteilterCtx && laufCtx.state !== "closed") laufCtx.close?.()?.catch?.(() => { /* schon zu */ });
           return;
         }
         if (ctx.state === "suspended") {
@@ -165,6 +194,7 @@ export function createOhrSolo({ ear, aufStatus, aufTranskript, aufLeer, aufFehle
           document.addEventListener("click", wecken, { once: true });
         }
         const quelle = ctx.createMediaStreamSource(stream);
+        quelleKnoten = quelle;
         const analyser = ctx.createAnalyser();
         analyser.fftSize = 512;
         quelle.connect(analyser);
@@ -224,6 +254,13 @@ const UNTERBRECHEN_ZIELE = "#voiceModeOverlay .voice-mode-logo, #voiceModeOverla
 const ANZEIGE = { speaking: "Ich spreche ...", thinking: "Einen Moment ..." };
 const antwortLaeuft = () => ["thinking", "speaking"].includes(overlayModus());
 const NACHLAUF_MS = 2000;
+const FEHL_TEXTE = {
+  anmeldung: "Die Spracherkennung braucht eine gültige Anmeldung – bitte einmal ab- und wieder anmelden.",
+  zu_viele: "Gerade zu viele Sprachanfragen – kurz warten.",
+  timeout: "Die Spracherkennung hat zu lange gebraucht.",
+  offline: "Keine Internetverbindung.",
+  server_unreachable: "Die Spracherkennung ist gerade nicht erreichbar."
+};
 // Zeitmessung (08.11.2026) wie sprachZeit in voice-ear.js — ohne Import, damit dieses Modul eigenstaendig bleibt.
 const markiere = (name) => { try { const jetzt = globalThis.performance?.now?.() ?? Date.now(); if (name === "stille") globalThis.smejjSprachZeiten = {}; (globalThis.smejjSprachZeiten ||= {})[name] = jetzt; } catch { /* Messung darf nie stoeren */ } };
 // Stille Diagnose (05.11.2026): nur aktiv, wenn im Browser globalThis.smejjOhrProtokoll gesetzt ist.
@@ -278,6 +315,7 @@ export function verdrahteOhrSolo(host) {
     }
     return "";
   }
+  let fehlRunden = 0;
   const solo = createOhrSolo({
     ear,
     // Zwischenfrage: hoechstens 10 s je Aufnahme, dann auswerten (nie bis zum 45-s-Limit haengen).
@@ -297,6 +335,7 @@ export function verdrahteOhrSolo(host) {
     },
     aufTranskript: (text) => {
       const s = host.state;
+      fehlRunden = 0;
       protokoll(`transkript zwischen=${zwischen} nachlauf=${nachlauf} „${text.slice(0, 40)}“`);
       if (zwischen) {
         host.ducken?.(false);
@@ -317,6 +356,13 @@ export function verdrahteOhrSolo(host) {
     aufLeer: () => {
       const s = host.state;
       protokoll(`leer zwischen=${zwischen} modus=${overlayModus()}`);
+      // 13.11.2026: gescheiterte Erkennung sichtbar machen (nicht still neu zuhoeren); ab dem 2. Fehlschlag Tippen anbieten.
+      const grund = !zwischen && s.voiceModeActive && !s.voiceMuted ? ear.letzterFehler?.() : null;
+      if (grund) {
+        fehlRunden += 1;
+        const text = FEHL_TEXTE[grund] || FEHL_TEXTE.server_unreachable;
+        host.setStatus("listening", fehlRunden >= 2 ? `${text} Du kannst die Frage auch unten eintippen.` : `${text} Bitte noch einmal sprechen.`);
+      }
       if (zwischen) host.ducken?.(false);
       if (s.voiceModeActive && !s.voiceMuted && (zwischen ? antwortLaeuft() : s.ohrSoloAktiv)) solo.start();
     },

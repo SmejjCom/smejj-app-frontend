@@ -8,7 +8,7 @@
 //  3) Fertig: Bild von Rand zu Rand (Handy), weich scharf werdend, Glasleiste Sichern/Teilen/Ändern/Neu.
 //  4) Frisch fertig: öffnet sich von selbst im Vollbild; später per Antippen. Vollbild über den ganzen Bildschirm, Zoom (2 Finger / Doppeltipp), nach unten wischen schließt.
 // Nachgeladen über upgrade-hinweis.js – die Startseite wird nicht schwerer, gesperrte Dateien bleiben unberührt.
-import { t } from "./i18n/ui.js?v=2026111223";
+import { t } from "./i18n/ui.js?v=2026111224";
 
 export const STIL_ID = "bild-erstellen-stil";
 export const DAUER_KEY = "smejj.bild.dauer.v1";

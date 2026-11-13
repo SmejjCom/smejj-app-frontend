@@ -18,7 +18,7 @@
 // Zeitbudget nach dem Sprech-Ende: laenger warten wir nicht auf den Server,
 // sonst fuehlt sich das Gespraech traege an. Groq transkribiert eine Stunde
 // Audio in ~15 s — der Engpass ist der Upload, nicht das Modell.
-import { beobachtePegel } from "./audio-pegel.js?v=2026111223";
+import { beobachtePegel } from "./audio-pegel.js?v=2026111224";
 // 08.11.2026 („Blitz schneller“): 1500 -> 1100 ms; ist Whisper langsamer, gilt der Browser-Text.
 export const EAR_BUDGET_MS = 1100;
 // Obergrenze der Aufnahme (Schutz von Free-Tier und Upload-Zeit).
@@ -132,6 +132,9 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn, 
   let pegelStop = () => {};
   let ruhe = Infinity, spitze = 0, letzteSprache = 0;
   let fehlerMelden = () => {};
+  // 13.11.2026: Grund der letzten gescheiterten Erkennung (null = ok/keine Sprache). Das Ohr-Solo zeigt ihn an,
+  // statt still „Ich höre zu …“ zu wiederholen (Inhaber-Screenshot: endloses Zuhören ohne Ergebnis).
+  let letzterFehler = null;
   // Laufnummer (Geraetebefund 23.09.2026, iPhone: orangefarbener Mikrofon-Punkt
   // blieb an). start() wartet auf getUserMedia; kam in der Zwischenzeit
   // cancel()/finish(), legte der verspaetete Start trotzdem einen Recorder an,
@@ -169,6 +172,7 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn, 
       while (recorder && Date.now() < bis && Date.now() - letzteSprache < stilleMs) await new Promise((r) => setTimeout(r, 100));
     },
     hoerteSprache: () => Boolean(recorder) && spitze >= Math.max(0.03, ruhe * 4),
+    letzterFehler: () => letzterFehler,
     isAlive() {
       return alive && Boolean(pickRecorderMime()) && typeof navigator !== "undefined"
         && Boolean(navigator.mediaDevices?.getUserMedia);
@@ -258,9 +262,11 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn, 
       await beendet;
       const blob = new Blob(teile, { type: mime });
       if (stuecke === teile) stuecke = [];
+      letzterFehler = null;
       if (blob.size < 1_000) return ""; // zu kurz fuer echte Sprache
       const abbruch = new AbortController();
       const budget = setTimeout(() => abbruch.abort(), Number(optionen?.budgetMs) > 0 ? Number(optionen.budgetMs) : budgetMs);
+      let letzterStatus = 0;
       try {
         for (const adresse of lebende()) {
           let antwort;
@@ -287,15 +293,18 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn, 
           // Ein 503 OHNE "ear_not_configured" (QA 28.10.: auth_unavailable,
           // Anmeldedienst kurz weg) ist voruebergehend: frueher blieb die
           // Adresse bis zum Neuladen tot, auch nachdem der Server wieder lief.
-          if (!antwort.ok) continue;
+          if (!antwort.ok) { letzterStatus = antwort.status; continue; }
           const daten = await antwort.json();
           return String(daten?.text || "").trim();
         }
         // Keine Adresse mehr uebrig — erst JETZT gibt das Ohr auf.
         if (lebende().length === 0) alive = false;
+        letzterFehler = abbruch.signal.aborted ? "timeout" : globalThis.navigator?.onLine === false ? "offline"
+          : letzterStatus === 401 || letzterStatus === 403 ? "anmeldung" : letzterStatus === 429 ? "zu_viele" : "server_unreachable";
         meldeFehler(abbruch.signal.aborted ? "timeout" : globalThis.navigator?.onLine === false ? "offline" : "server_unreachable");
         return "";
       } catch {
+        letzterFehler = abbruch.signal.aborted ? "timeout" : "server_unreachable";
         meldeFehler(abbruch.signal.aborted ? "timeout" : "server_unreachable");
         return ""; // Budget gerissen — Web-Speech-Text gewinnt
       } finally {
