@@ -3,13 +3,13 @@
 // oeffnet die Projektseite. Chats aus der Liste darunter lassen sich am Computer
 // auf ein Projekt ziehen. Faellt dieses Modul aus, bleibt der Punkt „Projekte“.
 
-import { listProjekte, setzeChatProjekt } from "/assets/chat-store.js?v=2026111230";
-import { ordnerSvg, oeffneNeuesProjekt } from "./projekte-fenster.js?v=2026111230";
+import { listProjekte, setzeChatProjekt } from "/assets/chat-store.js?v=2026111231";
+import { ordnerSvg, oeffneNeuesProjekt } from "./projekte-fenster.js?v=2026111231";
 
 const MAX_SICHTBAR = 5;
 // Projekt-Kopf im Chat (Bild 3) mitladen — nur Nebenwirkung, kein Start-Gewicht.
-import("./projekt-kontext.js?v=2026111230").catch(() => {});
-const projektSeite = () => import("./arbeitsbereiche.js?v=2026111230");
+import("./projekt-kontext.js?v=2026111231").catch(() => {});
+const projektSeite = () => import("./arbeitsbereiche.js?v=2026111231");
 
 function stil() {
   if (document.getElementById("projekteSpurStil")) return;

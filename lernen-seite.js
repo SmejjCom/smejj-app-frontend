@@ -1,7 +1,7 @@
 // smejj.com — Seite /lernen.html und /en/learning.html (08.11.2026): Widerspruch gegen das Lernen aus Fragen
 // OHNE Anmeldung. Befund Simulator/Emulator 08.11.: Gäste landen bei „Einstellungen“ auf der Anmeldeseite und
 // hatten keinen erreichbaren Schalter. Gleiche Logik wie in den Einstellungen (lern-widerspruch.js).
-import { fragenLoeschen, kontoStandAngleichen, lernenWidersprochen, widerspruchSetzen } from "./lern-widerspruch.js?v=2026111230";
+import { fragenLoeschen, kontoStandAngleichen, lernenWidersprochen, widerspruchSetzen } from "./lern-widerspruch.js?v=2026111231";
 
 const EN = document.documentElement.lang === "en";
 const T = EN ? {

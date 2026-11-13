@@ -9,7 +9,7 @@
 // Rueckruf nach einer Modellwahl. So bleibt das Modul fuer sich pruefbar
 // und es entsteht kein Ringschluss zwischen den beiden Dateien.
 //
-import { t } from "./i18n/ui.js?v=2026111230"; // Begruessung uebersetzt (Betreiber 24.09.2026)
+import { t } from "./i18n/ui.js?v=2026111231"; // Begruessung uebersetzt (Betreiber 24.09.2026)
 
 // ---- Modellwahl (Betreiber 2026-08-17: "warum kann ich bei Code nicht
 // Modelle waehlen?"). Dieselben Speicher wie der Start-Picker, damit Chat und
@@ -40,6 +40,8 @@ export const STUFE_KEY = "smejj.stufe.v1";
 // (und SMEJJ_AKTUELL in app.js, Test tests/code-modell-menue.test.mjs prueft den Gleichstand).
 export const AKTUELLE_VERSION = "smejj 1.1";
 export const STANDARD_WAHL = AKTUELLE_VERSION;
+// Inhaber 13.11.2026 („Ja. 1.0“): Reihenfolge smejj 1.1 / Auto / smejj 1.0 – 1.0 unter Auto als bewusste Wahl.
+export const ZUSATZ_VERSION = "smejj 1.0";
 const EIGENE_NAMEN = /^smejj 1(\.\d+)?$/i;
 
 /** Anzeigename aus dem Menue -> Modellname fuer den Server. Reine Funktion. */
@@ -102,7 +104,7 @@ export function migriereAlteWahl(speicher = typeof localStorage !== "undefined" 
     const jetzt = speicher.getItem(MODELL_KEY) || "";
     if (jetzt === EIGENES_MODELL.titel) speicher.setItem(MODELL_KEY, STANDARD_WAHL);
     // 11.11.2026: alte Versionswahl (z. B. smejj 1.1–1.3) -> aktuelle Version
-    if (EIGENE_NAMEN.test(jetzt) && jetzt !== AKTUELLE_VERSION) speicher.setItem(MODELL_KEY, AKTUELLE_VERSION);
+    if (EIGENE_NAMEN.test(jetzt) && jetzt !== AKTUELLE_VERSION && jetzt !== ZUSATZ_VERSION) speicher.setItem(MODELL_KEY, AKTUELLE_VERSION); // 13.11.: 1.0 bleibt
     if (EIGENE_NAMEN.test(jetzt) && speicher.getItem(STUFE_KEY) !== EIGENE_STUFE) speicher.setItem(STUFE_KEY, EIGENE_STUFE);
     if (!ALTE_AUTO_WERTE.has(jetzt)) return false;
     speicher.setItem(MODELL_KEY, AUTO_WAHL);
@@ -343,6 +345,7 @@ export async function oeffneModellMenue(kontext = {}) {
       kontext.beiWahl?.();
     }
   });
+  stufenZeile({ titel: ZUSATZ_VERSION, stufe: EIGENE_STUFE, hinweis: "Kleines eigenes Modell — schneller, einfacher" }); // 13.11.2026 unter Auto
   feld.append(menue);
   // Das Menue KLEBT am Modellnamen (Betreiber 2026-08-17, wie Claude):
   // Unterkante 6px ueber der Knopf-Oberkante, rechtsbuendig zum Knopf —

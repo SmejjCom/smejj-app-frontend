@@ -15,9 +15,9 @@
 // gilt der Besucher als abgemeldet und landet auf der Anmeldeseite. Lieber
 // einmal zu viel anmelden als die Anmelde-Pflicht still verlieren.
 
-import { API_ORIGIN, STORAGE_KEYS } from "./config.js?v=2026111230";
-import { initOfflineBanner } from "./offline-banner.js?v=2026111230";
-import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026111230";
+import { API_ORIGIN, STORAGE_KEYS } from "./config.js?v=2026111231";
+import { initOfflineBanner } from "./offline-banner.js?v=2026111231";
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026111231";
 
 // App-Shell-weiter Offline-Hinweis (Audit 2026-08-09). Hier eingehaengt, weil das
 // Gate ohnehin auf allen App- und Landeseiten laeuft (profile-dock.js,
