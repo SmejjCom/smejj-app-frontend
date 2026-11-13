@@ -8,9 +8,9 @@
 // wachsen darf. Die Navigation laeuft ueber history + popstate — genau den
 // Mechanismus, den app.js bereits fuer Deep-Links verwendet (kein Reload).
 
-import { STORAGE_KEYS } from "./config.js?v=2026111224";
-import { t } from "./i18n/ui.js?v=2026111224";
-import { focusMenuEdge, handleMenuKeyboard } from "./profile-menue-tasten.js?v=2026111224";
+import { STORAGE_KEYS } from "./config.js?v=2026111225";
+import { t } from "./i18n/ui.js?v=2026111225";
+import { focusMenuEdge, handleMenuKeyboard } from "./profile-menue-tasten.js?v=2026111225";
 
 // Oeffnet/schliesst das Menue und verdrahtet die Aktionen.
 // Input: keiner (arbeitet auf #profileDockButton/#profileDockMenu). Output: void.
@@ -256,7 +256,7 @@ export function schliesseSpurAmHandy(dok = document) {
 // kein Sitzungsdatum, und "Lokale Daten loeschen" bleibt der Weg dafuer.
 async function logout() {
   try {
-    const module = await import("./account-sessions.js?v=2026111224");
+    const module = await import("./account-sessions.js?v=2026111225");
     await module.logoutCurrentSession();
   } catch {
     /* fail-safe: auch ohne Server-Antwort lokal abmelden */

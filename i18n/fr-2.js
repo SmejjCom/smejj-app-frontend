@@ -25,7 +25,6 @@ export default {
   "Bild wird erneut geladen …": "Rechargement de l'image …",
   "Was steht als Nächstes an, {name}?": "Et maintenant, {name} ?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "L'image a été interrompue — veuillez renvoyer la demande.",
-  "Diktat läuft — der Text erscheint nach dem Stoppen.": "Dictée en cours — le texte apparaît après l'arrêt.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "Aucune parole reconnue — veuillez réessayer.",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "Micro non autorisé — saisissez votre question ci-dessous.",
   "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "La reconnaissance vocale ne démarre pas sur cet appareil — saisissez votre question ci-dessous.",

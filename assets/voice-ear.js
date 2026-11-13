@@ -18,7 +18,7 @@
 // Zeitbudget nach dem Sprech-Ende: laenger warten wir nicht auf den Server,
 // sonst fuehlt sich das Gespraech traege an. Groq transkribiert eine Stunde
 // Audio in ~15 s — der Engpass ist der Upload, nicht das Modell.
-import { beobachtePegel } from "./audio-pegel.js?v=2026111224";
+import { beobachtePegel } from "./audio-pegel.js?v=2026111225";
 // 08.11.2026 („Blitz schneller“): 1500 -> 1100 ms; ist Whisper langsamer, gilt der Browser-Text.
 export const EAR_BUDGET_MS = 1100;
 // Obergrenze der Aufnahme (Schutz von Free-Tier und Upload-Zeit).
@@ -163,6 +163,57 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn, 
     stream = null;
   };
 
+  // 13.11.2026: das Senden einer fertigen Aufnahme, auch fuer Aufnahmen der iPhone-App (Diktatbruecke).
+  async function schicke(blob, mime, optionen = {}, meldeFehler = () => {}) {
+      if (blob.size < 1_000) return ""; // zu kurz fuer echte Sprache
+      const abbruch = new AbortController();
+      const budget = setTimeout(() => abbruch.abort(), Number(optionen?.budgetMs) > 0 ? Number(optionen.budgetMs) : budgetMs);
+      let letzterStatus = 0;
+      try {
+        for (const adresse of lebende()) {
+          let antwort;
+          try {
+            antwort = await holen(adresse, {
+              method: "POST",
+              headers: authHeaders({ "Content-Type": mime, ...kontextKopf(adresse) }),
+              body: blob,
+              signal: abbruch.signal
+            });
+          } catch {
+            // Netzfehler auf DIESER Adresse: die naechste darf es versuchen,
+            // aber die tote wird nicht gemerkt — ein Aussetzer ist kein Ausfall.
+            continue;
+          }
+          if (antwort.status === 404 || (antwort.status === 503 && await ohneSchluessel(antwort))) {
+            // Route fehlt oder Ohr dort nicht konfiguriert: diese Adresse ist
+            // fuer die Sitzung erledigt, die naechste kommt dran.
+            tot.add(adresse);
+            continue;
+          }
+          // 401/429/5xx (Befund 30.09.: Bruecke lehnt das Token ab, der
+          // Rueckfallweg liefert 200) — naechste Adresse statt aufgeben.
+          // Ein 503 OHNE "ear_not_configured" (QA 28.10.: auth_unavailable,
+          // Anmeldedienst kurz weg) ist voruebergehend: frueher blieb die
+          // Adresse bis zum Neuladen tot, auch nachdem der Server wieder lief.
+          if (!antwort.ok) { letzterStatus = antwort.status; continue; }
+          const daten = await antwort.json();
+          return String(daten?.text || "").trim();
+        }
+        // Keine Adresse mehr uebrig — erst JETZT gibt das Ohr auf.
+        if (lebende().length === 0) alive = false;
+        letzterFehler = abbruch.signal.aborted ? "timeout" : globalThis.navigator?.onLine === false ? "offline"
+          : letzterStatus === 401 || letzterStatus === 403 ? "anmeldung" : letzterStatus === 429 ? "zu_viele" : "server_unreachable";
+        meldeFehler(abbruch.signal.aborted ? "timeout" : globalThis.navigator?.onLine === false ? "offline" : "server_unreachable");
+        return "";
+      } catch {
+        letzterFehler = abbruch.signal.aborted ? "timeout" : "server_unreachable";
+        meldeFehler(abbruch.signal.aborted ? "timeout" : "server_unreachable");
+        return ""; // Budget gerissen — Web-Speech-Text gewinnt
+      } finally {
+        clearTimeout(budget);
+      }
+  }
+
   return {
     /** true, wenn in der laufenden Aufnahme deutlich lauter als die Raumruhe gesprochen wurde. */
     /** Wartet, bis seit stilleMs niemand mehr spricht (hoechstens maxMs) — die Erkennung schickte
@@ -263,53 +314,13 @@ export function createServerEar({ url, urls, budgetMs = EAR_BUDGET_MS, fetchFn, 
       const blob = new Blob(teile, { type: mime });
       if (stuecke === teile) stuecke = [];
       letzterFehler = null;
-      if (blob.size < 1_000) return ""; // zu kurz fuer echte Sprache
-      const abbruch = new AbortController();
-      const budget = setTimeout(() => abbruch.abort(), Number(optionen?.budgetMs) > 0 ? Number(optionen.budgetMs) : budgetMs);
-      let letzterStatus = 0;
-      try {
-        for (const adresse of lebende()) {
-          let antwort;
-          try {
-            antwort = await holen(adresse, {
-              method: "POST",
-              headers: authHeaders({ "Content-Type": mime, ...kontextKopf(adresse) }),
-              body: blob,
-              signal: abbruch.signal
-            });
-          } catch {
-            // Netzfehler auf DIESER Adresse: die naechste darf es versuchen,
-            // aber die tote wird nicht gemerkt — ein Aussetzer ist kein Ausfall.
-            continue;
-          }
-          if (antwort.status === 404 || (antwort.status === 503 && await ohneSchluessel(antwort))) {
-            // Route fehlt oder Ohr dort nicht konfiguriert: diese Adresse ist
-            // fuer die Sitzung erledigt, die naechste kommt dran.
-            tot.add(adresse);
-            continue;
-          }
-          // 401/429/5xx (Befund 30.09.: Bruecke lehnt das Token ab, der
-          // Rueckfallweg liefert 200) — naechste Adresse statt aufgeben.
-          // Ein 503 OHNE "ear_not_configured" (QA 28.10.: auth_unavailable,
-          // Anmeldedienst kurz weg) ist voruebergehend: frueher blieb die
-          // Adresse bis zum Neuladen tot, auch nachdem der Server wieder lief.
-          if (!antwort.ok) { letzterStatus = antwort.status; continue; }
-          const daten = await antwort.json();
-          return String(daten?.text || "").trim();
-        }
-        // Keine Adresse mehr uebrig — erst JETZT gibt das Ohr auf.
-        if (lebende().length === 0) alive = false;
-        letzterFehler = abbruch.signal.aborted ? "timeout" : globalThis.navigator?.onLine === false ? "offline"
-          : letzterStatus === 401 || letzterStatus === 403 ? "anmeldung" : letzterStatus === 429 ? "zu_viele" : "server_unreachable";
-        meldeFehler(abbruch.signal.aborted ? "timeout" : globalThis.navigator?.onLine === false ? "offline" : "server_unreachable");
-        return "";
-      } catch {
-        letzterFehler = abbruch.signal.aborted ? "timeout" : "server_unreachable";
-        meldeFehler(abbruch.signal.aborted ? "timeout" : "server_unreachable");
-        return ""; // Budget gerissen — Web-Speech-Text gewinnt
-      } finally {
-        clearTimeout(budget);
-      }
+      return schicke(blob, mime, optionen, meldeFehler);
+    },
+
+    /** Eine fertige Aufnahme (z. B. aus der iPhone-App) in Text umwandeln — gleiche Adressen und Rueckfaelle. */
+    async transkribiere(blob, optionen = {}) {
+      if (!alive || !blob || blob.size < 1_000) return "";
+      return schicke(blob, blob.type || "audio/mp4", optionen, fehlerMelden);
     }
   };
 }

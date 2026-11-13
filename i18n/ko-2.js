@@ -25,7 +25,6 @@ export default {
   "Bild wird erneut geladen …": "이미지를 다시 불러오는 중 …",
   "Was steht als Nächstes an, {name}?": "다음은 무엇인가요, {name}님?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "이미지 생성이 중단되었습니다 — 요청을 다시 보내 주세요.",
-  "Diktat läuft — der Text erscheint nach dem Stoppen.": "받아쓰기 중 — 멈추면 텍스트가 나타납니다.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "음성이 인식되지 않았습니다 — 다시 시도해 주세요.",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "마이크가 허용되지 않았습니다 — 아래에 질문을 입력하세요.",
   "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "이 기기에서는 음성 인식을 시작할 수 없습니다 — 아래에 질문을 입력하세요.",

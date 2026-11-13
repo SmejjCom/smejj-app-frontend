@@ -25,7 +25,6 @@ export default {
   "Bild wird erneut geladen …": "Görsel yeniden yükleniyor …",
   "Was steht als Nächstes an, {name}?": "Sırada ne var, {name}?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "Görsel yarıda kesildi — lütfen isteği yeniden gönderin.",
-  "Diktat läuft — der Text erscheint nach dem Stoppen.": "Dikte sürüyor — metin durdurduktan sonra görünür.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "Konuşma algılanmadı — lütfen tekrar deneyin.",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "Mikrofona izin verilmedi — sorunuzu aşağıya yazın.",
   "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "Konuşma tanıma bu cihazda başlamıyor — sorunuzu aşağıya yazın.",

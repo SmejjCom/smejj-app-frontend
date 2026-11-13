@@ -25,7 +25,6 @@ export default {
   "Bild wird erneut geladen …": "Ricarico l'immagine …",
   "Was steht als Nächstes an, {name}?": "Qual è il prossimo passo, {name}?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "L'immagine è stata interrotta — invia di nuovo la richiesta.",
-  "Diktat läuft — der Text erscheint nach dem Stoppen.": "Dettatura in corso — il testo appare dopo l'arresto.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "Nessuna voce riconosciuta — riprova.",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "Microfono non consentito — scrivi la domanda qui sotto.",
   "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "Il riconoscimento vocale non si avvia su questo dispositivo — scrivi la domanda qui sotto.",

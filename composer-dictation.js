@@ -31,8 +31,8 @@
 //   (3) Jeder (Neu-)Start bekommt eine FRISCHE Instanz; jeder Handler prueft,
 //       ob er noch zur aktuellen Instanz gehoert. Spaete finale Ergebnisse
 //       nach dem Stopp-Klick werden noch geschrieben (stop() statt abort()).
-import { t } from "./i18n/ui.js?v=2026111224";
-import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026111224";
+import { t } from "./i18n/ui.js?v=2026111225";
+import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026111225";
 
 export function createDictation({ getInput, notifyInputChanged, showToast, RecognitionCtor, lang, speechSupported, setVisual, onBeforeToggle, serverOhr = null, warte = (fn, ms) => setTimeout(fn, ms), uhr = () => Date.now(), limitTimer = (fn, ms) => setTimeout(fn, ms) }) {
   // Eine Sitzung = vom Klick "Start" bis zum Klick "Stopp". Sie kann viele
@@ -41,7 +41,21 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
   let letzte = null; // die zuletzt beendete Sitzung (ihre Instanz darf noch nachliefern)
   let zaehler = 0;
   let leiste = () => {};
+  // Inhaber 13.11.2026: „Beim Einschalten soll das Mikrofon-Symbol unsere Logofarbe bekommen, beim
+  // Ausschalten wieder die normale Farbe.“ Die mobile Ruhe-Regel (mobil-ruhe.css, gesperrt) faerbt alle
+  // Knoepfe im Eingabefeld mit !important — dieser Zustand braucht darum eine spezifischere Regel.
+  const farbStil = () => {
+    try {
+      if (typeof document === "undefined" || document.getElementById("diktatLogofarbe")) return;
+      const st = document.createElement("style");
+      st.id = "diktatLogofarbe";
+      const an = '[data-start-tool="voice"]:is(.is-recording,[aria-pressed="true"])';
+      st.textContent = `html body ${an},html body[data-mobile-theme] #start .prompt-glass ${an},html body[data-mobile-theme] #start .prompt-glass.prompt-glass ${an}{color:#02fdfd!important;background:rgba(2,253,253,.12)!important;box-shadow:inset 0 0 0 1.5px rgba(2,253,253,.7)!important;animation:none!important}html body ${an} svg,html body ${an} svg *{color:#02fdfd!important;stroke:#02fdfd!important}`;
+      document.head.append(st);
+    } catch { /* ohne Stil bleibt die Funktion */ }
+  };
   const visual = active => {
+    if (active) farbStil();
     setVisual?.(active); leiste(active);
     try { window.dispatchEvent(new CustomEvent("smejj:diktat-status", { detail: { active } })); } catch {}
   };
@@ -60,6 +74,14 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
   // übernehmen" mit leerem Feld stehen. Nur die eigene Leiste der Sitzung.
   function leereLeisteSchliessen(s) {
     if (!s.verworfen && s.input?.value === s.original) s.leiste?.("close");
+  }
+  // Inhaber 13.11.2026: keine Leiste und keine Meldung — der Hinweis steht still im Feld (Platzhalter).
+  function hinweis(s, text) {
+    const feld = s?.input;
+    if (!feld) return;
+    if (s.platzhalterAlt === undefined) s.platzhalterAlt = feld.placeholder;
+    feld.placeholder = text || s.platzhalterAlt || "";
+    if (!text) s.platzhalterAlt = undefined;
   }
   function zusammensetzen(s, gesprochen, interim = false) {
     return `${s.prefix}${gesprochen}${s.suffix ? (gesprochen && !/\s$/.test(gesprochen) && !/^\s/.test(s.suffix) ? " " : "") + s.suffix : (interim ? "" : " ")}`.trimStart();
@@ -160,7 +182,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
           s.nurOhr = true;
           s.rec = null;
           beendeErkennung({ rec }, { abbrechen: true });
-          showToast(t("Diktat läuft — der Text erscheint nach dem Stoppen."), "warn"); // "info" zeigt showToast gar nicht
+          hinweis(s, t("Ich höre zu … zum Beenden aufs Mikrofon tippen"));
           return;
         }
         stop();
@@ -171,7 +193,7 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
           s.nurOhr = true;
           s.rec = null;
           beendeErkennung({ rec }, { abbrechen: true });
-          showToast(t("Diktat läuft — der Text erscheint nach dem Stoppen."), "warn");
+          hinweis(s, t("Ich höre zu … zum Beenden aufs Mikrofon tippen"));
           return;
         }
         stop();
@@ -220,6 +242,8 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     letzte = s;
     s.unbind?.(); clearTimeout(s.limit);
     visual(false);
+    if (!s.nurOhr || s.hatText) hinweis(s, "");
+    if (s.nativ) { stoppeNativ(s); return; }
     // stop() statt abort(): das letzte gesprochene Stueck kommt noch als
     // finales Ergebnis an und wird geschrieben (Handler pruefen die Instanz).
     beendeErkennung(s);
@@ -229,14 +253,16 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
       // Nachgelieferte Web-Speech-Ergebnisse waehrend der Startfreigabe
       // zaehlen mit; nur ohne Browsertext wird Audio transkribiert.
       if (!s.hatText) {
+        if (s.nurOhr) hinweis(s, t("Text wird geschrieben …"));
         Promise.resolve(serverOhr.finish(s.nurOhr ? { budgetMs: 30000 } : undefined)).then((text) => {
+          hinweis(s, "");
           const sauber = String(text || "").trim();
           // Hat das Ohr schon einen Serverfehler gemeldet, waere "Keine Sprache
           // erkannt" eine zweite, falsche Meldung (QA 28.10.).
           if (!sauber && s.nurOhr && !s.ohrFehler) showToast(t("Keine Sprache erkannt — bitte noch einmal versuchen."), "warn");
           uebernimmOhrText(s, sauber);
           leereLeisteSchliessen(s);
-        }).catch(() => { if (!s.ohrFehler) showToast(t("Keine Sprache erkannt — bitte noch einmal versuchen."), "warn"); leereLeisteSchliessen(s); });
+        }).catch(() => { hinweis(s, ""); if (!s.ohrFehler) showToast(t("Keine Sprache erkannt — bitte noch einmal versuchen."), "warn"); leereLeisteSchliessen(s); });
       } else {
         try { serverOhr.cancel(); } catch { /* Ohr war still */ }
       }
@@ -247,8 +273,80 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     else beendeOhr();
   }
 
+  // iPhone-App (13.11.2026): WebKit sperrt dort die Web-Spracherkennung — die App erkennt selbst
+  // (Apples Spracherkennung, Diktatbruecke.swift) und meldet den Text live als Ereignis `smejj-diktat`.
+  const nativBruecke = () => { try { return globalThis.window?.webkit?.messageHandlers?.smejjDiktat || null; } catch { return null; } };
+  let nativHoert = false;
+  let nativAus = false;
+  function nativEreignis(ereignis) {
+    const d = ereignis?.detail || {};
+    const s = sitzung?.nativ ? sitzung : (letzte?.nativ ? letzte : null);
+    if (!s || s.verworfen) return;
+    if (d.art === "text") {
+      if (!s.input || s.input.value !== s.letzterText) { s.verworfen = true; return; } // Nutzer hat selbst getippt
+      s.hatText = true;
+      hinweis(s, "");
+      s.input.value = zusammensetzen(s, String(d.text || ""), !d.final);
+      s.letzterText = s.input.value;
+      notifyInputChanged(s.input);
+    } else if (d.art === "aufnahme") {
+      // App-Rueckfall: Apples Erkennung nicht verfuegbar — die App nimmt auf, Text kommt nach dem Beenden.
+      s.nurAufnahme = true;
+      hinweis(s, t("Ich höre zu … zum Beenden aufs Mikrofon tippen"));
+    } else if (d.art === "audio") {
+      s.wartetAufText = true;
+      hinweis(s, t("Text wird geschrieben …"));
+      void (async () => {
+        let text = "";
+        try {
+          const bin = atob(String(d.daten || ""));
+          const bytes = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
+          text = String(await serverOhr?.transkribiere?.(new Blob([bytes], { type: d.typ || "audio/mp4" }), { budgetMs: 30000 }) || "").trim();
+        } catch { text = ""; }
+        s.wartetAufText = false;
+        hinweis(s, "");
+        if (!text) { showToast(t("Keine Sprache erkannt — bitte noch einmal versuchen."), "warn"); return; }
+        if (!s.input || s.input.value !== s.letzterText || s.verworfen) return;
+        s.input.value = zusammensetzen(s, text);
+        s.letzterText = s.input.value;
+        notifyInputChanged(s.input);
+      })();
+    } else if (d.art === "ende" || d.art === "fehler") {
+      if (sitzung === s) { s.aktiv = false; sitzung = null; letzte = s; visual(false); }
+      if (!s.wartetAufText) hinweis(s, "");
+      if (d.art === "fehler") {
+        const g = String(d.grund || "");
+        if (g === "mikrofon_verweigert") { showToast(t("Mikrofon nicht freigegeben"), "warn"); return; }
+        // Die App bekommt kein Audio: ab jetzt der Web-Weg (ein erneuter Klick startet ihn).
+        nativAus = true;
+        showToast(t("Mikrofon konnte nicht gestartet werden."), "warn");
+      }
+    }
+  }
+  function starteNativ(input) {
+    if (!nativHoert) { globalThis.window?.addEventListener?.("smejj-diktat", nativEreignis); nativHoert = true; }
+    if (letzte && letzte.rec) { letzte.rec.onresult = null; beendeErkennung(letzte, { abbrechen: true }); }
+    zaehler += 1;
+    const s = {
+      nr: zaehler, input, nativ: true, aktiv: true, verworfen: false, hatText: false,
+      letzterText: input.value, original: input.value,
+      suffix: Number.isInteger(input.selectionStart) ? input.value.slice(input.selectionEnd) : "",
+      prefix: Number.isInteger(input.selectionStart) ? input.value.slice(0, input.selectionStart) : (input.value ? `${input.value.replace(/\s+$/, "")} ` : ""),
+      finals: "", instFinals: "", interim: ""
+    };
+    sitzung = s;
+    letzte = null;
+    visual(true);
+    try { nativBruecke().postMessage({ aktion: "start", sprache: (typeof lang === "function" ? lang() : lang) || "de-DE" }); } catch { stop(); }
+  }
+  function stoppeNativ() {
+    try { nativBruecke()?.postMessage({ aktion: "stop" }); } catch { /* App weg */ }
+  }
+
   function start() {
     const input = getInput();
+    if (input && !sitzung && !nativAus && nativBruecke()) { starteNativ(input); return; }
     const nurOhr = !RecognitionCtor && Boolean(serverOhr?.isAlive?.());
     if (!input) return;
     if ((!RecognitionCtor && !nurOhr) || (!nurOhr && !speechSupported())) {

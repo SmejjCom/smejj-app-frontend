@@ -25,7 +25,6 @@ export default {
   "Bild wird erneut geladen …": "Memuat ulang gambar …",
   "Was steht als Nächstes an, {name}?": "Apa selanjutnya, {name}?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "Gambar terputus — silakan kirim permintaan lagi.",
-  "Diktat läuft — der Text erscheint nach dem Stoppen.": "Dikte berjalan — teks muncul setelah dihentikan.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "Tidak ada ucapan yang dikenali — silakan coba lagi.",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "Mikrofon tidak diizinkan — ketik pertanyaan Anda di bawah.",
   "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "Pengenalan suara tidak dapat dimulai di perangkat ini — ketik pertanyaan Anda di bawah.",

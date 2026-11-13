@@ -25,7 +25,6 @@ export default {
   "Bild wird erneut geladen …": "Reloading image …",
   "Was steht als Nächstes an, {name}?": "What's next, {name}?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "The image was interrupted — please send the request again.",
-  "Diktat läuft — der Text erscheint nach dem Stoppen.": "Dictation running — the text appears after you stop.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "No speech recognized — please try again.",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "Microphone not allowed — type your question below.",
   "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "Speech recognition won't start on this device — type your question below.",

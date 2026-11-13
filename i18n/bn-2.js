@@ -25,7 +25,6 @@ export default {
   "Bild wird erneut geladen …": "ছবিটি আবার লোড হচ্ছে …",
   "Was steht als Nächstes an, {name}?": "এরপর কী, {name}?",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "ছবিটি মাঝপথে থেমে গেছে — অনুগ্রহ করে অনুরোধটি আবার পাঠান।",
-  "Diktat läuft — der Text erscheint nach dem Stoppen.": "ডিক্টেশন চলছে — থামানোর পরে লেখা দেখা যাবে।",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "কোনো কথা শনাক্ত হয়নি — আবার চেষ্টা করুন।",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "মাইক্রোফোনের অনুমতি নেই — নিচে আপনার প্রশ্ন লিখুন।",
   "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "এই ডিভাইসে কণ্ঠস্বর শনাক্তকরণ চালু হচ্ছে না — নিচে আপনার প্রশ্ন লিখুন।",

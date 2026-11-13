@@ -25,7 +25,6 @@ export default {
   "Bild wird erneut geladen …": "正在重新加载图片 …",
   "Was steht als Nächstes an, {name}?": "接下来做什么，{name}？",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "图片生成被中断 — 请重新发送请求。",
-  "Diktat läuft — der Text erscheint nach dem Stoppen.": "正在听写 — 停止后会显示文字。",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "未识别到语音 — 请重试。",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "麦克风未获授权 — 请在下方输入问题。",
   "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "此设备无法启动语音识别 — 请在下方输入问题。",

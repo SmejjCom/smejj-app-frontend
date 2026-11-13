@@ -25,7 +25,6 @@ export default {
   "Bild wird erneut geladen …": "جارٍ إعادة تحميل الصورة …",
   "Was steht als Nächstes an, {name}?": "ما التالي يا {name}؟",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "انقطعت الصورة — يرجى إرسال الطلب مرة أخرى.",
-  "Diktat läuft — der Text erscheint nach dem Stoppen.": "الإملاء قيد التشغيل — يظهر النص بعد الإيقاف.",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "لم يتم التعرف على أي كلام — يرجى المحاولة مرة أخرى.",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "الميكروفون غير مسموح — اكتب سؤالك أدناه.",
   "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "لا يبدأ التعرّف على الكلام على هذا الجهاز — اكتب سؤالك أدناه.",

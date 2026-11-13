@@ -25,7 +25,6 @@ export default {
   "Bild wird erneut geladen …": "画像を再読み込みしています …",
   "Was steht als Nächstes an, {name}?": "次は何をしますか、{name}さん？",
   "Das Bild wurde unterbrochen — bitte den Auftrag erneut senden.": "画像の生成が中断されました — もう一度リクエストを送信してください。",
-  "Diktat läuft — der Text erscheint nach dem Stoppen.": "音声入力中 — 停止するとテキストが表示されます。",
   "Keine Sprache erkannt — bitte noch einmal versuchen.": "音声を認識できませんでした — もう一度お試しください。",
   "Mikrofon nicht erlaubt — Frage unten eintippen.": "マイクが許可されていません — 下に質問を入力してください。",
   "Spracherkennung startet auf diesem Geraet nicht — Frage unten eintippen.": "この端末では音声認識を開始できません — 下に質問を入力してください。",
