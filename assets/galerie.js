@@ -19,8 +19,8 @@
 // Speicher und Woerterbuch erst bei Bedarf laden: der reine Teil (sammleMedien)
 // bleibt so ohne Browser testbar, und der Start traegt kein Byte mehr.
 let t = (text) => text;
-const speicher = () => import("./chat-store.js?v=2026111301");
-const woerterbuch = import("./i18n/ui.js?v=2026111301").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
+const speicher = () => import("./chat-store.js?v=2026111401");
+const woerterbuch = import("./i18n/ui.js?v=2026111401").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
 
 const TYPEN = {
   bilder: { titel: "Bilder", knopf: "Bild erstellen", absicht: "bild-neu", leer: "Noch keine Bilder. Erstelle dein erstes Bild.", einheit: ["Bild", "Bilder"] },
@@ -234,6 +234,7 @@ function stil() {
 .galerie-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:18px}
 .galerie-kachel{display:flex;flex-direction:column;gap:4px;min-width:0;border:0;padding:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .galerie-kachel img,.galerie-kachel video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;background:rgba(127,127,127,.14);display:block}
+.galerie-kachel.ist-video{position:relative}.galerie-kachel.ist-video::after{content:"";position:absolute;left:50%;top:calc(50% - 10px);width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:rgba(0,0,0,.35) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 6l10 6-10 6z' fill='white'/%3E%3C/svg%3E") center/22px no-repeat;pointer-events:none}
 .galerie-abgelaufen{display:flex;align-items:center;justify-content:center;aspect-ratio:1;padding:8px;border-radius:12px;background:rgba(127,127,127,.14);font-size:12px;text-align:center;opacity:.8;cursor:pointer}
 .galerie-unter{cursor:pointer;font-size:12px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .galerie-leer{flex:none!important;height:auto!important;align-self:start;margin-top:18px;padding:28px 16px;border:1px dashed rgba(127,127,127,.45);border-radius:14px;text-align:center;opacity:.85}
@@ -324,11 +325,27 @@ function zeichne(typ) {
     (ansicht.querySelector(".galerie-kopf") || raster).after(leer);
     return;
   }
-  for (const eintrag of liste.slice(0, MAX_KACHELN)) raster.append(kachel(eintrag));
+  const sichtbar = liste.slice(0, MAX_KACHELN);
+  sichtbar.forEach((eintrag, i) => raster.append(kachel(eintrag, () => oeffneVollbild(raster, sichtbar, i))));
   void ladeMedien(raster);
 }
 
-function kachel(eintrag) {
+// Antippen eines Bildes/Videos oeffnet das Vollbild mit Wischen (galerie-ansicht.js, Inhaber 13.11.2026);
+// die Zeile darunter fuehrt weiterhin zum Chat, im Vollbild gibt es dafuer den Knopf „Zum Chat“.
+async function oeffneVollbild(raster, sichtbar, i) {
+  const kacheln = [...raster.querySelectorAll(".galerie-kachel")];
+  const eintraege = sichtbar.map((e, k) => ({
+    ...e,
+    el: kacheln[k]?.querySelector("img, video") || null,
+    adresse: MEDIEN_ADRESSE.test(e.quelle) ? e.quelle : ""
+  }));
+  try {
+    const { oeffneGalerieAnsicht } = await import("./galerie-ansicht.js?v=2026111401");
+    oeffneGalerieAnsicht(eintraege, i, { zumChat: (chatId) => void oeffneGespraech(chatId) });
+  } catch { oeffneGespraech(sichtbar[i]?.chatId); }
+}
+
+function kachel(eintrag, oeffnen) {
   const knopf = document.createElement("div");
   knopf.className = "galerie-kachel";
   knopf.title = eintrag.titel || "";
@@ -340,9 +357,10 @@ function kachel(eintrag) {
     medium.decoding = "async";
   } else {
     medium = document.createElement("video");
-    medium.controls = true;
+    medium.muted = true;
     medium.preload = "metadata";
     medium.playsInline = true;
+    knopf.classList.add("ist-video");
     // Abgelaufener 7-Tage-Link: ehrlicher Hinweis statt schwarzer Kachel; antippen oeffnet den Chat.
     medium.addEventListener("error", () => {
       const hinweis = document.createElement("div");
@@ -361,10 +379,8 @@ function kachel(eintrag) {
   unter.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); oeffneGespraech(eintrag.chatId); } });
   unter.textContent = [datumKurz(eintrag.zeit), eintrag.titel].filter(Boolean).join(" · ");
   unter.addEventListener("click", () => oeffneGespraech(eintrag.chatId));
-  if (eintrag.typ === "bild") {
-    medium.style.cursor = "pointer";
-    medium.addEventListener("click", () => oeffneGespraech(eintrag.chatId));
-  }
+  medium.style.cursor = "pointer";
+  medium.addEventListener("click", (e) => { e.preventDefault(); (oeffnen || (() => oeffneGespraech(eintrag.chatId)))(); });
   knopf.append(medium, unter);
   return knopf;
 }
@@ -378,7 +394,7 @@ async function oeffneGespraech(chatId) {
 async function ladeMedien(raster) {
   if (!raster.querySelector("[data-smejj-adresse]")) return;
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111301");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111401");
     await rehydriereMedien(raster);
   } catch { /* ohne Netz bleiben die Kacheln leer, nichts bricht */ }
 }
