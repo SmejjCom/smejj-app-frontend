@@ -15,7 +15,9 @@
     const antwort = await A.hole(pfad);
     if (!antwort.ok) return ctx.fehler(antwort.fehler);
     letzterTag = antwort.data.bericht ? antwort.data.bericht.tag : "";
-    ctx.zeichne(S.seite(antwort.data));
+    // Suchanbieter (13.11.2026): eigener Endpunkt; faellt er aus, bleibt die Radar-Seite wie bisher.
+    const suche = await A.hole("/api/admin/suche").catch(function () { return { ok: false }; });
+    ctx.zeichne(S.seite(Object.assign({}, antwort.data, { suche: suche && suche.ok ? suche.data : null })));
     verdrahte(ctx);
   }
 

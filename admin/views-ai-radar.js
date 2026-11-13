@@ -186,9 +186,34 @@
     }).join("");
   }
 
-  function seite(daten) {
-    return kopfzeile(daten.stand) + bericht(daten.bericht, daten.tageMitLaeufen) + themen(daten.stand) + budget(daten.stand) + suchblock();
+  // Suchanbieter (13.11.2026): Zustand, Fehler, Laufzeiten, Verbrauch seit Neustart — ohne Geheimnisse.
+  const ANBIETER_TON = { ok: "ok", wackelig: "warn", gestoert: "bad", unbenutzt: "dim" };
+  function suchanbieter(daten) {
+    if (!daten || !Array.isArray(daten.anbieter)) return "";
+    const zeilen = daten.anbieter.map(function (a) {
+      return "<tr><td><b>" + e(a.name) + "</b></td><td>" + V.pilleBlock(a.zustand, ANBIETER_TON[a.zustand] || "dim") + "</td><td>"
+        + String(a.aufrufe) + " / " + String(a.erfolgreich) + " / " + String(a.fehlgeschlagen) + " / " + String(a.zeitueberschreitungen) + "</td><td>"
+        + String(a.treffer) + "</td><td>" + String(a.msSchnitt) + " / " + String(a.msMax) + " ms</td><td>" + e(a.letzterFehler || "—")
+        + (a.letzterFehlerAm ? "<div class=\x27sub\x27>" + e(A.zeit(a.letzterFehlerAm)) + "</div>" : "") + "</td></tr>";
+    }).join("") || "<tr><td colspan=\x276\x27>Seit dem Neustart noch keine Suche.</td></tr>";
+    const k = daten.konfiguration || {};
+    const ki = k.kiDienste || {};
+    const ja = function (w) { return w ? V.pilleBlock("hinterlegt", "ok") : V.pilleBlock("fehlt", "dim"); };
+    const tav = (k.schluesselDienste && k.schluesselDienste.tavily) || {};
+    const v = tav.verbrauch || {};
+    const konfig = "<tr><td><b>Metasuche (SearXNG)</b></td><td>" + (k.metasuche && k.metasuche.eingeschaltet ? V.pilleBlock("an", "ok") : V.pilleBlock("aus", "warn"))
+      + (k.metasuche ? " Frist " + String(k.metasuche.fristMs) + " ms" : "") + "</td></tr>"
+      + "<tr><td><b>Tavily</b></td><td>" + ja(tav.hinterlegt) + " heute " + zahl(v.heute) + "/" + zahl(v.tagesDeckel) + ", Monat " + zahl(v.monat) + "/" + zahl(v.monatsDeckel)
+      + (v.ruhtBis ? " — ruht bis " + e(A.zeit(v.ruhtBis)) : "") + "</td></tr>"
+      + "<tr><td><b>KI-Dienste (nur Gegenpruefung, kein Beleg)</b></td><td>OpenAI " + ja(ki.openai) + " Anthropic " + ja(ki.anthropic) + " Gemini " + ja(ki.gemini) + " DeepSeek " + ja(ki.deepseek) + "</td></tr>";
+    return V.panelBlock("Suchanbieter", "seit " + e(A.zeit(daten.seit)) + " (Neustart des Dienstes) — keine vollstaendige Internetabdeckung",
+      V.tabelleBlock(["Anbieter", "Zustand", "Aufrufe / ok / Fehler / Zeit", "Treffer", "Schnitt / max", "Letzter Fehler"], [zeilen])
+      + V.tabelleBlock(["Einstellung", "Stand"], [konfig]));
   }
 
-  window.adminViewsAiRadar = { seite: seite, treffer: treffer, erkenntnis: erkenntnis, bericht: bericht };
+  function seite(daten) {
+    return kopfzeile(daten.stand) + suchanbieter(daten.suche) + bericht(daten.bericht, daten.tageMitLaeufen) + themen(daten.stand) + budget(daten.stand) + suchblock();
+  }
+
+  window.adminViewsAiRadar = { seite: seite, suchanbieter: suchanbieter, treffer: treffer, erkenntnis: erkenntnis, bericht: bericht };
 })();
