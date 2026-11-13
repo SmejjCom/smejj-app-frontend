@@ -6,7 +6,7 @@
 //   - angemeldet zusätzlich dauerhaft im Konto (POST /api/lernen/widerspruch), auch auf anderen Geräten.
 // Dazu „Gespeicherte Fragen löschen“ (nur angemeldet, POST /api/lernen/loeschen).
 // Wirft nie: ohne Netz bleibt der Gerätewiderspruch trotzdem wirksam.
-import { API_ORIGIN } from "./config.js?v=2026111219";
+import { API_ORIGIN } from "./config.js?v=2026111220";
 
 export const LERN_SCHLUESSEL = "smejj.lernen.v1";
 const TOKEN_KEY = "smejj.auth.accessToken.v1";

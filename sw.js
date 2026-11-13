@@ -186,8 +186,8 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1122";
-const ASSET_BUILD = "2026111219";
+const CACHE_NAME = "smejj-shell-v1123";
+const ASSET_BUILD = "2026111220";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -392,6 +392,8 @@ const SHELL = [
   "/assets/projekte-fenster.js",
   "/assets/projekte-spur.js",
   "/assets/projekt-kontext.js",
+  "/assets/projekt-start.js",
+  "/assets/projekt-aktionen.js",
   "/assets/topbar-krume.js",
   "/assets/spur-start.js",
   "/assets/code-flaeche.js",
@@ -655,13 +657,11 @@ const GAST_LAZY_MODULE = new Set([
   "/assets/i18n/ui.js", "/assets/config.js", "/assets/language-options.js",
   "/assets/besucher-puls.js"
 ]);
-
 // Dateien, die sich ohne Deploy aendern: netz-zuerst, Cache nur als Rueckfall.
 // Sie bleiben im Precache (damit sie offline ueberhaupt da sind), werden online
 // aber immer frisch geholt. Wer hier etwas eintraegt, muss sich sicher sein,
 // dass die Datei klein ist und ihr Inhalt wirklich veraltet.
 const LIVE_DATEN_PFADE = new Set(["/verlauf-messwerte.json"]);
-
 // HTML bleibt network-first: Navigationen und .html-Seiten sollen Aenderungen
 // sofort sehen; nur fuer sie ist der Netz-Rundweg den Preis wert.
 function isHtmlRequest(request, url) {

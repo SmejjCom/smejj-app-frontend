@@ -6,9 +6,12 @@
 // Chat im selben Projekt. Das Eingabefeld zeigt „Frag in <Projekt>“ bzw.
 // „Neuer Chat in <Projekt>“. Ein normaler „Neuer Chat“ beendet den Projekt-Modus.
 // Alles echt: chat-store (projectId des Chats, Vormerkung beim neuen Chat).
+// Seit v1123 (Inhaber 13.11.: „Es gibt keinen zweiten Chat“): die Projektseite IST
+// dieser Chat — leerer Projekt-Chat zeigt Karten + Chatliste (projekt-start.js),
+// der Kopf hat ⋯ (Umbenennen, Farbe, Anweisungen, Dateien, Sicherung, Loeschen).
 
-import { activeChatId, getChat, getProjekt, neuesGespraechImBereich, newChat, renameChat } from "/assets/chat-store.js?v=2026111219";
-import { ordnerSvg, oeffneFenster } from "./projekte-fenster.js?v=2026111219";
+import { activeChatId, getChat, getProjekt, neuesGespraechImBereich, newChat, renameChat } from "/assets/chat-store.js?v=2026111220";
+import { ordnerSvg, oeffneFenster } from "./projekte-fenster.js?v=2026111220";
 
 const NEU_KEY = "smejj.bereichNeu.v1";
 let platzhalterAlt = null;
@@ -20,7 +23,9 @@ function stil() {
   s.id = "projektKontextStil";
   s.textContent = `
 body.projekt-chat #start{position:relative}
-#projektKopf{display:flex;align-items:center;gap:10px;padding:8px 14px;position:absolute;left:0;right:0;top:0;z-index:40;background:var(--app-bg,#0f1012)}
+#projektKopf{display:flex;align-items:center;gap:8px;padding:8px 14px;position:absolute;left:0;right:0;top:0;z-index:40;background:var(--app-bg,#0f1012);box-sizing:border-box;max-width:100%}
+#projektKopf .pk-rechts{display:flex;align-items:center;gap:6px;position:relative;flex:none}
+html body #projektKopf button.pk-menue{display:none!important}
 body.projekt-chat #startLog{padding-top:64px!important}
 #projektKopf .pk-mitte{flex:1;min-width:0;text-align:center;line-height:1.25}
 #projektKopf .pk-name{display:inline-flex;align-items:center;gap:7px;font-size:18px;font-weight:600;max-width:100%}
@@ -32,6 +37,9 @@ body.projekt-chat #start .start-chips,body.projekt-chat #start .home-hero,body.p
 @media (max-width:760px){
   #projektKopf{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top) + 6px) 12px 8px;z-index:95;background:var(--app-bg,#0f1012)}
   body.projekt-chat #appMenuButton,body.projekt-chat #neuerChatStart{visibility:hidden}
+  html body #projektKopf button.pk-menue{display:grid!important}
+  html body #projektKopf button.pk-rund{width:38px!important;height:38px!important}
+  #projektKopf{gap:4px}
   body.projekt-chat #startLog{padding-top:calc(env(safe-area-inset-top) + 66px)!important;scroll-padding-top:calc(env(safe-area-inset-top) + 66px)}
 }`;
   document.head.append(s);
@@ -64,10 +72,40 @@ function knopf(svg, label, klick) {
 }
 
 const ZURUECK = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
+const MENUE = '<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
 const STIFT = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>';
 
+const startModul = () => import("./projekt-start.js?v=2026111220");
+
 async function zurProjektseite(id) {
-  try { await (await import("./arbeitsbereiche.js?v=2026111219")).oeffneProjekt(id); } catch { /* bleibt im Chat */ }
+  try { await (await import("./arbeitsbereiche.js?v=2026111220")).oeffneProjekt(id); } catch { /* bleibt im Chat */ }
+}
+
+function alleProjekte() {
+  document.querySelector('.nav-button[data-view="arbeitsbereiche"]')?.click();
+}
+
+// Neu zeichnen nur bei echten Aenderungen — sonst wuerde jeder Klick offene ⋯-Menues schliessen.
+let kopfZeichen = "";
+let flaecheZeichen = "";
+let schmutzig = true;
+function neuZeichnen() { schmutzig = true; void aktualisiere(); }
+
+async function flaecheSetzen(projekt, zeigen) {
+  const alt = document.getElementById("projektFlaeche");
+  if (!zeigen) { alt?.remove(); flaecheZeichen = ""; return; }
+  const zeichen = `${projekt.id}|${projekt.updatedAt || ""}`;
+  if (alt && !schmutzig && zeichen === flaecheZeichen) return;
+  schmutzig = false;
+  flaecheZeichen = zeichen;
+  let neu = null;
+  try { neu = await (await startModul()).zeichneFlaeche(projekt, neuZeichnen); } catch { neu = null; }
+  if (!neu || flaecheZeichen !== zeichen) return;
+  const jetzt = document.getElementById("projektFlaeche");
+  if (jetzt) { jetzt.replaceWith(neu); return; }
+  const log = document.getElementById("startLog");
+  if (log?.parentElement) log.parentElement.insertBefore(neu, log);
+  else document.getElementById("start")?.prepend(neu);
 }
 
 function umbenennen(chat) {
@@ -89,6 +127,8 @@ export async function aktualisiere() {
   let kopf = document.getElementById("projektKopf");
   if (!info) {
     kopf?.remove();
+    document.getElementById("projektFlaeche")?.remove();
+    kopfZeichen = ""; flaecheZeichen = "";
     document.body.classList.remove("projekt-chat");
     if (feld && platzhalterAlt !== null) { feld.placeholder = platzhalterAlt; platzhalterAlt = null; }
     return;
@@ -100,11 +140,15 @@ export async function aktualisiere() {
     if (platzhalterAlt === null) platzhalterAlt = feld.placeholder;
     feld.placeholder = sichtbar ? `Frag in ${projekt.name}` : `Neuer Chat in ${projekt.name}`;
   }
+  void flaecheSetzen(projekt, !sichtbar);
+  const zeichen = [projekt.id, projekt.name, projekt.farbe, chat?.id, chat?.title, sichtbar].join("|");
+  if (kopf && zeichen === kopfZeichen) return;
   if (!kopf) {
     kopf = document.createElement("div");
     kopf.id = "projektKopf";
     document.getElementById("start")?.prepend(kopf);
   }
+  kopfZeichen = zeichen;
   const mitte = document.createElement("div");
   mitte.className = "pk-mitte";
   const name = document.createElement("span");
@@ -123,11 +167,19 @@ export async function aktualisiere() {
     titel.addEventListener("click", () => umbenennen(chat));
     mitte.append(titel);
   }
+  const menueKnopf = knopf(MENUE, "Menü", () => document.getElementById("appMenuButton")?.click());
+  menueKnopf.classList.add("pk-menue");
+  const rechts = document.createElement("div");
+  rechts.className = "pk-rechts";
+  rechts.append(knopf(STIFT, `Neuer Chat in ${projekt.name}`, () => { neuesGespraechImBereich(projekt.id); newChat(); setTimeout(neuZeichnen, 150); }));
+  // Zurueck: aus einem laufenden Chat zur Projektseite (= leerer Projekt-Chat), von dort zu allen Projekten.
   kopf.replaceChildren(
-    knopf(ZURUECK, `Zurück zu ${projekt.name}`, () => zurProjektseite(projekt.id)),
+    menueKnopf,
+    knopf(ZURUECK, sichtbar ? `Zurück zu ${projekt.name}` : "Alle Projekte", () => (sichtbar ? zurProjektseite(projekt.id) : alleProjekte())),
     mitte,
-    knopf(STIFT, `Neuer Chat in ${projekt.name}`, () => { neuesGespraechImBereich(projekt.id); newChat(); setTimeout(aktualisiere, 150); })
+    rechts
   );
+  try { rechts.append((await startModul()).kopfMenue(projekt, neuZeichnen)); } catch { /* ohne Menue bleibt der Kopf */ }
 }
 
 let bereit = false;
@@ -143,8 +195,9 @@ export function initProjektKontext() {
     }
     spaeter();
   }, true);
-  window.addEventListener("smejj:chats-changed", spaeter);
-  window.addEventListener("smejj:projekte-geaendert", spaeter);
+  const geaendert = () => { schmutzig = true; kopfZeichen = ""; spaeter(); };
+  window.addEventListener("smejj:chats-changed", geaendert);
+  window.addEventListener("smejj:projekte-geaendert", geaendert);
   window.addEventListener("popstate", spaeter);
   const start = document.getElementById("start");
   if (start && typeof MutationObserver !== "undefined") {
