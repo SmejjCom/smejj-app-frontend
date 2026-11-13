@@ -12,14 +12,14 @@
 // (/api/chat-medien, nur eigenes Konto); Textdateien reisen als ihr Text mit.
 // Ohne Anmeldung (lokaler Modus) bleibt alles auf diesem Geraet — die Oberflaeche sagt das.
 
-import { API_ORIGIN } from "./config.js?v=2026111226";
+import { API_ORIGIN } from "./config.js?v=2026111227";
 
 const DB_NAME = "smejj-projekt-dateien";
 const STORE = "dateien";
 export const MAX_DATEI_BYTES = 10 * 1024 * 1024;
 export const MAX_DATEIEN_JE_PROJEKT = 50;
 const MAX_TEXT_JE_DATEI = 20_000;
-const pdfModul = () => import("./anhang-pdf-text.js?v=2026111226");
+const pdfModul = () => import("./anhang-pdf-text.js?v=2026111227");
 export const MAX_KONTEXT_ZEICHEN = 6_000;
 
 const TEXT_ENDUNG = /\.(txt|md|markdown|csv|tsv|json|xml|ya?ml|html?|css|js|mjs|ts|tsx|jsx|py|rb|go|rs|java|kt|swift|c|cc|cpp|h|hpp|cs|php|sh|sql|ini|toml|env\.example|log)$/i;

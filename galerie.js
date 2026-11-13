@@ -19,8 +19,8 @@
 // Speicher und Woerterbuch erst bei Bedarf laden: der reine Teil (sammleMedien)
 // bleibt so ohne Browser testbar, und der Start traegt kein Byte mehr.
 let t = (text) => text;
-const speicher = () => import("./chat-store.js?v=2026111226");
-const woerterbuch = import("./i18n/ui.js?v=2026111226").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
+const speicher = () => import("./chat-store.js?v=2026111227");
+const woerterbuch = import("./i18n/ui.js?v=2026111227").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
 
 const TYPEN = {
   bilder: { titel: "Bilder", knopf: "Bild erstellen", absicht: "bild-neu", leer: "Noch keine Bilder. Erstelle dein erstes Bild.", einheit: ["Bild", "Bilder"] },
@@ -222,7 +222,8 @@ function stil() {
 .sidebar .nav-button>.nav-zahl{margin-left:auto!important;flex:0 0 auto;min-width:22px;padding:1px 7px;border-radius:999px;font-size:12px;line-height:18px;text-align:center;background:rgba(127,127,127,.16);color:inherit;opacity:.85}
 .kopf-mit-zahl::after{content:attr(data-zahl);display:inline-block;vertical-align:middle;margin-left:10px;padding:2px 12px;border-radius:999px;font-size:.38em;line-height:1.5;letter-spacing:0;background:rgba(127,127,127,.16)}
 .galerie-kopf{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.galerie-neu{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:12px;border:0;font:inherit;font-size:15px;cursor:pointer;background:#2f6fde;color:#fff}
+.galerie-links{flex:1 1 auto;min-width:0}.galerie-titelzeile{display:flex;align-items:center;gap:12px}.galerie-titelzeile h2{margin:0;min-width:0}
+.galerie-neu{flex:0 0 auto;margin-left:auto;width:46px;height:46px;display:inline-flex;align-items:center;justify-content:center;padding:0;border-radius:50%;border:2px solid #02fdfd;background:transparent;color:#02fdfd;cursor:pointer}.galerie-neu:hover{background:rgba(2,253,253,.1)}.galerie-neu:focus-visible{outline:2px solid #02fdfd;outline-offset:3px}\nhtml body .view.view:is(#bilder,#videos):not(#start):not(#code) .galerie-titelzeile .galerie-neu.galerie-neu{width:46px!important;height:46px!important;min-height:0!important;padding:0!important;border-radius:50%!important;border:2px solid #02fdfd!important;color:#02fdfd!important}
 .galerie-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:18px}
 .galerie-kachel{display:flex;flex-direction:column;gap:4px;min-width:0;border:0;padding:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .galerie-kachel img,.galerie-kachel video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;background:rgba(127,127,127,.14);display:block}
@@ -252,14 +253,22 @@ function sichereAnsicht(typ) {
   h2.textContent = t(info.titel);
   const sub = document.createElement("p");
   sub.className = "subhead galerie-sub";
-  links.append(eyebrow, h2, sub);
+  // Inhaber 13.11.2026 (Mockup „Ja“): keine eigene Zeile „+ Bild erstellen“ mehr,
+  // nur ein Plus rechts in der Titelzeile; es oeffnet wie bisher „Bild/Video erstellen“.
+  const zeile = document.createElement("div");
+  zeile.className = "galerie-titelzeile";
   const neu = document.createElement("button");
   neu.type = "button";
   neu.className = "galerie-neu";
   neu.dataset.navAbsicht = info.absicht;
-  neu.textContent = `+ ${t(info.knopf)}`;
+  neu.title = t(info.knopf);
+  neu.setAttribute("aria-label", t(info.knopf));
+  neu.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
   neu.addEventListener("click", () => zuStart());
-  kopf.append(links, neu);
+  zeile.append(h2, neu);
+  links.className = "galerie-links";
+  links.append(eyebrow, zeile, sub);
+  kopf.append(links);
   const raster = document.createElement("div");
   raster.className = "galerie-raster";
   ansicht.append(kopf, raster);
@@ -353,7 +362,7 @@ async function oeffneGespraech(chatId) {
 async function ladeMedien(raster) {
   if (!raster.querySelector("[data-smejj-adresse]")) return;
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111226");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111227");
     await rehydriereMedien(raster);
   } catch { /* ohne Netz bleiben die Kacheln leer, nichts bricht */ }
 }
