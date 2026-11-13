@@ -13,9 +13,9 @@
 //
 // Dieses Modul laedt erst beim ersten Klick auf ein Bild (chat-medien.js).
 // Design-Regeln des Betreibers: viereckig, wenig Farbe, grosse Schrift.
-import { API_ORIGIN } from "./config.js?v=2026111225";
-import { t } from "./i18n/ui.js?v=2026111225";
-import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=2026111225";
+import { API_ORIGIN } from "./config.js?v=2026111226";
+import { t } from "./i18n/ui.js?v=2026111226";
+import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=2026111226";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const STIL_ID = "smejj-medien-ansicht-stil";
@@ -40,7 +40,7 @@ async function anfrage(pfad, { method = "GET", body } = {}) {
 }
 
 function meldung(text, ton = "ok") {
-  import("./components.js?v=2026111225").then((m) => m.showToast(text, ton)).catch(() => {});
+  import("./components.js?v=2026111226").then((m) => m.showToast(text, ton)).catch(() => {});
 }
 
 function stil() {
@@ -53,6 +53,9 @@ function stil() {
 .smejj-vollbild *{border-radius:0!important;box-sizing:border-box}
 .smejj-vollbild-leiste{display:flex;gap:8px;justify-content:flex-end;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 8px}
 .smejj-vollbild-leiste .smejj-vb-titel{margin-right:auto;font-size:17px;opacity:.8}
+/* 13.11.2026 (Inhaber-Screenshot: Inhalt und Bedienelemente ueberlagert): auf Handybreite liefen "Herunterladen" und "Teilen" ineinander. */
+.smejj-vollbild-leiste{flex-wrap:wrap}.smejj-vollbild-leiste .smejj-vb-titel{flex:1 1 80px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.smejj-vollbild-leiste button{flex:0 0 auto;white-space:nowrap}@media (max-width:480px){.smejj-vollbild-leiste button{padding:0 10px;font-size:15px}}
 .smejj-vollbild button,.smejj-teilen button,.smejj-teilen select{min-height:44px;min-width:44px;padding:0 14px;font:inherit;color:inherit;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);cursor:pointer}
 .smejj-vollbild button:hover,.smejj-teilen button:hover{background:rgba(255,255,255,.16)}
 .smejj-vollbild button:focus-visible,.smejj-teilen button:focus-visible,.smejj-teilen select:focus-visible,.smejj-teilen input:focus-visible{outline:2px solid #f6f3ee;outline-offset:2px}

@@ -7,7 +7,7 @@ import {
   geraeteBesitzer, getChat, importChat, listChats, neueProjektId, newChat, notifyChanged,
   notifyProjekteChanged, openChat, persistActive, renameChat, rohEigenerChat,
   sauberProjektName, scheduleSave, tx
-} from "./chat-store.js?v=2026111225";
+} from "./chat-store.js?v=2026111226";
 
 // GEMESSEN 2026-09-14 (A-bis-Z, angemeldet): der Papierkorb war IMMER leer.
 // listGeloeschteChats() warf "PAPIERKORB_TAGE is not defined" — die Konstante
@@ -214,7 +214,7 @@ export async function aktualisiereBereichsAnweisung(projectId) {
     // Projekt-Dateien (Textdateien, gedeckelt) als Wissen dazu — Projektverwaltung 12.11.2026.
     let wissen = "";
     if (projekt) {
-      try { wissen = await (await import("./projekt-dateien.js?v=2026111225")).kontextFuer(projekt.id); } catch { wissen = ""; }
+      try { wissen = await (await import("./projekt-dateien.js?v=2026111226")).kontextFuer(projekt.id); } catch { wissen = ""; }
     }
     const anweisung = [projekt?.anweisung || "", wissen ? `Wissen aus den Projektdateien:\n${wissen}` : ""].filter(Boolean).join("\n\n");
     if (anweisung) {
