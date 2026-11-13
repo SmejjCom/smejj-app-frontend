@@ -3,7 +3,7 @@
 // Eingabefeld) bleibt unverändert; nur die Menüs darüber werden Glas. Gleiche Glas-Werte wie die
 // Unterseiten (glas-unterseiten.js). Am Handy reicht das Seitenmenü bis ganz nach unten (Vollbild).
 // „:is(#glasSpur,.sidebar)“ hebt nur die Gewichtung (mobil-ruhe.css setzt die Fläche mit ID-Gewicht).
-import { GLAS_WERTE } from "./glas-unterseiten.js?v=2026111227";
+import { GLAS_WERTE } from "./glas-unterseiten.js?v=2026111228";
 
 export const STIL_ID = "glas-menue-stil";
 // Derselbe Seitenverlauf wie die Glas-Unterseiten (glas-unterseiten.js), hier für die ganze Fläche.

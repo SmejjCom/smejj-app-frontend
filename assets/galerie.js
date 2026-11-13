@@ -19,8 +19,8 @@
 // Speicher und Woerterbuch erst bei Bedarf laden: der reine Teil (sammleMedien)
 // bleibt so ohne Browser testbar, und der Start traegt kein Byte mehr.
 let t = (text) => text;
-const speicher = () => import("./chat-store.js?v=2026111227");
-const woerterbuch = import("./i18n/ui.js?v=2026111227").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
+const speicher = () => import("./chat-store.js?v=2026111228");
+const woerterbuch = import("./i18n/ui.js?v=2026111228").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
 
 const TYPEN = {
   bilder: { titel: "Bilder", knopf: "Bild erstellen", absicht: "bild-neu", leer: "Noch keine Bilder. Erstelle dein erstes Bild.", einheit: ["Bild", "Bilder"] },
@@ -32,17 +32,22 @@ const MAX_KACHELN = 200;
 const BILD_DATA = /^data:image\/(png|jpe?g|webp|gif);base64,/i;
 const VIDEO_DATA = /^data:video\/(mp4|webm);base64,/i;
 const MEDIEN_ADRESSE = /\/api\/chat-medien\?id=[A-Za-z0-9._-]+$/;
+// Erzeugte Videos liegen seit 24.09.2026 als signierter 7-Tage-Link in IDrive e2 und stehen im
+// Verlauf als Link oder Player (chat-video-e2.js) — die Galerie kannte nur data:-Videos und zeigte
+// darum 0 (Inhaber-Screenshot 13.11.2026). Gleiche Regel wie chat-video-e2.js (keine fremden Adressen).
+const E2_VIDEO = /^https:\/\/s3\.[a-z0-9-]+\.idrivee2\.com\/[a-z0-9.-]+\/medien-video\/\d{4}-\d{2}-\d{2}\/[0-9a-f]{32}\.(?:mp4|webm)\?[A-Za-z0-9%&=._~-]+$/;
+const VIDEO_ABGELAUFEN = "Video abgelaufen — Links zu erzeugten Videos gelten 7 Tage.";
 
 function attribut(tag, name) {
   const treffer = tag.match(new RegExp(`\\s${name}=("|')([^"']*)\\1`, "i"));
-  return treffer ? treffer[2] : "";
+  return treffer ? treffer[2].replace(/&amp;/g, "&") : "";
 }
 
 function zulaessig(quelle, typ) {
   const q = String(quelle || "");
   if (!q) return false;
   if (MEDIEN_ADRESSE.test(q)) return /^https:\/\//.test(q) || q.startsWith("/");
-  return typ === "bild" ? BILD_DATA.test(q) : VIDEO_DATA.test(q);
+  return typ === "bild" ? BILD_DATA.test(q) : VIDEO_DATA.test(q) || E2_VIDEO.test(q);
 }
 
 function htmlVon(nachricht) {
@@ -67,10 +72,12 @@ export function sammleMedien(chats) {
     const nachrichten = Array.isArray(chat.messages) ? chat.messages : [];
     nachrichten.forEach((nachricht, index) => {
       const html = htmlVon(nachricht);
-      if (!/<(img|video)\b/i.test(html)) return;
-      for (const [tag, name] of html.matchAll(/<(img|video)\b[^>]*>/gi)) {
-        const typ = name.toLowerCase() === "img" ? "bild" : "video";
-        const adresse = attribut(tag, "data-smejj-adresse");
+      if (!/<(img|video)\b|idrivee2\.com\//i.test(html)) return;
+      for (const [tag, name] of html.matchAll(/<(img|video|a)\b[^>]*>/gi)) {
+        const klein = name.toLowerCase();
+        const typ = klein === "img" ? "bild" : "video";
+        const adresse = klein === "a" ? attribut(tag, "href") : attribut(tag, "data-smejj-adresse");
+        if (klein === "a" && !E2_VIDEO.test(adresse)) continue;
         const quelle = adresse || attribut(tag, "src") || attribut(tag, "data-smejj-quelle");
         if (!zulaessig(quelle, typ)) continue;
         const schluessel = quelle.length > 200 ? quelle.slice(0, 120) + quelle.length : quelle;
@@ -227,6 +234,7 @@ function stil() {
 .galerie-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:18px}
 .galerie-kachel{display:flex;flex-direction:column;gap:4px;min-width:0;border:0;padding:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .galerie-kachel img,.galerie-kachel video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;background:rgba(127,127,127,.14);display:block}
+.galerie-abgelaufen{display:flex;align-items:center;justify-content:center;aspect-ratio:1;padding:8px;border-radius:12px;background:rgba(127,127,127,.14);font-size:12px;text-align:center;opacity:.8;cursor:pointer}
 .galerie-unter{cursor:pointer;font-size:12px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .galerie-leer{flex:none!important;height:auto!important;align-self:start;margin-top:18px;padding:28px 16px;border:1px dashed rgba(127,127,127,.45);border-radius:14px;text-align:center;opacity:.85}
 @media (max-width:700px){.workspace>.view.galerie-ansicht{padding-top:64px!important}.galerie-raster{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.galerie-kachel img,.galerie-kachel video{border-radius:8px}}`;
@@ -335,6 +343,14 @@ function kachel(eintrag) {
     medium.controls = true;
     medium.preload = "metadata";
     medium.playsInline = true;
+    // Abgelaufener 7-Tage-Link: ehrlicher Hinweis statt schwarzer Kachel; antippen oeffnet den Chat.
+    medium.addEventListener("error", () => {
+      const hinweis = document.createElement("div");
+      hinweis.className = "galerie-abgelaufen";
+      hinweis.textContent = t(VIDEO_ABGELAUFEN);
+      hinweis.addEventListener("click", () => oeffneGespraech(eintrag.chatId));
+      medium.replaceWith(hinweis);
+    }, { once: true });
   }
   if (MEDIEN_ADRESSE.test(eintrag.quelle)) medium.setAttribute("data-smejj-adresse", eintrag.quelle);
   else medium.src = eintrag.quelle;
@@ -362,7 +378,7 @@ async function oeffneGespraech(chatId) {
 async function ladeMedien(raster) {
   if (!raster.querySelector("[data-smejj-adresse]")) return;
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111227");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111228");
     await rehydriereMedien(raster);
   } catch { /* ohne Netz bleiben die Kacheln leer, nichts bricht */ }
 }

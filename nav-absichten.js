@@ -25,7 +25,7 @@ function loeseAus(absicht) {
 }
 
 let galerie = null;
-const ladeGalerie = () => (galerie ||= import("./galerie.js?v=2026111227").then((m) => (m.initGalerie(), m), (f) => { galerie = null; throw f; }));
+const ladeGalerie = () => (galerie ||= import("./galerie.js?v=2026111228").then((m) => (m.initGalerie(), m), (f) => { galerie = null; throw f; }));
 
 export function initNavAbsichten({ dokument = document } = {}) {
   dokument.addEventListener("click", (ereignis) => {
@@ -48,6 +48,8 @@ export function initNavAbsichten({ dokument = document } = {}) {
 if (typeof document !== "undefined") {
   initNavAbsichten();
   (globalThis.requestIdleCallback || ((f) => setTimeout(f, 1200)))(() => ladeGalerie().catch(() => {}));
+  // Formatwahl bei Bild/Video erstellen (Inhaber 13.11.2026) – nachgeladen, Startseite bleibt leicht.
+  (globalThis.requestIdleCallback || ((f) => setTimeout(f, 1200)))(() => import("./medien-format.js?v=2026111228").catch(() => {}));
 }
 
 // Pille "Nachdenken": schaltet die Gruendlich-Stufe ueber window.smejjApplyStufe

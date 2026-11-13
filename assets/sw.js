@@ -22,10 +22,6 @@
 // chat-bridge.js deployt, muss deshalb erneut hochzaehlen (v264); v236 bis
 // v263 sind verbraucht.
 //
-// v236 -> v237 (2026-08-09): neu gestaltete Verlauf-Ansicht
-// (chat-history-view.js) — Suche, Zeitgruppen, Themen, Aktions-Menue.
-// Eigene Nummer statt v236, damit ein spaeterer Deploy des Modellwahl-Chips nicht faelschlich als schon ausgeliefert gilt.
-//
 // v237 -> v238 (2026-08-09): in sechs Ansichten stand die Ueberschrift zweimal
 // untereinander — `<p class="eyebrow">Verlauf</p>` ueber `<h2>Verlauf</h2>`
 // (auch Suche, Websites, Coding, Automatisierung, Nutzer). Das Eyebrow ist als
@@ -186,8 +182,8 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1130";
-const ASSET_BUILD = "2026111227";
+const CACHE_NAME = "smejj-shell-v1131";
+const ASSET_BUILD = "2026111228";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -388,6 +384,7 @@ const SHELL = [
   "/assets/chat-medien-rettung.js",
   "/assets/nav-absichten.js",
   "/assets/galerie.js",
+  "/assets/medien-format.js",
   "/assets/projekt-dateien.js",
   "/assets/projekte-fenster.js",
   "/assets/projekte-spur.js",
