@@ -8,7 +8,7 @@
 //  3) Fertig: Bild von Rand zu Rand (Handy), weich scharf werdend, Glasleiste Sichern/Teilen/Ändern/Neu.
 //  4) Frisch fertig: öffnet sich von selbst im Vollbild; später per Antippen. Vollbild über den ganzen Bildschirm, Zoom (2 Finger / Doppeltipp), nach unten wischen schließt.
 // Nachgeladen über upgrade-hinweis.js – die Startseite wird nicht schwerer, gesperrte Dateien bleiben unberührt.
-import { t } from "./i18n/ui.js?v=2026111229";
+import { t } from "./i18n/ui.js?v=2026111230";
 
 export const STIL_ID = "bild-erstellen-stil";
 export const DAUER_KEY = "smejj.bild.dauer.v1";
@@ -214,20 +214,61 @@ async function alsDatei(bild) {
   return new File([blob], `smejj-bild.${endung}`, { type: blob.type || "image/png" });
 }
 
+// Inhaber 13.11.2026: „Teilen, Sichern usw. funktioniert nicht“. Befund (iPhone-Simulator, App 1.0.9):
+// echte Bilder liegen auf api.smejj.com und wurden erst NACH dem Tippen geladen — bis die Datei da war,
+// war die Tipp-Freigabe des Browsers verbraucht, navigator.share scheiterte, und die Panne wurde
+// stumm verschluckt. Jetzt liegt die Datei schon bereit (vorbereiten), geteilt wird sofort im Tipp,
+// und jede echte Panne bekommt einen sichtbaren Hinweis. Abbrechen durch den Nutzer bleibt still.
+const BEREIT = new WeakMap(); // bild -> { src, datei }
+
+function vorbereiten(bild) {
+  const src = bild?.currentSrc || bild?.src || "";
+  if (!src || BEREIT.get(bild)?.src === src) return;
+  BEREIT.set(bild, { src, datei: null });
+  alsDatei(bild).then((datei) => {
+    if (BEREIT.get(bild)?.src === src) BEREIT.set(bild, { src, datei });
+  }, () => { if (BEREIT.get(bild)?.src === src) BEREIT.delete(bild); });
+}
+
+function hinweis(text) {
+  const alt = document.getElementById("bildHinweis");
+  alt?.remove();
+  const h = document.createElement("div");
+  h.id = "bildHinweis";
+  h.setAttribute("role", "status");
+  h.textContent = text;
+  h.style.cssText = "position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 120px);transform:translateX(-50%);z-index:2147483646;max-width:86vw;padding:10px 16px;border-radius:14px;background:rgba(20,22,24,.92);color:#f1f3f5;font:15px/1.4 system-ui,-apple-system,sans-serif;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.4)";
+  document.body.append(h);
+  setTimeout(() => h.remove(), 3500);
+}
+
+function teileJetzt(datei, bild, nurSichern) {
+  if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [datei] }))) {
+    return navigator.share({ files: [datei], title: nurSichern ? undefined : promptZu(bild) });
+  }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(datei);
+  a.download = datei.name;
+  document.body.append(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  return Promise.resolve();
+}
+
 async function teile(bild, nurSichern) {
+  const src = bild.currentSrc || bild.src;
+  const bereit = BEREIT.get(bild);
   try {
+    // Datei schon da: im selben Tipp teilen, ohne vorheriges Warten.
+    if (bereit?.datei && bereit.src === src) return await teileJetzt(bereit.datei, bild, nurSichern);
     const datei = await alsDatei(bild);
-    if (navigator.canShare?.({ files: [datei] })) {
-      await navigator.share({ files: [datei], title: nurSichern ? undefined : promptZu(bild) });
-      return;
-    }
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(datei);
-    a.download = datei.name;
-    document.body.append(a);
-    a.click();
-    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-  } catch { /* Teilen abgebrochen */ }
+    BEREIT.set(bild, { src, datei });
+    await teileJetzt(datei, bild, nurSichern);
+  } catch (fehler) {
+    if (fehler?.name === "AbortError") return; // selbst abgebrochen
+    if (fehler?.name === "NotAllowedError") return hinweis(t("Das Bild ist jetzt bereit. Bitte noch einmal tippen."));
+    hinweis(t("Teilen hat nicht geklappt. Bitte noch einmal versuchen."));
+  }
 }
 
 function insFeld(text) {
@@ -267,6 +308,9 @@ function rahmeEin(bild) {
   if (neu) rahmen.classList.add("bild-neu");
   bild.replaceWith(rahmen);
   rahmen.append(bild, knoepfe(bild));
+  // Datei fuer Sichern/Teilen schon bereitlegen (nach dem Laden; neue Adresse = neu bereitlegen).
+  if (bild.complete && bild.naturalWidth) vorbereiten(bild);
+  bild.addEventListener("load", () => vorbereiten(bild));
   rahmen.addEventListener("click", () => oeffneVollbild(bild));
   if (erster) { merkeDauer(Date.now() - erster); erster = 0; }
   // Inhaber 12.11.2026: „wenn Bild fertig soll Vollbild sein, wie im Mockup“ – frisch erstellte Bilder

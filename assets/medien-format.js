@@ -6,7 +6,7 @@
 // Das Eingabefeld selbst bleibt unveraendert (Design-Lock); die Reihe ist ein eigenes Element davor.
 // Nachtrag (Inhaber 13.11.2026, Mockup „Ja“): Standard 9:16 bei Bild und Video; beim Video in DERSELBEN
 // Zeile die Länge 5 · 10 · 15 s (Standard 5 s) — Zusatz „(Länge 10 s)“, Bruecke: laengeAusAuftrag.
-import { t } from "./i18n/ui.js?v=2026111229";
+import { t } from "./i18n/ui.js?v=2026111230";
 
 export const BILD_FORMATE = Object.freeze(["1:1", "9:16", "16:9", "4:3", "3:4"]);
 export const VIDEO_FORMATE = Object.freeze(["1:1", "9:16", "16:9"]);
@@ -152,7 +152,7 @@ export function initMedienFormat({ dokument = document } = {}) {
     reihe.style.width = `${glas.offsetWidth}px`;
     reihe.style.top = `${glas.offsetTop - reihe.offsetHeight - 8}px`;
   }
-  if (typeof ResizeObserver === "function") new ResizeObserver(lege).observe(glas);
+  if (typeof ResizeObserver === "function") new ResizeObserver(() => requestAnimationFrame(lege)).observe(glas);
   globalThis.addEventListener?.("resize", lege);
 
   function pruefe() {

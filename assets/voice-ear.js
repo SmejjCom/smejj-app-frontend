@@ -18,7 +18,7 @@
 // Zeitbudget nach dem Sprech-Ende: laenger warten wir nicht auf den Server,
 // sonst fuehlt sich das Gespraech traege an. Groq transkribiert eine Stunde
 // Audio in ~15 s — der Engpass ist der Upload, nicht das Modell.
-import { beobachtePegel } from "./audio-pegel.js?v=2026111229";
+import { beobachtePegel } from "./audio-pegel.js?v=2026111230";
 // 08.11.2026 („Blitz schneller“): 1500 -> 1100 ms; ist Whisper langsamer, gilt der Browser-Text.
 export const EAR_BUDGET_MS = 1100;
 // Obergrenze der Aufnahme (Schutz von Free-Tier und Upload-Zeit).

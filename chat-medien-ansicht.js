@@ -13,9 +13,9 @@
 //
 // Dieses Modul laedt erst beim ersten Klick auf ein Bild (chat-medien.js).
 // Design-Regeln des Betreibers: viereckig, wenig Farbe, grosse Schrift.
-import { API_ORIGIN } from "./config.js?v=2026111229";
-import { t } from "./i18n/ui.js?v=2026111229";
-import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=2026111229";
+import { API_ORIGIN } from "./config.js?v=2026111230";
+import { t } from "./i18n/ui.js?v=2026111230";
+import { ADRESSE_ATTRIBUT, holeAnzeigeAdressen, kennungAus } from "./chat-medien.js?v=2026111230";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 const STIL_ID = "smejj-medien-ansicht-stil";
@@ -40,7 +40,7 @@ async function anfrage(pfad, { method = "GET", body } = {}) {
 }
 
 function meldung(text, ton = "ok") {
-  import("./components.js?v=2026111229").then((m) => m.showToast(text, ton)).catch(() => {});
+  import("./components.js?v=2026111230").then((m) => m.showToast(text, ton)).catch(() => {});
 }
 
 function stil() {
