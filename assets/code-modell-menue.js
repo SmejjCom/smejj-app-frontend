@@ -9,7 +9,7 @@
 // Rueckruf nach einer Modellwahl. So bleibt das Modul fuer sich pruefbar
 // und es entsteht kein Ringschluss zwischen den beiden Dateien.
 //
-import { t } from "./i18n/ui.js?v=2026111231"; // Begruessung uebersetzt (Betreiber 24.09.2026)
+import { t } from "./i18n/ui.js?v=2026111232"; // Begruessung uebersetzt (Betreiber 24.09.2026)
 
 // ---- Modellwahl (Betreiber 2026-08-17: "warum kann ich bei Code nicht
 // Modelle waehlen?"). Dieselben Speicher wie der Start-Picker, damit Chat und
@@ -47,7 +47,7 @@ const EIGENE_NAMEN = /^smejj 1(\.\d+)?$/i;
 /** Anzeigename aus dem Menue -> Modellname fuer den Server. Reine Funktion. */
 export function serverModell(wahl) {
   const name = String(wahl || "").trim();
-  return EIGENE_NAMEN.test(name) ? "smejj 1" : (name || "smejj 1");
+  return name === ZUSATZ_VERSION ? name : EIGENE_NAMEN.test(name) ? "smejj 1" : (name || "smejj 1"); // 13.11.: 1.0 reist als „smejj 1.0“ (eigene Kennung)
 }
 
 

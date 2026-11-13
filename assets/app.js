@@ -1,28 +1,28 @@
-import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js?v=2026111231";
-import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js?v=2026111231";
-import { AI_MODES, createAiRouter } from "/assets/ai/index.js?v=2026111231";
-import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=2026111231";
-import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=2026111231";
-import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=2026111231";
-import { initWorkspaceBridge } from "./workspace-bridge.js?v=2026111231";
-import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2026111231";
-import { holeSendepfad } from "./sendepfad-nachladen.js?v=2026111231";
-import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js?v=2026111231";
-import { initPanelBackdrop } from "./panel-backdrop.js?v=2026111231";
-import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js?v=2026111231";
-import { lesbarerStatus } from "./system-status-text.js?v=2026111231";
-import { afterFirstPaint } from "./deferred-start.js?v=2026111231";
-import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=2026111231";
-import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js?v=2026111231";
-import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2026111231";
-import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js?v=2026111231";
-import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=2026111231";
-import { applyViewTitle } from "./view-title.js?v=2026111231";
-import { getJson, postJson } from "./shared/http-json.js?v=2026111231";
+import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js?v=2026111232";
+import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js?v=2026111232";
+import { AI_MODES, createAiRouter } from "/assets/ai/index.js?v=2026111232";
+import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=2026111232";
+import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=2026111232";
+import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=2026111232";
+import { initWorkspaceBridge } from "./workspace-bridge.js?v=2026111232";
+import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2026111232";
+import { holeSendepfad } from "./sendepfad-nachladen.js?v=2026111232";
+import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js?v=2026111232";
+import { initPanelBackdrop } from "./panel-backdrop.js?v=2026111232";
+import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js?v=2026111232";
+import { lesbarerStatus } from "./system-status-text.js?v=2026111232";
+import { afterFirstPaint } from "./deferred-start.js?v=2026111232";
+import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=2026111232";
+import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js?v=2026111232";
+import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2026111232";
+import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js?v=2026111232";
+import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=2026111232";
+import { applyViewTitle } from "./view-title.js?v=2026111232";
+import { getJson, postJson } from "./shared/http-json.js?v=2026111232";
 // Kleine DOM-, Speicher- und Anzeige-Helfer. Herausgeloest am 07.09., weil
 // app.js mit 812 Zeilen ueber der Hausgrenze von 800 lag und damit
 // `npm run check:all` bei der ersten Pruefung abbrach.
-import { addEntry, downloadText, hideTaskIndicator, loadJson, loadText, setText, showTaskIndicator, snippet, writeOutput } from "./app-helfer.js?v=2026111231";
+import { addEntry, downloadText, hideTaskIndicator, loadJson, loadText, setText, showTaskIndicator, snippet, writeOutput } from "./app-helfer.js?v=2026111232";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
@@ -90,9 +90,9 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
-const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=2026111231").then((m) => (m.enhancePremiumSurfaces(), m)));
+const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=2026111232").then((m) => (m.enhancePremiumSurfaces(), m)));
 // Google-Login gehoert zur Profilseite — laedt erst beim Verlassen von Start/Chat.
-const holeGoogleLogin = ladeBeiAnsicht(["start", "chat"], () => import("./google-login.js?v=2026111231")
+const holeGoogleLogin = ladeBeiAnsicht(["start", "chat"], () => import("./google-login.js?v=2026111232")
   .then((m) => m.initGoogleLogin({ $, state, writeOutput, refreshSessionStatus }))
   .catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")));
 boot();
@@ -363,7 +363,7 @@ function bindStartComposer() {
   send.addEventListener("click", submit);
   bindPasteAttach({ getInput: () => input });
   // E24: auch fuer die Datei-Chips (start-chips.js).
-  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=2026111231").then((m) => m.initComposerTools()));
+  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=2026111232").then((m) => m.initComposerTools()));
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {
@@ -392,7 +392,7 @@ async function submitTask(task, { target = "#startLog" } = {}) {
       const anfrage = {
         task: await M.groundTask(task),
         // 10.11.2026: smejj 1.0–1.3 = unser Modell, der Server kennt es als "smejj 1" (code-modell-menue.js: serverModell).
-        model: M.modelForTask(task, /^smejj 1(\.[0-3])?$/i.test(state.settings.model || "smejj 1.0") ? "smejj 1" : state.settings.model) || "smejj 1",
+        model: M.modelForTask(task, /^smejj 1(\.[1-3])?$/i.test(state.settings.model || "smejj 1.1") ? "smejj 1" : state.settings.model) || "smejj 1",
         files: $("#fileRefs").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean), preferences: { stufe: normalizeStufe(state.settings.stufe), ...(window.smejjSettingsRuntime?.task?.() || {}), ...(window.smejjVoiceModePreferences || {}), ...(window.smejjBildAnhang?.take?.() || {}) },
         history: buildRequestHistory(task)
       };
