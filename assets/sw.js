@@ -182,8 +182,8 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1135";
-const ASSET_BUILD = "2026111232";
+const CACHE_NAME = "smejj-shell-v1136";
+const ASSET_BUILD = "2026111233";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -385,6 +385,7 @@ const SHELL = [
   "/assets/nav-absichten.js",
   "/assets/galerie.js",
   "/assets/medien-format.js",
+  "/assets/hochkant-ansicht.js",
   "/assets/projekt-dateien.js",
   "/assets/projekte-fenster.js",
   "/assets/projekte-spur.js",

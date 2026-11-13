@@ -8,7 +8,8 @@
 //  3) Fertig: Bild von Rand zu Rand (Handy), weich scharf werdend, Glasleiste Sichern/Teilen/Ändern/Neu.
 //  4) Frisch fertig: öffnet sich von selbst im Vollbild; später per Antippen. Vollbild über den ganzen Bildschirm, Zoom (2 Finger / Doppeltipp), nach unten wischen schließt.
 // Nachgeladen über upgrade-hinweis.js – die Startseite wird nicht schwerer, gesperrte Dateien bleiben unberührt.
-import { t } from "./i18n/ui.js?v=2026111232";
+import { t } from "./i18n/ui.js?v=2026111233";
+import { handy, mediumHochkant, oeffneHochkant } from "./hochkant-ansicht.js?v=2026111233";
 
 export const STIL_ID = "bild-erstellen-stil";
 export const DAUER_KEY = "smejj.bild.dauer.v1";
@@ -311,11 +312,20 @@ function rahmeEin(bild) {
   // Datei fuer Sichern/Teilen schon bereitlegen (nach dem Laden; neue Adresse = neu bereitlegen).
   if (bild.complete && bild.naturalWidth) vorbereiten(bild);
   bild.addEventListener("load", () => vorbereiten(bild));
-  rahmen.addEventListener("click", () => oeffneVollbild(bild));
+  rahmen.addEventListener("click", () => zeige(bild));
   if (erster) { merkeDauer(Date.now() - erster); erster = 0; }
   // Inhaber 12.11.2026: „wenn Bild fertig soll Vollbild sein, wie im Mockup“ – frisch erstellte Bilder
   // öffnen sich einmal von selbst im Vollbild (alte Bilder im Verlauf nicht). X/Wischen → zurück zum Chat.
-  if (neu && !document.querySelector(".bild-vollbild")) setTimeout(() => { if (bild.isConnected) oeffneVollbild(bild); }, 700);
+  if (neu && !document.querySelector(".bild-vollbild")) setTimeout(() => { if (bild.isConnected) zeige(bild); }, 700);
+}
+
+// Inhaber 13.11.2026 (Mockup „Ja“): 9:16-Bilder auf dem Handy als Vollbild im Chat (hochkant-ansicht.js),
+// Knöpfe/Text/Eingabe durchsichtig darüber; Antippen dort zoomt wie bisher. Andere Formate: wie bisher.
+function zeige(bild) {
+  const hochkant = () => handy() && mediumHochkant(bild)
+    && oeffneHochkant(bild, { knoepfe: (schliessen) => knoepfe(bild, schliessen), zoom: () => oeffneVollbild(bild) });
+  if (bild.complete && bild.naturalWidth) { if (!hochkant()) oeffneVollbild(bild); return; }
+  bild.addEventListener("load", () => { if (!hochkant()) oeffneVollbild(bild); }, { once: true });
 }
 
 // ---------------------------------------------------------------------------

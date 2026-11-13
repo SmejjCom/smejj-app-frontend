@@ -6,10 +6,10 @@
 import {
   listChats, benenneProjektUm, setzeProjektAnweisung, setzeProjektFarbe,
   loescheProjekt, setzeChatProjekt, renameChat, deleteChat
-} from "/assets/chat-store.js?v=2026111232";
-import { oeffneFenster, farbWahl } from "./projekte-fenster.js?v=2026111232";
+} from "/assets/chat-store.js?v=2026111233";
+import { oeffneFenster, farbWahl } from "./projekte-fenster.js?v=2026111233";
 
-export const dateienModul = () => import("./projekt-dateien.js?v=2026111232");
+export const dateienModul = () => import("./projekt-dateien.js?v=2026111233");
 
 export function el(tag, eigenschaften = {}, ...kinder) {
   const knoten = document.createElement(tag);
