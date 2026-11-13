@@ -4,12 +4,17 @@
 // Beim Senden haengt sie „(Format 16:9)“ an den Auftrag — die Bruecke liest das heraus und gibt es
 // an Bild- bzw. Video-Maler weiter (formatAusAuftrag). 1:1 ist wie bisher und braucht keinen Zusatz.
 // Das Eingabefeld selbst bleibt unveraendert (Design-Lock); die Reihe ist ein eigenes Element davor.
-import { t } from "./i18n/ui.js?v=2026111228";
+// Nachtrag (Inhaber 13.11.2026, Mockup „Ja“): Standard 9:16 bei Bild und Video; beim Video in DERSELBEN
+// Zeile die Länge 5 · 10 · 15 s (Standard 5 s) — Zusatz „(Länge 10 s)“, Bruecke: laengeAusAuftrag.
+import { t } from "./i18n/ui.js?v=2026111229";
 
 export const BILD_FORMATE = Object.freeze(["1:1", "9:16", "16:9", "4:3", "3:4"]);
 export const VIDEO_FORMATE = Object.freeze(["1:1", "9:16", "16:9"]);
+export const VIDEO_LAENGEN = Object.freeze([5, 10, 15]);
+export const STANDARD = Object.freeze({ bild: "9:16", video: "9:16", laenge: 5 });
 const SPEICHER = "smejj.medien.format.v1";
-const ZUSATZ = /\s*\(\s*Format\s+\d{1,2}:\d{1,2}\s*\)/i;
+const ZUSATZ = /\s*\(\s*Format\s+\d{1,2}:\d{1,2}\s*\)/gi;
+const LAENGE_ZUSATZ = /\s*\(\s*(?:Länge|Laenge|Dauer)\s+\d{1,2}\s*s\s*\)/gi;
 const VIDEO = /^\s*(generiere|erzeuge|erstelle|mach|mache|zeig|zeige)\s+(mir\s+)?(ein|einen|eine)\s+(video|film|clip|animation)\b|^\s*(generate|create|make)\s+(me\s+)?an?\s+(video|clip|animation)\b/i;
 const BILD = /^\s*(generiere|erzeuge|erstelle|mach|mache|zeichne|male)\s+(mir\s+)?(ein|eine|einen)\s+(bild|foto|grafik|illustration|zeichnung)\b|^\s*(generate|create|make|draw|paint)\s+(me\s+)?an?\s+(image|picture|photo|drawing)\b/i;
 
@@ -21,12 +26,15 @@ export function medienArt(text, vorlagen = {}) {
   return "";
 }
 
-/** Auftrag mit Format-Zusatz (rein, testbar). 1:1 und Unbekanntes = ohne Zusatz. */
-export function mitFormat(text, art, format) {
-  const ohne = String(text || "").replace(ZUSATZ, "").trimEnd();
+/** Auftrag mit Format- (und bei Video Längen-)Zusatz (rein, testbar). 1:1/Unbekanntes = ohne Formatzusatz. */
+export function mitFormat(text, art, format, laenge = 0) {
+  const ohne = String(text || "").replace(ZUSATZ, "").replace(LAENGE_ZUSATZ, "").trimEnd();
+  if (!art || !ohne) return ohne;
   const erlaubt = art === "video" ? VIDEO_FORMATE : BILD_FORMATE;
-  if (!art || !ohne || format === "1:1" || !erlaubt.includes(format)) return ohne;
-  return `${ohne} (Format ${format})`;
+  let neu = ohne;
+  if (format !== "1:1" && erlaubt.includes(format)) neu += ` (Format ${format})`;
+  if (art === "video" && VIDEO_LAENGEN.includes(Number(laenge))) neu += ` (Länge ${Number(laenge)} s)`;
+  return neu;
 }
 
 function lies() {
@@ -50,7 +58,10 @@ function stil() {
 #start .medien-format .mf-reihe{display:flex;gap:6px;flex-wrap:wrap}
 #start .medien-format button.mf-chip.mf-chip{display:inline-flex!important;align-items:center!important;gap:5px!important;min-height:34px!important;height:34px!important;padding:0 10px!important;border-radius:999px!important;border:1px solid rgba(127,127,127,.38)!important;background:rgba(40,46,50,.82)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#f1f3f5!important;font:inherit!important;font-size:14px!important;font-weight:600!important;cursor:pointer!important;box-shadow:none!important;width:auto!important}
 #start .medien-format button.mf-chip.mf-chip[aria-checked="true"]{border:2px solid #02fdfd!important;color:#02fdfd!important;background:rgba(4,40,44,.88)!important}
-#start .medien-format .mf-chip i{display:inline-block;border:2px solid currentColor;border-radius:2px;flex:none}`;
+#start .medien-format .mf-chip i{display:inline-block;border:2px solid currentColor;border-radius:2px;flex:none}
+#start .medien-format .mf-reihe.mf-video{gap:5px}
+#start .medien-format .mf-reihe.mf-video button.mf-chip.mf-chip{padding:0 8px!important;font-size:13.5px!important;gap:4px!important}
+#start .medien-format .mf-trenn{width:1px;align-self:stretch;margin:5px 2px;background:rgba(127,127,127,.5)}`;
   document.head.append(s);
 }
 
@@ -74,7 +85,7 @@ export function initMedienFormat({ dokument = document } = {}) {
   glas.before(reihe);
 
   let art = "";
-  let gewaehlt = { bild: "1:1", video: "1:1", ...lies() };
+  let gewaehlt = { ...STANDARD, ...lies() };
 
   const vorlagen = () => {
     const chips = [...dokument.querySelectorAll(".start-chips button")];
@@ -86,8 +97,11 @@ export function initMedienFormat({ dokument = document } = {}) {
 
   function zeichne() {
     const formate = art === "video" ? VIDEO_FORMATE : BILD_FORMATE;
-    if (!formate.includes(gewaehlt[art])) gewaehlt[art] = "1:1";
-    knoepfe.replaceChildren(...formate.map((f) => {
+    if (!formate.includes(gewaehlt[art])) gewaehlt[art] = STANDARD[art];
+    const video = art === "video";
+    titel.textContent = video ? `${t("Format")} · ${t("Länge")}` : t("Format");
+    knoepfe.classList.toggle("mf-video", video);
+    const formatKnoepfe = formate.map((f) => {
       const k = dokument.createElement("button");
       k.type = "button";
       k.className = "mf-chip";
@@ -101,7 +115,25 @@ export function initMedienFormat({ dokument = document } = {}) {
       symbol.setAttribute("aria-hidden", "true");
       k.append(symbol, f);
       return k;
-    }));
+    });
+    if (!video) return knoepfe.replaceChildren(...formatKnoepfe);
+    if (!VIDEO_LAENGEN.includes(Number(gewaehlt.laenge))) gewaehlt.laenge = STANDARD.laenge;
+    const trenn = dokument.createElement("span");
+    trenn.className = "mf-trenn";
+    trenn.setAttribute("aria-hidden", "true");
+    const laengen = VIDEO_LAENGEN.map((s) => {
+      const k = dokument.createElement("button");
+      k.type = "button";
+      k.className = "mf-chip";
+      k.setAttribute("role", "radio");
+      k.setAttribute("aria-checked", String(s === Number(gewaehlt.laenge)));
+      k.setAttribute("aria-label", `${t("Länge")} ${s} s`);
+      k.dataset.laenge = String(s);
+      k.textContent = `${s} s`;
+      return k;
+    });
+    knoepfe.replaceChildren(...formatKnoepfe, trenn, ...laengen);
+    return undefined;
   }
 
   // Die Eingabe liegt (Handy) absolut am unteren Rand: die Reihe sitzt genau darueber, gleiche Breite.
@@ -134,8 +166,13 @@ export function initMedienFormat({ dokument = document } = {}) {
   knoepfe.addEventListener("click", (ereignis) => {
     const k = ereignis.target.closest(".mf-chip");
     if (!k || !art) return;
-    gewaehlt[art] = k.dataset.format;
-    merke(art, gewaehlt[art]);
+    if (k.dataset.laenge) {
+      gewaehlt.laenge = Number(k.dataset.laenge);
+      merke("laenge", gewaehlt.laenge);
+    } else {
+      gewaehlt[art] = k.dataset.format;
+      merke(art, gewaehlt[art]);
+    }
     zeichne();
     lege();
     feld.focus();
@@ -144,7 +181,7 @@ export function initMedienFormat({ dokument = document } = {}) {
   // Vor dem Senden (Erfassungsphase, also VOR app.js): Zusatz anhaengen. Gleiche Bedingungen wie app.js.
   const vorSenden = () => {
     if (!art) return;
-    feld.value = mitFormat(feld.value, art, gewaehlt[art]);
+    feld.value = mitFormat(feld.value, art, gewaehlt[art], gewaehlt.laenge);
   };
   dokument.addEventListener("click", (ereignis) => {
     if (ereignis.target.closest?.("#startSend")) vorSenden();

@@ -18,7 +18,7 @@
 // Zusatz: eine andere Skript-Adresse, also ein Update — der volle Service Worker
 // uebernimmt und raeumt den schmalen Zwischenspeicher weg.
 
-import { initOfflineBanner } from "./offline-banner.js?v=2026111228";
+import { initOfflineBanner } from "./offline-banner.js?v=2026111229";
 
 const SCHMALER_SERVICE_WORKER = "/sw.js?eingang=willkommen";
 // Eine Datei, die es gibt, die aber in KEINEM Zwischenspeicher liegt: kommt sie
