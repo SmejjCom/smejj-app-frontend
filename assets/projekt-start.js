@@ -5,12 +5,11 @@
 // bleibt das eine vorhandene (#startMessage mit Plus, Mikrofon, Sprachmodus, Modell).
 // Dazu das ⋯-Menue im Projekt-Kopf. Nichts hier baut ein eigenes Eingabefeld.
 
-import { listChats, listProjekte, openChat } from "/assets/chat-store.js?v=2026111220";
+import { listChats, listProjekte, openChat } from "/assets/chat-store.js?v=2026111221";
 import {
   el, wann, vorschau, geheZu, dateienModul, umbenennen, farbeAendern, ordnerVerbinden,
   anweisungenFenster, dateienFenster, chatUmbenennen, chatLoeschen, chatVerschieben, loeschen
-} from "./projekt-aktionen.js?v=2026111220";
-import { ordnerSvg } from "./projekte-fenster.js?v=2026111220";
+} from "./projekt-aktionen.js?v=2026111221";
 
 function stil() {
   if (document.getElementById("projektStartStil")) return;
@@ -41,6 +40,12 @@ html body .pf-menue button{display:flex!important;justify-content:flex-start!imp
 html body .pf-menue button:hover{background:rgba(127,127,127,.18)!important}
 html body .pf-menue button.pf-gefahr{color:#ff7b72!important}
 .pf-menue hr{border:0;border-top:1px solid rgba(255,255,255,.1);margin:4px}
+/* Handy: Flaeche liegt genau zwischen Kopf und Eingabefeld (Masse setzt projekt-kontext.js) und
+   scrollt dort; bei offener Tastatur sitzt der Inhalt unten am Eingabefeld = rutscht nach oben. */
+html.mobil-chat-viewport #projektFlaeche.pf-eingepasst{position:absolute;left:0;right:0;max-width:none;margin:0;padding:6px 16px 8px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;z-index:2}
+html.mobil-chat-viewport #projektFlaeche.pf-eingepasst > *{width:100%;max-width:760px;margin-left:auto;margin-right:auto;flex:none}
+html.mobil-chat-viewport #projektFlaeche.pf-eingepasst::before{content:"";flex:0 0 0}
+html.projekt-tastatur #projektFlaeche.pf-eingepasst::before{flex:1 0 0}
 @media (max-width:760px){#projektFlaeche{padding:calc(env(safe-area-inset-top) + 70px) 14px 10px}#projektFlaeche .pf-titel{font-size:23px;margin:4px 0 14px}#projektFlaeche .pf-karten{gap:8px}html body #projektFlaeche button.pf-karte{padding:12px!important}#projektFlaeche .pf-datum{display:none}}`;
   document.head.append(s);
 }
@@ -102,7 +107,7 @@ export async function zeichneFlaeche(projekt, nach) {
   try { dateiZahl = (await (await dateienModul()).listeDateien(projekt.id)).length; } catch { /* 0 */ }
   if (meiner !== lauf) return null;
   const flaeche = el("div", { id: "projektFlaeche" });
-  flaeche.append(el("h2", { class: "pf-titel", html: ordnerSvg(projekt.farbe) }, el("span", { text: projekt.name || "Projekt" })));
+  // Kein zweiter Projektname in der Mitte: Ordner + Name stehen schon oben im Kopf (Inhaber 13.11.).
   flaeche.append(el("div", { class: "pf-karten" },
     el("button", { type: "button", class: "pf-karte", onclick: () => dateienFenster(projekt, nach) },
       el("b", { text: "Dateien" }),

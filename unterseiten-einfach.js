@@ -8,10 +8,10 @@
 // 2. Kostenschutz (#cost): für Nutzer ohne Bedeutung → direkt zu Konto → „Nutzung & Limits“.
 // 3. Handy: Entwickler-Einstellungen und Technik-Kopf im Konto ausgeblendet (Stil unten).
 // Nachgeladen über ansicht-schliessen.js (nur wenn eine Unterseite aufgeht).
-import { t } from "./i18n/ui.js?v=2026111220";
-import { API_ORIGIN } from "./config.js?v=2026111220";
+import { t } from "./i18n/ui.js?v=2026111221";
+import { API_ORIGIN } from "./config.js?v=2026111221";
 // iPhone-18-Glas für die Unterseiten (Inhaber 12.11.2026), Schritt für Schritt.
-import "./glas-unterseiten.js?v=2026111220";
+import "./glas-unterseiten.js?v=2026111221";
 
 const STIL_ID = "unterseiten-einfach-stil";
 export const KARTE_ID = "betriebEinfach";

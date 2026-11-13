@@ -196,7 +196,7 @@ export function renderChatMarkdown(node) {
     const html = toHtml(source);
     if (html) node.innerHTML = html;
     if (/Open-Meteo/i.test(source)) {
-      import("./chat-weather-card.js?v=2026111220").then(({wetterKarte}) => {
+      import("./chat-weather-card.js?v=2026111221").then(({wetterKarte}) => {
         const card = wetterKarte(source, toHtml, escapeHtml);
         if (card && node.innerHTML === html) node.innerHTML = card;
       }).catch(() => {});
@@ -394,7 +394,7 @@ function videoAbspielen(video, puffer, mime) {
 // videoAbspielen ausspielen. removeAttribute vor dem fetch: Selektor nie doppelt.
 // Videos als IDrive-e2-Link (24.09.2026): Modul nur laden, wenn eins im Chat steht.
 function e2Videos(w) {
-  if (w.querySelector?.('a[href*=".idrivee2.com/"],video[src*=".idrivee2.com/"]')) import("./chat-video-e2.js?v=2026111220").then((m) => m.e2VideosPruefen(w)).catch(() => {});
+  if (w.querySelector?.('a[href*=".idrivee2.com/"],video[src*=".idrivee2.com/"]')) import("./chat-video-e2.js?v=2026111221").then((m) => m.e2VideosPruefen(w)).catch(() => {});
 }
 
 function videoQuellenUmwandeln(wurzel) {

@@ -8,9 +8,9 @@
 // ALLES echt: Projekte/Chats aus chat-store, Dateizahl aus projekt-dateien.js.
 // Die frueheren smejjCloud-Werkzeuge bleiben ueber „Werkzeuge oeffnen“.
 
-import { listChats, listProjekte, neuesGespraechImBereich, newChat, getProjekt } from "/assets/chat-store.js?v=2026111220";
-import { ordnerSvg, oeffneNeuesProjekt } from "./projekte-fenster.js?v=2026111220";
-import { el, wann, geheZu, dateienModul } from "./projekt-aktionen.js?v=2026111220";
+import { listChats, listProjekte, neuesGespraechImBereich, newChat, getProjekt } from "/assets/chat-store.js?v=2026111221";
+import { ordnerSvg, oeffneNeuesProjekt } from "./projekte-fenster.js?v=2026111221";
+import { el, wann, geheZu, dateienModul } from "./projekt-aktionen.js?v=2026111221";
 
 const S = "html body #arbeitsbereiche#arbeitsbereiche.view.view #bereicheListe#bereicheListe";
 function stil() {

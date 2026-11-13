@@ -10,8 +10,8 @@
 // dieser Chat — leerer Projekt-Chat zeigt Karten + Chatliste (projekt-start.js),
 // der Kopf hat ⋯ (Umbenennen, Farbe, Anweisungen, Dateien, Sicherung, Loeschen).
 
-import { activeChatId, getChat, getProjekt, neuesGespraechImBereich, newChat, renameChat } from "/assets/chat-store.js?v=2026111220";
-import { ordnerSvg, oeffneFenster } from "./projekte-fenster.js?v=2026111220";
+import { activeChatId, getChat, getProjekt, neuesGespraechImBereich, newChat, renameChat } from "/assets/chat-store.js?v=2026111221";
+import { ordnerSvg, oeffneFenster } from "./projekte-fenster.js?v=2026111221";
 
 const NEU_KEY = "smejj.bereichNeu.v1";
 let platzhalterAlt = null;
@@ -37,6 +37,7 @@ body.projekt-chat #start .start-chips,body.projekt-chat #start .home-hero,body.p
 @media (max-width:760px){
   #projektKopf{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top) + 6px) 12px 8px;z-index:95;background:var(--app-bg,#0f1012)}
   body.projekt-chat #appMenuButton,body.projekt-chat #neuerChatStart{visibility:hidden}
+  html.mobil-chat-viewport body #projektKopf{top:var(--chat-sichtbar-oben,0px)!important}
   html body #projektKopf button.pk-menue{display:grid!important}
   html body #projektKopf button.pk-rund{width:38px!important;height:38px!important}
   #projektKopf{gap:4px}
@@ -75,14 +76,47 @@ const ZURUECK = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
 const MENUE = '<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
 const STIFT = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>';
 
-const startModul = () => import("./projekt-start.js?v=2026111220");
+const startModul = () => import("./projekt-start.js?v=2026111221");
 
 async function zurProjektseite(id) {
-  try { await (await import("./arbeitsbereiche.js?v=2026111220")).oeffneProjekt(id); } catch { /* bleibt im Chat */ }
+  try { await (await import("./arbeitsbereiche.js?v=2026111221")).oeffneProjekt(id); } catch { /* bleibt im Chat */ }
 }
 
 function alleProjekte() {
   document.querySelector('.nav-button[data-view="arbeitsbereiche"]')?.click();
+}
+
+// Handy: Projektflaeche genau zwischen Kopf und Eingabefeld einpassen (scrollt dort).
+// Bei offener Tastatur sitzt der Inhalt unten am Eingabefeld — er rutscht mit nach oben,
+// statt hinter dem Eingabefeld zu verschwinden (Inhaber 13.11.2026, Bildschirmfoto).
+export function passeFlaeche() {
+  const flaeche = document.getElementById("projektFlaeche");
+  const html = document.documentElement;
+  const vv = window.visualViewport;
+  const tastatur = Boolean(vv && vv.height < window.innerHeight * 0.8);
+  html.classList.toggle("projekt-tastatur", Boolean(flaeche) && tastatur);
+  if (!flaeche) return;
+  const feed = flaeche.parentElement;
+  const eingabe = document.querySelector("#start .prompt-glass");
+  const kopf = document.getElementById("projektKopf");
+  if (!html.classList.contains("mobil-chat-viewport") || !feed || !eingabe) {
+    flaeche.classList.remove("pf-eingepasst");
+    flaeche.style.top = flaeche.style.bottom = "";
+    return;
+  }
+  const f = feed.getBoundingClientRect();
+  const oben = Math.max(0, (kopf ? kopf.getBoundingClientRect().bottom : f.top) - f.top);
+  const unten = Math.max(0, f.bottom - eingabe.getBoundingClientRect().top + 8);
+  flaeche.classList.add("pf-eingepasst");
+  flaeche.style.top = `${Math.round(oben)}px`;
+  flaeche.style.bottom = `${Math.round(unten)}px`;
+  if (tastatur) flaeche.scrollTop = flaeche.scrollHeight;
+}
+let passeGeplant = false;
+function passeBald() {
+  if (passeGeplant) return;
+  passeGeplant = true;
+  requestAnimationFrame(() => { passeGeplant = false; passeFlaeche(); });
 }
 
 // Neu zeichnen nur bei echten Aenderungen — sonst wuerde jeder Klick offene ⋯-Menues schliessen.
@@ -93,7 +127,7 @@ function neuZeichnen() { schmutzig = true; void aktualisiere(); }
 
 async function flaecheSetzen(projekt, zeigen) {
   const alt = document.getElementById("projektFlaeche");
-  if (!zeigen) { alt?.remove(); flaecheZeichen = ""; return; }
+  if (!zeigen) { alt?.remove(); flaecheZeichen = ""; passeFlaeche(); return; }
   const zeichen = `${projekt.id}|${projekt.updatedAt || ""}`;
   if (alt && !schmutzig && zeichen === flaecheZeichen) return;
   schmutzig = false;
@@ -102,10 +136,13 @@ async function flaecheSetzen(projekt, zeigen) {
   try { neu = await (await startModul()).zeichneFlaeche(projekt, neuZeichnen); } catch { neu = null; }
   if (!neu || flaecheZeichen !== zeichen) return;
   const jetzt = document.getElementById("projektFlaeche");
-  if (jetzt) { jetzt.replaceWith(neu); return; }
-  const log = document.getElementById("startLog");
-  if (log?.parentElement) log.parentElement.insertBefore(neu, log);
-  else document.getElementById("start")?.prepend(neu);
+  if (jetzt) jetzt.replaceWith(neu);
+  else {
+    const log = document.getElementById("startLog");
+    if (log?.parentElement) log.parentElement.insertBefore(neu, log);
+    else document.getElementById("start")?.prepend(neu);
+  }
+  passeFlaeche();
 }
 
 function umbenennen(chat) {
@@ -199,6 +236,13 @@ export function initProjektKontext() {
   window.addEventListener("smejj:chats-changed", geaendert);
   window.addEventListener("smejj:projekte-geaendert", geaendert);
   window.addEventListener("popstate", spaeter);
+  window.visualViewport?.addEventListener("resize", passeBald);
+  window.visualViewport?.addEventListener("scroll", passeBald);
+  window.addEventListener("resize", passeBald);
+  document.addEventListener("focusin", () => setTimeout(passeBald, 350));
+  document.addEventListener("focusout", () => setTimeout(passeBald, 350));
+  const eingabe = document.querySelector("#start .prompt-glass");
+  if (eingabe && typeof ResizeObserver !== "undefined") new ResizeObserver(passeBald).observe(eingabe);
   const start = document.getElementById("start");
   if (start && typeof MutationObserver !== "undefined") {
     new MutationObserver(spaeter).observe(start, { attributes: true, attributeFilter: ["class"] });
