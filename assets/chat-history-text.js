@@ -11,8 +11,8 @@
 // den Kommentaren der jeweiligen Funktion und in
 // docs/frontend/SW_VERSIONSVERLAUF_2026-08-ARCHIV-B.md (v237 bis v246).
 
-import { merkmaleVon, volltext } from "./chat-merkmale.js?v=2026111233";
-import { t, uiLanguage } from "./i18n/ui.js?v=2026111233";
+import { merkmaleVon, volltext } from "./chat-merkmale.js?v=2026111234";
+import { t, uiLanguage } from "./i18n/ui.js?v=2026111234";
 
 const MAX_TITEL = 62;
 const MAX_VORSCHAU = 130;

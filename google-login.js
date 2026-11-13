@@ -10,11 +10,11 @@
 // `deps` herein, statt aus dem Modulumfeld von app.js zu stammen. Das macht den
 // Block ausserdem testbar.
 
-import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js?v=2026111233";
-import { PROJECT_ROLES } from "/assets/storage/index.js?v=2026111233";
-import { getJson, postJson } from "./shared/http-json.js?v=2026111233";
-import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026111233";
-import { t } from "./i18n/ui.js?v=2026111233";
+import { CLIENT_ROUTES, STORAGE_KEYS } from "./config.js?v=2026111234";
+import { PROJECT_ROLES } from "/assets/storage/index.js?v=2026111234";
+import { getJson, postJson } from "./shared/http-json.js?v=2026111234";
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026111234";
+import { t } from "./i18n/ui.js?v=2026111234";
 
 export async function initGoogleLogin(deps) {
   const { $, state, writeOutput, refreshSessionStatus } = deps;

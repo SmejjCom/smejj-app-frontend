@@ -21,7 +21,7 @@
 //      verhoert ist, loest die Rueckfrage aus.
 //   3. Fail-open: Browser ohne Konfidenzwert (z. B. Safari) senden unveraendert.
 
-import { normalizeSpeechText } from "./voice-echo-filter.js?v=2026111233";
+import { normalizeSpeechText } from "./voice-echo-filter.js?v=2026111234";
 
 // Fast sicher verhoert — unabhaengig von der Laenge.
 const KONFIDENZ_SEHR_UNSICHER = 0.25;

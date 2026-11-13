@@ -5,7 +5,7 @@
 // Die echte Aktionszeile der Nachricht wird für die Dauer der Ansicht HIER eingehängt (alle Knöpfe
 // funktionieren unverändert) und beim Schließen an ihren Platz zurückgelegt.
 // Schließen: ✕, nach unten wischen, Escape oder Senden einer neuen Nachricht.
-import { t } from "./i18n/ui.js?v=2026111233";
+import { t } from "./i18n/ui.js?v=2026111234";
 
 export const HOCHKANT_AB = 1.6; // Höhe/Breite: 9:16 = 1,78; 3:4 = 1,33 bleibt normal
 const HANDY = "(max-width: 700px)";
@@ -44,7 +44,7 @@ function stil(doc) {
 .hochkant-ansicht .msg-actions{position:static!important;display:flex!important;justify-content:space-between;margin:0!important;padding:0!important;background:transparent!important;border:0!important;opacity:1!important;visibility:visible!important}
 .hochkant-ansicht .msg-actions *{color:#fff!important;text-shadow:0 1px 3px rgba(0,0,0,.7)}
 .hochkant-ansicht .msg-actions button{background:transparent!important;border:0!important}
-#start .home-feed.hochkant-offen .prompt-glass{background:rgba(20,22,24,.55)!important;border-color:rgba(255,255,255,.25)!important;-webkit-backdrop-filter:blur(12px)!important;backdrop-filter:blur(12px)!important}`;
+html body #start.view.view .home-feed.hochkant-offen .prompt-glass.prompt-glass.prompt-glass.prompt-glass.prompt-glass.prompt-glass,html body[data-mobile-theme] #start.view.view .home-feed.hochkant-offen .prompt-glass.prompt-glass.prompt-glass.prompt-glass.prompt-glass.prompt-glass{background:rgba(20,22,24,.55)!important;border-color:rgba(255,255,255,.25)!important;-webkit-backdrop-filter:blur(12px)!important;backdrop-filter:blur(12px)!important}`;
   doc.head.append(s);
 }
 
