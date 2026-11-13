@@ -6,10 +6,10 @@
 import {
   listChats, benenneProjektUm, setzeProjektAnweisung, setzeProjektFarbe,
   loescheProjekt, setzeChatProjekt, renameChat, deleteChat
-} from "/assets/chat-store.js?v=2026111221";
-import { oeffneFenster, farbWahl } from "./projekte-fenster.js?v=2026111221";
+} from "/assets/chat-store.js?v=2026111222";
+import { oeffneFenster, farbWahl } from "./projekte-fenster.js?v=2026111222";
 
-export const dateienModul = () => import("./projekt-dateien.js?v=2026111221");
+export const dateienModul = () => import("./projekt-dateien.js?v=2026111222");
 
 export function el(tag, eigenschaften = {}, ...kinder) {
   const knoten = document.createElement(tag);
@@ -32,6 +32,14 @@ export function wann(zeit) {
   if (tage === 1) return "Gestern";
   if (tage < 7) return d.toLocaleDateString("de-DE", { weekday: "long" });
   return d.toLocaleDateString("de-DE", { day: "numeric", month: "short" });
+}
+
+function dateiInfo(datei) {
+  const teile = [datei.seiten ? `${datei.seiten} ${datei.seiten === 1 ? "Seite" : "Seiten"}` : groesse(datei.groesse)];
+  if (datei.text) teile.push("Wissen ✓");
+  if (datei.hinweis && !datei.text) teile.push(datei.hinweis);
+  if (datei.abgeglichen) teile.push("☁");
+  return teile.join(" · ");
 }
 
 function groesse(bytes) {
@@ -100,10 +108,9 @@ export async function dateienFenster(projekt, nach) {
   const neuZeichnen = async () => {
     const dateien = await m.listeDateien(projekt.id);
     liste.replaceChildren(...dateien.map((datei) => el("div", { class: "pj-datei" },
-      el("span", { title: datei.name, text: datei.name }),
-      el("small", { style: "opacity:.6;white-space:nowrap", text: `${groesse(datei.groesse)}${datei.text ? " · Wissen" : ""}` }),
-      el("button", { type: "button", class: "pjf-leise", style: "padding:4px 10px", "aria-label": `${datei.name} öffnen`, text: "Öffnen", onclick: () => oeffneDatei(m, datei.id) }),
-      el("button", { type: "button", class: "pjf-leise", style: "padding:4px 10px", "aria-label": `${datei.name} entfernen`, text: "✕", onclick: async () => { await m.entferneDatei(datei.id); await neuZeichnen(); nach?.(); } }))));
+      el("span", { class: "pj-dtext" }, el("b", { title: datei.name, text: datei.name }), el("small", { text: dateiInfo(datei) })),
+      el("button", { type: "button", class: "pjf-leise pj-dknopf", "aria-label": `${datei.name} öffnen`, text: "Öffnen", onclick: () => oeffneDatei(m, datei.id) }),
+      el("button", { type: "button", class: "pjf-leise pj-dknopf", "aria-label": `${datei.name} entfernen`, text: "✕", onclick: async () => { await m.entferneDatei(datei.id); await neuZeichnen(); nach?.(); } }))));
     if (!dateien.length) liste.append(el("p", { class: "pj-hinweis", text: "Noch keine Dateien." }));
   };
   wahl.addEventListener("change", async () => {
@@ -117,11 +124,22 @@ export async function dateienFenster(projekt, nach) {
     await neuZeichnen();
     nach?.();
   });
+  // Abgleich-Hinweis oben: auf allen Geraeten (angemeldet) oder nur hier (lokaler Modus).
+  const abgleich = el("p", { class: "pj-abgleich", role: "status" });
+  const zeigeAbgleich = () => {
+    const st = m.abgleichStatus ? m.abgleichStatus(projekt.id) : { aktiv: false };
+    const vor = st.zuletzt ? Math.max(0, Math.round((Date.now() - Date.parse(st.zuletzt)) / 60000)) : -1;
+    abgleich.textContent = st.aktiv
+      ? `☁ Auf allen deinen Geräten${vor < 0 ? " · wird abgeglichen …" : vor === 0 ? " · gerade abgeglichen" : ` · abgeglichen vor ${vor} Min.`}`
+      : "Nur auf diesem Gerät – melde dich an, damit deine Dateien auf allen Geräten da sind.";
+  };
+  zeigeAbgleich();
   await neuZeichnen();
+  void m.gleicheAb?.(projekt.id).then(async () => { zeigeAbgleich(); await neuZeichnen(); });
   oeffneFenster({
     titel: "Projektdateien",
-    text: "Textdateien (z. B. .txt, .md, .csv, Code) nutzt smejj als Wissen für Antworten in diesem Projekt. Gespeichert auf diesem Gerät, bis 10 MB je Datei.",
-    inhalt: el("div", {}, wahl, meldung, liste),
+    text: "PDFs und Textdateien (z. B. .txt, .md, .csv, Code) nutzt smejj als Wissen für Antworten in diesem Projekt – mit Angabe von Datei und Seite. Bis 10 MB je Datei.",
+    inhalt: el("div", {}, abgleich, wahl, meldung, liste),
     aktionen: [{ text: "Dateien hinzufügen", klick: () => { wahl.click(); return false; } }, { text: "Fertig", primaer: true }]
   });
 }

@@ -10,8 +10,8 @@
 // dieser Chat — leerer Projekt-Chat zeigt Karten + Chatliste (projekt-start.js),
 // der Kopf hat ⋯ (Umbenennen, Farbe, Anweisungen, Dateien, Sicherung, Loeschen).
 
-import { activeChatId, getChat, getProjekt, neuesGespraechImBereich, newChat, renameChat } from "/assets/chat-store.js?v=2026111221";
-import { ordnerSvg, oeffneFenster } from "./projekte-fenster.js?v=2026111221";
+import { activeChatId, getChat, getProjekt, neuesGespraechImBereich, newChat, renameChat } from "/assets/chat-store.js?v=2026111222";
+import { ordnerSvg, oeffneFenster } from "./projekte-fenster.js?v=2026111222";
 
 const NEU_KEY = "smejj.bereichNeu.v1";
 let platzhalterAlt = null;
@@ -76,10 +76,10 @@ const ZURUECK = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
 const MENUE = '<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
 const STIFT = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>';
 
-const startModul = () => import("./projekt-start.js?v=2026111221");
+const startModul = () => import("./projekt-start.js?v=2026111222");
 
 async function zurProjektseite(id) {
-  try { await (await import("./arbeitsbereiche.js?v=2026111221")).oeffneProjekt(id); } catch { /* bleibt im Chat */ }
+  try { await (await import("./arbeitsbereiche.js?v=2026111222")).oeffneProjekt(id); } catch { /* bleibt im Chat */ }
 }
 
 function alleProjekte() {
@@ -235,6 +235,7 @@ export function initProjektKontext() {
   const geaendert = () => { schmutzig = true; kopfZeichen = ""; spaeter(); };
   window.addEventListener("smejj:chats-changed", geaendert);
   window.addEventListener("smejj:projekte-geaendert", geaendert);
+  window.addEventListener("smejj:projekt-dateien-geaendert", geaendert);
   window.addEventListener("popstate", spaeter);
   window.visualViewport?.addEventListener("resize", passeBald);
   window.visualViewport?.addEventListener("scroll", passeBald);

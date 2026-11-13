@@ -5,11 +5,11 @@
 // bleibt das eine vorhandene (#startMessage mit Plus, Mikrofon, Sprachmodus, Modell).
 // Dazu das ⋯-Menue im Projekt-Kopf. Nichts hier baut ein eigenes Eingabefeld.
 
-import { listChats, listProjekte, openChat } from "/assets/chat-store.js?v=2026111221";
+import { listChats, listProjekte, openChat } from "/assets/chat-store.js?v=2026111222";
 import {
   el, wann, vorschau, geheZu, dateienModul, umbenennen, farbeAendern, ordnerVerbinden,
   anweisungenFenster, dateienFenster, chatUmbenennen, chatLoeschen, chatVerschieben, loeschen
-} from "./projekt-aktionen.js?v=2026111221";
+} from "./projekt-aktionen.js?v=2026111222";
 
 function stil() {
   if (document.getElementById("projektStartStil")) return;
@@ -104,7 +104,12 @@ export async function zeichneFlaeche(projekt, nach) {
   stil();
   const [seine, projekte] = await Promise.all([projektChats(projekt.id), listProjekte().catch(() => [])]);
   let dateiZahl = 0;
-  try { dateiZahl = (await (await dateienModul()).listeDateien(projekt.id)).length; } catch { /* 0 */ }
+  try {
+    const m = await dateienModul();
+    dateiZahl = (await m.listeDateien(projekt.id)).length;
+    // Im Hintergrund mit den anderen Geraeten abgleichen; Neues meldet sich per Ereignis.
+    void m.gleicheAb?.(projekt.id);
+  } catch { /* 0 */ }
   if (meiner !== lauf) return null;
   const flaeche = el("div", { id: "projektFlaeche" });
   // Kein zweiter Projektname in der Mitte: Ordner + Name stehen schon oben im Kopf (Inhaber 13.11.).

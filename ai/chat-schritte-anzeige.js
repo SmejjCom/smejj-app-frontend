@@ -29,7 +29,7 @@
 // er `node.textContent`, die Schritte wuerden also in die Antwort einfliessen.
 // ---------------------------------------------------------------------------
 
-import { t } from "../i18n/ui.js?v=2026111221";
+import { t } from "../i18n/ui.js?v=2026111222";
 
 const SCHRITT_SYMBOL = { suche: "🔍", seite: "📄" };
 

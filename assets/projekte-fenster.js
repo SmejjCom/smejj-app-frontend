@@ -2,7 +2,7 @@
 // Ein Fenster (Dialog) fuer: Neues Projekt, Anweisungen, Dateien, Farbe. Am Handy
 // erscheint es als Vollbild-Blatt von unten. Escape, X und Klick daneben schliessen.
 
-import { erstelleProjekt, setzeProjektFarbe } from "/assets/chat-store.js?v=2026111221";
+import { erstelleProjekt, setzeProjektFarbe, setzeProjektAnweisung } from "/assets/chat-store.js?v=2026111222";
 
 export const FARBEN = ["", "#e5534b", "#f0883e", "#d4a72c", "#3fb950", "#39c5cf", "#58a6ff", "#a371f7", "#db61a2"];
 
@@ -31,6 +31,21 @@ function stil() {
 html body .pjf button.pjf-primaer{background:#f2f5f4!important;color:#111214!important;border:0!important;border-radius:999px!important;padding:9px 16px!important;font-weight:600!important;min-height:0!important}
 html body .pjf button.pjf-leise{background:transparent!important;color:inherit!important;border:1px solid rgba(255,255,255,.2)!important;border-radius:999px!important;padding:9px 16px!important;min-height:0!important}
 html body .pjf button.pjf-zu{background:transparent!important;border:0!important;color:inherit!important;font-size:18px!important;padding:4px 8px!important;min-height:0!important;opacity:.7}
+.pj-abgleich{display:block;font-size:13px;line-height:1.4;margin:0 0 10px;padding:9px 12px;border-radius:12px;background:rgba(95,212,200,.1);border:1px solid rgba(95,212,200,.35);color:#bdeee8}
+.pj-datei{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid rgba(255,255,255,.08);min-width:0}
+.pj-dtext{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.pj-dtext b{font-size:14.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pj-dtext small{font-size:12.5px;opacity:.65}
+html body .pjf button.pj-dknopf{padding:6px 12px!important;flex:none!important;font-size:13px!important}
+.pj-hinweis{font-size:13px;opacity:.7;margin:6px 0}
+.pjf-vlab{font-size:13px;opacity:.7;font-weight:600;margin:14px 0 8px}
+.pjf-vraster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+html body .pjf button.pjf-vorlage{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:3px;text-align:left!important;padding:10px!important;border-radius:14px!important;border:1px solid rgba(255,255,255,.14)!important;background:rgba(255,255,255,.03)!important;color:inherit!important;min-height:0!important;width:100%!important;min-width:0!important}
+html body .pjf button.pjf-vorlage[aria-pressed=true]{border-color:#5fd4c8!important;background:rgba(95,212,200,.1)!important}
+.pjf-vorlage em{font-style:normal;font-size:19px;line-height:1}
+.pjf-vorlage b{font-size:13.5px;font-weight:600}
+.pjf-vorlage span{font-size:11.5px;opacity:.65;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.pjf-vanw{min-height:84px!important;margin-top:10px;font-size:14px!important}
 @media (max-width:640px){.pjf-hinter{align-items:flex-end;padding:0}.pjf{width:100%;max-height:92vh;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}}`;
   document.head.append(s);
 }
@@ -121,7 +136,24 @@ export function farbWahl(start = "") {
   return { knoten: reihe, wert: () => gewaehlt };
 }
 
-/** Fenster „Neues Projekt“: Name + Farbe. Ruft nachher(id) mit der neuen Kennung. */
+// Vorlagen beim Anlegen (Inhaber 13.11.2026, Entwurf projekte-vorschlag-2): ein Tipp
+// traegt eine fertige, aenderbare Anweisung und eine Farbe ein. Kurz halten — das
+// Projekt wird mit Anweisung abgeglichen (Server-Grenze 4 KB je Projekt).
+export const VORLAGEN = [
+  { id: "reise", zeichen: "✈️", name: "Reise", kurz: "Route, Hotels, Kosten", farbe: "#39c5cf",
+    anweisung: "Plane Reisen kurz und übersichtlich: Route, Zeiten, Unterkünfte und Kosten in Euro. Nenne günstige Alternativen und Tipps gegen Warteschlangen." },
+  { id: "steuer", zeichen: "🧾", name: "Steuer", kurz: "Belege, Fristen", farbe: "#d4a72c",
+    anweisung: "Hilf bei Steuer und Finanzen in Deutschland: einfache Sprache, Fristen und benötigte Belege als Liste. Weise darauf hin, wenn eine Steuerberatung nötig ist." },
+  { id: "website", zeichen: "🌐", name: "Website", kurz: "Texte, Code", farbe: "#58a6ff",
+    anweisung: "Hilf bei einer Website: kurze, klare Texte und funktionierender Code mit kurzer Erklärung. Achte auf Handy-Ansicht, Barrierefreiheit und Datenschutz." },
+  { id: "lernen", zeichen: "📚", name: "Lernen", kurz: "Erklären, abfragen", farbe: "#3fb950",
+    anweisung: "Erkläre Schritt für Schritt in einfachen Worten mit Beispielen. Stelle am Ende 2–3 kurze Übungsfragen und prüfe meine Antworten freundlich." },
+  { id: "bewerbung", zeichen: "💼", name: "Bewerbung", kurz: "Anschreiben, CV", farbe: "#a371f7",
+    anweisung: "Hilf bei Bewerbungen: Anschreiben und Lebenslauf klar, ehrlich und passend zur Stelle. Gib konkrete Verbesserungen statt allgemeiner Tipps." },
+  { id: "leer", zeichen: "➕", name: "Leer", kurz: "ohne Vorlage", farbe: "", anweisung: "" }
+];
+
+/** Fenster „Neues Projekt“: Name, Vorlage (optional), Farbe. Ruft nachher(id) mit der neuen Kennung. */
 export function oeffneNeuesProjekt(nachher) {
   const eingabe = document.createElement("input");
   eingabe.type = "text";
@@ -129,14 +161,48 @@ export function oeffneNeuesProjekt(nachher) {
   eingabe.placeholder = "Zum Beispiel: Urlaub Kopenhagen";
   eingabe.setAttribute("aria-label", "Projektname");
   const farbe = farbWahl("");
+  const vlab = document.createElement("p");
+  vlab.className = "pjf-vlab";
+  vlab.textContent = "Mit Vorlage starten (optional)";
+  const raster = document.createElement("div");
+  raster.className = "pjf-vraster";
+  raster.setAttribute("role", "group");
+  raster.setAttribute("aria-label", "Vorlagen");
+  const anweisung = document.createElement("textarea");
+  anweisung.className = "pjf-vanw";
+  anweisung.maxLength = 1500;
+  anweisung.placeholder = "Anweisung (optional): Wie soll smejj in diesem Projekt antworten?";
+  anweisung.setAttribute("aria-label", "Anweisung für das Projekt");
+  let vorlageName = "";
+  for (const v of VORLAGEN) {
+    const k = document.createElement("button");
+    k.type = "button";
+    k.className = "pjf-vorlage";
+    k.dataset.vorlage = v.id;
+    k.setAttribute("aria-pressed", "false");
+    const em = document.createElement("em"); em.textContent = v.zeichen;
+    const b = document.createElement("b"); b.textContent = v.name;
+    const sp = document.createElement("span"); sp.textContent = v.kurz;
+    k.append(em, b, sp);
+    k.addEventListener("click", () => {
+      for (const x of raster.children) x.setAttribute("aria-pressed", String(x === k));
+      anweisung.value = v.anweisung;
+      // Name nur vorschlagen, solange keiner (oder der vorige Vorschlag) dasteht.
+      if (!eingabe.value.trim() || eingabe.value === vorlageName) { eingabe.value = v.id === "leer" ? "" : v.name; vorlageName = eingabe.value; }
+      const knopf = [...farbe.knoten.children].find((x) => x.getAttribute("aria-label") === (v.farbe ? `Farbe ${v.farbe}` : "Standardfarbe"));
+      knopf?.click();
+    });
+    raster.append(k);
+  }
   const inhalt = document.createElement("div");
-  inhalt.append(eingabe, farbe.knoten);
+  inhalt.append(eingabe, vlab, raster, anweisung, farbe.knoten);
   const anlegen = async ({ meldung }) => {
     const name = eingabe.value.trim();
     if (!name) { meldung("Bitte einen Projektnamen eingeben."); eingabe.focus(); return false; }
     const id = await erstelleProjekt(name);
     if (!id) { meldung("Name schon vergeben oder Höchstzahl (50) erreicht."); return false; }
     if (farbe.wert()) await setzeProjektFarbe(id, farbe.wert());
+    if (anweisung.value.trim()) await setzeProjektAnweisung(id, anweisung.value.trim());
     nachher?.(id);
     return true;
   };
