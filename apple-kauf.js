@@ -7,14 +7,14 @@
 // (alte App, Safari), bleibt alles wie bisher: keine Preise, kein Kauf.
 // Ablauf: Kauf in der App mit Konto-Token -> signierter Beleg -> smejj-Server prüft ihn bei Apple-
 // Zertifikaten und stellt das Konto um. Die Seite selbst schaltet nie etwas frei.
-import { API_ORIGIN } from "./config.js?v=2026111234";
-import { t } from "./i18n/ui.js?v=2026111234";
+import { API_ORIGIN } from "./config.js?v=2026111301";
+import { t } from "./i18n/ui.js?v=2026111301";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1"; // wie account-sessions.js
 export const APPLE_PRODUKTE = Object.freeze([
-  { id: "com.smejj.app.plus", plan: "plus", name: "Plus", vorteile: ["1 000 Nachrichten", "Premium-Stimme", "Schnellere Antworten"], beliebt: true },
-  { id: "com.smejj.app.pro", plan: "pro", name: "Pro", vorteile: ["Alles aus Plus", "Unbegrenzte Nachrichten", "Coding-Agent & Projekte"] },
-  { id: "com.smejj.app.max", plan: "max", name: "Max", vorteile: ["Alles aus Pro", "5× Limits", "Früher Zugriff auf Neues", "Direkter Support"] }
+  { id: "com.smejj.app.plus", plan: "plus", name: "Plus", vorteile: ["1 000 Nachrichten", "100 Bilder", "10 Foto-Videos (bis 10 Sek.)", "Premium-Stimme"], beliebt: true },
+  { id: "com.smejj.app.pro", plan: "pro", name: "Pro", vorteile: ["5 000 Nachrichten", "400 Bilder", "40 Foto-Videos (bis 10 Sek.)", "Premium-Stimme & Projekte"] },
+  { id: "com.smejj.app.max", plan: "max", name: "Max", vorteile: ["15 000 Nachrichten", "1 500 Bilder", "150 Foto-Videos (bis 10 Sek.)", "Früher Zugriff & direkter Support"] }
 ]);
 const APPLE_EULA = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
 

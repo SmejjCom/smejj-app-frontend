@@ -66,7 +66,7 @@
        index.html (gleiche Marke, eine Instanz). Als Web-App oeffnet "/" abgemeldet
        diese Seite; die Tastatur des Probier-Felds loest denselben WebKit-Fehler aus
        (Layout-Viewport bleibt klein, schwarzer Balken unten). -->
-  <script src="/assets/pwa-schnellstart.js?v=2026111234" type="module"></script>
+  <script src="/assets/pwa-schnellstart.js?v=2026111301" type="module"></script>
   <!-- Besucher-Puls (Autopilot Nr. 81): EINE Strichliste je Sitzung, ohne Cookie
        und ohne Kennung. Ohne diese Zahl ist "es kommt niemand" nicht von
        "niemand kann melden" zu unterscheiden. -->
@@ -75,8 +75,8 @@
        bekam keinen Service Worker und sah offline die Fehlerseite des Browsers.
        Registriert den schmalen Service Worker (~19 KB statt 2 MB) und zeigt
        das Offline-Band der App nach einer echten Netzprobe. -->
-  <script src="/assets/willkommen-offline.js?v=2026111234" type="module"></script>
-  <script type="module" src="/assets/willkommen-composer.js?v=2026111234"></script>
+  <script src="/assets/willkommen-offline.js?v=2026111301" type="module"></script>
+  <script type="module" src="/assets/willkommen-composer.js?v=2026111301"></script>
   <style>
     /* Apple 3.1.1: alles mit data-nur-web verschwindet in der iOS-Huelle
        (ios-preise-aus.js setzt das Attribut am <html>). */
@@ -230,7 +230,7 @@
     }
     footer a { text-decoration: none; }
   </style>
-  <link id="composerEingabeStil" rel="stylesheet" href="/assets/composer-eingabe.css?v=2026111234">
+  <link id="composerEingabeStil" rel="stylesheet" href="/assets/composer-eingabe.css?v=2026111301">
 </head>
 <body>
   <header class="leiste">
@@ -317,7 +317,6 @@
       <button type="button" data-fokus="alles" class="an">Von allem etwas</button>
       <button type="button" data-fokus="bilder">Bilder</button>
       <button type="button" data-fokus="video">Videos</button>
-      <button type="button" data-fokus="code">Programmieren</button>
     </div>
     <p class="fokus-satz" id="fokusSatz">Chat, Websuche, Dateien und Sprache sind in jedem Plan unbegrenzt.</p>
     <div class="plaene">
@@ -326,7 +325,7 @@
         <span class="preis">0&nbsp;€ <small>/ Monat</small></span>
         <ul>
           <li>Chat, Websuche, Dateien, Sprache</li>
-          <li>Alle Funktionen — auch Bild, Video und Code</li>
+          <li>Alle Funktionen — auch Bild und Video</li>
           <li>Keine Kreditkarte nötig</li>
         </ul>
         <a class="knopf cyan" href="/auth/register/">Kostenlos starten</a>
@@ -336,8 +335,8 @@
         <span class="preis">9&nbsp;€ <small>/ Monat</small></span>
         <ul>
           <li>Alles aus Frei sowie:</li>
-          <li>Mehr Bilder, Videos und Aufträge</li>
-          <li>Schnellere Antworten</li>
+          <li>1 000 Nachrichten im Monat</li>
+          <li>100 Bilder und 10 Foto-Videos im Monat</li>
         </ul>
         <a class="knopf" href="/auth/register/?plan=plus">Plus nehmen</a>
       </div>
@@ -346,7 +345,7 @@
         <span class="preis">19&nbsp;€ <small>/ Monat</small></span>
         <ul>
           <li>Alles aus Plus sowie:</li>
-          <li>Für tägliche Arbeit mit Bildern und Code</li>
+          <li>5 000 Nachrichten, 400 Bilder und 40 Foto-Videos im Monat</li>
         </ul>
         <a class="knopf" href="/auth/register/?plan=pro">Pro nehmen</a>
       </div>
@@ -355,7 +354,7 @@
         <span class="preis">39&nbsp;€ <small>/ Monat</small></span>
         <ul>
           <li>Alles aus Pro sowie:</li>
-          <li>Die höchsten Mengen für Vielnutzer</li>
+          <li>15 000 Nachrichten, 1 500 Bilder und 150 Foto-Videos im Monat</li>
         </ul>
         <a class="knopf" href="/auth/register/?plan=max">Max nehmen</a>
       </div>

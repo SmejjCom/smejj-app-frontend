@@ -11,12 +11,12 @@
 // überall, Mach überall rein.“). Ohne Brücke (alte App, Safari auf iOS) fail-closed nichts.
 // Nur angemeldet und nur im Plan „Frei“.
 // Eigenes Modul, nachgeladen aus profile-dock.js — die Startseite wird nicht schwerer.
-import { t } from "./i18n/ui.js?v=2026111234";
+import { t } from "./i18n/ui.js?v=2026111301";
 // Mitgeladen (12.11.2026): Glas für Seiten-/Profilmenü und Selbstheilung veralteter Zwischenspeicher.
-import "./glas-menue.js?v=2026111234";
-import "./aktuell-halten.js?v=2026111234";
-import "./bild-erstellen.js?v=2026111234";
-import { appleBruecke } from "./apple-kauf.js?v=2026111234";
+import "./glas-menue.js?v=2026111301";
+import "./aktuell-halten.js?v=2026111301";
+import "./bild-erstellen.js?v=2026111301";
+import { appleBruecke } from "./apple-kauf.js?v=2026111301";
 
 export const DOCK_ID = "upgradeDock";
 export const MENUE_ID = "upgradeMenue";
@@ -106,8 +106,8 @@ function baueMenueEintrag(doc, win) {
   titel.textContent = t("Auf Plus upgraden");
   const vorteil = doc.createElement("small");
   // In der iOS-App ohne Web-Preis: dort gilt der Apple-Preis der Plan-Karte (Landeswährung).
-  vorteil.textContent = istIos() ? t("1 000 Nachrichten, Premium-Stimme, schnellere Antworten")
-    : t("1 000 Nachrichten, Premium-Stimme, schnellere Antworten · 9 €/Monat");
+  vorteil.textContent = istIos() ? t("1 000 Nachrichten, 100 Bilder, 10 Foto-Videos")
+    : t("1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat");
   text.append(titel, vorteil);
   eintrag.append(stern, text);
   // Über „Mein Plan“ gehen, wenn das Menü-Modul geladen ist: schließt das Menü sauber.

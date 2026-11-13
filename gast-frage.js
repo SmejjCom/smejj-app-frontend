@@ -63,7 +63,7 @@
     try {
       // Derselbe sichere Renderer wie im angemeldeten Chat. Erst nach Ende
       // des Streams auszeichnen: weitere Textstuecke wuerden Links loeschen.
-      var renderer = await import("./chat-markdown.js?v=2026111234");
+      var renderer = await import("./chat-markdown.js?v=2026111301");
       renderer.renderChatMarkdown(text);
     } catch (fehler) { /* bei Ladefehlern bleibt die vollstaendige Textantwort */ }
   }

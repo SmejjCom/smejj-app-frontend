@@ -5,10 +5,9 @@
   var SAETZE = {
     alles: "Chat, Websuche, Dateien und Sprache sind in jedem Plan unbegrenzt.",
     bilder: "Bilder gehen in jedem Plan — ein Bild dauert rund 12 Sekunden. Für viele Bilder im Monat passt smejj Plus.",
-    video: "Kurze Videos mit Erzählstimme gibt es in jedem Plan. Für regelmäßige Videos passt smejj Plus oder Pro.",
-    code: "Programmieren hat eine eigene Tür: smejj.com/code. In jedem Plan enthalten — für tägliche Code-Arbeit passt Pro."
+    video: "Kurze Videos mit Erzählstimme gibt es in jedem Plan. Für regelmäßige Videos passt smejj Plus oder Pro."
   };
-  var FOKUS_PLAN = { alles: 1, bilder: 1, video: 2, code: 2 }; // Index in .plaene
+  var FOKUS_PLAN = { alles: 1, bilder: 1, video: 2 }; // Index in .plaene
   // Mockup 1: das Probier-Feld. Die Frage geht NIE in die Adresszeile —
   // sie wandert per sessionStorage mit, die App legt sie nach der Anmeldung
   // ins Schreibfeld (app.js liest smejj.probierFrage.v1).
