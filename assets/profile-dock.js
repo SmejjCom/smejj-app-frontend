@@ -2,13 +2,13 @@
 //
 // Bild + Name unten links; liest nur localStorage (app.js), schreibt nie zurueck.
 
-import "./auth-gate.js?v=2026111222";
+import "./auth-gate.js?v=2026111223";
 // Hier eingehaengt statt in index.html (Start-Lock).
-import { STORAGE_KEYS } from "./config.js?v=2026111222";
-import { t } from "./i18n/ui.js?v=2026111222";
-import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=2026111222";
-import { ladeBeiKlick } from "./nachladen.js?v=2026111222";
-import { initUsageCapture } from "./usage-meter.js?v=2026111222";
+import { STORAGE_KEYS } from "./config.js?v=2026111223";
+import { t } from "./i18n/ui.js?v=2026111223";
+import { PROFILE_PICTURE_EVENT, readProfilePicture } from "./profile-picture-store.js?v=2026111223";
+import { ladeBeiKlick } from "./nachladen.js?v=2026111223";
+import { initUsageCapture } from "./usage-meter.js?v=2026111223";
 
 // Buttons, nach deren Klick sich Name/Session aendern koennen (app.js schreibt
 // localStorage synchron im Handler; das Neuzeichnen laeuft danach im Makrotask).
@@ -17,7 +17,7 @@ import { initUsageCapture } from "./usage-meter.js?v=2026111222";
 let menueGeladen = null;
 let letzterMenueStand = ["", "", false];
 function holeMenue() {
-  menueGeladen ||= import("./profile-dock-menu.js?v=2026111222").catch((f) => { menueGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", f); throw f; });
+  menueGeladen ||= import("./profile-dock-menu.js?v=2026111223").catch((f) => { menueGeladen = null; console.error("[smejj.com] Nachladen fehlgeschlagen:", f); throw f; });
   return menueGeladen;
 }
 
@@ -37,7 +37,7 @@ export function initProfileDock() {
   ladeBeiKlick(["#profileDockButton"], () => holeMenue().then((m) => { m.initProfileDockMenu(); m.renderProfileDockMenu(...letzterMenueStand); return m; }));
   window.addEventListener("smejj:chats-changed", function quellenEinmal() {
     window.removeEventListener("smejj:chats-changed", quellenEinmal);
-    import("./quellen-panel.js?v=2026111222").catch((f) => console.error("[smejj.com] Nachladen fehlgeschlagen:", f));
+    import("./quellen-panel.js?v=2026111223").catch((f) => console.error("[smejj.com] Nachladen fehlgeschlagen:", f));
   });
   // Icon-Zaehler erst beim ersten Druck auf ein BEDIENELEMENT (Startgewicht,
   // gemessen 2026-09-14): er zaehlt nur Knoepfe und Links aus seiner
@@ -48,12 +48,12 @@ export function initProfileDock() {
   const zaehlerHolen = (event) => {
     if (!event.target?.closest?.("button, a, [role='button'], [data-jump], [data-composer-action], [data-start-tool], [data-browser-oeffnen]")) return;
     document.removeEventListener("pointerdown", zaehlerHolen, { capture: true });
-    import("./icon-nutzung.js?v=2026111222").catch(() => {});
+    import("./icon-nutzung.js?v=2026111223").catch(() => {});
   };
   document.addEventListener("pointerdown", zaehlerHolen, { capture: true });
   render();
   ladeSchliessenBeiUnterseite();
-  setTimeout(() => import("./upgrade-hinweis.js?v=2026111222").catch(() => {}), 1500); // Upgrade-Hinweis (12.11.2026)
+  setTimeout(() => import("./upgrade-hinweis.js?v=2026111223").catch(() => {}), 1500); // Upgrade-Hinweis (12.11.2026)
   window.addEventListener(PROFILE_PICTURE_EVENT, render);
   window.addEventListener("storage", (event) => {
     if (!event.key || event.key === STORAGE_KEYS.profile || event.key === STORAGE_KEYS.session) render();
@@ -65,7 +65,7 @@ export function initProfileDock() {
 
 // X-Knopf auf Unterseiten (12.11.2026), erst beim Oeffnen nachgeladen (Startgewicht).
 function ladeSchliessenBeiUnterseite() {
-  const hole = () => import("./ansicht-schliessen.js?v=2026111222").catch(() => {});
+  const hole = () => import("./ansicht-schliessen.js?v=2026111223").catch(() => {});
   const unterseite = (el) => el?.classList?.contains("view") && el.classList.contains("is-active") && el.id !== "start" && el.id !== "code";
   if (unterseite(document.querySelector(".view.is-active"))) { hole(); return; }
   const wache = new MutationObserver((liste) => {

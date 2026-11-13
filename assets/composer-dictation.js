@@ -31,9 +31,8 @@
 //   (3) Jeder (Neu-)Start bekommt eine FRISCHE Instanz; jeder Handler prueft,
 //       ob er noch zur aktuellen Instanz gehoert. Spaete finale Ergebnisse
 //       nach dem Stopp-Klick werden noch geschrieben (stop() statt abort()).
-import { diktatLeiste } from "./composer-diktat-leiste.js?v=2026111222";
-import { t } from "./i18n/ui.js?v=2026111222";
-import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026111222";
+import { t } from "./i18n/ui.js?v=2026111223";
+import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026111223";
 
 export function createDictation({ getInput, notifyInputChanged, showToast, RecognitionCtor, lang, speechSupported, setVisual, onBeforeToggle, serverOhr = null, warte = (fn, ms) => setTimeout(fn, ms), uhr = () => Date.now(), limitTimer = (fn, ms) => setTimeout(fn, ms) }) {
   // Eine Sitzung = vom Klick "Start" bis zum Klick "Stopp". Sie kann viele
@@ -286,8 +285,9 @@ export function createDictation({ getInput, notifyInputChanged, showToast, Recog
     s.unbind = bindAufnahmeUnterbrechung({ stop: unterbrechen });
     s.limit = limitTimer(() => { if (sitzung === s) { showToast("Zeitlimit erreicht: Die Aufnahme wurde nach 60 Sekunden gestoppt.", "warn"); stop(); } }, 60_000);
     s.limit?.unref?.();
-    leiste("close");
-    leiste = s.leiste = diktatLeiste(input, { stop, accept, discard });
+    // Inhaber 13.11.2026: keine Leiste mehr (kein „Aufnahme läuft …“, kein Stoppen/Übernehmen/Verwerfen).
+    // Wie Tastatur-Diktat: Text erscheint live im Feld, das Mikrofon leuchtet, erneuter Klick beendet.
+    leiste = s.leiste = () => {};
     visual(true);
     const gescheitert = result => {
       if (sitzung !== s || !s.nurOhr || result?.ok !== false) return;
