@@ -19,8 +19,8 @@
 // Speicher und Woerterbuch erst bei Bedarf laden: der reine Teil (sammleMedien)
 // bleibt so ohne Browser testbar, und der Start traegt kein Byte mehr.
 let t = (text) => text;
-const speicher = () => import("./chat-store.js?v=2026111404");
-const woerterbuch = import("./i18n/ui.js?v=2026111404").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
+const speicher = () => import("./chat-store.js?v=2026111405");
+const woerterbuch = import("./i18n/ui.js?v=2026111405").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
 
 const TYPEN = {
   bilder: { titel: "Bilder", knopf: "Bild erstellen", absicht: "bild-neu", leer: "Noch keine Bilder. Erstelle dein erstes Bild.", einheit: ["Bild", "Bilder"] },
@@ -234,7 +234,7 @@ function stil() {
 .galerie-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:18px}
 .galerie-kachel{display:flex;flex-direction:column;gap:4px;min-width:0;border:0;padding:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .galerie-kachel img,.galerie-kachel video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;background:rgba(127,127,127,.14);display:block}
-.galerie-kachel.ist-video{position:relative}.galerie-kachel.ist-video::after{content:"";position:absolute;left:50%;top:calc(50% - 10px);width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:rgba(0,0,0,.35) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 6l10 6-10 6z' fill='white'/%3E%3C/svg%3E") center/22px no-repeat;pointer-events:none}
+.galerie-kachel.ist-video{position:relative;align-self:start}.galerie-kachel.ist-video:has(.galerie-abgelaufen)::after{display:none}.galerie-kachel.ist-video::after{content:"";position:absolute;left:0;right:0;top:0;aspect-ratio:1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns=http://www.w3.org/2000/svg viewBox=0 0 40 40%3E%3Ccircle cx=20 cy=20 r=20 fill=%23000 fill-opacity=.4/%3E%3Cpath d=M16 12l12 8-12 8z fill=white/%3E%3C/svg%3E") center/40px no-repeat}
 .galerie-abgelaufen{display:flex;align-items:center;justify-content:center;aspect-ratio:1;padding:8px;border-radius:12px;background:rgba(127,127,127,.14);font-size:12px;text-align:center;opacity:.8;cursor:pointer}
 .galerie-unter{cursor:pointer;font-size:12px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .galerie-leer{flex:none!important;height:auto!important;align-self:start;margin-top:18px;padding:28px 16px;border:1px dashed rgba(127,127,127,.45);border-radius:14px;text-align:center;opacity:.85}
@@ -340,7 +340,7 @@ async function oeffneVollbild(raster, sichtbar, i) {
     adresse: MEDIEN_ADRESSE.test(e.quelle) ? e.quelle : ""
   }));
   try {
-    const { oeffneGalerieAnsicht } = await import("./galerie-ansicht.js?v=2026111404");
+    const { oeffneGalerieAnsicht } = await import("./galerie-ansicht.js?v=2026111405");
     const typ = raster.closest(".galerie-ansicht")?.id || "";
     oeffneGalerieAnsicht(eintraege, i, {
       zumChat: (chatId) => void oeffneGespraech(chatId),
@@ -366,6 +366,9 @@ function kachel(eintrag, oeffnen) {
     medium.preload = "metadata";
     medium.playsInline = true;
     knopf.classList.add("ist-video");
+    // chat-video-e2.js prueft jedes <video> mit e2-Adresse streng (ohne #-Zusatz) und ersetzte die Kachel durch
+    // „Video abgelaufen“ (Inhaber-Screenshot 14.11.2026, v1142). Die Galerie prueft selbst — Marke = schon geprueft.
+    medium.setAttribute("data-smejj-e2", "1");
     // Quelle wird spaeter oft noch getauscht (data: -> blob:, Nachladen) — Startbild bei jedem neuen Laden anhaengen.
     medium.addEventListener("loadstart", () => {
       const q = medium.getAttribute("src") || "";
@@ -404,7 +407,7 @@ async function oeffneGespraech(chatId) {
 async function ladeMedien(raster) {
   if (!raster.querySelector("[data-smejj-adresse]")) return;
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111404");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111405");
     await rehydriereMedien(raster);
     for (const v of raster.querySelectorAll("video")) {
       const q = v.getAttribute("src") || "";

@@ -1,4 +1,4 @@
-import { t } from "./i18n/ui.js?v=2026111404";
+import { t } from "./i18n/ui.js?v=2026111405";
 
 // view-chrome.js — smejj.com View-Navigation: Zurueck-Pfeil + Schliessen-X.
 // Zweck: Jede App-View ausser der Startseite (#start) erhaelt zur Laufzeit oben

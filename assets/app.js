@@ -1,28 +1,28 @@
-import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js?v=2026111404";
-import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js?v=2026111404";
-import { AI_MODES, createAiRouter } from "/assets/ai/index.js?v=2026111404";
-import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=2026111404";
-import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=2026111404";
-import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=2026111404";
-import { initWorkspaceBridge } from "./workspace-bridge.js?v=2026111404";
-import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2026111404";
-import { holeSendepfad } from "./sendepfad-nachladen.js?v=2026111404";
-import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js?v=2026111404";
-import { initPanelBackdrop } from "./panel-backdrop.js?v=2026111404";
-import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js?v=2026111404";
-import { lesbarerStatus } from "./system-status-text.js?v=2026111404";
-import { afterFirstPaint } from "./deferred-start.js?v=2026111404";
-import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=2026111404";
-import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js?v=2026111404";
-import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2026111404";
-import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js?v=2026111404";
-import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=2026111404";
-import { applyViewTitle } from "./view-title.js?v=2026111404";
-import { getJson, postJson } from "./shared/http-json.js?v=2026111404";
+import { CLIENT_ROUTES, STORAGE_KEYS, UI_COPY } from "./config.js?v=2026111405";
+import { PROJECT_ROLES, createLocalWorkspace } from "/assets/storage/index.js?v=2026111405";
+import { AI_MODES, createAiRouter } from "/assets/ai/index.js?v=2026111405";
+import { Icons, closeModal, openModal, renderChatMarkdown, renderEmptyState, setButtonIcon, showToast } from "./components.js?v=2026111405";
+import { bindPasteAttach, composePastedTask } from "./composer-paste-attach.js?v=2026111405";
+import { bindeSuchNachlader, holeSuche, ladeSucheFuerAnsicht } from "./such-nachladen.js?v=2026111405";
+import { initWorkspaceBridge } from "./workspace-bridge.js?v=2026111405";
+import { ladeBeiAnsicht, ladeBeiKlick } from "./nachladen.js?v=2026111405";
+import { holeSendepfad } from "./sendepfad-nachladen.js?v=2026111405";
+import { applyPanelCompact, syncLeftMenuState } from "./left-menu-state.js?v=2026111405";
+import { initPanelBackdrop } from "./panel-backdrop.js?v=2026111405";
+import { buildChatTargets, buildRequestHistory } from "./chat-history-context.js?v=2026111405";
+import { lesbarerStatus } from "./system-status-text.js?v=2026111405";
+import { afterFirstPaint } from "./deferred-start.js?v=2026111405";
+import { bindUploads, validateBrowserUpload } from "./uploads-surface.js?v=2026111405";
+import { bindProjects, refreshProjectList, selectedProjectId } from "./projects-surface.js?v=2026111405";
+import { PANEL_WIDTHS, bindPanelResize, getPanelWidth, restorePanelWidths, setPanelOpen, setPanelWidth } from "./panel-layout.js?v=2026111405";
+import { bindLocalWorkspace, ensureProject, refreshLocalWorkspaceStatus } from "./local-workspace-surface.js?v=2026111405";
+import { ALIAS_PATHS, PATH_VIEWS, VIEW_ALIASES, VIEW_PATHS, getViewFromUrl, updateCanonical } from "./view-routes.js?v=2026111405";
+import { applyViewTitle } from "./view-title.js?v=2026111405";
+import { getJson, postJson } from "./shared/http-json.js?v=2026111405";
 // Kleine DOM-, Speicher- und Anzeige-Helfer. Herausgeloest am 07.09., weil
 // app.js mit 812 Zeilen ueber der Hausgrenze von 800 lag und damit
 // `npm run check:all` bei der ersten Pruefung abbrach.
-import { addEntry, downloadText, hideTaskIndicator, loadJson, loadText, setText, showTaskIndicator, snippet, writeOutput } from "./app-helfer.js?v=2026111404";
+import { addEntry, downloadText, hideTaskIndicator, loadJson, loadText, setText, showTaskIndicator, snippet, writeOutput } from "./app-helfer.js?v=2026111405";
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
@@ -90,9 +90,9 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
-const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=2026111404").then((m) => (m.enhancePremiumSurfaces(), m)));
+const holeFlaechen = ladeBeiAnsicht(["start", "chat"], () => import("./premium-surfaces.js?v=2026111405").then((m) => (m.enhancePremiumSurfaces(), m)));
 // Google-Login gehoert zur Profilseite — laedt erst beim Verlassen von Start/Chat.
-const holeGoogleLogin = ladeBeiAnsicht(["start", "chat"], () => import("./google-login.js?v=2026111404")
+const holeGoogleLogin = ladeBeiAnsicht(["start", "chat"], () => import("./google-login.js?v=2026111405")
   .then((m) => m.initGoogleLogin({ $, state, writeOutput, refreshSessionStatus }))
   .catch((error) => writeOutput("#profileOutput", error.message || "Google Login konnte nicht geladen werden.")));
 boot();
@@ -363,7 +363,7 @@ function bindStartComposer() {
   send.addEventListener("click", submit);
   bindPasteAttach({ getInput: () => input });
   // E24: auch fuer die Datei-Chips (start-chips.js).
-  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=2026111404").then((m) => m.initComposerTools()));
+  window.smejjLadeComposerTools = ladeBeiKlick(["[data-start-tool]", "#composerPlusButton"], () => import("./composer-tools.js?v=2026111405").then((m) => m.initComposerTools()));
   initWorkspaceBridge({ workspace, ensureProject: () => ensureProject({ state, workspace }), showToast });
   input.addEventListener("input", resizeInput);
   input.addEventListener("keydown", (event) => {
