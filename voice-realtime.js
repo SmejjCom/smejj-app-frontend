@@ -15,7 +15,7 @@
 // AudioWorklet: laeuft ohne Zusatzdatei ueberall (Safari eingeschlossen); der
 // Kontext wird per ctx.resume() innerhalb der Klick-Geste geweckt (iOS startet
 // "suspended", Lehre 2026-08-25).
-import { baueBoxKette } from "./voice-premium-tts.js?v=2026111402";
+import { baueBoxKette } from "./voice-premium-tts.js?v=2026111403";
 const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1"; // wie voice-premium-tts.js / auth-gate.js
 const RELAY_STANDARD = "wss://api.smejj.com/api/voice-realtime";
 const EINGANG_RATE = 16000;

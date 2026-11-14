@@ -63,7 +63,7 @@
     try {
       // Derselbe sichere Renderer wie im angemeldeten Chat. Erst nach Ende
       // des Streams auszeichnen: weitere Textstuecke wuerden Links loeschen.
-      var renderer = await import("./chat-markdown.js?v=2026111402");
+      var renderer = await import("./chat-markdown.js?v=2026111403");
       renderer.renderChatMarkdown(text);
     } catch (fehler) { /* bei Ladefehlern bleibt die vollstaendige Textantwort */ }
   }
@@ -130,6 +130,7 @@
         if (roh === "[DONE]") continue;
         try {
           var stueckchen = JSON.parse(roh);
+          if (stueckchen && stueckchen.model) letztesModell = String(stueckchen.model);
           var inhalt = stueckchen && stueckchen.choices && stueckchen.choices[0]
             && stueckchen.choices[0].delta && stueckchen.choices[0].delta.content;
           if (inhalt) schreibe(inhalt);
@@ -163,6 +164,24 @@
     p.appendChild(satz);
     p.appendChild(knopf);
     text.parentNode.appendChild(p);
+  }
+
+  // 14.11.2026 (Inhaber-Freigabe): nachts trainiert smejj 1.1, dann antwortet smejj 1.0 – leise Zeile unter der Antwort.
+  var letztesModell = "";
+  var NACHT_TEXT = {
+    de: "Hinweis: smejj 1.1 lernt gerade (nächtliches Trainingsfenster). Diese Antwort kam von smejj 1.0.",
+    en: "Note: smejj 1.1 is training right now (nightly window). This answer came from smejj 1.0.",
+    tr: "Not: smejj 1.1 şu anda eğitiliyor (gece eğitim penceresi). Bu yanıt smejj 1.0'dan geldi."
+  };
+  function nachtHinweis(text) {
+    if (letztesModell !== "smejj-1-basis" || !text || !text.parentNode || document.getElementById("gastNachtHinweis")) return;
+    var p = document.createElement("p");
+    p.className = "gast-fuss";
+    p.id = "gastNachtHinweis";
+    p.setAttribute("role", "note");
+    var sprache = String(document.documentElement.lang || "de").slice(0, 2).toLowerCase();
+    p.textContent = NACHT_TEXT[sprache] || NACHT_TEXT.en;
+    text.parentNode.insertBefore(p, text.nextSibling);
   }
 
   function feldAufraeumen() {
@@ -205,6 +224,7 @@
       return true;
     }
     var antwort = "";
+    letztesModell = "";
     var steuerung = new AbortController();
     var start = Date.now();
     var uhr = setTimeout(function () { steuerung.abort(); }, ZEITGRENZE_MS);
@@ -248,6 +268,7 @@
       clearTimeout(uhr); clearTimeout(stille); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
       if (!antwort.trim()) throw new Error("leere Antwort");
       await formatiereAntwort(text);
+      try { nachtHinweis(text); } catch (fehler) { /* Hinweis ist Zugabe */ }
       var karte = document.getElementById("gastAntwort");
       var alterHinweis = document.getElementById("gastHinweis");
       if (alterHinweis) alterHinweis.remove();
