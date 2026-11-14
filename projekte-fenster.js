@@ -2,7 +2,7 @@
 // Ein Fenster (Dialog) fuer: Neues Projekt, Anweisungen, Dateien, Farbe. Am Handy
 // erscheint es als Vollbild-Blatt von unten. Escape, X und Klick daneben schliessen.
 
-import { erstelleProjekt, setzeProjektFarbe, setzeProjektAnweisung } from "/assets/chat-store.js?v=2026111401";
+import { erstelleProjekt, setzeProjektFarbe, setzeProjektAnweisung } from "/assets/chat-store.js?v=2026111402";
 
 export const FARBEN = ["", "#e5534b", "#f0883e", "#d4a72c", "#3fb950", "#39c5cf", "#58a6ff", "#a371f7", "#db61a2"];
 

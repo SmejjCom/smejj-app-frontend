@@ -19,8 +19,8 @@
 // Speicher und Woerterbuch erst bei Bedarf laden: der reine Teil (sammleMedien)
 // bleibt so ohne Browser testbar, und der Start traegt kein Byte mehr.
 let t = (text) => text;
-const speicher = () => import("./chat-store.js?v=2026111401");
-const woerterbuch = import("./i18n/ui.js?v=2026111401").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
+const speicher = () => import("./chat-store.js?v=2026111402");
+const woerterbuch = import("./i18n/ui.js?v=2026111402").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
 
 const TYPEN = {
   bilder: { titel: "Bilder", knopf: "Bild erstellen", absicht: "bild-neu", leer: "Noch keine Bilder. Erstelle dein erstes Bild.", einheit: ["Bild", "Bilder"] },
@@ -340,7 +340,7 @@ async function oeffneVollbild(raster, sichtbar, i) {
     adresse: MEDIEN_ADRESSE.test(e.quelle) ? e.quelle : ""
   }));
   try {
-    const { oeffneGalerieAnsicht } = await import("./galerie-ansicht.js?v=2026111401");
+    const { oeffneGalerieAnsicht } = await import("./galerie-ansicht.js?v=2026111402");
     oeffneGalerieAnsicht(eintraege, i, { zumChat: (chatId) => void oeffneGespraech(chatId) });
   } catch { oeffneGespraech(sichtbar[i]?.chatId); }
 }
@@ -394,7 +394,7 @@ async function oeffneGespraech(chatId) {
 async function ladeMedien(raster) {
   if (!raster.querySelector("[data-smejj-adresse]")) return;
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111401");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111402");
     await rehydriereMedien(raster);
   } catch { /* ohne Netz bleiben die Kacheln leer, nichts bricht */ }
 }
