@@ -12,13 +12,32 @@
 // Es liegen immer nur drei Folien im DOM (vorige, aktuelle, naechste) — schnell auch bei vielen Medien.
 // Woerterbuch nachgeladen (wie galerie.js): der reine Teil bleibt ohne Browser testbar.
 let t = (text) => text;
-if (typeof document !== "undefined") import("./i18n/ui.js?v=2026111403").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
+if (typeof document !== "undefined") import("./i18n/ui.js?v=2026111404").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
 const STIL_ID = "galerie-ansicht-stil";
 const SCHWELLE_WEG = 0.3;
 const SCHWELLE_TEMPO = 0.45;
 const ZU_WEG = 120;
 const TEMPI = [1, 1.5, 2, 0.5];
 const MAX_ZOOM = 4;
+
+/**
+ * Video-Adresse mit Startbild (Medienfragment #t=0.1): das iPhone zeigt sonst bis zum Abspielen nur Schwarz
+ * (im Simulator gemessen 14.11.2026, gilt auch fuer blob:-Adressen). Bilder und Adressen mit # bleiben unveraendert.
+ */
+export function mitStartbild(quelle) {
+  const q = String(quelle || "");
+  if (!q || q.includes("#") || q.startsWith("data:image")) return q;
+  return `${q}#t=0.1`;
+}
+
+/** Startbild bei allen Videos unter einem Knoten setzen (nach dem Nachladen der Medien-Adressen). */
+export function setzeStartbilder(knoten) {
+  for (const v of knoten?.querySelectorAll?.("video") || []) {
+    const q = v.getAttribute("src") || "";
+    const neu = mitStartbild(q);
+    if (neu !== q) v.setAttribute("src", neu);
+  }
+}
 
 /** Ganze Sekunden als m:ss. Input: Sekunden. Output: Text. */
 export function zeitText(s) {
@@ -122,12 +141,16 @@ function baueMedium(eintrag) {
     el.setAttribute("playsinline", "");
     el.preload = "metadata";
     el.loop = true;
+    el.addEventListener("loadstart", () => {
+      const q = el.getAttribute("src") || "";
+      if (mitStartbild(q) !== q) el.setAttribute("src", mitStartbild(q));
+    });
   } else {
     el.alt = eintrag.titel || t("Erstelltes Bild");
     el.decoding = "async";
     el.draggable = false;
   }
-  if (quelle && !quelle.startsWith("data:image/svg")) el.src = quelle;
+  if (quelle && !quelle.startsWith("data:image/svg")) el.src = el.tagName === "VIDEO" ? mitStartbild(quelle) : quelle;
   return el;
 }
 
@@ -250,8 +273,9 @@ export function oeffneGalerieAnsicht(eintraege, start = 0, optionen = {}) {
   async function nachladen(folie) {
     if (!folie.querySelector("[data-smejj-adresse]")) return;
     try {
-      const { rehydriereMedien } = await import("./chat-medien.js?v=2026111403");
+      const { rehydriereMedien } = await import("./chat-medien.js?v=2026111404");
       await rehydriereMedien(folie);
+      setzeStartbilder(folie);
     } catch { /* ohne Netz bleibt die Folie dunkel; nichts bricht */ }
   }
 
@@ -371,7 +395,35 @@ export function oeffneGalerieAnsicht(eintraege, start = 0, optionen = {}) {
   }
   function ruhig(an) { huelle.classList.toggle("ruhig", an); }
 
+  // Zurueck-Taste (Android, Browser, Wischgeste am iPhone) schliesst nur das Vollbild — wie in Foto-Apps.
+  // Beim Oeffnen ein eigener Verlaufseintrag (gleiche Adresse). Die App-Lauscher (app.js) laufen bei popstate
+  // VOR unserem (Reihenfolge der Anmeldung, auch mit capture — in Chrome gemessen) und schalten auf den Chat;
+  // darum stellt der Aufrufer danach seine Ansicht wieder her (optionen.zurueckZurGalerie).
+  let verlauf = false;
+  let eigenesZurueck = false;
+  let zu_ = false;
+  let nachZurueck = null;
+  function beiZurueck() {
+    try { optionen.zurueckZurGalerie?.(); } catch { /* Ansicht bleibt, wie die App sie gesetzt hat */ }
+    if (eigenesZurueck) {
+      eigenesZurueck = false;
+      window.removeEventListener("popstate", beiZurueck, true);
+      const fertig = nachZurueck; nachZurueck = null; fertig?.();
+      return;
+    }
+    verlauf = false;
+    void schliessen();
+  }
+  try {
+    history.pushState({ ...(history.state && typeof history.state === "object" ? history.state : {}), smejjGalerieVollbild: true }, "");
+    verlauf = true;
+    window.addEventListener("popstate", beiZurueck, true);
+  } catch { /* ohne Verlauf bleibt nur X/Wischen/Esc */ }
+
+  /** Vollbild schliessen; die Zusage erfuellt sich, wenn auch der eigene Verlaufseintrag wieder weg ist. */
   function schliessen() {
+    if (zu_) return Promise.resolve();
+    zu_ = true;
     videoAbmelden();
     for (const v of huelle.querySelectorAll("video")) { v.pause(); v.removeAttribute("src"); v.load?.(); }
     document.removeEventListener("keydown", beiTaste, true);
@@ -379,6 +431,15 @@ export function oeffneGalerieAnsicht(eintraege, start = 0, optionen = {}) {
     huelle.remove();
     document.documentElement.style.overflow = vorherUeberlauf;
     try { vorherFokus?.focus?.({ preventScroll: true }); } catch { /* egal */ }
+    if (!verlauf) { window.removeEventListener("popstate", beiZurueck, true); return Promise.resolve(); }
+    verlauf = false;
+    return new Promise((fertig) => {
+      eigenesZurueck = true;
+      nachZurueck = fertig;
+      // Sicherheitsnetz: kommt kein popstate (z. B. Verlauf gesperrt), nicht haengen bleiben.
+      setTimeout(() => { if (nachZurueck === fertig) { nachZurueck = null; fertig(); } }, 600);
+      try { history.back(); } catch { nachZurueck = null; fertig(); }
+    });
   }
 
   // ---- Knoepfe ---------------------------------------------------------------
@@ -399,12 +460,13 @@ export function oeffneGalerieAnsicht(eintraege, start = 0, optionen = {}) {
     if (v?.tagName === "VIDEO" && Number.isFinite(v.duration)) v.currentTime = (Number(leiste.value) / 1000) * v.duration;
   });
   for (const el of [kopf, fuss]) for (const typ of ["pointerdown", "pointerup", "click"]) el.addEventListener(typ, (e) => e.stopPropagation());
-  halte(chat, () => { const id = eintraege[index]?.chatId; schliessen(); if (id) optionen.zumChat?.(id); });
+  // Erst den eigenen Verlaufseintrag abbauen, DANN zum Chat (sonst wuerde history.back() die neue Ansicht zuruecknehmen).
+  halte(chat, async () => { const id = eintraege[index]?.chatId; await schliessen(); if (id) optionen.zumChat?.(id); });
   halte(sichern, async () => {
     const el = aktuell();
     if (!el) return;
     if (el.getAttribute("data-smejj-adresse")) {
-      try { (await import("./chat-medien-ansicht.js?v=2026111403")).herunterladen(el); return; } catch { /* Rueckfall unten */ }
+      try { (await import("./chat-medien-ansicht.js?v=2026111404")).herunterladen(el); return; } catch { /* Rueckfall unten */ }
     }
     await gibDateiWeiter(el, false);
   });
@@ -412,7 +474,7 @@ export function oeffneGalerieAnsicht(eintraege, start = 0, optionen = {}) {
     const el = aktuell();
     if (!el) return;
     if (el.getAttribute("data-smejj-adresse")) {
-      try { (await import("./chat-medien-ansicht.js?v=2026111403")).oeffneTeilenBlatt(el); return; } catch { /* Rueckfall unten */ }
+      try { (await import("./chat-medien-ansicht.js?v=2026111404")).oeffneTeilenBlatt(el); return; } catch { /* Rueckfall unten */ }
     }
     await gibDateiWeiter(el, true);
   });

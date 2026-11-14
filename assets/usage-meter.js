@@ -10,7 +10,7 @@
 // geschluckt. Kein Eintrag in SAFE_EXPORT_KEYS noetig; account-privacy.js
 // exportiert den Schluessel explizit mit.
 
-import { initFieldVitals } from "./field-vitals.js?v=2026111403";
+import { initFieldVitals } from "./field-vitals.js?v=2026111404";
 
 const USAGE_KEY = "smejj.usage.v1";
 const COUNTER_KEYS = ["messages", "voiceSeconds", "codingTasks"];

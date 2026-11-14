@@ -19,8 +19,8 @@
 // Speicher und Woerterbuch erst bei Bedarf laden: der reine Teil (sammleMedien)
 // bleibt so ohne Browser testbar, und der Start traegt kein Byte mehr.
 let t = (text) => text;
-const speicher = () => import("./chat-store.js?v=2026111403");
-const woerterbuch = import("./i18n/ui.js?v=2026111403").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
+const speicher = () => import("./chat-store.js?v=2026111404");
+const woerterbuch = import("./i18n/ui.js?v=2026111404").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
 
 const TYPEN = {
   bilder: { titel: "Bilder", knopf: "Bild erstellen", absicht: "bild-neu", leer: "Noch keine Bilder. Erstelle dein erstes Bild.", einheit: ["Bild", "Bilder"] },
@@ -340,8 +340,13 @@ async function oeffneVollbild(raster, sichtbar, i) {
     adresse: MEDIEN_ADRESSE.test(e.quelle) ? e.quelle : ""
   }));
   try {
-    const { oeffneGalerieAnsicht } = await import("./galerie-ansicht.js?v=2026111403");
-    oeffneGalerieAnsicht(eintraege, i, { zumChat: (chatId) => void oeffneGespraech(chatId) });
+    const { oeffneGalerieAnsicht } = await import("./galerie-ansicht.js?v=2026111404");
+    const typ = raster.closest(".galerie-ansicht")?.id || "";
+    oeffneGalerieAnsicht(eintraege, i, {
+      zumChat: (chatId) => void oeffneGespraech(chatId),
+      // Zurueck-Taste: app.js schaltet bei popstate auf den Chat (Adresse bleibt „/“) — Galerie ohne Neuzeichnen zurueck.
+      zurueckZurGalerie: () => zeigeWieder(typ)
+    });
   } catch { oeffneGespraech(sichtbar[i]?.chatId); }
 }
 
@@ -361,6 +366,11 @@ function kachel(eintrag, oeffnen) {
     medium.preload = "metadata";
     medium.playsInline = true;
     knopf.classList.add("ist-video");
+    // Quelle wird spaeter oft noch getauscht (data: -> blob:, Nachladen) — Startbild bei jedem neuen Laden anhaengen.
+    medium.addEventListener("loadstart", () => {
+      const q = medium.getAttribute("src") || "";
+      if (startbild(q) !== q) medium.setAttribute("src", startbild(q));
+    });
     // Abgelaufener 7-Tage-Link: ehrlicher Hinweis statt schwarzer Kachel; antippen oeffnet den Chat.
     medium.addEventListener("error", () => {
       const hinweis = document.createElement("div");
@@ -371,7 +381,7 @@ function kachel(eintrag, oeffnen) {
     }, { once: true });
   }
   if (MEDIEN_ADRESSE.test(eintrag.quelle)) medium.setAttribute("data-smejj-adresse", eintrag.quelle);
-  else medium.src = eintrag.quelle;
+  else medium.src = eintrag.typ === "video" ? startbild(eintrag.quelle) : eintrag.quelle;
   const unter = document.createElement("div");
   unter.className = "galerie-unter";
   unter.setAttribute("role", "button");
@@ -394,9 +404,30 @@ async function oeffneGespraech(chatId) {
 async function ladeMedien(raster) {
   if (!raster.querySelector("[data-smejj-adresse]")) return;
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111403");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2026111404");
     await rehydriereMedien(raster);
+    for (const v of raster.querySelectorAll("video")) {
+      const q = v.getAttribute("src") || "";
+      if (startbild(q) !== q) v.setAttribute("src", startbild(q));
+    }
   } catch { /* ohne Netz bleiben die Kacheln leer, nichts bricht */ }
+}
+
+/** Galerie-Seite wieder als aktive Ansicht zeigen (ohne Neuzeichnen, Bildlage bleibt). */
+function zeigeWieder(typ) {
+  const ansicht = document.getElementById(typ);
+  if (!ansicht || !TYPEN[typ]) return;
+  const lage = ansicht.scrollTop;
+  for (const view of document.querySelectorAll(".view")) view.classList.toggle("is-active", view === ansicht);
+  for (const knopf of document.querySelectorAll(".nav-button")) knopf.classList.toggle("is-active", knopf.dataset.navAbsicht === typ);
+  ansicht.scrollTop = lage;
+}
+
+// Video-Kacheln zeigen am iPhone sonst nur Schwarz: Medienfragment #t=0.1 = Startbild (Inhaber 14.11.2026, gleiche Regel
+// wie mitStartbild in galerie-ansicht.js; hier doppelt, damit die Galerie dafuer kein weiteres Modul laedt).
+function startbild(quelle) {
+  const q = String(quelle || "");
+  return !q || q.includes("#") || q.startsWith("data:image") ? q : `${q}#t=0.1`;
 }
 
 function schliesseMenue() {
