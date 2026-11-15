@@ -5,7 +5,7 @@
 // dieses Startmodul dieselben Texte zur Laufzeit — genau wie start-chips.js die Chips
 // übersetzt. Läuft das Skript, findet das Modul nichts mehr zu tun (idempotent).
 // Nur Texte und Tooltips: keine ids, keine data-Attribute, keine Verdrahtung.
-import { uiLanguage } from "./i18n/ui.js?v=2026111405";
+import { uiLanguage } from "./i18n/ui.js?v=2026111406";
 
 export const TEXTE = [
   // Nr. 7 — Deutsch durchgängig
@@ -77,7 +77,6 @@ export const WOERTER = Object.freeze({
   "Coding-Aufgaben": "Programmier-Aufgaben",
   "Coding-Agent fertig": "Programmier-Agent fertig",
   "Für Coding: über die rechte Seitenleiste der App verbunden.": "Fürs Programmieren: über die rechte Seitenleiste der App verbunden.",
-  "Unbegrenzte Nachrichten, Coding-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.": "Unbegrenzte Nachrichten, Programmier-Agent & Projekte. Gesamtpreis 19 € pro Monat inkl. USt.",
   "App-Shell und lokale Arbeitsdaten offline halten.": "App-Hülle und lokale Arbeitsdaten offline halten.",
   "Lokalen Speicher, IDrive e2 und Sync prüfen.": "Lokalen Speicher, IDrive e2 und Abgleich prüfen.",
   "Sync": "Abgleich",
