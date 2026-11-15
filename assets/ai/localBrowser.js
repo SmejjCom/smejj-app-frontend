@@ -1,5 +1,5 @@
-import { AI_MODES } from "./providers.js?v=2026111405";
-import { evaluateAiCost } from "./costGuard.js?v=2026111405";
+import { AI_MODES } from "./providers.js?v=2026111406";
+import { evaluateAiCost } from "./costGuard.js?v=2026111406";
 
 export function detectLocalBrowserAi({ navigatorRef = globalThis.navigator } = {}) {
   const localCapable = Boolean(navigatorRef?.gpu);
