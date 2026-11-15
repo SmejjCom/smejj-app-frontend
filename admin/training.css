@@ -315,3 +315,9 @@
 .tb.tb-dunkel .lt-stufen button,.tb.tb-dunkel .lt-betrieb button,.tb.tb-dunkel .lt-knopf{background:var(--tb-card);color:var(--tb-ink);}
 .tb.tb-dunkel .lt-stufen button[aria-pressed="true"],.tb.tb-dunkel .lt-betrieb button[aria-pressed="true"],.tb.tb-dunkel .lt-knopf[aria-pressed="true"]{background:var(--tb-acc-soft);color:#c7caff;}
 .tb.tb-dunkel .lt-knopf.start{color:var(--lt-gruen);} .tb.tb-dunkel .lt-knopf.stopp{color:var(--lt-rot);}
+/* 15.11.2026 Anträge – neue Reihen ganz unten (blau = Antrag gestellt) */
+.tb .lt{--lt-blau:#1d4ed8;--lt-blau-soft:#e8efff;}
+.tb .lt-kachel.blau{border-color:#9db8f5;} .tb .lt-ikone.blau,.tb .lt-status.blau{background:var(--lt-blau-soft);color:var(--lt-blau);} .tb .lt-status.blau .lt-licht{background:var(--lt-blau);}
+.tb .lt-anzahl{font-size:13px;font-weight:400;padding:1px 8px;margin-left:6px;border-radius:10px!important;background:var(--lt-grau-soft);color:var(--lt-grau);}
+.tb .lt-bereich summary{cursor:pointer;} .tb .lt-kontakt a{color:var(--tb-acc);word-break:break-all;}
+.tb.tb-dunkel .lt{--lt-blau:#93b4ff;--lt-blau-soft:#14213d;} .tb.tb-dunkel .lt-kachel.blau{border-color:#2a4a8a;}

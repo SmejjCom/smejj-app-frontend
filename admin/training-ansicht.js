@@ -92,7 +92,11 @@
       const m = teil("fabrik-" + k);
       t[k] = m ? Object.assign({ _am: m.letzteMeldung, _alt: min(m.letzteMeldung, jetzt) }, m.fabrik || {}) : null;
     });
-    return { rechner: rechner, lagen: lagen, plan: (teil("fabrik-plan") || {}).fabrik || null, t: t, speicher: d.speicher || {}, jetzt: jetzt };
+    // 15.11.2026: Anträge (fabrik-antraege-1..n) – Liste in Teilen, weil der Server je Meldung höchstens 12 Einträge durchlässt
+    const antr = alle.filter((m) => m.art === "fabrik-antraege").sort((x, y) => String(x.id).localeCompare(String(y.id)));
+    const antraege = [].concat(...antr.map((m) => (m.fabrik && Array.isArray(m.fabrik.liste) ? m.fabrik.liste : [])));
+    return { rechner: rechner, lagen: lagen, plan: (teil("fabrik-plan") || {}).fabrik || null, t: t, speicher: d.speicher || {}, jetzt: jetzt,
+      antraege: antraege, antraegeStand: antr.length ? antr[0].letzteMeldung : null };
   }
 
   /** Engpässe mit Ursache und nächstem sicheren Schritt. Gewollte Pausen des Inhabers sind keine Engpässe. */
@@ -118,7 +122,7 @@
 
   // ------------------------------------------------------------ Rahmen
   const REITER = [["ressourcen", "Leitstand"], ["uebersicht", "Übersicht"], ["steuerung", "Steuerung"], ["aufgaben", "Aufgaben"], ["wissen", "Wissen"], ["qualitaet", "Qualität"],
-    ["kosten", "Kosten"], ["automatik", "Automatik"], ["verlauf", "Verlauf"]];
+    ["kosten", "Kosten"], ["automatik", "Automatik"], ["verlauf", "Verlauf"], ["pending", "Pending"]];   // 15.11.: Pending = Anträge, noch nicht aktiviert
 
   // Hell/Dunkel (Inhaber 04.11.2026): Schalter oben rechts in der Titelzeile, je Gerät gemerkt. Standard bleibt hell (Vorlage 03.11.).
   const THEMA_SCHLUESSEL = "smejj.admin.training.thema";
@@ -593,6 +597,12 @@
       + '<div class="tb-daten-huelle"><table class="tb-tabelle tb-blick"><thead><tr><th>Ressource</th><th>Zustand</th><th>Betrieb</th><th>Leistung</th><th>Kosten</th><th>Messung</th></tr></thead><tbody>'
       + z.join("") + "</tbody></table></div></div>";
   }
+  /** 15.11.2026 (Inhaber): eigener Reiter „Pending“ – Anträge, Warteliste, keine Möglichkeit; nur Anzeige (training-leitstand.js). */
+  function pending(o) {
+    const L = window.adminTrainingLeitstand;
+    const inhalt = L && L.antraege ? L.antraege(o) : "";
+    return '<div class="lt">' + (inhalt || '<div class="tb-karte"><p class="tb-dim">Noch keine Anträge-Meldung der Fabrik empfangen – nicht erfasst.</p></div>') + "</div>";
+  }
   function ressourcen(o, offen) {
     const r = o.t.ressourcen, d = o.t.dienste;
     const rListe = r && Array.isArray(r.liste) ? r.liste : [];
@@ -687,7 +697,7 @@
   }
 
   window.adminTrainingAnsicht = {
-    ordnen: ordnen, rahmen: rahmen, THEMA_SCHLUESSEL: THEMA_SCHLUESSEL, uebersicht: uebersicht, steuerung: steuerung, ressourcen: ressourcen, wissen: wissen, qualitaet: qualitaet, verlauf: verlauf, engpaesse: engpaesse,
+    ordnen: ordnen, rahmen: rahmen, THEMA_SCHLUESSEL: THEMA_SCHLUESSEL, uebersicht: uebersicht, steuerung: steuerung, ressourcen: ressourcen, pending: pending, wissen: wissen, qualitaet: qualitaet, verlauf: verlauf, engpaesse: engpaesse,
     helfer: { zahl: zahl, uhr: uhr, tagUhr: tagUhr, dauerText: dauerText, altText: altText, pille: pille, klartext: klartext, min: min,
       NAME: NAME, KENNUNG: KENNUNG, KAMEL: KAMEL, TYP_TEXT: TYP_TEXT, ZUSTAND: ZUSTAND, GATES: GATES, TEIL_ALT_MIN: TEIL_ALT_MIN,
       balken: balken, LAGE: LAGE, befehlStand: befehlStand }

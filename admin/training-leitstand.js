@@ -150,6 +150,45 @@
       + '<div class="lt-klein">' + e(x.kosten || "") + (x.gemessen ? " · " : "") + (x.gemessen ? H.altText(x.gemessen, o.jetzt, 15) : "") + "</div></div>";
   }
 
+  // ------------------------------------------------------------ Anträge (Inhaber 15.11.2026: eigener Reiter „Pending“, nur Anzeige)
+  // Quelle: Fabrik-Meldungen fabrik-antraege-1..n (antraege_meldung.py). Der Leitstand selbst bleibt unverändert.
+  const BEREICH = [["antrag", "blau", "Antrag gestellt – wartet auf Anbieter"], ["offen", "gelb", "Noch offen – Warteliste oder du bist dran"],
+    ["nein", "grau", "Keine Möglichkeit gefunden"], ["aktiv", "gruen", "Kontakte der aktiven Anbieter"]];
+  function link(url) {
+    if (!/^https:\/\/[^\s"'<>]+$/.test(url || "")) return "";
+    return '<a href="' + e(url) + '" target="_blank" rel="noopener noreferrer">' + e(url.replace(/^https:\/\//, "").replace(/\/$/, "").slice(0, 48)) + "</a>";
+  }
+  function kontakt(x) {
+    const z = [];
+    if (x.web && link(x.web)) z.push("Web: " + link(x.web));
+    const mail = String(x.mail || "").replace(/\s*\(at\)\s*/i, "@");   // Fabrik meldet „name (at) domain“ (Upload-Weg lässt kein @ zu)
+    if (/^[^\s@<>"']+@[^\s@<>"']+\.[a-z]{2,}$/i.test(mail)) z.push('E-Mail: <a href="mailto:' + e(mail) + '">' + e(mail) + "</a>");
+    if (x.tel) z.push("Tel.: " + e(x.tel));
+    if (x.kontakt) z.push("Kontakt: " + e(x.kontakt));
+    return z.length ? '<div class="lt-klein lt-kontakt">' + z.join("<br>") + "</div>" : "";
+  }
+  function antragKachel(x, ampel) {
+    const zeile = [x.land, x.firma, x.datum, x.menge, x.nr ? "Nr. " + x.nr : ""].filter(Boolean).join(" · ");
+    const titel = x.status || (ampel === "grau" ? x.grund || "nicht möglich" : "nicht erfasst");
+    return kachel(ampel, ampel === "grau" ? ICON.stecker : ICON.wolke, x.name || x.id || "?", status(ampel, titel),
+      (zeile ? '<div class="lt-klein">' + e(zeile) + "</div>" : "")
+      + (x.schritt ? '<div class="lt-was">' + e(x.schritt) + "</div>" : "")
+      + (ampel === "grau" && x.grund && x.status ? '<div class="lt-klein">' + e(x.grund) + "</div>" : "")
+      + kontakt(x));
+  }
+  function antraege(o) {
+    const l = Array.isArray(o.antraege) ? o.antraege.filter((x) => x && typeof x === "object") : [];
+    if (!l.length) return "";
+    return BEREICH.map((b) => {
+      const t = l.filter((x) => x.bereich === b[0]);
+      if (!t.length) return "";
+      const raster = '<div class="lt-raster">' + t.map((x) => antragKachel(x, b[1])).join("") + "</div>";
+      const kopf = e(b[2]) + ' <span class="lt-anzahl">' + t.length + "</span>";
+      return b[0] === "nein" || b[0] === "aktiv" ? '<details class="lt-bereich"><summary class="lt-abschnitt">' + kopf + "</summary>" + raster + "</details>"
+        : '<h3 class="lt-abschnitt">' + kopf + "</h3>" + raster;
+    }).join("") + (o.antraegeStand ? '<div class="lt-klein">Anträge – Stand: ' + H.altText(o.antraegeStand, o.jetzt, 180) + "</div>" : "");
+  }
+
   function leitstand(o, offen, cloudEin, dienstEin) {
     const ids = new Set(cloudEin.map((x) => x.id));
     const cloudListe = cloudEin.concat(dienstEin.filter((x) => ALS_CLOUD.indexOf(x.id) >= 0 && !ids.has(x.id)));
@@ -193,5 +232,5 @@
       + "Der Schutz vor vollem Speicher, Hitze und leerem Akku bleibt immer an. Jede Änderung fragt nach einem kurzen Grund; die Macs übernehmen sie in höchstens einer Minute.</div></div>";
   }
 
-  window.adminTrainingLeitstand = { leitstand: leitstand, ICON: ICON };
+  window.adminTrainingLeitstand = { leitstand: leitstand, antraege: antraege, ICON: ICON };
 })();
