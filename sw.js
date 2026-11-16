@@ -182,7 +182,7 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1144";
+const CACHE_NAME = "smejj-shell-v1145";
 const ASSET_BUILD = "2026111406";
 const SHELL = [
   "/",
@@ -288,6 +288,8 @@ const SHELL = [
   "/assets/view-chrome.js",
   "/assets/composer-tools.js",
   "/assets/pwa-schnellstart.js",
+  "/assets/teilen-ziel.js",
+  "/assets/teilen-ziel-logik.js",
   "/assets/mobil-tastatur.js",
   "/assets/mobil-tastatur-platz.js",
   "/assets/such-nachladen.js",
@@ -558,7 +560,6 @@ const WILLKOMMEN_SHELL = [
   "/assets/audio-pegel.js",
   "/assets/composer-eingabe.css",
   "/assets/willkommen-composer.js",
-
   "/willkommen.html",
   "/assets/ios-preise-aus.js",
   "/assets/willkommen-sprache.js",
@@ -579,7 +580,6 @@ const INSTALL_LISTE = SCHMAL ? WILLKOMMEN_SHELL : SHELL;
 // ihn beim Aktivieren als "nicht meiner" und raeumt ihn weg — und der schmale
 // loescht umgekehrt nie einen vollen, der noch gebraucht wird.
 const AKTIVER_CACHE = SCHMAL ? CACHE_NAME.replace("smejj-shell-", "smejj-willkommen-") : CACHE_NAME;
-
 // ZEITGRENZEN (Betreiber-Freigabe 1g, 15.09.2026: "Zeitgrenze fuer durchgereichte
 // Netzabrufe, damit Updates nicht an haengenden Anfragen haengen bleiben").
 // Ohne Grenze wartet ein Abruf so lange, wie das Netz schweigt: beim Installieren
