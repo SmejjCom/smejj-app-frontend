@@ -292,4 +292,58 @@
       return false;
     }
   };
+
+  // Teilen-Ziel fuer Gaeste (Inhaber-Freigabe 16.11.2026 „Gäste-Lücke auch beheben, Freigabe“).
+  // Das fruehe Tor in index.html reicht nur teilen/title/text/url hierher weiter.
+  // Der Inhalt fuellt das Probier-Feld vor — nur als Feldwert, nie automatisch
+  // senden —, die Adresse wird sofort geputzt, und die Anmeldung nimmt ihn mit
+  // (derselbe Uebergabeschluessel wie willkommen-fokus.js / app.js).
+  var TEILEN_MAX = 4000;
+  var TEILEN_SCHLUESSEL = "smejj.probierFrage.v1";
+  function teilenBereinige(wert) {
+    return String(wert == null ? "" : wert)
+      .replace(/\r\n?/g, "\n")
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B\u2028\u2029\uFEFF]/g, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+  function teilenText(params) {
+    var t = teilenBereinige(params.get("title"));
+    var x = teilenBereinige(params.get("text"));
+    var u = teilenBereinige(params.get("url"));
+    var teile = [];
+    var mitTitel = Boolean(t && x.indexOf(t) < 0 && t !== u);
+    if (mitTitel) teile.push(t);
+    if (x && x === u) x = "";
+    if (x) teile.push(x);
+    if (u && x.indexOf(u) < 0 && !(mitTitel && t.indexOf(u) >= 0)) teile.push(u);
+    var zeichen = Array.from(teile.join("\n"));
+    return zeichen.length <= TEILEN_MAX ? zeichen.join("") : zeichen.slice(0, TEILEN_MAX).join("").replace(/\s+$/, "");
+  }
+  function teilenUebernehmen() {
+    var params = new URLSearchParams(location.search);
+    var istTeilen = params.get("teilen") === "1" || ["title", "text", "url"].some(function (n) { return (params.get(n) || "").trim() !== ""; });
+    if (!istTeilen) return;
+    var inhalt = teilenText(params);
+    ["teilen", "title", "text", "url"].forEach(function (n) { params.delete(n); });
+    var rest = params.toString();
+    // Sofort putzen: ein Neuladen darf den Inhalt nicht erneut einsetzen.
+    try { history.replaceState(history.state, "", location.pathname + (rest ? "?" + rest : "") + location.hash); } catch (fehler) { /* egal */ }
+    var feld = document.getElementById("probierFeld");
+    if (!inhalt || !feld || feld.value.trim()) return;
+    feld.value = inhalt;
+    feld.dispatchEvent(new Event("input", { bubbles: true }));
+    try { sessionStorage.setItem(TEILEN_SCHLUESSEL, inhalt); } catch (fehler) { /* Feld bleibt gefuellt */ }
+    feld.addEventListener("input", function () {
+      try {
+        if (feld.value.trim()) sessionStorage.setItem(TEILEN_SCHLUESSEL, feld.value.trim());
+        else sessionStorage.removeItem(TEILEN_SCHLUESSEL);
+      } catch (fehler) { /* Speicher gesperrt */ }
+    });
+    try {
+      if (!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches)) feld.focus({ preventScroll: true });
+    } catch (fehler) { /* ohne Fokus */ }
+  }
+  try { teilenUebernehmen(); } catch (fehler) { /* Teilen ist Zugabe, die Seite laeuft weiter */ }
 })();
