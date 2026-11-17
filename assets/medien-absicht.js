@@ -32,9 +32,19 @@ const WISSENSFRAGE = /\b(unterschied|was ist|wie geht|bedeutung|erkläre|erklare
 // 800-Zeilen-Grenze (Hinweis der Parallelsitzung 2026-08-17). app.js ruft
 // nur noch chatOhneMedienauftrag() — ein Aufruf statt Bedingung plus
 // Kommentarblock, und die Regel bleibt an EINER Stelle.
+// Pruefung 17.11.2026, Befund 1: Chromium merkt sich ein offline gescheitertes import() bis zum
+// Neuladen — der Chat blieb danach tot. Darum den Klienten gleich mit vorladen (dieses Modul kommt
+// im Leerlauf ueber sendepfad-nachladen.js) und vor dem Import per fetch pruefen, ob das Netz traegt
+// (ein gescheiterter fetch wird nicht gemerkt; offline kommt so "Failed to fetch" statt der rohen
+// Importmeldung, und app.js zeigt seinen Offline-Satz).
+let klient = null;
+const holeKlient = () => klient ||= fetch("/assets/ai/chatClient.js?v=2026111701")
+  .then(() => import("/assets/ai/chatClient.js?v=2026111701"))
+  .catch((fehler) => { klient = null; throw fehler; });
+if (globalThis.document) holeKlient().catch(() => {});
 export async function chatOhneMedienauftrag(auftrag) {
   if (istMedienAuftrag(auftrag?.task)) return false;
-  const { runClientChat } = await import("/assets/ai/chatClient.js?v=2026111406");
+  const { runClientChat } = await holeKlient();
   return runClientChat(auftrag);
 }
 

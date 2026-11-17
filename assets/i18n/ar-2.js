@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "دفعة مستحقة — يُرجى التحقق من وسيلة الدفع في بوابة الاشتراك.",
   "Aktiv — verlängert sich am {datum}.": "فعّال — يتجدد في {datum}.",
   "Einen Moment — das Abo-Portal wird geöffnet …": "لحظة — يتم فتح بوابة الاشتراك …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "فُتحت بوابة الاشتراك: الإدارة، تغيير الخطة، الإلغاء، الفواتير.",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "فُتحت بوابة الاشتراك. سجّل الدخول هناك ببريد حسابك الإلكتروني — سترسل Stripe رمز تأكيد.",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "فُتحت صفحة الدفع في Stripe. بعد الدفع سيظهر اشتراكك هنا خلال لحظات.",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "إدارة الاشتراك — الفواتير والخطة والإلغاء",
   "Rechnungen & Zahlungen": "الفواتير والمدفوعات",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5000 رسالة · 400 صورة · 40 فيديو من الصور",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15000 رسالة · 1500 صورة · 150 فيديو من الصور",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1000 رسالة، 100 صورة، 10 فيديو من الصور",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1000 رسالة، 100 صورة، 10 فيديو من الصور · 9 €/شهريًا"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1000 رسالة، 100 صورة، 10 فيديو من الصور · 9 €/شهريًا",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "الرسالة أو المرفق كبير جدًا. يُرجى تقصير النص أو إرفاق ملف أصغر.",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "لم ينجح ذلك الآن. يُرجى المحاولة مرة أخرى.",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "لا يوجد اتصال بالإنترنت. عندما تعود متصلًا يمكنك الإرسال مرة أخرى.",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "استغرق الخادم وقتًا طويلًا للرد. يُرجى المحاولة مرة أخرى.",
+  "Verbindung zum Server unterbrochen.": "انقطع الاتصال بالخادم.",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "الإجابة غير مكتملة – انقطع الاتصال. يُرجى إرسال السؤال مرة أخرى.",
+  "Erneut versuchen": "إعادة المحاولة",
+  "In {s} s erneut versuchen": "إعادة المحاولة بعد {s} ث",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "لحظة — جارٍ التحقق من حالة اشتراكك …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "تعذّر جلب حالة اشتراكك الآن. حتى لا يتم الشراء مرتين، يبدأ الدفع فقط بعد هذا التحقق. يُرجى المحاولة بعد قليل.",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "حظر المتصفح نافذة الدفع. يُرجى السماح بالنوافذ المنبثقة لـ smejj.com والنقر مرة أخرى.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "تُفتح بوابة الاشتراك في نافذة جديدة: الإدارة، تغيير الخطة، الإلغاء، الفواتير. إذا لم تُفتح أي نافذة، يُرجى السماح بالنوافذ المنبثقة لـ smejj.com.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "تُفتح بوابة الاشتراك في نافذة جديدة. سجّل الدخول هناك ببريد حسابك — سترسل لك Stripe رمز تأكيد. إذا لم تُفتح أي نافذة، يُرجى السماح بالنوافذ المنبثقة لـ smejj.com."
 };

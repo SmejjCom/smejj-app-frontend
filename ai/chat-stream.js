@@ -1,21 +1,18 @@
 // smejj.com — Empfang der Chat-Antwort (SSE) fuer die Startseite.
 //
-// Ausgelagert aus app.js am 2026-08-04: die Datei stand an ihrer 800-Zeilen-
-// Grenze, und das Lesen eines Ereignisstroms ist ohnehin eine eigene Aufgabe —
-// es hat mit dem Bedienen der Oberflaeche nichts zu tun. Verhalten unveraendert;
-// die Funktionen sind Zeile fuer Zeile dieselben wie vorher.
+// Ausgelagert aus app.js am 2026-08-04 (800-Zeilen-Grenze; eigene Aufgabe).
 //
 // Was hier bewusst NICHT liegt: welche Endpunkte in welcher Reihenfolge gefragt
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
-import { fetchStreamWithRetry } from "./fetch-retry.js?v=2026111406";
-import { t } from "../i18n/ui.js?v=2026111406";
-import { empfehlungText } from "../sprach-helfer.js?v=2026111406";
-import { API_ORIGIN } from "../config.js?v=2026111406";
-import { mitLiveDaten } from "./live-daten.js?v=2026111406";
-import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js?v=2026111406";
-import { zeigeNachtHinweis } from "./nacht-hinweis.js?v=2026111406"; // 14.11.2026: nachts antwortet smejj 1.0 statt 1.1
-import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js?v=2026111406";
+import { fetchStreamWithRetry } from "./fetch-retry.js?v=2026111701";
+import { t } from "../i18n/ui.js?v=2026111701";
+import { empfehlungText } from "../sprach-helfer.js?v=2026111701";
+import { API_ORIGIN } from "../config.js?v=2026111701";
+import { mitLiveDaten } from "./live-daten.js?v=2026111701";
+import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js?v=2026111701";
+import { zeigeNachtHinweis } from "./nacht-hinweis.js?v=2026111701"; // 14.11.2026: nachts antwortet smejj 1.0 statt 1.1
+import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js?v=2026111701";
 
 // Gleicher Schluessel wie in auth/auth-page.js, account-sessions.js und
 // auth-gate.js — dort bewusst dupliziert, damit kein Modul den anderen nur
@@ -100,8 +97,8 @@ export async function erneuereZugangsToken() {
   return "";
 }
 
-import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js?v=2026111406";
-export { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, QUELLEN_LEER_HINWEIS } from "./chat-schritte-anzeige.js?v=2026111406";
+import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js?v=2026111701";
+export { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, QUELLEN_LEER_HINWEIS } from "./chat-schritte-anzeige.js?v=2026111701";
 // ---------------------------------------------------------------------------
 // Denk-Zeile (Betreiber 2026-08-23, Vorbild Antigravity "Thought for 1s ›"):
 // Denk-Text des Modells (delta.reasoning_content) gehoert NICHT in die
@@ -209,7 +206,7 @@ export function letzteNutzerfrage(body) {
  */
 // Wörter unter den Symbolen der Antwort-Leiste auf dem Handy (UI/UX Nr. 4) —
 // eigenes Modul, dynamisch, stumm bei Fehlern; die Leiste selbst bleibt unberührt.
-if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js?v=2026111406").catch(() => {});
+if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js?v=2026111701").catch(() => {});
 
 const AKTION_STIL_ID = "antwort-aktion-stil";
 // Der Stil kommt aus dem Modul, nicht aus chat-actions.css: die CSS liegt im
@@ -379,7 +376,21 @@ export function verstaendlicheMeldung(status, roh) {
   // QA 2026-10-28 (R2): die Bruecke kann die Anmeldung gerade nicht pruefen — kein Modellfehler.
   if (/auth_unavailable/.test(code)) return t("Die Anmeldung kann gerade nicht geprüft werden. Bitte versuche es gleich noch einmal.");
   if (status >= 500 || /backends failed|model_unavailable/i.test(code)) return t("Die Modelle antworten gerade nicht. Das ist unser Fehler, nicht deiner.");
-  return code;
+  // Pruefung 17.11.2026, Befund 3: nie eine Maschinen-Kennung zeigen ("payload_too_large", "ValidationError: …").
+  if (status === 413 || /too_large/i.test(code)) return t("Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.");
+  return /^[\w.:-]+$|\b[A-Z]\w*(Error|Exception)\b|^\s*[[{<]/.test(code) || !code ? t("Das hat gerade nicht geklappt. Bitte versuche es noch einmal.") : code;
+}
+
+/** Befund 5: steht in der Meldung "Deine Frage steht noch im Feld", muss sie dort auch stehen. */
+export function frageZurueckInsFeld(output, feld = globalThis.document?.getElementById?.("startMessage")) {
+  if (!feld || String(feld.value || "").trim() || !output?.closest?.("#startLog")) return false;
+  let knoten = output.previousElementSibling;
+  while (knoten && !knoten.classList?.contains("user")) knoten = knoten.previousElementSibling;
+  const frage = String(knoten?.textContent || "").trim();
+  if (!frage) return false;
+  feld.value = frage;
+  feld.dispatchEvent(new Event("input", { bubbles: true }));
+  return true;
 }
 
 /**
@@ -403,14 +414,15 @@ export function fehlerAktion(output, status, frage, { senden = sendeAlsNutzer, g
   }
   if (status === 402) return haengeAktionsKnopf(output, t("Zu den Einstellungen"), "einstellungen", { senden: () => gehZu("/settings") });
   if (!frage) return null;
-  const knopf = haengeAktionsKnopf(output, status === 429 ? "In 20 s erneut versuchen" : "Erneut versuchen", frage, { senden });
+  const warte = (s) => t("In {s} s erneut versuchen").replace("{s}", s);
+  const knopf = haengeAktionsKnopf(output, status === 429 ? warte(20) : t("Erneut versuchen"), frage, { senden });
   if (knopf && status === 429) {
     knopf.disabled = true;
     let rest = 20;
     const takt = setInterval(() => {
       rest -= 1;
-      if (rest <= 0) { clearInterval(takt); knopf.disabled = false; knopf.textContent = "Erneut versuchen"; return; }
-      knopf.textContent = `In ${rest} s erneut versuchen`;
+      if (rest <= 0) { clearInterval(takt); knopf.disabled = false; knopf.textContent = t("Erneut versuchen"); return; }
+      knopf.textContent = warte(rest);
     }, 1000);
   }
   return knopf;
@@ -679,7 +691,7 @@ export async function streamChatAnswer(url, body, output, optionen = {}) {
     // Bild abgelegt — dasselbe Bild nachholen statt neu malen. Nicht nach einem bewussten Stopp.
     // Das Modul kommt erst beim Abriss (Startgewicht: es gehoert nicht in jeden Seitenaufruf).
     if (!lauf.gestoppt && /Die Bild-Übertragung ist abgerissen/.test(output?.textContent || "")) {
-      import("./bild-nachholen.js?v=2026111406").then(({ holeBildNach }) => holeBildNach({
+      import("./bild-nachholen.js?v=2026111701").then(({ holeBildNach }) => holeBildNach({
         output, renderMarkdown: optionen.renderMarkdown, hinweis: t("Bild wird erneut geladen …"),
         anfrage: () => fetchStreamWithRetry(zieleAnpassen(url, (rumpf) => ({ ...rumpf, bildErneut: true })), {
           method: "POST", headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() }, body: JSON.stringify({ ...body, bildErneut: true })
@@ -693,7 +705,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   // Fragen-Erfassung (Trainingsplan smejj 1.1, Stufe 1): loest nur aus, wartet
   // nie, bricht nie — der Server entscheidet aus Ledger und Schalter. Dynamisch
   // nachgeladen, damit ein fehlendes Modul den Chat nicht beruehrt.
-  import("/assets/ai/frage-erfassung.js?v=2026111406").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
+  import("/assets/ai/frage-erfassung.js?v=2026111701").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
   // Stufe 0 zuerst: was das Geraet des Nutzers selbst beantworten kann, kostet
   // niemanden etwas und ist meist schneller (gemessen 1,7-3,5 s gegen 2,9-6,6 s).
   if (await versucheLokaleAntwort(body, output, renderMarkdown)) return;
@@ -719,11 +731,18 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   // QA 2026-10-28 (R2): Nach wiederholtem 503 wirft fetch-retry.js nur "bridge_unreachable" und
   // verschluckt den Grund. Meldet die Bruecke auth_unavailable, ist der Server erreichbar — nur die
   // Anmeldung gerade nicht pruefbar. Diese Huelle schaut darum bei 503 in eine Kopie der Antwort.
-  const grund = { authAusfall: false };
+  // Pruefung 17.11.2026, Befund 4: bei 429/5xx die letzte Antwort behalten, damit verstaendlicheMeldung
+  // greift (fetch-retry.js steht unter der Sicherheitssperre, darum hier); 429 beendet sofort.
+  const grund = { authAusfall: false, antwort: null };
+  const kurzSchluss = new AbortController();
   const mitGrund = async (...args) => {
     const antwort = await globalThis.fetch(...args);
-    if (antwort?.status === 503) {
-      try { if ((await antwort.clone().json())?.error === "auth_unavailable") grund.authAusfall = true; } catch { /* kein JSON */ }
+    if (antwort?.status === 429 || antwort?.status >= 500) {
+      const text = await antwort.text().catch(() => "");
+      try { if (antwort.status === 503 && JSON.parse(text)?.error === "auth_unavailable") grund.authAusfall = true; } catch { /* kein JSON */ }
+      grund.antwort = new Response(text, { status: antwort.status, headers: antwort.headers });
+      if (antwort.status === 429) kurzSchluss.abort();
+      return grund.antwort.clone();
     }
     return antwort;
   };
@@ -732,30 +751,28 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
     response = await fetchStreamWithRetry(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() },
-      body: JSON.stringify(body), signal: lauf.controller.signal
+      body: JSON.stringify(body), signal: AbortSignal.any([lauf.controller.signal, kurzSchluss.signal])
     }, { fetchFn: mitGrund });
-  } catch {
-    stoppeWartesignal();
-    clearThinkingState(output);
-    if (lauf.gestoppt) return;
-    output.textContent = grund.authAusfall ? t("Die Anmeldung kann gerade nicht geprüft werden. Bitte versuche es gleich noch einmal.") : "Verbindung zum Server unterbrochen.";
-    haengeAktionsKnopf(output, "Erneut versuchen", letzteNutzerfrage(body));
-    return;
+  } catch (fehler) {
+    if (grund.antwort && !lauf.gestoppt) response = grund.antwort;
+    else {
+      stoppeWartesignal();
+      clearThinkingState(output);
+      if (lauf.gestoppt) return;
+      const grundText = String(fehler?.message || "");
+      output.textContent = grund.authAusfall ? t("Die Anmeldung kann gerade nicht geprüft werden. Bitte versuche es gleich noch einmal.")
+        : globalThis.navigator?.onLine === false ? t("Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.")
+          : /timeout/i.test(grundText) ? t("Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.") : t("Verbindung zum Server unterbrochen.");
+      haengeAktionsKnopf(output, t("Erneut versuchen"), letzteNutzerfrage(body));
+      frageZurueckInsFeld(output);
+      return;
+    }
   }
   // TIEFE SPUR AUSGEFALLEN? Dann eine schnelle Antwort statt gar keiner.
-  //
-  // Live gemessen 2026-09-07: Mit "Nachdenken" gibt die Bruecke die Schnellspur
-  // ab (streamFastLane: `if (stufe === "gruendlich") return false`). Danach
-  // bleibt nur der Control-Router — und der meldet derzeit ALLE Modelle als
-  // "degraded" (runtimeAvailable=false). Faellt er durch, antwortet streamModel
-  // mit 503 "Model backend is not configured", weil die Bruecke kein eigenes
-  // Modell hat (modelConfigured=false). Der Nutzer sah nur einen Fehler.
-  //
-  // Ein EINZIGER Rueckfall auf die schnelle Spur bringt eine echte Antwort. Die
-  // Live-Daten bleiben dabei erhalten — sie stecken schon in der Frage.
-  // Jeder Server-Ausfall zaehlt (500/502/503/504) — nicht nur die zwei, die
-  // heute gemessen wurden. Der Rueckfall kostet eine Anfrage und kann nur
-  // helfen; bleibt auch er erfolglos, kommt unten die ehrliche Meldung.
+  // Live 2026-09-07: mit "Nachdenken" gibt die Bruecke die Schnellspur ab; faellt der Control-Router
+  // durch, kommt 503. EIN Rueckfall auf die schnelle Spur (Live-Daten stecken schon in der Frage);
+  // bleibt er erfolglos, kommt unten die ehrliche Meldung. Seit 17.11.2026 (Befund 4) erreicht
+  // die 5xx-Antwort diese Stelle wirklich (vorher warf fetch-retry.js nur "bridge_unreachable").
   if (!lauf.gestoppt && response && !response.ok && response.status >= 500 && response.status <= 504
       && String(body?.preferences?.stufe || "") === "gruendlich") {
     // "schnell", NICHT "auto" — das ist der Unterschied zwischen Antwort und
@@ -808,6 +825,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
     output.dataset.fehlerCode = istPlanLimit(rohFehler) ? "plan_limit" : "";
     output.textContent = verstaendlicheMeldung(response.status, rohFehler);
     fehlerAktion(output, response.status, letzteNutzerfrage(body));
+    frageZurueckInsFeld(output);
     return;
   }
 
@@ -910,6 +928,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
       if (output.textContent.trim() && typeof renderMarkdown === "function") { output.dataset.rohtext = output.textContent; renderMarkdown(output); }
       return;
     }
+    frageZurueckInsFeld(output); // app.js meldet danach "Deine Frage steht noch im Feld" (Befund 5)
     throw abriss;
   } finally {
     // Auch bei Abbruch deregistrieren.
@@ -937,6 +956,10 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
     falteSchritte(output, schritteOhneFundZahl);
     return;
   }
+  // Pruefung 17.11.2026, Befund 7: endet der Strom mitten in einem Ereignis, ist die Antwort abgerissen.
+  const rest = buffer.split("\n").filter((zeile) => zeile.startsWith("data: ")).map((zeile) => zeile.slice(6)).join("\n").trim();
+  let abgerissen = false;
+  if (rest && rest !== "[DONE]") { try { output.textContent += JSON.parse(rest).choices?.[0]?.delta?.content || ""; } catch { abgerissen = true; } }
   // Der Lauf endete ohne Schlussantwort (alle Runden gingen in Werkzeuge).
   // Dann ist die letzte Arbeitsnotiz besser als eine leere Blase.
   if (!output.textContent.trim() && letzteNotiz.trim()) output.textContent = letzteNotiz;
@@ -945,6 +968,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   // Vorlesen, Bewerten) fuer Text, den es nicht gibt. Live gemessen.
   if (frageGezeigt && !output.textContent.trim()) { output.remove(); return; }
   output.textContent = entferneAbgerisseneMedien(output.textContent);
+  if (abgerissen) output.textContent = `${output.textContent.trim()}\n\n${t("Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.")}`.trim();
   // Die Anzeige-Marke MUSS hier fallen: sie blendet den Rohtext aus, und eine
   // fertige Antwort waere sonst unsichtbar.
   markiereMedienStrom(output);
@@ -955,5 +979,6 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   });
   renderMarkdown?.(output);
   falteSchritte(output, schritteOhneFundZahl);
+  if (abgerissen) haengeAktionsKnopf(output, t("Erneut versuchen"), letzteNutzerfrage(body));
   try { zeigeNachtHinweis(output, body?.model, output.dataset.stromModell); } catch { /* Hinweis ist Zugabe */ }
 }

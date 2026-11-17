@@ -15,7 +15,14 @@
   if (probier) {
     probier.addEventListener("submit", function (e) {
       e.preventDefault();
-      var frage = (document.getElementById("probierFeld") || {}).value || "";
+      // Pruefung 17.11.2026 (F3): laeuft schon eine Gast-Anfrage (gast-frage.js
+      // setzt aria-busy), ist ein zweiter Klick kein Wunsch nach der Anmeldung.
+      if (probier.getAttribute("aria-busy") === "true") return;
+      var feldEl = document.getElementById("probierFeld");
+      var frage = (feldEl || {}).value || "";
+      // F4: leeres Feld (oder nur Leerzeichen) heisst „noch nichts getippt“ –
+      // ins Feld setzen statt kommentarlos zur Registrierung zu springen.
+      if (!frage.trim() && feldEl) { try { feldEl.focus(); } catch (fehler) { /* alter Browser */ } return; }
       try { if (frage.trim()) sessionStorage.setItem("smejj.probierFrage.v1", frage.trim()); } catch (fehler) { /* ohne Speicher geht es trotzdem zur Anmeldung */ }
       // Seit dem 21.09.2026 (Betreiber-Freigabe, Apple-Ablehnung 2.1): die
       // erste Frage wird HIER beantwortet, ohne Konto. gast-frage.js faellt

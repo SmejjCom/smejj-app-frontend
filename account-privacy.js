@@ -1,25 +1,25 @@
-import { STORAGE_KEYS } from "./config.js?v=2026111406";
+import { STORAGE_KEYS } from "./config.js?v=2026111701";
 import { initServerSessionControls, fetchLoginMethods, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
-  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026111406";
-import { languageOptionsMarkup } from "./language-options.js?v=2026111406";
-import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026111406";
-import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026111406";
-import { clearProfilePicture } from "./profile-picture-store.js?v=2026111406";
-import { afterFirstPaint } from "./deferred-start.js?v=2026111406";
+  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026111701";
+import { languageOptionsMarkup } from "./language-options.js?v=2026111701";
+import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026111701";
+import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026111701";
+import { clearProfilePicture } from "./profile-picture-store.js?v=2026111701";
+import { afterFirstPaint } from "./deferred-start.js?v=2026111701";
 // Ohne ?v=: siehe die Begruendung in account-auth-state.js. Eine Marke hier
 // wuerde erzwingen, dass diese ABO-GESPERRTE Datei bei jeder Stil-Aenderung
 // wieder angefasst wird — genau das soll die Auslagerung verhindern.
-import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026111406";
+import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026111701";
 // Gleicher Schluessel wie in profile-dock-menu.js — bewusst dupliziert statt
 // importiert (wie TOKEN_KEY in auth-gate.js): profile-dock-menu.js liegt im
 // Startbuendel, diese Datei wird nachgeladen. Ein Import zoege das Startmodul
 // unter einer zweiten Marke herein — genau die Falle, vor der die Markenkette
 // warnt (zwei Kopien mit getrenntem Zustand).
 const KONTO_REITER_SCHLUESSEL = "smejj.konto.reiter.v1";
-import { usageSummary } from "./usage-meter.js?v=2026111406";
-import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026111406";
+import { usageSummary } from "./usage-meter.js?v=2026111701";
+import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026111701";
 // Apple-In-App-Kauf in der iOS-App (Inhaber 12.11.2026: „Soll mit Plus usw Pakete sein überall, Mach überall rein.“)
-import { appleBruecke, appleKaufMarkup, appleVerwalten, bindeAppleKauf, zeichneAppleKnoepfe } from "./apple-kauf.js?v=2026111406";
+import { appleBruecke, appleKaufMarkup, appleVerwalten, bindeAppleKauf, zeichneAppleKnoepfe } from "./apple-kauf.js?v=2026111701";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const PERSONAL_KEY = "smejj.personalization.v1";
@@ -235,22 +235,38 @@ function renderBillingState(view, billing) {
 async function openBillingPortal(view) {
   output(view, t("Einen Moment — das Abo-Portal wird geöffnet …"));
   const portal = await requestBillingPortal();
+  // Mit "noopener" meldet window.open nie zurueck, ob das Fenster aufging (Pruefung 17.11.2026,
+  // Befund 2): darum kein "geöffnet" behaupten, sondern den Pop-up-Hinweis gleich mitgeben.
   if (portal.ok) {
     window.open(portal.url, "_blank", "noopener");
-    output(view, t("Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen."));
+    output(view, t("Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com."));
     return;
   }
   window.open(STRIPE_BILLING_PORTAL_URL, "_blank", "noopener");
-  output(view, t("Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode."));
+  output(view, t("Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com."));
 }
 
 // Plan-Knopf: ohne aktives Abo startet der Stripe-Checkout; mit aktivem Abo
 // fuehrt der Weg ins Portal (ein zweiter Zahlungslink wuerde ein zweites,
 // paralleles Abo anlegen — die Umstellung gehoert zu Stripe).
-function startOrSwitchPlan(view, plan) {
-  const aktiverPlan = billingAktuell?.plan;
-  if (PLAN_LABELS[aktiverPlan]) return openBillingPortal(view);
-  window.open(planLink(plan), "_blank", "noopener");
+// Pruefung 17.11.2026, Befund 2 (Geld): gekauft wird nur mit bestaetigtem Abo-Stand samt
+// Kontokennung (client_reference_id) — sonst liesse sich die Zahlung keinem Konto zuordnen,
+// oder ein unbekannter Stand fuehrte zu einem zweiten Abo statt ins Portal.
+async function startOrSwitchPlan(view, plan) {
+  if (!billingAktuell || !billingCheckoutRef) {
+    output(view, t("Einen Moment — dein Abo-Stand wird geprüft …"));
+    const stand = await fetchBillingStatus();
+    if (stand) { billingCheckoutRef = String(stand.checkoutRef || ""); billingAktuell = stand; renderBillingState(view, stand); }
+  }
+  if (PLAN_LABELS[billingAktuell?.plan]) return openBillingPortal(view);
+  if (!billingAktuell || !billingCheckoutRef) {
+    output(view, t("Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal."));
+    return;
+  }
+  // Ohne "noopener" meldet window.open, ob das Fenster aufging; den Rueckweg kappt opener = null.
+  const fenster = window.open(planLink(plan), "_blank");
+  if (!fenster) { output(view, t("Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.")); return; }
+  try { fenster.opener = null; } catch { /* fremdes Fenster */ }
   output(view, t("Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar."));
 }
 

@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Payment due — please check your payment method in the subscription portal.",
   "Aktiv — verlängert sich am {datum}.": "Active — renews on {datum}.",
   "Einen Moment — das Abo-Portal wird geöffnet …": "One moment — opening the subscription portal …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "Subscription portal opened: manage, switch plans, cancel, invoices.",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "Subscription portal opened. Sign in there with your account email — Stripe will send you a confirmation code.",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Stripe checkout opened. After payment, your subscription will appear here within moments.",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "Manage subscription — invoices, plan & cancellation",
   "Rechnungen & Zahlungen": "Invoices & payments",
@@ -676,5 +674,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5,000 messages · 400 images · 40 photo videos",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15,000 messages · 1,500 images · 150 photo videos",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1,000 messages, 100 images, 10 photo videos",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1,000 messages, 100 images, 10 photo videos · €9/month"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1,000 messages, 100 images, 10 photo videos · €9/month",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "Message or attachment too large. Please shorten the text or attach a smaller file.",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "That didn't work just now. Please try again.",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "No internet connection. Once you are back online, you can send it again.",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "The server took too long to respond. Please try again.",
+  "Verbindung zum Server unterbrochen.": "Connection to the server was interrupted.",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "Answer incomplete – the connection dropped. Please send the question again.",
+  "Erneut versuchen": "Try again",
+  "In {s} s erneut versuchen": "Try again in {s} s",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "One moment — checking your subscription status …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Your subscription status can't be loaded right now. So that nothing is bought twice, checkout only starts after this check. Please try again in a moment.",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Your browser blocked the payment window. Please allow pop-ups for smejj.com and tap again.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "The subscription portal opens in a new window: manage, change plan, cancel, invoices. If none opens, please allow pop-ups for smejj.com.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "The subscription portal opens in a new window. Sign in there with your account email — Stripe will send you a confirmation code. If none opens, please allow pop-ups for smejj.com."
 };

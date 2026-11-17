@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "支払いが未完了です — サブスクリプションポータルで支払い方法をご確認ください。",
   "Aktiv — verlängert sich am {datum}.": "有効 — {datum}に更新されます。",
   "Einen Moment — das Abo-Portal wird geöffnet …": "少々お待ちください — サブスクリプションポータルを開いています…",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "サブスクリプションポータルを開きました: 管理、プラン変更、解約、請求書。",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "サブスクリプションポータルを開きました。アカウントのメールアドレスでサインインしてください — Stripeから確認コードが届きます。",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Stripeの決済ページを開きました。お支払い後、まもなくここにサブスクリプションが表示されます。",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "サブスクリプション管理 — 請求書・プラン・解約",
   "Rechnungen & Zahlungen": "請求と支払い",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5,000 メッセージ · 画像400枚 · フォト動画40本",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15,000 メッセージ · 画像1,500枚 · フォト動画150本",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1,000 メッセージ、画像100枚、フォト動画10本",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1,000 メッセージ、画像100枚、フォト動画10本 · 月額 9 €"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1,000 メッセージ、画像100枚、フォト動画10本 · 月額 9 €",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "メッセージまたは添付ファイルが大きすぎます。テキストを短くするか、小さいファイルを添付してください。",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "うまくいきませんでした。もう一度お試しください。",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "インターネットに接続されていません。オンラインに戻ったら、もう一度送信できます。",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "サーバーの応答に時間がかかりすぎました。もう一度お試しください。",
+  "Verbindung zum Server unterbrochen.": "サーバーとの接続が切れました。",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "回答が途中で切れました – 接続が中断されました。もう一度質問を送ってください。",
+  "Erneut versuchen": "再試行",
+  "In {s} s erneut versuchen": "{s} 秒後に再試行",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "少々お待ちください — サブスクリプションの状態を確認しています …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "現在サブスクリプションの状態を取得できません。二重購入を防ぐため、この確認が済むまで購入は始まりません。少し待ってからもう一度お試しください。",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "ブラウザが支払いウィンドウをブロックしました。smejj.com のポップアップを許可して、もう一度タップしてください。",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "サブスクリプションポータルが新しいウィンドウで開きます：管理、プラン変更、解約、請求書。開かない場合は smejj.com のポップアップを許可してください。",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "サブスクリプションポータルが新しいウィンドウで開きます。アカウントのメールアドレスでサインインしてください — Stripe から確認コードが届きます。開かない場合は smejj.com のポップアップを許可してください。"
 };

@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "भुगतान बाकी — कृपया सदस्यता पोर्टल में भुगतान का तरीका जाँचें।",
   "Aktiv — verlängert sich am {datum}.": "सक्रिय — {datum} को नवीनीकृत होगी।",
   "Einen Moment — das Abo-Portal wird geöffnet …": "एक क्षण — सदस्यता पोर्टल खुल रहा है …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "सदस्यता पोर्टल खुल गया: प्रबंधन, प्लान बदलना, रद्द करना, बिल।",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "सदस्यता पोर्टल खुल गया। वहाँ अपने खाते के ईमेल से साइन इन करें — Stripe आपको पुष्टि कोड भेजेगा।",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Stripe चेकआउट खुल गया। भुगतान के बाद आपकी सदस्यता कुछ ही क्षणों में यहाँ दिखेगी।",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "सदस्यता प्रबंधित करें — बिल, प्लान और रद्दीकरण",
   "Rechnungen & Zahlungen": "चालान और भुगतान",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5000 संदेश · 400 चित्र · 40 फ़ोटो-वीडियो",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15000 संदेश · 1500 चित्र · 150 फ़ोटो-वीडियो",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1000 संदेश, 100 चित्र, 10 फ़ोटो-वीडियो",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1000 संदेश, 100 चित्र, 10 फ़ोटो-वीडियो · 9 €/माह"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1000 संदेश, 100 चित्र, 10 फ़ोटो-वीडियो · 9 €/माह",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "संदेश या अटैचमेंट बहुत बड़ा है। कृपया टेक्स्ट छोटा करें या छोटी फ़ाइल जोड़ें।",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "अभी नहीं हो पाया। कृपया फिर से कोशिश करें।",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "इंटरनेट कनेक्शन नहीं है। फिर से ऑनलाइन होने पर आप इसे दोबारा भेज सकते हैं।",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "सर्वर ने जवाब देने में बहुत देर की। कृपया फिर से कोशिश करें।",
+  "Verbindung zum Server unterbrochen.": "सर्वर से कनेक्शन टूट गया।",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "जवाब अधूरा है – कनेक्शन टूट गया। कृपया सवाल फिर से भेजें।",
+  "Erneut versuchen": "फिर से कोशिश करें",
+  "In {s} s erneut versuchen": "{s} सेकंड में फिर से कोशिश करें",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "एक पल — आपकी सदस्यता की स्थिति जाँची जा रही है …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "आपकी सदस्यता की स्थिति अभी नहीं मिल पा रही है। ताकि कुछ भी दो बार न खरीदा जाए, खरीद इस जाँच के बाद ही शुरू होगी। कृपया थोड़ी देर में फिर से कोशिश करें।",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "ब्राउज़र ने भुगतान विंडो रोक दी। कृपया smejj.com के लिए पॉप-अप की अनुमति दें और फिर से टैप करें।",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "सदस्यता पोर्टल नई विंडो में खुलता है: प्रबंधन, प्लान बदलना, रद्द करना, बिल। अगर कुछ न खुले, तो smejj.com के लिए पॉप-अप की अनुमति दें।",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "सदस्यता पोर्टल नई विंडो में खुलता है। वहाँ अपने खाते के ईमेल से साइन इन करें — Stripe आपको एक पुष्टि कोड भेजेगा। अगर कुछ न खुले, तो smejj.com के लिए पॉप-अप की अनुमति दें।"
 };

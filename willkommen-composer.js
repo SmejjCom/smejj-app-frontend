@@ -1,5 +1,5 @@
 // smejj.com — mehrzeiliger Gast-Composer; Dateien bleiben bis zur Anmeldung lokal.
-import { initEingabeHost, haltFeldSichtbar } from "./composer-eingabe-host.js?v=2026111406";
+import { initEingabeHost, haltFeldSichtbar } from "./composer-eingabe-host.js?v=2026111701";
 const form = document.getElementById("probierForm"), input = document.getElementById("probierFeld");
 if (form && input) {
   initEingabeHost();
@@ -10,10 +10,12 @@ if (form && input) {
   input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); form.requestSubmit(); } });
   const menu = document.getElementById("gastDateiMenu"), plus = document.getElementById("gastPlus");
   plus.addEventListener("click", () => { menu.hidden = !menu.hidden; plus.setAttribute("aria-expanded", String(!menu.hidden)); });
+  // Pruefung 17.11.2026 (F10): Esc schliesst das offene Plus-Menue, der Fokus geht zurueck auf Plus.
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !menu.hidden) { menu.hidden = true; plus.setAttribute("aria-expanded", "false"); plus.focus(); } });
   for (const button of menu.querySelectorAll("[data-picker]")) button.addEventListener("click", () => { document.getElementById(button.dataset.picker).click(); menu.hidden = true; plus.setAttribute("aria-expanded", "false"); });
   for (const picker of form.querySelectorAll("input[type=file]")) picker.addEventListener("change", async () => {
     const files = Array.from(picker.files || []); picker.value = "";
-    const { uebernehmeDateiAuswahl } = await import("./composer-bild-anhang.js?v=2026111406");
+    const { uebernehmeDateiAuswahl } = await import("./composer-bild-anhang.js?v=2026111701");
     await uebernehmeDateiAuswahl(files, input, notify); hinweis(); input.scrollIntoView({ block: "center", behavior: "smooth" });
   });
   function hinweis() {
@@ -31,7 +33,7 @@ if (form && input) {
   let dictation;
   document.getElementById("gastDiktat").addEventListener("click", async () => {
     if (!dictation) {
-      const [{ createDictation }, { createServerEar }, { CLIENT_ROUTES }] = await Promise.all([import("./composer-dictation.js?v=2026111406"), import("./voice-ear.js?v=2026111406"), import("./config.js?v=2026111406")]);
+      const [{ createDictation }, { createServerEar }, { CLIENT_ROUTES }] = await Promise.all([import("./composer-dictation.js?v=2026111701"), import("./voice-ear.js?v=2026111701"), import("./config.js?v=2026111701")]);
       const RecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
       const warn = text => { const p = document.getElementById("gastDiktatStatus"); p.textContent = text; };
       dictation = createDictation({ getInput: () => input, notifyInputChanged: notify, RecognitionCtor, speechSupported: () => Boolean(RecognitionCtor), lang: () => document.documentElement.lang || "de-DE", showToast: warn, serverOhr: createServerEar({ urls: [CLIENT_ROUTES.api.voiceTranscribeFallback], budgetMs: 6000 }), setVisual: active => document.getElementById("gastDiktat").setAttribute("aria-pressed", String(active)) });

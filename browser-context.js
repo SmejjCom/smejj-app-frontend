@@ -15,8 +15,8 @@
 // damit der zweite Aufrufweg (erst Client-Chat, dann Server-Stream) nichts
 // nachlaedt. Kein neuer Anbieter, kein neuer Dienst.
 
-import { CLIENT_ROUTES } from "./config.js?v=2026111406";
-import { firstSafeUrl } from "./autonomous-intent.js?v=2026111406";
+import { CLIENT_ROUTES } from "./config.js?v=2026111701";
+import { firstSafeUrl } from "./autonomous-intent.js?v=2026111701";
 
 // Modelle, bei denen die Bridge ihre werkzeuglose Schnellspur ueberspringt und
 // an den Control Server weiterreicht — dort laeuft echtes Tool-Calling.

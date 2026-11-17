@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Ödeme bekleniyor — lütfen abonelik portalında ödeme yöntemini kontrol et.",
   "Aktiv — verlängert sich am {datum}.": "Etkin — {datum} tarihinde yenilenir.",
   "Einen Moment — das Abo-Portal wird geöffnet …": "Bir saniye — abonelik portalı açılıyor …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "Abonelik portalı açıldı: yönet, plan değiştir, iptal et, faturalar.",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "Abonelik portalı açıldı. Hesap e-postanla giriş yap — Stripe sana bir onay kodu gönderecek.",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Stripe ödeme sayfası açıldı. Ödemeden sonra aboneliğin birkaç saniye içinde burada görünür.",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "Aboneliği yönet — faturalar, plan ve iptal",
   "Rechnungen & Zahlungen": "Faturalar ve ödemeler",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5.000 mesaj · 400 görsel · 40 fotoğraf videosu",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15.000 mesaj · 1.500 görsel · 150 fotoğraf videosu",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1.000 mesaj, 100 görsel, 10 fotoğraf videosu",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1.000 mesaj, 100 görsel, 10 fotoğraf videosu · 9 €/ay"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1.000 mesaj, 100 görsel, 10 fotoğraf videosu · 9 €/ay",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "Mesaj veya ek çok büyük. Lütfen metni kısalt ya da daha küçük bir dosya ekle.",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "Şu an olmadı. Lütfen tekrar dene.",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "İnternet bağlantısı yok. Tekrar çevrimiçi olduğunda yeniden gönderebilirsin.",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "Sunucu yanıt vermekte çok gecikti. Lütfen tekrar dene.",
+  "Verbindung zum Server unterbrochen.": "Sunucu bağlantısı kesildi.",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "Yanıt eksik – bağlantı koptu. Lütfen soruyu tekrar gönder.",
+  "Erneut versuchen": "Tekrar dene",
+  "In {s} s erneut versuchen": "{s} sn sonra tekrar dene",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "Bir saniye — abonelik durumun kontrol ediliyor …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Abonelik durumun şu an alınamıyor. Hiçbir şey iki kez satın alınmasın diye ödeme ancak bu kontrolden sonra başlar. Lütfen birazdan tekrar dene.",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Tarayıcı ödeme penceresini engelledi. Lütfen smejj.com için açılır pencerelere izin ver ve tekrar dokun.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Abonelik portalı yeni bir pencerede açılır: yönet, plan değiştir, iptal et, faturalar. Hiçbiri açılmazsa lütfen smejj.com için açılır pencerelere izin ver.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Abonelik portalı yeni bir pencerede açılır. Orada hesabının e-postasıyla giriş yap — Stripe sana bir onay kodu gönderir. Hiçbiri açılmazsa lütfen smejj.com için açılır pencerelere izin ver."
 };

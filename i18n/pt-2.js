@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Pagamento pendente — verifique o meio de pagamento no portal da assinatura.",
   "Aktiv — verlängert sich am {datum}.": "Ativa — renova em {datum}.",
   "Einen Moment — das Abo-Portal wird geöffnet …": "Um momento — abrindo o portal da assinatura …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "Portal da assinatura aberto: gerenciar, mudar de plano, cancelar, faturas.",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "Portal da assinatura aberto. Entre com o e-mail da sua conta — a Stripe enviará um código de confirmação.",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Checkout da Stripe aberto. Após o pagamento, sua assinatura aparecerá aqui em instantes.",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "Gerenciar assinatura — faturas, plano e cancelamento",
   "Rechnungen & Zahlungen": "Faturas e pagamentos",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5.000 mensagens · 400 imagens · 40 vídeos de foto",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15.000 mensagens · 1.500 imagens · 150 vídeos de foto",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1.000 mensagens, 100 imagens, 10 vídeos de foto",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1.000 mensagens, 100 imagens, 10 vídeos de foto · 9 €/mês"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1.000 mensagens, 100 imagens, 10 vídeos de foto · 9 €/mês",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "Mensagem ou anexo grande demais. Encurte o texto ou anexe um arquivo menor.",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "Isso não funcionou agora. Tente novamente.",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "Sem conexão com a internet. Quando estiver online de novo, você pode enviar novamente.",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "O servidor demorou demais para responder. Tente novamente.",
+  "Verbindung zum Server unterbrochen.": "A conexão com o servidor foi interrompida.",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "Resposta incompleta – a conexão caiu. Envie a pergunta novamente.",
+  "Erneut versuchen": "Tentar novamente",
+  "In {s} s erneut versuchen": "Tentar novamente em {s} s",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "Um momento — verificando o status da sua assinatura …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "O status da sua assinatura não pode ser consultado agora. Para que nada seja comprado duas vezes, a compra só começa após essa verificação. Tente novamente em instantes.",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "O navegador bloqueou a janela de pagamento. Permita pop-ups para smejj.com e toque novamente.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "O portal da assinatura abre em uma nova janela: gerenciar, mudar de plano, cancelar, faturas. Se nada abrir, permita pop-ups para smejj.com.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "O portal da assinatura abre em uma nova janela. Entre lá com o e-mail da sua conta — a Stripe enviará um código de confirmação. Se nada abrir, permita pop-ups para smejj.com."
 };

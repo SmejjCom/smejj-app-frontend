@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Pagamento in sospeso — controlla il metodo di pagamento nel portale abbonamenti.",
   "Aktiv — verlängert sich am {datum}.": "Attivo — si rinnova il {datum}.",
   "Einen Moment — das Abo-Portal wird geöffnet …": "Un attimo — apertura del portale abbonamenti …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "Portale abbonamenti aperto: gestisci, cambia piano, disdici, fatture.",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "Portale abbonamenti aperto. Accedi con l’e-mail del tuo account — Stripe ti invierà un codice di conferma.",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Checkout Stripe aperto. Dopo il pagamento l’abbonamento apparirà qui in pochi istanti.",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "Gestisci abbonamento — fatture, piano e disdetta",
   "Rechnungen & Zahlungen": "Fatture e pagamenti",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5.000 messaggi · 400 immagini · 40 foto-video",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15.000 messaggi · 1.500 immagini · 150 foto-video",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1.000 messaggi, 100 immagini, 10 foto-video",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1.000 messaggi, 100 immagini, 10 foto-video · 9 €/mese"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1.000 messaggi, 100 immagini, 10 foto-video · 9 €/mese",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "Messaggio o allegato troppo grande. Accorcia il testo o allega un file più piccolo.",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "Non ha funzionato. Riprova.",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "Nessuna connessione internet. Quando sarai di nuovo online potrai inviarlo di nuovo.",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "Il server ha impiegato troppo tempo a rispondere. Riprova.",
+  "Verbindung zum Server unterbrochen.": "Connessione al server interrotta.",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "Risposta incompleta – la connessione si è interrotta. Invia di nuovo la domanda.",
+  "Erneut versuchen": "Riprova",
+  "In {s} s erneut versuchen": "Riprova tra {s} s",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "Un momento — verifica dello stato dell'abbonamento …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Lo stato del tuo abbonamento non è disponibile al momento. Per evitare un doppio acquisto, il pagamento parte solo dopo questa verifica. Riprova tra poco.",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Il browser ha bloccato la finestra di pagamento. Consenti i pop-up per smejj.com e tocca di nuovo.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Il portale dell'abbonamento si apre in una nuova finestra: gestire, cambiare piano, disdire, fatture. Se non si apre nulla, consenti i pop-up per smejj.com.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Il portale dell'abbonamento si apre in una nuova finestra. Accedi con l'e-mail del tuo account — Stripe ti invierà un codice di conferma. Se non si apre nulla, consenti i pop-up per smejj.com."
 };

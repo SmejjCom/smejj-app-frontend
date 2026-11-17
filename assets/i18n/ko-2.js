@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "결제 대기 중 — 구독 포털에서 결제 수단을 확인해 주세요.",
   "Aktiv — verlängert sich am {datum}.": "활성 — {datum}에 갱신됩니다.",
   "Einen Moment — das Abo-Portal wird geöffnet …": "잠시만요 — 구독 포털을 여는 중입니다 …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "구독 포털이 열렸습니다: 관리, 플랜 변경, 해지, 청구서.",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "구독 포털이 열렸습니다. 계정 이메일로 로그인하세요 — Stripe가 확인 코드를 보내드립니다.",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Stripe 결제 페이지가 열렸습니다. 결제 후 곧 여기에 구독이 표시됩니다.",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "구독 관리 — 청구서, 플랜, 해지",
   "Rechnungen & Zahlungen": "청구서 및 결제",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "메시지 5,000개 · 이미지 400개 · 사진 동영상 40개",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "메시지 15,000개 · 이미지 1,500개 · 사진 동영상 150개",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "메시지 1,000개, 이미지 100개, 사진 동영상 10개",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "메시지 1,000개, 이미지 100개, 사진 동영상 10개 · 월 9 €"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "메시지 1,000개, 이미지 100개, 사진 동영상 10개 · 월 9 €",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "메시지나 첨부 파일이 너무 큽니다. 텍스트를 줄이거나 더 작은 파일을 첨부해 주세요.",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "지금은 되지 않았습니다. 다시 시도해 주세요.",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "인터넷에 연결되어 있지 않습니다. 다시 온라인이 되면 다시 보낼 수 있습니다.",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "서버 응답이 너무 오래 걸렸습니다. 다시 시도해 주세요.",
+  "Verbindung zum Server unterbrochen.": "서버와의 연결이 끊겼습니다.",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "답변이 완전하지 않습니다 – 연결이 끊겼습니다. 질문을 다시 보내 주세요.",
+  "Erneut versuchen": "다시 시도",
+  "In {s} s erneut versuchen": "{s}초 후 다시 시도",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "잠시만요 — 구독 상태를 확인하고 있습니다 …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "지금은 구독 상태를 불러올 수 없습니다. 중복 구매를 막기 위해 이 확인이 끝난 뒤에만 구매가 시작됩니다. 잠시 후 다시 시도해 주세요.",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "브라우저가 결제 창을 차단했습니다. smejj.com의 팝업을 허용한 뒤 다시 탭해 주세요.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "구독 포털이 새 창에서 열립니다: 관리, 요금제 변경, 해지, 청구서. 아무것도 열리지 않으면 smejj.com의 팝업을 허용해 주세요.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "구독 포털이 새 창에서 열립니다. 계정 이메일로 로그인하세요 — Stripe가 확인 코드를 보내 드립니다. 아무것도 열리지 않으면 smejj.com의 팝업을 허용해 주세요."
 };

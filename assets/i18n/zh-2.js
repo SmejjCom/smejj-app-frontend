@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "待付款 — 请在订阅门户中检查支付方式。",
   "Aktiv — verlängert sich am {datum}.": "已生效 — 将于{datum}续订。",
   "Einen Moment — das Abo-Portal wird geöffnet …": "请稍候 — 正在打开订阅门户……",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "订阅门户已打开：管理、更换套餐、取消、账单。",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "订阅门户已打开。请用你的账户邮箱登录 — Stripe 会发送确认码。",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Stripe 支付页面已打开。付款后，你的订阅很快就会显示在这里。",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "管理订阅 — 账单、套餐与取消",
   "Rechnungen & Zahlungen": "账单与付款",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5000 条消息 · 400 张图片 · 40 个照片视频",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15000 条消息 · 1500 张图片 · 150 个照片视频",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1000 条消息、100 张图片、10 个照片视频",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1000 条消息、100 张图片、10 个照片视频 · 每月 9 €"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1000 条消息、100 张图片、10 个照片视频 · 每月 9 €",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "消息或附件太大。请缩短文本或附加较小的文件。",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "刚才没有成功。请再试一次。",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "没有网络连接。重新联网后，你可以再次发送。",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "服务器响应时间过长。请再试一次。",
+  "Verbindung zum Server unterbrochen.": "与服务器的连接已中断。",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "回答不完整——连接已中断。请重新发送问题。",
+  "Erneut versuchen": "重试",
+  "In {s} s erneut versuchen": "{s} 秒后重试",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "请稍候——正在检查你的订阅状态 …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "暂时无法获取你的订阅状态。为避免重复购买，只有在检查完成后才会开始付款。请稍后再试。",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "浏览器拦截了付款窗口。请允许 smejj.com 的弹出窗口，然后再点一次。",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "订阅门户会在新窗口中打开：管理、更换方案、取消、发票。如果没有打开，请允许 smejj.com 的弹出窗口。",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "订阅门户会在新窗口中打开。请用你的账户邮箱登录——Stripe 会向你发送确认码。如果没有打开，请允许 smejj.com 的弹出窗口。"
 };

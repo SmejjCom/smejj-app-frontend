@@ -378,3 +378,32 @@ a:focus-visible {
   outline: 2px solid var(--auth-ink);
   outline-offset: 3px;
 }
+
+/* Pruefung 17.11.2026 (F1): Beide Anmeldeseiten erzwingen per Inline-Stil einen
+   dunklen Glas-Hintergrund (auch im hellen Systemmodus), die helle Palette
+   schaltete aber die Schrift auf dunkel um – dunkel auf dunkel, Kontrast ~1:1.
+   Die Seiten bleiben deshalb auch im hellen Modus dunkel: dieselbe dunkle
+   Palette wie oben (eigener Block, die v1030-Palette bleibt bytegleich). html:is(:root)/html … schlaegt die gleichnamigen hellen
+   Inline-Regeln (hoehere Spezifitaet), das dunkle Aussehen bleibt unveraendert. */
+@media (prefers-color-scheme: light) {
+  html:is(:root) {
+    color-scheme: dark;
+    --auth-bg: #0d0f12;
+    --auth-panel: #14171c;
+    --auth-ink: #ececf1;
+    --auth-muted: #9096a1;
+    --auth-line: #262a31;
+    --auth-line-strong: #343943;
+    --auth-accent: #2fd4c9;
+    --auth-primary-bg: #ececf1;
+    --auth-primary-ink: #101216;
+    --auth-error: #e5726f;
+    --auth-success: #5fe0c6;
+    --auth-focus: rgba(47, 212, 201, 0.45);
+  }
+  html body[data-auth-mode="register"] .auth-card { background: rgba(20, 23, 28, 0.92); }
+  html .auth-button.auth-apple { background: #fff; color: #000; border-color: #fff; }
+  html .auth-button.auth-apple:hover { border-color: #fff; }
+  html .auth-apple .auth-apple-logo.fuer-dunkel { display: flex; }
+  html .auth-apple .auth-apple-logo.fuer-hell { display: none; }
+}

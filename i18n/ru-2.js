@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Ожидается оплата — проверьте способ оплаты в портале подписки.",
   "Aktiv — verlängert sich am {datum}.": "Активна — продлевается {datum}.",
   "Einen Moment — das Abo-Portal wird geöffnet …": "Секунду — открываем портал подписки …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "Портал подписки открыт: управление, смена плана, отмена, счета.",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "Портал подписки открыт. Войдите с адресом электронной почты вашего аккаунта — Stripe пришлёт код подтверждения.",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Открыта оплата Stripe. После оплаты подписка появится здесь через несколько мгновений.",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "Управлять подпиской — счета, план и отмена",
   "Rechnungen & Zahlungen": "Счета и платежи",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5000 сообщений · 400 изображений · 40 фотовидео",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15000 сообщений · 1500 изображений · 150 фотовидео",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1000 сообщений, 100 изображений, 10 фотовидео",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1000 сообщений, 100 изображений, 10 фотовидео · 9 €/мес."
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1000 сообщений, 100 изображений, 10 фотовидео · 9 €/мес.",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "Сообщение или вложение слишком большое. Сократите текст или прикрепите файл поменьше.",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "Сейчас не получилось. Попробуйте ещё раз.",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "Нет подключения к интернету. Когда снова будете онлайн, отправьте ещё раз.",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "Сервер слишком долго не отвечал. Попробуйте ещё раз.",
+  "Verbindung zum Server unterbrochen.": "Соединение с сервером прервано.",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "Ответ неполный — соединение оборвалось. Отправьте вопрос ещё раз.",
+  "Erneut versuchen": "Повторить",
+  "In {s} s erneut versuchen": "Повторить через {s} с",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "Минутку — проверяем статус подписки …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Статус подписки сейчас недоступен. Чтобы ничего не купить дважды, оплата начнётся только после этой проверки. Попробуйте чуть позже.",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Браузер заблокировал окно оплаты. Разрешите всплывающие окна для smejj.com и нажмите ещё раз.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Портал подписки откроется в новом окне: управление, смена тарифа, отмена, счета. Если окно не открылось, разрешите всплывающие окна для smejj.com.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Портал подписки откроется в новом окне. Войдите там с e-mail вашего аккаунта — Stripe пришлёт код подтверждения. Если окно не открылось, разрешите всплывающие окна для smejj.com."
 };

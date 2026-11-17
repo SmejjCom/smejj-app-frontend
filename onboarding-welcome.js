@@ -7,7 +7,7 @@
 // Eingehaengt ueber account-privacy.js (NICHT Start-Lock): die Anmeldung
 // leitet zu /profile — genau dort begruessen wir. Fail-safe: jeder Fehler
 // wird geschluckt, die Kontoseite laeuft immer weiter.
-import { t } from "./i18n/ui.js?v=2026111406";
+import { t } from "./i18n/ui.js?v=2026111701";
 
 const ONBOARDING_KEY = "smejj.onboarding.v1";
 const SESSION_KEY = "smejj.session.v1";
@@ -40,6 +40,7 @@ export function markOnboardingDone(storage = globalThis.localStorage) {
 // Input: planLinks { plus, pro, max } (Stripe-Zahlungslinks), optional
 // leseAbo() -> Promise<{plan}|null> fuer den echten Abo-Stand. Output: void.
 export function initOnboardingWelcome(planLinks = {}, doc = globalThis.document, leseAbo = null) {
+  aboLeser = leseAbo;
   tryShowOnboarding(planLinks, doc);
   setTimeout(() => tryShowOnboarding(planLinks, doc), 300);
   setTimeout(() => tryShowOnboarding(planLinks, doc), 600);
@@ -81,6 +82,28 @@ const PLAN_TITEL = { plus: "Plus — 9 €", pro: "Pro — 19 €", max: "Max �
 // hier das Ergebnis vor. Ohne das bliebe "Free — Aktiv" stehen, wenn die
 // Serverantwort vor dem Overlay eintrifft.
 let bestaetigtesAbo = null;
+let aboLeser = null;
+
+// Pruefung 17.11.2026 (gleiche Fehlerklasse wie Befund 2 in account-privacy.js):
+// Kauf nur mit bestaetigtem Abo-Stand samt Kontokennung (client_reference_id),
+// sonst liesse sich die Zahlung keinem Konto zuordnen. Kein Link ohne Kennung.
+export async function kaufStarten(plan, planLinks, doc = globalThis.document, oeffne = (u) => globalThis.open?.(u, "_blank")) {
+  const melde = (text) => { const n = doc?.querySelector(".onboarding-note"); if (n) { n.textContent = text; n.setAttribute("role", "alert"); } };
+  if (!planLinks?.[plan]) return "kein-link";
+  if (!bestaetigtesAbo?.checkoutRef && aboLeser) {
+    melde(t("Einen Moment — dein Abo-Stand wird geprüft …"));
+    try { bestaetigtesAbo = (await aboLeser()) || null; } catch { bestaetigtesAbo = null; }
+    zeigeEchtenPlan(bestaetigtesAbo, doc);
+  }
+  if (bestaetigtesAbo && PLAN_TITEL[bestaetigtesAbo.plan]) { melde(t("Dein Abo ist aktiv. Danke! Plan wechseln oder kündigen kannst du jederzeit unter Konto → Abo & Zahlungen.")); return "aktiv"; }
+  const ref = String(bestaetigtesAbo?.checkoutRef || "");
+  if (!ref) { melde(t("Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.")); return "ohne-kennung"; }
+  // Ohne "noopener" meldet window.open, ob das Fenster aufging; den Rueckweg kappt opener = null.
+  const fenster = oeffne(`${planLinks[plan]}?client_reference_id=${encodeURIComponent(ref)}`);
+  if (!fenster) { melde(t("Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.")); return "blockiert"; }
+  try { fenster.opener = null; } catch { /* fremdes Fenster */ }
+  return "geoeffnet";
+}
 
 // Karte auf den bestaetigten Serverstand umschreiben: der bezahlte Plan traegt
 // das "Aktiv"-Abzeichen, Free verliert es, und der eigene Plan bietet keinen
@@ -155,9 +178,9 @@ function tryShowOnboarding(planLinks, doc) {
     doc.body.append(overlay);
     zeigeEchtenPlan(bestaetigtesAbo, doc); // Abo-Stand war schon da
     overlay.addEventListener("click", (event) => {
-      if (event.target.closest("#onboardingPlus") && planLinks.plus) window.open(planLinks.plus, "_blank", "noopener");
-      if (event.target.closest("#onboardingPro") && planLinks.pro) window.open(planLinks.pro, "_blank", "noopener");
-      if (event.target.closest("#onboardingMax") && planLinks.max) window.open(planLinks.max, "_blank", "noopener");
+      if (event.target.closest("#onboardingPlus")) kaufStarten("plus", planLinks, doc);
+      if (event.target.closest("#onboardingPro")) kaufStarten("pro", planLinks, doc);
+      if (event.target.closest("#onboardingMax")) kaufStarten("max", planLinks, doc);
       if (event.target.closest("#onboardingStart") || event.target === overlay) {
         markOnboardingDone();
         overlay.remove();

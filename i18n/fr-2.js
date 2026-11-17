@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Paiement en attente — vérifiez votre moyen de paiement dans le portail d’abonnement.",
   "Aktiv — verlängert sich am {datum}.": "Actif — se renouvelle le {datum}.",
   "Einen Moment — das Abo-Portal wird geöffnet …": "Un instant — ouverture du portail d’abonnement …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "Portail d’abonnement ouvert : gérer, changer de forfait, résilier, factures.",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "Portail d’abonnement ouvert. Connectez-vous avec l’e-mail de votre compte — Stripe vous enverra un code de confirmation.",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Paiement Stripe ouvert. Après le paiement, votre abonnement apparaîtra ici en quelques instants.",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "Gérer l’abonnement — factures, forfait et résiliation",
   "Rechnungen & Zahlungen": "Factures et paiements",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5 000 messages · 400 images · 40 vidéos photo",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15 000 messages · 1 500 images · 150 vidéos photo",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1 000 messages, 100 images, 10 vidéos photo",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1 000 messages, 100 images, 10 vidéos photo · 9 €/mois"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1 000 messages, 100 images, 10 vidéos photo · 9 €/mois",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "Message ou pièce jointe trop volumineux. Raccourcis le texte ou joins un fichier plus petit.",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "Cela n'a pas fonctionné. Réessaie.",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "Pas de connexion internet. Dès que tu es de nouveau en ligne, tu peux l'envoyer à nouveau.",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "Le serveur a mis trop de temps à répondre. Réessaie.",
+  "Verbindung zum Server unterbrochen.": "La connexion au serveur a été interrompue.",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "Réponse incomplète – la connexion a été coupée. Renvoie la question.",
+  "Erneut versuchen": "Réessayer",
+  "In {s} s erneut versuchen": "Réessayer dans {s} s",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "Un instant — vérification de ton abonnement …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "L'état de ton abonnement est indisponible pour le moment. Pour éviter un double achat, le paiement ne démarre qu'après cette vérification. Réessaie dans un instant.",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Le navigateur a bloqué la fenêtre de paiement. Autorise les fenêtres pop-up pour smejj.com et touche à nouveau.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Le portail d'abonnement s'ouvre dans une nouvelle fenêtre : gérer, changer de forfait, résilier, factures. Si rien ne s'ouvre, autorise les fenêtres pop-up pour smejj.com.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Le portail d'abonnement s'ouvre dans une nouvelle fenêtre. Connecte-toi avec l'e-mail de ton compte — Stripe t'enverra un code de confirmation. Si rien ne s'ouvre, autorise les fenêtres pop-up pour smejj.com."
 };

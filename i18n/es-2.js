@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Pago pendiente — revisa tu método de pago en el portal de suscripción.",
   "Aktiv — verlängert sich am {datum}.": "Activa — se renueva el {datum}.",
   "Einen Moment — das Abo-Portal wird geöffnet …": "Un momento — abriendo el portal de suscripción …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "Portal de suscripción abierto: gestionar, cambiar de plan, cancelar, facturas.",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "Portal de suscripción abierto. Inicia sesión allí con el correo de tu cuenta — Stripe te enviará un código de confirmación.",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Pago de Stripe abierto. Tras el pago, tu suscripción aparecerá aquí en unos instantes.",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "Gestionar suscripción — facturas, plan y cancelación",
   "Rechnungen & Zahlungen": "Facturas y pagos",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5000 mensajes · 400 imágenes · 40 fotovídeos",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15000 mensajes · 1500 imágenes · 150 fotovídeos",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1000 mensajes, 100 imágenes, 10 fotovídeos",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1000 mensajes, 100 imágenes, 10 fotovídeos · 9 €/mes"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1000 mensajes, 100 imágenes, 10 fotovídeos · 9 €/mes",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "Mensaje o archivo adjunto demasiado grande. Acorta el texto o adjunta un archivo más pequeño.",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "Eso no ha funcionado ahora. Inténtalo de nuevo.",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "Sin conexión a internet. Cuando vuelvas a estar en línea, podrás enviarlo de nuevo.",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "El servidor tardó demasiado en responder. Inténtalo de nuevo.",
+  "Verbindung zum Server unterbrochen.": "Se interrumpió la conexión con el servidor.",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "Respuesta incompleta: la conexión se cortó. Envía la pregunta de nuevo.",
+  "Erneut versuchen": "Reintentar",
+  "In {s} s erneut versuchen": "Reintentar en {s} s",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "Un momento: comprobando el estado de tu suscripción …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Ahora no se puede consultar el estado de tu suscripción. Para que nada se compre dos veces, la compra solo empieza tras esta comprobación. Inténtalo de nuevo en un momento.",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "El navegador bloqueó la ventana de pago. Permite las ventanas emergentes para smejj.com y vuelve a tocar.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "El portal de suscripción se abre en una ventana nueva: gestionar, cambiar de plan, cancelar, facturas. Si no se abre ninguna, permite las ventanas emergentes para smejj.com.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "El portal de suscripción se abre en una ventana nueva. Inicia sesión allí con el correo de tu cuenta: Stripe te enviará un código de confirmación. Si no se abre ninguna, permite las ventanas emergentes para smejj.com."
 };

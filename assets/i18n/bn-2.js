@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "পেমেন্ট বাকি — অনুগ্রহ করে সাবস্ক্রিপশন পোর্টালে পেমেন্টের মাধ্যম যাচাই করুন।",
   "Aktiv — verlängert sich am {datum}.": "সক্রিয় — {datum} তারিখে নবায়ন হবে।",
   "Einen Moment — das Abo-Portal wird geöffnet …": "এক মুহূর্ত — সাবস্ক্রিপশন পোর্টাল খোলা হচ্ছে …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "সাবস্ক্রিপশন পোর্টাল খোলা হয়েছে: পরিচালনা, প্ল্যান বদল, বাতিল, চালান।",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "সাবস্ক্রিপশন পোর্টাল খোলা হয়েছে। আপনার অ্যাকাউন্টের ইমেল দিয়ে সাইন ইন করুন — Stripe আপনাকে একটি নিশ্চিতকরণ কোড পাঠাবে।",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Stripe চেকআউট খোলা হয়েছে। পেমেন্টের পর আপনার সাবস্ক্রিপশন কিছুক্ষণের মধ্যে এখানে দেখা যাবে।",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "সাবস্ক্রিপশন পরিচালনা — চালান, প্ল্যান ও বাতিল",
   "Rechnungen & Zahlungen": "চালান ও পেমেন্ট",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "৫০০০ বার্তা · ৪০০টি ছবি · ৪০টি ফটো-ভিডিও",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "১৫০০০ বার্তা · ১৫০০টি ছবি · ১৫০টি ফটো-ভিডিও",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "১০০০ বার্তা, ১০০টি ছবি, ১০টি ফটো-ভিডিও",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "১০০০ বার্তা, ১০০টি ছবি, ১০টি ফটো-ভিডিও · ৯ €/মাস"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "১০০০ বার্তা, ১০০টি ছবি, ১০টি ফটো-ভিডিও · ৯ €/মাস",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "বার্তা বা সংযুক্তি খুব বড়। অনুগ্রহ করে লেখা ছোট করুন বা ছোট ফাইল সংযুক্ত করুন।",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "এখন হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "ইন্টারনেট সংযোগ নেই। আবার অনলাইনে এলে আবার পাঠাতে পারবেন।",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "সার্ভার উত্তর দিতে খুব বেশি সময় নিয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
+  "Verbindung zum Server unterbrochen.": "সার্ভারের সঙ্গে সংযোগ বিচ্ছিন্ন হয়েছে।",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "উত্তর অসম্পূর্ণ – সংযোগ কেটে গেছে। অনুগ্রহ করে প্রশ্নটি আবার পাঠান।",
+  "Erneut versuchen": "আবার চেষ্টা করুন",
+  "In {s} s erneut versuchen": "{s} সেকেন্ড পরে আবার চেষ্টা করুন",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "একটু অপেক্ষা করুন — আপনার সাবস্ক্রিপশনের অবস্থা যাচাই করা হচ্ছে …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "আপনার সাবস্ক্রিপশনের অবস্থা এখন পাওয়া যাচ্ছে না। যাতে কিছু দুবার কেনা না হয়, এই যাচাইয়ের পরেই কেনা শুরু হবে। অনুগ্রহ করে একটু পরে আবার চেষ্টা করুন।",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "ব্রাউজার পেমেন্ট উইন্ডো আটকে দিয়েছে। অনুগ্রহ করে smejj.com-এর জন্য পপ-আপ অনুমতি দিন এবং আবার ট্যাপ করুন।",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "সাবস্ক্রিপশন পোর্টাল নতুন উইন্ডোতে খোলে: পরিচালনা, প্ল্যান পরিবর্তন, বাতিল, ইনভয়েস। কিছু না খুললে smejj.com-এর জন্য পপ-আপ অনুমতি দিন।",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "সাবস্ক্রিপশন পোর্টাল নতুন উইন্ডোতে খোলে। সেখানে আপনার অ্যাকাউন্টের ইমেল দিয়ে সাইন ইন করুন — Stripe আপনাকে একটি নিশ্চিতকরণ কোড পাঠাবে। কিছু না খুললে smejj.com-এর জন্য পপ-আপ অনুমতি দিন।"
 };

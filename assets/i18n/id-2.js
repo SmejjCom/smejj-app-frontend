@@ -336,8 +336,6 @@ export default {
   "Zahlung offen — bitte Zahlungsmittel im Abo-Portal prüfen.": "Pembayaran tertunda — periksa metode pembayaran di portal langganan.",
   "Aktiv — verlängert sich am {datum}.": "Aktif — diperpanjang pada {datum}.",
   "Einen Moment — das Abo-Portal wird geöffnet …": "Sebentar — membuka portal langganan …",
-  "Abo-Portal geöffnet: verwalten, Plan wechseln, kündigen, Rechnungen.": "Portal langganan terbuka: kelola, ganti paket, batalkan, faktur.",
-  "Abo-Portal geöffnet. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode.": "Portal langganan terbuka. Masuk dengan email akunmu — Stripe akan mengirim kode konfirmasi.",
   "Stripe-Checkout geöffnet. Nach der Zahlung ist dein Abo hier in wenigen Augenblicken sichtbar.": "Checkout Stripe terbuka. Setelah pembayaran, langgananmu akan muncul di sini dalam beberapa saat.",
   "Abo verwalten — Rechnungen, Plan & Kündigung": "Kelola langganan — faktur, paket & pembatalan",
   "Rechnungen & Zahlungen": "Tagihan & pembayaran",
@@ -678,5 +676,20 @@ export default {
   "5 000 Nachrichten · 400 Bilder · 40 Foto-Videos": "5.000 pesan · 400 gambar · 40 video foto",
   "15 000 Nachrichten · 1 500 Bilder · 150 Foto-Videos": "15.000 pesan · 1.500 gambar · 150 video foto",
   "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos": "1.000 pesan, 100 gambar, 10 video foto",
-  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1.000 pesan, 100 gambar, 10 video foto · 9 €/bulan"
+  "1 000 Nachrichten, 100 Bilder, 10 Foto-Videos · 9 €/Monat": "1.000 pesan, 100 gambar, 10 video foto · 9 €/bulan",
+  // Pruefung 17.11.2026 (Befunde 3-7: Chat-Fehlermeldungen).
+  "Nachricht oder Anhang zu groß. Bitte kürze den Text oder hänge eine kleinere Datei an.": "Pesan atau lampiran terlalu besar. Persingkat teks atau lampirkan file yang lebih kecil.",
+  "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.": "Itu belum berhasil. Silakan coba lagi.",
+  "Keine Internetverbindung. Sobald du wieder online bist, kannst du es noch einmal schicken.": "Tidak ada koneksi internet. Setelah kembali online, kamu bisa mengirimnya lagi.",
+  "Der Server hat zu lange nicht geantwortet. Bitte versuche es noch einmal.": "Server terlalu lama merespons. Silakan coba lagi.",
+  "Verbindung zum Server unterbrochen.": "Koneksi ke server terputus.",
+  "Antwort unvollständig – die Verbindung ist abgerissen. Bitte schick die Frage noch einmal.": "Jawaban tidak lengkap – koneksi terputus. Silakan kirim pertanyaannya lagi.",
+  "Erneut versuchen": "Coba lagi",
+  "In {s} s erneut versuchen": "Coba lagi dalam {s} dtk",
+  // Pruefung 17.11.2026 (Befund 2: Abo-Knopf).
+  "Einen Moment — dein Abo-Stand wird geprüft …": "Sebentar — status langgananmu sedang diperiksa …",
+  "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Status langgananmu tidak dapat diambil saat ini. Agar tidak ada yang terbeli dua kali, pembelian baru dimulai setelah pemeriksaan ini. Silakan coba lagi sebentar lagi.",
+  "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Browser memblokir jendela pembayaran. Izinkan pop-up untuk smejj.com lalu ketuk lagi.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Portal langganan terbuka di jendela baru: kelola, ganti paket, batalkan, faktur. Jika tidak ada yang terbuka, izinkan pop-up untuk smejj.com.",
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Portal langganan terbuka di jendela baru. Masuk di sana dengan email akunmu — Stripe akan mengirim kode konfirmasi. Jika tidak ada yang terbuka, izinkan pop-up untuk smejj.com."
 };

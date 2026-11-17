@@ -63,7 +63,7 @@
     try {
       // Derselbe sichere Renderer wie im angemeldeten Chat. Erst nach Ende
       // des Streams auszeichnen: weitere Textstuecke wuerden Links loeschen.
-      var renderer = await import("./chat-markdown.js?v=2026111406");
+      var renderer = await import("./chat-markdown.js?v=2026111701");
       renderer.renderChatMarkdown(text);
     } catch (fehler) { /* bei Ladefehlern bleibt die vollstaendige Textantwort */ }
   }
@@ -207,9 +207,42 @@
     }
   }
 
+  // Pruefung 17.11.2026 (F5): offline nicht zur Anmeldung schicken – die haengt
+  // genauso am Netz. Klarer Satz in der Karte, die Frage kommt zurueck ins Feld.
+  var OFFLINE_TEXT = {
+    de: "Keine Internetverbindung. Bitte prüfe deine Verbindung und sende die Frage dann noch einmal.",
+    en: "No internet connection. Please check your connection and send your question again.",
+    tr: "İnternet bağlantısı yok. Lütfen bağlantını kontrol et ve sorunu yeniden gönder."
+  };
+  function offlineMelden(text, frage) {
+    if (!(navigator.onLine === false) || !text) return false;
+    var sprache = String(document.documentElement.lang || "de").slice(0, 2).toLowerCase();
+    text.textContent = OFFLINE_TEXT[sprache] || OFFLINE_TEXT.en;
+    text.setAttribute("role", "alert");
+    var alterHinweis = document.getElementById("gastHinweis");
+    if (alterHinweis) alterHinweis.remove();
+    var feld = document.getElementById("probierFeld");
+    if (feld && !feld.value.trim()) { feld.value = frage; feld.dispatchEvent(new Event("input", { bubbles: true })); }
+    return true;
+  }
+
+  // Pruefung 17.11.2026 (F3): Doppelklick auf Senden – der zweite Klick traf das
+  // schon geleerte Feld und schickte den Gast zur Anmeldung, die Antwort ging
+  // verloren. Solange eine Gast-Anfrage laeuft, ist die Form aria-busy und
+  // jede weitere Anfrage wird ignoriert (willkommen-fokus.js prueft dasselbe).
+  var laeuft = false;
+  function beschaeftigt(el, an) {
+    try { if (an) el.setAttribute("aria-busy", "true"); else el.removeAttribute("aria-busy"); } catch (fehler) { /* ohne Attribut sperrt laeuft trotzdem */ }
+  }
   window.smejjGastFrage = async function (frage, form) {
     var ziel = form || document.getElementById("probierForm");
-    if (!ziel || !frage) return false;
+    if (!ziel || !frage || laeuft) return false;
+    laeuft = true;
+    beschaeftigt(ziel, true);
+    try { return await frageStellen(frage, ziel); } finally { laeuft = false; beschaeftigt(ziel, false); }
+  };
+
+  async function frageStellen(frage, ziel) {
     var text = kasten(ziel, frage);
     feldAufraeumen();
     antwortInBlick(text);
@@ -287,11 +320,12 @@
         fuss(document.getElementById("gastAntwort"));
         return true;
       }
+      if (offlineMelden(text, frage)) return false;
       // Zurueck auf den alten, bewaehrten Weg — mit der Frage im Gepaeck.
       location.href = "/auth/register/";
       return false;
     }
-  };
+  }
 
   // Teilen-Ziel fuer Gaeste (Inhaber-Freigabe 16.11.2026 „Gäste-Lücke auch beheben, Freigabe“).
   // Das fruehe Tor in index.html reicht nur teilen/title/text/url hierher weiter.

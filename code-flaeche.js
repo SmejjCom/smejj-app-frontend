@@ -28,15 +28,15 @@
 // index.html — das <script>-Tag fehlte, ALLE Knoepfe der Code-Seite waren
 // tot. Der module-queries-Test prueft jetzt auch dieses Glied.
 
-import { listProjekte, neuesGespraechImBereich, newChat } from "/assets/chat-store.js?v=2026111406";
+import { listProjekte, neuesGespraechImBereich, newChat } from "/assets/chat-store.js?v=2026111701";
 // OHNE ?v — dieselbe Kennung wie app.js/cline-model-menu.js ("./config.js"),
 // sonst entsteht eine zweite Modulinstanz (module-queries-Waechter).
-import { API_ORIGIN } from "./config.js?v=2026111406";
+import { API_ORIGIN } from "./config.js?v=2026111701";
 // Modellwahl und Modell-Menue liegen seit 2026-08-18 in einem eigenen
 // Modul (800-Zeilen-Regel des Master-Prompts). OHNE ?v — gleiche Kennung
 // ueberall, sonst zweite Modulinstanz (module-queries-Waechter).
 // Anhang-Chips (Datei anhaengen) — eigenes Modul seit der Zeilen-Diaet.
-import { zieheAnhaengeAusFeld, nimmAnhaengeMit, anhaengeZahl } from "./code-anhaenge.js?v=2026111406";
+import { zieheAnhaengeAusFeld, nimmAnhaengeMit, anhaengeZahl } from "./code-anhaenge.js?v=2026111701";
 import {
   MODELL_KEY,
   AUTO_WAHL,
@@ -46,7 +46,7 @@ import {
   modellAnzeige as modellAnzeigeRoh,
   oeffneModellMenue as oeffneModellMenueRoh,
   schliesseModellMenue
-} from "./code-modell-menue.js?v=2026111406";
+} from "./code-modell-menue.js?v=2026111701";
 
 // Eigener Schluessel (smejj.currentProject gehoert der Dateiflaeche). MUSS vor
 // baueKopfzeile() stehen — der Aufruf wertet sein Objekt SOFORT aus; weiter
@@ -68,7 +68,9 @@ const { zeichne, zeichneProjektChip } = baueKopfzeile({
 // Die Hausanzeige (Auto/Gruendlich/Schnell) kennt nur diese Datei —
 // darum wird sie dem Modul hereingereicht statt dort nachgebaut.
 function modellAnzeige() {
-  return modellAnzeigeRoh(MODELL_TEXT[stufe()]);
+  // Pruefung 17.11.2026, Befund 6: die Staffel kennt nur noch eine Stufe — ohne Treffer zeigte der Chip "undefined".
+  const wahl = localStorage.getItem(MODELL_KEY) || "";
+  return modellAnzeigeRoh(MODELL_TEXT[stufe()] || (/^smejj\b/i.test(wahl) ? wahl : SMEJJ_STAFFEL[0]?.titel) || "smejj");
 }
 // Nach jeder Modellwahl neu zeichnen (Rueckruf statt Rueckimport).
 function oeffneModellMenue(kontext = {}) {
