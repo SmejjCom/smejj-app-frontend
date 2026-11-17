@@ -25,6 +25,18 @@ function ansage(text) {
   } catch { /* ohne Stimme bleibt das Abzeichen */ }
 }
 
+// Vorhandene Einblendung (#toastRoot, toast-warn), aber 8 s statt 3,2 s: der Satz ist lang.
+function meldeFehler(text) {
+  const root = document.querySelector("#toastRoot");
+  if (!root) return;
+  const n = document.createElement("div");
+  n.className = "toast toast-warn";
+  n.setAttribute("role", "alert");
+  n.textContent = text;
+  root.append(n);
+  setTimeout(() => n.remove(), 8000);
+}
+
 function schliesse() {
   liveAn = false;
   if (strom) {
@@ -63,8 +75,8 @@ async function oeffne(art) {
       ? await navigator.mediaDevices.getDisplayMedia({ video: true })
       : await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
   } catch {
-    // Zugriff verweigert oder nicht verfuegbar — Fehlermeldung mit Ausweg.
-    alert(art === "bildschirm"
+    // Zugriff verweigert oder nicht verfuegbar — Meldung mit Ausweg in der Seite (17.11.2026: statt alert).
+    meldeFehler(art === "bildschirm"
       ? "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus."
       : "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff in der Adressleiste und probier es noch einmal.");
     return;

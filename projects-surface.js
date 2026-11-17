@@ -4,20 +4,20 @@
 // Code zeilengleich uebernommen, kein Verhaltenswechsel. Alles, was frueher aus
 // dem Modulumfeld von app.js kam, wird jetzt ausdruecklich als `deps` gereicht.
 
-import { STORAGE_KEYS } from "./config.js?v=2026111701";
-import { t } from "./i18n/ui.js?v=2026111701";
-import { PROJECT_ROLES } from "/assets/storage/index.js?v=2026111701";
+import { STORAGE_KEYS } from "./config.js?v=2026111702";
+import { t } from "./i18n/ui.js?v=2026111702";
+import { PROJECT_ROLES } from "/assets/storage/index.js?v=2026111702";
 // E2E-Test 14.09.2026: fehlte — "Exportieren" brach mit "downloadText is not defined" ab.
 // Gleiche Adresse wie app.js (?v=4), sonst laedt der Browser das Modul ein zweites Mal.
-import { downloadText } from "./app-helfer.js?v=2026111701";
+import { downloadText } from "./app-helfer.js?v=2026111702";
 
 export function bindProjects(deps) {
   const { $, state, workspace, showToast, writeOutput, ensureProject, refreshLocalWorkspaceStatus, renderProjectCards, renderEmptyState } = deps;
   // Livetest 15.09.2026: ein Doppelklick legte ZWEI Projekte an — der zweite Klick
   // wartete hinter dem Dialog und lief danach durch. Sperre bis zum Ende.
   const anlegen = sperreWaehrendDesLaufs(async () => {
-    // W2-09: Klick legte vorher sofort ein Projekt an; Abbrechen legt nichts an.
-    const eingabe = window.prompt("Wie soll das Projekt heißen?", "Mein Projekt");
+    // W2-09: Abbrechen legt nichts an.
+    const eingabe = await (await import("./projekte-fenster.js?v=2026111702")).frageText({ titel: "Wie soll das Projekt heißen?", wert: "Mein Projekt" });
     if (eingabe === null) return;
     if (eingabe.trim().length > 80) { showToast("Projektname zu lang: maximal 80 Zeichen.", "warn"); return; }
     const { project } = await workspace.createProject({

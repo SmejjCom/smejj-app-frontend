@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Türkçe (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von tr-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./tr-2.js?v=2026111701";
+import zusatz from "./tr-2.js?v=2026111702";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -272,7 +272,7 @@ export default {
   "Arbeitsbereich": "Çalışma alanı",
   "Sicherheitsmodus": "Güvenlik modu",
   "Free-safe": "Free-safe",
-  "BYOK vorbereitet": "BYOK hazır",
+  "BYOK vorbereitet": "Kendi anahtarın hazır",
   "Lokal": "Yerel",
   "Aussehen & Schriftgröße": "Görünüm",
   "Gilt nur außerhalb der geschützten Startseite.": "Yalnızca korunan ana sayfanın dışında geçerlidir.",
@@ -304,7 +304,7 @@ export default {
   "Hoch": "Yüksek",
   "Maximal": "En yüksek",
   "Modellverwaltung": "Model yönetimi",
-  "Standardmodell, BYOK und lokale Modelle.": "Varsayılan model, BYOK ve yerel modeller.",
+  "Standardmodell, BYOK und lokale Modelle.": "Varsayılan model, kendi anahtarların ve yerel modeller.",
   "KI-Modelle öffnen": "Yapay zeka modellerini aç",
   "Persönliches": "Kişiselleştirme",
   "Dauerhafte Hinweise für Antworten und Zusammenarbeit.": "Yanıtlar ve iş birliği için kalıcı yönergeler.",

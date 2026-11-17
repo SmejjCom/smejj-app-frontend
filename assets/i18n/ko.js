@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 한국어 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ko-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ko-2.js?v=2026111701";
+import zusatz from "./ko-2.js?v=2026111702";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -272,7 +272,7 @@ export default {
   "Arbeitsbereich": "작업 공간",
   "Sicherheitsmodus": "보안 모드",
   "Free-safe": "Free-safe",
-  "BYOK vorbereitet": "BYOK 준비됨",
+  "BYOK vorbereitet": "내 키 준비됨",
   "Lokal": "로컬",
   "Aussehen & Schriftgröße": "화면 표시",
   "Gilt nur außerhalb der geschützten Startseite.": "보호된 홈 화면 밖에서만 적용됩니다.",
@@ -304,7 +304,7 @@ export default {
   "Hoch": "높음",
   "Maximal": "최대",
   "Modellverwaltung": "모델 관리",
-  "Standardmodell, BYOK und lokale Modelle.": "기본 모델, BYOK, 로컬 모델.",
+  "Standardmodell, BYOK und lokale Modelle.": "기본 모델, 내 키, 로컬 모델.",
   "KI-Modelle öffnen": "AI 모델 열기",
   "Persönliches": "개인화",
   "Dauerhafte Hinweise für Antworten und Zusammenarbeit.": "응답과 협업을 위한 지속적인 지침.",

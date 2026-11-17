@@ -441,3 +441,17 @@
     max-height: calc(100dvh - var(--sa-top) - var(--hinweis-hoehe, 0px));
   }
 }
+
+/* Pruefung 17.11.2026: Auf Unterseiten legt das Glas (glas-unterseiten.js, eigener Stil
+   #glas-unterseiten-stil) eine dunkle Glasflaeche ueber die Hauptaktion — die dunkle Schrift
+   von oben (#04211f) stand dann dunkel auf dunkel (1,2:1, z. B. „Profil speichern“,
+   „+ Schlüssel erstellen“). Nur solange das Glas aktiv ist: helle Schrift; deaktiviert
+   deutlich gedimmt, aber lesbar (≥ 3:1). */
+html:has(#glas-unterseiten-stil) body .view.view:not(#start):not(#code) :is(.toolbar > button:first-child, #projectCreate, #projectSave, #searchSubmit, #saveSettings, #saveProfile, #storageAgain, .ac-primary) {
+  color: var(--premium-text, #f2f5f4);
+}
+html:has(#glas-unterseiten-stil) body .view.view:not(#start):not(#code) button:disabled {
+  color: var(--premium-text, #f2f5f4);
+  opacity: 0.7;
+  cursor: not-allowed;
+}

@@ -15,9 +15,9 @@
 // gilt der Besucher als abgemeldet und landet auf der Anmeldeseite. Lieber
 // einmal zu viel anmelden als die Anmelde-Pflicht still verlieren.
 
-import { API_ORIGIN, STORAGE_KEYS } from "./config.js?v=2026111701";
-import { initOfflineBanner } from "./offline-banner.js?v=2026111701";
-import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026111701";
+import { API_ORIGIN, STORAGE_KEYS } from "./config.js?v=2026111702";
+import { initOfflineBanner } from "./offline-banner.js?v=2026111702";
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026111702";
 
 // App-Shell-weiter Offline-Hinweis (Audit 2026-08-09). Hier eingehaengt, weil das
 // Gate ohnehin auf allen App- und Landeseiten laeuft (profile-dock.js,
@@ -419,7 +419,8 @@ if (typeof window !== "undefined") {
   // Nach der Pruefung immer noch einmal nach dem Chat-Token sehen: hat
   // verifyStoredSession eines mitgebracht, kehrt der Aufruf sofort um; sonst
   // versucht er den Cookie-Weg. Beides blockiert das Rendern nicht.
-  if (!umgeleitet) {
+  // Gast: nicht fragen (401).
+  if (!umgeleitet && hasSession(window.localStorage)) {
     verifyStoredSession(window)
       .catch(() => {})
       .then(() => holeApiTokenUeberCookie(window))

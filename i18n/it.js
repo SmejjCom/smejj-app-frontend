@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Italiano (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von it-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./it-2.js?v=2026111701";
+import zusatz from "./it-2.js?v=2026111702";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -272,7 +272,7 @@ export default {
   "Arbeitsbereich": "Spazio di lavoro",
   "Sicherheitsmodus": "Modalità di sicurezza",
   "Free-safe": "Free-safe",
-  "BYOK vorbereitet": "BYOK pronto",
+  "BYOK vorbereitet": "Chiave propria pronta",
   "Lokal": "Locale",
   "Aussehen & Schriftgröße": "Aspetto",
   "Gilt nur außerhalb der geschützten Startseite.": "Si applica solo al di fuori della home protetta.",
@@ -304,7 +304,7 @@ export default {
   "Hoch": "Alto",
   "Maximal": "Massimo",
   "Modellverwaltung": "Gestione dei modelli",
-  "Standardmodell, BYOK und lokale Modelle.": "Modello predefinito, BYOK e modelli locali.",
+  "Standardmodell, BYOK und lokale Modelle.": "Modello predefinito, chiavi proprie e modelli locali.",
   "KI-Modelle öffnen": "Apri modelli IA",
   "Persönliches": "Personalizzazione",
   "Dauerhafte Hinweise für Antworten und Zusammenarbeit.": "Indicazioni permanenti per risposte e collaborazione.",

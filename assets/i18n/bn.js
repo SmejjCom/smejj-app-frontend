@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung বাংলা (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von bn-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./bn-2.js?v=2026111701";
+import zusatz from "./bn-2.js?v=2026111702";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -272,7 +272,7 @@ export default {
   "Arbeitsbereich": "ওয়ার্কস্পেস",
   "Sicherheitsmodus": "নিরাপত্তা মোড",
   "Free-safe": "Free-safe",
-  "BYOK vorbereitet": "BYOK প্রস্তুত",
+  "BYOK vorbereitet": "নিজস্ব কী প্রস্তুত",
   "Lokal": "স্থানীয়",
   "Aussehen & Schriftgröße": "চেহারা",
   "Gilt nur außerhalb der geschützten Startseite.": "শুধুমাত্র সুরক্ষিত হোম পেজের বাইরে প্রযোজ্য।",
@@ -304,7 +304,7 @@ export default {
   "Hoch": "উচ্চ",
   "Maximal": "সর্বোচ্চ",
   "Modellverwaltung": "মডেল ব্যবস্থাপনা",
-  "Standardmodell, BYOK und lokale Modelle.": "ডিফল্ট মডেল, BYOK ও স্থানীয় মডেল।",
+  "Standardmodell, BYOK und lokale Modelle.": "ডিফল্ট মডেল, নিজস্ব কী এবং লোকাল মডেল।",
   "KI-Modelle öffnen": "AI মডেল খুলুন",
   "Persönliches": "ব্যক্তিগতকরণ",
   "Dauerhafte Hinweise für Antworten und Zusammenarbeit.": "উত্তর ও সহযোগিতার জন্য স্থায়ী নির্দেশনা।",

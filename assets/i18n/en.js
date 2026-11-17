@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung English (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von en-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./en-2.js?v=2026111701";
+import zusatz from "./en-2.js?v=2026111702";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -272,7 +272,7 @@ export default {
   "Arbeitsbereich": "Workspace",
   "Sicherheitsmodus": "Security mode",
   "Free-safe": "Free-safe",
-  "BYOK vorbereitet": "BYOK ready",
+  "BYOK vorbereitet": "Own key prepared",
   "Lokal": "Local",
   "Aussehen & Schriftgröße": "Appearance",
   "Gilt nur außerhalb der geschützten Startseite.": "Applies only outside the protected home screen.",
@@ -304,7 +304,7 @@ export default {
   "Hoch": "High",
   "Maximal": "Maximum",
   "Modellverwaltung": "Model management",
-  "Standardmodell, BYOK und lokale Modelle.": "Default model, BYOK, and local models.",
+  "Standardmodell, BYOK und lokale Modelle.": "Default model, your own keys, and local models.",
   "KI-Modelle öffnen": "Open AI models",
   "Persönliches": "Personalization",
   "Dauerhafte Hinweise für Antworten und Zusammenarbeit.": "Persistent guidance for responses and collaboration.",
@@ -358,7 +358,7 @@ export default {
   "Standardeinstellungen wiederhergestellt": "Default settings restored",
   "Konto & Datenschutz": "Account & Privacy",
   "Konto": "Account",
-  "Identität, Sitzungen und Daten sicher verwalten. Secrets werden weder angezeigt noch exportiert.": "Manage identity, sessions, and data securely. Secrets are never displayed or exported.",
+  "Identität, Sitzungen und Daten sicher verwalten. Secrets werden weder angezeigt noch exportiert.": "Manage identity, sessions, and data securely. Passwords and keys are never shown or exported.",
   "Kontobereiche": "Account sections",
   "Profil": "Profile",
   "Anmeldung & Sicherheit": "Sign-in & Security",

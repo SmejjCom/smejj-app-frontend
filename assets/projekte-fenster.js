@@ -2,7 +2,7 @@
 // Ein Fenster (Dialog) fuer: Neues Projekt, Anweisungen, Dateien, Farbe. Am Handy
 // erscheint es als Vollbild-Blatt von unten. Escape, X und Klick daneben schliessen.
 
-import { erstelleProjekt, setzeProjektFarbe, setzeProjektAnweisung } from "/assets/chat-store.js?v=2026111701";
+import { erstelleProjekt, setzeProjektFarbe, setzeProjektAnweisung } from "/assets/chat-store.js?v=2026111702";
 
 export const FARBEN = ["", "#e5534b", "#f0883e", "#d4a72c", "#3fb950", "#39c5cf", "#58a6ff", "#a371f7", "#db61a2"];
 
@@ -54,7 +54,7 @@ html body .pjf button.pjf-vorlage[aria-pressed=true]{border-color:#5fd4c8!import
  * Fenster oeffnen. inhalt: Knoten; aktionen: [{text, primaer, klick}] — klick darf
  * false liefern, dann bleibt das Fenster offen.
  */
-export function oeffneFenster({ titel, text = "", inhalt = null, aktionen = [] }) {
+export function oeffneFenster({ titel, text = "", inhalt = null, aktionen = [], beimSchliessen = null }) {
   stil();
   document.querySelector(".pjf-hinter")?.remove();
   const hinter = document.createElement("div");
@@ -88,7 +88,7 @@ export function oeffneFenster({ titel, text = "", inhalt = null, aktionen = [] }
   fenster.append(meldung);
   const leiste = document.createElement("div");
   leiste.className = "pjf-aktionen";
-  const schliessen = () => { hinter.remove(); document.removeEventListener("keydown", taste, true); };
+  const schliessen = () => { hinter.remove(); document.removeEventListener("keydown", taste, true); beimSchliessen?.(); };
   const taste = (e) => { if (e.key === "Escape") { e.stopPropagation(); schliessen(); } };
   for (const aktion of aktionen) {
     const knopf = document.createElement("button");
@@ -111,6 +111,24 @@ export function oeffneFenster({ titel, text = "", inhalt = null, aktionen = [] }
   document.body.append(hinter);
   setTimeout(() => fenster.querySelector("input,textarea")?.focus(), 30);
   return { schliessen, fenster };
+}
+
+/**
+ * Text im eigenen Fenster erfragen statt window.prompt (Pruefung 17.11.2026, Befund 9).
+ * Liefert den Text, bei Abbrechen/Esc/Schliessen null. Enter bestaetigt.
+ */
+export function frageText({ titel, wert = "", max = 80, knopf = "Anlegen" }) {
+  return new Promise((fertig) => {
+    const eingabe = document.createElement("input");
+    eingabe.type = "text";
+    eingabe.maxLength = max;
+    eingabe.value = wert;
+    eingabe.setAttribute("aria-label", titel);
+    let ergebnis = null;
+    const f = oeffneFenster({ titel, inhalt: eingabe, beimSchliessen: () => fertig(ergebnis),
+      aktionen: [{ text: "Abbrechen" }, { text: knopf, primaer: true, klick: () => { ergebnis = eingabe.value; return true; } }] });
+    eingabe.addEventListener("keydown", (e) => { if (e.key === "Enter") f.fenster.querySelector(".pjf-primaer")?.click(); });
+  });
 }
 
 /** Farbwahl als Knopfreihe; liefert {knoten, wert()} */

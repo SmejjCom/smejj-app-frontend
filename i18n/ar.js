@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung العربية (Quellsprache Deutsch als Schluessel, RTL).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ar-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ar-2.js?v=2026111701";
+import zusatz from "./ar-2.js?v=2026111702";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -272,7 +272,7 @@ export default {
   "Arbeitsbereich": "مساحة العمل",
   "Sicherheitsmodus": "وضع الأمان",
   "Free-safe": "Free-safe",
-  "BYOK vorbereitet": "BYOK جاهز",
+  "BYOK vorbereitet": "مفتاح خاص جاهز",
   "Lokal": "محلي",
   "Aussehen & Schriftgröße": "المظهر",
   "Gilt nur außerhalb der geschützten Startseite.": "يُطبَّق فقط خارج الصفحة الرئيسية المحمية.",
@@ -304,7 +304,7 @@ export default {
   "Hoch": "مرتفع",
   "Maximal": "أقصى",
   "Modellverwaltung": "إدارة النماذج",
-  "Standardmodell, BYOK und lokale Modelle.": "النموذج الافتراضي وBYOK والنماذج المحلية.",
+  "Standardmodell, BYOK und lokale Modelle.": "النموذج الافتراضي ومفاتيحك الخاصة والنماذج المحلية.",
   "KI-Modelle öffnen": "فتح نماذج الذكاء الاصطناعي",
   "Persönliches": "التخصيص",
   "Dauerhafte Hinweise für Antworten und Zusammenarbeit.": "إرشادات دائمة للردود والتعاون.",

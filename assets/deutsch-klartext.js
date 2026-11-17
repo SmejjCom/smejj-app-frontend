@@ -5,7 +5,7 @@
 // dieses Startmodul dieselben Texte zur Laufzeit — genau wie start-chips.js die Chips
 // übersetzt. Läuft das Skript, findet das Modul nichts mehr zu tun (idempotent).
 // Nur Texte und Tooltips: keine ids, keine data-Attribute, keine Verdrahtung.
-import { uiLanguage } from "./i18n/ui.js?v=2026111701";
+import { uiLanguage } from "./i18n/ui.js?v=2026111702";
 
 export const TEXTE = [
   // Nr. 7 — Deutsch durchgängig
@@ -99,7 +99,11 @@ export const WOERTER = Object.freeze({
   "Wenn ein Diff oder externer Schritt wartet.": "Wenn eine Änderung oder ein externer Schritt wartet.",
   "owner/editor/viewer/local-only vorbereitet": "Besitzer/Bearbeiter/Betrachter/nur lokal vorbereitet",
   "Aufbauphase: ohne Limit.": "Aufbauphase: ohne Grenze.",
-  "Bitte zuerst bei smejj.com anmelden. Der API-Key wird keinem lokalen Profil zugeordnet.": "Bitte zuerst bei smejj.com anmelden. Der API-Schlüssel wird keinem lokalen Profil zugeordnet."
+  "Bitte zuerst bei smejj.com anmelden. Der API-Key wird keinem lokalen Profil zugeordnet.": "Bitte zuerst bei smejj.com anmelden. Der API-Schlüssel wird keinem lokalen Profil zugeordnet.",
+  "Lokal-first · fail-closed": "Zuerst auf deinem Gerät · im Zweifel gesperrt",
+  "Identität, Sitzungen und Daten sicher verwalten. Secrets werden weder angezeigt noch exportiert.": "Identität, Sitzungen und Daten sicher verwalten. Passwörter und Schlüssel werden nie angezeigt oder exportiert.",
+  "Erweiterte Modelle (BYOK)": "Erweiterte Modelle (eigener Schlüssel)",
+  "BYOK-Felder leeren": "Felder für eigene Schlüssel leeren"
 });
 
 /** Reine Funktion: exakter Treffer (ohne Randleerraum) → deutsches Wort, sonst unverändert. */
@@ -110,18 +114,8 @@ export function deutschesWort(text) {
 }
 
 /**
- * Ist die Oberfläche deutsch?
- *
- * BIS ZUM 20.09.2026 wurde dafür <html lang> gelesen — und genau das war der
- * Fehler: i18n/ui.js setzt lang und dir AUSDRÜCKLICH NUR auf Oberflächen-Ebene,
- * niemals global, damit die start-gelockte Startseite unberührt bleibt. <html>
- * steht also immer auf "de". Dieses Modul hielt darum JEDE Sprache für Deutsch
- * und germanisierte die englische Oberfläche wieder zurück ("Projects" →
- * "Projekte", "Capabilities" → "Fähigkeiten", das ganze Modell-Menü).
- * Gemessen im iPhone-Simulator mit englischer Oberfläche.
- *
- * Jetzt entscheidet die Sprach-Laufzeit; <html lang> bleibt nur Rückfallebene,
- * falls das Modul ohne sie geladen wird (Tests reichen ein eigenes Dokument).
+ * Ist die Oberfläche deutsch? Entscheidet die Sprach-Laufzeit, nicht <html lang> (steht immer
+ * auf "de", Befund 20.09.2026); <html lang> nur als Rückfall (Tests).
  */
 export function oberflaecheDeutsch(doc = document) {
   try {

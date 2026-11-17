@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 中文 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von zh-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./zh-2.js?v=2026111701";
+import zusatz from "./zh-2.js?v=2026111702";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -272,7 +272,7 @@ export default {
   "Arbeitsbereich": "工作区",
   "Sicherheitsmodus": "安全模式",
   "Free-safe": "Free-safe",
-  "BYOK vorbereitet": "BYOK 就绪",
+  "BYOK vorbereitet": "自有密钥已就绪",
   "Lokal": "本地",
   "Aussehen & Schriftgröße": "外观",
   "Gilt nur außerhalb der geschützten Startseite.": "仅适用于受保护首页之外的区域。",
@@ -304,7 +304,7 @@ export default {
   "Hoch": "高",
   "Maximal": "最高",
   "Modellverwaltung": "模型管理",
-  "Standardmodell, BYOK und lokale Modelle.": "默认模型、BYOK 与本地模型。",
+  "Standardmodell, BYOK und lokale Modelle.": "默认模型、自有密钥和本地模型。",
   "KI-Modelle öffnen": "打开 AI 模型",
   "Persönliches": "个性化",
   "Dauerhafte Hinweise für Antworten und Zusammenarbeit.": "用于回复与协作的长期指引。",

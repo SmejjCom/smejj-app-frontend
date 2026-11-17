@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung हिन्दी (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von hi-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./hi-2.js?v=2026111701";
+import zusatz from "./hi-2.js?v=2026111702";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -272,7 +272,7 @@ export default {
   "Arbeitsbereich": "वर्कस्पेस",
   "Sicherheitsmodus": "सुरक्षा मोड",
   "Free-safe": "Free-safe",
-  "BYOK vorbereitet": "BYOK तैयार",
+  "BYOK vorbereitet": "अपनी कुंजी तैयार",
   "Lokal": "स्थानीय",
   "Aussehen & Schriftgröße": "दिखावट",
   "Gilt nur außerhalb der geschützten Startseite.": "केवल संरक्षित होम पेज के बाहर लागू होता है।",
@@ -304,7 +304,7 @@ export default {
   "Hoch": "उच्च",
   "Maximal": "अधिकतम",
   "Modellverwaltung": "मॉडल प्रबंधन",
-  "Standardmodell, BYOK und lokale Modelle.": "डिफ़ॉल्ट मॉडल, BYOK और स्थानीय मॉडल।",
+  "Standardmodell, BYOK und lokale Modelle.": "डिफ़ॉल्ट मॉडल, अपनी कुंजियाँ और लोकल मॉडल।",
   "KI-Modelle öffnen": "AI मॉडल खोलें",
   "Persönliches": "वैयक्तिकरण",
   "Dauerhafte Hinweise für Antworten und Zusammenarbeit.": "उत्तरों और सहयोग के लिए स्थायी निर्देश।",

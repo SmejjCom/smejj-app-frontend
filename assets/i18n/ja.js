@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 日本語 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ja-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ja-2.js?v=2026111701";
+import zusatz from "./ja-2.js?v=2026111702";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -272,7 +272,7 @@ export default {
   "Arbeitsbereich": "ワークスペース",
   "Sicherheitsmodus": "セキュリティモード",
   "Free-safe": "Free-safe",
-  "BYOK vorbereitet": "BYOK 準備済み",
+  "BYOK vorbereitet": "自分のキーを準備済み",
   "Lokal": "ローカル",
   "Aussehen & Schriftgröße": "外観",
   "Gilt nur außerhalb der geschützten Startseite.": "保護されたホーム画面以外にのみ適用されます。",
@@ -304,7 +304,7 @@ export default {
   "Hoch": "高",
   "Maximal": "最大",
   "Modellverwaltung": "モデル管理",
-  "Standardmodell, BYOK und lokale Modelle.": "デフォルトモデル、BYOK、ローカルモデル。",
+  "Standardmodell, BYOK und lokale Modelle.": "標準モデル、自分のキー、ローカルモデル。",
   "KI-Modelle öffnen": "AI モデルを開く",
   "Persönliches": "パーソナライズ",
   "Dauerhafte Hinweise für Antworten und Zusammenarbeit.": "回答と協働のための恒久的な指示。",

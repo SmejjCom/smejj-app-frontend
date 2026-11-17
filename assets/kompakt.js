@@ -174,7 +174,7 @@ export function breitePruefen(feld, glas) {
 
 // Ein frischer Start im Handy-Querformat durchlaeuft nie den <=600-px-Lader.
 // Nur Inhaltsstile nachladen; das geschuetzte Eingabe-Dock bleibt unveraendert.
-export function ladeQuerformatInhalte(win = window, lade = () => import("/assets/mobil-ansichten.js?v=2026111701")) {
+export function ladeQuerformatInhalte(win = window, lade = () => import("/assets/mobil-ansichten.js?v=2026111702")) {
   let mq;
   try { mq = win.matchMedia("(pointer:coarse) and (max-height:500px) and (max-width:1100px)"); }
   catch { return false; }
@@ -196,5 +196,5 @@ if (typeof document !== "undefined" && document.querySelector(".view")) {
   // Pruefung 17.11.2026, Befund 8: im Handy-Querformat polstert das Start-Buendel den Verlauf mit
   // var(--feld-hoehe, 62px), gemessen wurde das Feld aber nur bis 600 px (mobil-dock.js) — die
   // Knopfleiste der letzten Antwort lag 15–26 px hinter dem 109 px hohen Feld. Nur messen, kein Stil.
-  ladeQuerformatInhalte(window, () => import("/assets/vollbild-chat.js?v=2026111701"));
+  ladeQuerformatInhalte(window, () => import("/assets/vollbild-chat.js?v=2026111702"));
 }

@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Bahasa Indonesia (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von id-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./id-2.js?v=2026111701";
+import zusatz from "./id-2.js?v=2026111702";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -272,7 +272,7 @@ export default {
   "Arbeitsbereich": "Ruang kerja",
   "Sicherheitsmodus": "Mode keamanan",
   "Free-safe": "Free-safe",
-  "BYOK vorbereitet": "BYOK siap",
+  "BYOK vorbereitet": "Kunci sendiri siap",
   "Lokal": "Lokal",
   "Aussehen & Schriftgröße": "Tampilan",
   "Gilt nur außerhalb der geschützten Startseite.": "Hanya berlaku di luar beranda yang dilindungi.",
@@ -304,7 +304,7 @@ export default {
   "Hoch": "Tinggi",
   "Maximal": "Maksimal",
   "Modellverwaltung": "Manajemen model",
-  "Standardmodell, BYOK und lokale Modelle.": "Model bawaan, BYOK, dan model lokal.",
+  "Standardmodell, BYOK und lokale Modelle.": "Model bawaan, kunci sendiri, dan model lokal.",
   "KI-Modelle öffnen": "Buka model AI",
   "Persönliches": "Personalisasi",
   "Dauerhafte Hinweise für Antworten und Zusammenarbeit.": "Panduan permanen untuk jawaban dan kolaborasi.",
