@@ -193,7 +193,6 @@ export default {
   "blockiert": "محظور",
   "verboten": "ممنوع",
   "Lokale Checks": "فحوصات محلية",
-  "Lokal-first · fail-closed": "محلي أولاً · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "تُنشأ مشاريعك ونسخك الاحتياطية على هذا الجهاز أولاً، ثم تتم النسخة السحابية تلقائياً بعد ذلك.",
   "Projekt erstellen": "إنشاء مشروع",
   "Liste aktualisieren": "تحديث القائمة",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "تعذّر جلب حالة اشتراكك الآن. حتى لا يتم الشراء مرتين، يبدأ الدفع فقط بعد هذا التحقق. يُرجى المحاولة بعد قليل.",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "حظر المتصفح نافذة الدفع. يُرجى السماح بالنوافذ المنبثقة لـ smejj.com والنقر مرة أخرى.",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "تُفتح بوابة الاشتراك في نافذة جديدة: الإدارة، تغيير الخطة، الإلغاء، الفواتير. إذا لم تُفتح أي نافذة، يُرجى السماح بالنوافذ المنبثقة لـ smejj.com.",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "تُفتح بوابة الاشتراك في نافذة جديدة. سجّل الدخول هناك ببريد حسابك — سترسل لك Stripe رمز تأكيد. إذا لم تُفتح أي نافذة، يُرجى السماح بالنوافذ المنبثقة لـ smejj.com."
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "تُفتح بوابة الاشتراك في نافذة جديدة. سجّل الدخول هناك ببريد حسابك — سترسل لك Stripe رمز تأكيد. إذا لم تُفتح أي نافذة، يُرجى السماح بالنوافذ المنبثقة لـ smejj.com.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "تعذّر فتح الكاميرا. اسمح لـ smejj باستخدام الكاميرا من إعدادات جهازك ثم حاول مرة أخرى.",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "تعذّر فتح الكاميرا. اسمح بالوصول إلى الكاميرا عبر رمز القفل بجانب العنوان ثم حاول مرة أخرى.",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "تعذّرت مشاركة الشاشة. رفض المتصفح الإذن — حاول مرة أخرى واختر نافذة.",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "مشاركة الشاشة غير ممكنة على هذا الجهاز.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "البيانات محمية"
 };

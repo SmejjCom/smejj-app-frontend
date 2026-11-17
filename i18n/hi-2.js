@@ -193,7 +193,6 @@ export default {
   "blockiert": "अवरुद्ध",
   "verboten": "निषिद्ध",
   "Lokale Checks": "स्थानीय जाँचें",
-  "Lokal-first · fail-closed": "पहले स्थानीय · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "आपके प्रोजेक्ट और बैकअप पहले इसी डिवाइस पर बनते हैं। क्लाउड बैकअप उसके बाद स्वतः होता है।",
   "Projekt erstellen": "प्रोजेक्ट बनाएँ",
   "Liste aktualisieren": "सूची ताज़ा करें",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "आपकी सदस्यता की स्थिति अभी नहीं मिल पा रही है। ताकि कुछ भी दो बार न खरीदा जाए, खरीद इस जाँच के बाद ही शुरू होगी। कृपया थोड़ी देर में फिर से कोशिश करें।",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "ब्राउज़र ने भुगतान विंडो रोक दी। कृपया smejj.com के लिए पॉप-अप की अनुमति दें और फिर से टैप करें।",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "सदस्यता पोर्टल नई विंडो में खुलता है: प्रबंधन, प्लान बदलना, रद्द करना, बिल। अगर कुछ न खुले, तो smejj.com के लिए पॉप-अप की अनुमति दें।",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "सदस्यता पोर्टल नई विंडो में खुलता है। वहाँ अपने खाते के ईमेल से साइन इन करें — Stripe आपको एक पुष्टि कोड भेजेगा। अगर कुछ न खुले, तो smejj.com के लिए पॉप-अप की अनुमति दें।"
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "सदस्यता पोर्टल नई विंडो में खुलता है। वहाँ अपने खाते के ईमेल से साइन इन करें — Stripe आपको एक पुष्टि कोड भेजेगा। अगर कुछ न खुले, तो smejj.com के लिए पॉप-अप की अनुमति दें।",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "कैमरा नहीं खुल सका। अपने डिवाइस की सेटिंग्स में smejj को कैमरा की अनुमति दें और फिर से कोशिश करें।",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "कैमरा नहीं खुल सका। पते के पास ताले वाले चिह्न से कैमरा की अनुमति दें और फिर से कोशिश करें।",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "स्क्रीन शेयर नहीं हो सकी। आपके ब्राउज़र ने अनुमति नहीं दी — फिर से कोशिश करें और एक विंडो चुनें।",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "इस डिवाइस पर स्क्रीन शेयर करना संभव नहीं है।",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "डेटा सुरक्षित"
 };

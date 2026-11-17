@@ -193,7 +193,6 @@ export default {
   "blockiert": "bloqué",
   "verboten": "interdit",
   "Lokale Checks": "Contrôles locaux",
-  "Lokal-first · fail-closed": "Local d'abord · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "Tes projets et sauvegardes sont créés d'abord sur cet appareil. La sauvegarde dans le cloud suit automatiquement.",
   "Projekt erstellen": "Créer un projet",
   "Liste aktualisieren": "Actualiser la liste",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "L'état de ton abonnement est indisponible pour le moment. Pour éviter un double achat, le paiement ne démarre qu'après cette vérification. Réessaie dans un instant.",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Le navigateur a bloqué la fenêtre de paiement. Autorise les fenêtres pop-up pour smejj.com et touche à nouveau.",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Le portail d'abonnement s'ouvre dans une nouvelle fenêtre : gérer, changer de forfait, résilier, factures. Si rien ne s'ouvre, autorise les fenêtres pop-up pour smejj.com.",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Le portail d'abonnement s'ouvre dans une nouvelle fenêtre. Connecte-toi avec l'e-mail de ton compte — Stripe t'enverra un code de confirmation. Si rien ne s'ouvre, autorise les fenêtres pop-up pour smejj.com."
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Le portail d'abonnement s'ouvre dans une nouvelle fenêtre. Connecte-toi avec l'e-mail de ton compte — Stripe t'enverra un code de confirmation. Si rien ne s'ouvre, autorise les fenêtres pop-up pour smejj.com.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "Impossible d'ouvrir la caméra. Autorise smejj à utiliser la caméra dans les réglages de ton appareil et réessaie.",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "Impossible d'ouvrir la caméra. Autorise l'accès à la caméra via l'icône du cadenas à côté de l'adresse et réessaie.",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "Impossible de partager l'écran. Ton navigateur a refusé — réessaie et choisis une fenêtre.",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "Le partage d'écran n'est pas possible sur cet appareil.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "Données protégées"
 };

@@ -193,7 +193,6 @@ export default {
   "blockiert": "차단됨",
   "verboten": "금지",
   "Lokale Checks": "로컬 점검",
-  "Lokal-first · fail-closed": "로컬 우선 · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "프로젝트와 백업은 이 기기에서 먼저 만들어집니다. 클라우드 백업은 그 뒤에 자동으로 진행됩니다.",
   "Projekt erstellen": "프로젝트 만들기",
   "Liste aktualisieren": "목록 새로 고침",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "지금은 구독 상태를 불러올 수 없습니다. 중복 구매를 막기 위해 이 확인이 끝난 뒤에만 구매가 시작됩니다. 잠시 후 다시 시도해 주세요.",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "브라우저가 결제 창을 차단했습니다. smejj.com의 팝업을 허용한 뒤 다시 탭해 주세요.",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "구독 포털이 새 창에서 열립니다: 관리, 요금제 변경, 해지, 청구서. 아무것도 열리지 않으면 smejj.com의 팝업을 허용해 주세요.",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "구독 포털이 새 창에서 열립니다. 계정 이메일로 로그인하세요 — Stripe가 확인 코드를 보내 드립니다. 아무것도 열리지 않으면 smejj.com의 팝업을 허용해 주세요."
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "구독 포털이 새 창에서 열립니다. 계정 이메일로 로그인하세요 — Stripe가 확인 코드를 보내 드립니다. 아무것도 열리지 않으면 smejj.com의 팝업을 허용해 주세요.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "카메라를 열 수 없습니다. 기기 설정에서 smejj의 카메라 사용을 허용한 뒤 다시 시도해 주세요.",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "카메라를 열 수 없습니다. 주소 옆 자물쇠 아이콘에서 카메라 접근을 허용한 뒤 다시 시도해 주세요.",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "화면을 공유할 수 없습니다. 브라우저가 거부했습니다 — 다시 시도하고 창을 선택해 주세요.",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "이 기기에서는 화면 공유를 할 수 없습니다.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "데이터 보호됨"
 };

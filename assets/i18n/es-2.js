@@ -193,7 +193,6 @@ export default {
   "blockiert": "bloqueado",
   "verboten": "prohibido",
   "Lokale Checks": "Comprobaciones locales",
-  "Lokal-first · fail-closed": "Local primero · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "Tus proyectos y copias de seguridad se crean primero en este dispositivo. La copia en la nube llega después automáticamente.",
   "Projekt erstellen": "Crear proyecto",
   "Liste aktualisieren": "Actualizar lista",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Ahora no se puede consultar el estado de tu suscripción. Para que nada se compre dos veces, la compra solo empieza tras esta comprobación. Inténtalo de nuevo en un momento.",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "El navegador bloqueó la ventana de pago. Permite las ventanas emergentes para smejj.com y vuelve a tocar.",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "El portal de suscripción se abre en una ventana nueva: gestionar, cambiar de plan, cancelar, facturas. Si no se abre ninguna, permite las ventanas emergentes para smejj.com.",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "El portal de suscripción se abre en una ventana nueva. Inicia sesión allí con el correo de tu cuenta: Stripe te enviará un código de confirmación. Si no se abre ninguna, permite las ventanas emergentes para smejj.com."
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "El portal de suscripción se abre en una ventana nueva. Inicia sesión allí con el correo de tu cuenta: Stripe te enviará un código de confirmación. Si no se abre ninguna, permite las ventanas emergentes para smejj.com.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "No se pudo abrir la cámara. Permite a smejj usar la cámara en los ajustes de tu dispositivo e inténtalo de nuevo.",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "No se pudo abrir la cámara. Permite el acceso a la cámara con el icono del candado junto a la dirección e inténtalo de nuevo.",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "No se pudo compartir la pantalla. Tu navegador lo rechazó: inténtalo de nuevo y elige una ventana.",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "Compartir pantalla no es posible en este dispositivo.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "Datos protegidos"
 };

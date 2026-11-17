@@ -193,7 +193,6 @@ export default {
   "blockiert": "已阻止",
   "verboten": "禁止",
   "Lokale Checks": "本地检查",
-  "Lokal-first · fail-closed": "本地优先 · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "你的项目和备份先在本设备生成，云端备份随后自动完成。",
   "Projekt erstellen": "创建项目",
   "Liste aktualisieren": "刷新列表",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "暂时无法获取你的订阅状态。为避免重复购买，只有在检查完成后才会开始付款。请稍后再试。",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "浏览器拦截了付款窗口。请允许 smejj.com 的弹出窗口，然后再点一次。",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "订阅门户会在新窗口中打开：管理、更换方案、取消、发票。如果没有打开，请允许 smejj.com 的弹出窗口。",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "订阅门户会在新窗口中打开。请用你的账户邮箱登录——Stripe 会向你发送确认码。如果没有打开，请允许 smejj.com 的弹出窗口。"
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "订阅门户会在新窗口中打开。请用你的账户邮箱登录——Stripe 会向你发送确认码。如果没有打开，请允许 smejj.com 的弹出窗口。",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "无法打开摄像头。请在设备设置中允许 smejj 使用摄像头，然后重试。",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "无法打开摄像头。请通过地址旁的锁形图标允许使用摄像头，然后重试。",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "无法共享屏幕。浏览器拒绝了请求——请重试并选择一个窗口。",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "此设备无法共享屏幕。",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "数据已保护"
 };

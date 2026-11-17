@@ -193,7 +193,6 @@ export default {
   "blockiert": "engellendi",
   "verboten": "yasak",
   "Lokale Checks": "Yerel denetimler",
-  "Lokal-first · fail-closed": "Önce yerel · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "Projelerin ve yedeklerin önce bu cihazda oluşur. Buluttaki yedek sonra otomatik olarak gelir.",
   "Projekt erstellen": "Proje oluştur",
   "Liste aktualisieren": "Listeyi yenile",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Abonelik durumun şu an alınamıyor. Hiçbir şey iki kez satın alınmasın diye ödeme ancak bu kontrolden sonra başlar. Lütfen birazdan tekrar dene.",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Tarayıcı ödeme penceresini engelledi. Lütfen smejj.com için açılır pencerelere izin ver ve tekrar dokun.",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Abonelik portalı yeni bir pencerede açılır: yönet, plan değiştir, iptal et, faturalar. Hiçbiri açılmazsa lütfen smejj.com için açılır pencerelere izin ver.",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Abonelik portalı yeni bir pencerede açılır. Orada hesabının e-postasıyla giriş yap — Stripe sana bir onay kodu gönderir. Hiçbiri açılmazsa lütfen smejj.com için açılır pencerelere izin ver."
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Abonelik portalı yeni bir pencerede açılır. Orada hesabının e-postasıyla giriş yap — Stripe sana bir onay kodu gönderir. Hiçbiri açılmazsa lütfen smejj.com için açılır pencerelere izin ver.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "Kamera açılamadı. Cihaz ayarlarından smejj'e kamera izni ver ve tekrar dene.",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "Kamera açılamadı. Adresin yanındaki kilit simgesinden kamera erişimine izin ver ve tekrar dene.",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "Ekran paylaşılamadı. Tarayıcın izni reddetti — tekrar dene ve bir pencere seç.",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "Bu cihazda ekran paylaşımı mümkün değil.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "Veriler korunuyor"
 };

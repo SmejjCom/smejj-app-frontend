@@ -88,7 +88,11 @@ export function sorgeFuerGlas(doc = document) {
     // Logo schwebt als runder Glas-Knopf (wie das X).
     + "\nhtml body:has(.view.is-active:not(#start):not(#code)) #appMenuButton{width:44px!important;height:44px!important;border-radius:50%!important;"
     + "background:color-mix(in srgb,#f1f3f5 10%,transparent)!important;border:1px solid color-mix(in srgb,#f1f3f5 24%,transparent)!important;"
-    + "box-shadow:inset 0 1px 0 color-mix(in srgb,#f1f3f5 25%,transparent),0 8px 24px #0005!important;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transform:translate(12px,10px)}";
+    + "box-shadow:inset 0 1px 0 color-mix(in srgb,#f1f3f5 25%,transparent),0 8px 24px #0005!important;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transform:translate(12px,10px)}"
+    // Geraete-/Pruefbefund 17.11.2026 (Rechner): der 44-px-Knopf lag ueber dem Reiter „Start“, „Browser bedienen“ und
+    // „Kostenschutz an“ wurden abgeschnitten. Nur am breiten Bildschirm: Logo 30 px, Namen der Leiste 14,5 px.
+    + "\n@media (min-width:601px){html body:has(.view.is-active:not(#start):not(#code)) #appMenuButton{width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;transform:translate(12px,4px)}"
+    + "html body:has(.view.is-active:not(#start):not(#code)) :is(.nav-button .nav-label,.nav-button.nav-kosten){font-size:14.5px!important;letter-spacing:0!important}}";
   doc.head.append(stil);
   return true;
 }

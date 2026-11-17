@@ -193,7 +193,6 @@ export default {
   "blockiert": "blocked",
   "verboten": "forbidden",
   "Lokale Checks": "Local checks",
-  "Lokal-first · fail-closed": "Local-first · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "Your projects and backups are created on this device first. The cloud backup follows automatically.",
   "Projekt erstellen": "Create project",
   "Liste aktualisieren": "Refresh list",
@@ -689,5 +688,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Your subscription status can't be loaded right now. So that nothing is bought twice, checkout only starts after this check. Please try again in a moment.",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Your browser blocked the payment window. Please allow pop-ups for smejj.com and tap again.",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "The subscription portal opens in a new window: manage, change plan, cancel, invoices. If none opens, please allow pop-ups for smejj.com.",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "The subscription portal opens in a new window. Sign in there with your account email — Stripe will send you a confirmation code. If none opens, please allow pop-ups for smejj.com."
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "The subscription portal opens in a new window. Sign in there with your account email — Stripe will send you a confirmation code. If none opens, please allow pop-ups for smejj.com.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "The camera could not be opened. Allow smejj to use the camera in your device settings and try again.",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "The camera could not be opened. Allow camera access via the lock icon next to the address and try again.",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "The screen could not be shared. Your browser declined — try again and choose a window.",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "Screen sharing is not possible on this device.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "Data protected"
 };

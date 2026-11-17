@@ -14,6 +14,26 @@
 // hoerbar an (vorhandene Vorlese-Stimme) und ein Abzeichen bleibt sichtbar,
 // solange die Vorschau laeuft.
 
+import { t } from "./i18n/ui.js?v=2026111704";
+
+// Geraetebefund 17.11.2026 (Samsung A37, App): "Bildschirm teilen" gibt es auf Handys nicht (kein getDisplayMedia) —
+// dort gar nicht anbieten; und der Kamera-Hinweis nannte eine Adressleiste, die es in der App nicht gibt.
+export const kannBildschirmTeilen = (nav = globalThis.navigator) => typeof nav?.mediaDevices?.getDisplayMedia === "function";
+export function laeuftAlsApp(win = globalThis) {
+  try { return Boolean(win.Capacitor) || win.navigator?.standalone === true || win.matchMedia?.("(display-mode: standalone)").matches === true; } catch { return false; }
+}
+export function kameraFehlerText(app = laeuftAlsApp()) {
+  return app
+    ? t("Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.")
+    : t("Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.");
+}
+export function versteckeBildschirmTeilen(doc = globalThis.document, nav = globalThis.navigator) {
+  if (!doc?.querySelectorAll || kannBildschirmTeilen(nav)) return 0;
+  const knoepfe = [...doc.querySelectorAll('[data-kamera-start="bildschirm"]')];
+  for (const k of knoepfe) { k.hidden = true; k.style.setProperty("display", "none", "important"); }
+  return knoepfe.length;
+}
+
 let strom = null;
 let liveAn = false;
 
@@ -70,6 +90,7 @@ function bildJetzt() {
 
 async function oeffne(art) {
   schliesse();
+  if (art === "bildschirm" && !kannBildschirmTeilen()) { meldeFehler(t("Bildschirm teilen ist auf diesem Gerät nicht möglich.")); return; }
   try {
     strom = art === "bildschirm"
       ? await navigator.mediaDevices.getDisplayMedia({ video: true })
@@ -77,8 +98,8 @@ async function oeffne(art) {
   } catch {
     // Zugriff verweigert oder nicht verfuegbar — Meldung mit Ausweg in der Seite (17.11.2026: statt alert).
     meldeFehler(art === "bildschirm"
-      ? "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus."
-      : "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff in der Adressleiste und probier es noch einmal.");
+      ? t("Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.")
+      : kameraFehlerText());
     return;
   }
   ansage(art === "bildschirm" ? "smejj sieht jetzt deinen Bildschirm." : "smejj sieht jetzt deine Kamera.");
@@ -147,6 +168,7 @@ async function oeffne(art) {
 }
 
 export function initKamera() {
+  versteckeBildschirmTeilen();
   document.addEventListener("click", (ereignis) => {
     const knopf = ereignis.target.closest("[data-kamera-start]");
     if (!knopf) return;

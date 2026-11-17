@@ -3,13 +3,13 @@
 // oeffnet die Projektseite. Chats aus der Liste darunter lassen sich am Computer
 // auf ein Projekt ziehen. Faellt dieses Modul aus, bleibt der Punkt „Projekte“.
 
-import { listProjekte, setzeChatProjekt } from "/assets/chat-store.js?v=2026111703";
-import { ordnerSvg, oeffneNeuesProjekt } from "./projekte-fenster.js?v=2026111703";
+import { listProjekte, setzeChatProjekt } from "/assets/chat-store.js?v=2026111704";
+import { ordnerSvg, oeffneNeuesProjekt } from "./projekte-fenster.js?v=2026111704";
 
 const MAX_SICHTBAR = 5;
 // Projekt-Kopf im Chat (Bild 3) mitladen — nur Nebenwirkung, kein Start-Gewicht.
-import("./projekt-kontext.js?v=2026111703").catch(() => {});
-const projektSeite = () => import("./arbeitsbereiche.js?v=2026111703");
+import("./projekt-kontext.js?v=2026111704").catch(() => {});
+const projektSeite = () => import("./arbeitsbereiche.js?v=2026111704");
 
 function stil() {
   if (document.getElementById("projekteSpurStil")) return;
@@ -21,7 +21,10 @@ function stil() {
 .spur-projekte .spur-projekte-kopf{cursor:pointer;background:none;border:0;text-align:left;width:100%}
 .spur-projekte .spur-projekt-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .spur-projekte .nav-button.ist-ziel{outline:2px dashed rgba(95,212,200,.8);outline-offset:-2px}
-.spur-projekte .button-icon svg{width:18px;height:18px}`;
+.spur-projekte .button-icon svg{width:18px;height:18px}
+/* Geraetebefund 17.11.2026 (Samsung A37): lange Chat-Titel brachen hart ab – im Flex-Knopf greift text-overflow nicht. */
+.nav-start .spur-chat.spur-chat{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.nav-start .spur-chat.spur-chat::before{display:inline-block;vertical-align:middle;margin-right:16px}`;
   document.head.append(s);
 }
 

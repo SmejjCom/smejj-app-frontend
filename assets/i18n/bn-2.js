@@ -193,7 +193,6 @@ export default {
   "blockiert": "অবরুদ্ধ",
   "verboten": "নিষিদ্ধ",
   "Lokale Checks": "স্থানীয় পরীক্ষা",
-  "Lokal-first · fail-closed": "আগে স্থানীয় · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "আপনার প্রকল্প ও ব্যাকআপ প্রথমে এই ডিভাইসেই তৈরি হয়। ক্লাউড ব্যাকআপ পরে স্বয়ংক্রিয়ভাবে হয়।",
   "Projekt erstellen": "প্রকল্প তৈরি করুন",
   "Liste aktualisieren": "তালিকা নতুন করে আনুন",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "আপনার সাবস্ক্রিপশনের অবস্থা এখন পাওয়া যাচ্ছে না। যাতে কিছু দুবার কেনা না হয়, এই যাচাইয়ের পরেই কেনা শুরু হবে। অনুগ্রহ করে একটু পরে আবার চেষ্টা করুন।",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "ব্রাউজার পেমেন্ট উইন্ডো আটকে দিয়েছে। অনুগ্রহ করে smejj.com-এর জন্য পপ-আপ অনুমতি দিন এবং আবার ট্যাপ করুন।",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "সাবস্ক্রিপশন পোর্টাল নতুন উইন্ডোতে খোলে: পরিচালনা, প্ল্যান পরিবর্তন, বাতিল, ইনভয়েস। কিছু না খুললে smejj.com-এর জন্য পপ-আপ অনুমতি দিন।",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "সাবস্ক্রিপশন পোর্টাল নতুন উইন্ডোতে খোলে। সেখানে আপনার অ্যাকাউন্টের ইমেল দিয়ে সাইন ইন করুন — Stripe আপনাকে একটি নিশ্চিতকরণ কোড পাঠাবে। কিছু না খুললে smejj.com-এর জন্য পপ-আপ অনুমতি দিন।"
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "সাবস্ক্রিপশন পোর্টাল নতুন উইন্ডোতে খোলে। সেখানে আপনার অ্যাকাউন্টের ইমেল দিয়ে সাইন ইন করুন — Stripe আপনাকে একটি নিশ্চিতকরণ কোড পাঠাবে। কিছু না খুললে smejj.com-এর জন্য পপ-আপ অনুমতি দিন।",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "ক্যামেরা খোলা যায়নি। ডিভাইসের সেটিংসে smejj-কে ক্যামেরার অনুমতি দিন এবং আবার চেষ্টা করুন।",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "ক্যামেরা খোলা যায়নি। ঠিকানার পাশে তালা চিহ্ন থেকে ক্যামেরার অনুমতি দিন এবং আবার চেষ্টা করুন।",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "স্ক্রিন শেয়ার করা যায়নি। আপনার ব্রাউজার অনুমতি দেয়নি — আবার চেষ্টা করুন এবং একটি উইন্ডো বেছে নিন।",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "এই ডিভাইসে স্ক্রিন শেয়ার করা সম্ভব নয়।",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "ডেটা সুরক্ষিত"
 };

@@ -1,25 +1,25 @@
-import { STORAGE_KEYS } from "./config.js?v=2026111703";
+import { STORAGE_KEYS } from "./config.js?v=2026111704";
 import { initServerSessionControls, fetchLoginMethods, fetchAuthenticatedUser, fetchBillingStatus, logoutCurrentSession,
-  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026111703";
-import { languageOptionsMarkup } from "./language-options.js?v=2026111703";
-import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026111703";
-import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026111703";
-import { clearProfilePicture } from "./profile-picture-store.js?v=2026111703";
-import { afterFirstPaint } from "./deferred-start.js?v=2026111703";
+  requestBillingPortal, fetchTrainingNotice, grantTrainingConsent, revokeTrainingConsent } from "./account-sessions.js?v=2026111704";
+import { languageOptionsMarkup } from "./language-options.js?v=2026111704";
+import { t, uiLanguage, uiDirection } from "./i18n/ui.js?v=2026111704";
+import { initProfilePictureControl, maybeImportAccountPicture, profilePictureMarkup } from "./profile-picture-control.js?v=2026111704";
+import { clearProfilePicture } from "./profile-picture-store.js?v=2026111704";
+import { afterFirstPaint } from "./deferred-start.js?v=2026111704";
 // Ohne ?v=: siehe die Begruendung in account-auth-state.js. Eine Marke hier
 // wuerde erzwingen, dass diese ABO-GESPERRTE Datei bei jeder Stil-Aenderung
 // wieder angefasst wird — genau das soll die Auslagerung verhindern.
-import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026111703";
+import { applyAuthState, KONTO_STIL_MARKE } from "./account-auth-state.js?v=2026111704";
 // Gleicher Schluessel wie in profile-dock-menu.js — bewusst dupliziert statt
 // importiert (wie TOKEN_KEY in auth-gate.js): profile-dock-menu.js liegt im
 // Startbuendel, diese Datei wird nachgeladen. Ein Import zoege das Startmodul
 // unter einer zweiten Marke herein — genau die Falle, vor der die Markenkette
 // warnt (zwei Kopien mit getrenntem Zustand).
 const KONTO_REITER_SCHLUESSEL = "smejj.konto.reiter.v1";
-import { usageSummary } from "./usage-meter.js?v=2026111703";
-import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026111703";
+import { usageSummary } from "./usage-meter.js?v=2026111704";
+import { initOnboardingWelcome } from "./onboarding-welcome.js?v=2026111704";
 // Apple-In-App-Kauf in der iOS-App (Inhaber 12.11.2026: „Soll mit Plus usw Pakete sein überall, Mach überall rein.“)
-import { appleBruecke, appleKaufMarkup, appleVerwalten, bindeAppleKauf, zeichneAppleKnoepfe } from "./apple-kauf.js?v=2026111703";
+import { appleBruecke, appleKaufMarkup, appleVerwalten, bindeAppleKauf, zeichneAppleKnoepfe } from "./apple-kauf.js?v=2026111704";
 
 const CONSENT_KEY = "smejj.privacy-consent.v1";
 const PERSONAL_KEY = "smejj.personalization.v1";
@@ -276,7 +276,7 @@ async function startOrSwitchPlan(view, plan) {
 // Nutzung & Limits, Daten & Datenschutz. Bereiche ohne Server-Anbindung sagen
 // ehrlich "Bald verfügbar" statt tote Knoepfe zu zeigen. App-Huelle unveraendert.
 function markup() {
-  return `<header class="account-header"><div><p class="eyebrow">${t("Konto & Datenschutz")}</p><h2>${t("Konto")}</h2><p class="subhead">${t("Identität, Sitzungen und Daten sicher verwalten. Secrets werden weder angezeigt noch exportiert.")}</p></div><span class="account-security">Lokal-first · fail-closed</span></header>
+  return `<header class="account-header"><div><p class="eyebrow">${t("Konto & Datenschutz")}</p><h2>${t("Konto")}</h2><p class="subhead">${t("Identität, Sitzungen und Daten sicher verwalten. Secrets werden weder angezeigt noch exportiert.")}</p></div><span class="account-security">${t("Daten geschützt")}</span></header>
   <div class="account-layout"><nav class="account-nav" role="tablist" aria-label="${t("Kontobereiche")}">
     ${nav("identity", "Profil")}${nav("personalization", "Personalisierung")}${nav("voice", "Sprache & Stimme")}${nav("notifications", "Benachrichtigungen")}${nav("security", "Anmeldung & Sicherheit")}${nav("billing", "Mein Plan")}${nav("usage", "Nutzung & Limits")}${nav("data", "Meine Daten")}
   </nav><div class="account-content">

@@ -6,7 +6,7 @@
 // Das Eingabefeld selbst bleibt unveraendert (Design-Lock); die Reihe ist ein eigenes Element davor.
 // Nachtrag (Inhaber 13.11.2026, Mockup „Ja“): Standard 9:16 bei Bild und Video; beim Video in DERSELBEN
 // Zeile die Länge 5 · 10 · 15 s (Standard 5 s) — Zusatz „(Länge 10 s)“, Bruecke: laengeAusAuftrag.
-import { t } from "./i18n/ui.js?v=2026111703";
+import { t } from "./i18n/ui.js?v=2026111704";
 
 export const BILD_FORMATE = Object.freeze(["1:1", "9:16", "16:9", "4:3", "3:4"]);
 export const VIDEO_FORMATE = Object.freeze(["1:1", "9:16", "16:9"]);
@@ -138,10 +138,21 @@ export function initMedienFormat({ dokument = document } = {}) {
 
   // Die Eingabe liegt (Handy) absolut am unteren Rand: die Reihe sitzt genau darueber, gleiche Breite.
   // Liegt die Eingabe im Fluss (Computer, Startseite in der Mitte), steht die Reihe im Fluss darunter.
+  // Geraetebefund 17.11.2026 (iPhone): die schwebende Reihe lag ueber der Knopfzeile der letzten Antwort.
+  // Solange sie sichtbar ist, bekommt der Verlauf ihre Hoehe als Zusatzpolster (am Ende bleibt er am Ende).
+  function polster(an) {
+    const log = dokument.getElementById("startLog");
+    if (!log?.style) return;
+    const amEnde = log.scrollHeight - log.scrollTop - log.clientHeight < 40;
+    log.style.paddingBottom = "";
+    if (an) log.style.paddingBottom = `${(parseFloat(getComputedStyle(log).paddingBottom) || 0) + reihe.offsetHeight + 8}px`;
+    if (amEnde) log.scrollTop = log.scrollHeight;
+  }
   function lege() {
-    if (reihe.hidden) return;
+    if (reihe.hidden) { polster(false); return; }
     const schwebend = /^(absolute|fixed)$/.test(getComputedStyle(glas).position);
     if (!schwebend) {
+      polster(false);
       if (glas.nextElementSibling !== reihe) glas.after(reihe);
       Object.assign(reihe.style, { position: "static", left: "", top: "", width: "", margin: "10px 0 0" });
       return;
@@ -151,6 +162,7 @@ export function initMedienFormat({ dokument = document } = {}) {
     reihe.style.left = `${glas.offsetLeft}px`;
     reihe.style.width = `${glas.offsetWidth}px`;
     reihe.style.top = `${glas.offsetTop - reihe.offsetHeight - 8}px`;
+    polster(true);
   }
   if (typeof ResizeObserver === "function") new ResizeObserver(() => requestAnimationFrame(lege)).observe(glas);
   globalThis.addEventListener?.("resize", lege);
@@ -160,7 +172,7 @@ export function initMedienFormat({ dokument = document } = {}) {
     if (neu === art) return;
     art = neu;
     reihe.hidden = !art;
-    if (art) { zeichne(); lege(); }
+    if (art) { zeichne(); lege(); } else polster(false);
   }
 
   knoepfe.addEventListener("click", (ereignis) => {

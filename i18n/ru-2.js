@@ -193,7 +193,6 @@ export default {
   "blockiert": "заблокировано",
   "verboten": "запрещено",
   "Lokale Checks": "Локальные проверки",
-  "Lokal-first · fail-closed": "Сначала локально · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "Ваши проекты и резервные копии создаются сначала на этом устройстве. Копия в облаке появляется потом автоматически.",
   "Projekt erstellen": "Создать проект",
   "Liste aktualisieren": "Обновить список",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Статус подписки сейчас недоступен. Чтобы ничего не купить дважды, оплата начнётся только после этой проверки. Попробуйте чуть позже.",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Браузер заблокировал окно оплаты. Разрешите всплывающие окна для smejj.com и нажмите ещё раз.",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Портал подписки откроется в новом окне: управление, смена тарифа, отмена, счета. Если окно не открылось, разрешите всплывающие окна для smejj.com.",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Портал подписки откроется в новом окне. Войдите там с e-mail вашего аккаунта — Stripe пришлёт код подтверждения. Если окно не открылось, разрешите всплывающие окна для smejj.com."
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Портал подписки откроется в новом окне. Войдите там с e-mail вашего аккаунта — Stripe пришлёт код подтверждения. Если окно не открылось, разрешите всплывающие окна для smejj.com.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "Не удалось открыть камеру. Разрешите smejj доступ к камере в настройках устройства и попробуйте ещё раз.",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "Не удалось открыть камеру. Разрешите доступ к камере через значок замка рядом с адресом и попробуйте ещё раз.",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "Не удалось показать экран. Браузер отклонил запрос — попробуйте ещё раз и выберите окно.",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "Показ экрана на этом устройстве невозможен.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "Данные защищены"
 };

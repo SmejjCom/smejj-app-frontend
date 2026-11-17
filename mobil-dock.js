@@ -132,6 +132,10 @@ export const REGELN = "@media (max-width:600px){"
   + "body #start.has-start-chat #startLog.start-log{padding-top:calc(env(safe-area-inset-top,0px) + 56px);scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}"
   + "body .mobil-kopfglas{position:fixed;top:0;left:0;right:0;height:calc(env(safe-area-inset-top,0px) + 52px);z-index:73;pointer-events:none;background:linear-gradient(180deg,rgba(7,10,14,.92) 0%,rgba(7,10,14,.72) 70%,rgba(7,10,14,0) 100%);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 70%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 70%,transparent 100%)}"
   + "body:not(.mobil-chat-offen) .mobil-kopfglas{display:none}"
+  // Geraetebefund 17.11.2026 (iPhone-App): Nachrichten und Knopfzeilen liefen sichtbar unter Uhr und Dynamic Island durch.
+  // Der Streifen deckt jetzt GENAU die Statusleiste (Safe Area) in der Seitenfarbe ab – ohne Verlauf, ohne Unschaerfe;
+  // die zwei Glas-Knoepfe (z-index 75) bleiben darueber unveraendert. Im Browser-Tab ist die Safe Area 0 → nichts zu sehen.
+  + "html body.mobil-chat-offen:not(:has(#code.is-active)) .mobil-kopfglas.mobil-kopfglas.mobil-kopfglas.mobil-kopfglas{display:block!important;height:env(safe-area-inset-top,0px)!important;background:none!important;background-color:inherit!important;-webkit-mask-image:none!important;mask-image:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;z-index:44!important}"
   // (15) Startseite kompakt und UNTEN (Betreiber 08.09.: "unten noch mehr runterziehen und kompakt
   //      machen, unten ist Platz frei, oben verlieren wir viel — ChatGPT hat es ganz unten").
   //      GEMESSEN (Pixel 7, 412x839): .home-feed steht auf justify-content:center, der Block endete
@@ -352,7 +356,7 @@ if (typeof document !== "undefined" && document.querySelector("#startMessage, #c
   verdrahteAuswahl();
   verdrahteCodeFeldHoehe();
   // Ansichten nach dem Login (Profil, Einstellungen, Verlauf, Dateien …) — eigenes Modul, ohne Marke.
-  import("/assets/mobil-ansichten.js?v=2026111703").catch(() => {});
+  import("/assets/mobil-ansichten.js?v=2026111704").catch(() => {});
   // Vollbild-Chat (17.09.2026): misst das schwebende Feld (--feld-hoehe), design-v14-vollbild-chat.css.
-  import("/assets/vollbild-chat.js?v=2026111703").catch(() => {});
+  import("/assets/vollbild-chat.js?v=2026111704").catch(() => {});
 }

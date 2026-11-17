@@ -18,7 +18,10 @@
 .dictation-wave i { background:currentColor; width:3px; height:3px; }
 .dictation-controls output { font-variant-numeric:tabular-nums; }
 
-#composerUpdateHinweis { position:fixed; top:12px; left:12px; right:12px; z-index:9998; padding:12px; background:var(--glas-2, #172325); color:var(--ink,#fff); border:1px solid currentColor; border-radius:12px; }
+#composerUpdateHinweis { position:fixed; top:calc(env(safe-area-inset-top, 0px) + 64px); left:12px; right:12px; z-index:9998; padding:12px; background:var(--glas-2, #172325); color:var(--ink,#fff); border:1px solid currentColor; border-radius:12px; }
+/* Geraetebefund 17.11.2026 (Samsung A37): der Hinweis lag ueber Logo und "Neuer Chat" (top 12 px) – jetzt darunter.
+   Tastatur-Fokus des Eingabefelds (Pruefung 17.11., Befund 14): dezenter Rahmen am Glas, nur bei :focus-visible. */
+@media (hover:hover) and (pointer:fine) { #start .prompt-glass:has(#startMessage:focus-visible) { outline:2px solid rgba(2,253,253,.45); outline-offset:2px; } }
 
 .dictation-wave[hidden] { display:none; }
 

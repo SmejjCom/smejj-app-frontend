@@ -193,7 +193,6 @@ export default {
   "blockiert": "ブロック済み",
   "verboten": "禁止",
   "Lokale Checks": "ローカルチェック",
-  "Lokal-first · fail-closed": "ローカル優先 · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "プロジェクトとバックアップはまずこの端末上に作られます。クラウドへの保存はその後自動的に行われます。",
   "Projekt erstellen": "プロジェクトを作成",
   "Liste aktualisieren": "一覧を更新",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "現在サブスクリプションの状態を取得できません。二重購入を防ぐため、この確認が済むまで購入は始まりません。少し待ってからもう一度お試しください。",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "ブラウザが支払いウィンドウをブロックしました。smejj.com のポップアップを許可して、もう一度タップしてください。",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "サブスクリプションポータルが新しいウィンドウで開きます：管理、プラン変更、解約、請求書。開かない場合は smejj.com のポップアップを許可してください。",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "サブスクリプションポータルが新しいウィンドウで開きます。アカウントのメールアドレスでサインインしてください — Stripe から確認コードが届きます。開かない場合は smejj.com のポップアップを許可してください。"
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "サブスクリプションポータルが新しいウィンドウで開きます。アカウントのメールアドレスでサインインしてください — Stripe から確認コードが届きます。開かない場合は smejj.com のポップアップを許可してください。",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "カメラを開けませんでした。端末の設定で smejj にカメラの使用を許可してから、もう一度お試しください。",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "カメラを開けませんでした。アドレスの横の鍵アイコンからカメラへのアクセスを許可して、もう一度お試しください。",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "画面を共有できませんでした。ブラウザが許可しませんでした — もう一度ウィンドウを選んでお試しください。",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "この端末では画面共有はできません。",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "データ保護中"
 };

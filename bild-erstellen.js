@@ -8,8 +8,8 @@
 //  3) Fertig: Bild von Rand zu Rand (Handy), weich scharf werdend, Glasleiste Sichern/Teilen/Ändern/Neu.
 //  4) Frisch fertig: öffnet sich von selbst im Vollbild; später per Antippen. Vollbild über den ganzen Bildschirm, Zoom (2 Finger / Doppeltipp), nach unten wischen schließt.
 // Nachgeladen über upgrade-hinweis.js – die Startseite wird nicht schwerer, gesperrte Dateien bleiben unberührt.
-import { t } from "./i18n/ui.js?v=2026111703";
-import { handy, mediumHochkant, oeffneHochkant } from "./hochkant-ansicht.js?v=2026111703";
+import { t } from "./i18n/ui.js?v=2026111704";
+import { handy, mediumHochkant, oeffneHochkant } from "./hochkant-ansicht.js?v=2026111704";
 
 export const STIL_ID = "bild-erstellen-stil";
 export const DAUER_KEY = "smejj.bild.dauer.v1";
@@ -87,7 +87,8 @@ export function bildCss() {
     + ".bild-fortschritt .bf-text span{color:#9aa4ad;font-size:12.5px}"
     + ".bild-fortschritt .bf-balken{height:4px;border-radius:4px!important;background:rgba(255,255,255,.12);margin-top:7px;overflow:hidden}"
     + ".bild-fortschritt .bf-balken i{display:block;height:100%;border-radius:4px!important;background:linear-gradient(90deg,#2fd0bd,#5ee0f0);transition:width .6s}"
-    + ".bf-stufen{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 2px}"
+    // Geraet 17.11.2026 (grosse Schrift): umbrechende Stufen ragten mit "Feinschliff" ins Eingabefeld – eine Zeile, notfalls seitlich wischbar.
+    + ".bf-stufen{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:4px 0 2px}.bf-stufen::-webkit-scrollbar{display:none}.bf-stufen span{flex:none}"
     + `.bf-stufen span{font-size:12px;padding:5px 10px;border-radius:999px!important;border:1px solid ${KANTE};color:#9aa4ad;background:rgba(255,255,255,.05)}`
     + ".bf-stufen span.ok{color:#bff3ea;border-color:rgba(47,208,189,.55);background:rgba(47,208,189,.14)}"
     + ".bf-stufen span.jetzt{color:#f1f3f5;border-color:rgba(255,255,255,.42)}"

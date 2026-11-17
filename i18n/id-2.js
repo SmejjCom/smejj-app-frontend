@@ -193,7 +193,6 @@ export default {
   "blockiert": "diblokir",
   "verboten": "dilarang",
   "Lokale Checks": "Pemeriksaan lokal",
-  "Lokal-first · fail-closed": "Lokal dulu · fail-closed",
   "Deine Projekte und Sicherungen entstehen zuerst auf diesem Gerät. Die Sicherung in der Cloud kommt danach automatisch.": "Proyek dan cadanganmu dibuat lebih dulu di perangkat ini. Cadangan di cloud menyusul secara otomatis.",
   "Projekt erstellen": "Buat proyek",
   "Liste aktualisieren": "Segarkan daftar",
@@ -691,5 +690,12 @@ export default {
   "Dein Abo-Stand ist gerade nicht abrufbar. Damit nichts doppelt gekauft wird, startet der Kauf erst nach dieser Prüfung. Bitte versuche es gleich noch einmal.": "Status langgananmu tidak dapat diambil saat ini. Agar tidak ada yang terbeli dua kali, pembelian baru dimulai setelah pemeriksaan ini. Silakan coba lagi sebentar lagi.",
   "Der Browser hat das Zahlungsfenster blockiert. Erlaube bitte Pop-ups für smejj.com und tippe noch einmal.": "Browser memblokir jendela pembayaran. Izinkan pop-up untuk smejj.com lalu ketuk lagi.",
   "Das Abo-Portal öffnet sich in einem neuen Fenster: verwalten, Plan wechseln, kündigen, Rechnungen. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Portal langganan terbuka di jendela baru: kelola, ganti paket, batalkan, faktur. Jika tidak ada yang terbuka, izinkan pop-up untuk smejj.com.",
-  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Portal langganan terbuka di jendela baru. Masuk di sana dengan email akunmu — Stripe akan mengirim kode konfirmasi. Jika tidak ada yang terbuka, izinkan pop-up untuk smejj.com."
+  "Das Abo-Portal öffnet sich in einem neuen Fenster. Melde dich dort mit deiner Konto-E-Mail an — Stripe schickt dir einen Bestätigungscode. Geht keins auf, erlaube bitte Pop-ups für smejj.com.": "Portal langganan terbuka di jendela baru. Masuk di sana dengan email akunmu — Stripe akan mengirim kode konfirmasi. Jika tidak ada yang terbuka, izinkan pop-up untuk smejj.com.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Die Kamera ließ sich nicht öffnen. Erlaube smejj den Kamerazugriff in den Einstellungen deines Geräts und probier es noch einmal.": "Kamera tidak bisa dibuka. Izinkan smejj memakai kamera di pengaturan perangkatmu lalu coba lagi.",
+  "Die Kamera ließ sich nicht öffnen. Erlaube den Kamerazugriff über das Schloss-Symbol neben der Adresse und probier es noch einmal.": "Kamera tidak bisa dibuka. Izinkan akses kamera lewat ikon gembok di samping alamat lalu coba lagi.",
+  "Der Bildschirm konnte nicht geteilt werden. Dein Browser hat die Freigabe abgelehnt — probier es noch einmal und wähle ein Fenster aus.": "Layar tidak bisa dibagikan. Browser menolak izin — coba lagi dan pilih sebuah jendela.",
+  "Bildschirm teilen ist auf diesem Gerät nicht möglich.": "Berbagi layar tidak bisa di perangkat ini.",
+  // Geraetebefunde 17.11.2026: Kamera-Meldungen, Konto-Abzeichen.
+  "Daten geschützt": "Data terlindungi"
 };
