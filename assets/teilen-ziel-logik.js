@@ -85,7 +85,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     };
     const start = () => {
       // Dieselbe Modul-Kennung wie ueberall — sonst zweite Instanz (Waechter).
-      import("/assets/chat-store.js?v=2026111702")
+      import("/assets/chat-store.js?v=2026111703")
         .then((m) => m.newChat?.())
         .catch(() => { /* nicht angemeldet oder Modul fehlt: Feld trotzdem fuellen */ })
         .finally(einsetzen);

@@ -8,8 +8,8 @@
 //  3) Fertig: Bild von Rand zu Rand (Handy), weich scharf werdend, Glasleiste Sichern/Teilen/Ändern/Neu.
 //  4) Frisch fertig: öffnet sich von selbst im Vollbild; später per Antippen. Vollbild über den ganzen Bildschirm, Zoom (2 Finger / Doppeltipp), nach unten wischen schließt.
 // Nachgeladen über upgrade-hinweis.js – die Startseite wird nicht schwerer, gesperrte Dateien bleiben unberührt.
-import { t } from "./i18n/ui.js?v=2026111702";
-import { handy, mediumHochkant, oeffneHochkant } from "./hochkant-ansicht.js?v=2026111702";
+import { t } from "./i18n/ui.js?v=2026111703";
+import { handy, mediumHochkant, oeffneHochkant } from "./hochkant-ansicht.js?v=2026111703";
 
 export const STIL_ID = "bild-erstellen-stil";
 export const DAUER_KEY = "smejj.bild.dauer.v1";
@@ -324,8 +324,11 @@ function rahmeEin(bild) {
 function zeige(bild) {
   const hochkant = () => handy() && mediumHochkant(bild)
     && oeffneHochkant(bild, { knoepfe: (schliessen) => knoepfe(bild, schliessen), zoom: () => oeffneVollbild(bild) });
-  if (bild.complete && bild.naturalWidth) { if (!hochkant()) oeffneVollbild(bild); return; }
-  bild.addEventListener("load", () => { if (!hochkant()) oeffneVollbild(bild); }, { once: true });
+  // Geraet 17.11.2026: ein geparktes Medium (1×1-Platzhalter, chat-markdown.js) ist schon "geladen" —
+  // das Vollbild oeffnete sich damit schwarz. Erst das echte Bild (> 1 px) zeigen.
+  if (bild.complete && bild.naturalWidth > 1) { if (!hochkant()) oeffneVollbild(bild); return; }
+  const geladen = () => { if (bild.naturalWidth <= 1) return; bild.removeEventListener("load", geladen); if (!hochkant()) oeffneVollbild(bild); };
+  bild.addEventListener("load", geladen);
 }
 
 // ---------------------------------------------------------------------------

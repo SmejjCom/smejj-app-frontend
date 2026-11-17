@@ -5,11 +5,11 @@
 // bleibt das eine vorhandene (#startMessage mit Plus, Mikrofon, Sprachmodus, Modell).
 // Dazu das ⋯-Menue im Projekt-Kopf. Nichts hier baut ein eigenes Eingabefeld.
 
-import { listChats, listProjekte, openChat } from "/assets/chat-store.js?v=2026111702";
+import { listChats, listProjekte, openChat } from "/assets/chat-store.js?v=2026111703";
 import {
   el, wann, vorschau, geheZu, dateienModul, umbenennen, farbeAendern, ordnerVerbinden,
   anweisungenFenster, dateienFenster, chatUmbenennen, chatLoeschen, chatVerschieben, loeschen
-} from "./projekt-aktionen.js?v=2026111702";
+} from "./projekt-aktionen.js?v=2026111703";
 
 function stil() {
   if (document.getElementById("projektStartStil")) return;

@@ -31,7 +31,7 @@
 // einzige Fehlermeldung — der fail-safe Rueckweg sieht genauso aus wie
 // "nichts zu tun". chat-sync.js baut seine Adresse aus demselben Grund direkt
 // aus API_ORIGIN; das ist die eine Quelle, der beide folgen.
-import { API_ORIGIN } from "./config.js?v=2026111702";
+import { API_ORIGIN } from "./config.js?v=2026111703";
 
 const TOKEN_KEY = "smejj.auth.accessToken.v1";
 
@@ -180,7 +180,11 @@ export function entwaessere(knoten) {
     // Den angezeigten blob merken: gleich danach will rehydriereMedien ihn
     // zurueck, und ein zweiter fetch fuer dieselben Bytes waere verschenkt.
     // Seit 23.09.2026 auch data: — das frisch erzeugte Bild bleibt so ohne Netz sichtbar.
-    if (bisher.startsWith("blob:") || bisher.startsWith("data:image/")) ANZEIGE_BLOB.set(el, { quelle: bisher, adresse, bis: 0 });
+    // NUR echte Bilddaten (base64): Platzhalter sind utf8-SVGs (Parkplatz 1×1 aus chat-markdown.js/
+    // parkeMedienAdressen, FEHLENDES_/UNVOLLSTAENDIGES_BILD). Wurde der Parkplatz gemerkt, stellte
+    // rehydriereMedien ihn "ohne Netz" wieder her und holte nie die Anzeige-Adresse — ein frisch
+    // gemaltes Bild (Bruecke v178 liefert die Medien-Adresse) blieb leer bis zum Neuladen (Geraet 17.11.2026).
+    if (bisher.startsWith("blob:") || /^data:image\/[a-z0-9.+-]+;base64,/i.test(bisher)) ANZEIGE_BLOB.set(el, { quelle: bisher, adresse, bis: 0 });
     el.setAttribute("src", adresse);
     zurueck += 1;
   }
@@ -468,7 +472,7 @@ function hoereAufKlicks(knoten) {
     // dann der alte Weg, dann der Hinweis) — sonst Endlosschleife bei totem Netz.
     else if (art === "neu" && !MIT_FEHLERHOERER.has(bild)) { hoereAufFehler(bild); rehydriereMedien({ querySelectorAll: () => [bild] }); }
   }, true);
-  const oeffne = (el) => import("./chat-medien-ansicht.js?v=2026111702").then((m) => m.oeffneVollbild(el)).catch(() => {});
+  const oeffne = (el) => import("./chat-medien-ansicht.js?v=2026111703").then((m) => m.oeffneVollbild(el)).catch(() => {});
   document.addEventListener("click", (ereignis) => {
     const bild = ereignis.target?.closest?.(`.entry img[${ADRESSE_ATTRIBUT}]`);
     if (!bild || !istMedienAdresse(bild.getAttribute(ADRESSE_ATTRIBUT))) return;

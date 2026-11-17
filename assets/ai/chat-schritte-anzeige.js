@@ -29,7 +29,7 @@
 // er `node.textContent`, die Schritte wuerden also in die Antwort einfliessen.
 // ---------------------------------------------------------------------------
 
-import { t } from "../i18n/ui.js?v=2026111702";
+import { t } from "../i18n/ui.js?v=2026111703";
 
 const SCHRITT_SYMBOL = { suche: "🔍", seite: "📄" };
 
@@ -190,6 +190,23 @@ function gruppeFuer(liste, art) {
   liste.append(gruppe);
   return gruppe;
 }
+
+/**
+ * Zeilenumbruch fuer Schrittzeilen (Geraet 17.11.2026, Samsung A37, grosse Schrift): die Zeile ist ein
+ * Flex-Container ohne Umbruch (chat-markdown.css, Start-Lock); passte "• Bild: Male dein Bild läuft …
+ * (ca. 1 Minute)" nicht in eine Zeile, quetschten sich die Teile zu Wortspalten ("Male / Bild dein Bild / :").
+ * Mit flex-wrap rutscht der Stand als Ganzes in die naechste Zeile. Nur diese eine Eigenschaft.
+ */
+export const SCHRITT_UMBRUCH_ID = "chat-schritt-umbruch";
+export function sorgeFuerSchrittUmbruch(doc = globalThis.document) {
+  if (!doc?.head || !doc.createElement || doc.getElementById?.(SCHRITT_UMBRUCH_ID)) return false;
+  const stil = doc.createElement("style");
+  stil.id = SCHRITT_UMBRUCH_ID;
+  stil.textContent = ".chat-schritt{flex-wrap:wrap}";
+  doc.head.appendChild(stil);
+  return true;
+}
+sorgeFuerSchrittUmbruch();
 
 /**
  * Zeigt einen Arbeitsschritt an. "laeuft" legt eine Zeile an, "fertig"
