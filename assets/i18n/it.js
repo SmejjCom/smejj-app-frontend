@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Italiano (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von it-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./it-2.js?v=2026111704";
+import zusatz from "./it-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "Vale per ogni risposta, come un'istruzione permanente. Salvato solo su questo dispositivo.",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "Istruzioni salvate: valgono dalla prossima risposta.",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "smejj ricorda ciò che è utile nelle tue chat. Arriva insieme ai piani.",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "Salva",
+  "Video sichern": "Salva video",
+  "Erstelle ein neues Bild von": "Crea una nuova immagine di",
+  "Erstelle ein neues Video von": "Crea un nuovo video di",
+  "aber": "ma",
+  "Neues Bild mit geändertem Wunsch": "Nuova immagine con richiesta modificata",
+  "Neues Video mit geändertem Wunsch": "Nuovo video con richiesta modificata",
+  "Szenen entstehen": "Creazione delle scene",
+  "Bewegung": "Movimento",
+  "Video wird fertig": "Video quasi pronto",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "Download avviato: il file comparirà a breve in «Download».",
 };

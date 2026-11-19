@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Русский (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ru-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ru-2.js?v=2026111704";
+import zusatz from "./ru-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "Действует для каждого ответа — как постоянное указание. Хранится только на этом устройстве.",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "Инструкции сохранены — они действуют со следующего ответа.",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "smejj запоминает полезное из ваших чатов. Появится вместе с тарифами.",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "Сохранить",
+  "Video sichern": "Сохранить видео",
+  "Erstelle ein neues Bild von": "Создай новое изображение",
+  "Erstelle ein neues Video von": "Создай новое видео",
+  "aber": "но",
+  "Neues Bild mit geändertem Wunsch": "Новое изображение с изменённым запросом",
+  "Neues Video mit geändertem Wunsch": "Новое видео с изменённым запросом",
+  "Szenen entstehen": "Создаём сцены",
+  "Bewegung": "Движение",
+  "Video wird fertig": "Видео почти готово",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "Загрузка началась – файл скоро появится в папке «Загрузки».",
 };

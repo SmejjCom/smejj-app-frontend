@@ -9,8 +9,8 @@
 // Hier steht nur, was den Zustand der Anwendung NICHT kennt. Alles, was `state`,
 // den Arbeitsbereich oder den Router braucht, bleibt in app.js.
 
-import { scrolleAnsEnde } from "/assets/verlauf-unten.js?v=2026111704";
-import { denkText } from "./denk-text.js?v=2026111704";
+import { scrolleAnsEnde } from "/assets/verlauf-unten.js?v=2026111901";
+import { denkText } from "./denk-text.js?v=2026111901";
 
 const $ = (selector) => document.querySelector(selector);
 

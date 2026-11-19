@@ -8,18 +8,34 @@
 //  3) Fertig: Bild von Rand zu Rand (Handy), weich scharf werdend, Glasleiste Sichern/Teilen/Ändern/Neu.
 //  4) Frisch fertig: öffnet sich von selbst im Vollbild; später per Antippen. Vollbild über den ganzen Bildschirm, Zoom (2 Finger / Doppeltipp), nach unten wischen schließt.
 // Nachgeladen über upgrade-hinweis.js – die Startseite wird nicht schwerer, gesperrte Dateien bleiben unberührt.
-import { t } from "./i18n/ui.js?v=2026111704";
-import { handy, mediumHochkant, oeffneHochkant } from "./hochkant-ansicht.js?v=2026111704";
+import { t } from "./i18n/ui.js?v=2026111901";
+import { aenderungsText, bildDownloadAdresse, DOWNLOAD_HINWEIS, handy, istAndroid, ladeVomServer, mediumHochkant, oeffneHochkant, ohneZusaetze } from "./hochkant-ansicht.js?v=2026111901";
 
 export const STIL_ID = "bild-erstellen-stil";
-export const DAUER_KEY = "smejj.bild.dauer.v1";
-export const STANDARD_DAUER_MS = 45_000;
+// Messung 18.11.2026 (U8): Bilder brauchen 8–12 s, geschätzt waren 45 s – der Ring sprang von 17–40 % auf fertig.
+// Neuer Schlüssel v2: die alten, vom 45-s-Start verzerrten Mittelwerte beginnen frisch bei 12 s.
+export const DAUER_KEY = "smejj.bild.dauer.v2";
+export const STANDARD_DAUER_MS = 12_000;
 export const STUFEN = [
   [0, "Idee verstanden"],
   [15, "Komposition"],
   [50, "Details"],
   [85, "Feinschliff"]
 ];
+// Videos (gleiche Karte, Schritt „video|…“): gemessen 15–32 s, eigene Schätzung und eigene Stufen.
+export const VIDEO_DAUER_KEY = "smejj.video.dauer.v1";
+export const VIDEO_STANDARD_DAUER_MS = 25_000;
+export const VIDEO_STUFEN = [
+  [0, "Idee verstanden"],
+  [15, "Szenen entstehen"],
+  [55, "Bewegung"],
+  [85, "Video wird fertig"]
+];
+const ART = {
+  bild: { key: DAUER_KEY, standard: STANDARD_DAUER_MS, stufen: STUFEN },
+  video: { key: VIDEO_DAUER_KEY, standard: VIDEO_STANDARD_DAUER_MS, stufen: VIDEO_STUFEN }
+};
+const artInfo = (art) => ART[art] || ART.bild;
 
 /** Geschätzter Fortschritt in Prozent aus vergangener Zeit und erwarteter Dauer. Nie 100 vor dem Bild. */
 export function schaetzeProzent(vergangenMs, erwartetMs, uebertragung = false) {
@@ -39,24 +55,25 @@ export function restzeitText(vergangenMs, erwartetMs, uebertragung = false) {
   return `${t("noch ca.")} ${rest} ${t("Sekunden")}`;
 }
 
-export function aktuelleStufe(prozent) {
+export function aktuelleStufe(prozent, art = "bild") {
   let index = 0;
-  STUFEN.forEach(([ab], i) => { if (prozent >= ab) index = i; });
+  artInfo(art).stufen.forEach(([ab], i) => { if (prozent >= ab) index = i; });
   return index;
 }
 
 /** Gelernte übliche Dauer (gleitender Mittelwert), Speicher fehlt → Standard. */
-export function erwarteteDauer(speicher = globalThis.localStorage) {
+export function erwarteteDauer(speicher = globalThis.localStorage, art = "bild") {
+  const { key, standard } = artInfo(art);
   try {
-    const wert = Number(speicher?.getItem(DAUER_KEY));
-    return wert >= 5_000 && wert <= 600_000 ? wert : STANDARD_DAUER_MS;
-  } catch { return STANDARD_DAUER_MS; }
+    const wert = Number(speicher?.getItem(key));
+    return wert >= 5_000 && wert <= 600_000 ? wert : standard;
+  } catch { return standard; }
 }
 
-export function merkeDauer(ms, speicher = globalThis.localStorage) {
-  if (!(ms >= 3_000 && ms <= 900_000)) return erwarteteDauer(speicher);
-  const neu = Math.round(erwarteteDauer(speicher) * 0.6 + ms * 0.4);
-  try { speicher?.setItem(DAUER_KEY, String(neu)); } catch { /* ohne Speicher: Standard */ }
+export function merkeDauer(ms, speicher = globalThis.localStorage, art = "bild") {
+  if (!(ms >= 3_000 && ms <= 900_000)) return erwarteteDauer(speicher, art);
+  const neu = Math.round(erwarteteDauer(speicher, art) * 0.6 + ms * 0.4);
+  try { speicher?.setItem(artInfo(art).key, String(neu)); } catch { /* ohne Speicher: Standard */ }
   return neu;
 }
 
@@ -135,36 +152,42 @@ function karteHtml() {
     + '<div class="bf-balken"><i style="width:1%"></i></div></div></div>';
 }
 
-function stufenHtml(index) {
-  return STUFEN.map(([, name], i) => `<span class="${i < index ? "ok" : i === index ? "jetzt" : ""}">${i < index ? "✓ " : ""}${t(name)}</span>`).join("");
+function stufenHtml(index, art) {
+  return artInfo(art).stufen.map(([, name], i) => `<span class="${i < index ? "ok" : i === index ? "jetzt" : ""}">${i < index ? "✓ " : ""}${t(name)}</span>`).join("");
 }
 
 function zeichneKarte(karte, uebertragung) {
   const info = laufend.get(karte);
   if (!info) return;
-  const erwartet = erwarteteDauer();
+  const { stufen } = artInfo(info.art);
+  const erwartet = erwarteteDauer(undefined, info.art);
   const vergangen = Date.now() - info.start;
   const p = schaetzeProzent(vergangen, erwartet, uebertragung);
-  const stufe = uebertragung ? STUFEN.length - 1 : aktuelleStufe(p);
+  const stufe = uebertragung ? stufen.length - 1 : aktuelleStufe(p, info.art);
   karte.querySelector(".bf-ring").style.background = `conic-gradient(#2fd0bd 0 ${p}%,rgba(255,255,255,.12) ${p}% 100%)`;
   karte.querySelector(".bf-ring b").textContent = `${p}%`;
-  karte.querySelector(".bf-text strong").textContent = uebertragung ? t("Fast fertig") : t(STUFEN[stufe][1]);
+  karte.querySelector(".bf-text strong").textContent = uebertragung ? t("Fast fertig") : t(stufen[stufe][1]);
   karte.querySelector(".bf-text span").textContent = restzeitText(vergangen, erwartet, uebertragung);
   karte.querySelector(".bf-balken i").style.width = `${p}%`;
   karte.querySelector(".bf-wolke").style.opacity = String(0.55 + p / 220);
-  const stufen = karte.nextElementSibling?.classList?.contains("bf-stufen") ? karte.nextElementSibling : null;
-  if (stufen) stufen.innerHTML = stufenHtml(uebertragung ? STUFEN.length : stufe);
+  const leiste = karte.nextElementSibling?.classList?.contains("bf-stufen") ? karte.nextElementSibling : null;
+  if (leiste) leiste.innerHTML = stufenHtml(uebertragung ? stufen.length : stufe, info.art);
 }
 
-function starteKarte(karte, start = Date.now()) {
+function starteKarte(karte, start = Date.now(), art = "bild") {
   if (laufend.has(karte)) return;
   karte.classList.add("bild-fortschritt");
   karte.innerHTML = karteHtml();
   const stufen = karte.ownerDocument.createElement("div");
   stufen.className = "bf-stufen";
   karte.after(stufen);
-  laufend.set(karte, { start });
-  if (!erster) erster = start;
+  laufend.set(karte, { start, art });
+  if (art === "bild" && !erster) erster = start; // Bild-Dauer misst rahmeEin; Videos messen sich beim Abräumen
+}
+
+/** Bild oder Video? Der Platzhalter steht in der Schrittliste neben seinem Schritt („video|…“ vom Control). */
+export function platzhalterArt(platzhalter) {
+  return platzhalter?.parentElement?.querySelector?.('[data-schritt^="video|"]') ? "video" : "bild";
 }
 
 /** Alter Platzhalter (chat-schritte-anzeige.js) → unsere Karte im Platzhalter. */
@@ -173,7 +196,7 @@ function verbessereLaufende(doc, zeichnen = false) {
     p.classList.add("bild-karte-an");
     const karte = doc.createElement("div");
     p.append(karte);
-    starteKarte(karte);
+    starteKarte(karte, Date.now(), platzhalterArt(p));
   }
   // Übertragung: der Platzhalter ist schon weg, die Rohdaten laufen → eigene Karte VOR der Antwort
   // (dahinter liegt die Knopfleiste Kopieren/Vorlesen …; deren Baustein prüft den nächsten Nachbarn).
@@ -190,6 +213,8 @@ function verbessereLaufende(doc, zeichnen = false) {
     const imStrom = karte.classList.contains("bf-uebertragung");
     const weg = !karte.isConnected || (imStrom && !(karte.bfAusgabe?.isConnected && karte.bfAusgabe.classList.contains("medien-strom")));
     if (weg) {
+      const info = laufend.get(karte);
+      if (info?.art === "video" && !imStrom) merkeDauer(Date.now() - info.start, undefined, "video");
       karte.nextElementSibling?.classList?.contains("bf-stufen") && karte.nextElementSibling.remove();
       if (imStrom) karte.remove();
       laufend.delete(karte);
@@ -202,11 +227,21 @@ function verbessereLaufende(doc, zeichnen = false) {
 // ---------------------------------------------------------------------------
 // Fertige Bilder
 // ---------------------------------------------------------------------------
-function promptZu(bild) {
+/** Motiv aus dem Nutzerauftrag: ohne „Erstelle ein (neues) Bild von:“ und ohne „(Format 16:9)“ (rein, testbar). */
+export function motivAus(text) {
+  return ohneZusaetze(text)
+    .replace(/^(generiere|erzeuge|erstelle|male|zeichne)\s+(mir\s+)?((ein|eine|einen)\s+)?(neue[sn]?\s+)?(bild|foto|grafik|illustration|zeichnung)\s*(von|:)?\s*:?\s*/i, "")
+    .slice(0, 160);
+}
+
+function promptQuelle(bild) {
   let e = bild.closest(".entry")?.previousElementSibling;
   while (e && !e.classList?.contains("user")) e = e.previousElementSibling;
-  const text = String(e?.textContent || "").replace(/\s+/g, " ").trim();
-  return text.replace(/^(generiere|erstelle|male|zeichne)\s+(ein|mir ein)?\s*bild\s*(von|:)?\s*:?\s*/i, "").slice(0, 160) || t("Bild");
+  return String(e?.textContent || "");
+}
+
+function promptZu(bild) {
+  return motivAus(promptQuelle(bild)) || t("Bild");
 }
 
 async function alsDatei(bild) {
@@ -254,12 +289,16 @@ function teileJetzt(datei, bild, nurSichern) {
   document.body.append(a);
   a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  hinweis(t(DOWNLOAD_HINWEIS));
   return Promise.resolve();
 }
 
 async function teile(bild, nurSichern) {
   const src = bild.currentSrc || bild.src;
   const bereit = BEREIT.get(bild);
+  // Geraetebefund 18.11.2026 (Android-App/TWA): „Sichern“ laedt die Datei vom eigenen Server (attachment).
+  const vomServer = nurSichern && istAndroid() ? bildDownloadAdresse(src) : "";
+  if (vomServer) return ladeVomServer(vomServer);
   try {
     // Datei schon da: im selben Tipp teilen, ohne vorheriges Warten.
     if (bereit?.datei && bereit.src === src) return await teileJetzt(bereit.datei, bild, nurSichern);
@@ -288,14 +327,16 @@ function knoepfe(bild, beimSchliessen) {
   const aktionen = [
     ["⤓", t("Sichern"), () => teile(bild, true)],
     ["↗", t("Teilen"), () => teile(bild, false)],
-    ["✎", t("Ändern"), () => { beimSchliessen?.(); insFeld(`${t("Ändere das Bild")}: `); }],
+    // Messung 18.11.2026 (U4): keine Bearbeitung mehr vortäuschen – es entsteht ein neues Bild, das Original bleibt.
+    ["✎", t("Ändern"), () => { beimSchliessen?.(); insFeld(aenderungsText("bild", motivAus(promptQuelle(bild)))); }, t("Neues Bild mit geändertem Wunsch")],
     ["↻", t("Neu"), () => { beimSchliessen?.(); insFeld(`${t("Erstelle ein neues Bild von")}: ${promptZu(bild)}`); }]
   ];
-  for (const [zeichen, name, tun] of aktionen) {
+  for (const [zeichen, name, tun, hilfe] of aktionen) {
     const k = document.createElement("button");
     k.type = "button";
     k.textContent = `${zeichen} ${name}`;
-    k.setAttribute("aria-label", name);
+    k.setAttribute("aria-label", hilfe || name);
+    if (hilfe) k.title = hilfe;
     k.addEventListener("click", (e) => { e.stopPropagation(); tun(); });
     leiste.append(k);
   }

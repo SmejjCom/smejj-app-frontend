@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung বাংলা (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von bn-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./bn-2.js?v=2026111704";
+import zusatz from "./bn-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "প্রতিটি উত্তরে প্রযোজ্য — স্থায়ী নির্দেশের মতো। শুধু এই ডিভাইসে সংরক্ষিত।",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "নির্দেশনা সংরক্ষিত — পরের উত্তর থেকে কার্যকর।",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "smejj আপনার চ্যাট থেকে দরকারি বিষয় মনে রাখে। প্ল্যানের সঙ্গে চালু হবে।",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "সংরক্ষণ",
+  "Video sichern": "ভিডিও সংরক্ষণ",
+  "Erstelle ein neues Bild von": "এর নতুন ছবি তৈরি করো",
+  "Erstelle ein neues Video von": "এর নতুন ভিডিও তৈরি করো",
+  "aber": "কিন্তু",
+  "Neues Bild mit geändertem Wunsch": "পরিবর্তিত অনুরোধে নতুন ছবি",
+  "Neues Video mit geändertem Wunsch": "পরিবর্তিত অনুরোধে নতুন ভিডিও",
+  "Szenen entstehen": "দৃশ্য তৈরি হচ্ছে",
+  "Bewegung": "গতি",
+  "Video wird fertig": "ভিডিও শেষ হচ্ছে",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "ডাউনলোড শুরু হয়েছে – ফাইলটি একটু পরেই “ডাউনলোড”-এ দেখা যাবে।",
 };

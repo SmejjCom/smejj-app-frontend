@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung العربية (Quellsprache Deutsch als Schluessel, RTL).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ar-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ar-2.js?v=2026111704";
+import zusatz from "./ar-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "ينطبق على كل إجابة — مثل أمر دائم. يُحفظ على هذا الجهاز فقط.",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "تم حفظ التعليمات — وتسري بدءًا من الإجابة التالية.",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "يتذكّر smejj الأمور المفيدة من محادثاتك. يبدأ مع الخطط.",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "حفظ",
+  "Video sichern": "حفظ الفيديو",
+  "Erstelle ein neues Bild von": "أنشئ صورة جديدة لـ",
+  "Erstelle ein neues Video von": "أنشئ فيديو جديدًا لـ",
+  "aber": "لكن",
+  "Neues Bild mit geändertem Wunsch": "صورة جديدة بطلب معدّل",
+  "Neues Video mit geändertem Wunsch": "فيديو جديد بطلب معدّل",
+  "Szenen entstehen": "إنشاء المشاهد",
+  "Bewegung": "الحركة",
+  "Video wird fertig": "إنهاء الفيديو",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "بدأ التنزيل – سيظهر الملف بعد لحظات في «التنزيلات».",
 };

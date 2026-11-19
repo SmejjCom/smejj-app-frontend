@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Français (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von fr-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./fr-2.js?v=2026111704";
+import zusatz from "./fr-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "S'applique à chaque réponse, comme une consigne permanente. Enregistré uniquement sur cet appareil.",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "Instructions enregistrées : elles s'appliquent dès la prochaine réponse.",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "smejj retient ce qui est utile dans vos conversations. Disponible avec les forfaits.",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "Enregistrer",
+  "Video sichern": "Enregistrer la vidéo",
+  "Erstelle ein neues Bild von": "Crée une nouvelle image de",
+  "Erstelle ein neues Video von": "Crée une nouvelle vidéo de",
+  "aber": "mais",
+  "Neues Bild mit geändertem Wunsch": "Nouvelle image avec une demande modifiée",
+  "Neues Video mit geändertem Wunsch": "Nouvelle vidéo avec une demande modifiée",
+  "Szenen entstehen": "Création des scènes",
+  "Bewegung": "Mouvement",
+  "Video wird fertig": "Finalisation de la vidéo",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "Téléchargement lancé – le fichier apparaîtra dans un instant dans « Téléchargements ».",
 };

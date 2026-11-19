@@ -6,7 +6,7 @@
 // Das Eingabefeld selbst bleibt unveraendert (Design-Lock); die Reihe ist ein eigenes Element davor.
 // Nachtrag (Inhaber 13.11.2026, Mockup „Ja“): Standard 9:16 bei Bild und Video; beim Video in DERSELBEN
 // Zeile die Länge 5 · 10 · 15 s (Standard 5 s) — Zusatz „(Länge 10 s)“, Bruecke: laengeAusAuftrag.
-import { t } from "./i18n/ui.js?v=2026111704";
+import { t } from "./i18n/ui.js?v=2026111901";
 
 export const BILD_FORMATE = Object.freeze(["1:1", "9:16", "16:9", "4:3", "3:4"]);
 export const VIDEO_FORMATE = Object.freeze(["1:1", "9:16", "16:9"]);
@@ -15,14 +15,35 @@ export const STANDARD = Object.freeze({ bild: "9:16", video: "9:16", laenge: 5 }
 const SPEICHER = "smejj.medien.format.v1";
 const ZUSATZ = /\s*\(\s*Format\s+\d{1,2}:\d{1,2}\s*\)/gi;
 const LAENGE_ZUSATZ = /\s*\(\s*(?:Länge|Laenge|Dauer)\s+\d{1,2}\s*s\s*\)/gi;
-const VIDEO = /^\s*(generiere|erzeuge|erstelle|mach|mache|zeig|zeige)\s+(mir\s+)?(ein|einen|eine)\s+(video|film|clip|animation)\b|^\s*(generate|create|make)\s+(me\s+)?an?\s+(video|clip|animation)\b/i;
-const BILD = /^\s*(generiere|erzeuge|erstelle|mach|mache|zeichne|male)\s+(mir\s+)?(ein|eine|einen)\s+(bild|foto|grafik|illustration|zeichnung)\b|^\s*(generate|create|make|draw|paint)\s+(me\s+)?an?\s+(image|picture|photo|drawing)\b/i;
+// Messung 18.11.2026 (U11): Die Reihe erschien nur bei „Erstelle ein Bild/Foto/Grafik …“ – bei „eine Skizze“,
+// „ein neues Bild“ (Vorbelegung von „Ändern“/„Neu“) oder auf Türkisch fehlte sie, dann galt stumm 1:1.
+// Jetzt: mehr Bildwörter (Skizze, Logo, Gemälde, Aquarell, Poster/Plakat …), „neues/weiteres“, und die
+// Sprachen en/de/tr/es/fr/it (dieselben Formen wie die übersetzten Vorlagen „Generiere ein Bild von:“).
+const ENDE = "(?=$|[^\\p{L}])";
+const muster = (quelle) => new RegExp(quelle + ENDE, "iu");
+const VIDEO = [
+  muster("^\\s*(generiere|erzeuge|erstelle|mach|mache|zeig|zeige)\\s+(mir\\s+)?(bitte\\s+)?(ein|einen|eine)\\s+(neue[sn]?\\s+|weitere[sn]?\\s+|kurze[sn]?\\s+)?(video|film|clip|animation)"),
+  muster("^\\s*(generate|create|make)\\s+(me\\s+)?(an?|another)\\s+(new\\s+|short\\s+)?(video|clip|animation)"),
+  muster("(^|\\s)(video|videosu|videosunu|videoyu|klip|klibi|klibini|animasyon|animasyonu|animasyonunu)\\s+(oluştur|yap|üret|hazırla)"),
+  muster("^\\s*(crea|créame|creame|genera|genérame|generame|haz|hazme)\\s+(una?|otro)\\s+(nuevo\\s+)?(v[ií]deo|clip|animación)"),
+  muster("^\\s*(crée|cree|créez|génère|genere|générez|fais|faites)([\\s-]+moi)?\\s+(une?)\\s+(nouvelle\\s+|autre\\s+)?(vidéo|video|animation|clip)"),
+  muster("^\\s*(crea|creami|genera|generami|fai|fammi)\\s+(un\\s+|uno\\s+|un['’]\\s*)(nuovo\\s+|altro\\s+)?(video|clip|animazione)")
+];
+const BILD = [
+  muster("^\\s*(generiere|erzeuge|erstelle|mach|mache|zeichne|male|gestalte|entwirf)\\s+(mir\\s+)?(bitte\\s+)?(ein|eine|einen)\\s+(neue[sn]?\\s+|weitere[sn]?\\s+|andere[sn]?\\s+|kleine[sn]?\\s+)?(bildchen|bild|foto|grafik|illustration|zeichnung|skizze|logo|gemälde|gemaelde|aquarell|poster|plakat)"),
+  muster("^\\s*(generate|create|make|draw|paint|design|sketch)\\s+(me\\s+)?(an?|another)\\s+(new\\s+)?(image|picture|photo|drawing|sketch|logo|illustration|painting|poster|watercolou?r)"),
+  muster("(^|\\s)(resim|resmi|resmini|görsel|görseli|görselini|fotoğraf|fotoğrafı|fotoğrafını|foto|fotosu|fotosunu|çizim|çizimi|çizimini|logo|logosu|logosunu|eskiz|eskizi|eskizini|afiş|afişi|afişini|poster|posteri|posterini|tablo|tablosu|tablosunu|illüstrasyon|illüstrasyonu|illüstrasyonunu)\\s+(oluştur|çiz|yap|üret|tasarla|hazırla)"),
+  muster("^\\s*(crea|créame|creame|genera|genérame|generame|haz|hazme|dibuja|dibújame|pinta|píntame|diseña)\\s+(una?|otra|otro)\\s+(nueva\\s+|nuevo\\s+)?(imagen|foto|fotografía|ilustración|dibujo|boceto|logo|logotipo|pintura|acuarela|póster|cartel)"),
+  muster("^\\s*(crée|cree|créez|génère|genere|générez|fais|faites|dessine|dessinez|peins|peignez)([\\s-]+moi)?\\s+(une?)\\s+(nouvelle\\s+|nouvel\\s+|nouveau\\s+|autre\\s+)?(image|photo|illustration|dessin|esquisse|croquis|logo|peinture|aquarelle|affiche|poster)"),
+  muster("^\\s*(crea|creami|genera|generami|fai|fammi|disegna|disegnami|dipingi|dipingimi)\\s+(una\\s+|uno\\s+|un\\s+|un['’]\\s*)(nuova\\s+|nuovo\\s+|altra\\s+)?(immagine|foto|illustrazione|disegno|schizzo|logo|dipinto|acquerello|poster|locandina)")
+];
+const trifft = (liste, text) => liste.some((m) => m.test(text));
 
 /** Welche Medienart steht im Feld? "video" | "bild" | "" (rein, testbar). */
 export function medienArt(text, vorlagen = {}) {
   const wert = String(text || "");
-  if ((vorlagen.video && wert.startsWith(vorlagen.video)) || VIDEO.test(wert)) return "video";
-  if ((vorlagen.bild && wert.startsWith(vorlagen.bild)) || BILD.test(wert)) return "bild";
+  if ((vorlagen.video && wert.startsWith(vorlagen.video)) || trifft(VIDEO, wert)) return "video";
+  if ((vorlagen.bild && wert.startsWith(vorlagen.bild)) || trifft(BILD, wert)) return "bild";
   return "";
 }
 
@@ -61,7 +82,8 @@ function stil() {
 #start .medien-format .mf-chip i{display:inline-block;border:2px solid currentColor;border-radius:2px;flex:none}
 #start .medien-format .mf-reihe.mf-video{gap:5px}
 #start .medien-format .mf-reihe.mf-video button.mf-chip.mf-chip{padding:0 8px!important;font-size:13.5px!important;gap:4px!important}
-#start .medien-format .mf-trenn{width:1px;align-self:stretch;margin:5px 2px;background:rgba(127,127,127,.5)}`;
+#start .medien-format .mf-trenn{width:1px;align-self:stretch;margin:5px 2px;background:rgba(127,127,127,.5)}
+#startLog.mf-polster::after{content:"";display:block;flex:none;height:var(--mf-reihe-polster,0px);pointer-events:none}`;
   document.head.append(s);
 }
 
@@ -140,12 +162,18 @@ export function initMedienFormat({ dokument = document } = {}) {
   // Liegt die Eingabe im Fluss (Computer, Startseite in der Mitte), steht die Reihe im Fluss darunter.
   // Geraetebefund 17.11.2026 (iPhone): die schwebende Reihe lag ueber der Knopfzeile der letzten Antwort.
   // Solange sie sichtbar ist, bekommt der Verlauf ihre Hoehe als Zusatzpolster (am Ende bleibt er am Ende).
+  // Geraetebefund 18.11.2026 (iPhone + Pixel): Das Polster war eine feste Pixelzahl im Inline-Stil und
+  // ueberschrieb die mitwachsende Regel (Feldhoehe + Home-Leiste/Tastatur). Wuchs das Feld auf zwei Zeilen
+  // oder ging die Tastatur zu, lagen Antwortzeilen und Knopfzeile unter Feld und Reihe. Jetzt bleibt die
+  // Regel des Verlaufs unberuehrt; die Reihe bringt ihre Hoehe als eigenes Endstueck (::after) mit.
   function polster(an) {
     const log = dokument.getElementById("startLog");
     if (!log?.style) return;
     const amEnde = log.scrollHeight - log.scrollTop - log.clientHeight < 40;
-    log.style.paddingBottom = "";
-    if (an) log.style.paddingBottom = `${(parseFloat(getComputedStyle(log).paddingBottom) || 0) + reihe.offsetHeight + 8}px`;
+    if (log.style.paddingBottom) log.style.paddingBottom = ""; // Altlast frueherer Fassung
+    log.classList.toggle("mf-polster", Boolean(an));
+    if (an) log.style.setProperty("--mf-reihe-polster", `${reihe.offsetHeight + 8}px`);
+    else log.style.removeProperty("--mf-reihe-polster");
     if (amEnde) log.scrollTop = log.scrollHeight;
   }
   function lege() {
@@ -166,6 +194,8 @@ export function initMedienFormat({ dokument = document } = {}) {
   }
   if (typeof ResizeObserver === "function") new ResizeObserver(() => requestAnimationFrame(lege)).observe(glas);
   globalThis.addEventListener?.("resize", lege);
+  // Tastatur auf/zu verschiebt das Feld, ohne dass es seine Groesse aendert: Reihe neu anlegen.
+  globalThis.visualViewport?.addEventListener?.("resize", () => requestAnimationFrame(lege));
 
   function pruefe() {
     const neu = medienArt(feld.value, vorlagen());

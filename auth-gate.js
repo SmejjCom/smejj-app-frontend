@@ -15,9 +15,9 @@
 // gilt der Besucher als abgemeldet und landet auf der Anmeldeseite. Lieber
 // einmal zu viel anmelden als die Anmelde-Pflicht still verlieren.
 
-import { API_ORIGIN, STORAGE_KEYS } from "./config.js?v=2026111704";
-import { initOfflineBanner } from "./offline-banner.js?v=2026111704";
-import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026111704";
+import { API_ORIGIN, STORAGE_KEYS } from "./config.js?v=2026111901";
+import { initOfflineBanner } from "./offline-banner.js?v=2026111901";
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026111901";
 
 // App-Shell-weiter Offline-Hinweis (Audit 2026-08-09). Hier eingehaengt, weil das
 // Gate ohnehin auf allen App- und Landeseiten laeuft (profile-dock.js,
@@ -212,18 +212,8 @@ export function zeigeAbgelaufenHinweis(win) {
   streifen.append(text, link, zu);
   dok.body.appendChild(streifen);
   legePlatzAn(dok);
-  // WIE HOCH BIN ICH? — die Frage muss beantwortbar sein, sonst deckt dieser
-  // Streifen andere Bedienelemente zu.
-  //
-  // GEMESSEN 2026-09-10 (375x812): der Streifen ist 105 px hoch, liegt fix am
-  // oberen Rand und traegt z-index 2147483000 — mehr als jedes Overlay der App.
-  // Sein "Spaeter"-Knopf lag damit genau auf dem X des Sprachmodus, das seit
-  // heute oben rechts sitzt: die Sprachwelt liess sich nicht mehr schliessen
-  // (Escape ging noch, sichtbar war sie blockiert).
-  //
-  // Kein z-index-Wettruesten: der Streifen SOLL oben liegen, er meldet etwas
-  // Wichtiges. Stattdessen sagt er seine Hoehe an, und wer darunter Platz
-  // braucht, rechnet sie ein (composer-tools.css: --hinweis-hoehe).
+  // Hoehe ansagen (gemessen 10.09.: 105 px verdeckten das X des Sprachmodus);
+  // wer darunter Platz braucht, rechnet sie ein (composer-tools.css: --hinweis-hoehe).
   meldeHoehe(dok, Math.ceil(streifen.getBoundingClientRect().height) || 0);
   // Der Streifen bricht je nach Breite unterschiedlich um — bei einer
   // Drehung aendert sich seine Hoehe. Ohne diesen Beobachter bliebe der alte
@@ -347,7 +337,7 @@ export async function holeApiTokenUeberCookie(win, { fetchFn = globalThis.fetch,
  *
  * @param {object} win window-artiges Objekt
  * @param {{fetchFn?: Function, apiOrigin?: string, jetztPruefen?: boolean}} [deps]
- * @returns {Promise<"kein-token"|"gueltig"|"abgelaufen"|"unklar"|"oeffentlich">}
+ * @returns {Promise<"kein-token"|"gueltig"|"gerettet"|"abgelaufen"|"unklar"|"oeffentlich">}
  */
 export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, apiOrigin = API_ORIGIN, speicher = authMeSpeicher } = {}) {
   let token = "";
@@ -387,6 +377,11 @@ export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, api
     return "unklar"; // offline oder Zeitueberschreitung: nichts tun.
   }
   if (urteil !== false) return "gueltig";
+
+  // 18.11.2026: erst still retten (sitzung-retten.js), dann fragen.
+  try {
+    if (await (await import("./sitzung-retten.js?v=2026111901")).retteSitzung(win, { fetchFn, apiOrigin, token })) { speicher.verwerfen?.(); return "gerettet"; }
+  } catch {}
 
   // Alle angemeldeten Sitzungen (Google, Passkey, E-Mail) sind dauerhaft: niemals eigenmaechtig abmelden
   try {

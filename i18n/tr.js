@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Türkçe (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von tr-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./tr-2.js?v=2026111704";
+import zusatz from "./tr-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "Her yanıt için geçerlidir — kalıcı bir talimat gibi. Yalnızca bu cihazda saklanır.",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "Talimatlar kaydedildi — bir sonraki yanıttan itibaren geçerli.",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "smejj sohbetlerindeki işe yarar bilgileri hatırlar. Planlarla birlikte başlar.",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "Kaydet",
+  "Video sichern": "Videoyu kaydet",
+  "Erstelle ein neues Bild von": "Yeni bir resim oluştur",
+  "Erstelle ein neues Video von": "Yeni bir video oluştur",
+  "aber": "ama",
+  "Neues Bild mit geändertem Wunsch": "Değiştirilmiş istekle yeni resim",
+  "Neues Video mit geändertem Wunsch": "Değiştirilmiş istekle yeni video",
+  "Szenen entstehen": "Sahneler oluşuyor",
+  "Bewegung": "Hareket",
+  "Video wird fertig": "Video tamamlanıyor",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "İndirme başladı – dosya birazdan “İndirilenler” klasöründe görünecek.",
 };

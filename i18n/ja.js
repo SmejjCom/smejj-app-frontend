@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 日本語 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ja-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ja-2.js?v=2026111704";
+import zusatz from "./ja-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "すべての回答に適用されます（継続的な指示）。この端末にのみ保存されます。",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "指示を保存しました。次の回答から適用されます。",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "smejj はチャットの中の役立つ情報を覚えます。プランと同時に開始します。",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "保存",
+  "Video sichern": "動画を保存",
+  "Erstelle ein neues Bild von": "次の新しい画像を作成",
+  "Erstelle ein neues Video von": "次の新しい動画を作成",
+  "aber": "ただし",
+  "Neues Bild mit geändertem Wunsch": "変更した内容で新しい画像",
+  "Neues Video mit geändertem Wunsch": "変更した内容で新しい動画",
+  "Szenen entstehen": "シーンを作成中",
+  "Bewegung": "動き",
+  "Video wird fertig": "動画を仕上げ中",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "ダウンロードを開始しました。ファイルはまもなく「ダウンロード」に表示されます。",
 };

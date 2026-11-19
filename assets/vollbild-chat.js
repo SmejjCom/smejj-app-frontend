@@ -34,6 +34,25 @@ export function beobachteFeld(doc = document, Beobachter = typeof ResizeObserver
   new Beobachter(setze).observe(glas);
   setze();
   if (log) haltEndeSichtbar(log, Beobachter);
+  if (log) haltEndeBeiMedien(log);
+  return true;
+}
+
+// Geraetebefund 18.11.2026 (iPhone, Video fertig): Bilder und Videos bekommen ihre Hoehe erst, wenn sie
+// geladen sind – NACH dem Mitlaufen der Antwort. Der Verlauf wurde laenger, scrollTop blieb stehen, und die
+// letzten Zeilen samt Knopfzeile lagen hinter dem Eingabefeld. Stand der Verlauf am Ende, bleibt er dort.
+export function haltEndeBeiMedien(log) {
+  if (!log?.addEventListener || log.dataset.endeMedien === "an") return false;
+  log.dataset.endeMedien = "an";
+  const nahAmEnde = () => log.scrollHeight - log.scrollTop - log.clientHeight < NAH_AM_ENDE_PX;
+  let amEnde = nahAmEnde();
+  log.addEventListener("scroll", () => { amEnde = nahAmEnde(); }, { passive: true });
+  const geladen = (ereignis) => {
+    if (!/^(IMG|VIDEO)$/.test(ereignis.target?.tagName || "") || !amEnde) return;
+    log.scrollTop = log.scrollHeight;
+  };
+  log.addEventListener("load", geladen, true);
+  log.addEventListener("loadedmetadata", geladen, true);
   return true;
 }
 

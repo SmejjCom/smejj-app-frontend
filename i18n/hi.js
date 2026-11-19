@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung हिन्दी (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von hi-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./hi-2.js?v=2026111704";
+import zusatz from "./hi-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "हर उत्तर पर लागू — एक स्थायी निर्देश की तरह। केवल इसी डिवाइस पर सहेजा जाता है।",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "निर्देश सहेजे गए — ये अगले उत्तर से लागू होंगे।",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "smejj आपकी बातचीत से उपयोगी बातें याद रखता है। योजनाओं के साथ शुरू होगा।",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "सहेजें",
+  "Video sichern": "वीडियो सहेजें",
+  "Erstelle ein neues Bild von": "इसकी नई तस्वीर बनाओ",
+  "Erstelle ein neues Video von": "इसका नया वीडियो बनाओ",
+  "aber": "लेकिन",
+  "Neues Bild mit geändertem Wunsch": "बदले हुए अनुरोध के साथ नई तस्वीर",
+  "Neues Video mit geändertem Wunsch": "बदले हुए अनुरोध के साथ नया वीडियो",
+  "Szenen entstehen": "दृश्य बन रहे हैं",
+  "Bewegung": "गति",
+  "Video wird fertig": "वीडियो पूरा हो रहा है",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "डाउनलोड शुरू हो गया – फ़ाइल कुछ ही पलों में “डाउनलोड” में दिखेगी।",
 };

@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung Bahasa Indonesia (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von id-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./id-2.js?v=2026111704";
+import zusatz from "./id-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "Berlaku untuk setiap jawaban — seperti instruksi tetap. Disimpan hanya di perangkat ini.",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "Instruksi disimpan — berlaku mulai jawaban berikutnya.",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "smejj mengingat hal berguna dari obrolanmu. Hadir bersama paket langganan.",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "Simpan",
+  "Video sichern": "Simpan video",
+  "Erstelle ein neues Bild von": "Buat gambar baru tentang",
+  "Erstelle ein neues Video von": "Buat video baru tentang",
+  "aber": "tetapi",
+  "Neues Bild mit geändertem Wunsch": "Gambar baru dengan permintaan yang diubah",
+  "Neues Video mit geändertem Wunsch": "Video baru dengan permintaan yang diubah",
+  "Szenen entstehen": "Membuat adegan",
+  "Bewegung": "Gerakan",
+  "Video wird fertig": "Menyelesaikan video",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "Unduhan dimulai – file akan segera muncul di “Unduhan”.",
 };

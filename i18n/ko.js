@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 한국어 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von ko-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./ko-2.js?v=2026111704";
+import zusatz from "./ko-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "모든 답변에 적용됩니다 — 상시 지침처럼. 이 기기에만 저장됩니다.",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "지침을 저장했습니다 — 다음 답변부터 적용됩니다.",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "smejj는 대화에서 유용한 내용을 기억합니다. 요금제와 함께 시작됩니다.",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "저장",
+  "Video sichern": "동영상 저장",
+  "Erstelle ein neues Bild von": "다음 새 이미지를 생성",
+  "Erstelle ein neues Video von": "다음 새 동영상을 생성",
+  "aber": "하지만",
+  "Neues Bild mit geändertem Wunsch": "바뀐 요청으로 새 이미지",
+  "Neues Video mit geändertem Wunsch": "바뀐 요청으로 새 동영상",
+  "Szenen entstehen": "장면 만드는 중",
+  "Bewegung": "움직임",
+  "Video wird fertig": "동영상 마무리 중",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "다운로드가 시작되었습니다. 파일이 곧 ‘다운로드’에 표시됩니다.",
 };

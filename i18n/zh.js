@@ -1,7 +1,7 @@
 // smejj.com — UI-Uebersetzung 中文 (Quellsprache Deutsch als Schluessel).
 // Abschnitts-Kommentare am 22.09.2026 entfernt (800-Zeilen-Regel) — die Herkunft jedes Schluessels steht im Git-Verlauf.
 // 23.09.2026: der Block vor "...zusatz" wanderte an den Anfang von zh-2.js (Datei stand bei 788 Zeilen); Rangfolge unveraendert.
-import zusatz from "./zh-2.js?v=2026111704";
+import zusatz from "./zh-2.js?v=2026111901";
 
 export default {
   // Video abgelaufen (IDrive e2, 24.09.2026)
@@ -524,4 +524,16 @@ export default {
   "Gilt für jede Antwort — wie ein Dauerauftrag. Gespeichert nur auf diesem Gerät.": "适用于每一次回答，就像长期指令。仅保存在本设备上。",
   "Anweisungen gespeichert — sie gelten ab der nächsten Antwort.": "指令已保存，将从下一次回答开始生效。",
   "smejj merkt sich Nützliches aus deinen Chats. Startet zusammen mit den Plänen.": "smejj 会记住聊天中有用的内容。将与套餐一同推出。",
+  // Medien-Korrekturen 18.11.2026 (Sichern/Ändern/Video-Stufen)
+  "Sichern": "保存",
+  "Video sichern": "保存视频",
+  "Erstelle ein neues Bild von": "生成这个的新图片",
+  "Erstelle ein neues Video von": "生成这个的新视频",
+  "aber": "但是",
+  "Neues Bild mit geändertem Wunsch": "按修改后的要求生成新图片",
+  "Neues Video mit geändertem Wunsch": "按修改后的要求生成新视频",
+  "Szenen entstehen": "正在生成场景",
+  "Bewegung": "动作",
+  "Video wird fertig": "视频即将完成",
+  "Download gestartet – die Datei erscheint gleich unter „Downloads“.": "已开始下载——文件稍后会出现在“下载”中。",
 };
