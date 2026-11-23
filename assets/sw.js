@@ -182,8 +182,8 @@
 // in docs/frontend/SW_VERSIONSVERLAUF_2026-08.md, so wie es der Kopf dieser
 // Datei verlangt (Touch-Ziele auf 44 px, Startseite und alle 16 Ansichten).
 // Wer den naechsten Stand sucht, schaut also besser dorthin als hierher.
-const CACHE_NAME = "smejj-shell-v1151";
-const ASSET_BUILD = "2026111901";
+const CACHE_NAME = "smejj-shell-v1152";
+const ASSET_BUILD = "2026112001";
 const SHELL = [
   "/",
   "/assets/start-styles.css",
@@ -287,7 +287,7 @@ const SHELL = [
   "/assets/search-overlay.js",
   "/assets/view-chrome.js",
   "/assets/composer-tools.js",
-  "/assets/pwa-schnellstart.js",
+  "/assets/pwa-schnellstart.js", "/assets/update-hinweis.js", // v1152: Update-Leiste, bei Bedarf geladen
   "/assets/teilen-ziel.js",
   "/assets/teilen-ziel-logik.js",
   "/assets/mobil-tastatur.js",

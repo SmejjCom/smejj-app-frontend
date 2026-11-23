@@ -5,8 +5,8 @@
 // Die echte Aktionszeile der Nachricht wird für die Dauer der Ansicht HIER eingehängt (alle Knöpfe
 // funktionieren unverändert) und beim Schließen an ihren Platz zurückgelegt.
 // Schließen: ✕, nach unten wischen, Escape oder Senden einer neuen Nachricht.
-import { t } from "./i18n/ui.js?v=2026111901";
-import { API_ORIGIN } from "./config.js?v=2026111901";
+import { t } from "./i18n/ui.js?v=2026112001";
+import { API_ORIGIN } from "./config.js?v=2026112001";
 
 export const HOCHKANT_AB = 1.6; // Höhe/Breite: 9:16 = 1,78; 3:4 = 1,33 bleibt normal
 const HANDY = "(max-width: 700px)";
@@ -59,6 +59,50 @@ export function videoPlatzhalter(video) {
   BEKANNT.add(platz); // kein zweites Auto-Vollbild für die Kopie
   try { platz.muted = true; } catch { /* egal */ }
   return platz;
+}
+
+// Samsung 20.11.2026 (Fehler 2): Nach einem fertigen Bild stand auf dem Handy die Tastatur offen und verdeckte
+// das Bild (Feld behielt den Fokus, z. B. nach Senden mit der Eingabetaste). Auf Touch-Geräten gilt darum:
+// Öffnet ein Medien-Vollbild, wird ein fokussiertes Eingabefeld gelöst (Text bleibt), und solange es offen ist,
+// bekommt das Feld keinen Fokus ohne eigenen Tipp hinein. Am Computer (Maus) bleibt alles wie bisher.
+const MEDIEN_VOLLBILD = ".hochkant-ansicht, .bild-vollbild";
+const EIGENER_TIPP_MS = 1500;
+
+export function beruehrung(win = globalThis) {
+  return typeof win?.matchMedia === "function" && win.matchMedia("(pointer: coarse)").matches;
+}
+
+/** Löst den Fokus des Eingabefelds auf Touch-Geräten (Tastatur geht zu, Text bleibt). true = gelöst. */
+export function loeseEingabeFokus(doc = globalThis.document, win = globalThis) {
+  const feld = doc?.activeElement;
+  if (!feld || feld.id !== "startMessage" || !beruehrung(win) || typeof feld.blur !== "function") return false;
+  feld.blur();
+  return true;
+}
+
+/** Wacht einmal pro Dokument: kein Fokus ohne Tipp, solange ein Medien-Vollbild offen ist. */
+export function schuetzeMedienVollbild(doc = globalThis.document, win = globalThis) {
+  if (!doc?.addEventListener || doc.smejjMedienFokusWache) return false;
+  doc.smejjMedienFokusWache = true;
+  let letzterTipp = 0;
+  const tipp = (e) => { if (e.target?.closest?.("#startMessage")) letzterTipp = Date.now(); };
+  doc.addEventListener("pointerdown", tipp, true);
+  doc.addEventListener("touchstart", tipp, { capture: true, passive: true });
+  doc.addEventListener("focusin", (e) => {
+    if (e.target?.id !== "startMessage" || !doc.querySelector?.(MEDIEN_VOLLBILD)) return;
+    if (Date.now() - letzterTipp < EIGENER_TIPP_MS) return; // eigener Tipp ins Feld: Tastatur gewollt
+    loeseEingabeFokus(doc, win);
+  }, true);
+  // Das normale Bild-Vollbild (bild-erstellen.js) hängt direkt am body.
+  const Beobachter = doc.defaultView?.MutationObserver || globalThis.MutationObserver;
+  if (typeof Beobachter === "function" && doc.body) {
+    new Beobachter((liste) => {
+      for (const m of liste) {
+        for (const n of m.addedNodes) if (n?.matches?.(MEDIEN_VOLLBILD)) { loeseEingabeFokus(doc, win); return; }
+      }
+    }).observe(doc.body, { childList: true });
+  }
+  return true;
 }
 
 export function schliesseHochkant() {
@@ -163,6 +207,7 @@ export function oeffneHochkant(medium, { knoepfe, zoom } = {}) {
   }
   box.append(kopie, verlauf, zu, unten);
   feed.append(box);
+  loeseEingabeFokus(doc, doc.defaultView || globalThis);
   feed.classList.add("hochkant-offen");
   // Unterkante der Knöpfe genau über dem Eingabefeld.
   const lege = () => box.style.setProperty("--hk-unten", `${Math.max(90, feed.clientHeight - glas.offsetTop + 12)}px`);
@@ -318,12 +363,32 @@ export function aenderungsText(art, motiv) {
   return alt ? `${anfang}: ${alt}, ${t("aber")} ` : `${anfang}: `;
 }
 
-async function teileLink(video) {
-  const url = video?.currentSrc || video?.src || "";
+// Sicherheitspruefung 22.11.2026 (A4): „Teilen“ gab bisher die e2-Leseadresse weiter – samt X-Amz-Credential
+// (Kennung des Speicherschluessels), Eimername und Signatur, 7 Tage gueltig. Signierte Adressen verlassen die
+// App jetzt nie mehr: geteilt wird die Datei selbst (geholt ueber den eigenen Server), sonst ein Hinweis.
+const SIGNIERT = /[?&](?:X-Amz-[A-Za-z]+|Signature|AWSAccessKeyId|Expires|sig|token)=/i;
+
+/** Adresse, die man gefahrlos als Link teilen darf; "" fuer signierte oder e2-Adressen (rein, testbar). */
+export function teilbareAdresse(url) {
+  const quelle = String(url || "");
+  if (!/^https?:\/\//i.test(quelle) || SIGNIERT.test(quelle) || /\.idrivee2\.com\//i.test(quelle)) return "";
+  return quelle;
+}
+
+/** Teilen eines Videos: Datei ins Teilen-Menue, nie die signierte Speicheradresse. */
+export async function teileVideo(video, { bereit = null, holen, nav = globalThis.navigator, doc = globalThis.document } = {}) {
+  const quelle = video?.currentSrc || video?.src || "";
   try {
-    if (navigator.share) return await navigator.share({ url });
-    await navigator.clipboard?.writeText(url);
-  } catch { /* abgebrochen */ }
+    const datei = bereit || await holeVideoDatei(quelle, holen);
+    if (datei && nav?.share && nav.canShare?.({ files: [datei] })) return await nav.share({ files: [datei] });
+    const link = teilbareAdresse(quelle);
+    if (link && nav?.share) return await nav.share({ url: link });
+    if (datei) return await sichereDatei(datei, { nav, doc });
+    medienHinweis(t("Teilen hat nicht geklappt. Bitte noch einmal versuchen."), doc);
+  } catch (fehler) {
+    if (fehler?.name === "NotAllowedError") medienHinweis(t("Das Video ist jetzt bereit. Bitte noch einmal tippen."), doc);
+    /* sonst: selbst abgebrochen = still */
+  }
   return undefined;
 }
 
@@ -345,7 +410,7 @@ export function ergaenzeSichernKnopf(video) {
   k.addEventListener("click", (e) => {
     e.stopPropagation();
     const aktuell = eintrag.querySelector("video") || video;
-    sichereVideo(aktuell, null, { teilen: () => teileLink(aktuell) });
+    sichereVideo(aktuell, null, { teilen: () => teileVideo(aktuell) });
   });
   const mehr = leiste.querySelector('[data-act="menu"]');
   if (mehr) mehr.before(k); else leiste.append(k);
@@ -364,7 +429,7 @@ function videoKnoepfe(video) {
       feld.dispatchEvent(new Event("input", { bubbles: true }));
       feld.focus({ preventScroll: true });
     };
-    const teilen = () => teileLink(video);
+    const teilen = () => teileVideo(video, { bereit: datei });
     const motiv = () => {
       let e = eintragVorher?.previousElementSibling;
       while (e && !e.classList?.contains("user")) e = e.previousElementSibling;
@@ -425,7 +490,7 @@ export function starteHochkantVideos(doc = document) {
 }
 
 if (typeof document !== "undefined" && typeof MutationObserver !== "undefined") {
-  const los = () => starteHochkantVideos();
+  const los = () => { starteHochkantVideos(); schuetzeMedienVollbild(); };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", los, { once: true });
   else los();
 }

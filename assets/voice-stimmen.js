@@ -25,8 +25,9 @@ export const STIMMEN = {
   ],
   en: [
     { id: "amy", name: "Amy", geschlecht: "w", art: "freundlich und natürlich", sprache: "English (US)" },
+    // 22.11.2026 (Inhaber „Freigabe: Mach 100 % komplett fertig, lass nicht offen.“): „Lessac“ (Datensatz nicht kommerziell)
+    // ist raus; Kristin (gemeinfrei) ist die englische Standardstimme. Gespeicherte Wahl „lessac“ -> ALTE_KENNUNGEN.
     { id: "kristin", name: "Kristin", geschlecht: "w", art: "ruhig und angenehm", sprache: "English (US)" },
-    { id: "lessac", name: "Lessac", geschlecht: "w", art: "professionell", sprache: "English (US)" },
     { id: "alba", name: "Alba", geschlecht: "w", art: "jung und dynamisch", sprache: "English (UK)" },
     { id: "jenny", name: "Jenny", geschlecht: "w", art: "warm und sympathisch", sprache: "English (UK)" },
     { id: "ryan", name: "Ryan", geschlecht: "m", art: "freundlich und natürlich", sprache: "English (US)" },
@@ -37,8 +38,11 @@ export const STIMMEN = {
   ]
 };
 
-/** Standard je Sprache = die bisher live gesprochene Stimme (keine Ueberraschung nach dem Update). */
-export const STANDARD_STIMME = { de: "thorsten", en: "lessac" };
+/** Standard je Sprache. Englisch: Kristin — die Bruecke sprach die alte Standard-Kennung „lessac“ schon mit Kristin. */
+export const STANDARD_STIMME = { de: "thorsten", en: "kristin" };
+
+/** Fruehere Kennungen, die nicht mehr in der Liste stehen: gespeicherte Wahl bleibt gueltig (alt -> neu). */
+export const ALTE_KENNUNGEN = { en: { lessac: "kristin" } };
 
 // tempo: Sprechgeschwindigkeit (1 = Modellvorgabe), ausdruck: Lebendigkeit der
 // Betonung (Piper noise_scale). Werte lokal gegen Piper nachgemessen.
@@ -75,7 +79,9 @@ export function leseStimmWahl(speicher = typeof localStorage !== "undefined" ? l
   try { roh = JSON.parse(speicher?.getItem(SPEICHER_SCHLUESSEL) || "{}") || {}; } catch { roh = {}; }
   const stimmen = {};
   for (const sprache of Object.keys(STIMMEN)) {
-    const id = roh?.stimmen?.[sprache];
+    const gespeichert = roh?.stimmen?.[sprache];
+    const id = (typeof gespeichert === "string" && Object.hasOwn(ALTE_KENNUNGEN[sprache] || {}, gespeichert))
+      ? ALTE_KENNUNGEN[sprache][gespeichert] : gespeichert;
     stimmen[sprache] = STIMMEN[sprache].some((s) => s.id === id) ? id : STANDARD_STIMME[sprache];
   }
   const persoenlichkeit = PERSOENLICHKEITEN.some((p) => p.id === roh?.persoenlichkeit) ? roh.persoenlichkeit : "freundlich";
