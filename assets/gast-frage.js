@@ -63,7 +63,7 @@
     try {
       // Derselbe sichere Renderer wie im angemeldeten Chat. Erst nach Ende
       // des Streams auszeichnen: weitere Textstuecke wuerden Links loeschen.
-      var renderer = await import("./chat-markdown.js?v=2026112302");
+      var renderer = await import("./chat-markdown.js?v=2026112303");
       renderer.renderChatMarkdown(text);
     } catch (fehler) { /* bei Ladefehlern bleibt die vollstaendige Textantwort */ }
   }
@@ -119,7 +119,7 @@
 
   // Der Strom kommt als SSE-Zeilen ("data: {…}"). Ein Stück kann mitten in
   // einer Zeile enden — darum wird der Rest gepuffert und nie geraten.
-  function lies(stueck, puffer, schreibe) {
+  function lies(stueck, puffer, schreibe, ende) {
     var daten = puffer + stueck;
     var zeilen = daten.split("\n");
     var rest = zeilen.pop();
@@ -127,7 +127,7 @@
       var z = zeilen[i].trim();
       if (!z.indexOf("data:")) {
         var roh = z.slice(5).trim();
-        if (roh === "[DONE]") continue;
+        if (roh === "[DONE]") { if (ende) ende(); continue; }
         try {
           var stueckchen = JSON.parse(roh);
           if (stueckchen && stueckchen.model) letztesModell = String(stueckchen.model);
@@ -231,6 +231,32 @@
   // verloren. Solange eine Gast-Anfrage laeuft, ist die Form aria-busy und
   // jede weitere Anfrage wird ignoriert (willkommen-fokus.js prueft dasselbe).
   var laeuft = false;
+  // Stufe 6 (23.11.2026, Befund F1): Die Karte verspricht „Weiterfragen geht sofort“, geschickt wurde aber nur die
+  // aktuelle Frage („Und das Doppelte davon?“ → „Bezugswert fehlt“). Jetzt reist der Verlauf DIESES Seitenbesuchs mit –
+  // nur im Arbeitsspeicher (nichts Neues gespeichert), nur fertige Antworten (abgebrochene/fehlgeschlagene nie),
+  // begrenzt auf die letzten VERLAUF_MAX Nachrichten und Zeichen je Nachricht/gesamt (keine aufgeblaehten Anfragen).
+  var VERLAUF_MAX = 6, VERLAUF_ZEICHEN_JE = 1500, VERLAUF_ZEICHEN_GESAMT = 6000;
+  var verlauf = [];
+  function verlaufKuerze(t) {
+    var z = Array.from(String(t == null ? "" : t).trim());
+    return z.length <= VERLAUF_ZEICHEN_JE ? z.join("") : z.slice(0, VERLAUF_ZEICHEN_JE).join("") + " …";
+  }
+  // liste: abwechselnd user/assistant (immer ganze Paare). Neueste Paare zuerst gewaehlt, Reihenfolge bleibt.
+  function verlaufBauen(liste, frage) {
+    var aus = [], summe = 0;
+    for (var i = liste.length - 2; i >= 0 && aus.length + 2 <= VERLAUF_MAX; i -= 2) {
+      var f = verlaufKuerze(liste[i].content), a = verlaufKuerze(liste[i + 1].content);
+      var laenge = Array.from(f).length + Array.from(a).length;
+      if (!f || !a || summe + laenge > VERLAUF_ZEICHEN_GESAMT) break;
+      summe += laenge;
+      aus.unshift({ role: "user", content: f }, { role: "assistant", content: a });
+    }
+    return aus.concat([{ role: "user", content: frage }]);
+  }
+  function verlaufMerken(frage, antwort) {
+    verlauf.push({ role: "user", content: verlaufKuerze(frage) }, { role: "assistant", content: verlaufKuerze(antwort) });
+    if (verlauf.length > VERLAUF_MAX) verlauf = verlauf.slice(verlauf.length - VERLAUF_MAX);
+  }
   function beschaeftigt(el, an) {
     try { if (an) el.setAttribute("aria-busy", "true"); else el.removeAttribute("aria-busy"); } catch (fehler) { /* ohne Attribut sperrt laeuft trotzdem */ }
   }
@@ -257,6 +283,7 @@
       return true;
     }
     var antwort = "";
+    var regulaerZuEnde = false;
     letztesModell = "";
     var steuerung = new AbortController();
     var start = Date.now();
@@ -278,7 +305,7 @@
         headers: { "Content-Type": "application/json" },
         signal: steuerung.signal,
         cache: "no-store",
-        body: JSON.stringify(mitLernWiderspruch({ model: "smejj-1", stream: true, messages: [{ role: "user", content: frage }] }))
+        body: JSON.stringify(mitLernWiderspruch({ model: "smejj-1", stream: true, messages: verlaufBauen(verlauf, frage) }))
       });
       if (!res.ok || !res.body) throw new Error("kein Strom");
       var leser = res.body.getReader();
@@ -296,10 +323,11 @@
           antwort += teil;
           text.textContent = antwort;
           if (erstesStueck) antwortInBlick(text);
-        });
+        }, function () { regulaerZuEnde = true; });
       }
       clearTimeout(uhr); clearTimeout(stille); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
       if (!antwort.trim()) throw new Error("leere Antwort");
+      if (regulaerZuEnde) verlaufMerken(frage, antwort); // nur mit [DONE]: Abriss mitten im Strom zaehlt nicht
       await formatiereAntwort(text);
       try { nachtHinweis(text); } catch (fehler) { /* Hinweis ist Zugabe */ }
       var karte = document.getElementById("gastAntwort");

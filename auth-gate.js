@@ -15,9 +15,9 @@
 // gilt der Besucher als abgemeldet und landet auf der Anmeldeseite. Lieber
 // einmal zu viel anmelden als die Anmelde-Pflicht still verlieren.
 
-import { API_ORIGIN, STORAGE_KEYS } from "./config.js?v=2026112302";
-import { initOfflineBanner } from "./offline-banner.js?v=2026112302";
-import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026112302";
+import { API_ORIGIN, STORAGE_KEYS } from "./config.js?v=2026112303";
+import { initOfflineBanner } from "./offline-banner.js?v=2026112303";
+import { authMeSpeicher } from "./shared/auth-me-speicher.js?v=2026112303";
 
 // App-Shell-weiter Offline-Hinweis (Audit 2026-08-09). Hier eingehaengt, weil das
 // Gate ohnehin auf allen App- und Landeseiten laeuft (profile-dock.js,
@@ -380,7 +380,7 @@ export async function verifyStoredSession(win, { fetchFn = globalThis.fetch, api
 
   // 18.11.2026: erst still retten (sitzung-retten.js), dann fragen.
   try {
-    if (await (await import("./sitzung-retten.js?v=2026112302")).retteSitzung(win, { fetchFn, apiOrigin, token })) { speicher.verwerfen?.(); return "gerettet"; }
+    if (await (await import("./sitzung-retten.js?v=2026112303")).retteSitzung(win, { fetchFn, apiOrigin, token })) { speicher.verwerfen?.(); return "gerettet"; }
   } catch {}
 
   // Alle angemeldeten Sitzungen (Google, Passkey, E-Mail) sind dauerhaft: niemals eigenmaechtig abmelden

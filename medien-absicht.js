@@ -38,8 +38,8 @@ const WISSENSFRAGE = /\b(unterschied|was ist|wie geht|bedeutung|erkläre|erklare
 // (ein gescheiterter fetch wird nicht gemerkt; offline kommt so "Failed to fetch" statt der rohen
 // Importmeldung, und app.js zeigt seinen Offline-Satz).
 let klient = null;
-const holeKlient = () => klient ||= fetch("/assets/ai/chatClient.js?v=2026112302")
-  .then(() => import("/assets/ai/chatClient.js?v=2026112302"))
+const holeKlient = () => klient ||= fetch("/assets/ai/chatClient.js?v=2026112303")
+  .then(() => import("/assets/ai/chatClient.js?v=2026112303"))
   .catch((fehler) => { klient = null; throw fehler; });
 if (globalThis.document) holeKlient().catch(() => {});
 export async function chatOhneMedienauftrag(auftrag) {
