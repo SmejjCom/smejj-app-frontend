@@ -74,14 +74,27 @@ const GERAEUSCH_ETIKETTEN = new Set([
   "music", "music plays", "musik", "musik spielt", "screams", "scream", "schreie", "applause",
   "applaus", "laughter", "lachen", "gelächter", "noise", "geräusch", "geräusche", "silence",
   "stille", "thanks for watching", "thank you for watching", "vielen dank fürs zuschauen",
-  "danke fürs zuschauen", "sound", "beep", "piep", "inaudible", "unverständlich"
+  "danke fürs zuschauen", "sound", "beep", "piep", "inaudible", "unverständlich",
+  // C5 23.11.2026: gemessene Whisper-Erfindungen bei Stille/Rauschen/Musik (eigenes Ohr).
+  "música", "musica", "thank you", "thanks for listening", "please subscribe",
+  "like and subscribe", "vielen dank für ihre aufmerksamkeit"
 ]);
-const GERAEUSCH_ANFAENGE = ["untertitel im auftrag", "untertitelung", "untertitel der amara", "subtitles by"];
+const GERAEUSCH_ANFAENGE = [
+  "untertitel im auftrag", "untertitelung", "untertitel der amara", "untertitel von", "subtitles by",
+  "sous titres réalisés", "subtítulos realizados", "subtitulado por", "altyazı m k"
+];
+// C5: Stille ergab „www.feyyaz.tv“ – eine reine Web-Adresse mit www./http ist nie eine
+// gesprochene Frage („smejj.com“ allein bleibt erlaubt). Reine Riesenzahlen („7,000,000“)
+// sind Rausch-Erfindungen; kurze Zahlen („7“, „2026“, „3,5“) bleiben echte Antworten.
+const NUR_ADRESSE = /^(?:https?:\/\/|www\.)[\p{L}\p{N}-]+(?:\.[\p{L}\p{N}-]+)+\/?[.!]?$/iu;
+const NUR_RIESENZAHL = /^(?:\d{1,3}(?:[.,\s]\d{3}){2,}|\d{7,})[.!]?$/;
 
 export function istGeraeusch(text) {
   const normalized = normalizeSpeechText(text);
   if (!normalized) return true;
   if (GERAEUSCH_ETIKETTEN.has(normalized)) return true;
+  const roh = String(text || "").trim();
+  if (NUR_ADRESSE.test(roh) || NUR_RIESENZAHL.test(roh)) return true;
   return GERAEUSCH_ANFAENGE.some((anfang) => normalized.startsWith(anfang));
 }
 

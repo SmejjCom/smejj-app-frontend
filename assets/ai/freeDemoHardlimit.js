@@ -1,5 +1,5 @@
-import { AI_MODES } from "./providers.js?v=2026112301";
-import { evaluateAiCost } from "./costGuard.js?v=2026112301";
+import { AI_MODES } from "./providers.js?v=2026112302";
+import { evaluateAiCost } from "./costGuard.js?v=2026112302";
 
 export function evaluateFreeDemo({ hardLimitAllowed = false, remaining = 0 } = {}) {
   const allowed = hardLimitAllowed === true && Number.isFinite(Number(remaining)) && Number(remaining) > 0;

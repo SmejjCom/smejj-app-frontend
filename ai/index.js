@@ -1,9 +1,9 @@
-export { createAiRouter, AI_MODES } from "./router.js?v=2026112301";
-export { PROVIDERS, getProvider } from "./providers.js?v=2026112301";
-export { validateByokConfig } from "./byok.js?v=2026112301";
-export { detectLocalBrowserAi } from "./localBrowser.js?v=2026112301";
-export { disabledMode } from "./disabledMode.js?v=2026112301";
-export { evaluateFreeDemo } from "./freeDemoHardlimit.js?v=2026112301";
-export { evaluateAiCost } from "./costGuard.js?v=2026112301";
-export { buildPromptContext } from "./promptContextBuilder.js?v=2026112301";
+export { createAiRouter, AI_MODES } from "./router.js?v=2026112302";
+export { PROVIDERS, getProvider } from "./providers.js?v=2026112302";
+export { validateByokConfig } from "./byok.js?v=2026112302";
+export { detectLocalBrowserAi } from "./localBrowser.js?v=2026112302";
+export { disabledMode } from "./disabledMode.js?v=2026112302";
+export { evaluateFreeDemo } from "./freeDemoHardlimit.js?v=2026112302";
+export { evaluateAiCost } from "./costGuard.js?v=2026112302";
+export { buildPromptContext } from "./promptContextBuilder.js?v=2026112302";
 

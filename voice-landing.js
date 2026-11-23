@@ -8,39 +8,39 @@
 // das Modul initialisiert sich nur auf Seiten OHNE App-Composer (#startSend).
 // Inhalt oeffentlich, Interaktion angemeldet: fuer Abgemeldete steht auf den
 // Sprachseiten nur ein Anmelde-Knopf (Begruendung im Modulkopf dort).
-import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026112301";
-import { darfSprechen, buildLoginCta } from "./voice-landing-signin.js?v=2026112301";
-import { CLIENT_ROUTES } from "./config.js?v=2026112301";
+import { bindAufnahmeUnterbrechung } from "./aufnahme-lebenszyklus.js?v=2026112302";
+import { darfSprechen, buildLoginCta } from "./voice-landing-signin.js?v=2026112302";
+import { CLIENT_ROUTES } from "./config.js?v=2026112302";
 // Stufe 1c: satzweises Vorlesen — erster Satz startet, waehrend der Rest streamt.
-import { createSpeechQueue } from "./voice-speech-queue.js?v=2026112301";
-import { leseErkennung } from "./voice-erkennung.js?v=2026112301"; // volle Ergebnisliste (WebKit-Doppelungen, 27.09.2026)
+import { createSpeechQueue } from "./voice-speech-queue.js?v=2026112302";
+import { leseErkennung } from "./voice-erkennung.js?v=2026112302"; // volle Ergebnisliste (WebKit-Doppelungen, 27.09.2026)
 // Sende-Button (Pfeil nach oben, wie ChatGPT) fuer getippte Fragen in der Leiste.
-import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=2026112301";
+import { bindTypedSend, SEND_ICON_SVG } from "./voice-typed-send.js?v=2026112302";
 // Stufe 1e (Blitz-Paket): geteilter Echo-Filter, Mikrofonpegel-Unterbrechung
 // und Verbindungs-Vorwaermer — schnellere Antworten, Unterbrechen wie ChatGPT.
-import { normalizeSpeechText, isLikelyEcho, enoughForBarge } from "./voice-echo-filter.js?v=2026112301";
-import { createSpeechInterrupt } from "./voice-vad.js?v=2026112301";
-import { warmUpAgentConnection } from "./voice-warmup.js?v=2026112301";
+import { normalizeSpeechText, isLikelyEcho, enoughForBarge, istGeraeusch } from "./voice-echo-filter.js?v=2026112302";
+import { createSpeechInterrupt } from "./voice-vad.js?v=2026112302";
+import { warmUpAgentConnection } from "./voice-warmup.js?v=2026112302";
 // Stufe 2a: Interim-Waechter — Sprech-Ende ~1 s frueher erkennen und senden.
 // OHNE ?v= — dieselbe Kennung wie in public/composer-tools.js. Zwei Kennungen
 // waeren zwei Modulinstanzen mit getrenntem Zustand (check:module-queries).
 // Der Cache wird ueber die Version in sw.js gebrochen, nicht ueber die Import-URL.
-import { createSilenceWatchdog } from "./voice-endpoint.js?v=2026112301";
+import { createSilenceWatchdog } from "./voice-endpoint.js?v=2026112302";
 // Stufe 3: Rueckfrage statt Blindantwort + Doppel-Sende-Schutz (geteilte Naht
 // mit der Startseite; Muster aus dem ChatGPT-Live-Vergleich 2026-08-03).
-import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js?v=2026112301";
+import { sollNachfragen, clarifyLine, createDoppelschutz } from "./voice-clarify.js?v=2026112302";
 // Stufe 4 (Groq-Ohr): praezises Server-Transkript mit Web-Speech-Fallback.
-import { createServerEar, createEarSend } from "./voice-ear.js?v=2026112301";
-import { buildReserveChatRequest } from "./chat-history-context.js?v=2026112301";
-import { appendVoiceTurn, buildAgentPayload } from "./voice-conversation.js?v=2026112301";
+import { createServerEar, createEarSend } from "./voice-ear.js?v=2026112302";
+import { buildReserveChatRequest } from "./chat-history-context.js?v=2026112302";
+import { appendVoiceTurn, buildAgentPayload } from "./voice-conversation.js?v=2026112302";
 // Stufe 3a: Denk-Laut, damit zwischen Frage und Antwort nicht nur Stille steht.
-import { createThinkingCue } from "./voice-thinking-cue.js?v=2026112301";
+import { createThinkingCue } from "./voice-thinking-cue.js?v=2026112302";
 // Stufe B: Premium-Stimme (Server-TTS ueber WebAudio -> Echounterdrueckung greift,
 // Unterbrechen wie ChatGPT). Fail-safe: ohne Worker bleibt die Browser-Stimme.
-import { createPremiumVoice } from "./voice-premium-tts.js?v=2026112301";
+import { createPremiumVoice } from "./voice-premium-tts.js?v=2026112302";
 // Stufe A2: automatischer Neuversuch, wenn eine Salad-Replika ausfaellt.
-import { fetchStreamWithRetry } from "./ai/fetch-retry.js?v=2026112301";
-import { bridgeAuthHeaders } from "./ai/chat-stream.js?v=2026112301";
+import { fetchStreamWithRetry } from "./ai/fetch-retry.js?v=2026112302";
+import { bridgeAuthHeaders } from "./ai/chat-stream.js?v=2026112302";
 
 // Re-Export fuer bestehende Nutzer der bisherigen Modul-API.
 export { normalizeSpeechText, isLikelyEcho, enoughForBarge };
@@ -502,11 +502,19 @@ function listen() {
   }
 }
 
+// C5 (23.11.2026): Ohne Abbruch lief der alte Antwortstrom nach dem Unterbrechen 7,5–8,1 s weiter
+// und rechnete im Hausmodell mit. Neuer Zug oder Schliessen beendet ihn; neu=false heisst nur beenden.
+export function antwortAbbruchErneuern(ziel, neu = true) {
+  try { ziel.antwortAbbruch?.abort(); } catch { /* schon beendet */ }
+  ziel.antwortAbbruch = neu ? new AbortController() : null;
+  return ziel.antwortAbbruch;
+}
+
 async function sendTask(task, { getippt = false } = {}) {
   if (!state.active) return;
   // Stufe 3: erkannte Duplikate nicht doppelt senden (onresult UND onend
   // koennen dieselbe Aeusserung liefern). Getippte Fragen sind Absicht.
-  if (!getippt && doppelschutz.blockiert(task)) {
+  if (!getippt && (istGeraeusch(task) || doppelschutz.blockiert(task))) { // Stufe 3: Erfundenes aus Stille nie senden
     stopBargeListener();
     const doppelt = state.recognition;
     state.recognition = null;
@@ -529,6 +537,7 @@ async function sendTask(task, { getippt = false } = {}) {
   }
   const requestId = state.requestId + 1;
   state.requestId = requestId;
+  const antwortAbbruch = antwortAbbruchErneuern(state); // C5: alten Strom beim neuen Zug beenden
   setStatus("thinking", T.thinking);
   setTranscript(task);
   // Stufe 1c: satzweises Vorlesen — die Ausgabe beginnt mit dem ersten fertigen
@@ -605,7 +614,8 @@ async function sendTask(task, { getippt = false } = {}) {
     ], {
       method: "POST",
       headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() },
-      body: JSON.stringify(nutzlast)
+      body: JSON.stringify(nutzlast),
+      signal: antwortAbbruch.signal
     });
     if (response.ok && response.body) {
       reply = await readAgentReply(response, (partial) => {
@@ -647,6 +657,7 @@ async function sendTask(task, { getippt = false } = {}) {
 
 function closeOverlay() {
   serverEar.cancel();
+  antwortAbbruchErneuern(state, false);
   state.active = false;
   state.fallback = false;
   state.failStreak = 0;
