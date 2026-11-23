@@ -7,7 +7,7 @@
 //
 // WICHTIG: derselbe chat-store-Spezifizierer wie in search.js und
 // chat-history-view.js — ein abweichender Pfad erzeugt eine ZWEITE Modulinstanz.
-import { listChats } from "/assets/chat-store.js?v=2026112001";
+import { listChats } from "/assets/chat-store.js?v=2026112301";
 import {
   anzeigeTitel,
   anzeigeVorschau,
@@ -15,7 +15,7 @@ import {
   zeitText,
   trefferAusschnitt,
   mitHervorhebung
-} from "/assets/chat-history-text.js?v=2026112001";
+} from "/assets/chat-history-text.js?v=2026112301";
 
 // Chats zuerst: wer sucht, sucht fast immer eine alte Unterhaltung.
 const GRUPPEN_REIHENFOLGE = ["Chats", "Projekte", "Projekt-Dateien", "Dateien", "Aufgaben", "Arbeitsbereiche", "Einstellungen", "Werkzeuge", "Memory"];
@@ -148,7 +148,7 @@ async function zeigeTreffer(frage, lauf) {
   if (lauf !== suchlauf) return;
   beginneAnzeige();
   if (!treffer.length) {
-    els.log.append(hinweis(`Keine Treffer fuer "${frage}" in deinen Chats und Dateien.`), netzGruppe(frage));
+    els.log.append(hinweis(`Keine Treffer für "${frage}" in deinen Chats und Dateien.`), netzGruppe(frage));
     setzeAktiv(0);
     return;
   }

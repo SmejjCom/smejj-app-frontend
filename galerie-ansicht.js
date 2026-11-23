@@ -12,7 +12,7 @@
 // Es liegen immer nur drei Folien im DOM (vorige, aktuelle, naechste) — schnell auch bei vielen Medien.
 // Woerterbuch nachgeladen (wie galerie.js): der reine Teil bleibt ohne Browser testbar.
 let t = (text) => text;
-if (typeof document !== "undefined") import("./i18n/ui.js?v=2026112001").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
+if (typeof document !== "undefined") import("./i18n/ui.js?v=2026112301").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
 const STIL_ID = "galerie-ansicht-stil";
 const SCHWELLE_WEG = 0.3;
 const SCHWELLE_TEMPO = 0.45;
@@ -274,7 +274,7 @@ export function oeffneGalerieAnsicht(eintraege, start = 0, optionen = {}) {
   async function nachladen(folie) {
     if (!folie.querySelector("[data-smejj-adresse]")) return;
     try {
-      const { rehydriereMedien } = await import("./chat-medien.js?v=2026112001");
+      const { rehydriereMedien } = await import("./chat-medien.js?v=2026112301");
       await rehydriereMedien(folie);
       setzeStartbilder(folie);
     } catch { /* ohne Netz bleibt die Folie dunkel; nichts bricht */ }
@@ -467,7 +467,7 @@ export function oeffneGalerieAnsicht(eintraege, start = 0, optionen = {}) {
     const el = aktuell();
     if (!el) return;
     if (el.getAttribute("data-smejj-adresse")) {
-      try { (await import("./chat-medien-ansicht.js?v=2026112001")).herunterladen(el); return; } catch { /* Rueckfall unten */ }
+      try { (await import("./chat-medien-ansicht.js?v=2026112301")).herunterladen(el); return; } catch { /* Rueckfall unten */ }
     }
     await gibDateiWeiter(el, false);
   });
@@ -475,7 +475,7 @@ export function oeffneGalerieAnsicht(eintraege, start = 0, optionen = {}) {
     const el = aktuell();
     if (!el) return;
     if (el.getAttribute("data-smejj-adresse")) {
-      try { (await import("./chat-medien-ansicht.js?v=2026112001")).oeffneTeilenBlatt(el); return; } catch { /* Rueckfall unten */ }
+      try { (await import("./chat-medien-ansicht.js?v=2026112301")).oeffneTeilenBlatt(el); return; } catch { /* Rueckfall unten */ }
     }
     await gibDateiWeiter(el, true);
   });

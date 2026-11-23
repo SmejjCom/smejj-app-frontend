@@ -5,8 +5,8 @@
 // Die echte Aktionszeile der Nachricht wird für die Dauer der Ansicht HIER eingehängt (alle Knöpfe
 // funktionieren unverändert) und beim Schließen an ihren Platz zurückgelegt.
 // Schließen: ✕, nach unten wischen, Escape oder Senden einer neuen Nachricht.
-import { t } from "./i18n/ui.js?v=2026112001";
-import { API_ORIGIN } from "./config.js?v=2026112001";
+import { t } from "./i18n/ui.js?v=2026112301";
+import { API_ORIGIN } from "./config.js?v=2026112301";
 
 export const HOCHKANT_AB = 1.6; // Höhe/Breite: 9:16 = 1,78; 3:4 = 1,33 bleibt normal
 const HANDY = "(max-width: 700px)";

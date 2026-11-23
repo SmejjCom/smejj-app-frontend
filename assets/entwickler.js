@@ -4,15 +4,25 @@
 // Seite keine Panel-Ueberschrift mitbringt.
 //
 // Auth-Guard: Nur angemeldete Nutzer sehen den API-Bereich.
-import { API_ORIGIN } from "./config.js?v=2026112001";
-import { initApiCenter } from "./api-center-surface.js?v=2026112001";
+import { API_ORIGIN, STORAGE_KEYS } from "./config.js?v=2026112301";
+import { initApiCenter } from "./api-center-surface.js?v=2026112301";
 
 const AUTH_TOKEN_KEY = "smejj.auth.accessToken.v1";
 const mount = document.querySelector("[data-dev-mount]");
 
 // Pruefe Anmeldestatus: localStorage oder Session-Token
 const hatToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
-if (!hatToken) {
+// Stufe 2 / R4 (23.11.2026): Gaeste ohne Sitzungsspur fragen nichts ab (kein 401) – wie auth-gate.js seit v1148.
+function hatSitzungsspur() {
+  try {
+    return (JSON.parse(localStorage.getItem(STORAGE_KEYS.session) || "{}") || {}).authenticated === true;
+  } catch {
+    return false;
+  }
+}
+if (!hatToken && !hatSitzungsspur()) {
+  zeigeAnmeldung();
+} else if (!hatToken) {
   // Versuche Session-Token zu holen (Cookie-basierte Sitzung)
   fetch(`${API_ORIGIN}/api/auth/session-token`, { credentials: "include" })
     .then(r => r.ok ? r.json() : {})
