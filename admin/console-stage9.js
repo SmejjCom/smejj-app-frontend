@@ -36,6 +36,8 @@
         zeichne(ctx);
         window.scrollTo(0, 0);
       });
+      // N2 R3: Enter/Leertaste wie ein Klick (Tastaturbedienung).
+      el.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); el.click(); } });
     });
     document.querySelectorAll("[data-apZurueck]").forEach(function (el) {
       el.addEventListener("click", function () {

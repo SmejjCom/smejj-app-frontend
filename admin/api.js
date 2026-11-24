@@ -419,6 +419,10 @@
     const code = data && data.error ? String(data.error) : "";
     const bekannt = {
       admin_authentication_required: "Nicht angemeldet. Bitte auf smejj.com anmelden.",
+      // N2 R1 (23.11.2026): diese Codes kommen von der allgemeinen Anmeldesperre des Control-Servers,
+      // nicht von der Admin-Pruefung – bisher stand der rohe Code auf dem Bildschirm.
+      authentication_required: "Deine Anmeldung ist abgelaufen. Bitte die Seite neu laden und erneut anmelden.",
+      session_revoked_or_expired: "Deine Anmeldung ist abgelaufen oder wurde beendet. Bitte die Seite neu laden und erneut anmelden.",
       admin_role_required: "Dieses Konto hat keine Verwaltungsrolle.",
       admin_account_not_active: "Das Konto ist gesperrt.",
       admin_permission_denied: "Diese Rolle darf das nicht.",
@@ -459,6 +463,8 @@
       audit_list_failed: "Das Audit-Log liess sich nicht lesen."
     };
     if (bekannt[code]) return bekannt[code];
+    if (status === 401) return "Deine Anmeldung ist abgelaufen. Bitte die Seite neu laden und erneut anmelden.";
+    if (status >= 500) return "Der Control-Server hatte einen Fehler (HTTP " + status + "). Bitte gleich nochmal versuchen." + (code ? " [" + code + "]" : "");
     if (code) return code;
     return "Unerwarteter Fehler (HTTP " + status + ").";
   }

@@ -368,6 +368,8 @@
       zeile.addEventListener("click", function () {
         geheZu("akte/" + zeile.getAttribute("data-akte"));
       });
+      // N2 R3: Enter/Leertaste wie ein Klick (Tastaturbedienung).
+      zeile.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); zeile.click(); } });
     });
     const feld = document.getElementById("sucheFeld");
     const knopf = document.getElementById("sucheKnopf");

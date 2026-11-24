@@ -89,7 +89,8 @@
       const verbrauch = n.verbrauch
         ? e(String(n.verbrauch.anfragen)) + " Anfragen" + (n.verbrauch.kostenUsd !== null && n.verbrauch.kostenUsd !== undefined ? ' <span class="s">· ' + e(n.verbrauch.kostenUsd.toFixed(3)) + " $</span>" : "")
         : '<span class="s">—</span>';
-      return '<tr class="klickbar" data-akte="' + e(n.userId) + '">'
+      // N2 R3 (23.11.2026): tabindex – die Zeile ist per Tab erreichbar (Enter/Leertaste in console.js).
+      return '<tr class="klickbar" tabindex="0" data-akte="' + e(n.userId) + '">'
         + '<td><b>' + e(n.name || "Unbenannt") + '</b><br><span class="mono">' + e(n.email) + "</span>"
         + (n.status !== "active" ? " " + pille(n.status === "blocked" ? "gesperrt" : n.status, "bad") : "") + "</td>"
         + "<td>" + methodePille(n.method) + "</td>"

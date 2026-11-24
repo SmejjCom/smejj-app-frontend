@@ -5,14 +5,14 @@
 // Was hier bewusst NICHT liegt: welche Endpunkte in welcher Reihenfolge gefragt
 // werden (fetch-retry.js) und welchen Rumpf jeder von ihnen bekommt
 // (chat-history-context.js). Dieses Modul empfaengt nur.
-import { fetchStreamWithRetry } from "./fetch-retry.js?v=2026112303";
-import { t } from "../i18n/ui.js?v=2026112303";
-import { empfehlungText } from "../sprach-helfer.js?v=2026112303";
-import { API_ORIGIN } from "../config.js?v=2026112303";
-import { mitLiveDaten } from "./live-daten.js?v=2026112303";
-import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js?v=2026112303";
-import { zeigeNachtHinweis } from "./nacht-hinweis.js?v=2026112303"; // 14.11.2026: nachts antwortet smejj 1.0 statt 1.1
-import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js?v=2026112303";
+import { fetchStreamWithRetry } from "./fetch-retry.js?v=2026112401";
+import { t } from "../i18n/ui.js?v=2026112401";
+import { empfehlungText } from "../sprach-helfer.js?v=2026112401";
+import { API_ORIGIN } from "../config.js?v=2026112401";
+import { mitLiveDaten } from "./live-daten.js?v=2026112401";
+import { starteStilleWache, stilleText, STILLE_GRENZE_MS } from "./strom-stillstand.js?v=2026112401";
+import { zeigeNachtHinweis } from "./nacht-hinweis.js?v=2026112401"; // 14.11.2026: nachts antwortet smejj 1.0 statt 1.1
+import { frageLokal, istRueckfrage, lokalErlaubt, merkeEntscheidung, taugtFuerLokal } from "./lokalesModell.js?v=2026112401";
 
 // Gleicher Schluessel wie in auth/auth-page.js, account-sessions.js und
 // auth-gate.js — dort bewusst dupliziert, damit kein Modul den anderen nur
@@ -97,8 +97,8 @@ export async function erneuereZugangsToken() {
   return "";
 }
 
-import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js?v=2026112303";
-export { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, QUELLEN_LEER_HINWEIS } from "./chat-schritte-anzeige.js?v=2026112303";
+import { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, findeSchrittListe, schrittListe, schrittOhneFund } from "./chat-schritte-anzeige.js?v=2026112401";
+export { zeigeSchritt, falteSchritte, starteWartesignal, quellenHinweis, verwirfArbeitsnotiz, QUELLEN_LEER_HINWEIS } from "./chat-schritte-anzeige.js?v=2026112401";
 // ---------------------------------------------------------------------------
 // Denk-Zeile (Betreiber 2026-08-23, Vorbild Antigravity "Thought for 1s ›"):
 // Denk-Text des Modells (delta.reasoning_content) gehoert NICHT in die
@@ -206,7 +206,7 @@ export function letzteNutzerfrage(body) {
  */
 // Wörter unter den Symbolen der Antwort-Leiste auf dem Handy (UI/UX Nr. 4) —
 // eigenes Modul, dynamisch, stumm bei Fehlern; die Leiste selbst bleibt unberührt.
-if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js?v=2026112303").catch(() => {});
+if (typeof document !== "undefined") import("/assets/chat-actions-woerter.js?v=2026112401").catch(() => {});
 
 const AKTION_STIL_ID = "antwort-aktion-stil";
 // Der Stil kommt aus dem Modul, nicht aus chat-actions.css: die CSS liegt im
@@ -691,7 +691,7 @@ export async function streamChatAnswer(url, body, output, optionen = {}) {
     // Bild abgelegt — dasselbe Bild nachholen statt neu malen. Nicht nach einem bewussten Stopp.
     // Das Modul kommt erst beim Abriss (Startgewicht: es gehoert nicht in jeden Seitenaufruf).
     if (!lauf.gestoppt && /Die Bild-Übertragung ist abgerissen/.test(output?.textContent || "")) {
-      import("./bild-nachholen.js?v=2026112303").then(({ holeBildNach }) => holeBildNach({
+      import("./bild-nachholen.js?v=2026112401").then(({ holeBildNach }) => holeBildNach({
         output, renderMarkdown: optionen.renderMarkdown, hinweis: t("Bild wird erneut geladen …"),
         anfrage: () => fetchStreamWithRetry(zieleAnpassen(url, (rumpf) => ({ ...rumpf, bildErneut: true })), {
           method: "POST", headers: { "Content-Type": "application/json", ...bridgeAuthHeaders() }, body: JSON.stringify({ ...body, bildErneut: true })
@@ -705,7 +705,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   // Fragen-Erfassung (Trainingsplan smejj 1.1, Stufe 1): loest nur aus, wartet
   // nie, bricht nie — der Server entscheidet aus Ledger und Schalter. Dynamisch
   // nachgeladen, damit ein fehlendes Modul den Chat nicht beruehrt.
-  import("/assets/ai/frage-erfassung.js?v=2026112303").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
+  import("/assets/ai/frage-erfassung.js?v=2026112401").then((m) => m.erfasseFrageFuersTraining(body)).catch(() => {});
   // Stufe 0 zuerst: was das Geraet des Nutzers selbst beantworten kann, kostet
   // niemanden etwas und ist meist schneller (gemessen 1,7-3,5 s gegen 2,9-6,6 s).
   if (await versucheLokaleAntwort(body, output, renderMarkdown)) return;
@@ -838,6 +838,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   meldeStromstand();
   const decoder = new TextDecoder();
   let buffer = "";
+  let fertigGemeldet = false; // Stufe 2 / R3: nur ein vollständig beendeter Strom endet mit [DONE]
   // Ausgang der Werkzeugarbeit — gebraucht wird er erst ganz am Ende, fuer die
   // gefaltete Titelzeile und fuer die Frage, ob die Antwort auf nichts steht.
   let frageGezeigt = false;
@@ -872,6 +873,7 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
         .filter((line) => line.startsWith("data: "))
         .map((line) => line.slice(6))
         .join("\n");
+      if (text === "[DONE]") fertigGemeldet = true;
       if (!text || text === "[DONE]") continue;
       // Ab dem ersten echten Ereignis uebernimmt der Server die Anzeige —
       // egal ob es ein Arbeitsschritt oder schon Antworttext ist.
@@ -960,6 +962,9 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   const rest = buffer.split("\n").filter((zeile) => zeile.startsWith("data: ")).map((zeile) => zeile.slice(6)).join("\n").trim();
   let abgerissen = false;
   if (rest && rest !== "[DONE]") { try { output.textContent += JSON.parse(rest).choices?.[0]?.delta?.content || ""; } catch { abgerissen = true; } }
+  // Stufe 2 / R3 (erst nach dem Server-Rollout N3): Strom ohne [DONE] und ohne eigenen Stopp = abgerissen.
+  if (rest === "[DONE]") fertigGemeldet = true;
+  if (!fertigGemeldet && !lauf.gestoppt) abgerissen = true;
   // Der Lauf endete ohne Schlussantwort (alle Runden gingen in Werkzeuge).
   // Dann ist die letzte Arbeitsnotiz besser als eine leere Blase.
   if (!output.textContent.trim() && letzteNotiz.trim()) output.textContent = letzteNotiz;
@@ -981,6 +986,6 @@ async function streamChatAnswerInnen(url, body, output, { renderMarkdown, offlin
   falteSchritte(output, schritteOhneFundZahl);
   if (abgerissen) haengeAktionsKnopf(output, t("Erneut versuchen"), letzteNutzerfrage(body));
   // Geraet 17.11.2026: die Bruecke liefert das Bild als Medien-Adresse, chat-markdown.js parkt sie (1×1-SVG) — sofort holen, nicht erst beim Speichern.
-  if (output.querySelector?.("img[data-smejj-adresse]")) import("../chat-medien.js?v=2026112303").then((m) => m.rehydriereMedien(output)).catch(() => {});
+  if (output.querySelector?.("img[data-smejj-adresse]")) import("../chat-medien.js?v=2026112401").then((m) => m.rehydriereMedien(output)).catch(() => {});
   try { zeigeNachtHinweis(output, body?.model, output.dataset.stromModell); } catch { /* Hinweis ist Zugabe */ }
 }

@@ -6,9 +6,17 @@
 (function () {
   "use strict";
   const A = window.adminApi;
+  const D = window.adminDialog;   // N2 R2b: Rueckfrage vor dem Ausschalten (wie die anderen Schalter)
   const S = window.adminViewsAiRadar;
 
   let letzterTag = "";
+
+  // N2 R2a (23.11.2026): Ein Fehler bei einer AKTION ersetzt nicht mehr die ganze Seite (ctx.fehler) –
+  // sonst waren alle Felder und Knoepfe weg, Eingaben verloren und kein erneuter Versuch moeglich.
+  // Er steht jetzt als rote Meldung oben; die Seite bleibt, wie sie war.
+  function aktionsFehler(ctx, text) {
+    ctx.meldung(text + " Eingaben bleiben stehen – einfach erneut versuchen.", true);
+  }
 
   async function laden(ctx, tag) {
     const pfad = tag ? "/api/admin/radar?tag=" + encodeURIComponent(tag) : "/api/admin/radar";
@@ -32,6 +40,11 @@
   async function aktion(ctx, el) {
     const was = el.getAttribute("data-radar");
     if (was === "jetzt") return jetzt(ctx, el);
+    if (was === "aus" && !(await D.bestaetige({
+      titel: "Radar ausschalten?",
+      absaetze: ["Dann laufen keine Recherchen mehr, bis jemand wieder einschaltet. Einschalten geht jederzeit mit einem Klick."],
+      okText: "Ausschalten"
+    }))) return;
     if (was === "ein" || was === "aus") return schalten(ctx, was === "ein");
     if (was === "thema") return themaSpeichern(ctx);
     if (was === "suchen") return suchen(ctx);
@@ -45,7 +58,7 @@
     const antwort = await A.sende("/api/admin/radar/jetzt", {});
     el.disabled = false;
     el.textContent = alt;
-    if (!antwort.ok) return ctx.fehler(antwort.fehler);
+    if (!antwort.ok) return aktionsFehler(ctx, antwort.fehler);
     const lauf = antwort.data.lauf || {};
     ctx.meldung(lauf.ok
       ? lauf.anfragen + " Anfrage(n), " + (lauf.gespeicherteIds || []).length + " Erkenntnis(se) gespeichert"
@@ -55,7 +68,7 @@
 
   async function schalten(ctx, ein) {
     const antwort = await A.sende("/api/admin/radar/schalter", { ein: ein, grund: ein ? "Radar eingeschaltet" : "Radar ausgeschaltet" });
-    if (!antwort.ok) return ctx.fehler(antwort.fehler);
+    if (!antwort.ok) return aktionsFehler(ctx, antwort.fehler);
     laden(ctx, letzterTag);
   }
 
@@ -64,13 +77,13 @@
     const titel = wert("radarThemaTitel");
     const anfrage = wert("radarThemaAnfrage");
     const stunden = Number(wert("radarThemaStunden")) || 24;
-    if (!id || !anfrage) return ctx.meldung("Kennung und Suchanfrage sind Pflicht.");
+    if (!id || !anfrage) return ctx.meldung("Kennung und Suchanfrage sind Pflicht.", true);   // N2 R2c: Fehler, nicht „Erledigt“
     const stand = await A.hole("/api/admin/radar");
     const vorhandene = stand.ok && stand.data.stand ? (stand.data.stand.themen || []) : [];
     const eigene = vorhandene.filter(function (t) { return t.eigen === true; });
     eigene.push({ id: id, titel: titel || id, bereich: "konkurrenz", anfragen: [anfrage], intervallStunden: stunden, prioritaet: 2, eigen: true });
     const antwort = await A.sende("/api/admin/radar/konfig", { themen: eigene, grund: "Thema " + id + " ergaenzt" });
-    if (!antwort.ok) return ctx.fehler(antwort.fehler);
+    if (!antwort.ok) return aktionsFehler(ctx, antwort.fehler);
     laden(ctx, letzterTag);
   }
 
@@ -87,9 +100,9 @@
   async function zuruecknehmen(ctx, id) {
     const feld = document.querySelector("[data-grund='" + id + "']");
     const grund = feld ? String(feld.value || "").trim() : "";
-    if (grund.length < 5) return ctx.meldung("Bitte einen Grund angeben (mindestens 5 Zeichen).");
+    if (grund.length < 5) return ctx.meldung("Bitte einen Grund angeben (mindestens 5 Zeichen).", true);   // N2 R2c
     const antwort = await A.sende("/api/admin/radar/zuruecknehmen", { eintragId: id, grund: grund });
-    if (!antwort.ok) return ctx.fehler(antwort.fehler);
+    if (!antwort.ok) return aktionsFehler(ctx, antwort.fehler);
     ctx.meldung("Zurueckgenommen.");
     laden(ctx, letzterTag);
   }
