@@ -1,4 +1,4 @@
-import "./mobil-tastatur.js?v=2026112401";
+import "./mobil-tastatur.js?v=2026112303";
 // smejj.com — PWA-Schnellstarts (Manifest-Shortcuts, 25.08.).
 //
 // Android/Chrome zeigt beim App-Icon Langdruck die Manifest-Shortcuts. Damit
@@ -117,7 +117,7 @@ if (willNeu || willSprechen) {
 
   if (willNeu) {
     // Dieselbe Modul-Kennung wie ueberall — sonst zweite Instanz (Waechter).
-    import("/assets/chat-store.js?v=2026112401")
+    import("/assets/chat-store.js?v=2026112303")
       .then((m) => m.newChat?.())
       .catch(() => { /* nicht angemeldet oder Modul fehlt: Start bleibt Start */ });
   }
@@ -162,7 +162,7 @@ if ("serviceWorker" in navigator) {
     button.addEventListener("click", async () => { if (!await aktualisieren()) button.textContent = "Aufnahme/Antwort beenden oder Entwurf sichern"; });
     box.append(button); document.body.append(box);
     // v1152 (Pixel 7 Pro 20.11.): Leiste unten über dem Eingabefeld mit X – Modul erst bei Bedarf (Startgewicht).
-    import("./update-hinweis.js?v=2026112401").then((m) => m.verbessereUpdateHinweis(box)).catch(() => {});
+    import("./update-hinweis.js?v=2026112303").then((m) => m.verbessereUpdateHinweis(box)).catch(() => {});
   });
   const pruefeUpdate = () => { if (!document.hidden) navigator.serviceWorker.getRegistration().then(r => r?.update()).catch(() => {}); };
   document.addEventListener("visibilitychange", pruefeUpdate);

@@ -281,8 +281,7 @@
 
   // ---------- Bildschirm 1: Liste ----------
   function zeile(a) {
-    // N2 R3 (23.11.2026): tabindex – per Tab erreichbar (Enter/Leertaste in console-stage9.js).
-    return '<tr class="ap-row" tabindex="0" data-ap="' + e(a.id) + '">'
+    return '<tr class="ap-row" data-ap="' + e(a.id) + '">'
       // Betreiber 2026-09-03: Nummer in derselben Zeile wie der Name, der leuchtende
       // viereckige Punkt direkt UNTER der Nummer; die Zustand-Spalte traegt nur das Wort.
       + '<td class="ap-nr-zelle"><span class="ap-nr-stapel"><span class="ap-nr-zahl">' + e(a.nummer || "—") + "</span>" + punkt(zustand(a).farbe) + "</span></td>"
