@@ -8,9 +8,9 @@
 // wachsen darf. Die Navigation laeuft ueber history + popstate — genau den
 // Mechanismus, den app.js bereits fuer Deep-Links verwendet (kein Reload).
 
-import { STORAGE_KEYS } from "./config.js?v=2026112401";
-import { t } from "./i18n/ui.js?v=2026112401";
-import { focusMenuEdge, handleMenuKeyboard } from "./profile-menue-tasten.js?v=2026112401";
+import { STORAGE_KEYS } from "./config.js?v=2026112402";
+import { t } from "./i18n/ui.js?v=2026112402";
+import { focusMenuEdge, handleMenuKeyboard } from "./profile-menue-tasten.js?v=2026112402";
 
 // Oeffnet/schliesst das Menue und verdrahtet die Aktionen.
 // Input: keiner (arbeitet auf #profileDockButton/#profileDockMenu). Output: void.
@@ -20,6 +20,7 @@ export function initProfileDockMenu() {
   if (!button || !menu || menu.dataset.menuReady) return;
   menu.dataset.menuReady = "true";
   fuegeGeraeteEin(menu);
+  markiereSpracheZeile(menu);
   applyLabels(menu);
   // Das Menue MUSS aus der Sidebar heraus: .sidebar hat overflow:hidden und
   // wuerde es abschneiden (live gemessen: 208px Menue in 199px Sidebar). Ein
@@ -42,7 +43,7 @@ export function initProfileDockMenu() {
     const item = event.target.closest("[data-dock-action]");
     if (!item) return;
     setOpen(button, menu, false);
-    runAction(item.dataset.dockAction, item.dataset.dockReiter);
+    runAction(item.dataset.dockAction, item.dataset.dockReiter, item.dataset.dockFeld);
   });
   menu.addEventListener("keydown", (event) => {
     handleMenuKeyboard(event, menu, button, () => setOpen(button, menu, false));
@@ -70,6 +71,42 @@ export function fuegeGeraeteEin(menu) {
   zeile.textContent = "Meine Geräte";
   konto.after(zeile);
   return true;
+}
+
+// v1157 (Gerätetest 24.11.2026, Fehler 4): „Sprache“ öffnete die Einstellungen auf dem zuletzt
+// benutzten Reiter. Die Zeile (index.html, Start-Lock, bleibt unverändert) bekommt zur Laufzeit
+// Reiter „general“ und Feld „settingsLanguage“; „Einstellungen“ bleibt beim letzten Reiter.
+export function markiereSpracheZeile(menu) {
+  const wert = menu?.querySelector?.("#dockWertSprache");
+  const zeile = wert?.closest?.('[data-dock-action="settings"]');
+  if (!zeile) return false;
+  zeile.dataset.dockReiter = "general";
+  zeile.dataset.dockFeld = "settingsLanguage";
+  return true;
+}
+
+// Nach dem Sprung: wartet (kurz) bis die Einstellungsseite steht, waehlt den Reiter ueber seinen
+// vorhandenen Knopf (derselbe Weg wie von Hand, settings-surface.js activate) und setzt den Fokus
+// aufs Feld. Gibt nach `wartenMs` auf. Output: Promise<boolean>.
+export function zeigeEinstellungsReiter(reiter, feldId, doc = document, win = window, wartenMs = 2500) {
+  const ende = Date.now() + wartenMs;
+  return new Promise((fertig) => {
+    const versuch = () => {
+      const ansicht = doc.getElementById("settings");
+      const knopf = ansicht?.classList.contains("is-active") ? ansicht.querySelector(`[data-settings-tab="${reiter}"]`) : null;
+      if (knopf) {
+        knopf.click();
+        const feld = feldId ? doc.getElementById(feldId) : null;
+        try { feld?.scrollIntoView?.({ block: "center" }); } catch { /* alte Browser */ }
+        try { feld?.focus?.({ preventScroll: true }); } catch { /* still */ }
+        fertig(true);
+        return;
+      }
+      if (Date.now() >= ende) { fertig(false); return; }
+      win.setTimeout(versuch, 50);
+    };
+    versuch();
+  });
 }
 
 // Zeichnet den Kopf (Name/E-Mail) neu. Input: displayName, email. Output: void.
@@ -164,7 +201,7 @@ function placeAboveButton(button, menu) {
 }
 
 // Fuehrt eine Menue-Aktion aus. Input: action-Name. Output: void.
-function runAction(action, reiter) {
+function runAction(action, reiter, feld) {
   // Geraetetest 21.09.2026: "Mein Plan" landete im Reiter "Profil" — am Handy
   // muss man die Reiterleiste dann erst bis ans Ende schieben.
   //
@@ -182,7 +219,11 @@ function runAction(action, reiter) {
     } catch { /* Storage gesperrt: dann eben der Standard-Reiter */ }
     return goTo("/profile");
   }
-  if (action === "settings") return goTo("/settings");
+  if (action === "settings") {
+    goTo("/settings");
+    if (reiter) void zeigeEinstellungsReiter(reiter, feld);
+    return;
+  }
   if (action === "hilfe") { location.href = "/hilfe.html"; return; }
   if (action === "logout") return logout();
 }
@@ -256,7 +297,7 @@ export function schliesseSpurAmHandy(dok = document) {
 // kein Sitzungsdatum, und "Lokale Daten loeschen" bleibt der Weg dafuer.
 async function logout() {
   try {
-    const module = await import("./account-sessions.js?v=2026112401");
+    const module = await import("./account-sessions.js?v=2026112402");
     await module.logoutCurrentSession();
   } catch {
     /* fail-safe: auch ohne Server-Antwort lokal abmelden */

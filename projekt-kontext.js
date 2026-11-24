@@ -10,8 +10,8 @@
 // dieser Chat — leerer Projekt-Chat zeigt Karten + Chatliste (projekt-start.js),
 // der Kopf hat ⋯ (Umbenennen, Farbe, Anweisungen, Dateien, Sicherung, Loeschen).
 
-import { activeChatId, getChat, getProjekt, neuesGespraechImBereich, newChat, renameChat } from "/assets/chat-store.js?v=2026112401";
-import { ordnerSvg, oeffneFenster } from "./projekte-fenster.js?v=2026112401";
+import { activeChatId, getChat, getProjekt, neuesGespraechImBereich, newChat, renameChat } from "/assets/chat-store.js?v=2026112402";
+import { ordnerSvg, oeffneFenster } from "./projekte-fenster.js?v=2026112402";
 
 const NEU_KEY = "smejj.bereichNeu.v1";
 let platzhalterAlt = null;
@@ -36,7 +36,8 @@ html body #projektKopf button.pk-rund{width:42px!important;height:42px!important
 body.projekt-chat #start .start-chips,body.projekt-chat #start .home-hero,body.projekt-chat #start .erste-schritte{display:none!important}
 @media (max-width:760px){
   #projektKopf{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top) + 6px) 12px 8px;z-index:95;background:var(--app-bg,#0f1012)}
-  body.projekt-chat #appMenuButton,body.projekt-chat #neuerChatStart{visibility:hidden}
+  body.projekt-chat:not(.left-panel-open) #appMenuButton,body.projekt-chat #neuerChatStart{visibility:hidden}
+  body.projekt-chat.left-panel-open #projektKopf{visibility:hidden}
   html.mobil-chat-viewport body #projektKopf{top:var(--chat-sichtbar-oben,0px)!important}
   html body #projektKopf button.pk-menue{display:grid!important}
   html body #projektKopf button.pk-rund{width:38px!important;height:38px!important}
@@ -76,10 +77,10 @@ const ZURUECK = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
 const MENUE = '<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
 const STIFT = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>';
 
-const startModul = () => import("./projekt-start.js?v=2026112401");
+const startModul = () => import("./projekt-start.js?v=2026112402");
 
 async function zurProjektseite(id) {
-  try { await (await import("./arbeitsbereiche.js?v=2026112401")).oeffneProjekt(id); } catch { /* bleibt im Chat */ }
+  try { await (await import("./arbeitsbereiche.js?v=2026112402")).oeffneProjekt(id); } catch { /* bleibt im Chat */ }
 }
 
 function alleProjekte() {
@@ -208,7 +209,7 @@ export async function aktualisiere() {
   menueKnopf.classList.add("pk-menue");
   const rechts = document.createElement("div");
   rechts.className = "pk-rechts";
-  rechts.append(knopf(STIFT, `Neuer Chat in ${projekt.name}`, () => { neuesGespraechImBereich(projekt.id); newChat(); setTimeout(neuZeichnen, 150); }));
+  rechts.append(knopf(STIFT, `Neuer Chat in ${projekt.name}`, () => { neuesGespraechImBereich(projekt.id); newChat(); stiftFokus(); setTimeout(neuZeichnen, 150); }));
   // Zurueck: aus einem laufenden Chat zur Projektseite (= leerer Projekt-Chat), von dort zu allen Projekten.
   kopf.replaceChildren(
     menueKnopf,
@@ -217,6 +218,26 @@ export async function aktualisiere() {
     rechts
   );
   try { rechts.append((await startModul()).kopfMenue(projekt, neuZeichnen)); } catch { /* ohne Menue bleibt der Kopf */ }
+}
+
+// v1157 (Gerätetest 24.11.2026, Fehler 2c): Auf der leeren Projektseite ist man schon in einem neuen
+// Projekt-Chat – der Stift blieb ohne sichtbare Wirkung. Wie „Neuer Chat“ (spur-start.js) setzt er jetzt
+// den Cursor ins leere Eingabefeld.
+function stiftFokus() {
+  const feld = document.getElementById("startMessage");
+  if (!feld) return;
+  feld.value = "";
+  feld.dispatchEvent(new Event("input", { bubbles: true }));
+  feld.focus({ preventScroll: true });
+}
+
+// v1157 (Fehler 2a): Das X der Projekte-Übersicht („Schließen und zur Startseite“) führte zurück ins
+// Projekt, weil die Vormerkung stehen blieb. Es beendet den Projekt-Modus jetzt wie der normale „Neuer Chat“.
+// Das „←“ der Übersicht bleibt „einen Schritt zurück“ (ins Projekt).
+export function verlaesstProjekt(ziel, aktiv) {
+  if (!ziel?.closest) return false;
+  if (ziel.closest("#arbeitsbereiche .view-chrome-close")) return true;
+  return Boolean(ziel.closest("#ansichtSchliessen")) && aktiv === "arbeitsbereiche";
 }
 
 let bereit = false;
@@ -229,6 +250,12 @@ export function initProjektKontext() {
     const ziel = e.target.closest?.("#neuerChatStart, .nav-start .nav-button");
     if (ziel && (ziel.id === "neuerChatStart" || ziel.querySelector(".nav-kuerzel"))) {
       try { sessionStorage.removeItem(NEU_KEY); } catch { /* still */ }
+    }
+    // Erfassungsphase = vor goToStart (view-chrome.js/ansicht-schliessen.js): erst die Vormerkung weg,
+    // dann ein normaler neuer Chat (newChat raeumt dabei auch die Projekt-Anweisung aus dem Sitzungsspeicher).
+    if (verlaesstProjekt(e.target, document.querySelector(".view.is-active")?.id || "")) {
+      try { sessionStorage.removeItem(NEU_KEY); } catch { /* still */ }
+      newChat();
     }
     spaeter();
   }, true);

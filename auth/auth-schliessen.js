@@ -21,7 +21,7 @@ export function rueckWeg(referrer, origin, verlaufLaenge) {
 
 async function beschriften(knopf) {
   try {
-    const { t, loadUiLanguage, savedUiLanguage } = await import("../i18n/ui.js?v=2026112401");
+    const { t, loadUiLanguage, savedUiLanguage } = await import("../i18n/ui.js?v=2026112402");
     const setze = () => { const text = t("Schließen"); knopf.setAttribute("aria-label", text); knopf.title = text; };
     setze();
     await loadUiLanguage(savedUiLanguage());

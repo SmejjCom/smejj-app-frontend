@@ -14,7 +14,7 @@
 // hoerbar an (vorhandene Vorlese-Stimme) und ein Abzeichen bleibt sichtbar,
 // solange die Vorschau laeuft.
 
-import { t } from "./i18n/ui.js?v=2026112401";
+import { t } from "./i18n/ui.js?v=2026112402";
 
 // Geraetebefund 17.11.2026 (Samsung A37, App): "Bildschirm teilen" gibt es auf Handys nicht (kein getDisplayMedia) —
 // dort gar nicht anbieten; und der Kamera-Hinweis nannte eine Adressleiste, die es in der App nicht gibt.

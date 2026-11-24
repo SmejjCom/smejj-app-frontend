@@ -86,9 +86,17 @@ export function sorgeFuerGlas(doc = document) {
     // (.workspace::after aus mobil-ruhe.css) wird auf Unterseiten durchsichtig – genau wie chat-glas.css es für den Chat macht.
     + "\nhtml body:has(.view.is-active:not(#start):not(#code)) .workspace::after{background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}"
     // Logo schwebt als runder Glas-Knopf (wie das X).
+    // v1157 (Gerätetest 24.11.2026, Fehler 3+8): 10 % Weiß ohne Weichzeichner (der verlor ohne !important gegen
+    // „.glass-icon×4 {backdrop-filter:none!important}“ im Start-Bündel) ließ den Text durchscheinen. Jetzt deckend
+    // wie das X aus ansicht-schliessen.js, hell und dunkel; Startseite/Code bleiben unberührt.
     + "\nhtml body:has(.view.is-active:not(#start):not(#code)) #appMenuButton{width:44px!important;height:44px!important;border-radius:50%!important;"
-    + "background:color-mix(in srgb,#f1f3f5 10%,transparent)!important;border:1px solid color-mix(in srgb,#f1f3f5 24%,transparent)!important;"
-    + "box-shadow:inset 0 1px 0 color-mix(in srgb,#f1f3f5 25%,transparent),0 8px 24px #0005!important;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transform:translate(12px,10px)}"
+    + "background:rgba(28,30,34,.82)!important;border:1px solid color-mix(in srgb,#f1f3f5 24%,transparent)!important;"
+    + "box-shadow:inset 0 1px 0 color-mix(in srgb,#f1f3f5 25%,transparent),0 8px 24px #0005!important;-webkit-backdrop-filter:blur(20px)!important;backdrop-filter:blur(20px)!important;transform:translate(12px,10px)}"
+    + "\nhtml[data-mobile-theme=\"light\"] body:has(.view.is-active:not(#start):not(#code)) #appMenuButton{background:rgba(255,255,255,.86)!important;border-color:rgba(0,0,0,.12)!important}"
+    // Handy: das Logo endet bei 54 px (10 px + 44 px) und 56 px (12 px + 44 px). Die Kopfzeile („Arbeiten“,
+    // „Meine Sachen“) beginnt darunter, der Zurück-Pfeil daneben – statt 42 px (kompakt.js) bzw. 52 px (view-chrome.css).
+    + "\n@media (max-width:600px){html body .view.view.is-active.has-view-chrome:not(#start):not(#code){padding-top:62px!important}"
+    + "html body .view.view.is-active:not(#start):not(#code) > .view-chrome{left:calc(env(safe-area-inset-left,0px) + 64px)!important}}"
     // Geraete-/Pruefbefund 17.11.2026 (Rechner): der 44-px-Knopf lag ueber dem Reiter „Start“, „Browser bedienen“ und
     // „Kostenschutz an“ wurden abgeschnitten. Nur am breiten Bildschirm: Logo 30 px, Namen der Leiste 14,5 px.
     + "\n@media (min-width:601px){html body:has(.view.is-active:not(#start):not(#code)) #appMenuButton{width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;transform:translate(12px,4px)}"
