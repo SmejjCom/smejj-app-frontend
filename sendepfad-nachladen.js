@@ -1,19 +1,19 @@
 // smejj.com — Sendepfad vorladen.
 let sendepfadGeladen = null;
-const hole = () => sendepfadGeladen ||= fetch("/assets/ai/chat-stream.js?v=2026112303").then(() => Promise.all([
-  import("/assets/ai/chat-stream.js?v=2026112303"),
-  import("./autonomous-intent.js?v=2026112303"),
-  import("./browser-context.js?v=2026112303"),
-  import("./medien-absicht.js?v=2026112303"),
-  import("./maus-absicht.js?v=2026112303"),
-  import("./free-coding-fallback.js?v=2026112303")
+const hole = () => sendepfadGeladen ||= fetch("/assets/ai/chat-stream.js?v=2026112401").then(() => Promise.all([
+  import("/assets/ai/chat-stream.js?v=2026112401"),
+  import("./autonomous-intent.js?v=2026112401"),
+  import("./browser-context.js?v=2026112401"),
+  import("./medien-absicht.js?v=2026112401"),
+  import("./maus-absicht.js?v=2026112401"),
+  import("./free-coding-fallback.js?v=2026112401")
 ]).catch((fehler) => { fehler.importFehler = 1; throw fehler; })).then((teile) => Object.assign({}, ...teile))
   .catch((fehler) => { sendepfadGeladen = null; throw fehler; });
 export function holeSendepfad() {
   return hole().catch((fehler) => {
     const d = globalThis.document, f = d?.getElementById("startMessage"), u = d && [...d.querySelectorAll("#startLog .entry.user")].pop();
     if (f && !f.value.trim() && u) f.value = u.textContent.trim();
-    if (fehler?.importFehler) setTimeout(() => import("./i18n/ui.js?v=2026112303").then(({ t }) => {
+    if (fehler?.importFehler) setTimeout(() => import("./i18n/ui.js?v=2026112401").then(({ t }) => {
       const antwort = [...document.querySelectorAll("#startLog .entry.assistant")].pop();
       if (!antwort || antwort.querySelector("button")) return;
       const knopf = document.createElement("button");

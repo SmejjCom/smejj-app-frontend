@@ -63,7 +63,7 @@
     try {
       // Derselbe sichere Renderer wie im angemeldeten Chat. Erst nach Ende
       // des Streams auszeichnen: weitere Textstuecke wuerden Links loeschen.
-      var renderer = await import("./chat-markdown.js?v=2026112303");
+      var renderer = await import("./chat-markdown.js?v=2026112401");
       renderer.renderChatMarkdown(text);
     } catch (fehler) { /* bei Ladefehlern bleibt die vollstaendige Textantwort */ }
   }
@@ -226,6 +226,33 @@
     return true;
   }
 
+  // Stufe 2 / R2 (23.11.2026): Serverfehler (5xx) oder Verbindungsabbruch bei bestehender
+  // Verbindung sprangen kommentarlos zu „Konto erstellen“. Jetzt ein Satz in der Karte, die
+  // Frage kommt zurueck ins Feld, darunter die gewohnte Fusszeile. 4xx (Anmeldung noetig,
+  // Kontingent) und die eigene Zeitgrenze fuehren weiter zur Anmeldung.
+  var STOERUNG_TEXT = {
+    de: "Die Antwort hat gerade nicht geklappt. Deine Frage steht wieder im Feld – bitte sende sie noch einmal.",
+    en: "The answer didn't come through just now. Your question is back in the field – please send it again.",
+    tr: "Yanıt şu anda gelmedi. Sorun yeniden alanda – lütfen tekrar gönder."
+  };
+  function istStoerung(fehler) {
+    if (!fehler) return false;
+    if (typeof fehler.status === "number") return fehler.status >= 500;
+    return fehler.name !== "AbortError" && fehler.leer !== true;
+  }
+  function stoerungMelden(text, frage) {
+    if (!text) return false;
+    var sprache = String(document.documentElement.lang || "de").slice(0, 2).toLowerCase();
+    text.textContent = STOERUNG_TEXT[sprache] || STOERUNG_TEXT.en;
+    text.setAttribute("role", "alert");
+    var alterHinweis = document.getElementById("gastHinweis");
+    if (alterHinweis) alterHinweis.remove();
+    var feld = document.getElementById("probierFeld");
+    if (feld && !feld.value.trim()) { feld.value = frage; feld.dispatchEvent(new Event("input", { bubbles: true })); }
+    fuss(text.parentNode);
+    return true;
+  }
+
   // Pruefung 17.11.2026 (F3): Doppelklick auf Senden – der zweite Klick traf das
   // schon geleerte Feld und schickte den Gast zur Anmeldung, die Antwort ging
   // verloren. Solange eine Gast-Anfrage laeuft, ist die Form aria-busy und
@@ -307,7 +334,7 @@
         cache: "no-store",
         body: JSON.stringify(mitLernWiderspruch({ model: "smejj-1", stream: true, messages: verlaufBauen(verlauf, frage) }))
       });
-      if (!res.ok || !res.body) throw new Error("kein Strom");
+      if (!res.ok || !res.body) { var ohneStrom = new Error("kein Strom"); ohneStrom.status = res.ok ? 0 : Number(res.status) || 0; throw ohneStrom; }
       var leser = res.body.getReader();
       var decoder = new TextDecoder();
       var puffer = "";
@@ -326,7 +353,7 @@
         }, function () { regulaerZuEnde = true; });
       }
       clearTimeout(uhr); clearTimeout(stille); clearTimeout(hinweis); document.removeEventListener("visibilitychange", wache);
-      if (!antwort.trim()) throw new Error("leere Antwort");
+      if (!antwort.trim()) { var leer = new Error("leere Antwort"); leer.leer = true; throw leer; }
       if (regulaerZuEnde) verlaufMerken(frage, antwort); // nur mit [DONE]: Abriss mitten im Strom zaehlt nicht
       await formatiereAntwort(text);
       try { nachtHinweis(text); } catch (fehler) { /* Hinweis ist Zugabe */ }
@@ -348,8 +375,8 @@
         fuss(document.getElementById("gastAntwort"));
         return true;
       }
-      if (offlineMelden(text, frage)) return false;
-      // Zurueck auf den alten, bewaehrten Weg — mit der Frage im Gepaeck.
+      if (offlineMelden(text, frage) || (istStoerung(fehler) && stoerungMelden(text, frage))) return false;
+      // Sonst (4xx, Zeitgrenze) der alte Weg — mit der Frage im Gepaeck.
       location.href = "/auth/register/";
       return false;
     }

@@ -1,4 +1,4 @@
-import { t } from "./i18n/ui.js?v=2026112303";
+import { t } from "./i18n/ui.js?v=2026112401";
 
 // smejj.com — Maus-Plan uebersetzen und Ziele pruefen (reine Funktionen).
 //

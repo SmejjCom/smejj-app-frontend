@@ -29,6 +29,10 @@
   <meta name="twitter:description" content="smejj.com — Schreiben, recherchieren, Bilder und Videos erstellen, programmieren. In einem Fenster, kostenlos starten, deine Daten bleiben bei dir.">
   <meta name="twitter:image" content="https://smejj.com/og-image.png">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; worker-src 'self' blob:; font-src 'self'; connect-src 'self' https://api.smejj.com">
+  <!-- Rahmenschutz (Inhaber-Freigabe 24.11.2026): Pages kann keine Kopfzeilen setzen, frame-ancestors
+       wirkt in einer meta-CSP nicht. Darum synchron und als erstes Skript: in einem fremden Rahmen
+       bleibt die Seite unsichtbar und bricht, wenn erlaubt, aus dem Rahmen aus. -->
+  <script src="/assets/rahmen-schutz.js?v=r1"></script>
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="theme-color" content="#070b11">
   <!-- Als App installierbar — MIT durchsichtiger Statusleiste (Betreiber-Befund 18.09.2026).
@@ -60,13 +64,13 @@
   <script src="/assets/willkommen-sprache.js?v=6" defer></script>
   <!-- Die erste Frage OHNE Konto (21.09.2026). Laedt VOR dem Fokus-Skript,
        damit window.smejjGastFrage beim ersten Absenden schon steht. -->
-  <script src="/assets/gast-frage.js?v=42" defer></script>
-  <script src="/assets/willkommen-fokus.js?v=w5" defer></script>
+  <script src="/assets/gast-frage.js?v=43" defer></script>
+  <script src="/assets/willkommen-fokus.js?v=w6" defer></script>
   <!-- Vollbild-Heilung fuer die installierte App (2026-09-07): dieselbe Datei wie in
        index.html (gleiche Marke, eine Instanz). Als Web-App oeffnet "/" abgemeldet
        diese Seite; die Tastatur des Probier-Felds loest denselben WebKit-Fehler aus
        (Layout-Viewport bleibt klein, schwarzer Balken unten). -->
-  <script src="/assets/pwa-schnellstart.js?v=2026112303" type="module"></script>
+  <script src="/assets/pwa-schnellstart.js?v=2026112401" type="module"></script>
   <!-- Besucher-Puls (Autopilot Nr. 81): EINE Strichliste je Sitzung, ohne Cookie
        und ohne Kennung. Ohne diese Zahl ist "es kommt niemand" nicht von
        "niemand kann melden" zu unterscheiden. -->
@@ -75,8 +79,8 @@
        bekam keinen Service Worker und sah offline die Fehlerseite des Browsers.
        Registriert den schmalen Service Worker (~19 KB statt 2 MB) und zeigt
        das Offline-Band der App nach einer echten Netzprobe. -->
-  <script src="/assets/willkommen-offline.js?v=2026112303" type="module"></script>
-  <script type="module" src="/assets/willkommen-composer.js?v=2026112303"></script>
+  <script src="/assets/willkommen-offline.js?v=2026112401" type="module"></script>
+  <script type="module" src="/assets/willkommen-composer.js?v=2026112401"></script>
   <style>
     /* Apple 3.1.1: alles mit data-nur-web verschwindet in der iOS-Huelle
        (ios-preise-aus.js setzt das Attribut am <html>). */
@@ -194,6 +198,15 @@
     /* .held p (0,1,1) schlug die Klassenregel (0,1,0) und nahm der Zeile ihren Abstand —
        im Pixel-7-Emulator (2026-09-07) klebte der Satz am Probier-Feld. */
     #probierFeld::placeholder { color: var(--ink-dim); opacity: 1; }
+    /* Fokusrahmen NUR bei Tastaturbedienung (Inhaber-Freigabe 24.11.2026). willkommen-fokus.js setzt
+       html.tastatur-bedienung nach der Tab-Taste und nimmt sie bei Maus/Finger wieder weg – bei
+       Maus und Touch bleibt das Feld unveraendert. Zweifarbig (dunkel innen, Cyan aussen): >= 3:1
+       auf dunklem wie hellem Grund; transparente Kontur fuer Windows-Kontrastmodus. */
+    html.tastatur-bedienung #probierFeld:focus { outline: 2px solid #32f6ea; outline-offset: 2px; }
+    @supports selector(:has(*)) {
+      html.tastatur-bedienung #probierFeld:focus { outline: 2px solid transparent; }
+      html.tastatur-bedienung .probier:has(#probierFeld:focus) { box-shadow: inset 0 1px 0 var(--licht), 0 0 0 2px #070b11, 0 0 0 4px #32f6ea; }
+    }
     .probier-zeile, .held .probier-zeile { font-size: 14px; color: var(--ink-dim); margin-top: 12px; }
     .held { max-width: 860px; margin: 0 auto; padding: 72px 22px 40px; text-align: center; }
     .held .vertrauen {
@@ -234,7 +247,7 @@
     }
     footer a { text-decoration: none; }
   </style>
-  <link id="composerEingabeStil" rel="stylesheet" href="/assets/composer-eingabe.css?v=2026112303">
+  <link id="composerEingabeStil" rel="stylesheet" href="/assets/composer-eingabe.css?v=2026112401">
 </head>
 <body>
   <header class="leiste">

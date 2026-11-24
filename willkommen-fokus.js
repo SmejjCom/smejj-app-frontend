@@ -47,3 +47,19 @@
     plaene.forEach(function (p, i) { p.classList.toggle("fokus", i === FOKUS_PLAN[knopf.dataset.fokus]); });
   });
 })();
+
+// Fokusrahmen im Probierfeld nur bei Tastaturbedienung (Inhaber-Freigabe 24.11.2026).
+// :focus-visible schlaegt bei Textfeldern auch nach Maus-/Fingertipp an – darum eine
+// eigene Erkennung: Tab-Taste setzt html.tastatur-bedienung, Maus/Finger/Stift nimmt
+// sie wieder weg. Das Aussehen bei Maus und Touch bleibt damit unveraendert.
+(function () {
+  var KLASSE = "tastatur-bedienung";
+  var wurzel = document.documentElement;
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Tab") wurzel.classList.add(KLASSE);
+  }, true);
+  function zeiger() { wurzel.classList.remove(KLASSE); }
+  document.addEventListener("pointerdown", zeiger, true);
+  document.addEventListener("mousedown", zeiger, true);
+  document.addEventListener("touchstart", zeiger, { capture: true, passive: true });
+})();
