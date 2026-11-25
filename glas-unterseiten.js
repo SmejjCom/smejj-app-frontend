@@ -80,6 +80,14 @@ export function sorgeFuerGlas(doc = document) {
   const stil = doc.createElement("style");
   stil.id = STIL_ID;
   stil.textContent = regeln(SEITEN)
+    // v1158 (Inhaber 25.11.2026, Lesbarkeit hell): Unterseiten tragen auch im hellen Modus den dunklen Glas-Grund, mobil-ruhe.css
+    // faerbt dort aber mit der hellen Palette (dunkel auf dunkel). Auf Unterseiten gilt darum die dunkle Palette von
+    // mobil-ruhe.css (gleiche Werte) – wie die v1157-Galerie, fuer alle Unterseiten. Startseite und Code-Flaeche unveraendert.
+    // --premium-soft (Anbieter-Zeilen, 44 % Deckkraft = 4,0:1) auf --ruhe-neben; color-scheme dunkel wie im dunklen Modus
+    // (Browser-Vorgaben fuer Links/Felder); der Abo-Knopf auf Tuerkis behaelt
+    // seine dunkle Schrift (#06201c aus account-privacy.js), wie bisher im hellen Modus.
+    + "\nhtml[data-mobile-theme=\"light\"] body .view.view:not(#start):not(#code){--ruhe-grund:#151719;--ruhe-flaeche:#23262a;--ruhe-text:#f1f3f5;--ruhe-neben:#b8bec6;--ruhe-kante:#464c54;--premium-soft:var(--ruhe-neben);color-scheme:dark}"
+    + "\nhtml[data-mobile-theme=\"light\"] body .view.view:not(#start):not(#code) .plan-karte.ist-beliebt .plan-knopf{--ruhe-text:#06201c}"
     // Auf Unterseiten steht oben rechts ein X – der Stift „Neuer Chat“ lag sonst darüber (Befund 12.11.2026).
     + "\nbody:has(.view.is-active:not(#start):not(#code)) #neuerChatStart{display:none!important}"
     // Vollbild wie im Chat (Inhaber 12.11.2026: „oben schwarz … zwei Bereiche … volle Fläche“): der feste Kopfstreifen

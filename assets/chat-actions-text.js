@@ -8,7 +8,7 @@
 // Stufe 2 / R1 (23.11.2026): dieselbe Regel wie die Text-Fassung (ohneMedienAdressen, A4 22.11.) —
 // signierte e2-/X-Amz-Adressen landen auch in der HTML-Fassung nie in der Zwischenablage.
 // Relativer Pfad = dieselbe Modul-Adresse wie in chat-actions.js (/assets/…), also kein Zusatzabruf.
-import { ohneMedienAdressen } from "./chat-actions-menu.js?v=2026112402";
+import { ohneMedienAdressen } from "./chat-actions-menu.js?v=2026112501";
 
 /* Beim Einfuegen in Google Docs standen riesige Luecken zwischen den
    Absaetzen (Betreiber-Befund 2026-08-13): der Chat kopierte nur rohes

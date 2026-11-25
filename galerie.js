@@ -19,8 +19,8 @@
 // Speicher und Woerterbuch erst bei Bedarf laden: der reine Teil (sammleMedien)
 // bleibt so ohne Browser testbar, und der Start traegt kein Byte mehr.
 let t = (text) => text;
-const speicher = () => import("./chat-store.js?v=2026112402");
-const woerterbuch = import("./i18n/ui.js?v=2026112402").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
+const speicher = () => import("./chat-store.js?v=2026112501");
+const woerterbuch = import("./i18n/ui.js?v=2026112501").then((m) => { if (typeof m.t === "function") t = m.t; }, () => {});
 
 const TYPEN = {
   bilder: { titel: "Bilder", knopf: "Bild erstellen", absicht: "bild-neu", leer: "Noch keine Bilder. Erstelle dein erstes Bild.", einheit: ["Bild", "Bilder"] },
@@ -238,9 +238,6 @@ function stil() {
 .galerie-abgelaufen{display:flex;align-items:center;justify-content:center;aspect-ratio:1;padding:8px;border-radius:12px;background:rgba(127,127,127,.14);font-size:12px;text-align:center;opacity:.8;cursor:pointer}
 .galerie-unter{cursor:pointer;font-size:12px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .galerie-leer{flex:none!important;height:auto!important;align-self:start;margin-top:18px;padding:28px 16px;border:1px dashed rgba(127,127,127,.45);border-radius:14px;text-align:center;opacity:.85}
-/* v1157 (Geraetetest Pixel 7 Pro 24.11.2026): Unterseiten tragen auch im hellen Modus den dunklen Glas-Grund
-   (glas-unterseiten.js), mobil-ruhe.css faerbt h2/p dort aber dunkel -> Kopf und Bildzeilen hell halten. */
-html body[data-mobile-theme="light"] .workspace>.view.galerie-ansicht:not(#start) :is(.galerie-kopf,.galerie-kopf h2,.galerie-kopf p,.galerie-unter,.galerie-leer,.galerie-abgelaufen){color:#f1f3f5!important}
 @media (max-width:700px){.workspace>.view.galerie-ansicht{padding-top:64px!important}.galerie-raster{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.galerie-kachel img,.galerie-kachel video{border-radius:8px}}`;
   document.head.append(s);
 }
@@ -343,7 +340,7 @@ async function oeffneVollbild(raster, sichtbar, i) {
     adresse: MEDIEN_ADRESSE.test(e.quelle) ? e.quelle : ""
   }));
   try {
-    const { oeffneGalerieAnsicht } = await import("./galerie-ansicht.js?v=2026112402");
+    const { oeffneGalerieAnsicht } = await import("./galerie-ansicht.js?v=2026112501");
     const typ = raster.closest(".galerie-ansicht")?.id || "";
     oeffneGalerieAnsicht(eintraege, i, {
       zumChat: (chatId) => void oeffneGespraech(chatId),
@@ -410,7 +407,7 @@ async function oeffneGespraech(chatId) {
 async function ladeMedien(raster) {
   if (!raster.querySelector("[data-smejj-adresse]")) return;
   try {
-    const { rehydriereMedien } = await import("./chat-medien.js?v=2026112402");
+    const { rehydriereMedien } = await import("./chat-medien.js?v=2026112501");
     await rehydriereMedien(raster);
     for (const v of raster.querySelectorAll("video")) {
       const q = v.getAttribute("src") || "";
